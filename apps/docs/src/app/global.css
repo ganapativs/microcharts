@@ -15,8 +15,8 @@
   --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
 
   /* Fluid type ramp for the marketing surface. */
-  --text-fluid-hero: clamp(2.9rem, 1.5rem + 6.4vw, 6.75rem);
-  --text-fluid-h2: clamp(1.85rem, 1.2rem + 2.6vw, 3.15rem);
+  --text-fluid-hero: clamp(2.75rem, 1.6rem + 5.4vw, 5.75rem);
+  --text-fluid-h2: clamp(1.8rem, 1.2rem + 2.4vw, 3rem);
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -229,9 +229,9 @@ body {
 .display {
   font-family: var(--font-display);
   font-optical-sizing: auto;
-  font-weight: 620;
-  letter-spacing: -0.022em;
-  line-height: 0.96;
+  font-weight: 600;
+  letter-spacing: -0.021em;
+  line-height: 0.98;
 }
 
 /* Small mono metadata: section markers, sizes, coordinates. */
