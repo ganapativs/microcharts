@@ -5,6 +5,7 @@ import { HeroChart, InstrumentStrip } from "@/components/charts/showcase";
 import { FourContexts } from "@/components/charts/contexts";
 import { InstallCommand } from "@/components/ui/copy";
 import { Reveal } from "@/components/ui/reveal";
+import { HeroShader } from "@/components/hero-shader";
 import { STATS } from "@/lib/stats";
 
 // The real accessible name microcharts generates — quoted, never hand-written.
@@ -25,9 +26,9 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute inset-0 grid-paper opacity-60" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pt-24">
+      <section className="relative overflow-hidden border-b border-fd-border/60">
+        <HeroShader className="pointer-events-none absolute inset-0 -z-10 h-full w-full" />
+        <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-20 sm:px-6 sm:pb-24 sm:pt-28">
           <Reveal className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {["Zero dependencies", "~1 kB each", "RSC-safe", "Accessible by default"].map(
               (t, i) => (
@@ -40,9 +41,9 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={60}>
-            <h1 className="display mt-6 max-w-4xl text-fluid-hero text-[length:var(--text-fluid-hero)] text-fd-foreground">
+            <h1 className="display mt-6 max-w-4xl text-[length:var(--text-fluid-hero)] text-fd-foreground">
               Word-sized charts <br className="hidden sm:block" />
-              for React.
+              for <em>React</em>.
             </h1>
           </Reveal>
 
@@ -64,8 +65,12 @@ export default function HomePage() {
             <InstallCommand />
           </Reveal>
 
-          <Reveal delay={260} className="mt-14">
-            <div className="panel grid-paper flex items-center justify-center px-6 py-12">
+          <Reveal delay={260} className="mt-16">
+            <div className="panel relative flex items-center justify-center overflow-hidden px-6 py-14">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 grid-paper opacity-70"
+              />
               <HeroChart />
             </div>
           </Reveal>
