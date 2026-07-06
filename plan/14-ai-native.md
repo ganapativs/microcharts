@@ -51,7 +51,7 @@ Convention: ` ```microchart ` fenced block, JSON body. Also accept ` ```microcha
 - **llms.txt + markdown docs mirror** (already planned) now includes the spec schema + 20 canonical spec examples (one per chart, one per theme).
 - **System-prompt snippet** published in docs: ~15 lines teaching an assistant the fenced-block format — copy-paste into any chatbot. (The Mermaid lesson: LLMs learned it because examples saturated docs everywhere; we seed deliberately.)
 - Component APIs stay guessable: an LLM that guesses props from the chart name should usually be right (enforced informally in API review — "would GPT/Claude guess this?").
-- **MCP stance updated**: earlier research said skip; the spec changes the math — an MCP server is now ~50 lines (validate spec → return SVG string/data-URI). Ship as `examples/mcp-server` (not a published product) in v1.x; promote only if usage appears.
+- **MCP stance updated**: earlier research said skip; the spec changes the math — an MCP server is now ~50 lines (validate spec → return SVG string/data-URI). Ship as `examples/mcp-server` (not a published product) in v1.x; promote only if usage appears. **Tool surface, gating, and anti-patterns now specified in [20-discoverability.md](20-discoverability.md) §6** (not launch-critical; requires spec + string renderer; real tools only — validate/render/list/examples — never a docs-search wrapper; same catalog/schema JSON as the docs).
 
 ## 5. Agent-friendly repo (existing plan, restated as one surface)
 

@@ -33,14 +33,16 @@ Each lands per the Definition of Done in `09-testing-quality.md` (a11y, budgets,
 
 **3.1** **Fumadocs** docs site (fumadocs-ui 16.10+, verified active weekly releases 2026-07; React/Next-native — deliberate reversal of the earlier Starlight/Astro pick). Rationale: microcharts + live-prop editors ARE React, so a React-native docs runtime makes live "edit props → see chart" demos first-class with **no Astro-island bridge** (the bridge friction is what made Sandpack fragile), and the default theme is the most modern/delightful out of box in 2026 — matching the brand bar. Trade-off accepted: ships more client JS than Astro, but **docs-site JS ≠ library bundle**, so the zero-dep/size gates are untouched. Live examples = Shiki highlighting (inherited from `fumadocs-core`, no standalone pin) + real components rendered inline — NOT Sandpack (verified stale, in-browser bundler unneeded; StackBlitz SDK is the fallback if full editing is ever wanted). Landing = hero + one falsifiable number + live demo above the fold; full gallery one click away (verified: peer libs don't do gallery-first landings). The 4-contexts pattern on every chart page. **Storybook 10** (Vite builder, verified very active 2026-07) is the local component workshop — replaces Ladle (5.1.1, went sleepy: no release since 2025-11). Storybook earns the weight here: a11y addon maps to the axe DoD, theme/background/viewport toggles cover the light/dark × 5-preset matrix out of box (hundreds of chart variants to eyeball), and Chromatic/Argos visual-regression is first-class. The self-rendering `chart-gallery.html` retires into a Storybook story once the workshop exists.
 **3.2** Accessibility page + screen-reader demo recording. Theming guide. "Which microchart?" chooser. Short "design notes" page (why defaults look the way they do) — principles applied silently; external docs/marketing never lecture about Tufte or cite theory. The craft shows, it doesn't preach.
-**3.3** llms.txt + markdown docs mirror. GitHub topics. README with the falsifiable-number pitch + comparison table (size/deps/a11y receipts vs react-sparklines/Recharts).
+**3.3** LLM + registry surface per **[20-discoverability.md](20-discoverability.md) §5/§10**: `/llms.txt` (curated map) + `/llms-full.txt` + `.md` mirrors + `microcharts.catalog.json` (generated from the chart registry, validated against `package.json#exports` — never hand-maintained). GitHub topics. README with the falsifiable-number pitch + comparison table (size/deps/a11y receipts vs react-sparklines/Recharts) + links to docs/llms.txt/catalog. npm `description`/`keywords`/`homepage` per 20 §10.
 **3.4** `v0.x` releases to npm throughout (changesets), provenance on.
+**3.5** **Discoverability P0 gate ([20](20-discoverability.md) §15 P0, DoD §17)** — built WITH the docs app, not bolted on after: shared `docsMeta()` helper on every route (title/description/canonical/OG/Twitter — no page hand-rolls `<head>`), JSON-LD helpers (BreadcrumbList/TechArticle/SoftwareSourceCode), `sitemap.xml` + `robots.txt`, OG image template + per-launch-page cards from real chart output, and the §11 CI checks (metadata/canonical/JSON-LD/link/llms-endpoint tests). Primary content = static HTML (client-only examples never carry indexable content); Core Web Vitals targets per §11.
 
-✋ **Checkpoint 3**: 3–5 friendly devs try it cold; watch where they stumble; fix API paper cuts. API freeze for 1.0 surface.
+✋ **Checkpoint 3**: 3–5 friendly devs try it cold; watch where they stumble; fix API paper cuts. API freeze for 1.0 surface. **Plus the 20 §17 discoverability DoD**: llms surface returns 200s and is generated from canonical sources; npm/GitHub/docs metadata tell one story; share cards render with product visuals.
 
 ## Phase 4 — Launch (≈ 1 week, timed)
 
 **4.1** `1.0.0`. **4.2** Show HN (Tue–Thu 8–10am ET; title = the number; link = live no-signup demo; first comment = honest "why I built it" + limitations). **4.3** dev.to engineering writeup ("making sparklines screen-reader accessible" angle). **4.4** This Week in React / React Status submissions; awesome-list PRs; r/reactjs (verify self-promo rules first). **4.5** Product Hunt as credibility echo, low investment.
+**Pre-flight + launch week:** the [20-discoverability.md](20-discoverability.md) §14 P0 checklist must be green before any announcement (docs pages, llms surface, OG cards, Search Console + sitemap submitted); launch-week P1 items (editorial posts, social threads linking live pages, llms.txt directory submission) ride 4.2–4.5. Post-launch analytics cadence per 20 §13; competitor comparison pages only once measured data exists (20 §9 rules — this is also where the deferred bench competitor matrix lands).
 
 ## Phase 5 — Catalog buildout (v1.x → v2, ≈ 1 quarter, demand-ordered)
 
@@ -48,7 +50,7 @@ Each lands per the Definition of Done in `09-testing-quality.md` (a11y, budgets,
 **5.2** Categorical: MiniBar, DotPlot, PairedBars, Slope, MicroBox (+ Lollipop).
 **5.3** Part-to-whole: Progress, SegmentedBar, ProgressRing (MicroDonut later, `decorative` subpath).
 **5.4** Scalar: HeatCell, StatusDot, TrendArrow.
-**5.5** shadcn-style copy-paste CLI (`npx microcharts add sparkline`) + registry entry.
+**5.5** shadcn-style copy-paste CLI (`npx microcharts add sparkline`) + registry entry — scope + item rules per [20-discoverability.md](20-discoverability.md) §7 (CLI must do real work: `doctor`/`add`/`render`/`catalog`; registry = recipes/wrappers, never core internals).
 **5.6** Community: good-first-issues, preset gallery, locale contributions for summaries.
 
 ## Phase 5b — Universal rendering & AI-native (parallel track, v1.x; see `13`/`14`)
@@ -59,8 +61,8 @@ Each lands per the Definition of Done in `09-testing-quality.md` (a11y, budgets,
 **5b.4** Markdown integrations: streamdown recipe, react-markdown recipe, `rehype-microcharts` build-time plugin.
 **5b.5** Context presets: `newspaper`, `magazine`, `poster`, `eink`, `print` + print.css + physical-sizing docs.
 **5b.6** Font-fidelity export tiers: `system`/`embed` (zero-dep); optional `@microcharts/outline` (opentype.js 2.0, verified active) as separate package.
-**5b.7** Chart-as-URL edge-function template + README badge dogfood (our repo wears its own sparkline badges); server PNG recipe via sharp (verified active).
-**5b.8** `examples/mcp-server` (~50-line spec→SVG tool).
+**5b.7** Chart-as-URL edge-function template + README badge dogfood (our repo wears its own sparkline badges); server PNG recipe via sharp (verified active). Once `microcharts/string` exists, OG/share cards switch from template art to real chart output ([20](20-discoverability.md) §8).
+**5b.8** `examples/mcp-server` — tool surface + gating per [20-discoverability.md](20-discoverability.md) §6: ships only after the JSON spec + string renderer exist; real tools (`validate_microchart_spec`, `render_microchart_svg`, `list_microchart_types`, `get_microchart_examples`), same catalog/schema JSON as the docs, never a docs-search wrapper.
 
 Sequencing note: 5b.1–5b.3 can start immediately after Checkpoint 2 (they only need the v1 five + string renderer); a slice (toSVG/toPNG + spec + streamdown recipe) is worth pulling INTO the launch if timing allows — export + AI-streaming are launch-post differentiators.
 

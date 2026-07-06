@@ -24,7 +24,7 @@ Micro-scale editorial instruments: crisp geometry, strong rhythm, direct labelin
 4. Let delight emerge from motion, rhythm, texture, and direct manipulation without changing the data's meaning.
 5. Treat tiny size as a design material, not a limitation: composition, contrast, and summaries must survive the smallest supported context.
 
-**The plan is law.** Every decision below is researched, verified, and cross-referenced in `plan/` (21 docs). Read the specific doc before working in its area; `plan/README.md` is the index. `plan/12-research-audit.md` classifies every claim's provenance — new factual claims must be added there. `plan/chart-gallery.html` is the visual reference for all 96 chart types (self-rendering, zero-dep — open it).
+**The plan is law.** Every decision below is researched, verified, and cross-referenced in `plan/` (22 docs). Read the specific doc before working in its area; `plan/README.md` is the index. `plan/12-research-audit.md` classifies every claim's provenance — new factual claims must be added there. `plan/chart-gallery.html` is the visual reference for all 96 chart types (self-rendering, zero-dep — open it). **Docs-site / README / npm-metadata / share-card work is governed by `plan/20-discoverability.md`** (metadata contract, llms surface, OG cards — roadmap step 3.5 is its launch gate; built with the docs app, never bolted on after).
 
 ## Non-negotiables (violating any of these is a bug)
 

@@ -29,6 +29,7 @@
 | [17-frontier-charts.md](17-frontier-charts.md)           | **Frontier collection: 20 types mined from professions chart libraries never absorbed** — aviation tapes, WMO station glyphs, clinical AGP strips, waveforms, minimaps, token-confidence typography + absorbed refinements and rejection ledger |
 | [18-text-labeling.md](18-text-labeling.md)               | **Decision:** numeric-anchor labeling — how direct labels stay static-safe when text width is unmeasurable server-side                                                                                                                          |
 | [19-css-delivery.md](19-css-delivery.md)                 | **Decision:** one layered `styles.css`, imported once — CSS not per-chart-split; budget accounting (JS gzip vs shared CSS)                                                                                                                      |
+| [20-discoverability.md](20-discoverability.md)           | **Discoverability: SEO/metadata contract, LLM surface (`llms.txt`, `.md` mirrors, catalog+schema JSON), OG/share cards, npm/GitHub metadata, CLI + MCP stance.** §15 P0 = roadmap step 3.5 (launch gate); §14 P1 = launch week; P2 rides Phase 5b |
 | [chart-gallery.html](chart-gallery.html)                 | **Visual reference: all 96 chart types drawn in the design language** + context demos + 5-theme strip + live palette switcher & dark mode                                                                                                       |
 
 ## Headline decisions

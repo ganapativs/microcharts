@@ -197,3 +197,20 @@ Note: Codex's citations were spot-checked for plausibility but not independently
 | **Every chart ships a `/interactive` client entry** (not just Sparkline/SparkBar). Delta = `live` announce + pulse; Bullet = value/target readout on hover/focus; ActivityGrid = cell hover + 2-D keyboard nav + live readout. | ADOPTED — user call. Aligns roadmap 2.6 with CLAUDE.md DoD ("static + interactive entries", always was universal). All useful; none skipped. plan/10 §2.6 + CLAUDE.md catalog updated. |
 | **Bench competitor matrix (Recharts/Chart.js/MUI X/uPlot/@fnando) deferred to launch prep.** | ADOPTED — "not competing now" (user). Our reproducible core/SSR numbers ship in `bench/`; competitor harness is a launch-time isolated-workspace job (plan/07 §3 keeps it as the public-benchmark plan). |
 | Review-found robustness fixes: SparkGroup no longer injects chart props into non-series children; Delta guards non-finite input (`—`, not `NaN%`). | FIXED + tested. |
+
+## Doc 20 — Discoverability (Codex addition, integrated 2026-07-06)
+
+Codex authored [20-discoverability.md](20-discoverability.md) (SEO / LLM surface / OG / npm / CLI / MCP stance). Integration decision: **kept intact as the single home** (evidence table + acceptance tests are one coherent contract); execution woven into roadmap as new step **3.5** (P0 launch gate), Phase 4 pre-flight (§14), and Phase 5b pointers (§6/§7/§8) — plus STATUS rows and cross-refs from docs 11/13/14. Other docs point at 20; nothing copied.
+
+| Claim / item | Status |
+| --- | --- |
+| Google JS-SEO / canonical / structured-data / title-link / snippet / image-SEO guidance (§1 rows 1–6) | CORROBORATED — all primary-source Google Search Central URLs; cited per-claim in the doc; spot-checked plausible, not re-fetched here |
+| `llms.txt` proposal + Mintlify/Anthropic/Cursor adoption | CORROBORATED — llmstxt.org + Mintlify docs; consistent with our own doc-14 plan |
+| Core Web Vitals thresholds (LCP 2.5s / INP 200ms / CLS 0.1 @ p75) | CONFIRMED — stable web.dev definitions |
+| npm search uses description/keywords; `exports` boundary guidance | CONFIRMED — npm/Node primary docs, matches our package setup |
+| shadcn registry distribution & MCP server-card direction | CORROBORATED — evolving specs; re-verify before P2 implementation |
+| **Correction applied:** repository URL said `github.com/microcharts/microcharts` | FIXED → `ganapativs/microcharts` (actual repo; revisit if a GitHub org migration happens — README open item 2) |
+| **Correction applied:** §12 example summary "increased from 3 to 9, peaking at 9" — not our `describeSeries` wording | FIXED → real output ("Trending up 200%. Range 3 to 9. Last value 9.") + rule that docs quote generated summaries only |
+| Open dependency: doc assumes `microcharts.dev` domain | FLAGGED — domain is README open item 2; not registered yet. Decide before 3.5 work starts (canonical URLs bake the domain in) |
+| OG template sketch uses Inter font | NOTED — brand uses system stack; resolve at implementation, not a plan conflict |
+

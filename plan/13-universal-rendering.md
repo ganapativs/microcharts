@@ -46,7 +46,7 @@ Charts render few glyphs (a value label, min/max) — embedding/outlining stays 
 - `microcharts/string` renders themed SVG anywhere. **PNG on server**: documented recipe using **sharp** (verified active 2026-07-01) — `sharp(Buffer.from(svg)).png()`. Recipe/example first; optional `@microcharts/node` wrapper only if demand shows. resvg-js rejected (stale since 2024-03, violates maintained-only rule).
 - **Chart-as-URL endpoint (recipe + deployable template)**: an edge-function example (`/spark.svg?data=3,5,4,8&type=line&theme=newspaper&w=120&h=24`) → cache-friendly SVG/PNG. Enables:
   - **README badges** — sparkline badges for GitHub (shields.io-style). Dogfood loop: our repo's README shows our npm-downloads sparkline as one of our own badges. Marketing that demos the product.
-  - Email (PNG variant), Notion/docs embeds, OG images, CMS content.
+  - Email (PNG variant), Notion/docs embeds, OG images, CMS content. (OG/share-card system — sizes, budgets, template → real-chart upgrade path: [20-discoverability.md](20-discoverability.md) §8.)
 - Spec input for the endpoint = the same JSON chart spec as the AI layer (`14-ai-native.md`) — one spec, three consumers (React props, URL params, streaming blocks).
 
 ## 3. Print & physical contexts

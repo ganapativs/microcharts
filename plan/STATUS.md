@@ -2,7 +2,7 @@
 
 > **Single source of truth for what's done.** Mirrors the step IDs in [10-roadmap.md](10-roadmap.md).
 > Update this file in the **same commit** as the work it tracks. Roadmap = the plan (stable); STATUS = live progress.
-> Last updated: **2026-07-06** (Phase 2 complete — Checkpoint 2 passed) · Env: node 24.18, pnpm 11.10.0 (this repo) · Git: **pushed** to `github.com/ganapativs/microcharts` (**private**), branch `main`. CI green.
+> Last updated: **2026-07-06** (Phase 2 complete · plan/20 discoverability integrated → new step 3.5) · Env: node 24.18, pnpm 11.10.0 (this repo) · Git: **pushed** to `github.com/ganapativs/microcharts` (**private**), branch `main`. CI green.
 > CI matrix is Node **22/24** only (pnpm 11 needs Node ≥22 via `node:sqlite`; Node 20 EOL). Published artifact stays node-20-safe (`engines: >=20`).
 >
 > **Account-gated setup still pending (one-time, not code):** npmjs.org Trusted Publisher for `@microcharts/react` (release.yml uses OIDC, no token); `ARGOS_TOKEN` repo secret (visual.yml). Both needed before their workflows actually publish/upload.
@@ -24,7 +24,7 @@
 
 **Phases 0 + 1 + 2 COMPLETE.** Checkpoints 0, 1, 2 all passed. Phase 2 shipped the five charts each with static + `/interactive` entries, SparkGroup shared scale, and the bench harness — 167 tests, `pnpm check`/size/publint/attw/visual/RSC all green.
 
-**Immediate next: Phase 3 — docs & polish (plan/10 §3).** Start 3.1: Fumadocs site + Storybook 10 workshop. Argos visual baselines recorded (build #1 via `visual.yml` dispatch, 2026-07-06); future PRs diff against them.
+**Immediate next: Phase 3 — docs & polish (plan/10 §3).** Start 3.1: Fumadocs site + Storybook 10 workshop — **with the [plan/20](20-discoverability.md) metadata contract built in from the first route** (new step 3.5 is the launch gate; plan/20 landed 2026-07-06 via Codex, woven into roadmap §3/§4/§5b). Argos visual baselines recorded (build #1 via `visual.yml` dispatch, 2026-07-06); future PRs diff against them.
 
 **Phase-2 deferred (documented, not blocking Phase 3):** doc *pages* land with Fumadocs in Phase 3 (compiled 4-context examples seeded in `tests/visual/*.spec.ts` + `bench/demo.mjs`); bench **competitor matrix** deferred to launch prep (not competing pre-1.0).
 
@@ -70,14 +70,15 @@ Pending one-time account setup (unblocks release/visual workflows): npmjs Truste
 
 | Step | State | Note |
 |---|---|---|
-| 3.1 Docs site | [ ] | **Fumadocs** (React-native) + live-prop demos; **Storybook 10** workshop. (Reversed from Starlight/Ladle — see audit.) |
+| 3.1 Docs site | [ ] | **Fumadocs** (React-native) + live-prop demos; **Storybook 10** workshop. (Reversed from Starlight/Ladle — see audit.) Build WITH the plan/20 metadata contract from day one (see 3.5) — retrofitting `<head>`/JSON-LD is the anti-pattern plan/20 §16 forbids. |
 | 3.2 A11y page, theming guide, chooser, design notes | [ ] | |
-| 3.3 llms.txt, README pitch + comparison table | [◐] | README is a pre-release stub; pitch/comparison not written. |
+| 3.3 LLM + registry surface (plan/20 §5/§10) | [◐] | `/llms.txt` + `/llms-full.txt` + `.md` mirrors + `microcharts.catalog.json` (generated, validated against exports), GitHub topics, README pitch + comparison table, npm keywords/homepage. README is a pre-release stub; nothing else started. |
 | 3.4 v0.x releases via changesets | [ ] | Blocked on 0.3 changesets init. |
-| ✋ Checkpoint 3 | [ ] | Cold-dev testing; API freeze for 1.0. |
+| 3.5 Discoverability P0 gate (plan/20 §15/§17) | [ ] | `docsMeta()` on every route, JSON-LD helpers, sitemap/robots, OG template + launch-page cards, §11 CI checks (metadata/canonical/JSON-LD/links/llms endpoints). Added 2026-07-06 with plan/20. |
+| ✋ Checkpoint 3 | [ ] | Cold-dev testing; API freeze for 1.0. **+ plan/20 §17 discoverability DoD green.** |
 
 ## Phase 4 — Launch `[ ]`
-Not started. `1.0.0` → Show HN → dev.to → awesome-lists → PH.
+Not started. `1.0.0` → Show HN → dev.to → awesome-lists → PH. **Pre-flight = plan/20 §14 P0 checklist; launch-week P1 items ride 4.2–4.5; analytics cadence per §13. Deferred bench competitor matrix lands here (comparison pages need measured data — plan/20 §9).**
 
 ## Phase 5+ — Catalog / universal rendering / AI-native / decision / frontier / expressive `[ ]`
 Not started. Post-launch, demand-ordered. See [10-roadmap.md](10-roadmap.md) §5–5c, [13](13-universal-rendering.md)/[14](14-ai-native.md)/[15](15-expressive-charts.md)/[16](16-decision-micrographs.md)/[17](17-frontier-charts.md).

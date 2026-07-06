@@ -42,3 +42,4 @@ The category died of maintainer abandonment — counter-signal deliberately:
 
 - Track: npm downloads, bundle-size-over-time chart (dogfooded — rendered with microcharts), GitHub stars/issues, docs analytics (privacy-friendly).
 - Quarterly review drives catalog ordering + kill/keep decisions.
+- **Full metric set, tools (Search Console/Bing/npm/GitHub/docs analytics), review cadence, and action rules: [20-discoverability.md](20-discoverability.md) §13.** npm/GitHub/README discoverability requirements (keywords, homepage, topics, social preview): 20 §10.
