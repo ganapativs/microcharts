@@ -6,7 +6,19 @@ import { defineConfig } from "tsdown";
 // CSS is NOT bundled through tsdown — it ships as one static `styles.css`
 // (see plan/19-css-delivery.md) so static charts stay zero-JS.
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: [
+    "src/index.ts",
+    "src/charts/sparkline/index.tsx",
+    "src/charts/sparkline/client.tsx",
+    "src/charts/sparkbar/index.tsx",
+    "src/charts/sparkbar/client.tsx",
+    "src/charts/delta/index.tsx",
+    "src/charts/delta/client.tsx",
+    "src/charts/bullet/index.tsx",
+    "src/charts/bullet/client.tsx",
+    "src/charts/activity-grid/index.tsx",
+    "src/charts/activity-grid/client.tsx",
+  ],
   format: ["esm"],
   dts: true,
   clean: true,

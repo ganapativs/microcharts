@@ -32,9 +32,9 @@ export const EN: SummaryStrings = {
 
 export interface DescribeOptions {
   /** `Intl.NumberFormat` options, or a custom formatter. Locale-aware default. */
-  format?: Intl.NumberFormatOptions | ((n: number) => string);
-  locale?: string | string[];
-  strings?: SummaryStrings;
+  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  locale?: string | string[] | undefined;
+  strings?: SummaryStrings | undefined;
 }
 
 function makeFormatter(opts: DescribeOptions): (n: number) => string {

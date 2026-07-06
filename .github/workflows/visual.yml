@@ -1,8 +1,9 @@
 name: Visual
 
-# Manual for now: no charts exist yet, so there are no visual specs to run.
-# Phase 2 flips this to `pull_request` once tests/visual/*.spec.ts land.
+# Runs on PRs (Sparkline visual specs landed, Phase 2.1). Argos stores + diffs
+# baselines in the cloud (needs the ARGOS_TOKEN secret); manual dispatch kept.
 on:
+  pull_request:
   workflow_dispatch:
 
 permissions:

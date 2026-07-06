@@ -4,6 +4,8 @@
     "src/index.ts",
     "src/core/index.ts",
     "src/shared/index.ts",
+    "src/charts/*/index.tsx",
+    "src/charts/*/client.tsx",
     "src/test/**/*.ts",
     "playwright.config.ts"
   ],

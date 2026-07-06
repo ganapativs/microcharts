@@ -90,10 +90,49 @@
     font-size: var(--mc-label-size);
     fill: var(--mc-stroke);
   }
+  /* small-multiples wrapper — layout-neutral by default (plan/04 §5) */
+  :where(.mc-group) {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--mc-gap);
+    align-items: center;
+  }
   /* focusable interactive charts never lose a visible ring (plan/08 §4) */
   :where(.mc-root:focus-visible) {
     outline: 2px solid var(--mc-accent);
     outline-offset: 2px;
+  }
+
+  /* <Delta> — inline text metric; glyph + number share the valence color via
+     currentColor. Direction is double-encoded (triangle shape + color). */
+  :where(.mc-delta) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--mc-gap);
+    font: var(--mc-font);
+    font-variant-numeric: tabular-nums;
+    color: var(--mc-neutral);
+    vertical-align: middle;
+    line-height: 1;
+  }
+  :where(.mc-delta[data-mc-valence="pos"]) {
+    color: var(--mc-positive);
+  }
+  :where(.mc-delta[data-mc-valence="neg"]) {
+    color: var(--mc-negative);
+  }
+  :where(.mc-delta .mc-delta-glyph) {
+    fill: currentColor;
+    flex: none;
+  }
+  :where(.mc-delta .mc-delta-num) {
+    font-weight: 600;
+  }
+  /* interactive Delta wrapper: hosts the live region + pulse (see motion layer) */
+  :where(.mc-delta-live) {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
   }
 }
 
@@ -115,11 +154,64 @@
     fill: none;
     stroke: var(--mc-neutral);
   }
+  /* filled marks (min/max endpoints) — solid data ink, no stroke */
+  :where(.mc-root [data-mc-ink="point"]) {
+    fill: var(--mc-stroke);
+    stroke: none;
+  }
+  /* solid bars — neutral fill; valence variants encode sign (redundant with
+     position, never color-alone — plan/08 1.4.1) */
+  :where(.mc-root [data-mc-ink="bar"]) {
+    fill: var(--mc-stroke);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-ink="positive"]) {
+    fill: var(--mc-positive);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-ink="negative"]) {
+    fill: var(--mc-negative);
+    stroke: none;
+  }
+  /* normal-range band + area fill — real data, lowest z, never decoration */
+  :where(.mc-root [data-mc-ink="band"]) {
+    fill: var(--mc-band);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-ink="fill"]) {
+    fill: var(--mc-stroke);
+    fill-opacity: 0.12;
+    stroke: none;
+  }
+  /* intensity cell (ActivityGrid/HeatCell) — color IS the variable; opacity per
+     discrete level set inline. Paired with the numeric summary for a11y. */
+  :where(.mc-root [data-mc-ink="cell"]) {
+    fill: var(--mc-accent);
+    stroke: none;
+  }
 }
 
 @layer microcharts.motion {
+  @keyframes mc-pulse {
+    0% {
+      transform: scale(1);
+    }
+    30% {
+      transform: scale(1.16);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  /* one-shot emphasis when an interactive Delta's value changes */
+  :where(.mc-delta-live[data-pulse="1"] .mc-delta-num) {
+    display: inline-block;
+    animation: mc-pulse var(--mc-duration) var(--mc-easing);
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    :where(.mc-root *) {
+    :where(.mc-root *),
+    :where(.mc-delta-live .mc-delta-num) {
       animation: none !important;
       transition: none !important;
     }
@@ -148,8 +240,36 @@
       stroke: GrayText;
       fill: GrayText;
     }
+    :where(.mc-root [data-mc-ink="point"]),
+    :where(.mc-root [data-mc-ink="bar"]) {
+      fill: CanvasText;
+    }
+    /* win-loss / sign: keep up≠down distinguishable without color */
+    :where(.mc-root [data-mc-ink="positive"]) {
+      fill: CanvasText;
+    }
+    :where(.mc-root [data-mc-ink="negative"]) {
+      fill: GrayText;
+    }
+    /* band/fill are color-encoded surfaces — keep them, mapped to system ink */
+    :where(.mc-root [data-mc-ink="band"]) {
+      fill: GrayText;
+    }
+    :where(.mc-root [data-mc-ink="fill"]) {
+      fill: CanvasText;
+      fill-opacity: 0.2;
+    }
+    /* color-encoded cells keep their per-level opacity, mapped to system accent */
+    :where(.mc-root [data-mc-ink="cell"]) {
+      forced-color-adjust: none;
+      fill: Highlight;
+    }
     :where(.mc-root:focus-visible) {
       outline-color: Highlight;
+    }
+    /* Delta: glyph shape already distinguishes direction; unify to system ink */
+    :where(.mc-delta) {
+      color: CanvasText;
     }
   }
 }

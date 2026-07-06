@@ -6,6 +6,66 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/sparkline (static)",
+    "path": "dist/charts/sparkline/index.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/sparkline/interactive",
+    "path": "dist/charts/sparkline/client.js",
+    "limit": "4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/sparkbar (static)",
+    "path": "dist/charts/sparkbar/index.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/sparkbar/interactive",
+    "path": "dist/charts/sparkbar/client.js",
+    "limit": "4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/delta (static)",
+    "path": "dist/charts/delta/index.js",
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/delta/interactive",
+    "path": "dist/charts/delta/client.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/bullet (static)",
+    "path": "dist/charts/bullet/index.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/bullet/interactive",
+    "path": "dist/charts/bullet/client.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/activity-grid (static)",
+    "path": "dist/charts/activity-grid/index.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/activity-grid/interactive",
+    "path": "dist/charts/activity-grid/client.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
     "name": "styles.css (shared, whole library)",
     "path": "styles.css",
     "limit": "10 kB",

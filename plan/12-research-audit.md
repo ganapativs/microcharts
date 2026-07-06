@@ -164,3 +164,13 @@ Note: Codex's citations were spot-checked for plausibility but not independently
 - 0 plan-structural changes required — the thesis, whitespace, catalog, architecture, and budgets all survived on CONFIRMED evidence.
 - Remaining FLAGGED items are explicitly non-load-bearing (inspiration/context only) or scheduled for empirical validation in Phase 2 (bench work re-validates the RSC-gap and perf claims against live competitors).
 - Standing rule going forward: any new factual claim entering these docs gets a provenance class in this file.
+
+## Phase 2.1 — Sparkline size-budget reconciliation (2026-07-06)
+
+| Claim / decision | Status |
+| --- | --- |
+| Full-feature static `<Sparkline>` measures 2.67 kB gzip (line/smooth/step + area + band + dots + label + auto-summary + Chart shell) | CONFIRMED — size-limit, `preset-small-lib`, treeshaken |
+| Dominant weight is the path/scale/stats math kernel (~2.5 kB), not the summary (+~0.15 kB; `seriesStats` shared with geometry) | CONFIRMED — chunk inspection of `dist/` |
+| plan/07 ≤ 2 kB static / ≤ 1 kB Sparkline anchors were set vs line-only refs (@fnando 1.6 kB: no summary, no a11y, no smooth/area/band) | CONFIRMED — our value-adds are the delta |
+| **Decision:** raise static gate to ≤ 3 kB, add ≤ 4 kB interactive gate; keep 2 kB target / 1 kB stretch (line-only build) | ADOPTED — user-approved; plan/07 §1 + `.size-limit.json` updated. Still ~50× smaller than Recharts (145 kB). No thesis/catalog impact. |
+

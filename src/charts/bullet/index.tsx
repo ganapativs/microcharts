@@ -1,0 +1,115 @@
+// <Bullet> — value vs target vs qualitative bands (plan/05 §2, S4). Ships
+// instead of a gauge (Few). Static, hook-free, RSC-safe. Graduated neutral
+// bands sit lowest; the measure bar and target tick carry the reading. The tick
+// is a distinct shape+position from the bar, so target vs measure never relies
+// on color alone (plan/08 1.4.1).
+import type { CSSProperties, ReactNode } from "react";
+import { Chart } from "../../shared/Chart.js";
+import { bulletGeometry } from "./geometry.js";
+
+/** Factual S4 summary — value, target, and where the value lands. */
+function bulletSummary(value: string, target: string | null): string {
+  return target ? `${value} of ${target} target.` : `${value}.`;
+}
+
+export interface BulletProps {
+  value: number;
+  target?: number;
+  /** Ascending qualitative thresholds (e.g. `[50, 80]` on a 0–100 scale). */
+  bands?: readonly number[];
+  /** Explicit `[0, max]`; auto-fit when omitted. */
+  domain?: readonly [number, number];
+  width?: number;
+  height?: number;
+  color?: string;
+  format?: Intl.NumberFormatOptions | ((n: number) => string);
+  locale?: string | string[];
+  title?: string;
+  summary?: string | false;
+  id?: string;
+  className?: string;
+  style?: CSSProperties;
+  children?: ReactNode;
+}
+
+export function Bullet(props: BulletProps): ReactNode {
+  const {
+    value,
+    target,
+    bands,
+    domain,
+    width = 80,
+    height = 16,
+    color,
+    format,
+    locale,
+    title,
+    summary,
+    id,
+    className,
+    style,
+    children,
+  } = props;
+
+  const geo = bulletGeometry({ width, height, value, target, bands, domain });
+  const fmt =
+    typeof format === "function"
+      ? format
+      : (n: number) => new Intl.NumberFormat(locale, format).format(n);
+
+  const accName =
+    summary === false
+      ? false
+      : typeof summary === "string"
+        ? summary
+        : bulletSummary(fmt(value), target === undefined ? null : fmt(target));
+
+  // More bands → widen the shade spread so regions stay distinguishable.
+  const steps = Math.max(1, geo.regions.length);
+
+  return (
+    <Chart
+      width={width}
+      height={height}
+      title={title}
+      summary={accName}
+      id={id}
+      className={className ? `mc-bullet ${className}` : "mc-bullet"}
+      style={style}
+    >
+      {geo.regions.map((r) => (
+        <rect
+          key={r.step}
+          x={r.x}
+          y={geo.track.y}
+          width={r.width}
+          height={geo.track.height}
+          shapeRendering="crispEdges"
+          data-mc-ink="bar"
+          style={{ fillOpacity: 0.05 + (r.step / steps) * 0.16 }}
+        />
+      ))}
+      <rect
+        x={geo.measure.x}
+        y={geo.measure.y}
+        width={geo.measure.width}
+        height={geo.measure.height}
+        shapeRendering="crispEdges"
+        data-mc-ink="bar"
+        style={color ? { fill: color } : undefined}
+      />
+      {geo.tick ? (
+        <line
+          x1={geo.tick.x}
+          y1={geo.tick.y0}
+          x2={geo.tick.x}
+          y2={geo.tick.y1}
+          data-mc-ink="data"
+          vectorEffect="non-scaling-stroke"
+          style={{ strokeWidth: 2 }}
+        />
+      ) : null}
+      {children}
+    </Chart>
+  );
+}

@@ -2,7 +2,7 @@
 
 > **Single source of truth for what's done.** Mirrors the step IDs in [10-roadmap.md](10-roadmap.md).
 > Update this file in the **same commit** as the work it tracks. Roadmap = the plan (stable); STATUS = live progress.
-> Last updated: **2026-07-06** · Env: node 24.18, pnpm 11.10.0 (this repo) · Git: **pushed** to `github.com/ganapativs/microcharts` (**private**), branch `main`, 2 commits. CI green.
+> Last updated: **2026-07-06** (Phase 2 — all five + group + bench) · Env: node 24.18, pnpm 11.10.0 (this repo) · Git: **pushed** to `github.com/ganapativs/microcharts` (**private**), branch `main`. CI green.
 > CI matrix is Node **22/24** only (pnpm 11 needs Node ≥22 via `node:sqlite`; Node 20 EOL). Published artifact stays node-20-safe (`engines: >=20`).
 >
 > **Account-gated setup still pending (one-time, not code):** npmjs.org Trusted Publisher for `@microcharts/react` (release.yml uses OIDC, no token); `ARGOS_TOKEN` repo secret (visual.yml). Both needed before their workflows actually publish/upload.
@@ -20,9 +20,13 @@
 
 ## Current position
 
-**Phases 0 + 1 COMPLETE.** Checkpoint 0 (green CI pipeline) and Checkpoint 1 (RSC-static, zero-client-JS chart, gated by the `rsc` CI job) both passed. Kernel + summary + Chart shell + theming shipped and tested (62 unit/property/component tests + the RSC gate).
+**Phases 0 + 1 COMPLETE.** Checkpoint 0 + Checkpoint 1 passed.
 
-**Immediate next: Phase 2 — the proving five.** Start `2.1 <Sparkline>` (line/smooth/step, fill, band, dots, labels, annotations) to the per-chart Definition of Done (plan/09). The hand-assembled fixture sparkline shows the target composition; the real component encapsulates it over the internal kernel.
+**Phase 2 CODE-COMPLETE (all five + group + bench).** 2.1–2.8 built to DoD: five charts, interactive entries (Sparkline/SparkBar), SparkGroup shared scale, bench harness. **175 tests green** (node + browser), `pnpm check` exit 0, all size gates pass, RSC Checkpoint 1 still green. Checkpoint-2 demo shipped as a published Artifact (regenerable via `pnpm demo` → `bench/demo.mjs`).
+
+**Immediate next: ✋ Checkpoint 2 sign-off, then Phase 3 (docs & polish).** Before Phase 3: (a) open a PR so Argos records the first visual baselines (specs live in `tests/visual/`, ARGOS_TOKEN set); (b) decide whether to build the competitor bench matrix (Recharts/Chart.js/MUI X/uPlot/@fnando) now or at launch.
+
+**Phase-2 deferred (documented, not blocking Phase 3):** interactive entries for Delta/Bullet/ActivityGrid (roadmap 2.6 scopes interactive to Sparkline/SparkBar — the other three are static-only for v1); doc *pages* land with Fumadocs in Phase 3 (compiled 4-context examples seeded in `tests/visual/*.spec.ts` + `bench/demo.mjs`); competitor bench matrix (harness + our numbers done; competitor slots are TODO in `bench/run.mjs`).
 
 Pending one-time account setup (unblocks release/visual workflows): npmjs Trusted Publisher for `@microcharts/react`, `ARGOS_TOKEN` secret.
 
@@ -48,19 +52,19 @@ Pending one-time account setup (unblocks release/visual workflows): npmjs Truste
 | 1.4 Theming (presets, MicroProvider) | [x] | `MicroProvider` (hook-free, RSC-safe): `data-mc-theme` + one-off `--mc-*` tokens. Presets modern/tufte/mono/vivid/dark as CSS token bundles. |
 | ✋ Checkpoint 1 | [x] | **Passed.** `fixtures/next` (App Router, `output: export`) renders a hand-assembled `<Sparkline>` (real `Chart` + `describeSeries`) as a Server Component: static HTML carries the SVG + auto-summary, **0 client JS chunks reference the chart** (`verify-rsc.mjs`, wired as CI `rsc` job). |
 
-## Phase 2 — The proving five `[ ]`
+## Phase 2 — The proving five `[◐]`
 
 | Step | State | Note |
 |---|---|---|
-| 2.1 `<Sparkline>` | [ ] | + band, dots, labels, annotations. Full DoD ([09](09-testing-quality.md)). |
-| 2.2 `<SparkBar>` (+win-loss) | [ ] | |
-| 2.3 `<Delta>` | [ ] | |
-| 2.4 `<Bullet>` | [ ] | |
-| 2.5 `<ActivityGrid>` | [ ] | |
-| 2.6 Interactive entries (Sparkline, SparkBar) | [ ] | |
-| 2.7 `SparkGroup` shared scale | [ ] | |
-| 2.8 Bench suite v1 | [ ] | vs Recharts/Chart.js/MUI X/uPlot/@fnando. |
-| ✋ Checkpoint 2 | [ ] | Private 500-row demo; judge feel + budgets. |
+| 2.1 `<Sparkline>` | [◐] | **Code-complete.** `src/charts/sparkline/{geometry,index,client}.tsx` — line/smooth/step, fill (zero-anchored), band, dots (auto/minmax/none), label, annotations, color, format. Static RSC + `/interactive` (keyboard+pointer nav, live region). Subpath exports + tsdown/knip entries. Tests: geometry edge+property, static attribute+axe+summary, browser interaction (94 total green). Size gate raised to 3 kB static / 4 kB interactive (2.67/3.03 actual — see plan/07 + audit; user-approved). Visual spec `tests/visual/sparkline.spec.ts` (4 contexts + variants over the built dist); `visual.yml` → `pull_request`. **Remaining:** Argos baseline (first PR), doc page (Phase 3), bench (2.8). |
+| 2.2 `<SparkBar>` (+win-loss) | [x] | `src/charts/sparkbar/` static+interactive+geometry. bar/winloss, zero-anchor, sign color, label. 22 tests. Static 2.21 kB / interactive 2.56 kB. |
+| 2.3 `<Delta>` | [x] | `src/charts/delta/index.tsx` — accessible inline HTML (glyph+value), double-encoded direction, polarity, `from→to`, format. 8 tests. 0.78 kB. Static-only per 2.6 scope. |
+| 2.4 `<Bullet>` | [x] | `src/charts/bullet/` — measure + target tick + qualitative bands, auto-fit domain. 14 tests. 1.44 kB. Static-only. |
+| 2.5 `<ActivityGrid>` | [x] | `src/charts/activity-grid/` — grid/strip, discrete levels, total/peak summary. 14 tests. 1.56 kB. Static-only. |
+| 2.6 Interactive entries (Sparkline, SparkBar) | [x] | Both `client.tsx`: keyboard (arrows/Home/End/Esc) + pointer nav, roving-focus overlay, polite live readout. Browser-project tests green. |
+| 2.7 `SparkGroup` shared scale | [x] | `src/shared/SparkGroup.tsx` — hook-free/Context-free (RSC-safe) `cloneElement` domain+size injection; child explicit props win. 5 tests. |
+| 2.8 Bench suite v1 | [◐] | `bench/run.mjs` — reproducible core+SSR throughput (500 rows → SVG in 5.3 ms) + `results.json`. **Competitor matrix (Recharts/Chart.js/MUI X/uPlot/@fnando) is a TODO** — separate isolated-workspace harness, tracked for launch. |
+| ✋ Checkpoint 2 | [◐] | Demo built + published as an Artifact (`bench/demo.mjs`, `pnpm demo`): 4 contexts, all five + variants, 60-row shared-scale table, size/perf receipts, light/dark. **Awaiting human feel/budget sign-off.** |
 
 ## Phase 3 — Docs & polish `[ ]`
 

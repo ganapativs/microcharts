@@ -8,3 +8,10 @@ coverage/
 .vitest/
 playwright-report/
 test-results/
+screenshots/
+
+# generated bench output
+bench/results.json
+demo.html
+.vitest-attachments/
+__screenshots__/

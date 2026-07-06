@@ -6,7 +6,8 @@
 
 | Metric | Budget | Gate |
 |---|---|---|
-| Gzip per static chart component (incl. shared core, tree-shaken) | **≤ 2 kB** (Sparkline target ≤ 1 kB) | size-limit per subpath export |
+| Gzip per static chart component (incl. shared core, tree-shaken) | **≤ 3 kB** hard gate · ≤ 2 kB target · ≤ 1 kB stretch | size-limit per subpath export |
+| Gzip per interactive (`…/interactive`) chart entry | **≤ 4 kB** hard gate | size-limit per subpath export |
 | Whole library gzip (all v1 charts + styles) | **≤ 10 kB** | size-limit on barrel |
 | Runtime dependencies | **0** | CI check on package.json + lockfile |
 | Client JS for static charts (RSC) | **0 bytes** | bundle-analysis test on Next.js fixture |
@@ -16,6 +17,8 @@
 | Memory for 1,000 static instances | < 10 MB JS heap delta | benchmark suite, tracked |
 
 Anchors from research: @fnando/sparkline = 1.6 kB proves feasibility; react-sparklines = 6.6 kB is the ceiling of embarrassment; Chart.js 68 kB / Recharts 145 kB are the marketing foil.
+
+**Measured reality (2026-07-06, Phase 2.1).** The shipped `<Sparkline>` is **2.67 kB** gzip: line/smooth/step + area + band + dots + label + the auto-summary a11y name (the flagship) + the `<Chart>` shell. The 1–2 kB anchors were set against *line-only* refs (@fnando has no summary, no a11y, no smooth/area/band); our value-adds are the delta. Gate raised to **≤ 3 kB static / ≤ 4 kB interactive** to reflect the honest full-feature cost, with 2 kB kept as the target and 1 kB as a stretch for a stripped line-only build. Still ~50× smaller than Recharts. Dominant weight is the path/scale/stats math kernel (~2.5 kB treeshaken), not the summary (+~0.15 kB, since `seriesStats` is shared). See plan/12 audit.
 
 ## 2. Techniques (from `03-architecture.md`, operationalized)
 

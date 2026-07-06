@@ -18,6 +18,8 @@ export { MicroProvider } from "./shared/MicroProvider.js";
 export type { Preset, MicroProviderProps } from "./shared/MicroProvider.js";
 export { Chart } from "./shared/Chart.js";
 export type { ChartProps } from "./shared/Chart.js";
+export { SparkGroup } from "./shared/SparkGroup.js";
+export type { SparkGroupProps } from "./shared/SparkGroup.js";
 
 /** Shared prop grammar — one meaning per name across every chart (plan/04). */
 export interface MicrochartCommonProps {

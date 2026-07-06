@@ -40,6 +40,46 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./sparkline": {
+      "types": "./dist/charts/sparkline/index.d.ts",
+      "import": "./dist/charts/sparkline/index.js"
+    },
+    "./sparkline/interactive": {
+      "types": "./dist/charts/sparkline/client.d.ts",
+      "import": "./dist/charts/sparkline/client.js"
+    },
+    "./sparkbar": {
+      "types": "./dist/charts/sparkbar/index.d.ts",
+      "import": "./dist/charts/sparkbar/index.js"
+    },
+    "./sparkbar/interactive": {
+      "types": "./dist/charts/sparkbar/client.d.ts",
+      "import": "./dist/charts/sparkbar/client.js"
+    },
+    "./delta": {
+      "types": "./dist/charts/delta/index.d.ts",
+      "import": "./dist/charts/delta/index.js"
+    },
+    "./delta/interactive": {
+      "types": "./dist/charts/delta/client.d.ts",
+      "import": "./dist/charts/delta/client.js"
+    },
+    "./bullet": {
+      "types": "./dist/charts/bullet/index.d.ts",
+      "import": "./dist/charts/bullet/index.js"
+    },
+    "./bullet/interactive": {
+      "types": "./dist/charts/bullet/client.d.ts",
+      "import": "./dist/charts/bullet/client.js"
+    },
+    "./activity-grid": {
+      "types": "./dist/charts/activity-grid/index.d.ts",
+      "import": "./dist/charts/activity-grid/index.js"
+    },
+    "./activity-grid/interactive": {
+      "types": "./dist/charts/activity-grid/client.d.ts",
+      "import": "./dist/charts/activity-grid/client.js"
+    },
     "./styles.css": "./styles.css"
   },
   "publishConfig": {
@@ -57,6 +97,8 @@
     "test:watch": "vitest",
     "knip": "knip",
     "size": "size-limit",
+    "bench": "pnpm build && node bench/run.mjs",
+    "demo": "pnpm build && node bench/run.mjs && node bench/demo.mjs demo.html",
     "test:visual": "playwright test",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm knip",
     "pack:check": "pnpm build && publint && attw --pack .",

@@ -9,16 +9,16 @@ export interface ChartProps {
   width: number;
   height: number;
   /** Short accessible name. */
-  title?: string;
+  title?: string | undefined;
   /**
    * Accessible description — usually `describeSeries(...)` (plan/08 §2).
    * `false` = decorative (T0): the chart is hidden from assistive tech.
    */
-  summary?: string | false;
+  summary?: string | false | undefined;
   /** Explicit id root (overrides the auto counter — for stable client ids). */
-  id?: string;
-  className?: string;
-  style?: CSSProperties;
+  id?: string | undefined;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
   /** SVG content: paths, marks, annotation children. */
   children?: ReactNode;
 }
