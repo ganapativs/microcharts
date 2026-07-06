@@ -42,9 +42,9 @@
 |---|---|---|
 | 1.1 `core/{scale,path,stats,bank}.ts` | [x] | + `color.ts`, `types.ts`. Pure, property-tested (fast-check) + full edge matrix — 50 tests green. `describeSeries` exported at root. |
 | 1.2 `core/summary.ts` (describeSeries) | [x] | S1 shape (trend %/range/last), degenerate forms, `EN` templates (swappable for i18n), Intl formatting. S2–S4 land with their charts. |
-| 1.3 `shared/Chart.tsx` + `styles.css` a11y blocks | [◐] | `styles.css` has `@layer` + tokens + reduced-motion/forced-colors skeleton; `Chart.tsx` not built (`src/shared/.gitkeep`). |
-| 1.4 Theming (presets, MicroProvider) | [ ] | tokens exist in `styles.css`; presets/provider not built. |
-| ✋ Checkpoint 1 | [ ] | Hand-assembled sparkline SSR-static in Next fixture, zero client JS. |
+| 1.3 `shared/Chart.tsx` + `styles.css` a11y blocks | [x] | Hook-free `Chart` (role=img + `<title>`/`<desc>` + aria-labelledby, decorative opt-out); `a11y.ts` id/label composition; `styles.css` reconciled to plan token names + dark/forced-colors/prefers-contrast/reduced-motion. 6 component tests. |
+| 1.4 Theming (presets, MicroProvider) | [x] | `MicroProvider` (hook-free, RSC-safe): `data-mc-theme` + one-off `--mc-*` tokens. Presets modern/tufte/mono/vivid/dark as CSS token bundles. |
+| ✋ Checkpoint 1 | [ ] | **Next**: hand-assembled sparkline SSR-static in a Next fixture, zero client JS. Kernel + Chart + theming ready to compose it. |
 
 ## Phase 2 — The proving five `[ ]`
 

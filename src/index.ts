@@ -13,6 +13,12 @@ export const MICROCHARTS_VERSION = "0.0.1";
 export { describeSeries, EN } from "./core/summary.js";
 export type { SummaryStrings, DescribeOptions } from "./core/summary.js";
 
+// Theming + the shared chart shell (plan/06, plan/03).
+export { MicroProvider } from "./shared/MicroProvider.js";
+export type { Preset, MicroProviderProps } from "./shared/MicroProvider.js";
+export { Chart } from "./shared/Chart.js";
+export type { ChartProps } from "./shared/Chart.js";
+
 /** Shared prop grammar — one meaning per name across every chart (plan/04). */
 export interface MicrochartCommonProps {
   /** The series. `data` alone always renders something (plan/04). */

@@ -2,37 +2,79 @@
  * @microcharts/react — shared stylesheet (see plan/19-css-delivery.md).
  * One artifact, imported once:  import '@microcharts/react/styles.css'
  * Not per-chart-split. Zero-specificity via :where() so consumer overrides win.
- * Theme by overriding --mc-* at any scope. Charts never paint their own background.
+ * Theme by overriding --mc-* at any scope. Charts never paint a background.
+ * Token names + values per plan/06.
  */
 
 @layer microcharts.tokens, microcharts.base, microcharts.charts, microcharts.motion;
 
 @layer microcharts.tokens {
   :where(:root) {
-    /* semantic color — Okabe-Ito-derived (see plan/06) */
-    --mc-pos: #009e73;
-    --mc-neg: #d55e00;
-    --mc-accent: #0072b2;
-    --mc-muted: #6b7280;
-    --mc-ink: currentColor;
-    --mc-track: color-mix(in oklab, currentColor 12%, transparent);
+    /* semantic color — Okabe-Ito-derived (plan/06 §2) */
+    --mc-stroke: #171717; /* primary data ink */
+    --mc-positive: #009e73; /* up / good */
+    --mc-negative: #d55e00; /* down / bad */
+    --mc-neutral: #8a8a8a; /* no-valence data */
+    --mc-accent: #0072b2; /* emphasis: endpoint dot, active */
+    --mc-band: color-mix(in oklab, var(--mc-stroke) 8%, transparent);
 
-    /* geometry */
-    --mc-stroke: 1.5;
+    /* categorical (valence-free series) — yellow omitted from the default order */
+    --mc-cat-1: #e69f00;
+    --mc-cat-2: #56b4e9;
+    --mc-cat-3: #009e73;
+    --mc-cat-4: #0072b2;
+    --mc-cat-5: #d55e00;
+    --mc-cat-6: #cc79a7;
+
+    /* geometry + type */
+    --mc-stroke-width: 1.5;
+    --mc-dot-size: 2;
     --mc-radius: 1px;
-
-    /* type */
+    --mc-gap: 0.25em;
     --mc-font: inherit;
     --mc-label-size: 0.75em;
+
+    /* motion */
+    --mc-duration: 300ms;
+    --mc-easing: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out */
   }
 
+  /* Dark mode — hand-tuned, never auto-inverted (plan/06 §2). */
   @media (prefers-color-scheme: dark) {
     :where(:root) {
-      /* hand-tuned, never inverted (see plan/06) */
-      --mc-pos: #34d399;
-      --mc-neg: #fb923c;
-      --mc-accent: #38bdf8;
+      --mc-stroke: #ededed;
+      --mc-positive: #2dd4a7;
+      --mc-negative: #ff8a4c;
+      --mc-accent: #4cc2ff;
+      --mc-neutral: #9a9a9a;
     }
+  }
+  :where([data-mc-theme="dark"]) {
+    --mc-stroke: #ededed;
+    --mc-positive: #2dd4a7;
+    --mc-negative: #ff8a4c;
+    --mc-accent: #4cc2ff;
+    --mc-neutral: #9a9a9a;
+  }
+
+  /* Presets = token bundles (plan/06 §3, layer 2). Visual only. */
+  :where([data-mc-theme="tufte"]) {
+    --mc-stroke: #333333;
+    --mc-accent: #b8112a; /* single red endpoint accent */
+    --mc-stroke-width: 1;
+    --mc-radius: 0;
+  }
+  :where([data-mc-theme="mono"]) {
+    --mc-positive: var(--mc-stroke);
+    --mc-negative: var(--mc-stroke);
+    --mc-accent: var(--mc-stroke);
+    --mc-neutral: var(--mc-stroke);
+  }
+  :where([data-mc-theme="vivid"]) {
+    --mc-positive: #00c896;
+    --mc-negative: #ff5630;
+    --mc-accent: #2f6bff;
+    --mc-stroke-width: 2;
   }
 }
 
@@ -40,13 +82,18 @@
   :where(.mc-root) {
     display: inline-block;
     vertical-align: middle;
+    overflow: visible;
     font: var(--mc-font);
   }
-
-  /* rendered numbers align in columns */
   :where(.mc-root text) {
     font-variant-numeric: tabular-nums;
     font-size: var(--mc-label-size);
+    fill: var(--mc-stroke);
+  }
+  /* focusable interactive charts never lose a visible ring (plan/08 §4) */
+  :where(.mc-root:focus-visible) {
+    outline: 2px solid var(--mc-accent);
+    outline-offset: 2px;
   }
 }
 
@@ -62,9 +109,31 @@
     }
   }
 
+  @media (prefers-contrast: more) {
+    :where(.mc-root) {
+      --mc-stroke-width: 2;
+      --mc-band: color-mix(in oklab, var(--mc-stroke) 16%, transparent);
+    }
+  }
+
   @media (forced-colors: active) {
     :where(.mc-root) {
       forced-color-adjust: none;
+    }
+    /* data ink → CanvasText, accent → Highlight, muted → GrayText (plan/08 §4) */
+    :where(.mc-root [data-mc-ink="data"]) {
+      stroke: CanvasText;
+    }
+    :where(.mc-root [data-mc-ink="accent"]) {
+      stroke: Highlight;
+      fill: Highlight;
+    }
+    :where(.mc-root [data-mc-ink="muted"]) {
+      stroke: GrayText;
+      fill: GrayText;
+    }
+    :where(.mc-root:focus-visible) {
+      outline-color: Highlight;
     }
   }
 }

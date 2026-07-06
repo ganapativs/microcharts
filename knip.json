@@ -1,6 +1,12 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["src/index.ts", "src/core/index.ts", "src/test/**/*.ts", "playwright.config.ts"],
+  "entry": [
+    "src/index.ts",
+    "src/core/index.ts",
+    "src/shared/index.ts",
+    "src/test/**/*.ts",
+    "playwright.config.ts"
+  ],
   "project": ["src/**/*.{ts,tsx}"],
   "ignoreDependencies": [
     "react",
