@@ -1,0 +1,38 @@
+---
+title: All charts
+description: The five v1 microcharts — Sparkline, SparkBar, Delta, Bullet, and ActivityGrid — with the data shape each one answers.
+---
+
+Every chart shares one grammar: `data` alone always renders something correct, and
+the same prop names mean the same thing everywhere. Pick by the shape of your data
+and the decision you need someone to make in a single glance.
+
+<Cards>
+  <Card title="Sparkline" href="/docs/charts/sparkline" description="Trend over ordered values." />
+  <Card
+    title="SparkBar"
+    href="/docs/charts/sparkbar"
+    description="Magnitude, or a win–loss streak."
+  />
+  <Card title="Delta" href="/docs/charts/delta" description="Signed change between two values." />
+  <Card title="Bullet" href="/docs/charts/bullet" description="A measure against a target." />
+  <Card
+    title="ActivityGrid"
+    href="/docs/charts/activity-grid"
+    description="Calendar or matrix intensity."
+  />
+</Cards>
+
+## Two entries per chart
+
+Each chart ships a **static** entry (hook-free, server-component safe, zero client
+JavaScript) and an **interactive** entry (`/interactive`) that adds hover, keyboard
+navigation, and live announcements. Import whichever the context needs.
+
+```tsx
+import { Sparkline } from "@microcharts/react/sparkline"; // static, RSC-safe
+import { Sparkline } from "@microcharts/react/sparkline/interactive"; // hover + keyboard
+```
+
+Not seeing the chart you need? The catalog grows toward 96 planned types — browse the
+[gallery](/gallery) for what's shipped and what's next.

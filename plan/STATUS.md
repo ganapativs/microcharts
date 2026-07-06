@@ -24,7 +24,7 @@
 
 **Phases 0 + 1 + 2 COMPLETE.** Checkpoints 0, 1, 2 all passed. Phase 2 shipped the five charts each with static + `/interactive` entries, SparkGroup shared scale, and the bench harness — 167 tests, `pnpm check`/size/publint/attw/visual/RSC all green.
 
-**Immediate next: Phase 3 — docs & polish (plan/10 §3).** Start 3.1: Fumadocs site + Storybook 10 workshop — **with the [plan/20](20-discoverability.md) metadata contract built in from the first route** (new step 3.5 is the launch gate; plan/20 landed 2026-07-06 via Codex, woven into roadmap §3/§4/§5b). Argos visual baselines recorded (build #1 via `visual.yml` dispatch, 2026-07-06); future PRs diff against them.
+**Phase 3 largely done (2026-07-07):** `apps/docs` Fumadocs site is built, browser-verified, `pnpm --filter @microcharts/docs build` (static export, 54 pages) + docs tests green; discoverability P0 (3.5) wired from the first route (plan/20 metadata contract, JSON-LD, llms/catalog, OG, sitemap/robots). **Remaining in Phase 3:** Storybook 10 workshop (3.1, deferred — docs `LiveDemo` covers previews), README pitch + npm homepage→docs (3.3/plan/20 §10), changesets releases (3.4), then Checkpoint 3 (cold-dev testing). Argos visual baselines recorded (build #1, 2026-07-06); the Delta glyph fix will legitimately update the Delta baseline on the next run.
 
 **Phase-2 deferred (documented, not blocking Phase 3):** doc *pages* land with Fumadocs in Phase 3 (compiled 4-context examples seeded in `tests/visual/*.spec.ts` + `bench/demo.mjs`); bench **competitor matrix** deferred to launch prep (not competing pre-1.0).
 
@@ -70,12 +70,14 @@ Pending one-time account setup (unblocks release/visual workflows): npmjs Truste
 
 | Step | State | Note |
 |---|---|---|
-| 3.1 Docs site | [ ] | **Fumadocs** (React-native) + live-prop demos; **Storybook 10** workshop. (Reversed from Starlight/Ladle — see audit.) Build WITH the plan/20 metadata contract from day one (see 3.5) — retrofitting `<head>`/JSON-LD is the anti-pattern plan/20 §16 forbids. |
-| 3.2 A11y page, theming guide, chooser, design notes | [ ] | |
-| 3.3 LLM + registry surface (plan/20 §5/§10) | [◐] | `/llms.txt` + `/llms-full.txt` + `.md` mirrors + `microcharts.catalog.json` (generated, validated against exports), GitHub topics, README pitch + comparison table, npm keywords/homepage. README is a pre-release stub; nothing else started. |
+| 3.1 Docs site | [x] | **Fumadocs 16.10 + Next 16 (static export)** at `apps/docs` — independently deployable to Cloudflare Workers Static Assets (`wrangler.jsonc`), Vercel, or any CDN. Custom "editorial instrument" design (Instrument Serif + Hanken Grotesk + JetBrains Mono, matte light/dark palette, does NOT feel like stock Fumadocs). Landing (hero + falsifiable bench number + live interactive charts), gallery, live-prop `LiveDemo` (Preview/Code toggle, Shiki). Static Orama search. Browser-verified light/dark + mobile. |
+| 3.2 A11y page, theming guide, chooser, design notes | [x] | `content/docs/{accessibility,theming,chooser,design-notes,performance,ai}.mdx` + 5 chart pages + quickstart. Summaries quote REAL `describeSeries` output. Design notes keep principles silent (no Tufte name-drop). |
+| 3.3 LLM + registry surface (plan/20 §5/§10) | [x] | Curated `/llms.txt` (with "does not support" notes, links resolve to `.md` mirrors), `/llms-full.txt`, markdown mirrors (`/llms.mdx/docs/.../content.md`), generated `/microcharts.catalog.json` (validated against `package.json#exports` by `catalog.test.ts`). npm keywords/homepage still the pre-release stub (README pitch pending). |
 | 3.4 v0.x releases via changesets | [ ] | Blocked on 0.3 changesets init. |
-| 3.5 Discoverability P0 gate (plan/20 §15/§17) | [ ] | `docsMeta()` on every route, JSON-LD helpers, sitemap/robots, OG template + launch-page cards, §11 CI checks (metadata/canonical/JSON-LD/links/llms endpoints). Added 2026-07-06 with plan/20. |
+| 3.5 Discoverability P0 gate (plan/20 §15/§17) | [x] | `docsMeta()` on every route, JSON-LD (WebSite/SoftwareSourceCode/Breadcrumb/TechArticle), `sitemap.xml`/`robots.txt`, per-page OG (`fumadocs-ui/og`) + on-brand default `/og/default.png`, static-export-safe. `metadata.test.ts` asserts canonical/title/description/og:image/JSON-LD/h1/noindex on the built HTML (plan/20 §11). Domain swappable via `NEXT_PUBLIC_SITE_URL` (`lib/site.ts`) — `microcharts.dev` still unregistered. |
 | ✋ Checkpoint 3 | [ ] | Cold-dev testing; API freeze for 1.0. **+ plan/20 §17 discoverability DoD green.** |
+
+**Phase-2 bugfix folded in (2026-07-07):** Delta's "up" glyph pointed **down** (both up/down paths shared the same 3 vertices) — a violation of the honest double-encoding non-negotiable, caught while building the docs. Fixed `src/charts/delta/index.tsx` GLYPH.up → `M5 3 L9 9 L1 9 Z`; added a semantic direction regression test. Delta's Argos baseline will change (correctly) on next visual run. **Storybook 10 workshop (3.1) still pending** — deferred; docs `LiveDemo` covers live-component previews for now.
 
 ## Phase 4 — Launch `[ ]`
 Not started. `1.0.0` → Show HN → dev.to → awesome-lists → PH. **Pre-flight = plan/20 §14 P0 checklist; launch-week P1 items ride 4.2–4.5; analytics cadence per §13. Deferred bench competitor matrix lands here (comparison pages need measured data — plan/20 §9).**

@@ -1,0 +1,57 @@
+---
+title: Performance
+description: microcharts is zero-dependency and budget-gated — around 1 kB gzip per chart, ~6 SVG nodes typical, and 500 charts server-rendered in about 5 milliseconds. Every number is reproducible.
+---
+
+Performance is a promise, not a marketing line. Every figure below is produced by a command
+you can run yourself.
+
+## Size
+
+Each chart is imported from its own subpath, so you ship only what you use. Sizes are gzip,
+measured in CI by `pnpm size` and gated — a chart that grows past budget fails the build.
+
+| Chart        | Static  | Interactive |
+| ------------ | ------- | ----------- |
+| Sparkline    | 2.67 kB | 3.03 kB     |
+| SparkBar     | 2.21 kB | 2.56 kB     |
+| Delta        | 0.81 kB | 1.07 kB     |
+| Bullet       | 1.44 kB | 1.90 kB     |
+| ActivityGrid | 1.56 kB | 2.01 kB     |
+
+The whole library carries **zero runtime dependencies** — no chart engine, no D3. That
+constraint is enforced by CI, permanently.
+
+## Server rendering
+
+Static charts are hook-free and listener-free, so they render on the server to plain SVG
+with no client JavaScript. Throughput, measured by `pnpm bench`:
+
+| Charts | Time    | Per chart | Payload |
+| ------ | ------- | --------- | ------- |
+| 100    | 1.8 ms  | 0.018 ms  | ~551 B  |
+| 500    | 5.4 ms  | 0.011 ms  | ~551 B  |
+| 1000   | 12.3 ms | 0.012 ms  | ~551 B  |
+
+A table with 500 sparklines becomes HTML in about five milliseconds, and none of it ships
+JavaScript to the browser.
+
+## Reproduce it
+
+```bash
+git clone https://github.com/ganapativs/microcharts
+pnpm install
+pnpm bench   # SSR throughput → bench/results.json
+pnpm size    # gzip budgets → measured actuals
+```
+
+## Related
+
+<Cards>
+  <Card title="Charts" href="/docs/charts" description="Per-chart sizes and behavior." />
+  <Card
+    title="Accessibility"
+    href="/docs/accessibility"
+    description="Small and accessible at once."
+  />
+</Cards>

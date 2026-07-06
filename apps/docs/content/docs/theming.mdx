@@ -1,0 +1,91 @@
+---
+title: Theming
+description: Theme microcharts with ~20 CSS custom properties and named presets — override a token at any scope, switch presets with a data attribute, and get hand-tuned dark mode for free.
+---
+
+microcharts theming is CSS custom properties, all the way down. There is no theme provider
+to wire up and no Tailwind requirement — set a `--mc-*` variable at any scope and every
+chart inside it retunes with zero re-render.
+
+## Override a token
+
+```css
+.brand {
+  --mc-accent: #7c3aed;
+  --mc-stroke-width: 2;
+}
+```
+
+Precedence is predictable: a **prop** wins over a **CSS variable scope**, which wins over a
+**preset**, which wins over the built-in default.
+
+<LiveDemo
+  label="Per-instance color"
+  code={`<Sparkline data={data} />
+<Sparkline data={data} color="#7c3aed" />
+<Sparkline data={data} color="var(--mc-positive)" />`}
+>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} title="Default" />
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} color="#7c3aed" title="Custom" />
+  <Sparkline
+    data={[3, 5, 4, 8, 6, 9]}
+    width={110}
+    height={30}
+    color="var(--mc-positive)"
+    title="Token"
+  />
+</LiveDemo>
+
+## Presets
+
+Presets are bundled token sets, applied with a `data-mc-theme` attribute — pure CSS, zero
+JavaScript. They change how charts _look_, never what the data _means_.
+
+<LiveDemo
+  label="Presets"
+  code={`<div data-mc-theme="modern"><Sparkline data={data} dots="minmax" /></div>
+<div data-mc-theme="tufte"><Sparkline data={data} dots="minmax" /></div>
+<div data-mc-theme="vivid"><Sparkline data={data} dots="minmax" /></div>
+<div data-mc-theme="mono"><Sparkline data={data} dots="minmax" /></div>`}
+>
+  <div data-mc-theme="modern">
+    <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="modern" />
+  </div>
+  <div data-mc-theme="tufte">
+    <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="tufte" />
+  </div>
+  <div data-mc-theme="vivid">
+    <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="vivid" />
+  </div>
+  <div data-mc-theme="mono">
+    <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="mono" />
+  </div>
+</LiveDemo>
+
+## The token set
+
+Around twenty variables cover the whole surface: `--mc-stroke`, `--mc-positive`,
+`--mc-negative`, `--mc-neutral`, `--mc-accent`, `--mc-band`, `--mc-cat-1` … `--mc-cat-6`,
+plus geometry and motion (`--mc-stroke-width`, `--mc-dot-size`, `--mc-radius`, `--mc-gap`,
+`--mc-duration`, `--mc-easing`, `--mc-font`).
+
+## Dark mode
+
+Dark values are hand-tuned per token — never auto-inverted. microcharts follows
+`prefers-color-scheme` out of the box, and you can force a scope with `data-mc-theme="dark"`.
+Charts never paint their own background, so they always sit cleanly on your surface.
+
+## Related
+
+<Cards>
+  <Card
+    title="Accessibility"
+    href="/docs/accessibility"
+    description="Contrast and forced-colors."
+  />
+  <Card
+    title="Design notes"
+    href="/docs/design-notes"
+    description="Why the defaults look the way they do."
+  />
+</Cards>

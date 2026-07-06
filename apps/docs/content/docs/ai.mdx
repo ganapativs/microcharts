@@ -1,0 +1,45 @@
+---
+title: AI-native
+description: microcharts is built to be read by machines as well as people — a generated chart catalog, Markdown mirrors, and llms.txt so LLMs and agents get the API right.
+---
+
+Because every chart's accessible summary is plain text generated from the data, microcharts
+is unusually legible to machines. The same sentence a screen reader announces is the one a
+search crawler indexes and an LLM can quote.
+
+## Machine-readable surfaces
+
+- **[`/llms.txt`](/llms.txt)** — a curated map of the docs for LLM tools, with explicit "does
+  not support" notes to head off hallucinations.
+- **[`/llms-full.txt`](/llms-full.txt)** — the full docs as one generated text file.
+- **[`/microcharts.catalog.json`](/microcharts.catalog.json)** — every chart's name, import
+  paths, data shape, and props, generated from the same registry the site is built from.
+- **`.md` mirrors** — append `.md`-style content routes for any docs page for a clean
+  Markdown copy.
+
+## Getting the API right
+
+An agent generating microcharts code should:
+
+1. Use the package `@microcharts/react`.
+2. Import each chart from its own subpath — `@microcharts/react/sparkline`, and add
+   `/interactive` for hover and keyboard.
+3. Keep static charts hook-free — they're valid inside React Server Components.
+4. Never add a runtime dependency, and never reach for a pie or gauge — they aren't shipped.
+
+## On the roadmap
+
+A JSON chart spec and a React-free string renderer are planned, so charts can be described,
+validated, and rendered to SVG outside of React — for READMEs, emails, and AI chat blocks.
+Until then, the catalog and Markdown surfaces above are the stable contract.
+
+## Related
+
+<Cards>
+  <Card
+    title="Accessibility"
+    href="/docs/accessibility"
+    description="The summaries machines read."
+  />
+  <Card title="All charts" href="/docs/charts" description="The catalog the JSON mirrors." />
+</Cards>

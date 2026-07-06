@@ -1,0 +1,85 @@
+---
+title: Sparkline
+description: Render a tiny accessible trend line in React — RSC-safe static SVG, or an interactive entry with hover and keyboard navigation.
+---
+
+Sparkline draws a compact trend over ordered values. Reach for it when direction and
+shape matter more than exact points — inline in a sentence, inside a table cell, or as
+the quiet backbone of a KPI card.
+
+<LiveDemo
+  label="Sparkline"
+  meta="static · 2.67 kB"
+  code={`import { Sparkline } from "@microcharts/react/sparkline";
+
+<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />`}
+>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} title="Weekly revenue" />
+</LiveDemo>
+
+## When to use it
+
+- **Good for** — an inline trend, a table-cell trend, a KPI sparkline, dense dashboards.
+- **Avoid for** — part-to-whole comparisons or reading exact category values. Use
+  [SparkBar](/docs/charts/sparkbar) for discrete magnitudes, or [Bullet](/docs/charts/bullet)
+  for a value against a target.
+
+## Variants
+
+Shape, fill, a normal-range band, and dots are all props — same data, different read.
+
+<LiveDemo
+  label="Variants"
+  code={`<Sparkline data={data} curve="smooth" />
+<Sparkline data={data} fill />
+<Sparkline data={data} band={[4, 8]} />
+<Sparkline data={data} dots="minmax" label="last" />`}
+>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} curve="smooth" title="Smooth" />
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} fill title="Filled area" />
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} band={[4, 8]} title="With band" />
+  <Sparkline
+    data={[3, 5, 4, 8, 6, 9]}
+    width={120}
+    height={30}
+    dots="minmax"
+    label="last"
+    title="Min/max dots"
+  />
+</LiveDemo>
+
+## Four homes
+
+The same chart, sized for four real contexts.
+
+<FourContexts slug="sparkline" />
+
+## Accessibility
+
+By default the chart is an `img` whose accessible name is generated from the data. The
+example above is announced as:
+
+> Weekly revenue. Trending up 200%. Range 3 to 9. Last value 9.
+
+Pass a `title` to name it, or `summary={false}` to make it decorative when the surrounding
+text already says what it shows. The interactive entry adds a polite live region that reads
+each focused point as you arrow through it.
+
+## Props
+
+<PropTable slug="sparkline" />
+
+## Related
+
+<Cards>
+  <Card
+    title="SparkBar"
+    href="/docs/charts/sparkbar"
+    description="Discrete magnitudes instead of a line."
+  />
+  <Card
+    title="Accessibility"
+    href="/docs/accessibility"
+    description="How the summaries are built."
+  />
+</Cards>

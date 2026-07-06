@@ -1,0 +1,74 @@
+---
+title: Quickstart
+description: Install @microcharts/react, import the stylesheet, and render your first accessible chart — static in a Server Component, or interactive on the client.
+---
+
+## Install
+
+<PackageTabs />
+
+## Import the stylesheet once
+
+microcharts ships a single stylesheet — import it once at the root of your app. It carries
+all theming tokens and chart styles in a low-specificity cascade layer, so your own styles
+always win.
+
+```tsx title="app/layout.tsx"
+import "@microcharts/react/styles.css";
+```
+
+## Your first chart
+
+Every chart renders from `data` alone. This works in a React Server Component with **zero
+client JavaScript** — it's pure SVG.
+
+<LiveDemo
+  label="Static · RSC-safe"
+  code={`import { Sparkline } from "@microcharts/react/sparkline";
+
+export default function Page() {
+  return <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
+}`}
+>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} title="Weekly revenue" />
+</LiveDemo>
+
+## Add interactivity
+
+Need hover, keyboard navigation, or live announcements? Import the same chart from its
+`/interactive` entry. Everything else — props, output, accessibility — is identical.
+
+```tsx
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
+
+<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
+```
+
+## Import paths
+
+Import each chart from its own subpath so you only ship what you use.
+
+| Chart        | Static                             | Interactive                                    |
+| ------------ | ---------------------------------- | ---------------------------------------------- |
+| Sparkline    | `@microcharts/react/sparkline`     | `@microcharts/react/sparkline/interactive`     |
+| SparkBar     | `@microcharts/react/sparkbar`      | `@microcharts/react/sparkbar/interactive`      |
+| Delta        | `@microcharts/react/delta`         | `@microcharts/react/delta/interactive`         |
+| Bullet       | `@microcharts/react/bullet`        | `@microcharts/react/bullet/interactive`        |
+| ActivityGrid | `@microcharts/react/activity-grid` | `@microcharts/react/activity-grid/interactive` |
+
+## Next
+
+<Cards>
+  <Card
+    title="All charts"
+    href="/docs/charts"
+    description="The five, with the data shape each answers."
+  />
+  <Card title="Theming" href="/docs/theming" description="~20 CSS variables and named presets." />
+  <Card
+    title="Accessibility"
+    href="/docs/accessibility"
+    description="Summaries, keyboard, forced colors."
+  />
+  <Card title="Performance" href="/docs/performance" description="Sizes and SSR benchmarks." />
+</Cards>

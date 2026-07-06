@@ -69,6 +69,14 @@ v1 = Sparkline (+band), SparkBar (+win-loss), Delta, Bullet, ActivityGrid. **Eve
 
 **Budgets (measured reality, plan/07 §amended):** static ≤ 3 kB gz per subpath (Delta-class simple charts ≤ 1.5 kB), interactive ≤ static + 1 kB, styles.css ≤ 10 kB shared. SSR bench floor: ≥ ~50 rows/ms.
 
+## Docs site (`apps/docs` — Phase 3, plan/20)
+
+Independent pnpm workspace (`apps/*`). **Fumadocs 16 + Next 16 static export (`output: 'export'`)** — deployable to Cloudflare Workers Static Assets (`wrangler.jsonc`), Vercel, or any CDN with zero server runtime. Consumes the built library (`@microcharts/react` → `dist/`), so **`pnpm build` before docs build/dev**. Domain is swappable via `SITE.url` (`src/lib/site.ts`, env `NEXT_PUBLIC_SITE_URL`) — never scatter `microcharts.dev` (unregistered).
+
+**Design is law here too** (memory: `docs-site-design-system`): "editorial measurement instrument" — matte premium, minimal, visual-first (charts are the heroes, minimum text), hairline precision, mono metadata, Instrument Serif display + Hanken Grotesk UI + JetBrains Mono. Light+dark premium parity (rich on AMOLED/XDR), fully fluid/responsive, delightful restrained motion (all reduced-motion-gated), and it must NOT feel like stock Fumadocs. Every UI element gets a unique feel. Reskin via `--color-fd-*` token overrides in `src/app/global.css`; bind `--mc-*` to the site (next-themes class) theme, not the OS. `describeSeries` output in docs must be the REAL string (docs-as-tests), never hand-written. Never name-drop Tufte/theory (non-negotiable #6 applies to the site).
+
+**Discoverability is built in from the first route, never bolted on** (plan/20 §16): `docsMeta()` on every route, JSON-LD helpers, `sitemap.xml`/`robots.txt`, per-page + default OG, curated `/llms.txt` + `/llms-full.txt` + `.md` mirrors + generated `/microcharts.catalog.json` (from the `src/lib/catalog.ts` registry, validated against `package.json#exports`). `metadata.test.ts` gates the built HTML. See memory `docs-site-architecture` for structure, commands, and gotchas.
+
 ## Quality bar (plan/09)
 
 Per-chart Definition of Done: static + interactive entries · shared edge-case fixture suite green (empty, single point, all-equal, nulls, all-null, negatives, NaN/±Infinity — documented behavior, this kills the Grafana bug class) · property tests · axe clean + summary correct · visual baselines approved (light/dark × presets) · size budget entry · doc page with 4 contexts (sentence/cell/KPI card/tab) · bench scenario. SVG testing: normalized attribute assertions (coords rounded to 2 decimals at generation), never whole-markup snapshots. React 18 + 19 matrix, StrictMode on.

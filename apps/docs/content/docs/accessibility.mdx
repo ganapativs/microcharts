@@ -1,0 +1,63 @@
+---
+title: Accessibility
+description: How microcharts stays accessible by default — data-generated summaries, keyboard navigation, forced-colors and reduced-motion support, and never encoding meaning in color alone.
+---
+
+Accessibility is not a setting in microcharts. Every chart is accessible the moment you
+render it, because the accessible name is generated from your data.
+
+## Summaries that write themselves
+
+By default a chart is an `img` whose accessible name is a natural-language sentence built
+from the series. No `alt` text to forget, no summary to drift out of sync with the data.
+
+<LiveDemo
+  label="Announced automatically"
+  code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />
+// announced as:
+// "Weekly revenue. Trending up 200%. Range 3 to 9. Last value 9."`}
+>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={140} height={36} title="Weekly revenue" />
+</LiveDemo>
+
+Degenerate data produces honest short forms rather than a broken chart — empty and all-null
+become "No data.", a single point becomes "Single value X.", and a flat line becomes "Flat
+at X."
+
+## Decorative opt-out
+
+When the surrounding text already describes the data, mark the chart decorative with
+`summary={false}` so screen readers skip the redundancy.
+
+```tsx
+<p>
+  Revenue climbed steadily this week <Sparkline data={data} summary={false} />.
+</p>
+```
+
+## Keyboard and live regions
+
+The `/interactive` entries are focusable and fully keyboard-navigable. Arrow keys walk the
+points (or move in two dimensions across an ActivityGrid), and each focused value is read
+through a polite live region.
+
+## Color is never the only channel
+
+Direction and state are always doubled. Delta pairs a triangle glyph with its color; SparkBar
+encodes sign by position above or below the baseline; ActivityGrid always ships a numeric
+summary alongside its intensity. Default strokes clear 4.5:1 contrast in both themes.
+
+## System preferences, handled
+
+- **`prefers-reduced-motion`** — entrance and update animations resolve instantly to their
+  final state.
+- **`forced-colors`** — data ink maps to system `CanvasText`, accents to `Highlight`, muted
+  marks to `GrayText`.
+- **`prefers-contrast`** — strokes thicken and bands deepen automatically.
+
+## Related
+
+<Cards>
+  <Card title="Theming" href="/docs/theming" description="Tokens, presets, and dark mode." />
+  <Card title="Charts" href="/docs/charts" description="Each chart's exact summary behavior." />
+</Cards>

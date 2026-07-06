@@ -5,9 +5,11 @@
 // triangle shape (up/down/flat) AND color — never color alone (plan/08 1.4.1).
 import type { CSSProperties, ReactNode } from "react";
 
+// viewBox is 0 0 10 10 (y grows downward). Apex is the lone vertex: at the top
+// (small y) for up ▲, at the bottom (large y) for down ▼.
 const GLYPH = {
-  up: "M5 9 L9 3 L1 3 Z", // ▲
-  down: "M1 3 L9 3 L5 9 Z", // ▼
+  up: "M5 3 L9 9 L1 9 Z", // ▲ apex top
+  down: "M1 3 L9 3 L5 9 Z", // ▼ apex bottom
   flat: "M1 4.25 H9 V5.75 H1 Z", // ▬
 } as const;
 

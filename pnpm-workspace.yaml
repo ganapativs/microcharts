@@ -1,4 +1,5 @@
 packages:
+  - "apps/*"
   - "fixtures/*"
 
 # pnpm 11 reads project settings from here (not .npmrc).
@@ -14,8 +15,10 @@ minimumReleaseAge: 0
 verifyDepsBeforeRun: false
 
 # Dependencies allowed to run install/build scripts (pnpm 11 blocks these by
-# default). Both are trusted CLI binaries that fetch their native executable.
+# default). All are trusted CLI binaries that fetch their native executable
+# (workerd = Cloudflare Workers runtime, via wrangler in the docs app).
 allowBuilds:
   esbuild: true
   lefthook: true
   sharp: true
+  workerd: true

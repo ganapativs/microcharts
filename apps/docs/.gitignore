@@ -1,0 +1,22 @@
+# deps
+/node_modules
+
+# generated content
+.source
+
+# build
+/.next/
+/out/
+/build
+*.tsbuildinfo
+
+# cloudflare
+.wrangler
+.dev.vars
+
+# misc
+.DS_Store
+*.pem
+.env*.local
+.vercel
+next-env.d.ts

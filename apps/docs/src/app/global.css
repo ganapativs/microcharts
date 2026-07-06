@@ -1,0 +1,205 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+@import "@microcharts/react/styles.css";
+
+/*
+ * microcharts docs — "editorial measurement instrument".
+ * Matte, minimal, premium. The charts are the heroes; the chrome is a quiet
+ * precision frame. Not default Fumadocs (see memory: docs-site-design-system).
+ */
+
+@theme {
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-src), ui-monospace, "SF Mono", monospace;
+  --font-display: var(--font-display-src), ui-serif, Georgia, serif;
+
+  /* Fluid type ramp for the marketing surface. */
+  --text-fluid-hero: clamp(2.9rem, 1.6rem + 6.2vw, 6.5rem);
+  --text-fluid-h2: clamp(1.75rem, 1.2rem + 2.4vw, 3rem);
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --radius-panel: 14px;
+}
+
+/* ---- Matte palette: retune Fumadocs' --color-fd-* tokens (light) --------- */
+:root {
+  --color-fd-background: #fbfaf7; /* warm paper */
+  --color-fd-foreground: #191712;
+  --color-fd-muted: #f2efe8;
+  --color-fd-muted-foreground: #6b6659;
+  --color-fd-border: #e7e2d7;
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: #191712;
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: #191712;
+  --color-fd-primary: #0f66a6;
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-secondary: #f2efe8;
+  --color-fd-secondary-foreground: #191712;
+  --color-fd-accent: #ece7dc;
+  --color-fd-accent-foreground: #191712;
+  --color-fd-ring: #0f66a6;
+
+  /* our own semantic surface tokens */
+  --paper: var(--color-fd-background);
+  --ink: var(--color-fd-foreground);
+  --faint: var(--color-fd-muted-foreground);
+  --rule: var(--color-fd-border);
+  --signal: #0f66a6;
+
+  /* Bind microcharts tokens to the SITE theme (next-themes class), not the OS.
+     The library keys its dark values off @media(prefers-color-scheme) with
+     zero specificity; these :root overrides (higher specificity) win, so a
+     forced light/dark docs theme always matches its charts. */
+  --mc-stroke: #171717;
+  --mc-positive: #009e73;
+  --mc-negative: #d55e00;
+  --mc-accent: #0072b2;
+  --mc-neutral: #8a8a8a;
+
+  color-scheme: light;
+}
+
+/* ---- Dark: hand-tuned matte near-black, rich on AMOLED/XDR -------------- */
+.dark {
+  --color-fd-background: #0b0b0c;
+  --color-fd-foreground: #ecebe6;
+  --color-fd-muted: #161618;
+  --color-fd-muted-foreground: #98938a;
+  --color-fd-border: #24242a;
+  --color-fd-card: #101012;
+  --color-fd-card-foreground: #ecebe6;
+  --color-fd-popover: #101012;
+  --color-fd-popover-foreground: #ecebe6;
+  --color-fd-primary: #59c2ff;
+  --color-fd-primary-foreground: #06121b;
+  --color-fd-secondary: #161618;
+  --color-fd-secondary-foreground: #ecebe6;
+  --color-fd-accent: #17171a;
+  --color-fd-accent-foreground: #ecebe6;
+  --color-fd-ring: #59c2ff;
+
+  --signal: #59c2ff;
+
+  /* microcharts dark tokens, bound to the site theme (see :root note). */
+  --mc-stroke: #ededed;
+  --mc-positive: #2dd4a7;
+  --mc-negative: #ff8a4c;
+  --mc-accent: #4cc2ff;
+  --mc-neutral: #9a9a9a;
+
+  color-scheme: dark;
+}
+
+/* ---- Base ---------------------------------------------------------------- */
+html {
+  scrollbar-gutter: stable;
+  -webkit-text-size-adjust: 100%;
+}
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+body {
+  font-feature-settings: "cv01", "ss01";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+::selection {
+  background: color-mix(in oklab, var(--signal) 22%, transparent);
+}
+
+/* ---- Identity primitives ------------------------------------------------- */
+
+/* Editorial serif display — the signature voice. */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.018em;
+  line-height: 0.98;
+}
+
+/* Small mono metadata: section markers, sizes, coordinates. */
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+/* Hairline rule that respects the token border. */
+.rule {
+  border-color: var(--rule);
+}
+
+/* Faint engineered graph-paper backdrop (the instrument tell). */
+.grid-paper {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--rule) 55%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--rule) 55%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 32px 32px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 40%, transparent 100%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 40%, transparent 100%);
+}
+
+/* Draw-in underline on hover for text links. */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1.5px;
+  transition: background-size 0.32s var(--ease-out-quint);
+}
+.link-underline:hover {
+  background-size: 100% 1.5px;
+}
+
+/* Elevation via hairline, never shadow stacks (plan/06). */
+.panel {
+  background: var(--color-fd-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-panel);
+}
+
+/* Scroll-reveal: charts and panels fade+rise once, gated on reduced-motion. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reveal {
+  animation: rise-in 0.7s var(--ease-out-quint) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .link-underline {
+    animation: none !important;
+    transition: none !important;
+  }
+  .link-underline {
+    background-size: 100% 1.5px;
+  }
+}
+
+/* Charts embedded in prose/cards inherit the host font + tabular numerals. */
+.mc-root text {
+  font-family: var(--font-sans);
+}

@@ -1,0 +1,68 @@
+---
+title: Bullet
+description: A compact bullet chart for React — a measured value against a target tick and qualitative bands, static SVG or interactive.
+---
+
+Bullet compares one measured value to a target, against a backdrop of qualitative bands
+(poor / okay / good). It answers "are we there yet?" in a single row — ideal for progress,
+SLAs, budgets, and quotas.
+
+<LiveDemo
+  label="Bullet"
+  meta="static · 1.44 kB"
+  code={`import { Bullet } from "@microcharts/react/bullet";
+
+<Bullet value={72} target={80} bands={[50, 90]} title="Quota attainment" />`}
+>
+  <Bullet value={72} target={80} bands={[50, 90]} width={200} height={22} title="Quota attainment" />
+</LiveDemo>
+
+## When to use it
+
+- **Good for** — progress to a goal, a value against a target, KPIs with thresholds.
+- **Avoid for** — trends over time (use [Sparkline](/docs/charts/sparkline)) or
+  distributions.
+
+## Variants
+
+<LiveDemo
+  label="Variants"
+  code={`<Bullet value={72} target={80} bands={[50, 90]} />
+<Bullet value={94} target={80} bands={[50, 90]} />
+<Bullet value={38} target={80} bands={[50, 90]} />`}
+>
+  <div className="flex flex-col gap-3">
+    <Bullet value={72} target={80} bands={[50, 90]} width={200} height={20} title="Behind target" />
+    <Bullet
+      value={94}
+      target={80}
+      bands={[50, 90]}
+      width={200}
+      height={20}
+      title="Ahead of target"
+    />
+    <Bullet value={38} target={80} bands={[50, 90]} width={200} height={20} title="Well behind" />
+  </div>
+</LiveDemo>
+
+## Accessibility
+
+Bullet announces its value, its target, and where it lands among the bands — no color is
+required to tell whether the target was met, because the measure's length and the target
+tick encode it by position. The interactive entry reads the value and target on hover and
+focus.
+
+## Props
+
+<PropTable slug="bullet" />
+
+## Related
+
+<Cards>
+  <Card title="Delta" href="/docs/charts/delta" description="The change that moved the measure." />
+  <Card
+    title="Sparkline"
+    href="/docs/charts/sparkline"
+    description="The trend leading to the value."
+  />
+</Cards>

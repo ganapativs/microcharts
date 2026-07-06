@@ -1,0 +1,76 @@
+---
+title: ActivityGrid
+description: A calendar or matrix intensity chart for React — the contribution-graph shape, static SVG or an interactive 2-D keyboard grid.
+---
+
+ActivityGrid maps ordered values onto a grid of cells, each shaded by intensity. It's the
+contribution-graph shape: cadence, streaks, and seasonality, readable at a glance.
+
+<LiveDemo
+  label="ActivityGrid"
+  meta="static · 1.56 kB"
+  code={`import { ActivityGrid } from "@microcharts/react/activity-grid";
+
+<ActivityGrid data={commitCounts} title="Commits" />`}
+>
+  <ActivityGrid
+    data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3, 0, 2, 3, 4, 1, 2, 0]}
+    cell={11}
+    title="Commit activity"
+  />
+</LiveDemo>
+
+## When to use it
+
+- **Good for** — daily activity, streaks and cadence, seasonality at a glance.
+- **Avoid for** — exact values, or precise comparison between two individual cells. Color
+  intensity is deliberately approximate; pair it with a number when precision matters.
+
+## Variants
+
+`layout="strip"` collapses to a single row for inline use.
+
+<LiveDemo
+  label="Variants"
+  code={`<ActivityGrid data={data} />
+<ActivityGrid data={data} layout="strip" />`}
+>
+  <div className="flex flex-col items-start gap-4">
+    <ActivityGrid
+      data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]}
+      cell={11}
+      title="Grid"
+    />
+    <ActivityGrid
+      data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4]}
+      layout="strip"
+      cell={11}
+      title="Strip"
+    />
+  </div>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="activity-grid" />
+
+## Accessibility
+
+Intensity is a color channel, so ActivityGrid always pairs it with a numeric summary of
+its total and peak — the information survives forced-colors and color-blind viewing. The
+interactive entry adds 2-D arrow-key navigation, announcing each cell's value as you move.
+
+## Props
+
+<PropTable slug="activity-grid" />
+
+## Related
+
+<Cards>
+  <Card title="SparkBar" href="/docs/charts/sparkbar" description="Discrete magnitudes in a row." />
+  <Card
+    title="Accessibility"
+    href="/docs/accessibility"
+    description="Why color is never the only channel."
+  />
+</Cards>

@@ -1,0 +1,75 @@
+---
+title: Delta
+description: An inline signed change for React KPIs — direction double-encoded by glyph and color, with optional percent-from-prior.
+---
+
+Delta is a text-first metric: a signed number with a direction glyph. It reads inline,
+next to a KPI, or inside a table cell. Direction is always doubled — a triangle _and_ a
+color — so it never relies on color alone.
+
+<LiveDemo
+  label="Delta"
+  meta="static · 0.81 kB"
+  code={`import { Delta } from "@microcharts/react/delta";
+
+<Delta value={0.124} title="Revenue vs last week" />`}
+>
+  <span className="text-lg"><Delta value={0.124} title="Revenue vs last week" /></span>
+</LiveDemo>
+
+## When to use it
+
+- **Good for** — a KPI's change, period-over-period percent, inline metric movement.
+- **Avoid for** — showing a series or comparing magnitudes across items.
+
+## Variants
+
+`from` derives a percent change; `positive="down"` flips only the color for metrics where
+down is good (latency, churn, cost).
+
+<LiveDemo
+  label="Variants"
+  code={`<Delta value={0.124} />
+<Delta value={128} from={100} />
+<Delta value={-0.08} />
+<Delta value={-0.05} positive="down" />`}
+>
+  <span className="text-lg">
+    <Delta value={0.124} title="Percent" />
+  </span>
+  <span className="text-lg">
+    <Delta value={128} from={100} title="From prior" />
+  </span>
+  <span className="text-lg">
+    <Delta value={-0.08} title="Down is bad" />
+  </span>
+  <span className="text-lg">
+    <Delta value={-0.05} positive="down" title="Down is good" />
+  </span>
+</LiveDemo>
+
+## Accessibility
+
+Delta renders accessible inline text — the glyph is decorative and the value carries the
+meaning. Color is a redundant channel on top of the direction glyph and the sign, so the
+change survives forced-colors and color-blind viewing. The interactive entry re-announces
+the figure through a polite live region when the value changes.
+
+## Props
+
+<PropTable slug="delta" />
+
+## Related
+
+<Cards>
+  <Card
+    title="Sparkline"
+    href="/docs/charts/sparkline"
+    description="Pair a Delta with the trend behind it."
+  />
+  <Card
+    title="Bullet"
+    href="/docs/charts/bullet"
+    description="A value measured against a target."
+  />
+</Cards>
