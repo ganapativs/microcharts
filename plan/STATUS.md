@@ -24,7 +24,7 @@
 
 **Phases 0 + 1 + 2 COMPLETE.** Checkpoints 0, 1, 2 all passed. Phase 2 shipped the five charts each with static + `/interactive` entries, SparkGroup shared scale, and the bench harness — 167 tests, `pnpm check`/size/publint/attw/visual/RSC all green.
 
-**Immediate next: Phase 3 — docs & polish (plan/10 §3).** Start 3.1: Fumadocs site + Storybook 10 workshop. Also: first PR (or `visual.yml` workflow_dispatch) records the Argos visual baselines (specs in `tests/visual/`, ARGOS_TOKEN set).
+**Immediate next: Phase 3 — docs & polish (plan/10 §3).** Start 3.1: Fumadocs site + Storybook 10 workshop. Argos visual baselines recorded (build #1 via `visual.yml` dispatch, 2026-07-06); future PRs diff against them.
 
 **Phase-2 deferred (documented, not blocking Phase 3):** doc *pages* land with Fumadocs in Phase 3 (compiled 4-context examples seeded in `tests/visual/*.spec.ts` + `bench/demo.mjs`); bench **competitor matrix** deferred to launch prep (not competing pre-1.0).
 
