@@ -17,6 +17,10 @@ color — so it never relies on color alone.
   <span className="text-lg"><Delta value={0.124} title="Revenue vs last week" /></span>
 </LiveDemo>
 
+## Try it
+
+<Playground chart="delta" />
+
 ## Interactive
 
 <InteractiveDemo slug="delta" />
@@ -31,26 +35,33 @@ color — so it never relies on color alone.
 `from` derives a percent change; `positive="down"` flips only the color for metrics where
 down is good (latency, churn, cost).
 
-<LiveDemo
-  label="Variants"
-  code={`<Delta value={0.124} />
-<Delta value={128} from={100} />
-<Delta value={-0.08} />
-<Delta value={-0.05} positive="down" />`}
->
+<LiveDemo label="percent" code={`<Delta value={0.124} />`}>
   <span className="text-lg">
     <Delta value={0.124} title="Percent" />
   </span>
+</LiveDemo>
+
+<LiveDemo label="from prior" code={`<Delta value={128} from={100} />`}>
   <span className="text-lg">
     <Delta value={128} from={100} title="From prior" />
   </span>
+</LiveDemo>
+
+<LiveDemo label="negative" code={`<Delta value={-0.08} />`}>
   <span className="text-lg">
     <Delta value={-0.08} title="Down is bad" />
   </span>
+</LiveDemo>
+
+<LiveDemo label="down is good" code={`<Delta value={-0.05} positive="down" />`}>
   <span className="text-lg">
     <Delta value={-0.05} positive="down" title="Down is good" />
   </span>
 </LiveDemo>
+
+## Four homes
+
+<FourContexts slug="delta" />
 
 ## Accessibility
 

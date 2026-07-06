@@ -53,7 +53,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
           ),
         }}
       />
-      <DocsTitle className="font-display text-[2.15em] font-normal tracking-[-0.02em]">
+      <DocsTitle className="font-display text-[2.15em] font-medium tracking-[-0.025em]">
         {page.data.title}
       </DocsTitle>
       <DocsDescription className="mb-0 text-base">{page.data.description}</DocsDescription>

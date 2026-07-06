@@ -1,24 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Provider } from "@/components/provider";
 import { SITE } from "@/lib/site";
 import { jsonLdScript, softwareSourceCodeJsonLd, websiteJsonLd } from "@/lib/jsonld";
 import "./global.css";
 
-// Instrument Sans — crisp humanist body/UI. Distinct from the Inter/Hanken pack.
-const sans = Instrument_Sans({
+// Hanken Grotesk — crisp, compact humanist body/UI (narrower than Instrument
+// Sans). Excellent tabular numerals for the charts to inherit.
+const sans = Hanken_Grotesk({
   subsets: ["latin"],
   variable: "--font-sans-src",
   display: "swap",
 });
 
-// Fraunces — a soft, optical old-style serif with real character (the display
-// voice). Optical sizing gives the huge hero type its handcrafted warmth.
-const display = Fraunces({
+// Bricolage Grotesque — an expressive, optical display grotesque with genuine
+// character (the "handcrafted" voice). Distinct from the serif-heavy AI
+// editorial pack; carries the big hero + section headings.
+const display = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--font-display-src",
   display: "swap",
-  style: ["normal", "italic"],
 });
 
 const mono = JetBrains_Mono({

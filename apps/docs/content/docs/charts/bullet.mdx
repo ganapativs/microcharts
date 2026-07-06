@@ -17,6 +17,10 @@ SLAs, budgets, and quotas.
   <Bullet value={72} target={80} bands={[50, 90]} width={200} height={22} title="Quota attainment" />
 </LiveDemo>
 
+## Try it
+
+<Playground chart="bullet" />
+
 ## Interactive
 
 <InteractiveDemo slug="bullet" />
@@ -29,25 +33,21 @@ SLAs, budgets, and quotas.
 
 ## Variants
 
-<LiveDemo
-  label="Variants"
-  code={`<Bullet value={72} target={80} bands={[50, 90]} />
-<Bullet value={94} target={80} bands={[50, 90]} />
-<Bullet value={38} target={80} bands={[50, 90]} />`}
->
-  <div className="flex flex-col gap-3">
-    <Bullet value={72} target={80} bands={[50, 90]} width={200} height={20} title="Behind target" />
-    <Bullet
-      value={94}
-      target={80}
-      bands={[50, 90]}
-      width={200}
-      height={20}
-      title="Ahead of target"
-    />
-    <Bullet value={38} target={80} bands={[50, 90]} width={200} height={20} title="Well behind" />
-  </div>
+<LiveDemo label="behind target" code={`<Bullet value={72} target={80} bands={[50, 90]} />`}>
+  <Bullet value={72} target={80} bands={[50, 90]} width={220} height={22} title="Behind target" />
 </LiveDemo>
+
+<LiveDemo label="ahead of target" code={`<Bullet value={94} target={80} bands={[50, 90]} />`}>
+  <Bullet value={94} target={80} bands={[50, 90]} width={220} height={22} title="Ahead of target" />
+</LiveDemo>
+
+<LiveDemo label="no bands" code={`<Bullet value={38} target={80} />`}>
+  <Bullet value={38} target={80} width={220} height={22} title="Measure and target only" />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="bullet" />
 
 ## Accessibility
 

@@ -17,6 +17,10 @@ glance.
   <SparkBar data={[4, 6, 2, 8, 5, 9]} width={120} height={32} title="Deploys per day" />
 </LiveDemo>
 
+## Try it
+
+<Playground chart="sparkbar" />
+
 ## Interactive
 
 <InteractiveDemo slug="sparkbar" />
@@ -29,18 +33,27 @@ glance.
 
 ## Variants
 
-<LiveDemo
-  label="Variants"
-  code={`<SparkBar data={[4, 6, 2, 8, 5, 9]} />
-<SparkBar data={[1, -1, 1, 1, -1, 1, -1]} mode="winloss" />`}
->
-  <SparkBar data={[4, 6, 2, 8, 5, 9]} width={120} height={30} title="Magnitude" />
+<LiveDemo label="bar (default)" code={`<SparkBar data={[4, 6, 2, 8, 5, 9]} />`}>
+  <SparkBar data={[4, 6, 2, 8, 5, 9]} width={130} height={32} title="Magnitude" />
+</LiveDemo>
+
+<LiveDemo label="winloss" code={`<SparkBar data={[1, -1, 1, 1, -1, 1, -1]} mode="winloss" />`}>
   <SparkBar
     data={[1, -1, 1, 1, -1, 1, -1]}
-    width={120}
-    height={30}
+    width={130}
+    height={32}
     mode="winloss"
     title="Win–loss streak"
+  />
+</LiveDemo>
+
+<LiveDemo label="label" code={`<SparkBar data={[4, 6, 2, 8, 5, 9]} label="last" />`}>
+  <SparkBar
+    data={[4, 6, 2, 8, 5, 9]}
+    width={130}
+    height={32}
+    label="last"
+    title="With endpoint label"
   />
 </LiveDemo>
 

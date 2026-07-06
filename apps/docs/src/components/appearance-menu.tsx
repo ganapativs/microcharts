@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Check, Monitor, Moon, Sun } from "lucide-react";
+import { Sparkline } from "@microcharts/react/sparkline";
 import { cn } from "@/lib/cn";
 
 const ACCENTS = [
@@ -10,12 +11,12 @@ const ACCENTS = [
   { id: "clay", label: "Clay", color: "#a14a34" },
   { id: "moss", label: "Moss", color: "#4d7c1e" },
   { id: "teal", label: "Teal", color: "#0f766e" },
-  { id: "plum", label: "Plum", color: "#8a3a6b" },
+  { id: "rose", label: "Rose", color: "#be123c" },
 ] as const;
 
 const THEMES = [
   { id: "light", icon: Sun, label: "Light" },
-  { id: "system", icon: Monitor, label: "System" },
+  { id: "system", icon: Monitor, label: "Auto" },
   { id: "dark", icon: Moon, label: "Dark" },
 ] as const;
 
@@ -63,56 +64,82 @@ export function AppearanceMenu() {
         aria-label="Appearance"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex size-8 items-center justify-center rounded-md border border-fd-border text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+        className="flex size-8 items-center justify-center rounded-md border border-fd-border transition-colors hover:bg-fd-muted"
       >
         <span
-          className="size-3.5 rounded-full ring-2 ring-fd-background"
+          className="size-3.5 rounded-[5px] ring-2 ring-fd-background transition-transform"
           style={{ background: mounted ? "var(--accent)" : current.color }}
         />
       </button>
 
       {open && (
-        <div className="pop-in absolute right-0 top-[calc(100%+8px)] z-50 w-56 origin-top-right rounded-xl border border-fd-border bg-fd-popover p-3 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.28)]">
-          <div className="mono-label mb-2 text-[0.6rem]">Theme</div>
-          <div className="flex rounded-lg border border-fd-border bg-fd-muted/50 p-0.5">
-            {THEMES.map((t) => {
-              const active = mounted && theme === t.id;
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTheme(t.id)}
-                  aria-label={t.label}
-                  className={cn(
-                    "flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-xs transition-colors",
-                    active
-                      ? "bg-fd-card text-fd-foreground ring-1 ring-fd-border"
-                      : "text-fd-muted-foreground hover:text-fd-foreground",
-                  )}
-                >
-                  <t.icon className="size-3.5" />
-                </button>
-              );
-            })}
+        <div className="pop-in absolute right-0 top-[calc(100%+10px)] z-50 w-[19rem] origin-top-right overflow-hidden rounded-2xl border border-fd-border bg-fd-popover shadow-[0_20px_60px_-20px_rgba(0,0,0,0.4)]">
+          {/* live preview — the accent on a real microchart */}
+          <div className="grid-paper relative flex items-center justify-center border-b border-fd-border px-5 py-6">
+            <span className="mono-label absolute left-4 top-3 text-[0.56rem]">Preview</span>
+            <span className="mono-label absolute right-4 top-3 text-[0.56rem] text-fd-primary">
+              {current.label}
+            </span>
+            <Sparkline
+              data={[6, 9, 7, 12, 10, 15, 13, 18, 16, 22]}
+              width={220}
+              height={52}
+              curve="smooth"
+              dots="minmax"
+              color="var(--accent)"
+              summary={false}
+            />
           </div>
 
-          <div className="mono-label mb-2 mt-4 text-[0.6rem]">Accent</div>
-          <div className="grid grid-cols-6 gap-1.5">
-            {ACCENTS.map((a) => (
-              <button
-                key={a.id}
-                type="button"
-                onClick={() => setAccent(a.id)}
-                aria-label={a.label}
-                aria-pressed={accent === a.id}
-                title={a.label}
-                className={cn(
-                  "flex aspect-square items-center justify-center rounded-md transition-transform hover:scale-110",
-                  accent === a.id && "ring-2 ring-fd-ring ring-offset-2 ring-offset-fd-popover",
-                )}
-                style={{ background: a.color }}
-              />
-            ))}
+          <div className="p-3">
+            <div className="mono-label mb-2 text-[0.58rem]">Theme</div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {THEMES.map((t) => {
+                const active = mounted && theme === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setTheme(t.id)}
+                    className={cn(
+                      "flex flex-col items-center gap-1 rounded-lg border py-2 text-[0.68rem] transition-colors",
+                      active
+                        ? "border-fd-primary/50 bg-fd-primary/10 text-fd-foreground"
+                        : "border-fd-border text-fd-muted-foreground hover:text-fd-foreground",
+                    )}
+                  >
+                    <t.icon className="size-4" />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mono-label mb-2 mt-4 text-[0.58rem]">Accent</div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {ACCENTS.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => setAccent(a.id)}
+                  aria-pressed={accent === a.id}
+                  className={cn(
+                    "group flex items-center gap-2 rounded-lg border px-2 py-1.5 text-[0.7rem] transition-colors",
+                    accent === a.id
+                      ? "border-fd-primary/50 bg-fd-primary/10 text-fd-foreground"
+                      : "border-fd-border text-fd-muted-foreground hover:text-fd-foreground",
+                  )}
+                >
+                  <span
+                    className="relative flex size-4 shrink-0 items-center justify-center rounded-full"
+                    style={{ background: a.color }}
+                  >
+                    {accent === a.id && <Check className="size-2.5 text-white" strokeWidth={3.5} />}
+                  </span>
+                  {a.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

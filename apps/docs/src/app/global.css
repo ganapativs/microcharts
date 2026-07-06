@@ -12,7 +12,7 @@
 @theme {
   --font-sans: var(--font-sans-src), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-src), ui-monospace, "SF Mono", monospace;
-  --font-display: var(--font-display-src), ui-serif, Georgia, serif;
+  --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
 
   /* Fluid type ramp for the marketing surface. */
   --text-fluid-hero: clamp(2.9rem, 1.5rem + 6.4vw, 6.75rem);
@@ -146,15 +146,15 @@
   --accent-fg: #180a05;
 }
 
-:root[data-accent="plum"] {
-  --accent: #8a3a6b;
-  --accent-strong: #732f59;
-  --accent-fg: #fff7fb;
+:root[data-accent="rose"] {
+  --accent: #be123c;
+  --accent-strong: #9f0f33;
+  --accent-fg: #fff5f6;
 }
-.dark[data-accent="plum"] {
-  --accent: #cf8fb6;
-  --accent-strong: #e0a5c8;
-  --accent-fg: #160611;
+.dark[data-accent="rose"] {
+  --accent: #fb6f89;
+  --accent-strong: #ff8299;
+  --accent-fg: #1a060a;
 }
 
 :root[data-accent="teal"] {
@@ -187,21 +187,51 @@ body {
   background: color-mix(in oklab, var(--signal) 22%, transparent);
 }
 
+/* accent-themed range slider (playground controls) */
+.mc-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.mc-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-fd-border);
+}
+.mc-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--color-fd-card);
+  box-shadow: 0 0 0 1px var(--color-fd-border);
+}
+.mc-range::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-fd-border);
+}
+.mc-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-fd-card);
+  border-radius: 50%;
+  background: var(--accent);
+}
+
 /* ---- Identity primitives ------------------------------------------------- */
 
-/* Editorial serif display — the signature voice (Fraunces, optical). */
+/* Expressive display — the signature voice (Bricolage Grotesque, optical). */
 .display {
   font-family: var(--font-display);
   font-optical-sizing: auto;
-  font-weight: 380;
-  letter-spacing: -0.021em;
-  line-height: 0.94;
-}
-/* the hero gets a touch more weight + a single italic word for character */
-.display em,
-.display i {
-  font-style: italic;
-  font-weight: 400;
+  font-weight: 620;
+  letter-spacing: -0.022em;
+  line-height: 0.96;
 }
 
 /* Small mono metadata: section markers, sizes, coordinates. */
@@ -322,8 +352,8 @@ body {
 .prose h2 {
   font-family: var(--font-display);
   font-optical-sizing: auto;
-  font-weight: 440;
-  letter-spacing: -0.012em;
+  font-weight: 560;
+  letter-spacing: -0.016em;
 }
 .prose :where(h1, h2, h3, h4) {
   scroll-margin-top: 5rem;

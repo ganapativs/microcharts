@@ -19,7 +19,7 @@ the quiet backbone of a KPI card.
 
 ## Try it
 
-<Playground />
+<Playground chart="sparkline" />
 
 ## Interactive
 
@@ -35,21 +35,37 @@ the quiet backbone of a KPI card.
 ## Variants
 
 Shape, fill, a normal-range band, and dots are all props — same data, different read.
+Flip any of them to the Code tab.
 
-<LiveDemo
-  label="Variants"
-  code={`<Sparkline data={data} curve="smooth" />
-<Sparkline data={data} fill />
-<Sparkline data={data} band={[4, 8]} />
-<Sparkline data={data} dots="minmax" label="last" />`}
->
-  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} curve="smooth" title="Smooth" />
-  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} fill title="Filled area" />
-  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} band={[4, 8]} title="With band" />
+<LiveDemo label="curve" code={`<Sparkline data={data} curve="smooth" />`}>
   <Sparkline
     data={[3, 5, 4, 8, 6, 9]}
     width={120}
-    height={30}
+    height={32}
+    curve="smooth"
+    title="Smooth curve"
+  />
+</LiveDemo>
+
+<LiveDemo label="fill" code={`<Sparkline data={data} fill />`}>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} fill title="Filled area" />
+</LiveDemo>
+
+<LiveDemo label="band" code={`<Sparkline data={data} band={[4, 8]} />`}>
+  <Sparkline
+    data={[3, 5, 4, 8, 6, 9]}
+    width={120}
+    height={32}
+    band={[4, 8]}
+    title="Normal-range band"
+  />
+</LiveDemo>
+
+<LiveDemo label="dots + label" code={`<Sparkline data={data} dots="minmax" label="last" />`}>
+  <Sparkline
+    data={[3, 5, 4, 8, 6, 9]}
+    width={130}
+    height={32}
     dots="minmax"
     label="last"
     title="Min/max dots"
