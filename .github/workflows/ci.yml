@@ -37,7 +37,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22, 24]
+        # pnpm 11 requires Node >=22 (uses node:sqlite); Node 20 is also EOL.
+        # The published ESM artifact stays node-20-safe (engines: >=20) — we
+        # just can't run the pnpm-11 dev toolchain on 20.
+        node: [22, 24]
         react: ["18", "19"]
     steps:
       - uses: actions/checkout@v4
