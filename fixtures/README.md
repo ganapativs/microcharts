@@ -8,10 +8,11 @@ Real apps that consume `@microcharts/react` to prove it works where it must:
 - **`vite/`** — Vite + React. Asserts SSR + CSR hydration and the interactive
   (`…/interactive`) entries behave.
 
-**Status: not yet wired.** These activate at **Checkpoint 1** (plan/10 §1), when
-the first hand-assembled `<Sparkline>` exists to render — there is nothing to
-mount until a chart lands. Wiring them earlier would only install Next/Vite
-against an empty library. Tracked in [../plan/STATUS.md](../plan/STATUS.md) (0.4).
+**Status:** `next/` is **live** (Checkpoint 1 passed) — `pnpm --filter
+@microcharts/fixture-next build` static-exports a page whose hand-assembled
+`<Sparkline>` renders server-side, and `… verify` (verify-rsc.mjs) asserts the
+SVG + auto-summary are in the static HTML with zero client JS. Both run in CI
+(the `rsc` job). `vite/` is still to come (SSR + interactive-entry checks).
 
-When wired, they become pnpm workspace packages (added to `pnpm-workspace.yaml`
-`packages:`) so `pnpm -F next build` / `pnpm -F vite dev` work.
+They are pnpm workspace packages (`pnpm-workspace.yaml` → `packages: [fixtures/*]`)
+so `pnpm --filter @microcharts/fixture-next <script>` works.

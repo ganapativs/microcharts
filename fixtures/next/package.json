@@ -1,0 +1,23 @@
+{
+  "name": "@microcharts/fixture-next",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "start": "next start",
+    "dev": "next dev",
+    "verify": "node verify-rsc.mjs"
+  },
+  "dependencies": {
+    "@microcharts/react": "workspace:*",
+    "next": "^16.2.10",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^6.0.3"
+  }
+}

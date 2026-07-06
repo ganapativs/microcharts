@@ -13,5 +13,5 @@
   "rules": {
     "react/react-in-jsx-scope": "off"
   },
-  "ignorePatterns": ["dist", "node_modules", "plan"]
+  "ignorePatterns": ["dist", "node_modules", "plan", "fixtures"]
 }

@@ -98,7 +98,23 @@
 }
 
 @layer microcharts.charts {
-  /* per-chart rules land here as charts ship */
+  /* ink roles — marks carry data-mc-ink; color/width come from tokens so a
+     single --mc-* override retunes every chart (plan/06 §3). */
+  :where(.mc-root [data-mc-ink="data"]) {
+    fill: none;
+    stroke: var(--mc-stroke);
+    stroke-width: var(--mc-stroke-width);
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  :where(.mc-root [data-mc-ink="accent"]) {
+    fill: var(--mc-accent);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-ink="muted"]) {
+    fill: none;
+    stroke: var(--mc-neutral);
+  }
 }
 
 @layer microcharts.motion {

@@ -54,3 +54,18 @@ jobs:
         run: pnpm add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
+
+  rsc:
+    # Checkpoint 1 gate: static charts render server-side with zero client JS.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build # dist/ that the fixture imports
+      - run: pnpm --filter @microcharts/fixture-next build
+      - run: pnpm --filter @microcharts/fixture-next verify

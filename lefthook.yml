@@ -7,7 +7,8 @@ pre-commit:
       run: pnpm oxfmt --check {staged_files}
     lint:
       glob: "*.{ts,tsx}"
-      run: pnpm oxlint {staged_files}
+      # tolerate an all-ignored set (e.g. only fixtures/** staged)
+      run: pnpm oxlint --no-error-on-unmatched-pattern {staged_files}
 
 pre-push:
   parallel: true

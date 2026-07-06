@@ -1,3 +1,6 @@
+packages:
+  - "fixtures/*"
+
 # pnpm 11 reads project settings from here (not .npmrc).
 #
 # This repo deliberately tracks bleeding-edge tooling (oxc, vitest, tsdown) that
@@ -15,3 +18,4 @@ verifyDepsBeforeRun: false
 allowBuilds:
   esbuild: true
   lefthook: true
+  sharp: true

@@ -20,9 +20,11 @@
 
 ## Current position
 
-**Phase 0 COMPLETE.** ✋ Checkpoint 0 passed — pushed to a private GitHub repo, CI green (quality + Node 22/24 × React 18/19), Release workflow green (no-op), `npm publish --dry-run` clean.
+**Phases 0 + 1 COMPLETE.** Checkpoint 0 (green CI pipeline) and Checkpoint 1 (RSC-static, zero-client-JS chart, gated by the `rsc` CI job) both passed. Kernel + summary + Chart shell + theming shipped and tested (62 unit/property/component tests + the RSC gate).
 
-**Immediate next: Phase 1 — core kernel.** Start `1.1` (`core/scale.ts`, `core/path.ts`). Pending one-time account setup before those workflows do real work: npmjs Trusted Publisher for `@microcharts/react`, `ARGOS_TOKEN` secret. Fixture apps land with the first chart (Checkpoint 1).
+**Immediate next: Phase 2 — the proving five.** Start `2.1 <Sparkline>` (line/smooth/step, fill, band, dots, labels, annotations) to the per-chart Definition of Done (plan/09). The hand-assembled fixture sparkline shows the target composition; the real component encapsulates it over the internal kernel.
+
+Pending one-time account setup (unblocks release/visual workflows): npmjs Trusted Publisher for `@microcharts/react`, `ARGOS_TOKEN` secret.
 
 ---
 
@@ -44,7 +46,7 @@
 | 1.2 `core/summary.ts` (describeSeries) | [x] | S1 shape (trend %/range/last), degenerate forms, `EN` templates (swappable for i18n), Intl formatting. S2–S4 land with their charts. |
 | 1.3 `shared/Chart.tsx` + `styles.css` a11y blocks | [x] | Hook-free `Chart` (role=img + `<title>`/`<desc>` + aria-labelledby, decorative opt-out); `a11y.ts` id/label composition; `styles.css` reconciled to plan token names + dark/forced-colors/prefers-contrast/reduced-motion. 6 component tests. |
 | 1.4 Theming (presets, MicroProvider) | [x] | `MicroProvider` (hook-free, RSC-safe): `data-mc-theme` + one-off `--mc-*` tokens. Presets modern/tufte/mono/vivid/dark as CSS token bundles. |
-| ✋ Checkpoint 1 | [ ] | **Next**: hand-assembled sparkline SSR-static in a Next fixture, zero client JS. Kernel + Chart + theming ready to compose it. |
+| ✋ Checkpoint 1 | [x] | **Passed.** `fixtures/next` (App Router, `output: export`) renders a hand-assembled `<Sparkline>` (real `Chart` + `describeSeries`) as a Server Component: static HTML carries the SVG + auto-summary, **0 client JS chunks reference the chart** (`verify-rsc.mjs`, wired as CI `rsc` job). |
 
 ## Phase 2 — The proving five `[ ]`
 

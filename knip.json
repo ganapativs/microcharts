@@ -8,6 +8,8 @@
     "playwright.config.ts"
   ],
   "project": ["src/**/*.{ts,tsx}"],
+  "ignore": ["fixtures/**"],
+  "ignoreWorkspaces": ["fixtures/*"],
   "ignoreDependencies": [
     "react",
     "react-dom",
