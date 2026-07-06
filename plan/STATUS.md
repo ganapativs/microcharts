@@ -2,7 +2,8 @@
 
 > **Single source of truth for what's done.** Mirrors the step IDs in [10-roadmap.md](10-roadmap.md).
 > Update this file in the **same commit** as the work it tracks. Roadmap = the plan (stable); STATUS = live progress.
-> Last updated: **2026-07-06** · Env: node 24.18, pnpm 11.10.0 (this repo) · Git: **0 commits, scaffold uncommitted**, branch `master` (PR target `main`).
+> Last updated: **2026-07-06** · Env: node 24.18, pnpm 11.10.0 (this repo) · Git: **pushed** to `github.com/ganapativs/microcharts` (**private**), branch `main`, 2 commits. CI green.
+> CI matrix is Node **22/24** only (pnpm 11 needs Node ≥22 via `node:sqlite`; Node 20 EOL). Published artifact stays node-20-safe (`engines: >=20`).
 >
 > **Account-gated setup still pending (one-time, not code):** npmjs.org Trusted Publisher for `@microcharts/react` (release.yml uses OIDC, no token); `ARGOS_TOKEN` repo secret (visual.yml). Both needed before their workflows actually publish/upload.
 
@@ -19,9 +20,9 @@
 
 ## Current position
 
-**Phase 0 nearly complete.** Scaffold builds green on pnpm 11 (`pnpm check` exit 0; publint/attw/dry-run pass). **Uncommitted.**
+**Phase 0 COMPLETE.** ✋ Checkpoint 0 passed — pushed to a private GitHub repo, CI green (quality + Node 22/24 × React 18/19), Release workflow green (no-op), `npm publish --dry-run` clean.
 
-**Immediate next:** (a) first commit + set `main`; (b) push so CI actually runs → **Checkpoint 0** (empty-but-green pipeline on GitHub); (c) one-time account setup (npmjs Trusted Publisher, `ARGOS_TOKEN`). Fixture apps intentionally deferred to Phase 1 (need a component to render).
+**Immediate next: Phase 1 — core kernel.** Start `1.1` (`core/scale.ts`, `core/path.ts`). Pending one-time account setup before those workflows do real work: npmjs Trusted Publisher for `@microcharts/react`, `ARGOS_TOKEN` secret. Fixture apps land with the first chart (Checkpoint 1).
 
 ---
 
@@ -33,7 +34,7 @@
 | 0.2 Repo scaffold | [x] | `package.json` (ESM-only, `dependencies:{}`, exports skeleton), `tsconfig.json` (TS6 strict), `tsdown.config.ts`, `LICENSE` (MIT), `CODE_OF_CONDUCT.md` (Covenant 3.0), `CONTRIBUTING.md`, `.github/` health files, `src/` skeleton, `styles.css`. |
 | 0.3 CI skeleton | [x] | `ci.yml` (quality job + React 18/19 × Node 20/22/24 matrix, size-limit, publint, attw, knip); **changesets** init (`.changeset/config.json`, access public, scripts version/release); **Renovate** (`renovate.json`, validated); **release workflow** (`release.yml`, OIDC trusted publishing + provenance). ⏳ one-time: npmjs Trusted Publisher setup. |
 | 0.4 Quality scaffolding | [x] | Vitest two-project (node + `@vitest/browser`), fast-check, knip, size-limit, attw; **axe-core harness** (`src/test/a11y.ts`); **Playwright + Argos** visual config (`playwright.config.ts`) + pinned-Docker `visual.yml`. Fixtures (Next RSC + Vite) intentionally deferred to Phase 1 — `fixtures/README.md` (need a component to render). ⏳ one-time: `ARGOS_TOKEN` secret. |
-| ✋ Checkpoint 0 | [◐] | Packaging bar met locally (publint/attw/`npm publish --dry-run` green). **Not yet:** pipeline proven green on GitHub Actions (needs first push). |
+| ✋ Checkpoint 0 | [x] | **Passed.** Private repo pushed; CI green (quality + Node 22/24 × React 18/19); Release workflow green (no-op); publint/attw/`npm publish --dry-run` clean. |
 
 ## Phase 1 — Core kernel `[ ]`
 
