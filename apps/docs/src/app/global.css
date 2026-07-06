@@ -10,86 +10,162 @@
  */
 
 @theme {
-  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-src), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-src), ui-monospace, "SF Mono", monospace;
   --font-display: var(--font-display-src), ui-serif, Georgia, serif;
 
   /* Fluid type ramp for the marketing surface. */
-  --text-fluid-hero: clamp(2.9rem, 1.6rem + 6.2vw, 6.5rem);
-  --text-fluid-h2: clamp(1.75rem, 1.2rem + 2.4vw, 3rem);
+  --text-fluid-hero: clamp(2.9rem, 1.5rem + 6.4vw, 6.75rem);
+  --text-fluid-h2: clamp(1.85rem, 1.2rem + 2.6vw, 3.15rem);
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-  --radius-panel: 14px;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius-panel: 16px;
 }
 
-/* ---- Matte palette: retune Fumadocs' --color-fd-* tokens (light) --------- */
+/*
+ * Accent is a single token (--accent) that everything derives from — chrome,
+ * links, focus rings, AND the chart emphasis color. The global picker swaps it
+ * via [data-accent] (see accent presets below). Default = Cobalt (rich, calm,
+ * deliberately NOT the cyan-on-dark / purple-gradient AI palette).
+ */
 :root {
-  --color-fd-background: #fbfaf7; /* warm paper */
-  --color-fd-foreground: #191712;
-  --color-fd-muted: #f2efe8;
-  --color-fd-muted-foreground: #6b6659;
-  --color-fd-border: #e7e2d7;
-  --color-fd-card: #ffffff;
-  --color-fd-card-foreground: #191712;
-  --color-fd-popover: #ffffff;
-  --color-fd-popover-foreground: #191712;
-  --color-fd-primary: #0f66a6;
-  --color-fd-primary-foreground: #ffffff;
-  --color-fd-secondary: #f2efe8;
-  --color-fd-secondary-foreground: #191712;
-  --color-fd-accent: #ece7dc;
-  --color-fd-accent-foreground: #191712;
-  --color-fd-ring: #0f66a6;
+  /* accent — Cobalt default (light) */
+  --accent: #2f52d4;
+  --accent-strong: #2543b8;
+  --accent-fg: #fdfdff;
+
+  /* warm paper neutrals, tinted off the ink (never pure white) */
+  --color-fd-background: #faf7f1;
+  --color-fd-foreground: #1b1712;
+  --color-fd-muted: #f0ebe1;
+  --color-fd-muted-foreground: #6a6357;
+  --color-fd-border: #e6ded0;
+  --color-fd-card: #fffdf9;
+  --color-fd-card-foreground: #1b1712;
+  --color-fd-popover: #fffdf9;
+  --color-fd-popover-foreground: #1b1712;
+  --color-fd-primary: var(--accent);
+  --color-fd-primary-foreground: var(--accent-fg);
+  --color-fd-secondary: #f0ebe1;
+  --color-fd-secondary-foreground: #1b1712;
+  --color-fd-accent: #ece5d8;
+  --color-fd-accent-foreground: #1b1712;
+  --color-fd-ring: var(--accent);
 
   /* our own semantic surface tokens */
   --paper: var(--color-fd-background);
   --ink: var(--color-fd-foreground);
   --faint: var(--color-fd-muted-foreground);
   --rule: var(--color-fd-border);
-  --signal: #0f66a6;
+  --signal: var(--accent);
 
   /* Bind microcharts tokens to the SITE theme (next-themes class), not the OS.
      The library keys its dark values off @media(prefers-color-scheme) with
      zero specificity; these :root overrides (higher specificity) win, so a
-     forced light/dark docs theme always matches its charts. */
-  --mc-stroke: #171717;
-  --mc-positive: #009e73;
-  --mc-negative: #d55e00;
-  --mc-accent: #0072b2;
-  --mc-neutral: #8a8a8a;
+     forced light/dark docs theme always matches its charts. --mc-accent follows
+     the site accent so the picker retunes charts too. */
+  --mc-stroke: #221d16;
+  --mc-positive: #0b8a63;
+  --mc-negative: #c5521c;
+  --mc-accent: var(--accent);
+  --mc-neutral: #94897a;
 
   color-scheme: light;
 }
 
-/* ---- Dark: hand-tuned matte near-black, rich on AMOLED/XDR -------------- */
+/* ---- Dark: warm-cool matte, tinted off the accent — no pure black, no
+   neon glow. Rich on AMOLED/XDR. -------------------------------------------- */
 .dark {
-  --color-fd-background: #0b0b0c;
-  --color-fd-foreground: #ecebe6;
-  --color-fd-muted: #161618;
-  --color-fd-muted-foreground: #98938a;
-  --color-fd-border: #24242a;
-  --color-fd-card: #101012;
-  --color-fd-card-foreground: #ecebe6;
-  --color-fd-popover: #101012;
-  --color-fd-popover-foreground: #ecebe6;
-  --color-fd-primary: #59c2ff;
-  --color-fd-primary-foreground: #06121b;
-  --color-fd-secondary: #161618;
-  --color-fd-secondary-foreground: #ecebe6;
-  --color-fd-accent: #17171a;
-  --color-fd-accent-foreground: #ecebe6;
-  --color-fd-ring: #59c2ff;
+  /* accent — Cobalt (dark): soft cornflower, matte, NOT cyan */
+  --accent: #7f9cf5;
+  --accent-strong: #93abff;
+  --accent-fg: #0a0c14;
 
-  --signal: #59c2ff;
+  --color-fd-background: #0c0d11;
+  --color-fd-foreground: #e9e8e3;
+  --color-fd-muted: #16171d;
+  --color-fd-muted-foreground: #928d84;
+  --color-fd-border: #232530;
+  --color-fd-card: #111319;
+  --color-fd-card-foreground: #e9e8e3;
+  --color-fd-popover: #111319;
+  --color-fd-popover-foreground: #e9e8e3;
+  --color-fd-primary: var(--accent);
+  --color-fd-primary-foreground: var(--accent-fg);
+  --color-fd-secondary: #16171d;
+  --color-fd-secondary-foreground: #e9e8e3;
+  --color-fd-accent: #191b22;
+  --color-fd-accent-foreground: #e9e8e3;
+  --color-fd-ring: var(--accent);
+
+  --signal: var(--accent);
 
   /* microcharts dark tokens, bound to the site theme (see :root note). */
-  --mc-stroke: #ededed;
-  --mc-positive: #2dd4a7;
-  --mc-negative: #ff8a4c;
-  --mc-accent: #4cc2ff;
-  --mc-neutral: #9a9a9a;
+  --mc-stroke: #e9e6df;
+  --mc-positive: #34d399;
+  --mc-negative: #fb8c5a;
+  --mc-accent: var(--accent);
+  --mc-neutral: #8f8a80;
 
   color-scheme: dark;
+}
+
+/* ---- Accent presets — the global picker sets [data-accent] on <html>.
+   All tasteful, all non-AI: warm and cool, none neon-on-dark. --------------- */
+:root[data-accent="ember"] {
+  --accent: #c2410c;
+  --accent-strong: #9a330a;
+  --accent-fg: #fffaf5;
+}
+.dark[data-accent="ember"] {
+  --accent: #f7924e;
+  --accent-strong: #ffa869;
+  --accent-fg: #180a03;
+}
+
+:root[data-accent="moss"] {
+  --accent: #4d7c1e;
+  --accent-strong: #3f6717;
+  --accent-fg: #fbfdf6;
+}
+.dark[data-accent="moss"] {
+  --accent: #a3c46a;
+  --accent-strong: #b6d47f;
+  --accent-fg: #0c1206;
+}
+
+:root[data-accent="clay"] {
+  --accent: #a14a34;
+  --accent-strong: #863c2a;
+  --accent-fg: #fff8f4;
+}
+.dark[data-accent="clay"] {
+  --accent: #e08e73;
+  --accent-strong: #f0a288;
+  --accent-fg: #180a05;
+}
+
+:root[data-accent="plum"] {
+  --accent: #8a3a6b;
+  --accent-strong: #732f59;
+  --accent-fg: #fff7fb;
+}
+.dark[data-accent="plum"] {
+  --accent: #cf8fb6;
+  --accent-strong: #e0a5c8;
+  --accent-fg: #160611;
+}
+
+:root[data-accent="teal"] {
+  --accent: #0f766e;
+  --accent-strong: #0c5f58;
+  --accent-fg: #f2fdfb;
+}
+.dark[data-accent="teal"] {
+  --accent: #55c2b3;
+  --accent-strong: #6fd4c6;
+  --accent-fg: #04120f;
 }
 
 /* ---- Base ---------------------------------------------------------------- */
@@ -113,12 +189,19 @@ body {
 
 /* ---- Identity primitives ------------------------------------------------- */
 
-/* Editorial serif display — the signature voice. */
+/* Editorial serif display — the signature voice (Fraunces, optical). */
 .display {
   font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 380;
+  letter-spacing: -0.021em;
+  line-height: 0.94;
+}
+/* the hero gets a touch more weight + a single italic word for character */
+.display em,
+.display i {
+  font-style: italic;
   font-weight: 400;
-  letter-spacing: -0.018em;
-  line-height: 0.98;
 }
 
 /* Small mono metadata: section markers, sizes, coordinates. */
@@ -186,6 +269,20 @@ body {
 }
 .reveal {
   animation: rise-in 0.7s var(--ease-out-quint) both;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.pop-in {
+  animation: pop-in 0.16s var(--ease-out-expo) both;
 }
 
 @media (prefers-reduced-motion: reduce) {

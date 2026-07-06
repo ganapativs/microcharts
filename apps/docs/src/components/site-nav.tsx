@@ -2,10 +2,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SearchTrigger } from "fumadocs-ui/layouts/shared/slots/search-trigger";
-import { ThemeSwitch } from "fumadocs-ui/layouts/shared/slots/theme-switch";
 import { Search } from "lucide-react";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/cn";
+import { Brandmark } from "@/components/brandmark";
+import { AppearanceMenu } from "@/components/appearance-menu";
 
 function GithubMark() {
   return (
@@ -24,32 +25,25 @@ const links = [
 
 function Wordmark() {
   return (
-    <Link href="/" className="group flex items-center gap-2" aria-label={`${SITE.name} home`}>
-      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden className="shrink-0">
-        <rect width="32" height="32" rx="7" className="fill-fd-primary" />
-        <path
-          d="M6 21L11 16L15 18L20 10.5L25.5 6.5"
-          className="stroke-fd-primary-foreground"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx="25.5" cy="6.5" r="2.6" className="fill-fd-primary-foreground" />
-      </svg>
-      <span className="text-[0.95rem] font-semibold tracking-tight text-fd-foreground">
+    <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} home`}>
+      <Brandmark size={24} className="shrink-0 transition-transform group-hover:-translate-y-px" />
+      <span className="text-[0.98rem] font-semibold tracking-[-0.01em] text-fd-foreground">
         microcharts
       </span>
     </Link>
   );
 }
 
+const ctrl =
+  "flex size-8 items-center justify-center rounded-md border border-transparent text-fd-muted-foreground transition-colors hover:border-fd-border hover:text-fd-foreground";
+
 export function SiteNav() {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-40 border-b border-fd-border/80 bg-fd-background/72 backdrop-blur-xl">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-fd-border/70 bg-fd-background/70 backdrop-blur-xl">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center gap-5 px-4 sm:px-6">
         <Wordmark />
-        <div className="mx-1 hidden items-center gap-1 md:flex">
+        <div className="hidden items-center gap-0.5 md:flex">
           {links.map((l) => {
             const active =
               pathname === l.href || (l.href !== "/docs" && pathname.startsWith(l.href));
@@ -58,13 +52,16 @@ export function SiteNav() {
                 key={l.href}
                 href={l.href}
                 className={cn(
-                  "rounded-md px-2.5 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.12em] transition-colors",
+                  "relative rounded-md px-2.5 py-1.5 text-[0.82rem] font-medium transition-colors",
                   active
                     ? "text-fd-foreground"
                     : "text-fd-muted-foreground hover:text-fd-foreground",
                 )}
               >
                 {l.label}
+                {active && (
+                  <span className="absolute inset-x-2.5 -bottom-[11px] h-px bg-fd-primary" />
+                )}
               </Link>
             );
           })}
@@ -72,12 +69,12 @@ export function SiteNav() {
 
         <div className="ml-auto flex items-center gap-1.5">
           <SearchTrigger
-            className="group flex h-8 items-center gap-2 rounded-md border border-fd-border bg-fd-muted/50 pl-2.5 pr-1.5 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
             aria-label="Search"
+            className="group flex h-8 items-center gap-2 rounded-md border border-fd-border bg-fd-muted/40 pl-2 pr-1.5 text-fd-muted-foreground transition-colors hover:border-fd-border hover:text-fd-foreground"
           >
-            <Search className="size-3.5" />
-            <span className="hidden font-mono text-[0.7rem] sm:inline">Search</span>
-            <kbd className="hidden rounded border border-fd-border bg-fd-card px-1.5 py-0.5 font-mono text-[0.62rem] sm:inline">
+            <Search className="size-4 shrink-0" strokeWidth={2} />
+            <span className="hidden text-[0.8rem] sm:inline">Search</span>
+            <kbd className="hidden items-center rounded border border-fd-border bg-fd-card px-1.5 py-px font-mono text-[0.62rem] leading-5 sm:inline-flex">
               ⌘K
             </kbd>
           </SearchTrigger>
@@ -86,11 +83,11 @@ export function SiteNav() {
             target="_blank"
             rel="noreferrer noopener"
             aria-label="GitHub repository"
-            className="inline-flex size-8 items-center justify-center rounded-md text-fd-muted-foreground transition-colors hover:bg-fd-muted hover:text-fd-foreground"
+            className={ctrl}
           >
             <GithubMark />
           </a>
-          <ThemeSwitch className="shrink-0" />
+          <AppearanceMenu />
         </div>
       </nav>
     </header>

@@ -17,7 +17,7 @@ export function GET() {
         flexDirection: "column",
         justifyContent: "space-between",
         padding: 72,
-        background: "#fbfaf7",
+        background: "#faf7f1",
         color: "#191712",
         fontFamily: "Georgia, serif",
         position: "relative",
@@ -30,7 +30,7 @@ export function GET() {
             width: 44,
             height: 44,
             borderRadius: 10,
-            background: "#0f66a6",
+            background: "#2f52d4",
             display: "flex",
           }}
         />
@@ -46,12 +46,12 @@ export function GET() {
           <polyline
             points="0,96 120,80 240,88 360,52 480,64 600,30 720,44 840,14 960,26 1056,4"
             fill="none"
-            stroke="#0f66a6"
+            stroke="#2f52d4"
             strokeWidth="5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <circle cx="1056" cy="4" r="9" fill="#0f66a6" />
+          <circle cx="1056" cy="4" r="9" fill="#2f52d4" />
         </svg>
       </div>
 

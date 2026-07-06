@@ -1,21 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import { Provider } from "@/components/provider";
 import { SITE } from "@/lib/site";
 import { jsonLdScript, softwareSourceCodeJsonLd, websiteJsonLd } from "@/lib/jsonld";
 import "./global.css";
 
-const sans = Hanken_Grotesk({
+// Instrument Sans — crisp humanist body/UI. Distinct from the Inter/Hanken pack.
+const sans = Instrument_Sans({
   subsets: ["latin"],
-  variable: "--font-hanken",
+  variable: "--font-sans-src",
   display: "swap",
 });
 
-const display = Instrument_Serif({
+// Fraunces — a soft, optical old-style serif with real character (the display
+// voice). Optical sizing gives the huge hero type its handcrafted warmth.
+const display = Fraunces({
   subsets: ["latin"],
-  weight: "400",
   variable: "--font-display-src",
   display: "swap",
+  style: ["normal", "italic"],
 });
 
 const mono = JetBrains_Mono({
@@ -23,6 +26,9 @@ const mono = JetBrains_Mono({
   variable: "--font-mono-src",
   display: "swap",
 });
+
+// No-flash accent: apply the saved accent before first paint.
+const ACCENT_SCRIPT = `try{var a=localStorage.getItem("mc-accent");if(a&&a!=="cobalt")document.documentElement.dataset.accent=a}catch(e){}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -63,8 +69,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0b0c" },
+    { media: "(prefers-color-scheme: light)", color: "#faf7f1" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0d11" },
   ],
 };
 
@@ -76,6 +82,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen font-sans antialiased">
+        <script dangerouslySetInnerHTML={{ __html: ACCENT_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
