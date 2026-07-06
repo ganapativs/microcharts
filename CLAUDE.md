@@ -50,7 +50,7 @@ pnpm · TypeScript 6 strict (watch `@typescript/native-preview`/tsgo, adopt at s
 
 ## Catalog (96 types — plan/05 core 34, plan/16 decision 20, plan/15 expressive 22, plan/17 frontier 20)
 
-v1 = Sparkline (+band), SparkBar (+win-loss), Delta, Bullet, ActivityGrid. Then decision micrographs (QuantileDots/GradedBand/BenchmarkStrip first — strongest research). Expressive ships as `@microcharts/expressive`. Not shipping: pie, gauge, battery, waffle, violin (reasons + replacements in plan/05 §4; glanceability research backs it). Cut ledger in plan/15 — don't resurrect cut charts without new evidence. Admission bar for new types: ≤ 200×60 px, unique data story, honest channel, read-back without training.
+v1 = Sparkline (+band), SparkBar (+win-loss), Delta, Bullet, ActivityGrid. **Every chart ships a static default (`…/name`) AND a `…/name/interactive` client entry** — the DoD's "static + interactive entries" is universal, not opt-in (Delta = live announce, Bullet = value/target readout, ActivityGrid = cell hover + 2-D keyboard nav). Skip an interactive entry only when a type has no meaningful interaction, and say why. Then decision micrographs (QuantileDots/GradedBand/BenchmarkStrip first — strongest research). Expressive ships as `@microcharts/expressive`. Not shipping: pie, gauge, battery, waffle, violin (reasons + replacements in plan/05 §4; glanceability research backs it). Cut ledger in plan/15 — don't resurrect cut charts without new evidence. Admission bar for new types: ≤ 200×60 px, unique data story, honest channel, read-back without training.
 
 ## Quality bar (plan/09)
 

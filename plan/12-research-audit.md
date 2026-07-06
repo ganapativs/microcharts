@@ -174,3 +174,11 @@ Note: Codex's citations were spot-checked for plausibility but not independently
 | plan/07 ≤ 2 kB static / ≤ 1 kB Sparkline anchors were set vs line-only refs (@fnando 1.6 kB: no summary, no a11y, no smooth/area/band) | CONFIRMED — our value-adds are the delta |
 | **Decision:** raise static gate to ≤ 3 kB, add ≤ 4 kB interactive gate; keep 2 kB target / 1 kB stretch (line-only build) | ADOPTED — user-approved; plan/07 §1 + `.size-limit.json` updated. Still ~50× smaller than Recharts (145 kB). No thesis/catalog impact. |
 
+
+## Phase 2 — interactive scope widened + bench competitors deferred (2026-07-06)
+
+| Decision | Status |
+| --- | --- |
+| **Every chart ships a `/interactive` client entry** (not just Sparkline/SparkBar). Delta = `live` announce + pulse; Bullet = value/target readout on hover/focus; ActivityGrid = cell hover + 2-D keyboard nav + live readout. | ADOPTED — user call. Aligns roadmap 2.6 with CLAUDE.md DoD ("static + interactive entries", always was universal). All useful; none skipped. plan/10 §2.6 + CLAUDE.md catalog updated. |
+| **Bench competitor matrix (Recharts/Chart.js/MUI X/uPlot/@fnando) deferred to launch prep.** | ADOPTED — "not competing now" (user). Our reproducible core/SSR numbers ship in `bench/`; competitor harness is a launch-time isolated-workspace job (plan/07 §3 keeps it as the public-benchmark plan). |
+| Review-found robustness fixes: SparkGroup no longer injects chart props into non-series children; Delta guards non-finite input (`—`, not `NaN%`). | FIXED + tested. |

@@ -25,7 +25,7 @@
 
 Order: **2.1 `<Sparkline>`** (line/smooth/step, fill, band, dots, labels, annotations layer) → **2.2 `<SparkBar>`** (+ win-loss) → **2.3 `<Delta>`** → **2.4 `<Bullet>`** → **2.5 `<ActivityGrid>`**.
 Each lands per the Definition of Done in `09-testing-quality.md` (a11y, budgets, visuals, docs fixtures, bench).
-**2.6** Interactive entries (hover, keyboard, live) for Sparkline + SparkBar. **2.7** `SparkGroup` shared scale. **2.8** Bench suite v1 (us vs Recharts/Chart.js/MUI X/uPlot/@fnando).
+**2.6** Interactive entries (hover, keyboard, live) for **every** chart — each ships a static default + a `…/interactive` client entry (revised 2026-07-06 from "Sparkline + SparkBar only": Delta gains live announce, Bullet a value/target readout, ActivityGrid cell hover + 2-D keyboard nav; all genuinely useful, so all ship). **2.7** `SparkGroup` shared scale. **2.8** Bench suite v1 — our reproducible core/SSR numbers (`bench/`). The **competitor matrix** (Recharts/Chart.js/MUI X/uPlot/@fnando) is deferred to launch prep (`04-launch`); not competing pre-1.0, so no competitor harness now.
 
 ✋ **Checkpoint 2 — "test the waters" demo**: private demo page: a data table with 500 sparkline rows, KPI card row, inline-prose sparks. Judge: does it _feel_ handcrafted? Are numbers (size/perf) hitting budgets? Iterate design here before any public move.
 
