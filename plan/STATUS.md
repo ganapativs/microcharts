@@ -40,8 +40,8 @@
 
 | Step | State | Note |
 |---|---|---|
-| 1.1 `core/{scale,path,stats,bank}.ts` | [ ] | Folders stubbed (`src/core/.gitkeep`). Property-tested, pure. |
-| 1.2 `core/summary.ts` (describeSeries) | [ ] | S1 + S4 shapes, en templates, Intl. |
+| 1.1 `core/{scale,path,stats,bank}.ts` | [x] | + `color.ts`, `types.ts`. Pure, property-tested (fast-check) + full edge matrix — 50 tests green. `describeSeries` exported at root. |
+| 1.2 `core/summary.ts` (describeSeries) | [x] | S1 shape (trend %/range/last), degenerate forms, `EN` templates (swappable for i18n), Intl formatting. S2–S4 land with their charts. |
 | 1.3 `shared/Chart.tsx` + `styles.css` a11y blocks | [◐] | `styles.css` has `@layer` + tokens + reduced-motion/forced-colors skeleton; `Chart.tsx` not built (`src/shared/.gitkeep`). |
 | 1.4 Theming (presets, MicroProvider) | [ ] | tokens exist in `styles.css`; presets/provider not built. |
 | ✋ Checkpoint 1 | [ ] | Hand-assembled sparkline SSR-static in Next fixture, zero client JS. |

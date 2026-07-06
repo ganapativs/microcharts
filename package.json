@@ -80,6 +80,7 @@
     "@vitest/browser-playwright": "^4.1.10",
     "axe-core": "^4.12.1",
     "fast-check": "^4.8.0",
+    "jsdom": "^29.1.1",
     "knip": "^6.24.0",
     "lefthook": "^2.1.9",
     "oxfmt": "^0.57.0",

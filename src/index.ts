@@ -9,6 +9,10 @@
 
 export const MICROCHARTS_VERSION = "0.0.1";
 
+// Flagship: standalone natural-language series summary (plan/08 §2).
+export { describeSeries, EN } from "./core/summary.js";
+export type { SummaryStrings, DescribeOptions } from "./core/summary.js";
+
 /** Shared prop grammar — one meaning per name across every chart (plan/04). */
 export interface MicrochartCommonProps {
   /** The series. `data` alone always renders something (plan/04). */
