@@ -27,6 +27,16 @@ export interface SeriesStats {
  * degenerate case (plan/03 §4, plan/09 edge matrix). Indices point back into
  * the original array so marks land on the right x position even with gaps.
  */
+/** Last finite value in the series, or undefined. Single reverse loop — no
+ *  array copy, no ES2023 APIs (CLAUDE.md: ES2022 runtime floor). */
+export function lastFinite(values: readonly Value[]): number | undefined {
+  for (let i = values.length - 1; i >= 0; i--) {
+    const v = values[i];
+    if (isFiniteValue(v)) return v;
+  }
+  return undefined;
+}
+
 export function seriesStats(values: readonly Value[]): SeriesStats | null {
   let count = 0;
   let min = Infinity;

@@ -36,7 +36,10 @@ export function bankTo45(values: readonly Value[], height: number): number {
   const yRange = max - min;
   if (yRange === 0) return round2(height * 4);
 
-  const medSlope = median(slopes.toSorted((a, b) => a - b));
+  // .slice().sort(), not .toSorted(): the ES2023 API is a silent runtime cliff
+  // on Safari < 16.4 while tsc (lib ES2023) stays green. Library rule: no
+  // post-ES2022 runtime APIs (CLAUDE.md).
+  const medSlope = median(slopes.slice().sort((a, b) => a - b));
   if (medSlope === 0) return round2(height * 4);
 
   // pixel slope = (medSlope * height / yRange) / (width / (n - 1)) = 1

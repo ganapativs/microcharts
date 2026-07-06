@@ -4,18 +4,15 @@
 // on hover or focus. The wrapper owns the accessible name (role=img); the inner
 // static chart is decorative so the reading isn't announced twice.
 import { useState, type CSSProperties } from "react";
-import { Bullet as StaticBullet, type BulletProps } from "./index.js";
+import { makeFormatter } from "../../core/format.js";
+import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
 
 export function Bullet(props: BulletProps): React.ReactNode {
   const { value, target, format, locale, title, summary, className, style } = props;
   const [open, setOpen] = useState(false);
 
-  const fmt =
-    typeof format === "function"
-      ? format
-      : (n: number) => new Intl.NumberFormat(locale, format).format(n);
-
-  const auto = target === undefined ? `${fmt(value)}.` : `${fmt(value)} of ${fmt(target)} target.`;
+  const fmt = makeFormatter(format, locale);
+  const auto = bulletSummary(fmt(value), target === undefined ? null : fmt(target));
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : auto;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 

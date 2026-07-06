@@ -21,11 +21,11 @@ describe("interactive <Sparkline> (plan/04 §4, plan/08 T2)", () => {
     const live = fig.querySelector('[aria-live="polite"]')!;
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(live.textContent).toBe("Point 1: 4");
+    expect(live.textContent).toBe("Point 1 of 10: 4.");
     await userEvent.keyboard("{ArrowRight}");
-    expect(live.textContent).toBe("Point 2: 6");
+    expect(live.textContent).toBe("Point 2 of 10: 6.");
     await userEvent.keyboard("{End}");
-    expect(live.textContent).toBe("Point 10: 12");
+    expect(live.textContent).toBe("Point 10 of 10: 12.");
     await userEvent.keyboard("{Escape}");
     expect(live.textContent).toBe("");
   });

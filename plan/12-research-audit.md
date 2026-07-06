@@ -157,6 +157,21 @@
 
 Note: Codex's citations were spot-checked for plausibility but not independently re-fetched — classified CORROBORATED, not CONFIRMED. All seven forms are standard named techniques with decades of practice; risk is low.
 
+## Phase 2 implementation review (2026-07-06)
+
+| Finding | Resolution |
+|---|---|
+| Two competing interactive composition patterns (Sparkline/ActivityGrid re-implemented the SVG; Bullet/Delta wrapped the static) | CANON: interactive composes static (`summary={false}` + overlay children). Refactored; browser screenshots passed unchanged (pixel-identical proof) |
+| Module-counter ids in static naming → hydration mismatch under StrictMode/concurrent | Deterministic `aria-label` default; ids only with explicit `id` prop. plan/08 §1 amended |
+| Per-point pointer hit-spans (N DOM nodes/chart) in sparkline client | Single wrapper listener + nearest-x math |
+| `label="last"` painted outside the viewBox (`.mc-root` overflow: visible → layout spill) | `labelMetrics` deterministic gutter + fontSize as SVG attribute + y-clamp; containment regression tests added |
+| `toSorted` (ES2023) vs ES2022 target — silent Safari <16.4 cliff | ES2022 floor rule; `slice().sort()`; contradicting unicorn lint rules disabled with rationale |
+| `new Intl.NumberFormat` per render/call across charts | `core/format.ts` cached `makeFormatter`, used everywhere |
+| Hardcoded-English live-region strings | `SummaryStrings.point()` added; interactive entries accept `strings` |
+| Win-loss zero-value bar colored positive | Zero → neutral ink |
+| Duplicated summary/opacity logic across static/client | Single exported functions (`bulletSummary`, `activitySummary`, `levelOpacity`) |
+| Phase 2's ≤3 kB budget raise vs plan's original ≤2 kB | Verified properly documented in plan/07 "Measured reality" — accepted, not silent |
+
 ## Net result of verification round
 
 - 8 corrections found and patched (5 a11y, React Compiler/zero-dep conflict, size-limit action, Sandpack, gallery-first).

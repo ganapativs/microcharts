@@ -17,6 +17,8 @@ export interface SummaryStrings {
   noChange: string;
   range: (min: string, max: string) => string;
   last: (value: string) => string;
+  /** Interactive point announcement, e.g. "Point 3 of 12: 42." */
+  point: (position: number, total: number, value: string) => string;
 }
 
 export const EN: SummaryStrings = {
@@ -28,6 +30,7 @@ export const EN: SummaryStrings = {
   noChange: "No net change.",
   range: (min, max) => `Range ${min} to ${max}.`,
   last: (v) => `Last value ${v}.`,
+  point: (pos, total, v) => `Point ${pos} of ${total}: ${v}.`,
 };
 
 export interface DescribeOptions {
@@ -37,11 +40,10 @@ export interface DescribeOptions {
   strings?: SummaryStrings | undefined;
 }
 
+import { makeFormatter as cachedFormatter } from "./format.js";
+
 function makeFormatter(opts: DescribeOptions): (n: number) => string {
-  const { format, locale } = opts;
-  if (typeof format === "function") return format;
-  const nf = new Intl.NumberFormat(locale, format);
-  return (n) => nf.format(n);
+  return cachedFormatter(opts.format, opts.locale);
 }
 
 /**

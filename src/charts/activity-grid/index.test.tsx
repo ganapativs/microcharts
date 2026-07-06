@@ -25,7 +25,9 @@ describe("<ActivityGrid> (plan/05 S1-binned, plan/08)", () => {
 
   it("summary states total, periods, and the busiest bin", () => {
     const { container } = draw(<ActivityGrid data={[1, 2, 3]} title="A" />);
-    expect(container.querySelector("desc")!.textContent).toBe("Total 6 over 3 periods. Busiest 3.");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "A. Total 6 over 3 periods. Busiest 3.",
+    );
   });
 
   it("strip layout → single row of cells", () => {
@@ -37,7 +39,7 @@ describe("<ActivityGrid> (plan/05 S1-binned, plan/08)", () => {
   it("empty → no cells, 'No activity.'", () => {
     const { container } = draw(<ActivityGrid data={[]} title="e" />);
     expect(container.querySelectorAll("rect")).toHaveLength(0);
-    expect(container.querySelector("desc")!.textContent).toBe("No activity.");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("e. No activity.");
   });
 
   it("is axe-clean", async () => {

@@ -57,17 +57,17 @@ export interface DeltaProps {
   /** The change to show. With `from`, the current value (delta is derived). */
   value: number;
   /** Prior value; when given, Delta shows the percent change from it. */
-  from?: number;
+  from?: number | undefined;
   /** Which direction is "good" — flips only the color, never the glyph (plan/04 §6). */
-  positive?: "up" | "down";
+  positive?: "up" | "down" | undefined;
   /** Number formatting; defaults to a locale-aware percent. */
-  format?: Intl.NumberFormatOptions | ((n: number) => string);
-  locale?: string | string[];
+  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  locale?: string | string[] | undefined;
   /** Accessible name override; `false` = decorative (redundant with nearby text). */
-  summary?: string | false;
-  title?: string;
-  className?: string;
-  style?: CSSProperties;
+  summary?: string | false | undefined;
+  title?: string | undefined;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
 }
 
 export function Delta(props: DeltaProps): ReactNode {

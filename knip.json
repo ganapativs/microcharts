@@ -1,27 +1,14 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": [
-    "src/index.ts",
     "src/core/index.ts",
     "src/shared/index.ts",
     "src/charts/*/index.tsx",
     "src/charts/*/client.tsx",
-    "src/test/**/*.ts",
-    "playwright.config.ts"
+    "src/test/**/*.ts"
   ],
   "project": ["src/**/*.{ts,tsx}"],
   "ignore": ["fixtures/**"],
   "ignoreWorkspaces": ["fixtures/*"],
-  "ignoreDependencies": [
-    "react",
-    "react-dom",
-    "@types/react",
-    "@types/react-dom",
-    "@testing-library/react",
-    "@vitest/browser",
-    "vitest-browser-react",
-    "fast-check",
-    "@axe-core/playwright",
-    "@argos-ci/playwright"
-  ]
+  "ignoreDependencies": ["@vitest/browser", "fast-check", "@axe-core/playwright"]
 }

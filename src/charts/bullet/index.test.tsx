@@ -16,12 +16,12 @@ describe("<Bullet> (plan/05 S4, plan/08)", () => {
 
   it("summary states value of target", () => {
     const { container } = draw(<Bullet value={72} target={80} />);
-    expect(container.querySelector("desc")!.textContent).toBe("72 of 80 target.");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("72 of 80 target.");
   });
 
   it("no target → value-only summary, no tick", () => {
     const { container } = draw(<Bullet value={72} />);
-    expect(container.querySelector("desc")!.textContent).toBe("72.");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("72.");
     expect(container.querySelector("line")).toBeNull();
   });
 
@@ -35,7 +35,7 @@ describe("<Bullet> (plan/05 S4, plan/08)", () => {
 
   it("format applies to the summary", () => {
     const { container } = draw(<Bullet value={0.72} target={0.8} format={{ style: "percent" }} />);
-    expect(container.querySelector("desc")!.textContent).toBe("72% of 80% target.");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("72% of 80% target.");
   });
 
   it("is axe-clean", async () => {

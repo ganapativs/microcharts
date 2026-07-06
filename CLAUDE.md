@@ -52,6 +52,23 @@ pnpm · TypeScript 6 strict (watch `@typescript/native-preview`/tsgo, adopt at s
 
 v1 = Sparkline (+band), SparkBar (+win-loss), Delta, Bullet, ActivityGrid. **Every chart ships a static default (`…/name`) AND a `…/name/interactive` client entry** — the DoD's "static + interactive entries" is universal, not opt-in (Delta = live announce, Bullet = value/target readout, ActivityGrid = cell hover + 2-D keyboard nav). Skip an interactive entry only when a type has no meaningful interaction, and say why. Then decision micrographs (QuantileDots/GradedBand/BenchmarkStrip first — strongest research). Expressive ships as `@microcharts/expressive`. Not shipping: pie, gauge, battery, waffle, violin (reasons + replacements in plan/05 §4; glanceability research backs it). Cut ledger in plan/15 — don't resurrect cut charts without new evidence. Admission bar for new types: ≤ 200×60 px, unique data story, honest channel, read-back without training.
 
+## Component canon (Phase 2 review, 2026-07-06 — every future chart follows this exactly)
+
+**File anatomy per chart** (`src/charts/<name>/`): `geometry.ts` (pure, React-free, property/edge-tested in the node project) · `index.tsx` (static: hook-free, listener-free, RSC-safe) · `client.tsx` (interactive, `"use client"`) · `index.test.tsx` + `geometry.test.ts` (node) · `client.browser.test.tsx` (real browser). Add the subpath pair to `package.json#exports`, `tsdown` entries, and `.size-limit.json` in the same PR.
+
+**The canonical interactive pattern** (violations = the review's #1 finding; never regress):
+1. **Compose the static component** — `<Static… {...props} summary={false}>` with overlay marks (crosshair, focus ring) passed as its `children`. NEVER re-implement the SVG in the client entry; geometry is pure, so both entries computing it get identical numbers and the visual cannot drift.
+2. **One pointer listener on the wrapper** + pure math (nearest-x / grid lookup) — never a DOM node per data point (500 rows × 30 points must stay cheap).
+3. Wrapper `<span tabIndex={0} role="img" aria-label={title + summary}>` owns naming + roving keyboard; announcements through a polite live region using `SummaryStrings` (i18n contract — **no hardcoded English outside `EN`**). Shared summary text lives in ONE exported function (`bulletSummary`, `activitySummary` pattern) used by both entries.
+
+**Accessible naming (amended plan/08 §1):** default = deterministic composed `aria-label` (+ id-less `<title>`); explicit `id` prop opts into `<title>/<desc>` + `aria-labelledby`. NEVER generate ids in static components (module counters desync under StrictMode/concurrent renders → hydration mismatches). Interactive entries may use `useId`.
+
+**Containment (hard rule):** nothing may paint outside the viewBox — `.mc-root` has `overflow: visible`, so an escape is a layout spill, not a clip. Direct labels reserve a deterministic gutter BEFORE geometry (`labelMetrics`: fontSize in viewBox units set as an SVG attribute — never em-based CSS for in-chart text — and a 0.62·em/char over-estimate); label y is clamped by font ascent. Every chart ships a containment test asserting coords + estimated text extents ≤ viewBox.
+
+**Runtime + perf rules:** ES2022 floor — no `toSorted`/`toReversed`/etc. (tsc lib ES2023 stays green while Safari < 16.4 crashes; `unicorn/no-array-sort|no-array-reverse` are off in `.oxlintrc.json` for exactly this reason). Number formatting only via `makeFormatter` (`core/format.ts`, cached `Intl.NumberFormat`) — never `new Intl.NumberFormat` in a component. Geometry inputs → outputs must be pure and 2-dp rounded at generation.
+
+**Budgets (measured reality, plan/07 §amended):** static ≤ 3 kB gz per subpath (Delta-class simple charts ≤ 1.5 kB), interactive ≤ static + 1 kB, styles.css ≤ 10 kB shared. SSR bench floor: ≥ ~50 rows/ms.
+
 ## Quality bar (plan/09)
 
 Per-chart Definition of Done: static + interactive entries · shared edge-case fixture suite green (empty, single point, all-equal, nulls, all-null, negatives, NaN/±Infinity — documented behavior, this kills the Grafana bug class) · property tests · axe clean + summary correct · visual baselines approved (light/dark × presets) · size budget entry · doc page with 4 contexts (sentence/cell/KPI card/tab) · bench scenario. SVG testing: normalized attribute assertions (coords rounded to 2 decimals at generation), never whole-markup snapshots. React 18 + 19 matrix, StrictMode on.

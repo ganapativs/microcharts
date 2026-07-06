@@ -23,11 +23,11 @@ describe("interactive <ActivityGrid> (plan/04 §4, plan/08 T2)", () => {
     const live = fig.querySelector('[aria-live="polite"]')!;
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(live.textContent).toBe("Period 1: 0");
+    expect(live.textContent).toBe("Point 1 of 98: 0.");
     await userEvent.keyboard("{ArrowDown}"); // next row, same (first) column → index 1
-    expect(live.textContent).toBe("Period 2: 1");
+    expect(live.textContent).toBe("Point 2 of 98: 1.");
     await userEvent.keyboard("{ArrowRight}"); // next column, same row → index 1+7 = 8
-    expect(live.textContent).toBe("Period 9: 8");
+    expect(live.textContent).toBe("Point 9 of 98: 8.");
     await userEvent.keyboard("{Escape}");
     expect(live.textContent).toBe("");
   });

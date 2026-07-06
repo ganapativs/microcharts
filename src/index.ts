@@ -21,10 +21,13 @@ export type { ChartProps } from "./shared/Chart.js";
 export { SparkGroup } from "./shared/SparkGroup.js";
 export type { SparkGroupProps } from "./shared/SparkGroup.js";
 
+export type { Value, Polarity } from "./core/types.js";
+export { makeFormatter, type Format } from "./core/format.js";
+
 /** Shared prop grammar — one meaning per name across every chart (plan/04). */
 export interface MicrochartCommonProps {
-  /** The series. `data` alone always renders something (plan/04). */
-  data: readonly number[];
+  /** The series. `null`/`NaN` are gaps; `data` alone always renders (plan/04). */
+  data: readonly (number | null)[];
   /** Fixed value domain `[min, max]`; auto-fit when omitted. */
   domain?: readonly [number, number];
   /** Accessible name. A string overrides the auto-summary; `false` = decorative. */

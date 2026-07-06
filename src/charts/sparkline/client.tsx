@@ -1,28 +1,28 @@
 "use client";
 // Interactive <Sparkline> (plan/04 §4, plan/08 T2). Opt-in entry:
 //   import { Sparkline } from '@microcharts/react/sparkline/interactive'
-// Adds pointer + keyboard point navigation over the static geometry. Navigation
-// rides an HTML overlay with roving focus (Visa/Data-Navigator pattern) — never
-// per-point SVG focus — and announces the focused value through a throttle-free
-// polite live region. The static marks are unchanged, so the visual is identical
-// to the RSC entry; only behavior is layered on. Motion/geometry gate on the
-// browser, which exists here (unlike the static entry).
-import { useCallback, useId, useMemo, useState, type CSSProperties } from "react";
-import { linePath, smoothPath, stepPath, areaPath, type Curve } from "../../core/path.js";
-import { describeSeries } from "../../core/summary.js";
+//
+// CANONICAL INTERACTIVE PATTERN (CLAUDE.md — every chart follows this):
+//   1. COMPOSE the static component (`summary={false}`, overlay marks passed
+//      as its children) — never re-implement the visual; it cannot drift.
+//   2. ONE pointer listener on the wrapper + nearest-stop math — never a DOM
+//      node per point (500 rows × 30 pts must stay cheap, plan/03 §6).
+//   3. The wrapper owns the accessible name (role=img + aria-label) and the
+//      roving keyboard; announcements go through a polite live region using
+//      the i18n-able SummaryStrings (plan/08 §5).
+import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { makeFormatter } from "../../core/format.js";
+import { describeSeries, EN, type SummaryStrings } from "../../core/summary.js";
+import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
-import { sparkGeometry } from "./geometry.js";
-import type { SparklineProps } from "./index.js";
-
-const CURVE: Record<Curve, (p: readonly (readonly [number, number] | null)[]) => string> = {
-  linear: linePath,
-  smooth: smoothPath,
-  step: stepPath,
-};
+import { labelMetrics, sparkGeometry } from "./geometry.js";
+import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
 
 export interface InteractiveSparklineProps extends SparklineProps {
   /** Called with the index of the focused point (or `null` when cleared). */
   onPointFocus?: (index: number | null) => void;
+  /** Swappable announcement strings (defaults to EN). */
+  strings?: SummaryStrings;
 }
 
 export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
@@ -31,27 +31,30 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     domain,
     width = 80,
     height = 20,
-    curve = "linear",
     fill = false,
     band,
-    dots = "auto",
-    color,
+    label = "none",
     title,
     summary,
     format,
     locale,
     onPointFocus,
+    strings = EN,
     className,
     style,
-    children,
+    ...rest
   } = props;
 
-  const geo = useMemo(
-    () => sparkGeometry(data, { width, height, domain, zero: fill, band }),
-    [data, width, height, domain, fill, band],
-  );
-  const d = CURVE[curve](geo.points);
-  const base = useId();
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+
+  // Same geometry inputs as the static render (pure → identical numbers),
+  // including the label gutter, so overlay marks line up exactly.
+  const geo = useMemo(() => {
+    const last = lastFinite(data);
+    const labelText = label === "last" && last !== undefined ? fmt(last) : undefined;
+    const gutterRight = labelText !== undefined ? labelMetrics(labelText, width, height).gutter : 0;
+    return sparkGeometry(data, { width, height, domain, zero: fill, band, gutterRight });
+  }, [data, width, height, domain, fill, band, label, fmt]);
 
   // Indices with a finite value — the only navigable stops.
   const stops = useMemo(
@@ -60,20 +63,35 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   );
   const [active, setActive] = useState<number | null>(null);
 
-  const fmt = useMemo(
-    () =>
-      typeof format === "function"
-        ? format
-        : (n: number) => new Intl.NumberFormat(locale, format).format(n),
-    [format, locale],
-  );
-
   const move = useCallback(
     (next: number | null) => {
       setActive(next);
       onPointFocus?.(next);
     },
     [onPointFocus],
+  );
+
+  // ONE listener; nearest finite stop by x distance in viewBox space.
+  const onPointerMove = useCallback(
+    (e: PointerEvent<HTMLElement>) => {
+      if (stops.length === 0) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      if (r.width === 0) return;
+      const x = ((e.clientX - r.left) / r.width) * width;
+      let best = stops[0]!;
+      let bestDist = Infinity;
+      for (const i of stops) {
+        const p = geo.points[i];
+        if (!p) continue;
+        const d = Math.abs(p[0] - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      }
+      if (best !== active) move(best);
+    },
+    [stops, geo, width, active, move],
   );
 
   const onKeyDown = useCallback(
@@ -110,8 +128,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     summary === false ? undefined : (summary ?? describeSeries(data, { format, locale }));
   const activeValue = active !== null ? (data[active] as number) : null;
   const activePoint = active !== null ? geo.points[active] : null;
-  const strokeStyle = color ? { stroke: color } : undefined;
-  const fillStyle = color ? { fill: color } : undefined;
+  const activePos = active !== null ? stops.indexOf(active) + 1 : 0;
 
   const wrapStyle: CSSProperties = {
     display: "inline-block",
@@ -128,35 +145,23 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
       role="img"
       aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
       onKeyDown={onKeyDown}
+      onPointerMove={onPointerMove}
+      onPointerLeave={() => move(null)}
       onBlur={() => move(null)}
     >
-      <svg
-        className="mc-root"
-        viewBox={`0 0 ${width} ${height}`}
+      <StaticSparkline
+        {...rest}
+        data={data}
+        domain={domain}
         width={width}
         height={height}
-        preserveAspectRatio="xMidYMid meet"
-        aria-hidden="true"
+        fill={fill}
+        band={band}
+        label={label}
+        format={format}
+        locale={locale}
+        summary={false}
       >
-        {geo.band ? (
-          <rect
-            x={geo.band.x}
-            y={geo.band.y}
-            width={geo.band.width}
-            height={geo.band.height}
-            data-mc-ink="band"
-          />
-        ) : null}
-        {fill && d ? (
-          <path
-            d={areaPath(geo.points, geo.baselineY, curve)}
-            data-mc-ink="fill"
-            style={fillStyle}
-          />
-        ) : null}
-        {d ? (
-          <path d={d} vectorEffect="non-scaling-stroke" data-mc-ink="data" style={strokeStyle} />
-        ) : null}
         {activePoint ? (
           <line
             x1={activePoint[0]}
@@ -167,36 +172,11 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
-        {dots !== "none" && geo.last ? (
-          <circle cx={geo.last.x} cy={geo.last.y} r={2} data-mc-ink="accent" />
-        ) : null}
         {activePoint ? (
           <circle cx={activePoint[0]} cy={activePoint[1]} r={2.5} data-mc-ink="accent" />
         ) : null}
-        {children}
-      </svg>
-      {/* pointer hit targets — one invisible slice per finite point */}
-      <span aria-hidden="true" style={{ position: "absolute", inset: 0 }}>
-        {stops.map((i) => {
-          const p = geo.points[i]!;
-          const left = `${(p[0] / width) * 100}%`;
-          return (
-            <span
-              key={i}
-              onPointerEnter={() => move(i)}
-              onPointerLeave={() => move(null)}
-              style={{
-                position: "absolute",
-                top: 0,
-                bottom: 0,
-                left,
-                width: `${100 / stops.length}%`,
-                transform: "translateX(-50%)",
-              }}
-            />
-          );
-        })}
-      </span>
+        {rest.children}
+      </StaticSparkline>
       <span
         aria-live="polite"
         style={{
@@ -208,12 +188,11 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
           whiteSpace: "nowrap",
         }}
       >
-        {activeValue !== null ? `Point ${active! + 1}: ${fmt(activeValue)}` : ""}
+        {activeValue !== null ? strings.point(activePos, stops.length, fmt(activeValue)) : ""}
       </span>
       {activePoint && activeValue !== null ? (
         <span
           className="mc-spark-readout"
-          data-id={`${base}-readout`}
           style={{
             position: "absolute",
             left: `${(activePoint[0] / width) * 100}%`,

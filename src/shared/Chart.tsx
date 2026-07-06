@@ -1,8 +1,9 @@
 // Root <svg> wrapper for every chart (plan/03 §3, plan/08). Hook-free and
-// listener-free → RSC-safe, SSR-static, zero client JS. Owns sizing, the
-// role=img + <title>/<desc> + aria-labelledby composition, and token plumbing.
+// listener-free → RSC-safe, SSR-static, zero client JS. Owns sizing and the
+// accessible naming (deterministic by default; <title>/<desc>+aria-labelledby
+// when an explicit stable `id` is supplied — see shared/a11y.ts).
 import type { CSSProperties, ReactNode } from "react";
-import { labelIds, nextId } from "./a11y.js";
+import { accessibleNaming } from "./a11y.js";
 
 export interface ChartProps {
   /** viewBox width/height in integer units (plan/03 §3). */
@@ -15,7 +16,7 @@ export interface ChartProps {
    * `false` = decorative (T0): the chart is hidden from assistive tech.
    */
   summary?: string | false | undefined;
-  /** Explicit id root (overrides the auto counter — for stable client ids). */
+  /** Stable id root — opts into <title>/<desc> + aria-labelledby naming. */
   id?: string | undefined;
   className?: string | undefined;
   style?: CSSProperties | undefined;
@@ -25,12 +26,7 @@ export interface ChartProps {
 
 export function Chart(props: ChartProps): ReactNode {
   const { width, height, title, summary, id, className, style, children } = props;
-
-  const decorative = summary === false;
-  const hasTitle = !decorative && typeof title === "string" && title.length > 0;
-  const hasDesc = !decorative && typeof summary === "string" && summary.length > 0;
-  const base = id ?? nextId();
-  const { labelledBy, titleId, descId } = labelIds(base, hasTitle, hasDesc);
+  const naming = accessibleNaming(title, summary, id);
 
   return (
     <svg
@@ -40,10 +36,12 @@ export function Chart(props: ChartProps): ReactNode {
       height={height}
       preserveAspectRatio="xMidYMid meet"
       style={style}
-      {...(decorative ? { "aria-hidden": true } : { role: "img", "aria-labelledby": labelledBy })}
+      {...naming.rootAttrs}
     >
-      {hasTitle ? <title id={titleId}>{title}</title> : null}
-      {hasDesc ? <desc id={descId}>{summary}</desc> : null}
+      {naming.renderTitle ? <title id={naming.titleId}>{title}</title> : null}
+      {naming.renderDesc && typeof summary === "string" ? (
+        <desc id={naming.descId}>{summary}</desc>
+      ) : null}
       {children}
     </svg>
   );

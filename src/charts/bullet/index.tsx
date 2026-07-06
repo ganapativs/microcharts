@@ -5,31 +5,33 @@
 // on color alone (plan/08 1.4.1).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { makeFormatter } from "../../core/format.js";
 import { bulletGeometry } from "./geometry.js";
 
-/** Factual S4 summary — value, target, and where the value lands. */
-function bulletSummary(value: string, target: string | null): string {
+/** Factual S4 summary — value, target, and where the value lands. Shared with
+ *  the interactive entry (one wording, no drift). */
+export function bulletSummary(value: string, target: string | null): string {
   return target ? `${value} of ${target} target.` : `${value}.`;
 }
 
 export interface BulletProps {
   value: number;
-  target?: number;
+  target?: number | undefined;
   /** Ascending qualitative thresholds (e.g. `[50, 80]` on a 0–100 scale). */
-  bands?: readonly number[];
+  bands?: readonly number[] | undefined;
   /** Explicit `[0, max]`; auto-fit when omitted. */
-  domain?: readonly [number, number];
-  width?: number;
-  height?: number;
-  color?: string;
-  format?: Intl.NumberFormatOptions | ((n: number) => string);
-  locale?: string | string[];
-  title?: string;
-  summary?: string | false;
-  id?: string;
-  className?: string;
-  style?: CSSProperties;
-  children?: ReactNode;
+  domain?: readonly [number, number] | undefined;
+  width?: number | undefined;
+  height?: number | undefined;
+  color?: string | undefined;
+  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  locale?: string | string[] | undefined;
+  title?: string | undefined;
+  summary?: string | false | undefined;
+  id?: string | undefined;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
+  children?: ReactNode | undefined;
 }
 
 export function Bullet(props: BulletProps): ReactNode {
@@ -52,10 +54,7 @@ export function Bullet(props: BulletProps): ReactNode {
   } = props;
 
   const geo = bulletGeometry({ width, height, value, target, bands, domain });
-  const fmt =
-    typeof format === "function"
-      ? format
-      : (n: number) => new Intl.NumberFormat(locale, format).format(n);
+  const fmt = makeFormatter(format, locale);
 
   const accName =
     summary === false

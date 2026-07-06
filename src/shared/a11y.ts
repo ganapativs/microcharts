@@ -1,26 +1,77 @@
-// Accessible-name plumbing (plan/08 §1). No hooks — the static entry is
-// RSC-safe and cannot call useId. Ids come from a module counter, which is
-// correct for server/SSR-static rendering (each chart on a page gets a unique
-// id during one render pass). For repeated client-side hydration, pass an
-// explicit `id` to <Chart> or use the interactive entry (which may use useId).
-let counter = 0;
+// Accessible-name plumbing (plan/08 §1, amended after the Phase 2 review).
+//
+// The static entry is hook-free (RSC-safe → no useId) and must produce output
+// that is IDENTICAL across server render, client render, StrictMode double
+// render, and any concurrent re-render. A module counter cannot guarantee that
+// (discarded renders advance it → hydration mismatches on id attributes), so:
+//
+//   - DEFAULT (no `id` prop): name the svg with a composed `aria-label`
+//     (title + summary) and still render `<title>` for hover/secondary naming.
+//     Fully deterministic — nothing generated.
+//   - EXPLICIT `id` prop: the maximal `<title>/<desc>` + `aria-labelledby`
+//     wiring (plan/08's preferred pattern) — safe because the id is stable.
+//
+// Interactive entries use React's `useId` instead (client-only, always safe).
 
-export function nextId(prefix = "mc"): string {
-  counter += 1;
-  return `${prefix}-${counter.toString(36)}`;
-}
-
-export interface LabelIds {
-  /** value for aria-labelledby, or undefined when decorative/unnamed */
-  labelledBy: string | undefined;
+export interface AccessibleNaming {
+  /** Attributes to spread on the root svg. */
+  rootAttrs:
+    | { "aria-hidden": true }
+    | { role: "img"; "aria-label": string }
+    | { role: "img"; "aria-labelledby": string };
+  /** id for the `<title>` element (only in explicit-id mode). */
   titleId: string | undefined;
+  /** id for the `<desc>` element (only in explicit-id mode). */
   descId: string | undefined;
+  /** Whether to render the <title>/<desc> children at all. */
+  renderTitle: boolean;
+  renderDesc: boolean;
 }
 
-/** Derives the title/desc ids and the composed aria-labelledby (plan/08 T1). */
-export function labelIds(base: string, hasTitle: boolean, hasDesc: boolean): LabelIds {
-  const titleId = hasTitle ? `${base}-t` : undefined;
-  const descId = hasDesc ? `${base}-d` : undefined;
-  const labelledBy = [titleId, descId].filter(Boolean).join(" ") || undefined;
-  return { labelledBy, titleId, descId };
+/**
+ * Composes the chart's accessible naming from `title` + `summary`.
+ * `summary === false` → decorative (T0, hidden from AT).
+ */
+export function accessibleNaming(
+  title: string | undefined,
+  summary: string | false | undefined,
+  id: string | undefined,
+): AccessibleNaming {
+  if (summary === false) {
+    return {
+      rootAttrs: { "aria-hidden": true },
+      titleId: undefined,
+      descId: undefined,
+      renderTitle: false,
+      renderDesc: false,
+    };
+  }
+
+  const hasTitle = typeof title === "string" && title.length > 0;
+  const hasDesc = typeof summary === "string" && summary.length > 0;
+
+  if (id) {
+    const titleId = hasTitle ? `${id}-t` : undefined;
+    const descId = hasDesc ? `${id}-d` : undefined;
+    const labelledBy = [titleId, descId].filter(Boolean).join(" ");
+    if (labelledBy) {
+      return {
+        rootAttrs: { role: "img", "aria-labelledby": labelledBy },
+        titleId,
+        descId,
+        renderTitle: hasTitle,
+        renderDesc: hasDesc,
+      };
+    }
+  }
+
+  const label = [title, hasDesc ? summary : undefined].filter(Boolean).join(". ");
+  return {
+    rootAttrs: { role: "img", "aria-label": label || "Chart" },
+    titleId: undefined,
+    descId: undefined,
+    // <title> still renders (tooltip + secondary naming); <desc> only with ids.
+    renderTitle: hasTitle,
+    renderDesc: false,
+  };
 }

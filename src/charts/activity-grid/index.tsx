@@ -7,12 +7,19 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { seriesStats } from "../../core/stats.js";
 import { type Value } from "../../core/types.js";
+import { makeFormatter } from "../../core/format.js";
 import { activityGridGeometry } from "./geometry.js";
 
-const LEVELS = 5;
+export const LEVELS = 5;
 
-/** Factual S1-binned summary — total, span, and the busiest bin. */
-function activitySummary(data: readonly Value[], fmt: (n: number) => string): string {
+/** Opacity ramp per discrete level (level 0 = faint empty track). Shared with
+ *  the interactive entry so the visuals cannot drift. */
+export const levelOpacity = (level: number): number =>
+  level === 0 ? 0.06 : 0.25 + (level / (LEVELS - 1)) * 0.75;
+
+/** Factual S1-binned summary — total, span, and the busiest bin. Shared with
+ *  the interactive entry (one wording, no drift). */
+export function activitySummary(data: readonly Value[], fmt: (n: number) => string): string {
   const s = seriesStats(data);
   if (!s) return "No activity.";
   return `Total ${fmt(s.sum)} over ${s.count} ${s.count === 1 ? "period" : "periods"}. Busiest ${fmt(s.max)}.`;
@@ -21,21 +28,21 @@ function activitySummary(data: readonly Value[], fmt: (n: number) => string): st
 export interface ActivityGridProps {
   data: readonly Value[];
   /** `"grid"` (7 rows, default) or `"strip"` (1 row). */
-  layout?: "grid" | "strip";
+  layout?: "grid" | "strip" | undefined;
   /** Cell edge length in viewBox units. */
-  cell?: number;
-  gap?: number;
+  cell?: number | undefined;
+  gap?: number | undefined;
   /** Explicit `[min, max]` for level bucketing; auto-fit when omitted. */
-  domain?: readonly [number, number];
-  color?: string;
-  format?: Intl.NumberFormatOptions | ((n: number) => string);
-  locale?: string | string[];
-  title?: string;
-  summary?: string | false;
-  id?: string;
-  className?: string;
-  style?: CSSProperties;
-  children?: ReactNode;
+  domain?: readonly [number, number] | undefined;
+  color?: string | undefined;
+  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  locale?: string | string[] | undefined;
+  title?: string | undefined;
+  summary?: string | false | undefined;
+  id?: string | undefined;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
+  children?: ReactNode | undefined;
 }
 
 export function ActivityGrid(props: ActivityGridProps): ReactNode {
@@ -63,15 +70,8 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
     levels: LEVELS,
     domain,
   });
-  const fmt =
-    typeof format === "function"
-      ? format
-      : (n: number) => new Intl.NumberFormat(locale, format).format(n);
+  const fmt = makeFormatter(format, locale);
   const accName = summary === false ? false : (summary ?? activitySummary(data, fmt));
-
-  // Opacity ramp per discrete level (level 0 = faint empty track).
-  const opacity = (level: number): number =>
-    level === 0 ? 0.06 : 0.25 + (level / (LEVELS - 1)) * 0.75;
 
   const w = Math.max(geo.width, 1);
   const h = Math.max(geo.height, 1);
@@ -96,7 +96,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
           rx={1}
           shapeRendering="crispEdges"
           data-mc-ink="cell"
-          style={{ fillOpacity: opacity(c.level), ...(color ? { fill: color } : null) }}
+          style={{ fillOpacity: levelOpacity(c.level), ...(color ? { fill: color } : null) }}
         />
       ))}
       {children}

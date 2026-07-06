@@ -46,7 +46,7 @@ describe("<SparkBar> static structure (plan/05, plan/09)", () => {
 
   it("auto-summary is the description", () => {
     const { container } = draw(<SparkBar data={D} title="T" />);
-    expect(container.querySelector("desc")!.textContent).toMatch(/Trending up/);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toMatch(/Trending up/);
   });
 
   it("skips gaps: no rect for null", () => {
@@ -57,7 +57,7 @@ describe("<SparkBar> static structure (plan/05, plan/09)", () => {
   it("empty data → no rects, 'No data.'", () => {
     const { container } = draw(<SparkBar data={[]} title="e" />);
     expect(container.querySelectorAll("rect")).toHaveLength(0);
-    expect(container.querySelector("desc")!.textContent).toBe("No data.");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("e. No data.");
   });
 });
 

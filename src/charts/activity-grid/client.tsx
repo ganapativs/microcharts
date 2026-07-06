@@ -1,45 +1,40 @@
 "use client";
 // Interactive <ActivityGrid> (plan/04 §4, plan/08 T2). The GitHub interaction:
 // hover a cell for its value, or roving-focus the grid and walk it in 2-D with
-// the arrow keys. The focused cell is ringed and read out through a polite live
-// region. Static visual is unchanged; only behavior is layered on.
-import { useCallback, useMemo, useState, type CSSProperties } from "react";
-import { isFiniteValue, type Value } from "../../core/types.js";
+// the arrow keys. Follows the CANONICAL INTERACTIVE PATTERN (CLAUDE.md):
+// composes the static component (summary={false}, focus ring as its child),
+// one pointer listener on the wrapper, announcements via SummaryStrings.
+import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { makeFormatter } from "../../core/format.js";
+import { EN, type SummaryStrings } from "../../core/summary.js";
 import { activityGridGeometry } from "./geometry.js";
-import type { ActivityGridProps } from "./index.js";
+import {
+  ActivityGrid as StaticActivityGrid,
+  activitySummary,
+  LEVELS,
+  type ActivityGridProps,
+} from "./index.js";
 
-const LEVELS = 5;
-const opacity = (level: number): number =>
-  level === 0 ? 0.06 : 0.25 + (level / (LEVELS - 1)) * 0.75;
-
-function summarize(data: readonly Value[], fmt: (n: number) => string): string {
-  let sum = 0;
-  let count = 0;
-  let max = -Infinity;
-  for (const v of data) {
-    if (!isFiniteValue(v)) continue;
-    sum += v;
-    count++;
-    if (v > max) max = v;
-  }
-  if (count === 0) return "No activity.";
-  return `Total ${fmt(sum)} over ${count} ${count === 1 ? "period" : "periods"}. Busiest ${fmt(max)}.`;
+export interface InteractiveActivityGridProps extends ActivityGridProps {
+  /** Swappable announcement strings (defaults to EN). */
+  strings?: SummaryStrings;
 }
 
-export function ActivityGrid(props: ActivityGridProps): React.ReactNode {
+export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNode {
   const {
     data,
     layout = "grid",
     cell = 10,
     gap = 2,
     domain,
-    color,
     format,
     locale,
     title,
     summary,
+    strings = EN,
     className,
     style,
+    ...rest
   } = props;
 
   const rows = layout === "strip" ? 1 : 7;
@@ -52,16 +47,14 @@ export function ActivityGrid(props: ActivityGridProps): React.ReactNode {
   const h = Math.max(geo.height, 1);
 
   const [active, setActive] = useState<number | null>(null);
-  const fmt = useMemo(
-    () =>
-      typeof format === "function"
-        ? format
-        : (n: number) => new Intl.NumberFormat(locale, format).format(n),
-    [format, locale],
-  );
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   const accName =
-    summary === false ? undefined : typeof summary === "string" ? summary : summarize(data, fmt);
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : activitySummary(data, fmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const clampIndex = useCallback((i: number) => (i >= 0 && i < geo.cells.length ? i : null), [geo]);
@@ -104,24 +97,30 @@ export function ActivityGrid(props: ActivityGridProps): React.ReactNode {
     [active, rows, geo, clampIndex],
   );
 
+  // ONE listener on the wrapper; cell lookup is pure grid math.
   const onPointerMove = useCallback(
-    (e: React.PointerEvent<SVGSVGElement>) => {
+    (e: PointerEvent<HTMLElement>) => {
       const r = e.currentTarget.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return;
       const x = ((e.clientX - r.left) / r.width) * w;
       const y = ((e.clientY - r.top) / r.height) * h;
       const col = Math.floor(x / step);
       const row = Math.floor(y / step);
       const i = col * rows + row;
-      setActive(i >= 0 && i < geo.cells.length && row < rows ? i : null);
+      setActive(row >= 0 && row < rows && i >= 0 && i < geo.cells.length ? i : null);
     },
     [w, h, step, rows, geo],
   );
 
   const activeCell = active !== null ? geo.cells[active] : undefined;
-  const readout =
+  const announced =
     activeCell === undefined
       ? ""
-      : `Period ${activeCell.index + 1}: ${activeCell.value === null ? "no data" : fmt(activeCell.value)}`;
+      : strings.point(
+          activeCell.index + 1,
+          geo.cells.length,
+          activeCell.value === null ? strings.noData : fmt(activeCell.value),
+        );
 
   const wrapStyle: CSSProperties = {
     display: "inline-block",
@@ -138,31 +137,21 @@ export function ActivityGrid(props: ActivityGridProps): React.ReactNode {
       role="img"
       aria-label={label}
       onKeyDown={onKeyDown}
+      onPointerMove={onPointerMove}
+      onPointerLeave={() => setActive(null)}
       onBlur={() => setActive(null)}
     >
-      <svg
-        className="mc-root"
-        viewBox={`0 0 ${w} ${h}`}
-        width={w}
-        height={h}
-        preserveAspectRatio="xMidYMid meet"
-        aria-hidden="true"
-        onPointerMove={onPointerMove}
-        onPointerLeave={() => setActive(null)}
+      <StaticActivityGrid
+        {...rest}
+        data={data}
+        layout={layout}
+        cell={cell}
+        gap={gap}
+        domain={domain}
+        format={format}
+        locale={locale}
+        summary={false}
       >
-        {geo.cells.map((c) => (
-          <rect
-            key={c.index}
-            x={c.x}
-            y={c.y}
-            width={c.size}
-            height={c.size}
-            rx={1}
-            shapeRendering="crispEdges"
-            data-mc-ink="cell"
-            style={{ fillOpacity: opacity(c.level), ...(color ? { fill: color } : null) }}
-          />
-        ))}
         {activeCell ? (
           <rect
             x={activeCell.x - 0.5}
@@ -176,7 +165,8 @@ export function ActivityGrid(props: ActivityGridProps): React.ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
-      </svg>
+        {rest.children}
+      </StaticActivityGrid>
       <span
         aria-live="polite"
         style={{
@@ -188,7 +178,7 @@ export function ActivityGrid(props: ActivityGridProps): React.ReactNode {
           whiteSpace: "nowrap",
         }}
       >
-        {readout}
+        {announced}
       </span>
       {activeCell ? (
         <span

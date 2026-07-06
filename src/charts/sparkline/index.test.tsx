@@ -75,7 +75,7 @@ describe("<Sparkline> static structure (plan/03, plan/09)", () => {
 
   it("auto-summary is the accessible description", () => {
     const { container } = draw(<Sparkline data={[1, 2, 4]} title="T" />);
-    expect(container.querySelector("desc")!.textContent).toMatch(/Trending up/);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toMatch(/Trending up/);
   });
 
   it("summary={false} → decorative, aria-hidden, no desc", () => {
@@ -106,7 +106,7 @@ describe("<Sparkline> edge inputs (plan/09)", () => {
   it("empty data → no path, 'No data.' summary, no crash", () => {
     const { container } = draw(<Sparkline data={[]} title="Empty" />);
     expect(container.querySelector('[data-mc-ink="data"]')).toBeNull();
-    expect(container.querySelector("desc")!.textContent).toBe("No data.");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("Empty. No data.");
   });
 
   it("single point → dot, no line path move-only is fine", () => {
@@ -129,5 +129,32 @@ describe("<Sparkline> a11y (axe, plan/08)", () => {
   it("decorative chart is axe-clean", async () => {
     const { container } = draw(<Sparkline data={D} summary={false} />);
     await expectNoA11yViolations(container);
+  });
+});
+
+describe("containment (CLAUDE.md: nothing paints outside the viewBox)", () => {
+  it("label='last' reserves a gutter — text start + estimated width stays inside", () => {
+    const { container } = render(
+      <Sparkline data={[3, 5, 4, 8, 6, 1284]} width={80} height={20} label="last" />,
+    );
+    const text = container.querySelector("text")!;
+    const x = Number(text.getAttribute("x"));
+    const fontSize = Number(text.getAttribute("fontSize") ?? text.getAttribute("font-size"));
+    const estimated = text.textContent!.length * fontSize * 0.62;
+    expect(x + estimated).toBeLessThanOrEqual(80);
+    // label y is clamped so ascenders/descenders stay inside too
+    const y = Number(text.getAttribute("y"));
+    expect(y - fontSize * 0.55).toBeGreaterThanOrEqual(0);
+    expect(y + fontSize * 0.55).toBeLessThanOrEqual(20);
+  });
+
+  it("all path/mark coordinates stay inside the viewBox with label gutter active", () => {
+    const { container } = render(
+      <Sparkline data={[1, 9, 2, 8, 3]} width={60} height={16} label="last" dots="minmax" />,
+    );
+    for (const c of container.querySelectorAll("circle")) {
+      expect(Number(c.getAttribute("cx"))).toBeLessThanOrEqual(60);
+      expect(Number(c.getAttribute("cy"))).toBeLessThanOrEqual(16);
+    }
   });
 });

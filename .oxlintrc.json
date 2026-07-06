@@ -11,7 +11,9 @@
     "perf": "warn"
   },
   "rules": {
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "unicorn/no-array-sort": "off",
+    "unicorn/no-array-reverse": "off"
   },
   "ignorePatterns": ["dist", "node_modules", "plan", "fixtures"]
 }

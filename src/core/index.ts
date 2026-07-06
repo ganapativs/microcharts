@@ -6,4 +6,5 @@ export { seriesStats, type SeriesStats } from "./stats.js";
 export { linePath, smoothPath, stepPath, areaPath, type Curve } from "./path.js";
 export { bankTo45 } from "./bank.js";
 export { OKABE_ITO, SEMANTIC, CATEGORICAL, categoricalToken } from "./color.js";
+export { makeFormatter, type Format } from "./format.js";
 export { describeSeries, EN, type SummaryStrings, type DescribeOptions } from "./summary.js";

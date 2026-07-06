@@ -29,6 +29,23 @@ export interface SparkGeometry {
   plot: { x0: number; x1: number; y0: number; y1: number };
 }
 
+/**
+ * Deterministic label sizing (no DOM measurement — plan/03). Font size is in
+ * viewBox units (set as an SVG attribute, so it scales with the chart instead
+ * of drifting against em-based CSS), and the gutter reserves enough plot width
+ * that the text NEVER paints outside the viewBox (containment rule, CLAUDE.md).
+ * 0.62em-per-char is a safe over-estimate for tabular digits + separators.
+ */
+export function labelMetrics(
+  text: string,
+  width: number,
+  height: number,
+): { fontSize: number; gutter: number } {
+  const fontSize = Math.max(6, Math.min(Math.round(height * 0.5), 11));
+  const gutter = Math.min(Math.ceil(text.length * fontSize * 0.62) + 4, Math.floor(width * 0.45));
+  return { fontSize, gutter };
+}
+
 export interface SparkGeometryOptions {
   width: number;
   height: number;
@@ -40,6 +57,8 @@ export interface SparkGeometryOptions {
   band?: readonly [number, number] | undefined;
   /** Inset so endpoint dots and strokes are not clipped. */
   pad?: number;
+  /** Extra right inset reserved for a direct endpoint label (viewBox units). */
+  gutterRight?: number | undefined;
 }
 
 /**
@@ -49,9 +68,9 @@ export interface SparkGeometryOptions {
  * scale maps a zero-span domain to its range midpoint).
  */
 export function sparkGeometry(data: readonly Value[], opts: SparkGeometryOptions): SparkGeometry {
-  const { width, height, pad = 2 } = opts;
+  const { width, height, pad = 2, gutterRight = 0 } = opts;
   const x0 = pad;
-  const x1 = width - pad;
+  const x1 = width - pad - gutterRight;
   const y0 = pad;
   const y1 = height - pad;
   const plot = { x0, x1, y0, y1 };

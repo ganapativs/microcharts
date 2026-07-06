@@ -12,17 +12,19 @@ describe("Chart (a11y composition, plan/08)", () => {
     expect(svg.classList.contains("mc-root")).toBe(true);
   });
 
-  it("composes aria-labelledby from title + summary ids", () => {
+  it("default (no id): deterministic aria-label composed from title + summary — hydration-safe, no generated ids", () => {
     const { container } = render(
       <Chart width={80} height={20} title="Revenue" summary="Trending up 12%." />,
     );
     const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("aria-label")).toBe("Revenue. Trending up 12%.");
+    expect(svg.getAttribute("aria-labelledby")).toBeNull();
+    // <title> still renders (hover/secondary naming) but carries no generated id
     const titleEl = container.querySelector("title")!;
-    const descEl = container.querySelector("desc")!;
-    const labelledBy = svg.getAttribute("aria-labelledby")!;
-    expect(labelledBy.split(" ")).toEqual([titleEl.id, descEl.id]);
     expect(titleEl.textContent).toBe("Revenue");
-    expect(descEl.textContent).toBe("Trending up 12%.");
+    expect(titleEl.hasAttribute("id")).toBe(false);
+    // <desc> only exists in explicit-id mode
+    expect(container.querySelector("desc")).toBeNull();
   });
 
   it("decorative (summary=false) → aria-hidden, no role, no title/desc", () => {
@@ -34,12 +36,13 @@ describe("Chart (a11y composition, plan/08)", () => {
     expect(container.querySelector("desc")).toBeNull();
   });
 
-  it("honors an explicit id and merges className", () => {
+  it("explicit id: full <title>/<desc> + aria-labelledby wiring", () => {
     const { container } = render(
       <Chart width={10} height={10} id="fixed" title="T" summary="S" className="cell" />,
     );
     expect(container.querySelector("title")!.id).toBe("fixed-t");
     expect(container.querySelector("desc")!.id).toBe("fixed-d");
+    expect(container.querySelector("svg")!.getAttribute("aria-labelledby")).toBe("fixed-t fixed-d");
     expect(container.querySelector("svg")!.getAttribute("class")).toBe("mc-root cell");
   });
 });
