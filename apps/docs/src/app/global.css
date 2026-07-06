@@ -285,8 +285,24 @@ body {
   animation: pop-in 0.16s var(--ease-out-expo) both;
 }
 
+@keyframes route-fade {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.route-fade {
+  animation: route-fade 0.34s var(--ease-out-expo) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
+  .route-fade,
+  .pop-in,
   .link-underline {
     animation: none !important;
     transition: none !important;
@@ -299,4 +315,32 @@ body {
 /* Charts embedded in prose/cards inherit the host font + tabular numerals. */
 .mc-root text {
   font-family: var(--font-sans);
+}
+
+/* ---- Docs chrome — ours, not stock Fumadocs ------------------------------ */
+/* editorial serif section headings inside docs prose */
+.prose h2 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 440;
+  letter-spacing: -0.012em;
+}
+.prose :where(h1, h2, h3, h4) {
+  scroll-margin-top: 5rem;
+}
+/* prose links carry a soft accent underline instead of the default */
+.prose a:not([class]) {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in oklab, var(--accent) 42%, transparent);
+  transition: text-decoration-color 0.2s var(--ease-out-quint);
+}
+.prose a:not([class]):hover {
+  text-decoration-color: var(--accent);
+}
+/* sidebar + TOC: active state leans on the accent */
+#nd-sidebar a[data-active="true"],
+#nd-tocnav a[data-active="true"] {
+  color: var(--color-fd-primary);
+  font-weight: 550;
 }

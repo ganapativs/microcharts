@@ -34,7 +34,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   ];
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
+    <DocsPage toc={page.data.toc} full={page.data.full} breadcrumb={{ enabled: false }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbJsonLd(crumbs)) }}
@@ -53,9 +53,11 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
           ),
         }}
       />
-      <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
-      <div className="flex flex-row items-center gap-2 border-b border-fd-border pb-6">
+      <DocsTitle className="font-display text-[2.15em] font-normal tracking-[-0.02em]">
+        {page.data.title}
+      </DocsTitle>
+      <DocsDescription className="mb-0 text-base">{page.data.description}</DocsDescription>
+      <div className="flex flex-row items-center gap-1.5 border-b border-fd-border pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
           markdownUrl={markdownUrl}
