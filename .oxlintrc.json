@@ -10,5 +10,8 @@
     "suspicious": "warn",
     "perf": "warn"
   },
+  "rules": {
+    "react/react-in-jsx-scope": "off"
+  },
   "ignorePatterns": ["dist", "node_modules", "plan"]
 }
