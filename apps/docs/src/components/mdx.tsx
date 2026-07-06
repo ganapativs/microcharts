@@ -10,6 +10,7 @@ import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
 import { InstallCommand } from "@/components/ui/copy";
 import { FourContexts } from "@/components/charts/contexts";
+import { Playground } from "@/components/charts/playground";
 import { PropTable } from "@/components/charts/prop-table";
 import { PackageTabs } from "@/components/ui/package-tabs";
 
@@ -28,6 +29,7 @@ export function getMDXComponents(components?: MDXComponents) {
     LiveDemo,
     InstallCommand,
     FourContexts,
+    Playground,
     PropTable,
     PackageTabs,
     ...components,
