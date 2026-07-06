@@ -1,0 +1,18 @@
+# Git hooks (Go-native, no husky). Runs fast checks locally; CI is the gate of record.
+pre-commit:
+  parallel: true
+  commands:
+    format:
+      glob: "*.{ts,tsx,js,jsx,json,css}"
+      run: pnpm oxfmt --check {staged_files}
+    lint:
+      glob: "*.{ts,tsx}"
+      run: pnpm oxlint {staged_files}
+
+pre-push:
+  parallel: true
+  commands:
+    typecheck:
+      run: pnpm typecheck
+    test:
+      run: pnpm test

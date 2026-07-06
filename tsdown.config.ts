@@ -1,0 +1,16 @@
+import { defineConfig } from "tsdown";
+
+// Per-component subpath exports land here as charts ship (Phase 2):
+//   'src/charts/sparkline/index.tsx', 'src/charts/sparkline/client.tsx', ...
+// Each becomes its own entry so consumers pay only for what they import.
+// CSS is NOT bundled through tsdown — it ships as one static `styles.css`
+// (see plan/19-css-delivery.md) so static charts stay zero-JS.
+export default defineConfig({
+  entry: ["src/index.ts"],
+  format: ["esm"],
+  dts: true,
+  clean: true,
+  treeshake: true,
+  platform: "neutral",
+  outDir: "dist",
+});

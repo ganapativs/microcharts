@@ -1,0 +1,32 @@
+name: Visual
+
+# Manual for now: no charts exist yet, so there are no visual specs to run.
+# Phase 2 flips this to `pull_request` once tests/visual/*.spec.ts land.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    # Pinned to the Playwright release matching @playwright/test so baselines
+    # render byte-identical to local generation (plan/09 §1).
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Argos needs history to diff against the base
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Run visual specs + upload to Argos
+        run: pnpm test:visual
+        env:
+          ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}

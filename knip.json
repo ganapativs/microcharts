@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/index.ts", "src/test/**/*.ts", "playwright.config.ts"],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignoreDependencies": [
+    "react",
+    "react-dom",
+    "@types/react",
+    "@types/react-dom",
+    "@testing-library/react",
+    "@vitest/browser",
+    "vitest-browser-react",
+    "fast-check",
+    "@fast-check/vitest",
+    "@axe-core/playwright",
+    "@argos-ci/playwright"
+  ]
+}

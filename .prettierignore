@@ -1,0 +1,6 @@
+# oxfmt reads this. Docs/generated assets are hand-formatted — keep formatter off them.
+*.md
+*.html
+dist/
+plan/
+pnpm-lock.yaml

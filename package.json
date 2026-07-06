@@ -1,0 +1,104 @@
+{
+  "name": "@microcharts/react",
+  "version": "0.0.1",
+  "description": "Word-sized charts for React. Zero dependencies, tiny, accessible by default.",
+  "keywords": [
+    "accessible",
+    "chart",
+    "charts",
+    "dataviz",
+    "microchart",
+    "react",
+    "rsc",
+    "sparkline",
+    "svg",
+    "zero-dependency"
+  ],
+  "homepage": "https://github.com/ganapativs/microcharts#readme",
+  "bugs": {
+    "url": "https://github.com/ganapativs/microcharts/issues"
+  },
+  "license": "MIT",
+  "author": "Ganapati V S",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ganapativs/microcharts.git"
+  },
+  "files": [
+    "dist",
+    "styles.css",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./styles.css"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "knip": "knip",
+    "size": "size-limit",
+    "test:visual": "playwright test",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm knip",
+    "pack:check": "pnpm build && publint && attw --pack .",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.4",
+    "@argos-ci/playwright": "^7.3.0",
+    "@axe-core/playwright": "^4.12.1",
+    "@changesets/cli": "^2.31.0",
+    "@fast-check/vitest": "^0.4.1",
+    "@playwright/test": "^1.61.1",
+    "@size-limit/preset-small-lib": "^12.1.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/browser": "^4.1.10",
+    "@vitest/browser-playwright": "^4.1.10",
+    "axe-core": "^4.12.1",
+    "fast-check": "^4.8.0",
+    "knip": "^6.24.0",
+    "lefthook": "^2.1.9",
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
+    "playwright": "^1.61.1",
+    "publint": "^0.3.21",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "size-limit": "^12.1.0",
+    "tsdown": "^0.22.3",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10",
+    "vitest-browser-react": "^2.2.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.10.0+sha512.0b7f8b98060031904c017e3a41eb187a16d40eeb829b95c4f8cb03681761fc4ab53dd219115b9b447f4dce1a05a214764461e7d3703392a9f32f9511ce8c86c8"
+}

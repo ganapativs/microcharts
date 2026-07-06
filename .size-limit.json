@@ -1,0 +1,14 @@
+[
+  {
+    "name": "@microcharts/react (root barrel)",
+    "path": "dist/index.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "styles.css (shared, whole library)",
+    "path": "styles.css",
+    "limit": "10 kB",
+    "gzip": true
+  }
+]

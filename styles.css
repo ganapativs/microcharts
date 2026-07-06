@@ -1,0 +1,70 @@
+/*
+ * @microcharts/react — shared stylesheet (see plan/19-css-delivery.md).
+ * One artifact, imported once:  import '@microcharts/react/styles.css'
+ * Not per-chart-split. Zero-specificity via :where() so consumer overrides win.
+ * Theme by overriding --mc-* at any scope. Charts never paint their own background.
+ */
+
+@layer microcharts.tokens, microcharts.base, microcharts.charts, microcharts.motion;
+
+@layer microcharts.tokens {
+  :where(:root) {
+    /* semantic color — Okabe-Ito-derived (see plan/06) */
+    --mc-pos: #009e73;
+    --mc-neg: #d55e00;
+    --mc-accent: #0072b2;
+    --mc-muted: #6b7280;
+    --mc-ink: currentColor;
+    --mc-track: color-mix(in oklab, currentColor 12%, transparent);
+
+    /* geometry */
+    --mc-stroke: 1.5;
+    --mc-radius: 1px;
+
+    /* type */
+    --mc-font: inherit;
+    --mc-label-size: 0.75em;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :where(:root) {
+      /* hand-tuned, never inverted (see plan/06) */
+      --mc-pos: #34d399;
+      --mc-neg: #fb923c;
+      --mc-accent: #38bdf8;
+    }
+  }
+}
+
+@layer microcharts.base {
+  :where(.mc-root) {
+    display: inline-block;
+    vertical-align: middle;
+    font: var(--mc-font);
+  }
+
+  /* rendered numbers align in columns */
+  :where(.mc-root text) {
+    font-variant-numeric: tabular-nums;
+    font-size: var(--mc-label-size);
+  }
+}
+
+@layer microcharts.charts {
+  /* per-chart rules land here as charts ship */
+}
+
+@layer microcharts.motion {
+  @media (prefers-reduced-motion: reduce) {
+    :where(.mc-root *) {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where(.mc-root) {
+      forced-color-adjust: none;
+    }
+  }
+}

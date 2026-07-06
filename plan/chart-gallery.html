@@ -1,0 +1,828 @@
+<meta charset="utf-8">
+<title>microcharts — 96 chart types, drawn</title>
+<style>
+  :root{
+    --bg:#FAFBFC; --card:#FFFFFF; --ink:#17181B; --muted:#6E7480; --faint:#E7EAEE;
+    --accent:#0072B2; --pos:#009E73; --neg:#D55E00; --band:rgba(23,24,27,.07);
+  }
+  [data-mode="dark"]{
+    --bg:#0F1216; --card:#151A20; --ink:#E6E9ED; --muted:#8B95A1; --faint:#2A313A;
+    --pos:#2FBF96; --neg:#F08A4B; --band:rgba(230,233,237,.09);
+  }
+  html,body{transition:background .2s ease,color .2s ease}
+  .controls{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:0 0 36px}
+  .ctl-group{display:flex;gap:4px;align-items:center;background:var(--card);border:1px solid var(--faint);border-radius:99px;padding:3px}
+  .ctl-group button{font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:none;border:none;border-radius:99px;padding:4px 12px;cursor:pointer}
+  .ctl-group button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+  .ctl-group button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .swatches{display:flex;gap:6px;align-items:center;background:var(--card);border:1px solid var(--faint);border-radius:99px;padding:6px 10px}
+  .swatches button{width:18px;height:18px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+  .swatches button[aria-pressed="true"]{border-color:var(--ink)}
+  .swatches button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .ctl-label{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;padding:48px 24px 96px}
+  main{max-width:1080px;margin:0 auto}
+  h1{font-size:26px;font-weight:650;letter-spacing:-.02em;margin:0 0 4px;text-wrap:balance}
+  .sub{color:var(--muted);margin:0 0 40px;max-width:62ch}
+  h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:44px 0 6px;border-top:1px solid var(--faint);padding-top:20px}
+  .fam-note{color:var(--muted);font-size:13px;margin:0 0 16px;max-width:70ch}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid var(--faint);border-radius:10px;padding:14px 16px 12px;display:flex;flex-direction:column;gap:8px}
+  .card .viz{min-height:64px;display:flex;align-items:center}
+  .card h3{font-size:13.5px;font-weight:600;margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .card h3 .n{color:var(--muted);font-weight:500;font-size:11px;font-variant-numeric:tabular-nums}
+  .card p{font-size:12.5px;color:var(--muted);margin:0}
+  .v1{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.05em;color:var(--accent);border:1px solid currentColor;border-radius:99px;padding:0 7px;line-height:16px;vertical-align:2px;margin-left:6px}
+  svg{display:block}
+  svg text{font-family:inherit;font-variant-numeric:tabular-nums}
+  /* context demos */
+  .contexts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+  .ctx{background:var(--card);border:1px solid var(--faint);border-radius:10px;padding:18px}
+  .ctx .lbl{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .prose{font-size:15px;max-width:60ch}
+  .prose svg{display:inline-block;vertical-align:-3px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  td,th{padding:7px 10px;text-align:left;border-bottom:1px solid var(--faint);white-space:nowrap}
+  th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  td.num{font-variant-numeric:tabular-nums;text-align:right}
+  .kpi{display:flex;flex-direction:column;gap:2px}
+  .kpi .t{font-size:12px;color:var(--muted)}
+  .kpi .v{font-size:26px;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:10px}
+  .kpi .d{font-size:12.5px;font-variant-numeric:tabular-nums}
+  .themes{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+  .theme{border-radius:10px;padding:16px;border:1px solid var(--faint)}
+  .theme .lbl{font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;opacity:.65}
+  footer{margin-top:56px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--faint);padding-top:16px;max-width:70ch}
+  @media (prefers-reduced-motion:no-preference){
+    .card{transition:border-color .15s ease} .card:hover{border-color:#CBD2DA}
+    .breathe-core{animation:breathe 3.2s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+    .breathe-ring{animation:breathe-ring 3.2s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+    .fly{animation:blink 2.4s ease-in-out infinite}
+    .fly.f1{animation-delay:.8s}.fly.f2{animation-delay:1.6s}
+  }
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
+  @keyframes breathe-ring{0%,100%{transform:scale(1);opacity:.35}50%{transform:scale(1.25);opacity:.12}}
+  @keyframes blink{0%,100%{opacity:.15}50%{opacity:1}}
+  code{font-size:.9em;background:var(--faint);border-radius:4px;padding:1px 5px}
+</style>
+<main>
+  <h1>microcharts — the full catalog, drawn</h1>
+  <p class="sub">All 96 chart types from the plan — 34 core workhorses, 20 decision micrographs, 22 expressive originals, and 20 frontier forms mined from professions that solved micro data display decades before the web — rendered at 2× scale by a zero-dependency renderer inside this page. Plain data arrays in, crisp word-sized SVG out. Hairline strokes, direct labels, one accent, no chrome. Try a palette or flip the mode — every chart re-renders from the same data.</p>
+
+  <div class="controls">
+    <span class="ctl-label">Mode</span>
+    <div class="ctl-group" role="group" aria-label="Color mode">
+      <button id="mode-light" aria-pressed="true">Light</button>
+      <button id="mode-dark" aria-pressed="false">Dark</button>
+    </div>
+    <span class="ctl-label">Accent palette</span>
+    <div class="swatches" id="palette-swatches" role="group" aria-label="Accent palette"></div>
+  </div>
+
+  <h2>Charts where they'll actually live</h2>
+  <div class="contexts">
+    <div class="ctx"><div class="lbl">In a sentence</div>
+      <p class="prose">Signups recovered strongly this quarter <span id="inline-spark"></span> ending at <strong>1,284/wk</strong>, while churn <span id="inline-spark2"></span> kept drifting down.</p>
+    </div>
+    <div class="ctx"><div class="lbl">In a table</div>
+      <table><thead><tr><th>Service</th><th>p99 · 30d</th><th style="text-align:right">now</th><th></th></tr></thead><tbody id="ctx-table"></tbody></table>
+    </div>
+    <div class="ctx"><div class="lbl">In a KPI card</div>
+      <div class="kpi"><span class="t">Weekly revenue</span>
+        <span class="v">$48.2k <span id="kpi-delta"></span></span>
+        <span id="kpi-spark"></span>
+      </div>
+    </div>
+  </div>
+
+  <h2>One chart, five worlds</h2>
+  <p class="fam-note">Identical data, five theme presets — proof the token layer carries the design language anywhere text goes.</p>
+  <div class="themes" id="themes"></div>
+
+  <h2>Trend — ordered series · 13 types</h2>
+  <p class="fam-note">The workhorse family: what happened over time, in the width of a word.</p>
+  <div class="grid" id="fam-trend"></div>
+
+  <h2>Categorical — labeled values · 7 types</h2>
+  <div class="grid" id="fam-cat"></div>
+
+  <h2>Part-to-whole · 6 types</h2>
+  <div class="grid" id="fam-ptw"></div>
+
+  <h2>Scalar + reference · 5 types</h2>
+  <div class="grid" id="fam-scalar"></div>
+
+  <h2>Matrix / time-structured · 3 types</h2>
+  <div class="grid" id="fam-matrix"></div>
+
+  <h2 style="margin-top:64px">The expressive collection · 22</h2>
+  <p class="fam-note">A second catalog, drawn from global visual culture — typography research, natural forms, analog instruments, historical notation, living motion, architecture. Survivors of an editorial cut — every one passes the read-back test and keeps a documented encoding channel: delight never lies. Ships separately as <code>@microcharts/expressive</code>.</p>
+
+  <h2>Typographic — the text is the chart · 2</h2>
+  <div class="grid" id="ex-type"></div>
+  <h2>Organic &amp; natural forms · 5</h2>
+  <div class="grid" id="ex-nature"></div>
+  <h2>Instruments &amp; analog devices · 3</h2>
+  <div class="grid" id="ex-instr"></div>
+  <h2>Historical &amp; cultural notation · 3</h2>
+  <div class="grid" id="ex-hist"></div>
+  <h2>Living &amp; ambient — motion as data · 4</h2>
+  <p class="fam-note">Animation is the encoding, not decoration — every one has a static equivalent under reduced-motion.</p>
+  <div class="grid" id="ex-live"></div>
+  <h2>Spatial &amp; architectural · 5</h2>
+  <div class="grid" id="ex-space"></div>
+
+  <h2 style="margin-top:64px">Decision micrographs — real questions, answered · 20</h2>
+  <p class="fam-note">A third catalog, built from decision-science research (quantile dotplots, fan charts, graded uncertainty bands) and the questions people actually bring to data: <em>Will we land? Is this normal? Did the fix work? Can I trust this number?</em> Each chart is named for the question it answers — the most underserved territory in dataviz is not prettier trends, it's honest uncertainty and comparison at inline scale.</p>
+
+  <h2>"Where is this going?" — forecasting &amp; uncertainty · 4</h2>
+  <div class="grid" id="q-forecast"></div>
+  <h2>"Is this normal? Did it work?" — judgment &amp; comparison · 5</h2>
+  <div class="grid" id="q-judge"></div>
+  <h2>"Are we on track?" — commitments &amp; budgets · 4</h2>
+  <div class="grid" id="q-track"></div>
+  <h2>"What's really going on?" — structure &amp; trust · 5</h2>
+  <div class="grid" id="q-trust"></div>
+  <h2>"What repeats, and what matters first?" — pattern &amp; priority · 2</h2>
+  <div class="grid" id="q-pattern"></div>
+
+  <h2 style="margin-top:64px">The frontier collection · 20</h2>
+  <p class="fam-note">A fourth catalog from a deep-research sweep of professions that solved micro data display decades ago and were never absorbed by chart libraries: aviation instrument panels, clinical medicine, meteorology's 1941 station model, broadcast audio, trading floors, developer tools, and the AI era. Each keeps its lineage's honesty rules.</p>
+
+  <h2>From instrument panels · 5</h2>
+  <div class="grid" id="f-instr"></div>
+  <h2>From medicine &amp; the quantified self · 3</h2>
+  <div class="grid" id="f-med"></div>
+  <h2>From media &amp; developer tools · 3</h2>
+  <div class="grid" id="f-dev"></div>
+  <h2>From the AI era &amp; trading floors · 4</h2>
+  <div class="grid" id="f-ai"></div>
+  <h2>From systems, traces &amp; trustworthy models · 5</h2>
+  <div class="grid" id="f-sys"></div>
+
+  <footer>Every chart above is generated from a small data array by inline JavaScript — no libraries, no images. Real components add theming tokens, animation, accessibility summaries, and the shared prop grammar. Numbers on cards are minimum sensible footprints in CSS px; charts here render at roughly 2× for inspection.</footer>
+</main>
+<script>
+const NS="http://www.w3.org/2000/svg";
+
+// ---------- theme engine: surface mode × data palette ----------
+const MODES={
+  light:{bg:"#FAFBFC",surface:"#FFFFFF",ink:"#17181B",muted:"#8A909B",faint:"#E7EAEE",band:"rgba(23,24,27,.07)",
+         pos:"#009E73",neg:"#D55E00",warn:"#C99700",gold:"#D9A514"},
+  dark: {bg:"#0F1216",surface:"#151A20",ink:"#E6E9ED",muted:"#8B95A1",faint:"#2A313A",band:"rgba(230,233,237,.09)",
+         pos:"#2FBF96",neg:"#F08A4B",warn:"#E0B341",gold:"#E5C15A"}};
+const PALETTES={
+  azure:  {light:"#0072B2",dark:"#5AB1F0"},
+  violet: {light:"#6D4AC9",dark:"#A78BFA"},
+  teal:   {light:"#0F766E",dark:"#2DD4BF"},
+  amber:  {light:"#B45309",dark:"#F5A623"},
+  ink:    {light:"#17181B",dark:"#E6E9ED"}};
+const C={};let MODE="light",PAL="azure";
+function applyTheme(mode,pal){MODE=mode;PAL=pal;
+  Object.assign(C,MODES[mode],{acc:PALETTES[pal][mode]});
+  document.documentElement.setAttribute("data-mode",mode);
+  document.documentElement.style.setProperty("--accent",C.acc);
+  buildAll()}
+
+function E(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e}
+function svg(w,h,scale=2){const s=E("svg",{viewBox:`0 0 ${w} ${h}`,width:w*scale,height:h*scale,fill:"none","aria-hidden":"true",focusable:"false"});return s}
+function sc(d,w,h,p=2,min,max){const lo=min??Math.min(...d),hi=max??Math.max(...d),r=hi-lo||1;
+  return d.map((v,i)=>[p+i*(w-2*p)/(d.length-1),h-p-(v-lo)*(h-2*p)/r])}
+function line(pts){return "M"+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L ")}
+function smooth(pts){let d="M"+pts[0][0]+" "+pts[0][1];for(let i=1;i<pts.length;i++){const[x0,y0]=pts[i-1],[x1,y1]=pts[i],mx=(x0+x1)/2;d+=` C ${mx} ${y0}, ${mx} ${y1}, ${x1} ${y1}`}return d}
+function stroke(s,d,col,w=1.25,extra={}){const p=E("path",{d,stroke:col,"stroke-width":w,"stroke-linecap":"round","stroke-linejoin":"round",...extra});s.appendChild(p);return p}
+function dot(s,x,y,r,col){s.appendChild(E("circle",{cx:x,cy:y,r,fill:col}))}
+function rect(s,x,y,w,h,col,rx=0){s.appendChild(E("rect",{x,y,width:Math.max(w,0.5),height:Math.max(h,0.5),fill:col,rx,"shape-rendering":"crispEdges"}))}
+function txt(s,x,y,str,size,col,anchor="start",weight=500){const t=E("text",{x,y,"font-size":size,fill:col,"text-anchor":anchor,"font-weight":weight});t.textContent=str;s.appendChild(t)}
+
+// ---------- chart renderers (data in → svg out) ----------
+const D1=[4,6,5,9,7,8,11,9,13,12,15,14,18], D2=[9,7,8,6,7,5,6,4,5,3,4,3,2];
+function sparkline(d=D1,t={}){const w=92,h=22,s=svg(w,h,t.scale||2);const pts=sc(d,w-16,h,3);
+  if(t.band!==false){const lo=h*0.35,hi=h*0.75;s.appendChild(E("rect",{x:0,y:lo,width:w-16,height:hi-lo,fill:t.band||C.band}))}
+  stroke(s,(t.curve==="smooth"?smooth:line)(pts),t.ink||C.ink,t.sw||1.25,t.dash?{"stroke-dasharray":t.dash}:{});
+  const[ex,ey]=pts.at(-1);dot(s,ex,ey,2,t.acc||C.acc);
+  txt(s,ex+4,ey+2.5,String(d.at(-1)),7.5,t.acc||C.acc);return s}
+function bandspark(){const w=92,h=26,s=svg(w,h);const lo=[3,4,3,5,4,5,6,5,7,6,8,7,9],hi=[9,11,10,13,11,12,15,13,17,15,18,16,20];
+  const all=[...lo,...hi],mn=Math.min(...all),mx=Math.max(...all);
+  const pl=sc(lo,w-16,h,3,mn,mx),ph=sc(hi,w-16,h,3,mn,mx);
+  const area="M"+ph.map(p=>p.join(" ")).join(" L ")+" L "+pl.slice().reverse().map(p=>p.join(" ")).join(" L ")+" Z";
+  s.appendChild(E("path",{d:area,fill:C.band}));
+  const mid=lo.map((v,i)=>(v+hi[i])/2+ (i%3-1)*1.2);const pm=sc(mid,w-16,h,3,mn,mx);
+  stroke(s,line(pm),C.ink,1.25);const[ex,ey]=pm.at(-1);dot(s,ex,ey,2,C.acc);txt(s,ex+4,ey+2.5,"14",7.5,C.acc);return s}
+function sparkbar(d=[3,5,4,7,6,9,8,11,9,12],col){const w=92,h=22,s=svg(w,h);const mx=Math.max(...d),bw=(w-14)/d.length;
+  d.forEach((v,i)=>rect(s,i*bw+1,h-2-(v/mx)*(h-4),bw-2,(v/mx)*(h-4),i===d.length-1?(col||C.acc):C.ink));
+  txt(s,w-12,h-2-(d.at(-1)/mx)*(h-4)+3,String(d.at(-1)),7.5,col||C.acc);return s}
+function winloss(){const w=92,h=20,s=svg(w,h);const d=[1,1,-1,1,-1,1,1,1,-1,1,-1,1];const bw=(w-4)/d.length;
+  d.forEach((v,i)=>rect(s,i*bw+2,v>0?3:h/2,bw-2.5,h/2-3,v>0?C.pos:C.neg));return s}
+function horizon(){const w=100,h=16,s=svg(w,h);const d=[2,5,9,14,22,30,26,34,42,38,47,52,44,58,63];
+  const bandH=20; // fold every 20 units
+  for(let b=0;b<4;b++){const seg=d.map(v=>Math.max(0,Math.min(v-b*bandH,bandH)));
+    const pts=sc(seg,w,h,0,0,bandH);
+    const area="M0 "+h+" L "+pts.map(p=>p.join(" ")).join(" L ")+` L ${w} ${h} Z`;
+    s.appendChild(E("path",{d:area,fill:C.acc,opacity:0.22+b*0.24}))}
+  return s}
+function ohlc(){const w=100,h=26,s=svg(w,h);const cs=[[5,9,3,7],[7,11,6,10],[10,13,8,9],[9,12,7,11],[11,15,10,14],[14,17,12,13],[13,16,11,15],[15,19,14,18]];
+  const all=cs.flat(),mn=Math.min(...all),mx=Math.max(...all),cw=(w-6)/cs.length;
+  cs.forEach((c,i)=>{const x=3+i*cw+cw/2;const y=v=>h-2-(v-mn)*(h-4)/(mx-mn);const up=c[3]>=c[0];const col=up?C.pos:C.neg;
+    stroke(s,`M${x} ${y(c[1])} L${x} ${y(c[2])}`,col,1);
+    rect(s,x-cw/4,Math.min(y(c[0]),y(c[3])),cw/2,Math.abs(y(c[0])-y(c[3]))||1,col)});return s}
+function dualspark(){const w=92,h=22,s=svg(w,h);const b=[6,7,7,8,8,9,9,10,10,11,11,12,12];
+  stroke(s,line(sc(b,w-4,h,3,2,20)),C.muted,1,{"stroke-dasharray":"3 2.5"});
+  stroke(s,line(sc(D1,w-4,h,3,2,20)),C.ink,1.25);
+  const pts=sc(D1,w-4,h,3,2,20);dot(s,...pts.at(-1),2,C.acc);return s}
+function stackedarea(){const w=92,h=24,s=svg(w,h);const a=[4,5,5,6,7,7,8,9],b=[3,3,4,4,4,5,5,5],c=[2,2,2,3,3,3,3,4];
+  const tot=a.map((v,i)=>v+b[i]+c[i]),mx=Math.max(...tot);
+  const layer=(cum,col,op)=>{const pts=cum.map((v,i)=>[2+i*(w-4)/(cum.length-1),h-2-(v/mx)*(h-4)]);
+    s.insertBefore(E("path",{d:"M2 "+(h-2)+" L "+pts.map(p=>p.join(" ")).join(" L ")+` L ${w-2} ${h-2} Z`,fill:col,opacity:op}),s.firstChild)};
+  layer(a.map((v,i)=>v+b[i]+c[i]),C.acc,0.25);layer(a.map((v,i)=>v+b[i]),C.acc,0.5);layer(a,C.acc,0.9);return s}
+function bumpstrip(){const w=92,h=24,s=svg(w,h);const ranks=[4,4,3,3,2,3,2,1,1,2,1,1];
+  const pts=ranks.map((r,i)=>[3+i*(w-20)/(ranks.length-1),3+(r-1)*(h-8)/3]);
+  stroke(s,line(pts),C.ink,1.25);dot(s,...pts.at(-1),2,C.acc);txt(s,pts.at(-1)[0]+4,pts.at(-1)[1]+2.5,"#1",7.5,C.acc);
+  [1,2,3,4].forEach(r=>stroke(s,`M3 ${3+(r-1)*(h-8)/3} L${w-18} ${3+(r-1)*(h-8)/3}`,C.faint,0.5));return s}
+function seismo(){const w=92,h=20,s=svg(w,h);const d=[1,1,2,1,6,2,1,9,3,1,2,12,4,1,2,1,7,2,1,3,1,10,2,1];
+  const bw=(w-4)/d.length,mx=12;d.forEach((v,i)=>{const bh=(v/mx)*(h-4);stroke(s,`M${2+i*bw+bw/2} ${(h-bh)/2} L${2+i*bw+bw/2} ${(h+bh)/2}`,v>8?C.neg:C.ink,1)});return s}
+function histo(){const w=80,h=22,s=svg(w,h);const d=[1,3,6,9,12,10,7,4,2,1];const mx=Math.max(...d),bw=(w-4)/d.length;
+  d.forEach((v,i)=>rect(s,2+i*bw,h-2-(v/mx)*(h-4),bw-1.5,(v/mx)*(h-4),C.ink));return s}
+function rug(){const w=80,h=14,s=svg(w,h);[3,7,9,12,14,15,17,22,24,25,26,29,35,38,39,41,48,55,58,70,76].forEach(x=>stroke(s,`M${x} 3 L${x} ${h-3}`,C.ink,1));
+  stroke(s,`M25.5 1 L25.5 ${h-1}`,C.acc,1.5);return s}
+function heatstrip(){const w=96,h=12,s=svg(w,h);const d=[1,2,4,3,5,7,6,8,5,9,7,10,8,6,9,11];const mx=11;
+  d.forEach((v,i)=>rect(s,i*6,1,5,h-2,C.acc,1.2));[...s.children].forEach((r,i)=>r.setAttribute("opacity",(0.15+0.85*d[i]/mx).toFixed(2)));return s}
+function minibar(){const w=92,h=30,s=svg(w,h);const d=[["NA",38],["EU",29],["APAC",18],["LATAM",9]];
+  d.forEach((r,i)=>{const y=i*7+2;rect(s,26,y,(r[1]/38)*(w-40),4.5,i===0?C.acc:C.ink);txt(s,0,y+4.2,r[0],6.5,C.muted);txt(s,28+(r[1]/38)*(w-40),y+4.2,String(r[1]),6.5,C.muted)});return s}
+function dotplot(){const w=92,h=30,s=svg(w,h);const d=[["v3.2",72],["v3.1",58],["v3.0",41],["v2.9",22]];
+  d.forEach((r,i)=>{const y=i*7+4.5;stroke(s,`M24 ${y} L${w-8} ${y}`,C.faint,0.75);
+    dot(s,24+(r[1]/80)*(w-34),y,2.4,i===0?C.acc:C.ink);txt(s,0,y+2.4,r[0],6.5,C.muted)});return s}
+function lollipop(){const w=92,h=30,s=svg(w,h);const d=[["Mon",30],["Tue",44],["Wed",26],["Thu",52]];
+  d.forEach((r,i)=>{const y=i*7+4.5,x=24+(r[1]/60)*(w-34);stroke(s,`M24 ${y} L${x} ${y}`,C.ink,1);dot(s,x,y,2.2,C.acc);txt(s,0,y+2.4,r[0],6.5,C.muted)});return s}
+function pairedbars(){const w=92,h=32,s=svg(w,h);const d=[["Q1",30,26],["Q2",34,38],["Q3",40,37],["Q4",44,49]];
+  d.forEach((r,i)=>{const y=i*7.5+2;rect(s,20,y,(r[1]/50)*(w-30),2.6,C.muted);rect(s,20,y+3,(r[2]/50)*(w-30),2.6,C.acc);txt(s,0,y+5.4,r[0],6.5,C.muted)});return s}
+function slope(){const w=70,h=40,s=svg(w,h);const rows=[["A",30,12,C.pos],["B",22,24,C.muted],["C",10,32,C.neg]];
+  rows.forEach(r=>{stroke(s,`M16 ${r[1]} L${w-16} ${r[2]}`,r[3],1.25);dot(s,16,r[1],1.8,r[3]);dot(s,w-16,r[2],1.8,r[3]);
+    txt(s,12,r[1]+2.4,r[0],6.5,C.muted,"end");txt(s,w-12,r[2]+2.4,r[0],6.5,C.muted)});return s}
+function microbox(){const w=88,h=16,s=svg(w,h);const y=h/2,[mn,q1,md,q3,mx]=[6,26,40,58,82];
+  stroke(s,`M${mn} ${y} L${q1} ${y}`,C.ink,1);stroke(s,`M${q3} ${y} L${mx} ${y}`,C.ink,1);
+  s.appendChild(E("rect",{x:q1,y:y-5,width:q3-q1,height:10,fill:C.band,stroke:C.ink,"stroke-width":1}));
+  stroke(s,`M${md} ${y-5} L${md} ${y+5}`,C.acc,1.5);return s}
+function dumbbell(){const w=92,h=30,s=svg(w,h);const d=[["Sr",42,74],["Mid",30,55],["Jr",18,36]];
+  d.forEach((r,i)=>{const y=i*9+5;stroke(s,`M${r[1]} ${y} L${r[2]} ${y}`,C.faint,2);
+    dot(s,r[1],y,2.4,C.muted);dot(s,r[2],y,2.4,C.acc);txt(s,0,y+2.4,r[0],6.5,C.muted)});return s}
+function waterfall(){const w=96,h=30,s=svg(w,h);let lvl=6;const steps=[["St",6,C.muted,true],["+A",8,C.pos],["+B",5,C.pos],["–C",-7,C.neg],["+D",6,C.pos],["End",18,C.muted,true]];
+  const u=(h-8)/20,bw=w/steps.length;let x=1;
+  steps.forEach((st,i)=>{let y0,y1;
+    if(st[3]){y0=h-4-st[1]*u;y1=h-4;lvl=st[1]}else{y0=h-4-(lvl+Math.max(st[1],0))*u;y1=h-4-(lvl+Math.min(st[1],0))*u;lvl+=st[1]}
+    rect(s,x,y0,bw-3,Math.max(y1-y0,1),st[2]);
+    if(i<steps.length-1)stroke(s,`M${x+bw-3} ${h-4-lvl*u} L${x+bw} ${h-4-lvl*u}`,C.muted,0.6);
+    x+=bw});return s}
+function progress(t={}){const w=88,h=10,s=svg(w,h);rect(s,0,3,w-22,4,t.track||C.faint,2);rect(s,0,3,(w-22)*0.72,4,t.acc||C.acc,2);
+  txt(s,w-18,9,"72%",7.5,t.ink||C.ink);return s}
+function segmented(){const w=92,h=10,s=svg(w,h);const segs=[[42,C.acc],[28,C.pos],[18,C.muted],[12,C.faint]];let x=0;
+  segs.forEach(g=>{rect(s,x,2,(g[0]/100)*w-1.5,6,g[1],1.5);x+=(g[0]/100)*w});return s}
+function ring(){const sz=30,s=svg(sz,sz);const r=11,c=2*Math.PI*r;
+  s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r,stroke:C.faint,"stroke-width":3.5,fill:"none"}));
+  s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r,stroke:C.acc,"stroke-width":3.5,fill:"none","stroke-linecap":"round",
+    "stroke-dasharray":`${c*0.72} ${c}`,transform:`rotate(-90 ${sz/2} ${sz/2})`}));
+  txt(s,sz/2,sz/2+2.6,"72",7,C.ink,"middle",600);return s}
+function microdonut(){const sz=30,s=svg(sz,sz);const r=10,c=2*Math.PI*r;let off=0;
+  [[0.46,C.acc],[0.3,C.pos],[0.24,C.faint]].forEach(seg=>{
+    s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r,stroke:seg[1],"stroke-width":6,fill:"none",
+      "stroke-dasharray":`${c*seg[0]-1} ${c}`,"stroke-dashoffset":-off*c,transform:`rotate(-90 ${sz/2} ${sz/2})`}));off+=seg[0]});return s}
+function funnel(){const w=92,h=32,s=svg(w,h);const d=[["Visit",100],["Trial",56],["Pay",23]];
+  d.forEach((r,i)=>{const y=i*10+2,bw=(r[1]/100)*(w-34);rect(s,26,y,bw,6,C.acc,1);
+    txt(s,0,y+5.4,r[0],6.5,C.muted);txt(s,28+bw,y+5.4,r[1]+"%",6.5,C.muted)});
+  return s}
+function pictogram(){const w=92,h=14,s=svg(w,h);for(let i=0;i<8;i++)dot(s,7+i*11,h/2,3.4,i<5?C.acc:C.faint);return s}
+function delta(v="+12.4%",up=true,t={}){const w=56,h=16,s=svg(w,h);const col=up?(t.pos||C.pos):(t.neg||C.neg);
+  s.appendChild(E("path",{d:up?"M5 11 L9 5 L13 11 Z":"M5 5 L9 11 L13 5 Z",fill:col}));
+  txt(s,17,12,v,9.5,col,"start",600);return s}
+function bullet(){const w=110,h=16,s=svg(w,h);
+  [[w,.07],[w*0.75,.13],[w*0.5,.2]].forEach(([bw,op])=>{rect(s,0,3,bw,10,C.ink);s.lastChild.setAttribute("opacity",op)});
+  rect(s,0,6.5,w*0.62,3,C.ink);stroke(s,`M${w*0.8} 1.5 L${w*0.8} 14.5`,C.neg,1.75);return s}
+function heatcell(){const s=svg(70,16);[0.15,0.35,0.6,0.85,1].forEach((o,i)=>{rect(s,i*14,1,12.5,14,C.acc,2);s.lastChild.setAttribute("opacity",o)});return s}
+function statusdot(){const w=96,h=14,s=svg(w,h);
+  dot(s,5,h/2,3.4,C.pos);txt(s,12,h/2+2.6,"live",7,C.muted);
+  s.appendChild(E("rect",{x:36,y:h/2-3.4,width:6.8,height:6.8,fill:C.warn}));txt(s,47,h/2+2.6,"degraded",7,C.muted);
+  s.appendChild(E("path",{d:`M86 ${h/2-4} L90 ${h/2+4} L82 ${h/2+4} Z`,fill:C.neg}));return s}
+function trendarrow(){const w=70,h=18,s=svg(w,h);
+  s.appendChild(E("path",{d:"M4 13 L11 6 L15 10 L22 3",stroke:C.pos,"stroke-width":2,fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}));
+  s.appendChild(E("path",{d:"M22 3 L22 8 M22 3 L17 3",stroke:C.pos,"stroke-width":2,fill:"none","stroke-linecap":"round"}));
+  s.appendChild(E("path",{d:"M40 5 L47 12 L51 8 L58 15",stroke:C.neg,"stroke-width":2,fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}));
+  s.appendChild(E("path",{d:"M58 15 L58 10 M58 15 L53 15",stroke:C.neg,"stroke-width":2,fill:"none","stroke-linecap":"round"}));return s}
+function activitygrid(){const cols=16,rows=5,cs=5,s=svg(cols*(cs+1.5),rows*(cs+1.5));
+  for(let c=0;c<cols;c++)for(let r=0;r<rows;r++){const v=Math.abs(Math.sin(c*2.7+r*1.9))*(c/cols+0.3);
+    rect(s,c*(cs+1.5),r*(cs+1.5),cs,cs,C.acc,1.2);s.lastChild.setAttribute("opacity",(v>0.85?1:0.08+v*0.8).toFixed(2))}return s}
+function calendarstrip(){const cs=6,s=svg(7*(cs+2),(cs+2)*2-2);
+  const vals=[0.1,0.4,0.7,0.2,0.9,0.5,0.05, 0.3,0.8,0.6,1,0.4,0.15,0.55];
+  vals.forEach((v,i)=>{rect(s,(i%7)*(cs+2),Math.floor(i/7)*(cs+2),cs,cs,C.acc,1.2);s.lastChild.setAttribute("opacity",(0.08+v*0.9).toFixed(2))});return s}
+function eventtimeline(){const w=110,h=14,s=svg(w,h);stroke(s,`M0 ${h/2} L${w} ${h/2}`,C.faint,4);
+  [[0,34,C.pos],[38,20,C.pos],[62,10,C.neg],[76,30,C.pos]].forEach(sp=>stroke(s,`M${sp[0]+1} ${h/2} L${sp[0]+sp[1]} ${h/2}`,sp[2],4));
+  [12,45,68].forEach(x=>{dot(s,x,h/2,1.6,C.surface)});return s}
+
+// ---------- decision micrographs (research-grounded; see plan doc 16) ----------
+function qForecastCone(){const w=100,h=26,s=svg(w,h);const hist=[6,7,6,8,9,8,10,11];const hx=54;
+  const hp=hist.map((v,i)=>[3+i*(hx-3)/(hist.length-1),h-3-(v-4)*(h-6)/14]);
+  const fan=(spread,op)=>{const y0=hp.at(-1)[1];
+    s.appendChild(E("path",{d:`M${hx} ${y0} L${w-3} ${y0-8-spread} L${w-3} ${y0-8+spread} Z`,fill:C.acc,opacity:op}))};
+  fan(11,0.14);fan(5.5,0.22);
+  stroke(s,line(hp),C.ink,1.25);
+  stroke(s,`M${hx} ${hp.at(-1)[1]} L${w-3} ${hp.at(-1)[1]-8}`,C.acc,1.1,{"stroke-dasharray":"2.5 2.5"});
+  dot(s,hx,hp.at(-1)[1],1.8,C.ink);return s}
+function qQuantileDots(){const w=96,h=30,s=svg(w,h);const bins=[1,2,4,6,4,2,1];const bw=9,r=1.9;const x0=10;
+  bins.forEach((n,b)=>{for(let i=0;i<n;i++)dot(s,x0+b*bw,h-4-i*(2*r+1.2),r,b>=4?C.acc:C.ink)});
+  stroke(s,`M${x0+3.5*bw+4.5} ${h-2} L${x0+3.5*bw+4.5} 2`,C.neg,1,{"stroke-dasharray":"2 2"});
+  txt(s,x0+3.5*bw+8,7,"target",6,C.muted);return s}
+function qGradedBand(){const w=96,h=26,s=svg(w,h);const m=[8,9,8,10,11,10,12,13,12,14];
+  const pts=sc(m,w-6,h,4);
+  [[9,0.10],[5.5,0.16],[2.5,0.26]].forEach(([sp,op])=>{
+    const up=pts.map(p=>`${p[0]} ${Math.max(p[1]-sp,1)}`).join(" L ");
+    const dn=pts.slice().reverse().map(p=>`${p[0]} ${Math.min(p[1]+sp,h-1)}`).join(" L ");
+    s.appendChild(E("path",{d:`M${up} L ${dn} Z`,fill:C.acc,opacity:op}))});
+  stroke(s,line(pts),C.ink,1.25);return s}
+function qHOPs(){const w=96,h=26,s=svg(w,h);
+  for(let k=0;k<5;k++){const d=Array.from({length:9},(_,i)=>8+i*0.7+Math.sin(i*1.3+k*2.1)*2.2);
+    stroke(s,line(sc(d,w-6,h,3,4,18)),C.acc,1,{opacity:k===4?0.9:0.18})}
+  return s}
+function qBenchmarkStrip(){const w=100,h=18,s=svg(w,h);const y=h/2;
+  rect(s,6,y-4,78,8,C.band,3);rect(s,26,y-4,34,8,C.ink,3);s.lastChild.setAttribute("opacity",0.14);
+  s.lastChild.removeAttribute("shape-rendering");
+  stroke(s,`M43 ${y-4} L43 ${y+4}`,C.muted,1);
+  dot(s,68,y,3,C.acc);txt(s,74,y+2.6,"p82",7,C.acc);return s}
+function qABStrips(){const w=100,h=26,s=svg(w,h);
+  const strip=(y,cx,sp,col,lbl)=>{stroke(s,`M${cx-sp} ${y} L${cx+sp} ${y}`,col,1);
+    stroke(s,`M${cx-sp*0.45} ${y} L${cx+sp*0.45} ${y}`,col,3,{"stroke-linecap":"round"});
+    dot(s,cx,y,2.4,col);txt(s,4,y+2.4,lbl,6.5,C.muted)};
+  strip(7,44,26,C.muted,"A");strip(19,58,24,C.acc,"B");
+  stroke(s,`M44 3 L44 23`,C.faint,0.75);return s}
+function qShiftHist(){const w=96,h=28,s=svg(w,h);const before=[2,5,8,10,7,4,2,1,0,0],after=[0,0,1,3,6,9,10,7,4,2];
+  const bw=(w-8)/10,mid=h/2;
+  before.forEach((v,i)=>rect(s,4+i*bw,mid-1-(v/10)*(mid-3),bw-1.5,(v/10)*(mid-3),C.muted));
+  after.forEach((v,i)=>rect(s,4+i*bw,mid+1,bw-1.5,(v/10)*(mid-3),C.acc));
+  stroke(s,`M4 ${mid} L${w-4} ${mid}`,C.faint,0.75);return s}
+function qChangePoint(){const w=96,h=24,s=svg(w,h);const d=[5,6,5,6,5,6,11,12,11,13,12,13];
+  const cpx=3+(5.5/11)*(w-14);
+  s.appendChild(E("rect",{x:cpx,y:2,width:w-8-cpx,height:h-4,fill:C.acc,opacity:0.08}));
+  stroke(s,line(sc(d,w-8,h,3)),C.ink,1.25);
+  stroke(s,`M${cpx} 2 L${cpx} ${h-2}`,C.acc,1,{"stroke-dasharray":"2 2"});
+  const pts=sc(d,w-8,h,3);dot(s,...pts.at(-1),1.8,C.acc);return s}
+function qControlStrip(){const w=96,h=24,s=svg(w,h);const d=[9,10,9,11,10,9,10,11,10,16];
+  rect(s,3,7,w-14,10,C.band,2);
+  const pts=sc(d,w-14,h,3,4,18);stroke(s,line(pts),C.ink,1);
+  pts.forEach((p,i)=>{if(d[i]>14){dot(s,p[0],p[1],2.4,C.neg)}});
+  txt(s,pts.at(-1)[0]+3,pts.at(-1)[1]+2,"3σ",6.5,C.neg);return s}
+function qErrorBudget(){const w=96,h=26,s=svg(w,h);
+  stroke(s,`M4 4 L${w-14} ${h-4}`,C.muted,1,{"stroke-dasharray":"2.5 2.5"});
+  const d=[100,97,92,90,82,70,62,55,38];
+  const pts=d.map((v,i)=>[4+i*(w-18)/(d.length-1),4+(100-v)*(h-8)/100]);
+  stroke(s,line(pts),C.ink,1.25);dot(s,...pts.at(-1),2,C.neg);
+  txt(s,pts.at(-1)[0]+3,pts.at(-1)[1]+2.5,"38%",6.5,C.neg);return s}
+function qBurnChart(){const w=96,h=28,s=svg(w,h);
+  stroke(s,`M4 4 L${w-6} ${h-5}`,C.muted,1,{"stroke-dasharray":"2.5 2.5"});
+  const act=[[4,4],[16,7],[28,9],[40,14],[52,15],[64,20]];
+  stroke(s,line(act),C.ink,1.4);
+  stroke(s,`M64 20 L${w-6} ${h-8}`,C.acc,1.1,{"stroke-dasharray":"1.5 2.5"});
+  stroke(s,`M64 2 L64 ${h-2}`,C.faint,1);txt(s,66,7,"today",5.5,C.muted);
+  dot(s,64,20,1.8,C.ink);return s}
+function qRetention(){const w=96,h=26,s=svg(w,h);
+  const ref=[100,60,44,36,31,28,26,25],act=[100,68,55,48,44,42,41,40];
+  stroke(s,line(sc(ref,w-22,h,3,20,100)),C.muted,1,{"stroke-dasharray":"2.5 2"});
+  const pts=sc(act,w-22,h,3,20,100);stroke(s,line(pts),C.ink,1.25);
+  dot(s,...pts.at(-1),2,C.acc);txt(s,pts.at(-1)[0]+3,pts.at(-1)[1]+2.5,"40%",6.5,C.acc);return s}
+function qCoverage(){const w=96,h=14,s=svg(w,h);
+  rect(s,2,4,w-24,6,C.band,2);
+  [[2,26],[32,18],[56,14],[74,18]].forEach(g=>rect(s,g[0],4,g[1],6,C.acc,2));
+  txt(s,w-18,11,"79%",7,C.muted);return s}
+function qNetFlow(){const w=96,h=28,s=svg(w,h);const inn=[4,5,6,5,7,8,7,9],out=[3,4,4,6,5,6,8,7];
+  const mid=h/2,ux=(w-8)/(inn.length-1);
+  const area=(d,sign,col)=>{const pts=d.map((v,i)=>`${4+i*ux} ${mid-sign*v*1.35}`).join(" L ");
+    s.appendChild(E("path",{d:`M4 ${mid} L ${pts} L ${w-4} ${mid} Z`,fill:col,opacity:0.35}))};
+  area(inn,1,C.pos);area(out,-1,C.neg);
+  stroke(s,`M4 ${mid} L${w-4} ${mid}`,C.faint,0.75);
+  const net=inn.map((v,i)=>v-out[i]);const npts=net.map((v,i)=>[4+i*ux,mid-v*1.35]);
+  stroke(s,line(npts),C.ink,1.25);dot(s,...npts.at(-1),1.8,C.ink);return s}
+function qPercentileLadder(){const w=100,h=20,s=svg(w,h);const y=h/2+2;
+  stroke(s,`M4 ${y} L${w-4} ${y}`,C.faint,1);
+  [["p50",22,C.ink],["p90",58,C.ink],["p99",86,C.neg]].forEach(([l,x,col])=>{
+    stroke(s,`M${x} ${y-4} L${x} ${y+4}`,col,1.6);txt(s,x,y-6,l,5.5,C.muted,"middle")});
+  return s}
+function qRateVolume(){const w=96,h=26,s=svg(w,h);const vol=[6,9,4,10,12,5,8,11],rate=[3.1,3.3,2.6,3.4,3.6,2.4,3.2,3.8];
+  const bw=(w-10)/vol.length;
+  vol.forEach((v,i)=>rect(s,4+i*bw,h-3-(v/12)*(h*0.5),bw-2,(v/12)*(h*0.5),C.band));
+  vol.forEach((v,i)=>{s.children[i].setAttribute("fill",C.ink);s.children[i].setAttribute("opacity",0.18)});
+  const pts=rate.map((v,i)=>[4+i*bw+bw/2-1,4+(3.8-v)*(h*0.55)/1.4]);
+  stroke(s,line(pts),C.ink,1.25);dot(s,...pts.at(-1),1.8,C.acc);return s}
+function qDataDiff(){const w=96,h=30,s=svg(w,h);const mid=48;
+  const rows=[["api",8,3],["db",2,9],["ui",12,1]];
+  rows.forEach((r,i)=>{const y=i*9+4;
+    rect(s,mid+1,y,r[1]*2.6,5,C.pos,1);rect(s,mid-1-r[2]*2.6,y,r[2]*2.6,5,C.neg,1);
+    txt(s,4,y+4.4,r[0],6,C.muted)});
+  stroke(s,`M${mid} 2 L${mid} ${h-2}`,C.faint,1);return s}
+function qQuadrant(){const w=60,h=32,s=svg(w,h);
+  stroke(s,`M${w/2} 3 L${w/2} ${h-3}`,C.faint,0.75);stroke(s,`M6 ${h/2} L${w-6} ${h/2}`,C.faint,0.75);
+  [[16,22],[22,10],[40,24]].forEach(p=>dot(s,p[0],p[1],1.6,C.muted));
+  dot(s,44,9,3,C.acc);return s}
+
+// ---------- frontier collection (see plan doc 17) ----------
+function fTapeGauge(){const w=30,h=36,s=svg(w,h);
+  rect(s,8,2,14,h-4,C.band,2);
+  rect(s,8,2,14,9,C.neg,0);s.lastChild.setAttribute("opacity",0.25);
+  rect(s,8,11,14,7,C.warn,0);s.lastChild.setAttribute("opacity",0.25);
+  [6,12,18,24,30].forEach((y,i)=>{stroke(s,`M8 ${y} L12 ${y}`,C.muted,0.8);
+    txt(s,14,y+2,String(46-i*2),5,C.muted)});
+  s.appendChild(E("path",{d:`M2 ${h/2} L7 ${h/2-3.5} L7 ${h/2+3.5} Z`,fill:C.acc}));
+  stroke(s,`M8 ${h/2} L22 ${h/2}`,C.acc,1);
+  s.appendChild(E("path",{d:`M23 ${h/2-1} L23 ${h/2-6} M23 ${h/2-6} L21.5 ${h/2-4} M23 ${h/2-6} L24.5 ${h/2-4}`,stroke:C.acc,"stroke-width":1,fill:"none","stroke-linecap":"round"}));
+  return s}
+function fStationGlyph(){const w=84,h=32,s=svg(w,h);
+  const st=(cx,fill,ang,barbs,tl,br)=>{
+    s.appendChild(E("circle",{cx,cy:h/2,r:4.5,stroke:C.ink,"stroke-width":1,fill:"none"}));
+    if(fill)s.appendChild(E("path",{d:`M${cx} ${h/2-4.5} A4.5 4.5 0 0 1 ${cx} ${h/2+4.5} Z`,fill:C.ink}));
+    const a=ang*Math.PI/180,x2=cx+Math.cos(a)*11,y2=h/2-Math.sin(a)*11;
+    stroke(s,`M${cx+Math.cos(a)*4.5} ${h/2-Math.sin(a)*4.5} L${x2} ${y2}`,C.ink,1);
+    for(let b=0;b<barbs;b++){const t=0.75-b*0.2,bx=cx+Math.cos(a)*11*t,by=h/2-Math.sin(a)*11*t;
+      stroke(s,`M${bx} ${by} L${bx+Math.cos(a+1.9)*3.5} ${by-Math.sin(a+1.9)*3.5}`,C.ink,1)}
+    txt(s,cx-7,h/2-6,tl,5,C.acc,"end");txt(s,cx+7,h/2+9,br,5,C.muted)};
+  st(16,true,45,2,"18","72");st(46,false,160,3,"22","68");st(74,true,290,1,"15","81");return s}
+function fWindBarb(){const w=84,h=28,s=svg(w,h);
+  const barb=(cx,ang,flags)=>{const a=ang*Math.PI/180;
+    dot(s,cx,h/2,1.4,C.ink);
+    const x2=cx+Math.cos(a)*13,y2=h/2-Math.sin(a)*13;
+    stroke(s,`M${cx} ${h/2} L${x2} ${y2}`,C.ink,1.1);
+    flags.forEach((f,i)=>{const t=1-i*0.22,bx=cx+Math.cos(a)*13*t,by=h/2-Math.sin(a)*13*t;
+      if(f===2)s.appendChild(E("path",{d:`M${bx} ${by} L${bx+Math.cos(a+1.9)*5} ${by-Math.sin(a+1.9)*5} L${cx+Math.cos(a)*13*(t-0.16)} ${h/2-Math.sin(a)*13*(t-0.16)} Z`,fill:C.acc}));
+      else stroke(s,`M${bx} ${by} L${bx+Math.cos(a+1.9)*(f===1?5:3)} ${by-Math.sin(a+1.9)*(f===1?5:3)}`,C.ink,1)})};
+  barb(14,60,[1,1]);barb(42,120,[2,1]);barb(70,200,[1,0.5]);return s}
+function fDualWindow(){const w=96,h=24,s=svg(w,h);
+  const fast=[12,9,14,8,13,7,15,9,12,6,13,8],slow=[11,10.5,10.8,10.4,10.6,10.2,10.4,10.1,10,9.8,9.9,9.7];
+  stroke(s,`M3 ${h-4-(9-4)*(h-8)/12} L${w-3} ${h-4-(9-4)*(h-8)/12}`,C.neg,0.9,{"stroke-dasharray":"2.5 2"});
+  stroke(s,line(sc(fast,w-6,h,3,4,16)),C.muted,0.7);
+  stroke(s,line(sc(slow,w-6,h,3,4,16)),C.ink,1.75);
+  const p=sc(slow,w-6,h,3,4,16).at(-1);dot(s,...p,1.8,C.acc);return s}
+function fDepthWedge(){const w=84,h=26,s=svg(w,h);const mid=w/2;
+  let d1=`M${mid-3} ${h-3}`;for(let i=1;i<=5;i++)d1+=` L${mid-3-i*7.5} ${h-3-i*i*0.85} L${mid-3-(i+0.4)*7.5} ${h-3-i*i*0.85}`;
+  s.appendChild(E("path",{d:d1+` L${mid-44} ${h-3} Z`,fill:C.pos,opacity:0.4}));
+  let d2=`M${mid+3} ${h-3}`;for(let i=1;i<=5;i++)d2+=` L${mid+3+i*7} ${h-3-i*i*0.7} L${mid+3+(i+0.4)*7} ${h-3-i*i*0.7}`;
+  s.appendChild(E("path",{d:d2+` L${mid+40} ${h-3} Z`,fill:C.neg,opacity:0.4}));
+  stroke(s,`M${mid} 4 L${mid} ${h-3}`,C.faint,0.75);return s}
+function fTimeInRange(){const w=96,h=18,s=svg(w,h);
+  const segs=[[7,C.neg],[14,C.warn],[62,C.pos],[12,C.warn],[5,C.neg]];let x=2;
+  segs.forEach(g=>{rect(s,x,5,g[0]*0.78,8,g[1],1.5);x+=g[0]*0.78+1});
+  txt(s,2,4,"62% in range",6,C.muted);return s}
+function fFoldedDay(){const w=96,h=28,s=svg(w,h);
+  const med=[6,5,4,4,5,8,12,14,13,12,13,11,9,7];
+  const pm=sc(med,w-6,h,4,2,18);
+  [[6,0.10],[3,0.18]].forEach(([sp,op])=>{
+    const up=pm.map(p=>`${p[0]} ${Math.max(p[1]-sp,1.5)}`).join(" L ");
+    const dn=pm.slice().reverse().map(p=>`${p[0]} ${Math.min(p[1]+sp,h-1.5)}`).join(" L ");
+    s.appendChild(E("path",{d:`M${up} L ${dn} Z`,fill:C.acc,opacity:op}))});
+  stroke(s,line(pm),C.ink,1.25);
+  const today=[7,6,4,5,6,9,14,16,14,13,14,12,10,8];
+  stroke(s,line(sc(today,w-6,h,4,2,18)),C.acc,0.9,{"stroke-dasharray":"1.5 2"});
+  return s}
+function fHypnogram(){const w=96,h=26,s=svg(w,h);
+  const stages=[0,1,2,3,2,3,3,2,1,2,3,2,1,0,1,2,2,1,0];const cols=[C.neg,C.acc,C.ink,C.muted];
+  const bw=(w-8)/stages.length;let d="";
+  stages.forEach((st,i)=>{const y=4+st*(h-8)/3,x=4+i*bw;
+    stroke(s,`M${x} ${y} L${x+bw} ${y}`,cols[st],1.6);
+    if(i<stages.length-1){const ny=4+stages[i+1]*(h-8)/3;stroke(s,`M${x+bw} ${y} L${x+bw} ${ny}`,C.faint,0.7)}});
+  return s}
+function fWaveform(){const w=96,h=24,s=svg(w,h);const mid=h/2;
+  const amps=[2,4,7,9,6,10,8,5,9,11,7,4,6,8,10,6,3,5,7,4,2,3,5,3];
+  amps.forEach((a,i)=>{const x=3+i*3.9;stroke(s,`M${x} ${mid-a} L${x} ${mid+a}`,i<10?C.acc:C.ink,2.2,{"stroke-linecap":"round",opacity:i<10?1:0.35})});
+  return s}
+function fMinimap(){const w=30,h=36,s=svg(w,h);
+  rect(s,4,2,16,h-4,C.band,2);
+  for(let i=0;i<14;i++){const lw=4+Math.abs(Math.sin(i*1.8))*9;stroke(s,`M6 ${4+i*2.3} L${6+lw} ${4+i*2.3}`,C.muted,0.8,{opacity:0.5})}
+  s.appendChild(E("rect",{x:3,y:12,width:18,height:9,fill:"none",stroke:C.acc,"stroke-width":1,rx:1.5}));
+  [6,17,28].forEach((y,i)=>rect(s,23,y,3,2,i===1?C.neg:C.warn,0.5));return s}
+function fStarSpoke(){const w=76,h=32,s=svg(w,h);
+  const star=(cx,vals,col)=>{vals.forEach((v,i)=>{const a=-Math.PI/2+i*2*Math.PI/vals.length;
+    stroke(s,`M${cx} ${h/2} L${cx+Math.cos(a)*v} ${h/2+Math.sin(a)*v}`,col,1.1);
+    dot(s,cx+Math.cos(a)*v,h/2+Math.sin(a)*v,1.3,col)})};
+  star(20,[13,8,11,6,9],C.ink);star(56,[7,12,5,11,13],C.acc);return s}
+function fTokenConf(){const w=110,h=22,s=svg(w,h);
+  const words=[["The",0],["forecast",0],["suggests",1],["rain",0],["tomorrow",2]];let x=4;
+  words.forEach(([wd,tier])=>{const t=E("text",{x,y:12,"font-size":8.5,fill:C.ink});t.textContent=wd;s.appendChild(t);
+    const ww=wd.length*4.6;
+    rect(s,x,15,ww,2.2,[C.pos,C.warn,C.neg][tier],1);s.lastChild.setAttribute("opacity",[0.55,0.8,0.9][tier]);
+    x+=ww+4});return s}
+function fRubricStrip(){const w=96,h=30,s=svg(w,h);
+  const rows=[["accuracy",4.5,0.85],["safety",4.5,0.95],["style",2.5,0.55],["speed",2.5,0.7]];let y=3;
+  rows.forEach(r=>{rect(s,30,y,(w-36)*r[2],r[1],r[2]>0.8?C.pos:r[2]>0.6?C.acc:C.warn,1);
+    txt(s,0,y+r[1],r[0],5.5,C.muted);y+=r[1]+2.5});return s}
+function fEtaBar(){const w=96,h=18,s=svg(w,h);
+  rect(s,2,6,w-26,6,C.band,3);rect(s,2,6,(w-26)*0.55,6,C.acc,3);
+  [0.62,0.72,0.84].forEach((p,i)=>rect(s,2+(w-26)*p,6,(w-26)*0.07,6,C.acc,2));
+  [...s.children].slice(-3).forEach((r,i)=>r.setAttribute("opacity",(0.45-i*0.14).toFixed(2)));
+  txt(s,w-20,12.5,"~42s",7,C.muted);return s}
+function fVolumeProfile(){const w=88,h=30,s=svg(w,h);
+  const vols=[3,7,12,22,15,8,4];
+  vols.forEach((v,i)=>{const y=3+i*3.6;rect(s,w-6-v*2.6,y,v*2.6,2.6,i===3?C.acc:C.ink,0.5);
+    if(i!==3)s.lastChild.setAttribute("opacity",0.4)});
+  s.appendChild(E("rect",{x:w-6-22*2.6,y:9.5,width:22*2.6,height:11,fill:C.acc,opacity:0.08}));
+  const px=[5,6,8,7,9,11,10,12,11,13];
+  stroke(s,line(sc(px,w-28,h,4,4,14)),C.ink,1);return s}
+
+// ---------- codex additions: pattern/priority + systems/traces (docs 16 Q19-20, 17 F16-20) ----------
+function qCyclePlot(){const w=96,h=28,s=svg(w,h);
+  const slots=[[8,9,11],[13,14,13],[10,9,8],[6,7,9]];const means=slots.map(sl=>sl.reduce((a,b)=>a+b)/3);
+  const sx=i=>8+i*26,y=v=>h-3-(v-4)*(h-8)/11;
+  stroke(s,line(means.map((m,i)=>[sx(i)+5,y(m)])),C.faint,1);
+  slots.forEach((sl,i)=>{stroke(s,line(sl.map((v,j)=>[sx(i)+j*5,y(v)])),C.ink,1.1);
+    dot(s,sx(i)+5,y(means[i]),1.8,C.acc)});return s}
+function qParetoStrip(){const w=96,h=28,s=svg(w,h);const d=[38,24,15,9,7,7];
+  const bw=(w-30)/d.length;let cum=0;const cums=d.map(v=>(cum+=v));
+  d.forEach((v,i)=>rect(s,4+i*bw,h-3-(v/38)*(h-10),bw-2,(v/38)*(h-10),i<2?C.acc:C.ink));
+  stroke(s,line(cums.map((c,i)=>[4+i*bw+bw/2-1,h-3-(c/100)*(h-8)])),C.muted,1);
+  stroke(s,`M4 ${h-3-0.8*(h-8)} L${w-26} ${h-3-0.8*(h-8)}`,C.neg,0.8,{"stroke-dasharray":"2 2"});
+  txt(s,w-24,h-3-0.8*(h-8)+2.5,"80%",6,C.neg);return s}
+function fPhaseTrace(){const w=60,h=32,s=svg(w,h);
+  stroke(s,`M6 ${h-4} L6 4 M6 ${h-4} L${w-6} ${h-4}`,C.faint,0.75);
+  let d="M";const pts=[];for(let t=0;t<20;t++){const x=30+Math.cos(t*0.55)*(14-t*0.45),y=16+Math.sin(t*0.55)*(10-t*0.32);pts.push([x,y])}
+  stroke(s,line(pts),C.ink,1);pts.forEach((p,i)=>{if(i%5===0)dot(s,p[0],p[1],0.9,C.muted)});
+  const[lx,ly]=pts.at(-1);dot(s,lx,ly,2,C.acc);return s}
+function fTraceFold(){const w=96,h=26,s=svg(w,h);
+  rect(s,3,3,w-6,5,C.ink,1);
+  rect(s,3,10,34,5,C.acc,1);rect(s,40,10,28,5,C.ink,1);s.lastChild.setAttribute("opacity",0.5);
+  rect(s,71,10,20,5,C.ink,1);s.lastChild.setAttribute("opacity",0.5);
+  rect(s,8,17,22,5,C.acc,1);rect(s,44,17,14,5,C.ink,1);s.lastChild.setAttribute("opacity",0.35);
+  return s}
+function fEventRaster(){const w=96,h=28,s=svg(w,h);
+  const lanes=[[6,14,30,46,47,62,80],[9,30,44,58,74,88],[30,31,49,66],[4,18,30,52,53,70,85]];
+  s.appendChild(E("rect",{x:29,y:2,width:4,height:h-4,fill:C.acc,opacity:0.12}));
+  lanes.forEach((ln,r)=>{const y=5+r*6;ln.forEach(x=>stroke(s,`M${x} ${y-2.2} L${x} ${y+2.2}`,Math.abs(x-30)<2?C.acc:C.ink,1.1))});
+  return s}
+function fCalibrationStrip(){const w=60,h=32,s=svg(w,h);
+  stroke(s,`M6 ${h-6} L${w-6} 4`,C.faint,0.9,{"stroke-dasharray":"2 2"});
+  const pts=[[12,24,5],[22,21,9],[32,15,12],[42,13,7],[52,6,3]];
+  pts.forEach(p=>{dot(s,p[0],p[1],1.8,Math.abs((h-6)-(p[1])-((p[0]-6)/(w-12))*(h-10))<3?C.ink:C.neg);
+    rect(s,p[0]-1.5,h-4,3,-p[2]*0.35,C.muted);s.lastChild.setAttribute("opacity",0.35)});
+  return s}
+function fPartitionStrip(){const w=96,h=20,s=svg(w,h);
+  const top=[[46,C.acc],[30,C.ink],[16,C.muted]];let x=2;
+  top.forEach(seg=>{rect(s,x,3,seg[0]-1.5,6,seg[1],1);x+=seg[0]});
+  const kids=[[20,C.acc,.7],[14,C.acc,.45],[10,C.acc,.25],[18,C.ink,.6],[10,C.ink,.35],[14,C.muted,.5]];x=2;
+  kids.forEach(k=>{rect(s,x,11,k[0]-1.5,6,k[1],1);s.lastChild.setAttribute("opacity",k[2]);x+=k[0]});
+  return s}
+
+// ---------- assembly ----------
+function card(el,name,n,story,viz,isV1){const c=document.createElement("div");c.className="card";
+  const h=document.createElement("h3");h.innerHTML=name+(isV1?'<span class="v1">v1</span>':"")+`<span class="n">${n}</span>`;
+  const v=document.createElement("div");v.className="viz";v.appendChild(viz);
+  const p=document.createElement("p");p.textContent=story;
+  c.append(h,v,p);document.getElementById(el).appendChild(c)}
+
+const CONTAINERS=["fam-trend","fam-cat","fam-ptw","fam-scalar","fam-matrix","ex-type","ex-nature","ex-instr","ex-hist","ex-live","ex-space","q-forecast","q-judge","q-track","q-trust","q-pattern","f-instr","f-med","f-dev","f-ai","f-sys","ctx-table","inline-spark","inline-spark2","kpi-delta","kpi-spark"];
+function buildAll(){
+CONTAINERS.forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=""});
+
+card("fam-trend","Sparkline","60×16","The trend, word-sized. Line, smooth, step and area variants; endpoint dot + direct value label.",sparkline(D1,{curve:"smooth"}),true);
+card("fam-trend","Band sparkline","60×20","Trend against its normal range — the range band is real data, not decoration.",bandspark(),true);
+card("fam-trend","SparkBar","60×12","Discrete periods as bars; latest period accented.",sparkbar(),true);
+card("fam-trend","Win-loss","60×12","Binary outcome streaks above and below the line.",winloss());
+card("fam-trend","Horizon chart","80×14","A huge value range folded into layered opacity bands — maximum data density per pixel.",horizon());
+card("fam-trend","OHLC spark","80×16","Open-high-low-close per period, for financial table rows.",ohlc());
+card("fam-trend","Dual sparkline","60×16","Series vs benchmark — the comparison is dashed, never a second color fighting for attention.",dualspark());
+card("fam-trend","Stacked-area micro","60×16","Share shift over time, ≤3 layers, zero-anchored.",stackedarea());
+card("fam-trend","Bump strip","60×16","Rank position over time — the story of climbing to #1.",bumpstrip());
+card("fam-trend","Seismogram","60×16","Event intensity ticks; spikes flag anomalies.",seismo());
+card("fam-trend","Histogram strip","60×16","The shape of a distribution in a table cell.",histo());
+card("fam-trend","Rug strip","60×10","Raw observations as ticks; one accented. Composes under a sparkline.",rug());
+card("fam-trend","Heat strip","10×10/cell","Value-by-time as calibrated color.",heatstrip());
+
+card("fam-cat","MiniBar","50×16","Magnitude ranking with direct labels — no axis needed.",minibar());
+card("fam-cat","DotPlot","50×16","Few-value comparison with minimal ink; optional stem variant (absorbs Lollipop).",dotplot());
+card("fam-cat","PairedBars","60×20","Plan vs actual, category by category.",pairedbars());
+card("fam-cat","Slope","40×40","Before → after across categories; crossings are the story.",slope());
+card("fam-cat","MicroBox","40×14","Five-number summary — p50/p95 latency in a row.",microbox());
+card("fam-cat","Dumbbell","60×12","From → to ranges per row: salary bands, confidence spans.",dumbbell());
+card("fam-cat","Waterfall micro","70×18","How gains and losses compose into the final number.",waterfall());
+
+card("fam-ptw","Progress","40×8","Completion with its number, always.",progress());
+card("fam-ptw","SegmentedBar","60×10","Composition in one bar, ≤5 segments.",segmented());
+card("fam-ptw","ProgressRing","24×24","Icon-level completion affordance.",ring());
+card("fam-ptw","MicroDonut","24×24","Capped wedges + Other rollup; deliberately small.",microdonut());
+card("fam-ptw","Funnel micro","60×18","Stage conversion, labeled directly.",funnel());
+card("fam-ptw","Pictogram row","60×12","Unit counts — 5 of 8, at a glance.",pictogram());
+
+card("fam-scalar","Delta","50×14","Change vs prior period; direction is glyph + color, never color alone.",delta(),true);
+card("fam-scalar","Bullet","80×16","Value vs target vs qualitative bands — everything a gauge says, in a fraction of the space.",bullet(),true);
+card("fam-scalar","HeatCell","12×12","One value as calibrated color steps.",heatcell());
+card("fam-scalar","StatusDot","8×8","State encoded by shape and color together.",statusdot());
+card("fam-scalar","TrendArrow","16×16","Direction at its most minimal.",trendarrow());
+
+card("fam-matrix","ActivityGrid","7×N","Intensity calendar — the most-copied dataviz pattern of the decade.",activitygrid(),true);
+card("fam-matrix","Calendar strip","7×7/wk","Two weeks of activity, week-shaped.",calendarstrip());
+card("fam-matrix","Event timeline","80×12","Spans and incidents on a row — uptime windows, releases, on-call.",eventtimeline());
+
+// expressive collection cards
+card("ex-type","FatDigits","E1","Numeral ink weight ∝ value — a number that is its own bar chart (FatFonts research).",fatdigits());
+card("ex-type","FillWord","E2","The word's glyphs fill like a progress bar — label and bar are one.",fillword());
+
+card("ex-nature","TreeRings","E3","Ring spacing = per-period growth; the current year accented. Dendrochronology for cohorts.",treerings());
+card("ex-nature","MoonPhase","E4","Illuminated fraction = cycle progress — sprints, billing periods, quotas.",moonphase());
+card("ex-nature","Constellation","E5","Sparse events as a star chart: position = time × value, size = magnitude.",constellation());
+card("ex-nature","SproutRow","E6","Growth stages per category — seed to bloom as a maturity scale.",sproutrow());
+card("ex-nature","GardenGrid","E7","ActivityGrid's soft sibling: dot radius = value. Habits with warmth.",gardengrid());
+
+card("ex-instr","Thermometer","E8","A calibrated column with ticks and bulb — ranges people feel.",thermometer());
+card("ex-instr","BalanceBeam","E9","Tilt ∝ ratio of two weights — buy/sell, in/out at a glance.",balancebeam());
+card("ex-instr","Hourglass","E10","Sand split = elapsed vs remaining — TTLs, deadlines.",hourglass());
+
+card("ex-hist","TallyMarks","E11","Four-and-strike groups — live counts with a human hand.",tallymarks());
+card("ex-hist","DicePips","E12","Pip patterns are subitized instantly — ratings, severity 1–6.",dicepips());
+card("ex-hist","MusicStaff","E13","Pitch = value, sequence = time — the series as a melody; pairs with sonification.",musicstaff());
+
+card("ex-live","HeartbeatBlip","E14","Spike per event, flatline = down — the most legible alive-signal ever designed.",heartbeat());
+card("ex-live","BreathingDot","E15","Pulse amplitude and rate = load — calm is healthy. (Animates; static under reduced motion.)",breathingdot());
+card("ex-live","CometTrail","E16","A live value with its fading positional history — the sparkline as motion.",comettrail());
+card("ex-live","OrbitStatus","E17","Orbit radius = latency, speed = call rate — dependency health per row.",orbitstatus());
+
+card("ex-space","PolarClock","E18","Radial segments per hour — a day's shape in 24 pixels.",polarclock());
+card("ex-space","SpiralYear","E19","A year coiled into a square; opacity = value. Seasonality at a glance.",spiralyear());
+card("ex-space","Honeycomb","E20","Hex cells filling — the waffle's organic sibling.",honeycomb());
+card("ex-space","CitySkyline","E21","Building height = value, lit windows = second variable — a two-var bar with charm.",cityskyline());
+card("ex-space","BubbleRow","E22","Touching circles, r ∝ √value — magnitude with physicality.",(function(){const w=92,h=28,s=svg(w,h);let x=6;[14,8,11,5,9].forEach((v,i)=>{const r=Math.sqrt(v)*1.9;x+=r;dot(s,x,h/2,r,i===0?C.acc:C.ink);s.lastChild.setAttribute("opacity",i===0?1:0.7);x+=r+2});return s})());
+
+// decision micrographs
+card("q-forecast","ForecastCone","Q1","Will we land? History solid, median projection dashed, 50/80% bands opening honestly — the Bank of England fan chart, word-sized.",qForecastCone());
+card("q-forecast","QuantileDots","Q2","What are the odds? Twenty dots = twenty futures; count the dots past the target line. Research-proven to beat error bars for real decisions.",qQuantileDots());
+card("q-forecast","GradedBand","Q3","How sure are we? Nested 50/80/95 bands — confidence you can see fading, never a false hard edge.",qGradedBand());
+card("q-forecast","EnsembleGhosts","Q4","What could happen? A handful of simulated paths, one emphasized — the static cousin of hypothetical-outcome plots.",qHOPs());
+
+card("q-judge","BenchmarkStrip","Q5","Is this normal? Peer range as a quiet band, your value as the dot, percentile said outright.",qBenchmarkStrip());
+card("q-judge","ABStrips","Q6","Did B beat A? Two quantile strips on one scale — overlap is the honest answer, not a single misleading average.",qABStrips());
+card("q-judge","ShiftHistogram","Q7","Did the fix change things? Before mirrored above, after below — the distribution's move is the proof.",qShiftHist());
+card("q-judge","ChangePoint","Q8","When did behavior change? The detected regime shaded, the break marked — context for every anomaly.",qChangePoint());
+card("q-judge","ControlStrip","Q9","Is the process in control? Shewhart's control chart at cell size — the band is expected variation; red dots earn attention.",qControlStrip());
+
+card("q-track","ErrorBudget","Q10","Are we burning too fast? SLO budget remaining vs the steady-burn diagonal — above the line is safety.",qErrorBudget());
+card("q-track","BurnChart","Q11","Will we finish? Plan dashed, actual solid, today marked, the projection dotted to the deadline.",qBurnChart());
+card("q-track","RetentionCurve","Q12","Do they stay? Your cohort's decay against the benchmark ghost — the gap is the product story.",qRetention());
+card("q-track","CoverageStrip","Q13","Can I trust this data? Where measurement actually happened vs the gaps — missingness made visible before conclusions.",qCoverage());
+
+card("q-trust","NetFlow","Q14","In vs out? Inflow above the line, outflow mirrored below, net drawn on top — cash flow in a table cell.",qNetFlow());
+card("q-trust","PercentileLadder","Q15","What's the tail? p50, p90, p99 as ticks on one strip — the median never tells the latency story alone.",qPercentileLadder());
+card("q-trust","RateVolume","Q16","Rate moved — on what volume? Ghost bars carry the denominator so a 100% jump on 3 events can't lie.",qRateVolume());
+card("q-trust","DataDiff","Q17","What changed between versions? Added right, removed left, per key — the code diff, generalized to data.",qDataDiff());
+card("q-trust","QuadrantDot","Q18","Where does this sit? Effort × impact position against the field — the 2×2 at glyph size.",qQuadrant());
+
+card("q-pattern","CyclePlot","Q19","What repeats beneath the trend? Each slot keeps its own within-period trajectory; the connected means reveal the cycle. Never smoothed across period boundaries.",qCyclePlot());
+card("q-pattern","ParetoStrip","Q20","What should we fix first? Descending impact + cumulative share on a fixed 0–100% scale — 80% is a reference line, never a claimed law.",qParetoStrip());
+
+// frontier collection
+card("f-instr","TapeGauge","F1","The sparkline, inverted: your value fixed at the pointer, the scale scrolls past. Value + rate chevron + zone bands in one character of width — aviation's PFD tape.",fTapeGauge());
+card("f-instr","StationGlyph","F2","Six variables in a character-sized glyph via fixed geometric slots — the WMO station model (standardized 1941), generalized to any metrics. Never absorbed by a chart library, until now.",fStationGlyph());
+card("f-instr","WindBarb","F3","Direction + quantized magnitude in one mark — half flag 5, full 10, pennant 50. For any flow: traffic, requests, migration.",fWindBarb());
+card("f-instr","DualWindowMeter","F4","Broadcast loudness metering generalized: fast window thin, slow window thick, compliance target dashed — the honest form of every noisy-metric-with-an-SLO.",fDualWindow());
+card("f-instr","DepthWedge","F5","Supply and demand as cumulative wedges meeting at the spread — the orderbook's posture in a glyph.",fDepthWedge());
+
+card("f-med","TimeInRange","F6","The committee-ratified microchart: time in each clinical zone as a fixed-order strip. Ported to SLOs, uptime, and every corridor metric.",fTimeInRange());
+card("f-med","FoldedDayBand","F7","Fourteen days folded onto one 24-hour axis: median + percentile envelopes, today dashed on top. What does a typical day look like — and is today typical?",fFoldedDay());
+card("f-med","Hypnogram","F8","The step strip that refuses to smooth — categorical states over time (sleep stages, deploy states, severity levels). Interpolation here would be a lie.",fHypnogram());
+
+card("f-dev","Waveform","F9","The most-seen microchart on earth, with its honesty rule kept: max-per-bucket downsampling — means hide spikes.",fWaveform());
+card("f-dev","MinimapStrip","F10","Content thumbnail + your viewport window + marker ticks — position-in-the-whole for documents, timelines, logs. VS Code's gift to dataviz.",fMinimap());
+card("f-dev","StarSpoke","F11","The dense multi-variable glyph that survived peer review: contour-free spokes, two entities compared at a glance. (Chernoff faces did not survive.)",fStarSpoke());
+
+card("f-ai","TokenConfidence","F12","The text is the chart: per-token confidence as tinted underlines, in discrete tiers — confident, unsure, guessing. AI-native and typographically honest.",fTokenConf());
+card("f-ai","RubricStrip","F13","Quality refuses to be one number: weighted criteria as mini-bars, height = weight, length = score. Evals, reviews, comparisons.",fRubricStrip());
+card("f-ai","EtaBar","F14","The progress bar, told truthfully: solid = observed, the remainder re-forecast from the actual rate — never linear-interpolated hope.",fEtaBar());
+card("f-ai","VolumeProfile","F15","Where activity concentrated, not when: a histogram perpendicular to the trend, modal level accented, value area shaded. Trading floors have kept this to themselves for decades.",fVolumeProfile());
+
+card("f-sys","PhaseTrace","F16","Two synchronized signals as one trajectory — loops expose lag and feedback, clusters expose regimes, the directed endpoint is now. Dynamical systems' gift to dashboards.",fPhaseTrace());
+card("f-sys","TraceFold","F17","Where did the latency go? Width = duration, row = nesting depth, critical path accented — one request's flame chart, folded into a cell.",fTraceFold());
+card("f-sys","EventRaster","F18","One lane per source, one tick per event — vertical bands reveal synchronization, diagonals reveal cascade. Neuroscience's spike raster, generalized.",fEventRaster());
+card("f-sys","CalibrationStrip","F19","Does this probability deserve trust? Predicted vs observed against the identity diagonal, with quiet support bars so tiny bins can't look authoritative.",fCalibrationStrip());
+card("f-sys","PartitionStrip","F20","How does a hierarchy consume the whole? Width = share, rows = depth, alignment = parentage — the icicle plot, legible at 20 pixels.",fPartitionStrip());
+
+// contexts
+document.getElementById("inline-spark").appendChild(sparkline([3,4,3,5,6,8,9,11],{band:false,scale:1}));
+document.getElementById("inline-spark2").appendChild(sparkline(D2,{band:false,acc:C.pos,scale:1}));
+const tb=document.getElementById("ctx-table");
+[["api-gateway",[8,7,9,8,10,9,11,14,12,16],"162 ms",true],
+ ["auth",[6,6,5,6,5,5,4,5,4,4],"48 ms",false],
+ ["billing",[4,5,4,6,5,7,6,8,9,8],"95 ms",true],
+ ["search",[9,8,8,7,7,6,6,5,5,4],"71 ms",false]].forEach(r=>{
+  const tr=document.createElement("tr");
+  const td1=document.createElement("td");td1.textContent=r[0];
+  const td2=document.createElement("td");td2.appendChild(sparkline(r[1],{band:false,acc:r[3]?C.neg:C.pos,scale:1}));
+  const td3=document.createElement("td");td3.className="num";td3.textContent=r[2];
+  const td4=document.createElement("td");td4.appendChild(delta(r[3]?"+9%":"−7%",r[3]?true:false,{pos:C.neg,neg:C.pos}));
+  tr.append(td1,td2,td3,td4);tb.appendChild(tr)});
+document.getElementById("kpi-delta").appendChild(delta("+12.4%",true));
+document.getElementById("kpi-spark").appendChild(sparkline([28,30,29,33,35,34,38,41,40,44,46,48],{curve:"smooth"}));
+} // end buildAll
+
+// controls
+const sw=document.getElementById("palette-swatches");
+Object.keys(PALETTES).forEach(p=>{const b=document.createElement("button");
+  b.style.background=PALETTES[p].light;b.title=p;b.setAttribute("aria-label","Palette "+p);
+  b.setAttribute("aria-pressed",p===PAL?"true":"false");
+  b.onclick=()=>{sw.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true");b.style.background=PALETTES[p][MODE];applyTheme(MODE,p)};
+  sw.appendChild(b)});
+["light","dark"].forEach(m=>{document.getElementById("mode-"+m).onclick=()=>{
+  document.getElementById("mode-light").setAttribute("aria-pressed",m==="light"?"true":"false");
+  document.getElementById("mode-dark").setAttribute("aria-pressed",m==="dark"?"true":"false");
+  sw.querySelectorAll("button").forEach((x,i)=>x.style.background=PALETTES[Object.keys(PALETTES)[i]][m]);
+  applyTheme(m,PAL)}});
+applyTheme("light","azure");
+
+// ---------- expressive collection ----------
+function fatdigits(){const w=92,h=26,s=svg(w,h);[["3",300],["7",600],["12",900]].forEach((d,i)=>{
+  const t=E("text",{x:14+i*30,y:20,"font-size":17,"font-weight":d[1],fill:C.ink,"text-anchor":"middle"});t.textContent=d[0];s.appendChild(t)});return s}
+function fillword(){const w=110,h=24,s=svg(w,h);const cp=E("clipPath",{id:"fw"});cp.appendChild(E("rect",{x:0,y:0,width:w*0.72,height:h}));
+  const defs=E("defs",{});defs.appendChild(cp);s.appendChild(defs);
+  const t1=E("text",{x:4,y:17,"font-size":14,"font-weight":700,fill:C.faint});t1.textContent="uploading";s.appendChild(t1);
+  const t2=E("text",{x:4,y:17,"font-size":14,"font-weight":700,fill:C.acc,"clip-path":"url(#fw)"});t2.textContent="uploading";s.appendChild(t2);
+  txt(s,84,17,"72%",8,C.muted);return s}
+function treerings(){const sz=36,s=svg(sz,sz);const rs=[3,5.5,8.5,10.5,13.5,16];
+  rs.forEach((r,i)=>s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r,stroke:i===rs.length-1?C.acc:C.ink,"stroke-width":i===rs.length-1?1.5:0.9,fill:"none",opacity:i===rs.length-1?1:0.55})));
+  dot(s,sz/2,sz/2,1.4,C.ink);return s}
+function moonphase(){const sz=30,s=svg(sz,sz);const cp=E("clipPath",{id:"mp"});cp.appendChild(E("rect",{x:0,y:0,width:sz*0.72,height:sz}));
+  const defs=E("defs",{});defs.appendChild(cp);s.appendChild(defs);
+  s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r:11,stroke:C.faint,"stroke-width":1.5,fill:"none"}));
+  s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r:11,fill:C.acc,"clip-path":"url(#mp)",opacity:0.9}));return s}
+function constellation(){const w=96,h=30,s=svg(w,h);const pts=[[8,22,1.4],[24,10,2.4],[40,16,1.6],[58,6,3],[74,14,1.8],[88,9,2.2]];
+  for(let i=1;i<pts.length;i++)stroke(s,`M${pts[i-1][0]} ${pts[i-1][1]} L${pts[i][0]} ${pts[i][1]}`,C.faint,0.7);
+  pts.forEach(p=>dot(s,p[0],p[1],p[2],C.ink));dot(s,58,6,3,C.acc);return s}
+function sproutrow(){const w=96,h=30,s=svg(w,h);const stages=[4,9,14,20];
+  stages.forEach((ht,i)=>{const x=14+i*24;stroke(s,`M${x} ${h-3} L${x} ${h-3-ht}`,C.pos,1.4);
+    if(i>0)s.appendChild(E("ellipse",{cx:x-3,cy:h-3-ht*0.6,rx:3.2,ry:1.8,fill:C.pos,opacity:0.8,transform:`rotate(-30 ${x-3} ${h-3-ht*0.6})`}));
+    if(i>1)s.appendChild(E("ellipse",{cx:x+3,cy:h-3-ht*0.8,rx:3.2,ry:1.8,fill:C.pos,opacity:0.8,transform:`rotate(30 ${x+3} ${h-3-ht*0.8})`}));
+    if(i>2)dot(s,x,h-4-ht,2.4,C.acc)});return s}
+function gardengrid(){const s=svg(90,30);for(let c=0;c<12;c++)for(let r=0;r<4;r++){
+  const v=Math.abs(Math.sin(c*1.7+r*2.3));dot(s,5+c*7.5,5+r*7,0.8+v*2.4,C.pos);s.lastChild.setAttribute("opacity",(0.35+v*0.6).toFixed(2))}return s}
+function thermometer(){const w=90,h=26,s=svg(w,h);
+  s.appendChild(E("rect",{x:6,y:9,width:64,height:8,rx:4,stroke:C.ink,"stroke-width":1,fill:"none"}));
+  rect(s,8,11,44,4,C.neg,2);s.appendChild(E("circle",{cx:74,cy:13,r:6,stroke:C.ink,"stroke-width":1,fill:C.neg}));
+  [20,34,48,62].forEach(x=>stroke(s,`M${x} 6 L${x} 8`,C.muted,0.8));return s}
+function balancebeam(){const w=80,h=30,s=svg(w,h);
+  s.appendChild(E("path",{d:`M${w/2-5} ${h-4} L${w/2} ${h-13} L${w/2+5} ${h-4} Z`,fill:C.ink}));
+  const g=E("g",{transform:`rotate(-9 ${w/2} ${h-13})`});
+  g.appendChild(E("path",{d:`M${w/2-28} ${h-13} L${w/2+28} ${h-13}`,stroke:C.ink,"stroke-width":1.5,"stroke-linecap":"round"}));
+  g.appendChild(E("circle",{cx:w/2-24,cy:h-18,r:5,fill:C.acc}));g.appendChild(E("circle",{cx:w/2+24,cy:h-16.5,r:3.2,fill:C.muted}));
+  s.appendChild(g);return s}
+function hourglass(){const w=30,h=32,s=svg(w,h);
+  stroke(s,`M6 3 L24 3 L8 16 L24 29 L6 29 L22 16 Z`,C.ink,1,{"stroke-linejoin":"round"});
+  s.appendChild(E("path",{d:"M11 6.5 L19 6.5 L15 11.5 Z",fill:C.acc,opacity:0.8}));
+  s.appendChild(E("path",{d:"M9.5 28 L20.5 28 L15 21 Z",fill:C.acc}));return s}
+function tallymarks(){const w=90,h=26,s=svg(w,h);let x=8;
+  for(let g=0;g<3;g++){for(let i=0;i<4;i++)stroke(s,`M${x+i*4.5} 5 L${x+i*4.5} 21`,C.ink,1.4);
+    stroke(s,`M${x-2.5} 19 L${x+16} 6`,g<2?C.ink:C.acc,1.4);x+=26}
+  for(let i=0;i<2;i++)stroke(s,`M${x+i*4.5} 5 L${x+i*4.5} 21`,C.acc,1.4);return s}
+function dicepips(){const w=92,h=26,s=svg(w,h);const faces=[[3,[[6,6],[12,12],[18,18]]],[5,[[6,6],[18,6],[12,12],[6,18],[18,18]]],[2,[[6,6],[18,18]]]];
+  faces.forEach((f,i)=>{const x=4+i*30;s.appendChild(E("rect",{x,y:1,width:24,height:24,rx:5,stroke:C.ink,"stroke-width":1,fill:"none"}));
+    f[1].forEach(p=>dot(s,x+p[0],1+p[1],2,i===1?C.acc:C.ink))});return s}
+function musicstaff(){const w=96,h=28,s=svg(w,h);for(let i=0;i<5;i++)stroke(s,`M2 ${5+i*4.5} L${w-2} ${5+i*4.5}`,C.faint,0.8);
+  const notes=[[12,21],[26,16.5],[40,12],[54,16.5],[68,7.5],[84,12]];
+  notes.forEach((n,i)=>{const col=i===4?C.acc:C.ink,up=n[1]>h/2;
+    s.appendChild(E("ellipse",{cx:n[0],cy:n[1],rx:3.2,ry:2.4,fill:col,transform:`rotate(-15 ${n[0]} ${n[1]})`}));
+    stroke(s,up?`M${n[0]+3} ${n[1]-1} L${n[0]+3} ${Math.max(n[1]-11,2)}`:`M${n[0]-3} ${n[1]+1} L${n[0]-3} ${Math.min(n[1]+11,h-2)}`,col,1)});return s}
+function heartbeat(){const w=96,h=26,s=svg(w,h);
+  stroke(s,`M2 ${h/2} L26 ${h/2} L31 ${h/2-3} L36 ${h/2+4} L41 ${h/2-15} L46 ${h/2+9} L50 ${h/2} L58 ${h/2} L94 ${h/2}`,C.pos,1.5);
+  dot(s,88,h/2,2,C.pos);return s}
+function breathingdot(){const sz=30,s=svg(sz,sz);
+  s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r:11,stroke:C.pos,"stroke-width":1,fill:"none",opacity:0.35,class:"breathe-ring"}));
+  s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r:5.5,fill:C.pos,class:"breathe-core"}));return s}
+function comettrail(){const w=92,h=24,s=svg(w,h);const pts=sc([5,6,5,7,8,7,9,11,10,13],w-14,h,3);
+  pts.forEach((p,i)=>{if(i<pts.length-1)dot(s,p[0],p[1],0.8+1.2*(i/pts.length),C.acc),s.lastChild.setAttribute("opacity",(0.08+0.6*(i/pts.length)).toFixed(2))});
+  dot(s,...pts.at(-1),3,C.acc);return s}
+function orbitstatus(){const w=60,h=32,s=svg(w,h);dot(s,w/2,h/2,3.4,C.ink);
+  s.appendChild(E("ellipse",{cx:w/2,cy:h/2,rx:12,ry:7,stroke:C.faint,"stroke-width":0.9,fill:"none"}));
+  s.appendChild(E("ellipse",{cx:w/2,cy:h/2,rx:23,ry:13,stroke:C.faint,"stroke-width":0.9,fill:"none"}));
+  dot(s,w/2+11,h/2-3,2,C.pos);dot(s,w/2-21,h/2+5,2,C.neg);return s}
+function polarclock(){const sz=34,s=svg(sz,sz);const cx=sz/2,cy=sz/2;
+  for(let i=0;i<12;i++){const a=(i/12)*Math.PI*2-Math.PI/2;const len=3+Math.abs(Math.sin(i*1.8))*10;
+    stroke(s,`M${cx+Math.cos(a)*3} ${cy+Math.sin(a)*3} L${cx+Math.cos(a)*(3+len)} ${cy+Math.sin(a)*(3+len)}`,i===7?C.acc:C.ink,1.5,{opacity:i===7?1:0.6})}return s}
+function spiralyear(){const sz=34,s=svg(sz,sz);const cx=sz/2,cy=sz/2;
+  for(let i=0;i<36;i++){const a=i*0.55,r=2+i*0.38;const v=Math.abs(Math.sin(i*0.7));
+    dot(s,cx+Math.cos(a)*r,cy+Math.sin(a)*r,1.1,C.acc);s.lastChild.setAttribute("opacity",(0.15+v*0.85).toFixed(2))}return s}
+function honeycomb(){const w=76,h=30,s=svg(w,h);const hex=(cx,cy,r,fill,op)=>{let d="M";
+  for(let i=0;i<6;i++){const a=Math.PI/6+i*Math.PI/3;d+=(cx+r*Math.cos(a)).toFixed(1)+" "+(cy+r*Math.sin(a)).toFixed(1)+(i<5?" L ":" Z")}
+  s.appendChild(E("path",{d,fill:fill||"none",stroke:C.ink,"stroke-width":0.8,opacity:op}))};
+  const pos=[[10,9],[22,9],[34,9],[46,9],[58,9],[16,19.5],[28,19.5],[40,19.5],[52,19.5],[64,19.5]];
+  pos.forEach((p,i)=>hex(p[0],p[1],6.5,i<7?C.acc:"none",i<7?0.85:0.5));return s}
+function cityskyline(){const w=96,h=32,s=svg(w,h);const bld=[[2,14,16,3],[20,22,14,6],[36,10,12,2],[50,26,16,8],[68,17,13,4],[83,12,11,3]];
+  bld.forEach(b=>{const top=h-2-b[1];rect(s,b[0],top,b[2],b[1],C.ink);
+    for(let i=0;i<b[3];i++){const wx=b[0]+2.5+(i%3)*((b[2]-4)/3),wy=top+2.5+Math.floor(i/3)*4.5;
+      if(wy+2.4<h-3)rect(s,wx,wy,2,2.4,C.gold)}});
+  return s}
+
+// themes
+const THEMES=[
+ ["modern",{bg:"#FFFFFF",ink:"#17181B",acc:"#0072B2",band:"rgba(23,24,27,.07)",font:"inherit"}],
+ ["tufte",{bg:"#FFFFF8",ink:"#333333",acc:"#B32E2E",band:"rgba(60,60,60,.08)",font:"Georgia,serif"}],
+ ["newspaper",{bg:"#F6F5F1",ink:"#111111",acc:"#111111",band:"rgba(17,17,17,.10)",dash:"1 0",sw:1.5,font:"Georgia,'Times New Roman',serif"}],
+ ["e-ink",{bg:"#EDEDEA",ink:"#000000",acc:"#000000",band:"rgba(0,0,0,.12)",sw:2,font:"inherit"}],
+ ["poster",{bg:"#101318",ink:"#F4F6F8",acc:"#4FB3FF",band:"rgba(244,246,248,.12)",sw:2.25,font:"inherit"}]];
+const tw=document.getElementById("themes");
+THEMES.forEach(([name,t])=>{const d=document.createElement("div");d.className="theme";
+  d.style.background=t.bg;d.style.color=t.ink;d.style.fontFamily=t.font;
+  d.innerHTML=`<div class="lbl">${name}</div>`;
+  const s=sparkline(D1,{ink:t.ink,acc:t.acc,band:t.band,sw:t.sw||1.25});
+  d.appendChild(s);
+  const val=document.createElement("div");val.style.cssText="font-size:12px;margin-top:8px;font-variant-numeric:tabular-nums";
+  val.innerHTML=`18 units <span style="color:${name==='poster'?'#6EE7B7':'#009E73'};font-weight:600">▲ 12%</span>`;
+  d.appendChild(val);tw.appendChild(d)});
+</script>

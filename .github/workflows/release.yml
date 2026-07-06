@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency: release-${{ github.ref }}
+
+# No token: publishing uses npm **trusted publishing** (OIDC) + automatic
+# provenance. Requires a one-time setup on npmjs.org: add this repo + workflow
+# as a Trusted Publisher for @microcharts/react. If you ever need the classic
+# path instead, add an NPM_TOKEN secret and set it as NODE_AUTH_TOKEN below.
+permissions: {}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the version PR / tags
+      pull-requests: write # open the "Version Packages" PR
+      id-token: write # OIDC for trusted publishing + provenance
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - name: Ensure npm supports OIDC trusted publishing
+        run: npm install -g npm@latest
+      - run: pnpm install --frozen-lockfile
+      - name: Create release PR or publish
+        uses: changesets/action@v1
+        with:
+          version: pnpm run version
+          publish: pnpm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"

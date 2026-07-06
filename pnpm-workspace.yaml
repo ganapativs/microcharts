@@ -1,0 +1,17 @@
+# pnpm 11 reads project settings from here (not .npmrc).
+#
+# This repo deliberately tracks bleeding-edge tooling (oxc, vitest, tsdown) that
+# is freshness-vetted by hand per plan/12-research-audit.md, so pnpm 11's
+# minimum-release-age supply-chain gate is disabled here only. Global and other
+# repos keep their own policy.
+minimumReleaseAge: 0
+
+# Skip the pre-script dependency re-verification so `pnpm run <script>` doesn't
+# re-run the policy check on every invocation.
+verifyDepsBeforeRun: false
+
+# Dependencies allowed to run install/build scripts (pnpm 11 blocks these by
+# default). Both are trusted CLI binaries that fetch their native executable.
+allowBuilds:
+  esbuild: true
+  lefthook: true

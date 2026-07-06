@@ -1,0 +1,3 @@
+# Playwright visual-regression specs (*.spec.ts) land here in Phase 2.
+# Each renders a chart in a fixture page and asserts toHaveScreenshot,
+# uploaded to Argos for PR review. Baselines live in __screenshots__/.
