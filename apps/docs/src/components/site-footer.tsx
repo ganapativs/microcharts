@@ -2,6 +2,14 @@ import Link from "next/link";
 import { SITE } from "@/lib/site";
 import { STABLE_CHARTS } from "@/lib/catalog";
 
+function XMark() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817-5.966 6.817H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
+    </svg>
+  );
+}
+
 const cols: { title: string; links: { href: string; label: string; external?: boolean }[] }[] = [
   {
     title: "Docs",
@@ -67,7 +75,26 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-12 flex flex-col gap-3 border-t border-fd-border pt-6 text-fd-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <span className="mono-label">© 2026 {SITE.author}</span>
+          <span className="mono-label flex items-center gap-2">
+            © 2026
+            <a
+              href={SITE.authorUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="link-underline hover:text-fd-foreground"
+            >
+              {SITE.author}
+            </a>
+            <a
+              href={SITE.authorX}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label={`${SITE.author} on X`}
+              className="text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+            >
+              <XMark />
+            </a>
+          </span>
           <div className="flex gap-4 text-sm">
             <a href={SITE.repo} className="link-underline hover:text-fd-foreground">
               GitHub

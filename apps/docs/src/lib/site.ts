@@ -19,6 +19,9 @@ export const SITE = {
   repo: "https://github.com/ganapativs/microcharts",
   npm: "https://www.npmjs.com/package/@microcharts/react",
   author: "Ganapati V S",
+  authorUrl: "https://meetguns.com",
+  authorX: "https://x.com/ganapativs",
+  authorXHandle: "@ganapativs",
   ogImageAlt: "microcharts — tiny accessible React charts rendered inline",
 } as const;
 
