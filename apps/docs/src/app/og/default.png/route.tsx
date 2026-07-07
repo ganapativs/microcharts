@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { SITE } from "@/lib/site";
+import { CELL_FILL, CELL_R, CELL_SIZE, CELLS } from "@/lib/brand";
 
 export const revalidate = false;
 export const dynamic = "force-static";
@@ -29,11 +30,28 @@ export function GET() {
           style={{
             width: 44,
             height: 44,
-            borderRadius: 10,
+            borderRadius: 12,
             background: "#2f52d4",
             display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        />
+        >
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+            {CELLS.map((c) => (
+              <rect
+                key={c.x}
+                x={c.x}
+                y={c.y}
+                width={CELL_SIZE}
+                height={CELL_SIZE}
+                rx={CELL_R}
+                fill={CELL_FILL}
+                opacity={c.o}
+              />
+            ))}
+          </svg>
+        </div>
         <div style={{ fontSize: 28, letterSpacing: "-0.01em", color: "#191712" }}>microcharts</div>
       </div>
 

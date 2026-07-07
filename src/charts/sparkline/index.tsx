@@ -128,8 +128,15 @@ export function Sparkline(props: SparklineProps): ReactNode {
       ) : null}
       {showMinMax && geo.min && geo.max && geo.min.index !== geo.max.index ? (
         <>
-          <circle cx={geo.min.x} cy={geo.min.y} r={1.5} data-mc-ink="point" />
-          <circle cx={geo.max.x} cy={geo.max.y} r={1.5} data-mc-ink="point" />
+          {/* Skip an extremum dot that coincides with the endpoint: the accent
+              endpoint dot already marks it, and stacking a second circle (plus a
+              same-colour label) collapses into an unreadable blob at cell size. */}
+          {!(showEndpoint && geo.last && geo.min.index === geo.last.index) ? (
+            <circle cx={geo.min.x} cy={geo.min.y} r={1.5} data-mc-ink="point" />
+          ) : null}
+          {!(showEndpoint && geo.last && geo.max.index === geo.last.index) ? (
+            <circle cx={geo.max.x} cy={geo.max.y} r={1.5} data-mc-ink="point" />
+          ) : null}
         </>
       ) : null}
       {showEndpoint && geo.last ? (
@@ -137,7 +144,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
       ) : null}
       {labelText !== undefined && metrics && geo.last ? (
         <text
-          x={geo.last.x + 3}
+          x={geo.last.x + 4}
           /* y clamped so ascenders/descenders stay inside the viewBox */
           y={Math.min(
             Math.max(geo.last.y, metrics.fontSize * 0.55),

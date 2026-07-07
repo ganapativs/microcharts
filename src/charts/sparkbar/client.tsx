@@ -172,14 +172,8 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         <span
           className="mc-spark-readout"
           style={{
-            position: "absolute",
             left: `${((activeBar.x + activeBar.width / 2) / width) * 100}%`,
-            bottom: "100%",
             transform: "translateX(-50%)",
-            font: "var(--mc-label-size, 0.75em) var(--mc-font, inherit)",
-            fontVariantNumeric: "tabular-nums",
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
           }}
         >
           {fmt(activeValue)}

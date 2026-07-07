@@ -75,16 +75,18 @@ export function InteractiveDemo({ slug }: { slug: string }) {
   const [deltaValue, setDeltaValue] = useState(0.184);
 
   return (
-    <div className="not-prose my-6 overflow-hidden rounded-xl border border-fd-border bg-fd-card">
+    <div className="panel not-prose my-6 overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-fd-border px-4 py-2.5">
         <span className="mono-label">Interactive</span>
         {slug === "delta" && (
           <button
             type="button"
             onClick={() => setDeltaValue((v) => (v > 0 ? -0.062 : 0.184))}
-            className="inline-flex items-center gap-1.5 rounded-md border border-fd-border px-2 py-1 font-mono text-[0.68rem] text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+            aria-label="Change value"
+            title="Change value"
+            className="ghost-ctrl size-8"
           >
-            <RotateCw className="size-3" /> change
+            <RotateCw className="size-4" />
           </button>
         )}
       </div>

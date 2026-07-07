@@ -59,7 +59,7 @@ export default function GalleryPage() {
           <Reveal key={chart.slug} delay={i * 60}>
             <Link
               href={`/docs/charts/${chart.slug}`}
-              className="group flex h-full flex-col rounded-xl border border-fd-border bg-fd-card transition-colors hover:border-fd-primary/40"
+              className="glass glass-lift group flex h-full flex-col overflow-hidden"
             >
               <div className="flex items-baseline justify-between border-b border-fd-border px-4 py-2.5">
                 <span className="mono-label group-hover:text-fd-primary transition-colors">

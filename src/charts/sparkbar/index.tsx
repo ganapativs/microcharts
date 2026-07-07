@@ -6,8 +6,8 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter } from "../../core/format.js";
 import { describeSeries, type DescribeOptions } from "../../core/summary.js";
-import { isFiniteValue, type Value } from "../../core/types.js";
-import { sparkBarGeometry, type Bar, type SparkBarMode } from "./geometry.js";
+import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { labelMetrics, sparkBarGeometry, type Bar, type SparkBarMode } from "./geometry.js";
 
 /** Ink role for a bar: valence color in win-loss / negatives, else neutral or
  *  accent for the endpoint. Position already encodes sign, so color is redundant
@@ -60,9 +60,30 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     children,
   } = props;
 
-  const geo = sparkBarGeometry(data, { width, height, mode, domain, gap });
   const accName = summary === false ? false : (summary ?? describeSeries(data, { format, locale }));
   const fmt = makeFormatter(format, locale);
+
+  // The endpoint label reserves a deterministic right gutter BEFORE geometry, so
+  // bars never sit under it (plan/18; mirrors the Sparkline).
+  let labelText: string | undefined;
+  if (label === "last" && mode === "bar") {
+    for (let i = data.length - 1; i >= 0; i--) {
+      const v = data[i];
+      if (isFiniteValue(v)) {
+        labelText = fmt(v);
+        break;
+      }
+    }
+  }
+  const metrics = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
+  const geo = sparkBarGeometry(data, {
+    width,
+    height,
+    mode,
+    domain,
+    gap,
+    gutterRight: metrics?.gutter ?? 0,
+  });
   const last = geo.bars.at(-1);
 
   return (
@@ -87,15 +108,18 @@ export function SparkBar(props: SparkBarProps): ReactNode {
           style={color && barInk(bar, mode) === "bar" ? { fill: color } : undefined}
         />
       ))}
-      {label === "last" && mode === "bar" && last && isFiniteValue(last.value) ? (
+      {labelText !== undefined && metrics && last ? (
         <text
-          x={Math.min(last.x + last.width + 3, width)}
-          y={last.y}
-          dominantBaseline="hanging"
-          textAnchor="end"
+          x={round2(last.x + last.width + 4)}
+          y={round2(
+            Math.min(Math.max(last.y, metrics.fontSize * 0.6), height - metrics.fontSize * 0.6),
+          )}
+          fontSize={metrics.fontSize}
+          dominantBaseline="middle"
+          textAnchor="start"
           data-mc-ink="accent"
         >
-          {fmt(last.value)}
+          {labelText}
         </text>
       ) : null}
       {children}

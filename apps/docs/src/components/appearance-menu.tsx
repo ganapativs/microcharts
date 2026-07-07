@@ -24,6 +24,15 @@ const THEMES = [
   { id: "dark", icon: Moon, label: "Dark" },
 ] as const;
 
+// Chart presets — the library's token bundles. "modern" is the default (no
+// attribute); the rest set [data-mc-preset] on <html>. Charts recolor live.
+const PRESETS = [
+  { id: "modern", label: "Modern" },
+  { id: "editorial", label: "Editorial" },
+  { id: "mono", label: "Mono" },
+  { id: "vivid", label: "Vivid" },
+] as const;
+
 function AccentChip({
   id,
   label,
@@ -70,6 +79,7 @@ export function AppearanceMenu() {
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState<CSSProperties>({});
   const [accent, setAccentState] = useState<string>("cobalt");
+  const [preset, setPresetState] = useState<string>("modern");
   const { theme, setTheme } = useTheme();
   const ref = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -80,7 +90,9 @@ export function AppearanceMenu() {
   function toggle() {
     if (!open && ref.current) {
       const r = ref.current.getBoundingClientRect();
-      const PANEL_H = 400;
+      // approximate popover height (preview + theme + accent + chart-style rows)
+      // so the up/down flip keeps it on-screen; err tall to avoid clipping.
+      const PANEL_H = 460;
       const openUp = r.bottom + PANEL_H > window.innerHeight && r.top > PANEL_H;
       const vertical: CSSProperties = openUp
         ? { bottom: window.innerHeight - r.top + 10 }
@@ -97,6 +109,7 @@ export function AppearanceMenu() {
   useEffect(() => {
     setMounted(true);
     setAccentState(document.documentElement.dataset.accent ?? "cobalt");
+    setPresetState(document.documentElement.dataset.mcPreset ?? "modern");
   }, []);
 
   useEffect(() => {
@@ -124,6 +137,15 @@ export function AppearanceMenu() {
     setAccentState(id);
   }
 
+  function setPreset(id: string) {
+    if (id === "modern") delete document.documentElement.dataset.mcPreset;
+    else document.documentElement.dataset.mcPreset = id;
+    try {
+      localStorage.setItem("mc-preset", id);
+    } catch {}
+    setPresetState(id);
+  }
+
   const current = SOLIDS.find((a) => a.id === accent) ?? SOLIDS[0];
 
   return (
@@ -147,7 +169,7 @@ export function AppearanceMenu() {
           <div
             ref={panelRef}
             style={pos}
-            className="pop-in fixed z-[60] w-[20rem] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-fd-border bg-fd-popover shadow-[0_20px_60px_-20px_rgba(0,0,0,0.45)]"
+            className="glass glass-strong pop-in fixed z-[60] w-[20rem] max-w-[calc(100vw-1.5rem)] overflow-hidden"
           >
             {/* live preview — the accent on a real microchart, no overlap */}
             <div className="border-b border-fd-border">
@@ -156,7 +178,7 @@ export function AppearanceMenu() {
                 <span className="mono-label text-[0.56rem] text-fd-primary">{current.label}</span>
               </div>
               <div className="grid-paper flex items-center justify-center px-5 pb-5 pt-1">
-                <div key={accent} className="mc-morph flex justify-center">
+                <div key={accent + preset} className="mc-morph flex justify-center">
                   <Sparkline
                     data={[6, 9, 7, 12, 10, 15, 13, 18, 16, 22]}
                     width={240}
@@ -201,6 +223,29 @@ export function AppearanceMenu() {
                 {SOLIDS.map((a) => (
                   <AccentChip key={a.id} {...a} active={accent === a.id} onSelect={setAccent} />
                 ))}
+              </div>
+
+              <div className="mono-label mb-2 mt-4 text-[0.58rem]">Chart style</div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {PRESETS.map((p) => {
+                  const active = preset === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setPreset(p.id)}
+                      aria-pressed={active}
+                      className={cn(
+                        "rounded-lg border py-1.5 text-[0.7rem] transition-all duration-200 hover:-translate-y-px",
+                        active
+                          ? "border-fd-primary/50 bg-fd-primary/10 text-fd-foreground"
+                          : "border-fd-border text-fd-muted-foreground hover:border-fd-primary/30 hover:text-fd-foreground",
+                      )}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>,

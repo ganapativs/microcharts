@@ -34,6 +34,14 @@
     --mc-font: inherit;
     --mc-label-size: 0.75em;
 
+    /* interactive readout chip surface — a tooltip needs a legible backing, so
+       this is the one place a mark sits on an opaque plane. Defaults to the
+       system canvas so it adapts with no config; override to match a themed
+       surface (the docs bind it to their panel tokens). */
+    --mc-surface: Canvas;
+    --mc-surface-ink: CanvasText;
+    --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);
+
     /* motion */
     --mc-duration: 300ms;
     --mc-easing: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out */
@@ -58,9 +66,11 @@
   }
 
   /* Presets = token bundles (plan/06 §3, layer 2). Visual only. */
-  /* "editorial" — hairline ink, a single restrained red endpoint accent. */
+  /* "editorial" — hairline, sharp, a single restrained red endpoint accent.
+     Ink is left to the active theme (never pinned to a light value) so the
+     preset stays legible on dark surfaces too — its identity is the weight and
+     the accent, not a fixed grey. */
   :where([data-mc-theme="editorial"]) {
-    --mc-stroke: #333333;
     --mc-accent: #b8112a;
     --mc-stroke-width: 1;
     --mc-radius: 0;
@@ -192,6 +202,35 @@
   :where(.mc-root [data-mc-ink="cell"]) {
     fill: var(--mc-accent);
     stroke: none;
+  }
+
+  /* Interactive sparkline crosshair — a dashed guide reads as "measuring" the
+     focused point rather than just crossing it. Scoped to the interactive
+     wrapper (styled here so the client entry stays under its size budget). */
+  :where(.mc-spark-interactive [data-mc-ink="muted"]) {
+    stroke-dasharray: 1.5 2;
+  }
+
+  /* Interactive readout — the value revealed on hover/focus. A small chip on an
+     opaque surface so the figure stays legible over any mark or content it
+     floats above. Zero-specificity, so a component's inline position wins. */
+  :where(.mc-spark-readout) {
+    position: absolute;
+    bottom: 100%;
+    margin-bottom: 0.3em;
+    padding: 0.05em 0.4em;
+    border-radius: 0.4em;
+    background: var(--mc-surface);
+    color: var(--mc-surface-ink);
+    box-shadow:
+      0 0 0 1px var(--mc-surface-edge),
+      0 2px 6px -2px color-mix(in oklab, CanvasText 40%, transparent);
+    font: var(--mc-label-size, 0.75em) var(--mc-font, inherit);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.35;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    pointer-events: none;
   }
 }
 

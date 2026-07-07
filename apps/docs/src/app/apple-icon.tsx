@@ -1,10 +1,15 @@
 import { ImageResponse } from "next/og";
+import { CELL_FILL, CELL_R, CELL_SIZE, CELLS } from "@/lib/brand";
+import { envIcon } from "@/lib/env-badge";
 
 export const dynamic = "force-static";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
+// Apple touch icon — same canonical mark, env-tinted background. PNG because
+// apple-touch-icon must be raster; the favicon proper stays SVG.
 export default function AppleIcon() {
+  const { bg } = envIcon();
   return new ImageResponse(
     <div
       style={{
@@ -13,18 +18,22 @@ export default function AppleIcon() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#2f52d4",
+        background: bg,
       }}
     >
       <svg width="120" height="120" viewBox="0 0 32 32" fill="none">
-        <path
-          d="M6.5 22.5L13 15.5L18.5 18L25 8.5"
-          stroke="#faf7f1"
-          strokeWidth="2.3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx="25" cy="8.5" r="2.9" stroke="#faf7f1" strokeWidth="2" fill="#2f52d4" />
+        {CELLS.map((c) => (
+          <rect
+            key={c.x}
+            x={c.x}
+            y={c.y}
+            width={CELL_SIZE}
+            height={CELL_SIZE}
+            rx={CELL_R}
+            fill={CELL_FILL}
+            opacity={c.o}
+          />
+        ))}
       </svg>
     </div>,
     size,

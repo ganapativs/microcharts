@@ -96,6 +96,9 @@ export function SiteFooter() {
             </a>
           </span>
           <div className="flex gap-4 text-sm">
+            <Link href="/brand" className="link-underline hover:text-fd-foreground">
+              Brand
+            </Link>
             <a href={SITE.repo} className="link-underline hover:text-fd-foreground">
               GitHub
             </a>

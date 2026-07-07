@@ -36,6 +36,14 @@ the quiet backbone of a KPI card.
   [SparkBar](/docs/charts/sparkbar) for discrete magnitudes, or [Bullet](/docs/charts/bullet)
   for a value against a target.
 
+## Sizing
+
+`width` and `height` are viewBox units that also set the rendered pixel box. Omit them and
+drive the width from CSS for a chart that fills its container — the viewBox keeps the
+aspect ratio.
+
+<Sizing chart="sparkline" />
+
 ## Variants
 
 Shape, fill, a normal-range band, and dots are all props — same data, different read.

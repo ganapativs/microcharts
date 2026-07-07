@@ -28,8 +28,8 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
-// No-flash accent: apply the saved accent before first paint.
-const ACCENT_SCRIPT = `try{var a=localStorage.getItem("mc-accent");if(a&&a!=="cobalt")document.documentElement.dataset.accent=a}catch(e){}`;
+// No-flash appearance: apply the saved accent + chart preset before first paint.
+const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem("mc-accent");if(a&&a!=="cobalt")d.dataset.accent=a;var p=localStorage.getItem("mc-preset");if(p&&p!=="modern")d.dataset.mcPreset=p}catch(e){}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -39,7 +39,9 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   applicationName: SITE.name,
-  authors: [{ name: SITE.author }],
+  authors: [{ name: SITE.author, url: SITE.authorUrl }],
+  creator: SITE.author,
+  publisher: SITE.author,
   keywords: [
     "react charts",
     "sparkline",
@@ -52,6 +54,9 @@ export const metadata: Metadata = {
     "dataviz",
   ],
   alternates: { canonical: "/" },
+  // Crisp env-aware SVG favicon (app/brand/icon.svg); apple-touch icon is the
+  // generated PNG (app/apple-icon.tsx) via its file convention.
+  icons: { icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }] },
   openGraph: {
     type: "website",
     siteName: SITE.name,
@@ -62,6 +67,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: SITE.authorXHandle,
+    creator: SITE.authorXHandle,
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
     images: ["/og/default.png"],
@@ -70,8 +77,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4efe4" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c0d11" },
+    { media: "(prefers-color-scheme: light)", color: "#efe9dd" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0b0f" },
   ],
 };
 

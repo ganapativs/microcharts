@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SearchTrigger } from "fumadocs-ui/layouts/shared/slots/search-trigger";
-import { Search } from "lucide-react";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import { Brandmark } from "@/components/brandmark";
@@ -21,12 +20,13 @@ const links = [
   { href: "/docs/charts/sparkline", label: "Charts" },
   { href: "/gallery", label: "Gallery" },
   { href: "/docs/accessibility", label: "A11y" },
+  { href: "/brand", label: "Brand" },
 ];
 
 function Wordmark() {
   return (
     <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} home`}>
-      <Brandmark size={24} className="shrink-0 transition-transform group-hover:-translate-y-px" />
+      <Brandmark size={28} className="shrink-0 transition-transform group-hover:-translate-y-px" />
       <span className="text-[0.98rem] font-semibold tracking-[-0.01em] text-fd-foreground">
         microcharts
       </span>
@@ -39,7 +39,7 @@ const ctrl = "ghost-ctrl size-8";
 export function SiteNav() {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-40 border-b border-fd-border/70 bg-fd-background/70 backdrop-blur-xl">
+    <header className="glass-rail sticky top-0 z-40">
       <nav className="mx-auto flex h-14 max-w-6xl items-center gap-5 px-4 sm:px-6">
         <Wordmark />
         <div className="hidden items-center gap-0.5 md:flex">
@@ -67,16 +67,9 @@ export function SiteNav() {
         </div>
 
         <div className="ml-auto flex items-center gap-1.5">
-          <SearchTrigger
-            aria-label="Search"
-            className="ghost-ctrl group h-8 w-8 gap-2 sm:w-auto sm:justify-start sm:pl-2.5 sm:pr-1.5"
-          >
-            <Search className="size-4 shrink-0" strokeWidth={2} />
-            <span className="hidden text-[0.8rem] sm:inline">Search</span>
-            <kbd className="hidden items-center rounded bg-fd-card px-1.5 py-px font-mono text-[0.62rem] leading-5 shadow-sm ring-1 ring-fd-border/60 sm:inline-flex">
-              ⌘K
-            </kbd>
-          </SearchTrigger>
+          {/* Fumadocs' SearchTrigger renders its own icon (ignores children), so
+              style it as a clean square icon button matching GitHub + palette. */}
+          <SearchTrigger aria-label="Search" className="ghost-ctrl size-8" />
           <a
             href={SITE.repo}
             target="_blank"

@@ -214,3 +214,16 @@ Codex authored [20-discoverability.md](20-discoverability.md) (SEO / LLM surface
 | Open dependency: doc assumes `microcharts.dev` domain | FLAGGED — domain is README open item 2; not registered yet. Decide before 3.5 work starts (canonical URLs bake the domain in) |
 | OG template sketch uses Inter font | NOTED — brand uses system stack; resolve at implementation, not a plan conflict |
 
+
+## Dependency decision — `env.style` NOT adopted (2026-07-07)
+
+User asked to add [env.style](https://env.style) for per-environment favicon colours. Researched (site + npm + GitHub README):
+
+| Finding | Verdict |
+| --- | --- |
+| `env.style@1.0.1` created **2026-07-05** (2 days before evaluation), single maintainer, no track record | FAILS CLAUDE.md "registry-verified **actively maintained** before adoption" |
+| Pulls `sharp` (native) + `decode-ico` as build deps | Extra native build surface for a docs-only nicety |
+| Detects env via `ENV_STYLES_ENV → VERCEL_TARGET_ENV → VERCEL_ENV → NODE_ENV`; writes tinted icons to `public/__envstyle/` | Useful model — reused the detection ORDER natively |
+| Static-export (`output: 'export'`) support **undocumented** | Risk: our docs deploy is static; unverified it injects the icon link without a runtime |
+
+**Decision:** delivered the capability natively instead — `lib/env-badge.ts` (env detection mirroring env.style's order) + `app/icon.tsx` / `app/apple-icon.tsx` (ImageResponse, `force-static`) tint the favicon squircle per env: production = cobalt `#2f52d4`, staging/preview = ember `#c2410c`, development = teal `#0f766e`. Zero new deps, resolved at build time, static-export-safe. Swap to the `env.style` package if it matures (multi-release history + a static-export note).

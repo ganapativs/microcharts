@@ -10,6 +10,7 @@ import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
 import { InstallCommand } from "@/components/ui/copy";
 import { FourContexts } from "@/components/charts/contexts";
+import { Sizing } from "@/components/charts/sizing";
 import { Playground } from "@/components/charts/playground";
 import { Usage } from "@/components/charts/usage";
 import { InteractiveDemo } from "@/components/charts/interactive";
@@ -31,6 +32,7 @@ export function getMDXComponents(components?: MDXComponents) {
     LiveDemo,
     InstallCommand,
     FourContexts,
+    Sizing,
     Playground,
     Usage,
     InteractiveDemo,

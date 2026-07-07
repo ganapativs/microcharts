@@ -50,19 +50,7 @@ export function Bullet(props: BulletProps): React.ReactNode {
     >
       <StaticBullet {...props} summary={false} style={FILL} />
       {open ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            position: "absolute",
-            right: 0,
-            bottom: "100%",
-            font: "var(--mc-label-size, 0.75em) var(--mc-font, inherit)",
-            fontVariantNumeric: "tabular-nums",
-            color: "var(--mc-accent)",
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
-          }}
-        >
+        <span className="mc-spark-readout" style={{ right: 0 }}>
           {readout}
         </span>
       ) : null}

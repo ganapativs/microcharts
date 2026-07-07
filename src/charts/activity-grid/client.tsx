@@ -184,15 +184,8 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         <span
           className="mc-spark-readout"
           style={{
-            position: "absolute",
             left: `${((activeCell.x + activeCell.size / 2) / w) * 100}%`,
-            bottom: "100%",
             transform: "translateX(-50%)",
-            font: "var(--mc-label-size, 0.75em) var(--mc-font, inherit)",
-            fontVariantNumeric: "tabular-nums",
-            color: "var(--mc-accent)",
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
           }}
         >
           {activeCell.value === null ? "—" : fmt(activeCell.value)}

@@ -35,6 +35,14 @@ SLAs, budgets, and quotas.
 - **Avoid for** — trends over time (use [Sparkline](/docs/charts/sparkline)) or
   distributions.
 
+## Sizing
+
+`width` and `height` are viewBox units that also set the rendered pixel box — a bullet
+reads best wide and short. Omit them and drive the width from CSS to fill a table cell or
+card column; the viewBox keeps the aspect ratio.
+
+<Sizing chart="bullet" />
+
 ## Variants
 
 <LiveDemo label="behind target" code={`<Bullet value={72} target={80} bands={[50, 90]} />`}>

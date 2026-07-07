@@ -35,6 +35,14 @@ glance.
 - **Avoid for** — a continuous trend shape (use [Sparkline](/docs/charts/sparkline)) or
   hundreds of points, where bars become noise.
 
+## Sizing
+
+`width` and `height` are viewBox units that also set the rendered pixel box. Omit them and
+drive the width from CSS for a chart that fills its container — the viewBox keeps the
+aspect ratio.
+
+<Sizing chart="sparkbar" />
+
 ## Variants
 
 <LiveDemo label="bar (default)" code={`<SparkBar data={[4, 6, 2, 8, 5, 9]} />`}>

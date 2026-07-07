@@ -181,7 +181,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
           />
         ) : null}
         {activePoint ? (
-          <circle cx={activePoint[0]} cy={activePoint[1]} r={2.5} data-mc-ink="accent" />
+          <circle cx={activePoint[0]} cy={activePoint[1]} r={2.6} data-mc-ink="accent" />
         ) : null}
         {rest.children}
       </StaticSparkline>
@@ -198,18 +198,17 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
       >
         {activeValue !== null ? strings.point(activePos, stops.length, fmt(activeValue)) : ""}
       </span>
-      {activePoint && activeValue !== null ? (
+      {activePoint &&
+      activeValue !== null &&
+      /* At the endpoint the persistent `label="last"` already shows this value —
+         a floating readout there just collides with it. Skip it; every other
+         point still gets the readout. */
+      !(label === "last" && active === stops[stops.length - 1]) ? (
         <span
           className="mc-spark-readout"
           style={{
-            position: "absolute",
             left: `${(activePoint[0] / width) * 100}%`,
-            bottom: "100%",
             transform: "translateX(-50%)",
-            font: "var(--mc-label-size, 0.75em) var(--mc-font, inherit)",
-            fontVariantNumeric: "tabular-nums",
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
           }}
         >
           {fmt(activeValue)}

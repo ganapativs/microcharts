@@ -41,6 +41,8 @@ export function docsMeta({
     },
     twitter: {
       card: "summary_large_image",
+      site: SITE.authorXHandle,
+      creator: SITE.authorXHandle,
       title,
       description,
       images: [imageUrl],

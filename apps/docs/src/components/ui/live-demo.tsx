@@ -32,28 +32,17 @@ export function LiveDemo({
         {label ? <span className="mono-label pl-1">{label}</span> : <span />}
         <div className="flex items-center gap-2">
           {meta ? <span className="mono-label opacity-70 mr-1">{meta}</span> : null}
-          <div
-            role="tablist"
-            aria-label="Demo view"
-            className="relative flex rounded-md border border-fd-border bg-fd-muted/60 p-0.5 text-xs"
-          >
+          <div role="tablist" aria-label="Demo view" className="seg">
             {(["preview", "code"] as const).map((t) => (
               <button
                 key={t}
                 role="tab"
                 aria-selected={tab === t}
+                data-active={tab === t}
                 type="button"
                 onClick={() => setTab(t)}
-                className={cn(
-                  "relative z-10 rounded px-3 py-1 font-mono uppercase tracking-wider transition-colors",
-                  tab === t
-                    ? "text-fd-foreground"
-                    : "text-fd-muted-foreground hover:text-fd-foreground",
-                )}
+                className="seg-opt uppercase"
               >
-                {tab === t && (
-                  <span className="absolute inset-0 -z-10 rounded bg-fd-card shadow-sm ring-1 ring-fd-border" />
-                )}
                 {t}
               </button>
             ))}
@@ -71,7 +60,7 @@ export function LiveDemo({
           {children}
         </div>
       ) : (
-        <div className="[&_figure]:!my-0 [&_figure]:!rounded-none [&_figure]:!border-0">
+        <div className="code-inset">
           <DynamicCodeBlock lang={lang} code={code} />
         </div>
       )}

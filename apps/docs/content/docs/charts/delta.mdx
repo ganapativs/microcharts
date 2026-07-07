@@ -34,6 +34,14 @@ color — so it never relies on color alone.
 - **Good for** — a KPI's change, period-over-period percent, inline metric movement.
 - **Avoid for** — showing a series or comparing magnitudes across items.
 
+## Sizing
+
+Delta is text, not a fixed box — it takes the `font-size` of whatever wraps it and its
+glyph scales in `em`. Size it by the surrounding type: inline it inherits the sentence,
+beside a KPI figure lift the font-size.
+
+<Sizing chart="delta" />
+
 ## Variants
 
 `from` derives a percent change; `positive="down"` flips only the color for metrics where

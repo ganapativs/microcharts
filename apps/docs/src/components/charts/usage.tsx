@@ -17,7 +17,7 @@ export function Usage({ chart }: { chart: string }) {
   const install = "pnpm add @microcharts/react";
 
   return (
-    <div className="not-prose my-6 overflow-hidden rounded-xl border border-fd-border bg-fd-card">
+    <div className="panel not-prose my-6 overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-fd-border px-4 py-2.5">
         <span className="mono-label">Install &amp; use</span>
         <span className="mono-label opacity-60">{c.staticImport.replace("@microcharts/", "")}</span>
@@ -33,7 +33,7 @@ export function Usage({ chart }: { chart: string }) {
         <CopyButton text={install} className="shrink-0" />
       </div>
 
-      <div className="[&_figure]:!my-0 [&_figure]:!rounded-none [&_figure]:!border-0">
+      <div className="code-inset">
         <DynamicCodeBlock lang="tsx" code={`${imports}\n\n${usage}`} />
       </div>
     </div>

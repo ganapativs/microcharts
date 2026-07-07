@@ -3,6 +3,7 @@ import { describeSeries } from "@microcharts/react";
 import { ArrowRight } from "lucide-react";
 import { HeroChart, InstrumentStrip } from "@/components/charts/showcase";
 import { FourContexts } from "@/components/charts/contexts";
+import { AiNative } from "@/components/charts/ai-native";
 import { InstallCommand } from "@/components/ui/copy";
 import { Reveal } from "@/components/ui/reveal";
 import { STATS } from "@/lib/stats";
@@ -32,14 +33,18 @@ export default function HomePage() {
         />
         <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-20 sm:px-6 sm:pb-24 sm:pt-28">
           <Reveal className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            {["Zero dependencies", "~1 kB each", "RSC-safe", "Accessible by default"].map(
-              (t, i) => (
-                <span key={t} className="mono-label">
-                  {i > 0 && <span className="mr-2 text-fd-border">/</span>}
-                  {t}
-                </span>
-              ),
-            )}
+            {[
+              "Zero dependencies",
+              "~1 kB each",
+              "RSC-safe",
+              "AI-native",
+              "Accessible by default",
+            ].map((t, i) => (
+              <span key={t} className="mono-label">
+                {i > 0 && <span className="mr-2 text-fd-border">/</span>}
+                {t}
+              </span>
+            ))}
           </Reveal>
 
           <Reveal delay={60}>
@@ -52,14 +57,15 @@ export default function HomePage() {
           <Reveal delay={120}>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
               A tiny, handcrafted chart set for dense interfaces — sentences, table cells, KPI
-              cards. Server-rendered, accessible, and nearly weightless.
+              cards. Server-rendered and nearly weightless, and legible to the people and the models
+              that read them.
             </p>
           </Reveal>
 
           <Reveal delay={180} className="mt-9 flex flex-wrap items-center gap-3">
             <Link
               href="/docs/quickstart"
-              className="cta-accent group inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
+              className="cta-accent group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
             >
               Get started
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -81,7 +87,7 @@ export default function HomePage() {
 
       {/* ── Falsifiable numbers ──────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-fd-border bg-fd-border md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
             { v: STATS.deps, u: "runtime deps", note: "CI-enforced, forever" },
             {
@@ -92,7 +98,7 @@ export default function HomePage() {
             { v: "~1 kB", u: "gzip per chart", note: "≤ 2 kB budget gate" },
             { v: "6", u: "SVG nodes, typical", note: "earn every mark" },
           ].map((s) => (
-            <div key={s.u} className="bg-fd-card px-5 py-7">
+            <div key={s.u} className="glass px-5 py-7">
               <div className="display text-4xl tabular-nums text-fd-foreground sm:text-5xl">
                 {s.v}
               </div>
@@ -103,15 +109,21 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── AI-native (flagship) ─────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <SectionMark n="01">Built for machines and people</SectionMark>
+        <AiNative />
+      </section>
+
       {/* ── The five ─────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <SectionMark n="01">The proving five</SectionMark>
+        <SectionMark n="02">The proving five</SectionMark>
         <InstrumentStrip />
       </section>
 
       {/* ── In context (the thesis) ──────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <SectionMark n="02">One chart, four homes</SectionMark>
+        <SectionMark n="03">One chart, four homes</SectionMark>
         <div className="mb-8 max-w-2xl">
           <h2 className="display text-fluid-h2 text-[length:var(--text-fluid-h2)]">
             Built to live inside your interface.
@@ -124,7 +136,7 @@ export default function HomePage() {
 
       {/* ── Accessibility flagship ───────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <SectionMark n="03">Reads itself aloud</SectionMark>
+        <SectionMark n="04">Reads itself aloud</SectionMark>
         <div className="grid items-center gap-8 md:grid-cols-2">
           <div>
             <h2 className="display text-fluid-h2 text-[length:var(--text-fluid-h2)]">
@@ -144,7 +156,7 @@ export default function HomePage() {
           <div className="panel p-6">
             <div className="mono-label mb-4">Announced as</div>
             <p className="text-lg leading-relaxed text-fd-foreground">“{heroSummary}”</p>
-            <div className="mt-6 rounded-lg border border-fd-border bg-fd-muted/40 p-4 font-mono text-sm text-fd-muted-foreground">
+            <div className="command-well mt-6 p-4 font-mono text-sm text-fd-muted-foreground">
               {`<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />`}
             </div>
           </div>
@@ -160,13 +172,13 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/docs/quickstart"
-              className="cta-accent inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
+              className="cta-accent inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
             >
               Read the docs <ArrowRight className="size-4" />
             </Link>
             <Link
               href="/gallery"
-              className="inline-flex items-center gap-2 rounded-lg border border-fd-border px-5 py-2.5 text-sm font-medium transition-colors hover:border-fd-primary/40"
+              className="cta-ghost inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium"
             >
               Browse the gallery
             </Link>

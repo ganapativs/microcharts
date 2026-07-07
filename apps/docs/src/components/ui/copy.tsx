@@ -26,11 +26,7 @@ export function CopyButton({
           setTimeout(() => setCopied(false), 1400);
         });
       }}
-      className={cn(
-        "inline-flex items-center justify-center rounded-md text-fd-muted-foreground transition-colors hover:bg-fd-muted hover:text-fd-foreground",
-        SIZE[size],
-        className,
-      )}
+      className={cn("ghost-ctrl", SIZE[size], className)}
     >
       {copied ? <Check className="size-4 text-fd-primary" /> : <Copy className="size-4" />}
     </button>
@@ -41,7 +37,7 @@ export function CopyButton({
  * <code> never inherits the docs prose inline-code chip (the nested-pill bug). */
 export function InstallCommand({ command = "pnpm add @microcharts/react" }: { command?: string }) {
   return (
-    <div className="not-prose group flex h-10 items-center gap-2.5 rounded-lg border border-fd-border bg-fd-card pl-3.5 pr-1.5">
+    <div className="command-well not-prose group flex h-10 items-center gap-2.5 pl-3.5 pr-1.5">
       <code className="min-w-0 flex-1 truncate font-mono text-sm text-fd-foreground">
         <span aria-hidden className="mr-2 select-none text-fd-primary">
           $

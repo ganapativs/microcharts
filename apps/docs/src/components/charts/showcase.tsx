@@ -94,7 +94,7 @@ export function InstrumentStrip() {
         <Reveal key={c.slug} delay={i * 70}>
           <Link
             href={`/docs/charts/${c.slug}`}
-            className="group block h-full rounded-xl border border-fd-border bg-fd-card transition-colors hover:border-fd-primary/40"
+            className="glass glass-lift group flex h-full flex-col overflow-hidden"
           >
             <div className="flex items-baseline justify-between border-b border-fd-border px-4 py-2.5">
               <span className="mono-label group-hover:text-fd-primary transition-colors">
@@ -102,7 +102,9 @@ export function InstrumentStrip() {
               </span>
               <span className="mono-label opacity-60">{CHART_GZIP[c.slug]?.static} kB</span>
             </div>
-            <div className="flex min-h-[104px] items-center justify-center px-4 py-6">{c.node}</div>
+            <div className="flex min-h-[104px] flex-1 items-center justify-center px-4 py-6">
+              {c.node}
+            </div>
             <div className="flex items-center justify-between px-4 py-2.5 text-xs text-fd-muted-foreground">
               <span>{c.hint}</span>
               <span className="font-mono opacity-0 transition-opacity group-hover:opacity-100">

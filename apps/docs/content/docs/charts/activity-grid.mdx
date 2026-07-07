@@ -38,6 +38,14 @@ contribution-graph shape: cadence, streaks, and seasonality, readable at a glanc
 - **Avoid for** — exact values, or precise comparison between two individual cells. Color
   intensity is deliberately approximate; pair it with a number when precision matters.
 
+## Sizing
+
+ActivityGrid sizes from `cell` — the edge length of one square in viewBox units. Bump it to
+scale the whole grid, or drive the width from CSS to fill a container; the viewBox keeps the
+grid's aspect ratio.
+
+<Sizing chart="activity-grid" />
+
 ## Variants
 
 `layout="strip"` collapses to a single row for inline use.

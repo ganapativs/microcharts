@@ -33,18 +33,14 @@ function Segmented<T extends string>({
 }) {
   return (
     <Field label={label}>
-      <div className="flex w-max rounded-md border border-fd-border bg-fd-muted/50 p-0.5">
+      <div className="seg w-max">
         {options.map((o) => (
           <button
             key={o}
             type="button"
+            data-active={value === o}
             onClick={() => onChange(o)}
-            className={cn(
-              "rounded px-2 py-1 font-mono text-[0.7rem] leading-none transition-colors",
-              value === o
-                ? "bg-fd-card text-fd-foreground shadow-sm ring-1 ring-fd-border"
-                : "text-fd-muted-foreground hover:text-fd-foreground",
-            )}
+            className="seg-opt"
           >
             {o}
           </button>
@@ -136,16 +132,18 @@ function Shell({
   morphKey?: string;
 }) {
   return (
-    <div className="not-prose my-6 overflow-hidden rounded-xl border border-fd-border bg-fd-card">
+    <div className="panel not-prose my-6 overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-fd-border px-4 py-2.5">
         <span className="mono-label">Live playground</span>
         {onShuffle && (
           <button
             type="button"
             onClick={onShuffle}
-            className="inline-flex items-center gap-1.5 rounded-md border border-fd-border px-2 py-1 font-mono text-[0.68rem] text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+            aria-label="Shuffle data"
+            title="Shuffle data"
+            className="ghost-ctrl size-8"
           >
-            <RotateCw className="size-3" /> shuffle
+            <RotateCw className="size-4" />
           </button>
         )}
       </div>
@@ -157,7 +155,7 @@ function Shell({
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-t border-fd-border px-4 py-4">
         {controls}
       </div>
-      <div className="border-t border-fd-border [&_figure]:!my-0 [&_figure]:!rounded-none [&_figure]:!border-0">
+      <div className="code-inset border-t border-fd-border">
         <DynamicCodeBlock lang="tsx" code={code} />
       </div>
     </div>
