@@ -16,7 +16,7 @@ function SectionMark({ n, children }: { n: string; children: React.ReactNode }) 
   return (
     <div className="mb-8 flex items-center gap-3">
       <span className="mono-label text-fd-primary">{n}</span>
-      <span className="h-px flex-1 bg-fd-border" />
+      <span className="h-px flex-1 bg-hairline" />
       <span className="mono-label">{children}</span>
     </div>
   );
@@ -26,7 +26,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-fd-border/60">
+      <section className="relative overflow-hidden border-b border-hairline/60">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10 grid-paper opacity-60"
@@ -41,7 +41,7 @@ export default function HomePage() {
               "Accessible by default",
             ].map((t, i) => (
               <span key={t} className="mono-label">
-                {i > 0 && <span className="mr-2 text-fd-border">/</span>}
+                {i > 0 && <span className="mr-2 text-hairline">/</span>}
                 {t}
               </span>
             ))}

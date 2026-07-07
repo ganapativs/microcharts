@@ -159,8 +159,11 @@ function recipesFor(slug: string): Recipe[] {
           code: `// let CSS drive the width — the viewBox keeps the grid's ratio\n<div style={{ width: "100%", maxWidth: 320 }}>\n  <ActivityGrid data={data} style={{ width: "100%", height: "auto" }} />\n</div>`,
           node: (
             <FluidFrame>
+              {/* a full quarter (13 weeks) so the fluid grid reads landscape at
+                  the frame width — 20 values gave ~3 giant columns. Deterministic
+                  wave, not random (SSR-stable). */}
               <ActivityGrid
-                data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]}
+                data={Array.from({ length: 91 }, (_, i) => (i * 5 + (i % 3) * 7) % 5)}
                 style={{ width: "100%", height: "auto" }}
                 summary={false}
               />

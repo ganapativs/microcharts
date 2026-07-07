@@ -25,7 +25,7 @@ export function Instrument({
   return (
     <figure className={cn("panel overflow-hidden", className)}>
       {(label || meta) && (
-        <figcaption className="flex items-baseline justify-between gap-3 border-b border-fd-border px-4 py-2.5">
+        <figcaption className="flex items-baseline justify-between gap-3 border-b border-hairline px-4 py-2.5">
           {label ? <span className="mono-label">{label}</span> : <span />}
           {meta ? <span className="mono-label opacity-70">{meta}</span> : null}
         </figcaption>
@@ -40,7 +40,7 @@ export function Instrument({
         {children}
       </div>
       {caption ? (
-        <div className="border-t border-fd-border px-4 py-2.5 text-sm text-fd-muted-foreground">
+        <div className="border-t border-hairline px-4 py-2.5 text-sm text-fd-muted-foreground">
           {caption}
         </div>
       ) : null}

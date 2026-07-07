@@ -48,7 +48,7 @@ function SectionMark({ n, children }: { n: string; children: React.ReactNode }) 
   return (
     <div className="mb-8 flex items-center gap-3">
       <span className="mono-label text-fd-primary">{n}</span>
-      <span className="h-px flex-1 bg-fd-border" />
+      <span className="h-px flex-1 bg-hairline" />
       <span className="mono-label">{children}</span>
     </div>
   );
@@ -132,7 +132,7 @@ export default function BrandPage() {
               weight, not decoration. It borrows the ActivityGrid’s DNA, so the brand and the
               product read as one hand.
             </p>
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-fd-border pt-5">
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-hairline pt-5">
               {[
                 ["Container", "Superellipse · n 4.5"],
                 ["Cells", "Three · graded fill"],
@@ -176,7 +176,7 @@ export default function BrandPage() {
                     height={72}
                   />
                 </div>
-                <div className="flex items-center justify-between gap-2 border-t border-fd-border px-3.5 py-2.5">
+                <div className="flex items-center justify-between gap-2 border-t border-hairline px-3.5 py-2.5">
                   <div className="min-w-0">
                     <div className="truncate text-sm font-medium text-fd-foreground">{a.name}</div>
                     <div className="mono-label mt-0.5 truncate opacity-70">{a.note}</div>
@@ -193,7 +193,7 @@ export default function BrandPage() {
                     </a>
                   </div>
                 </div>
-                <div className="mono-label flex items-center justify-between border-t border-fd-border/70 px-3.5 py-2 opacity-60">
+                <div className="mono-label flex items-center justify-between border-t border-hairline/70 px-3.5 py-2 opacity-60">
                   <span>{a.file}</span>
                   <span className="tabular-nums">{(bytes / 1024).toFixed(1)} kB · svg</span>
                 </div>
@@ -252,7 +252,7 @@ export default function BrandPage() {
                 </div>
               ))}
             </div>
-            <p className="border-t border-fd-border pt-5 text-sm text-fd-muted-foreground">
+            <p className="border-t border-hairline pt-5 text-sm text-fd-muted-foreground">
               Below 16 px the cells lose the grade and the read collapses — never go smaller. The
               SVG scales cleanly above it to any size.
             </p>
@@ -287,7 +287,9 @@ export default function BrandPage() {
             },
             {
               label: "Invert fills",
-              svg: markInner("#14161d", "#14161d"),
+              /* ink-on-ink so the "cells vanish" mistake stays visible on the
+                 dark tile too (a hardcoded #14161d blob disappeared in dark). */
+              svg: markInner("var(--color-fd-foreground)", "var(--color-fd-foreground)"),
             },
             {
               label: "Rotate",
@@ -342,12 +344,12 @@ export default function BrandPage() {
                 </svg>
                 <span
                   aria-hidden
-                  className="absolute right-2 top-2 grid size-5 place-items-center rounded-full bg-[#c5521c] font-mono text-[11px] font-bold text-white"
+                  className="absolute right-2 top-2 grid size-5 place-items-center rounded-full bg-[#ad4713] font-mono text-[11px] font-bold text-white"
                 >
                   ✕
                 </span>
               </div>
-              <div className="border-t border-fd-border px-3 py-2 text-center">
+              <div className="border-t border-hairline px-3 py-2 text-center">
                 <span className="text-xs text-fd-muted-foreground">{d.label}</span>
               </div>
             </Reveal>
@@ -387,9 +389,11 @@ export default function BrandPage() {
           <div>
             <div className="mono-label mb-3">Semantic — direction never rides on color alone</div>
             <div className="grid grid-cols-2 gap-2">
-              <ColorSwatch hex="#0b8a63" name="Positive" role="Light" />
+              {/* Keep in sync with the site --mc-positive/--mc-negative in
+                  global.css (contrast-tuned to clear 4.5:1 on light glass). */}
+              <ColorSwatch hex="#077353" name="Positive" role="Light" />
               <ColorSwatch hex="#34d399" name="Positive" role="Dark" />
-              <ColorSwatch hex="#c5521c" name="Negative" role="Light" />
+              <ColorSwatch hex="#ad4713" name="Negative" role="Light" />
               <ColorSwatch hex="#fb8c5a" name="Negative" role="Dark" />
             </div>
           </div>
@@ -425,7 +429,7 @@ export default function BrandPage() {
           ].map((t, i) => (
             <Reveal key={t.name} delay={i * 60} className="panel flex flex-col gap-4 p-6">
               <div className={t.cls + " text-fd-foreground"}>{t.specimen}</div>
-              <div className="mt-auto border-t border-fd-border pt-4">
+              <div className="mt-auto border-t border-hairline pt-4">
                 <div className="text-sm font-medium text-fd-foreground">{t.name}</div>
                 <div className="mono-label mt-1">{t.role}</div>
                 <p className="mt-2 text-sm text-fd-muted-foreground">{t.use}</p>
@@ -479,7 +483,7 @@ export default function BrandPage() {
       </section>
 
       {/* ── Permission note ───────────────────────────────────────────── */}
-      <Reveal className="mt-20 border-t border-fd-border pt-8">
+      <Reveal className="mt-20 border-t border-hairline pt-8">
         <p className="max-w-2xl text-sm text-fd-muted-foreground">
           Use the mark to link to or reference microcharts — a “built with,” a talk slide, an
           integration. Don’t modify it, use it as your own product’s mark, or imply endorsement. The

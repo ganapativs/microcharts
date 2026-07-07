@@ -57,11 +57,14 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
         {page.data.title}
       </DocsTitle>
       <DocsDescription className="mb-0 text-base">{page.data.description}</DocsDescription>
-      <div className="flex flex-row items-center gap-1.5 border-b border-fd-border pb-6">
-        <MarkdownCopyButton markdownUrl={markdownUrl} />
+      <div className="flex flex-row items-center gap-1.5 border-b border-hairline pb-6">
+        {/* Route the Fumadocs built-ins through the canon secondary button so the
+            title row matches every other text action on the site. */}
+        <MarkdownCopyButton markdownUrl={markdownUrl} className="cta-ghost" />
         <ViewOptionsPopover
           markdownUrl={markdownUrl}
           githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`}
+          className="cta-ghost"
         />
       </div>
       <DocsBody>

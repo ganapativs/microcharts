@@ -172,7 +172,7 @@ export function AppearanceMenu() {
             className="glass glass-strong pop-in fixed z-[60] w-[20rem] max-w-[calc(100vw-1.5rem)] overflow-hidden"
           >
             {/* live preview — the accent on a real microchart, no overlap */}
-            <div className="border-b border-fd-border">
+            <div className="border-b border-hairline">
               <div className="flex items-center justify-between px-4 pb-1.5 pt-3">
                 <span className="mono-label text-[0.56rem]">Preview</span>
                 <span className="mono-label text-[0.56rem] text-fd-primary">{current.label}</span>

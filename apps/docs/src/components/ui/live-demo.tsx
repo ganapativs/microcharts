@@ -28,10 +28,14 @@ export function LiveDemo({
 
   return (
     <div className="not-prose my-6 panel overflow-hidden">
-      <div className="flex items-center justify-between gap-3 border-b border-fd-border px-3 py-2">
-        {label ? <span className="mono-label pl-1">{label}</span> : <span />}
+      {/* flex-wrap + nowrap labels: at phone widths the seg drops to its own
+          line instead of the meta text breaking mid-token. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-b border-hairline px-3 py-2">
+        {label ? <span className="mono-label whitespace-nowrap pl-1">{label}</span> : <span />}
         <div className="flex items-center gap-2">
-          {meta ? <span className="mono-label opacity-70 mr-1">{meta}</span> : null}
+          {meta ? (
+            <span className="mono-label mr-1 whitespace-nowrap opacity-70">{meta}</span>
+          ) : null}
           <div role="tablist" aria-label="Demo view" className="seg">
             {(["preview", "code"] as const).map((t) => (
               <button

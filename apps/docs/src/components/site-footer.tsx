@@ -37,7 +37,7 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-fd-border">
+    <footer className="mt-24 border-t border-hairline">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           <div className="col-span-2 sm:col-span-1">
@@ -74,7 +74,7 @@ export function SiteFooter() {
             </div>
           ))}
         </div>
-        <div className="mt-12 flex flex-col gap-3 border-t border-fd-border pt-6 text-fd-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-hairline pt-6 text-fd-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span className="mono-label flex items-center gap-1.5">
             <span>© 2026</span>
             <a
@@ -90,7 +90,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noreferrer noopener"
               aria-label={`${SITE.author} on X`}
-              className="inline-flex size-6 items-center justify-center rounded-md text-fd-muted-foreground transition-colors hover:bg-fd-muted hover:text-fd-foreground"
+              className="ghost-ctrl size-6"
             >
               <XMark />
             </a>

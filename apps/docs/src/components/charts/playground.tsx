@@ -133,7 +133,7 @@ function Shell({
 }) {
   return (
     <div className="panel not-prose my-6 overflow-hidden">
-      <div className="flex items-center justify-between gap-3 border-b border-fd-border px-4 py-2.5">
+      <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-2.5">
         <span className="mono-label">Live playground</span>
         {onShuffle && (
           <button
@@ -152,10 +152,10 @@ function Shell({
           {preview}
         </div>
       </div>
-      <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-t border-fd-border px-4 py-4">
+      <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-t border-hairline px-4 py-4">
         {controls}
       </div>
-      <div className="code-inset border-t border-fd-border">
+      <div className="code-inset border-t border-hairline">
         <DynamicCodeBlock lang="tsx" code={code} />
       </div>
     </div>

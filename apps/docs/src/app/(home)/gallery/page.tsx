@@ -61,7 +61,7 @@ export default function GalleryPage() {
               href={`/docs/charts/${chart.slug}`}
               className="glass glass-lift group flex h-full flex-col overflow-hidden"
             >
-              <div className="flex items-baseline justify-between border-b border-fd-border px-4 py-2.5">
+              <div className="flex items-baseline justify-between border-b border-hairline px-4 py-2.5">
                 <span className="mono-label group-hover:text-fd-primary transition-colors">
                   {chart.name}
                 </span>
@@ -70,7 +70,7 @@ export default function GalleryPage() {
               <div className="flex min-h-[120px] flex-1 items-center justify-center px-5 py-8">
                 <Preview chart={chart} />
               </div>
-              <div className="border-t border-fd-border px-4 py-3">
+              <div className="border-t border-hairline px-4 py-3">
                 <p className="text-sm text-fd-foreground">{chart.tagline}</p>
                 <p className="mono-label mt-2 opacity-70">{chart.dataShape}</p>
               </div>
@@ -79,7 +79,7 @@ export default function GalleryPage() {
         ))}
 
         {/* teaser for the planned catalog */}
-        <div className="flex min-h-[220px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-fd-border p-6 text-center">
+        <div className="flex min-h-[220px] flex-col items-center justify-center gap-2 rounded-[var(--radius-panel)] border border-dashed border-hairline p-6 text-center">
           <span className="display text-4xl text-fd-muted-foreground">+91</span>
           <p className="text-sm text-fd-muted-foreground">
             decision, expressive, and frontier charts on the roadmap

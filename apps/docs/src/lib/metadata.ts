@@ -26,7 +26,9 @@ export function docsMeta({
   const imageUrl = abs(image);
 
   return {
-    title: `${title} · ${SITE.name}`,
+    /* Bare title — the root layout's `%s · ${SITE.name}` template appends the
+       site name exactly once (a manual suffix here doubled it). */
+    title,
     description,
     metadataBase: new URL(SITE.url),
     alternates: { canonical: url },

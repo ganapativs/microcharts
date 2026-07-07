@@ -96,7 +96,7 @@ export function InstrumentStrip() {
             href={`/docs/charts/${c.slug}`}
             className="glass glass-lift group flex h-full flex-col overflow-hidden"
           >
-            <div className="flex items-baseline justify-between border-b border-fd-border px-4 py-2.5">
+            <div className="flex items-baseline justify-between border-b border-hairline px-4 py-2.5">
               <span className="mono-label group-hover:text-fd-primary transition-colors">
                 {c.label}
               </span>

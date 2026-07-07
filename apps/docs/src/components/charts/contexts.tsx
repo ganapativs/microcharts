@@ -199,7 +199,7 @@ export function FourContexts({ slug }: { slug: string }) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {contexts.map((c) => (
           <div key={c.label} className="panel flex flex-col overflow-hidden">
-            <div className="border-b border-fd-border px-4 py-2">
+            <div className="border-b border-hairline px-4 py-2">
               <span className={tag}>{c.label}</span>
             </div>
             {tab === "code" ? (

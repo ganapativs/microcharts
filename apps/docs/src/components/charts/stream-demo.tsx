@@ -324,7 +324,7 @@ export function StreamDemo() {
   return (
     <div ref={rootRef} className="panel not-prose overflow-hidden">
       {/* chat header */}
-      <div className="flex items-center justify-between border-b border-fd-border px-4 py-2.5">
+      <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
         <div className="flex items-center gap-2">
           <span className="size-2 rounded-full" style={{ background: "var(--accent)" }} />
           <span className="mono-label">assistant</span>

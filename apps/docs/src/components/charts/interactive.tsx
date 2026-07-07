@@ -76,7 +76,7 @@ export function InteractiveDemo({ slug }: { slug: string }) {
 
   return (
     <div className="panel not-prose my-6 overflow-hidden">
-      <div className="flex items-center justify-between gap-3 border-b border-fd-border px-4 py-2.5">
+      <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-2.5">
         <span className="mono-label">Interactive</span>
         {slug === "delta" && (
           <button
@@ -93,7 +93,7 @@ export function InteractiveDemo({ slug }: { slug: string }) {
       <div className="grid-paper flex min-h-40 items-center justify-center px-6 py-10">
         <Chart slug={slug} deltaValue={deltaValue} />
       </div>
-      <div className="border-t border-fd-border px-4 py-2.5 text-sm text-fd-muted-foreground">
+      <div className="border-t border-hairline px-4 py-2.5 text-sm text-fd-muted-foreground">
         {HINTS[slug]}
       </div>
     </div>

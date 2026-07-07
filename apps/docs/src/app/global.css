@@ -31,6 +31,13 @@
   --radius-control: 12px;
 }
 
+/* Expose the ONE border token to Tailwind (`border-hairline`, `divide-hairline`)
+   so in-panel dividers use the same line as rims, tables, and rails — declared
+   `inline` so utilities reference the live per-theme var, not a snapshot. */
+@theme inline {
+  --color-hairline: var(--hairline);
+}
+
 /*
  * Accent is a single token (--accent) that everything derives from — chrome,
  * links, focus rings, AND the chart emphasis color. The global picker swaps it
@@ -133,11 +140,15 @@
      zero specificity; these :root overrides (higher specificity) win, so a
      forced light/dark docs theme always matches its charts. --mc-accent follows
      the site accent so the picker retunes charts too. Charts stay MATTE. */
+  /* positive/negative/neutral are darkened past the library defaults so every
+     data ink clears 4.5:1 over the COMPOSITED light glass (≈#f7f3ea) and the
+     bare field (#efe9dd) — the frost never earns contrast (a11y fallback drops
+     it), so the ink must. Verified: pos 5.29/4.84, neg 5.14/4.71, ntr 5.18/4.74. */
   --mc-stroke: #221d16;
-  --mc-positive: #0b8a63;
-  --mc-negative: #c5521c;
+  --mc-positive: #077353;
+  --mc-negative: #ad4713;
   --mc-accent: var(--accent);
-  --mc-neutral: #94897a;
+  --mc-neutral: #6e6557;
   /* interactive readout chip → site popover surface so it matches the theme */
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
@@ -627,6 +638,14 @@ body {
 }
 .ghost-ctrl:active {
   transform: scale(0.94);
+}
+
+/* One keyboard focus ring for the whole control canon — the accent, offset so
+   it reads on glass in both themes. :where() keeps specificity at zero so any
+   component can override. Charts keep the library's own focus treatment. */
+:where(.cta-accent, .cta-ghost, .ghost-ctrl, .seg-opt, .mc-range, .link-underline):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Sticky glass header rail — translucent, blurred, with a lit hairline under
