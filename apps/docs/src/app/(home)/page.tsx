@@ -145,7 +145,7 @@ export default function HomePage() {
             <div className="mono-label mb-4">Announced as</div>
             <p className="text-lg leading-relaxed text-fd-foreground">“{heroSummary}”</p>
             <div className="mt-6 rounded-lg border border-fd-border bg-fd-muted/40 p-4 font-mono text-sm text-fd-muted-foreground">
-              &lt;Sparkline data={"{[3, 5, 4, 8, 6, 9]}"} title="Weekly revenue" /&gt;
+              {`<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />`}
             </div>
           </div>
         </div>

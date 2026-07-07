@@ -75,13 +75,13 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-12 flex flex-col gap-3 border-t border-fd-border pt-6 text-fd-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <span className="mono-label flex items-center gap-2">
-            © 2026
+          <span className="mono-label flex items-center gap-1.5">
+            <span>© 2026</span>
             <a
               href={SITE.authorUrl}
               target="_blank"
               rel="noreferrer noopener"
-              className="link-underline hover:text-fd-foreground"
+              className="ml-0.5 underline decoration-fd-border underline-offset-[3px] transition-colors hover:text-fd-foreground hover:decoration-fd-muted-foreground"
             >
               {SITE.author}
             </a>
@@ -90,7 +90,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noreferrer noopener"
               aria-label={`${SITE.author} on X`}
-              className="text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+              className="inline-flex size-6 items-center justify-center rounded-md text-fd-muted-foreground transition-colors hover:bg-fd-muted hover:text-fd-foreground"
             >
               <XMark />
             </a>
