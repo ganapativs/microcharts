@@ -23,12 +23,14 @@ export function Usage({ chart }: { chart: string }) {
         <span className="mono-label opacity-60">{c.staticImport.replace("@microcharts/", "")}</span>
       </div>
 
-      <div className="flex items-center gap-3 border-b border-fd-border px-4 py-2.5">
-        <span aria-hidden className="mono-label text-fd-primary">
-          $
-        </span>
-        <code className="font-mono text-sm text-fd-foreground">{install}</code>
-        <CopyButton text={install} className="ml-auto -mr-1.5" />
+      <div className="flex items-center gap-2.5 border-b border-fd-border py-2 pl-4 pr-2">
+        <code className="min-w-0 flex-1 truncate font-mono text-sm leading-6 text-fd-foreground">
+          <span aria-hidden className="mr-2 select-none text-fd-primary">
+            $
+          </span>
+          {install}
+        </code>
+        <CopyButton text={install} className="shrink-0" />
       </div>
 
       <div className="[&_figure]:!my-0 [&_figure]:!rounded-none [&_figure]:!border-0">

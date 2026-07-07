@@ -25,15 +25,18 @@ export function CopyButton({ text, className }: { text: string; className?: stri
   );
 }
 
-/** The install command — mono, framed, one-click copy. */
+/** The install command — mono, framed, one-click copy. `not-prose` so the inner
+ * <code> never inherits the docs prose inline-code chip (the nested-pill bug). */
 export function InstallCommand({ command = "pnpm add @microcharts/react" }: { command?: string }) {
   return (
-    <div className="group flex items-center gap-3 rounded-lg border border-fd-border bg-fd-card/70 px-4 py-2.5 backdrop-blur">
-      <span aria-hidden className="mono-label text-fd-primary">
-        $
-      </span>
-      <code className="font-mono text-sm text-fd-foreground">{command}</code>
-      <CopyButton text={command} className="ml-auto -mr-1.5" />
+    <div className="not-prose group flex items-center gap-2.5 rounded-lg border border-fd-border bg-fd-muted/40 py-2.5 pl-3.5 pr-2">
+      <code className="min-w-0 flex-1 truncate font-mono text-sm leading-6 text-fd-foreground">
+        <span aria-hidden className="mr-2 select-none text-fd-primary">
+          $
+        </span>
+        {command}
+      </code>
+      <CopyButton text={command} className="shrink-0" />
     </div>
   );
 }
