@@ -1,5 +1,5 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import { appName, gitConfig } from "./shared";
+import { appName } from "./shared";
 import { Brandmark } from "@/components/brandmark";
 
 function Wordmark() {
@@ -17,10 +17,12 @@ export function baseOptions(): BaseLayoutProps {
       title: <Wordmark />,
       transparentMode: "top",
     },
-    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
+    // GitHub + the accent/appearance control live in the sidebar footer
+    // (see DocsSidebarChrome), not as nav links — so they sit bottom-right,
+    // out of the reading column.
     links: [
-      { text: "Gallery", url: "/gallery" },
       { text: "Home", url: "/" },
+      { text: "Gallery", url: "/gallery" },
     ],
   };
 }

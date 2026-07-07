@@ -59,7 +59,7 @@ export default function HomePage() {
           <Reveal delay={180} className="mt-9 flex flex-wrap items-center gap-3">
             <Link
               href="/docs/quickstart"
-              className="group inline-flex items-center gap-2 rounded-lg bg-fd-primary px-4 py-2.5 text-sm font-medium text-fd-primary-foreground transition-transform hover:-translate-y-0.5"
+              className="cta-accent group inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
             >
               Get started
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -160,7 +160,7 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/docs/quickstart"
-              className="inline-flex items-center gap-2 rounded-lg bg-fd-primary px-5 py-2.5 text-sm font-medium text-fd-primary-foreground transition-transform hover:-translate-y-0.5"
+              className="cta-accent inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
             >
               Read the docs <ArrowRight className="size-4" />
             </Link>

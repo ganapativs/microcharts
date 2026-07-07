@@ -58,9 +58,10 @@
   }
 
   /* Presets = token bundles (plan/06 §3, layer 2). Visual only. */
-  :where([data-mc-theme="tufte"]) {
+  /* "editorial" — hairline ink, a single restrained red endpoint accent. */
+  :where([data-mc-theme="editorial"]) {
     --mc-stroke: #333333;
-    --mc-accent: #b8112a; /* single red endpoint accent */
+    --mc-accent: #b8112a;
     --mc-stroke-width: 1;
     --mc-radius: 0;
   }
@@ -124,6 +125,9 @@
   :where(.mc-delta .mc-delta-glyph) {
     fill: currentColor;
     flex: none;
+    /* optical: the digits' ink centre sits a hair below the line-box centre —
+       nudge the mark down to match so glyph + number share one midline. */
+    transform: translateY(0.045em);
   }
   :where(.mc-delta .mc-delta-num) {
     font-weight: 600;

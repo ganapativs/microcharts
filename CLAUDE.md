@@ -46,7 +46,7 @@ pnpm · TypeScript 6 strict (watch `@typescript/native-preview`/tsgo, adopt at s
 
 ## Theming (plan/06)
 
-~20 CSS custom properties (`--mc-*`) at low specificity = runtime contract; presets = token bundles (`modern` default, `tufte`, `mono`, `vivid`, + context presets `newspaper`/`magazine`/`poster`/`eink`/`print`). Precedence: prop > CSS var scope > preset > default. Presets are visual only — never change data semantics. Colors: Okabe-Ito-derived semantic tokens (pos `#009E73`, neg `#D55E00`), palettes swap the accent only. Dark mode hand-tuned, never inverted. Charts never paint their own background. `tabular-nums` on all rendered numbers.
+~20 CSS custom properties (`--mc-*`) at low specificity = runtime contract; presets = token bundles (`modern` default, `editorial`, `mono`, `vivid`, + context presets `newspaper`/`magazine`/`poster`/`eink`/`print`). **Never use the name "tufte" as a preset id or in any code/docs/UI — the `editorial` preset embodies those principles without naming the person (non-negotiable #6).** Precedence: prop > CSS var scope > preset > default. Presets are visual only — never change data semantics. Colors: Okabe-Ito-derived semantic tokens (pos `#009E73`, neg `#D55E00`), palettes swap the accent only. Dark mode hand-tuned, never inverted. Charts never paint their own background. `tabular-nums` on all rendered numbers.
 
 ## Catalog (96 types — plan/05 core 34, plan/16 decision 20, plan/15 expressive 22, plan/17 frontier 20)
 

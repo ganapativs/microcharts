@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 
 /** Built-in presets (token bundles in styles.css). `modern` is the default. */
-export type Preset = "modern" | "tufte" | "mono" | "vivid" | "dark";
+export type Preset = "modern" | "editorial" | "mono" | "vivid" | "dark";
 
 export interface MicroProviderProps {
   theme?: Preset;

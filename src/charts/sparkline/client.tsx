@@ -18,6 +18,11 @@ import { isFiniteValue } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
 import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
 
+// The composed static SVG fills the focusable wrapper so the wrapper's box and
+// the SVG's box coincide — pointer→viewBox math and overlay marks stay exact,
+// and the chart scales fluidly with its container.
+const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
+
 export interface InteractiveSparklineProps extends SparklineProps {
   /** Called with the index of the focused point (or `null` when cleared). */
   onPointFocus?: (index: number | null) => void;
@@ -161,6 +166,9 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
         format={format}
         locale={locale}
         summary={false}
+        /* Fill the focusable wrapper exactly so pointer math + overlay marks
+           map 1:1 (the wrapper box === the SVG box) and the chart is fluid. */
+        style={FILL}
       >
         {activePoint ? (
           <line

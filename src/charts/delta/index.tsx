@@ -5,12 +5,14 @@
 // triangle shape (up/down/flat) AND color — never color alone (plan/08 1.4.1).
 import type { CSSProperties, ReactNode } from "react";
 
-// viewBox is 0 0 10 10 (y grows downward). Apex is the lone vertex: at the top
-// (small y) for up ▲, at the bottom (large y) for down ▼.
+// viewBox is 0 0 10 10 (y grows downward). Each mark is vertically CENTERED in
+// the box (symmetric 2u top/bottom margin) so the glyph's optical centre lands
+// on the digits' centre — no drift beside the number. Apex is the lone vertex:
+// top (small y) for up ▲, bottom (large y) for down ▼.
 const GLYPH = {
-  up: "M5 3 L9 9 L1 9 Z", // ▲ apex top
-  down: "M1 3 L9 3 L5 9 Z", // ▼ apex bottom
-  flat: "M1 4.25 H9 V5.75 H1 Z", // ▬
+  up: "M5 2.4 L8.6 7.6 L1.4 7.6 Z", // ▲ apex top, centred
+  down: "M1.4 2.4 L8.6 2.4 L5 7.6 Z", // ▼ apex bottom, centred
+  flat: "M1.4 4.2 H8.6 V5.8 H1.4 Z", // ▬ centred bar
 } as const;
 
 /** Resolved Delta model — shared by the static entry and the interactive one. */
@@ -90,8 +92,8 @@ export function Delta(props: DeltaProps): ReactNode {
       <svg
         className="mc-delta-glyph"
         viewBox="0 0 10 10"
-        width="1em"
-        height="1em"
+        width="0.82em"
+        height="0.82em"
         aria-hidden="true"
       >
         <path d={GLYPH[glyphKey]} />

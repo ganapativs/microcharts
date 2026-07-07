@@ -8,6 +8,10 @@ import { isFiniteValue } from "../../core/types.js";
 import { sparkBarGeometry, type Bar, type SparkBarMode } from "./geometry.js";
 import type { SparkBarProps } from "./index.js";
 
+// The SVG fills the focusable wrapper so its box coincides with the wrapper's —
+// the %-positioned hit zones + readout map 1:1 and the chart scales fluidly.
+const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
+
 function barInk(bar: Bar, mode: SparkBarMode, activeIndex: number | null): string {
   if (bar.index === activeIndex) return "accent";
   if (mode === "winloss" || bar.sign < 0) return bar.sign < 0 ? "negative" : "positive";
@@ -118,6 +122,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         width={width}
         height={height}
         preserveAspectRatio="xMidYMid meet"
+        style={FILL}
         aria-hidden="true"
       >
         {geo.bars.map((bar) => (

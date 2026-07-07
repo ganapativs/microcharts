@@ -125,11 +125,15 @@ function Shell({
   preview,
   controls,
   code,
+  morphKey,
 }: {
   onShuffle?: () => void;
   preview: ReactNode;
   controls: ReactNode;
   code: string;
+  /** Replays a gentle morph when this changes — pass only discrete props, never
+      slider values, so dragging doesn't strobe. */
+  morphKey?: string;
 }) {
   return (
     <div className="not-prose my-6 overflow-hidden rounded-xl border border-fd-border bg-fd-card">
@@ -146,7 +150,9 @@ function Shell({
         )}
       </div>
       <div className="grid-paper flex min-h-32 items-center justify-center px-6 py-10">
-        {preview}
+        <div key={morphKey} className="mc-morph flex w-full items-center justify-center">
+          {preview}
+        </div>
       </div>
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-t border-fd-border px-4 py-4">
         {controls}
@@ -189,6 +195,7 @@ function SparklinePG() {
     .join("\n");
   return (
     <Shell
+      morphKey={`${curve}-${dots}-${fill}-${band}-${label}-${seed}`}
       onShuffle={() => {
         setData(wave(seed));
         setSeed((s) => s + 1);
@@ -248,6 +255,7 @@ function SparkBarPG() {
     .join("\n");
   return (
     <Shell
+      morphKey={`${mode}-${label}-${seed}`}
       onShuffle={() => {
         setData(wave(seed));
         setSeed((s) => s + 1);
@@ -294,6 +302,7 @@ function BulletPG() {
     .join("\n");
   return (
     <Shell
+      morphKey={`bands-${bands}`}
       preview={
         <Bullet
           value={value}
@@ -339,6 +348,7 @@ function ActivityGridPG() {
         );
         setSeed((s) => s + 1);
       }}
+      morphKey={`${layout}-${cell}-${seed}`}
       preview={<ActivityGrid data={data} layout={layout} cell={Number(cell)} title="Playground" />}
       controls={
         <>
@@ -370,6 +380,7 @@ function DeltaPG() {
     .join("\n");
   return (
     <Shell
+      morphKey={`delta-${positive}`}
       preview={
         <span className="text-3xl">
           <Delta value={value} positive={positive} summary={false} />

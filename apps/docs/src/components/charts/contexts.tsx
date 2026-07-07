@@ -60,7 +60,7 @@ export function FourContexts({ slug }: { slug: string }) {
         <span className={tag}>In a sentence</span>
         <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
           Signups held steady{" "}
-          <span className="inline-flex translate-y-[0.15em] align-middle">
+          <span className="mx-1 inline-flex align-middle">
             <Mark chart={chart} data={data} />
           </span>{" "}
           through the quarter, closing at <span className="font-mono tabular-nums">{last}</span>.

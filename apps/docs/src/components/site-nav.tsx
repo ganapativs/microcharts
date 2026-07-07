@@ -34,8 +34,7 @@ function Wordmark() {
   );
 }
 
-const ctrl =
-  "flex size-8 items-center justify-center rounded-md border border-transparent text-fd-muted-foreground transition-colors hover:border-fd-border hover:text-fd-foreground";
+const ctrl = "ghost-ctrl size-8";
 
 export function SiteNav() {
   const pathname = usePathname();
@@ -70,11 +69,11 @@ export function SiteNav() {
         <div className="ml-auto flex items-center gap-1.5">
           <SearchTrigger
             aria-label="Search"
-            className="group flex h-8 items-center gap-2 rounded-md border border-fd-border bg-fd-muted/40 pl-2 pr-1.5 text-fd-muted-foreground transition-colors hover:border-fd-border hover:text-fd-foreground"
+            className="group flex h-8 w-8 items-center justify-center gap-2 rounded-lg bg-fd-muted/60 text-fd-muted-foreground transition-all duration-200 hover:bg-fd-muted hover:text-fd-foreground active:scale-[0.97] sm:w-auto sm:justify-start sm:pl-2.5 sm:pr-1.5"
           >
             <Search className="size-4 shrink-0" strokeWidth={2} />
             <span className="hidden text-[0.8rem] sm:inline">Search</span>
-            <kbd className="hidden items-center rounded border border-fd-border bg-fd-card px-1.5 py-px font-mono text-[0.62rem] leading-5 sm:inline-flex">
+            <kbd className="hidden items-center rounded bg-fd-card px-1.5 py-px font-mono text-[0.62rem] leading-5 shadow-sm ring-1 ring-fd-border/60 sm:inline-flex">
               ⌘K
             </kbd>
           </SearchTrigger>

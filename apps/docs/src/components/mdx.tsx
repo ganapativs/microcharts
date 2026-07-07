@@ -11,6 +11,7 @@ import { LiveDemo } from "@/components/ui/live-demo";
 import { InstallCommand } from "@/components/ui/copy";
 import { FourContexts } from "@/components/charts/contexts";
 import { Playground } from "@/components/charts/playground";
+import { Usage } from "@/components/charts/usage";
 import { InteractiveDemo } from "@/components/charts/interactive";
 import { PropTable } from "@/components/charts/prop-table";
 import { PackageTabs } from "@/components/ui/package-tabs";
@@ -31,6 +32,7 @@ export function getMDXComponents(components?: MDXComponents) {
     InstallCommand,
     FourContexts,
     Playground,
+    Usage,
     InteractiveDemo,
     PropTable,
     PackageTabs,

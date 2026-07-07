@@ -35,22 +35,24 @@
   --accent-strong: #2543b8;
   --accent-fg: #fdfdff;
 
-  /* warm paper neutrals, tinted off the ink (never pure white) */
-  --color-fd-background: #faf7f1;
-  --color-fd-foreground: #1b1712;
-  --color-fd-muted: #f0ebe1;
-  --color-fd-muted-foreground: #6a6357;
-  --color-fd-border: #e6ded0;
-  --color-fd-card: #fffdf9;
-  --color-fd-card-foreground: #1b1712;
-  --color-fd-popover: #fffdf9;
-  --color-fd-popover-foreground: #1b1712;
+  /* Light: a warm "manuscript" paper — distinct from generic cream. Deep
+     espresso ink, layered surfaces with real elevation steps, hairline borders
+     with a touch more chroma so they read as drawn, not muddy. */
+  --color-fd-background: #f4efe4;
+  --color-fd-foreground: #17110a;
+  --color-fd-muted: #ece5d5;
+  --color-fd-muted-foreground: #6b6252;
+  --color-fd-border: #e0d5c0;
+  --color-fd-card: #fffefb;
+  --color-fd-card-foreground: #17110a;
+  --color-fd-popover: #fffefb;
+  --color-fd-popover-foreground: #17110a;
   --color-fd-primary: var(--accent);
   --color-fd-primary-foreground: var(--accent-fg);
-  --color-fd-secondary: #f0ebe1;
-  --color-fd-secondary-foreground: #1b1712;
-  --color-fd-accent: #ece5d8;
-  --color-fd-accent-foreground: #1b1712;
+  --color-fd-secondary: #ece5d5;
+  --color-fd-secondary-foreground: #17110a;
+  --color-fd-accent: #e7ded0;
+  --color-fd-accent-foreground: #17110a;
   --color-fd-ring: var(--accent);
 
   /* our own semantic surface tokens */
@@ -182,6 +184,17 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Subtle "lit page" depth — warm light from above on paper; a faint accent
+     bloom on the dark canvas. Keeps large fields from reading flat. */
+  background-color: var(--color-fd-background);
+  background-image: radial-gradient(125% 85% at 50% -12%, var(--page-glow), transparent 55%);
+  background-attachment: fixed;
+}
+:root {
+  --page-glow: color-mix(in oklab, #fffaf0 62%, transparent);
+}
+.dark {
+  --page-glow: color-mix(in oklab, var(--accent) 7%, transparent);
 }
 ::selection {
   background: color-mix(in oklab, var(--signal) 22%, transparent);
@@ -286,6 +299,69 @@ body {
   border-radius: var(--radius-panel);
 }
 
+/* Primary CTA — solid accent surface. */
+.cta-accent {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: none;
+}
+.cta-accent:hover {
+  filter: brightness(1.05) saturate(1.03);
+}
+
+/* Ghost control — borderless icon button; hover is a soft tinted wash + lift.
+   Replaces the boxed, bordered nav icons for a calmer, more crafted row. */
+.ghost-ctrl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: var(--color-fd-muted-foreground);
+  transition:
+    background-color 0.2s var(--ease-out-quint),
+    color 0.2s var(--ease-out-quint),
+    transform 0.2s var(--ease-out-quint);
+}
+.ghost-ctrl:hover {
+  background: color-mix(in oklab, var(--color-fd-muted-foreground) 12%, transparent);
+  color: var(--color-fd-foreground);
+}
+.ghost-ctrl:active {
+  transform: scale(0.94);
+}
+
+/* Chip / swatch press feedback in the picker. */
+@keyframes chip-pop {
+  0% {
+    transform: scale(0.8);
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.chip-pop {
+  animation: chip-pop 0.32s var(--ease-out-quint);
+}
+
+/* Gentle morph when a playground/prop change swaps the rendered chart. Keyed
+   remount replays it; purely cosmetic, fully reduced-motion-gated. */
+@keyframes mc-morph {
+  from {
+    opacity: 0.55;
+    transform: translateY(2px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.mc-morph {
+  animation: mc-morph 0.28s var(--ease-out-quint) both;
+}
+
 /* Scroll-reveal: charts and panels fade+rise once, gated on reduced-motion. */
 @keyframes rise-in {
   from {
@@ -333,6 +409,9 @@ body {
   .reveal,
   .route-fade,
   .pop-in,
+  .mc-morph,
+  .chip-pop,
+  .ghost-ctrl,
   .link-underline {
     animation: none !important;
     transition: none !important;

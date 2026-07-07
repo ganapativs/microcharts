@@ -7,6 +7,10 @@ import { useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
 
+// The static SVG fills the focusable wrapper so its box coincides with the
+// wrapper's — the readout anchors to the real chart edge, and it scales fluidly.
+const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
+
 export function Bullet(props: BulletProps): React.ReactNode {
   const { value, target, format, locale, title, summary, className, style } = props;
   const [open, setOpen] = useState(false);
@@ -44,7 +48,7 @@ export function Bullet(props: BulletProps): React.ReactNode {
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
     >
-      <StaticBullet {...props} summary={false} />
+      <StaticBullet {...props} summary={false} style={FILL} />
       {open ? (
         <span
           className="mc-spark-readout"
