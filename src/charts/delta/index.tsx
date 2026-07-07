@@ -3,6 +3,7 @@
 // accessible inline HTML (not a tiny SVG viewBox) so the number flows and wraps
 // like text; the glyph is an inline SVG. Direction is ALWAYS double-encoded —
 // triangle shape (up/down/flat) AND color — never color alone (plan/08 1.4.1).
+import { makeFormatter } from "../../core/format.js";
 import type { CSSProperties, ReactNode } from "react";
 
 // viewBox is 0 0 10 10 (y grows downward). Each mark is vertically CENTERED in
@@ -34,14 +35,7 @@ export function deltaModel(props: DeltaProps): DeltaModel {
   const shown = from === undefined ? value : from !== 0 ? delta / Math.abs(from) : delta;
   const sign: -1 | 0 | 1 = !finite ? 0 : delta > 0 ? 1 : delta < 0 ? -1 : 0;
 
-  const fmt =
-    typeof format === "function"
-      ? format
-      : (n: number) =>
-          new Intl.NumberFormat(
-            locale,
-            format ?? { style: "percent", maximumFractionDigits: 1 },
-          ).format(n);
+  const fmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
 
   // Non-finite input (NaN/±Infinity) renders the flat/em-dash form rather than
   // "NaN%" — documented degenerate behavior (plan/09 edge matrix).
