@@ -123,8 +123,9 @@ export function DotPlot(props: DotPlotProps): ReactNode {
             {showCategories ? (
               <text
                 x={geo.labelX}
-                y={row.y + fontSize * 0.35}
+                y={row.y}
                 fontSize={fontSize}
+                dominantBaseline="central"
                 textAnchor="end"
                 data-mc-ink="label"
               >
@@ -140,8 +141,9 @@ export function DotPlot(props: DotPlotProps): ReactNode {
                   return (
                     <text
                       x={fits ? row.x + 4 : row.x - 4}
-                      y={row.y + fontSize * 0.35}
+                      y={row.y}
                       fontSize={fontSize}
+                      dominantBaseline="central"
                       textAnchor={fits ? "start" : "end"}
                     >
                       {text}

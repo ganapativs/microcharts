@@ -178,7 +178,7 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
           x={geo.lastPrimary.x + 4}
           y={Math.min(Math.max(geo.lastPrimary.y, fontSize * 0.55), height - fontSize * 0.55)}
           fontSize={fontSize}
-          dominantBaseline="middle"
+          dominantBaseline="central"
           textAnchor="start"
           data-mc-ink="accent"
         >

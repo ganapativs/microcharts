@@ -58,7 +58,8 @@ describe("trendArrowGeometry (plan/22 #1)", () => {
       expect(y).toBeLessThanOrEqual(height);
       expect(y).toBe(Math.round(y * 100) / 100);
     }
-    expect(geo.labelY).toBeLessThanOrEqual(height);
-    expect(geo.labelY - geo.fontSize).toBeGreaterThanOrEqual(-1); // ascent clamp
+    // central baseline → the em box is labelY ± 0.5·fontSize
+    expect(geo.labelY + geo.fontSize * 0.5).toBeLessThanOrEqual(height + 1);
+    expect(geo.labelY - geo.fontSize * 0.5).toBeGreaterThanOrEqual(-1);
   });
 });

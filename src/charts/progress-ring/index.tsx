@@ -82,7 +82,13 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
         <path d={geo.arc} data-mc-ink="accent" style={color ? { fill: color } : undefined} />
       ) : null}
       {label === "percent" && model.display !== undefined ? (
-        <text x={geo.labelX} y={geo.labelY} fontSize={geo.fontSize} textAnchor="middle">
+        <text
+          x={geo.labelX}
+          y={geo.labelY}
+          fontSize={geo.fontSize}
+          dominantBaseline="central"
+          textAnchor="middle"
+        >
           {model.display}
         </text>
       ) : null}

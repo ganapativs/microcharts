@@ -174,7 +174,13 @@ export function Progress(props: ProgressProps): ReactNode {
         </>
       )}
       {model.display !== undefined ? (
-        <text x={geo.labelX} y={geo.labelY} fontSize={fontSize} textAnchor="end">
+        <text
+          x={geo.labelX}
+          y={geo.labelY}
+          fontSize={fontSize}
+          dominantBaseline="central"
+          textAnchor="end"
+        >
           {model.display}
         </text>
       ) : null}

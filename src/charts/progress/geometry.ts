@@ -33,8 +33,9 @@ export function progressGeometry(opts: {
   fontSize: number;
 }): ProgressGeometry {
   const { width, height, fraction, segments, gutterCh, fontSize } = opts;
-  // gutter from the char estimate (0.62em/char) + a 3-unit gap to the bar
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 3 : 0;
+  // gutter from the char estimate (0.62em/char) + a 5-unit gap to the bar so
+  // the value reads as separate from the fill, not stuck to it
+  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 5 : 0;
   const barH = Math.max(2, round2(height * 0.5));
   const y = round2((height - barH) / 2);
 
@@ -65,6 +66,6 @@ export function progressGeometry(opts: {
     fill,
     segments: slots,
     labelX: width + gutter,
-    labelY: round2(Math.min(height - 1, height / 2 + fontSize * 0.35)),
+    labelY: round2(height / 2),
   };
 }

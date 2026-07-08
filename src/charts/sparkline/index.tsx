@@ -212,7 +212,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
             height - metrics.fontSize * 0.55,
           )}
           fontSize={metrics.fontSize}
-          dominantBaseline="middle"
+          dominantBaseline="central"
           textAnchor="start"
           data-mc-ink="accent"
         >

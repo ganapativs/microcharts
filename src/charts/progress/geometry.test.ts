@@ -14,7 +14,7 @@ describe("progressGeometry (plan/22 #4)", () => {
     const bare = progressGeometry({ width: 48, height: 8, fraction: 1, gutterCh: 0, fontSize: 6 });
     expect(geo.track.w).toBe(48);
     expect(geo.track.w).toBe(bare.track.w); // same scale with or without a label
-    expect(geo.totalWidth).toBe(48 + Math.ceil(4 * 6 * 0.62) + 3);
+    expect(geo.totalWidth).toBe(48 + Math.ceil(4 * 6 * 0.62) + 5);
     expect(geo.labelX - 4 * 6 * 0.62).toBeGreaterThanOrEqual(geo.track.w); // text clears the bar
     expect(geo.labelX).toBeLessThanOrEqual(geo.totalWidth);
   });

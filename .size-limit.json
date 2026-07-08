@@ -97,7 +97,7 @@
   {
     "name": "@microcharts/react/heat-cell/interactive",
     "path": "dist/charts/heat-cell/client.js",
-    "limit": "2.15 kB",
+    "limit": "2.2 kB",
     "gzip": true
   },
   {

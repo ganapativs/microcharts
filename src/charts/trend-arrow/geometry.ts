@@ -87,7 +87,7 @@ export function trendArrowGeometry(opts: {
 
   const fontSize = Math.max(6, Math.min(round2(height * 0.5), 11));
   // Baseline sits so digits center optically on the glyph; clamp inside the box.
-  const labelY = round2(Math.min(height - 1, height / 2 + fontSize * 0.35));
+  const labelY = round2(height / 2);
   const labelX = round2(BOX * scale + ox + 2);
 
   return { d, labelX, labelY, fontSize };

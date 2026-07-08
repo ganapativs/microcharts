@@ -167,8 +167,9 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
             <>
               <text
                 x={leftLabel.x}
-                y={midY + fontSize * 0.35}
+                y={midY}
                 fontSize={fontSize}
+                dominantBaseline="central"
                 textAnchor={leftLabel.anchor}
                 data-mc-ink="label"
               >
@@ -176,8 +177,9 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
               </text>
               <text
                 x={rightLabel.x}
-                y={midY + fontSize * 0.35}
+                y={midY}
                 fontSize={fontSize}
+                dominantBaseline="central"
                 textAnchor={rightLabel.anchor}
                 data-mc-ink="label"
               >
@@ -187,8 +189,9 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
           ) : label === "net" ? (
             <text
               x={rightLabel.x}
-              y={midY + fontSize * 0.35}
+              y={midY}
               fontSize={fontSize}
+              dominantBaseline="central"
               textAnchor={rightLabel.anchor}
               data-mc-ink="label"
             >

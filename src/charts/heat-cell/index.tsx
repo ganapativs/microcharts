@@ -109,7 +109,13 @@ export function HeatCell(props: HeatCellProps): ReactNode {
         }
       />
       {showLabel ? (
-        <text x={SIZE / 2} y={SIZE / 2 + fontSize * 0.35} fontSize={fontSize} textAnchor="middle">
+        <text
+          x={SIZE / 2}
+          y={SIZE / 2}
+          fontSize={fontSize}
+          dominantBaseline="central"
+          textAnchor="middle"
+        >
           {text}
         </text>
       ) : null}

@@ -64,7 +64,8 @@ export function ohlcGeometry(opts: {
   const n = valid.length;
   if (n === 0) return { marks: [], truncated, pitch: 0, invalid };
 
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 3 : 0;
+  // +5 gap so the last-close value reads as separate from the final candle
+  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 5 : 0;
   const x0 = 1;
   const x1 = width - 1 - gutter;
 

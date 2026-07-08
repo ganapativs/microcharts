@@ -174,8 +174,9 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
             {d.label ? (
               <text
                 x={geo.labelX}
-                y={row.y + fontSize * 0.35}
+                y={row.y}
                 fontSize={fontSize}
+                dominantBaseline="central"
                 textAnchor="end"
                 data-mc-ink="label"
               >
@@ -219,16 +220,18 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
               <>
                 <text
                   x={leftX - 3.5}
-                  y={row.y + fontSize * 0.35}
+                  y={row.y}
                   fontSize={fontSize}
+                  dominantBaseline="central"
                   textAnchor="end"
                 >
                   {fmt(leftVal)}
                 </text>
                 <text
                   x={rightX + 3.5}
-                  y={row.y + fontSize * 0.35}
+                  y={row.y}
                   fontSize={fontSize}
+                  dominantBaseline="central"
                   textAnchor="start"
                 >
                   {fmt(rightVal)}

@@ -131,8 +131,8 @@ export function Slope(props: SlopeProps): ReactNode {
   // apart instead of colliding; an impossible column drops its labels
   const layoutColumn = (ys: (number | null)[]): (number | null)[] => {
     const present: number[] = [];
-    for (const y of ys) if (y !== null) present.push(y + fontSize * 0.35);
-    const spread = spreadLabels(present, fontSize * 1.05, fontSize * 0.8, height - fontSize * 0.25);
+    for (const y of ys) if (y !== null) present.push(y);
+    const spread = spreadLabels(present, fontSize * 1.05, fontSize * 0.5, height - fontSize * 0.5);
     let k = 0;
     return ys.map((y) => (y === null || !spread ? null : spread[k++]!));
   };
@@ -194,7 +194,13 @@ export function Slope(props: SlopeProps): ReactNode {
               <circle cx={line.x1} cy={line.y1} r={1.5} style={{ fill: stroke }} />
             ) : null}
             {showLabels && wantLeft && leftYs[line.index] !== null ? (
-              <text x={geo.leftLabelX} y={leftYs[line.index]!} fontSize={fontSize} textAnchor="end">
+              <text
+                x={geo.leftLabelX}
+                y={leftYs[line.index]!}
+                fontSize={fontSize}
+                dominantBaseline="central"
+                textAnchor="end"
+              >
                 {fmt(d.from)}
               </text>
             ) : null}
@@ -203,6 +209,7 @@ export function Slope(props: SlopeProps): ReactNode {
                 x={geo.rightLabelX}
                 y={rightYs[line.index]!}
                 fontSize={fontSize}
+                dominantBaseline="central"
                 textAnchor="start"
                 data-mc-ink={wantLabel && !wantLeft ? "label" : undefined}
               >

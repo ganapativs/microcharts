@@ -405,3 +405,14 @@ wrapper; measured wrapper==svg (180==180) after. FILL is NOT applied universally
 sized by geometry-width props use inline-block wrappers that already hug the SVG, and
 width:100% on a child of an auto-width inline-block would break them. Browser regression
 test added. Budget 3.4→3.5 kB interactive (measured 3.42; caps honored).
+
+**Label vertical centering — 15 charts (2026-07-08, round-14 user review):** direct labels used
+`y = center + fontSize*0.35` (cap-box half-height) which browser-measured ~2.5px HIGH; the eye
+centers the full line-box, and a fixed constant can't track it across fonts. `dominant-baseline="middle"`
+(ohlc/dual/sparkbar) was ~1.3px high. Standardized on the SVG-native `dominant-baseline="central"` +
+`y = center` (in-browser deltaPx 0.00) across likert, segmented, dot-plot, dumbbell, heat-cell, slope,
+bump-strip, progress, trend-arrow, progress-ring, ohlc, dual-sparkline, sparkbar, sparkline-last. Kept
+as an attribute (not CSS) so SVGs stay self-contained + the craft audit reads it. Edge-anchored labels
+(funnel top, sparkline min/max, stacked-area stagger) left alphabetic. Also: progress + ohlc label
+gutter gap +3→+5 for separation. Budgets: heat-cell interactive 2.15→2.2 kB (measured 2.15, +central
+attr). Browser regression test on likert asserts deltaPx < 1.2.

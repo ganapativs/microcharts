@@ -111,7 +111,13 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
     >
       <path d={geo.d} data-mc-ink={ink} />
       {showValue ? (
-        <text x={geo.labelX} y={geo.labelY} fontSize={geo.fontSize} textAnchor="start">
+        <text
+          x={geo.labelX}
+          y={geo.labelY}
+          fontSize={geo.fontSize}
+          dominantBaseline="central"
+          textAnchor="start"
+        >
           {model.display}
         </text>
       ) : null}

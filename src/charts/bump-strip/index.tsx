@@ -64,9 +64,9 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
   }
 
   const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 7));
-  // clamped label baseline — the glyph box never leaves the frame
+  // clamped label center — the glyph box (central baseline) never leaves the frame
   const labelY = (y: number): number =>
-    Math.min(Math.max(y + fontSize * 0.35, fontSize * 0.8), height - fontSize * 0.25);
+    Math.min(Math.max(y, fontSize * 0.5), height - fontSize * 0.5);
   const maxLabelChars =
     label === "none"
       ? 0
@@ -112,6 +112,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
           x={geo.lastLabel.x}
           y={labelY(geo.lastLabel.y)}
           fontSize={fontSize}
+          dominantBaseline="central"
           textAnchor="start"
           data-mc-ink="accent"
         >
@@ -123,6 +124,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
           x={geo.firstLabel.x}
           y={labelY(geo.firstLabel.y)}
           fontSize={fontSize}
+          dominantBaseline="central"
           textAnchor="end"
           data-mc-ink="label"
         >

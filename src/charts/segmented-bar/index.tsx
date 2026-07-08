@@ -122,7 +122,8 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
             {text !== undefined && seg.labelFits(text.length) ? (
               <text
                 x={round2Mid(seg.x, seg.w)}
-                y={height / 2 + fontSize * 0.35}
+                y={height / 2}
+                dominantBaseline="central"
                 fontSize={fontSize}
                 textAnchor="middle"
                 style={{ fill: "var(--mc-surface, Canvas)" }}

@@ -33,7 +33,7 @@
     },
     "heat-cell": {
       "static": "1.8 kB",
-      "interactive": "2.15 kB"
+      "interactive": "2.2 kB"
     },
     "progress": {
       "static": "1.9 kB",

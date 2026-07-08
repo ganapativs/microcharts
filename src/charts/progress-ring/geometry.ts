@@ -45,7 +45,7 @@ export function ringGeometry(opts: {
     track,
     arc,
     labelX: round2(c),
-    labelY: round2(c + fontSize * 0.35),
+    labelY: round2(c),
     fontSize,
   };
 }

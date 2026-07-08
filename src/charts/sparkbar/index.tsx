@@ -129,7 +129,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
             Math.min(Math.max(last.y, metrics.fontSize * 0.6), height - metrics.fontSize * 0.6),
           )}
           fontSize={metrics.fontSize}
-          dominantBaseline="middle"
+          dominantBaseline="central"
           textAnchor="start"
           data-mc-ink="accent"
         >
