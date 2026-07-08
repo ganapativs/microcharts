@@ -42,7 +42,7 @@ export function labelMetrics(
   height: number,
 ): { fontSize: number; gutter: number } {
   const fontSize = Math.max(6, Math.min(Math.round(height * 0.5), 11));
-  const gutter = Math.min(Math.ceil(text.length * fontSize * 0.62) + 4, Math.floor(width * 0.45));
+  const gutter = Math.min(Math.ceil(text.length * fontSize * 0.62) + 6, Math.floor(width * 0.45));
   return { fontSize, gutter };
 }
 

@@ -18,6 +18,11 @@ import { isFiniteValue } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
 import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
 
+// The composed static SVG fills the focusable wrapper so the wrapper's box and
+// the SVG's box coincide — pointer→viewBox math and overlay marks stay exact,
+// and the chart scales fluidly with its container.
+const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
+
 export interface InteractiveSparklineProps extends SparklineProps {
   /** Called with the index of the focused point (or `null` when cleared). */
   onPointFocus?: (index: number | null) => void;
@@ -161,6 +166,9 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
         format={format}
         locale={locale}
         summary={false}
+        /* Fill the focusable wrapper exactly so pointer math + overlay marks
+           map 1:1 (the wrapper box === the SVG box) and the chart is fluid. */
+        style={FILL}
       >
         {activePoint ? (
           <line
@@ -173,7 +181,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
           />
         ) : null}
         {activePoint ? (
-          <circle cx={activePoint[0]} cy={activePoint[1]} r={2.5} data-mc-ink="accent" />
+          <circle cx={activePoint[0]} cy={activePoint[1]} r={2.6} data-mc-ink="accent" />
         ) : null}
         {rest.children}
       </StaticSparkline>
@@ -190,18 +198,17 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
       >
         {activeValue !== null ? strings.point(activePos, stops.length, fmt(activeValue)) : ""}
       </span>
-      {activePoint && activeValue !== null ? (
+      {activePoint &&
+      activeValue !== null &&
+      /* At the endpoint the persistent `label="last"` already shows this value —
+         a floating readout there just collides with it. Skip it; every other
+         point still gets the readout. */
+      !(label === "last" && active === stops[stops.length - 1]) ? (
         <span
           className="mc-spark-readout"
           style={{
-            position: "absolute",
             left: `${(activePoint[0] / width) * 100}%`,
-            bottom: "100%",
             transform: "translateX(-50%)",
-            font: "var(--mc-label-size, 0.75em) var(--mc-font, inherit)",
-            fontVariantNumeric: "tabular-nums",
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
           }}
         >
           {fmt(activeValue)}

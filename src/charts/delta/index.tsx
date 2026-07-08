@@ -3,12 +3,17 @@
 // accessible inline HTML (not a tiny SVG viewBox) so the number flows and wraps
 // like text; the glyph is an inline SVG. Direction is ALWAYS double-encoded —
 // triangle shape (up/down/flat) AND color — never color alone (plan/08 1.4.1).
+import { makeFormatter } from "../../core/format.js";
 import type { CSSProperties, ReactNode } from "react";
 
+// viewBox is 0 0 10 10 (y grows downward). Each mark is vertically CENTERED in
+// the box (symmetric 2u top/bottom margin) so the glyph's optical centre lands
+// on the digits' centre — no drift beside the number. Apex is the lone vertex:
+// top (small y) for up ▲, bottom (large y) for down ▼.
 const GLYPH = {
-  up: "M5 9 L9 3 L1 3 Z", // ▲
-  down: "M1 3 L9 3 L5 9 Z", // ▼
-  flat: "M1 4.25 H9 V5.75 H1 Z", // ▬
+  up: "M5 2.4 L8.6 7.6 L1.4 7.6 Z", // ▲ apex top, centred
+  down: "M1.4 2.4 L8.6 2.4 L5 7.6 Z", // ▼ apex bottom, centred
+  flat: "M1.4 4.2 H8.6 V5.8 H1.4 Z", // ▬ centred bar
 } as const;
 
 /** Resolved Delta model — shared by the static entry and the interactive one. */
@@ -30,14 +35,7 @@ export function deltaModel(props: DeltaProps): DeltaModel {
   const shown = from === undefined ? value : from !== 0 ? delta / Math.abs(from) : delta;
   const sign: -1 | 0 | 1 = !finite ? 0 : delta > 0 ? 1 : delta < 0 ? -1 : 0;
 
-  const fmt =
-    typeof format === "function"
-      ? format
-      : (n: number) =>
-          new Intl.NumberFormat(
-            locale,
-            format ?? { style: "percent", maximumFractionDigits: 1 },
-          ).format(n);
+  const fmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
 
   // Non-finite input (NaN/±Infinity) renders the flat/em-dash form rather than
   // "NaN%" — documented degenerate behavior (plan/09 edge matrix).
@@ -88,8 +86,8 @@ export function Delta(props: DeltaProps): ReactNode {
       <svg
         className="mc-delta-glyph"
         viewBox="0 0 10 10"
-        width="1em"
-        height="1em"
+        width="0.82em"
+        height="0.82em"
         aria-hidden="true"
       >
         <path d={GLYPH[glyphKey]} />

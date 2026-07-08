@@ -6,7 +6,34 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
+// Apex = the lone y among the triangle's three vertices; base = the repeated y.
+// In viewBox y-down space, apex above base (apexY < baseY) points up, and below
+// (apexY > baseY) points down. Guards against the up/down glyph pointing the
+// wrong way (both once shared the same downward triangle).
+function apexPointsUp(pathD: string): boolean {
+  const ys = [...pathD.matchAll(/-?\d+(?:\.\d+)?/g)]
+    .map((m) => Number(m[0]))
+    .filter((_, i) => i % 2 === 1); // y is every 2nd number in "x y" pairs
+  const counts = new Map<number, number>();
+  for (const y of ys) counts.set(y, (counts.get(y) ?? 0) + 1);
+  const apex = [...counts].find(([, c]) => c === 1)?.[0];
+  const base = [...counts].find(([, c]) => c > 1)?.[0];
+  return apex !== undefined && base !== undefined && apex < base;
+}
+
 describe("<Delta> (plan/05 S4, plan/08)", () => {
+  it("up glyph points up and down glyph points down (honest direction)", () => {
+    const up = draw(<Delta value={0.1} />)
+      .container.querySelector(".mc-delta path")!
+      .getAttribute("d")!;
+    const down = draw(<Delta value={-0.1} />)
+      .container.querySelector(".mc-delta path")!
+      .getAttribute("d")!;
+    expect(up).not.toBe(down);
+    expect(apexPointsUp(up)).toBe(true);
+    expect(apexPointsUp(down)).toBe(false);
+  });
+
   it("positive value → up glyph, positive valence, signed percent", () => {
     const { container } = draw(<Delta value={0.124} />);
     const el = container.querySelector(".mc-delta")!;

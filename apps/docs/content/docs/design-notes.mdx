@@ -1,0 +1,37 @@
+---
+title: Design notes
+description: The reasoning behind microcharts' defaults — why there are no axes or legends, why areas anchor at zero, why color encodes and never decorates, and why every chart stays small.
+---
+
+microcharts has opinions, and they're baked into the defaults so you rarely have to think
+about them. Here's the reasoning, in case you're curious.
+
+## Direct labels beat chrome
+
+At this size, an axis, a legend, and a gridline all cost more ink than they return. So there
+are none. A value sits at the end of the line; a min and max mark themselves. The chart is
+almost all data.
+
+## Areas anchor at zero
+
+A filled Sparkline always measures from zero, because an area that floats on an arbitrary
+baseline exaggerates change. Length should mean magnitude, honestly.
+
+## Color encodes, never decorates
+
+There is one accent per context, and a color change always means a meaning change. Positive
+and negative come from a color-blind-safe pair, and they're always doubled by a glyph or a
+position so the chart survives without color at all.
+
+## Small is a material, not a limit
+
+Composition, contrast, and the auto-summary all have to survive the smallest supported size.
+That constraint is what makes the charts calm: there's no room for anything that isn't
+carrying information.
+
+## What we don't ship
+
+No pie, no gauge, no 3-D, no gradients-as-decoration, no drop shadows on data, no looping
+animation. These aren't theme options you can switch on — they're designed out, because at a
+glance they mislead more than they inform. Where a rejected chart answered a real question,
+the catalog ships a faster replacement.

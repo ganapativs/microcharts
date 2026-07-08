@@ -245,7 +245,7 @@ Ship four layers. They serve different tools and should be generated, not manual
 /llms.txt                 curated map, small enough to inspect
 /llms-full.txt            full docs context, generated
 /**/*.md                  Markdown mirror for every docs page
-/microcharts.catalog.json machine-readable chart/API catalog
+/catalog.json machine-readable chart/API catalog
 /microcharts.schema.json  JSON chart spec schema from plan/14
 ```
 
@@ -276,7 +276,7 @@ Use `@microcharts/react` for React. Import individual charts from subpaths, for 
 
 ## Machine Interfaces
 
-- [Chart catalog JSON](https://microcharts.dev/microcharts.catalog.json): chart names, import paths, props, examples, and data shapes.
+- [Chart catalog JSON](https://microcharts.dev/catalog.json): chart names, import paths, props, examples, and data shapes.
 - [Chart spec JSON Schema](https://microcharts.dev/microcharts.schema.json): schema for AI and URL-rendered charts.
 
 ## Optional
@@ -339,11 +339,11 @@ By default, the chart renders as an image with a deterministic text summary. Use
 
 ### 5.3 Machine Catalog
 
-Generate `microcharts.catalog.json` from the same chart registry used by docs navigation and package exports.
+Generate `catalog.json` from the same chart registry used by docs navigation and package exports.
 
 ```json
 {
-  "$schema": "https://microcharts.dev/microcharts.catalog.schema.json",
+  "$schema": "https://microcharts.dev/catalog.schema.json",
   "package": "@microcharts/react",
   "version": "1.0.0",
   "charts": [
@@ -450,7 +450,7 @@ https://microcharts.dev/.well-known/mcp/catalog.json
 
 Rules:
 
-- MCP server must use the same `microcharts.catalog.json` and `microcharts.schema.json` as the docs.
+- MCP server must use the same `catalog.json` and `microcharts.schema.json` as the docs.
 - MCP server must not require auth for public docs/spec rendering.
 - MCP server must not invent chart props. It validates against schema and returns errors.
 - MCP server must include server metadata/discovery only after the MCP server-card shape stabilizes enough for real clients.
@@ -694,7 +694,7 @@ README requirements:
 - "Why microcharts" bullets with receipts only: zero deps, RSC-safe static entries, accessible summaries, per-chart subpaths.
 - Import path table.
 - Link to docs with UTM.
-- Link to `/llms.txt` and `/microcharts.catalog.json`.
+- Link to `/llms.txt` and `/catalog.json`.
 - Dogfood chart-as-URL badge once `microcharts/string` exists.
 
 GitHub requirements:
@@ -895,7 +895,7 @@ P2 after first traction:
 - Implement JSON-LD helpers for breadcrumbs, TechArticle, and source/package pages.
 - Generate `sitemap.xml`, `image-sitemap.xml`, and `robots.txt`.
 - Generate `/llms.txt`, `/llms-full.txt`, and `.md` mirrors.
-- Generate `microcharts.catalog.json` from chart registry and validate against exports.
+- Generate `catalog.json` from chart registry and validate against exports.
 - Publish `microcharts.schema.json` for the plan/14 chart spec once implemented.
 - Add metadata/link/JSON-LD tests for built docs routes.
 - Create OG image template and at least route-specific images for launch pages.

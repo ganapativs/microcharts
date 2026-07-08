@@ -1,0 +1,111 @@
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Provider } from "@/components/provider";
+import { SITE } from "@/lib/site";
+import { jsonLdScript, softwareSourceCodeJsonLd, websiteJsonLd } from "@/lib/jsonld";
+import "./global.css";
+
+// Hanken Grotesk — crisp, compact humanist body/UI (narrower than Instrument
+// Sans). Excellent tabular numerals for the charts to inherit.
+const sans = Hanken_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-sans-src",
+  display: "swap",
+});
+
+// Bricolage Grotesque — an expressive, optical display grotesque with genuine
+// character (the "handcrafted" voice). Distinct from the serif-heavy AI
+// editorial pack; carries the big hero + section headings.
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display-src",
+  display: "swap",
+});
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono-src",
+  display: "swap",
+});
+
+// No-flash appearance: apply the saved accent + chart preset before first paint.
+const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem("mc-accent");if(a&&a!=="cobalt")d.dataset.accent=a;var p=localStorage.getItem("mc-preset");if(p&&p!=="modern")d.dataset.mcPreset=p}catch(e){}`;
+
+// A quiet hello for the curious dev who opens the console — real product facts,
+// not filler. Fires once per full load; the wordmark carries the accent.
+const CONSOLE_SCRIPT = `try{console.log("%c${SITE.name}%c\\n${SITE.tagline}\\nZero dependencies, ~1 kB gzip per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#2f52d4;font-weight:700;font-size:13px","color:#8a8a8a;font-size:11px;line-height:1.6")}catch(e){}`;
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: `${SITE.name} — ${SITE.tagline}`,
+    template: `%s · ${SITE.name}`,
+  },
+  description: SITE.description,
+  applicationName: SITE.name,
+  authors: [{ name: SITE.author, url: SITE.authorUrl }],
+  creator: SITE.author,
+  publisher: SITE.author,
+  keywords: [
+    "react charts",
+    "sparkline",
+    "microchart",
+    "accessible charts",
+    "zero dependency",
+    "rsc",
+    "svg charts",
+    "tiny chart",
+    "dataviz",
+  ],
+  alternates: { canonical: "/" },
+  // Crisp env-aware SVG favicon (app/brand/icon.svg); apple-touch icon is the
+  // generated PNG (app/apple-icon.tsx) via its file convention.
+  icons: { icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }] },
+  openGraph: {
+    type: "website",
+    siteName: SITE.name,
+    title: `${SITE.name} — ${SITE.tagline}`,
+    description: SITE.description,
+    url: SITE.url,
+    images: [{ url: "/og/default.png", width: 1200, height: 630, alt: SITE.ogImageAlt }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: SITE.authorXHandle,
+    creator: SITE.authorXHandle,
+    title: `${SITE.name} — ${SITE.tagline}`,
+    description: SITE.description,
+    images: ["/og/default.png"],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#e9edf4" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0b0f" },
+  ],
+};
+
+export default function Layout({ children }: LayoutProps<"/">) {
+  return (
+    <html
+      lang="en"
+      className={`${sans.variable} ${display.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="flex flex-col min-h-screen font-sans antialiased">
+        <script dangerouslySetInnerHTML={{ __html: ACCENT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: CONSOLE_SCRIPT }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(softwareSourceCodeJsonLd()) }}
+        />
+        <Provider>{children}</Provider>
+      </body>
+    </html>
+  );
+}

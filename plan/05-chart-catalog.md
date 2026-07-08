@@ -1,6 +1,7 @@
 # 05 — Chart Catalog
 
 > Status: v2 (final-pass expanded) · Inputs: taxonomy research (Tufte/Few sources, Datadog/Stripe/MUI/GitHub evidence)
+> **EXPANDED 2026-07-08:** +2 research-validated core types (#35 MicroScatter, #36 LikertStrip — see §3 and [12-research-audit.md](12-research-audit.md) §2026-07-08 catalog-expansion entry) → core = 36, full catalog = **100** with docs 16 (+IconArray = 21) / 15 (22) / 17 (+ConfusionGrid = 21). Buildout: [21-full-catalog-buildout.md](21-full-catalog-buildout.md).
 > Defines: the v1 five, the 34-type core catalog (96 total with docs `16`/`15`/`17`), and the four common-path data shapes that keep everyday APIs small.
 > Visual reference: **[chart-gallery.html](chart-gallery.html)** — every type rendered in the design language.
 
@@ -30,7 +31,7 @@ Chosen by usage evidence (Stripe metric cards, Datadog widgets, MUI X sparkline,
 
 v1 proves: shared grammar across all four data shapes (S1×2, S4×2, plus band), SSR-static rendering, animation system, theming system, a11y system — on real, high-demand components.
 
-## 3. Full catalog — 34 core chart types (v1 five → v2/v3 buildout)
+## 3. Full catalog — 36 core chart types (34 + 2 added 2026-07-08; v1 five → pre-launch buildout per plan/21)
 
 Distinct chart *types* (not prop variants), all micro-viable. Roadmap bakes all 34 in (+20 decision in `16`, +22 expressive in `15`, +20 frontier in `17` → **96 total**); the architecture (shared geometry/math core, one prop grammar, specialized data records only when earned) is what makes a hundred-type future possible without becoming a junk drawer.
 
@@ -88,10 +89,20 @@ Distinct chart *types* (not prop variants), all micro-viable. Roadmap bakes all 
 | 33 | **Calendar strip** | 7×7/wk | week-shaped recent activity |
 | 34 | **Event timeline / span strip** | 80×12 | durations + events on a row (mini-gantt: uptime windows, on-call shifts, release spans) |
 
+### Relationship — paired values, unordered (S1-XY) — 1 type (ADDED 2026-07-08)
+| # | Component | Min footprint | What it uniquely shows |
+|---|---|---|---|
+| 35 | **MicroScatter** | 40×24 | are these two variables related? — plain point cloud (≤ ~60 points), optional focal-point accent. The one classical form the catalog missed: scatterplots are the highest-precision correlation display (Harrison et al. InfoVis 2014, Weber-law ranking; Rensink & Baldridge 2010). Distinct from QuadrantDot (one value judged against a field) and PhaseTrace (time-connected trajectory). |
+
+### Part-to-whole addition (ADDED 2026-07-08)
+| # | Component | Min footprint | What it uniquely shows |
+|---|---|---|---|
+| 36 | **LikertStrip** | 60×12 | agreement/sentiment balance — diverging stacked bar centered on neutral (counts diverge left/right of a zero line, graded ink toward the poles, neutral split at center and labeled). The recommended display for Likert-scale data (Heiberger & Robbins, J. Stat. Software 57(5)); known neutral-handling critique (Datawrapper) addressed by explicit neutral split + direct labels. Distinct from SegmentedBar (composition without valence or center). |
+
 ### Composite helpers (not counted as types)
 `<SparkGroup>` shared-scale provider (small multiples, kills the per-row auto-scaling bug) · annotation layer (`<Threshold>`, `<Marker>`, `<TargetZone>`, `<Callout>`, and `<Marker celebrate>` — the relocated confetti moment: particle burst on milestone crossing, earned only) working identically inside every S1/S2 chart. Stacked-area micro takes a `style="ridge"` variant (the relocated MountainRidges look).
 
-**Beyond 96**: the grammar + core scale to hundreds of types (community + demand-driven: recurrence plot, micro radar, ridge strip, compass…). Bar for admission stays fixed: earns its keep at ≤ 200×60 px, unique data story, passes the design principles. A public "chart proposals" template channels demand.
+**Beyond 100**: the grammar + core scale to hundreds of types (community + demand-driven: recurrence plot, micro radar, ridge strip, compass…). Bar for admission stays fixed: earns its keep at ≤ 200×60 px, unique data story, passes the design principles. A public "chart proposals" template channels demand. (2026-07-08: four candidates cleared this bar with cited research and joined the catalog — MicroScatter, LikertStrip here; IconArray in doc 16; ConfusionGrid in doc 17. Beeswarm/strip-plot, compass, micro-Sankey, and micro-ECDF were evaluated the same day and did NOT clear it — overlap or read-back failures; see plan/12.)
 
 ## 4. Not shipping (summary)
 

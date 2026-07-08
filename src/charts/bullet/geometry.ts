@@ -50,7 +50,7 @@ export function bulletGeometry(opts: BulletGeometryOptions): BulletGeometry {
   const track = { x: x0, width: round2(x1 - x0), y: round2(trackY), height: round2(trackH) };
 
   // Bands: [min..t1], [t1..t2], …, [tk..max]. Ascending, clamped, de-duped.
-  const thresholds = bands.filter((t) => t > min && t < max).toSorted((a, b) => a - b);
+  const thresholds = bands.filter((t) => t > min && t < max).sort((a, b) => a - b);
   const edges = [min, ...thresholds, max];
   const regions: BulletRegion[] = [];
   for (let i = 0; i < edges.length - 1; i++) {

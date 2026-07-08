@@ -2,7 +2,7 @@
 
 > Status: v2 — consolidated after editorial review (was 35; cut ledger at bottom).
 > The test each survivor passed: **(a)** a sighted stranger can read the value back without training, **(b)** the encoding channel is honest and documented, **(c)** it tells a data story no core chart tells, **(d)** a senior designer would respect it, not roll eyes.
-> Ships as **`@microcharts/expressive`** — same grammar, tokens, a11y summaries, and budgets as core.
+> ~~Ships as `@microcharts/expressive`~~ — **PACKAGING REVERSED 2026-07-08 ([21-full-catalog-buildout.md](21-full-catalog-buildout.md) §0): ships INSIDE `@microcharts/react` as flat subpaths, pre-launch (Batch 3, [24](24-batch-3-expressive.md)).** The separate-package rationale was re-audited: it was marketing/timing framing, never technical (grammar, tokens, a11y summaries, and budgets were always identical to core; subpath exports already give per-type tree-shaking). Collection identity survives as catalog metadata.
 
 ## Typographic — the text is the chart (2)
 

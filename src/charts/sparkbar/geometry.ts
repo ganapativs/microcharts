@@ -7,6 +7,19 @@ import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
 export type SparkBarMode = "bar" | "winloss";
 
+/** Endpoint-label metrics, anchored (never measures text — unmeasurable
+ *  server-side). fontSize in viewBox units; gutter over-estimates width so the
+ *  label never overruns. Kept local to avoid bundling the Sparkline. */
+export function labelMetrics(
+  text: string,
+  width: number,
+  height: number,
+): { fontSize: number; gutter: number } {
+  const fontSize = Math.max(6, Math.min(Math.round(height * 0.5), 11));
+  const gutter = Math.min(Math.ceil(text.length * fontSize * 0.62) + 6, Math.floor(width * 0.45));
+  return { fontSize, gutter };
+}
+
 /** One placed bar. `sign` drives valence color; `gap` bars (null data) are dropped. */
 export interface Bar {
   x: number;
@@ -33,18 +46,21 @@ export interface SparkBarGeometryOptions {
   /** Fraction of each slot left empty between bars (0–0.9). */
   gap?: number | undefined;
   pad?: number | undefined;
+  /** Reserve plot width on the right for a direct value label, so bars never sit
+   *  under it (mirrors the Sparkline). */
+  gutterRight?: number | undefined;
 }
 
 export function sparkBarGeometry(
   data: readonly Value[],
   opts: SparkBarGeometryOptions,
 ): SparkBarGeometry {
-  const { width, height, mode = "bar", gap = 0.25, pad = 1 } = opts;
+  const { width, height, mode = "bar", gap = 0.25, pad = 1, gutterRight = 0 } = opts;
   const x0 = pad;
   const y0 = pad;
   const y1 = height - pad;
   const n = data.length;
-  const slot = n > 0 ? (width - pad * 2) / n : 0;
+  const slot = n > 0 ? Math.max(0, width - pad * 2 - gutterRight) / n : 0;
   const barW = round2(Math.max(0.5, slot * (1 - gap)));
   const inset = (slot - barW) / 2;
 

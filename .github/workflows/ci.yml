@@ -51,7 +51,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Pin React ${{ matrix.react }}
-        run: pnpm add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
+        # -w: the repo became a pnpm workspace when apps/* was added, so pnpm 11
+        # requires an explicit workspace-root flag to add the React-matrix pin to
+        # the root (lib) package (ERR_PNPM_ADDING_TO_ROOT otherwise).
+        run: pnpm add -D -w react@${{ matrix.react }} react-dom@${{ matrix.react }}
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
 

@@ -1,0 +1,14 @@
+{
+  // Cloudflare Workers Static Assets deploy for the static-exported docs site.
+  // No Worker code — Cloudflare serves ./out directly from the edge.
+  //   pnpm --filter @microcharts/docs cf:deploy
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "microcharts-docs",
+  "compatibility_date": "2025-07-01",
+  "assets": {
+    "directory": "./out",
+    // Static export emits per-route index.html + a top-level 404.html.
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+  },
+}

@@ -1,4 +1,6 @@
-# 17 — The Frontier Collection (20 types)
+# 17 — The Frontier Collection (21 types)
+
+> **EXPANDED 2026-07-08:** +F21 ConfusionGrid (AI-era section; research-validated — see plan/12 catalog-expansion entry). Full catalog now 100 (plan/21).
 
 > Status: draft v2 · Fourth catalog, from dedicated cross-domain research cycles (2026-07-06). The thesis: **entire professions standardized brilliant micro data displays that chart libraries rarely absorb** — aviation, medicine, meteorology, audio, trading, AI tooling, observability, dynamical systems. These would surprise expert chart-UX designers because they come from outside the usual web-chart canon.
 > Admission bar unchanged: honest documented channel, read-back without training (or with a 1-line key), ≤ 200×60 px, unique data story. Ships across core/v2 per roadmap note below.
@@ -30,10 +32,11 @@
 | F10 | **MinimapStrip** | VS Code minimap / game minimaps | Content-thumbnail + **viewport window** + annotation-tick lane in one strip: position-in-the-whole for long documents, timelines, logs. Fog-of-war convention adopted for unknown regions (absence ≠ zero) |
 | F11 | **StarSpoke** | Star-glyph research (validated: contour-free wins for outlier/similarity tasks; Chernoff faces confirmed dead) | 4–6 spokes, length = value, no contour polygon — the honest dense multi-variable glyph for comparing entity profiles at a glance |
 
-## From the AI era (3)
+## From the AI era (4 — F21 added 2026-07-08)
 
 | # | Type | Lineage | What it uniquely does |
 |---|---|---|---|
+| F21 | **ConfusionGrid** (ADDED 2026-07-08) | Confusion-matrix heatmaps — the standard classifier-evaluation display; generalized by Neo (Apple, CHI 2022, arXiv 2110.12536) and ConfusionFlow (TVCG, arXiv 1910.00969) | A k×k labeled agreement matrix at glyph scale (2×2 default, ≤ 4×4): rows = actual, columns = predicted, cell ink = count share, **diagonal = agreement, accented**; off-diagonal cells show exactly *where the errors go* — the one thing accuracy-as-a-number hides. Generalizes beyond ML to any paired-classification agreement (triage vs outcome, plan vs actual category, A-rater vs B-rater). Sibling of CalibrationStrip (trust the probability) and RubricStrip (don't collapse quality): ConfusionGrid = don't collapse *errors*. Micro rules: counts normalized per-row by default (documented), raw-count mode available, k > 4 refused (legibility bar), never color-alone (diagonal gets a shape accent) |
 | F12 | **TokenConfidence** | LLM logprob UIs (OpenAI cookbook lineage; discrete-tier finding from 2026 preprint, cited cautiously) | Per-token confidence as a **typographic property** — tinted underlines beneath the text itself. Design rule adopted: discrete tiers ("confident/unsure/guessing"), not a continuous gradient — people calibrate categorically. The text *is* the chart; extends our FillWord family and the AI-native spec (doc 14) |
 | F13 | **RubricStrip** | Model-eval scorecards (LLM Comparator, CHI 2024; Anthropic eval practice) | Weighted multi-criteria mini-bars — bar height ∝ criterion weight, length = score. **Structurally resists collapsing quality into one dishonest number.** Evals, code review, vendor comparison |
 | F14 | **EtaBar** | Streaming-progress gap identified in AI product UX | Progress bar that **re-forecasts honestly**: solid = observed, remainder sized by observed rate (not linear interpolation), ETA label updates as rate changes. The download bar, told truthfully |
@@ -74,8 +77,8 @@ Chernoff/face glyphs (perceptually serial, confirmed dead by 2021+ research) · 
 
 ## Citations
 
-WMO station model · NASA NTRS 19870010832 (tape displays) · Johnson et al. 2019 *Diabetes Technol Ther* (AGP) · Islam et al. CHI 2022 (sleep vis) · ITU-R BS.1770/EBU R128 · Goffin et al. TVCG 2014 + GistVis arXiv:2502.03784 · Graphing Inline arXiv:2603.10533 · He et al. arXiv:2307.10089 + 2508.02639 · Petek et al. arXiv:2508.00937 · NetHOPs arXiv:2108.09870 · LLM Comparator arXiv:2402.10524 · Wood & Isenberg sketchy rendering · TradingView/amCharts depth+profile docs · Apple watchOS HIG complications · Game UI Database · OpenTelemetry Trace API/concepts · Brendan Gregg flame-graph/flame-chart lineage · Toups et al. 2011 event-structure rastergrams + Rastermap 2025 · Guo et al. ICML 2017 reliability diagrams · Kruskal & Landwehr 1983 icicle plots · phase-portrait literature.
+WMO station model · NASA NTRS 19870010832 (tape displays) · Johnson et al. 2019 *Diabetes Technol Ther* (AGP) · Islam et al. CHI 2022 (sleep vis) · ITU-R BS.1770/EBU R128 · Goffin et al. TVCG 2014 + GistVis arXiv:2502.03784 · Graphing Inline arXiv:2603.10533 · He et al. arXiv:2307.10089 + 2508.02639 · Petek et al. arXiv:2508.00937 · NetHOPs arXiv:2108.09870 · LLM Comparator arXiv:2402.10524 · Wood & Isenberg sketchy rendering · TradingView/amCharts depth+profile docs · Apple watchOS HIG complications · Game UI Database · OpenTelemetry Trace API/concepts · Brendan Gregg flame-graph/flame-chart lineage · Toups et al. 2011 event-structure rastergrams + Rastermap 2025 · Guo et al. ICML 2017 reliability diagrams · Kruskal & Landwehr 1983 icicle plots · phase-portrait literature · Neo: generalized confusion-matrix vis, Apple, CHI 2022 (arXiv:2110.12536) + ConfusionFlow (arXiv:1910.00969) (F21, verified 2026-07-08).
 
-**Final catalog: 34 core + 20 decision + 22 expressive + 20 frontier = 96 types.**
+**Final catalog (amended 2026-07-08, plan/21): 36 core + 21 decision + 22 expressive + 21 frontier = 100 types** (originally 34 + 20 + 22 + 20 = 96).
 
 Roadmap note: flagships = TapeGauge, TokenConfidence, TimeInRange, Waveform, Hypnogram, TraceFold, CalibrationStrip (highest usage-breadth). StationGlyph is the halo/marketing piece. Rest demand-driven in v2.x.

@@ -8,7 +8,7 @@
     "src/test/**/*.ts"
   ],
   "project": ["src/**/*.{ts,tsx}"],
-  "ignore": ["fixtures/**"],
-  "ignoreWorkspaces": ["fixtures/*"],
+  "ignore": ["fixtures/**", "apps/**"],
+  "ignoreWorkspaces": ["fixtures/*", "apps/*"],
   "ignoreDependencies": ["@vitest/browser", "fast-check", "@axe-core/playwright"]
 }

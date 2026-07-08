@@ -2,11 +2,16 @@
 // Interactive <SparkBar> (plan/04 §4, plan/08 T2). Keyboard + pointer bar
 // navigation with a polite live readout, roving focus on an HTML overlay. The
 // visual layer matches the static entry; only behavior is layered on.
-import { useCallback, useMemo, useState, type CSSProperties } from "react";
+import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { makeFormatter } from "../../core/format.js";
 import { describeSeries } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
 import { sparkBarGeometry, type Bar, type SparkBarMode } from "./geometry.js";
 import type { SparkBarProps } from "./index.js";
+
+// The SVG fills the focusable wrapper so its box coincides with the wrapper's —
+// the %-positioned hit zones + readout map 1:1 and the chart scales fluidly.
+const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 function barInk(bar: Bar, mode: SparkBarMode, activeIndex: number | null): string {
   if (bar.index === activeIndex) return "accent";
@@ -44,13 +49,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
   const stops = useMemo(() => geo.bars.map((b) => b.index), [geo]);
   const [active, setActive] = useState<number | null>(null);
 
-  const fmt = useMemo(
-    () =>
-      typeof format === "function"
-        ? format
-        : (n: number) => new Intl.NumberFormat(locale, format).format(n),
-    [format, locale],
-  );
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   const move = useCallback(
     (next: number | null) => {
@@ -58,6 +57,28 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
       onPointFocus?.(next);
     },
     [onPointFocus],
+  );
+
+  // ONE listener; nearest bar by x distance to its centre in viewBox space —
+  // never a DOM node per bar (plan/03 §6). Gaps snap to the closest bar.
+  const onPointerMove = useCallback(
+    (e: PointerEvent<HTMLElement>) => {
+      if (geo.bars.length === 0) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      if (r.width === 0) return;
+      const x = ((e.clientX - r.left) / r.width) * width;
+      let best = geo.bars[0]!.index;
+      let bestDist = Infinity;
+      for (const b of geo.bars) {
+        const d = Math.abs(b.x + b.width / 2 - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = b.index;
+        }
+      }
+      if (best !== active) move(best);
+    },
+    [geo, width, active, move],
   );
 
   const onKeyDown = useCallback(
@@ -110,6 +131,8 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
       role="img"
       aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
       onKeyDown={onKeyDown}
+      onPointerMove={onPointerMove}
+      onPointerLeave={() => move(null)}
       onBlur={() => move(null)}
     >
       <svg
@@ -118,6 +141,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         width={width}
         height={height}
         preserveAspectRatio="xMidYMid meet"
+        style={FILL}
         aria-hidden="true"
       >
         {geo.bars.map((bar) => (
@@ -134,22 +158,6 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         ))}
         {children}
       </svg>
-      <span aria-hidden="true" style={{ position: "absolute", inset: 0 }}>
-        {geo.bars.map((bar) => (
-          <span
-            key={bar.index}
-            onPointerEnter={() => move(bar.index)}
-            onPointerLeave={() => move(null)}
-            style={{
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: `${(bar.x / width) * 100}%`,
-              width: `${(bar.width / width) * 100}%`,
-            }}
-          />
-        ))}
-      </span>
       <span
         aria-live="polite"
         style={{
@@ -167,14 +175,8 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         <span
           className="mc-spark-readout"
           style={{
-            position: "absolute",
             left: `${((activeBar.x + activeBar.width / 2) / width) * 100}%`,
-            bottom: "100%",
             transform: "translateX(-50%)",
-            font: "var(--mc-label-size, 0.75em) var(--mc-font, inherit)",
-            fontVariantNumeric: "tabular-nums",
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
           }}
         >
           {fmt(activeValue)}

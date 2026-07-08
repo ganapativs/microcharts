@@ -1,0 +1,15 @@
+{
+  "title": "Docs",
+  "pages": [
+    "index",
+    "quickstart",
+    "charts",
+    "---Guides---",
+    "accessibility",
+    "theming",
+    "performance",
+    "chooser",
+    "ai",
+    "design-notes"
+  ]
+}

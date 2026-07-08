@@ -1,0 +1,163 @@
+---
+title: Theming
+description: Theme microcharts with ~20 CSS custom properties and named presets — override a token at any scope, switch presets with a data attribute, and get hand-tuned dark mode for free.
+---
+
+microcharts theming is CSS custom properties, all the way down. There is no theme provider
+to wire up and no Tailwind requirement — set a `--mc-*` variable at any scope and every
+chart inside it retunes with zero re-render.
+
+## Override a token
+
+```css
+.brand {
+  --mc-accent: #7c3aed;
+  --mc-stroke-width: 2;
+}
+```
+
+Precedence is predictable: a **prop** wins over a **CSS variable scope**, which wins over a
+**preset**, which wins over the built-in default.
+
+<LiveDemo
+  label="Per-instance color"
+  code={`<Sparkline data={data} />
+<Sparkline data={data} color="#7c3aed" />
+<Sparkline data={data} color="var(--mc-positive)" />`}
+>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} title="Default" />
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={110} height={30} color="#7c3aed" title="Custom" />
+  <Sparkline
+    data={[3, 5, 4, 8, 6, 9]}
+    width={110}
+    height={30}
+    color="var(--mc-positive)"
+    title="Token"
+  />
+</LiveDemo>
+
+## Presets
+
+Presets are bundled token sets, applied with a `data-mc-theme` attribute — pure CSS, zero
+JavaScript. They change how charts _look_, never what the data _means_.
+
+<LiveDemo
+  label="Presets"
+  code={`<div data-mc-theme="modern"><Sparkline data={data} dots="minmax" /></div>
+<div data-mc-theme="editorial"><Sparkline data={data} dots="minmax" /></div>
+<div data-mc-theme="vivid"><Sparkline data={data} dots="minmax" /></div>
+<div data-mc-theme="mono"><Sparkline data={data} dots="minmax" /></div>`}
+>
+  <div data-mc-theme="modern">
+    <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="modern" />
+  </div>
+  <div data-mc-theme="editorial">
+    <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="editorial" />
+  </div>
+  <div data-mc-theme="vivid">
+    <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="vivid" />
+  </div>
+  <div data-mc-theme="mono">
+    <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="mono" />
+  </div>
+</LiveDemo>
+
+<Callout type="info">
+  This site's appearance menu (the palette icon in the nav) previews these presets and accents live
+  — every chart on every page retunes as you switch, because it is the same token contract.
+</Callout>
+
+## The token set
+
+Around twenty custom properties cover the whole surface. Set any of them at any scope and
+every chart inside retunes — no re-render, no build step. Here is the full set with its
+defaults, grouped by what it controls and why it exists:
+
+```css
+:root {
+  /* ── Semantic colour — encodes MEANING, never decoration ─────────────── */
+
+  /* Default ink: lines, bars, labels. Dark mode ships a hand-tuned value,
+     not an inversion. */
+  --mc-stroke: #171717;
+
+  /* The "good" direction — a colour-blind-safe green, always paired with a
+     ▲ so meaning never rests on colour alone. */
+  --mc-positive: #009e73;
+
+  /* The "bad" direction — colour-blind-safe vermillion, paired with a ▼. */
+  --mc-negative: #d55e00;
+
+  /* No-signal marks: baselines, inactive points, empty cells. */
+  --mc-neutral: #8a8a8a;
+
+  /* The single emphasis colour — one highlighted series or endpoint.
+     Rebind this to your brand. */
+  --mc-accent: #0072b2;
+
+  /* Normal-range shading, derived from the ink so it always matches. */
+  --mc-band: color-mix(in oklab, var(--mc-stroke) 8%, transparent);
+
+  /* ── Categorical palette — only for the rare multi-series chart ────────
+     Six hues that stay distinguishable across the common colour-vision
+     types AND in greyscale/print. Ordered high-contrast-first, so a 2- or
+     3-series chart reaches for the most separable pair first. */
+  --mc-cat-1: #e69f00;
+  --mc-cat-2: #56b4e9;
+  --mc-cat-3: #009e73;
+  --mc-cat-4: #0072b2;
+  --mc-cat-5: #d55e00;
+  --mc-cat-6: #cc79a7;
+
+  /* ── Geometry — treats size as a design material ───────────────────────*/
+
+  /* Hairline by default so a chart reads at text weight inline; bump to
+     ~2 when it stands alone. */
+  --mc-stroke-width: 1;
+
+  /* Endpoint / extrema dot radius, in viewBox units. */
+  --mc-dot-size: 2;
+
+  /* Bar corner radius — 0 keeps rectilinear marks crisp. */
+  --mc-radius: 0;
+
+  /* Spacing between grouped marks; em-based so it scales with the font. */
+  --mc-gap: 0.25em;
+
+  /* Direct-label text size, relative to the chart's font. */
+  --mc-label-size: 0.75em;
+
+  /* ── Motion & type — applied only where it earns its place ─────────────*/
+
+  /* Entrance timing for interactive entries; static charts never animate
+     (zero client JS). */
+  --mc-duration: 300ms;
+
+  /* Ease-out: marks decelerate into place, never bounce or loop. */
+  --mc-easing: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Charts borrow your UI font + tabular numerals by default; pin a family
+     here to override. */
+  --mc-font: inherit;
+
+  /* ── Interactive readout surface — the only opaque plane a mark sits on ──
+     The value chip shown on hover/focus. Defaults to the system canvas so it
+     adapts with no config; point these at your popover tokens to match a
+     themed surface. */
+  --mc-surface: Canvas;
+  --mc-surface-ink: CanvasText;
+  --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);
+}
+```
+
+Two rules make this predictable. **Semantic tokens keep their meaning** — swapping `--mc-accent`
+retints the emphasis colour, but `--mc-positive`/`--mc-negative` still mean up and down, so a
+preset can restyle a chart without ever changing what it says. And **every token has a
+hand-tuned dark value** (never auto-inverted — see [Dark mode](#dark-mode)), so overriding one
+light value doesn't quietly break the dark surface.
+
+## Dark mode
+
+Dark values are hand-tuned per token — never auto-inverted. microcharts follows
+`prefers-color-scheme` out of the box, and you can force a scope with `data-mc-theme="dark"`.
+Charts never paint their own background, so they always sit cleanly on your surface.

@@ -55,12 +55,12 @@ describe("MicroProvider (theming, plan/06)", () => {
 
   it("applies a preset and one-off token overrides", () => {
     const { container } = render(
-      <MicroProvider theme="tufte" tokens={{ "--mc-accent": "#f50" }}>
+      <MicroProvider theme="editorial" tokens={{ "--mc-accent": "#f50" }}>
         x
       </MicroProvider>,
     );
     const el = container.firstElementChild as HTMLElement;
-    expect(el.getAttribute("data-mc-theme")).toBe("tufte");
+    expect(el.getAttribute("data-mc-theme")).toBe("editorial");
     expect(el.style.getPropertyValue("--mc-accent")).toBe("#f50");
   });
 });

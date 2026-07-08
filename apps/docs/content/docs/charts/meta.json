@@ -1,0 +1,4 @@
+{
+  "title": "Charts",
+  "pages": ["index", "sparkline", "sparkbar", "delta", "bullet", "activity-grid"]
+}

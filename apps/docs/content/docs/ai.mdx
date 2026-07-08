@@ -1,0 +1,59 @@
+---
+title: AI-native
+description: microcharts is built to be read and written by machines as well as people — a stream-friendly chart grammar, a generated catalog, Markdown mirrors, and llms.txt so LLMs and agents get the API right.
+---
+
+Every chart's accessible summary is plain text generated from the data, so microcharts is
+unusually legible to machines. The same sentence a screen reader announces is the one a search
+crawler indexes and an LLM can quote — and the components are simple enough that a model can
+emit them correctly without a schema in front of it.
+
+## Render charts from a model stream
+
+A model can describe a chart in a compact fenced block. The block names a chart type on the
+info string; the body is whitespace-separated numbers, or `key=value` pairs for the composite
+charts. It is deliberately forgiving — the kind of thing a model produces reliably mid-stream.
+
+````text
+```chart sparkline
+132 148 141 165 159 182 176 203
+```
+````
+
+The composite charts take named fields:
+
+````text
+```chart bullet
+value=72 target=80 bands=50,90
+```
+````
+
+The [home page](/) renders exactly this grammar live: a scripted reply streams in, and each
+block morphs into a real, accessible chart the moment its fence closes. Mapping a parsed block
+to a component is a few lines — read the type, split the body, and hand the values to the
+matching import (`sparkline`, `sparkbar`, `bullet`, `delta`, `activity-grid`).
+
+<Callout type="info">
+  A first-class JSON chart spec and a React-free string renderer are on the roadmap, so charts can
+  be validated and rendered to SVG outside React — for READMEs, emails, and chat blocks. Until then
+  the grammar above is a stable convention and the surfaces below are the contract.
+</Callout>
+
+## Machine-readable surfaces
+
+- **[`/llms.txt`](/llms.txt)** — a curated map of the docs for LLM tools, with explicit "does
+  not support" notes to head off hallucinations.
+- **[`/llms-full.txt`](/llms-full.txt)** — the full docs as one generated text file.
+- **[`/catalog.json`](/catalog.json)** — every chart's name, import
+  paths, data shape, and props, generated from the same registry the site is built from.
+- **`.md` mirrors** — append `.md` to any docs page for a clean Markdown copy.
+
+## Getting the API right
+
+An agent generating microcharts code should:
+
+1. Use the package `@microcharts/react`.
+2. Import each chart from its own subpath — `@microcharts/react/sparkline`, and add
+   `/interactive` for hover and keyboard.
+3. Keep static charts hook-free — they're valid inside React Server Components.
+4. Never add a runtime dependency, and never reach for a pie or gauge — they aren't shipped.
