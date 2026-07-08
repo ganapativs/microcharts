@@ -809,3 +809,28 @@ same side), WE-4 (8 on one side); WE-3 excluded at micro scale (flag density = n
 Gates: node 1220, browser 88, craft 244/0, size 2.68/3.56, bench 51 rows/ms (floor 12), docs 180
 pages + tests 100, real-browser sweep green (band faint, out-points ringed-neg, all-dots, dashed
 provisional band all confirmed; readout chip "73" visible, out-points announce the crossed limit).
+
+## Batch 2 wave 2 — ForecastCone (2026-07-09)
+
+**ForecastCone (plan/23 #11) — full DoD, static + interactive.** Provenance: plan/16 §Q1. The
+three honesty rules are enforced, not offered: ≤ 2 bands (a 95% band reads as false tail
+confidence at micro scale), median always dashed (an estimate never renders as fact), and a
+non-widening cone is flagged (`widening: false`, property-tested) and rendered AS GIVEN — never
+auto-inflated. Reversed `[hi,lo]` pairs swapped; empty history → cone-only cell.
+
+**Deviations / decisions:**
+- **`softEdge` and `curve` variants DEFERRED** (plan §11 lists them, shared vocab). They are
+  cosmetic — the chart's honesty rules (bands/dashed/widening) are all implemented, and history
+  is linear + the outer band is a hard-edged polygon. Adding a soft halo + smooth/step history
+  costs size/complexity for no decision value at micro scale. Logged here; add later if wanted.
+- **Clearance polarity = higher-is-target** (band lo ≥ target → clears, hi ≤ target → misses,
+  else straddles). No polarity prop; documented. A "stay under" threshold reads inverted — a
+  `positive` prop could refine it later.
+- **Static budget 2.83 kB > spec §11 target 2.5** (two band polygons + history + dashed mid +
+  strings), interactive 3.71 kB (spec 3.5). Under 3/4 hard caps. Same budget-floor class.
+
+Gates: node 1246, browser 90, craft 256/0, size 2.83/3.71, bench 23.2 rows/ms (floor 10), docs
+183 pages + tests 102, real-browser sweep green (nested bands 0.13/0.24, dashed accent median,
+region-aware announce + readout chip "42 · 33–55" confirmed). NOTE: graded-band/micro-donut/ohlc
+bench floors flake under machine load (dev server + parallel builds) — environmental, they pass
+clean; the calibrated ~half-baseline floors are a touch tight for a loaded machine.

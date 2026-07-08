@@ -405,4 +405,16 @@ export const SCENARIOS = [
     floor: 12, // band + line + per-point out-test + MR estimator
     props: (i) => ({ data: rugs[i % POOL].map((v) => v * 10 + 40), rules: "we", summary: false }),
   },
+  {
+    slug: "forecast-cone",
+    component: "ForecastCone",
+    floor: 10, // 2 band polygons + history + mid — few nodes, per-point loop
+    props: (i) => {
+      const src = rugs[i % POOL];
+      const hist = src.slice(0, 20).map((v) => v * 5 + 30);
+      const mid = src.slice(20).map((v) => v * 5 + 42);
+      const p80 = mid.map((v, j) => [v - 4 - j, v + 4 + j]);
+      return { data: hist, forecast: { mid, p80 }, summary: false };
+    },
+  },
 ];

@@ -25,6 +25,7 @@ import { EN_RETENTION } from "./strings-retention.js";
 import { EN_BURN } from "./strings-burn.js";
 import { EN_ERROR_BUDGET } from "./strings-error-budget.js";
 import { EN_CONTROL } from "./strings-control.js";
+import { EN_FORECAST } from "./strings-forecast.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -50,4 +51,5 @@ export const EN: SummaryStrings = {
   ...EN_BURN,
   ...EN_ERROR_BUDGET,
   ...EN_CONTROL,
+  ...EN_FORECAST,
 };

@@ -319,6 +319,21 @@ export interface SummaryStrings {
     side: "upper" | "lower" | null,
     limit: string,
   ) => string;
+  /** Forecast summary, e.g. "Median forecast 42 by week 14 (80% between 33 and 55), from 38 today." */
+  forecast: (
+    mid: string,
+    at: number,
+    unit: string,
+    lo: string,
+    hi: string,
+    now: string | null,
+  ) => string;
+  /** Clearance clause, e.g. " The 80% band clears the 45 target." */
+  forecastClearance: (status: "clears" | "straddles" | "misses", target: string) => string;
+  /** History-region announcement, e.g. "Week 9: 38." */
+  forecastAtHistory: (unit: string, period: number, value: string) => string;
+  /** Forecast-region announcement, e.g. "Week 14 (forecast): median 42, 80% between 33 and 55." */
+  forecastAtForecast: (unit: string, period: number, mid: string, lo: string, hi: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

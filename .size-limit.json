@@ -515,6 +515,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/forecast-cone (static)",
+    "path": "dist/charts/forecast-cone/index.js",
+    "limit": "2.95 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/forecast-cone/interactive",
+    "path": "dist/charts/forecast-cone/client.js",
+    "limit": "3.85 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

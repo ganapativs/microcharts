@@ -185,6 +185,10 @@
     "control-strip": {
       "static": "2.8 kB",
       "interactive": "3.7 kB"
+    },
+    "forecast-cone": {
+      "static": "2.95 kB",
+      "interactive": "3.85 kB"
     }
   }
 }

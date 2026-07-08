@@ -47,6 +47,7 @@
     "retention-curve",
     "burn-chart",
     "error-budget",
-    "control-strip"
+    "control-strip",
+    "forecast-cone"
   ]
 }

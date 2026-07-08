@@ -55,6 +55,7 @@ import retentionCurve from "./retention-curve";
 import burnChart from "./burn-chart";
 import errorBudget from "./error-budget";
 import controlStrip from "./control-strip";
+import forecastCone from "./forecast-cone";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -102,6 +103,7 @@ const MODULES: ChartModule[] = [
   burnChart,
   errorBudget,
   controlStrip,
+  forecastCone,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

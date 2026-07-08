@@ -21,6 +21,7 @@ const { RetentionCurve } = await D("retention-curve");
 const { BurnChart } = await D("burn-chart");
 const { ErrorBudget } = await D("error-budget");
 const { ControlStrip } = await D("control-strip");
+const { ForecastCone } = await D("forecast-cone");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -75,6 +76,8 @@ const BACT = [40, 35, 31, 27, 24, 21];
 const EB = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
 const EBURN = [1, 0.82, 0.6, 0.38, 0.18, 0.04, 0];
 const CTRL = [74,73,75,74,76,73,74,75,74,73,82,74,75,73,74,76,74,73,75,74,66,74,75,74,73,76,74,75,74,73];
+const FCH = [30, 32, 31, 34, 36, 35, 38];
+const FCF = { mid: [39, 40, 41, 42], p80: [[36, 42], [35, 45], [34, 50], [33, 55]], p50: [[37, 41], [37, 43], [36, 46], [35, 49]] };
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -209,6 +212,12 @@ const body = [
   row("we rules", svg(ControlStrip, { data: CTRL, rules: "we", width: 240, height: 24 })),
   row("all dots", svg(ControlStrip, { data: CTRL, dots: "all", width: 240, height: 24 })),
   row("provisional", svg(ControlStrip, { data: CTRL.slice(0,6), width: 240, height: 24 })),
+
+  `<h2>ForecastCone</h2>`,
+  row("default 80x20", svg(ForecastCone, { data: FCH, forecast: FCF, width: 80, height: 20 })),
+  row("target", svg(ForecastCone, { data: FCH, forecast: FCF, target: 45, width: 240, height: 28 })),
+  row("single band", svg(ForecastCone, { data: FCH, forecast: { mid: FCF.mid, p80: FCF.p80 }, width: 240, height: 28 })),
+  row("cone only", svg(ForecastCone, { data: [], forecast: FCF, width: 240, height: 28 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

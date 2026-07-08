@@ -380,6 +380,14 @@
       "types": "./dist/charts/control-strip/client.d.ts",
       "import": "./dist/charts/control-strip/client.js"
     },
+    "./forecast-cone": {
+      "types": "./dist/charts/forecast-cone/index.d.ts",
+      "import": "./dist/charts/forecast-cone/index.js"
+    },
+    "./forecast-cone/interactive": {
+      "types": "./dist/charts/forecast-cone/client.d.ts",
+      "import": "./dist/charts/forecast-cone/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

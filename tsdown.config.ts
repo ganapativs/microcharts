@@ -99,6 +99,8 @@ export default defineConfig({
     "src/charts/error-budget/client.tsx",
     "src/charts/control-strip/index.tsx",
     "src/charts/control-strip/client.tsx",
+    "src/charts/forecast-cone/index.tsx",
+    "src/charts/forecast-cone/client.tsx",
   ],
   format: ["esm"],
   dts: true,

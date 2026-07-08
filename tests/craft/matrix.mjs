@@ -516,6 +516,37 @@ add(
 const BURN = { plan: [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0], actual: [40, 38, 36, 34, 32, 30] };
 const EB = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
 const CTRL = [10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16, 10, 9, 11, 10];
+const FC_HIST = [30, 32, 31, 34, 36, 35, 38];
+const FC_FORE = {
+  mid: [39, 40, 41, 42],
+  p80: [
+    [36, 42],
+    [35, 45],
+    [34, 50],
+    [33, 55],
+  ],
+  p50: [
+    [37, 41],
+    [37, 43],
+    [36, 46],
+    [35, 49],
+  ],
+};
+add(
+  "forecast-cone",
+  "ForecastCone",
+  [
+    { data: FC_HIST, forecast: FC_FORE },
+    { data: FC_HIST, forecast: { mid: FC_FORE.mid, p80: FC_FORE.p80 } },
+    { data: FC_HIST, forecast: FC_FORE, target: 45 },
+    { data: FC_HIST, forecast: FC_FORE, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
 add(
   "control-strip",
   "ControlStrip",
