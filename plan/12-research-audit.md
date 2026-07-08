@@ -304,3 +304,10 @@ with a `$pending` note so CI stays green and the exception is impossible to miss
 (a) bless a documented flagship exception (recommendation — sparkline is the feature-dense flagship;
 every other chart sits well under its cap), (b) drop `label="minmax"` (−≈180 B → ≈3 140, still over),
 (c) both features out (back to 2 965). Decision goes back into size-budgets.json + this entry.
+
+**ActivityGrid budget adjustment (2026-07-08, Batch 0.D — within model caps, no gate conflict):**
+`shape` variant + calendar-alignment retrofit measured 2 037 B static / 3 175 B interactive
+(was 1 677/2 762). Per-chart budgets in `scripts/size-budgets.json` raised 2→2.1 kB and
+3→3.25 kB — both far inside the 3/4 kB model hard caps. Note: the interactive−static delta was
+already over the "+1 kB" guideline before Batch 0 (1 085 B); the absolute per-chart budgets are
+the enforced contract (plan/21 §1 table is per-subpath).

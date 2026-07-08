@@ -7,6 +7,6 @@
     "sparkbar": { "static": "3 kB", "interactive": "4 kB" },
     "delta": { "static": "1.5 kB", "interactive": "2 kB" },
     "bullet": { "static": "2 kB", "interactive": "2.5 kB" },
-    "activity-grid": { "static": "2 kB", "interactive": "3 kB" }
+    "activity-grid": { "static": "2.1 kB", "interactive": "3.25 kB" }
   }
 }

@@ -37,6 +37,9 @@ export interface ActivityGridGeometryOptions {
   levels?: number | undefined;
   /** Explicit `[min, max]` for level bucketing; auto-fit when omitted. */
   domain?: readonly [number, number] | undefined;
+  /** Leading empty slots — aligns slot 0 to a real weekday (calendar retrofit).
+   *  Layout-only: indices, levels and the summary still refer to `data`. */
+  offset?: number | undefined;
 }
 
 /** Buckets a value into 0..(levels-1). 0 for ≤0 / empty; positives fill 1..max. */
@@ -55,10 +58,11 @@ export function activityGridGeometry(
   const cell = opts.cell ?? 10;
   const gap = opts.gap ?? 2;
   const levels = Math.max(2, opts.levels ?? 5);
+  const offset = Math.max(0, Math.floor(opts.offset ?? 0)) % rows;
   const step = cell + gap;
 
   const n = data.length;
-  const cols = n === 0 ? 0 : Math.ceil(n / rows);
+  const cols = n === 0 ? 0 : Math.ceil((n + offset) / rows);
   const width = cols > 0 ? cols * step - gap : 0;
   const height = rows > 0 ? rows * step - gap : 0;
 
@@ -66,8 +70,9 @@ export function activityGridGeometry(
   const [min, max] = e ?? [0, 0];
 
   const cells: Cell[] = data.map((v, i) => {
-    const col = Math.floor(i / rows);
-    const row = i % rows;
+    const slot = i + offset;
+    const col = Math.floor(slot / rows);
+    const row = slot % rows;
     const finite = isFiniteValue(v);
     return {
       x: col * step,

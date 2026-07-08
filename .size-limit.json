@@ -55,13 +55,13 @@
   {
     "name": "@microcharts/react/activity-grid (static)",
     "path": "dist/charts/activity-grid/index.js",
-    "limit": "2 kB",
+    "limit": "2.1 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/activity-grid/interactive",
     "path": "dist/charts/activity-grid/client.js",
-    "limit": "3 kB",
+    "limit": "3.25 kB",
     "gzip": true
   },
   {

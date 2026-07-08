@@ -49,6 +49,24 @@ export const entry: ChartEntry = {
       description: "7-row calendar or single strip.",
     },
     {
+      name: "shape",
+      type: '"square" | "round" | "dot"',
+      required: false,
+      description: "Cell mark: crisp square, soft corners, or padded dot.",
+    },
+    {
+      name: "start",
+      type: "string | Date",
+      required: false,
+      description: "First slot's calendar day (UTC) — pads the first column so weekday rows align.",
+    },
+    {
+      name: "weekStart",
+      type: "0 | 1",
+      required: false,
+      description: "Start of week for start alignment (0 Sunday, 1 Monday).",
+    },
+    {
       name: "cell",
       type: "number",
       required: false,
@@ -100,6 +118,7 @@ export function InteractiveDemo() {
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "layout", options: ["grid", "strip"], init: "grid" },
+    { kind: "segmented", key: "shape", options: ["square", "round", "dot"], init: "square" },
     { kind: "segmented", key: "cell", options: ["9", "12", "15"], init: "12" },
   ],
   data: gridWave(0),
@@ -108,6 +127,7 @@ export const playground: PlaygroundSpec = {
     <ActivityGrid
       data={data}
       layout={s.layout as "grid" | "strip"}
+      shape={s.shape as "square" | "round" | "dot"}
       cell={Number(s.cell)}
       title="Playground"
     />
@@ -117,9 +137,12 @@ export const playground: PlaygroundSpec = {
       "<ActivityGrid",
       `  data={/* ${data.length} values */}`,
       `  layout="${s.layout}"`,
+      s.shape !== "square" && `  shape="${s.shape}"`,
       `  cell={${s.cell}}`,
       "/>",
-    ].join("\n"),
+    ]
+      .filter(Boolean)
+      .join("\n"),
 };
 
 export const recipes: Recipe[] = [
