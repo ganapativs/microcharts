@@ -42,6 +42,8 @@ import dualSparkline from "./dual-sparkline";
 import stackedArea from "./stacked-area";
 import ohlc from "./ohlc";
 import horizon from "./horizon";
+import calendarStrip from "./calendar-strip";
+import eventTimeline from "./event-timeline";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -76,6 +78,8 @@ const MODULES: ChartModule[] = [
   stackedArea,
   ohlc,
   horizon,
+  calendarStrip,
+  eventTimeline,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

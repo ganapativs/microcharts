@@ -1,0 +1,126 @@
+---
+title: EventTimeline
+description: A word-sized event timeline for React — spans and instants on one linear time axis, merged coverage that never double-counts.
+---
+
+EventTimeline answers "what happened when, and for how long?" — uptime windows, on-call
+shifts, release spans and incident points on one row. Diamonds mark instants, rects mark
+durations: the type distinction is a shape, so it survives 12 px where color coding
+wouldn't.
+
+<LiveDemo
+  label="EventTimeline"
+  sizeOf="event-timeline"
+  code={`import { EventTimeline } from "@microcharts/react/event-timeline";
+
+<EventTimeline data={windows} domain={today} title="API uptime" />`}
+>
+  <EventTimeline
+    data={[
+      { start: Date.UTC(2026, 5, 3, 1), end: Date.UTC(2026, 5, 3, 5), label: "Freeze", kind: "accent" },
+      { start: Date.UTC(2026, 5, 3, 6), end: Date.UTC(2026, 5, 3, 15), label: "Healthy", kind: "positive" },
+      { start: Date.UTC(2026, 5, 3, 11), label: "Incident", kind: "negative" },
+      { start: Date.UTC(2026, 5, 3, 16), end: Date.UTC(2026, 5, 3, 18), kind: "negative" },
+      { start: Date.UTC(2026, 5, 3, 20), label: "Release" },
+    ]}
+    domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)]}
+    title="API uptime"
+    style={{ width: 240, height: 30 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="event-timeline" />
+
+## Try it
+
+<Playground chart="event-timeline" />
+
+## Interactive
+
+<InteractiveDemo slug="event-timeline" />
+
+## When to use it
+
+- **Good for** — per-service uptime rows, on-call shifts and release windows in cards.
+- **Avoid for** — more than ~12 items, or aggregated durations (MiniBar of totals).
+
+## Sizing
+
+<Sizing chart="event-timeline" />
+
+## Variants
+
+<LiveDemo
+  label="now tick"
+  code={`// authored, never implicit — determinism
+<EventTimeline data={windows} domain={today} now={Date.now()} />`}
+>
+  <EventTimeline
+    data={[
+      {
+        start: Date.UTC(2026, 5, 3, 6),
+        end: Date.UTC(2026, 5, 3, 15),
+        label: "Healthy",
+        kind: "positive",
+      },
+      { start: Date.UTC(2026, 5, 3, 11), label: "Incident", kind: "negative" },
+    ]}
+    domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)]}
+    now={Date.UTC(2026, 5, 3, 21)}
+    title="With now"
+    style={{ width: 240, height: 30 }}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="span labels"
+  code={`<EventTimeline data={windows} domain={today} label="spans" width={160} height={14} />`}
+>
+  <EventTimeline
+    data={[
+      {
+        start: Date.UTC(2026, 5, 3, 6),
+        end: Date.UTC(2026, 5, 3, 15),
+        label: "Healthy",
+        kind: "positive",
+      },
+      {
+        start: Date.UTC(2026, 5, 3, 16),
+        end: Date.UTC(2026, 5, 3, 18),
+        label: "Deploy",
+        kind: "accent",
+      },
+    ]}
+    domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)]}
+    label="spans"
+    width={160}
+    height={14}
+    title="Labeled spans"
+    style={{ width: 280, height: 26 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="event-timeline" />
+
+## Why this default
+
+Duration is length on a linear time axis — never log or compressed time. Items that
+overlap the window edge are clipped flat (honest partial visibility); fully-outside
+items are excluded with a dev warning. Overlapping spans render translucent in data
+order — a legibility device, not an encoding; the exact intervals live in the
+announcements.
+
+## Accessibility
+
+The accessible name is the coverage read — **"3 spans covering 63% of the window; 2
+events."** — where coverage merges intervals first, so overlaps never double-count. The
+interactive entry cycles items chronologically: spans announce **"Freeze: Jun 3, 01:00
+to Jun 3, 05:00 — 4h."**, instants **"Incident: Jun 3, 11:00."**
+
+## Props
+
+<PropTable slug="event-timeline" />

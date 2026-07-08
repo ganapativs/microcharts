@@ -9,15 +9,15 @@
   },
   "delta": {
     "static": 0.92,
-    "interactive": 1.18
+    "interactive": 1.17
   },
   "bullet": {
     "static": 1.64,
     "interactive": 2
   },
   "activity-grid": {
-    "static": 2.08,
-    "interactive": 3.25
+    "static": 2.09,
+    "interactive": 3.26
   },
   "trend-arrow": {
     "static": 1.65,
@@ -76,8 +76,8 @@
     "interactive": 3.01
   },
   "segmented-bar": {
-    "static": 2.3,
-    "interactive": 3.19
+    "static": 2.31,
+    "interactive": 3.2
   },
   "histogram-strip": {
     "static": 2.07,
@@ -88,12 +88,12 @@
     "interactive": 3.35
   },
   "progress-ring": {
-    "static": 2.07,
+    "static": 2.08,
     "interactive": 2.47
   },
   "micro-donut": {
-    "static": 2.34,
-    "interactive": 3.3
+    "static": 2.35,
+    "interactive": 3.31
   },
   "funnel": {
     "static": 2.12,
@@ -116,8 +116,8 @@
     "interactive": 3.81
   },
   "stacked-area": {
-    "static": 2.8,
-    "interactive": 3.84
+    "static": 2.81,
+    "interactive": 3.85
   },
   "ohlc": {
     "static": 2.4,
@@ -125,7 +125,15 @@
   },
   "horizon": {
     "static": 2.29,
-    "interactive": 3.15
+    "interactive": 3.16
+  },
+  "calendar-strip": {
+    "static": 2.27,
+    "interactive": 3.4
+  },
+  "event-timeline": {
+    "static": 2.64,
+    "interactive": 3.74
   },
   "annotations": {
     "static": 1.46

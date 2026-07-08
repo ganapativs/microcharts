@@ -33,6 +33,8 @@ import { DualSparkline } from "@microcharts/react/dual-sparkline";
 import { StackedArea } from "@microcharts/react/stacked-area";
 import { Ohlc } from "@microcharts/react/ohlc";
 import { Horizon } from "@microcharts/react/horizon";
+import { CalendarStrip } from "@microcharts/react/calendar-strip";
+import { EventTimeline } from "@microcharts/react/event-timeline";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -85,6 +87,8 @@ export function getMDXComponents(components?: MDXComponents) {
     StackedArea,
     Ohlc,
     Horizon,
+    CalendarStrip,
+    EventTimeline,
     SparkGroup,
     // docs building blocks
     Instrument,
