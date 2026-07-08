@@ -119,9 +119,6 @@ export function annulusSector(
   return `M${ox} ${oy} ${cwArcs(cx, cy, rOuter, a0, a0 + sweep)} L${ix} ${iy} ${ccwArcs(cx, cy, ri, a0, a0 + sweep)} Z`;
 }
 
-/** Alias — ring charts (track/value arc) reference `annulusArc`; the geometry
- *  is the annulus sector with butt ends. */
-
 /** Circular arc length for the sweep (clamped to one turn), 2-dp — feeds
  *  stroke-dasharray so dash math is exact at any radius. 0 when degenerate. */
 export function arcLength(r: number, a0: number, a1: number): number {
