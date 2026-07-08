@@ -5,9 +5,11 @@ import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
-const BURSTS = Array.from({ length: 48 }, (_, i) =>
-  i % 9 === 0 ? (i % 27 === 0 ? 8 : 3) : i % 13 === 0 ? 1 : 0,
-);
+// A dense, bursty signal — mostly-live slots with quiet gaps and a few real
+// spikes — so the trace reads as a seismograph, not scattered matchsticks.
+const BURSTS = [
+  1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2, 0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1, 2, 1,
+];
 
 export const entry: ChartEntry = {
   name: "Seismogram",
@@ -22,7 +24,7 @@ export const entry: ChartEntry = {
     channel: "tick presence (density) + height (intensity)",
     precision: "medium — Sparkline for levels, EventTimeline for labeled events",
   },
-  nodeBudget: "≤ 2 (tick path + midline)",
+  nodeBudget: "≤ 2 typical (tick path; +1 flag path, +1 signed midline)",
   bestFor: ["error bursts per service", "alert density", "activity texture in rows"],
   avoidFor: ["level tracking (Sparkline)", "labeled events (EventTimeline)"],
   props: [
@@ -45,6 +47,12 @@ export const entry: ChartEntry = {
       description: "Polarity coloring of signed ticks.",
     },
     {
+      name: "anomaly",
+      type: "number",
+      required: false,
+      description: "Flag spikes: |v| ≥ threshold flares in the alert token.",
+    },
+    {
       name: "domain",
       type: "[number, number]",
       required: false,
@@ -59,12 +67,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Seismogram data={BURSTS} summary={false} width={120} height={24} />;
+  return <Seismogram data={BURSTS} summary={false} width={140} height={28} />;
 }
 
 export const showcase = {
   hint: "events",
-  Node: () => <Seismogram data={BURSTS} title="Error bursts" width={120} height={24} />,
+  Node: () => <Seismogram data={BURSTS} title="Error bursts" width={200} height={34} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -77,12 +85,14 @@ export const playground: PlaygroundSpec = {
       init: "intensity",
     },
     { kind: "toggle", key: "signed", label: "signed data", init: false },
+    { kind: "toggle", key: "flag", label: "flag spikes", init: false },
   ],
   render: (s) => (
     <Seismogram
       data={(s.signed as boolean) ? BURSTS.map((v, i) => (i % 2 === 0 ? v : -v)) : BURSTS}
       mode={s.mode as "intensity" | "barcode"}
       positive={(s.signed as boolean) ? "up" : undefined}
+      anomaly={(s.flag as boolean) ? 6 : undefined}
       summary={false}
       width={260}
       height={44}
@@ -94,6 +104,7 @@ export const playground: PlaygroundSpec = {
       "  data={events}",
       s.mode !== "intensity" && `  mode="${s.mode}"`,
       (s.signed as boolean) && '  positive="up"',
+      (s.flag as boolean) && "  anomaly={6}",
       "/>",
     ]
       .filter(Boolean)
@@ -110,6 +121,11 @@ export const recipes: Recipe[] = [
     label: "barcode (presence only)",
     code: `// heights are noise? declare it — uniform ticks say "when", not "how hard"\n<Seismogram data={deploys} mode="barcode" />`,
     node: <Seismogram data={BURSTS} mode="barcode" summary={false} width={120} height={14} />,
+  },
+  {
+    label: "flag anomalies",
+    code: `// spikes at or above the threshold flare in the alert token\n<Seismogram data={service.bursts} anomaly={6} />`,
+    node: <Seismogram data={BURSTS} anomaly={6} summary={false} width={120} height={14} />,
   },
 ];
 

@@ -33,13 +33,11 @@ describe("<GradedBand> (plan/23 #4, S1)", () => {
     );
   });
 
-  it("label='median' widens the viewBox for a gutter value", () => {
-    const plain = draw(<GradedBand data={SAMPLE} />).container;
+  it("label='median' states the median next to its tick (none shows no text)", () => {
     const labeled = draw(<GradedBand data={SAMPLE} label="median" />).container;
-    const wPlain = Number(plain.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
-    const wLabeled = Number(labeled.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
-    expect(wLabeled).toBeGreaterThan(wPlain);
+    const none = draw(<GradedBand data={SAMPLE} />).container;
     expect(labeled.querySelector("text")!.textContent).toBe("50");
+    expect(none.querySelector("text")).toBeNull();
   });
 
   it("is axe-clean", async () => {

@@ -55,26 +55,34 @@ export interface PercentileLadderProps {
 const FONT = 4.5;
 const LABEL_MIN_WIDTH = 56;
 
-/** Places tick labels: a forward/backward sweep to a minimum pitch inside the
- *  box, or drop-out when they cannot all fit (plan/18 — never measure). */
+/** Places tick labels at their tick x (clamped inside the box), ENDPOINT-FIRST:
+ *  p50 and the tail always win; an interior label is dropped (→ null) when it
+ *  would collide — so clustered percentiles never merge into unreadable text
+ *  (plan/18 degradation — never measure, never overlap). */
 export function ladderLabelLayout(
   geo: PercentileLadderGeometry,
   texts: readonly string[],
   width: number,
-): number[] | null {
-  const maxW = Math.max(...texts.map((t) => t.length * FONT * 0.62));
-  const pitch = maxW + 1;
-  const halfMax = maxW / 2;
-  const min = geo.track.x0 - 3 + halfMax;
-  const max = width - 3 - halfMax;
-  if ((geo.ticks.length - 1) * pitch > max - min) return null;
-  const xs = geo.ticks.map((t) => Math.min(max, Math.max(min, t.x)));
-  for (let i = 1; i < xs.length; i++) xs[i] = Math.max(xs[i]!, xs[i - 1]! + pitch);
-  if (xs[xs.length - 1]! > max) {
-    xs[xs.length - 1] = max;
-    for (let i = xs.length - 2; i >= 0; i--) xs[i] = Math.min(xs[i]!, xs[i + 1]! - pitch);
-  }
-  return xs.map((x) => round2(x));
+): (number | null)[] {
+  const n = geo.ticks.length;
+  const half = texts.map((t) => (t.length * FONT * 0.62) / 2);
+  const clampX = (i: number) =>
+    Math.min(width - 3 - half[i]!, Math.max(geo.track.x0 - 3 + half[i]!, geo.ticks[i]!.x));
+  const out: (number | null)[] = Array.from({ length: n }, () => null);
+  const boxes: { lo: number; hi: number }[] = [];
+  const place = (i: number) => {
+    const cx = clampX(i);
+    const lo = cx - half[i]! - 1;
+    const hi = cx + half[i]! + 1;
+    if (boxes.some((b) => lo < b.hi && hi > b.lo)) return;
+    out[i] = round2(cx);
+    boxes.push({ lo, hi });
+  };
+  // endpoints first (p50 anchors the read, the tail is the point), then interiors
+  if (n >= 1) place(n - 1);
+  if (n >= 2) place(0);
+  for (let i = 1; i < n - 1; i++) place(i);
+  return out;
 }
 
 export function PercentileLadder(props: PercentileLadderProps): ReactNode {
@@ -139,6 +147,8 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   const labelX = showLabels ? ladderLabelLayout(geo, texts, width) : null;
   // keep the alphabetic descender (≈0.22·fs) inside the viewBox
   const labelY = round2(height - FONT * 0.22 - 0.2);
+  // pin the label size to viewBox units (see coverage-strip / plan/12)
+  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart
@@ -148,7 +158,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
       summary={accName}
       id={id}
       className={cls}
-      style={style}
+      style={rootStyle}
     >
       <line
         x1={geo.track.x0}
@@ -186,19 +196,21 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
         );
       })}
       {labelX
-        ? rendered.map((t, i) => (
-            <text
-              key={t.p}
-              x={labelX[i]}
-              y={labelY}
-              textAnchor="middle"
-              data-mc-ink="label"
-              fontSize={FONT}
-              style={{ fontVariantNumeric: "tabular-nums" }}
-            >
-              {texts[i]}
-            </text>
-          ))
+        ? rendered.map((t, i) =>
+            labelX[i] === null ? null : (
+              <text
+                key={t.p}
+                x={labelX[i]!}
+                y={labelY}
+                textAnchor="middle"
+                data-mc-ink="label"
+                fontSize={FONT}
+                style={{ fontVariantNumeric: "tabular-nums" }}
+              >
+                {texts[i]}
+              </text>
+            ),
+          )
         : null}
       {geo.logTag ? (
         <text

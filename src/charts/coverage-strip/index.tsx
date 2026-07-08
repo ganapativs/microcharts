@@ -97,6 +97,9 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
   });
 
   const accName = summary === false ? false : (summary ?? coverageSummary(geo, pctFmt, strings));
+  // pin the label size to viewBox units (the shared 0.75em default is ambient —
+  // it would render labels ~2× and break the reserved gutter). plan/12.
+  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart
@@ -106,7 +109,7 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-coverage-strip ${className}` : "mc-coverage-strip"}
-      style={style}
+      style={rootStyle}
     >
       {geo.cells.map((c) =>
         c.present ? (
@@ -126,6 +129,8 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
             }}
           />
         ) : (
+          // an EMPTY slot, not a void: a faint track fill + a hairline outline
+          // so it reads as "measured nothing here" (survives forced-colors)
           <rect
             key={c.index}
             x={c.x}
@@ -133,8 +138,9 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
             width={c.w}
             height={c.h}
             rx={c.rx}
-            fill="none"
-            stroke="var(--mc-muted)"
+            fill="var(--mc-band)"
+            stroke="var(--mc-neutral)"
+            strokeOpacity={0.35}
             strokeWidth={0.5}
             data-mc-ink="gap"
           />

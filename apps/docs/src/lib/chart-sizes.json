@@ -48,8 +48,8 @@
     "interactive": 2.21
   },
   "seismogram": {
-    "static": 2.2,
-    "interactive": 3.17
+    "static": 2.38,
+    "interactive": 3.34
   },
   "heat-strip": {
     "static": 2.27,
@@ -136,24 +136,24 @@
     "interactive": 3.74
   },
   "coverage-strip": {
-    "static": 2.23,
-    "interactive": 3.01
+    "static": 2.24,
+    "interactive": 3.02
   },
   "benchmark-strip": {
-    "static": 2.64,
-    "interactive": 3.42
+    "static": 2.68,
+    "interactive": 3.46
   },
   "percentile-ladder": {
-    "static": 2.92,
-    "interactive": 3.69
+    "static": 2.95,
+    "interactive": 3.71
   },
   "graded-band": {
-    "static": 2.58,
-    "interactive": 3.37
+    "static": 2.6,
+    "interactive": 3.38
   },
   "icon-array": {
-    "static": 2.04,
-    "interactive": 2.9
+    "static": 2.06,
+    "interactive": 2.93
   },
   "annotations": {
     "static": 1.46

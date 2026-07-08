@@ -5,11 +5,33 @@ import { seismogramGeometry } from "./geometry.js";
 const base = { width: 60, height: 16, mode: "intensity" as const };
 
 describe("seismogramGeometry (plan/22 #8)", () => {
-  it("all-positive → baseline at the bottom edge; ticks rise from it", () => {
+  it("unsigned → centered baseline, ticks mirror symmetrically (seismograph)", () => {
     const geo = seismogramGeometry({ ...base, values: [0, 3, 0, 8, 1] });
-    expect(geo.baselineY).toBe(15.5);
-    for (const t of geo.ticks) expect(t.y1).toBe(geo.baselineY);
+    expect(geo.signed).toBe(false);
+    expect(geo.baselineY).toBe(8); // height/2
+    for (const t of geo.ticks) {
+      // each tick straddles the center equally — |up| === |down|
+      expect(t.y0 + t.y1).toBeCloseTo(16, 5);
+      expect(t.y0).toBeLessThan(geo.baselineY);
+      expect(t.y1).toBeGreaterThan(geo.baselineY);
+    }
     expect(geo.ticks.length).toBe(3); // zeros are quiet
+    expect(geo.dData).not.toBe("");
+    expect(geo.dPos).toBe(""); // no polarity split without negatives
+  });
+
+  it("taller magnitude → longer symmetric tick", () => {
+    const geo = seismogramGeometry({ ...base, values: [8, 1] });
+    const [big, small] = geo.ticks;
+    expect(big!.y1 - big!.y0).toBeGreaterThan(small!.y1 - small!.y0);
+  });
+
+  it("anomaly threshold → over-threshold ticks split into dFlag", () => {
+    const geo = seismogramGeometry({ ...base, values: [2, 9, 3, 12], anomaly: 8 });
+    expect(geo.dFlag).not.toBe(""); // 9 and 12 flagged
+    expect(geo.dData).not.toBe(""); // 2 and 3 stay normal
+    expect(geo.ticks.filter((t) => t.flag).length).toBe(2);
+    expect(geo.ticks.filter((t) => t.flag).every((t) => Math.abs(t.v) >= 8)).toBe(true);
   });
 
   it("signed data → auto-centered baseline, ticks both ways", () => {
@@ -29,8 +51,9 @@ describe("seismogramGeometry (plan/22 #8)", () => {
     ];
     const geo = seismogramGeometry({ ...base, values });
     expect(geo.ticks.length).toBe(1);
-    expect(geo.ticks[0]!.y0).toBe(0.5); // tip at the top pad
-    expect(geo.ticks[0]!.y1).toBe(geo.baselineY);
+    // spans the full box, centered — top pad to bottom pad
+    expect(geo.ticks[0]!.y0).toBe(0.5);
+    expect(geo.ticks[0]!.y1).toBe(15.5);
   });
 
   it("long series collapse via max-per-bucket — the spike survives", () => {

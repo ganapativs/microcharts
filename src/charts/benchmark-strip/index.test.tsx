@@ -23,20 +23,18 @@ describe("<BenchmarkStrip> (plan/23 #2, structured)", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain("of 5 peers");
   });
 
-  it("percentile label renders in a right gutter (wider viewBox)", () => {
-    const plain = draw(<BenchmarkStrip data={PEERS} value={20} label="none" />).container;
+  it("the percentile reads next to the focal dot (label='none' shows no text)", () => {
     const labeled = draw(<BenchmarkStrip data={PEERS} value={20} label="percentile" />).container;
-    const wPlain = Number(plain.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
-    const wLabeled = Number(labeled.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
-    expect(wLabeled).toBeGreaterThan(wPlain);
+    const none = draw(<BenchmarkStrip data={PEERS} value={20} label="none" />).container;
     expect(labeled.querySelector("text")!.textContent).toBe("p49");
+    expect(none.querySelector("text")).toBeNull();
   });
 
   it("positive polarity colors the focal dot by which side of the band is good", () => {
     const up = draw(<BenchmarkStrip data={PEERS} value={38} positive="up" />).container;
     const down = draw(<BenchmarkStrip data={PEERS} value={38} positive="down" />).container;
-    expect(up.querySelector("circle")!.getAttribute("style")).toContain("--mc-pos");
-    expect(down.querySelector("circle")!.getAttribute("style")).toContain("--mc-neg");
+    expect(up.querySelector("circle")!.getAttribute("fill")).toContain("--mc-positive");
+    expect(down.querySelector("circle")!.getAttribute("fill")).toContain("--mc-negative");
   });
 
   it("is axe-clean", async () => {

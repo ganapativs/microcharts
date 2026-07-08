@@ -20,10 +20,10 @@ describe("<CoverageStrip> (plan/23 #1, S1-with-gaps)", () => {
     const { container } = draw(<CoverageStrip data={[0, null, 5]} />);
     const rects = [...container.querySelectorAll("rect")];
     expect(rects.length).toBe(3);
-    // the measured zero is a filled cell, not the hollow gap
+    // the measured zero is a solid accent cell; the gap is a faint track slot
     expect(rects[0]!.getAttribute("data-mc-ink")).toBe("cell");
-    expect(rects[1]!.getAttribute("fill")).toBe("none");
     expect(rects[1]!.getAttribute("data-mc-ink")).toBe("gap");
+    expect(rects[1]!.getAttribute("fill")).toBe("var(--mc-band)");
   });
 
   it("label='percent' states coverage in a right gutter (wider viewBox)", () => {

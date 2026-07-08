@@ -106,7 +106,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
 
   const accName = summary === false ? false : (summary ?? benchmarkSummary(geo, fmt, strings));
 
-  // dot color: default accent; with polarity, the "good" side reads pos, else neg
+  // dot color: default accent; with polarity, the "good" side reads positive
   const good =
     positive === undefined
       ? undefined
@@ -114,38 +114,49 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
         ? geo.dot.value >= geo.median.value
         : geo.dot.value <= geo.median.value;
   const dotFill =
-    color ?? (good === undefined ? undefined : good ? "var(--mc-pos)" : "var(--mc-neg)");
+    color ??
+    (good === undefined ? "var(--mc-accent)" : good ? "var(--mc-positive)" : "var(--mc-negative)");
 
   const labelText =
     label === "value" ? fmt(geo.dot.value) : label === "percentile" ? `p${geo.percentile}` : "";
+  // the percentile/value reads RIGHT NEXT TO the dot (the focal value is the
+  // point), flipping to the dot's left when it would run off the right edge
+  const labelW = labelText.length * FONT * 0.62;
+  const flip = geo.dot.x + 4 + labelW > width;
+  const labelX = round2(flip ? geo.dot.x - 4 : geo.dot.x + 4);
+  const midY = round2(height / 2);
+  // pin the label size to viewBox units (see coverage-strip / plan/12)
+  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart
-      width={geo.totalWidth}
+      width={width}
       height={height}
       title={title}
       summary={accName}
       id={id}
       className={cls}
-      style={style}
+      style={rootStyle}
     >
       <rect
         x={geo.outer.x}
         y={geo.bandY}
         width={geo.outer.width}
         height={geo.bandH}
-        rx={1}
+        rx={1.5}
         data-mc-ink="band"
-        style={{ fillOpacity: 0.14 }}
+        fill="var(--mc-neutral)"
+        fillOpacity={0.16}
       />
       <rect
         x={geo.inner.x}
         y={geo.bandY}
         width={geo.inner.width}
         height={geo.bandH}
-        rx={1}
+        rx={1.5}
         data-mc-ink="band"
-        style={{ fillOpacity: 0.3 }}
+        fill="var(--mc-neutral)"
+        fillOpacity={0.34}
       />
       {median ? (
         <line
@@ -153,38 +164,38 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
           y1={geo.bandY - 0.5}
           x2={geo.median.x}
           y2={geo.bandY + geo.bandH + 0.5}
-          data-mc-ink="data"
+          stroke="var(--mc-neutral)"
           vectorEffect="non-scaling-stroke"
           style={{ strokeWidth: 1 }}
         />
       ) : null}
-      <circle
-        cx={geo.dot.x}
-        cy={round2(height / 2)}
-        r={2}
-        data-mc-ink="data"
-        style={dotFill ? { fill: dotFill } : undefined}
-      />
       {geo.dot.clamped !== 0 ? (
         <path
           d={
             geo.dot.clamped < 0
-              ? `M${geo.dot.x - 3} ${height / 2} l2 -1.6 v3.2 Z`
-              : `M${geo.dot.x + 3} ${height / 2} l-2 -1.6 v3.2 Z`
+              ? `M${geo.dot.x - 3} ${midY} l2.4 -1.8 v3.6 Z`
+              : `M${geo.dot.x + 3} ${midY} l-2.4 -1.8 v3.6 Z`
           }
-          data-mc-ink="data"
-          style={dotFill ? { fill: dotFill } : undefined}
+          style={{ fill: dotFill }}
         />
       ) : null}
+      {/* accent dot with a surface halo so it reads on top of the band */}
+      <circle
+        cx={geo.dot.x}
+        cy={midY}
+        r={2.4}
+        fill={dotFill}
+        stroke="var(--mc-surface)"
+        strokeWidth={0.9}
+      />
       {showLabel ? (
         <text
-          x={geo.labelX}
-          y={geo.labelY}
-          textAnchor="end"
+          x={labelX}
+          y={midY}
+          textAnchor={flip ? "end" : "start"}
           dominantBaseline="central"
-          data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
+          style={{ fill: dotFill, fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

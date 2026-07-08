@@ -63,12 +63,15 @@ export function iconArrayGeometry(opts: {
   const g = 0.25; // inter-cell gap as a fraction of cell size
   const cellW = plotW / (cols + (cols - 1) * g);
   const cellH = height / (rows + (rows - 1) * g);
-  const cell = Math.max(0, Math.min(cellW, cellH));
+  // cap the cell so a wide chart keeps a compact grid + the label hugs it,
+  // rather than the units ballooning across the whole width
+  const cell = Math.max(0, Math.min(cellW, cellH, 8));
   const pitch = cell * (1 + g);
   const gridW = cols * cell + (cols - 1) * cell * g;
   const gridH = rows * cell + (rows - 1) * cell * g;
-  const startX = round2((plotW - gridW) / 2);
+  const startX = 0.5; // left-aligned so the label sits right after the grid
   const startY = round2((height - gridH) / 2);
+  const gridRight = round2(startX + gridW);
 
   const m = cellMetrics(cell, shape);
   const units = Array.from({ length: n }, (_, i) => {
@@ -92,7 +95,7 @@ export function iconArrayGeometry(opts: {
     cols,
     rows,
     note,
-    labelX: round2(width),
+    labelX: round2(gridRight + 4), // start-anchored, right after the grid
     labelY: round2(height / 2),
     totalWidth: width,
   };

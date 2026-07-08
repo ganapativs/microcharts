@@ -35,6 +35,8 @@ export interface SeismogramProps {
   mode?: "intensity" | "barcode" | undefined;
   /** Which sign is good — colors signed ticks by polarity. */
   positive?: "up" | "down" | undefined;
+  /** Magnitude threshold; ticks with `|v| ≥ anomaly` flare in the alert token. */
+  anomaly?: number | undefined;
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
@@ -55,6 +57,7 @@ export function Seismogram(props: SeismogramProps): ReactNode {
     data,
     mode = "intensity",
     positive,
+    anomaly,
     domain,
     width = 60,
     height = 16,
@@ -70,20 +73,17 @@ export function Seismogram(props: SeismogramProps): ReactNode {
     children,
   } = props;
 
-  const geo = seismogramGeometry({ width, height, values: data, domain, mode });
+  const geo = seismogramGeometry({ width, height, values: data, domain, mode, anomaly });
   const fmt = makeFormatter(format, locale);
   const accName = summary === false ? false : (summary ?? seismogramSummary(data, fmt, strings));
 
-  const hasNeg = geo.dNeg !== "";
   const goodDown = positive === "down";
-  const tickStyle = (neg: boolean) => ({
-    strokeWidth: 1,
-    ...(color
-      ? { stroke: color }
-      : positive !== undefined && hasNeg
-        ? { stroke: neg === goodDown ? "var(--mc-positive)" : "var(--mc-negative)" }
-        : null),
-  });
+  const baseStroke = color ? { stroke: color } : null;
+  // signed polarity coloring only engages when the author declares which way is good
+  const polarity = (neg: boolean) =>
+    positive !== undefined
+      ? { stroke: neg === goodDown ? "var(--mc-positive)" : "var(--mc-negative)" }
+      : baseStroke;
 
   return (
     <Chart
@@ -95,9 +95,10 @@ export function Seismogram(props: SeismogramProps): ReactNode {
       className={className ? `mc-seismo ${className}` : "mc-seismo"}
       style={style}
     >
-      {hasNeg || geo.ticks.length === 0 ? (
-        /* midline for signed data; for a quiet strip it doubles as the
-           designed empty state — a strip at rest, not a blank hole (§8a.3) */
+      {geo.signed || geo.ticks.length === 0 ? (
+        /* zero-reference midline for signed data; for a quiet strip it doubles
+           as the designed empty state — a strip at rest, not a blank hole
+           (§8a.3). Unsigned ticks are centered and imply their own axis. */
         <line
           x1={0}
           y1={geo.baselineY}
@@ -109,20 +110,38 @@ export function Seismogram(props: SeismogramProps): ReactNode {
           style={{ strokeWidth: 0.75 }}
         />
       ) : null}
+      {/* tick width inherits --mc-stroke-width (theme-tunable, matches peers) */}
+      {geo.dData !== "" ? (
+        <path
+          d={geo.dData}
+          data-mc-ink="data"
+          vectorEffect="non-scaling-stroke"
+          style={baseStroke ?? undefined}
+        />
+      ) : null}
       {geo.dPos !== "" ? (
         <path
           d={geo.dPos}
           data-mc-ink="data"
           vectorEffect="non-scaling-stroke"
-          style={tickStyle(false)}
+          style={polarity(false) ?? undefined}
         />
       ) : null}
-      {hasNeg ? (
+      {geo.dNeg !== "" ? (
         <path
           d={geo.dNeg}
           data-mc-ink="data"
           vectorEffect="non-scaling-stroke"
-          style={tickStyle(true)}
+          style={polarity(true) ?? undefined}
+        />
+      ) : null}
+      {geo.dFlag !== "" ? (
+        /* anomaly spikes — alert token; redundant with height, never color-alone */
+        <path
+          d={geo.dFlag}
+          data-mc-ink="data"
+          vectorEffect="non-scaling-stroke"
+          style={{ stroke: "var(--mc-negative)" }}
         />
       ) : null}
       {children}

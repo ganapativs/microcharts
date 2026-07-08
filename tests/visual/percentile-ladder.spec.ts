@@ -11,7 +11,13 @@ const svg = (props: Record<string, unknown>) =>
   renderToStaticMarkup(h(PercentileLadder as never, props));
 
 const LATENCY = Array.from({ length: 200 }, (_, i) =>
-  i < 180 ? 90 + (i % 60) : i < 196 ? 400 + (i % 300) : 1400 + (i % 900),
+  i < 130
+    ? 90 + (i % 50)
+    : i < 180
+      ? 150 + ((i * 7) % 320)
+      : i < 196
+        ? 480 + ((i * 11) % 900)
+        : 1500 + ((i * 13) % 800),
 );
 
 function gallery(): string {

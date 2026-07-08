@@ -93,11 +93,13 @@ export function IconArray(props: IconArrayProps): ReactNode {
   const fillColor =
     color ??
     (positive === "down"
-      ? "var(--mc-neg)"
+      ? "var(--mc-negative)"
       : positive === "up"
-        ? "var(--mc-pos)"
+        ? "var(--mc-positive)"
         : "var(--mc-accent)");
   const labelText = label === "percent" ? pctFmt(geo.k / geo.n) : `${geo.k} in ${geo.n}`;
+  // pin the label size to viewBox units (see coverage-strip / plan/12)
+  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart
@@ -107,7 +109,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-icon-array ${className}` : "mc-icon-array"}
-      style={style}
+      style={rootStyle}
     >
       {geo.units.map((u) =>
         u.filled ? (
@@ -123,6 +125,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
             style={{ fill: fillColor }}
           />
         ) : (
+          // empty unit — a visible faint-fill slot with a hairline, never a void
           <rect
             key={u.index}
             x={u.x}
@@ -130,8 +133,9 @@ export function IconArray(props: IconArrayProps): ReactNode {
             width={geo.cell}
             height={geo.cell}
             rx={geo.rx}
-            fill="none"
-            stroke="var(--mc-muted)"
+            fill="var(--mc-band)"
+            stroke="var(--mc-neutral)"
+            strokeOpacity={0.4}
             strokeWidth={0.5}
             data-mc-ink="unit-off"
           />
@@ -141,7 +145,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
         <text
           x={geo.labelX}
           y={geo.labelY}
-          textAnchor="end"
+          textAnchor="start"
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}

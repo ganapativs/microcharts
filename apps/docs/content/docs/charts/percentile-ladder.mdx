@@ -17,7 +17,7 @@ renders when it applies.
 <PercentileLadder data={latencies} title="Request latency" />`}
 >
   <PercentileLadder
-    data={Array.from({ length: 200 }, (_, i) => (i < 180 ? 90 + (i % 60) : i < 196 ? 400 + (i % 300) : 1400 + (i % 900)))}
+    data={Array.from({ length: 200 }, (_, i) => (i < 130 ? 90 + (i % 50) : i < 180 ? 150 + ((i * 7) % 320) : i < 196 ? 480 + ((i * 11) % 900) : 1500 + ((i * 13) % 800)))}
     title="Request latency"
     width={240} height={18}
   />
@@ -54,7 +54,13 @@ renders when it applies.
   <span className="inline-flex flex-col gap-2">
     <PercentileLadder
       data={Array.from({ length: 200 }, (_, i) =>
-        i < 180 ? 90 + (i % 60) : i < 196 ? 400 + (i % 300) : 1400 + (i % 900),
+        i < 130
+          ? 90 + (i % 50)
+          : i < 180
+            ? 150 + ((i * 7) % 320)
+            : i < 196
+              ? 480 + ((i * 11) % 900)
+              : 1500 + ((i * 13) % 800),
       )}
       scale="log"
       title="Log scale"
@@ -63,7 +69,13 @@ renders when it applies.
     />
     <PercentileLadder
       data={Array.from({ length: 200 }, (_, i) =>
-        i < 180 ? 90 + (i % 60) : i < 196 ? 400 + (i % 300) : 1400 + (i % 900),
+        i < 130
+          ? 90 + (i % 50)
+          : i < 180
+            ? 150 + ((i * 7) % 320)
+            : i < 196
+              ? 480 + ((i * 11) % 900)
+              : 1500 + ((i * 13) % 800),
       )}
       ps={[50, 95, 99.9]}
       label="values"

@@ -37,7 +37,7 @@ describe("<IconArray> (plan/23 #21, S4 scalar rate)", () => {
   it("positive='down' flips the fill to the risk tone", () => {
     const { container } = draw(<IconArray value={0.15} of={20} positive="down" />);
     expect(container.querySelector('[data-mc-ink="unit"]')!.getAttribute("style")).toContain(
-      "--mc-neg",
+      "--mc-negative",
     );
   });
 

@@ -151,13 +151,13 @@
   {
     "name": "@microcharts/react/seismogram (static)",
     "path": "dist/charts/seismogram/index.js",
-    "limit": "2.3 kB",
+    "limit": "2.4 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/seismogram/interactive",
     "path": "dist/charts/seismogram/client.js",
-    "limit": "3.2 kB",
+    "limit": "3.35 kB",
     "gzip": true
   },
   {

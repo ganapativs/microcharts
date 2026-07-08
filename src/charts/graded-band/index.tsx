@@ -53,8 +53,11 @@ export interface GradedBandProps {
 }
 
 const FONT = 6;
+// widest band faintest → narrowest strongest; VISIBLE at every level (the
+// graded nesting is the whole read). Accent tint distinguishes it from
+// BenchmarkStrip's neutral peer band.
 const OPACITY = (step: number, k: number): number =>
-  k <= 1 ? 0.32 : round2(0.14 + (step / (k - 1)) * 0.26);
+  k <= 1 ? 0.34 : round2(0.14 + (step / (k - 1)) * 0.24);
 
 export function GradedBand(props: GradedBandProps): ReactNode {
   const {
@@ -80,16 +83,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const showLabel = label === "median";
-  const geo = gradedBandGeometry({
-    width,
-    height,
-    data,
-    levels,
-    value,
-    domain,
-    gutterCh: showLabel ? 4 : 0,
-    fontSize: FONT,
-  });
+  const geo = gradedBandGeometry({ width, height, data, levels, value, domain });
   const cls = className ? `mc-graded-band ${className}` : "mc-graded-band";
 
   if (geo === null) {
@@ -112,15 +106,24 @@ export function GradedBand(props: GradedBandProps): ReactNode {
   const k = geo.bands.length;
   const outer = geo.bands[0];
 
+  // median value reads right at the median tick (over the faint band, like the
+  // gallery), flipping to the tick's left near the right edge — never escapes
+  const medText = showLabel ? fmt(geo.median.value) : "";
+  const medW = medText.length * FONT * 0.62;
+  const medFlip = geo.median.x + 3 + medW > width - 1;
+  const medX = round2(medFlip ? geo.median.x - 3 : geo.median.x + 3);
+  // pin the label size to viewBox units (see coverage-strip / plan/12)
+  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+
   return (
     <Chart
-      width={geo.totalWidth}
+      width={width}
       height={height}
       title={title}
       summary={accName}
       id={id}
       className={cls}
-      style={style}
+      style={rootStyle}
     >
       {softEdge && outer && !geo.degenerate ? (
         // id-free soft edge: a wider, fainter halo behind the outer band
@@ -131,7 +134,8 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           height={geo.bandH}
           rx={geo.bandH / 2}
           data-mc-ink="band"
-          style={{ fillOpacity: OPACITY(0, k) * 0.5, ...(color ? { fill: color } : null) }}
+          fill={color ?? "var(--mc-accent)"}
+          fillOpacity={OPACITY(0, k) * 0.5}
         />
       ) : null}
       {geo.bands.map((b) => (
@@ -143,7 +147,8 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           height={geo.bandH}
           rx={softEdge ? geo.bandH / 2 : 1}
           data-mc-ink="band"
-          style={{ fillOpacity: OPACITY(b.step, k), ...(color ? { fill: color } : null) }}
+          fill={color ?? "var(--mc-accent)"}
+          fillOpacity={OPACITY(b.step, k)}
         />
       ))}
       <line
@@ -151,24 +156,32 @@ export function GradedBand(props: GradedBandProps): ReactNode {
         y1={geo.bandY - 0.5}
         x2={geo.median.x}
         y2={geo.bandY + geo.bandH + 0.5}
-        data-mc-ink="data"
+        stroke="var(--mc-stroke)"
         vectorEffect="non-scaling-stroke"
         style={{ strokeWidth: 1.5 }}
       />
       {geo.dot ? (
-        <circle cx={geo.dot.x} cy={round2(height / 2)} r={1.6} data-mc-ink="data" />
+        // the observed value is a distinct hollow ring, never confused with the tick
+        <circle
+          cx={geo.dot.x}
+          cy={round2(height / 2)}
+          r={1.8}
+          fill="var(--mc-surface)"
+          stroke="var(--mc-stroke)"
+          strokeWidth={1}
+        />
       ) : null}
       {showLabel ? (
         <text
-          x={geo.labelX}
-          y={geo.labelY}
-          textAnchor="end"
+          x={medX}
+          y={round2(height / 2)}
+          textAnchor={medFlip ? "end" : "start"}
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
           style={{ fontVariantNumeric: "tabular-nums" }}
         >
-          {fmt(geo.median.value)}
+          {medText}
         </text>
       ) : null}
       {children}

@@ -239,18 +239,23 @@ export function pictogramGeometry(opts: {
 
 **Collection:** core · **Data shape:** S1 (`data: (number | null)[]` — per-slot event intensity; 0/null = quiet) · **Source:** plan/05 §3 Trend #10
 **Question it answers:** "When did things happen, and how hard?" — event density and intensity over ordered time.
-**Primary encoding:** tick presence (density) + tick height (intensity) · **Precision:** medium — steer to Sparkline for level tracking, EventTimeline for labeled events.
-**Default render:** `viewBox="0 0 60 16"`. One `<path>` of vertical tick segments from the baseline (`data-mc-ink="data"`, non-scaling-stroke). Baseline: bottom edge for all-positive data; auto-centered midline when negatives exist (ticks extend both ways). Node budget ≤ 2 (tick path + optional midline hairline).
+**Primary encoding:** tick presence (density) + tick length (intensity) · **Precision:** medium — steer to Sparkline for level tracking, EventTimeline for labeled events.
+**Default render:** `viewBox="0 0 60 16"`. Ticks read as a seismograph trace: **unsigned intensity mirrors each tick symmetrically about a centered baseline** (magnitude = full length, half each way — the instrument's signature; no midline drawn, the centered ticks imply their own axis); **signed data keeps a zero baseline** with direction encoding sign (up = +, down = −) and draws the midline hairline. Amended 2026-07-08 (§8-rev, audit R-SEISMO-CENTER): the earlier "bottom edge for all-positive" default read as a bar strip and diverged from `chart-gallery.html`'s seismo() reference — centered is now the default for all data. Node budget ≤ 2 typical (one tick path; +1 flag path when `anomaly` set, +1 midline when signed).
 **Props beyond shared grammar:**
-- `mode?: "intensity" | "barcode"` · `"intensity"` · barcode collapses heights to uniform ticks — pure occurrence density when magnitudes are noise (shared `mode` vocabulary: data-semantic switch).
-**Variants (2–6):** `mode` (intensity ↔ presence) · signed data (auto midline — direction of shocks) · `positive` polarity coloring of signed ticks.
+- `mode?: "intensity" | "barcode"` · `"intensity"` · barcode collapses heights to uniform full-length ticks — pure occurrence density when magnitudes are noise (shared `mode` vocabulary: data-semantic switch).
+- `anomaly?: number` · magnitude threshold; ticks with `|v| ≥ anomaly` flare in the alert token (`--mc-negative`). Honest — author sets the threshold, and the flag is redundant with tick length (never color-alone). "Spikes flag anomalies" (the gallery card promise) is delivered by this prop.
+**Variants (2–6):** `mode` (intensity ↔ presence) · signed data (zero baseline + midline — direction of shocks) · `positive` polarity coloring of signed ticks · `anomaly` spike flagging.
 **Geometry (`geometry.ts`):**
 ```ts
 export function seismogramGeometry(opts: {
   width: number; height: number;
   values: readonly (number | null)[]; domain?: readonly [number, number];
-  mode: "intensity" | "barcode";
-}): { d: string; ticks: { x: number; y0: number; y1: number; v: number }[]; baselineY: number }
+  mode: "intensity" | "barcode"; anomaly?: number;
+}): {
+  dData: string; dPos: string; dNeg: string; dFlag: string;
+  ticks: { x: number; y0: number; y1: number; v: number; flag: boolean; slot: number }[];
+  baselineY: number; signed: boolean; downsampled: boolean; slotW: number;
+}
 ```
 **New core needs:** `downsample.maxPerBucket` — series longer than `width` px-slots collapse via max-per-bucket (spikes must survive; never mean).
 **Interactive entry:** pointer → nearest-x tick; announces `strings.point` reuse ("Slot 88 of 120: 8.") plus quiet slots ("Slot 40: no event."); ←/→ step slots, Home/End first/last event.
@@ -258,7 +263,7 @@ export function seismogramGeometry(opts: {
 **Edge cases beyond the shared matrix:** all-zero (no events) → empty strip + "No events." (`strings.noEvents`) · single spike among zeros must render at full height (regression test — this is the chart's whole job) · downsampled render → summary still computed from raw values, never the buckets.
 **Size budget:** static ≤ 2.0 kB / interactive ≤ 2.8 kB.
 **Honesty notes:** max-per-bucket downsampling only, documented; barcode mode must be labeled as presence-only in docs (a tall-looking uniform tick is not intensity).
-**Docs page:** Playground: data, mode, signed toggle. 4-context: table cell (error bursts per service) hero. "Why this default": ticks-from-baseline over bars — density reads as texture, not magnitude comparison.
+**Docs page:** Playground: data, mode, signed toggle, anomaly threshold. 4-context: table cell (error bursts per service) hero. "Why this default": a centered seismograph trace over bottom-anchored bars — the symmetric flare reads as event intensity, not a magnitude comparison, and stays visually distinct from SparkBar.
 
 ---
 

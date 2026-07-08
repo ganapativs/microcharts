@@ -17,8 +17,6 @@ export interface InteractiveGradedBandProps extends GradedBandProps {
   strings?: QuantileStrings;
 }
 
-const FONT = 6;
-
 export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
   const {
     data,
@@ -36,18 +34,8 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
   } = props;
 
   const geo = useMemo(
-    () =>
-      gradedBandGeometry({
-        width,
-        height,
-        data,
-        levels,
-        value,
-        domain: props.domain,
-        gutterCh: label === "median" ? 4 : 0,
-        fontSize: FONT,
-      }),
-    [width, height, data, levels, value, props.domain, label],
+    () => gradedBandGeometry({ width, height, data, levels, value, domain: props.domain }),
+    [width, height, data, levels, value, props.domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [active, setActive] = useState<number | null>(null);

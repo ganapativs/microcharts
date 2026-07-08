@@ -3,10 +3,11 @@ title: Seismogram
 description: An event-density strip for React — when things happened and how hard, with spike-preserving downsampling.
 ---
 
-Seismogram answers "when did things happen, and how hard?". Ticks rise from a baseline:
-presence reads as density texture, height as intensity. Long series collapse via
-max-per-bucket only — the spike is the chart's whole job, so it always survives, and the
-summary is always computed from the raw values, never the buckets.
+Seismogram answers "when did things happen, and how hard?". Ticks read as a seismograph
+trace — centered on a midline and flaring symmetrically: presence is density texture,
+length is intensity. Long series collapse via max-per-bucket only — the spike is the
+chart's whole job, so it always survives, and the summary is always computed from the raw
+values, never the buckets.
 
 <LiveDemo
   label="Seismogram"
@@ -16,9 +17,9 @@ summary is always computed from the raw values, never the buckets.
 <Seismogram data={burstsPerMinute} title="Error bursts" />`}
 >
   <Seismogram
-    data={[0, 3, 0, 0, 8, 1, 0, 2, 0, 0, 3, 0, 1, 0, 0, 5, 0, 0, 2, 0]}
+    data={[1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2, 0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1]}
     title="Error bursts"
-    width={220} height={32}
+    width={240} height={36}
   />
 </LiveDemo>
 
@@ -51,25 +52,41 @@ summary is always computed from the raw values, never the buckets.
 <Seismogram data={deploys} mode="barcode" />`}
 >
   <Seismogram
-    data={[0, 3, 0, 0, 8, 1, 0, 2, 0, 0, 3, 0]}
+    data={[1, 0, 2, 1, 3, 0, 1, 2, 0, 1, 1, 0, 2, 1, 3, 1, 0, 1, 2, 1]}
     mode="barcode"
     title="Deploys"
-    width={160}
-    height={20}
+    width={180}
+    height={22}
   />
 </LiveDemo>
 
 <LiveDemo
   label="signed shocks"
-  code={`// negatives extend below an auto-centered midline
+  code={`// negatives extend below a zero baseline (up = +, down = −)
 <Seismogram data={flows} positive="up" />`}
 >
   <Seismogram
-    data={[4, 0, -2, 0, 5, 0, 0, -4, 0, 3]}
+    data={[3, -1, 4, -2, 1, 5, -3, 2, -1, 4, -2, 6, -4, 1, -2, 3, -1, 2]}
     positive="up"
     title="Net flow shocks"
-    width={160}
-    height={26}
+    width={200}
+    height={30}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="flag anomalies"
+  code={`// spikes at or above the threshold flare in the alert token
+<Seismogram data={service.bursts} anomaly={6} />`}
+>
+  <Seismogram
+    data={[
+      1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2, 0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1,
+    ]}
+    anomaly={6}
+    title="Error bursts"
+    width={240}
+    height={36}
   />
 </LiveDemo>
 
@@ -79,10 +96,12 @@ summary is always computed from the raw values, never the buckets.
 
 ## Why this default
 
-Ticks-from-baseline over bars: density reads as texture rather than inviting bar-to-bar
-magnitude comparison the strip is too small to support. Barcode mode is documented as
-presence-only — a uniform tick is not intensity. A quiet strip renders its baseline at
-rest, never a blank hole.
+A centered seismograph trace over bottom-anchored bars: the symmetric flare reads as event
+intensity rather than inviting the bar-to-bar magnitude comparison the strip is too small to
+support — and it stays visually distinct from SparkBar. Barcode mode is documented as
+presence-only — a uniform tick is not intensity. `anomaly` flags spikes at or above a
+threshold in the alert token; the flag is redundant with tick length, never color alone. A
+quiet strip renders its baseline at rest, never a blank hole.
 
 ## Accessibility
 

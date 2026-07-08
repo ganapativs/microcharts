@@ -82,7 +82,9 @@ export function coverageGeometry(opts: {
     };
   }
 
-  const gap = round2(Math.min(1, (width / n) * 0.2));
+  // flush cells (tiny hairline gap) read as a continuous ruler of slots, so a
+  // gap slot is visibly an EMPTY slot, not a void between islands
+  const gap = round2(Math.min(0.6, (width / n) * 0.08));
   const cellW = (width - gap * (n - 1)) / n;
   const size = Math.min(cellW, height);
   const m = cellMetrics(size, shape);

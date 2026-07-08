@@ -17,8 +17,6 @@ export interface InteractiveBenchmarkStripProps extends BenchmarkStripProps {
   strings?: QuantileStrings;
 }
 
-const FONT = 6;
-
 export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.ReactNode {
   const {
     data,
@@ -36,18 +34,8 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
   } = props;
 
   const geo = useMemo(
-    () =>
-      benchmarkStripGeometry({
-        width,
-        height,
-        data,
-        value,
-        range,
-        domain: props.domain,
-        gutterCh: label !== "none" ? 4 : 0,
-        fontSize: FONT,
-      }),
-    [width, height, data, value, range, props.domain, label],
+    () => benchmarkStripGeometry({ width, height, data, value, range, domain: props.domain }),
+    [width, height, data, value, range, props.domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [active, setActive] = useState<number | null>(null);

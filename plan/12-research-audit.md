@@ -459,3 +459,67 @@ collision. Resolved by reserving an 11-unit LEFT gutter for the tag when `scale=
 low-percentile ticks clear the tag. Verified by the craft gate (172 configs, 0 escapes/overlaps).
 Label containment: width-aware forward/backward sweep with drop-out below the documented 56 px
 minimum; fontSize emitted as an SVG attribute (not CSS) so the craft audit measures it correctly.
+
+**R-SEISMO-CENTER — Seismogram default re-centered + anomaly flag (2026-07-08, gallery-vs-impl
+review, user-directed).** A visual review against `plan/chart-gallery.html`'s `seismo()` reference
+found two divergences in the shipped Seismogram: (1) the plan/22 §8 default anchored all-positive
+ticks to the BOTTOM edge, which read as a SparkBar-like bar strip and lost the seismograph identity
+the gallery shows (ticks centered on a midline, flaring symmetrically); (2) the gallery card copy
+"spikes flag anomalies" had no implementation — coloring only engaged via `positive` polarity on
+signed data. Resolution: unsigned intensity now mirrors each tick symmetrically about a centered
+baseline (magnitude = full length, half each way; no midline drawn — centered ticks imply the axis);
+signed data keeps the zero baseline + midline (unchanged). New `anomaly?: number` prop flags ticks
+with `|v| ≥ threshold` in `--mc-negative` via a dedicated `dFlag` path — honest (author-set
+threshold, redundant with tick length, never color-alone). Geometry return shape changed
+(`d` → `dData/dPos/dNeg/dFlag` + `signed`/`slotW`); `baselineY` for unsigned is now `height/2`.
+plan/22 §8 amended in place. Tests updated (geometry 8, static 18, browser 2 — all green); the
+"single spike renders full height" regression still holds (0.5→15.5, now centered). Argos baselines
+for Seismogram (light/dark × presets) must be re-approved — the static render changed.
+
+## Batch 2 wave 1 — visual-craft rework (2026-07-08, user screenshot review)
+
+The first W1 pass shipped with real visual defects the craft gate MISSED. Two systemic
+root causes, both now fixed; the process lesson is that the craft gate's SSR text-extent
+estimate is necessary but NOT sufficient — a real-browser `getBBox` pass is mandatory
+before calling a labelled chart done.
+
+1. **Invented CSS token names → invisible marks.** CoverageStrip/IconArray used
+   `var(--mc-muted)` (does not exist → no stroke → gap/empty cells rendered as VOIDS);
+   BenchmarkStrip/IconArray used `var(--mc-pos)`/`var(--mc-neg)` (real tokens are
+   `--mc-positive`/`--mc-negative` → polarity colors were absent). The craft gate never
+   checks color, so it passed. Fixed to the real tokens (`styles.css` defines
+   `--mc-neutral`, `--mc-positive`, `--mc-negative`, `--mc-band`, `--mc-accent`,
+   `--mc-stroke`, `--mc-surface` — no `-muted`/`-pos`/`-neg`). Lesson: grep the token
+   before using it.
+
+2. **`--mc-label-size: 0.75em` overrides the `font-size` attribute → labels render ~2×.**
+   `styles.css` sets `:where(.mc-root text){font-size:var(--mc-label-size)}` with the
+   default `0.75em`. A CSS declaration (even 0-specificity `:where`) beats an SVG
+   presentation ATTRIBUTE, so `fontSize={4.5}` was ignored and text rendered at 0.75em of
+   the AMBIENT font (~10 user units in a 12–18-unit viewBox) — hence the overlaps
+   ("5090", "log"×"50", "56%" crowding). The craft gate reads the attribute (4.5) so it
+   was blind to this. FIX: each chart pins `--mc-label-size: \`${FONT}px\`` on its root
+   (inline style beats the `:where` rule), making labels viewBox-proportional and the
+   attribute authoritative → craft estimate and browser render now agree. This is a
+   LATENT issue for every chart that direct-labels (they inherit the ambient 0.75em);
+   flagged for a possible shared fix (bind `--mc-label-size` in the Chart wrapper). New
+   charts must pin it until then.
+
+**Design corrections (cross-checked against plan/chart-gallery.html):**
+- CoverageStrip: gaps are now a continuous faint-track ruler (flush cells, `--mc-band`
+  fill + hairline) instead of near-invisible hollow outlines — a gap reads as an EMPTY
+  slot, not a void (gallery `qCoverage` uses a track + filled blocks).
+- BenchmarkStrip vs GradedBand were indistinguishable (both invisible band + tick). Now
+  distinct: BenchmarkStrip = visible NEUTRAL peer band + prominent accent dot (surface
+  halo) + percentile label beside the dot; GradedBand = ACCENT graded nested bands + a
+  median tick and NO dot (a value dot is a hollow ring when supplied). Band `fillOpacity`
+  raised to visible levels (was `--mc-band` 8% × 0.14 ≈ 1%).
+- Labels moved from far-right gutters to beside their mark (benchmark→dot, graded→median
+  tick) — the "floating far number" look was the wrong-size symptom, not the gutter.
+- IconArray: grid left-aligned + label hugs it (was a big void from an oversized gutter);
+  empty units are visible faint slots.
+- PercentileLadder: demo data reshaped so p50/p90/p99 actually spread; label collision
+  handled by ENDPOINT-PRIORITY drop (p50 + tail always win, interior drops) instead of a
+  cram-spread; `log` tag in a reserved left gutter, clear of the p50 label. Verified by a
+  real-browser getBBox sweep: 0 escapes, 0 text-on-text/mark overlaps across 27 variants
+  (band backgrounds exempt). New reusable harness `scripts/visual-check.mjs`.
