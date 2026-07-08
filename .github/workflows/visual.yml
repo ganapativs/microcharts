@@ -1,8 +1,11 @@
 name: Visual
 
-# Runs on PRs (Sparkline visual specs landed, Phase 2.1). Argos stores + diffs
-# baselines in the cloud (needs the ARGOS_TOKEN secret); manual dispatch kept.
+# Runs on PRs + every main push. Argos stores + diffs baselines in the cloud
+# (needs the ARGOS_TOKEN secret). Main pushes refresh the reference build so PRs
+# always diff against current main, not a frozen manual dispatch. Manual kept.
 on:
+  push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
