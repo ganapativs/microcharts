@@ -1,13 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { test, fc } from "@fast-check/vitest";
-import {
-  parseUTCDay,
-  isoDate,
-  weekGrid,
-  dayOfYear,
-  daysInYear,
-  monthStartDays,
-} from "./calendar.js";
+import { parseUTCDay } from "./calendar.js";
+import { isoDate, weekGrid, dayOfYear, daysInYear, monthStartDays } from "./calendar-grid.js";
 
 // arbitrary UTC day in a wide window (1990–2090)
 const utcDay = fc

@@ -1,0 +1,131 @@
+---
+title: TrendArrow
+description: A direction glyph for React tables and dashboards — up, down, or honestly flat, readable at 8 px before any number.
+---
+
+TrendArrow answers "which way is this moving?" at glyph size. The shape _is_ the
+direction — up, down, or a flat bar — and color only reinforces it, so the read survives
+grayscale, print, and forced-colors. When the magnitude matters, reach for
+[Delta](/docs/charts/delta) instead.
+
+<LiveDemo
+  label="TrendArrow"
+  sizeOf="trend-arrow"
+  code={`import { TrendArrow } from "@microcharts/react/trend-arrow";
+
+<TrendArrow
+  value={-0.08}
+  positive="down"
+  format={{ style: "percent", maximumFractionDigits: 0 }}
+  title="Latency vs last week"
+/>`}
+>
+  <span className="text-lg">
+    {"Latency "}
+    <TrendArrow
+      value={-0.08}
+      positive="down"
+      format={{ style: "percent", maximumFractionDigits: 0 }}
+      title="Latency vs last week"
+      style={{ width: "1em", height: "1em" }}
+    />
+    {" improved again this week."}
+  </span>
+</LiveDemo>
+
+## Install
+
+<Usage chart="trend-arrow" />
+
+## Try it
+
+<Playground chart="trend-arrow" />
+
+## Interactive
+
+<InteractiveDemo slug="trend-arrow" />
+
+## When to use it
+
+- **Good for** — table direction columns, dense dashboards, inline movement cues.
+- **Avoid for** — exact magnitudes (Delta) or series shape (Sparkline).
+
+## Sizing
+
+The glyph is a fixed 16-unit box that scales like an image — size it with CSS. With
+`showValue` the viewBox widens to reserve a gutter for the number, so text never paints
+outside the chart.
+
+<Sizing chart="trend-arrow" />
+
+## Variants
+
+Three glyph weights for three densities, an honest noise floor, and the number when the
+glyph alone is too terse.
+
+<LiveDemo
+  label="glyphs"
+  code={`<TrendArrow value={1} glyph="arrow" />
+<TrendArrow value={1} glyph="triangle" />
+<TrendArrow value={1} glyph="chevron" />`}
+>
+  <span className="inline-flex items-center gap-3">
+    <TrendArrow value={1} glyph="arrow" title="Arrow" style={{ width: 20, height: 20 }} />
+    <TrendArrow value={1} glyph="triangle" title="Triangle" style={{ width: 20, height: 20 }} />
+    <TrendArrow value={1} glyph="chevron" title="Chevron" style={{ width: 20, height: 20 }} />
+  </span>
+</LiveDemo>
+
+<LiveDemo
+  label="flat band"
+  code={`// |value| ≤ flatBand reads as "no real change" — a declared noise floor
+<TrendArrow value={0.01} flatBand={0.02} />`}
+>
+  <span className="inline-flex items-center gap-3">
+    <TrendArrow
+      value={0.01}
+      flatBand={0.02}
+      title="Within noise"
+      style={{ width: 20, height: 20 }}
+    />
+  </span>
+</LiveDemo>
+
+<LiveDemo
+  label="with the value"
+  code={`<TrendArrow value={0.12} showValue format={{ style: "percent", maximumFractionDigits: 0 }} />`}
+>
+  <TrendArrow
+    value={0.12}
+    showValue
+    format={{ style: "percent", maximumFractionDigits: 0 }}
+    title="Weekly change"
+    style={{ height: 22 }}
+  />
+</LiveDemo>
+
+<LiveDemo label="down is good" code={`<TrendArrow value={-0.08} positive="down" />`}>
+  <TrendArrow value={-0.08} positive="down" title="Latency" style={{ width: 20, height: 20 }} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="trend-arrow" />
+
+## Why this default
+
+The arrow (shaft + head) stays legible at 8 px and in forced-colors where lighter marks
+blur; the glyph never scales with magnitude — an arrow twice as long would be a lie at
+this precision. `flatBand` exists so tiny wiggles don't read as movement: declare your
+noise floor instead of letting every ±0.1% look like a trend.
+
+## Accessibility
+
+The default accessible name is the factual direction — **"Up 12%."**, **"No change."**
+within the flat band, **"No data."** for non-finite input. `positive="down"` flips only
+the color, never the glyph or the words. The interactive entry announces direction
+changes through a polite live region and pulses the glyph (gated on reduced motion).
+
+## Props
+
+<PropTable slug="trend-arrow" />

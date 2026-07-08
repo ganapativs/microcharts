@@ -1,0 +1,68 @@
+"use client";
+// Interactive <PictogramRow> (plan/22 #7). `live` announces value changes
+// ("6 of 8."). No per-unit pointer targets — the units are ONE datum; hovering
+// unit 4 of 8 has no distinct meaning (documented skip). Composes the static
+// component (canon).
+import { useEffect, useMemo, useRef, useState } from "react";
+import { makeFormatter } from "../../core/format.js";
+import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
+import {
+  PictogramRow as StaticPictogramRow,
+  pictogramSummary,
+  type PictogramRowProps,
+} from "./index.js";
+
+export interface InteractivePictogramRowProps extends PictogramRowProps {
+  /** Announce when the value changes (default true). */
+  live?: boolean;
+  strings?: ScalarStrings;
+}
+
+export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNode {
+  const { live = true, strings = EN_SCALAR, title, format, locale, ...rest } = props;
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  const text = pictogramSummary(rest.value, rest.total, fmt, strings);
+
+  const [announced, setAnnounced] = useState("");
+  const prev = useRef(rest.value);
+  useEffect(() => {
+    if (prev.current === rest.value) return;
+    prev.current = rest.value;
+    if (live) setAnnounced(text);
+  }, [rest.value, text, live]);
+
+  const label = [title, text].filter(Boolean).join(". ") || undefined;
+
+  return (
+    <span
+      className="mc-pictogram-live"
+      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      tabIndex={0}
+      role="img"
+      aria-label={label}
+    >
+      <StaticPictogramRow
+        {...rest}
+        format={format}
+        locale={locale}
+        strings={strings}
+        summary={false}
+      />
+      {live ? (
+        <span
+          aria-live="polite"
+          style={{
+            position: "absolute",
+            width: 1,
+            height: 1,
+            overflow: "hidden",
+            clip: "rect(0 0 0 0)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {announced}
+        </span>
+      ) : null}
+    </span>
+  );
+}

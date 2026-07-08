@@ -38,9 +38,10 @@ describe("catalog ↔ package exports (plan/20 §5.3)", () => {
         [c.staticImport, c.interactiveImport].filter(Boolean).map((i) => toSubpath(i!)),
       ),
     );
-    // every chart subpath in exports (excluding root, package.json, styles) is catalogued
+    // every chart subpath in exports is catalogued; non-chart shared layers
+    // (the annotations entry) are documented as guides, not catalog rows
     const chartSubpaths = Object.keys(pkg.exports).filter(
-      (k) => k !== "." && k !== "./package.json" && k !== "./styles.css",
+      (k) => k !== "." && k !== "./package.json" && k !== "./styles.css" && k !== "./annotations",
     );
     for (const sub of chartSubpaths) {
       expect(catalogSubpaths.has(sub)).toBe(true);

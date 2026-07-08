@@ -1,0 +1,130 @@
+---
+title: MiniBar
+description: A tiny categorical bar chart for React table cells — zero-anchored bars, honest data order, highlight and polarity built in.
+---
+
+MiniBar answers "which category is biggest, and by roughly how much?". Bars are always
+zero-anchored, and the data's own order is the default truth — weekday order or funnel
+order carries meaning that ranking would destroy, so `sort` is explicit, never silent.
+
+<LiveDemo
+  label="MiniBar"
+  sizeOf="mini-bar"
+  code={`import { MiniBar } from "@microcharts/react/mini-bar";
+
+<MiniBar data={[
+  { label: "East", value: 940 },
+  { label: "West", value: 410 },
+  { label: "South", value: 620 },
+  { label: "North", value: 120 },
+]} title="Sales by region" />`}
+>
+  <MiniBar
+    data={[
+      { label: "East", value: 940 },
+      { label: "West", value: 410 },
+      { label: "South", value: 620 },
+      { label: "North", value: 120 },
+    ]}
+    title="Sales by region"
+    width={150} height={48}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="mini-bar" />
+
+## Try it
+
+<Playground chart="mini-bar" />
+
+## Interactive
+
+<InteractiveDemo slug="mini-bar" />
+
+## When to use it
+
+- **Good for** — per-row category mix in tables, small comparisons in KPI cards.
+- **Avoid for** — more than 8 categories (a full bar chart) or time series (SparkBar).
+
+## Sizing
+
+<Sizing chart="mini-bar" />
+
+## Variants
+
+<LiveDemo
+  label="ranked"
+  code={`// reordering changes what the chart SAYS, so it's a data prop
+<MiniBar data={regions} sort="desc" />`}
+>
+  <MiniBar
+    data={[
+      { label: "East", value: 940 },
+      { label: "West", value: 410 },
+      { label: "South", value: 620 },
+      { label: "North", value: 120 },
+    ]}
+    sort="desc"
+    title="Ranked"
+    width={120}
+    height={36}
+  />
+</LiveDemo>
+
+<LiveDemo label="highlight" code={`<MiniBar data={regions} highlight="South" />`}>
+  <MiniBar
+    data={[
+      { label: "East", value: 940 },
+      { label: "West", value: 410 },
+      { label: "South", value: 620 },
+      { label: "North", value: 120 },
+    ]}
+    highlight="South"
+    title="This row's category"
+    width={120}
+    height={36}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="signed + polarity"
+  code={`// bars extend below zero; positive engages the valence tokens
+<MiniBar data={dailyDelta} positive="up" />`}
+>
+  <MiniBar
+    data={[
+      { label: "Mon", value: 4 },
+      { label: "Tue", value: -2 },
+      { label: "Wed", value: 6 },
+      { label: "Thu", value: -1 },
+      { label: "Fri", value: 3 },
+    ]}
+    positive="up"
+    title="Daily delta"
+    width={120}
+    height={36}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="mini-bar" />
+
+## Why this default
+
+Unsorted by default: the data's order often IS information. Null values keep their slot
+as a gap, so a missing category never shifts its neighbors. Explicit domains are widened
+to include zero — a bar whose length doesn't start at zero is a lie, so the component
+refuses to draw one.
+
+## Accessibility
+
+The accessible name carries count and extremes — **"4 categories. Highest East 940,
+lowest North 120."** The interactive entry announces each bar with its rank:
+**"East: 940 — 1st of 4."**
+
+## Props
+
+<PropTable slug="mini-bar" />

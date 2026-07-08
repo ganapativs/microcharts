@@ -1,0 +1,97 @@
+---
+title: Dumbbell
+description: A dumbbell chart for React — where each row started and ended, hollow-to-filled direction with no legend needed.
+---
+
+Dumbbell answers "where did each row start and end?". The hollow dot is _before_, the
+filled dot is _after_ — direction is shape-coded, so it never relies on color alone.
+With `positive` the connector takes the valence token by direction.
+
+<LiveDemo
+  label="Dumbbell"
+  sizeOf="dumbbell"
+  code={`import { Dumbbell } from "@microcharts/react/dumbbell";
+
+<Dumbbell data={[{ from: 62000, to: 84000 }]} title="Band move" />`}
+>
+  <Dumbbell data={[{ from: 62000, to: 84000 }]} title="Band move" style={{ width: 200, height: 28 }} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="dumbbell" />
+
+## Try it
+
+<Playground chart="dumbbell" />
+
+## Interactive
+
+<InteractiveDemo slug="dumbbell" />
+
+## When to use it
+
+- **Good for** — salary bands, before/after per table row, ranges.
+- **Avoid for** — many categories where crossings matter (Slope) or the path between
+  (Sparkline).
+
+## Sizing
+
+<Sizing chart="dumbbell" />
+
+## Variants
+
+<LiveDemo label="valence" code={`<Dumbbell data={moves} positive="up" />`}>
+  <Dumbbell
+    data={[
+      { label: "Paris", from: 52, to: 61 },
+      { label: "Oslo", from: 66, to: 60 },
+    ]}
+    positive="up"
+    title="Moves"
+    style={{ width: 200, height: 44 }}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="no change"
+  code={`// from === to → a single dot, honestly
+<Dumbbell data={[{ from: 55, to: 55 }]} />`}
+>
+  <Dumbbell data={[{ from: 55, to: 55 }]} title="Flat" style={{ width: 200, height: 24 }} />
+</LiveDemo>
+
+<LiveDemo
+  label="values"
+  code={`<Dumbbell data={[{ from: 40, to: 60 }]} label="value" domain={[0, 100]} />`}
+>
+  <Dumbbell
+    data={[{ from: 40, to: 60 }]}
+    label="value"
+    domain={[0, 100]}
+    title="With values"
+    style={{ width: 240, height: 26 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="dumbbell" />
+
+## Why this default
+
+Hollow → filled reads as before → after without a legend, and renders identically
+whichever way the data runs — direction comes from the values, not the array order. For
+_ranges_ (min→max, confidence spans) the docs require dropping `positive`: a range has
+no valence, and coloring it green or red would invent one.
+
+## Accessibility
+
+Single row: **"From 62,000 to 84,000, up 35%."**; a degenerate pair says **"No change at
+62,000."**; multi-row leads with the largest change (**"2 rows. Largest change Berlin,
+up 42%."**). The interactive entry roves rows with ↑/↓ and inspects either end with ←/→
+("From: 48." / "To: 68.").
+
+## Props
+
+<PropTable slug="dumbbell" />

@@ -9,6 +9,8 @@ import { makeFormatter } from "../../core/format.js";
 import { describeSeries, type DescribeOptions } from "../../core/summary.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 import { labelMetrics, sparkBarGeometry, type Bar, type SparkBarMode } from "./geometry.js";
+import { resolveAnnotations } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 
 /** Ink role for a bar: valence color in win-loss / negatives, else neutral or
  *  accent for the endpoint. Position already encodes sign, so color is redundant
@@ -87,6 +89,16 @@ export function SparkBar(props: SparkBarProps): ReactNode {
   });
   const last = geo.bars.at(-1);
 
+  // annotations host contract (plan/22 #28): Marker x = data INDEX (bar slot
+  // center), Threshold/TargetZone y = data values (sign space in win-loss).
+  const ann = resolveAnnotations(children, {
+    x: (i) => geo.x0 + i * geo.slot + geo.slot / 2,
+    y: scaleLinear(geo.domain, [height - 1, 1]),
+    width,
+    height,
+    fontSize: Math.max(5, Math.min(Math.round(height * 0.22), 9)),
+  });
+
   return (
     <Chart
       width={width}
@@ -97,6 +109,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
       className={className ? `mc-sparkbar ${className}` : "mc-sparkbar"}
       style={style}
     >
+      {ann.under}
       {geo.bars.map((bar) => (
         <rect
           key={bar.index}
@@ -116,14 +129,15 @@ export function SparkBar(props: SparkBarProps): ReactNode {
             Math.min(Math.max(last.y, metrics.fontSize * 0.6), height - metrics.fontSize * 0.6),
           )}
           fontSize={metrics.fontSize}
-          dominantBaseline="middle"
+          dominantBaseline="central"
           textAnchor="start"
           data-mc-ink="accent"
         >
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

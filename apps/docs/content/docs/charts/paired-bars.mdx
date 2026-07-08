@@ -1,0 +1,105 @@
+---
+title: PairedBars
+description: Actual vs expected per category for React tables — grouped or overlay bars on one shared zero-anchored scale.
+---
+
+PairedBars answers "how does actual compare to expected, category by category?". Value
+and reference always share one zero-anchored domain — comparing bars on different scales
+is the cardinal grouped-bar lie — and the reference is muted by two structural cues
+(opacity _and_ width), never color alone.
+
+<LiveDemo
+  label="PairedBars"
+  sizeOf="paired-bars"
+  code={`import { PairedBars } from "@microcharts/react/paired-bars";
+
+<PairedBars data={[
+  { label: "East", value: 940, ref: 1200 },
+  { label: "West", value: 410, ref: 400 },
+]} title="Actual vs plan" />`}
+>
+  <PairedBars
+    data={[
+      { label: "East", value: 940, ref: 1200 },
+      { label: "West", value: 410, ref: 400 },
+      { label: "South", value: 620, ref: 600 },
+      { label: "North", value: 120, ref: 300 },
+    ]}
+    title="Actual vs plan"
+    width={200} height={64}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="paired-bars" />
+
+## Try it
+
+<Playground chart="paired-bars" />
+
+## Interactive
+
+<InteractiveDemo slug="paired-bars" />
+
+## When to use it
+
+- **Good for** — budget vs actual per region, target vs result rows.
+- **Avoid for** — data without a reference series (MiniBar) or more than 5 pairs.
+
+## Sizing
+
+<Sizing chart="paired-bars" />
+
+## Variants
+
+<LiveDemo
+  label="overlay"
+  code={`// the ghost is always the REFERENCE, never the value
+<PairedBars data={regions} mode="overlay" />`}
+>
+  <PairedBars
+    data={[
+      { label: "East", value: 940, ref: 1200 },
+      { label: "West", value: 410, ref: 400 },
+    ]}
+    mode="overlay"
+    title="Overlay"
+    width={140}
+    height={44}
+  />
+</LiveDemo>
+
+<LiveDemo label="valence" code={`<PairedBars data={regions} positive="up" />`}>
+  <PairedBars
+    data={[
+      { label: "East", value: 940, ref: 1200 },
+      { label: "West", value: 410, ref: 400 },
+    ]}
+    positive="up"
+    title="Over/under plan"
+    width={140}
+    height={44}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="paired-bars" />
+
+## Why this default
+
+Grouped over overlay by default — overlap hides small over-shoots, so the denser overlay
+form is the variant you choose for tight cells, not the analytical default. A pair with a
+missing reference renders the value bar alone and announces "no reference"; a chart where
+_every_ reference is missing dev-warns and steers to MiniBar.
+
+## Accessibility
+
+The accessible name leads with the largest gap — **"4 pairs. Largest gap East: 940 vs
+1,200."** The interactive entry roves pairs and announces each as value vs reference
+(**"East: 940 vs 1,200."**).
+
+## Props
+
+<PropTable slug="paired-bars" />

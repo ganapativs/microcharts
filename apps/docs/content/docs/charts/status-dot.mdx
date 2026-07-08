@@ -1,0 +1,105 @@
+---
+title: StatusDot
+description: A categorical state mark for React — five paired shape+color states that survive grayscale, print, and forced-colors.
+---
+
+StatusDot answers "what state is this thing in right now?". Every state pairs a distinct
+silhouette with a semantic color — filled circle, triangle, diamond, hollow ring,
+half-filled circle — so two states can never collapse into the same mark for the 1-in-12
+colorblind readers a colored disc fails.
+
+<LiveDemo
+  label="StatusDot"
+  sizeOf="status-dot"
+  code={`import { StatusDot } from "@microcharts/react/status-dot";
+
+<StatusDot status="ok" title="API" />`}
+>
+  <span className="text-lg">
+    {"The API is "}
+    <StatusDot status="ok" title="API" style={{ width: "0.6em", height: "0.6em" }} />
+    {" operational."}
+  </span>
+</LiveDemo>
+
+## Install
+
+<Usage chart="status-dot" />
+
+## Try it
+
+<Playground chart="status-dot" />
+
+## Interactive
+
+<InteractiveDemo slug="status-dot" />
+
+## When to use it
+
+- **Good for** — service lists, inline state in a sentence, monitoring rows.
+- **Avoid for** — quantities, trends, or vocabularies past ~6 states (marks stop being
+  memorable).
+
+## The state contract
+
+| status  | glyph              | token           |
+| ------- | ------------------ | --------------- |
+| `ok`    | filled circle      | `--mc-positive` |
+| `warn`  | triangle           | `--mc-cat-1`    |
+| `error` | diamond            | `--mc-negative` |
+| `off`   | hollow ring        | `--mc-neutral`  |
+| `busy`  | half-filled circle | `--mc-accent`   |
+
+The pairing is a contract: `color` recolors a state but never reshapes it, and a theme
+must never let two states share a silhouette.
+
+## Sizing
+
+<Sizing chart="status-dot" />
+
+## Variants
+
+<LiveDemo
+  label="pulse"
+  code={`// "this state is live" — monitoring contexts; gated on reduced motion
+<StatusDot status="ok" pulse />`}
+>
+  <StatusDot status="ok" pulse title="Live" style={{ width: 18, height: 18 }} />
+</LiveDemo>
+
+<LiveDemo
+  label="custom vocabulary"
+  code={`<StatusDot
+  status="degraded"
+  states={{ degraded: { glyph: "triangle", token: "--mc-cat-1", label: "degraded" } }}
+/>`}
+>
+  <StatusDot
+    status="degraded"
+    states={{ degraded: { glyph: "triangle", token: "--mc-cat-1", label: "degraded" } }}
+    title="Search"
+    style={{ width: 18, height: 18 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="status-dot" />
+
+## Why this default
+
+Shape+color pairing beats a colored disc: the five silhouettes stay distinct in
+grayscale, print, and forced-colors, where color-only status dots all become the same
+gray circle. An unknown status key renders the `off` ring with a dev warning — never a
+plausible-looking wrong state.
+
+## Accessibility
+
+The accessible name is the state's label — **"Status: warning."** — composed with your
+`title` ("Deploys. Status: warning."). The interactive entry announces state changes
+through a polite live region and stays quiet on mount. `pulse` is a CSS halo that
+disappears entirely under `prefers-reduced-motion`.
+
+## Props
+
+<PropTable slug="status-dot" />

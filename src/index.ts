@@ -10,7 +10,8 @@
 export const MICROCHARTS_VERSION = "0.0.1";
 
 // Flagship: standalone natural-language series summary (plan/08 §2).
-export { describeSeries, EN } from "./core/summary.js";
+export { describeSeries } from "./core/summary.js";
+export { EN } from "./core/strings.js";
 export type { SummaryStrings, DescribeOptions } from "./core/summary.js";
 
 // Theming + the shared chart shell (plan/06, plan/03).

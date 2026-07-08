@@ -1,0 +1,110 @@
+---
+title: Ohlc
+description: A word-sized OHLC/candlestick chart for React — per-period price action in a table cell, capped at 20 periods, never averaged.
+---
+
+Ohlc answers "what was the price action per period?" — open, high, low, close, in a
+cell. Direction is encoded by valence color AND body geometry, never color alone.
+
+<LiveDemo
+  label="Ohlc"
+  sizeOf="ohlc"
+  code={`import { Ohlc } from "@microcharts/react/ohlc";
+
+<Ohlc data={sessions} title="ACME 20 sessions" />`}
+>
+  <Ohlc
+    data={Array.from({ length: 20 }, (_, i) => {
+      const base = 140 + Math.sin(i / 3) * 8 + i * 0.6;
+      return {
+        open: Math.round(base * 10) / 10,
+        high: Math.round((base + 3 + (i % 3)) * 10) / 10,
+        low: Math.round((base - 3 - (i % 2)) * 10) / 10,
+        close: Math.round((base + (i % 2 === 0 ? 2 : -1.5)) * 10) / 10,
+      };
+    })}
+    title="ACME 20 sessions"
+    style={{ width: 240, height: 30 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="ohlc" />
+
+## Try it
+
+<Playground chart="ohlc" />
+
+## Interactive
+
+<InteractiveDemo slug="ohlc" />
+
+## When to use it
+
+- **Good for** — watchlist table rows, ticker KPI cards.
+- **Avoid for** — a single close series (Sparkline), or more than ~20 periods.
+
+## Sizing
+
+<Sizing chart="ohlc" />
+
+## Variants
+
+<LiveDemo
+  label="bars"
+  code={`// open tick left, close tick right — the pre-candle convention
+<Ohlc data={sessions} variant="bars" />`}
+>
+  <Ohlc
+    data={Array.from({ length: 20 }, (_, i) => {
+      const base = 140 + Math.sin(i / 3) * 8 + i * 0.6;
+      return {
+        open: Math.round(base * 10) / 10,
+        high: Math.round((base + 3 + (i % 3)) * 10) / 10,
+        low: Math.round((base - 3 - (i % 2)) * 10) / 10,
+        close: Math.round((base + (i % 2 === 0 ? 2 : -1.5)) * 10) / 10,
+      };
+    })}
+    variant="bars"
+    title="Bar form"
+    style={{ width: 240, height: 30 }}
+  />
+</LiveDemo>
+
+<LiveDemo label="last close label" code={`<Ohlc data={sessions} label="last" />`}>
+  <Ohlc
+    data={Array.from({ length: 20 }, (_, i) => {
+      const base = 140 + Math.sin(i / 3) * 8 + i * 0.6;
+      return {
+        open: Math.round(base * 10) / 10,
+        high: Math.round((base + 3 + (i % 3)) * 10) / 10,
+        low: Math.round((base - 3 - (i % 2)) * 10) / 10,
+        close: Math.round((base + (i % 2 === 0 ? 2 : -1.5)) * 10) / 10,
+      };
+    })}
+    label="last"
+    title="With last close"
+    style={{ width: 260, height: 30 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="ohlc" />
+
+## Why this default
+
+`maxPeriods` renders the most recent N sessions and warns in development past it — data
+is truncated visibly, never averaged into fake candles. Bodies keep a minimum 1-unit
+height so doji sessions stay visible.
+
+## Accessibility
+
+The accessible name is the run read — **"20 periods. Last close 150.3, up 7.4%; range
+136.4 to 156."** The interactive entry announces each session's four prices (**"Period
+18 of 20: open 149.1, high 154.1, low 145.1, close 151.1."**).
+
+## Props
+
+<PropTable slug="ohlc" />

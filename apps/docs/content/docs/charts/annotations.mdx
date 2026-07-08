@@ -1,0 +1,100 @@
+---
+title: Annotations
+description: Declarative reference context for React microcharts — thresholds, target zones, moment markers, and callouts as children.
+---
+
+Annotations answer "what should the reader compare the data against?". They are plain
+children — `<Threshold>`, `<TargetZone>`, `<Marker>`, `<Callout>` — rendered by the host
+chart in its own coordinate space, identical inside every host. Reference ink whispers:
+everything sits at 0.7 opacity or below, so the data never competes with its context.
+
+<LiveDemo
+  label="Annotations"
+  sizeOf="annotations"
+  code={`import { Sparkline } from "@microcharts/react/sparkline";
+import { Threshold, TargetZone, Marker } from "@microcharts/react/annotations";
+
+<Sparkline data={latency} title="p95 latency" width={160} height={40}>
+  <TargetZone y={[40, 60]} />
+  <Threshold y={65} label="SLA" />
+  <Marker x={8} label="deploy" />
+</Sparkline>`}
+>
+  <Sparkline
+    data={[48, 52, 45, 58, 51, 47, 55, 49, 71, 64, 57, 52]}
+    title="p95 latency"
+    width={160}
+    height={40}
+  >
+    <TargetZone y={[40, 60]} />
+    <Threshold y={65} label="SLA" />
+    <Marker x={8} label="deploy" />
+  </Sparkline>
+</LiveDemo>
+
+## Install
+
+```tsx
+import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annotations";
+```
+
+The annotation layer is its own ~1.5 kB entry. Hosts that render no annotations pay only
+a tiny children walker — the mark renderers ship with this import.
+
+## The vocabulary
+
+- **`<Threshold y={65} label="SLA" />`** — a dashed reference hairline at a data-space y.
+- **`<TargetZone y={[40, 60]} />`** — a normal-range band, always _below_ the data ink.
+- **`<Marker x={8} label="deploy" />`** — a vertical moment mark; `x` addresses the
+  host's primary axis (the data **index** on S1 charts like Sparkline/SparkBar).
+- **`<Marker x={8} celebrate />`** — six deterministic particles burst once on entrance
+  (milestone crossings only; under reduced motion they rest as a quiet starburst).
+- **`<Callout x={5} y={45} label="dip" />`** — one narrated point with an elbow hairline.
+
+<LiveDemo
+  label="celebrate"
+  code={`<Sparkline data={signups} width={160} height={36}>
+  <Marker x={9} celebrate label="10k!" />
+</Sparkline>`}
+>
+  <Sparkline
+    data={[3, 4, 5, 5, 6, 8, 9, 11, 12, 14, 15, 17]}
+    title="Signups"
+    width={160}
+    height={36}
+  >
+    <Marker x={9} celebrate label="10k!" />
+  </Sparkline>
+</LiveDemo>
+
+<LiveDemo
+  label="callout"
+  code={`<Sparkline data={latency} width={160} height={40}>
+  <Callout x={3} y={58} label="cache miss" />
+</Sparkline>`}
+>
+  <Sparkline
+    data={[48, 52, 45, 58, 51, 47, 55, 49, 51, 46]}
+    title="Latency"
+    width={160}
+    height={40}
+  >
+    <Callout x={3} y={58} label="cache miss" />
+  </Sparkline>
+</LiveDemo>
+
+## Hosts
+
+Every S1/S2 chart hosts annotations: Sparkline, SparkBar, and the core batch as it ships.
+Scalar and structured charts (Progress, StatusDot, MicroDonut, timelines) don't take
+annotations in v1 — their pages say so. Marker-x semantics (index vs category) are
+documented per host.
+
+## Honesty rules
+
+- Coordinates outside the host's domain **clamp to the edge at 0.4 opacity** — visibly
+  off-scale, never silently dropped.
+- Annotations never mutate the auto summary: the data description stays pure. When you
+  narrate an annotation statically, pass an explicit `summary` string.
+- `celebrate` particles are seeded from the data (never `Math.random`), so server and
+  client always render the same burst.

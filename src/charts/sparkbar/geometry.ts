@@ -36,6 +36,12 @@ export interface SparkBarGeometry {
   bars: Bar[];
   /** y of the zero baseline (bar mode) or the mid-line (win-loss). */
   baselineY: number;
+  /** Resolved y-domain (win-loss uses sign space [−1, 1]) — annotations frame. */
+  domain: readonly [number, number];
+  /** Slot pitch on x (annotations Marker x = data index). */
+  slot: number;
+  /** Left plot inset. */
+  x0: number;
 }
 
 export interface SparkBarGeometryOptions {
@@ -94,7 +100,7 @@ export function sparkBarGeometry(
         last: i === lastFinite,
       });
     }
-    return { bars, baselineY: mid };
+    return { bars, baselineY: mid, domain: [-1, 1], slot, x0 };
   }
 
   const domain = opts.domain ?? niceDomain(data, true);
@@ -123,5 +129,5 @@ export function sparkBarGeometry(
       last: i === lastFinite,
     });
   }
-  return { bars, baselineY };
+  return { bars, baselineY, domain, slot, x0 };
 }

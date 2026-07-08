@@ -1,0 +1,103 @@
+---
+title: CalendarStrip
+description: A word-sized calendar heatmap for React — the last few weeks day by day, real calendar position, no-record days honestly distinct from zeros.
+---
+
+CalendarStrip answers "what did the last few weeks actually look like, day by day?" —
+week-aligned recent activity where real calendar position matters. Weekday rhythm is the
+read; for longer ordinal histories, use ActivityGrid.
+
+<LiveDemo
+  label="CalendarStrip"
+  sizeOf="calendar-strip"
+  code={`import { CalendarStrip } from "@microcharts/react/calendar-strip";
+
+<CalendarStrip data={days} end="2026-07-01" title="Deploy cadence" />`}
+>
+  <CalendarStrip
+    data={Array.from({ length: 18 }, (_, i) => ({
+      date: `2026-06-${String(4 + i).padStart(2, "0")}`,
+      value: i % 4 === 3 ? 0 : (i % 7) + 1,
+    }))}
+    end="2026-07-01"
+    title="Deploy cadence"
+    style={{ width: 150, height: 84 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="calendar-strip" />
+
+## Try it
+
+<Playground chart="calendar-strip" />
+
+## Interactive
+
+<InteractiveDemo slug="calendar-strip" />
+
+## When to use it
+
+- **Good for** — habit/deploy cadence in KPI cards, week-aligned recent activity.
+- **Avoid for** — long ordinal histories (ActivityGrid), exact per-day values (MiniBar).
+
+## Sizing
+
+<Sizing chart="calendar-strip" />
+
+## Variants
+
+<LiveDemo label="two weeks" code={`<CalendarStrip data={days} end="2026-07-01" weeks={2} />`}>
+  <CalendarStrip
+    data={Array.from({ length: 18 }, (_, i) => ({
+      date: `2026-06-${String(4 + i).padStart(2, "0")}`,
+      value: i % 4 === 3 ? 0 : (i % 7) + 1,
+    }))}
+    end="2026-07-01"
+    weeks={2}
+    title="Two weeks"
+    style={{ width: 150, height: 42 }}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="Sunday weeks"
+  code={`<CalendarStrip data={days} end="2026-07-01" weekStart={0} />`}
+>
+  <CalendarStrip
+    data={Array.from({ length: 18 }, (_, i) => ({
+      date: `2026-06-${String(4 + i).padStart(2, "0")}`,
+      value: i % 4 === 3 ? 0 : (i % 7) + 1,
+    }))}
+    end="2026-07-01"
+    weekStart={0}
+    title="Sunday start"
+    style={{ width: 150, height: 84 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="calendar-strip" />
+
+## Why this default
+
+Monday start + 4 weeks: one glance covers a month of weekday rhythm without scrolling
+history. All date math is UTC — the same input renders identically in any host timezone,
+so SSR output never depends on where the server runs. `end` defaults to today but should
+be pinned wherever determinism matters.
+
+Empty ≠ zero: a day with no record renders as a faint outline, a day with value 0 as a
+filled track cell — a feed gap never masquerades as a quiet day. Future days are blank,
+never extrapolated.
+
+## Accessibility
+
+The accessible name counts real days — **"Active 11 of 24 days over 4 weeks."** The
+interactive entry walks the grid in 2-D and announces real calendar days (**"Tuesday,
+June 9: 0."**, **"Tuesday, June 16: no data."**).
+
+## Props
+
+<PropTable slug="calendar-strip" />

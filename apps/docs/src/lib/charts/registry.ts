@@ -15,8 +15,72 @@ import sparkbar from "./sparkbar";
 import delta from "./delta";
 import bullet from "./bullet";
 import activityGrid from "./activity-grid";
+import trendArrow from "./trend-arrow";
+import statusDot from "./status-dot";
+import heatCell from "./heat-cell";
+import progress from "./progress";
+import rugStrip from "./rug-strip";
+import miniBar from "./mini-bar";
+import pictogramRow from "./pictogram-row";
+import seismogram from "./seismogram";
+import heatStrip from "./heat-strip";
+import dotPlot from "./dot-plot";
+import dumbbell from "./dumbbell";
+import pairedBars from "./paired-bars";
+import slope from "./slope";
+import microScatter from "./micro-scatter";
+import segmentedBar from "./segmented-bar";
+import histogramStrip from "./histogram-strip";
+import microBox from "./micro-box";
+import progressRing from "./progress-ring";
+import microDonut from "./micro-donut";
+import funnel from "./funnel";
+import likertStrip from "./likert-strip";
+import waterfall from "./waterfall";
+import bumpStrip from "./bump-strip";
+import dualSparkline from "./dual-sparkline";
+import stackedArea from "./stacked-area";
+import ohlc from "./ohlc";
+import horizon from "./horizon";
+import calendarStrip from "./calendar-strip";
+import eventTimeline from "./event-timeline";
 
-const MODULES: ChartModule[] = [sparkline, sparkbar, delta, bullet, activityGrid];
+const MODULES: ChartModule[] = [
+  sparkline,
+  sparkbar,
+  delta,
+  bullet,
+  activityGrid,
+  trendArrow,
+  statusDot,
+  heatCell,
+  progress,
+  rugStrip,
+  miniBar,
+  pictogramRow,
+  seismogram,
+  heatStrip,
+  dotPlot,
+  dumbbell,
+  pairedBars,
+  slope,
+  microScatter,
+  segmentedBar,
+  histogramStrip,
+  microBox,
+  progressRing,
+  microDonut,
+  funnel,
+  likertStrip,
+  waterfall,
+  bumpStrip,
+  dualSparkline,
+  stackedArea,
+  ohlc,
+  horizon,
+  calendarStrip,
+  eventTimeline,
+];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(
   MODULES.map((m) => [m.entry.slug, m]),

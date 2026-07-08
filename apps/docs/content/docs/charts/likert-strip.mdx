@@ -1,0 +1,108 @@
+---
+title: LikertStrip
+description: A diverging Likert strip for React — valence and balance from a center line, with both neutral conventions supported honestly.
+---
+
+LikertStrip answers "does the response lean agree or disagree — and how hard?" — the
+valence + balance read that SegmentedBar (unvalenced composition) cannot say. The center
+line is the question; everything else is the answer.
+
+<LiveDemo
+  label="LikertStrip"
+  sizeOf="likert-strip"
+  code={`import { LikertStrip } from "@microcharts/react/likert-strip";
+
+<LikertStrip data={responses} title="Q1 satisfaction" />`}
+>
+  <LikertStrip
+    data={[
+      { label: "Strongly disagree", value: 10 },
+      { label: "Disagree", value: 14 },
+      { label: "Neutral", value: 14 },
+      { label: "Agree", value: 34 },
+      { label: "Strongly agree", value: 28 },
+    ]}
+    title="Q1 satisfaction"
+    width={220} height={24}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="likert-strip" />
+
+## Try it
+
+<Playground chart="likert-strip" />
+
+## Interactive
+
+<InteractiveDemo slug="likert-strip" />
+
+## When to use it
+
+- **Good for** — survey question rows (share one scale via SparkGroup), sentiment in cards.
+- **Avoid for** — more than 7 levels, or exact per-level values (MiniBar).
+
+## Sizing
+
+<Sizing chart="likert-strip" />
+
+## Variants
+
+<LiveDemo
+  label="omit neutral"
+  code={`// the known critique of center-split neutral — supported, never silent
+<LikertStrip data={responses} neutral="omit" />`}
+>
+  <LikertStrip
+    data={[
+      { label: "Strongly disagree", value: 10 },
+      { label: "Disagree", value: 14 },
+      { label: "Neutral", value: 14 },
+      { label: "Agree", value: 34 },
+      { label: "Strongly agree", value: 28 },
+    ]}
+    neutral="omit"
+    title="Omit neutral"
+    width={220}
+    height={24}
+  />
+</LiveDemo>
+
+<LiveDemo label="net score" code={`<LikertStrip data={responses} label="net" />`}>
+  <LikertStrip
+    data={[
+      { label: "Strongly disagree", value: 10 },
+      { label: "Disagree", value: 14 },
+      { label: "Neutral", value: 14 },
+      { label: "Agree", value: 34 },
+      { label: "Strongly agree", value: 28 },
+    ]}
+    label="net"
+    title="Net score"
+    width={220}
+    height={24}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="likert-strip" />
+
+## Why this default
+
+Both neutral conventions are supported honestly: `split` straddles the center (the
+canonical placement), `omit` removes neutral from the bar for cleaner pole comparison —
+but its share is ALWAYS labeled and spoken; neutral is never silently dropped. Graded
+opacity encodes ordinal distance from neutral, never magnitude.
+
+## Accessibility
+
+The accessible name is the full valence read — **"62% agree, 24% disagree, 14% neutral.
+Leans positive."** A |net| under 5 points reads "Balanced." The interactive entry steps
+levels in data order (**"Disagree: 14%, level 2 of 5."**).
+
+## Props
+
+<PropTable slug="likert-strip" />

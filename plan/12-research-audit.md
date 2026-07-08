@@ -320,3 +320,105 @@ N-node charts regression floors at ~half their measured 2026-07-08 baseline (spa
 activity-grid 5) — tripwires, not aspirations; measured numbers in `bench/results.json`.
 Measurement fix in the same pass: warm every component process-wide before measuring any (the first
 chart otherwise pays renderToStaticMarkup JIT warmup and reads 3–4× slow), median of 5 windows.
+
+**Batch 1 W1 budget divergence (2026-07-08, plan/22 #1–4 — needs user sign-off at the batch gate):**
+plan/22 set W1 static budgets of 1.2–1.5 kB, below the measured floor of any `Chart`-composed SVG
+chart: the shared wrapper (Chart + a11y naming) + cached formatter + JSX glue cost ~0.9–1.0 kB gz
+before any chart code (evidence: shipped Bullet = 1.56 kB static; Delta's 0.92 kB is HTML-only, no
+Chart shell — the "Delta-class ≤ 1.5" target only fits chart-less inline components). Trims measured
+first (esbuild --analyze per entry): the one structural win was splitting the growing `EN` dictionary
+into per-shape MODULES (`core/strings-scalar.ts` EN_SCALAR, `EN_SERIES` in summary.ts, `EN`
+aggregate in `core/strings.ts`) — bundlers keep whole chunks, so before the split every chart paid
+every batch's new templates (sparkline had crept +113 B over its exception; back under after).
+Final measured/budgeted (static/interactive, gz): trend-arrow 1.64→1.7/1.94→2 kB · status-dot
+1.55→1.6/1.8→1.9 kB · heat-cell 1.7→1.75/2.09→2.15 kB · progress 1.82→1.9/2.11→2.2 kB. All well
+inside the 3/4 kB hard caps and ≤ 2 kB target; the plan/22 per-chart numbers for later waves should
+be read as (chart-specific code) + ~1.5 kB shared floor. NOT a precedent for the hard caps.
+
+**Progress label-gutter honesty fix (2026-07-08, W1 craft review):** the spec's "viewBox 48×8 with a
+right label gutter reserved" was first implemented by shrinking the track inside a fixed 48-unit
+box — screenshot review caught that rows with different label lengths ("44%" vs "112%") then render
+different track widths, silently changing the scale row-to-row in a table column. Fixed: the gutter
+WIDENS the viewBox (total = width + gutter) and the track always spans the full given width;
+regression-tested (`progress/geometry.test.ts` comparability case). Same rule already used by
+TrendArrow `showValue`.
+
+**Annotations host-cost architecture (2026-07-08, Batch 1 W4 — plan/22 #28):** the spec's "hosts
+call the shared resolver" was first implemented with the resolver + all four mark renderers in one
+module — that bundled the whole annotation layer (+~1.4 kB gz, incl. celebrate/jitter) into EVERY
+host's static entry and blew sparkline's pinned exception to 4.76 kB. Restructured: each annotation
+component carries its mark renderer as a static field (ships with the consumer's
+`@microcharts/react/annotations` import, 1.46/1.5 kB), and hosts import only a tiny children walker
+(`shared/annotations-host.tsx`, ~0.29 kB incl. the scale frame). Residual: sparkline
+3.61/4.61 kB measured → budget set 3.65/4.65 kB, PENDING user sign-off at the batch gate (the prior
+3.35/4.35 exception + the spec-mandated host contract conflict; every other host absorbs the walker
+inside its normal headroom). Fragment children are unwrapped by the walker (React's Children.forEach
+does not descend into <>…</>).
+
+**`style` variant-prop collision (2026-07-08, Batch 1 W5):** plan/21 §3 names the render-styling
+variant vocabulary `style` (StackedArea ridge, Ohlc candle/bars). On DOM-facing React components
+`style` is reserved for CSSProperties (every shipped chart already forwards it as CSS). Resolution:
+the variant prop is named **`variant`** (`<StackedArea variant="ridge">`, `<Ohlc variant="bars">`),
+same semantics as the plan's `style` vocabulary; the CSS `style` prop stays untouched. Surfaced as
+a plan↔code divergence per the working rule — rename in plan/21/22 wording at the batch gate.
+
+**DualSparkline `curve="step"` (2026-07-08, W5):** renders as linear. The shared `curve` grammar
+lists step, but on a two-line benchmark strip the step form reads as noise, and importing the step
+path builder pushed the entry past the 3 kB HARD cap (3 008 B measured). Divergence documented in
+the chart's docs page; revisit only with a measured trim elsewhere.
+
+**`core/calendar` module split (2026-07-08, W6):** `weekGrid`/`dayOfYear`/`daysInYear`/
+`monthStartDays`/`isoDate` moved to `core/calendar-grid.ts`; `calendar.ts` keeps only
+`parseUTCDay`. Chunk granularity (see the strings-module rationale): once CalendarStrip
+made calendar.ts a shared chunk, ActivityGrid would have carried the whole grid kernel
+for one day-parsing call. ActivityGrid interactive budget 3.25 → 3.3 kB — the 3.25 was
+measured-exact with zero headroom, and content-hash renames alone move gzip by ±5 B.
+
+**`normalizeShares` denormal fix (2026-07-08, W6):** the float remainder (1 − Σshares)
+was added to the LAST positive share; a denormal-tiny entry (counterexample
+`[4e-106, 2.4e-93, 5e-324, 0]`) went negative absorbing it. Remainder now folds into
+the LARGEST share, clamped at 0. Found by the fast-check invariant suite.
+
+**Slope label-spread solver (2026-07-08, craft review):** user screenshot review found endpoint
+labels overlapping at showcase sizes (greedy drop threshold passed 5.7-unit spacing that
+collides visually at fontSize 6). Replaced drop-on-collision with `core/labels.spreadLabels`
+— a deterministic forward/backward sweep that nudges label baselines to a full glyph pitch
+inside the frame (property-tested; reusable by future dense-label charts). Slope budget
+2.8/3.8 → 2.95/3.95 kB (measured 2.91/3.90; 3/4 kB hard caps honored). Craft gate added:
+`pnpm craft` (tests/craft/matrix.mjs) renders 141 chart×variant×size configs against dist
+and fails on text escapes, text-text overlap, or text-on-mark collisions.
+
+**Dumbbell connector pierce fix (2026-07-08, round-13 visual audit):** the connector ran
+dot-center → dot-center, crossing the hollow "before" ring's interior (fill=none) so the
+line showed through the empty dot. Fixed: connector endpoints inset by the mark radius
+along the row (drops the connector when dots nearly touch). Budget 2.65/3.55 → 2.7/3.65 kB
+(measured 2.64/3.55; 3/4 kB hard caps honored). New geometry-audit gate (tests/craft/
+geometry-audit.mjs, wired into `pnpm craft`) detects LINE-THROUGH-HOLLOW via chord-inside-
+disk, plus MARK-ESCAPE. Full visual sweep report in plan/VISUAL-AUDIT.md.
+
+**CalendarStrip interactive pointer drift (2026-07-08, round-13 interactive sweep):** the
+fixed 7 px-cell grid can only be shown larger via CSS width, but the interactive wrapper
+was sized 180 px while the composed static SVG stayed at its intrinsic 55 px → pointer math
+(÷ wrapper width) landed off the cells. Fixed with the FILL pattern (memory
+interactive-wrapper-fills-svg) — `style={FILL}` on the composed static so the SVG fills the
+wrapper; measured wrapper==svg (180==180) after. FILL is NOT applied universally: charts
+sized by geometry-width props use inline-block wrappers that already hug the SVG, and
+width:100% on a child of an auto-width inline-block would break them. Browser regression
+test added. Budget 3.4→3.5 kB interactive (measured 3.42; caps honored).
+
+**Label vertical centering — 15 charts (2026-07-08, round-14 user review):** direct labels used
+`y = center + fontSize*0.35` (cap-box half-height) which browser-measured ~2.5px HIGH; the eye
+centers the full line-box, and a fixed constant can't track it across fonts. `dominant-baseline="middle"`
+(ohlc/dual/sparkbar) was ~1.3px high. Standardized on the SVG-native `dominant-baseline="central"` +
+`y = center` (in-browser deltaPx 0.00) across likert, segmented, dot-plot, dumbbell, heat-cell, slope,
+bump-strip, progress, trend-arrow, progress-ring, ohlc, dual-sparkline, sparkbar, sparkline-last. Kept
+as an attribute (not CSS) so SVGs stay self-contained + the craft audit reads it. Edge-anchored labels
+(funnel top, sparkline min/max, stacked-area stagger) left alphabetic. Also: progress + ohlc label
+gutter gap +3→+5 for separation. Budgets: heat-cell interactive 2.15→2.2 kB (measured 2.15, +central
+attr). Browser regression test on likert asserts deltaPx < 1.2.
+
+**Label breathing space (2026-07-08, round-14 user review):** beside-mark label gaps were
+inconsistent (2–5 units) and the tightest read as cramped. Standardized to ~4 units: likert
+gap 2→4 (+ gutter 2→4), dumbbell 3.5→4, sparkline/dual last-value offset +4→+6, bump-strip
+end labels +2→+5 (offset + both gutters). Live-measured likert 2px→4px. dot-plot/slope (3 units)
+and progress/ohlc (5 units) already comfortable, left as-is.

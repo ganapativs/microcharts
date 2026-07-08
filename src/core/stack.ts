@@ -68,12 +68,14 @@ export function normalizeShares(
 
   const shares = values.map((v) => (isFiniteValue(v) && v > 0 ? v / total : 0));
   let sum = 0;
-  let last = -1;
+  let biggest = -1;
   for (let i = 0; i < shares.length; i++) {
-    if (shares[i]! > 0) last = i;
+    if (shares[i]! > 0 && (biggest < 0 || shares[i]! > shares[biggest]!)) biggest = i;
     sum += shares[i]!;
   }
-  if (last >= 0) shares[last] = shares[last]! + (1 - sum);
+  // fold the float remainder into the LARGEST share — a tiny share could go
+  // negative absorbing it (denormal counterexample: [4e-106, 2e-93, 5e-324])
+  if (biggest >= 0) shares[biggest] = Math.max(0, shares[biggest]! + (1 - sum));
 
   return { shares, total };
 }

@@ -6,7 +6,8 @@
 // one pointer listener on the wrapper, announcements via SummaryStrings.
 import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { EN, type SummaryStrings } from "../../core/summary.js";
+import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
+import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import { activityGridGeometry } from "./geometry.js";
 import {
   ActivityGrid as StaticActivityGrid,
@@ -19,8 +20,10 @@ import {
 
 export interface InteractiveActivityGridProps extends ActivityGridProps {
   /** Swappable announcement strings (defaults to EN). */
-  strings?: SummaryStrings;
+  strings?: SeriesStrings & SlotStrings;
 }
+
+const DEFAULT_STRINGS = { ...EN_SERIES, ...EN_SLOTS };
 
 export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNode {
   const {
@@ -36,7 +39,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     locale,
     title,
     summary,
-    strings = EN,
+    strings = DEFAULT_STRINGS,
     className,
     style,
     ...rest
@@ -125,11 +128,9 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
   const announced =
     activeCell === undefined
       ? ""
-      : strings.point(
-          activeCell.index + 1,
-          geo.cells.length,
-          activeCell.value === null ? strings.noData : fmt(activeCell.value),
-        );
+      : activeCell.value === null
+        ? strings.pointEmpty(activeCell.index + 1, geo.cells.length)
+        : strings.point(activeCell.index + 1, geo.cells.length, fmt(activeCell.value));
 
   const wrapStyle: CSSProperties = {
     display: "inline-block",

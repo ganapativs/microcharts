@@ -1,12 +1,146 @@
 {
   "$comment": "Per-subpath gzip budgets (plan/21 §1, budget model v2). Keys are export subpaths without './'. Every chart needs an entry — gen-size-limits.mjs fails on a missing one, so adding a chart forces a budget decision. Hard ceilings: static ≤ 3 kB (target 2 kB, Delta-class 1.5 kB), interactive ≤ static + 1 kB. `.size-limit.json` is GENERATED from this file + package.json#exports — never hand-edit it.",
-  "$exception": "Sparkline 3.35/4.35 kB is a USER-APPROVED flagship exception (2026-07-08) to the 3/4 kB hard caps — it carries the long-series guard + label=minmax on top of the densest feature set; every trim was measured and exhausted first (plan/12 audit). Every other chart holds the standard caps; do not cite this exception to justify another.",
+  "$exception": "Sparkline 3.35/4.35 kB was USER-APPROVED (2026-07-08) as a flagship exception to the 3/4 kB hard caps (long-series guard + label=minmax; trims exhausted first — plan/12). Batch 1 W4 raised it to 3.65/4.65 kB PENDING user sign-off at the batch gate: the plan/22 #28 annotations HOST contract adds the children walker + scale frame (~0.29 kB) to every S1/S2 host — the annotation MARK renderers ship in ./annotations (1.46 kB), which consumers import separately, so hosts only pay the walker. Not a precedent for other charts.",
   "styles": "12 kB",
   "charts": {
-    "sparkline": { "static": "3.35 kB", "interactive": "4.35 kB" },
-    "sparkbar": { "static": "3 kB", "interactive": "4 kB" },
-    "delta": { "static": "1.5 kB", "interactive": "2 kB" },
-    "bullet": { "static": "2 kB", "interactive": "2.5 kB" },
-    "activity-grid": { "static": "2.1 kB", "interactive": "3.25 kB" }
+    "sparkline": {
+      "static": "3.65 kB",
+      "interactive": "4.65 kB"
+    },
+    "sparkbar": {
+      "static": "3 kB",
+      "interactive": "4 kB"
+    },
+    "delta": {
+      "static": "1.5 kB",
+      "interactive": "2 kB"
+    },
+    "bullet": {
+      "static": "2 kB",
+      "interactive": "2.5 kB"
+    },
+    "activity-grid": {
+      "static": "2.1 kB",
+      "interactive": "3.3 kB"
+    },
+    "trend-arrow": {
+      "static": "1.7 kB",
+      "interactive": "2 kB"
+    },
+    "status-dot": {
+      "static": "1.6 kB",
+      "interactive": "1.9 kB"
+    },
+    "heat-cell": {
+      "static": "1.8 kB",
+      "interactive": "2.2 kB"
+    },
+    "progress": {
+      "static": "1.9 kB",
+      "interactive": "2.2 kB"
+    },
+    "rug-strip": {
+      "static": "2.3 kB",
+      "interactive": "3.2 kB"
+    },
+    "mini-bar": {
+      "static": "2.25 kB",
+      "interactive": "3.3 kB"
+    },
+    "pictogram-row": {
+      "static": "1.95 kB",
+      "interactive": "2.4 kB"
+    },
+    "seismogram": {
+      "static": "2.3 kB",
+      "interactive": "3.2 kB"
+    },
+    "heat-strip": {
+      "static": "2.35 kB",
+      "interactive": "3.15 kB"
+    },
+    "dot-plot": {
+      "static": "2.5 kB",
+      "interactive": "3.3 kB"
+    },
+    "dumbbell": {
+      "static": "2.7 kB",
+      "interactive": "3.65 kB"
+    },
+    "paired-bars": {
+      "static": "2.5 kB",
+      "interactive": "3.3 kB"
+    },
+    "slope": {
+      "static": "2.95 kB",
+      "interactive": "3.95 kB"
+    },
+    "micro-scatter": {
+      "static": "2.7 kB",
+      "interactive": "3.5 kB"
+    },
+    "annotations": {
+      "static": "1.5 kB"
+    },
+    "segmented-bar": {
+      "static": "2.4 kB",
+      "interactive": "3.3 kB"
+    },
+    "histogram-strip": {
+      "static": "2.4 kB",
+      "interactive": "3.2 kB"
+    },
+    "micro-box": {
+      "static": "2.6 kB",
+      "interactive": "3.4 kB"
+    },
+    "progress-ring": {
+      "static": "2.3 kB",
+      "interactive": "3 kB"
+    },
+    "micro-donut": {
+      "static": "2.6 kB",
+      "interactive": "3.4 kB"
+    },
+    "funnel": {
+      "static": "2.6 kB",
+      "interactive": "3.4 kB"
+    },
+    "likert-strip": {
+      "static": "2.6 kB",
+      "interactive": "3.4 kB"
+    },
+    "waterfall": {
+      "static": "2.8 kB",
+      "interactive": "3.6 kB"
+    },
+    "bump-strip": {
+      "static": "2.4 kB",
+      "interactive": "3.2 kB"
+    },
+    "dual-sparkline": {
+      "static": "3 kB",
+      "interactive": "3.9 kB"
+    },
+    "stacked-area": {
+      "static": "2.9 kB",
+      "interactive": "3.9 kB"
+    },
+    "ohlc": {
+      "static": "2.9 kB",
+      "interactive": "3.8 kB"
+    },
+    "horizon": {
+      "static": "2.9 kB",
+      "interactive": "3.8 kB"
+    },
+    "calendar-strip": {
+      "static": "2.5 kB",
+      "interactive": "3.5 kB"
+    },
+    "event-timeline": {
+      "static": "3 kB",
+      "interactive": "4 kB"
+    }
   }
 }

@@ -14,5 +14,5 @@ export const STATS = {
   avgBytes: 550, // average server-rendered chart payload
 } as const;
 
-/** Measured gzip size (kB) per chart subpath — static / interactive. */
-export const CHART_GZIP: Record<string, { static: number; interactive: number }> = chartSizes;
+/** Measured gzip size (kB) per subpath — static / interactive (annotations has no client entry). */
+export const CHART_GZIP: Record<string, { static: number; interactive?: number }> = chartSizes;

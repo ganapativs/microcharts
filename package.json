@@ -80,6 +80,242 @@
       "types": "./dist/charts/activity-grid/client.d.ts",
       "import": "./dist/charts/activity-grid/client.js"
     },
+    "./trend-arrow": {
+      "types": "./dist/charts/trend-arrow/index.d.ts",
+      "import": "./dist/charts/trend-arrow/index.js"
+    },
+    "./trend-arrow/interactive": {
+      "types": "./dist/charts/trend-arrow/client.d.ts",
+      "import": "./dist/charts/trend-arrow/client.js"
+    },
+    "./status-dot": {
+      "types": "./dist/charts/status-dot/index.d.ts",
+      "import": "./dist/charts/status-dot/index.js"
+    },
+    "./status-dot/interactive": {
+      "types": "./dist/charts/status-dot/client.d.ts",
+      "import": "./dist/charts/status-dot/client.js"
+    },
+    "./heat-cell": {
+      "types": "./dist/charts/heat-cell/index.d.ts",
+      "import": "./dist/charts/heat-cell/index.js"
+    },
+    "./heat-cell/interactive": {
+      "types": "./dist/charts/heat-cell/client.d.ts",
+      "import": "./dist/charts/heat-cell/client.js"
+    },
+    "./progress": {
+      "types": "./dist/charts/progress/index.d.ts",
+      "import": "./dist/charts/progress/index.js"
+    },
+    "./progress/interactive": {
+      "types": "./dist/charts/progress/client.d.ts",
+      "import": "./dist/charts/progress/client.js"
+    },
+    "./rug-strip": {
+      "types": "./dist/charts/rug-strip/index.d.ts",
+      "import": "./dist/charts/rug-strip/index.js"
+    },
+    "./rug-strip/interactive": {
+      "types": "./dist/charts/rug-strip/client.d.ts",
+      "import": "./dist/charts/rug-strip/client.js"
+    },
+    "./mini-bar": {
+      "types": "./dist/charts/mini-bar/index.d.ts",
+      "import": "./dist/charts/mini-bar/index.js"
+    },
+    "./mini-bar/interactive": {
+      "types": "./dist/charts/mini-bar/client.d.ts",
+      "import": "./dist/charts/mini-bar/client.js"
+    },
+    "./pictogram-row": {
+      "types": "./dist/charts/pictogram-row/index.d.ts",
+      "import": "./dist/charts/pictogram-row/index.js"
+    },
+    "./pictogram-row/interactive": {
+      "types": "./dist/charts/pictogram-row/client.d.ts",
+      "import": "./dist/charts/pictogram-row/client.js"
+    },
+    "./seismogram": {
+      "types": "./dist/charts/seismogram/index.d.ts",
+      "import": "./dist/charts/seismogram/index.js"
+    },
+    "./seismogram/interactive": {
+      "types": "./dist/charts/seismogram/client.d.ts",
+      "import": "./dist/charts/seismogram/client.js"
+    },
+    "./heat-strip": {
+      "types": "./dist/charts/heat-strip/index.d.ts",
+      "import": "./dist/charts/heat-strip/index.js"
+    },
+    "./heat-strip/interactive": {
+      "types": "./dist/charts/heat-strip/client.d.ts",
+      "import": "./dist/charts/heat-strip/client.js"
+    },
+    "./dot-plot": {
+      "types": "./dist/charts/dot-plot/index.d.ts",
+      "import": "./dist/charts/dot-plot/index.js"
+    },
+    "./dot-plot/interactive": {
+      "types": "./dist/charts/dot-plot/client.d.ts",
+      "import": "./dist/charts/dot-plot/client.js"
+    },
+    "./dumbbell": {
+      "types": "./dist/charts/dumbbell/index.d.ts",
+      "import": "./dist/charts/dumbbell/index.js"
+    },
+    "./dumbbell/interactive": {
+      "types": "./dist/charts/dumbbell/client.d.ts",
+      "import": "./dist/charts/dumbbell/client.js"
+    },
+    "./paired-bars": {
+      "types": "./dist/charts/paired-bars/index.d.ts",
+      "import": "./dist/charts/paired-bars/index.js"
+    },
+    "./paired-bars/interactive": {
+      "types": "./dist/charts/paired-bars/client.d.ts",
+      "import": "./dist/charts/paired-bars/client.js"
+    },
+    "./slope": {
+      "types": "./dist/charts/slope/index.d.ts",
+      "import": "./dist/charts/slope/index.js"
+    },
+    "./slope/interactive": {
+      "types": "./dist/charts/slope/client.d.ts",
+      "import": "./dist/charts/slope/client.js"
+    },
+    "./micro-scatter": {
+      "types": "./dist/charts/micro-scatter/index.d.ts",
+      "import": "./dist/charts/micro-scatter/index.js"
+    },
+    "./micro-scatter/interactive": {
+      "types": "./dist/charts/micro-scatter/client.d.ts",
+      "import": "./dist/charts/micro-scatter/client.js"
+    },
+    "./segmented-bar": {
+      "types": "./dist/charts/segmented-bar/index.d.ts",
+      "import": "./dist/charts/segmented-bar/index.js"
+    },
+    "./segmented-bar/interactive": {
+      "types": "./dist/charts/segmented-bar/client.d.ts",
+      "import": "./dist/charts/segmented-bar/client.js"
+    },
+    "./histogram-strip": {
+      "types": "./dist/charts/histogram-strip/index.d.ts",
+      "import": "./dist/charts/histogram-strip/index.js"
+    },
+    "./histogram-strip/interactive": {
+      "types": "./dist/charts/histogram-strip/client.d.ts",
+      "import": "./dist/charts/histogram-strip/client.js"
+    },
+    "./micro-box": {
+      "types": "./dist/charts/micro-box/index.d.ts",
+      "import": "./dist/charts/micro-box/index.js"
+    },
+    "./micro-box/interactive": {
+      "types": "./dist/charts/micro-box/client.d.ts",
+      "import": "./dist/charts/micro-box/client.js"
+    },
+    "./progress-ring": {
+      "types": "./dist/charts/progress-ring/index.d.ts",
+      "import": "./dist/charts/progress-ring/index.js"
+    },
+    "./progress-ring/interactive": {
+      "types": "./dist/charts/progress-ring/client.d.ts",
+      "import": "./dist/charts/progress-ring/client.js"
+    },
+    "./micro-donut": {
+      "types": "./dist/charts/micro-donut/index.d.ts",
+      "import": "./dist/charts/micro-donut/index.js"
+    },
+    "./micro-donut/interactive": {
+      "types": "./dist/charts/micro-donut/client.d.ts",
+      "import": "./dist/charts/micro-donut/client.js"
+    },
+    "./funnel": {
+      "types": "./dist/charts/funnel/index.d.ts",
+      "import": "./dist/charts/funnel/index.js"
+    },
+    "./funnel/interactive": {
+      "types": "./dist/charts/funnel/client.d.ts",
+      "import": "./dist/charts/funnel/client.js"
+    },
+    "./likert-strip": {
+      "types": "./dist/charts/likert-strip/index.d.ts",
+      "import": "./dist/charts/likert-strip/index.js"
+    },
+    "./likert-strip/interactive": {
+      "types": "./dist/charts/likert-strip/client.d.ts",
+      "import": "./dist/charts/likert-strip/client.js"
+    },
+    "./waterfall": {
+      "types": "./dist/charts/waterfall/index.d.ts",
+      "import": "./dist/charts/waterfall/index.js"
+    },
+    "./waterfall/interactive": {
+      "types": "./dist/charts/waterfall/client.d.ts",
+      "import": "./dist/charts/waterfall/client.js"
+    },
+    "./bump-strip": {
+      "types": "./dist/charts/bump-strip/index.d.ts",
+      "import": "./dist/charts/bump-strip/index.js"
+    },
+    "./bump-strip/interactive": {
+      "types": "./dist/charts/bump-strip/client.d.ts",
+      "import": "./dist/charts/bump-strip/client.js"
+    },
+    "./dual-sparkline": {
+      "types": "./dist/charts/dual-sparkline/index.d.ts",
+      "import": "./dist/charts/dual-sparkline/index.js"
+    },
+    "./dual-sparkline/interactive": {
+      "types": "./dist/charts/dual-sparkline/client.d.ts",
+      "import": "./dist/charts/dual-sparkline/client.js"
+    },
+    "./stacked-area": {
+      "types": "./dist/charts/stacked-area/index.d.ts",
+      "import": "./dist/charts/stacked-area/index.js"
+    },
+    "./stacked-area/interactive": {
+      "types": "./dist/charts/stacked-area/client.d.ts",
+      "import": "./dist/charts/stacked-area/client.js"
+    },
+    "./ohlc": {
+      "types": "./dist/charts/ohlc/index.d.ts",
+      "import": "./dist/charts/ohlc/index.js"
+    },
+    "./ohlc/interactive": {
+      "types": "./dist/charts/ohlc/client.d.ts",
+      "import": "./dist/charts/ohlc/client.js"
+    },
+    "./horizon": {
+      "types": "./dist/charts/horizon/index.d.ts",
+      "import": "./dist/charts/horizon/index.js"
+    },
+    "./horizon/interactive": {
+      "types": "./dist/charts/horizon/client.d.ts",
+      "import": "./dist/charts/horizon/client.js"
+    },
+    "./calendar-strip": {
+      "types": "./dist/charts/calendar-strip/index.d.ts",
+      "import": "./dist/charts/calendar-strip/index.js"
+    },
+    "./calendar-strip/interactive": {
+      "types": "./dist/charts/calendar-strip/client.d.ts",
+      "import": "./dist/charts/calendar-strip/client.js"
+    },
+    "./event-timeline": {
+      "types": "./dist/charts/event-timeline/index.d.ts",
+      "import": "./dist/charts/event-timeline/index.js"
+    },
+    "./event-timeline/interactive": {
+      "types": "./dist/charts/event-timeline/client.d.ts",
+      "import": "./dist/charts/event-timeline/client.js"
+    },
+    "./annotations": {
+      "types": "./dist/annotations.d.ts",
+      "import": "./dist/annotations.js"
+    },
     "./styles.css": "./styles.css"
   },
   "publishConfig": {
@@ -102,6 +338,7 @@
     "bench": "pnpm build && node bench/run.mjs",
     "demo": "pnpm build && node bench/run.mjs && node bench/demo.mjs demo.html",
     "test:visual": "playwright test",
+    "craft": "node tests/craft/matrix.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm knip",
     "pack:check": "pnpm build && publint && attw --pack .",
     "changeset": "changeset",

@@ -1,22 +1,141 @@
 {
   "sparkline": {
-    "static": 3.34,
-    "interactive": 4.34
+    "static": 3.62,
+    "interactive": 4.61
   },
   "sparkbar": {
-    "static": 2.49,
-    "interactive": 2.7
+    "static": 2.78,
+    "interactive": 2.72
   },
   "delta": {
     "static": 0.92,
-    "interactive": 1.18
+    "interactive": 1.17
   },
   "bullet": {
     "static": 1.64,
-    "interactive": 1.99
+    "interactive": 2
   },
   "activity-grid": {
-    "static": 2.06,
-    "interactive": 3.2
+    "static": 2.09,
+    "interactive": 3.26
+  },
+  "trend-arrow": {
+    "static": 1.66,
+    "interactive": 1.96
+  },
+  "status-dot": {
+    "static": 1.56,
+    "interactive": 1.81
+  },
+  "heat-cell": {
+    "static": 1.77,
+    "interactive": 2.15
+  },
+  "progress": {
+    "static": 1.84,
+    "interactive": 2.13
+  },
+  "rug-strip": {
+    "static": 2.25,
+    "interactive": 3.12
+  },
+  "mini-bar": {
+    "static": 2.18,
+    "interactive": 3.17
+  },
+  "pictogram-row": {
+    "static": 1.89,
+    "interactive": 2.21
+  },
+  "seismogram": {
+    "static": 2.2,
+    "interactive": 3.17
+  },
+  "heat-strip": {
+    "static": 2.27,
+    "interactive": 3.09
+  },
+  "dot-plot": {
+    "static": 2.19,
+    "interactive": 3.09
+  },
+  "dumbbell": {
+    "static": 2.65,
+    "interactive": 3.56
+  },
+  "paired-bars": {
+    "static": 2.25,
+    "interactive": 3.17
+  },
+  "slope": {
+    "static": 2.92,
+    "interactive": 3.92
+  },
+  "micro-scatter": {
+    "static": 1.88,
+    "interactive": 3.01
+  },
+  "segmented-bar": {
+    "static": 2.33,
+    "interactive": 3.21
+  },
+  "histogram-strip": {
+    "static": 2.07,
+    "interactive": 2.83
+  },
+  "micro-box": {
+    "static": 2.54,
+    "interactive": 3.35
+  },
+  "progress-ring": {
+    "static": 2.08,
+    "interactive": 2.48
+  },
+  "micro-donut": {
+    "static": 2.35,
+    "interactive": 3.31
+  },
+  "funnel": {
+    "static": 2.12,
+    "interactive": 2.96
+  },
+  "likert-strip": {
+    "static": 2.6,
+    "interactive": 3.36
+  },
+  "waterfall": {
+    "static": 1.99,
+    "interactive": 2.84
+  },
+  "bump-strip": {
+    "static": 1.94,
+    "interactive": 2.69
+  },
+  "dual-sparkline": {
+    "static": 2.94,
+    "interactive": 3.81
+  },
+  "stacked-area": {
+    "static": 2.81,
+    "interactive": 3.85
+  },
+  "ohlc": {
+    "static": 2.4,
+    "interactive": 3.22
+  },
+  "horizon": {
+    "static": 2.29,
+    "interactive": 3.16
+  },
+  "calendar-strip": {
+    "static": 2.27,
+    "interactive": 3.42
+  },
+  "event-timeline": {
+    "static": 2.64,
+    "interactive": 3.74
+  },
+  "annotations": {
+    "static": 1.46
   }
 }

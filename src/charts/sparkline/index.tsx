@@ -10,6 +10,8 @@ import { describeSeries, type DescribeOptions } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { type Value } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
+import { resolveAnnotations } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 import { makeFormatter } from "../../core/format.js";
 
 const CURVE: Record<Curve, (p: readonly (readonly [number, number] | null)[]) => string> = {
@@ -109,6 +111,22 @@ export function Sparkline(props: SparklineProps): ReactNode {
   });
   const d = CURVE[curve](geo.linePoints);
 
+  // annotations host contract (plan/22 #28): Marker x = data INDEX, Threshold/
+  // TargetZone y = data values. Non-annotation children pass through untouched
+  // — zero render-tree change when no annotation children are present.
+  const yScale = scaleLinear(geo.domain, [geo.plot.y1, geo.plot.y0]);
+  const n = data.length;
+  const ann = resolveAnnotations(children, {
+    x: (i) =>
+      n > 1
+        ? geo.plot.x0 + (i * (geo.plot.x1 - geo.plot.x0)) / (n - 1)
+        : (geo.plot.x0 + geo.plot.x1) / 2,
+    y: yScale,
+    width,
+    height,
+    fontSize: Math.max(5, Math.min(Math.round(height * 0.22), 9)),
+  });
+
   const accName = summary === false ? false : (summary ?? describeSeries(data, { format, locale }));
 
   const strokeStyle = color ? { stroke: color } : undefined;
@@ -136,6 +154,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
           data-mc-ink="band"
         />
       ) : null}
+      {ann.under}
       {fill && d ? (
         <path
           d={areaPath(geo.linePoints, geo.baselineY, curve)}
@@ -186,21 +205,22 @@ export function Sparkline(props: SparklineProps): ReactNode {
         : null}
       {labelText !== undefined && metrics && geo.last ? (
         <text
-          x={geo.last.x + 4}
+          x={geo.last.x + 6}
           /* y clamped so ascenders/descenders stay inside the viewBox */
           y={Math.min(
             Math.max(geo.last.y, metrics.fontSize * 0.55),
             height - metrics.fontSize * 0.55,
           )}
           fontSize={metrics.fontSize}
-          dominantBaseline="middle"
+          dominantBaseline="central"
           textAnchor="start"
           data-mc-ink="accent"
         >
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

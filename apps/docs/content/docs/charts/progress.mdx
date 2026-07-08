@@ -1,0 +1,100 @@
+---
+title: Progress
+description: A zero-anchored progress bar for React — the percent label is the datum, with segments for step counts and honest >100% handling.
+---
+
+Progress answers "how far along is this, exactly?". The bar gives the instant read; the
+percent label _is_ the datum — a bare bar is decoration. The track never shrinks for the
+label (the viewBox widens instead), so fractions stay comparable down a table column.
+
+<LiveDemo
+  label="Progress"
+  sizeOf="progress"
+  code={`import { Progress } from "@microcharts/react/progress";
+
+<Progress value={0.68} title="Onboarding" />`}
+>
+  <Progress value={0.68} title="Onboarding" width={160} height={22} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="progress" />
+
+## Try it
+
+<Playground chart="progress" />
+
+## Interactive
+
+<InteractiveDemo slug="progress" />
+
+## When to use it
+
+- **Good for** — KPI cards, table completion columns, step counts (`segments`).
+- **Avoid for** — icon-size slots (ProgressRing) or composition (SegmentedBar).
+
+## Sizing
+
+<Sizing chart="progress" />
+
+## Variants
+
+<LiveDemo
+  label="segments"
+  code={`// discrete steps — the chart now says "3 of 5", not "60%"
+<Progress value={3} max={5} segments={5} label="fraction" />`}
+>
+  <Progress value={3} max={5} segments={5} label="fraction" title="Steps" width={160} height={22} />
+</LiveDemo>
+
+<LiveDemo
+  label="label modes"
+  code={`<Progress value={34} max={50} label="value" />
+<Progress value={0.68} label="none" />`}
+>
+  <span className="inline-flex items-center gap-4">
+    <Progress value={34} max={50} label="value" title="Value label" width={140} height={22} />
+    <Progress value={0.68} label="none" title="Bare bar" width={110} height={22} />
+  </span>
+</LiveDemo>
+
+<LiveDemo
+  label="over 100%"
+  code={`// the bar clamps; the LABEL tells the truth
+<Progress value={112} max={100} />`}
+>
+  <Progress value={112} max={100} title="Overshoot" width={160} height={22} />
+</LiveDemo>
+
+<LiveDemo
+  label="burn-down"
+  code={`// less is good — wording flips, the bar stays factual
+<Progress value={0.68} positive="down" />`}
+>
+  <Progress value={0.68} positive="down" title="Budget burn" width={160} height={22} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="progress" />
+
+## Why this default
+
+The percent label is on by default because it is the datum — the bar alone can't say
+"68%". Past 100% the bar clamps at full but the label carries the true figure ("112%"):
+the number and the bar only ever disagree in that one documented case, and the number
+wins. `max <= 0` renders an empty track and says "No data." rather than inventing a
+fraction.
+
+## Accessibility
+
+The accessible name is the completion — **"68% complete."**, or **"3 of 5 steps."** when
+segmented, or **"32% remaining."** with `positive="down"`. The interactive entry
+re-announces through a polite live region, throttled to whole-percent changes so a
+streaming value doesn't spam screen readers, and the fill-width transition is gated on
+reduced motion.
+
+## Props
+
+<PropTable slug="progress" />

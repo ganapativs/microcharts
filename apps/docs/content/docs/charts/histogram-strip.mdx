@@ -1,0 +1,78 @@
+---
+title: HistogramStrip
+description: A micro histogram for React — mode, spread, and skew in a cell, from raw observations with uniform bins.
+---
+
+HistogramStrip answers "what does the distribution look like?". Raw observations in,
+≤ 12 uniform bins out — counts zero-anchored, never density-smoothed. Pre-aggregated
+counts are not supported; that's SparkBar's contract.
+
+<LiveDemo
+  label="HistogramStrip"
+  sizeOf="histogram-strip"
+  code={`import { HistogramStrip } from "@microcharts/react/histogram-strip";
+
+<HistogramStrip data={responseTimes} title="Response times" />`}
+>
+  <HistogramStrip
+    data={Array.from({ length: 120 }, (_, i) =>
+      i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
+    )}
+    title="Response times"
+    style={{ width: 220, height: 56 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="histogram-strip" />
+
+## Try it
+
+<Playground chart="histogram-strip" />
+
+## Interactive
+
+<InteractiveDemo slug="histogram-strip" />
+
+## When to use it
+
+- **Good for** — latency clusters in a sentence, distributions per table row.
+- **Avoid for** — raw marks (RugStrip) or series over time (Sparkline).
+
+## Sizing
+
+<Sizing chart="histogram-strip" />
+
+## Variants
+
+<LiveDemo label="where you fall" code={`<HistogramStrip data={salaries} highlight={72} />`}>
+  <HistogramStrip
+    data={Array.from({ length: 120 }, (_, i) =>
+      i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
+    )}
+    highlight={45}
+    title="You are here"
+    style={{ width: 220, height: 56 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="histogram-strip" />
+
+## Why this default
+
+Auto bin count is √n capped at 12 — enough shape to see skew, few enough bars to survive
+60 px. All values identical collapse to ONE bin (never twelve slivers); explicit bin
+counts collapse to the observation count. `highlight` marks the bin of a value and never
+re-bins around it.
+
+## Accessibility
+
+The accessible name names the modal bin — **"120 values, most between 40 and 50."** The
+interactive entry roves bins with range announcements (**"40 to 50: 34 values."**).
+
+## Props
+
+<PropTable slug="histogram-strip" />

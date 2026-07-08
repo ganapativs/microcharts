@@ -1,0 +1,100 @@
+---
+title: SegmentedBar
+description: A composition bar for React — parts of a whole as segment lengths, with a labeled Other rollup and largest-remainder percents.
+---
+
+SegmentedBar answers "what is this made of, and in what proportions?". Segments always
+sum to the full bar; past `maxSegments` the tail rolls into a labeled "Other" — nothing
+is silently dropped. A flat bar beats a donut of the same data at every size we ship.
+
+<LiveDemo
+  label="SegmentedBar"
+  sizeOf="segmented-bar"
+  code={`import { SegmentedBar } from "@microcharts/react/segmented-bar";
+
+<SegmentedBar data={mix} title="Browser share" />`}
+>
+  <SegmentedBar
+    data={[
+      { label: "Chrome", value: 620 },
+      { label: "Safari", value: 240 },
+      { label: "Firefox", value: 90 },
+      { label: "Edge", value: 30 },
+      { label: "Arc", value: 20 },
+    ]}
+    title="Browser share"
+    width={220} height={20}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="segmented-bar" />
+
+## Try it
+
+<Playground chart="segmented-bar" />
+
+## Interactive
+
+<InteractiveDemo slug="segmented-bar" />
+
+## When to use it
+
+- **Good for** — traffic mix per table row, composition in KPI cards.
+- **Avoid for** — precise cross-row comparison (MiniBar) or negative parts (Waterfall).
+
+## Sizing
+
+<Sizing chart="segmented-bar" />
+
+## Variants
+
+<LiveDemo label="percents" code={`<SegmentedBar data={mix} label="percent" />`}>
+  <SegmentedBar
+    data={[
+      { label: "Chrome", value: 620 },
+      { label: "Safari", value: 240 },
+      { label: "Firefox", value: 140 },
+    ]}
+    label="percent"
+    title="With percents"
+    width={220}
+    height={20}
+  />
+</LiveDemo>
+
+<LiveDemo label="ranked" code={`<SegmentedBar data={mix} order="desc" />`}>
+  <SegmentedBar
+    data={[
+      { label: "Firefox", value: 90 },
+      { label: "Chrome", value: 620 },
+      { label: "Safari", value: 240 },
+    ]}
+    order="desc"
+    title="Ranked"
+    width={220}
+    height={20}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="segmented-bar" />
+
+## Why this default
+
+Data order is the default — inherent sequences (funnel-like stages, weekday mixes) carry
+meaning that ranking destroys. Summary percents use largest-remainder rounding so they
+always sum to exactly 100; negative values are excluded with a dev warning (a
+part-to-whole cannot contain negative parts — use Waterfall).
+
+## Accessibility
+
+The accessible name is the full composition — **"Chrome 62%, Safari 24%, Firefox 9%,
+Edge 3%, Other 2%."** The interactive entry roves segments; the Other segment announces
+its member count (**"Other: 2%, 2 categories."**).
+
+## Props
+
+<PropTable slug="segmented-bar" />

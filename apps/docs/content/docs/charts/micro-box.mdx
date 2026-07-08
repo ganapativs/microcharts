@@ -1,0 +1,83 @@
+---
+title: MicroBox
+description: A box plot in a table row for React — median, IQR, and honest whiskers, with the violin's documented replacement role.
+---
+
+MicroBox answers "what are the p50 and spread of this metric?" — the five-number summary
+in a table row. Min-max whiskers by default (Tukey fences imply a normality assumption
+most product data doesn't meet); `tukey` mode exposes fence-breakers as dots.
+
+<LiveDemo
+  label="MicroBox"
+  sizeOf="micro-box"
+  code={`import { MicroBox } from "@microcharts/react/micro-box";
+
+<MicroBox stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }} title="p95 latency" />`}
+>
+  <MicroBox
+    stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }}
+    title="p95 latency"
+    width={220} height={32}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="micro-box" />
+
+## Try it
+
+<Playground chart="micro-box" />
+
+## Interactive
+
+<InteractiveDemo slug="micro-box" />
+
+## When to use it
+
+- **Good for** — latency percentile rows (p50/p95/p99), spread beside a stat — precomputed `stats` is the production path.
+- **Avoid for** — distribution shape (HistogramStrip) or fewer than 5 observations (renders honest dots).
+
+## Sizing
+
+<Sizing chart="micro-box" />
+
+## Variants
+
+<LiveDemo label="tukey outliers" code={`<MicroBox data={values} whiskers="tukey" />`}>
+  <MicroBox
+    data={[...Array.from({ length: 20 }, (_, i) => 40 + i), 400, 500]}
+    whiskers="tukey"
+    title="With outliers"
+    style={{ width: 220, height: 32 }}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="too few observations"
+  code={`// < 5 values → dots, never a fake box
+<MicroBox data={[3, 7, 9]} />`}
+>
+  <MicroBox data={[3, 7, 9]} title="Only three" width={220} height={32} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="micro-box" />
+
+## Why this default
+
+Never a box from fewer than 5 observations — dots at the raw values instead. Precomputed
+`stats` with non-monotonic values are refused with a dev warning: garbage in must not
+render a plausible-looking lie. Outlier dots cap at 3 per side (the furthest); the
+clipped count rides the announcements.
+
+## Accessibility
+
+The accessible name is the five-number reading — **"Median 42, middle half 35 to 51,
+range 12 to 96."** The interactive entry roves a fixed 5-stop model (min → Q1 → median →
+Q3 → max), announcing each stat (**"Median: 42."**).
+
+## Props
+
+<PropTable slug="micro-box" />

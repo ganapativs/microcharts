@@ -6,34 +6,19 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { seriesStats } from "../../core/stats.js";
-import { round2, type Value } from "../../core/types.js";
+import type { Value } from "../../core/types.js";
 import { makeFormatter } from "../../core/format.js";
 import { parseUTCDay } from "../../core/calendar.js";
+import { cellMetrics, stepOpacity, type CellShape } from "../../shared/cell.js";
 import { activityGridGeometry } from "./geometry.js";
 
 export const LEVELS = 5;
 
-/** Opacity ramp per discrete level (level 0 = faint empty track). Shared with
- *  the interactive entry so the visuals cannot drift. */
-export const levelOpacity = (level: number): number =>
-  level === 0 ? 0.06 : 0.25 + (level / (LEVELS - 1)) * 0.75;
+/** Opacity ramp per discrete level — the shared stepped-color ramp
+ *  (shared/cell.ts), fixed to this chart's LEVELS. */
+export const levelOpacity = (level: number): number => stepOpacity(level, LEVELS);
 
-export type CellShape = "square" | "round" | "dot";
-
-/** Cell mark metrics per shape — shared with the interactive entry's focus
- *  ring so overlay and mark cannot drift. `crisp` only on rectilinear marks
- *  (canon: crispEdges never on curves). */
-export function cellMetrics(
-  size: number,
-  shape: CellShape,
-): { inset: number; rx: number; crisp: boolean } {
-  if (shape === "dot") {
-    const inset = round2(Math.max(0.5, size * 0.15));
-    return { inset, rx: round2((size - inset * 2) / 2), crisp: false };
-  }
-  if (shape === "round") return { inset: 0, rx: round2(size * 0.3), crisp: false };
-  return { inset: 0, rx: 1, crisp: true };
-}
+export { cellMetrics, type CellShape } from "../../shared/cell.js";
 
 /** Leading empty slots so slot 0 lands on `start`'s real weekday (UTC — via
  *  core/calendar; unparseable dates align to 0, matching the no-start layout). */
