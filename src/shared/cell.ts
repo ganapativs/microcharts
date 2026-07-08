@@ -23,3 +23,19 @@ export function cellMetrics(
 export function stepOpacity(step: number, steps: number): number {
   return step === 0 ? 0.06 : 0.25 + (step / (steps - 1)) * 0.75;
 }
+
+/** Ramp for calibrated VALUE cells (HeatCell/HeatStrip): every step stays
+ *  visible (0.25 → 1) — a real bottom-of-scale value must not vanish into the
+ *  0.06 empty-track look, which is reserved for truly-empty slots. */
+export function valueStepOpacity(step: number, steps: number): number {
+  return steps <= 1 ? 1 : 0.25 + (step / (steps - 1)) * 0.75;
+}
+
+/** Bins a value into 0..steps-1 over [d0, d1], clamped (HeatCell/HeatStrip
+ *  shared calibration). Zero-width domain → the single mid step. */
+export function stepIndex(value: number, d0: number, d1: number, steps: number): number {
+  const span = d1 - d0;
+  if (span === 0) return Math.floor(steps / 2);
+  const t = Math.min(1, Math.max(0, (value - d0) / span));
+  return Math.min(steps - 1, Math.floor(t * steps));
+}

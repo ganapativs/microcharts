@@ -1,0 +1,93 @@
+---
+title: Seismogram
+description: An event-density strip for React — when things happened and how hard, with spike-preserving downsampling.
+---
+
+Seismogram answers "when did things happen, and how hard?". Ticks rise from a baseline:
+presence reads as density texture, height as intensity. Long series collapse via
+max-per-bucket only — the spike is the chart's whole job, so it always survives, and the
+summary is always computed from the raw values, never the buckets.
+
+<LiveDemo
+  label="Seismogram"
+  sizeOf="seismogram"
+  code={`import { Seismogram } from "@microcharts/react/seismogram";
+
+<Seismogram data={burstsPerMinute} title="Error bursts" />`}
+>
+  <Seismogram
+    data={[0, 3, 0, 0, 8, 1, 0, 2, 0, 0, 3, 0, 1, 0, 0, 5, 0, 0, 2, 0]}
+    title="Error bursts"
+    style={{ width: 220, height: 32 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="seismogram" />
+
+## Try it
+
+<Playground chart="seismogram" />
+
+## Interactive
+
+<InteractiveDemo slug="seismogram" />
+
+## When to use it
+
+- **Good for** — error bursts per service, alert density, activity texture in rows.
+- **Avoid for** — level tracking (Sparkline) or labeled events (EventTimeline).
+
+## Sizing
+
+<Sizing chart="seismogram" />
+
+## Variants
+
+<LiveDemo
+  label="barcode"
+  code={`// magnitudes are noise? say so — uniform ticks are presence only
+<Seismogram data={deploys} mode="barcode" />`}
+>
+  <Seismogram
+    data={[0, 3, 0, 0, 8, 1, 0, 2, 0, 0, 3, 0]}
+    mode="barcode"
+    title="Deploys"
+    style={{ width: 160, height: 20 }}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="signed shocks"
+  code={`// negatives extend below an auto-centered midline
+<Seismogram data={flows} positive="up" />`}
+>
+  <Seismogram
+    data={[4, 0, -2, 0, 5, 0, 0, -4, 0, 3]}
+    positive="up"
+    title="Net flow shocks"
+    style={{ width: 160, height: 26 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="seismogram" />
+
+## Why this default
+
+Ticks-from-baseline over bars: density reads as texture rather than inviting bar-to-bar
+magnitude comparison the strip is too small to support. Barcode mode is documented as
+presence-only — a uniform tick is not intensity. A quiet strip renders its baseline at
+rest, never a blank hole.
+
+## Accessibility
+
+The accessible name counts the events — **"4 events, peak 8."**, or **"No events."** for
+a quiet strip. The interactive entry steps slots with position readouts ("Point 2 of 5:
+3."), announces quiet slots as "no data", and Home/End jump to the first/last event.
+
+## Props
+
+<PropTable slug="seismogram" />

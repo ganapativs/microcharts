@@ -19,6 +19,11 @@ import trendArrow from "./trend-arrow";
 import statusDot from "./status-dot";
 import heatCell from "./heat-cell";
 import progress from "./progress";
+import rugStrip from "./rug-strip";
+import miniBar from "./mini-bar";
+import pictogramRow from "./pictogram-row";
+import seismogram from "./seismogram";
+import heatStrip from "./heat-strip";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -30,6 +35,11 @@ const MODULES: ChartModule[] = [
   statusDot,
   heatCell,
   progress,
+  rugStrip,
+  miniBar,
+  pictogramRow,
+  seismogram,
+  heatStrip,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

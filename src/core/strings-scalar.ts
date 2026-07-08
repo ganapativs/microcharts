@@ -14,6 +14,7 @@ export type ScalarStrings = Pick<
   | "progress"
   | "remaining"
   | "stepsDone"
+  | "countOf"
 >;
 
 export const EN_SCALAR: ScalarStrings = {
@@ -25,4 +26,5 @@ export const EN_SCALAR: ScalarStrings = {
   progress: (pct) => `${pct} complete.`,
   remaining: (pct) => `${pct} remaining.`,
   stepsDone: (done, total) => `${done} of ${total} steps.`,
+  countOf: (value, total) => `${value} of ${total}.`,
 };

@@ -15,12 +15,13 @@ export function scaleLinear(
 ): Scale {
   const [d0, d1] = domain;
   const [r0, r1] = range;
-  const span = d1 - d0;
-  if (span === 0) {
+  // degenerate domain — zero span (slope NaN/±Infinity) or a denormal span
+  // (slope overflows, then 0 × Infinity poisons results): map to the midpoint
+  const m = (r1 - r0) / (d1 - d0);
+  if (!Number.isFinite(m)) {
     const mid = (r0 + r1) / 2;
     return () => mid;
   }
-  const m = (r1 - r0) / span;
   return (value) => r0 + (value - d0) * m;
 }
 

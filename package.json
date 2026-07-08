@@ -112,6 +112,46 @@
       "types": "./dist/charts/progress/client.d.ts",
       "import": "./dist/charts/progress/client.js"
     },
+    "./rug-strip": {
+      "types": "./dist/charts/rug-strip/index.d.ts",
+      "import": "./dist/charts/rug-strip/index.js"
+    },
+    "./rug-strip/interactive": {
+      "types": "./dist/charts/rug-strip/client.d.ts",
+      "import": "./dist/charts/rug-strip/client.js"
+    },
+    "./mini-bar": {
+      "types": "./dist/charts/mini-bar/index.d.ts",
+      "import": "./dist/charts/mini-bar/index.js"
+    },
+    "./mini-bar/interactive": {
+      "types": "./dist/charts/mini-bar/client.d.ts",
+      "import": "./dist/charts/mini-bar/client.js"
+    },
+    "./pictogram-row": {
+      "types": "./dist/charts/pictogram-row/index.d.ts",
+      "import": "./dist/charts/pictogram-row/index.js"
+    },
+    "./pictogram-row/interactive": {
+      "types": "./dist/charts/pictogram-row/client.d.ts",
+      "import": "./dist/charts/pictogram-row/client.js"
+    },
+    "./seismogram": {
+      "types": "./dist/charts/seismogram/index.d.ts",
+      "import": "./dist/charts/seismogram/index.js"
+    },
+    "./seismogram/interactive": {
+      "types": "./dist/charts/seismogram/client.d.ts",
+      "import": "./dist/charts/seismogram/client.js"
+    },
+    "./heat-strip": {
+      "types": "./dist/charts/heat-strip/index.d.ts",
+      "import": "./dist/charts/heat-strip/index.js"
+    },
+    "./heat-strip/interactive": {
+      "types": "./dist/charts/heat-strip/client.d.ts",
+      "import": "./dist/charts/heat-strip/client.js"
+    },
     "./styles.css": "./styles.css"
   },
   "publishConfig": {

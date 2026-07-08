@@ -91,7 +91,7 @@
   {
     "name": "@microcharts/react/heat-cell (static)",
     "path": "dist/charts/heat-cell/index.js",
-    "limit": "1.75 kB",
+    "limit": "1.8 kB",
     "gzip": true
   },
   {
@@ -110,6 +110,66 @@
     "name": "@microcharts/react/progress/interactive",
     "path": "dist/charts/progress/client.js",
     "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/rug-strip (static)",
+    "path": "dist/charts/rug-strip/index.js",
+    "limit": "2.15 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/rug-strip/interactive",
+    "path": "dist/charts/rug-strip/client.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/mini-bar (static)",
+    "path": "dist/charts/mini-bar/index.js",
+    "limit": "2.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/mini-bar/interactive",
+    "path": "dist/charts/mini-bar/client.js",
+    "limit": "3.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/pictogram-row (static)",
+    "path": "dist/charts/pictogram-row/index.js",
+    "limit": "1.95 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/pictogram-row/interactive",
+    "path": "dist/charts/pictogram-row/client.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/seismogram (static)",
+    "path": "dist/charts/seismogram/index.js",
+    "limit": "2.15 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/seismogram/interactive",
+    "path": "dist/charts/seismogram/client.js",
+    "limit": "3.15 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/heat-strip (static)",
+    "path": "dist/charts/heat-strip/index.js",
+    "limit": "2.35 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/heat-strip/interactive",
+    "path": "dist/charts/heat-strip/client.js",
+    "limit": "3.15 kB",
     "gzip": true
   },
   {

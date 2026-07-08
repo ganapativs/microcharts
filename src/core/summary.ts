@@ -19,6 +19,8 @@ export interface SummaryStrings {
   last: (value: string) => string;
   /** Interactive point announcement, e.g. "Point 3 of 12: 42." */
   point: (position: number, total: number, value: string) => string;
+  /** Interactive announcement for an empty slot, e.g. "Point 3 of 12: no data." */
+  pointEmpty: (position: number, total: number) => string;
   /** S4 scalar direction, e.g. "Up 12%." (trend-arrow; lands with it, plan/22 #1). */
   scalarDir: (direction: "up" | "down", amount: string) => string;
   /** S4 within-noise-floor change (trend-arrow flatBand). */
@@ -33,6 +35,26 @@ export interface SummaryStrings {
   remaining: (pct: string) => string;
   /** S3 segmented steps, e.g. "3 of 5 steps." (progress `segments`). */
   stepsDone: (done: number, total: number) => string;
+  /** S3 discrete units, e.g. "5 of 8." (pictogram-row). */
+  countOf: (value: string, total: number) => string;
+  /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
+  categories: (
+    count: number,
+    maxLabel: string,
+    maxValue: string,
+    minLabel: string,
+    minValue: string,
+  ) => string;
+  /** S2 per-category announcement, e.g. "East: 940 — 1st of 4." */
+  category: (label: string, value: string, rank: number, count: number) => string;
+  /** Distribution, e.g. "38 values from 3.1 to 9.7, median 5.2." (rug-strip). */
+  observations: (count: number, min: string, max: string, median: string) => string;
+  /** Per-observation announcement, e.g. "5.2 — 19th of 38." (rug-strip). */
+  observation: (value: string, rank: number, count: number) => string;
+  /** Event run, e.g. "34 events, peak 8." (seismogram). */
+  events: (count: number, peak: string) => string;
+  /** Quiet event strip (seismogram all-zero). */
+  noEvents: string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

@@ -10,6 +10,11 @@
     "trend-arrow",
     "status-dot",
     "heat-cell",
-    "progress"
+    "progress",
+    "rug-strip",
+    "mini-bar",
+    "pictogram-row",
+    "seismogram",
+    "heat-strip"
   ]
 }

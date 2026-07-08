@@ -1,0 +1,97 @@
+---
+title: HeatStrip
+description: A 1×N intensity strip for React tables — value-by-time as calibrated color steps, sharing ActivityGrid's scale.
+---
+
+HeatStrip answers "how did intensity evolve, glanceably?". It is the 1×N sibling of
+ActivityGrid: the same discrete step scale, the same cell vocabulary, laid on a single
+timeline. Empty is not zero — a slot with no record renders a hairline outline, visibly
+different from a low value.
+
+<LiveDemo
+  label="HeatStrip"
+  sizeOf="heat-strip"
+  code={`import { HeatStrip } from "@microcharts/react/heat-strip";
+
+<HeatStrip data={hourlyLoad} domain={[0, 100]} title="Load per hour" />`}
+>
+  <HeatStrip
+    data={[12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35]}
+    domain={[0, 100]}
+    title="Load per hour"
+    style={{ width: 240, height: 20 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="heat-strip" />
+
+## Try it
+
+<Playground chart="heat-strip" />
+
+## Interactive
+
+<InteractiveDemo slug="heat-strip" />
+
+## When to use it
+
+- **Good for** — per-tenant load rows, intensity ribbons in dense tables.
+- **Avoid for** — exact shape (Sparkline) or weekday rhythm (ActivityGrid).
+
+## Sizing
+
+<Sizing chart="heat-strip" />
+
+## Variants
+
+<LiveDemo
+  label="shapes"
+  code={`<HeatStrip data={load} shape="round" />
+<HeatStrip data={load} shape="dot" />`}
+>
+  <span className="inline-flex flex-col gap-1.5">
+    <HeatStrip
+      data={[12, 38, 66, 88, 84, 55, 28, 62, 85, 58]}
+      domain={[0, 100]}
+      shape="round"
+      title="Round"
+      style={{ width: 160, height: 14 }}
+    />
+    <HeatStrip
+      data={[12, 38, 66, 88, 84, 55, 28, 62, 85, 58]}
+      domain={[0, 100]}
+      shape="dot"
+      title="Dot"
+      style={{ width: 160, height: 14 }}
+    />
+  </span>
+</LiveDemo>
+
+<LiveDemo label="nulls hold their slot" code={`<HeatStrip data={[3, null, 8, null, 5]} />`}>
+  <HeatStrip data={[3, null, 8, null, 5]} title="Gaps" style={{ width: 100, height: 16 }} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="heat-strip" />
+
+## Why this default
+
+Square cells with a density-adaptive gap keep boundaries legible where round shapes blur
+at 10 px. Every real value renders at a visible opacity (0.25–1); the faint track look is
+reserved for truly-empty slots. Three ways a heat strip lies — continuous ramps, per-row
+autoscale, mean-based downsampling — are all closed: discrete steps, shared `domain`,
+max-per-bucket only.
+
+## Accessibility
+
+The summary reuses `describeSeries` verbatim — **"Trending up 467%. Range 3 to 18. Last
+value 17."** — so a color ramp is never the only channel. The interactive entry roves
+cells with ActivityGrid-parity announcements ("Point 2 of 4: 9.", empty slots as "no
+data").
+
+## Props
+
+<PropTable slug="heat-strip" />

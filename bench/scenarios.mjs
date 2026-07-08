@@ -11,10 +11,20 @@
 const POOL = 7;
 
 const waves = Array.from({ length: POOL }, (_, s) =>
-  Array.from({ length: 24 }, (_, i) => Math.sin((i + s) / 3) * 10 + i),
+  Array.from({ length: 24 }, (_w, i) => Math.sin((i + s) / 3) * 10 + i),
 );
 const grids = Array.from({ length: POOL }, (_, s) =>
-  Array.from({ length: 35 }, (_, j) => (s + j) % 5),
+  Array.from({ length: 35 }, (_g, j) => (s + j) % 5),
+);
+const rugs = Array.from({ length: POOL }, (_, s) =>
+  Array.from({ length: 38 }, (_r, j) => ((s * 7 + j * 13) % 97) / 10),
+);
+const CAT_LABELS = ["East", "West", "South", "North", "Mid", "Apex"];
+const cats = Array.from({ length: POOL }, (_, s) =>
+  CAT_LABELS.map((label, j) => ({ label, value: ((s + 1) * (j + 3) * 37) % 950 })),
+);
+const bursts = Array.from({ length: POOL }, (_, s) =>
+  Array.from({ length: 40 }, (_b, j) => ((s + j) % 9 === 0 ? (j % 7) + 1 : 0)),
 );
 
 export const SCENARIOS = [
@@ -71,5 +81,38 @@ export const SCENARIOS = [
     component: "Progress",
     floor: 40, // 3–4 nodes + label text per row
     props: (i) => ({ value: (i % 100) / 100, summary: false }),
+  },
+  {
+    slug: "rug-strip",
+    component: "RugStrip",
+    floor: 15, // 38 ticks grouped + sorted per row
+    props: (i) => ({ data: rugs[i % POOL], summary: false }),
+  },
+  {
+    slug: "mini-bar",
+    component: "MiniBar",
+    floor: 25, // ≤ 8 rects per row
+    props: (i) => ({ data: cats[i % POOL], summary: false }),
+  },
+  {
+    slug: "pictogram-row",
+    component: "PictogramRow",
+    floor: 30, // ≤ 8 unit glyphs + partial path
+    props: (i) => ({ value: (i % 17) / 2, total: 8, summary: false }),
+  },
+  {
+    slug: "seismogram",
+    component: "Seismogram",
+    floor: 25, // one tick path over 40 slots
+    props: (i) => ({ data: bursts[i % POOL], summary: false }),
+  },
+  {
+    slug: "heat-strip",
+    component: "HeatStrip",
+    floor: 10, // 30 cells/row
+    props: (i) => ({
+      data: waves[i % POOL].concat(waves[(i + 1) % POOL].slice(0, 6)),
+      summary: false,
+    }),
   },
 ];

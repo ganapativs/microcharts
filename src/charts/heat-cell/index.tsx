@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
-import { stepOpacity, type CellShape } from "../../shared/cell.js";
+import { valueStepOpacity, type CellShape } from "../../shared/cell.js";
 import { heatCellGeometry } from "./geometry.js";
 
 /** Factual S4 summary — value + calibrated level. Shared with the interactive
@@ -102,7 +102,10 @@ export function HeatCell(props: HeatCellProps): ReactNode {
         style={
           geo.step === null
             ? undefined
-            : { fillOpacity: stepOpacity(geo.step, steps), ...(color ? { fill: color } : null) }
+            : {
+                fillOpacity: valueStepOpacity(geo.step, steps),
+                ...(color ? { fill: color } : null),
+              }
         }
       />
       {showLabel ? (

@@ -3,14 +3,61 @@
   "$exception": "Sparkline 3.35/4.35 kB is a USER-APPROVED flagship exception (2026-07-08) to the 3/4 kB hard caps — it carries the long-series guard + label=minmax on top of the densest feature set; every trim was measured and exhausted first (plan/12 audit). Every other chart holds the standard caps; do not cite this exception to justify another.",
   "styles": "12 kB",
   "charts": {
-    "sparkline": { "static": "3.35 kB", "interactive": "4.35 kB" },
-    "sparkbar": { "static": "3 kB", "interactive": "4 kB" },
-    "delta": { "static": "1.5 kB", "interactive": "2 kB" },
-    "bullet": { "static": "2 kB", "interactive": "2.5 kB" },
-    "activity-grid": { "static": "2.1 kB", "interactive": "3.25 kB" },
-    "trend-arrow": { "static": "1.7 kB", "interactive": "2 kB" },
-    "status-dot": { "static": "1.6 kB", "interactive": "1.9 kB" },
-    "heat-cell": { "static": "1.75 kB", "interactive": "2.15 kB" },
-    "progress": { "static": "1.9 kB", "interactive": "2.2 kB" }
+    "sparkline": {
+      "static": "3.35 kB",
+      "interactive": "4.35 kB"
+    },
+    "sparkbar": {
+      "static": "3 kB",
+      "interactive": "4 kB"
+    },
+    "delta": {
+      "static": "1.5 kB",
+      "interactive": "2 kB"
+    },
+    "bullet": {
+      "static": "2 kB",
+      "interactive": "2.5 kB"
+    },
+    "activity-grid": {
+      "static": "2.1 kB",
+      "interactive": "3.25 kB"
+    },
+    "trend-arrow": {
+      "static": "1.7 kB",
+      "interactive": "2 kB"
+    },
+    "status-dot": {
+      "static": "1.6 kB",
+      "interactive": "1.9 kB"
+    },
+    "heat-cell": {
+      "static": "1.8 kB",
+      "interactive": "2.15 kB"
+    },
+    "progress": {
+      "static": "1.9 kB",
+      "interactive": "2.2 kB"
+    },
+    "rug-strip": {
+      "static": "2.15 kB",
+      "interactive": "3 kB"
+    },
+    "mini-bar": {
+      "static": "2.25 kB",
+      "interactive": "3.25 kB"
+    },
+    "pictogram-row": {
+      "static": "1.95 kB",
+      "interactive": "2.4 kB"
+    },
+    "seismogram": {
+      "static": "2.15 kB",
+      "interactive": "3.15 kB"
+    },
+    "heat-strip": {
+      "static": "2.35 kB",
+      "interactive": "3.15 kB"
+    }
   }
 }

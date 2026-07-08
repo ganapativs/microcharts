@@ -15,6 +15,9 @@ export {
   type DescribeOptions,
 } from "./summary.js";
 export { EN_SCALAR, type ScalarStrings } from "./strings-scalar.js";
+export { EN_CATEGORY, type CategoryStrings } from "./strings-category.js";
+export { EN_DIST, type DistStrings } from "./strings-dist.js";
+export { EN_SLOTS, type SlotStrings } from "./strings-slots.js";
 export { EN } from "./strings.js";
 export {
   quantiles,

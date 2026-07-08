@@ -3,7 +3,7 @@
 // opacity is a false-precision channel at 12 px. All metrics 2-dp.
 import { clamp } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
-import { cellMetrics, type CellShape } from "../../shared/cell.js";
+import { cellMetrics, stepIndex, type CellShape } from "../../shared/cell.js";
 
 export interface HeatCellGeometry {
   x: number;
@@ -35,13 +35,10 @@ export function heatCellGeometry(opts: {
   const [d0, d1] = domain;
   const span = d1 - d0;
   const finite = Number.isFinite(value) && Number.isFinite(d0) && Number.isFinite(d1);
-  // zero-width domain → single mid step (caller dev-warns)
+  // zero-width domain → single mid step (caller dev-warns); binning shared
+  // with HeatStrip via shared/cell.stepIndex — one calibration everywhere
   const t = !finite ? 0 : span === 0 ? 0.5 : round2(clamp((value - d0) / span, 0, 1));
-  const step = !finite
-    ? null
-    : span === 0
-      ? Math.floor(steps / 2)
-      : Math.min(steps - 1, Math.floor(t * steps));
+  const step = !finite ? null : stepIndex(value, d0, d1, steps);
 
   return {
     x: round2((width - size) / 2 + m.inset),

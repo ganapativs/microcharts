@@ -1,0 +1,101 @@
+---
+title: PictogramRow
+description: A unit pictogram for React — filled vs hollow units a reader can count, with honest fractional units and no size lies.
+---
+
+PictogramRow answers "how many of the N units are filled?" — ●●●○○ — counts a human can
+verify by counting. Filled vs hollow is a shape difference too, never opacity alone, and
+unit size is constant: scaling glyphs with value is the classic pictogram lie this
+component refuses to tell.
+
+<LiveDemo
+  label="PictogramRow"
+  sizeOf="pictogram-row"
+  code={`import { PictogramRow } from "@microcharts/react/pictogram-row";
+
+<PictogramRow value={5} total={8} title="Committee seats held" />`}
+>
+  <span className="text-lg">
+    The coalition holds{" "}
+    <PictogramRow value={5} total={8} title="Committee seats held" style={{ width: "4.5em", height: "0.8em" }} />{" "}
+    of the seats.
+  </span>
+</LiveDemo>
+
+## Install
+
+<Usage chart="pictogram-row" />
+
+## Try it
+
+<Playground chart="pictogram-row" />
+
+## Interactive
+
+<InteractiveDemo slug="pictogram-row" />
+
+## When to use it
+
+- **Good for** — seats, slots, and ratings in a sentence; capacity rows in tables.
+- **Avoid for** — more than 20 units (counting fails; use Progress) or continuous
+  ratios (Progress).
+
+## Sizing
+
+<Sizing chart="pictogram-row" />
+
+## Variants
+
+<LiveDemo
+  label="fractional clip"
+  code={`// the partial unit is real data — clipped, not rounded away
+<PictogramRow value={2.5} total={4} />`}
+>
+  <PictogramRow value={2.5} total={4} title="True partial" style={{ width: 90, height: 18 }} />
+</LiveDemo>
+
+<LiveDemo
+  label="rounded units"
+  code={`// seats can't be fractional — declare it
+<PictogramRow value={2.5} total={4} fractional="round" />`}
+>
+  <PictogramRow
+    value={2.5}
+    total={4}
+    fractional="round"
+    title="Whole seats"
+    style={{ width: 90, height: 18 }}
+  />
+</LiveDemo>
+
+<LiveDemo label="squares" code={`<PictogramRow value={3} total={5} shape="square" />`}>
+  <PictogramRow
+    value={3}
+    total={5}
+    shape="square"
+    title="Squares"
+    style={{ width: 90, height: 18 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="pictogram-row" />
+
+## Why this default
+
+Clip over round — the partial unit is real data, drawn as a true circular segment (not a
+`clipPath`, which would need generated ids that break server rendering determinism).
+Overflow renders all units filled but the summary keeps the true numbers ("9 of 8.") with
+a dev warning; the chart never silently caps the figure.
+
+## Accessibility
+
+The accessible name is the count — **"5 of 8."** — with the context noun coming from your
+`title` ("Committee seats held. 5 of 8."). The interactive entry re-announces on value
+changes. There are no per-unit pointer targets: the units are one datum, so hovering
+unit 4 of 8 has no distinct meaning.
+
+## Props
+
+<PropTable slug="pictogram-row" />

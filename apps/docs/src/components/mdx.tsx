@@ -9,6 +9,11 @@ import { TrendArrow } from "@microcharts/react/trend-arrow";
 import { StatusDot } from "@microcharts/react/status-dot";
 import { HeatCell } from "@microcharts/react/heat-cell";
 import { Progress } from "@microcharts/react/progress";
+import { RugStrip } from "@microcharts/react/rug-strip";
+import { MiniBar } from "@microcharts/react/mini-bar";
+import { PictogramRow } from "@microcharts/react/pictogram-row";
+import { Seismogram } from "@microcharts/react/seismogram";
+import { HeatStrip } from "@microcharts/react/heat-strip";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -34,6 +39,11 @@ export function getMDXComponents(components?: MDXComponents) {
     StatusDot,
     HeatCell,
     Progress,
+    RugStrip,
+    MiniBar,
+    PictogramRow,
+    Seismogram,
+    HeatStrip,
     SparkGroup,
     // docs building blocks
     Instrument,

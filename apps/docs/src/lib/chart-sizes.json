@@ -1,6 +1,6 @@
 {
   "sparkline": {
-    "static": 3.35,
+    "static": 3.34,
     "interactive": 4.34
   },
   "sparkbar": {
@@ -17,22 +17,42 @@
   },
   "activity-grid": {
     "static": 2.08,
-    "interactive": 3.22
+    "interactive": 3.25
   },
   "trend-arrow": {
-    "static": 1.64,
-    "interactive": 1.94
+    "static": 1.65,
+    "interactive": 1.95
   },
   "status-dot": {
-    "static": 1.55,
-    "interactive": 1.8
+    "static": 1.56,
+    "interactive": 1.81
   },
   "heat-cell": {
-    "static": 1.7,
-    "interactive": 2.09
+    "static": 1.75,
+    "interactive": 2.14
   },
   "progress": {
-    "static": 1.82,
-    "interactive": 2.11
+    "static": 1.83,
+    "interactive": 2.12
+  },
+  "rug-strip": {
+    "static": 2.11,
+    "interactive": 2.99
+  },
+  "mini-bar": {
+    "static": 2.16,
+    "interactive": 3.16
+  },
+  "pictogram-row": {
+    "static": 1.89,
+    "interactive": 2.21
+  },
+  "seismogram": {
+    "static": 2.07,
+    "interactive": 3.06
+  },
+  "heat-strip": {
+    "static": 2.27,
+    "interactive": 3.09
   }
 }
