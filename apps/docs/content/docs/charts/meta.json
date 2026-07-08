@@ -28,6 +28,12 @@
     "progress-ring",
     "micro-donut",
     "funnel",
-    "likert-strip"
+    "likert-strip",
+    "waterfall",
+    "bump-strip",
+    "dual-sparkline",
+    "stacked-area",
+    "ohlc",
+    "horizon"
   ]
 }

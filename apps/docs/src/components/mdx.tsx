@@ -27,6 +27,12 @@ import { ProgressRing } from "@microcharts/react/progress-ring";
 import { MicroDonut } from "@microcharts/react/micro-donut";
 import { Funnel } from "@microcharts/react/funnel";
 import { LikertStrip } from "@microcharts/react/likert-strip";
+import { Waterfall } from "@microcharts/react/waterfall";
+import { BumpStrip } from "@microcharts/react/bump-strip";
+import { DualSparkline } from "@microcharts/react/dual-sparkline";
+import { StackedArea } from "@microcharts/react/stacked-area";
+import { Ohlc } from "@microcharts/react/ohlc";
+import { Horizon } from "@microcharts/react/horizon";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -73,6 +79,12 @@ export function getMDXComponents(components?: MDXComponents) {
     MicroDonut,
     Funnel,
     LikertStrip,
+    Waterfall,
+    BumpStrip,
+    DualSparkline,
+    StackedArea,
+    Ohlc,
+    Horizon,
     SparkGroup,
     // docs building blocks
     Instrument,

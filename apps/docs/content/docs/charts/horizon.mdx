@@ -1,0 +1,92 @@
+---
+title: Horizon
+description: A word-sized horizon chart for React — a wide-range series folded into a slim band, dozens of rows glanceable at once.
+---
+
+Horizon answers "what happened across this wide-range series — in a 12-pixel row?" The
+series is cut into bands and folded: layer opacity carries magnitude, so extremes stay
+visible at heights where a sparkline would flatten into noise.
+
+<LiveDemo
+  label="Horizon"
+  sizeOf="horizon"
+  code={`import { Horizon } from "@microcharts/react/horizon";
+
+<Horizon data={cpuLoad} title="Cluster load" />`}
+>
+  <Horizon
+    data={[2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20]}
+    title="Cluster load"
+    style={{ width: 220, height: 22 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="horizon" />
+
+## Try it
+
+<Playground chart="horizon" />
+
+## Interactive
+
+<InteractiveDemo slug="horizon" />
+
+## When to use it
+
+- **Good for** — dense monitoring rows (dozens stacked), wide-range series in tight cells.
+- **Avoid for** — first-glance audiences (folding needs a key), or a few rows with room (Sparkline).
+
+## Sizing
+
+<Sizing chart="horizon" />
+
+## Variants
+
+<LiveDemo
+  label="three folds"
+  code={`// 3 folds only when the range genuinely spans them
+<Horizon data={cpuLoad} folds={3} />`}
+>
+  <Horizon
+    data={[
+      2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
+    ]}
+    folds={3}
+    title="Three folds"
+    style={{ width: 220, height: 22 }}
+  />
+</LiveDemo>
+
+<LiveDemo label="fold around a target" code={`<Horizon data={latency} baseline={20} />`}>
+  <Horizon
+    data={[
+      2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
+    ]}
+    baseline={20}
+    title="Baseline 20"
+    style={{ width: 220, height: 22 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="horizon" />
+
+## Why this default
+
+Two folds is the default because it needs no training to read approximately; three folds
+trade learnability for density and should be reserved for ranges that genuinely span
+them. The `baseline` is authored, never inferred — a fold origin is a claim about what
+"normal" means.
+
+## Accessibility
+
+The accessible name reads the unfolded series — **"Trending up 900%. Range 2 to 45. Last
+value 20."** — so screen-reader users get the true values, not the folded geometry. The
+interactive readout announces unfolded values per point.
+
+## Props
+
+<PropTable slug="horizon" />

@@ -1,0 +1,92 @@
+---
+title: DualSparkline
+description: A word-sized comparison sparkline for React — your series against its benchmark on one shared scale, never dual axes.
+---
+
+DualSparkline answers "how is this series doing against its benchmark?" Exactly two
+series, ever — three overlapped lines at 16 px are unreadable (SparkGroup for that). The
+benchmark whispers: dashed, thinner, neutral — never distinguished by color alone.
+
+<LiveDemo
+  label="DualSparkline"
+  sizeOf="dual-sparkline"
+  code={`import { DualSparkline } from "@microcharts/react/dual-sparkline";
+
+<DualSparkline data={ours} compare={market} title="Conversion vs market" />`}
+>
+  <DualSparkline
+    data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
+    compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
+    title="Conversion vs market"
+    style={{ width: 220, height: 28 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="dual-sparkline" />
+
+## Try it
+
+<Playground chart="dual-sparkline" />
+
+## Interactive
+
+<InteractiveDemo slug="dual-sparkline" />
+
+## When to use it
+
+- **Good for** — metric-vs-benchmark in table cells, actual-vs-plan in KPI cards.
+- **Avoid for** — 3+ series (SparkGroup), or different units per series (never dual axes).
+
+## Sizing
+
+<Sizing chart="dual-sparkline" />
+
+## Variants
+
+<LiveDemo
+  label="endpoint label"
+  code={`<DualSparkline data={ours} compare={market} label="last" />`}
+>
+  <DualSparkline
+    data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
+    compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
+    label="last"
+    title="With last value"
+    style={{ width: 220, height: 28 }}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="normal-range band"
+  code={`<DualSparkline data={ours} compare={market} band={[13, 16]} />`}
+>
+  <DualSparkline
+    data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
+    compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
+    band={[13, 16]}
+    title="With band"
+    style={{ width: 220, height: 28 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="dual-sparkline" />
+
+## Why this default
+
+One shared domain across both series — the entire point is comparability, so there are
+no dual axes and no per-series normalization. A shorter benchmark simply ends; stretching
+it would fake correlation. Coincident endpoints dedupe to one dot so ink never doubles.
+
+## Accessibility
+
+The accessible name reads both trends and both endpoints — **"Trending up 75% vs
+benchmark up 33%. Last 21 vs 16."** Identical series read "Matching benchmark." The
+interactive entry announces pairs (**"Point 9 of 12: 17 vs 15."**).
+
+## Props
+
+<PropTable slug="dual-sparkline" />

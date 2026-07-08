@@ -36,6 +36,12 @@ import progressRing from "./progress-ring";
 import microDonut from "./micro-donut";
 import funnel from "./funnel";
 import likertStrip from "./likert-strip";
+import waterfall from "./waterfall";
+import bumpStrip from "./bump-strip";
+import dualSparkline from "./dual-sparkline";
+import stackedArea from "./stacked-area";
+import ohlc from "./ohlc";
+import horizon from "./horizon";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -64,6 +70,12 @@ const MODULES: ChartModule[] = [
   microDonut,
   funnel,
   likertStrip,
+  waterfall,
+  bumpStrip,
+  dualSparkline,
+  stackedArea,
+  ohlc,
+  horizon,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(
