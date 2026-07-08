@@ -8,3 +8,45 @@ export { bankTo45 } from "./bank.js";
 export { OKABE_ITO, SEMANTIC, CATEGORICAL, categoricalToken } from "./color.js";
 export { makeFormatter, type Format } from "./format.js";
 export { describeSeries, EN, type SummaryStrings, type DescribeOptions } from "./summary.js";
+export {
+  quantiles,
+  fiveNumber,
+  quantileDotplot,
+  type FiveNumber,
+  type Dotplot,
+  type DotplotDot,
+} from "./quantile.js";
+export { uniformBins, uniform, type Bin, type UniformBins } from "./bin.js";
+export {
+  TAU,
+  polarPoint,
+  arcTo,
+  arcPath,
+  sector,
+  annulusSector,
+  annulusArc,
+  arcLength,
+  evenDashes,
+} from "./arc.js";
+export {
+  stackSeries,
+  normalizeShares,
+  normalizedShares,
+  divergingStack,
+  type StackLayer,
+  type StackedSeries,
+  type DivergingSegment,
+  type DivergingStack,
+} from "./stack.js";
+export { maxPerBucket, envelope } from "./downsample.js";
+export {
+  parseUTCDay,
+  isoDate,
+  weekGrid,
+  dayOfYear,
+  daysInYear,
+  monthStartDays,
+  type CalendarDay,
+  type WeekGrid,
+} from "./calendar.js";
+export { hashSeed, seeded, jitter } from "./jitter.js";
