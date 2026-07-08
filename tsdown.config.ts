@@ -95,6 +95,8 @@ export default defineConfig({
     "src/charts/retention-curve/client.tsx",
     "src/charts/burn-chart/index.tsx",
     "src/charts/burn-chart/client.tsx",
+    "src/charts/error-budget/index.tsx",
+    "src/charts/error-budget/client.tsx",
   ],
   format: ["esm"],
   dts: true,

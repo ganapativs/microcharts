@@ -287,6 +287,24 @@ export interface SummaryStrings {
     work: string,
     verb: string,
   ) => string;
+  /** Error-budget summary, e.g. "62% of error budget remains at day 12 of 30 — burning at 0.9× the steady rate." */
+  errorBudget: (
+    remaining: string,
+    elapsed: number,
+    total: number,
+    unit: string,
+    rate: string,
+  ) => string;
+  /** Exhausted-budget summary, e.g. "Budget exhausted at day 19 of 30." */
+  errorBudgetExhausted: (unit: string, at: number, total: number) => string;
+  /** Error-budget step announcement, e.g. "day 12 of 30: 62% budget remaining, burning at 1.4× steady rate." */
+  errorBudgetAt: (
+    unit: string,
+    at: number,
+    total: number,
+    remaining: string,
+    rate: string,
+  ) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

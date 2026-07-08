@@ -53,6 +53,7 @@ import rateVolume from "./rate-volume";
 import netFlow from "./net-flow";
 import retentionCurve from "./retention-curve";
 import burnChart from "./burn-chart";
+import errorBudget from "./error-budget";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -98,6 +99,7 @@ const MODULES: ChartModule[] = [
   netFlow,
   retentionCurve,
   burnChart,
+  errorBudget,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

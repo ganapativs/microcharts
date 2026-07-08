@@ -389,4 +389,14 @@ export const SCENARIOS = [
       return { data: { plan, actual }, summary: false };
     },
   },
+  {
+    slug: "error-budget",
+    component: "ErrorBudget",
+    floor: 12, // diagonal + wedges + line + per-step rate loop — few nodes
+    props: (i) => ({
+      data: rugs[i % POOL].map((_, k, a) => Math.max(0, 1 - k / a.length)),
+      window: 30,
+      summary: false,
+    }),
+  },
 ];

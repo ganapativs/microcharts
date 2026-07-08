@@ -364,6 +364,14 @@
       "types": "./dist/charts/burn-chart/client.d.ts",
       "import": "./dist/charts/burn-chart/client.js"
     },
+    "./error-budget": {
+      "types": "./dist/charts/error-budget/index.d.ts",
+      "import": "./dist/charts/error-budget/index.js"
+    },
+    "./error-budget/interactive": {
+      "types": "./dist/charts/error-budget/client.d.ts",
+      "import": "./dist/charts/error-budget/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

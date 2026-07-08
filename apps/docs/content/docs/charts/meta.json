@@ -45,6 +45,7 @@
     "rate-volume",
     "net-flow",
     "retention-curve",
-    "burn-chart"
+    "burn-chart",
+    "error-budget"
   ]
 }

@@ -514,6 +514,22 @@ add(
   ],
 );
 const BURN = { plan: [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0], actual: [40, 38, 36, 34, 32, 30] };
+const EB = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
+add(
+  "error-budget",
+  "ErrorBudget",
+  [
+    { data: EB, window: 30 },
+    { data: EB },
+    { data: EB, rates: [1] },
+    { data: [1, 0.6, 0.3, 0.05, 0], window: 12, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
 add(
   "burn-chart",
   "BurnChart",

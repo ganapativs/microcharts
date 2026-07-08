@@ -759,3 +759,33 @@ the guard. Fix: guard the ROUNDED result (`const r = round2(quotient); ratio = i
 (×100 then round) is safe for BOUNDED coordinates but can overflow on an unbounded data-derived
 value — guard after rounding, not before. (The wave-2 charts don't hit this: their round2 sees
 only bounded coords + raw values, and burn's projection guards `Number.isFinite(finishPeriod)`.)
+
+## Batch 2 wave 2 — ErrorBudget (2026-07-09)
+
+**ErrorBudget (plan/23 #9) — full DoD, static + interactive.** Provenance: plan/16 §Q10; the
+1×/6×/14.4× multiwindow burn-rate multiples are the Google SRE Workbook CONVENTION (labeled as
+such in docs), never universal law — `rates` is configurable. `currentRate` = observed slope
+over the last `max(2, ⌈n/6⌉)` steps ÷ steady, documented + property-tested.
+
+**Deviations from the plan §9 spec (deliberate):**
+- **Reference lines, not filled tinted wedges.** plan §9 asks for "stepped faint tint" regions
+  between successive rate lines. At 80×20 a filled diverging tint muddies the read; the burn-rate
+  references render as faint dashed hairlines (via `data-mc-ink="muted"` + low opacity, reusing
+  the forced-colors GrayText mapping — there is no `region`/`ghost` ink-role, and the plan's
+  names don't exist). The gallery sketch (`qErrorBudget`) also shows only lines. Honest + legible.
+- **`window` prop added.** The plan geometry signature is `{data, rates, pad}`, but "day 12 of
+  30" needs the full window length to place "now" mid-window; without it the actual line always
+  spans to the right edge. `window` defaults to `data.length` (line spans full width = "at window
+  end", matching the gallery).
+- **`unit` prop added** (default "day") for the summary noun.
+- **Static budget 2.41 kB** (lean — just linePath + clamp, no quantile), interactive 3.27; both
+  under caps and near the §9 target of 2 kB.
+
+**labelY clamp fix (caught by the real-browser sweep):** a 0%-remaining (exhausted) budget puts
+the endpoint at the bottom edge; the tracking label escaped because the clamp bottom margin was
+`fontSize*0.3` — a central-baseline box spans ≈ ±0.55·fontSize, so it's now `height -
+fontSize*0.6`. 0 escapes after. Same class as the RateVolume label-escape lesson.
+
+Gates: node 1191, browser 86, craft 232/0, size 2.41/3.27, bench 30.8 rows/ms (floor 12), docs
+177 pages + tests 98, real-browser sweep green (diagonal + faint burn-rate lines + exhaustion ✕
++ danger-colored endpoint/label all confirmed; readout chip "62% · 0.6×" visible).

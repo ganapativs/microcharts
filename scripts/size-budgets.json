@@ -177,6 +177,10 @@
     "burn-chart": {
       "static": "2.9 kB",
       "interactive": "3.8 kB"
+    },
+    "error-budget": {
+      "static": "2.5 kB",
+      "interactive": "3.3 kB"
     }
   }
 }

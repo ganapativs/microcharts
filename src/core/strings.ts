@@ -23,6 +23,7 @@ import { EN_RATE_VOLUME } from "./strings-rate-volume.js";
 import { EN_NET_FLOW } from "./strings-net-flow.js";
 import { EN_RETENTION } from "./strings-retention.js";
 import { EN_BURN } from "./strings-burn.js";
+import { EN_ERROR_BUDGET } from "./strings-error-budget.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -46,4 +47,5 @@ export const EN: SummaryStrings = {
   ...EN_NET_FLOW,
   ...EN_RETENTION,
   ...EN_BURN,
+  ...EN_ERROR_BUDGET,
 };

@@ -491,6 +491,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/error-budget (static)",
+    "path": "dist/charts/error-budget/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/error-budget/interactive",
+    "path": "dist/charts/error-budget/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

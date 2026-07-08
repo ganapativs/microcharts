@@ -1,0 +1,98 @@
+---
+title: ErrorBudget
+description: An SLO error-budget chart for React — budget remaining against the steady-burn diagonal, with Google-SRE burn-rate reference lines and exhaustion marking.
+---
+
+ErrorBudget answers "are we burning the error budget too fast to survive the window?". The
+budget remaining rides against the **steady-burn diagonal** — the pace that exactly spends
+the window — so "too fast" is legible at a glance: below the diagonal means you're outrunning
+your budget. Faster burn-rate reference lines (the Google-SRE 1×/6×/14.4× **convention**, not
+physics) sit below it as faint policy context.
+
+<LiveDemo
+  label="ErrorBudget"
+  sizeOf="error-budget"
+  code={`import { ErrorBudget } from "@microcharts/react/error-budget";
+
+<ErrorBudget data={remaining} window={30} title="Checkout SLO" />`}
+>
+  <ErrorBudget
+    data={[1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62]}
+    window={30}
+    unit="day"
+    label="remaining"
+    title="Checkout SLO"
+    width={260} height={30}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="error-budget" />
+
+## Try it
+
+<Playground chart="error-budget" />
+
+## Interactive
+
+<InteractiveDemo slug="error-budget" />
+
+## When to use it
+
+- **Good for** — an SLO error budget in a KPI card, a service list where each row is a budget, spotting a fast-burn before it exhausts the window.
+- **Avoid for** — a plain uptime series (Sparkline) or a one-number budget (Progress).
+
+## Sizing
+
+<Sizing chart="error-budget" />
+
+## Variants
+
+<LiveDemo
+  label="fast-burn + diagonal only"
+  code={`<ErrorBudget data={remaining} window={20} />
+<ErrorBudget data={remaining} rates={[1]} />`}
+>
+  <span className="inline-flex flex-col gap-1.5">
+    <ErrorBudget
+      data={[1, 0.82, 0.6, 0.38, 0.18, 0.04, 0]}
+      window={20}
+      unit="day"
+      title="Fast-burn"
+      width={220} height={28}
+    />
+    <ErrorBudget
+      data={[1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62]}
+      window={30}
+      rates={[1]}
+      unit="day"
+      title="Diagonal only"
+      width={220} height={28}
+    />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="error-budget" />
+
+## Why this default
+
+Remaining-vs-diagonal, because "too fast" is only legible against the pace that exactly spends
+the window. The 1×/6×/14.4× reference lines are the SRE Workbook's multiwindow burn-rate alert
+**convention** — a policy default, never universal law — so `rates` is configurable and the
+lines render as faint background context, never data-colored. `currentRate` is the observed
+burn slope over the last `max(2, ⌈n/6⌉)` steps ÷ the steady slope; when the budget hits zero
+before the window ends, the line stops at an ✕ and the summary says so.
+
+## Accessibility
+
+The accessible name states the budget, the elapsed window, and the burn rate — **"62% of error
+budget remains at day 12 of 30 — burning at 0.6× the steady rate."**; an exhausted window
+reads "Budget exhausted at day N of M." The interactive entry steps the days and announces
+each step's remaining and local burn rate.
+
+## Props
+
+<PropTable slug="error-budget" />
