@@ -1,0 +1,57 @@
+"use client";
+// Interactive <Progress> (plan/22 #4). `live` re-announces through a polite
+// region, throttled to whole-percent changes (no spam while a value streams).
+// Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
+// mark). Composes the static component (canon).
+import { useEffect, useRef, useState } from "react";
+import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
+import { Progress as StaticProgress, progressModel, type ProgressProps } from "./index.js";
+
+export interface InteractiveProgressProps extends ProgressProps {
+  /** Announce whole-percent changes (default true). */
+  live?: boolean;
+  strings?: ScalarStrings;
+}
+
+export function Progress(props: InteractiveProgressProps): React.ReactNode {
+  const { live = true, strings = EN_SCALAR, title, ...rest } = props;
+  const model = progressModel({ ...rest, strings });
+  const wholePct = Number.isFinite(model.fraction) ? Math.round(model.fraction * 100) : null;
+
+  const [announced, setAnnounced] = useState("");
+  const prev = useRef(wholePct);
+  useEffect(() => {
+    if (prev.current === wholePct) return; // sub-percent movement stays quiet
+    prev.current = wholePct;
+    if (live) setAnnounced(model.summary);
+  }, [wholePct, model.summary, live]);
+
+  const label = [title, model.summary].filter(Boolean).join(". ") || undefined;
+
+  return (
+    <span
+      className="mc-progress-live"
+      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      tabIndex={0}
+      role="img"
+      aria-label={label}
+    >
+      <StaticProgress {...rest} strings={strings} summary={false} />
+      {live ? (
+        <span
+          aria-live="polite"
+          style={{
+            position: "absolute",
+            width: 1,
+            height: 1,
+            overflow: "hidden",
+            clip: "rect(0 0 0 0)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {announced}
+        </span>
+      ) : null}
+    </span>
+  );
+}

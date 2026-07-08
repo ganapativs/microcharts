@@ -15,8 +15,22 @@ import sparkbar from "./sparkbar";
 import delta from "./delta";
 import bullet from "./bullet";
 import activityGrid from "./activity-grid";
+import trendArrow from "./trend-arrow";
+import statusDot from "./status-dot";
+import heatCell from "./heat-cell";
+import progress from "./progress";
 
-const MODULES: ChartModule[] = [sparkline, sparkbar, delta, bullet, activityGrid];
+const MODULES: ChartModule[] = [
+  sparkline,
+  sparkbar,
+  delta,
+  bullet,
+  activityGrid,
+  trendArrow,
+  statusDot,
+  heatCell,
+  progress,
+];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(
   MODULES.map((m) => [m.entry.slug, m]),

@@ -1,6 +1,6 @@
 {
   "sparkline": {
-    "static": 3.34,
+    "static": 3.35,
     "interactive": 4.34
   },
   "sparkbar": {
@@ -13,10 +13,26 @@
   },
   "bullet": {
     "static": 1.64,
-    "interactive": 1.99
+    "interactive": 2
   },
   "activity-grid": {
-    "static": 2.06,
-    "interactive": 3.2
+    "static": 2.08,
+    "interactive": 3.22
+  },
+  "trend-arrow": {
+    "static": 1.64,
+    "interactive": 1.94
+  },
+  "status-dot": {
+    "static": 1.55,
+    "interactive": 1.8
+  },
+  "heat-cell": {
+    "static": 1.7,
+    "interactive": 2.09
+  },
+  "progress": {
+    "static": 1.82,
+    "interactive": 2.11
   }
 }

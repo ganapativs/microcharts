@@ -7,6 +7,10 @@
     "sparkbar": { "static": "3 kB", "interactive": "4 kB" },
     "delta": { "static": "1.5 kB", "interactive": "2 kB" },
     "bullet": { "static": "2 kB", "interactive": "2.5 kB" },
-    "activity-grid": { "static": "2.1 kB", "interactive": "3.25 kB" }
+    "activity-grid": { "static": "2.1 kB", "interactive": "3.25 kB" },
+    "trend-arrow": { "static": "1.7 kB", "interactive": "2 kB" },
+    "status-dot": { "static": "1.6 kB", "interactive": "1.9 kB" },
+    "heat-cell": { "static": "1.75 kB", "interactive": "2.15 kB" },
+    "progress": { "static": "1.9 kB", "interactive": "2.2 kB" }
   }
 }

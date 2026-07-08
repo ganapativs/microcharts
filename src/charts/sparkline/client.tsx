@@ -12,7 +12,7 @@
 //      the i18n-able SummaryStrings (plan/08 §5).
 import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { describeSeries, EN, type SummaryStrings } from "../../core/summary.js";
+import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
@@ -27,7 +27,7 @@ export interface InteractiveSparklineProps extends SparklineProps {
   /** Called with the index of the focused point (or `null` when cleared). */
   onPointFocus?: (index: number | null) => void;
   /** Swappable announcement strings (defaults to EN). */
-  strings?: SummaryStrings;
+  strings?: SeriesStrings;
 }
 
 export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
@@ -44,7 +44,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     format,
     locale,
     onPointFocus,
-    strings = EN,
+    strings = EN_SERIES,
     className,
     style,
     ...rest

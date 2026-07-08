@@ -7,7 +7,15 @@ export { linePath, smoothPath, stepPath, areaPath, type Curve } from "./path.js"
 export { bankTo45 } from "./bank.js";
 export { OKABE_ITO, SEMANTIC, CATEGORICAL, categoricalToken } from "./color.js";
 export { makeFormatter, type Format } from "./format.js";
-export { describeSeries, EN, type SummaryStrings, type DescribeOptions } from "./summary.js";
+export {
+  describeSeries,
+  EN_SERIES,
+  type SummaryStrings,
+  type SeriesStrings,
+  type DescribeOptions,
+} from "./summary.js";
+export { EN_SCALAR, type ScalarStrings } from "./strings-scalar.js";
+export { EN } from "./strings.js";
 export {
   quantiles,
   fiveNumber,

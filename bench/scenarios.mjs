@@ -48,4 +48,28 @@ export const SCENARIOS = [
     floor: 5, // 35 cells/row (measured ~9 rows/ms, 2026-07-08)
     props: (i) => ({ data: grids[i % POOL], summary: false }),
   },
+  {
+    slug: "trend-arrow",
+    component: "TrendArrow",
+    floor: 50,
+    props: (i) => ({ value: (i % 50) / 100 - 0.2, showValue: true, summary: false }),
+  },
+  {
+    slug: "status-dot",
+    component: "StatusDot",
+    floor: 50,
+    props: (i) => ({ status: ["ok", "warn", "error", "off", "busy"][i % 5], summary: false }),
+  },
+  {
+    slug: "heat-cell",
+    component: "HeatCell",
+    floor: 50,
+    props: (i) => ({ value: (i % 10) / 10, summary: false }),
+  },
+  {
+    slug: "progress",
+    component: "Progress",
+    floor: 40, // 3–4 nodes + label text per row
+    props: (i) => ({ value: (i % 100) / 100, summary: false }),
+  },
 ];

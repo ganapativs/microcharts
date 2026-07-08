@@ -19,9 +19,31 @@ export interface SummaryStrings {
   last: (value: string) => string;
   /** Interactive point announcement, e.g. "Point 3 of 12: 42." */
   point: (position: number, total: number, value: string) => string;
+  /** S4 scalar direction, e.g. "Up 12%." (trend-arrow; lands with it, plan/22 #1). */
+  scalarDir: (direction: "up" | "down", amount: string) => string;
+  /** S4 within-noise-floor change (trend-arrow flatBand). */
+  flatChange: string;
+  /** S4 categorical state, e.g. "Status: warning." (status-dot). */
+  status: (stateLabel: string) => string;
+  /** S4 calibrated step, e.g. "42 — level 3 of 5." (heat-cell; 1-based level). */
+  level: (value: string, level: number, steps: number) => string;
+  /** S3 completion, e.g. "68% complete." (progress; reused by progress-ring). */
+  progress: (pct: string) => string;
+  /** S3 burn-down / countdown, e.g. "32% remaining." (progress `positive="down"`). */
+  remaining: (pct: string) => string;
+  /** S3 segmented steps, e.g. "3 of 5 steps." (progress `segments`). */
+  stepsDone: (done: number, total: number) => string;
 }
 
-export const EN: SummaryStrings = {
+/** The S1 series subset — what `describeSeries` and series-chart interactive
+ *  entries consume. Series charts default to this sub-dictionary so they never
+ *  bundle scalar/composition templates (and vice versa). */
+export type SeriesStrings = Pick<
+  SummaryStrings,
+  "noData" | "single" | "flat" | "trendPct" | "trendAbs" | "noChange" | "range" | "last" | "point"
+>;
+
+export const EN_SERIES: SeriesStrings = {
   noData: "No data.",
   single: (v) => `Single value ${v}.`,
   flat: (v) => `Flat at ${v}.`,
@@ -37,7 +59,7 @@ export interface DescribeOptions {
   /** `Intl.NumberFormat` options, or a custom formatter. Locale-aware default. */
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
   locale?: string | string[] | undefined;
-  strings?: SummaryStrings | undefined;
+  strings?: SeriesStrings | undefined;
 }
 
 import { makeFormatter as cachedFormatter } from "./format.js";
@@ -55,7 +77,7 @@ function makeFormatter(opts: DescribeOptions): (n: number) => string {
  */
 export function describeSeries(values: readonly Value[], opts: DescribeOptions = {}): string {
   const s = seriesStats(values);
-  const t = opts.strings ?? EN;
+  const t = opts.strings ?? EN_SERIES;
   if (!s) return t.noData;
 
   const fmt = makeFormatter(opts);

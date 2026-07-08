@@ -1,0 +1,117 @@
+---
+title: HeatCell
+description: One calibrated color step for React tables — the building block for host-owned intensity grids with a shared domain.
+---
+
+HeatCell answers "how intense is this one value against a known scale?". It is the
+single-cell building block for grids you lay out yourself — a matrix of tenants × hours,
+a custom calendar, a density chip in a sentence. Color is quantized into discrete steps:
+continuous opacity would fake precision a 12-px cell can't deliver.
+
+<LiveDemo
+  label="HeatCell"
+  sizeOf="heat-cell"
+  code={`import { HeatCell } from "@microcharts/react/heat-cell";
+
+<HeatCell value={42} domain={[0, 100]} title="Load" />`}
+>
+  <span className="inline-flex items-center gap-1.5">
+    {[12, 35, 58, 79, 96].map((v) => (
+      <HeatCell key={v} value={v} domain={[0, 100]} title={`Load ${v}`} style={{ width: 18, height: 18 }} />
+    ))}
+  </span>
+</LiveDemo>
+
+## Install
+
+<Usage chart="heat-cell" />
+
+## Try it
+
+<Playground chart="heat-cell" />
+
+## Interactive
+
+<InteractiveDemo slug="heat-cell" />
+
+## When to use it
+
+- **Good for** — table-cell matrices, custom grids, intensity chips beside labels.
+- **Avoid for** — precise comparison (MiniBar, DotPlot) or time series
+  (HeatStrip, ActivityGrid).
+
+## The shared-domain rule
+
+A lone cell has no data to auto-scale from, so `domain` defaults to `[0, 1]` — pass your
+grid's real scale. **Every cell in one grid must share one domain**: per-cell
+auto-scaling would make the brightest hour of a quiet tenant look like the brightest
+hour of a loud one.
+
+```tsx
+// one domain, computed once, shared by every cell
+const domain: [number, number] = [0, Math.max(...allValues)];
+rows.map((r) => r.hours.map((v) => <HeatCell value={v} domain={domain} />));
+```
+
+## Sizing
+
+<Sizing chart="heat-cell" />
+
+## Variants
+
+<LiveDemo
+  label="shapes"
+  code={`<HeatCell value={70} domain={[0, 100]} shape="square" />
+<HeatCell value={70} domain={[0, 100]} shape="round" />
+<HeatCell value={70} domain={[0, 100]} shape="dot" />`}
+>
+  <span className="inline-flex items-center gap-1.5">
+    <HeatCell value={70} domain={[0, 100]} title="Square" style={{ width: 18, height: 18 }} />
+    <HeatCell
+      value={70}
+      domain={[0, 100]}
+      shape="round"
+      title="Round"
+      style={{ width: 18, height: 18 }}
+    />
+    <HeatCell
+      value={70}
+      domain={[0, 100]}
+      shape="dot"
+      title="Dot"
+      style={{ width: 18, height: 18 }}
+    />
+  </span>
+</LiveDemo>
+
+<LiveDemo label="value chip" code={`<HeatCell value={8} domain={[0, 9]} label="value" />`}>
+  <HeatCell
+    value={8}
+    domain={[0, 9]}
+    label="value"
+    title="Intensity"
+    style={{ width: 28, height: 28 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="heat-cell" />
+
+## Why this default
+
+Five steps is the most a reader reliably distinguishes at cell size — the same ramp
+ActivityGrid uses, so intensity means one thing across the library. Values outside the
+domain clamp to the end steps (documented, never silently rescaled), and a zero-width
+domain renders the single mid step with a dev warning.
+
+## Accessibility
+
+The accessible name carries the value _and_ its calibration — **"42 — level 3 of 5."** —
+so the color scale is never the only channel. Non-finite input renders a designed empty
+track and says **"No data."** The interactive entry reveals the same reading on
+hover/focus, with ActivityGrid announcement parity.
+
+## Props
+
+<PropTable slug="heat-cell" />

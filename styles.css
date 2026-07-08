@@ -148,6 +148,22 @@
     display: inline-flex;
     vertical-align: middle;
   }
+  /* interactive TrendArrow wrapper — same live/pulse pattern at glyph size */
+  :where(.mc-trend-live) {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+  }
+  /* interactive StatusDot wrapper — live region host */
+  :where(.mc-status-live) {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+  }
+  /* interactive Progress: the fill glides to its new width (gated below) */
+  :where(.mc-progress-live .mc-progress-fill) {
+    transition: width var(--mc-duration) var(--mc-easing);
+  }
 }
 
 @layer microcharts.charts {
@@ -190,6 +206,11 @@
   }
   :where(.mc-root [data-mc-ink="negative"]) {
     fill: var(--mc-negative);
+    stroke: none;
+  }
+  /* filled no-valence marks (flat trend glyph, off states) */
+  :where(.mc-root [data-mc-ink="neutral"]) {
+    fill: var(--mc-neutral);
     stroke: none;
   }
   /* normal-range band + area fill — real data, lowest z, never decoration */
@@ -256,9 +277,39 @@
     display: inline-block;
     animation: mc-pulse var(--mc-duration) var(--mc-easing);
   }
+  /* one-shot glyph pulse when an interactive TrendArrow's direction changes */
+  :where(.mc-trend-live[data-pulse="1"] .mc-root) {
+    transform-origin: center;
+    animation: mc-pulse var(--mc-duration) var(--mc-easing);
+  }
+
+  /* StatusDot "live now" halo — expands + fades from the mark. This is a state
+     cue (monitoring), not decoration; it dies under reduced-motion below. */
+  @keyframes mc-status-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.9);
+      opacity: 0;
+    }
+  }
+  :where(.mc-status .mc-status-halo) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: mc-status-pulse 1.8s var(--mc-easing) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* static dot, no halo artifact left behind */
+    :where(.mc-status .mc-status-halo) {
+      display: none;
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     :where(.mc-root *),
+    :where(.mc-root),
     :where(.mc-delta-live .mc-delta-num) {
       animation: none !important;
       transition: none !important;
@@ -297,6 +348,10 @@
       fill: CanvasText;
     }
     :where(.mc-root [data-mc-ink="negative"]) {
+      fill: GrayText;
+    }
+    /* flat/off marks: shape already says "no direction" — quiet system ink */
+    :where(.mc-root [data-mc-ink="neutral"]) {
       fill: GrayText;
     }
     /* band/fill are color-encoded surfaces — keep them, mapped to system ink */

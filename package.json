@@ -80,6 +80,38 @@
       "types": "./dist/charts/activity-grid/client.d.ts",
       "import": "./dist/charts/activity-grid/client.js"
     },
+    "./trend-arrow": {
+      "types": "./dist/charts/trend-arrow/index.d.ts",
+      "import": "./dist/charts/trend-arrow/index.js"
+    },
+    "./trend-arrow/interactive": {
+      "types": "./dist/charts/trend-arrow/client.d.ts",
+      "import": "./dist/charts/trend-arrow/client.js"
+    },
+    "./status-dot": {
+      "types": "./dist/charts/status-dot/index.d.ts",
+      "import": "./dist/charts/status-dot/index.js"
+    },
+    "./status-dot/interactive": {
+      "types": "./dist/charts/status-dot/client.d.ts",
+      "import": "./dist/charts/status-dot/client.js"
+    },
+    "./heat-cell": {
+      "types": "./dist/charts/heat-cell/index.d.ts",
+      "import": "./dist/charts/heat-cell/index.js"
+    },
+    "./heat-cell/interactive": {
+      "types": "./dist/charts/heat-cell/client.d.ts",
+      "import": "./dist/charts/heat-cell/client.js"
+    },
+    "./progress": {
+      "types": "./dist/charts/progress/index.d.ts",
+      "import": "./dist/charts/progress/index.js"
+    },
+    "./progress/interactive": {
+      "types": "./dist/charts/progress/client.d.ts",
+      "import": "./dist/charts/progress/client.js"
+    },
     "./styles.css": "./styles.css"
   },
   "publishConfig": {

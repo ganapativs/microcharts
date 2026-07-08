@@ -320,3 +320,25 @@ N-node charts regression floors at ~half their measured 2026-07-08 baseline (spa
 activity-grid 5) — tripwires, not aspirations; measured numbers in `bench/results.json`.
 Measurement fix in the same pass: warm every component process-wide before measuring any (the first
 chart otherwise pays renderToStaticMarkup JIT warmup and reads 3–4× slow), median of 5 windows.
+
+**Batch 1 W1 budget divergence (2026-07-08, plan/22 #1–4 — needs user sign-off at the batch gate):**
+plan/22 set W1 static budgets of 1.2–1.5 kB, below the measured floor of any `Chart`-composed SVG
+chart: the shared wrapper (Chart + a11y naming) + cached formatter + JSX glue cost ~0.9–1.0 kB gz
+before any chart code (evidence: shipped Bullet = 1.56 kB static; Delta's 0.92 kB is HTML-only, no
+Chart shell — the "Delta-class ≤ 1.5" target only fits chart-less inline components). Trims measured
+first (esbuild --analyze per entry): the one structural win was splitting the growing `EN` dictionary
+into per-shape MODULES (`core/strings-scalar.ts` EN_SCALAR, `EN_SERIES` in summary.ts, `EN`
+aggregate in `core/strings.ts`) — bundlers keep whole chunks, so before the split every chart paid
+every batch's new templates (sparkline had crept +113 B over its exception; back under after).
+Final measured/budgeted (static/interactive, gz): trend-arrow 1.64→1.7/1.94→2 kB · status-dot
+1.55→1.6/1.8→1.9 kB · heat-cell 1.7→1.75/2.09→2.15 kB · progress 1.82→1.9/2.11→2.2 kB. All well
+inside the 3/4 kB hard caps and ≤ 2 kB target; the plan/22 per-chart numbers for later waves should
+be read as (chart-specific code) + ~1.5 kB shared floor. NOT a precedent for the hard caps.
+
+**Progress label-gutter honesty fix (2026-07-08, W1 craft review):** the spec's "viewBox 48×8 with a
+right label gutter reserved" was first implemented by shrinking the track inside a fixed 48-unit
+box — screenshot review caught that rows with different label lengths ("44%" vs "112%") then render
+different track widths, silently changing the scale row-to-row in a table column. Fixed: the gutter
+WIDENS the viewBox (total = width + gutter) and the track always spans the full given width;
+regression-tested (`progress/geometry.test.ts` comparability case). Same rule already used by
+TrendArrow `showValue`.

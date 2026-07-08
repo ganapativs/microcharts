@@ -65,6 +65,54 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/trend-arrow (static)",
+    "path": "dist/charts/trend-arrow/index.js",
+    "limit": "1.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/trend-arrow/interactive",
+    "path": "dist/charts/trend-arrow/client.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/status-dot (static)",
+    "path": "dist/charts/status-dot/index.js",
+    "limit": "1.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/status-dot/interactive",
+    "path": "dist/charts/status-dot/client.js",
+    "limit": "1.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/heat-cell (static)",
+    "path": "dist/charts/heat-cell/index.js",
+    "limit": "1.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/heat-cell/interactive",
+    "path": "dist/charts/heat-cell/client.js",
+    "limit": "2.15 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/progress (static)",
+    "path": "dist/charts/progress/index.js",
+    "limit": "1.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/progress/interactive",
+    "path": "dist/charts/progress/client.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
     "name": "styles.css (shared, whole library)",
     "path": "styles.css",
     "limit": "12 kB",
