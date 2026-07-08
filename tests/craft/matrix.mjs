@@ -29,6 +29,14 @@ const RV = [
   { rate: 3.6, volume: 70 },
   { rate: 4.1, volume: 38 },
 ];
+const NF = [
+  { in: 4, out: 3 },
+  { in: 5, out: 4 },
+  { in: 6, out: 4 },
+  { in: 5, out: 6 },
+  { in: 7, out: 5 },
+  { in: 8, out: 6 },
+];
 
 const CASES = [];
 const add = (slug, comp, variants, sizes) => CASES.push({ slug, comp, variants, sizes });
@@ -503,6 +511,16 @@ add(
   [
     [80, 12],
     [160, 16],
+  ],
+);
+add(
+  "net-flow",
+  "NetFlow",
+  [{ data: NF }, { data: NF, mode: "bars" }, { data: NF, net: false }, { data: NF, label: "none" }],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
   ],
 );
 add(

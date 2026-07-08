@@ -16,6 +16,7 @@ const { PercentileLadder } = await D("percentile-ladder");
 const { GradedBand } = await D("graded-band");
 const { IconArray } = await D("icon-array");
 const { RateVolume } = await D("rate-volume");
+const { NetFlow } = await D("net-flow");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -51,6 +52,18 @@ const RV = [
   { rate: 0.041, volume: 38 },
 ];
 const PCT = { style: "percent", maximumFractionDigits: 1 };
+const NF = [
+  { in: 42, out: 31 },
+  { in: 38, out: 35 },
+  { in: 45, out: 29 },
+  { in: 40, out: 44 },
+  { in: 52, out: 38 },
+  { in: 55, out: 36 },
+  { in: 44, out: 52 },
+  { in: 60, out: 41 },
+  { in: 57, out: 43 },
+];
+const KFMT = (n) => `${n}k`;
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -151,6 +164,13 @@ const body = [
       height: 28,
     }),
   ),
+
+  `<h2>NetFlow</h2>`,
+  row("default 80×20", svg(NetFlow, { data: NF, format: KFMT, width: 80, height: 20 })),
+  row("area, last", svg(NetFlow, { data: NF, format: KFMT, width: 240, height: 28 })),
+  row("bars", svg(NetFlow, { data: NF, format: KFMT, mode: "bars", width: 240, height: 28 })),
+  row("paydown", svg(NetFlow, { data: NF, format: KFMT, positive: "down", width: 240, height: 28 })),
+  row("gross only", svg(NetFlow, { data: NF, format: KFMT, net: false, width: 240, height: 28 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

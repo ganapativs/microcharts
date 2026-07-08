@@ -89,6 +89,8 @@ export default defineConfig({
     "src/charts/icon-array/client.tsx",
     "src/charts/rate-volume/index.tsx",
     "src/charts/rate-volume/client.tsx",
+    "src/charts/net-flow/index.tsx",
+    "src/charts/net-flow/client.tsx",
   ],
   format: ["esm"],
   dts: true,

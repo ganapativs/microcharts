@@ -651,3 +651,38 @@ parent's mid-initialization (before its `DEMO` const executed) → `ReferenceErr
 too via the shared chunk). FIX: touch the imported data only INSIDE the component body, never at
 client module top level (seismogram.client already did this — the rule was implicit). Pattern for
 every shared-DEMO docs client.
+
+## Batch 2 wave 2 — NetFlow (2026-07-08)
+
+**NetFlow (plan/23 §6) — full DoD, static + interactive.** Provenance: plan/16 §Q14. The
+"one shared scale for both directions, both areas anchor at zero" rule is the honest-encoding
+non-negotiable (#7 / plan/06 lie-factor=1), not an empirical claim.
+
+**Deviations from the plan §6 spec (deliberate):**
+- **`stack.ts` NOT used.** The spec's "new core needs: stack.ts zero-anchored helpers" assumed
+  `divergingStack` would model the mirror. It doesn't — `divergingStack` splits ONE valenced
+  distribution at a neutral pole (Likert-shaped), not a per-period bidirectional time series.
+  The honest primitive is a symmetric magnitude `scaleLinear` + a zero-anchored area, so NetFlow
+  builds those directly. No kernel change needed; `divergingStack` stays for LikertStrip et al.
+- **Area path built inline (no `core/areaPath`).** `areaPath` references a `TOP` curve map that
+  holds `smoothPath`+`stepPath`, so importing it drags both into the bundle even for linear-only
+  areas (~0.5 kB dead). NetFlow's areas are linear (a rate/flow area must not smooth), so a
+  6-line inline `zeroArea` (baseline→tops→baseline→close) using only `linePath` keeps it lean.
+  Trimmed static 2.88 → 2.61 kB.
+- **Tokens corrected from the spec.** plan §6 names `--mc-pos`/`--mc-neg`/`--mc-fg` and
+  `data-mc-ink="area"` — none exist. Areas use the real `positive`/`negative` ink-roles (which
+  ALSO give the forced-colors CanvasText-vs-GrayText distinction for free) with `fillOpacity`
+  dialed inline; the net line is `data-mc-ink="data"` (= `--mc-stroke`). Direction is never
+  color-alone: position (in above / out below zero) + the signed net in the label's TEXT are the
+  redundant channels. `positive="down"` swaps only the valence COLOR mapping (color = which
+  direction is good, position = in/out identity — two independent channels).
+- **Static budget 2.61 kB > spec §6 target 2 kB** (Chart wrapper + scale + linePath + strings
+  floor), interactive 3.41 kB (spec 3). Both UNDER the 3/4 kB hard caps. Same budget-floor class
+  as the rest of batch 2; needs user sign-off at the gate.
+- **Interactive announce = "Period N of M"** (no period labels in the data shape), summary
+  "across N periods" — same rationale as RateVolume.
+
+Gates: node 1122, browser 80, craft 196/0, size 2.61/3.41, bench 18.4 rows/ms (floor 8),
+docs build 168 pages + docs tests 92, tsc/oxlint/oxfmt/knip clean. Real-browser sweep: 0
+escapes / 0 text-on-mark, areas visible (0.2 area / 0.45 bars), mirror confirmed (inflow above
+zeroY, outflow below, both anchored at zero), interactive pairs gross + signed net.

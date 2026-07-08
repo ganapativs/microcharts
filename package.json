@@ -344,6 +344,14 @@
       "types": "./dist/charts/graded-band/client.d.ts",
       "import": "./dist/charts/graded-band/client.js"
     },
+    "./net-flow": {
+      "types": "./dist/charts/net-flow/index.d.ts",
+      "import": "./dist/charts/net-flow/index.js"
+    },
+    "./net-flow/interactive": {
+      "types": "./dist/charts/net-flow/client.d.ts",
+      "import": "./dist/charts/net-flow/client.js"
+    },
     "./rate-volume": {
       "types": "./dist/charts/rate-volume/index.d.ts",
       "import": "./dist/charts/rate-volume/index.js"

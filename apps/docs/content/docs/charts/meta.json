@@ -42,6 +42,7 @@
     "percentile-ladder",
     "graded-band",
     "icon-array",
-    "rate-volume"
+    "rate-volume",
+    "net-flow"
   ]
 }

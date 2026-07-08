@@ -41,6 +41,7 @@ import { PercentileLadder } from "@microcharts/react/percentile-ladder";
 import { GradedBand } from "@microcharts/react/graded-band";
 import { IconArray } from "@microcharts/react/icon-array";
 import { RateVolume } from "@microcharts/react/rate-volume";
+import { NetFlow } from "@microcharts/react/net-flow";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -101,6 +102,7 @@ export function getMDXComponents(components?: MDXComponents) {
     GradedBand,
     IconArray,
     RateVolume,
+    NetFlow,
     SparkGroup,
     // docs building blocks
     Instrument,

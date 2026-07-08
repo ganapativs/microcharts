@@ -165,6 +165,10 @@
     "rate-volume": {
       "static": "2.6 kB",
       "interactive": "3.5 kB"
+    },
+    "net-flow": {
+      "static": "2.7 kB",
+      "interactive": "3.5 kB"
     }
   }
 }

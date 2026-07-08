@@ -20,6 +20,7 @@ import { EN_COVERAGE } from "./strings-coverage.js";
 import { EN_QUANTILE } from "./strings-quantile.js";
 import { EN_FREQ } from "./strings-freq.js";
 import { EN_RATE_VOLUME } from "./strings-rate-volume.js";
+import { EN_NET_FLOW } from "./strings-net-flow.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -40,4 +41,5 @@ export const EN: SummaryStrings = {
   ...EN_QUANTILE,
   ...EN_FREQ,
   ...EN_RATE_VOLUME,
+  ...EN_NET_FLOW,
 };

@@ -220,6 +220,24 @@ export interface SummaryStrings {
   ) => string;
   /** Rate-volume zero-volume period, e.g. "Period 5 of 12: no events." */
   rateVolumeNoEvents: (position: number, total: number) => string;
+  /** Net-flow summary, e.g. "Net +1.1k last period; in 4.2k vs out 3.1k; net positive 9 of 12 periods." */
+  netFlow: (
+    netLast: string,
+    inLast: string,
+    outLast: string,
+    netPositive: number,
+    n: number,
+  ) => string;
+  /** Net-flow period announcement, e.g. "Period 6 of 12: in 4.2k, out 3.1k, net +1.1k." */
+  netFlowAt: (
+    position: number,
+    total: number,
+    inValue: string,
+    outValue: string,
+    net: string,
+  ) => string;
+  /** Net-flow all-zero, e.g. "No flow across 12 periods." */
+  netFlowNoFlow: (n: number) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

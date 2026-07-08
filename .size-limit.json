@@ -461,6 +461,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/net-flow (static)",
+    "path": "dist/charts/net-flow/index.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/net-flow/interactive",
+    "path": "dist/charts/net-flow/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/rate-volume (static)",
     "path": "dist/charts/rate-volume/index.js",
     "limit": "2.6 kB",

@@ -355,4 +355,13 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "net-flow",
+    component: "NetFlow",
+    floor: 8, // 2 area paths + net line — few nodes, per-period point loop
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, k) => ({ in: Math.abs(v), out: Math.abs(v) * 0.7 + (k % 5) })),
+      summary: false,
+    }),
+  },
 ];
