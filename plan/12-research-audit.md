@@ -311,3 +311,12 @@ every other chart sits well under its cap), (b) drop `label="minmax"` (−≈180
 3→3.25 kB — both far inside the 3/4 kB model hard caps. Note: the interactive−static delta was
 already over the "+1 kB" guideline before Batch 0 (1 085 B); the absolute per-chart budgets are
 the enforced contract (plan/21 §1 table is per-subpath).
+
+**Bench floor calibration (2026-07-08, Batch 0.D):** the plan/07 "≥ 50 rows/ms SSR" floor was
+calibrated on the single-path sparkline scenario; SSR cost scales with node count, so 24-rect
+SparkBar (~14 rows/ms) and 35-cell ActivityGrid (~9 rows/ms) can never meet it by construction.
+Bench v2 (`bench/scenarios.mjs` registry) keeps 50 for sparkline/delta-class charts and gives
+N-node charts regression floors at ~half their measured 2026-07-08 baseline (sparkbar 7, bullet 30,
+activity-grid 5) — tripwires, not aspirations; measured numbers in `bench/results.json`.
+Measurement fix in the same pass: warm every component process-wide before measuring any (the first
+chart otherwise pays renderToStaticMarkup JIT warmup and reads 3–4× slow), median of 5 windows.
