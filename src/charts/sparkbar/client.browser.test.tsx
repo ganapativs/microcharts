@@ -16,6 +16,15 @@ describe("interactive <SparkBar> (plan/04 §4, plan/08 T2)", () => {
     expect(fig.getAttribute("aria-label")).toMatch(/Weekly\. Trending up/);
   });
 
+  it("win-loss tie stays neutral, never a green win (regression, plan/12)", async () => {
+    // 0 is a tie: it must take the neutral 'bar' ink, not 'positive'.
+    const screen = await render(<SparkBar data={[3, -2, 0, 5]} mode="winloss" title="WL" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    expect(fig.querySelectorAll('rect[data-mc-ink="positive"]').length).toBe(2); // +3, +5
+    expect(fig.querySelectorAll('rect[data-mc-ink="negative"]').length).toBe(1); // -2
+    expect(fig.querySelectorAll('rect[data-mc-ink="bar"]').length).toBe(1); // the 0 tie
+  });
+
   it("keyboard walks bars and announces value; active bar goes accent", async () => {
     const fig = await mount();
     const live = fig.querySelector('[aria-live="polite"]')!;

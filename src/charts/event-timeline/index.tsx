@@ -186,7 +186,7 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
         y2={geo.track.y}
         data-mc-ink="band"
         vectorEffect="non-scaling-stroke"
-        style={{ stroke: "var(--mc-band)", strokeWidth: 1 }}
+        style={{ stroke: "var(--mc-neutral)", strokeOpacity: 0.35, strokeWidth: 1 }}
       />
       {geo.spans.map((s) => {
         const it = items[s.i]!;

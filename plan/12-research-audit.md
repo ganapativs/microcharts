@@ -523,3 +523,57 @@ before calling a labelled chart done.
   cram-spread; `log` tag in a reserved left gutter, clear of the p50 label. Verified by a
   real-browser getBBox sweep: 0 escapes, 0 text-on-text/mark overlaps across 27 variants
   (band backgrounds exempt). New reusable harness `scripts/visual-check.mjs`.
+
+**R-CATALOG-AUDIT-FIXES — full-catalog craft sweep (2026-07-08, user-directed, 7 parallel
+read-only audits + mechanical greps over all 39 charts × static/interactive/gallery/docs).**
+Findings + resolution (memory `chart-legibility-and-review-practices` updated with the
+invariants so these can't recur):
+- **`--mc-band` used as a STROKE color** (8%-alpha ≈ invisible): FIXED heat-strip:82 +
+  calendar-strip:147 (empty cells — broke the "empty ≠ zero" flagship), rug-strip:117
+  (empty axis), event-timeline:189 (track) → `var(--mc-neutral)` @0.35–0.45.
+- **calendar-strip real ZERO days** rendered at `stepOpacity(0)=0.06` (invisible) → floor
+  0.14 so present-but-zero reads distinct from empty.
+- **Primary-mark stroke-width hardcoded** (thinner than peers, ignores presets/forced-colors):
+  FIXED slope:174,186, percentile-ladder:194, micro-box:172 → `var(--mc-stroke-width)` /
+  `calc(...*k)`. (rug ticks, ohlc wicks, dumbbell rings left — intentional secondary hairlines.)
+- **sparkbar interactive re-implemented the SVG** → win-loss ties colored green, annotations
+  dropped, endpoint label absent. FIXED: client now COMPOSES `<StaticSparkBar summary={false}
+  style={FILL}>` (Chart forwards style, so fluid sizing survives); overlay focus ring as a
+  child. Regression test added (tie stays `bar`). This is the canonical pattern; the other 34
+  clients already compose.
+- **Docs interactive demos duplicated data** (drift class): seismogram.client had stale sparse
+  data while the registry was dense → now `export const BURSTS` from the registry, imported.
+  (Other 34 currently match; pattern established.)
+- **Demo CSS-sizing traps** → props: mini-bar playground, ohlc.mdx ×3, event-timeline.mdx,
+  micro-donut.client; pictogram-row inline-em aspect matched to kill letterbox.
+- **graded-band.mdx** was truncated → added Four homes / Why this default / Accessibility / Props.
+- **Gallery (reference, stale vs correct impls)**: renamed `tufte`→`editorial` theme
+  (non-negotiable #6), dropped the cancelled `@microcharts/expressive` claim, fixed 6 family
+  counts (96→100), fixed fCalibrationStrip negative-height slivers, redrew bumpstrip as a STEP
+  (its own honesty claim), fixed likert left-side opacity grading.
+- **False positives caught by verifying first** (agents erred): graded-band "RED test" (passes
+  24/0), dot-plot "of 3 drift" (real library string), icon-array "loose --mc-neg" (uses full
+  `--mc-negative`). No changes made to these.
+- **NOT touched — benchmark-strip** (P1 band/label findings real) is under a concurrent
+  session's edit (showed modified on a clean-start tree); left to avoid clobbering.
+- **Deferred** (spawned task): ~14 cosmetic gallery renderer refreshes where the impl is
+  already correct (ohlc/progress-ring/funnel/status-dot/trend-arrow/dumbbell/pictogram/coverage/
+  slope/stacked-area/heat-strip/segmented/micro-donut/paired-bars/waterfall/micro-box) + the
+  forced-colors system-color mapping for custom ink roles (unit/unit-off/gap/flag), which needs
+  moving their color from inline to CSS first.
+- Gates after fixes: node 1068, browser 75, craft 172/0, tsc (lib+docs), size (no fails),
+  docs 88. Argos baselines for the touched static charts must be re-approved.
+
+**Label size follow-up (2026-07-08, second user review).** The `--mc-label-size` pin
+(above) fixed overlaps but I pinned it to a FIXED viewBox-unit value (4.5–6) that rendered
+~HALF the size of the older charts (which use the shared `0.75em` ≈ 10.5px). Measured old
+vs new in-browser: Progress/HeatCell labels = 10.5px, mine = 4.5–6px. Fix: size labels
+proportional to chart height — `FONT = clamp(round(height·0.62), 7, 11)` for the strips,
+`clamp(round(height·0.5), 6, 9)` for PercentileLadder (3 labels share the track) and
+`clamp(round(height·0.5), 7, 10)` for IconArray (the grid stays the hero). This matches the
+old ~10.5px at typical sizes AND stays chart-proportional (better than the ambient `0.75em`,
+which shrinks relative to a larger chart). All gutter/spread math is driven by the same FONT
+so containment stays exact; the PercentileLadder `log`-tag gutter is now font-sized (was a
+fixed 11 units → collided with p50 once the font grew). IconArray default bumped 60×24 →
+140×28 (the old 60px default was too narrow for a properly-sized ratio label + 20-cell grid).
+percentile-ladder trimmed the log-fallback `devWarn` to stay under the 3 kB hard cap.

@@ -104,10 +104,10 @@
   <p class="fam-note">The workhorse family: what happened over time, in the width of a word.</p>
   <div class="grid" id="fam-trend"></div>
 
-  <h2>Categorical — labeled values · 7 types</h2>
+  <h2>Categorical — labeled values · 8 types</h2>
   <div class="grid" id="fam-cat"></div>
 
-  <h2>Part-to-whole · 6 types</h2>
+  <h2>Part-to-whole · 7 types</h2>
   <div class="grid" id="fam-ptw"></div>
 
   <h2>Scalar + reference · 5 types</h2>
@@ -117,7 +117,7 @@
   <div class="grid" id="fam-matrix"></div>
 
   <h2 style="margin-top:64px">The expressive collection · 22</h2>
-  <p class="fam-note">A second catalog, drawn from global visual culture — typography research, natural forms, analog instruments, historical notation, living motion, architecture. Survivors of an editorial cut — every one passes the read-back test and keeps a documented encoding channel: delight never lies. Ships separately as <code>@microcharts/expressive</code>.</p>
+  <p class="fam-note">A second catalog, drawn from global visual culture — typography research, natural forms, analog instruments, historical notation, living motion, architecture. Survivors of an editorial cut — every one passes the read-back test and keeps a documented encoding channel: delight never lies. All 100 ship in <code>@microcharts/react</code>, single package.</p>
 
   <h2>Typographic — the text is the chart · 2</h2>
   <div class="grid" id="ex-type"></div>
@@ -133,10 +133,10 @@
   <h2>Spatial &amp; architectural · 5</h2>
   <div class="grid" id="ex-space"></div>
 
-  <h2 style="margin-top:64px">Decision micrographs — real questions, answered · 20</h2>
+  <h2 style="margin-top:64px">Decision micrographs — real questions, answered · 21</h2>
   <p class="fam-note">A third catalog, built from decision-science research (quantile dotplots, fan charts, graded uncertainty bands) and the questions people actually bring to data: <em>Will we land? Is this normal? Did the fix work? Can I trust this number?</em> Each chart is named for the question it answers — the most underserved territory in dataviz is not prettier trends, it's honest uncertainty and comparison at inline scale.</p>
 
-  <h2>"Where is this going?" — forecasting &amp; uncertainty · 4</h2>
+  <h2>"Where is this going?" — forecasting &amp; uncertainty · 5</h2>
   <div class="grid" id="q-forecast"></div>
   <h2>"Is this normal? Did it work?" — judgment &amp; comparison · 5</h2>
   <div class="grid" id="q-judge"></div>
@@ -147,7 +147,7 @@
   <h2>"What repeats, and what matters first?" — pattern &amp; priority · 2</h2>
   <div class="grid" id="q-pattern"></div>
 
-  <h2 style="margin-top:64px">The frontier collection · 20</h2>
+  <h2 style="margin-top:64px">The frontier collection · 21</h2>
   <p class="fam-note">A fourth catalog from a deep-research sweep of professions that solved micro data display decades ago and were never absorbed by chart libraries: aviation instrument panels, clinical medicine, meteorology's 1941 station model, broadcast audio, trading floors, developer tools, and the AI era. Each keeps its lineage's honesty rules.</p>
 
   <h2>From instrument panels · 5</h2>
@@ -156,7 +156,7 @@
   <div class="grid" id="f-med"></div>
   <h2>From media &amp; developer tools · 3</h2>
   <div class="grid" id="f-dev"></div>
-  <h2>From the AI era &amp; trading floors · 4</h2>
+  <h2>From the AI era &amp; trading floors · 5</h2>
   <div class="grid" id="f-ai"></div>
   <h2>From systems, traces &amp; trustworthy models · 5</h2>
   <div class="grid" id="f-sys"></div>
@@ -198,6 +198,8 @@ function txt(s,x,y,str,size,col,anchor="start",weight=500){const t=E("text",{x,y
 
 // ---------- chart renderers (data in → svg out) ----------
 const D1=[4,6,5,9,7,8,11,9,13,12,15,14,18], D2=[9,7,8,6,7,5,6,4,5,3,4,3,2];
+// Okabe-Ito categorical tints (--mc-cat-*, theme-invariant) for plain, valence-free categories.
+const CAT=["#e69f00","#56b4e9","#009e73","#0072b2","#d55e00","#cc79a7"];
 function sparkline(d=D1,t={}){const w=92,h=22,s=svg(w,h,t.scale||2);const pts=sc(d,w-16,h,3);
   if(t.band!==false){const lo=h*0.35,hi=h*0.75;s.appendChild(E("rect",{x:0,y:lo,width:w-16,height:hi-lo,fill:t.band||C.band}))}
   stroke(s,(t.curve==="smooth"?smooth:line)(pts),t.ink||C.ink,t.sw||1.25,t.dash?{"stroke-dasharray":t.dash}:{});
@@ -226,7 +228,9 @@ function ohlc(){const w=100,h=26,s=svg(w,h);const cs=[[5,9,3,7],[7,11,6,10],[10,
   const all=cs.flat(),mn=Math.min(...all),mx=Math.max(...all),cw=(w-6)/cs.length;
   cs.forEach((c,i)=>{const x=3+i*cw+cw/2;const y=v=>h-2-(v-mn)*(h-4)/(mx-mn);const up=c[3]>=c[0];const col=up?C.pos:C.neg;
     stroke(s,`M${x} ${y(c[1])} L${x} ${y(c[2])}`,col,1);
-    rect(s,x-cw/4,Math.min(y(c[0]),y(c[3])),cw/2,Math.abs(y(c[0])-y(c[3]))||1,col)});return s}
+    const bt=Math.min(y(c[0]),y(c[3])),bh=Math.abs(y(c[0])-y(c[3]))||1;
+    // hollow up-body / filled down-body — direction is shape-coded (survives grayscale)
+    s.appendChild(E("rect",{x:x-cw/4,y:bt,width:cw/2,height:bh,fill:up?C.surface:col,stroke:col,"stroke-width":up?0.75:0,"shape-rendering":"crispEdges"}))});return s}
 function dualspark(){const w=92,h=22,s=svg(w,h);const b=[6,7,7,8,8,9,9,10,10,11,11,12,12];
   stroke(s,line(sc(b,w-4,h,3,2,20)),C.muted,1,{"stroke-dasharray":"3 2.5"});
   stroke(s,line(sc(D1,w-4,h,3,2,20)),C.ink,1.25);
@@ -235,19 +239,24 @@ function stackedarea(){const w=92,h=24,s=svg(w,h);const a=[4,5,5,6,7,7,8,9],b=[3
   const tot=a.map((v,i)=>v+b[i]+c[i]),mx=Math.max(...tot);
   const layer=(cum,col,op)=>{const pts=cum.map((v,i)=>[2+i*(w-4)/(cum.length-1),h-2-(v/mx)*(h-4)]);
     s.insertBefore(E("path",{d:"M2 "+(h-2)+" L "+pts.map(p=>p.join(" ")).join(" L ")+` L ${w-2} ${h-2} Z`,fill:col,opacity:op}),s.firstChild)};
-  layer(a.map((v,i)=>v+b[i]+c[i]),C.acc,0.25);layer(a.map((v,i)=>v+b[i]),C.acc,0.5);layer(a,C.acc,0.9);return s}
+  // categorical --mc-cat tints per series (not an accent-opacity ramp) — matches the impl
+  layer(a.map((v,i)=>v+b[i]+c[i]),CAT[2],0.8);layer(a.map((v,i)=>v+b[i]),CAT[1],0.8);layer(a,CAT[0],0.8);return s}
 function bumpstrip(){const w=92,h=24,s=svg(w,h);const ranks=[4,4,3,3,2,3,2,1,1,2,1,1];
   const pts=ranks.map((r,i)=>[3+i*(w-20)/(ranks.length-1),3+(r-1)*(h-8)/3]);
-  stroke(s,line(pts),C.ink,1.25);dot(s,...pts.at(-1),2,C.acc);txt(s,pts.at(-1)[0]+4,pts.at(-1)[1]+2.5,"#1",7.5,C.acc);
-  [1,2,3,4].forEach(r=>stroke(s,`M3 ${3+(r-1)*(h-8)/3} L${w-18} ${3+(r-1)*(h-8)/3}`,C.faint,0.5));return s}
+  // a rank cannot be 2.4 — step, never diagonal interpolation (matches the shipped chart)
+  let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=1;i<pts.length;i++){d+=` H${pts[i][0]} V${pts[i][1]}`;}
+  stroke(s,d,C.ink,1.25);dot(s,...pts.at(-1),2,C.acc);txt(s,pts.at(-1)[0]+4,pts.at(-1)[1]+2.5,"#1",7.5,C.acc);return s}
 function seismo(){const w=92,h=20,s=svg(w,h);const d=[1,1,2,1,6,2,1,9,3,1,2,12,4,1,2,1,7,2,1,3,1,10,2,1];
   const bw=(w-4)/d.length,mx=12;d.forEach((v,i)=>{const bh=(v/mx)*(h-4);stroke(s,`M${2+i*bw+bw/2} ${(h-bh)/2} L${2+i*bw+bw/2} ${(h+bh)/2}`,v>8?C.neg:C.ink,1)});return s}
 function histo(){const w=80,h=22,s=svg(w,h);const d=[1,3,6,9,12,10,7,4,2,1];const mx=Math.max(...d),bw=(w-4)/d.length;
   d.forEach((v,i)=>rect(s,2+i*bw,h-2-(v/mx)*(h-4),bw-1.5,(v/mx)*(h-4),C.ink));return s}
 function rug(){const w=80,h=14,s=svg(w,h);[3,7,9,12,14,15,17,22,24,25,26,29,35,38,39,41,48,55,58,70,76].forEach(x=>stroke(s,`M${x} 3 L${x} ${h-3}`,C.ink,1));
   stroke(s,`M25.5 1 L25.5 ${h-1}`,C.acc,1.5);return s}
-function heatstrip(){const w=96,h=12,s=svg(w,h);const d=[1,2,4,3,5,7,6,8,5,9,7,10,8,6,9,11];const mx=11;
-  d.forEach((v,i)=>rect(s,i*6,1,5,h-2,C.acc,1.2));[...s.children].forEach((r,i)=>r.setAttribute("opacity",(0.15+0.85*d[i]/mx).toFixed(2)));return s}
+function heatstrip(){const w=96,h=12,s=svg(w,h);const d=[1,2,4,3,5,7,6,8,5,9,7,10,8,6,9,11];
+  const steps=5,mn=Math.min(...d),mx=Math.max(...d),span=mx-mn||1;
+  // discrete stepped opacity (value binned into `steps`), not a continuous ramp
+  d.forEach((v,i)=>{const step=Math.min(steps-1,Math.floor((v-mn)/span*steps));
+    rect(s,i*6,1,5,h-2,C.acc,1.2);s.lastChild.setAttribute("opacity",(0.25+step/(steps-1)*0.75).toFixed(2))});return s}
 function minibar(){const w=92,h=30,s=svg(w,h);const d=[["NA",38],["EU",29],["APAC",18],["LATAM",9]];
   d.forEach((r,i)=>{const y=i*7+2;rect(s,26,y,(r[1]/38)*(w-40),4.5,i===0?C.acc:C.ink);txt(s,0,y+4.2,r[0],6.5,C.muted);txt(s,28+(r[1]/38)*(w-40),y+4.2,String(r[1]),6.5,C.muted)});return s}
 function dotplot(){const w=92,h=30,s=svg(w,h);const d=[["v3.2",72],["v3.1",58],["v3.0",41],["v2.9",22]];
@@ -257,41 +266,64 @@ function lollipop(){const w=92,h=30,s=svg(w,h);const d=[["Mon",30],["Tue",44],["
   d.forEach((r,i)=>{const y=i*7+4.5,x=24+(r[1]/60)*(w-34);stroke(s,`M24 ${y} L${x} ${y}`,C.ink,1);dot(s,x,y,2.2,C.acc);txt(s,0,y+2.4,r[0],6.5,C.muted)});return s}
 function pairedbars(){const w=92,h=32,s=svg(w,h);const d=[["Q1",30,26],["Q2",34,38],["Q3",40,37],["Q4",44,49]];
   d.forEach((r,i)=>{const y=i*7.5+2;rect(s,20,y,(r[1]/50)*(w-30),2.6,C.muted);rect(s,20,y+3,(r[2]/50)*(w-30),2.6,C.acc);txt(s,0,y+5.4,r[0],6.5,C.muted)});return s}
-function slope(){const w=70,h=40,s=svg(w,h);const rows=[["A",30,12,C.pos],["B",22,24,C.muted],["C",10,32,C.neg]];
-  rows.forEach(r=>{stroke(s,`M16 ${r[1]} L${w-16} ${r[2]}`,r[3],1.25);dot(s,16,r[1],1.8,r[3]);dot(s,w-16,r[2],1.8,r[3]);
+function slope(){const w=70,h=40,s=svg(w,h);const rows=[["A",30,12],["B",22,24],["C",10,32]];
+  // neutral ink by default — a rank change is not automatically good or bad
+  // (only valence-colored when `positive` is declared)
+  rows.forEach(r=>{stroke(s,`M16 ${r[1]} L${w-16} ${r[2]}`,C.ink,1.25);dot(s,16,r[1],1.8,C.ink);dot(s,w-16,r[2],1.8,C.ink);
     txt(s,12,r[1]+2.4,r[0],6.5,C.muted,"end");txt(s,w-12,r[2]+2.4,r[0],6.5,C.muted)});return s}
 function microbox(){const w=88,h=16,s=svg(w,h);const y=h/2,[mn,q1,md,q3,mx]=[6,26,40,58,82];
-  stroke(s,`M${mn} ${y} L${q1} ${y}`,C.ink,1);stroke(s,`M${q3} ${y} L${mx} ${y}`,C.ink,1);
-  s.appendChild(E("rect",{x:q1,y:y-5,width:q3-q1,height:10,fill:C.band,stroke:C.ink,"stroke-width":1}));
-  stroke(s,`M${md} ${y-5} L${md} ${y+5}`,C.acc,1.5);return s}
+  stroke(s,`M${mn} ${y} L${q1} ${y}`,C.muted,1);stroke(s,`M${q3} ${y} L${mx} ${y}`,C.muted,1);
+  s.appendChild(E("rect",{x:q1,y:y-5,width:q3-q1,height:10,fill:C.band,stroke:C.muted,"stroke-width":0.5}));
+  // median is data ink (--mc-stroke), not accent
+  stroke(s,`M${md} ${y-5} L${md} ${y+5}`,C.ink,2);return s}
 function dumbbell(){const w=92,h=30,s=svg(w,h);const d=[["Sr",42,74],["Mid",30,55],["Jr",18,36]];
   d.forEach((r,i)=>{const y=i*9+5;stroke(s,`M${r[1]} ${y} L${r[2]} ${y}`,C.faint,2);
-    dot(s,r[1],y,2.4,C.muted);dot(s,r[2],y,2.4,C.acc);txt(s,0,y+2.4,r[0],6.5,C.muted)});return s}
-function waterfall(){const w=96,h=30,s=svg(w,h);let lvl=6;const steps=[["St",6,C.muted,true],["+A",8,C.pos],["+B",5,C.pos],["–C",-7,C.neg],["+D",6,C.pos],["End",18,C.muted,true]];
-  const u=(h-8)/20,bw=w/steps.length;let x=1;
-  steps.forEach((st,i)=>{let y0,y1;
-    if(st[3]){y0=h-4-st[1]*u;y1=h-4;lvl=st[1]}else{y0=h-4-(lvl+Math.max(st[1],0))*u;y1=h-4-(lvl+Math.min(st[1],0))*u;lvl+=st[1]}
-    rect(s,x,y0,bw-3,Math.max(y1-y0,1),st[2]);
-    if(i<steps.length-1)stroke(s,`M${x+bw-3} ${h-4-lvl*u} L${x+bw} ${h-4-lvl*u}`,C.muted,0.6);
-    x+=bw});return s}
+    // hollow "from" ring → filled "to" dot — before/after reads without a legend (shape-coded)
+    s.appendChild(E("circle",{cx:r[1],cy:y,r:2.2,fill:"none",stroke:C.muted,"stroke-width":0.8}));
+    dot(s,r[2],y,2.4,C.ink);txt(s,0,y+2.4,r[0],6.5,C.muted)});return s}
+function waterfall(){const w=96,h=30,s=svg(w,h);
+  // `start` is a numeric opening level, NOT a rendered bar: floating delta bars
+  // + connectors, closed by ONE zero-anchored total bar.
+  const start=6,deltas=[8,5,-7,6],n=deltas.length,cols=n+1,gap=2,cw=(w-gap*(cols-1))/cols,pitch=cw+gap;
+  const levels=[];let run=start;deltas.forEach(d=>{run+=d;levels.push(run)});
+  const lo=Math.min(0,start,...levels),hi=Math.max(0,start,...levels),rng=hi-lo||1;
+  const y=v=>h-3-(v-lo)*(h-6)/rng;
+  let lvl=start;
+  deltas.forEach((d,i)=>{const from=lvl;lvl+=d;const yTop=y(Math.max(from,lvl)),yBot=y(Math.min(from,lvl)),x=i*pitch;
+    rect(s,x,yTop,cw,Math.max(yBot-yTop,1),d>=0?C.pos:C.neg);
+    stroke(s,`M${x+cw} ${y(lvl)} L${x+pitch} ${y(lvl)}`,C.muted,0.6,{"stroke-opacity":0.5})});
+  const tx=n*pitch,tTop=y(Math.max(0,lvl)),tBot=y(Math.min(0,lvl));
+  rect(s,tx,tTop,cw,Math.max(tBot-tTop,1),C.ink);return s}
 function progress(t={}){const w=88,h=10,s=svg(w,h);rect(s,0,3,w-22,4,t.track||C.faint,2);rect(s,0,3,(w-22)*0.72,4,t.acc||C.acc,2);
   txt(s,w-18,9,"72%",7.5,t.ink||C.ink);return s}
-function segmented(){const w=92,h=10,s=svg(w,h);const segs=[[42,C.acc],[28,C.pos],[18,C.muted],[12,C.faint]];let x=0;
+function segmented(){const w=92,h=10,s=svg(w,h);
+  // neutral categorical tints for plain categories (Okabe-Ito --mc-cat), not semantic colors
+  const segs=[[42,CAT[0]],[28,CAT[1]],[18,CAT[2]],[12,C.muted]];let x=0;
   segs.forEach(g=>{rect(s,x,2,(g[0]/100)*w-1.5,6,g[1],1.5);x+=(g[0]/100)*w});return s}
 function ring(){const sz=30,s=svg(sz,sz);const r=11,c=2*Math.PI*r;
   s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r,stroke:C.faint,"stroke-width":3.5,fill:"none"}));
-  s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r,stroke:C.acc,"stroke-width":3.5,fill:"none","stroke-linecap":"round",
+  // butt caps (annulus sectors), not round linecaps — start fixed at 12 o'clock
+  s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r,stroke:C.acc,"stroke-width":3.5,fill:"none",
     "stroke-dasharray":`${c*0.72} ${c}`,transform:`rotate(-90 ${sz/2} ${sz/2})`}));
-  txt(s,sz/2,sz/2+2.6,"72",7,C.ink,"middle",600);return s}
+  txt(s,sz/2,sz/2+2.4,"72%",6.5,C.ink,"middle",600);return s}
 function microdonut(){const sz=30,s=svg(sz,sz);const r=10,c=2*Math.PI*r;let off=0;
-  [[0.46,C.acc],[0.3,C.pos],[0.24,C.faint]].forEach(seg=>{
+  // neutral categorical tints (--mc-cat) for plain categories, not semantic colors
+  [[0.46,CAT[0]],[0.3,CAT[1]],[0.24,CAT[2]]].forEach(seg=>{
     s.appendChild(E("circle",{cx:sz/2,cy:sz/2,r,stroke:seg[1],"stroke-width":6,fill:"none",
       "stroke-dasharray":`${c*seg[0]-1} ${c}`,"stroke-dashoffset":-off*c,transform:`rotate(-90 ${sz/2} ${sz/2})`}));off+=seg[0]});return s}
 function funnel(){const w=92,h=32,s=svg(w,h);const d=[["Visit",100],["Trial",56],["Pay",23]];
-  d.forEach((r,i)=>{const y=i*10+2,bw=(r[1]/100)*(w-34);rect(s,26,y,bw,6,C.acc,1);
-    txt(s,0,y+5.4,r[0],6.5,C.muted);txt(s,28+bw,y+5.4,r[1]+"%",6.5,C.muted)});
+  const n=d.length,gap=3,cw=(w-gap*(n-1))/n,pitch=cw+gap,mx=100,base=h-2;
+  const st=d.map((r,i)=>{const bh=(r[1]/mx)*(h-9);return{x:i*pitch,y:base-bh,h:bh,w:cw}});
+  // trapezoid connector slats (band) between the tops of consecutive columns
+  for(let i=0;i<n-1;i++){const a=st[i],b=st[i+1];
+    s.appendChild(E("path",{d:`M${a.x+a.w} ${a.y}L${b.x} ${b.y}L${b.x} ${base}L${a.x+a.w} ${base}Z`,fill:C.band}))}
+  // vertical stepped columns, zero-anchored, heights ∝ value (silhouette is a shape, not a measurement)
+  st.forEach((c,i)=>{rect(s,c.x,c.y,c.w,c.h,C.ink);txt(s,c.x+c.w/2,c.y-1.5,d[i][1]+"%",5.5,C.muted,"middle")});
   return s}
-function pictogram(){const w=92,h=14,s=svg(w,h);for(let i=0;i<8;i++)dot(s,7+i*11,h/2,3.4,i<5?C.acc:C.faint);return s}
+function pictogram(){const w=92,h=14,s=svg(w,h);
+  // filled units = value; empty units = hollow rings (a SHAPE difference, never opacity-alone)
+  for(let i=0;i<8;i++){if(i<5)dot(s,7+i*11,h/2,3.4,C.acc);
+    else s.appendChild(E("circle",{cx:7+i*11,cy:h/2,r:3.1,fill:"none",stroke:C.muted,"stroke-width":0.6}))}return s}
 function delta(v="+12.4%",up=true,t={}){const w=56,h=16,s=svg(w,h);const col=up?(t.pos||C.pos):(t.neg||C.neg);
   s.appendChild(E("path",{d:up?"M5 11 L9 5 L13 11 Z":"M5 5 L9 11 L13 5 Z",fill:col}));
   txt(s,17,12,v,9.5,col,"start",600);return s}
@@ -299,15 +331,21 @@ function bullet(){const w=110,h=16,s=svg(w,h);
   [[w,.07],[w*0.75,.13],[w*0.5,.2]].forEach(([bw,op])=>{rect(s,0,3,bw,10,C.ink);s.lastChild.setAttribute("opacity",op)});
   rect(s,0,6.5,w*0.62,3,C.ink);stroke(s,`M${w*0.8} 1.5 L${w*0.8} 14.5`,C.neg,1.75);return s}
 function heatcell(){const s=svg(70,16);[0.15,0.35,0.6,0.85,1].forEach((o,i)=>{rect(s,i*14,1,12.5,14,C.acc,2);s.lastChild.setAttribute("opacity",o)});return s}
-function statusdot(){const w=96,h=14,s=svg(w,h);
-  dot(s,5,h/2,3.4,C.pos);txt(s,12,h/2+2.6,"live",7,C.muted);
-  s.appendChild(E("rect",{x:36,y:h/2-3.4,width:6.8,height:6.8,fill:C.warn}));txt(s,47,h/2+2.6,"degraded",7,C.muted);
-  s.appendChild(E("path",{d:`M86 ${h/2-4} L90 ${h/2+4} L82 ${h/2+4} Z`,fill:C.neg}));return s}
-function trendarrow(){const w=70,h=18,s=svg(w,h);
-  s.appendChild(E("path",{d:"M4 13 L11 6 L15 10 L22 3",stroke:C.pos,"stroke-width":2,fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}));
-  s.appendChild(E("path",{d:"M22 3 L22 8 M22 3 L17 3",stroke:C.pos,"stroke-width":2,fill:"none","stroke-linecap":"round"}));
-  s.appendChild(E("path",{d:"M40 5 L47 12 L51 8 L58 15",stroke:C.neg,"stroke-width":2,fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}));
-  s.appendChild(E("path",{d:"M58 15 L58 10 M58 15 L53 15",stroke:C.neg,"stroke-width":2,fill:"none","stroke-linecap":"round"}));return s}
+function statusdot(){const w=96,h=14,s=svg(w,h),y=h/2,r=3.4;const xs=[7,25,43,61,79];
+  // five-glyph vocab (shape+token pairing, never color-alone) — matches status-dot/index.tsx
+  dot(s,xs[0],y,r,C.pos); // ok — filled circle (positive)
+  s.appendChild(E("path",{d:`M${xs[1]} ${y-r} L${xs[1]+r} ${y+r} L${xs[1]-r} ${y+r} Z`,fill:C.warn})); // warn — triangle (cat-1)
+  s.appendChild(E("path",{d:`M${xs[2]} ${y-r-0.2} L${xs[2]+r} ${y} L${xs[2]} ${y+r+0.2} L${xs[2]-r} ${y} Z`,fill:C.neg})); // error — diamond (negative)
+  s.appendChild(E("circle",{cx:xs[3],cy:y,r:r-0.6,fill:"none",stroke:C.muted,"stroke-width":1.2})); // off — hollow ring (neutral)
+  s.appendChild(E("circle",{cx:xs[4],cy:y,r,fill:"none",stroke:C.acc,"stroke-width":1.2})); // busy — outline ring…
+  s.appendChild(E("path",{d:`M${xs[4]} ${y-r} A${r} ${r} 0 0 1 ${xs[4]} ${y+r} Z`,fill:C.acc})); // …+ right half-disc (accent)
+  return s}
+function trendarrow(){const w=70,h=18,s=svg(w,h),oy=1;
+  // single filled direction glyph — orientation encodes up/down/flat (never a trend line)
+  const poly=(pts,ox,col)=>s.appendChild(E("path",{d:"M"+pts.map(p=>(p[0]+ox).toFixed(1)+" "+(p[1]+oy).toFixed(1)).join(" L ")+" Z",fill:col}));
+  poly([[8,2],[13.2,8.4],[10,8.4],[10,14],[6,14],[6,8.4],[2.8,8.4]],8,C.pos);  // up
+  poly([[8,14],[13.2,7.6],[10,7.6],[10,2],[6,2],[6,7.6],[2.8,7.6]],44,C.neg); // down (vertical flip)
+  return s}
 function activitygrid(){const cols=16,rows=5,cs=5,s=svg(cols*(cs+1.5),rows*(cs+1.5));
   for(let c=0;c<cols;c++)for(let r=0;r<rows;r++){const v=Math.abs(Math.sin(c*2.7+r*1.9))*(c/cols+0.3);
     rect(s,c*(cs+1.5),r*(cs+1.5),cs,cs,C.acc,1.2);s.lastChild.setAttribute("opacity",(v>0.85?1:0.08+v*0.8).toFixed(2))}return s}
@@ -388,8 +426,12 @@ function qRetention(){const w=96,h=26,s=svg(w,h);
   const pts=sc(act,w-22,h,3,20,100);stroke(s,line(pts),C.ink,1.25);
   dot(s,...pts.at(-1),2,C.acc);txt(s,pts.at(-1)[0]+3,pts.at(-1)[1]+2.5,"40%",6.5,C.acc);return s}
 function qCoverage(){const w=96,h=14,s=svg(w,h);
-  rect(s,2,4,w-24,6,C.band,2);
-  [[2,26],[32,18],[56,14],[74,18]].forEach(g=>rect(s,g[0],4,g[1],6,C.acc,2));
+  // discrete per-slot cells: measured = filled, gaps = hollow (band + hairline outline).
+  // null (no measurement) vs 0 (a measured zero) is carried by SHAPE — 11/14 ≈ 79%.
+  const slots=[1,1,1,1,0,1,1,1,1,1,0,1,1,0],n=slots.length,cw=(w-22)/n;
+  slots.forEach((v,i)=>{const x=i*cw+1;
+    if(v)rect(s,x,4,cw-1.2,6,C.acc,1);
+    else s.appendChild(E("rect",{x,y:4,width:cw-1.2,height:6,rx:1,fill:C.band,stroke:C.muted,"stroke-opacity":0.5,"stroke-width":0.6}))});
   txt(s,w-18,11,"79%",7,C.muted);return s}
 function qNetFlow(){const w=96,h=28,s=svg(w,h);const inn=[4,5,6,5,7,8,7,9],out=[3,4,4,6,5,6,8,7];
   const mid=h/2,ux=(w-8)/(inn.length-1);
@@ -555,7 +597,7 @@ function fCalibrationStrip(){const w=60,h=32,s=svg(w,h);
   stroke(s,`M6 ${h-6} L${w-6} 4`,C.faint,0.9,{"stroke-dasharray":"2 2"});
   const pts=[[12,24,5],[22,21,9],[32,15,12],[42,13,7],[52,6,3]];
   pts.forEach(p=>{dot(s,p[0],p[1],1.8,Math.abs((h-6)-(p[1])-((p[0]-6)/(w-12))*(h-10))<3?C.ink:C.neg);
-    rect(s,p[0]-1.5,h-4,3,-p[2]*0.35,C.muted);s.lastChild.setAttribute("opacity",0.35)});
+    rect(s,p[0]-1.5,(h-4)-p[2]*0.35,3,p[2]*0.35,C.muted);s.lastChild.setAttribute("opacity",0.35)});
   return s}
 function fPartitionStrip(){const w=96,h=20,s=svg(w,h);
   const top=[[46,C.acc],[30,C.ink],[16,C.muted]];let x=2;
@@ -572,8 +614,8 @@ function microscatter(){const w=48,h=28,s=svg(w,h);
   return s}
 function likertstrip(){const w=96,h=16,s=svg(w,h);const cx=52;
   // levels: [strong-dis, dis, neutral, agree, strong-agree] shares of 84 units
-  rect(s,cx-19,4,11,8,C.neg,1);s.lastChild.setAttribute("opacity",".45");
-  rect(s,cx-8,4,8,8,C.neg,1);
+  rect(s,cx-19,4,11,8,C.neg,1); // strong-disagree pole = strongest, like the right side
+  rect(s,cx-8,4,8,8,C.neg,1);s.lastChild.setAttribute("opacity",".55");
   rect(s,cx-0.5,4,1,8,C.muted,0); // split neutral halves hug the hairline
   rect(s,cx+0.5+0.75,4,14,8,C.pos,1);s.lastChild.setAttribute("opacity",".55");
   rect(s,cx+15.75,4,17,8,C.pos,1);
@@ -847,7 +889,7 @@ function cityskyline(){const w=96,h=32,s=svg(w,h);const bld=[[2,14,16,3],[20,22,
 // themes
 const THEMES=[
  ["modern",{bg:"#FFFFFF",ink:"#17181B",acc:"#0072B2",band:"rgba(23,24,27,.07)",font:"inherit"}],
- ["tufte",{bg:"#FFFFF8",ink:"#333333",acc:"#B32E2E",band:"rgba(60,60,60,.08)",font:"Georgia,serif"}],
+ ["editorial",{bg:"#FFFFF8",ink:"#333333",acc:"#B32E2E",band:"rgba(60,60,60,.08)",font:"Georgia,serif"}],
  ["newspaper",{bg:"#F6F5F1",ink:"#111111",acc:"#111111",band:"rgba(17,17,17,.10)",dash:"1 0",sw:1.5,font:"Georgia,'Times New Roman',serif"}],
  ["e-ink",{bg:"#EDEDEA",ink:"#000000",acc:"#000000",band:"rgba(0,0,0,.12)",sw:2,font:"inherit"}],
  ["poster",{bg:"#101318",ink:"#F4F6F8",acc:"#4FB3FF",band:"rgba(244,246,248,.12)",sw:2.25,font:"inherit"}]];

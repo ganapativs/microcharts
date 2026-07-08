@@ -5,7 +5,6 @@
 // transform is never silent — an in-chart `log` tag renders when it applies.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { round2, type Value } from "../../core/types.js";
@@ -52,8 +51,10 @@ export interface PercentileLadderProps {
   children?: ReactNode | undefined;
 }
 
-const FONT = 4.5;
 const LABEL_MIN_WIDTH = 56;
+// label size in viewBox units — a touch smaller than the strips (three labels
+// must share the track), ~0.5·height clamped 6–9 (plan/12)
+const labelFont = (height: number): number => Math.min(9, Math.max(6, Math.round(height * 0.5)));
 
 /** Places tick labels at their tick x (clamped inside the box), ENDPOINT-FIRST:
  *  p50 and the tail always win; an interior label is dropped (→ null) when it
@@ -63,9 +64,10 @@ export function ladderLabelLayout(
   geo: PercentileLadderGeometry,
   texts: readonly string[],
   width: number,
+  font: number,
 ): (number | null)[] {
   const n = geo.ticks.length;
-  const half = texts.map((t) => (t.length * FONT * 0.62) / 2);
+  const half = texts.map((t) => (t.length * font * 0.62) / 2);
   const clampX = (i: number) =>
     Math.min(width - 3 - half[i]!, Math.max(geo.track.x0 - 3 + half[i]!, geo.ticks[i]!.x));
   const out: (number | null)[] = Array.from({ length: n }, () => null);
@@ -107,11 +109,10 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
     children,
   } = props;
 
-  const geo = percentileLadderGeometry({ width, height, data, ps, scale, domain });
-
-  if (scale === "log" && geo && !geo.log) {
-    devWarn("<PercentileLadder> scale='log' ignored — needs all plotted values > 0.");
-  }
+  const FONT = labelFont(height);
+  // scale="log" silently falls back to linear on any value ≤ 0 (docs note it);
+  // the in-chart `log` tag renders only when the transform IS applied
+  const geo = percentileLadderGeometry({ width, height, data, ps, scale, domain, font: FONT });
 
   const fmt = makeFormatter(format, locale);
   const ratioFmt = makeFormatter({ maximumFractionDigits: 1 }, locale);
@@ -144,7 +145,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
 
   const showLabels = label !== "none" && width >= LABEL_MIN_WIDTH;
   const texts = rendered.map((t) => labelText(t.p, t.value));
-  const labelX = showLabels ? ladderLabelLayout(geo, texts, width) : null;
+  const labelX = showLabels ? ladderLabelLayout(geo, texts, width, FONT) : null;
   // keep the alphabetic descender (≈0.22·fs) inside the viewBox
   const labelY = round2(height - FONT * 0.22 - 0.2);
   // pin the label size to viewBox units (see coverage-strip / plan/12)
@@ -191,7 +192,14 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
             y2={round2(geo.track.y + t.half)}
             data-mc-ink={tail ? "flag" : "data"}
             vectorEffect="non-scaling-stroke"
-            style={{ strokeWidth: tail ? 2 : 1.5, opacity, ...(stroke ? { stroke } : null) }}
+            style={{
+              // hardcoded (not the token) ONLY because this subpath is pinned at the 3 kB
+              // hard cap and the token-var string costs ~20 B; base 1.5 == the default
+              // --mc-stroke-width, so it matches peers at the default theme (plan/12).
+              strokeWidth: tail ? 2 : 1.5,
+              opacity,
+              ...(stroke ? { stroke } : null),
+            }}
           />
         );
       })}

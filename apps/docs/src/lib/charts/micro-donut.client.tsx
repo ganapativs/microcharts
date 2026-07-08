@@ -13,12 +13,7 @@ const MIX = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover a wedge (angle lookup) or arrow through them — Other announces its members.">
-      <MicroDonutInteractive
-        data={MIX}
-        size={48}
-        title="Traffic mix"
-        style={{ width: 96, height: 96 }}
-      />
+      <MicroDonutInteractive data={MIX} size={96} title="Traffic mix" />
     </DemoPanel>
   );
 }

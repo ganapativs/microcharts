@@ -14,16 +14,14 @@ export interface InteractiveIconArrayProps extends IconArrayProps {
   strings?: FreqStrings;
 }
 
-const FONT = 6;
-
 export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
   const {
     value,
     of = 20,
     label = "ratio",
     shape = "square",
-    width = 60,
-    height = 24,
+    width = 140,
+    height = 28,
     locale,
     strings = EN_FREQ,
     title,
@@ -31,10 +29,11 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     ...rest
   } = props;
 
+  const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
   const gutterCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
   const geo = useMemo(
     () => iconArrayGeometry({ width, height, value, of, shape, gutterCh, fontSize: FONT }),
-    [width, height, value, of, shape, gutterCh],
+    [width, height, value, of, shape, gutterCh, FONT],
   );
   const pctFmt = useMemo(
     () => makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale),

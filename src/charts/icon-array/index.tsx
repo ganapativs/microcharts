@@ -49,8 +49,6 @@ export interface IconArrayProps {
   children?: ReactNode | undefined;
 }
 
-const FONT = 6;
-
 export function IconArray(props: IconArrayProps): ReactNode {
   const {
     value,
@@ -58,8 +56,8 @@ export function IconArray(props: IconArrayProps): ReactNode {
     label = "ratio",
     shape = "square",
     positive,
-    width = 60,
-    height = 24,
+    width = 140,
+    height = 28,
     color,
     locale,
     strings = EN_FREQ,
@@ -71,17 +69,12 @@ export function IconArray(props: IconArrayProps): ReactNode {
     children,
   } = props;
 
+  // label a touch smaller than the strips so the countable grid stays the hero
+  // (~0.5·height, clamped 7–10) — see coverage-strip / plan/12
+  const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
   const showLabel = label !== "none";
   const gutterCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
-  const geo = iconArrayGeometry({
-    width,
-    height,
-    value,
-    of,
-    shape,
-    gutterCh,
-    fontSize: FONT,
-  });
+  const geo = iconArrayGeometry({ width, height, value, of, shape, gutterCh, fontSize: FONT });
 
   if (of === 100 && (width < 40 || height < 40)) {
     devWarn("<IconArray> of=100 needs ≥ 40×40 — unit size falls below the crispness floor.");

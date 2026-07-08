@@ -53,8 +53,6 @@ export interface CoverageStripProps {
   children?: ReactNode | undefined;
 }
 
-const FONT = 6;
-
 export function CoverageStrip(props: CoverageStripProps): ReactNode {
   const {
     data,
@@ -80,6 +78,10 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
   if (expected !== undefined && data.length > expected) {
     devWarn("<CoverageStrip> data longer than `expected` — expected clamped up to data length.");
   }
+
+  // label size in viewBox units — ~0.62·height, clamped 7–11 to match the rest
+  // of the catalog at any chart size (plan/12: labels are chart-proportional)
+  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.62)));
 
   const pctFmt = makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale);
   const showLabel = label === "percent";

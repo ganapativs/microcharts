@@ -52,7 +52,6 @@ export interface GradedBandProps {
   children?: ReactNode | undefined;
 }
 
-const FONT = 6;
 // widest band faintest → narrowest strongest; VISIBLE at every level (the
 // graded nesting is the whole read). Accent tint distinguishes it from
 // BenchmarkStrip's neutral peer band.
@@ -81,6 +80,8 @@ export function GradedBand(props: GradedBandProps): ReactNode {
     children,
   } = props;
 
+  // label size in viewBox units (~0.62·height, clamped 7–11) — see coverage-strip
+  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.62)));
   const fmt = makeFormatter(format, locale);
   const showLabel = label === "median";
   const geo = gradedBandGeometry({ width, height, data, levels, value, domain });
@@ -158,7 +159,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
         y2={geo.bandY + geo.bandH + 0.5}
         stroke="var(--mc-stroke)"
         vectorEffect="non-scaling-stroke"
-        style={{ strokeWidth: 1.5 }}
+        style={{ strokeWidth: "var(--mc-stroke-width)" }}
       />
       {geo.dot ? (
         // the observed value is a distinct hollow ring, never confused with the tick

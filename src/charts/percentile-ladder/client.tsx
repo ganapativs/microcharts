@@ -34,9 +34,11 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     ...rest
   } = props;
 
+  // must match the static geometry (label font sizes the log-tag gutter)
+  const font = Math.min(9, Math.max(6, Math.round(height * 0.5)));
   const geo = useMemo(
-    () => percentileLadderGeometry({ width, height, data, ps, scale, domain: props.domain }),
-    [width, height, data, ps, scale, props.domain],
+    () => percentileLadderGeometry({ width, height, data, ps, scale, domain: props.domain, font }),
+    [width, height, data, ps, scale, props.domain, font],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const ratioFmt = useMemo(() => makeFormatter({ maximumFractionDigits: 1 }, locale), [locale]);

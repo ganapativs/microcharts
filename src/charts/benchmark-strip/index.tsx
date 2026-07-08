@@ -48,8 +48,6 @@ export interface BenchmarkStripProps {
   children?: ReactNode | undefined;
 }
 
-const FONT = 6;
-
 export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
   const {
     data,
@@ -73,18 +71,11 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
     children,
   } = props;
 
+  // label size in viewBox units (~0.62·height, clamped 7–11) — see coverage-strip
+  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.62)));
   const fmt = makeFormatter(format, locale);
   const showLabel = label !== "none";
-  const geo = benchmarkStripGeometry({
-    width,
-    height,
-    data,
-    value,
-    range,
-    domain,
-    gutterCh: showLabel ? 4 : 0,
-    fontSize: FONT,
-  });
+  const geo = benchmarkStripGeometry({ width, height, data, value, range, domain });
 
   const cls = className ? `mc-benchmark-strip ${className}` : "mc-benchmark-strip";
 

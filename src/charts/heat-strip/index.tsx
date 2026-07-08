@@ -79,8 +79,9 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
             height={c.h}
             rx={c.rx}
             fill="none"
-            stroke="var(--mc-band)"
-            strokeWidth={0.5}
+            stroke="var(--mc-neutral)"
+            strokeOpacity={0.4}
+            strokeWidth={0.6}
           />
         ) : (
           <rect

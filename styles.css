@@ -229,6 +229,31 @@
     fill: var(--mc-accent);
     stroke: none;
   }
+  /* IconArray empty unit + CoverageStrip gap — a "measured nothing here" slot,
+     never a void: faint band fill + hairline neutral outline. Static, so the
+     color lives here (was inline) to earn a forced-colors mapping below. The
+     FILLED unit stays inline: its fill is dynamic (accent/positive/negative by
+     `positive`), so it can't move to a static ink-role rule. */
+  :where(.mc-root [data-mc-ink="unit-off"]) {
+    fill: var(--mc-band);
+    stroke: var(--mc-neutral);
+    stroke-opacity: 0.4;
+    stroke-width: 0.5;
+  }
+  :where(.mc-root [data-mc-ink="gap"]) {
+    fill: var(--mc-band);
+    stroke: var(--mc-neutral);
+    stroke-opacity: 0.35;
+    stroke-width: 0.5;
+  }
+  /* PercentileLadder tail flag — the emphasised accent tick/dot. Element-split:
+     the line strokes, the dot fills. `color` prop still overrides inline. */
+  :where(.mc-root line[data-mc-ink="flag"]) {
+    stroke: var(--mc-accent);
+  }
+  :where(.mc-root circle[data-mc-ink="flag"]) {
+    fill: var(--mc-accent);
+  }
 
   /* Interactive sparkline crosshair — a dashed guide reads as "measuring" the
      focused point rather than just crossing it. Scoped to the interactive

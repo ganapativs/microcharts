@@ -114,7 +114,8 @@ export function RugStrip(props: RugStripProps): ReactNode {
           y1={orientation === "horizontal" ? height / 2 : 0}
           x2={orientation === "horizontal" ? width : width / 2}
           y2={orientation === "horizontal" ? height / 2 : height}
-          stroke="var(--mc-band)"
+          stroke="var(--mc-neutral)"
+          strokeOpacity={0.4}
           strokeWidth={1}
           vectorEffect="non-scaling-stroke"
         />

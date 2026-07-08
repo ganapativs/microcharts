@@ -1,23 +1,20 @@
 "use client";
 // Interactive <SparkBar> (plan/04 §4, plan/08 T2). Keyboard + pointer bar
-// navigation with a polite live readout, roving focus on an HTML overlay. The
-// visual layer matches the static entry; only behavior is layered on.
+// navigation with a polite live readout, roving focus on an HTML overlay.
+// COMPOSES the static entry (component canon): the static renders the bars,
+// colors, endpoint label AND annotation children — the client only overlays a
+// focus outline + readout and owns interaction. Re-implementing the SVG here
+// used to mis-color win-loss ties and drop annotations/labels (plan/12).
 import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { describeSeries } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
-import { sparkBarGeometry, type Bar, type SparkBarMode } from "./geometry.js";
-import type { SparkBarProps } from "./index.js";
+import { labelMetrics, sparkBarGeometry } from "./geometry.js";
+import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
 
 // The SVG fills the focusable wrapper so its box coincides with the wrapper's —
 // the %-positioned hit zones + readout map 1:1 and the chart scales fluidly.
 const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
-
-function barInk(bar: Bar, mode: SparkBarMode, activeIndex: number | null): string {
-  if (bar.index === activeIndex) return "accent";
-  if (mode === "winloss" || bar.sign < 0) return bar.sign < 0 ? "negative" : "positive";
-  return bar.last ? "accent" : "bar";
-}
 
 export interface InteractiveSparkBarProps extends SparkBarProps {
   onPointFocus?: (index: number | null) => void;
@@ -31,6 +28,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     height = 20,
     mode = "bar",
     gap = 0.25,
+    label = "none",
     color,
     title,
     summary,
@@ -42,14 +40,34 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     children,
   } = props;
 
-  const geo = useMemo(
-    () => sparkBarGeometry(data, { width, height, mode, domain, gap }),
-    [data, width, height, mode, domain, gap],
-  );
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+
+  // Geometry must match the static entry EXACTLY (same right gutter when
+  // label="last" shifts the bars), so the overlay + pointer math never drift.
+  const geo = useMemo(() => {
+    let labelText: string | undefined;
+    if (label === "last" && mode === "bar") {
+      for (let i = data.length - 1; i >= 0; i--) {
+        const v = data[i];
+        if (isFiniteValue(v)) {
+          labelText = fmt(v);
+          break;
+        }
+      }
+    }
+    const metrics = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
+    return sparkBarGeometry(data, {
+      width,
+      height,
+      mode,
+      domain,
+      gap,
+      gutterRight: metrics?.gutter ?? 0,
+    });
+  }, [data, width, height, mode, domain, gap, label, fmt]);
+
   const stops = useMemo(() => geo.bars.map((b) => b.index), [geo]);
   const [active, setActive] = useState<number | null>(null);
-
-  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   const move = useCallback(
     (next: number | null) => {
@@ -135,29 +153,37 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
       onPointerLeave={() => move(null)}
       onBlur={() => move(null)}
     >
-      <svg
-        className="mc-root"
-        viewBox={`0 0 ${width} ${height}`}
+      <StaticSparkBar
+        data={data}
+        domain={domain}
         width={width}
         height={height}
-        preserveAspectRatio="xMidYMid meet"
+        mode={mode}
+        gap={gap}
+        label={label}
+        color={color}
+        format={format}
+        locale={locale}
+        summary={false}
         style={FILL}
-        aria-hidden="true"
       >
-        {geo.bars.map((bar) => (
-          <rect
-            key={bar.index}
-            x={bar.x}
-            y={bar.y}
-            width={bar.width}
-            height={bar.height}
-            shapeRendering="crispEdges"
-            data-mc-ink={barInk(bar, mode, active)}
-            style={color && barInk(bar, mode, active) === "bar" ? { fill: color } : undefined}
-          />
-        ))}
         {children}
-      </svg>
+        {activeBar ? (
+          // focus outline over the hovered/roved bar — the static keeps the bar's
+          // own valence color; this reads as "measuring", not a recolor.
+          <rect
+            x={activeBar.x}
+            y={activeBar.y}
+            width={activeBar.width}
+            height={activeBar.height}
+            fill="none"
+            stroke="var(--mc-accent)"
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+            shapeRendering="crispEdges"
+          />
+        ) : null}
+      </StaticSparkBar>
       <span
         aria-live="polite"
         style={{

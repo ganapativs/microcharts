@@ -15,6 +15,9 @@ const { BenchmarkStrip } = await D("benchmark-strip");
 const { PercentileLadder } = await D("percentile-ladder");
 const { GradedBand } = await D("graded-band");
 const { IconArray } = await D("icon-array");
+const { Progress } = await D("progress");
+const { Bullet } = await D("bullet");
+const { HeatCell } = await D("heat-cell");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -42,6 +45,12 @@ function row(title, ...cells) {
 }
 
 const body = [
+  `<h2>OLD charts (reference label size)</h2>`,
+  row("Progress 60×12", svg(Progress, { value: 0.56, width: 60, height: 12 })),
+  row("Progress 120×16", svg(Progress, { value: 0.56, width: 120, height: 16 })),
+  row("Bullet 90×14", svg(Bullet, { value: 72, target: 80, width: 90, height: 14 })),
+  row("HeatCell label", svg(HeatCell, { value: 72, domain: [0, 100], label: "value" })),
+
   `<h2>CoverageStrip</h2>`,
   row("default 80×10", svg(CoverageStrip, { data: COVERAGE, width: 80, height: 10 })),
   row(

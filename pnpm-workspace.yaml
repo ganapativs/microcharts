@@ -1,4 +1,10 @@
 packages:
+  # The published library lives at the repo root. It must be listed as an
+  # explicit workspace member so Changesets/manypkg can version it — otherwise
+  # `changeset version` fails: "Found changeset … for package @microcharts/react
+  # which is not in the workspace" (manypkg excludes the implicit root package
+  # from the versionable set). pnpm resolves the root member fine.
+  - "."
   - "apps/*"
   - "fixtures/*"
 

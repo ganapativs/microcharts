@@ -7,7 +7,8 @@ export { InteractiveDemo };
 const PKG = "@microcharts/react";
 // A dense, bursty signal — mostly-live slots with quiet gaps and a few real
 // spikes — so the trace reads as a seismograph, not scattered matchsticks.
-const BURSTS = [
+// Exported so the interactive demo shares ONE dataset (no static/interactive drift).
+export const BURSTS = [
   1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2, 0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1, 2, 1,
 ];
 
