@@ -97,19 +97,37 @@ export function Slope(props: SlopeProps): ReactNode {
           0,
         );
 
-  const geo = slopeGeometry({
+  const pairs = data.map((d) => ({ from: d.from, to: d.to }));
+  let geo = slopeGeometry({
     width,
     height,
-    pairs: data.map((d) => ({ from: d.from, to: d.to })),
+    pairs,
     domain,
     gutterLeftCh: estLeftCh,
     gutterRightCh: estRightCh,
     fontSize,
   });
+  // gutters ate the plot → drop labels AND give the reclaimed room back to
+  // the lines (a squeezed slope with labels is a pile, without them a sliver)
+  const labelsDropped = !geo.labelsFit;
+  if (labelsDropped) {
+    geo = slopeGeometry({
+      width,
+      height,
+      pairs,
+      domain,
+      gutterLeftCh: 0,
+      gutterRightCh: 0,
+      fontSize,
+    });
+  }
   const accName = summary === false ? false : (summary ?? slopeSummary(data, strings));
 
   const goodDir = positive === "down" ? -1 : 1;
-  const showLabels = label !== "none" && geo.labelsFit;
+  const showLabels = label !== "none" && !labelsDropped;
+  // baseline sits ~0.35em under the dot; keep the glyph box inside the frame
+  const labelY = (y: number): number =>
+    Math.min(Math.max(y + fontSize * 0.35, fontSize * 0.8), height - fontSize * 0.25);
   // greedy per-column label dedup: an endpoint within 0.9 × fontSize of an
   // already-labeled endpoint drops its label (pure arithmetic — plan/18)
   const labeled0: number[] = [];
@@ -176,19 +194,14 @@ export function Slope(props: SlopeProps): ReactNode {
               <circle cx={line.x1} cy={line.y1} r={1.5} style={{ fill: stroke }} />
             ) : null}
             {showLabels && wantLeft && line.nudge0 === 0 && canLabel(labeled0, line.y0) ? (
-              <text
-                x={geo.leftLabelX}
-                y={line.y0! + fontSize * 0.35}
-                fontSize={fontSize}
-                textAnchor="end"
-              >
+              <text x={geo.leftLabelX} y={labelY(line.y0!)} fontSize={fontSize} textAnchor="end">
                 {fmt(d.from)}
               </text>
             ) : null}
             {showLabels && line.nudge1 === 0 && canLabel(labeled1, line.y1) ? (
               <text
                 x={geo.rightLabelX}
-                y={line.y1! + fontSize * 0.35}
+                y={labelY(line.y1!)}
                 fontSize={fontSize}
                 textAnchor="start"
                 data-mc-ink={wantLabel && !wantLeft ? "label" : undefined}

@@ -96,8 +96,12 @@ export function slopeGeometry(opts: {
     lines,
     leftLabelX: gutterL > 0 ? gutterL - 3 : 0,
     rightLabelX: round2(width - (gutterR > 0 ? gutterR - 3 : 0)),
-    // rows closer than fontSize × 1.1 on average → labels drop (density rule)
-    labelsFit: pairs.length === 0 ? true : height / pairs.length >= fontSize * 1.1,
+    // labels drop when rows are denser than fontSize × 1.1 (density rule) OR
+    // when the gutters ate the plot — a slope squeezed under ~35% of its width
+    // (or 10 units) reads as a label pile, not a chart
+    labelsFit:
+      colX1 - colX0 >= Math.max(10, width * 0.35) &&
+      (pairs.length === 0 ? true : height / pairs.length >= fontSize * 1.1),
     colX0,
     colX1,
   };

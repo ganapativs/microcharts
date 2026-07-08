@@ -211,13 +211,13 @@
   {
     "name": "@microcharts/react/slope (static)",
     "path": "dist/charts/slope/index.js",
-    "limit": "2.7 kB",
+    "limit": "2.8 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/slope/interactive",
     "path": "dist/charts/slope/client.js",
-    "limit": "3.7 kB",
+    "limit": "3.8 kB",
     "gzip": true
   },
   {
