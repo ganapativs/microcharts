@@ -75,7 +75,16 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
   const FONT = Math.min(11, Math.max(7, Math.round(height * 0.62)));
   const fmt = makeFormatter(format, locale);
   const showLabel = label !== "none";
-  const geo = benchmarkStripGeometry({ width, height, data, value, range, domain });
+  const geo = benchmarkStripGeometry({
+    width,
+    height,
+    data,
+    value,
+    range,
+    domain,
+    gutterCh: showLabel ? 4 : 0,
+    fontSize: FONT,
+  });
 
   const cls = className ? `mc-benchmark-strip ${className}` : "mc-benchmark-strip";
 
@@ -110,18 +119,15 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
 
   const labelText =
     label === "value" ? fmt(geo.dot.value) : label === "percentile" ? `p${geo.percentile}` : "";
-  // the percentile/value reads RIGHT NEXT TO the dot (the focal value is the
-  // point), flipping to the dot's left when it would run off the right edge
-  const labelW = labelText.length * FONT * 0.62;
-  const flip = geo.dot.x + 4 + labelW > width;
-  const labelX = round2(flip ? geo.dot.x - 4 : geo.dot.x + 4);
+  // the percentile/value reads OUT in a clean right gutter (over the band it was
+  // cramped + low-contrast) — colored like the dot so it stays tied to the focal
   const midY = round2(height / 2);
   // pin the label size to viewBox units (see coverage-strip / plan/12)
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart
-      width={width}
+      width={geo.totalWidth}
       height={height}
       title={title}
       summary={accName}
@@ -182,9 +188,9 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
       />
       {showLabel ? (
         <text
-          x={labelX}
-          y={midY}
-          textAnchor={flip ? "end" : "start"}
+          x={geo.labelX}
+          y={geo.labelY}
+          textAnchor="end"
           dominantBaseline="central"
           fontSize={FONT}
           style={{ fill: dotFill, fontVariantNumeric: "tabular-nums" }}

@@ -33,9 +33,21 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
     ...rest
   } = props;
 
+  // must match the static's viewBox (the label gutter widens totalWidth)
+  const font = Math.min(11, Math.max(7, Math.round(height * 0.62)));
   const geo = useMemo(
-    () => benchmarkStripGeometry({ width, height, data, value, range, domain: props.domain }),
-    [width, height, data, value, range, props.domain],
+    () =>
+      benchmarkStripGeometry({
+        width,
+        height,
+        data,
+        value,
+        range,
+        domain: props.domain,
+        gutterCh: label !== "none" ? 4 : 0,
+        fontSize: font,
+      }),
+    [width, height, data, value, range, props.domain, label, font],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [active, setActive] = useState<number | null>(null);

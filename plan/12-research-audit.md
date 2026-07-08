@@ -592,3 +592,12 @@ bands now `--mc-neutral` 0.16/0.34, graded `--mc-accent` 0.14/0.26/0.38 — visi
 `fill`/`stroke`/`font-size` attribute, on any element carrying `data-mc-ink` or on `<text>`.** The
 SSR craft gate (color-blind, attribute-reader) cannot catch this class — a real-browser
 `getComputedStyle` band-opacity check is now part of the mandatory pre-done sweep (see memory).
+
+**BenchmarkStrip label moved OUT of the band (2026-07-08, fourth user review).** The percentile
+label sat beside the dot, OVER the peer band, colored like the dot (accent). At ~7px, accent text
+over the neutral gray band was low-contrast + cramped (worse in dark). Moved it OUT to a reserved
+right gutter (like CoverageStrip's percent): `gutterCh:4` → `totalWidth=width+gutter`, end-anchored
+at `labelX`, still colored like the dot so it stays tied to the focal value. The client passes the
+same gutterCh/font so its `totalWidth` matches (pointer math). GradedBand's `22` stays in-band — a
+dark `data-mc-ink="label"` over its pale accent band reads fine. Rule: a mark-colored label over a
+same-tone band → gutter it; only dark-over-pale may stay in-band.
