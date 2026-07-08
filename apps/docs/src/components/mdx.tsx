@@ -35,6 +35,11 @@ import { Ohlc } from "@microcharts/react/ohlc";
 import { Horizon } from "@microcharts/react/horizon";
 import { CalendarStrip } from "@microcharts/react/calendar-strip";
 import { EventTimeline } from "@microcharts/react/event-timeline";
+import { CoverageStrip } from "@microcharts/react/coverage-strip";
+import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
+import { PercentileLadder } from "@microcharts/react/percentile-ladder";
+import { GradedBand } from "@microcharts/react/graded-band";
+import { IconArray } from "@microcharts/react/icon-array";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -89,6 +94,11 @@ export function getMDXComponents(components?: MDXComponents) {
     Horizon,
     CalendarStrip,
     EventTimeline,
+    CoverageStrip,
+    BenchmarkStrip,
+    PercentileLadder,
+    GradedBand,
+    IconArray,
     SparkGroup,
     // docs building blocks
     Instrument,

@@ -311,4 +311,38 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+
+  {
+    slug: "coverage-strip",
+    component: "CoverageStrip",
+    floor: 8, // ≤ 120 cells, one rect each — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 40 }, (_c, j) => ((i + j) % 4 === 0 ? null : (i + j) % 9)),
+      summary: false,
+    }),
+  },
+  {
+    slug: "benchmark-strip",
+    component: "BenchmarkStrip",
+    floor: 30, // ≤ 6 nodes + quantile pass
+    props: (i) => ({ data: rugs[i % POOL], value: 4 + (i % 5), summary: false }),
+  },
+  {
+    slug: "percentile-ladder",
+    component: "PercentileLadder",
+    floor: 25, // ≤ 8 nodes + quantile pass
+    props: (i) => ({ data: rugs[i % POOL], summary: false }),
+  },
+  {
+    slug: "graded-band",
+    component: "GradedBand",
+    floor: 25, // ≤ 6 nodes + nested quantiles
+    props: (i) => ({ data: rugs[i % POOL], summary: false }),
+  },
+  {
+    slug: "icon-array",
+    component: "IconArray",
+    floor: 7, // 20 units/render — N-node class (measured ~15 rows/ms, half-floor)
+    props: (i) => ({ value: (i % 20) / 20, of: 20, summary: false }),
+  },
 ];

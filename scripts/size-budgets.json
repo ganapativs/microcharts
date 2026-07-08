@@ -141,6 +141,26 @@
     "event-timeline": {
       "static": "3 kB",
       "interactive": "4 kB"
+    },
+    "coverage-strip": {
+      "static": "2.4 kB",
+      "interactive": "3.15 kB"
+    },
+    "benchmark-strip": {
+      "static": "2.8 kB",
+      "interactive": "3.6 kB"
+    },
+    "percentile-ladder": {
+      "static": "3 kB",
+      "interactive": "3.9 kB"
+    },
+    "graded-band": {
+      "static": "2.75 kB",
+      "interactive": "3.55 kB"
+    },
+    "icon-array": {
+      "static": "2.2 kB",
+      "interactive": "3 kB"
     }
   }
 }

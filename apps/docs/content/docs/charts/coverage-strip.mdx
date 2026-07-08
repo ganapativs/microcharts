@@ -1,0 +1,73 @@
+---
+title: CoverageStrip
+description: A presence strip for React tables — where data was measured versus missing, so 0 never masquerades as "no reading".
+---
+
+CoverageStrip answers "can I trust this data — where was nothing measured?". Measured
+slots are filled; gaps are hollow with a hairline outline. The distinction between
+`null` (no measurement) and `0` (a measured zero) is the whole chart, and it is carried
+by **shape**, so it survives forced-colors and print. Nothing is ever interpolated
+across a gap.
+
+<LiveDemo
+  label="CoverageStrip"
+  sizeOf="coverage-strip"
+  code={`import { CoverageStrip } from "@microcharts/react/coverage-strip";
+
+<CoverageStrip data={readings} expected={24} label="percent" title="Sensor uptime" />`}
+>
+  <CoverageStrip
+    data={[3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10]}
+    expected={18}
+    label="percent"
+    title="Sensor uptime"
+    width={240} height={16}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="coverage-strip" />
+
+## Try it
+
+<Playground chart="coverage-strip" />
+
+## Interactive
+
+<InteractiveDemo slug="coverage-strip" />
+
+## When to use it
+
+- **Good for** — data-quality cells beside a metric, sensor-uptime rows, trailing-gap detection.
+- **Avoid for** — magnitude over time (HeatStrip) or exact values (Sparkline).
+
+## Sizing
+
+<Sizing chart="coverage-strip" />
+
+## Variants
+
+<LiveDemo
+  label="intensity + shape"
+  code={`<CoverageStrip data={readings} mode="intensity" domain={[0, 12]} />
+<CoverageStrip data={readings} shape="round" />`}
+>
+  <span className="inline-flex flex-col gap-1.5">
+    <CoverageStrip
+      data={[3, 4, null, 5, 0, null, 6, 8, 7, null, 9, 11]}
+      mode="intensity"
+      domain={[0, 12]}
+      title="Intensity"
+      width={200}
+      height={12}
+    />
+    <CoverageStrip
+      data={[3, 4, null, 5, 0, null, 6, 8, 7, null, 9, 11]}
+      shape="round"
+      title="Round"
+      width={200}
+      height={12}
+    />
+  </span>
+</LiveDemo>

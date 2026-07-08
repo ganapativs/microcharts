@@ -1,0 +1,75 @@
+---
+title: PercentileLadder
+description: A tail-percentile strip for React — p50/p90/p99 as graduated ticks on a zero-anchored track, because the median never tells the latency story alone.
+---
+
+PercentileLadder answers "what does the tail look like — not just the median?". Ticks at
+the chosen percentiles sit on a zero-anchored track; graduated height and accent make the
+**tail** read strongest. Tick distances carry the story, so the origin is never cropped —
+and a log transform (for long latency tails) is never silent: an in-chart `log` tag
+renders when it applies.
+
+<LiveDemo
+  label="PercentileLadder"
+  sizeOf="percentile-ladder"
+  code={`import { PercentileLadder } from "@microcharts/react/percentile-ladder";
+
+<PercentileLadder data={latencies} title="Request latency" />`}
+>
+  <PercentileLadder
+    data={Array.from({ length: 200 }, (_, i) => (i < 180 ? 90 + (i % 60) : i < 196 ? 400 + (i % 300) : 1400 + (i % 900)))}
+    title="Request latency"
+    width={240} height={18}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="percentile-ladder" />
+
+## Try it
+
+<Playground chart="percentile-ladder" />
+
+## Interactive
+
+<InteractiveDemo slug="percentile-ladder" />
+
+## When to use it
+
+- **Good for** — latency SLOs in a sentence, the tail per endpoint in tables, payment-size spread.
+- **Avoid for** — the odds of an outcome (QuantileDots) or the full distribution shape (MicroBox).
+
+## Sizing
+
+<Sizing chart="percentile-ladder" />
+
+## Variants
+
+<LiveDemo
+  label="scale + percentiles"
+  code={`<PercentileLadder data={latencies} scale="log" />
+<PercentileLadder data={latencies} ps={[50, 95, 99.9]} label="values" />`}
+>
+  <span className="inline-flex flex-col gap-2">
+    <PercentileLadder
+      data={Array.from({ length: 200 }, (_, i) =>
+        i < 180 ? 90 + (i % 60) : i < 196 ? 400 + (i % 300) : 1400 + (i % 900),
+      )}
+      scale="log"
+      title="Log scale"
+      width={220}
+      height={18}
+    />
+    <PercentileLadder
+      data={Array.from({ length: 200 }, (_, i) =>
+        i < 180 ? 90 + (i % 60) : i < 196 ? 400 + (i % 300) : 1400 + (i % 900),
+      )}
+      ps={[50, 95, 99.9]}
+      label="values"
+      title="Strict SLOs"
+      width={220}
+      height={20}
+    />
+  </span>
+</LiveDemo>

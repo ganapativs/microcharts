@@ -16,6 +16,9 @@ import { EN_STACK } from "./strings-stack.js";
 import { EN_OHLC } from "./strings-ohlc.js";
 import { EN_CALENDAR } from "./strings-calendar.js";
 import { EN_TIMELINE } from "./strings-timeline.js";
+import { EN_COVERAGE } from "./strings-coverage.js";
+import { EN_QUANTILE } from "./strings-quantile.js";
+import { EN_FREQ } from "./strings-freq.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -32,4 +35,7 @@ export const EN: SummaryStrings = {
   ...EN_OHLC,
   ...EN_CALENDAR,
   ...EN_TIMELINE,
+  ...EN_COVERAGE,
+  ...EN_QUANTILE,
+  ...EN_FREQ,
 };

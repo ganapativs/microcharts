@@ -44,6 +44,11 @@ import ohlc from "./ohlc";
 import horizon from "./horizon";
 import calendarStrip from "./calendar-strip";
 import eventTimeline from "./event-timeline";
+import coverageStrip from "./coverage-strip";
+import benchmarkStrip from "./benchmark-strip";
+import percentileLadder from "./percentile-ladder";
+import gradedBand from "./graded-band";
+import iconArray from "./icon-array";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -80,6 +85,11 @@ const MODULES: ChartModule[] = [
   horizon,
   calendarStrip,
   eventTimeline,
+  coverageStrip,
+  benchmarkStrip,
+  percentileLadder,
+  gradedBand,
+  iconArray,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

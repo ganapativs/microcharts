@@ -422,3 +422,40 @@ inconsistent (2–5 units) and the tightest read as cramped. Standardized to ~4 
 gap 2→4 (+ gutter 2→4), dumbbell 3.5→4, sparkline/dual last-value offset +4→+6, bump-strip
 end labels +2→+5 (offset + both gutters). Live-measured likert 2px→4px. dot-plot/slope (3 units)
 and progress/ohlc (5 units) already comfortable, left as-is.
+
+## Batch 2 wave 1 — decision strips + IconArray (2026-07-08)
+
+**BenchmarkStrip citation gap (mandatory, plan/23 risk #1).** plan/16 groups BenchmarkStrip
+with the "strongest research" uncertainty types (QuantileDots/GradedBand), but cites no study
+for the band+dot+stated-percentile form ITSELF. Classification: **inferred-from-adjacent-
+research** — its grounding is design inference from the quantile/uncertainty literature, not a
+direct empirical result. No external docs copy claims study backing for this specific type; the
+docs page describes the encoding and the mid-rank percentile rule, nothing more. (The
+QuantileDots 15–20-dot validation flag lands with that chart in a later wave.)
+
+**Budget-floor divergence (same class as Batch 1 W1).** plan/23 spec budgets for the strips
+(1.5 kB static) sit below the measured Chart-wrapper + kernel floor. The three quantile charts
+additionally pull `core/quantile` (+ `core/scale`), so ~2.6–2.9 kB static is the real floor.
+Budgets set to measured + small headroom, ALL under the 3/4 kB hard caps: coverage-strip
+2.23/2.96 → 2.4/3.15, benchmark-strip 2.64/3.42 → 2.8/3.6, graded-band 2.58/3.37 → 2.75/3.55,
+icon-array 2.04/2.86 → 2.2/3.0. Needs user sign-off at the batch gate (with the W1–W3
+divergences). **percentile-ladder** landed at 3.004 kB static — 4 B OVER the 3 kB hard cap —
+so it was TRIMMED, not granted a budget: the `spreadLabels` import was dropped and its
+forward/backward sweep inlined into `ladderLabelLayout` (same algorithm, no shared-util bytes),
+landing 2.9/3.68 kB under the caps. No exception requested.
+
+**IconArray grammar (simplification).** The plan/23 §21 data shape mentions "0–1 probability or
+{k,n} count-of-denominator via `of`". Shipped grammar keeps one meaning per prop: `value` is the
+0–1 rate, `of` is the denominator/grid size (10/20/100); a known "k in n" is expressed as
+`value={k/n} of={n}`. No separate `{k,n}` object — avoids two ways to say the same thing (plan/04
+one-grammar). The `of` mismatch edge in the spec is therefore N/A. `k` is resolved half-up and
+clamped [0,n]; a positive rate that rounds to 0 renders 0 filled units with a "(less than 1 in
+n)" note — never a partial-unit fill.
+
+**PercentileLadder log tag placement.** The in-chart `log` tag (plan/23 §3, "the transform is
+never silent") cannot share the 12 px vertical band with ticks + beneath-tick labels without
+collision. Resolved by reserving an 11-unit LEFT gutter for the tag when `scale="log"` applies
+(shifting the plot right), and graduating tick HEIGHT by emphasis (tail tallest) so short
+low-percentile ticks clear the tag. Verified by the craft gate (172 configs, 0 escapes/overlaps).
+Label containment: width-aware forward/backward sweep with drop-out below the documented 56 px
+minimum; fontSize emitted as an SVG attribute (not CSS) so the craft audit measures it correctly.

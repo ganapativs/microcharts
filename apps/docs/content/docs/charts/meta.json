@@ -36,6 +36,11 @@
     "ohlc",
     "horizon",
     "calendar-strip",
-    "event-timeline"
+    "event-timeline",
+    "coverage-strip",
+    "benchmark-strip",
+    "percentile-ladder",
+    "graded-band",
+    "icon-array"
   ]
 }

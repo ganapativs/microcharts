@@ -164,6 +164,39 @@ export interface SummaryStrings {
   eventAt: (label: string, atLabel: string) => string;
   /** "4 spans covering 82% of the window; 2 events." */
   timeline: (spans: number, events: number, coveragePct: string) => string;
+
+  /* ── Batch 2 — decision micrographs ──────────────────────────────────── */
+
+  /** Coverage summary, e.g. "18 of 24 slots measured (75%); longest gap 4 slots." */
+  coverage: (measured: number, expected: number, coveragePct: string, longestGap: number) => string;
+  /** Coverage slot announcement, e.g. "Slot 14: 3.2." / "Slot 14: no measurement." */
+  coverageSlot: (slot: number, value: string | null) => string;
+  /** Benchmark summary, e.g. "312 ms — 68th percentile of 42 peers (middle half 250–420 ms)." */
+  benchmark: (value: string, percentile: number, n: number, p25: string, p75: string) => string;
+  /** Benchmark all-equal peers, e.g. "312 ms — all 8 peers at 312 ms." */
+  benchmarkFlat: (value: string, n: number, peerValue: string) => string;
+  /** Benchmark edge announcement, e.g. "p75: 420 ms." */
+  benchmarkEdge: (name: string, value: string) => string;
+  /** Percentile-ladder summary, e.g. "p50 120 ms, p90 480 ms, p99 2.1 s — the slowest 1% take 17× the median." */
+  ladder: (list: string, tailShare: string, ratio: string) => string;
+  /** One ladder tick, e.g. "p90 480 ms" (list) — joined by the summary. */
+  ladderTick: (p: string, value: string) => string;
+  /** Ladder probe announcement, e.g. "p99: 2.1 s — 17× the median." */
+  ladderProbe: (p: string, value: string, ratio: string) => string;
+  /** Ladder all-equal, e.g. "All percentiles equal at 120 ms." */
+  ladderFlat: (value: string) => string;
+  /** Graded-band summary, e.g. "Median 21; 50% within 17–26, 95% within 9–38." */
+  gradedBand: (median: string, clauses: string) => string;
+  /** One band clause, e.g. "50% within 17–26" — joined by the summary. */
+  bandClause: (level: number, lo: string, hi: string) => string;
+  /** Band edge announcement, e.g. "80% interval: 17 to 26." */
+  bandEdge: (level: number, lo: string, hi: string) => string;
+  /** Graded band with no spread, e.g. "Point value 21, no interval." */
+  bandPoint: (value: string) => string;
+  /** Icon-array summary, e.g. "3 in 20. About 15%." (+ note for degenerate/sub-unit). */
+  iconArray: (k: number, n: number, pct: string, note: "none" | "all" | "sub" | null) => string;
+  /** Icon-array unit announcement, e.g. "Unit 7 of 20 — filled. 3 of 20 filled." */
+  iconArrayUnit: (index: number, n: number, filled: boolean, filledCount: number) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

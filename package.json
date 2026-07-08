@@ -312,6 +312,46 @@
       "types": "./dist/charts/event-timeline/client.d.ts",
       "import": "./dist/charts/event-timeline/client.js"
     },
+    "./coverage-strip": {
+      "types": "./dist/charts/coverage-strip/index.d.ts",
+      "import": "./dist/charts/coverage-strip/index.js"
+    },
+    "./coverage-strip/interactive": {
+      "types": "./dist/charts/coverage-strip/client.d.ts",
+      "import": "./dist/charts/coverage-strip/client.js"
+    },
+    "./benchmark-strip": {
+      "types": "./dist/charts/benchmark-strip/index.d.ts",
+      "import": "./dist/charts/benchmark-strip/index.js"
+    },
+    "./benchmark-strip/interactive": {
+      "types": "./dist/charts/benchmark-strip/client.d.ts",
+      "import": "./dist/charts/benchmark-strip/client.js"
+    },
+    "./percentile-ladder": {
+      "types": "./dist/charts/percentile-ladder/index.d.ts",
+      "import": "./dist/charts/percentile-ladder/index.js"
+    },
+    "./percentile-ladder/interactive": {
+      "types": "./dist/charts/percentile-ladder/client.d.ts",
+      "import": "./dist/charts/percentile-ladder/client.js"
+    },
+    "./graded-band": {
+      "types": "./dist/charts/graded-band/index.d.ts",
+      "import": "./dist/charts/graded-band/index.js"
+    },
+    "./graded-band/interactive": {
+      "types": "./dist/charts/graded-band/client.d.ts",
+      "import": "./dist/charts/graded-band/client.js"
+    },
+    "./icon-array": {
+      "types": "./dist/charts/icon-array/index.d.ts",
+      "import": "./dist/charts/icon-array/index.js"
+    },
+    "./icon-array/interactive": {
+      "types": "./dist/charts/icon-array/client.d.ts",
+      "import": "./dist/charts/icon-array/client.js"
+    },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"

@@ -454,6 +454,63 @@ add(
   ],
 );
 
+// ── Batch 2 wave 1 — decision strips + icon array ──────────────────────────
+const LATENCY = [120, 135, 128, 480, 142, 2100, 155, 138, 900, 148, 132, 470];
+add(
+  "coverage-strip",
+  "CoverageStrip",
+  [{ data: [1, null, 3, null, null, 5, 8] }, { data: [1, null, 3], expected: 8, label: "percent" }],
+  [
+    [80, 10],
+    [160, 14],
+  ],
+);
+add(
+  "benchmark-strip",
+  "BenchmarkStrip",
+  [
+    { data: LATENCY, value: 155 },
+    { data: LATENCY, value: 155, label: "value" },
+    { data: [1, 2, 3, 4, 5], value: 3 },
+  ],
+  [
+    [80, 12],
+    [160, 16],
+  ],
+);
+add(
+  "percentile-ladder",
+  "PercentileLadder",
+  [{ data: LATENCY }, { data: LATENCY, scale: "log" }, { data: LATENCY, label: "values" }],
+  [
+    [80, 12],
+    [160, 16],
+    [240, 20],
+  ],
+);
+add(
+  "graded-band",
+  "GradedBand",
+  [{ data: LATENCY }, { data: LATENCY, softEdge: true }, { data: LATENCY, label: "median" }],
+  [
+    [80, 12],
+    [160, 16],
+  ],
+);
+add(
+  "icon-array",
+  "IconArray",
+  [
+    { value: 0.15, of: 20 },
+    { value: 0.15, of: 20, label: "percent" },
+    { value: 0.6, of: 10, shape: "round" },
+  ],
+  [
+    [60, 24],
+    [120, 40],
+  ],
+);
+
 // BY-DESIGN exemptions: EventTimeline span labels render CENTERED INSIDE their
 // span rects (plan/22 #27 — the rect is the label's home, at 0.7 fill opacity).
 const ALLOWED = (line) =>

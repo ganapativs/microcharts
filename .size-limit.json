@@ -413,6 +413,66 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/coverage-strip (static)",
+    "path": "dist/charts/coverage-strip/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/coverage-strip/interactive",
+    "path": "dist/charts/coverage-strip/client.js",
+    "limit": "3.15 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/benchmark-strip (static)",
+    "path": "dist/charts/benchmark-strip/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/benchmark-strip/interactive",
+    "path": "dist/charts/benchmark-strip/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/percentile-ladder (static)",
+    "path": "dist/charts/percentile-ladder/index.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/percentile-ladder/interactive",
+    "path": "dist/charts/percentile-ladder/client.js",
+    "limit": "3.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/graded-band (static)",
+    "path": "dist/charts/graded-band/index.js",
+    "limit": "2.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/graded-band/interactive",
+    "path": "dist/charts/graded-band/client.js",
+    "limit": "3.55 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/icon-array (static)",
+    "path": "dist/charts/icon-array/index.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/icon-array/interactive",
+    "path": "dist/charts/icon-array/client.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

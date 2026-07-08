@@ -1,0 +1,75 @@
+---
+title: BenchmarkStrip
+description: A peer-band strip for React — one value positioned against its cohort's empirical quantiles, with the percentile stated.
+---
+
+BenchmarkStrip answers "is this value normal for its peer group?". A focal dot sits on a
+common scale against the peers' own **empirical** quantile bands — never a fitted
+distribution. There is no axis: the band is the reference frame. Small samples fall back
+to min–max so tail quantiles are never fiction.
+
+<LiveDemo
+  label="BenchmarkStrip"
+  sizeOf="benchmark-strip"
+  code={`import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
+
+<BenchmarkStrip data={peerLatencies} value={312} title="Latency vs peers" />`}
+>
+  <BenchmarkStrip
+    data={Array.from({ length: 42 }, (_, i) => 180 + Math.round(220 * Math.sin(i / 5) ** 2) + (i % 7) * 12)}
+    value={312}
+    title="Latency vs peers"
+    width={240} height={16}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="benchmark-strip" />
+
+## Try it
+
+<Playground chart="benchmark-strip" />
+
+## Interactive
+
+<InteractiveDemo slug="benchmark-strip" />
+
+## When to use it
+
+- **Good for** — a value against its cohort, per-row peer comparison in tables, SLA context.
+- **Avoid for** — a single trend (Sparkline) or two groups head-to-head (ABStrips).
+
+## Sizing
+
+<Sizing chart="benchmark-strip" />
+
+## Variants
+
+<LiveDemo
+  label="range + label"
+  code={`<BenchmarkStrip data={peers} value={300} range="minmax" />
+<BenchmarkStrip data={peers} value={312} label="value" />`}
+>
+  <span className="inline-flex flex-col gap-1.5">
+    <BenchmarkStrip
+      data={[210, 260, 300, 340, 410]}
+      value={300}
+      range="minmax"
+      title="Min–max"
+      width={200}
+      height={14}
+    />
+    <BenchmarkStrip
+      data={Array.from(
+        { length: 42 },
+        (_, i) => 180 + Math.round(220 * Math.sin(i / 5) ** 2) + (i % 7) * 12,
+      )}
+      value={312}
+      label="value"
+      title="Value label"
+      width={200}
+      height={14}
+    />
+  </span>
+</LiveDemo>
