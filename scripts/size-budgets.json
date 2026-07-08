@@ -109,6 +109,30 @@
     "likert-strip": {
       "static": "2.6 kB",
       "interactive": "3.4 kB"
+    },
+    "waterfall": {
+      "static": "2.8 kB",
+      "interactive": "3.6 kB"
+    },
+    "bump-strip": {
+      "static": "2.4 kB",
+      "interactive": "3.2 kB"
+    },
+    "dual-sparkline": {
+      "static": "3 kB",
+      "interactive": "3.9 kB"
+    },
+    "stacked-area": {
+      "static": "2.9 kB",
+      "interactive": "3.9 kB"
+    },
+    "ohlc": {
+      "static": "2.9 kB",
+      "interactive": "3.8 kB"
+    },
+    "horizon": {
+      "static": "2.9 kB",
+      "interactive": "3.8 kB"
     }
   }
 }

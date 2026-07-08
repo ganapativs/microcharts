@@ -1,0 +1,193 @@
+// <StackedArea> — how did the COMPOSITION shift over time (plan/22 #23).
+// ≤ 3 series hard cap (thickness reading degrades combinatorially); the total
+// is always zero-anchored. `style="ridge"` = identical stacking math rendered
+// with smooth, opaque, crest-lit silhouettes — editorial texture, zero
+// semantic change. Static, hook-free, RSC-safe.
+import type { CSSProperties, ReactNode } from "react";
+import { Chart } from "../../shared/Chart.js";
+import { devWarn } from "../../core/dev.js";
+import { makeFormatter } from "../../core/format.js";
+import type { Curve } from "../../core/path.js";
+import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
+import { isFiniteValue, type Value } from "../../core/types.js";
+import { stackedAreaGeometry } from "./geometry.js";
+
+export interface StackedAreaDatum {
+  label?: string | undefined;
+  values: readonly Value[];
+}
+
+/** Shared composition-shift summary — the leader at the last column. */
+export function stackedAreaSummary(
+  data: readonly StackedAreaDatum[],
+  sharesAtEnd: readonly number[],
+  points: number,
+  pctFmt: (n: number) => string,
+  strings: StackStrings,
+): string {
+  if (data.length === 0 || points === 0) return strings.noData;
+  let top = 0;
+  sharesAtEnd.forEach((s, i) => {
+    if (s > (sharesAtEnd[top] ?? 0)) top = i;
+  });
+  return strings.shareShift(
+    data.length,
+    points,
+    data[top]?.label ?? `Series ${top + 1}`,
+    pctFmt(sharesAtEnd[top] ?? 0),
+  );
+}
+
+export interface StackedAreaProps {
+  /** ≤ 3 series (hard cap). */
+  data: readonly StackedAreaDatum[];
+  /** `"ridge"` — the relocated MountainRidges look; same stack, new skin.
+   *  (plan/21 §3 names this `style`; React reserves that for CSS — logged.) */
+  variant?: "stacked" | "ridge" | undefined;
+  /** `"asc"` puts the smallest series on top (least thickness distortion). */
+  order?: "data" | "asc" | undefined;
+  /** `"last"` = endpoint share labels per series (deterministic drop-out). */
+  label?: "last" | "none" | undefined;
+  curve?: Curve | undefined;
+  domain?: readonly [number, number] | undefined;
+  width?: number | undefined;
+  height?: number | undefined;
+  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  locale?: string | string[] | undefined;
+  strings?: StackStrings | undefined;
+  title?: string | undefined;
+  summary?: string | false | undefined;
+  id?: string | undefined;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
+  children?: ReactNode | undefined;
+}
+
+const CAT_TOKENS = ["--mc-cat-1", "--mc-cat-2", "--mc-cat-3"];
+
+export function StackedArea(props: StackedAreaProps): ReactNode {
+  const {
+    data,
+    variant = "stacked",
+    order = "data",
+    label = "none",
+    curve = "linear",
+    domain,
+    width = 60,
+    height = 16,
+    format,
+    locale,
+    strings = EN_STACK,
+    title,
+    summary,
+    id,
+    className,
+    style,
+    children,
+  } = props;
+
+  if (data.length > 3) {
+    devWarn("<StackedArea> ≤ 3 series is a hard cap — thickness reading degrades past it.");
+  }
+  if (data.some((s) => s.values.some((v) => isFiniteValue(v) && v < 0))) {
+    devWarn(
+      "<StackedArea> negative values in a stacked composition — clamped to 0 (use Waterfall/Sparkline).",
+    );
+  }
+
+  let series = data.slice(0, 3);
+  if (order === "asc") {
+    series = [...series].sort(
+      (a, b) =>
+        a.values.reduce<number>((s, v) => s + (isFiniteValue(v) ? v : 0), 0) -
+        b.values.reduce<number>((s, v) => s + (isFiniteValue(v) ? v : 0), 0),
+    );
+  }
+
+  const fontSize = Math.max(5, Math.min(Math.round(height * 0.3), 7));
+  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  // ridge forces smooth silhouettes (documented)
+  const usedCurve: Curve = variant === "ridge" ? "smooth" : curve;
+  const geo = stackedAreaGeometry({
+    width,
+    height,
+    series: series.map((s) => s.values),
+    domain,
+    curve: usedCurve,
+    gutterCh: label === "last" ? 4 : 0,
+    fontSize,
+  });
+  const accName =
+    summary === false
+      ? false
+      : (summary ?? stackedAreaSummary(series, geo.sharesAt.at(-1) ?? [], geo.n, pctFmt, strings));
+
+  // endpoint labels drop when rows are too dense for the series count
+  const labelsFit = height / Math.max(1, series.length) >= fontSize * 1.1;
+
+  return (
+    <Chart
+      width={width}
+      height={height}
+      title={title}
+      summary={accName}
+      id={id}
+      className={className ? `mc-stacked ${className}` : "mc-stacked"}
+      style={style}
+    >
+      {/* back-to-front for ridge (opaque fills), bottom-up for stacked */}
+      {(variant === "ridge" ? [...geo.layers].reverse() : geo.layers).map((layer) => (
+        <g key={layer.index}>
+          {layer.dArea ? (
+            <path
+              d={layer.dArea}
+              style={{
+                fill: `var(${CAT_TOKENS[layer.index % CAT_TOKENS.length]})`,
+                fillOpacity: variant === "ridge" ? 1 : 0.8,
+              }}
+            />
+          ) : null}
+          {layer.dTop ? (
+            <path
+              d={layer.dTop}
+              fill="none"
+              stroke={
+                variant === "ridge"
+                  ? "var(--mc-surface, Canvas)"
+                  : `var(${CAT_TOKENS[layer.index % CAT_TOKENS.length]})`
+              }
+              strokeWidth={variant === "ridge" ? 1 : 0.75}
+              vectorEffect="non-scaling-stroke"
+            />
+          ) : null}
+        </g>
+      ))}
+      {label === "last" && labelsFit
+        ? geo.layers.map((layer) => (
+            <text
+              key={`t${layer.index}`}
+              x={width - 1}
+              y={round2Y(geo, layer, height, fontSize)}
+              fontSize={fontSize}
+              textAnchor="end"
+              data-mc-ink="label"
+            >
+              {pctFmt(layer.lastShare)}
+            </text>
+          ))
+        : null}
+      {children}
+    </Chart>
+  );
+}
+
+function round2Y(
+  geo: { layers: { dTop: string }[] },
+  layer: { index: number },
+  height: number,
+  fontSize: number,
+): number {
+  // stagger endpoint labels down the right edge in layer order
+  const y = fontSize + layer.index * fontSize * 1.15;
+  return Math.round(Math.min(y, height - 1) * 100) / 100;
+}

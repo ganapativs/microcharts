@@ -10,6 +10,10 @@ import { EN_SLOTS } from "./strings-slots.js";
 import { EN_PAIRED } from "./strings-paired.js";
 import { EN_SCATTER } from "./strings-scatter.js";
 import { EN_COMPOSITION } from "./strings-composition.js";
+import { EN_FLOW } from "./strings-flow.js";
+import { EN_VS } from "./strings-vs.js";
+import { EN_STACK } from "./strings-stack.js";
+import { EN_OHLC } from "./strings-ohlc.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -20,4 +24,8 @@ export const EN: SummaryStrings = {
   ...EN_PAIRED,
   ...EN_SCATTER,
   ...EN_COMPOSITION,
+  ...EN_FLOW,
+  ...EN_VS,
+  ...EN_STACK,
+  ...EN_OHLC,
 };

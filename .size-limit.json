@@ -317,6 +317,78 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/waterfall (static)",
+    "path": "dist/charts/waterfall/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/waterfall/interactive",
+    "path": "dist/charts/waterfall/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/bump-strip (static)",
+    "path": "dist/charts/bump-strip/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/bump-strip/interactive",
+    "path": "dist/charts/bump-strip/client.js",
+    "limit": "3.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dual-sparkline (static)",
+    "path": "dist/charts/dual-sparkline/index.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dual-sparkline/interactive",
+    "path": "dist/charts/dual-sparkline/client.js",
+    "limit": "3.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/stacked-area (static)",
+    "path": "dist/charts/stacked-area/index.js",
+    "limit": "2.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/stacked-area/interactive",
+    "path": "dist/charts/stacked-area/client.js",
+    "limit": "3.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ohlc (static)",
+    "path": "dist/charts/ohlc/index.js",
+    "limit": "2.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ohlc/interactive",
+    "path": "dist/charts/ohlc/client.js",
+    "limit": "3.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/horizon (static)",
+    "path": "dist/charts/horizon/index.js",
+    "limit": "2.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/horizon/interactive",
+    "path": "dist/charts/horizon/client.js",
+    "limit": "3.8 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

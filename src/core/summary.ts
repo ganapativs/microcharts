@@ -123,6 +123,35 @@ export interface SummaryStrings {
   fiveNum: (median: string, q1: string, q3: string, min: string, max: string) => string;
   /** Stat announcement, e.g. "Median: 42." */
   boxStat: (which: "min" | "q1" | "median" | "q3" | "max", value: string) => string;
+  /** Waterfall step, e.g. "Refunds: −140, running 1,410." */
+  waterfallStep: (label: string, delta: string, level: string) => string;
+  /** Waterfall summary, e.g. "From 1,200 to 1,540 over 5 steps: +480 gains, −140 losses." */
+  waterfall: (start: string, end: string, steps: number, gains: string, losses: string) => string;
+  /** Rank announcement, e.g. "Week 4 of 12: #3." */
+  rankAt: (period: number, total: number, rank: number) => string;
+  /** Rank run, e.g. "From #5 to #2 over 12 weeks; best #1." */
+  rankRun: (from: number, to: number, best: number, periods: number) => string;
+  /** Dual point, e.g. "Point 9 of 12: 17 vs 15." */
+  vsAt: (position: number, total: number, value: string, ref: string) => string;
+  /** Dual summary, e.g. "Trending up 12% vs benchmark up 4%. Last 17 vs 15." */
+  vs: (primaryClause: string, compareClause: string, lastValue: string, lastRef: string) => string;
+  /** Matching-benchmark degenerate. */
+  vsMatching: string;
+  /** Stack point, e.g. "Point 8 of 12: Mobile 45%, Web 38%, API 17%." */
+  stackAt: (position: number, total: number, clauses: string) => string;
+  /** Stack summary, e.g. "3 series over 12 points; Mobile leads at 45% share." */
+  shareShift: (count: number, points: number, topLabel: string, topPct: string) => string;
+  /** OHLC period, e.g. "Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20." */
+  ohlcAt: (position: number, total: number, o: string, h: string, l: string, c: string) => string;
+  /** OHLC run, e.g. "20 periods. Last close 148.20, up 3.4%; range 141.10 to 151.90." */
+  ohlcRun: (
+    periods: number,
+    close: string,
+    direction: "up" | "down" | "flat",
+    changePct: string,
+    lo: string,
+    hi: string,
+  ) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

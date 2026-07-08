@@ -354,3 +354,15 @@ component carries its mark renderer as a static field (ships with the consumer's
 3.35/4.35 exception + the spec-mandated host contract conflict; every other host absorbs the walker
 inside its normal headroom). Fragment children are unwrapped by the walker (React's Children.forEach
 does not descend into <>…</>).
+
+**`style` variant-prop collision (2026-07-08, Batch 1 W5):** plan/21 §3 names the render-styling
+variant vocabulary `style` (StackedArea ridge, Ohlc candle/bars). On DOM-facing React components
+`style` is reserved for CSSProperties (every shipped chart already forwards it as CSS). Resolution:
+the variant prop is named **`variant`** (`<StackedArea variant="ridge">`, `<Ohlc variant="bars">`),
+same semantics as the plan's `style` vocabulary; the CSS `style` prop stays untouched. Surfaced as
+a plan↔code divergence per the working rule — rename in plan/21/22 wording at the batch gate.
+
+**DualSparkline `curve="step"` (2026-07-08, W5):** renders as linear. The shared `curve` grammar
+lists step, but on a two-line benchmark strip the step form reads as noise, and importing the step
+path builder pushed the entry past the 3 kB HARD cap (3 008 B measured). Divergence documented in
+the chart's docs page; revisit only with a measured trim elsewhere.

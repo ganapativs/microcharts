@@ -1,0 +1,19 @@
+// Waterfall / rank-run summary templates — a separate MODULE (see
+// strings-scalar.ts for the chunk rationale). English lives only in core
+// string modules (canon). Aggregate: strings.ts EN.
+import type { SummaryStrings } from "./summary.js";
+
+export type FlowStrings = Pick<
+  SummaryStrings,
+  "noData" | "waterfallStep" | "waterfall" | "rankAt" | "rankRun"
+>;
+
+export const EN_FLOW: FlowStrings = {
+  noData: "No data.",
+  waterfallStep: (label, delta, level) => `${label}: ${delta}, running ${level}.`,
+  waterfall: (start, end, steps, gains, losses) =>
+    `From ${start} to ${end} over ${steps} steps: ${gains} gains, ${losses} losses.`,
+  rankAt: (period, total, rank) => `Week ${period} of ${total}: #${rank}.`,
+  rankRun: (from, to, best, periods) =>
+    `From #${from} to #${to} over ${periods} weeks; best #${best}.`,
+};

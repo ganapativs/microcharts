@@ -219,4 +219,69 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+
+  {
+    slug: "waterfall",
+    component: "Waterfall",
+    floor: 10, // ≤ 7 rects + connectors + running-level math (measured ~21.8 rows/ms — half-of-measured floor)
+    props: (i) => ({
+      data: cats[i % POOL].map((d, j) => ({
+        label: d.label,
+        value: j % 2 === 0 ? d.value : -Math.round(d.value / 2),
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "bump-strip",
+    component: "BumpStrip",
+    floor: 9, // 24 pts: path + change dots + end labels (measured ~18.5 rows/ms — half-of-measured floor)
+    props: (i) => ({
+      data: waves[i % POOL].map((v) => (Math.abs(Math.round(v)) % 8) + 1),
+      summary: false,
+    }),
+  },
+  {
+    slug: "dual-sparkline",
+    component: "DualSparkline",
+    floor: 30, // 2 paths + endpoint dots, one shared domain
+    props: (i) => ({
+      data: waves[i % POOL],
+      compare: waves[(i + 1) % POOL],
+      summary: false,
+    }),
+  },
+  {
+    slug: "stacked-area",
+    component: "StackedArea",
+    floor: 15, // 3 area paths + per-x share stacking
+    props: (i) => ({
+      data: [
+        { label: "A", values: waves[i % POOL].map((v) => Math.abs(v) + 1) },
+        { label: "B", values: waves[(i + 1) % POOL].map((v) => Math.abs(v) + 1) },
+        { label: "C", values: waves[(i + 2) % POOL].map((v) => Math.abs(v) + 1) },
+      ],
+      summary: false,
+    }),
+  },
+  {
+    slug: "ohlc",
+    component: "Ohlc",
+    floor: 8, // 20 periods × ~2 nodes each — N-node class
+    props: (i) => ({
+      data: waves[i % POOL].slice(0, 20).map((v, j) => ({
+        open: v + 10,
+        high: v + 12 + (j % 3),
+        low: v + 8 - (j % 2),
+        close: v + 9 + (j % 4),
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "horizon",
+    component: "Horizon",
+    floor: 20, // ≤ 3 fold paths + fold math per row
+    props: (i) => ({ data: waves[i % POOL], summary: false }),
+  },
 ];

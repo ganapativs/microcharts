@@ -21,6 +21,10 @@ export { EN_SLOTS, type SlotStrings } from "./strings-slots.js";
 export { EN_PAIRED, type PairedStrings } from "./strings-paired.js";
 export { EN_SCATTER, type ScatterStrings } from "./strings-scatter.js";
 export { EN_COMPOSITION, type CompositionStrings } from "./strings-composition.js";
+export { EN_FLOW, type FlowStrings } from "./strings-flow.js";
+export { EN_VS, type VsStrings } from "./strings-vs.js";
+export { EN_STACK, type StackStrings } from "./strings-stack.js";
+export { EN_OHLC, type OhlcStrings } from "./strings-ohlc.js";
 export { EN } from "./strings.js";
 export {
   quantiles,
