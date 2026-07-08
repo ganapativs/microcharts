@@ -1,4 +1,8 @@
 "use client";
+// oxlint-disable react/no-array-index-key -- streamed text/chart nodes have
+// stable POSITIONAL identity (order never changes; only the tail grows), so the
+// index is the correct key. Content-derived keys would remount — and re-animate —
+// already-rendered charts on every token tick.
 /**
  * The AI-native centerpiece — a scripted assistant reply streams in token by
  * token, and the chart syntax it emits becomes real, accessible microcharts:
@@ -12,7 +16,7 @@
  * final size from the first frame and nothing below it ever moves. All motion is
  * reduced-motion gated.
  */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SparkBar } from "@microcharts/react/sparkbar";
 import { Delta } from "@microcharts/react/delta";
@@ -88,8 +92,9 @@ function kv(body: string): Record<string, string> {
 
 const CHART_W = 240;
 
-// Standalone block chart (the fenced form).
-function BlockChart({ type, body }: { type: string; body: string }) {
+// Standalone block chart (the fenced form). Memoized: once a fence closes its
+// (type, body) are final, so it skips re-render on every later streamed token.
+const BlockChart = memo(function BlockChart({ type, body }: { type: string; body: string }) {
   switch (type) {
     case "sparkline":
       return (
@@ -129,11 +134,12 @@ function BlockChart({ type, body }: { type: string; body: string }) {
     default:
       return null;
   }
-}
+});
 
 // Word-sized chart that sits inside a sentence — the microcharts thesis. Decorative
-// (summary={false}); the surrounding text is its description.
-function InlineChart({ spec }: { spec: string }) {
+// (summary={false}); the surrounding text is its description. Memoized so revealed
+// inline charts don't re-render on every subsequent streamed token.
+const InlineChart = memo(function InlineChart({ spec }: { spec: string }) {
   const sp = spec.indexOf(" ");
   const type = sp === -1 ? spec : spec.slice(0, sp);
   const data = sp === -1 ? "" : spec.slice(sp + 1);
@@ -181,7 +187,7 @@ function InlineChart({ spec }: { spec: string }) {
   // align-middle) so they sit centred on the text line; inline-flex still lets
   // the morph transform apply.
   return <span className="mc-morph mx-1 inline-flex align-middle">{node}</span>;
-}
+});
 
 // Inline markdown — **bold**, an inline `chart …` span, or plain `code`.
 function Inline({ text }: { text: string }) {
@@ -247,14 +253,13 @@ const FULL_NODES = parse(SCRIPT);
 // like a real stream: words land at a readable clip, clauses breathe, and a
 // closed chart fence gets a beat so the raw→rendered morph is savoured.
 function nextDelay(last: string | null, next: string): number {
-  const jitter = () => Math.random();
   if (last === null) return 450; // a beat of "thinking" before the first token
   if (last.includes("\n\n")) return 300; // paragraph break
   if (last === "```") return 560; // a chart just closed → let it morph in
-  if (/[.:;!?]$/.test(last)) return 200 + jitter() * 150; // end of a clause
-  if (last.endsWith(",")) return 140 + jitter() * 90;
-  if (/^\s+$/.test(next)) return 20 + jitter() * 30; // whitespace flicks by
-  return 55 + jitter() * 85; // a word
+  if (/[.:;!?]$/.test(last)) return 200 + Math.random() * 150; // end of a clause
+  if (last.endsWith(",")) return 140 + Math.random() * 90;
+  if (/^\s+$/.test(next)) return 20 + Math.random() * 30; // whitespace flicks by
+  return 55 + Math.random() * 85; // a word
 }
 
 export function StreamDemo() {

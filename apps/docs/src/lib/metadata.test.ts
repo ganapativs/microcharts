@@ -33,6 +33,6 @@ describe.skipIf(!hasBuild)("built docs metadata (plan/20 §11)", () => {
 
   it("llms.txt and catalog json are emitted", () => {
     expect(existsSync(outDir + "llms.txt")).toBe(true);
-    expect(existsSync(outDir + "microcharts.catalog.json")).toBe(true);
+    expect(existsSync(outDir + "catalog.json")).toBe(true);
   });
 });

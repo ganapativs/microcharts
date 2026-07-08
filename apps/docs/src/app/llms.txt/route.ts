@@ -42,7 +42,7 @@ ${chartLines}
 
 ## Machine Interfaces
 
-- [Chart catalog JSON](${abs("/microcharts.catalog.json")}): names, import paths, props, data shapes.
+- [Chart catalog JSON](${abs("/catalog.json")}): names, import paths, props, data shapes.
 - [Full docs context](${abs("/llms-full.txt")}): complete generated docs text.
 
 ## Does Not Support

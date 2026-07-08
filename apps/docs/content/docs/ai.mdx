@@ -44,7 +44,7 @@ matching import (`sparkline`, `sparkbar`, `bullet`, `delta`, `activity-grid`).
 - **[`/llms.txt`](/llms.txt)** — a curated map of the docs for LLM tools, with explicit "does
   not support" notes to head off hallucinations.
 - **[`/llms-full.txt`](/llms-full.txt)** — the full docs as one generated text file.
-- **[`/microcharts.catalog.json`](/microcharts.catalog.json)** — every chart's name, import
+- **[`/catalog.json`](/catalog.json)** — every chart's name, import
   paths, data shape, and props, generated from the same registry the site is built from.
 - **`.md` mirrors** — append `.md` to any docs page for a clean Markdown copy.
 
@@ -57,14 +57,3 @@ An agent generating microcharts code should:
    `/interactive` for hover and keyboard.
 3. Keep static charts hook-free — they're valid inside React Server Components.
 4. Never add a runtime dependency, and never reach for a pie or gauge — they aren't shipped.
-
-## Related
-
-<Cards>
-  <Card
-    title="Accessibility"
-    href="/docs/accessibility"
-    description="The summaries machines read."
-  />
-  <Card title="All charts" href="/docs/charts" description="The catalog the JSON mirrors." />
-</Cards>

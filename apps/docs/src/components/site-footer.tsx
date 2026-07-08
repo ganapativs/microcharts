@@ -29,7 +29,7 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
     title: "Machine",
     links: [
       { href: "/llms.txt", label: "llms.txt", external: true },
-      { href: "/microcharts.catalog.json", label: "catalog.json", external: true },
+      { href: "/catalog.json", label: "catalog.json", external: true },
       { href: "/docs/ai", label: "AI-native" },
     ],
   },

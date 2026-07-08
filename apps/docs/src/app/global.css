@@ -50,23 +50,25 @@
   --accent-strong: #2543b8;
   --accent-fg: #fdfdff;
 
-  /* Light: warm "smoked stone" — a hair cooler and deeper than plain paper so
-     frosted glass separates from the field and has substance to refract. */
-  --color-fd-background: #efe9dd;
-  --color-fd-foreground: #17110a;
-  --color-fd-muted: #e7e0d1;
-  --color-fd-muted-foreground: #6b6252;
-  --color-fd-border: #ddd2bd;
-  --color-fd-card: #fffdf9;
-  --color-fd-card-foreground: #17110a;
-  --color-fd-popover: #fffdf9;
-  --color-fd-popover-foreground: #17110a;
+  /* Light: cool "pristine glass" — a bright, faintly blue-grey field so frosted
+     white glass separates and its vibrancy (saturated backdrop) reads. Cooler +
+     brighter than the old warm cream, which read flat/grey under near-white glass.
+     A whisper of warmth survives only in the field's corner, never the neutrals. */
+  --color-fd-background: #e9edf4;
+  --color-fd-foreground: #12151d;
+  --color-fd-muted: #e2e7f0;
+  --color-fd-muted-foreground: #5a616f;
+  --color-fd-border: #d0d7e3;
+  --color-fd-card: #fdfeff;
+  --color-fd-card-foreground: #12151d;
+  --color-fd-popover: #fdfeff;
+  --color-fd-popover-foreground: #12151d;
   --color-fd-primary: var(--accent);
   --color-fd-primary-foreground: var(--accent-fg);
-  --color-fd-secondary: #e7e0d1;
-  --color-fd-secondary-foreground: #17110a;
-  --color-fd-accent: #e2d9c9;
-  --color-fd-accent-foreground: #17110a;
+  --color-fd-secondary: #e2e7f0;
+  --color-fd-secondary-foreground: #12151d;
+  --color-fd-accent: #dbe2ee;
+  --color-fd-accent-foreground: #12151d;
   --color-fd-ring: var(--accent);
 
   /* our own semantic surface tokens */
@@ -77,61 +79,68 @@
   --signal: var(--accent);
 
   /* ── Liquid glass material (light) ──────────────────────────────────────────
-     Defined by REFRACTION + a bright bevelled edge, not by drop shadow. The
-     surface is translucent enough that the coloured field shows through and
-     saturates; the edge (bright inner bevel + rim) is what reads as glass. */
-  --glass-surface: color-mix(in oklab, var(--color-fd-card) 48%, transparent);
-  --glass-surface-strong: color-mix(in oklab, var(--color-fd-card) 66%, transparent);
+     A faint, LIGHTWEIGHT near-white frost — ONE card-based material for every
+     block. The read is carried by a thin rim + a soft bevel + a barely-there
+     ambient lift + vibrancy (backdrop saturate 1.9 blooms the colour behind it),
+     NEVER by weight or colour. MATTE: restrained sheen, faint grain, no glossy
+     specular edge. Kept translucent so a panel's tone sits close to the field
+     instead of popping forward as a heavy card (matched to the dark theme's
+     floating panes — the user prefers that lightness).
+     History, do NOT undo: warm cream → cool field; a light-blue panel tint was
+     tried and reverted (it split the UI — wells/seg/popover/sidebar/a11y
+     fallbacks all use the white card token, so only some blocks went blue). */
+  --glass-surface: color-mix(in oklab, var(--color-fd-card) 46%, transparent);
+  --glass-surface-strong: color-mix(in oklab, var(--color-fd-card) 62%, transparent);
   --glass-tint: color-mix(in oklab, var(--accent) 5%, transparent);
-  --glass-sheen: color-mix(in oklab, #ffffff 62%, transparent);
-  --glass-spec: color-mix(in oklab, #ffffff 75%, transparent);
-  --glass-blur: 13px;
+  --glass-sheen: color-mix(in oklab, #eef3fc 16%, transparent);
+  /* opaque fill for the a11y (reduced-transparency / high-contrast) fallback —
+     the same white card as the rest, so fallback blocks match too. */
+  --glass-solid: var(--color-fd-card);
+  --glass-blur: 14px;
   --glass-sat: 1.9;
-  --glass-bright: 1.04;
-  --grain-opacity: 0.03;
+  --glass-bright: 1.02;
+  --grain-opacity: 0.016;
   /* ONE border token — panel rims, chips, wells, segmented, tables, code fences
-     all use this so borders read the same in light + dark. Tuned so a warm-ink
-     rim reads clearly on a near-white glass surface (13% vanished on white).
-     Pushed a touch past the dark 17% because a warm-ink line on white carries
-     less perceived contrast than a cool-white line on near-black. */
-  --hairline: color-mix(in oklab, #17110a 22%, transparent);
-  /* The edge gives the glass thickness. On a light surface an all-white bevel is
-     invisible, so: a bright wet top sheen + a faint warm-dark inner floor that
-     reads as the underside catching shade. The rim is the real border, not here. */
+     all use this. A thin cool blue-ink rim is what defines a light panel now that
+     the shadow is nearly gone; 17% keeps it crisp but weightless. */
+  --hairline: color-mix(in oklab, #1a2438 17%, transparent);
+  /* A soft near-white specular top + a whisper of cool-dark underside — a light
+     bevel, not a thick lip. The rim (--hairline) is the real border. */
   --glass-edge:
-    inset 0 1px 0.5px color-mix(in oklab, #ffffff 92%, transparent),
-    inset 0 -1px 1px color-mix(in oklab, #2a2010 8%, transparent);
+    inset 0 1px 0.5px color-mix(in oklab, #ffffff 72%, transparent),
+    inset 0 -1px 1px color-mix(in oklab, #1b2740 6%, transparent);
   --glass-edge-lift:
-    inset 0 1.5px 0.5px #ffffff, inset 0 -1px 1.5px color-mix(in oklab, #2a2010 10%, transparent),
-    inset 0 0 0 1px color-mix(in oklab, var(--accent) 42%, transparent);
-  /* Soft ambient lift so glass rests above the field — diffuse, never a slab,
-     so it stays clean. Two layers: a tight contact + a wide soft cast. */
+    inset 0 1px 0.5px color-mix(in oklab, #ffffff 88%, transparent),
+    inset 0 -1px 1.5px color-mix(in oklab, #1b2740 8%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--accent) 34%, transparent);
+  /* Barely-there ambient lift so the panel floats rather than sits — matched to
+     the dark theme's near-invisible cast so both read equally lightweight. */
   --glass-shadow:
-    0 1px 1px color-mix(in oklab, #2a2010 5%, transparent),
-    0 7px 18px -11px color-mix(in oklab, #2a2010 16%, transparent);
-  --glass-shadow-lift: 0 14px 32px -14px color-mix(in oklab, #2a2010 24%, transparent);
+    0 0.5px 1px color-mix(in oklab, #17233c 4%, transparent),
+    0 6px 18px -12px color-mix(in oklab, #17233c 11%, transparent);
+  --glass-shadow-lift: 0 12px 30px -16px color-mix(in oklab, #17233c 17%, transparent);
 
   /* Optical field — real colour and light for the glass to bend and tint. Kept
      to the corners so central reading stays calm; richer than a flat wash. */
   --field:
     radial-gradient(
       58% 52% at 4% -8%,
-      color-mix(in oklab, var(--accent) 18%, transparent),
+      color-mix(in oklab, var(--accent) 17%, transparent),
       transparent 62%
     ),
     radial-gradient(
       52% 52% at 100% 2%,
-      color-mix(in oklab, #eaa066 26%, transparent),
+      color-mix(in oklab, #86a2e6 24%, transparent),
       transparent 62%
     ),
     radial-gradient(
       82% 72% at 50% 122%,
-      color-mix(in oklab, #a6bae8 34%, transparent),
+      color-mix(in oklab, #9fb1de 32%, transparent),
       transparent 64%
     ),
     radial-gradient(
       44% 44% at 84% 74%,
-      color-mix(in oklab, var(--accent) 10%, transparent),
+      color-mix(in oklab, #e6b48f 13%, transparent),
       transparent 72%
     );
 
@@ -144,11 +153,11 @@
      data ink clears 4.5:1 over the COMPOSITED light glass (≈#f7f3ea) and the
      bare field (#efe9dd) — the frost never earns contrast (a11y fallback drops
      it), so the ink must. Verified: pos 5.29/4.84, neg 5.14/4.71, ntr 5.18/4.74. */
-  --mc-stroke: #221d16;
+  --mc-stroke: #181c25;
   --mc-positive: #077353;
   --mc-negative: #ad4713;
   --mc-accent: var(--accent);
-  --mc-neutral: #6e6557;
+  --mc-neutral: #616773;
   /* interactive readout chip → site popover surface so it matches the theme */
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
@@ -189,8 +198,10 @@
   --glass-surface: color-mix(in oklab, var(--color-fd-card) 38%, transparent);
   --glass-surface-strong: color-mix(in oklab, var(--color-fd-card) 56%, transparent);
   --glass-tint: color-mix(in oklab, var(--accent) 11%, transparent);
-  --glass-sheen: color-mix(in oklab, #dce7ff 34%, transparent);
-  --glass-spec: color-mix(in oklab, #dce7ff 32%, transparent);
+  /* matte sheen — softened from 34% so dark panels stop reading glossy (the user
+     liked dark's calm look; the bright top wash was too wet). */
+  --glass-sheen: color-mix(in oklab, #dce7ff 18%, transparent);
+  --glass-solid: var(--color-fd-card);
   --glass-blur: 16px;
   --glass-sat: 1.7;
   --glass-bright: 1.12;
@@ -484,31 +495,11 @@ body {
     border: 1px solid var(--hairline);
     box-shadow: var(--glass-edge), var(--glass-shadow);
   }
-  /* Refractive edge — the liquid-glass signature. A thin rim (masked to the
-     border region) carries its OWN backdrop-filter, blurring + brightening the
-     field harder than the body: the edge visibly lenses what's behind it, the
-     way thick glass bends light. One extra pass, only at the rim. */
-  .glass::before,
-  .panel::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 0;
-    box-sizing: border-box;
-    padding: 4px;
-    -webkit-backdrop-filter: blur(2px) brightness(1.04) saturate(1.2);
-    backdrop-filter: blur(2px) brightness(1.04) saturate(1.2);
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    mask-composite: exclude;
-  }
+  /* NO glossy rim pseudo — the user found a bright specular edge too glossy
+     (matte is the brand). The edge read is carried entirely by the thin
+     --glass-edge bevel (a crisp 1px top line, matte) + the --hairline rim. This
+     also keeps the perf win: only ONE backdrop-filter pass per panel, no rim
+     pass. Don't reintroduce a bright rim gradient or a rim backdrop-filter. */
   /* fine frost grain — one tiled turbulence field so the surface isn't a dead
      flat plane. Kept very low so text + chart strokes stay crisp. */
   .glass::after,
@@ -602,18 +593,26 @@ body {
   -webkit-backdrop-filter: blur(12px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
   backdrop-filter: blur(12px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
   border: 1px solid var(--hairline);
+  color: var(--color-fd-muted-foreground);
   box-shadow: var(--glass-edge), var(--glass-shadow);
   transition:
-    box-shadow 0.3s var(--ease-out-quint),
-    transform 0.3s var(--ease-out-quint),
-    color 0.2s var(--ease-out-quint);
+    border-color 0.2s var(--ease-out-quint),
+    box-shadow 0.2s var(--ease-out-quint),
+    color 0.2s var(--ease-out-quint),
+    transform 0.12s var(--ease-out-quint);
 }
+/* Quiet, delightful hover — an accent-tinted rim + a small soft accent glow +
+   the text darkening to full ink. NO elevation jump (the old --glass-shadow-lift
+   was a 30px cast on a 30px button = the "horrible" heavy hover). */
 .cta-ghost:hover {
-  box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
-  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--accent) 34%, var(--hairline));
+  color: var(--color-fd-foreground);
+  box-shadow:
+    var(--glass-edge),
+    0 2px 9px -5px color-mix(in oklab, var(--accent) 34%, transparent);
 }
 .cta-ghost:active {
-  transform: translateY(0) scale(0.98);
+  transform: scale(0.97);
 }
 
 /* Ghost control — borderless icon button; hover is a soft frosted wash + lift. */
@@ -638,6 +637,31 @@ body {
 }
 .ghost-ctrl:active {
   transform: scale(0.94);
+}
+
+/* Fumadocs built-in copy buttons — the code-fence "Copy Text" and the heading
+   "Copy Anchor Link" — ship as rounded-md + a hard fd-border, inconsistent with
+   our borderless icon controls. Fold them into the ghost-ctrl language: no
+   border, control radius, a soft frosted wash + ink on hover. */
+:where(
+  button[aria-label="Copy Text"],
+  [aria-label="Copy Anchor Link"],
+  [aria-label="Copy Anchor"]
+) {
+  border-color: transparent !important;
+  border-radius: var(--radius-control) !important;
+  color: var(--color-fd-muted-foreground);
+  transition:
+    background-color 0.2s var(--ease-out-quint),
+    color 0.2s var(--ease-out-quint);
+}
+:where(
+  button[aria-label="Copy Text"],
+  [aria-label="Copy Anchor Link"],
+  [aria-label="Copy Anchor"]
+):hover {
+  background-color: color-mix(in oklab, var(--color-fd-card) 60%, transparent);
+  color: var(--color-fd-foreground);
 }
 
 /* One keyboard focus ring for the whole control canon — the accent, offset so
@@ -818,10 +842,14 @@ figure:has(> pre) .shiki,
   vertical-align: top;
 }
 
-/* Fumadocs doc cards (the <Cards>/<Card> "Related" blocks) → the glass panel
-   language. Scoped to <a> so it never touches the code figure (also bg-fd-card
-   rounded-xl, but a <figure>). */
-a:where([class~="bg-fd-card"][class~="rounded-xl"]) {
+/* Fumadocs doc cards (the <Cards>/<Card> blocks) AND the built-in prev/next page
+   footer → the glass panel language, so bottom-of-page navigation is the SAME
+   pill as every card. The footer links are identified by the chevron they carry
+   (content <Cards> keep their own bg-fd-card/rounded-xl hook); scoped to <a> so
+   it never touches the code figure. */
+a:where([class~="bg-fd-card"][class~="rounded-xl"]),
+a:where(:has(> div > svg[class~="lucide-chevron-left"])),
+a:where(:has(> div > svg[class~="lucide-chevron-right"])) {
   background-color: var(--glass-surface) !important;
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
     brightness(var(--glass-bright));
@@ -835,7 +863,9 @@ a:where([class~="bg-fd-card"][class~="rounded-xl"]) {
     border-color 0.3s var(--ease-out-quint),
     transform 0.3s var(--ease-out-quint);
 }
-a:where([class~="bg-fd-card"][class~="rounded-xl"]):hover {
+a:where([class~="bg-fd-card"][class~="rounded-xl"]):hover,
+a:where(:has(> div > svg[class~="lucide-chevron-left"])):hover,
+a:where(:has(> div > svg[class~="lucide-chevron-right"])):hover {
   background-color: var(--glass-surface) !important;
   border-color: color-mix(in oklab, var(--accent) 40%, var(--hairline)) !important;
   box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift) !important;
@@ -994,7 +1024,7 @@ a:where([class~="bg-fd-card"][class~="rounded-xl"]):hover {
   .glass,
   .panel,
   .glass-rail {
-    background-color: var(--color-fd-card);
+    background-color: var(--glass-solid);
     background-image: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -1002,8 +1032,6 @@ a:where([class~="bg-fd-card"][class~="rounded-xl"]):hover {
   .glass-rail {
     background-color: var(--color-fd-background);
   }
-  .glass::before,
-  .panel::before,
   .glass::after,
   .panel::after {
     display: none;
@@ -1032,14 +1060,12 @@ a:where([class~="bg-fd-card"][class~="rounded-xl"]):hover {
   .glass,
   .panel,
   .glass-rail {
-    background-color: var(--color-fd-card);
+    background-color: var(--glass-solid);
     background-image: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     box-shadow: inset 0 0 0 1px var(--color-fd-foreground);
   }
-  .glass::before,
-  .panel::before,
   .glass::after,
   .panel::after {
     display: none;
@@ -1054,8 +1080,6 @@ a:where([class~="bg-fd-card"][class~="rounded-xl"]):hover {
     backdrop-filter: none;
     border: 1px solid CanvasText;
   }
-  .glass::before,
-  .panel::before,
   .glass::after,
   .panel::after,
   .cta-accent::after {

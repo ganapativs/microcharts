@@ -9,7 +9,7 @@ const SURFACES = [
   { href: "/llms.txt", label: "llms.txt", note: "curated docs map", icon: FileText },
   { href: "/llms-full.txt", label: "llms-full.txt", note: "the full corpus", icon: FileText },
   {
-    href: "/microcharts.catalog.json",
+    href: "/catalog.json",
     label: "catalog.json",
     note: "every chart, typed",
     icon: Braces,

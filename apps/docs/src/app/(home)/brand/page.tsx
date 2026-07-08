@@ -163,8 +163,8 @@ export default function BrandPage() {
                     (a.tile === "dark"
                       ? "bg-[#0a0b0f]"
                       : a.tile === "light"
-                        ? "bg-[#efe9dd]"
-                        : "bg-gradient-to-br from-[#efe9dd] to-[#0a0b0f]")
+                        ? "bg-[#e9edf4]"
+                        : "bg-gradient-to-br from-[#e9edf4] to-[#0a0b0f]")
                   }
                 >
                   {/* Plain <img>: the file IS the deliverable, and next/image
@@ -338,7 +338,7 @@ export default function BrandPage() {
             },
           ].map((d, i) => (
             <Reveal key={d.label} delay={i * 40} className="glass flex flex-col overflow-hidden">
-              <div className="relative flex min-h-[104px] items-center justify-center bg-[#efe9dd] dark:bg-[#14161d]">
+              <div className="relative flex min-h-[104px] items-center justify-center bg-[#e9edf4] dark:bg-[#14161d]">
                 <svg viewBox="0 0 32 32" width="56" height="56" aria-hidden>
                   {d.svg}
                 </svg>
@@ -379,8 +379,8 @@ export default function BrandPage() {
           <div>
             <div className="mono-label mb-3">Neutrals</div>
             <div className="grid grid-cols-2 gap-2">
-              <ColorSwatch hex="#efe9dd" name="Paper" role="Light" ring />
-              <ColorSwatch hex="#17110a" name="Ink" role="Light" />
+              <ColorSwatch hex="#e9edf4" name="Paper" role="Light" ring />
+              <ColorSwatch hex="#12151d" name="Ink" role="Light" />
               <ColorSwatch hex="#0a0b0f" name="Paper" role="Dark" />
               <ColorSwatch hex="#e9e8e3" name="Ink" role="Dark" ring />
               <ColorSwatch hex="#faf7f1" name="Cell fill" role="Mark" ring />

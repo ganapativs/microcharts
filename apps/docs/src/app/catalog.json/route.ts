@@ -11,7 +11,7 @@ export const dynamic = "force-static";
  */
 export function GET() {
   const catalog = {
-    $schema: abs("/microcharts.catalog.schema.json"),
+    $schema: abs("/catalog.schema.json"),
     package: SITE.pkg,
     homepage: SITE.url,
     charts: CHARTS.map((c) => ({

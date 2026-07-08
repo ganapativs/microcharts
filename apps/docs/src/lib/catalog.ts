@@ -1,7 +1,7 @@
 /**
  * The chart registry — single source of truth for the shipped catalog.
  *
- * Drives the machine catalog (`/microcharts.catalog.json`), the gallery, doc
+ * Drives the machine catalog (`/catalog.json`), the gallery, doc
  * cross-links, and the curated `/llms.txt`. Import paths here are validated
  * against `@microcharts/react`'s `package.json#exports` by a docs test
  * (plan/20 §5.3 acceptance).
