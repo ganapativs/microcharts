@@ -22,7 +22,11 @@ function importPath(value) {
 
 const entries = [
   // Whole barrel: tracked + published honestly, never gated (plan/21 §1) — no limit.
-  { name: `${pkg.name} (root barrel, tracked not gated)`, path: importPath(pkg.exports["."]), gzip: true },
+  {
+    name: `${pkg.name} (root barrel, tracked not gated)`,
+    path: importPath(pkg.exports["."]),
+    gzip: true,
+  },
 ];
 
 const seen = new Set();
