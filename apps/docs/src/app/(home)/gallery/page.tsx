@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { docsMeta } from "@/lib/metadata";
-import { CHART_MODULES, STABLE_CHARTS } from "@/lib/charts/registry";
+import { CATALOG_TARGET, CHART_MODULES, STABLE_CHARTS } from "@/lib/charts/registry";
 import { CHART_GZIP } from "@/lib/stats";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -18,11 +18,11 @@ export default function GalleryPage() {
       <div className="max-w-2xl">
         <span className="mono-label text-fd-primary">The catalog</span>
         <h1 className="display mt-3 text-fluid-h2 text-[length:var(--text-fluid-h2)]">
-          Five shipped. Ninety-six planned.
+          {STABLE_CHARTS.length} of {CATALOG_TARGET} shipped.
         </h1>
         <p className="mt-4 text-fd-muted-foreground">
           Each chart earns its place: a unique data story, an honest encoding, and a read that needs
-          no training. Here are the five in v1.
+          no training. The full catalog ships before launch.
         </p>
       </div>
 
@@ -55,9 +55,11 @@ export default function GalleryPage() {
 
         {/* teaser for the planned catalog */}
         <div className="flex min-h-[220px] flex-col items-center justify-center gap-2 rounded-[var(--radius-panel)] border border-dashed border-hairline p-6 text-center">
-          <span className="display text-4xl text-fd-muted-foreground">+91</span>
+          <span className="display text-4xl text-fd-muted-foreground">
+            +{CATALOG_TARGET - STABLE_CHARTS.length}
+          </span>
           <p className="text-sm text-fd-muted-foreground">
-            decision, expressive, and frontier charts on the roadmap
+            core, decision, expressive, and frontier charts — all before launch
           </p>
         </div>
       </div>
