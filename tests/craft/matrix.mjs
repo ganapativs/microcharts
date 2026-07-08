@@ -3,6 +3,7 @@
 // or text-on-mark collisions. Run after `pnpm build`. Adding a chart type?
 // Add its variants here IN THE SAME PR (plan/21 §8a).
 import { audit, render } from "./audit.mjs";
+import { geometryAudit } from "./geometry-audit.mjs";
 const D = (s) => import(`../../dist/charts/${s}/index.js`);
 
 const CATS = [
@@ -473,10 +474,9 @@ for (const c of CASES) {
       }
       total++;
       try {
-        const issues = audit(
-          `${c.slug} ${JSON.stringify(v).slice(0, 50)} @${w === 999 ? "default" : w + "x" + hgt}`,
-          render(Comp, props),
-        );
+        const label = `${c.slug} ${JSON.stringify(v).slice(0, 50)} @${w === 999 ? "default" : w + "x" + hgt}`;
+        const svg = render(Comp, props);
+        const issues = [...audit(label, svg), ...geometryAudit(label, svg)];
         const real = issues.filter((i) => !ALLOWED(i));
         if (real.length) {
           bad++;

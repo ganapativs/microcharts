@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
+import { round2 } from "../../core/types.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { dumbbellGeometry } from "./geometry.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
@@ -143,6 +144,17 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
             : undefined;
         // from === to → single dot, connector omitted (honest degenerate)
         const single = row.x0 !== null && row.x0 === row.x1;
+        // connector stops at each dot's EDGE, not its center — otherwise it
+        // pierces the hollow "before" ring (r 1.7) and shows through. Inset by
+        // the mark radius along the row; if the dots nearly touch, drop the
+        // connector (nothing legible to draw between them).
+        const connector = (() => {
+          if (single || row.x0 === null || row.x1 === null) return null;
+          const dir = row.x1 >= row.x0 ? 1 : -1;
+          const x0 = round2(row.x0 + dir * 1.7);
+          const x1 = round2(row.x1 - dir * 2);
+          return dir > 0 ? (x1 > x0 ? { x0, x1 } : null) : x1 < x0 ? { x0, x1 } : null;
+        })();
         const est = (v: number) => fmt(v).length * fontSize * 0.62;
         const leftX = row.x0 !== null && row.x1 !== null ? Math.min(row.x0, row.x1) : null;
         const rightX = row.x0 !== null && row.x1 !== null ? Math.max(row.x0, row.x1) : null;
@@ -170,11 +182,11 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
                 {truncateLabel(d.label)}
               </text>
             ) : null}
-            {!single && row.x0 !== null && row.x1 !== null ? (
+            {!single && row.x0 !== null && row.x1 !== null && connector !== null ? (
               <line
-                x1={row.x0}
+                x1={connector.x0}
                 y1={row.y}
-                x2={row.x1}
+                x2={connector.x1}
                 y2={row.y}
                 data-mc-ink="muted"
                 vectorEffect="non-scaling-stroke"

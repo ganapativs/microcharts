@@ -387,3 +387,11 @@ inside the frame (property-tested; reusable by future dense-label charts). Slope
 2.8/3.8 → 2.95/3.95 kB (measured 2.91/3.90; 3/4 kB hard caps honored). Craft gate added:
 `pnpm craft` (tests/craft/matrix.mjs) renders 141 chart×variant×size configs against dist
 and fails on text escapes, text-text overlap, or text-on-mark collisions.
+
+**Dumbbell connector pierce fix (2026-07-08, round-13 visual audit):** the connector ran
+dot-center → dot-center, crossing the hollow "before" ring's interior (fill=none) so the
+line showed through the empty dot. Fixed: connector endpoints inset by the mark radius
+along the row (drops the connector when dots nearly touch). Budget 2.65/3.55 → 2.7/3.65 kB
+(measured 2.64/3.55; 3/4 kB hard caps honored). New geometry-audit gate (tests/craft/
+geometry-audit.mjs, wired into `pnpm craft`) detects LINE-THROUGH-HOLLOW via chord-inside-
+disk, plus MARK-ESCAPE. Full visual sweep report in plan/VISUAL-AUDIT.md.

@@ -60,16 +60,16 @@
     "interactive": 3.08
   },
   "dumbbell": {
-    "static": 2.55,
-    "interactive": 3.47
+    "static": 2.64,
+    "interactive": 3.55
   },
   "paired-bars": {
     "static": 2.25,
     "interactive": 3.17
   },
   "slope": {
-    "static": 2.91,
-    "interactive": 3.9
+    "static": 2.92,
+    "interactive": 3.91
   },
   "micro-scatter": {
     "static": 1.88,

@@ -20,6 +20,21 @@ describe("<Dumbbell> (plan/22 #11, S2-paired)", () => {
     );
   });
 
+  it("connector stops at the dot edges — never pierces the hollow from-dot", () => {
+    const { container } = draw(
+      <Dumbbell data={[{ from: 62000, to: 84000 }]} width={220} height={40} />,
+    );
+    const line = container.querySelector("line")!;
+    const circles = [...container.querySelectorAll("circle")];
+    const from = { cx: Number(circles[0]!.getAttribute("cx")), r: 1.7 };
+    const x1 = Number(line.getAttribute("x1"));
+    const x2 = Number(line.getAttribute("x2"));
+    // the connector's near end sits at/beyond the hollow ring's edge, so the
+    // visible chord inside the ring is ~0 (from-dot is left of the to-dot here)
+    const nearEnd = Math.min(x1, x2);
+    expect(nearEnd).toBeGreaterThanOrEqual(from.cx + from.r - 0.05);
+  });
+
   it("from === to → single dot, no connector, 'No change at 62,000.'", () => {
     const { container } = draw(<Dumbbell data={[{ from: 62000, to: 62000 }]} />);
     expect(container.querySelector("line")).toBeNull();

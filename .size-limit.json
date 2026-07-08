@@ -187,13 +187,13 @@
   {
     "name": "@microcharts/react/dumbbell (static)",
     "path": "dist/charts/dumbbell/index.js",
-    "limit": "2.65 kB",
+    "limit": "2.7 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/dumbbell/interactive",
     "path": "dist/charts/dumbbell/client.js",
-    "limit": "3.55 kB",
+    "limit": "3.65 kB",
     "gzip": true
   },
   {
