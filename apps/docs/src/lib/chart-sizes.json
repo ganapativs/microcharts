@@ -60,8 +60,8 @@
     "interactive": 3.09
   },
   "dumbbell": {
-    "static": 2.66,
-    "interactive": 3.57
+    "static": 2.65,
+    "interactive": 3.56
   },
   "paired-bars": {
     "static": 2.25,
@@ -101,7 +101,7 @@
   },
   "likert-strip": {
     "static": 2.6,
-    "interactive": 3.35
+    "interactive": 3.36
   },
   "waterfall": {
     "static": 1.99,

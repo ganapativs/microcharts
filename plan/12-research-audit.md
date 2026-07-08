@@ -416,3 +416,9 @@ as an attribute (not CSS) so SVGs stay self-contained + the craft audit reads it
 (funnel top, sparkline min/max, stacked-area stagger) left alphabetic. Also: progress + ohlc label
 gutter gap +3→+5 for separation. Budgets: heat-cell interactive 2.15→2.2 kB (measured 2.15, +central
 attr). Browser regression test on likert asserts deltaPx < 1.2.
+
+**Label breathing space (2026-07-08, round-14 user review):** beside-mark label gaps were
+inconsistent (2–5 units) and the tightest read as cramped. Standardized to ~4 units: likert
+gap 2→4 (+ gutter 2→4), dumbbell 3.5→4, sparkline/dual last-value offset +4→+6, bump-strip
+end labels +2→+5 (offset + both gutters). Live-measured likert 2px→4px. dot-plot/slope (3 units)
+and progress/ohlc (5 units) already comfortable, left as-is.

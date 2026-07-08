@@ -85,7 +85,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   const hasNeutralLevel = data.length % 2 === 1;
 
   // end labels reserve deterministic ch gutters ("100%" worst case = 4 chars)
-  const gutter = label === "none" ? 0 : Math.ceil(4 * fontSize * 0.62) + 2;
+  const gutter = label === "none" ? 0 : Math.ceil(4 * fontSize * 0.62) + 4;
   const geo = likertStripGeometry({
     width,
     height,
@@ -110,12 +110,12 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   const barX1 = geo?.segments.length ? Math.max(...geo.segments.map((g) => g.x + g.width)) : width;
   const estL = 4 * fontSize * 0.62;
   const leftLabel =
-    barX0 - 2 - estL >= 0
-      ? { x: barX0 - 2, anchor: "end" as const }
+    barX0 - 4 - estL >= 0
+      ? { x: barX0 - 4, anchor: "end" as const }
       : { x: 1, anchor: "start" as const };
   const rightLabel =
-    barX1 + 2 + estL <= width
-      ? { x: barX1 + 2, anchor: "start" as const }
+    barX1 + 4 + estL <= width
+      ? { x: barX1 + 4, anchor: "start" as const }
       : { x: width - 1, anchor: "end" as const };
   const barH = Math.max(3, height - 4);
   const net = geo ? (geo.shares.positive - geo.shares.negative) * 100 : 0;

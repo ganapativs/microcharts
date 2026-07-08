@@ -167,8 +167,8 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
           leftX !== null &&
           rightX !== null &&
           rightX - leftX >= Math.max(est(leftVal), est(rightVal)) &&
-          leftX - 3.5 - est(leftVal) >= 0 &&
-          rightX + 3.5 + est(rightVal) <= width;
+          leftX - 4 - est(leftVal) >= 0 &&
+          rightX + 4 + est(rightVal) <= width;
         return (
           <g key={row.index}>
             {d.label ? (
@@ -219,7 +219,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
             {showValues && leftX !== null && rightX !== null ? (
               <>
                 <text
-                  x={leftX - 3.5}
+                  x={leftX - 4}
                   y={row.y}
                   fontSize={fontSize}
                   dominantBaseline="central"
@@ -228,7 +228,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
                   {fmt(leftVal)}
                 </text>
                 <text
-                  x={rightX + 3.5}
+                  x={rightX + 4}
                   y={row.y}
                   fontSize={fontSize}
                   dominantBaseline="central"

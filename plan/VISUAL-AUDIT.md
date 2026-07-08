@@ -48,6 +48,8 @@ to `tests/craft/matrix.mjs` that would have caught it.**
 | 6 | Horizon | — | User asked whether impl/visuals are correct. | — | **VERIFIED** — a correct, property-tested horizon implementation (darker = farther from baseline; half-open fold bands). The slightly blobby look is inherent to the technique at low data density, not a bug. |
 | 3 | CalendarStrip (interactive) | HIGH | Pointer drift: the interactive wrapper was sized 180 px by the demo, but the fixed-cell grid's SVG rendered at its intrinsic 55 px, left-aligned. Pointer math divides by the 180 px wrapper while cells live in the left 55 px → crosshair/focus landed far off the cursor. Only interactive charts sized by CSS width (not geometry props) are affected; CalendarStrip was the only one (fixed 7 px cells force CSS scaling). | The SVG fills the focusable wrapper so pointer math is exact. | **FIXED** — composed static now gets `style={FILL}` (`display:block; width:100%; height:auto`). Browser regression test asserts `svg.width == wrapper.width`. |
 
+| 7 | Label breathing space | LOW | Label-to-mark gaps were inconsistent (likert 2, dumbbell 3.5, dot-plot/sparkline/dual 4, progress/ohlc 5) and the tightest read as cramped: likert 2px, bump `#1` 0.5, sparkline/dual last 2. | A comfortable, consistent gap. | **FIXED** — standardized beside-mark label gaps to ~4 units (likert 2→4, dumbbell 3.5→4, sparkline/dual last +4→+6, bump end labels +2→+5). Measured live: likert 2px→4px. dot-plot/slope (3) and progress/ohlc (5) left as-is. |
+
 ## Verified clean (checked, no issue)
 
 - **DotPlot** — value labels are correctly glued to each dot (Ada "96" sits left

@@ -175,7 +175,7 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
       ) : null}
       {label === "last" && geo.lastPrimary ? (
         <text
-          x={geo.lastPrimary.x + 4}
+          x={geo.lastPrimary.x + 6}
           y={Math.min(Math.max(geo.lastPrimary.y, fontSize * 0.55), height - fontSize * 0.55)}
           fontSize={fontSize}
           dominantBaseline="central"

@@ -35,8 +35,8 @@ export function bumpGeometry(opts: {
 }): BumpGeometry {
   const { width, height, ranks, gutterLeftCh, gutterRightCh, fontSize } = opts;
   const n = ranks.length;
-  const gutterL = gutterLeftCh > 0 ? Math.ceil(gutterLeftCh * fontSize * 0.62) + 2 : 0;
-  const gutterR = gutterRightCh > 0 ? Math.ceil(gutterRightCh * fontSize * 0.62) + 2 : 0;
+  const gutterL = gutterLeftCh > 0 ? Math.ceil(gutterLeftCh * fontSize * 0.62) + 5 : 0;
+  const gutterR = gutterRightCh > 0 ? Math.ceil(gutterRightCh * fontSize * 0.62) + 5 : 0;
   const x0 = gutterL + 1.5;
   const x1 = width - gutterR - 1.5;
 
@@ -91,8 +91,8 @@ export function bumpGeometry(opts: {
     d,
     points,
     changes,
-    firstLabel: first ? { x: round2(Math.max(0, x0 - 2)), y: first.y, rank: first.rank } : null,
-    lastLabel: last ? { x: round2(Math.min(width, x1 + 2)), y: last.y, rank: last.rank } : null,
+    firstLabel: first ? { x: round2(Math.max(0, x0 - 5)), y: first.y, rank: first.rank } : null,
+    lastLabel: last ? { x: round2(Math.min(width, x1 + 5)), y: last.y, rank: last.rank } : null,
     pitch,
   };
 }

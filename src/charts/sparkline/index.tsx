@@ -205,7 +205,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
         : null}
       {labelText !== undefined && metrics && geo.last ? (
         <text
-          x={geo.last.x + 4}
+          x={geo.last.x + 6}
           /* y clamped so ascenders/descenders stay inside the viewBox */
           y={Math.min(
             Math.max(geo.last.y, metrics.fontSize * 0.55),
