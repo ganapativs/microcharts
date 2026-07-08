@@ -789,3 +789,23 @@ fontSize*0.6`. 0 escapes after. Same class as the RateVolume label-escape lesson
 Gates: node 1191, browser 86, craft 232/0, size 2.41/3.27, bench 30.8 rows/ms (floor 12), docs
 177 pages + tests 98, real-browser sweep green (diagonal + faint burn-rate lines + exhaustion ✕
 + danger-colored endpoint/label all confirmed; readout chip "62% · 0.6×" visible).
+
+## Batch 2 wave 2 — ControlStrip (2026-07-09)
+
+**ControlStrip (plan/23 #10) — full DoD, static + interactive.** Provenance: plan/16 §Q9. The
+σ̂ = MR̄/1.128 individuals estimator is stated + property-tested (a constant-MR series gives the
+exact ±3σ̂ limits); sample SD is deliberately NOT used (inflates limits under drift). WE rules
+are the enumerated Western Electric subset — WE-1 (beyond 3σ, always), WE-2 (2-of-3 beyond 2σ
+same side), WE-4 (8 on one side); WE-3 excluded at micro scale (flag density = noise, documented).
+
+**Deviations / decisions:**
+- **Tab does NOT cycle violations** (plan §10 interactive suggested it). Trapping Tab breaks
+  keyboard focus egress (a11y regression); ←/→ steps all points, violations are visible as rings.
+- **`limits="percentile"`** pulls `core/quantile` (Batch 0) — the only kernel dep, adds ~0.15 kB;
+  static 2.68 / interactive 3.56 kB (budgets 2.8/3.7), under 3/4 hard caps. Same budget-floor class.
+- Band uses the standard `--mc-band` token (8% alpha, verified visible-but-faint); provisional
+  (n<10) band adds a dashed neutral border; degenerate (MR̄=0) collapses to the center hairline.
+
+Gates: node 1220, browser 88, craft 244/0, size 2.68/3.56, bench 51 rows/ms (floor 12), docs 180
+pages + tests 100, real-browser sweep green (band faint, out-points ringed-neg, all-dots, dashed
+provisional band all confirmed; readout chip "73" visible, out-points announce the crossed limit).

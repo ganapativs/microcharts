@@ -399,4 +399,10 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "control-strip",
+    component: "ControlStrip",
+    floor: 12, // band + line + per-point out-test + MR estimator
+    props: (i) => ({ data: rugs[i % POOL].map((v) => v * 10 + 40), rules: "we", summary: false }),
+  },
 ];

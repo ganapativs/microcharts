@@ -515,6 +515,22 @@ add(
 );
 const BURN = { plan: [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0], actual: [40, 38, 36, 34, 32, 30] };
 const EB = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
+const CTRL = [10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16, 10, 9, 11, 10];
+add(
+  "control-strip",
+  "ControlStrip",
+  [
+    { data: CTRL },
+    { data: CTRL, rules: "we" },
+    { data: CTRL, dots: "all" },
+    { data: CTRL.slice(0, 6) },
+  ],
+  [
+    [80, 16],
+    [160, 24],
+    [240, 28],
+  ],
+);
 add(
   "error-budget",
   "ErrorBudget",

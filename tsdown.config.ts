@@ -97,6 +97,8 @@ export default defineConfig({
     "src/charts/burn-chart/client.tsx",
     "src/charts/error-budget/index.tsx",
     "src/charts/error-budget/client.tsx",
+    "src/charts/control-strip/index.tsx",
+    "src/charts/control-strip/client.tsx",
   ],
   format: ["esm"],
   dts: true,

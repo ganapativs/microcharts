@@ -305,6 +305,20 @@ export interface SummaryStrings {
     remaining: string,
     rate: string,
   ) => string;
+  /** Control summary, e.g. "2 of 30 points outside control limits (center 74.2, limits 69.0–79.4)." */
+  control: (k: number, n: number, center: string, lo: string, hi: string) => string;
+  /** In-control summary, e.g. "All 30 points within control limits (center 74.2, limits 69.0–79.4)." */
+  controlInControl: (n: number, center: string, lo: string, hi: string) => string;
+  /** Provisional-limits clause appended when n < 10, e.g. " Limits provisional (n=6)." */
+  controlProvisional: (n: number) => string;
+  /** Control point announcement, e.g. "Point 14 of 30: 82.1 — above the upper limit (79.4)." */
+  controlAt: (
+    position: number,
+    total: number,
+    value: string,
+    side: "upper" | "lower" | null,
+    limit: string,
+  ) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

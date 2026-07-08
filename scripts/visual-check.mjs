@@ -20,6 +20,7 @@ const { NetFlow } = await D("net-flow");
 const { RetentionCurve } = await D("retention-curve");
 const { BurnChart } = await D("burn-chart");
 const { ErrorBudget } = await D("error-budget");
+const { ControlStrip } = await D("control-strip");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -73,6 +74,7 @@ const BPLAN = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];
 const BACT = [40, 35, 31, 27, 24, 21];
 const EB = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
 const EBURN = [1, 0.82, 0.6, 0.38, 0.18, 0.04, 0];
+const CTRL = [74,73,75,74,76,73,74,75,74,73,82,74,75,73,74,76,74,73,75,74,66,74,75,74,73,76,74,75,74,73];
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -201,6 +203,12 @@ const body = [
   row("fast-burn", svg(ErrorBudget, { data: EBURN, window: 20, width: 240, height: 28 })),
   row("exhausted", svg(ErrorBudget, { data: [1, 0.5, 0.2, 0.05, 0], window: 12, width: 240, height: 28 })),
   row("diagonal only", svg(ErrorBudget, { data: EB, window: 30, rates: [1], width: 240, height: 28 })),
+
+  `<h2>ControlStrip</h2>`,
+  row("default 80x16", svg(ControlStrip, { data: CTRL, width: 80, height: 16 })),
+  row("we rules", svg(ControlStrip, { data: CTRL, rules: "we", width: 240, height: 24 })),
+  row("all dots", svg(ControlStrip, { data: CTRL, dots: "all", width: 240, height: 24 })),
+  row("provisional", svg(ControlStrip, { data: CTRL.slice(0,6), width: 240, height: 24 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

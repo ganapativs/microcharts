@@ -54,6 +54,7 @@ import netFlow from "./net-flow";
 import retentionCurve from "./retention-curve";
 import burnChart from "./burn-chart";
 import errorBudget from "./error-budget";
+import controlStrip from "./control-strip";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -100,6 +101,7 @@ const MODULES: ChartModule[] = [
   retentionCurve,
   burnChart,
   errorBudget,
+  controlStrip,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

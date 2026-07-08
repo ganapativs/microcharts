@@ -46,6 +46,7 @@
     "net-flow",
     "retention-curve",
     "burn-chart",
-    "error-budget"
+    "error-budget",
+    "control-strip"
   ]
 }

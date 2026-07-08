@@ -503,6 +503,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/control-strip (static)",
+    "path": "dist/charts/control-strip/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/control-strip/interactive",
+    "path": "dist/charts/control-strip/client.js",
+    "limit": "3.7 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

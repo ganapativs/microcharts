@@ -372,6 +372,14 @@
       "types": "./dist/charts/error-budget/client.d.ts",
       "import": "./dist/charts/error-budget/client.js"
     },
+    "./control-strip": {
+      "types": "./dist/charts/control-strip/index.d.ts",
+      "import": "./dist/charts/control-strip/index.js"
+    },
+    "./control-strip/interactive": {
+      "types": "./dist/charts/control-strip/client.d.ts",
+      "import": "./dist/charts/control-strip/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

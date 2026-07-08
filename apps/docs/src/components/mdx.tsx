@@ -45,6 +45,7 @@ import { NetFlow } from "@microcharts/react/net-flow";
 import { RetentionCurve } from "@microcharts/react/retention-curve";
 import { BurnChart } from "@microcharts/react/burn-chart";
 import { ErrorBudget } from "@microcharts/react/error-budget";
+import { ControlStrip } from "@microcharts/react/control-strip";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -109,6 +110,7 @@ export function getMDXComponents(components?: MDXComponents) {
     RetentionCurve,
     BurnChart,
     ErrorBudget,
+    ControlStrip,
     SparkGroup,
     // docs building blocks
     Instrument,
