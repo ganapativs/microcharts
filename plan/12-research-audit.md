@@ -378,3 +378,12 @@ measured-exact with zero headroom, and content-hash renames alone move gzip by �
 was added to the LAST positive share; a denormal-tiny entry (counterexample
 `[4e-106, 2.4e-93, 5e-324, 0]`) went negative absorbing it. Remainder now folds into
 the LARGEST share, clamped at 0. Found by the fast-check invariant suite.
+
+**Slope label-spread solver (2026-07-08, craft review):** user screenshot review found endpoint
+labels overlapping at showcase sizes (greedy drop threshold passed 5.7-unit spacing that
+collides visually at fontSize 6). Replaced drop-on-collision with `core/labels.spreadLabels`
+— a deterministic forward/backward sweep that nudges label baselines to a full glyph pitch
+inside the frame (property-tested; reusable by future dense-label charts). Slope budget
+2.8/3.8 → 2.95/3.95 kB (measured 2.91/3.90; 3/4 kB hard caps honored). Craft gate added:
+`pnpm craft` (tests/craft/matrix.mjs) renders 141 chart×variant×size configs against dist
+and fails on text escapes, text-text overlap, or text-on-mark collisions.

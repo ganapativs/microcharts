@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
+import { spreadLabels } from "../../core/labels.js";
 import { pairChange, type DumbbellDatum } from "../dumbbell/index.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
 import { slopeGeometry } from "./geometry.js";
@@ -74,7 +75,7 @@ export function Slope(props: SlopeProps): ReactNode {
   } = props;
 
   if (data.length > 7) {
-    devWarn(`<Slope> ${data.length} categories — past 7 the crossings tangle (documented cap).`);
+    devWarn(`<Slope> ${data.length} categories — crossings tangle past 7.`);
   }
 
   const fontSize = 6;
@@ -125,19 +126,18 @@ export function Slope(props: SlopeProps): ReactNode {
 
   const goodDir = positive === "down" ? -1 : 1;
   const showLabels = label !== "none" && !labelsDropped;
-  // baseline sits ~0.35em under the dot; keep the glyph box inside the frame
-  const labelY = (y: number): number =>
-    Math.min(Math.max(y + fontSize * 0.35, fontSize * 0.8), height - fontSize * 0.25);
-  // greedy per-column label dedup: an endpoint within 0.9 × fontSize of an
-  // already-labeled endpoint drops its label (pure arithmetic — plan/18)
-  const labeled0: number[] = [];
-  const labeled1: number[] = [];
-  const canLabel = (seen: number[], y: number | null): boolean => {
-    if (y === null) return false;
-    if (seen.some((prev) => Math.abs(prev - y) < fontSize * 0.9)) return false;
-    seen.push(y);
-    return true;
+  // per-column label layout: baselines spread to a full glyph pitch inside
+  // the frame (deterministic sweep, core/labels) — close endpoints nudge
+  // apart instead of colliding; an impossible column drops its labels
+  const layoutColumn = (ys: (number | null)[]): (number | null)[] => {
+    const present: number[] = [];
+    for (const y of ys) if (y !== null) present.push(y + fontSize * 0.35);
+    const spread = spreadLabels(present, fontSize * 1.05, fontSize * 0.8, height - fontSize * 0.25);
+    let k = 0;
+    return ys.map((y) => (y === null || !spread ? null : spread[k++]!));
   };
+  const leftYs = showLabels ? layoutColumn(geo.lines.map((l) => l.y0)) : [];
+  const rightYs = showLabels ? layoutColumn(geo.lines.map((l) => l.y1)) : [];
 
   return (
     <Chart
@@ -193,15 +193,15 @@ export function Slope(props: SlopeProps): ReactNode {
             {line.y1 !== null ? (
               <circle cx={line.x1} cy={line.y1} r={1.5} style={{ fill: stroke }} />
             ) : null}
-            {showLabels && wantLeft && line.nudge0 === 0 && canLabel(labeled0, line.y0) ? (
-              <text x={geo.leftLabelX} y={labelY(line.y0!)} fontSize={fontSize} textAnchor="end">
+            {showLabels && wantLeft && leftYs[line.index] !== null ? (
+              <text x={geo.leftLabelX} y={leftYs[line.index]!} fontSize={fontSize} textAnchor="end">
                 {fmt(d.from)}
               </text>
             ) : null}
-            {showLabels && line.nudge1 === 0 && canLabel(labeled1, line.y1) ? (
+            {showLabels && rightYs[line.index] !== null ? (
               <text
                 x={geo.rightLabelX}
-                y={labelY(line.y1!)}
+                y={rightYs[line.index]!}
                 fontSize={fontSize}
                 textAnchor="start"
                 data-mc-ink={wantLabel && !wantLeft ? "label" : undefined}

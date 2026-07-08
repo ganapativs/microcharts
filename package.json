@@ -338,6 +338,7 @@
     "bench": "pnpm build && node bench/run.mjs",
     "demo": "pnpm build && node bench/run.mjs && node bench/demo.mjs demo.html",
     "test:visual": "playwright test",
+    "craft": "node tests/craft/matrix.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm knip",
     "pack:check": "pnpm build && publint && attw --pack .",
     "changeset": "changeset",

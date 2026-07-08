@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { bumpGeometry } from "./geometry.js";
 
-const base = { width: 60, height: 16, gutterCh: 2, fontSize: 6 };
+const base = { width: 60, height: 16, gutterLeftCh: 2, gutterRightCh: 2, fontSize: 6 };
 
 describe("bumpGeometry (plan/22 #21)", () => {
   it("rank 1 sits at the TOP (inverted y, documented)", () => {

@@ -28,14 +28,17 @@ export function bumpGeometry(opts: {
   height: number;
   ranks: readonly Value[];
   maxRank?: number | undefined;
-  gutterCh: number;
+  /** Left/right label gutters in ch (asymmetric: `label="last"` only pays right). */
+  gutterLeftCh: number;
+  gutterRightCh: number;
   fontSize: number;
 }): BumpGeometry {
-  const { width, height, ranks, gutterCh, fontSize } = opts;
+  const { width, height, ranks, gutterLeftCh, gutterRightCh, fontSize } = opts;
   const n = ranks.length;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 2 : 0;
-  const x0 = gutter + 1.5;
-  const x1 = width - gutter - 1.5;
+  const gutterL = gutterLeftCh > 0 ? Math.ceil(gutterLeftCh * fontSize * 0.62) + 2 : 0;
+  const gutterR = gutterRightCh > 0 ? Math.ceil(gutterRightCh * fontSize * 0.62) + 2 : 0;
+  const x0 = gutterL + 1.5;
+  const x1 = width - gutterR - 1.5;
 
   // ranks are 1-based integers; round non-integers (component dev-warns)
   const clean = ranks.map((r) =>

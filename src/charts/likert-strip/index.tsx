@@ -104,6 +104,19 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
           : likertSummary(geo.shares, hasNeutralLevel, pctFmt, strings)));
 
   const midY = height / 2;
+  // direct labels hug the BAR ends, not the frame — a small negative pole
+  // must not leave its label floating at the far edge
+  const barX0 = geo?.segments.length ? Math.min(...geo.segments.map((g) => g.x)) : 0;
+  const barX1 = geo?.segments.length ? Math.max(...geo.segments.map((g) => g.x + g.width)) : width;
+  const estL = 4 * fontSize * 0.62;
+  const leftLabel =
+    barX0 - 2 - estL >= 0
+      ? { x: barX0 - 2, anchor: "end" as const }
+      : { x: 1, anchor: "start" as const };
+  const rightLabel =
+    barX1 + 2 + estL <= width
+      ? { x: barX1 + 2, anchor: "start" as const }
+      : { x: width - 1, anchor: "end" as const };
   const barH = Math.max(3, height - 4);
   const net = geo ? (geo.shares.positive - geo.shares.negative) * 100 : 0;
 
@@ -153,19 +166,19 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
           {label === "ends" ? (
             <>
               <text
-                x={1}
+                x={leftLabel.x}
                 y={midY + fontSize * 0.35}
                 fontSize={fontSize}
-                textAnchor="start"
+                textAnchor={leftLabel.anchor}
                 data-mc-ink="label"
               >
                 {pctFmt(geo.shares.negative)}
               </text>
               <text
-                x={width - 1}
+                x={rightLabel.x}
                 y={midY + fontSize * 0.35}
                 fontSize={fontSize}
-                textAnchor="end"
+                textAnchor={rightLabel.anchor}
                 data-mc-ink="label"
               >
                 {pctFmt(geo.shares.positive)}
@@ -173,10 +186,10 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
             </>
           ) : label === "net" ? (
             <text
-              x={width - 1}
+              x={rightLabel.x}
               y={midY + fontSize * 0.35}
               fontSize={fontSize}
-              textAnchor="end"
+              textAnchor={rightLabel.anchor}
               data-mc-ink="label"
             >
               {`${net >= 0 ? "+" : "−"}${Math.round(Math.abs(net))}`}

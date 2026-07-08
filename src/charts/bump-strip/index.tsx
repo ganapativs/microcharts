@@ -78,7 +78,8 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
     height,
     ranks: data,
     maxRank,
-    gutterCh: label === "ends" ? maxLabelChars : 0,
+    gutterLeftCh: label === "ends" ? maxLabelChars : 0,
+    gutterRightCh: label !== "none" ? maxLabelChars : 0,
     fontSize,
   });
   const accName = summary === false ? false : (summary ?? bumpSummary(data, strings));

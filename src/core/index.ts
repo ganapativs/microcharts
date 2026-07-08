@@ -57,6 +57,7 @@ export {
   type DivergingStack,
 } from "./stack.js";
 export { maxPerBucket, envelope, decimateMinMax, type IndexedValue } from "./downsample.js";
+export { spreadLabels } from "./labels.js";
 export { parseUTCDay } from "./calendar.js";
 export {
   isoDate,
