@@ -55,6 +55,43 @@ export interface SummaryStrings {
   events: (count: number, peak: string) => string;
   /** Quiet event strip (seismogram all-zero). */
   noEvents: string;
+  /** S2-paired change, e.g. "From 62,000 to 84,000, up 35%." (dumbbell). */
+  fromTo: (from: string, to: string, direction: "up" | "down", pct: string) => string;
+  /** Degenerate pair, e.g. "No change at 62,000." */
+  flatPair: (value: string) => string;
+  /** Multi-row lead, e.g. "5 rows. Largest change Berlin, up 41%." */
+  rows: (count: number, topLabel: string, topDirection: "up" | "down", topPct: string) => string;
+  /** Referenced pair announcement, e.g. "East: 940 vs 1,200." (paired-bars). */
+  pairAt: (label: string, value: string, ref: string) => string;
+  /** Referenced pairs summary, e.g. "4 pairs. Largest gap East: 940 vs 1,200." */
+  pairs: (count: number, gapLabel: string, value: string, ref: string) => string;
+  /** Slope announcement, e.g. "Berlin: 48 to 61, up 27%." */
+  slopeAt: (
+    label: string,
+    from: string,
+    to: string,
+    direction: "up" | "down",
+    pct: string,
+  ) => string;
+  /** Slope summary, e.g. "5 categories: 3 up, 2 down. Largest change East, up 18%." */
+  slopes: (
+    count: number,
+    up: number,
+    down: number,
+    topLabel: string,
+    topDirection: "up" | "down",
+    topPct: string,
+  ) => string;
+  /** Slope with a missing end, e.g. "Berlin: 48, incomplete." */
+  slopeIncomplete: (label: string, value: string) => string;
+  /** Scatter size, e.g. "24 points." (micro-scatter). */
+  scatterCount: (count: number) => string;
+  /** Relationship clause, e.g. "Strong positive relationship (r 0.82)." */
+  relationship: (
+    tier: "strong" | "moderate" | "weak" | "none",
+    direction: "positive" | "negative",
+    r: string,
+  ) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

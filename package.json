@@ -152,6 +152,46 @@
       "types": "./dist/charts/heat-strip/client.d.ts",
       "import": "./dist/charts/heat-strip/client.js"
     },
+    "./dot-plot": {
+      "types": "./dist/charts/dot-plot/index.d.ts",
+      "import": "./dist/charts/dot-plot/index.js"
+    },
+    "./dot-plot/interactive": {
+      "types": "./dist/charts/dot-plot/client.d.ts",
+      "import": "./dist/charts/dot-plot/client.js"
+    },
+    "./dumbbell": {
+      "types": "./dist/charts/dumbbell/index.d.ts",
+      "import": "./dist/charts/dumbbell/index.js"
+    },
+    "./dumbbell/interactive": {
+      "types": "./dist/charts/dumbbell/client.d.ts",
+      "import": "./dist/charts/dumbbell/client.js"
+    },
+    "./paired-bars": {
+      "types": "./dist/charts/paired-bars/index.d.ts",
+      "import": "./dist/charts/paired-bars/index.js"
+    },
+    "./paired-bars/interactive": {
+      "types": "./dist/charts/paired-bars/client.d.ts",
+      "import": "./dist/charts/paired-bars/client.js"
+    },
+    "./slope": {
+      "types": "./dist/charts/slope/index.d.ts",
+      "import": "./dist/charts/slope/index.js"
+    },
+    "./slope/interactive": {
+      "types": "./dist/charts/slope/client.d.ts",
+      "import": "./dist/charts/slope/client.js"
+    },
+    "./micro-scatter": {
+      "types": "./dist/charts/micro-scatter/index.d.ts",
+      "import": "./dist/charts/micro-scatter/index.js"
+    },
+    "./micro-scatter/interactive": {
+      "types": "./dist/charts/micro-scatter/client.d.ts",
+      "import": "./dist/charts/micro-scatter/client.js"
+    },
     "./styles.css": "./styles.css"
   },
   "publishConfig": {

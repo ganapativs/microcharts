@@ -17,6 +17,6 @@ export type CategoryStrings = Pick<SummaryStrings, "noData" | "categories" | "ca
 export const EN_CATEGORY: CategoryStrings = {
   noData: "No data.",
   categories: (count, maxLabel, maxValue, minLabel, minValue) =>
-    `${count} categories. Highest ${maxLabel} ${maxValue}, lowest ${minLabel} ${minValue}.`,
+    `${count} ${count === 1 ? "category" : "categories"}. Highest ${maxLabel} ${maxValue}, lowest ${minLabel} ${minValue}.`,
   category: (label, value, rank, count) => `${label}: ${value} — ${ordinal(rank)} of ${count}.`,
 };

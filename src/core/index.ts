@@ -18,6 +18,8 @@ export { EN_SCALAR, type ScalarStrings } from "./strings-scalar.js";
 export { EN_CATEGORY, type CategoryStrings } from "./strings-category.js";
 export { EN_DIST, type DistStrings } from "./strings-dist.js";
 export { EN_SLOTS, type SlotStrings } from "./strings-slots.js";
+export { EN_PAIRED, type PairedStrings } from "./strings-paired.js";
+export { EN_SCATTER, type ScatterStrings } from "./strings-scatter.js";
 export { EN } from "./strings.js";
 export {
   quantiles,

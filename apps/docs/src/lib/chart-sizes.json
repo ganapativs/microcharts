@@ -40,8 +40,8 @@
     "interactive": 2.99
   },
   "mini-bar": {
-    "static": 2.16,
-    "interactive": 3.16
+    "static": 2.18,
+    "interactive": 3.17
   },
   "pictogram-row": {
     "static": 1.89,
@@ -49,10 +49,30 @@
   },
   "seismogram": {
     "static": 2.07,
-    "interactive": 3.06
+    "interactive": 3.04
   },
   "heat-strip": {
     "static": 2.27,
     "interactive": 3.09
+  },
+  "dot-plot": {
+    "static": 2.18,
+    "interactive": 3.08
+  },
+  "dumbbell": {
+    "static": 2.55,
+    "interactive": 3.47
+  },
+  "paired-bars": {
+    "static": 2.25,
+    "interactive": 3.17
+  },
+  "slope": {
+    "static": 2.68,
+    "interactive": 3.67
+  },
+  "micro-scatter": {
+    "static": 1.88,
+    "interactive": 3.01
   }
 }

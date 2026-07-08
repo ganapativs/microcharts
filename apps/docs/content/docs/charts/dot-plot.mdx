@@ -1,0 +1,107 @@
+---
+title: DotPlot
+description: A tiny dot plot for React — named values on one shared scale, with optional zero-anchored stems and value labels.
+---
+
+DotPlot answers "how do a few named values compare on one scale?" with the minimum ink
+per comparison. Dots over bars when the scale doesn't start at zero — position lies less
+than truncated bar length.
+
+<LiveDemo
+  label="DotPlot"
+  sizeOf="dot-plot"
+  code={`import { DotPlot } from "@microcharts/react/dot-plot";
+
+<DotPlot data={[
+  { label: "Ada", value: 96 },
+  { label: "Kim", value: 41 },
+  { label: "Sam", value: 88 },
+]} title="Review scores" />`}
+>
+  <DotPlot
+    data={[
+      { label: "Ada", value: 96 },
+      { label: "Kim", value: 41 },
+      { label: "Sam", value: 88 },
+    ]}
+    title="Review scores"
+    style={{ width: 180, height: 66 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="dot-plot" />
+
+## Try it
+
+<Playground chart="dot-plot" />
+
+## Interactive
+
+<InteractiveDemo slug="dot-plot" />
+
+## When to use it
+
+- **Good for** — KPI leaderboards, named comparisons in cards, rows where a truncated
+  bar would lie.
+- **Avoid for** — more than 7 rows or time series (Sparkline).
+
+## Sizing
+
+<Sizing chart="dot-plot" />
+
+## Variants
+
+<LiveDemo
+  label="stems"
+  code={`// stems anchor the read to zero — position becomes magnitude
+<DotPlot data={team} stem />`}
+>
+  <DotPlot
+    data={[
+      { label: "Ada", value: 96 },
+      { label: "Kim", value: 41 },
+      { label: "Sam", value: 88 },
+    ]}
+    stem
+    title="Magnitude read"
+    style={{ width: 180, height: 66 }}
+  />
+</LiveDemo>
+
+<LiveDemo label="values + highlight" code={`<DotPlot data={team} label="value" highlight="Ada" />`}>
+  <DotPlot
+    data={[
+      { label: "Ada", value: 96 },
+      { label: "Kim", value: 41 },
+      { label: "Sam", value: 88 },
+    ]}
+    label="value"
+    highlight="Ada"
+    title="Leaderboard"
+    style={{ width: 180, height: 66 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="dot-plot" />
+
+## Why this default
+
+Without `stem` the domain fits the data (a position read); with `stem` the domain is
+forced through zero (a magnitude read) — the prop flips the honesty regime, and the docs
+say so. Coincident dots on adjacent rows de-overlap by half a unit; labels truncate by
+character count and drop entirely when rows get too dense — all pure arithmetic, nothing
+measured.
+
+## Accessibility
+
+The accessible name carries count and extremes — **"3 categories. Highest Ada 96, lowest
+Kim 41."** The interactive entry roves rows and announces each with its rank
+(**"Ada: 96 — 1st of 3."**).
+
+## Props
+
+<PropTable slug="dot-plot" />

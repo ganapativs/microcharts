@@ -15,6 +15,11 @@
     "mini-bar",
     "pictogram-row",
     "seismogram",
-    "heat-strip"
+    "heat-strip",
+    "dot-plot",
+    "dumbbell",
+    "paired-bars",
+    "slope",
+    "micro-scatter"
   ]
 }

@@ -24,6 +24,11 @@ import miniBar from "./mini-bar";
 import pictogramRow from "./pictogram-row";
 import seismogram from "./seismogram";
 import heatStrip from "./heat-strip";
+import dotPlot from "./dot-plot";
+import dumbbell from "./dumbbell";
+import pairedBars from "./paired-bars";
+import slope from "./slope";
+import microScatter from "./micro-scatter";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -40,6 +45,11 @@ const MODULES: ChartModule[] = [
   pictogramRow,
   seismogram,
   heatStrip,
+  dotPlot,
+  dumbbell,
+  pairedBars,
+  slope,
+  microScatter,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

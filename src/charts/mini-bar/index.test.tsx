@@ -80,7 +80,7 @@ describe("<MiniBar> (plan/22 #6, S2)", () => {
   it("single category → still renders + summary states it", () => {
     const { container } = draw(<MiniBar data={[{ label: "Only", value: 4 }]} />);
     expect(container.querySelectorAll("rect").length).toBe(1);
-    expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain("1 categories");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain("1 category");
   });
 
   it("is axe-clean", async () => {

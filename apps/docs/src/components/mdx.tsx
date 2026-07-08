@@ -14,6 +14,11 @@ import { MiniBar } from "@microcharts/react/mini-bar";
 import { PictogramRow } from "@microcharts/react/pictogram-row";
 import { Seismogram } from "@microcharts/react/seismogram";
 import { HeatStrip } from "@microcharts/react/heat-strip";
+import { DotPlot } from "@microcharts/react/dot-plot";
+import { Dumbbell } from "@microcharts/react/dumbbell";
+import { PairedBars } from "@microcharts/react/paired-bars";
+import { Slope } from "@microcharts/react/slope";
+import { MicroScatter } from "@microcharts/react/micro-scatter";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -44,6 +49,11 @@ export function getMDXComponents(components?: MDXComponents) {
     PictogramRow,
     Seismogram,
     HeatStrip,
+    DotPlot,
+    Dumbbell,
+    PairedBars,
+    Slope,
+    MicroScatter,
     SparkGroup,
     // docs building blocks
     Instrument,

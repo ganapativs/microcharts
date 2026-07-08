@@ -173,6 +173,66 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/dot-plot (static)",
+    "path": "dist/charts/dot-plot/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dot-plot/interactive",
+    "path": "dist/charts/dot-plot/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dumbbell (static)",
+    "path": "dist/charts/dumbbell/index.js",
+    "limit": "2.65 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dumbbell/interactive",
+    "path": "dist/charts/dumbbell/client.js",
+    "limit": "3.55 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/paired-bars (static)",
+    "path": "dist/charts/paired-bars/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/paired-bars/interactive",
+    "path": "dist/charts/paired-bars/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/slope (static)",
+    "path": "dist/charts/slope/index.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/slope/interactive",
+    "path": "dist/charts/slope/client.js",
+    "limit": "3.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/micro-scatter (static)",
+    "path": "dist/charts/micro-scatter/index.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/micro-scatter/interactive",
+    "path": "dist/charts/micro-scatter/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
     "name": "styles.css (shared, whole library)",
     "path": "styles.css",
     "limit": "12 kB",

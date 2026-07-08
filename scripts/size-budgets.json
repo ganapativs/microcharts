@@ -58,6 +58,26 @@
     "heat-strip": {
       "static": "2.35 kB",
       "interactive": "3.15 kB"
+    },
+    "dot-plot": {
+      "static": "2.5 kB",
+      "interactive": "3.3 kB"
+    },
+    "dumbbell": {
+      "static": "2.65 kB",
+      "interactive": "3.55 kB"
+    },
+    "paired-bars": {
+      "static": "2.5 kB",
+      "interactive": "3.3 kB"
+    },
+    "slope": {
+      "static": "2.7 kB",
+      "interactive": "3.7 kB"
+    },
+    "micro-scatter": {
+      "static": "2.7 kB",
+      "interactive": "3.5 kB"
     }
   }
 }

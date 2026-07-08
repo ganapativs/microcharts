@@ -115,4 +115,59 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "dot-plot",
+    component: "DotPlot",
+    floor: 20, // 5 rows × (dot + label text)
+    props: (i) => ({ data: cats[i % POOL].slice(0, 5), summary: false }),
+  },
+  {
+    slug: "dumbbell",
+    component: "Dumbbell",
+    floor: 20, // ≤ 5 rows × 3 nodes + label
+    props: (i) => ({
+      data: cats[i % POOL].slice(0, 4).map((d) => ({
+        label: d.label,
+        from: d.value,
+        to: (d.value * 1.3) % 950,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "paired-bars",
+    component: "PairedBars",
+    floor: 25, // 2 rects per pair, ≤ 5 pairs
+    props: (i) => ({
+      data: cats[i % POOL].slice(0, 4).map((d) => ({
+        label: d.label,
+        value: d.value,
+        ref: (d.value * 1.2) % 950,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "slope",
+    component: "Slope",
+    floor: 20, // ≤ 7 lines + endpoint dots
+    props: (i) => ({
+      data: cats[i % POOL].slice(0, 5).map((d) => ({
+        label: d.label,
+        from: d.value,
+        to: (d.value * 1.4) % 950,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "micro-scatter",
+    component: "MicroScatter",
+    floor: 5, // 24 dot nodes/row (measured ~9 rows/ms — N-node class, half-of-measured floor)
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, j) => ({ x: j, y: v })),
+      trend: true,
+      summary: false,
+    }),
+  },
 ];

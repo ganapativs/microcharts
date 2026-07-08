@@ -1,0 +1,94 @@
+---
+title: MicroScatter
+description: A word-sized scatterplot for React — 2-D position with an honest Pearson r in the summary and an optional least-squares trend.
+---
+
+MicroScatter answers "are these two variables related?" — the relationship story no other
+micro chart tells. Dots render at 75% opacity so overplot reads as density instead of
+lying by occlusion, and duplicates are never jittered: position is the encoding.
+
+<LiveDemo
+  label="MicroScatter"
+  sizeOf="micro-scatter"
+  code={`import { MicroScatter } from "@microcharts/react/micro-scatter";
+
+<MicroScatter data={pairs} title="Latency vs error rate" />`}
+>
+  <span className="text-lg">
+    Latency and error rate{" "}
+    <MicroScatter
+      data={Array.from({ length: 24 }, (_, i) => ({ x: i, y: i * 3 + ((i * 7) % 5) * 6 }))}
+      title="Latency vs error rate"
+      style={{ width: "3em", height: "1.8em" }}
+    />{" "}
+    correlate strongly.
+  </span>
+</LiveDemo>
+
+## Install
+
+<Usage chart="micro-scatter" />
+
+## Try it
+
+<Playground chart="micro-scatter" />
+
+## Interactive
+
+<InteractiveDemo slug="micro-scatter" />
+
+## When to use it
+
+- **Good for** — correlation in a sentence, two-metric relationships in KPI cards.
+- **Avoid for** — more than 60 points (bin instead) or ordered time series (Sparkline).
+
+## Sizing
+
+<Sizing chart="micro-scatter" />
+
+## Variants
+
+<LiveDemo
+  label="trend"
+  code={`// least-squares, linear only — never smoothed
+<MicroScatter data={pairs} trend />`}
+>
+  <MicroScatter
+    data={Array.from({ length: 24 }, (_, i) => ({ x: i, y: i * 3 + ((i * 7) % 5) * 6 }))}
+    trend
+    title="With trend"
+    style={{ width: 140, height: 84 }}
+  />
+</LiveDemo>
+
+<LiveDemo label="focal point" code={`<MicroScatter data={pairs} focal={12} />`}>
+  <MicroScatter
+    data={Array.from({ length: 24 }, (_, i) => ({ x: i, y: i * 3 + ((i * 7) % 5) * 6 }))}
+    focal={12}
+    title="You are here"
+    style={{ width: 140, height: 84 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="micro-scatter" />
+
+## Why this default
+
+Axes are unlabeled at this scale, so `title` must name both variables — the a11y test in
+this repo asserts it in every example. The summary's relationship words are a documented
+heuristic on |r| (≥ 0.7 strong, ≥ 0.4 moderate, ≥ 0.2 weak), and whenever a relationship
+word appears, r appears beside it: claim and evidence travel together. Fewer than 3
+points, or a zero-variance cloud, makes no claim at all.
+
+## Accessibility
+
+The accessible name is the count plus the evidence-backed relationship — **"24 points.
+Strong positive relationship (r 0.9)."** — or just **"2 points."** when no claim is
+honest. The interactive entry steps points ordered by x and announces each formatted
+pair.
+
+## Props
+
+<PropTable slug="micro-scatter" />
