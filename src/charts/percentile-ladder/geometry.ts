@@ -99,7 +99,10 @@ export function percentileLadderGeometry(opts: {
 
   const first = vals[0]!;
   const quotient = first === 0 ? 0 : vals[k - 1]! / first;
-  const ratio = Number.isFinite(quotient) ? round2(quotient) : 0;
+  // round2 multiplies by 100 first, so a finite-but-huge quotient (denormal
+  // inputs → e.g. 1.8e306) overflows to Infinity — guard the ROUNDED result
+  const rounded = round2(quotient);
+  const ratio = Number.isFinite(rounded) ? rounded : 0;
 
   return {
     track: { x0: round2(x0), x1: round2(width - pad), y },

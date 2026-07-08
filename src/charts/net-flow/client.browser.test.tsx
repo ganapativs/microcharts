@@ -22,6 +22,10 @@ describe("interactive <NetFlow> (plan/23 #6)", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
     await expect.poll(() => live.textContent).toBe("Period 5 of 5: in 7, out 5, net +2.");
     expect(wrap.querySelectorAll("svg line").length).toBeGreaterThanOrEqual(1); // baseline + crosshair
+    // a VISIBLE readout chip shows in / out · net at the focused period
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("7 / 5 · +2");
   });
 
   it("a net-negative period states the negative sign in text", async () => {

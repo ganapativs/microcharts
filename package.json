@@ -356,6 +356,14 @@
       "types": "./dist/charts/retention-curve/client.d.ts",
       "import": "./dist/charts/retention-curve/client.js"
     },
+    "./burn-chart": {
+      "types": "./dist/charts/burn-chart/index.d.ts",
+      "import": "./dist/charts/burn-chart/index.js"
+    },
+    "./burn-chart/interactive": {
+      "types": "./dist/charts/burn-chart/client.d.ts",
+      "import": "./dist/charts/burn-chart/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

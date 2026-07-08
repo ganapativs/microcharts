@@ -244,6 +244,49 @@ export interface SummaryStrings {
   retentionNoPlateau: (last: string, n: number, unit: string) => string;
   /** Retention period announcement, e.g. "week 3: 41% retained (benchmark 37%)." */
   retentionAt: (unit: string, period: number, value: string, benchmark: string | null) => string;
+  /** Burn summary, e.g. "12 of 20 days in: 34 points remain vs 28 planned — projected to finish 3 days late." */
+  burn: (
+    elapsed: number,
+    total: number,
+    unit: string,
+    nowActual: string,
+    work: string,
+    verb: string,
+    nowPlan: string,
+    landing: string,
+  ) => string;
+  /** Burn summary, no plan line, e.g. "12 days in: 34 points remain." */
+  burnNoPlan: (
+    elapsed: number,
+    unit: string,
+    nowActual: string,
+    work: string,
+    verb: string,
+  ) => string;
+  /** Landing clause, e.g. "projected to finish 3 days late" / "...on time". */
+  burnLanding: (delta: number, unit: string) => string;
+  /** Flatlined projection clause. */
+  burnFlatlined: string;
+  /** Burn "remain" (down) / "done" (up) verb. */
+  burnRemain: string;
+  burnDone: string;
+  /** Burn period announcement, e.g. "day 12: 34 points remain, plan 28." */
+  burnAt: (
+    unit: string,
+    period: number,
+    nowActual: string,
+    work: string,
+    verb: string,
+    nowPlan: string | null,
+  ) => string;
+  /** Projected-region announcement, e.g. "day 18 (projected): 9 points remain." */
+  burnAtProjected: (
+    unit: string,
+    period: number,
+    value: string,
+    work: string,
+    verb: string,
+  ) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

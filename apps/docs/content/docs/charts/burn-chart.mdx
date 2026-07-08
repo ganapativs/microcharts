@@ -1,0 +1,93 @@
+---
+title: BurnChart
+description: A sprint burndown chart for React — plan vs actual with a dotted, honestly-provisional projection to the deadline and a signed landing gap.
+---
+
+BurnChart answers "will we finish on time?". It draws the **plan** line (dashed, full length
+to the deadline), the **actual** line to today, and a **dotted projection** whose slope is a
+plain linear fit over the last few actual points — provisional by construction, never a
+smoothed or optimistic curve. The gap label states the signed schedule landing, because
+"will we finish" is a number, not a vibe.
+
+<LiveDemo
+  label="BurnChart"
+  sizeOf="burn-chart"
+  code={`import { BurnChart } from "@microcharts/react/burn-chart";
+
+<BurnChart data={{ plan, actual }} title="Sprint 12" />`}
+>
+  <BurnChart
+    data={{ plan: [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0], actual: [40, 35, 31, 27, 24, 21] }}
+    label="gap"
+    title="Sprint 12"
+    width={260} height={30}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="burn-chart" />
+
+## Try it
+
+<Playground chart="burn-chart" />
+
+## Interactive
+
+<InteractiveDemo slug="burn-chart" />
+
+## When to use it
+
+- **Good for** — a sprint burndown in a tab header, will-we-finish in a KPI card, plan vs actual with a projected landing.
+- **Avoid for** — a single progress number (Progress) or a plain series (Sparkline).
+
+## Sizing
+
+<Sizing chart="burn-chart" />
+
+## Variants
+
+<LiveDemo
+  label="retrospective + burn-up"
+  code={`<BurnChart data={{ plan, actual }} projection={false} />
+<BurnChart data={{ plan, actual }} mode="up" />`}
+>
+  <span className="inline-flex flex-col gap-1.5">
+    <BurnChart
+      data={{ plan: [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0], actual: [40, 35, 31, 27, 24, 21] }}
+      projection={false}
+      title="Retrospective"
+      width={220} height={28}
+    />
+    <BurnChart
+      data={{ plan: [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40], actual: [0, 5, 9, 13, 16, 19] }}
+      mode="up"
+      title="Burn-up to scope"
+      width={220} height={28}
+    />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="burn-chart" />
+
+## Why this default
+
+The gap label, because "will we finish" is a number, not a vibe. History is drawn solid and
+exact; the projection is dotted, muted, and computed as a linear fit over the last
+`max(2, ⌈today/3⌉)` actual points — a stated method, never an optimistic hand-drawn curve.
+When the recent burn flattens, the projection never reaches zero and the summary says so
+outright ("not finishing at the current pace"), rather than implying a landing that isn't
+coming.
+
+## Accessibility
+
+The accessible name states progress against the plan and the projected landing — **"6 of 11
+days in: 21 points remain vs 20 planned — projected to finish 2 days late."**. The interactive
+entry steps the days; history announces actual vs plan, and the dotted region announces the
+projection.
+
+## Props
+
+<PropTable slug="burn-chart" />

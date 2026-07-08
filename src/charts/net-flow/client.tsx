@@ -164,6 +164,14 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticNetFlow>
+      {p ? (
+        <span
+          className="mc-net-flow-readout mc-spark-readout"
+          style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
+        >
+          {`${fmt(p.in)} / ${fmt(p.out)} · ${signedNet(p.net, fmt)}`}
+        </span>
+      ) : null}
       <span
         aria-live="polite"
         style={{

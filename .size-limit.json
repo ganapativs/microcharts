@@ -479,6 +479,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/burn-chart (static)",
+    "path": "dist/charts/burn-chart/index.js",
+    "limit": "2.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/burn-chart/interactive",
+    "path": "dist/charts/burn-chart/client.js",
+    "limit": "3.8 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",
@@ -493,7 +505,7 @@
   {
     "name": "@microcharts/react/rate-volume/interactive",
     "path": "dist/charts/rate-volume/client.js",
-    "limit": "3.5 kB",
+    "limit": "3.55 kB",
     "gzip": true
   },
   {

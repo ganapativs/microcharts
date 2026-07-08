@@ -184,6 +184,19 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticRateVolume>
+      {bar && datum ? (
+        <span
+          className="mc-rate-volume-readout mc-spark-readout"
+          style={{
+            left: `${((bar.x + bar.width / 2) / geo!.totalWidth) * 100}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {datum.volume > 0 && Number.isFinite(datum.rate)
+            ? `${fmt(datum.rate)} · ${fmtVol(datum.volume)}`
+            : "no events"}
+        </span>
+      ) : null}
       <span
         aria-live="polite"
         style={{

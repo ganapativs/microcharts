@@ -18,6 +18,7 @@ const { IconArray } = await D("icon-array");
 const { RateVolume } = await D("rate-volume");
 const { NetFlow } = await D("net-flow");
 const { RetentionCurve } = await D("retention-curve");
+const { BurnChart } = await D("burn-chart");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -67,6 +68,8 @@ const NF = [
 const KFMT = (n) => `${n}k`;
 const RET = [1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38, 0.379, 0.378];
 const RETB = [1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28, 0.279, 0.278];
+const BPLAN = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];
+const BACT = [40, 35, 31, 27, 24, 21];
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -181,6 +184,13 @@ const body = [
   row("benchmark", svg(RetentionCurve, { data: RET, benchmark: RETB, width: 240, height: 28 })),
   row("smooth", svg(RetentionCurve, { data: RET, curve: "smooth", width: 240, height: 28 })),
   row("still leaking", svg(RetentionCurve, { data: [1, 0.8, 0.6, 0.45, 0.32, 0.22], width: 240, height: 28 })),
+
+  `<h2>BurnChart</h2>`,
+  row("default 80×20", svg(BurnChart, { data: { plan: BPLAN, actual: BACT }, width: 80, height: 20 })),
+  row("behind, gap", svg(BurnChart, { data: { plan: BPLAN, actual: BACT }, width: 240, height: 28 })),
+  row("ahead", svg(BurnChart, { data: { plan: BPLAN, actual: [40, 34, 28, 22, 16, 10] }, width: 240, height: 28 })),
+  row("burn-up", svg(BurnChart, { data: { plan: BPLAN.map((v) => 40 - v), actual: BACT.map((v) => 40 - v) }, mode: "up", width: 240, height: 28 })),
+  row("flatlined", svg(BurnChart, { data: { plan: BPLAN, actual: [40, 38, 37, 36, 36, 36] }, width: 240, height: 28 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

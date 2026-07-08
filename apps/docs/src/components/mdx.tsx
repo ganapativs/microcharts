@@ -43,6 +43,7 @@ import { IconArray } from "@microcharts/react/icon-array";
 import { RateVolume } from "@microcharts/react/rate-volume";
 import { NetFlow } from "@microcharts/react/net-flow";
 import { RetentionCurve } from "@microcharts/react/retention-curve";
+import { BurnChart } from "@microcharts/react/burn-chart";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -105,6 +106,7 @@ export function getMDXComponents(components?: MDXComponents) {
     RateVolume,
     NetFlow,
     RetentionCurve,
+    BurnChart,
     SparkGroup,
     // docs building blocks
     Instrument,

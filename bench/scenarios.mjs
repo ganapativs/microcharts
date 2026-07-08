@@ -369,8 +369,24 @@ export const SCENARIOS = [
     component: "RetentionCurve",
     floor: 12, // step line + plateau scan — few nodes, per-period point loop
     props: (i) => ({
-      data: rugs[i % POOL].map((v, k) => Math.max(0, 1 - k / rugs[i % POOL].length - (v % 3) * 0.02)),
+      data: rugs[i % POOL].map((v, k) =>
+        Math.max(0, 1 - k / rugs[i % POOL].length - (v % 3) * 0.02),
+      ),
       summary: false,
     }),
+  },
+  {
+    slug: "burn-chart",
+    component: "BurnChart",
+    floor: 10, // plan + actual + projection + fit — few nodes, per-period loop
+    props: (i) => {
+      const src = rugs[i % POOL];
+      const total = src.length;
+      const plan = Array.from({ length: total }, (_, k) => Math.max(0, total - k));
+      const actual = src
+        .slice(0, Math.ceil(total / 2))
+        .map((v, k) => Math.max(0, total - k * 0.7 + (v % 3)));
+      return { data: { plan, actual }, summary: false };
+    },
   },
 ];

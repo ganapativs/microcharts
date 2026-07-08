@@ -714,3 +714,48 @@ build 171 pages + docs tests 94, tsc/oxlint/oxfmt/knip clean. Real-browser sweep
 text-on-mark, accent line + dashed ghost + step confirmed, plateau marker present only when flat
 (still-leaking curve → 0 markers), retention 1.0 anchored at the top of the locked frame,
 interactive pairs retention + benchmark.
+
+## Batch 2 wave 2 — BurnChart (2026-07-08)
+
+**BurnChart (plan/23 #8) — full DoD, static + interactive.** Provenance: plan/16 §Q11. The
+dotted-provisional-projection + stated-fit-method rules are honest-encoding (non-negotiable #7),
+not empirical. **Projection method:** linear least-squares slope over the last `max(2, ⌈today/3⌉)`
+actual points; a non-decreasing recent slope (mode=down) → the projection never reaches 0 → no
+landing, summary "not finishing at the current pace". Property-tested (behind/ahead/flatlined).
+
+**Deviations from the plan §8 spec (deliberate):**
+- **Tokens corrected.** plan §8 names `--mc-muted`/`--mc-fg`/`data-mc-ink="ghost"`; the plan line
+  is `data-mc-ink="muted"` (dashed), the actual `data-mc-ink="data"` + inline accent, the
+  projection inline accent + dotted + 0.65 opacity (provisional). The gap label is valence-colored
+  (`--mc-negative` late / `--mc-positive` early) with the SIGN in text (never color-alone).
+- **`work`/`unit` props added** (default "points"/"day") — the summary needs both nouns; the spec
+  examples hard-code them.
+- **Gap label = schedule days** ("+2 d"), the "will we finish on time" answer; suppressed when the
+  burn flatlines (no landing). Interactive announce uses 0-based day index + a "(projected)" clause
+  in the extrapolation region.
+- **Static budget 2.82 kB > spec §8 target 2 kB**, interactive 3.7 kB (spec 3). Under 3/4 hard
+  caps. Same budget-floor class; gate sign-off.
+
+## Batch 2 wave 2 — MISSING VISIBLE HOVER READOUT (2026-07-08, user screenshot review)
+
+All four wave-2 interactive charts (RateVolume/NetFlow/RetentionCurve/BurnChart) shipped with ONLY
+the visually-hidden `aria-live` region and no on-screen value readout — hovering showed a crosshair
++ focus ring but no number. The `.mc-spark-readout` chip (opaque surface, `--mc-surface*` tokens) is
+a GLOBAL zero-specificity style; the fix renders it in each client, positioned at the active point's
+`left: (x/totalWidth)*100%`. Concise per chart (rate·volume / in·out·net / value·benchmark /
+value). Browser tests now assert the chip text so it can't regress. Memory updated
+(chart-legibility-and-review-practices): the visible readout is part of the interactive DoD, not
+optional. Interactive budgets rate-volume 3.5→3.55, burn 3.75→3.8 kB (readout markup, ~10 B).
+
+## PercentileLadder ratio Infinity flake fixed (2026-07-08)
+
+An intermittent property-test failure (`containment: ratio finite`, ~1 in 3 runs) surfaced
+while building wave 2. Root cause in `percentile-ladder/geometry.ts`: `ratio` guarded the RAW
+quotient's finiteness (`Number.isFinite(quotient)`) but then passed it through `round2`, which
+multiplies by 100 FIRST — so a finite-but-huge quotient from denormal fuzz inputs (e.g. a p50
+of 5e-324 → p99/p50 ≈ 1.8e306, ×100 = 1.8e308 > Number.MAX_VALUE) overflowed to Infinity past
+the guard. Fix: guard the ROUNDED result (`const r = round2(quotient); ratio = isFinite(r) ? r
+: 0`). Added a deterministic regression test with the shrunk counterexample. Lesson: `round2`
+(×100 then round) is safe for BOUNDED coordinates but can overflow on an unbounded data-derived
+value — guard after rounding, not before. (The wave-2 charts don't hit this: their round2 sees
+only bounded coords + raw values, and burn's projection guards `Number.isFinite(finishPeriod)`.)

@@ -1,36 +1,30 @@
 "use client";
-// Interactive <RetentionCurve> (plan/23 #7). One pointer listener + nearest-
-// period math. ←/→ step periods; the live region states retention and, when a
-// benchmark is present, its value too. Composes the static component (canon);
-// the crosshair + ghost-value tick are overlay children.
+// Interactive <BurnChart> (plan/23 #8). One pointer listener + nearest-period
+// math across history AND the projection region. ←/→ step days, Home/End jump
+// start/deadline. Composes the static component (canon); the crosshair + marker
+// are overlay children.
 import { useCallback, useMemo, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
-import { retentionGeometry } from "./geometry.js";
-import {
-  RetentionCurve as StaticRetentionCurve,
-  retentionSummary,
-  type RetentionCurveProps,
-} from "./index.js";
+import { EN_BURN, type BurnStrings } from "../../core/strings-burn.js";
+import { burnGeometry } from "./geometry.js";
+import { BurnChart as StaticBurnChart, burnSummary, type BurnChartProps } from "./index.js";
 
-const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits: 0 };
-
-export interface InteractiveRetentionCurveProps extends RetentionCurveProps {
-  strings?: RetentionStrings;
+export interface InteractiveBurnChartProps extends BurnChartProps {
+  strings?: BurnStrings;
 }
 
-export function RetentionCurve(props: InteractiveRetentionCurveProps): React.ReactNode {
+export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
   const {
     data,
-    benchmark,
-    plateau = true,
-    curve = "step",
-    unit = "period",
+    mode = "down",
+    projection = true,
+    work = "points",
+    unit = "day",
     height = 20,
     width = 80,
-    format = PCT,
+    format,
     locale,
-    strings = EN_RETENTION,
+    strings = EN_BURN,
     title,
     summary,
     ...rest
@@ -38,8 +32,16 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
 
   const geo = useMemo(
     () =>
-      retentionGeometry({ width, height, data, benchmark, plateau, curve, domain: props.domain }),
-    [width, height, data, benchmark, plateau, curve, props.domain],
+      burnGeometry({
+        width,
+        height,
+        plan: data.plan,
+        actual: data.actual,
+        mode,
+        projection,
+        domain: props.domain,
+      }),
+    [width, height, data.plan, data.actual, mode, projection, props.domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [active, setActive] = useState<number | null>(null);
@@ -51,10 +53,16 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
         ? summary
         : geo === null
           ? strings.noData
-          : retentionSummary(geo, fmt, unit, data.length, strings);
+          : burnSummary(
+              geo,
+              fmt,
+              { unit, work, mode, elapsed: data.actual.length, total: data.plan.length },
+              strings,
+            );
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const count = geo?.points.length ?? 0;
+  const verb = mode === "down" ? strings.burnRemain : strings.burnDone;
 
   const onPointerMove = useCallback(
     (e: PointerEvent<HTMLElement>) => {
@@ -105,12 +113,25 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
 
   const p = active !== null && geo ? geo.points[active] : undefined;
   const announced = p
-    ? strings.retentionAt(unit, p.period, fmt(p.value), p.bench === null ? null : fmt(p.bench))
+    ? p.actual !== null
+      ? strings.burnAt(
+          unit,
+          p.period,
+          fmt(p.actual),
+          work,
+          verb,
+          p.plan === null ? null : fmt(p.plan),
+        )
+      : p.projected !== null
+        ? strings.burnAtProjected(unit, p.period, fmt(p.projected), work, verb)
+        : p.plan !== null
+          ? strings.burnAt(unit, p.period, fmt(p.plan), work, verb, null)
+          : ""
     : "";
 
   return (
     <span
-      className="mc-retention-curve-live"
+      className="mc-burn-chart-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
       role="img"
@@ -120,12 +141,12 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
       onKeyDown={onKeyDown}
       onBlur={() => setActive(null)}
     >
-      <StaticRetentionCurve
+      <StaticBurnChart
         {...rest}
         data={data}
-        benchmark={benchmark}
-        plateau={plateau}
-        curve={curve}
+        mode={mode}
+        projection={projection}
+        work={work}
         unit={unit}
         width={width}
         height={height}
@@ -155,28 +176,22 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
               strokeWidth={1}
               vectorEffect="non-scaling-stroke"
             />
-            {p.benchY !== null ? (
-              // ghost-value tick — a small hollow mark on the benchmark line
-              <circle
-                cx={p.x}
-                cy={p.benchY}
-                r={1.5}
-                fill="none"
-                stroke="var(--mc-neutral)"
-                strokeWidth={0.8}
-                vectorEffect="non-scaling-stroke"
-              />
-            ) : null}
           </>
         ) : null}
         {rest.children}
-      </StaticRetentionCurve>
+      </StaticBurnChart>
       {p ? (
         <span
-          className="mc-retention-readout mc-spark-readout"
+          className="mc-burn-readout mc-spark-readout"
           style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {p.bench === null ? fmt(p.value) : `${fmt(p.value)} · ${fmt(p.bench)}`}
+          {p.actual !== null
+            ? fmt(p.actual)
+            : p.projected !== null
+              ? `${fmt(p.projected)}⋯`
+              : p.plan !== null
+                ? fmt(p.plan)
+                : ""}
         </span>
       ) : null}
       <span

@@ -42,6 +42,17 @@ describe("percentileLadderGeometry (plan/23 #3)", () => {
     expect(percentileLadderGeometry({ ...base, data: [null, null] })).toBeNull();
   });
 
+  it("denormal inputs keep ratio finite (round2 must not overflow)", () => {
+    // regression: a tiny p50 made p99/p50 ≈ 1.8e306; round2 (×100 first)
+    // overflowed to Infinity past the finiteness guard on the raw quotient
+    const geo = percentileLadderGeometry({
+      ...base,
+      data: [9.06e-18, 5e-324, 0],
+      scale: "linear",
+    })!;
+    expect(Number.isFinite(geo.ratio)).toBe(true);
+  });
+
   test.prop([
     fc.array(fc.double({ noNaN: true, min: -1e4, max: 1e4 }), { minLength: 1, maxLength: 80 }),
     fc.constantFrom<"linear" | "log">("linear", "log"),
