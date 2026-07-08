@@ -29,6 +29,9 @@ jobs:
       - run: pnpm build
       - run: pnpm knip
       - run: pnpm size
+      # generated files must match their sources — never hand-edited (plan/21 §6.0.B)
+      - run: node scripts/gen-size-limits.mjs --check
+      - run: node scripts/sync-sizes.mjs --check
       - run: pnpm dlx publint
       - run: pnpm exec attw --pack .
 

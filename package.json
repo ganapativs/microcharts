@@ -97,6 +97,8 @@
     "test:watch": "vitest",
     "knip": "knip",
     "size": "size-limit",
+    "size:gen": "node scripts/gen-size-limits.mjs",
+    "size:sync": "node scripts/sync-sizes.mjs",
     "bench": "pnpm build && node bench/run.mjs",
     "demo": "pnpm build && node bench/run.mjs && node bench/demo.mjs demo.html",
     "test:visual": "playwright test",
