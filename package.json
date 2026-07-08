@@ -344,6 +344,14 @@
       "types": "./dist/charts/graded-band/client.d.ts",
       "import": "./dist/charts/graded-band/client.js"
     },
+    "./rate-volume": {
+      "types": "./dist/charts/rate-volume/index.d.ts",
+      "import": "./dist/charts/rate-volume/index.js"
+    },
+    "./rate-volume/interactive": {
+      "types": "./dist/charts/rate-volume/client.d.ts",
+      "import": "./dist/charts/rate-volume/client.js"
+    },
     "./icon-array": {
       "types": "./dist/charts/icon-array/index.d.ts",
       "import": "./dist/charts/icon-array/index.js"

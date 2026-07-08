@@ -161,6 +161,10 @@
     "icon-array": {
       "static": "2.2 kB",
       "interactive": "3 kB"
+    },
+    "rate-volume": {
+      "static": "2.6 kB",
+      "interactive": "3.5 kB"
     }
   }
 }

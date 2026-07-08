@@ -15,6 +15,7 @@ const { BenchmarkStrip } = await D("benchmark-strip");
 const { PercentileLadder } = await D("percentile-ladder");
 const { GradedBand } = await D("graded-band");
 const { IconArray } = await D("icon-array");
+const { RateVolume } = await D("rate-volume");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -39,6 +40,17 @@ const DRAWS = Array.from(
   (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
 );
 const COVERAGE = [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10];
+const RV = [
+  { rate: 0.023, volume: 220 },
+  { rate: 0.025, volume: 190 },
+  { rate: 0.028, volume: 160 },
+  { rate: 0.029, volume: 130 },
+  { rate: 0.031, volume: 110 },
+  { rate: 0.034, volume: 90 },
+  { rate: 0.036, volume: 66 },
+  { rate: 0.041, volume: 38 },
+];
+const PCT = { style: "percent", maximumFractionDigits: 1 };
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -116,6 +128,28 @@ const body = [
   row(
     "polarity",
     svg(IconArray, { value: 0.15, of: 20, positive: "down", width: 150, height: 30 }),
+  ),
+
+  `<h2>RateVolume</h2>`,
+  row("default 80×20", svg(RateVolume, { data: RV, format: PCT, width: 80, height: 20 })),
+  row(
+    "minVolume, last",
+    svg(RateVolume, { data: RV, format: PCT, minVolume: 50, width: 240, height: 28 }),
+  ),
+  row("step", svg(RateVolume, { data: RV, format: PCT, curve: "step", width: 240, height: 28 })),
+  row(
+    "zero volume gap",
+    svg(RateVolume, {
+      data: [
+        { rate: 2, volume: 100 },
+        { rate: 9, volume: 0 },
+        { rate: 3, volume: 80 },
+        { rate: 3.4, volume: 120 },
+      ],
+      minVolume: 90,
+      width: 240,
+      height: 28,
+    }),
   ),
 ].join("\n");
 

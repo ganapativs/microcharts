@@ -49,6 +49,7 @@ import benchmarkStrip from "./benchmark-strip";
 import percentileLadder from "./percentile-ladder";
 import gradedBand from "./graded-band";
 import iconArray from "./icon-array";
+import rateVolume from "./rate-volume";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -90,6 +91,7 @@ const MODULES: ChartModule[] = [
   percentileLadder,
   gradedBand,
   iconArray,
+  rateVolume,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

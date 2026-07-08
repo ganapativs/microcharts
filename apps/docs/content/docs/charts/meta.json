@@ -41,6 +41,7 @@
     "benchmark-strip",
     "percentile-ladder",
     "graded-band",
-    "icon-array"
+    "icon-array",
+    "rate-volume"
   ]
 }

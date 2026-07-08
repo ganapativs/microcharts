@@ -19,6 +19,7 @@ import { EN_TIMELINE } from "./strings-timeline.js";
 import { EN_COVERAGE } from "./strings-coverage.js";
 import { EN_QUANTILE } from "./strings-quantile.js";
 import { EN_FREQ } from "./strings-freq.js";
+import { EN_RATE_VOLUME } from "./strings-rate-volume.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -38,4 +39,5 @@ export const EN: SummaryStrings = {
   ...EN_COVERAGE,
   ...EN_QUANTILE,
   ...EN_FREQ,
+  ...EN_RATE_VOLUME,
 };

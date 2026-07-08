@@ -87,6 +87,8 @@ export default defineConfig({
     "src/charts/graded-band/client.tsx",
     "src/charts/icon-array/index.tsx",
     "src/charts/icon-array/client.tsx",
+    "src/charts/rate-volume/index.tsx",
+    "src/charts/rate-volume/client.tsx",
   ],
   format: ["esm"],
   dts: true,

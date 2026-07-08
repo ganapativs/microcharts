@@ -246,6 +246,14 @@
     stroke-opacity: 0.35;
     stroke-width: 0.5;
   }
+  /* RateVolume ghost bars — the volume denominator, deliberately low-precision
+     context behind the rate line (never a second precise series). Static neutral
+     fill lives here (not inline) to earn the forced-colors mapping below. */
+  :where(.mc-root [data-mc-ink="ghost"]) {
+    fill: var(--mc-neutral);
+    fill-opacity: 0.18;
+    stroke: none;
+  }
   /* PercentileLadder tail flag — the emphasised accent tick/dot. Element-split:
      the line strokes, the dot fills. `color` prop still overrides inline. */
   :where(.mc-root line[data-mc-ink="flag"]) {
@@ -420,6 +428,10 @@
       fill: Canvas;
       stroke: GrayText;
       stroke-opacity: 1;
+    }
+    /* ghost volume bars → quiet system ink, still readable as background context */
+    :where(.mc-root [data-mc-ink="ghost"]) {
+      fill: GrayText;
     }
     /* tail flag keeps its emphasis, mapped to the system accent */
     :where(.mc-root line[data-mc-ink="flag"]) {

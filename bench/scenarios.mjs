@@ -345,4 +345,14 @@ export const SCENARIOS = [
     floor: 7, // 20 units/render — N-node class (measured ~15 rows/ms, half-floor)
     props: (i) => ({ value: (i % 20) / 20, of: 20, summary: false }),
   },
+  {
+    slug: "rate-volume",
+    component: "RateVolume",
+    floor: 3, // 1 bar + object alloc/period — N-node class (measured ~7.6 rows/ms, half-floor)
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, k) => ({ rate: v, volume: 40 + ((k * 7) % 120) })),
+      minVolume: 50,
+      summary: false,
+    }),
+  },
 ];

@@ -197,6 +197,29 @@ export interface SummaryStrings {
   iconArray: (k: number, n: number, pct: string, note: "none" | "all" | "sub" | null) => string;
   /** Icon-array unit announcement, e.g. "Unit 7 of 20 — filled. 3 of 20 filled." */
   iconArrayUnit: (index: number, n: number, filled: boolean, filledCount: number) => string;
+  /** Rate-volume summary, e.g. "4.1% on 38 events (low volume); up from 2.3% across 12 periods." */
+  rateVolume: (
+    rateLast: string,
+    volumeLast: string,
+    unit: string,
+    low: boolean,
+    direction: "up" | "down",
+    rateFirst: string,
+    n: number,
+  ) => string;
+  /** Rate-volume, single/degenerate, e.g. "4.1% on 38 events (low volume)." */
+  rateVolumeShort: (rateLast: string, volumeLast: string, unit: string, low: boolean) => string;
+  /** Rate-volume period announcement, e.g. "Period 4 of 12: 4.1% on 38 events (low volume)." */
+  rateVolumeAt: (
+    position: number,
+    total: number,
+    rate: string,
+    volume: string,
+    unit: string,
+    low: boolean,
+  ) => string;
+  /** Rate-volume zero-volume period, e.g. "Period 5 of 12: no events." */
+  rateVolumeNoEvents: (position: number, total: number) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

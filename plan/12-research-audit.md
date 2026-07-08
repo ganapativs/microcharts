@@ -601,3 +601,53 @@ at `labelX`, still colored like the dot so it stays tied to the focal value. The
 same gutterCh/font so its `totalWidth` matches (pointer math). GradedBand's `22` stays in-band — a
 dark `data-mc-ink="label"` over its pale accent band reads fine. Rule: a mark-colored label over a
 same-tone band → gutter it; only dark-over-pale may stay in-band.
+
+## Batch 2 wave 2 — RateVolume (2026-07-08)
+
+**RateVolume (plan/23 §5) — full DoD, static + interactive.** Provenance: plan/16 §Q16;
+the "always show the denominator" thesis is design-principle (honest-encoding non-negotiable
+#7), not an empirical study — no external claim asserts otherwise. Ghost bars have NO removal
+prop by design (a rate without its volume is the lie the type prevents).
+
+**Deviations from the plan §5 spec (all deliberate, none change the data story):**
+- **`curve` dropped `"smooth"`.** Spec lists only `"linear" | "step"`. A smooth (Catmull-Rom)
+  rate line would imply between-period rate values that were never measured — dishonest for a
+  per-period rate. Dropping `smoothPath` also trimmed the static ~0.14 kB (2.73 → 2.59 kB).
+- **`unit?: string` prop added (default `"events"`).** The summary template requires a volume
+  noun (`… on 38 events …`); the spec's example hard-codes "events" but lists no prop. One
+  minimal prop keeps it i18n-able and per-instance ("orders", "sessions").
+- **Interactive announce = `"Period N of M: …"`**, not the spec example's `"March: …"`. The
+  data shape carries no period labels, so an index is the honest identifier (matches OHLC/stack/
+  vs). The summary uses the template's literal "across N periods" (the spec example's "12 weeks"
+  was illustrative; the template string says "periods").
+- **Static budget 2.55 kB > spec §5 target 2.5 kB** (Chart wrapper + scale + line/step path +
+  strings floor), interactive 3.42 kB (spec 3.5). Both UNDER the 3/4 kB hard caps. Budget set to
+  measured + headroom (2.6/3.5). Same budget-floor class as W1; needs user sign-off at the gate.
+
+**New `data-mc-ink="ghost"` ink-role** (`styles.css`): the volume denominator, static neutral
+fill at 0.18 opacity, with a forced-colors mapping to `GrayText` (stays quiet background context,
+never competes with the rate line). Static color lives in the CSS role (not inline) to earn that
+mapping — same discipline as `gap`/`unit-off`.
+
+**Two craft bugs the SSR gate missed, caught by the mandatory real-browser getBBox sweep:**
+1. **`round2` on the DATA values destroyed fractional-rate precision.** The geometry rounded
+   `last.rate`/`firstRate` to 2 dp (correct for COORDINATES, wrong for values used in labels +
+   summary): a percent-fraction rate `0.041` collapsed to `0.04`, so the endpoint label rendered
+   **"4%" instead of "4.1%"** and the reserved gutter was mis-sized. FIX: rate/volume are data
+   values — never coordinate-rounded; only x/y/width/height are. Lesson for any chart whose data
+   are small fractions: `round2` is for pixels, never for a value you will format.
+2. **Endpoint label escaped the viewBox.** (a) The gutter char-width over-estimate `0.62·em`
+   undershoots the wide `%` glyph → horizontal escape; bumped to `0.72·em`. (b) A label tracking
+   the endpoint's Y escaped top/bottom at rate extremes — the endpoint readout is now vertically
+   centered in the gutter (`labelY = height/2`, central baseline), a cleaner "current value"
+   readout that never escapes. Sweep after fix: 0 escapes, 0 text-on-mark, ghost fillOpacity 0.18,
+   label 11px (matches the old ~10.5px reference).
+
+**Docs circular-import TDZ trap.** `rate-volume.client.tsx` imports the shared `DEMO` from its
+registry parent `rate-volume.tsx`, which in turn imports `InteractiveDemo` from the client — a
+cycle. Computing `const FRAC = DEMO.map(...)` at the client's MODULE TOP LEVEL ran during the
+parent's mid-initialization (before its `DEMO` const executed) → `ReferenceError: Cannot access
+'f' before initialization` at static-export time (crashed the build, and knocked out delta's page
+too via the shared chunk). FIX: touch the imported data only INSIDE the component body, never at
+client module top level (seismogram.client already did this — the rule was implicit). Pattern for
+every shared-DEMO docs client.

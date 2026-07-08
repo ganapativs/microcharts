@@ -22,6 +22,14 @@ const SURVEY = [
   { label: "Strongly agree", value: 28 },
 ];
 
+const RV = [
+  { rate: 2.3, volume: 120 },
+  { rate: 3.1, volume: 90 },
+  { rate: 2.8, volume: 140 },
+  { rate: 3.6, volume: 70 },
+  { rate: 4.1, volume: 38 },
+];
+
 const CASES = [];
 const add = (slug, comp, variants, sizes) => CASES.push({ slug, comp, variants, sizes });
 
@@ -495,6 +503,21 @@ add(
   [
     [80, 12],
     [160, 16],
+  ],
+);
+add(
+  "rate-volume",
+  "RateVolume",
+  [
+    { data: RV },
+    { data: RV, minVolume: 50 },
+    { data: RV, curve: "step" },
+    { data: RV, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
   ],
 );
 add(
