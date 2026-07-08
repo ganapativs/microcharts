@@ -14,6 +14,10 @@ describe("interactive <GradedBand> (plan/23 #4)", () => {
     await expect.poll(() => live.textContent).toBe("50% interval: 25 to 75.");
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
     await expect.poll(() => live.textContent).toBe("95% interval: 2.5 to 97.5.");
+    // a VISIBLE readout chip shows the band's level + bounds
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("95% 2.5–97.5");
     // both edge ticks present for the active band
     expect(wrap.querySelectorAll("svg line").length).toBeGreaterThanOrEqual(3);
   });

@@ -12,9 +12,13 @@ describe("interactive <CoverageStrip> (plan/23 #1)", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("Slot 1: 3.");
+    // a VISIBLE readout chip shows the measured value
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("3");
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     await expect.poll(() => live.textContent).toBe("Slot 3: no measurement.");
+    // the chip distinguishes a gap from a measured zero
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("no data");
     // focus ring overlay present (4 cells + ring)
     expect(wrap.querySelectorAll("svg rect").length).toBe(5);
   });

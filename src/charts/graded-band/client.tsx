@@ -155,6 +155,17 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticGradedBand>
+      {band ? (
+        <span
+          className="mc-graded-band-readout mc-spark-readout"
+          style={{
+            left: `${((band.x + band.width / 2) / geo!.totalWidth) * 100}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {`${band.p}% ${fmt(band.lo)}–${fmt(band.hi)}`}
+        </span>
+      ) : null}
       <span
         aria-live="polite"
         style={{

@@ -162,6 +162,17 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         ) : null}
         {rest.children}
       </StaticCoverageStrip>
+      {cell ? (
+        <span
+          className="mc-coverage-readout mc-spark-readout"
+          style={{
+            left: `${((cell.x + cell.w / 2) / geo.totalWidth) * 100}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {!cell.present ? "no data" : cell.value === null ? "measured" : fmt(cell.value)}
+        </span>
+      ) : null}
       <span
         aria-live="polite"
         style={{

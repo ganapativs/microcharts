@@ -14,6 +14,8 @@ describe("interactive <PercentileLadder> (plan/23 #3)", () => {
     await expect.poll(() => live.textContent).toBe("p99: 99 — 2× the median.");
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     await expect.poll(() => live.textContent).toBe("p50: 50 — 1× the median.");
+    // a VISIBLE readout chip shows the tick's percentile + value
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("p50 50");
     expect(wrap.querySelectorAll("svg line").length).toBeGreaterThanOrEqual(2);
   });
 

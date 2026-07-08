@@ -158,6 +158,14 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         ) : null}
         {rest.children}
       </StaticPercentileLadder>
+      {tick ? (
+        <span
+          className="mc-ladder-readout mc-spark-readout"
+          style={{ left: `${(tick.x / width) * 100}%`, transform: "translateX(-50%)" }}
+        >
+          {`p${tick.p} ${fmt(tick.value)}`}
+        </span>
+      ) : null}
       <span
         aria-live="polite"
         style={{
