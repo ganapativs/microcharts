@@ -129,6 +129,9 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {/* fill via inline STYLE, not attribute: the data-mc-ink="band" CSS rule
+          (kept for the craft/overlap + forced-colors exemption) would otherwise
+          override a fill attribute to the faint --mc-band token. plan/12. */}
       <rect
         x={geo.outer.x}
         y={geo.bandY}
@@ -136,8 +139,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
         height={geo.bandH}
         rx={1.5}
         data-mc-ink="band"
-        fill="var(--mc-neutral)"
-        fillOpacity={0.16}
+        style={{ fill: "var(--mc-neutral)", fillOpacity: 0.16 }}
       />
       <rect
         x={geo.inner.x}
@@ -146,8 +148,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
         height={geo.bandH}
         rx={1.5}
         data-mc-ink="band"
-        fill="var(--mc-neutral)"
-        fillOpacity={0.34}
+        style={{ fill: "var(--mc-neutral)", fillOpacity: 0.34 }}
       />
       {median ? (
         <line

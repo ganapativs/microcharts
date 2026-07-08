@@ -135,10 +135,11 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           height={geo.bandH}
           rx={geo.bandH / 2}
           data-mc-ink="band"
-          fill={color ?? "var(--mc-accent)"}
-          fillOpacity={OPACITY(0, k) * 0.5}
+          style={{ fill: color ?? "var(--mc-accent)", fillOpacity: OPACITY(0, k) * 0.5 }}
         />
       ) : null}
+      {/* fill via inline STYLE (see benchmark-strip): the band ink-role CSS
+          would override a fill attribute to the faint --mc-band token. plan/12. */}
       {geo.bands.map((b) => (
         <rect
           key={b.p}
@@ -148,8 +149,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           height={geo.bandH}
           rx={softEdge ? geo.bandH / 2 : 1}
           data-mc-ink="band"
-          fill={color ?? "var(--mc-accent)"}
-          fillOpacity={OPACITY(b.step, k)}
+          style={{ fill: color ?? "var(--mc-accent)", fillOpacity: OPACITY(b.step, k) }}
         />
       ))}
       <line
