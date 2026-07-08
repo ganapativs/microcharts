@@ -94,6 +94,3 @@ export function uniformBins(
 
   return { bins, step, total, maxCount, domain: [d0, d1], binOf };
 }
-
-/** Alias — batch docs reference both `bin.uniformBins` and `bin.uniform`. */
-export const uniform = uniformBins;

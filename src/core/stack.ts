@@ -78,9 +78,6 @@ export function normalizeShares(
   return { shares, total };
 }
 
-/** Alias — batch docs reference both `normalizeShares` and `normalizedShares`. */
-export const normalizedShares = normalizeShares;
-
 /** Segment coordinates never emit -0 (ugly in SVG output + test assertions). */
 const z = (v: number): number => (v === 0 ? 0 : v);
 

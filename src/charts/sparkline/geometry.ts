@@ -7,7 +7,7 @@ import { seriesStats } from "../../core/stats.js";
 import { isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
 
 /** Series longer than this auto-decimate for line drawing (documented guard). */
-export const DEFAULT_MAX_POINTS = 200;
+const DEFAULT_MAX_POINTS = 200;
 
 /** A placed mark: its position (viewBox px) + the underlying data value/index. */
 interface Mark {

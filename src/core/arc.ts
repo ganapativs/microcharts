@@ -121,7 +121,6 @@ export function annulusSector(
 
 /** Alias — ring charts (track/value arc) reference `annulusArc`; the geometry
  *  is the annulus sector with butt ends. */
-export const annulusArc = annulusSector;
 
 /** Circular arc length for the sweep (clamped to one turn), 2-dp — feeds
  *  stroke-dasharray so dash math is exact at any radius. 0 when degenerate. */

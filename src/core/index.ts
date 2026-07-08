@@ -16,7 +16,7 @@ export {
   type Dotplot,
   type DotplotDot,
 } from "./quantile.js";
-export { uniformBins, uniform, type Bin, type UniformBins } from "./bin.js";
+export { uniformBins, type Bin, type UniformBins } from "./bin.js";
 export {
   TAU,
   polarPoint,
@@ -24,21 +24,19 @@ export {
   arcPath,
   sector,
   annulusSector,
-  annulusArc,
   arcLength,
   evenDashes,
 } from "./arc.js";
 export {
   stackSeries,
   normalizeShares,
-  normalizedShares,
   divergingStack,
   type StackLayer,
   type StackedSeries,
   type DivergingSegment,
   type DivergingStack,
 } from "./stack.js";
-export { maxPerBucket, envelope } from "./downsample.js";
+export { maxPerBucket, envelope, decimateMinMax, type IndexedValue } from "./downsample.js";
 export {
   parseUTCDay,
   isoDate,

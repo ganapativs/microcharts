@@ -7,7 +7,6 @@ import {
   arcPath,
   sector,
   annulusSector,
-  annulusArc,
   arcLength,
   evenDashes,
 } from "./arc.js";
@@ -79,8 +78,6 @@ describe("arcPath / sector / annulusSector (edge matrix)", () => {
   it("rInner is clamped to rOuter", () => {
     expect(annulusSector(12, 12, 10, 99, 0, 1)).toBe(annulusSector(12, 12, 10, 10, 0, 1));
   });
-
-  it("annulusArc is an alias", () => expect(annulusArc).toBe(annulusSector));
 
   it("sweep beyond one turn is clamped", () => {
     expect(arcPath(12, 12, 10, 0, 3 * TAU)).toBe(arcPath(12, 12, 10, 0, TAU));

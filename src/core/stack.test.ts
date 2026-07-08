@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { test, fc } from "@fast-check/vitest";
-import { stackSeries, normalizeShares, normalizedShares, divergingStack } from "./stack.js";
+import { stackSeries, normalizeShares, divergingStack } from "./stack.js";
 import { type Value } from "./types.js";
 
 const finite = fc.double({ noNaN: true, noDefaultInfinity: true, min: -1e6, max: 1e6 });
@@ -91,8 +91,6 @@ describe("normalizeShares (edge matrix)", () => {
     expect(r.total).toBe(8);
     expect(r.shares).toEqual([0.75, 0, 0, 0, 0.25]);
   });
-
-  it("normalizedShares is an alias", () => expect(normalizedShares).toBe(normalizeShares));
 });
 
 describe("normalizeShares (invariants)", () => {

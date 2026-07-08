@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { test, fc } from "@fast-check/vitest";
-import { uniformBins, uniform } from "./bin.js";
+import { uniformBins } from "./bin.js";
 
 const finite = fc.double({ noNaN: true, noDefaultInfinity: true, min: -1e6, max: 1e6 });
 
@@ -64,8 +64,6 @@ describe("uniformBins (edge matrix)", () => {
   it("nulls ignored", () => {
     expect(uniformBins([null, 1, null, 9])!.total).toBe(2);
   });
-
-  it("uniform is an alias", () => expect(uniform).toBe(uniformBins));
 });
 
 describe("uniformBins (invariants)", () => {
