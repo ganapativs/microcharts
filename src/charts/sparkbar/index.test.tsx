@@ -35,6 +35,18 @@ describe("<SparkBar> static structure (plan/05, plan/09)", () => {
     expect(inks).toEqual(new Set(["positive", "negative"]));
   });
 
+  it("win-loss tie (0) → thin neutral dash on the mid-line, never valence ink", () => {
+    const { container } = draw(<SparkBar data={[1, 0, -1]} mode="winloss" height={20} />);
+    const rects = [...container.querySelectorAll("rect")];
+    const tie = rects[1]!;
+    expect(tie.getAttribute("data-mc-ink")).toBe("bar");
+    expect(Number(tie.getAttribute("height"))).toBe(1);
+    // sits on the mid-line: win above it, loss below it
+    const [win, , loss] = rects;
+    expect(Number(win!.getAttribute("y"))).toBeLessThan(Number(tie.getAttribute("y")));
+    expect(Number(loss!.getAttribute("y"))).toBeGreaterThan(Number(tie.getAttribute("y")));
+  });
+
   it("rects use crispEdges", () => {
     const { container } = draw(<SparkBar data={D} />);
     expect(container.querySelector("rect")!.getAttribute("shape-rendering")).toBe("crispEdges");

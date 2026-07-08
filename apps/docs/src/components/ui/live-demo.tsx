@@ -2,6 +2,7 @@
 import { useState, type ReactNode } from "react";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { cn } from "@/lib/cn";
+import { CHART_GZIP } from "@/lib/stats";
 
 type Tab = "preview" | "code";
 
@@ -15,6 +16,7 @@ export function LiveDemo({
   lang = "tsx",
   label,
   meta,
+  sizeOf,
   grid = false,
 }: {
   children: ReactNode;
@@ -22,9 +24,14 @@ export function LiveDemo({
   lang?: string;
   label?: string;
   meta?: string;
+  /** Chart slug — renders the MEASURED static gzip size as the meta text, so
+      doc pages never hand-key a number that can go stale. */
+  sizeOf?: string;
   grid?: boolean;
 }) {
   const [tab, setTab] = useState<Tab>("preview");
+  const size = sizeOf ? CHART_GZIP[sizeOf]?.static : undefined;
+  const metaText = meta ?? (size !== undefined ? `static · ${size} kB` : undefined);
 
   return (
     <div className="not-prose my-6 panel overflow-hidden">
@@ -33,8 +40,8 @@ export function LiveDemo({
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-b border-hairline px-3 py-2">
         {label ? <span className="mono-label whitespace-nowrap pl-1">{label}</span> : <span />}
         <div className="flex items-center gap-2">
-          {meta ? (
-            <span className="mono-label mr-1 whitespace-nowrap opacity-70">{meta}</span>
+          {metaText ? (
+            <span className="mono-label mr-1 whitespace-nowrap opacity-70">{metaText}</span>
           ) : null}
           <div role="tablist" aria-label="Demo view" className="seg">
             {(["preview", "code"] as const).map((t) => (

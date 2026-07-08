@@ -30,7 +30,7 @@ export const entry: ChartEntry = {
       name: "mode",
       type: '"bar" | "winloss"',
       required: false,
-      description: "Magnitude bars or binary streak.",
+      description: "Magnitude bars, or a win/loss/tie streak (sign only).",
     },
     {
       name: "gap",
