@@ -2,7 +2,7 @@
 
 > **Single source of truth for what's done.** Mirrors the step IDs in [10-roadmap.md](10-roadmap.md).
 > Update this file in the **same commit** as the work it tracks. Roadmap = the plan (stable); STATUS = live progress.
-> Last updated: **2026-07-08** (Phase 3 round 10 — light material redo to cool/lightweight/matte/white-consistent + docs perf + button-hover fix + footer-pill nav dedup; see round-10 note below) · Env: node 24.18, pnpm 11.10.0 (this repo) · Git: **pushed** to `github.com/ganapativs/microcharts` (**private**), branch `main`. CI green.
+> Last updated: **2026-07-08** (round 11 — **SCOPE DECISION: all charts, one package, before launch; catalog expanded 96 → 100** (research-verified MicroScatter/LikertStrip/IconArray/ConfusionGrid) → plan/21 master + plan/22–25 batch specs authored (~2,800 lines); craft bar §8a added; bullet `.toSorted` ES2022 fix landed; plan/07/10/15/README/12 + CLAUDE.md amended; see Phase 3.75 section) · Env: node 24.18, pnpm 11.10.0 (this repo) · Git: **pushed** to `github.com/ganapativs/microcharts` (**private**), branch `main`. CI green.
 > CI matrix is Node **22/24** only (pnpm 11 needs Node ≥22 via `node:sqlite`; Node 20 EOL). Published artifact stays node-20-safe (`engines: >=20`).
 >
 > **Account-gated setup still pending (one-time, not code):** npmjs.org Trusted Publisher for `@microcharts/react` (release.yml uses OIDC, no token); `ARGOS_TOKEN` repo secret (visual.yml). Both needed before their workflows actually publish/upload.
@@ -27,6 +27,8 @@
 **Phase 3 largely done (2026-07-07):** `apps/docs` Fumadocs site is built, browser-verified, `pnpm --filter @microcharts/docs build` (static export, 54 pages) + docs tests green; discoverability P0 (3.5) wired from the first route (plan/20 metadata contract, JSON-LD, llms/catalog, OG, sitemap/robots). **Remaining in Phase 3:** Storybook 10 workshop (3.1, deferred — docs `LiveDemo` covers previews), README pitch + npm homepage→docs (3.3/plan/20 §10), changesets releases (3.4), then Checkpoint 3 (cold-dev testing). Argos visual baselines recorded (build #1, 2026-07-06); the Delta glyph fix will legitimately update the Delta baseline on the next run.
 
 **Phase-2 deferred (documented, not blocking Phase 3):** doc *pages* land with Fumadocs in Phase 3 (compiled 4-context examples seeded in `tests/visual/*.spec.ts` + `bench/demo.mjs`); bench **competitor matrix** deferred to launch prep (not competing pre-1.0).
+
+**SCOPE DECISION 2026-07-08 (user):** the release-scope fork is resolved — **all 100 catalog types ship in `@microcharts/react` (single package, `@microcharts/expressive` cancelled) BEFORE launch** (96 planned + 4 research-verified additions 2026-07-08: MicroScatter #35, LikertStrip #36, IconArray Q21, ConfusionGrid F21 — plan/12 audit). Master plan [21-full-catalog-buildout.md](21-full-catalog-buildout.md); batch briefs plan/22–25; Checkpoint 3 + Phase 4 launch move after the buildout (Phase 3.75). Next execution front = **Batch 0** (plan/21 §6): docs registry refactor → size/stats generators → kernel additions → shipped-five hardening/variant pass.
 
 Pending one-time account setup (unblocks release/visual workflows): npmjs Trusted Publisher for `@microcharts/react`, `ARGOS_TOKEN` secret.
 
@@ -129,11 +131,22 @@ Verified via preview (forces reduced-transparency → real frost injected to che
 
 **Workshop decision (3.1):** shipped an **in-docs interactive Playground** (prop controls → live chart + live code readout, `src/components/charts/playground.tsx`) instead of a standalone **Storybook 10** — per the user's "Fumadocs supports components / maybe don't need Storybook" steer, keeping the workshop inside the already-deployable docs with zero extra deps. Standalone Storybook 10 (visual-test workshop + theme/viewport matrix) remains available as a plan item if a dedicated tool is later wanted; the library's axe DoD is already met by unit tests (`src/test/a11y.ts`).
 
-## Phase 4 — Launch `[ ]`
+## Phase 3.75 — Full-catalog buildout `[ ]` (ADDED 2026-07-08 — plan/21; pre-launch)
+
+| Batch | Scope | State | Note |
+|---|---|---|---|
+| Planning | plan/21 master + plan/22–25 batch briefs + plan/05/06/07/10/12/15/16/17/README + CLAUDE.md + gallery amendments | [x] | Authored 2026-07-08 (round 11). Budget model v2; single-package decision; catalog 96 → 100 (plan/12 audit); craft bar plan/21 §8a; slug table for all 100; gallery = 100 tiles. Bullet `.toSorted()` ES2022 violation fixed (spun-off task) + Batch 0 gains ES2023-grep CI guard. |
+| 0 Foundation & hardening | docs registry refactor · size/stats generators · kernel adds (quantile/bin/arc/stack/downsample/calendar/jitter) · shipped-five variant+perf pass · edge-case fixture extraction · bench registry | [ ] | Spec: plan/21 §6. **Start here.** |
+| 1 Core completion (29 + annotations) | plan/22 | [ ] | Gate: full DoD ×29, Argos approved, bench green, craft bar §8a. |
+| 2 Decision micrographs (21) | plan/23 | [ ] | Gate: DoD ×21 + research-claim audit entries + craft bar. |
+| 3 Expressive (22, in-package) | plan/24 | [ ] | Gate: DoD ×22 + reduced-motion equivalents verified + craft bar. |
+| 4 Frontier (21) + release sync | plan/25 | [ ] | Gate: DoD ×21 + plan/20 §14 P0 + Checkpoint 3 + craft bar. |
+
+## Phase 4 — Launch `[ ]` (now AFTER Phase 3.75 — plan/10 amendment 2026-07-08)
 Not started. `1.0.0` → Show HN → dev.to → awesome-lists → PH. **Pre-flight = plan/20 §14 P0 checklist; launch-week P1 items ride 4.2–4.5; analytics cadence per §13. Deferred bench competitor matrix lands here (comparison pages need measured data — plan/20 §9).**
 
-## Phase 5+ — Catalog / universal rendering / AI-native / decision / frontier / expressive `[ ]`
-Not started. Post-launch, demand-ordered. See [10-roadmap.md](10-roadmap.md) §5–5c, [13](13-universal-rendering.md)/[14](14-ai-native.md)/[15](15-expressive-charts.md)/[16](16-decision-micrographs.md)/[17](17-frontier-charts.md).
+## Phase 5+ — Ecosystem: CLI / universal rendering / AI-native `[ ]`
+Not started. Post-launch. Chart content of old Phases 5/5b′/5c′/5c moved into Phase 3.75 (2026-07-08). See [10-roadmap.md](10-roadmap.md) §5–5b, [13](13-universal-rendering.md)/[14](14-ai-native.md).
 
 ---
 

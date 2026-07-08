@@ -227,3 +227,54 @@ User asked to add [env.style](https://env.style) for per-environment favicon col
 | Static-export (`output: 'export'`) support **undocumented** | Risk: our docs deploy is static; unverified it injects the icon link without a runtime |
 
 **Decision:** delivered the capability natively instead — `lib/env-badge.ts` (env detection mirroring env.style's order) + `app/icon.tsx` / `app/apple-icon.tsx` (ImageResponse, `force-static`) tint the favicon squircle per env: production = cobalt `#2f52d4`, staging/preview = ember `#c2410c`, development = teal `#0f766e`. Zero new deps, resolved at build time, static-export-safe. Swap to the `env.style` package if it matures (multi-release history + a static-export note).
+
+
+## Full-catalog buildout decision cycle (2026-07-08, user-directed)
+
+Scope decision by the user (resolves the release-scope fork left open in the round-10 handoff):
+**all 96 catalog types ship in `@microcharts/react`, single package, before launch.** Master doc:
+[21-full-catalog-buildout.md](21-full-catalog-buildout.md); batch specs docs 22–25.
+
+| Claim / decision | Provenance & verdict |
+| --- | --- |
+| `@microcharts/expressive` separate-package rationale was marketing/timing framing, not technical | CONFIRMED by re-audit of plan/15 + roadmap 5c: the plan itself states "same grammar, tokens, a11y summaries, and budgets as core"; no bundle/technical driver was ever recorded. Subpath exports already give per-type tree-shaking. Reversal is safe; recorded in plan/15 header. |
+| "≤ 10 kB whole library" budget impossible at 96 types | CONFIRMED arithmetic (96 × ~1.5–3 kB static minus shared-kernel dedupe ≫ 10 kB). Gate measured the wrong unit (users import subpaths). Budget model v2 in plan/21 §1; plan/07 amended; plan/README headline amended. All external "≤ 10 kB library" claims must be purged (Batch 0.E / Batch 4 release sync). |
+| Per-chart specs in docs 22–25 (props, variants, geometry, interaction, summaries) | NEW DESIGN WORK, derived from plan/05/15/16/17 one-liners + domain knowledge — provenance class: internal design, not external research. Research-backed constraints inherited from source docs keep their original provenance class. |
+| FatDigits (E1) adaptation: FatFonts custom glyphs → variable-font-weight tiers on the inherited font | FLAGGED deviation from Nacenta et al. FatFonts (which uses purpose-built glyphs where ink ∝ value). Weight tiers are a weaker, discrete encoding; documented as such in the batch-3 spec. Driver: zero-dep rule (custom font = asset dependency). |
+| BenchmarkStrip (Q5) "strongest research" claim | STILL FLAGGED — plan/16 cites no study for Q5 specifically (design rationale only). Carried into batch-2 spec open questions; resolve or soften the claim before its docs page ships. |
+| QuantileDots micro dot count 15–20 vs studied 50-dot design | FLAGGED (pre-existing, re-confirmed) — validate read-back at reduced count during Batch 2 review. |
+| TokenConfidence discrete-tier encoding | FLAGGED (pre-existing) — 2026 preprint "cited cautiously" per plan/17; keep the hedge in docs copy. |
+| Roadmap 5c flagship list included ConfettiBurst | CORRECTED — ConfettiBurst was cut/relocated to `<Marker celebrate>` in plan/15's own ledger; stale cross-reference fixed in plan/10 amendment. |
+
+
+## Catalog expansion 96 → 100 (2026-07-08, user-directed, research-verified same day)
+
+User asked for obvious-gap additions to a round 100 — "don't force a chart type." Gap analysis over
+the full 96 + live literature verification (WebSearch, 2026-07-08). Four admitted, four rejected.
+
+| Addition | Evidence | Verdict |
+| --- | --- | --- |
+| **MicroScatter** (#35 core) — relationship/correlation point cloud | Harrison, Yang, Franconeri & Chang, InfoVis 2014 "Ranking Visualizations of Correlation Using Weber's Law" (n=1687): scatterplots highest-precision correlation display, low between-subject variance, both correlation signs; Rensink & Baldridge 2010. Follow-up reanalysis (Kay & Heer "Beyond Weber's Law") refines but does not overturn the scatterplot ranking. | CONFIRMED — the one classical form the catalog lacked; "relationship" data story previously unserved (QuadrantDot = field position, PhaseTrace = trajectory). |
+| **LikertStrip** (#36 core) — diverging stacked bar, neutral-centered | Heiberger & Robbins, J. Statistical Software 57(5), "Design of Diverging Stacked Bar Charts for Likert Scales and Other Applications" — recommended primary display for Likert data. Known critique (Datawrapper "The case against diverging stacked bars") centers on neutral placement/comparability — spec mitigates: explicit neutral split at center + direct labels + `neutral` handling documented. | CONFIRMED with recorded counter-argument (both sides cited in docs page later). |
+| **IconArray** (Q21 decision) — k-of-N frequency grid for a stated rate | Garcia-Retamero, Galesic & Gigerenzer, Medical Decision Making 30(6) 2010: icon arrays reduce denominator neglect; Garcia-Retamero & Cokely, CDPS 2013 (visual aids improve risk comprehension, esp. low-numeracy). Purest expression of plan/16 system rule #3 (frequency beats probability). | CONFIRMED — distinct from PictogramRow (real small-set counts) and QuantileDots (forecast distributions). |
+| **ConfusionGrid** (F21 frontier) — k×k agreement matrix, diagonal accented | Standard classifier-eval display; generalizations: Neo (Apple, CHI 2022, arXiv:2110.12536), ConfusionFlow (TVCG, arXiv:1910.00969). Micro rules: ≤ 4×4, row-normalized default, diagonal never color-alone. | CORROBORATED — established professional instrument (lineage-based, like TapeGauge/TimeInRange), not a lab-tested micro form. |
+
+Rejected the same day (recorded so they aren't re-litigated without new evidence): **beeswarm/strip
+plot** (overlaps rug-strip + micro-box + quantile-dots; no unique decision story), **compass/bearing**
+(wind-barb covers direction+magnitude; bare bearing is a glyph, not a chart), **micro-Sankey**
+(link crossings unreadable at ≤ 200×60; partition-strip + data-diff cover the stories),
+**micro-ECDF** (percentile-ladder + histogram-strip cover; curve-reading needs training).
+
+Also this cycle: three independent batch-spec reviews flagged `src/charts/bullet/geometry.ts:53`
+using `.toSorted()` — a real ES2022-floor violation (Safari < 16.4 crash class) that had shipped
+despite the canon rule; CONFIRMED against git history and fixed to `.sort()` on the freshly
+filtered array via a spun-off background task (2026-07-08). A first verification pass wrongly
+called the claim false because it read the file *after* the background fix had landed — lesson
+recorded: verify against git blame/history, not just working-tree state. Batch 0 adds a CI grep
+guard for ES2023 array methods.
+
+**Plan-conflict resolution (2026-07-08, batch-3 spec authoring):** plan/06 §5 ("no idle loops")
+conflicted with plan/15's motion-as-encoding premise for E14–E17 (HeartbeatBlip, BreathingDot,
+CometTrail, OrbitStatus). Resolved by a narrow plan/06 amendment: looping motion allowed only where
+motion is the documented primary encoding channel, only in client entries, always
+reduced-motion-gated with meaningful static equivalents. Everywhere else the ban stands.

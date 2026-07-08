@@ -1,10 +1,12 @@
-# 16 — Decision Micrographs (20 types)
+# 16 — Decision Micrographs (21 types)
+
+> **EXPANDED 2026-07-08:** +Q21 IconArray (research-validated, in the forecasting & uncertainty table + plan/12 catalog-expansion entry). Catalog now 21 decision types; full catalog 100 (plan/21).
 
 > Status: draft v1 · The third catalog: charts named for the **real-world question they answer**, grounded in decision-science research (verified 2026-07-06, citations below). The most underserved territory in dataviz is not prettier trends — it's honest **uncertainty, comparison, and trust** at inline scale. No mainstream library ships any of these as first-class micro components.
 > Ships in core (`@microcharts/react`) — these are workhorses, not expressive flourishes. Same grammar, tokens, a11y summaries, budgets.
 > Visual reference: [chart-gallery.html](chart-gallery.html), "Decision micrographs" section.
 
-## "Where is this going?" — forecasting & uncertainty (4)
+## "Where is this going?" — forecasting & uncertainty (5 — Q21 added 2026-07-08)
 
 | # | Type | Question | Research grounding |
 |---|---|---|---|
@@ -12,6 +14,7 @@
 | Q2 | **QuantileDots** | What are the odds? | Kay et al. CHI 2016 "When (ish) is My Bus?", Fernandes et al. CHI 2018: 50-dot quantile dotplots reached **97% of optimal expected payoff**, beating CI bars and text. Micro: 15–20 dots (countable in clusters); count-the-dots-past-the-line turns probability into frequency — the format lay people actually reason with |
 | Q3 | **GradedBand** | How sure are we? | Correll & Gleicher TVCG 2014 "Error Bars Considered Harmful": bar+CI causes *within-the-bar bias*; opacity-graded bands don't, and calibrate viewer confidence better. Nested 50/80/95 opacities, never a false hard edge |
 | Q4 | **EnsembleGhosts** | What could happen? | Static cousin of Hypothetical Outcome Plots (Hullman et al. PLOS 2015: +35–41 pts accuracy). Research verdict honored: a static frame ≠ a HOP — we show a *few faint simulated paths + one emphasized*, and the interactive entry can loop true HOP frames on hover |
+| Q21 | **IconArray** (ADDED 2026-07-08) | How likely is this, really? | A stated probability/rate rendered as a k-of-N highlighted unit grid ("1 in 8" = 8×N grid, 1 filled per 8). Garcia-Retamero, Galesic & Gigerenzer, Medical Decision Making 30(6) 2010: icon arrays reduce denominator neglect; Garcia-Retamero & Cokely 2013 (visual aids improve risk comprehension). The purest expression of system rule #3 (frequency beats probability). Distinct from PictogramRow (unit counts of a small real set) and QuantileDots (forecast distribution): IconArray communicates one stated rate with its denominator made visible. Micro rules: N ∈ {10, 20, 100} documented grids; highlighted units contiguous from the start (scattered = harder to count, per the medical-risk literature); denominator always labeled |
 
 ## "Is this normal? Did it work?" — judgment & comparison (5)
 
@@ -60,6 +63,6 @@
 
 ## Citations
 
-Kay et al., CHI 2016 (10.1145/2858036.2858558) · Fernandes et al., CHI 2018 (idl.uw.edu/papers/uncertainty-bus) · Correll & Gleicher, IEEE TVCG 2014 · Correll, Moritz, Heer, CHI 2018 (VSUPs) · Hullman et al., PLOS ONE 2015 + IEEE VIS 2018 (HOPs) · BoE fan chart / BIS ifc_8thconf_62 · Google SRE Workbook, "Alerting on SLOs" · Shewhart individuals control chart · Blascheck et al. glanceable-vis studies (CHI 2024) · xeno.graphics (Lambrechts) · arXiv 2404.01485 (multiscale design space) · Amplitude/Mixpanel retention conventions · NIST/SEMATECH seasonal-subseries plot guidance (Cleveland 1993 lineage) · American Society for Quality Pareto-chart procedure.
+Kay et al., CHI 2016 (10.1145/2858036.2858558) · Fernandes et al., CHI 2018 (idl.uw.edu/papers/uncertainty-bus) · Correll & Gleicher, IEEE TVCG 2014 · Correll, Moritz, Heer, CHI 2018 (VSUPs) · Hullman et al., PLOS ONE 2015 + IEEE VIS 2018 (HOPs) · BoE fan chart / BIS ifc_8thconf_62 · Google SRE Workbook, "Alerting on SLOs" · Shewhart individuals control chart · Blascheck et al. glanceable-vis studies (CHI 2024) · xeno.graphics (Lambrechts) · arXiv 2404.01485 (multiscale design space) · Amplitude/Mixpanel retention conventions · NIST/SEMATECH seasonal-subseries plot guidance (Cleveland 1993 lineage) · American Society for Quality Pareto-chart procedure · Garcia-Retamero, Galesic & Gigerenzer, Medical Decision Making 30(6) 2010 (icon arrays vs denominator neglect, verified 2026-07-08) · Garcia-Retamero & Cokely, Current Directions in Psychological Science 2013 (visual aids for risk).
 
-**Catalog contribution: 20 decision types** (full catalog: 96 across docs 05/16/15/17).
+**Catalog contribution: 21 decision types** (was 20; +IconArray 2026-07-08 — full catalog: 100 across docs 05/16/15/17, see plan/21).

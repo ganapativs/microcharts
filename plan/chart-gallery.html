@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>microcharts — 96 chart types, drawn</title>
+<title>microcharts — 100 chart types, drawn</title>
 <style>
   :root{
     --bg:#FAFBFC; --card:#FFFFFF; --ink:#17181B; --muted:#6E7480; --faint:#E7EAEE;
@@ -68,7 +68,7 @@
 </style>
 <main>
   <h1>microcharts — the full catalog, drawn</h1>
-  <p class="sub">All 96 chart types from the plan — 34 core workhorses, 20 decision micrographs, 22 expressive originals, and 20 frontier forms mined from professions that solved micro data display decades before the web — rendered at 2× scale by a zero-dependency renderer inside this page. Plain data arrays in, crisp word-sized SVG out. Hairline strokes, direct labels, one accent, no chrome. Try a palette or flip the mode — every chart re-renders from the same data.</p>
+  <p class="sub">All 100 chart types from the plan — 36 core workhorses, 21 decision micrographs, 22 expressive originals, and 21 frontier forms mined from professions that solved micro data display decades before the web — rendered at 2× scale by a zero-dependency renderer inside this page. Plain data arrays in, crisp word-sized SVG out. Hairline strokes, direct labels, one accent, no chrome. Try a palette or flip the mode — every chart re-renders from the same data.</p>
 
   <div class="controls">
     <span class="ctl-label">Mode</span>
@@ -564,6 +564,37 @@ function fPartitionStrip(){const w=96,h=20,s=svg(w,h);
   kids.forEach(k=>{rect(s,x,11,k[0]-1.5,6,k[1],1);s.lastChild.setAttribute("opacity",k[2]);x+=k[0]});
   return s}
 
+function microscatter(){const w=48,h=28,s=svg(w,h);
+  const pts=[[6,22.5],[9,19],[12,20.5],[14,16],[17,17.5],[20,13.5],[23,15],[26,11.5],[29,12.5],[32,8.5],[35,10],[38,6.5],[41,7.5],[15,21.5],[28,17]];
+  stroke(s,line([[5,23.2],[42,6]]),C.faint,1);
+  pts.forEach(p=>{const c=E("circle",{cx:p[0],cy:p[1],r:1.5,fill:C.ink,"fill-opacity":.72});s.appendChild(c)});
+  dot(s,32,8.5,2,C.acc);
+  return s}
+function likertstrip(){const w=96,h=16,s=svg(w,h);const cx=52;
+  // levels: [strong-dis, dis, neutral, agree, strong-agree] shares of 84 units
+  rect(s,cx-19,4,11,8,C.neg,1);s.lastChild.setAttribute("opacity",".45");
+  rect(s,cx-8,4,8,8,C.neg,1);
+  rect(s,cx-0.5,4,1,8,C.muted,0); // split neutral halves hug the hairline
+  rect(s,cx+0.5+0.75,4,14,8,C.pos,1);s.lastChild.setAttribute("opacity",".55");
+  rect(s,cx+15.75,4,17,8,C.pos,1);
+  stroke(s,line([[cx,2],[cx,14]]),C.muted,.75);
+  txt(s,cx-21,10.8,"27%",5,C.muted,"end");txt(s,cx+34.5,10.8,"58%",5,C.ink,"start",600);
+  return s}
+function iconarray(){const w=96,h=22,s=svg(w,h);
+  for(let i=0;i<20;i++){const x=3+(i%10)*6.4,y=3+Math.floor(i/10)*8.4;
+    if(i<3)rect(s,x,y,5,6.6,C.acc,1);
+    else s.appendChild(E("rect",{x,y,width:5,height:6.6,fill:"none",stroke:C.faint,"stroke-width":.9,rx:1}))}
+  txt(s,70,10.5,"3 in 20",6,C.ink,"start",600);txt(s,70,18,"≈ 15%",5,C.muted,"start");
+  return s}
+function confusiongrid(){const w=54,h=34,s=svg(w,h);
+  const share=[[.86,.10,.04],[.12,.78,.10],[.05,.17,.78]];const cell=9.4,x0=12,y0=4;
+  const lab=["A","B","C"];
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++){const x=x0+c*(cell+.8),y=y0+r*(cell+.8);
+    rect(s,x,y,cell,cell,C.acc,1);s.lastChild.setAttribute("opacity",(0.12+share[r][c]*0.88).toFixed(2));
+    if(r===c)s.appendChild(E("rect",{x:x+.8,y:y+.8,width:cell-1.6,height:cell-1.6,fill:"none",stroke:C.ink,"stroke-width":.7,rx:.8,opacity:".8"}))}
+  for(let i=0;i<3;i++){txt(s,x0-3,y0+i*(cell+.8)+6.4,lab[i],4.5,C.muted,"end");txt(s,x0+i*(cell+.8)+4.7,y0+3*(cell+.8)+4.5,lab[i],4.5,C.muted,"middle")}
+  return s}
+
 // ---------- assembly ----------
 function card(el,name,n,story,viz,isV1){const c=document.createElement("div");c.className="card";
   const h=document.createElement("h3");h.innerHTML=name+(isV1?'<span class="v1">v1</span>':"")+`<span class="n">${n}</span>`;
@@ -595,12 +626,14 @@ card("fam-cat","PairedBars","60×20","Plan vs actual, category by category.",pai
 card("fam-cat","Slope","40×40","Before → after across categories; crossings are the story.",slope());
 card("fam-cat","MicroBox","40×14","Five-number summary — p50/p95 latency in a row.",microbox());
 card("fam-cat","Dumbbell","60×12","From → to ranges per row: salary bands, confidence spans.",dumbbell());
+card("fam-cat","MicroScatter","40×24","Are these two related? A point cloud with an honest least-squares hint — the catalog\u2019s relationship story.",microscatter());
 card("fam-cat","Waterfall micro","70×18","How gains and losses compose into the final number.",waterfall());
 
 card("fam-ptw","Progress","40×8","Completion with its number, always.",progress());
 card("fam-ptw","SegmentedBar","60×10","Composition in one bar, ≤5 segments.",segmented());
 card("fam-ptw","ProgressRing","24×24","Icon-level completion affordance.",ring());
 card("fam-ptw","MicroDonut","24×24","Capped wedges + Other rollup; deliberately small.",microdonut());
+card("fam-ptw","LikertStrip","60×12","Agree vs disagree around a center line; neutral split, never hidden. Sentiment balance in a table cell.",likertstrip());
 card("fam-ptw","Funnel micro","60×18","Stage conversion, labeled directly.",funnel());
 card("fam-ptw","Pictogram row","60×12","Unit counts — 5 of 8, at a glance.",pictogram());
 
@@ -649,6 +682,7 @@ card("q-forecast","QuantileDots","Q2","What are the odds? Twenty dots = twenty f
 card("q-forecast","GradedBand","Q3","How sure are we? Nested 50/80/95 bands — confidence you can see fading, never a false hard edge.",qGradedBand());
 card("q-forecast","EnsembleGhosts","Q4","What could happen? A handful of simulated paths, one emphasized — the static cousin of hypothetical-outcome plots.",qHOPs());
 
+card("q-forecast","IconArray","Q21","How likely, really? A stated rate as countable units — the denominator is the honesty.",iconarray());
 card("q-judge","BenchmarkStrip","Q5","Is this normal? Peer range as a quiet band, your value as the dot, percentile said outright.",qBenchmarkStrip());
 card("q-judge","ABStrips","Q6","Did B beat A? Two quantile strips on one scale — overlap is the honest answer, not a single misleading average.",qABStrips());
 card("q-judge","ShiftHistogram","Q7","Did the fix change things? Before mirrored above, after below — the distribution's move is the proof.",qShiftHist());
@@ -684,6 +718,7 @@ card("f-dev","Waveform","F9","The most-seen microchart on earth, with its honest
 card("f-dev","MinimapStrip","F10","Content thumbnail + your viewport window + marker ticks — position-in-the-whole for documents, timelines, logs. VS Code's gift to dataviz.",fMinimap());
 card("f-dev","StarSpoke","F11","The dense multi-variable glyph that survived peer review: contour-free spokes, two entities compared at a glance. (Chernoff faces did not survive.)",fStarSpoke());
 
+card("f-ai","ConfusionGrid","F21","Where do the errors go? Rows actual, columns predicted; the diagonal is agreement.",confusiongrid());
 card("f-ai","TokenConfidence","F12","The text is the chart: per-token confidence as tinted underlines, in discrete tiers — confident, unsure, guessing. AI-native and typographically honest.",fTokenConf());
 card("f-ai","RubricStrip","F13","Quality refuses to be one number: weighted criteria as mini-bars, height = weight, length = score. Evals, reviews, comparisons.",fRubricStrip());
 card("f-ai","EtaBar","F14","The progress bar, told truthfully: solid = observed, the remainder re-forecast from the actual rate — never linear-interpolated hope.",fEtaBar());

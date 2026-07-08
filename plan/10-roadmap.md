@@ -38,18 +38,33 @@ Each lands per the Definition of Done in `09-testing-quality.md` (a11y, budgets,
 **3.5** **Discoverability P0 gate ([20](20-discoverability.md) §15 P0, DoD §17)** — built WITH the docs app, not bolted on after: shared `docsMeta()` helper on every route (title/description/canonical/OG/Twitter — no page hand-rolls `<head>`), JSON-LD helpers (BreadcrumbList/TechArticle/SoftwareSourceCode), `sitemap.xml` + `robots.txt`, OG image template + per-launch-page cards from real chart output, and the §11 CI checks (metadata/canonical/JSON-LD/link/llms-endpoint tests). Primary content = static HTML (client-only examples never carry indexable content); Core Web Vitals targets per §11.
 
 ✋ **Checkpoint 3**: 3–5 friendly devs try it cold; watch where they stumble; fix API paper cuts. API freeze for 1.0 surface. **Plus the 20 §17 discoverability DoD**: llms surface returns 200s and is generated from canonical sources; npm/GitHub/docs metadata tell one story; share cards render with product visuals.
+**AMENDED 2026-07-08:** Checkpoint 3 (cold-dev testing + API freeze) moves AFTER Phase 3.75 — freezing the API on 5 charts then shipping 91 more would make the freeze meaningless.
+
+## Phase 3.75 — Full-catalog buildout (pre-launch; ADDED 2026-07-08, supersedes Phases 5.1–5.4 / 5b′ / 5c′ / 5c chart content)
+
+**Decision ([21-full-catalog-buildout.md](21-full-catalog-buildout.md)):** all 96 catalog types ship in
+`@microcharts/react` (single package — `@microcharts/expressive` is dead) **before launch**. Five
+gated batches, each an implementing-agent-sized brief:
+
+- **Batch 0** — foundation & hardening (plan/21 §6): docs registry refactor (kills per-slug switches),
+  size/stats generators, kernel additions (quantile/bin/arc/stack/downsample/calendar/jitter),
+  shipped-five variant + perf pass, shared edge-case fixture extraction, bench registry.
+- **Batch 1** — core completion, 27 components + annotations entry ([22](22-batch-1-core-completion.md)).
+- **Batch 2** — decision micrographs, 20 ([23](23-batch-2-decision-micrographs.md)).
+- **Batch 3** — expressive, 22, in-package ([24](24-batch-3-expressive.md)).
+- **Batch 4** — frontier, 20, + release sync/pitch ([25](25-batch-4-frontier-and-release.md)).
+
+Gate discipline: no batch N+1 before batch N's DoD (plan/21 §7). Then Checkpoint 3, then Phase 4.
 
 ## Phase 4 — Launch (≈ 1 week, timed)
 
 **4.1** `1.0.0`. **4.2** Show HN (Tue–Thu 8–10am ET; title = the number; link = live no-signup demo; first comment = honest "why I built it" + limitations). **4.3** dev.to engineering writeup ("making sparklines screen-reader accessible" angle). **4.4** This Week in React / React Status submissions; awesome-list PRs; r/reactjs (verify self-promo rules first). **4.5** Product Hunt as credibility echo, low investment.
 **Pre-flight + launch week:** the [20-discoverability.md](20-discoverability.md) §14 P0 checklist must be green before any announcement (docs pages, llms surface, OG cards, Search Console + sitemap submitted); launch-week P1 items (editorial posts, social threads linking live pages, llms.txt directory submission) ride 4.2–4.5. Post-launch analytics cadence per 20 §13; competitor comparison pages only once measured data exists (20 §9 rules — this is also where the deferred bench competitor matrix lands).
 
-## Phase 5 — Catalog buildout (v1.x → v2, ≈ 1 quarter, demand-ordered)
+## Phase 5 — Post-launch ecosystem (v1.x → v2; **5.1–5.4 chart items moved into Phase 3.75 Batch 1, 2026-07-08**)
 
-**5.1** Trend family completion: Band variant polish, Seismogram, HistogramStrip, RugStrip, HeatStrip.
-**5.2** Categorical: MiniBar, DotPlot, PairedBars, Slope, MicroBox (+ Lollipop).
-**5.3** Part-to-whole: Progress, SegmentedBar, ProgressRing (MicroDonut later, `decorative` subpath).
-**5.4** Scalar: HeatCell, StatusDot, TrendArrow.
+**5.1–5.4** ~~Trend/categorical/part-to-whole/scalar completion~~ → shipped pre-launch via
+[21-full-catalog-buildout.md](21-full-catalog-buildout.md) Batch 1.
 **5.5** shadcn-style copy-paste CLI (`npx microcharts add sparkline`) + registry entry — scope + item rules per [20-discoverability.md](20-discoverability.md) §7 (CLI must do real work: `doctor`/`add`/`render`/`catalog`; registry = recipes/wrappers, never core internals).
 **5.6** Community: good-first-issues, preset gallery, locale contributions for summaries.
 
@@ -66,17 +81,24 @@ Each lands per the Definition of Done in `09-testing-quality.md` (a11y, budgets,
 
 Sequencing note: 5b.1–5b.3 can start immediately after Checkpoint 2 (they only need the v1 five + string renderer); a slice (toSVG/toPNG + spec + streamdown recipe) is worth pulling INTO the launch if timing allows — export + AI-streaming are launch-post differentiators.
 
-## Phase 5b′ — Decision micrographs (v1.x–v2, core package; see `16`)
+## ~~Phase 5b′ — Decision micrographs~~ (MOVED 2026-07-08 → Phase 3.75 Batch 2, [23](23-batch-2-decision-micrographs.md))
 
-Research-grounded uncertainty/comparison/trust types, prioritized by evidence strength: QuantileDots + GradedBand + BenchmarkStrip first (strongest research + simplest), then ForecastCone, ControlStrip, ErrorBudget, BurnChart, RetentionCurve, remaining Q-types demand-driven. These ship in core — they're workhorses, and "the only library with honest uncertainty at inline scale" is a second Show-HN-grade story.
+Evidence-strength ordering preserved inside the batch (QuantileDots + GradedBand + BenchmarkStrip
+first). "The only library with honest uncertainty at inline scale" remains a launch-post story —
+now part of the primary launch, not a second wave.
 
-## Phase 5c′ — Frontier collection (v2.x, core + `@microcharts/expressive` split per type; see `17`)
+## ~~Phase 5c′ — Frontier collection~~ (MOVED 2026-07-08 → Phase 3.75 Batch 4, [25](25-batch-4-frontier-and-release.md); single package — no `@microcharts/expressive` split)
 
-Flagships by usage breadth: TapeGauge, TokenConfidence, TimeInRange, Waveform, Hypnogram, TraceFold (observability audiences), CalibrationStrip (ML audiences). StationGlyph = the halo/marketing piece ("the 1941 chart no library ever shipped"). Decision additions Q19 CyclePlot / Q20 ParetoStrip ride with the decision-micrograph track. Refinements land earlier: fading-edge bands into Q3/band-sparkline, micro-HOP into Q4 interactive, sweep mode on ProgressRing, pattern-fill second channel with the forced-colors work.
+Flagship ordering preserved (TapeGauge, TokenConfidence, TimeInRange, Waveform, Hypnogram, TraceFold,
+CalibrationStrip; StationGlyph = halo piece). Absorbed refinements (fading-edge → GradedBand,
+micro-HOP → EnsembleGhosts interactive, sweep → ProgressRing) land with their host charts in
+Batches 1–2.
 
-## Phase 5c — Expressive collection (v2.x, `@microcharts/expressive`; see `15`)
+## ~~Phase 5c — Expressive collection~~ (MOVED 2026-07-08 → Phase 3.75 Batch 3, [24](24-batch-3-expressive.md); ships INSIDE `@microcharts/react` — separate package decision reversed, see plan/21 §0 + plan/15 header)
 
-Flagships first: MoonPhase, HeartbeatBlip, TreeRings, TallyMarks, PolarClock, CitySkyline, FillWord, ConfettiBurst — then demand-driven from the remaining 27. Same grammar/tokens/a11y/budgets; every type ships with its documented encoding channel and precision rating. This is the "nobody else has anything like this" tier — launch-post material for a second wave of attention.
+Flagships first (MoonPhase, HeartbeatBlip, TreeRings, TallyMarks, PolarClock, CitySkyline, FillWord —
+ConfettiBurst was already relocated to `<Marker celebrate>`, the old flagship list was stale). Same
+grammar/tokens/a11y/budgets as always.
 
 ## Phase 6 — Horizon (only on traction)
 

@@ -1,6 +1,12 @@
 # 07 — Performance & Size Budgets
 
 > Status: draft v1 · "Micro CPU, micro RAM, micro bundle" made falsifiable. Every number here becomes a CI gate.
+> **AMENDED 2026-07-08 (budget model v2, [21-full-catalog-buildout.md](21-full-catalog-buildout.md) §1):**
+> the whole-library ≤ 10 kB gate is retired — it was written for a 5-chart v1 and is arithmetically
+> impossible at 96 types, and it measured the wrong thing (users pay per subpath, not per barrel).
+> Replacements: shared kernel ≤ 5 kB (proxied by the minimal-chart subpath), `styles.css` ≤ 12 kB,
+> barrel size tracked + published honestly but not gated. Per-subpath gates unchanged.
+> `.size-limit.json` is generated from `scripts/size-budgets.json` (Batch 0), never hand-edited.
 
 ## 1. Budgets (CI-enforced, size-limit + benchmark suite)
 
@@ -8,7 +14,7 @@
 |---|---|---|
 | Gzip per static chart component (incl. shared core, tree-shaken) | **≤ 3 kB** hard gate · ≤ 2 kB target · ≤ 1 kB stretch | size-limit per subpath export |
 | Gzip per interactive (`…/interactive`) chart entry | **≤ 4 kB** hard gate | size-limit per subpath export |
-| Whole library gzip (all v1 charts + styles) | **≤ 10 kB** | size-limit on barrel |
+| ~~Whole library gzip (all v1 charts + styles) ≤ 10 kB~~ | **Retired 2026-07-08** → shared kernel ≤ 5 kB · styles.css ≤ 12 kB · barrel tracked not gated (plan/21 §1) | size-limit + CI report |
 | Runtime dependencies | **0** | CI check on package.json + lockfile |
 | Client JS for static charts (RSC) | **0 bytes** | bundle-analysis test on Next.js fixture |
 | 500 sparklines initial render (M-class laptop, Chrome) | **< 50 ms scripting** | tinybench + Playwright CPU trace, tracked not hard-gated initially |
