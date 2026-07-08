@@ -118,7 +118,10 @@ export function IconArray(props: IconArrayProps): ReactNode {
             style={{ fill: fillColor }}
           />
         ) : (
-          // empty unit — a visible faint-fill slot with a hairline, never a void
+          // empty unit — a visible faint-fill slot with a hairline, never a
+          // void. Coloring lives in the "unit-off" ink-role rule (styles.css)
+          // so forced-colors can remap it; the FILLED unit stays inline (its
+          // fill is dynamic — accent/positive/negative by `positive`).
           <rect
             key={u.index}
             x={u.x}
@@ -126,10 +129,6 @@ export function IconArray(props: IconArrayProps): ReactNode {
             width={geo.cell}
             height={geo.cell}
             rx={geo.rx}
-            fill="var(--mc-band)"
-            stroke="var(--mc-neutral)"
-            strokeOpacity={0.4}
-            strokeWidth={0.5}
             data-mc-ink="unit-off"
           />
         ),

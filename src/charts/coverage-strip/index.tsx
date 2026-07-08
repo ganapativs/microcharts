@@ -132,7 +132,8 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
           />
         ) : (
           // an EMPTY slot, not a void: a faint track fill + a hairline outline
-          // so it reads as "measured nothing here" (survives forced-colors)
+          // so it reads as "measured nothing here". Coloring lives in the "gap"
+          // ink-role rule (styles.css) so forced-colors can remap it.
           <rect
             key={c.index}
             x={c.x}
@@ -140,10 +141,6 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
             width={c.w}
             height={c.h}
             rx={c.rx}
-            fill="var(--mc-band)"
-            stroke="var(--mc-neutral)"
-            strokeOpacity={0.35}
-            strokeWidth={0.5}
             data-mc-ink="gap"
           />
         ),

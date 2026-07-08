@@ -20,10 +20,11 @@ describe("<CoverageStrip> (plan/23 #1, S1-with-gaps)", () => {
     const { container } = draw(<CoverageStrip data={[0, null, 5]} />);
     const rects = [...container.querySelectorAll("rect")];
     expect(rects.length).toBe(3);
-    // the measured zero is a solid accent cell; the gap is a faint track slot
+    // the measured zero is a solid accent cell; the gap is a faint track slot.
+    // both colors come from ink-role rules (styles.css) — no inline fill now.
     expect(rects[0]!.getAttribute("data-mc-ink")).toBe("cell");
     expect(rects[1]!.getAttribute("data-mc-ink")).toBe("gap");
-    expect(rects[1]!.getAttribute("fill")).toBe("var(--mc-band)");
+    expect(rects[1]!.getAttribute("fill")).toBe(null);
   });
 
   it("label='percent' states coverage in a right gutter (wider viewBox)", () => {

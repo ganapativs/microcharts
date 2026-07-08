@@ -173,7 +173,9 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
       {rendered.map((t) => {
         const tail = t.emphasis === k - 1;
         const opacity = k <= 1 ? 1 : 0.45 + 0.55 * (t.emphasis / (k - 1));
-        const stroke = color ?? (tail ? "var(--mc-accent)" : undefined);
+        // the tail's default accent now lives in the "flag" ink-role rule
+        // (styles.css) so forced-colors can remap it; `color` still overrides.
+        const stroke = color;
         return dots ? (
           <circle
             key={t.p}

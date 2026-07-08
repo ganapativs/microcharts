@@ -411,6 +411,23 @@
       forced-color-adjust: none;
       fill: Highlight;
     }
+    /* empty/gap slots read as EMPTY (not filled): system background + a system
+       outline, so they stay visibly distinct from filled units. (The filled
+       IconArray unit keeps its inline dynamic fill under forced-color-adjust:
+       none — the fill's presence vs. absence is the shape cue.) */
+    :where(.mc-root [data-mc-ink="unit-off"]),
+    :where(.mc-root [data-mc-ink="gap"]) {
+      fill: Canvas;
+      stroke: GrayText;
+      stroke-opacity: 1;
+    }
+    /* tail flag keeps its emphasis, mapped to the system accent */
+    :where(.mc-root line[data-mc-ink="flag"]) {
+      stroke: Highlight;
+    }
+    :where(.mc-root circle[data-mc-ink="flag"]) {
+      fill: Highlight;
+    }
     :where(.mc-root:focus-visible) {
       outline-color: Highlight;
     }
