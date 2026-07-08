@@ -56,6 +56,7 @@ import burnChart from "./burn-chart";
 import errorBudget from "./error-budget";
 import controlStrip from "./control-strip";
 import forecastCone from "./forecast-cone";
+import quantileDots from "./quantile-dots";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -104,6 +105,7 @@ const MODULES: ChartModule[] = [
   errorBudget,
   controlStrip,
   forecastCone,
+  quantileDots,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

@@ -197,6 +197,10 @@ export interface SummaryStrings {
   iconArray: (k: number, n: number, pct: string, note: "none" | "all" | "sub" | null) => string;
   /** Icon-array unit announcement, e.g. "Unit 7 of 20 — filled. 3 of 20 filled." */
   iconArrayUnit: (index: number, n: number, filled: boolean, filledCount: number) => string;
+  /** Quantile-dots with a threshold, e.g. "4 in 20 chances above 15 min." */
+  quantileDots: (past: number, count: number, side: string, threshold: string) => string;
+  /** Quantile-dots without a threshold, e.g. "Most likely 12–15; range 4 to 38." */
+  quantileDotsRange: (modeLo: string, modeHi: string, min: string, max: string) => string;
   /** Rate-volume summary, e.g. "4.1% on 38 events (low volume); up from 2.3% across 12 periods." */
   rateVolume: (
     rateLast: string,

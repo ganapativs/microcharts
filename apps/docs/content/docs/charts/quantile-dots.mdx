@@ -1,0 +1,96 @@
+---
+title: QuantileDots
+description: A quantile dotplot for React — odds you can count. Each dot is a 1-in-N chance; a threshold turns the plot from shape into a "N in 20" read.
+---
+
+QuantileDots answers "what are the odds?" — in **countable** form. It's a quantile dotplot:
+each dot is an equal-probability quantile, so a dot is roughly a **1-in-N chance**, not a raw
+observation. Add a `threshold` and the plot turns from shape into odds: the dots past the line
+are re-inked and ringed, and the summary reads **"N in 20"** — because odds you can count beat
+odds you must trust, and a frequency reads truer than a bare percentage.
+
+<LiveDemo
+  label="QuantileDots"
+  sizeOf="quantile-dots"
+  code={`import { QuantileDots } from "@microcharts/react/quantile-dots";
+
+<QuantileDots data={waits} threshold={15} format={(n) => \`\${n} min\`} title="Bus wait" />`}
+>
+  <QuantileDots
+    data={Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)))}
+    threshold={15}
+    format={(n) => `${n} min`}
+    title="Bus wait"
+    width={260} height={30}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="quantile-dots" />
+
+## Try it
+
+<Playground chart="quantile-dots" />
+
+## Interactive
+
+<InteractiveDemo slug="quantile-dots" />
+
+## When to use it
+
+- **Good for** — a "will we miss the SLA?" read in a sentence, odds you can count in a KPI card, a posterior communicated as frequency rather than percent.
+- **Avoid for** — a precise distribution shape (HistogramStrip) or one estimate's interval (GradedBand).
+
+## Sizing
+
+<Sizing chart="quantile-dots" />
+
+## Variants
+
+<LiveDemo
+  label="fewer dots + count below"
+  code={`<QuantileDots data={waits} count={15} threshold={15} />
+<QuantileDots data={waits} threshold={10} side="below" />`}
+>
+  <span className="inline-flex flex-col gap-1.5">
+    <QuantileDots
+      data={Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)))}
+      count={15}
+      threshold={15}
+      format={(n) => `${n} min`}
+      title="15 dots"
+      width={220} height={28}
+    />
+    <QuantileDots
+      data={Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)))}
+      threshold={10}
+      side="below"
+      format={(n) => `${n} min`}
+      title="under 10 min"
+      width={220} height={28}
+    />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="quantile-dots" />
+
+## Why this default
+
+20 dots, because odds you can count beat odds you must trust — a reader subitizes a handful of
+highlighted dots faster than they parse "48%". Each dot is an equal-probability quantile, **not**
+a raw observation, and the summary always frames the answer as a frequency ("10 in 20"), never a
+bare percentage. Dots past the threshold are re-inked **and** ringed, so the count survives
+grayscale, print, and forced-colors.
+
+## Accessibility
+
+The accessible name states the odds in frequency form — **"10 in 20 chances above 15 min."** —
+or, without a threshold, "Most likely …; range …". The interactive entry is a probe: hovering or
+arrowing moves a live threshold and the count past it recomputes as you go.
+
+## Props
+
+<PropTable slug="quantile-dots" />

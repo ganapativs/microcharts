@@ -834,3 +834,35 @@ Gates: node 1246, browser 90, craft 256/0, size 2.83/3.71, bench 23.2 rows/ms (f
 region-aware announce + readout chip "42 · 33–55" confirmed). NOTE: graded-band/micro-donut/ohlc
 bench floors flake under machine load (dev server + parallel builds) — environmental, they pass
 clean; the calibrated ~half-baseline floors are a touch tight for a loaded machine.
+
+## Batch 2 wave 2 — QuantileDots (2026-07-09)
+
+**QuantileDots (plan/23 #12) — full DoD, static + interactive.** Provenance: plan/16 §Q2.
+Quantile dotplot via `core/quantile.quantileDotplot` (Kay/Fernandes binning, Batch 0). Each dot
+is an equal-probability quantile (≈ 1-in-count chance), NOT a raw observation; past-threshold
+dots are re-inked accent AND ringed (`stroke` = shape cue, never color-alone); summaries use
+frequency framing ("N in count"), never a bare percentage (plan/16 rule #3). count capped at 25.
+
+**Audit flag (mandatory, plan/23 honesty note).** The studied quantile-dotplot design (Kay 2016;
+Fernandes 2018 — 97%-of-optimal decision quality) used **50 dots**. The 15–20 default here is a
+countability judgment at micro scale (subitizing clusters in ≤200 px), NOT a validated
+equivalence to the 50-dot result. Classification: **inferred-from-adjacent-research** — the
+frequency-framing + quantile-dot ENCODING is studied; the specific low dot count is a design
+call. Docs recommend 15–20 and state "each dot ≈ a 1-in-count chance". Open question stands
+(plan/23 §Batch-level risks): validate 15–20 at micro scale or document as a deliberate tradeoff.
+
+**Interactive = the probe** (distinct from nearest-x): pointer x sets a LIVE threshold, the count
+past it recomputes purely; ←/→ nudge one bin, Esc resets to the prop threshold. The probe value
+is clamped to the data range AND rounded 2-dp (a raw pointer-derived float read as
+"9.7698…min"). Static accessible name reflects the PROP threshold (documented default), not the
+transient probe.
+
+**Chunk-isolation fix caught by size-limit.** I first added `quantileDots`/`quantileDotsRange` to
+`strings-freq` (shared with IconArray) — that taxed IconArray's interactive bundle +2 B, tipping
+it over its 3 kB budget. Split into its OWN `strings-quantile-dots` module (`EN_QUANTILE_DOTS`);
+IconArray back under budget. Reinforces the per-family-module rule: never add keys to a shared
+strings chunk that another chart already imports at its budget edge.
+
+Gates: node 1272, browser 92, craft 268/0, size (quantile-dots 2.51/3.3, icon-array back under),
+docs 186 pages + tests 104, real-browser sweep green (20 dots, flags re-inked+ringed, "10 in 20"
+label, probe recomputes + rounds clean, 0 escapes).

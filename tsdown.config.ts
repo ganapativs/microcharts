@@ -101,6 +101,8 @@ export default defineConfig({
     "src/charts/control-strip/client.tsx",
     "src/charts/forecast-cone/index.tsx",
     "src/charts/forecast-cone/client.tsx",
+    "src/charts/quantile-dots/index.tsx",
+    "src/charts/quantile-dots/client.tsx",
   ],
   format: ["esm"],
   dts: true,

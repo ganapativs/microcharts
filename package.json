@@ -388,6 +388,14 @@
       "types": "./dist/charts/forecast-cone/client.d.ts",
       "import": "./dist/charts/forecast-cone/client.js"
     },
+    "./quantile-dots": {
+      "types": "./dist/charts/quantile-dots/index.d.ts",
+      "import": "./dist/charts/quantile-dots/index.js"
+    },
+    "./quantile-dots/interactive": {
+      "types": "./dist/charts/quantile-dots/client.d.ts",
+      "import": "./dist/charts/quantile-dots/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

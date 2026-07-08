@@ -527,6 +527,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/quantile-dots (static)",
+    "path": "dist/charts/quantile-dots/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/quantile-dots/interactive",
+    "path": "dist/charts/quantile-dots/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

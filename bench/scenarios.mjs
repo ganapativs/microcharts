@@ -406,6 +406,12 @@ export const SCENARIOS = [
     props: (i) => ({ data: rugs[i % POOL].map((v) => v * 10 + 40), rules: "we", summary: false }),
   },
   {
+    slug: "quantile-dots",
+    component: "QuantileDots",
+    floor: 6, // 20 dot nodes/render — N-node class, per-dot loop
+    props: (i) => ({ data: rugs[i % POOL], threshold: 5, summary: false }),
+  },
+  {
     slug: "forecast-cone",
     component: "ForecastCone",
     floor: 10, // 2 band polygons + history + mid — few nodes, per-point loop

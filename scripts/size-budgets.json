@@ -189,6 +189,10 @@
     "forecast-cone": {
       "static": "2.95 kB",
       "interactive": "3.85 kB"
+    },
+    "quantile-dots": {
+      "static": "2.6 kB",
+      "interactive": "3.4 kB"
     }
   }
 }

@@ -48,6 +48,7 @@
     "burn-chart",
     "error-budget",
     "control-strip",
-    "forecast-cone"
+    "forecast-cone",
+    "quantile-dots"
   ]
 }

@@ -532,6 +532,22 @@ const FC_FORE = {
     [35, 49],
   ],
 };
+const QD = Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 40) * 0.4 + (i % 7) * 1.5));
+add(
+  "quantile-dots",
+  "QuantileDots",
+  [
+    { data: QD },
+    { data: QD, threshold: 15 },
+    { data: QD, count: 15 },
+    { data: QD, threshold: 15, side: "below" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
 add(
   "forecast-cone",
   "ForecastCone",
