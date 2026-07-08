@@ -107,8 +107,8 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "KPI before/after",
-    code: `<Slope data={cohorts} label="both"\n  width={120} height={72} />`,
-    node: <Slope data={RANKS} label="both" summary={false} width={120} height={72} />,
+    code: `<Slope data={cohorts} label="both"\n  width={140} height={96} />`,
+    node: <Slope data={RANKS} label="both" summary={false} width={140} height={96} />,
   },
   {
     label: "one vs the field",

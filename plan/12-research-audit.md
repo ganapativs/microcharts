@@ -395,3 +395,13 @@ along the row (drops the connector when dots nearly touch). Budget 2.65/3.55 →
 (measured 2.64/3.55; 3/4 kB hard caps honored). New geometry-audit gate (tests/craft/
 geometry-audit.mjs, wired into `pnpm craft`) detects LINE-THROUGH-HOLLOW via chord-inside-
 disk, plus MARK-ESCAPE. Full visual sweep report in plan/VISUAL-AUDIT.md.
+
+**CalendarStrip interactive pointer drift (2026-07-08, round-13 interactive sweep):** the
+fixed 7 px-cell grid can only be shown larger via CSS width, but the interactive wrapper
+was sized 180 px while the composed static SVG stayed at its intrinsic 55 px → pointer math
+(÷ wrapper width) landed off the cells. Fixed with the FILL pattern (memory
+interactive-wrapper-fills-svg) — `style={FILL}` on the composed static so the SVG fills the
+wrapper; measured wrapper==svg (180==180) after. FILL is NOT applied universally: charts
+sized by geometry-width props use inline-block wrappers that already hug the SVG, and
+width:100% on a child of an auto-width inline-block would break them. Browser regression
+test added. Budget 3.4→3.5 kB interactive (measured 3.42; caps honored).

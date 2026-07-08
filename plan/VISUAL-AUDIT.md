@@ -26,15 +26,24 @@ to `tests/craft/matrix.mjs` that would have caught it.**
    animation breaks screenshots) — put it at a top-level `app/<name>/page.tsx`.
 3. **Coordinate spot-checks** — SVG text/mark coordinates dumped and measured for
    any chart that looked off in the thumbnail (baseline centering, gutter width).
-4. **Interactive overlays** — covered by the 62-test browser suite
-   (`*.browser.test.tsx`): readout chip text, focus-ring presence, keyboard nav.
+4. **Interactive overlays** — the browser suite covers readout text / focus-ring
+   presence / keyboard nav, but NOT pixel alignment. Pointer alignment was swept
+   LIVE by measuring, for every pointer-mapping interactive entry, whether the
+   inner SVG fills the focusable wrapper (`svg.rect == wrapper.rect`). Drift
+   happens only when a demo sizes the wrapper by CSS width without the SVG
+   filling it — enumerated the 6 CSS-width demos, measured the 2 pointer-mapping
+   ones (calendar drifted, micro-donut clean), and spot-measured a grid
+   (activity-grid), a nearest-x (ohlc), and a band (dumbbell) chart — all
+   `svg == wrapper`. **Rule:** a fixed-cell/unit chart whose interactive demo
+   scales via CSS width MUST pass `style={FILL}` to its composed static.
 
 ## Findings
 
 | # | Chart | Severity | Issue | Expectation | Status |
 |---|-------|----------|-------|-------------|--------|
 | 1 | Dumbbell | HIGH | Connector ran dot-center → dot-center, so it crossed the interior of the hollow "before" ring (`fill="none"`, r 1.7) and showed through — the line visibly pierced the empty dot. Present at every size, static + interactive. | Connector stops at each dot's EDGE; the hollow ring reads as a clean circle with the line meeting its rim. | **FIXED** (`src/charts/dumbbell/index.tsx`): connector endpoints inset by the mark radius along the row; if the dots nearly touch, the connector is dropped. Regression test + geometry-audit gate added. |
-| 2 | Slope (docs recipes) | LOW | `KPI before/after` recipe (`label="both"`, 120×72, 5 rows) spreads the right-side labels to exactly the minimum glyph pitch (fontSize 6 → 6.3 px baseline gap). Legible and non-overlapping, but visually cramped. | More breathing room between endpoint labels. | OPEN — **not a chart bug** (the solver spreads to the density limit correctly). Fix in docs: give the recipe more height (e.g. 88–96 px) or drop to `label="value"`. |
+| 2 | Slope (docs recipe) | LOW | `KPI before/after` recipe spread the right-side labels to the minimum glyph pitch — legible but cramped. | More breathing room. | **FIXED** — recipe now 140×96 (5 rows breathe). |
+| 3 | CalendarStrip (interactive) | HIGH | Pointer drift: the interactive wrapper was sized 180 px by the demo, but the fixed-cell grid's SVG rendered at its intrinsic 55 px, left-aligned. Pointer math divides by the 180 px wrapper while cells live in the left 55 px → crosshair/focus landed far off the cursor. Only interactive charts sized by CSS width (not geometry props) are affected; CalendarStrip was the only one (fixed 7 px cells force CSS scaling). | The SVG fills the focusable wrapper so pointer math is exact. | **FIXED** — composed static now gets `style={FILL}` (`display:block; width:100%; height:auto`). Browser regression test asserts `svg.width == wrapper.width`. |
 
 ## Verified clean (checked, no issue)
 

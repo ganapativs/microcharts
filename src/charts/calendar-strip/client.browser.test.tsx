@@ -44,4 +44,16 @@ describe("interactive <CalendarStrip> (plan/22 #26)", () => {
     await userEvent.keyboard("{Home}");
     expect(fig.querySelector('rect[stroke="var(--mc-accent)"]')).not.toBeNull();
   });
+
+  it("inner SVG fills the wrapper when a demo scales it via CSS width", async () => {
+    // the grid has a fixed 7px cell (intrinsic viewBox ~55px), so a card sizes
+    // it up with a CSS width. The SVG must fill that width or the pointer math
+    // (which divides by the wrapper width) lands off the cells.
+    const fig = await mount(<CalendarStrip data={DATA} end={END} style={{ width: 180 }} />);
+    const svg = fig.querySelector("svg")!;
+    const wrapW = fig.getBoundingClientRect().width;
+    const svgW = svg.getBoundingClientRect().width;
+    expect(wrapW).toBeGreaterThan(120); // the demo width took effect
+    expect(Math.abs(svgW - wrapW)).toBeLessThan(1); // SVG fills it exactly
+  });
 });

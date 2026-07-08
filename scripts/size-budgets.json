@@ -136,7 +136,7 @@
     },
     "calendar-strip": {
       "static": "2.5 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.5 kB"
     },
     "event-timeline": {
       "static": "3 kB",

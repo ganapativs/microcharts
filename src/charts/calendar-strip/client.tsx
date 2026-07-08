@@ -16,6 +16,11 @@ import {
   type CalendarStripProps,
 } from "./index.js";
 
+// The composed static SVG must fill the focusable wrapper, or pointer math
+// (which divides by the wrapper width) drifts off the cells when a demo sizes
+// the wrapper wider than the grid's intrinsic viewBox. See the shared FILL rule.
+const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
+
 export interface InteractiveCalendarStripProps extends CalendarStripProps {
   strings?: CalendarStrings;
   /** Announced day label (defaults to weekday + month + day, UTC). */
@@ -160,6 +165,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         domain={domain}
         strings={strings}
         summary={false}
+        style={FILL}
       >
         {activeCell
           ? (() => {
