@@ -53,13 +53,25 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   // Same geometry inputs as the static render (pure → identical numbers),
-  // including the label gutter, so overlay marks line up exactly.
+  // including the label gutters, so overlay marks line up exactly.
   const geo = useMemo(() => {
     const last = lastFinite(data);
     const labelText = label === "last" && last !== undefined ? fmt(last) : undefined;
     const gutterRight = labelText !== undefined ? labelMetrics(labelText, width, height).gutter : 0;
-    return sparkGeometry(data, { width, height, domain, zero: fill, band, gutterRight });
-  }, [data, width, height, domain, fill, band, label, fmt]);
+    const mmSize = Math.max(5, Math.min(Math.round(height * 0.22), 9));
+    const gutterY = label === "minmax" && height >= (mmSize + 1) * 2 + 12 ? mmSize + 1 : 0;
+    return sparkGeometry(data, {
+      width,
+      height,
+      domain,
+      zero: fill,
+      band,
+      gutterRight,
+      gutterTop: gutterY,
+      gutterBottom: gutterY,
+      maxPoints: props.maxPoints,
+    });
+  }, [data, width, height, domain, fill, band, label, fmt, props.maxPoints]);
 
   // Indices with a finite value — the only navigable stops.
   const stops = useMemo(

@@ -42,6 +42,50 @@ export function maxPerBucket(
   return out;
 }
 
+/** A surviving observation pinned to its original index (`value: null` = a
+ *  fully-empty bucket, kept so line gaps survive decimation). */
+export interface IndexedValue {
+  index: number;
+  value: number | null;
+}
+
+/**
+ * Index-preserving min/max decimation for LINE rendering (the long-series
+ * sparkline guard, plan/21 §6.0.D). Each bucket contributes its min and max at
+ * their ORIGINAL indices, in index order — spikes keep their true x position
+ * and both extremes survive (never mean, never midpoint). Output ≤ 2·buckets
+ * entries; `buckets ≥ length` is an identity pass-through.
+ */
+export function decimateMinMax(values: readonly Value[], buckets: number): IndexedValue[] {
+  const n = values.length;
+  const k = Math.floor(buckets);
+  if (k < 1) return [];
+  if (k >= n) return values.map((v, i) => ({ index: i, value: isFiniteValue(v) ? v : null }));
+
+  const out: IndexedValue[] = [];
+  for (let i = 0; i < k; i++) {
+    const end = bucketStart(i + 1, n, k);
+    let lo = -1;
+    let hi = -1;
+    for (let j = bucketStart(i, n, k); j < end; j++) {
+      const v = values[j];
+      if (!isFiniteValue(v)) continue;
+      if (lo < 0 || v < (values[lo] as number)) lo = j;
+      if (hi < 0 || v > (values[hi] as number)) hi = j;
+    }
+    if (lo < 0) {
+      out.push({ index: bucketStart(i, n, k), value: null });
+    } else if (lo === hi) {
+      out.push({ index: lo, value: values[lo] as number });
+    } else {
+      const a = Math.min(lo, hi);
+      const b = Math.max(lo, hi);
+      out.push({ index: a, value: values[a] as number }, { index: b, value: values[b] as number });
+    }
+  }
+  return out;
+}
+
 /**
  * Min/max envelope per bucket — the shape-preserving alternative when both
  * extremes matter (waveform `style="envelope"`). Same bucket math and null

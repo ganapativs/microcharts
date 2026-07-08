@@ -1,7 +1,7 @@
 {
   "sparkline": {
-    "static": 2.97,
-    "interactive": 3.94
+    "static": 3.32,
+    "interactive": 4.32
   },
   "sparkbar": {
     "static": 2.49,
@@ -12,8 +12,8 @@
     "interactive": 1.18
   },
   "bullet": {
-    "static": 1.56,
-    "interactive": 1.92
+    "static": 1.64,
+    "interactive": 1.99
   },
   "activity-grid": {
     "static": 1.68,

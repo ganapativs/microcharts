@@ -52,9 +52,15 @@ export const entry: ChartEntry = {
     },
     {
       name: "label",
-      type: '"none" | "last"',
+      type: '"none" | "last" | "minmax"',
       required: false,
-      description: "Direct endpoint value label.",
+      description: "Direct value labels: endpoint, or the extremes.",
+    },
+    {
+      name: "maxPoints",
+      type: "number",
+      required: false,
+      description: "Line-point cap (default 200); longer series decimate min/max-preserving.",
     },
     {
       name: "title",

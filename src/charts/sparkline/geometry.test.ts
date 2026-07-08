@@ -142,3 +142,50 @@ describe("sparkGeometry (invariants)", () => {
     },
   );
 });
+
+describe("long-series guard (plan/21 §6.0.D — min/max decimation)", () => {
+  const long = Array.from({ length: 10_000 }, (_, i) => 50 + Math.sin(i / 7) * 20);
+
+  it("points stays 1:1 with data; linePoints collapses past maxPoints", () => {
+    const g = geo(long);
+    expect(g.points).toHaveLength(10_000);
+    expect(g.linePoints.length).toBeLessThanOrEqual(200);
+  });
+
+  it("short series → linePoints IS points (same reference, no copy)", () => {
+    const g = geo([1, 2, 3]);
+    expect(g.linePoints).toBe(g.points);
+  });
+
+  it("maxPoints=Infinity opts out", () => {
+    const g = geo(long, { maxPoints: Infinity });
+    expect(g.linePoints).toBe(g.points);
+  });
+
+  it("a lone spike survives decimation at its true x (never averaged away)", () => {
+    const spiky = long.slice();
+    spiky[7_777] = 500;
+    const g = geo(spiky, { domain: [0, 500] });
+    const spike = g.points[7_777]!;
+    expect(g.linePoints.some((p) => p !== null && p[0] === spike[0] && p[1] === spike[1])).toBe(
+      true,
+    );
+  });
+
+  it("an all-null stretch stays a gap after decimation", () => {
+    const gappy: (number | null)[] = long.slice();
+    for (let i = 4_000; i < 6_000; i++) gappy[i] = null;
+    const g = geo(gappy);
+    expect(g.linePoints).toContain(null);
+  });
+
+  test.prop([
+    fc.array(fc.double({ noNaN: true, min: -1e6, max: 1e6 }), { minLength: 300, maxLength: 2000 }),
+  ])("global min and max always survive decimation", (values) => {
+    const g = geo(values);
+    if (!g.min || !g.max) return;
+    for (const m of [g.min, g.max]) {
+      expect(g.linePoints.some((p) => p !== null && p[0] === m.x && p[1] === m.y)).toBe(true);
+    }
+  });
+});

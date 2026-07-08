@@ -7,13 +7,13 @@
   {
     "name": "@microcharts/react/sparkline (static)",
     "path": "dist/charts/sparkline/index.js",
-    "limit": "3 kB",
+    "limit": "3.35 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/sparkline/interactive",
     "path": "dist/charts/sparkline/client.js",
-    "limit": "4 kB",
+    "limit": "4.35 kB",
     "gzip": true
   },
   {
