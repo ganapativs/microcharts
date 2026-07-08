@@ -43,7 +43,7 @@ per subpath.** New gates:
 
 | Metric | Budget | Gate |
 |---|---|---|
-| Gzip per static chart subpath (tree-shaken, incl. shared core) | **≤ 3 kB** hard · ≤ 2 kB target · simple charts (Delta-class) ≤ 1.5 kB | size-limit per subpath |
+| Gzip per static chart subpath (tree-shaken, incl. shared core) | **≤ 3 kB** hard · ≤ 2 kB target · simple charts (Delta-class) ≤ 1.5 kB. One documented flagship exception: Sparkline 3.35/4.35 kB (user-approved 2026-07-08, plan/12 — not a precedent) | size-limit per subpath |
 | Gzip per interactive subpath | **≤ static + 1 kB** (≤ 4 kB hard) | size-limit per subpath |
 | Shared kernel (`core/` + `shared/`, fully tree-shaken cost of one minimal chart) | **≤ 5 kB** | size-limit on `./sparkline` (proxy) |
 | `styles.css` (whole library, shared) | **≤ 12 kB** | size-limit |

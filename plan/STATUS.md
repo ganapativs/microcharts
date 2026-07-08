@@ -34,7 +34,7 @@
 
 Pending one-time account setup (unblocks release/visual workflows): npmjs Trusted Publisher for `@microcharts/react`, `ARGOS_TOKEN` secret.
 
-**⚠️ Pending USER decision (2026-07-08, Batch 0.D):** sparkline budgets sit at **3.35/4.35 kB** — over the 3/4 kB hard caps — because the two plan-mandated hardening features (long-series guard + `label="minmax"` parity) landed on a chart with 35 B of headroom; every trim was measured and exhausted (full ledger in plan/12, options in `scripts/size-budgets.json` `$pending`). Approve a flagship exception or direct a feature cut, then revert the budget note.
+**RESOLVED (2026-07-08, user):** sparkline **3.35/4.35 kB approved as a documented flagship exception** to the 3/4 kB hard caps (long-series guard + `label="minmax"` on the densest chart; trim ledger in plan/12). Recorded in `scripts/size-budgets.json` `$exception` + plan/21 §1. Standard caps stay law for every other chart.
 
 ---
 

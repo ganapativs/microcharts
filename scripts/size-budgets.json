@@ -1,6 +1,6 @@
 {
   "$comment": "Per-subpath gzip budgets (plan/21 §1, budget model v2). Keys are export subpaths without './'. Every chart needs an entry — gen-size-limits.mjs fails on a missing one, so adding a chart forces a budget decision. Hard ceilings: static ≤ 3 kB (target 2 kB, Delta-class 1.5 kB), interactive ≤ static + 1 kB. `.size-limit.json` is GENERATED from this file + package.json#exports — never hand-edit it.",
-  "$pending": "⚠️ USER DECISION PENDING (2026-07-08): sparkline 3.35/4.35 kB exceeds the 3/4 kB hard caps. Batch-0-mandated features (long-series min/max guard ≈ +170 B, plan/04 label=minmax parity ≈ +145 B) landed on a chart that had 35 B headroom; all trim options were measured and exhausted (plan/12 audit). Options: bless a documented flagship exception, or drop label=minmax (−145 B), or make the guard opt-in. Revert to 3/4 kB once decided.",
+  "$exception": "Sparkline 3.35/4.35 kB is a USER-APPROVED flagship exception (2026-07-08) to the 3/4 kB hard caps — it carries the long-series guard + label=minmax on top of the densest feature set; every trim was measured and exhausted first (plan/12 audit). Every other chart holds the standard caps; do not cite this exception to justify another.",
   "styles": "12 kB",
   "charts": {
     "sparkline": { "static": "3.35 kB", "interactive": "4.35 kB" },

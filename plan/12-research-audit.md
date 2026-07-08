@@ -287,7 +287,7 @@ bindings, covers every future ES2023+ API automatically. Verified: full typechec
 lib. Residual gap: untyped dev-only `.mjs` (bench/, scripts/) — acceptable, they never ship and run
 on pinned dev Node. plan/21 §6.0.D wording updated to match.
 
-**Sparkline budget conflict (2026-07-08, Batch 0.D — ⚠️ user decision pending):** the two
+**Sparkline budget conflict (2026-07-08, Batch 0.D — RESOLVED same day: user approved option (a), the documented flagship exception; size-budgets.json carries it as `$exception`):** the two
 plan-mandated sparkline hardening features collide with the plan/21 §1 hard caps. Measured
 (webpack+terser+gzip, the real import cost): baseline **2 965 B** static (35 B under the 3 kB cap);
 long-series min/max guard (plan/21 §6.0.D, decimation inlined in geometry reusing scaled points —
