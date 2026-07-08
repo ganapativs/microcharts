@@ -63,14 +63,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <LikertStrip data={SURVEY} summary={false} style={{ width: 130, height: 20 }} />;
+  return <LikertStrip data={SURVEY} summary={false} width={130} height={20} />;
 }
 
 export const showcase = {
   hint: "sentiment",
-  Node: () => (
-    <LikertStrip data={SURVEY} title="Q1 satisfaction" style={{ width: 130, height: 20 }} />
-  ),
+  Node: () => <LikertStrip data={SURVEY} title="Q1 satisfaction" width={130} height={20} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -96,7 +94,8 @@ export const playground: PlaygroundSpec = {
       neutral={s.neutral as "split" | "omit"}
       label={s.label as "ends" | "net" | "none"}
       summary={false}
-      style={{ width: 260, height: 26 }}
+      width={260}
+      height={26}
     />
   ),
   code: (s) =>
@@ -115,14 +114,12 @@ export const recipes: Recipe[] = [
   {
     label: "survey rows",
     code: `{questions.map((q) => (\n  <LikertStrip key={q.id} data={q.responses} title={q.text} />\n))}`,
-    node: <LikertStrip data={SURVEY} summary={false} style={{ width: 160, height: 16 }} />,
+    node: <LikertStrip data={SURVEY} summary={false} width={160} height={16} />,
   },
   {
     label: "net score for dense tables",
     code: `<LikertStrip data={responses} label="net" />`,
-    node: (
-      <LikertStrip data={SURVEY} label="net" summary={false} style={{ width: 120, height: 14 }} />
-    ),
+    node: <LikertStrip data={SURVEY} label="net" summary={false} width={120} height={14} />,
   },
 ];
 
@@ -132,7 +129,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
       data={props.data.slice(0, 5).map((v, i) => ({ label: `L${i + 1}`, value: v }))}
       label="none"
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 12 }}
+      width={props.width ?? 60}
+      height={props.height ?? 12}
     />
   );
 }

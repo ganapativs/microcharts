@@ -66,20 +66,13 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return (
-    <EventTimeline data={DATA} domain={WINDOW} summary={false} style={{ width: 150, height: 20 }} />
-  );
+  return <EventTimeline data={DATA} domain={WINDOW} summary={false} width={150} height={20} />;
 }
 
 export const showcase = {
   hint: "when + how long",
   Node: () => (
-    <EventTimeline
-      data={DATA}
-      domain={WINDOW}
-      title="API uptime"
-      style={{ width: 150, height: 20 }}
-    />
+    <EventTimeline data={DATA} domain={WINDOW} title="API uptime" width={150} height={20} />
   ),
 };
 
@@ -100,10 +93,9 @@ export const playground: PlaygroundSpec = {
       domain={WINDOW}
       now={s.now ? T0 + 21 * H : undefined}
       label={s.label as "none" | "spans"}
-      width={s.label === "spans" ? 160 : 80}
-      height={s.label === "spans" ? 14 : 12}
+      width={280}
+      height={36}
       summary={false}
-      style={{ width: 280, height: 36 }}
     />
   ),
   code: (s) =>
@@ -123,14 +115,7 @@ export const recipes: Recipe[] = [
   {
     label: "uptime rows (shared window)",
     code: `{services.map((svc) => (\n  <EventTimeline key={svc.id} data={svc.windows} domain={today} title={svc.name} />\n))}`,
-    node: (
-      <EventTimeline
-        data={DATA}
-        domain={WINDOW}
-        summary={false}
-        style={{ width: 170, height: 14 }}
-      />
-    ),
+    node: <EventTimeline data={DATA} domain={WINDOW} summary={false} width={170} height={14} />,
   },
   {
     label: "with the current moment",
@@ -141,7 +126,8 @@ export const recipes: Recipe[] = [
         domain={WINDOW}
         now={T0 + 21 * H}
         summary={false}
-        style={{ width: 170, height: 14 }}
+        width={170}
+        height={14}
       />
     ),
   },
@@ -156,7 +142,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
       }))}
       domain={[0, 60]}
       summary={false}
-      style={{ width: props.width ?? 70, height: props.height ?? 12 }}
+      width={props.width ?? 70}
+      height={props.height ?? 12}
     />
   );
 }

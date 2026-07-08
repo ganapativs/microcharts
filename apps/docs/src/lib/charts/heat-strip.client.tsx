@@ -11,7 +11,8 @@ export function InteractiveDemo() {
         data={LOAD}
         domain={[0, 100]}
         title="CPU pressure"
-        style={{ width: 260, height: 26 }}
+        width={260}
+        height={26}
       />
     </DemoPanel>
   );

@@ -60,12 +60,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <SegmentedBar data={MIX} summary={false} style={{ width: 130, height: 16 }} />;
+  return <SegmentedBar data={MIX} summary={false} width={130} height={16} />;
 }
 
 export const showcase = {
   hint: "composition",
-  Node: () => <SegmentedBar data={MIX} title="Browser share" style={{ width: 130, height: 16 }} />,
+  Node: () => <SegmentedBar data={MIX} title="Browser share" width={130} height={16} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -87,7 +87,8 @@ export const playground: PlaygroundSpec = {
       order={s.order as "data" | "desc"}
       maxSegments={s.maxSegments as number}
       summary={false}
-      style={{ width: 260, height: 22 }}
+      width={260}
+      height={22}
     />
   ),
   code: (s) =>
@@ -106,15 +107,13 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "table cell",
-    code: `<SegmentedBar data={row.mix} style={{ width: 60, height: 10 }} />`,
-    node: <SegmentedBar data={MIX} summary={false} style={{ width: 60, height: 10 }} />,
+    code: `<SegmentedBar data={row.mix} width={60} height={10} />`,
+    node: <SegmentedBar data={MIX} summary={false} width={60} height={10} />,
   },
   {
     label: "with percents",
     code: `<SegmentedBar data={mix} label="percent" style={{ width: 160 }} />`,
-    node: (
-      <SegmentedBar data={MIX} label="percent" summary={false} style={{ width: 160, height: 14 }} />
-    ),
+    node: <SegmentedBar data={MIX} label="percent" summary={false} width={160} height={14} />,
   },
 ];
 
@@ -123,7 +122,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <SegmentedBar
       data={props.data.slice(0, 4).map((v, i) => ({ label: `c${i + 1}`, value: v }))}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 10 }}
+      width={props.width ?? 60}
+      height={props.height ?? 10}
     />
   );
 }

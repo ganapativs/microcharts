@@ -11,7 +11,7 @@ const BANDS = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Rove rows with ↑/↓; ←/→ inspect the from/to ends of the active row.">
-      <DumbbellInteractive data={BANDS} title="Band moves" style={{ width: 240, height: 72 }} />
+      <DumbbellInteractive data={BANDS} title="Band moves" width={240} height={72} />
     </DemoPanel>
   );
 }

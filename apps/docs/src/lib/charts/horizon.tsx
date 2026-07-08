@@ -59,12 +59,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Horizon data={LOAD} summary={false} style={{ width: 130, height: 16 }} />;
+  return <Horizon data={LOAD} summary={false} width={130} height={16} />;
 }
 
 export const showcase = {
   hint: "dense fold",
-  Node: () => <Horizon data={LOAD} title="Cluster load" style={{ width: 130, height: 16 }} />,
+  Node: () => <Horizon data={LOAD} title="Cluster load" width={130} height={16} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -90,7 +90,8 @@ export const playground: PlaygroundSpec = {
       folds={Number(s.folds) as 2 | 3}
       mode={s.mode as "mirror" | "offset"}
       summary={false}
-      style={{ width: 260, height: 24 }}
+      width={260}
+      height={24}
     />
   ),
   code: (s) =>
@@ -109,12 +110,12 @@ export const recipes: Recipe[] = [
   {
     label: "monitoring rows",
     code: `{hosts.map((h) => (\n  <Horizon key={h.id} data={h.load} title={h.name} />\n))}`,
-    node: <Horizon data={LOAD} summary={false} style={{ width: 160, height: 12 }} />,
+    node: <Horizon data={LOAD} summary={false} width={160} height={12} />,
   },
   {
     label: "fold around a target",
     code: `<Horizon data={latency} baseline={200} />`,
-    node: <Horizon data={LOAD} baseline={20} summary={false} style={{ width: 160, height: 14 }} />,
+    node: <Horizon data={LOAD} baseline={20} summary={false} width={160} height={14} />,
   },
 ];
 
@@ -123,7 +124,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <Horizon
       data={props.data}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 12 }}
+      width={props.width ?? 60}
+      height={props.height ?? 12}
     />
   );
 }

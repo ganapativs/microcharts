@@ -54,12 +54,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Dumbbell data={BANDS} summary={false} style={{ width: 130, height: 52 }} />;
+  return <Dumbbell data={BANDS} summary={false} width={130} height={52} />;
 }
 
 export const showcase = {
   hint: "before → after",
-  Node: () => <Dumbbell data={BANDS} title="Band moves" style={{ width: 130, height: 52 }} />,
+  Node: () => <Dumbbell data={BANDS} title="Band moves" width={130} height={52} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -75,7 +75,8 @@ export const playground: PlaygroundSpec = {
       label={(s.values as boolean) ? "value" : "none"}
       highlight={(s.highlight as boolean) ? "Berlin" : undefined}
       summary={false}
-      style={{ width: 240, height: 96 }}
+      width={240}
+      height={96}
     />
   ),
   code: (s) =>
@@ -94,24 +95,18 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "table cell",
-    code: `<Dumbbell data={[row.band]} style={{ width: 60, height: 12 }} />`,
-    node: (
-      <Dumbbell data={[{ from: 48, to: 68 }]} summary={false} style={{ width: 60, height: 12 }} />
-    ),
+    code: `<Dumbbell data={[row.band]} width={60} height={12} />`,
+    node: <Dumbbell data={[{ from: 48, to: 68 }]} summary={false} width={60} height={12} />,
   },
   {
     label: "a range, not a change",
     code: `// no positive prop — a min→max range has no valence to color\n<Dumbbell data={[{ from: p5, to: p95 }]} />`,
-    node: (
-      <Dumbbell data={[{ from: 12, to: 96 }]} summary={false} style={{ width: 60, height: 12 }} />
-    ),
+    node: <Dumbbell data={[{ from: 12, to: 96 }]} summary={false} width={60} height={12} />,
   },
 ];
 
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
-  return (
-    <Dumbbell data={[{ from: 48, to: 68 }]} summary={false} style={{ width: 60, height: 12 }} />
-  );
+  return <Dumbbell data={[{ from: 48, to: 68 }]} summary={false} width={60} height={12} />;
 }
 
 export function markCode(): string {

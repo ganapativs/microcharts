@@ -15,7 +15,7 @@ const PERIODS = Array.from({ length: 20 }, (_, i) => {
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover or arrow through the sessions — each announces open, high, low, and close.">
-      <OhlcInteractive data={PERIODS} title="ACME 20 sessions" style={{ width: 280, height: 32 }} />
+      <OhlcInteractive data={PERIODS} title="ACME 20 sessions" width={280} height={32} />
     </DemoPanel>
   );
 }

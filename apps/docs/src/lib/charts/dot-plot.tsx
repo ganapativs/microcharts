@@ -55,14 +55,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <DotPlot data={TEAM} summary={false} style={{ width: 130, height: 70 }} />;
+  return <DotPlot data={TEAM} summary={false} width={130} height={70} />;
 }
 
 export const showcase = {
   hint: "comparison",
-  Node: () => (
-    <DotPlot data={TEAM} highlight="Ada" title="Review scores" style={{ width: 130, height: 70 }} />
-  ),
+  Node: () => <DotPlot data={TEAM} highlight="Ada" title="Review scores" width={130} height={70} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -78,7 +76,8 @@ export const playground: PlaygroundSpec = {
       label={(s.values as boolean) ? "value" : "none"}
       highlight={(s.highlight as boolean) ? "Ada" : undefined}
       summary={false}
-      style={{ width: 220, height: 110 }}
+      width={220}
+      height={110}
     />
   ),
   code: (s) =>
@@ -97,21 +96,15 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "KPI leaderboard",
-    code: `<DotPlot data={team} label="value" highlight="Ada"\n  style={{ width: 140, height: 56 }} />`,
+    code: `<DotPlot data={team} label="value" highlight="Ada"\n  width={140} height={56} />`,
     node: (
-      <DotPlot
-        data={TEAM}
-        label="value"
-        highlight="Ada"
-        summary={false}
-        style={{ width: 140, height: 56 }}
-      />
+      <DotPlot data={TEAM} label="value" highlight="Ada" summary={false} width={140} height={56} />
     ),
   },
   {
     label: "magnitude read (stems)",
     code: `// stems force a zero-anchored domain — position becomes magnitude\n<DotPlot data={team} stem />`,
-    node: <DotPlot data={TEAM} stem summary={false} style={{ width: 140, height: 56 }} />,
+    node: <DotPlot data={TEAM} stem summary={false} width={140} height={56} />,
   },
 ];
 
@@ -120,7 +113,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <DotPlot
       data={props.data.slice(0, 4).map((v, i) => ({ label: `c${i + 1}`, value: v }))}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 32 }}
+      width={props.width ?? 60}
+      height={props.height ?? 32}
     />
   );
 }

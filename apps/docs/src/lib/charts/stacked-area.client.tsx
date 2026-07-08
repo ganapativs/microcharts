@@ -11,7 +11,7 @@ const MIX = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover or arrow across — each point announces every layer's share at once.">
-      <StackedAreaInteractive data={MIX} title="Traffic mix" style={{ width: 260, height: 32 }} />
+      <StackedAreaInteractive data={MIX} title="Traffic mix" width={260} height={32} />
     </DemoPanel>
   );
 }

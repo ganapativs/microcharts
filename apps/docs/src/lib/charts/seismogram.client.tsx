@@ -9,11 +9,7 @@ const BURSTS = Array.from({ length: 48 }, (_, i) =>
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover or arrow through the slots; Home/End jump to the first/last event.">
-      <SeismogramInteractive
-        data={BURSTS}
-        title="Error bursts"
-        style={{ width: 260, height: 36 }}
-      />
+      <SeismogramInteractive data={BURSTS} title="Error bursts" width={260} height={36} />
     </DemoPanel>
   );
 }

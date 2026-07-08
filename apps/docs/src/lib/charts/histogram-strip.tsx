@@ -51,18 +51,13 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <HistogramStrip data={TIMES} summary={false} style={{ width: 130, height: 34 }} />;
+  return <HistogramStrip data={TIMES} summary={false} width={130} height={34} />;
 }
 
 export const showcase = {
   hint: "distribution",
   Node: () => (
-    <HistogramStrip
-      data={TIMES}
-      highlight={45}
-      title="Response times"
-      style={{ width: 130, height: 34 }}
-    />
+    <HistogramStrip data={TIMES} highlight={45} title="Response times" width={130} height={34} />
   ),
 };
 
@@ -77,7 +72,8 @@ export const playground: PlaygroundSpec = {
       bins={s.bins as number}
       highlight={(s.highlight as boolean) ? 45 : undefined}
       summary={false}
-      style={{ width: 260, height: 64 }}
+      width={260}
+      height={64}
     />
   ),
   code: (s) =>
@@ -96,26 +92,12 @@ export const recipes: Recipe[] = [
   {
     label: "where you fall",
     code: `<HistogramStrip data={salaries} highlight={yourSalary} />`,
-    node: (
-      <HistogramStrip
-        data={TIMES}
-        highlight={45}
-        summary={false}
-        style={{ width: 140, height: 32 }}
-      />
-    ),
+    node: <HistogramStrip data={TIMES} highlight={45} summary={false} width={140} height={32} />,
   },
   {
     label: "fixed edges across rows",
     code: `<HistogramStrip data={rowA} domain={[0, 100]} />\n<HistogramStrip data={rowB} domain={[0, 100]} />`,
-    node: (
-      <HistogramStrip
-        data={TIMES}
-        domain={[0, 100]}
-        summary={false}
-        style={{ width: 140, height: 32 }}
-      />
-    ),
+    node: <HistogramStrip data={TIMES} domain={[0, 100]} summary={false} width={140} height={32} />,
   },
 ];
 
@@ -124,7 +106,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <HistogramStrip
       data={props.data}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 16 }}
+      width={props.width ?? 60}
+      height={props.height ?? 16}
     />
   );
 }

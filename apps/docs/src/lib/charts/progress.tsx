@@ -49,12 +49,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Progress value={0.68} summary={false} style={{ width: 120, height: 20 }} />;
+  return <Progress value={0.68} summary={false} width={120} height={20} />;
 }
 
 export const showcase = {
   hint: "completion",
-  Node: () => <Progress value={0.68} title="Backlog burn" style={{ width: 120, height: 20 }} />,
+  Node: () => <Progress value={0.68} title="Backlog burn" width={120} height={20} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -75,7 +75,8 @@ export const playground: PlaygroundSpec = {
       segments={(s.segments as number) >= 2 ? (s.segments as number) : undefined}
       label={s.label as "percent" | "value" | "fraction" | "none"}
       summary={false}
-      style={{ width: 200, height: 26 }}
+      width={200}
+      height={26}
     />
   ),
   code: (s) =>
@@ -113,7 +114,7 @@ export const recipes: Recipe[] = [
 ];
 
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
-  return <Progress value={0.68} summary={false} style={{ width: 64, height: 10 }} />;
+  return <Progress value={0.68} summary={false} width={64} height={10} />;
 }
 
 export function markCode(): string {

@@ -59,14 +59,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <PairedBars data={BUDGET} summary={false} style={{ width: 120, height: 40 }} />;
+  return <PairedBars data={BUDGET} summary={false} width={120} height={40} />;
 }
 
 export const showcase = {
   hint: "vs reference",
-  Node: () => (
-    <PairedBars data={BUDGET} title="Actual vs plan" style={{ width: 120, height: 40 }} />
-  ),
+  Node: () => <PairedBars data={BUDGET} title="Actual vs plan" width={120} height={40} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -115,15 +113,13 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "table cell",
-    code: `<PairedBars data={row.mix} style={{ width: 60, height: 20 }} />`,
-    node: <PairedBars data={BUDGET} summary={false} style={{ width: 60, height: 20 }} />,
+    code: `<PairedBars data={row.mix} width={60} height={20} />`,
+    node: <PairedBars data={BUDGET} summary={false} width={60} height={20} />,
   },
   {
     label: "overlay for tight cells",
     code: `// ghost = the reference, never the value\n<PairedBars data={row.mix} mode="overlay" />`,
-    node: (
-      <PairedBars data={BUDGET} mode="overlay" summary={false} style={{ width: 60, height: 20 }} />
-    ),
+    node: <PairedBars data={BUDGET} mode="overlay" summary={false} width={60} height={20} />,
   },
 ];
 
@@ -132,7 +128,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <PairedBars
       data={props.data.slice(0, 4).map((v, i) => ({ label: `c${i + 1}`, value: v, ref: v * 1.15 }))}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 20 }}
+      width={props.width ?? 60}
+      height={props.height ?? 20}
     />
   );
 }

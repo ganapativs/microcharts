@@ -13,11 +13,7 @@ const MIX = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover or arrow through the segments — Other announces its member count.">
-      <SegmentedBarInteractive
-        data={MIX}
-        title="Browser share"
-        style={{ width: 260, height: 22 }}
-      />
+      <SegmentedBarInteractive data={MIX} title="Browser share" width={260} height={22} />
     </DemoPanel>
   );
 }

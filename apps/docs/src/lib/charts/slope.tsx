@@ -60,12 +60,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Slope data={RANKS} summary={false} style={{ width: 90, height: 70 }} />;
+  return <Slope data={RANKS} summary={false} width={90} height={70} />;
 }
 
 export const showcase = {
   hint: "two moments",
-  Node: () => <Slope data={RANKS} title="Before vs after" style={{ width: 90, height: 70 }} />,
+  Node: () => <Slope data={RANKS} title="Before vs after" width={90} height={70} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -87,7 +87,8 @@ export const playground: PlaygroundSpec = {
       positive={(s.positive as boolean) ? "up" : undefined}
       highlight={(s.highlight as boolean) ? "West" : undefined}
       summary={false}
-      style={{ width: 200, height: 130 }}
+      width={200}
+      height={130}
     />
   ),
   code: (s) =>
@@ -106,18 +107,18 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "KPI before/after",
-    code: `<Slope data={cohorts} label="both"\n  style={{ width: 120, height: 72 }} />`,
-    node: <Slope data={RANKS} label="both" summary={false} style={{ width: 120, height: 72 }} />,
+    code: `<Slope data={cohorts} label="both"\n  width={120} height={72} />`,
+    node: <Slope data={RANKS} label="both" summary={false} width={120} height={72} />,
   },
   {
     label: "one vs the field",
     code: `<Slope data={cohorts} highlight="West" />`,
-    node: <Slope data={RANKS} highlight="West" summary={false} style={{ width: 90, height: 60 }} />,
+    node: <Slope data={RANKS} highlight="West" summary={false} width={90} height={60} />,
   },
 ];
 
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
-  return <Slope data={RANKS.slice(0, 3)} summary={false} style={{ width: 40, height: 26 }} />;
+  return <Slope data={RANKS.slice(0, 3)} summary={false} width={40} height={26} />;
 }
 
 export function markCode(): string {

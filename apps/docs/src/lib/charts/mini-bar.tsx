@@ -65,18 +65,13 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <MiniBar data={MIX} summary={false} style={{ width: 100, height: 32 }} />;
+  return <MiniBar data={MIX} summary={false} width={100} height={32} />;
 }
 
 export const showcase = {
   hint: "categories",
   Node: () => (
-    <MiniBar
-      data={MIX}
-      highlight="East"
-      title="Sales by region"
-      style={{ width: 100, height: 32 }}
-    />
+    <MiniBar data={MIX} highlight="East" title="Sales by region" width={100} height={32} />
   ),
 };
 
@@ -126,8 +121,8 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "table cell",
-    code: `<MiniBar data={row.mix} style={{ width: 50, height: 16 }} />`,
-    node: <MiniBar data={MIX} summary={false} style={{ width: 50, height: 16 }} />,
+    code: `<MiniBar data={row.mix} width={50} height={16} />`,
+    node: <MiniBar data={MIX} summary={false} width={50} height={16} />,
   },
   {
     label: "signed with polarity",
@@ -142,7 +137,8 @@ export const recipes: Recipe[] = [
         ]}
         positive="up"
         summary={false}
-        style={{ width: 80, height: 28 }}
+        width={80}
+        height={28}
       />
     ),
   },
@@ -153,7 +149,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <MiniBar
       data={props.data.slice(0, 6).map((v, i) => ({ label: `c${i + 1}`, value: v }))}
       summary={false}
-      style={{ width: props.width ?? 50, height: props.height ?? 16 }}
+      width={props.width ?? 50}
+      height={props.height ?? 16}
     />
   );
 }

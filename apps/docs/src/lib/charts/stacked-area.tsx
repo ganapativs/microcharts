@@ -61,12 +61,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <StackedArea data={MIX} summary={false} style={{ width: 130, height: 22 }} />;
+  return <StackedArea data={MIX} summary={false} width={130} height={22} />;
 }
 
 export const showcase = {
   hint: "mix shift",
-  Node: () => <StackedArea data={MIX} title="Traffic mix" style={{ width: 130, height: 22 }} />,
+  Node: () => <StackedArea data={MIX} title="Traffic mix" width={130} height={22} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -92,7 +92,8 @@ export const playground: PlaygroundSpec = {
       variant={s.variant as "stacked" | "ridge"}
       curve={s.curve as "linear" | "smooth"}
       summary={false}
-      style={{ width: 260, height: 32 }}
+      width={260}
+      height={32}
     />
   ),
   code: (s) =>
@@ -111,14 +112,12 @@ export const recipes: Recipe[] = [
   {
     label: "mix rows",
     code: `{regions.map((r) => (\n  <StackedArea key={r.id} data={r.mix} title={r.name} />\n))}`,
-    node: <StackedArea data={MIX} summary={false} style={{ width: 160, height: 18 }} />,
+    node: <StackedArea data={MIX} summary={false} width={160} height={18} />,
   },
   {
     label: "ridge skin",
     code: `<StackedArea data={mix} variant="ridge" />`,
-    node: (
-      <StackedArea data={MIX} variant="ridge" summary={false} style={{ width: 160, height: 20 }} />
-    ),
+    node: <StackedArea data={MIX} variant="ridge" summary={false} width={160} height={20} />,
   },
 ];
 
@@ -130,7 +129,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
         { label: "B", values: props.data.map((v, i) => Math.abs(v) * 0.6 + i * 0.2 + 1) },
       ]}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 14 }}
+      width={props.width ?? 60}
+      height={props.height ?? 14}
     />
   );
 }

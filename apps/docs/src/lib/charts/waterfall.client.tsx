@@ -17,7 +17,8 @@ export function InteractiveDemo() {
         data={PL}
         start={60}
         title="Net income bridge"
-        style={{ width: 260, height: 32 }}
+        width={260}
+        height={32}
       />
     </DemoPanel>
   );

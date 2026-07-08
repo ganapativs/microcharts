@@ -57,12 +57,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <MicroBox data={RAW} summary={false} style={{ width: 130, height: 22 }} />;
+  return <MicroBox data={RAW} summary={false} width={130} height={22} />;
 }
 
 export const showcase = {
   hint: "five numbers",
-  Node: () => <MicroBox data={RAW} title="Latency spread" style={{ width: 130, height: 22 }} />,
+  Node: () => <MicroBox data={RAW} title="Latency spread" width={130} height={22} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -81,7 +81,8 @@ export const playground: PlaygroundSpec = {
       data={(s.outlier as boolean) ? [...RAW, 400] : RAW}
       whiskers={s.whiskers as "minmax" | "tukey"}
       summary={false}
-      style={{ width: 260, height: 40 }}
+      width={260}
+      height={40}
     />
   ),
   code: (s) =>
@@ -103,16 +104,15 @@ export const recipes: Recipe[] = [
       <MicroBox
         stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }}
         summary={false}
-        style={{ width: 140, height: 18 }}
+        width={140}
+        height={18}
       />
     ),
   },
   {
     label: "shared domain rows",
     code: `<MicroBox stats={p50} domain={[0, 300]} />\n<MicroBox stats={p95} domain={[0, 300]} />`,
-    node: (
-      <MicroBox data={RAW} domain={[0, 300]} summary={false} style={{ width: 140, height: 18 }} />
-    ),
+    node: <MicroBox data={RAW} domain={[0, 300]} summary={false} width={140} height={18} />,
   },
 ];
 
@@ -121,7 +121,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <MicroBox
       data={props.data}
       summary={false}
-      style={{ width: props.width ?? 40, height: props.height ?? 14 }}
+      width={props.width ?? 40}
+      height={props.height ?? 14}
     />
   );
 }

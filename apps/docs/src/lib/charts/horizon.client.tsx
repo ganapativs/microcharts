@@ -9,7 +9,7 @@ const LOAD = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover or arrow across — each point announces its unfolded value.">
-      <HorizonInteractive data={LOAD} title="Cluster load" style={{ width: 260, height: 24 }} />
+      <HorizonInteractive data={LOAD} title="Cluster load" width={260} height={24} />
     </DemoPanel>
   );
 }

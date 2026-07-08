@@ -68,8 +68,8 @@
     "interactive": 3.17
   },
   "slope": {
-    "static": 2.68,
-    "interactive": 3.67
+    "static": 2.74,
+    "interactive": 3.73
   },
   "micro-scatter": {
     "static": 1.88,
@@ -108,8 +108,8 @@
     "interactive": 2.84
   },
   "bump-strip": {
-    "static": 1.88,
-    "interactive": 2.62
+    "static": 1.9,
+    "interactive": 2.65
   },
   "dual-sparkline": {
     "static": 2.94,

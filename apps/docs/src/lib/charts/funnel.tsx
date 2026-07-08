@@ -63,12 +63,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Funnel data={PIPE} summary={false} style={{ width: 130, height: 40 }} />;
+  return <Funnel data={PIPE} summary={false} width={130} height={40} />;
 }
 
 export const showcase = {
   hint: "conversion",
-  Node: () => <Funnel data={PIPE} title="Signup funnel" style={{ width: 130, height: 40 }} />,
+  Node: () => <Funnel data={PIPE} title="Signup funnel" width={130} height={40} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -96,7 +96,8 @@ export const playground: PlaygroundSpec = {
       connectors={s.connectors as boolean}
       label={s.label as "none" | "percent" | "value"}
       summary={false}
-      style={{ width: 260, height: 78 }}
+      width={260}
+      height={78}
     />
   ),
   code: (s) =>
@@ -115,15 +116,13 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "table cell",
-    code: `<Funnel data={campaign.stages} style={{ width: 60, height: 18 }} />`,
-    node: <Funnel data={PIPE} summary={false} style={{ width: 60, height: 18 }} />,
+    code: `<Funnel data={campaign.stages} width={60} height={18} />`,
+    node: <Funnel data={PIPE} summary={false} width={60} height={18} />,
   },
   {
     label: "the leak",
     code: `<Funnel data={stages} highlight="Activated" />`,
-    node: (
-      <Funnel data={PIPE} highlight="Activated" summary={false} style={{ width: 90, height: 26 }} />
-    ),
+    node: <Funnel data={PIPE} highlight="Activated" summary={false} width={90} height={26} />,
   },
 ];
 
@@ -132,7 +131,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <Funnel
       data={props.data.slice(0, 4).map((v, i) => ({ label: `s${i + 1}`, value: v }))}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 18 }}
+      width={props.width ?? 60}
+      height={props.height ?? 18}
     />
   );
 }

@@ -17,7 +17,7 @@ most product data doesn't meet); `tukey` mode exposes fence-breakers as dots.
   <MicroBox
     stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }}
     title="p95 latency"
-    style={{ width: 220, height: 32 }}
+    width={220} height={32}
   />
 </LiveDemo>
 
@@ -58,7 +58,7 @@ most product data doesn't meet); `tukey` mode exposes fence-breakers as dots.
   code={`// < 5 values → dots, never a fake box
 <MicroBox data={[3, 7, 9]} />`}
 >
-  <MicroBox data={[3, 7, 9]} title="Only three" style={{ width: 220, height: 32 }} />
+  <MicroBox data={[3, 7, 9]} title="Only three" width={220} height={32} />
 </LiveDemo>
 
 ## Four homes

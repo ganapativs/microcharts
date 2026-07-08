@@ -13,11 +13,7 @@ const SURVEY = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover or arrow through the levels — each announces its share and position.">
-      <LikertStripInteractive
-        data={SURVEY}
-        title="Q1 satisfaction"
-        style={{ width: 260, height: 26 }}
-      />
+      <LikertStripInteractive data={SURVEY} title="Q1 satisfaction" width={260} height={26} />
     </DemoPanel>
   );
 }

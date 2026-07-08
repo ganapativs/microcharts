@@ -53,18 +53,13 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <MicroScatter data={CLOUD} summary={false} style={{ width: 110, height: 66 }} />;
+  return <MicroScatter data={CLOUD} summary={false} width={110} height={66} />;
 }
 
 export const showcase = {
   hint: "correlation",
   Node: () => (
-    <MicroScatter
-      data={CLOUD}
-      trend
-      title="Spend vs conversions"
-      style={{ width: 110, height: 66 }}
-    />
+    <MicroScatter data={CLOUD} trend title="Spend vs conversions" width={110} height={66} />
   ),
 };
 
@@ -81,7 +76,8 @@ export const playground: PlaygroundSpec = {
       focal={(s.focal as boolean) ? 12 : undefined}
       r={s.r as number}
       summary={false}
-      style={{ width: 220, height: 132 }}
+      width={220}
+      height={132}
     />
   ),
   code: (s) =>
@@ -112,7 +108,7 @@ export const recipes: Recipe[] = [
   {
     label: "with the trend",
     code: `<MicroScatter data={pairs} trend />`,
-    node: <MicroScatter data={CLOUD} trend summary={false} style={{ width: 90, height: 54 }} />,
+    node: <MicroScatter data={CLOUD} trend summary={false} width={90} height={54} />,
   },
 ];
 
@@ -121,7 +117,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <MicroScatter
       data={props.data.map((v, i) => ({ x: i, y: v }))}
       summary={false}
-      style={{ width: props.width ?? 40, height: props.height ?? 24 }}
+      width={props.width ?? 40}
+      height={props.height ?? 24}
     />
   );
 }

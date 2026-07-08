@@ -58,14 +58,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <HeatStrip data={LOAD} domain={D} summary={false} style={{ width: 130, height: 18 }} />;
+  return <HeatStrip data={LOAD} domain={D} summary={false} width={130} height={18} />;
 }
 
 export const showcase = {
   hint: "intensity strip",
-  Node: () => (
-    <HeatStrip data={LOAD} domain={D} title="CPU pressure" style={{ width: 130, height: 18 }} />
-  ),
+  Node: () => <HeatStrip data={LOAD} domain={D} title="CPU pressure" width={130} height={18} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -89,7 +87,8 @@ export const playground: PlaygroundSpec = {
       steps={s.steps as number}
       shape={s.shape as "square" | "round" | "dot"}
       summary={false}
-      style={{ width: 260, height: 30 }}
+      width={260}
+      height={30}
     />
   ),
   code: (s) =>
@@ -111,12 +110,13 @@ export const recipes: Recipe[] = [
     code: `// one domain per table — rows stay comparable\n{tenants.map((t) => (\n  <HeatStrip key={t.id} data={t.load} domain={[0, 100]} />\n))}`,
     node: (
       <span className="inline-flex flex-col gap-1">
-        <HeatStrip data={LOAD} domain={D} summary={false} style={{ width: 160, height: 12 }} />
+        <HeatStrip data={LOAD} domain={D} summary={false} width={160} height={12} />
         <HeatStrip
           data={LOAD.map((v) => Math.round(v * 0.4))}
           domain={D}
           summary={false}
-          style={{ width: 160, height: 12 }}
+          width={160}
+          height={12}
         />
       </span>
     ),
@@ -124,9 +124,7 @@ export const recipes: Recipe[] = [
   {
     label: "nulls hold their slot",
     code: `// a missing record is visibly different from zero\n<HeatStrip data={[3, null, 8, null, 5]} />`,
-    node: (
-      <HeatStrip data={[3, null, 8, null, 5]} summary={false} style={{ width: 90, height: 14 }} />
-    ),
+    node: <HeatStrip data={[3, null, 8, null, 5]} summary={false} width={90} height={14} />,
   },
 ];
 
@@ -135,7 +133,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <HeatStrip
       data={props.data}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 10 }}
+      width={props.width ?? 60}
+      height={props.height ?? 10}
     />
   );
 }

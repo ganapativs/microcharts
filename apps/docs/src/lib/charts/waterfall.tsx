@@ -63,14 +63,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Waterfall data={PL} start={60} summary={false} style={{ width: 130, height: 24 }} />;
+  return <Waterfall data={PL} start={60} summary={false} width={130} height={24} />;
 }
 
 export const showcase = {
   hint: "bridge",
-  Node: () => (
-    <Waterfall data={PL} start={60} title="Net income bridge" style={{ width: 130, height: 24 }} />
-  ),
+  Node: () => <Waterfall data={PL} start={60} title="Net income bridge" width={130} height={24} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -91,7 +89,8 @@ export const playground: PlaygroundSpec = {
       total={s.total as boolean}
       positive={s.positive as "up" | "down"}
       summary={false}
-      style={{ width: 260, height: 32 }}
+      width={260}
+      height={32}
     />
   ),
   code: (s) =>
@@ -111,7 +110,7 @@ export const recipes: Recipe[] = [
   {
     label: "P&L rows",
     code: `{quarters.map((q) => (\n  <Waterfall key={q.id} data={q.steps} start={q.open} title={q.name} />\n))}`,
-    node: <Waterfall data={PL} start={60} summary={false} style={{ width: 160, height: 20 }} />,
+    node: <Waterfall data={PL} start={60} summary={false} width={160} height={20} />,
   },
   {
     label: "cost bridge (down is good)",
@@ -122,7 +121,8 @@ export const recipes: Recipe[] = [
         start={60}
         positive="down"
         summary={false}
-        style={{ width: 160, height: 20 }}
+        width={160}
+        height={20}
       />
     ),
   },
@@ -133,7 +133,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <Waterfall
       data={props.data.slice(0, 6).map((v, i) => ({ label: `S${i + 1}`, value: v - 10 }))}
       summary={false}
-      style={{ width: props.width ?? 70, height: props.height ?? 16 }}
+      width={props.width ?? 70}
+      height={props.height ?? 16}
     />
   );
 }

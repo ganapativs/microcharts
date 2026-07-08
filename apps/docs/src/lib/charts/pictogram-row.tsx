@@ -54,14 +54,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <PictogramRow value={5} total={8} summary={false} style={{ width: 110, height: 16 }} />;
+  return <PictogramRow value={5} total={8} summary={false} width={110} height={16} />;
 }
 
 export const showcase = {
   hint: "count",
-  Node: () => (
-    <PictogramRow value={6.5} total={8} title="Capacity used" style={{ width: 110, height: 16 }} />
-  ),
+  Node: () => <PictogramRow value={6.5} total={8} title="Capacity used" width={110} height={16} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -84,7 +82,8 @@ export const playground: PlaygroundSpec = {
       shape={s.shape as "dot" | "square"}
       fractional={s.fractional as "clip" | "round"}
       summary={false}
-      style={{ width: 240, height: 28 }}
+      width={240}
+      height={28}
     />
   ),
   code: (s) =>
@@ -120,12 +119,12 @@ export const recipes: Recipe[] = [
   {
     label: "star rating via renderPoint",
     code: `<PictogramRow value={3.5} total={5}\n  renderPoint={(u) => <path key={u.index} d={starPath(u)} … />} />`,
-    node: <PictogramRow value={3.5} total={5} summary={false} style={{ width: 90, height: 16 }} />,
+    node: <PictogramRow value={3.5} total={5} summary={false} width={90} height={16} />,
   },
 ];
 
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
-  return <PictogramRow value={3} total={5} summary={false} style={{ width: 56, height: 12 }} />;
+  return <PictogramRow value={3} total={5} summary={false} width={56} height={12} />;
 }
 
 export function markCode(): string {

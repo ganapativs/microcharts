@@ -12,7 +12,7 @@ const PIPE = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover or arrow through the stages — each announces its retained share of the first.">
-      <FunnelInteractive data={PIPE} title="Signup funnel" style={{ width: 260, height: 78 }} />
+      <FunnelInteractive data={PIPE} title="Signup funnel" width={260} height={78} />
     </DemoPanel>
   );
 }

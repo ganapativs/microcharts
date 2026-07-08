@@ -14,7 +14,8 @@ export function InteractiveDemo() {
         data={CLOUD}
         trend
         title="Spend vs conversions"
-        style={{ width: 220, height: 132 }}
+        width={220}
+        height={132}
       />
     </DemoPanel>
   );

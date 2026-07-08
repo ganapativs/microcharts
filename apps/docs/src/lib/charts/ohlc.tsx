@@ -65,12 +65,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Ohlc data={PERIODS} summary={false} style={{ width: 140, height: 24 }} />;
+  return <Ohlc data={PERIODS} summary={false} width={140} height={24} />;
 }
 
 export const showcase = {
   hint: "price action",
-  Node: () => <Ohlc data={PERIODS} title="ACME 20 sessions" style={{ width: 140, height: 24 }} />,
+  Node: () => <Ohlc data={PERIODS} title="ACME 20 sessions" width={140} height={24} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -96,7 +96,8 @@ export const playground: PlaygroundSpec = {
       variant={s.variant as "candle" | "bars"}
       label={s.label as "last" | "none"}
       summary={false}
-      style={{ width: 280, height: 32 }}
+      width={280}
+      height={32}
     />
   ),
   code: (s) =>
@@ -115,19 +116,13 @@ export const recipes: Recipe[] = [
   {
     label: "watchlist rows",
     code: `{tickers.map((t) => (\n  <Ohlc key={t.symbol} data={t.sessions} title={t.symbol} />\n))}`,
-    node: <Ohlc data={PERIODS} summary={false} style={{ width: 160, height: 18 }} />,
+    node: <Ohlc data={PERIODS} summary={false} width={160} height={18} />,
   },
   {
     label: "bars with last close",
     code: `<Ohlc data={sessions} variant="bars" label="last" />`,
     node: (
-      <Ohlc
-        data={PERIODS}
-        variant="bars"
-        label="last"
-        summary={false}
-        style={{ width: 170, height: 20 }}
-      />
+      <Ohlc data={PERIODS} variant="bars" label="last" summary={false} width={170} height={20} />
     ),
   },
 ];
@@ -142,7 +137,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
         close: v + 9 + (j % 4),
       }))}
       summary={false}
-      style={{ width: props.width ?? 70, height: props.height ?? 16 }}
+      width={props.width ?? 70}
+      height={props.height ?? 16}
     />
   );
 }

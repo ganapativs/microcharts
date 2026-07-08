@@ -11,7 +11,8 @@ export function InteractiveDemo() {
         data={FIELD}
         highlight={62}
         title="Response times"
-        style={{ width: 260, height: 24 }}
+        width={260}
+        height={24}
       />
     </DemoPanel>
   );

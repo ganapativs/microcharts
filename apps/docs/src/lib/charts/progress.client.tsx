@@ -23,7 +23,7 @@ export function InteractiveDemo() {
         </button>
       }
     >
-      <ProgressInteractive value={STOPS[i]!} title="Upload" style={{ width: 200, height: 26 }} />
+      <ProgressInteractive value={STOPS[i]!} title="Upload" width={200} height={26} />
     </DemoPanel>
   );
 }

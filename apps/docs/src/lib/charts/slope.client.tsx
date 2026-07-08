@@ -12,7 +12,7 @@ const RANKS = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover near a line or rove with ↑/↓ (ordered by the after value) — each announces its slope.">
-      <SlopeInteractive data={RANKS} title="Before vs after" style={{ width: 200, height: 120 }} />
+      <SlopeInteractive data={RANKS} title="Before vs after" width={200} height={120} />
     </DemoPanel>
   );
 }

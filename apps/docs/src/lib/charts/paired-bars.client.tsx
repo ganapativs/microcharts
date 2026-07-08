@@ -12,11 +12,7 @@ const BUDGET = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover a pair or rove with arrows — each announces value vs reference.">
-      <PairedBarsInteractive
-        data={BUDGET}
-        title="Actual vs plan"
-        style={{ width: 220, height: 72 }}
-      />
+      <PairedBarsInteractive data={BUDGET} title="Actual vs plan" width={220} height={72} />
     </DemoPanel>
   );
 }

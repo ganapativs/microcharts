@@ -12,7 +12,7 @@ const MIX = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover a bar or rove with arrow keys — each announces its label, value, and rank.">
-      <MiniBarInteractive data={MIX} title="Sales by region" style={{ width: 200, height: 64 }} />
+      <MiniBarInteractive data={MIX} title="Sales by region" width={200} height={64} />
     </DemoPanel>
   );
 }

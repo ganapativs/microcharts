@@ -58,20 +58,13 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return (
-    <DualSparkline data={US} compare={BENCH} summary={false} style={{ width: 130, height: 22 }} />
-  );
+  return <DualSparkline data={US} compare={BENCH} summary={false} width={130} height={22} />;
 }
 
 export const showcase = {
   hint: "vs benchmark",
   Node: () => (
-    <DualSparkline
-      data={US}
-      compare={BENCH}
-      title="Conversion vs market"
-      style={{ width: 130, height: 22 }}
-    />
+    <DualSparkline data={US} compare={BENCH} title="Conversion vs market" width={130} height={22} />
   ),
 };
 
@@ -93,7 +86,8 @@ export const playground: PlaygroundSpec = {
       label={s.label as "last" | "none"}
       band={s.band ? [13, 16] : undefined}
       summary={false}
-      style={{ width: 260, height: 30 }}
+      width={260}
+      height={30}
     />
   ),
   code: (s) =>
@@ -113,9 +107,7 @@ export const recipes: Recipe[] = [
   {
     label: "channel rows vs market",
     code: `{channels.map((c) => (\n  <DualSparkline key={c.id} data={c.series} compare={market} title={c.name} />\n))}`,
-    node: (
-      <DualSparkline data={US} compare={BENCH} summary={false} style={{ width: 160, height: 16 }} />
-    ),
+    node: <DualSparkline data={US} compare={BENCH} summary={false} width={160} height={16} />,
   },
   {
     label: "actual vs plan with endpoint",
@@ -126,7 +118,8 @@ export const recipes: Recipe[] = [
         compare={BENCH}
         label="last"
         summary={false}
-        style={{ width: 160, height: 18 }}
+        width={160}
+        height={18}
       />
     ),
   },
@@ -138,7 +131,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
       data={props.data}
       compare={props.data.map((v, i) => v * 0.85 + i * 0.1)}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 14 }}
+      width={props.width ?? 60}
+      height={props.height ?? 14}
     />
   );
 }

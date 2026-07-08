@@ -1,6 +1,6 @@
 ---
 title: BumpStrip
-description: A word-sized rank trajectory for React — where you rank and which way it's moving, #1 on top, gaps for unranked periods.
+description: "A word-sized rank trajectory for React — where you rank and which way it's moving, #1 on top, gaps for unranked periods."
 ---
 
 BumpStrip answers "where do we rank, and which way is it moving?" — position on an
@@ -17,7 +17,7 @@ values: Sparkline would lie about the distance between #2 and #3.
   <BumpStrip
     data={[5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1]}
     title="Category rank"
-    style={{ width: 220, height: 26 }}
+    width={220} height={26}
   />
 </LiveDemo>
 
@@ -49,11 +49,7 @@ values: Sparkline would lie about the distance between #2 and #3.
   code={`// null = unranked that period — the line breaks, honestly
 <BumpStrip data={[2, null, null, 3, 1, 1]} />`}
 >
-  <BumpStrip
-    data={[2, null, null, 3, 1, 1]}
-    title="With unranked weeks"
-    style={{ width: 220, height: 26 }}
-  />
+  <BumpStrip data={[2, null, null, 3, 1, 1]} title="With unranked weeks" width={220} height={26} />
 </LiveDemo>
 
 <LiveDemo label="shared scale for small multiples" code={`<BumpStrip data={ranks} maxRank={10} />`}>
@@ -61,7 +57,8 @@ values: Sparkline would lie about the distance between #2 and #3.
     data={[8, 7, 7, 6, 4, 4, 3, 3, 2, 2, 2, 1]}
     maxRank={10}
     title="Fixed 10-rank band"
-    style={{ width: 220, height: 26 }}
+    width={220}
+    height={26}
   />
 </LiveDemo>
 

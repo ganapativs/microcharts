@@ -16,9 +16,9 @@ component refuses to tell.
 <PictogramRow value={5} total={8} title="Committee seats held" />`}
 >
   <span className="text-lg">
-    The coalition holds{" "}
-    <PictogramRow value={5} total={8} title="Committee seats held" style={{ width: "4.5em", height: "0.8em" }} />{" "}
-    of the seats.
+    {"The coalition holds "}
+    <PictogramRow value={5} total={8} title="Committee seats held" style={{ width: "4.5em", height: "0.8em" }} />
+    {" of the seats."}
   </span>
 </LiveDemo>
 
@@ -51,7 +51,7 @@ component refuses to tell.
   code={`// the partial unit is real data — clipped, not rounded away
 <PictogramRow value={2.5} total={4} />`}
 >
-  <PictogramRow value={2.5} total={4} title="True partial" style={{ width: 90, height: 18 }} />
+  <PictogramRow value={2.5} total={4} title="True partial" width={90} height={18} />
 </LiveDemo>
 
 <LiveDemo
@@ -64,18 +64,13 @@ component refuses to tell.
     total={4}
     fractional="round"
     title="Whole seats"
-    style={{ width: 90, height: 18 }}
+    width={90}
+    height={18}
   />
 </LiveDemo>
 
 <LiveDemo label="squares" code={`<PictogramRow value={3} total={5} shape="square" />`}>
-  <PictogramRow
-    value={3}
-    total={5}
-    shape="square"
-    title="Squares"
-    style={{ width: 90, height: 18 }}
-  />
+  <PictogramRow value={3} total={5} shape="square" title="Squares" width={90} height={18} />
 </LiveDemo>
 
 ## Four homes

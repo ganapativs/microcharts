@@ -15,13 +15,13 @@ lying by occlusion, and duplicates are never jittered: position is the encoding.
 <MicroScatter data={pairs} title="Latency vs error rate" />`}
 >
   <span className="text-lg">
-    Latency and error rate{" "}
+    {"Latency and error rate "}
     <MicroScatter
       data={Array.from({ length: 24 }, (_, i) => ({ x: i, y: i * 3 + ((i * 7) % 5) * 6 }))}
       title="Latency vs error rate"
       style={{ width: "3em", height: "1.8em" }}
-    />{" "}
-    correlate strongly.
+    />
+    {" correlate strongly."}
   </span>
 </LiveDemo>
 

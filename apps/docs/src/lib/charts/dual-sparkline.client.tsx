@@ -12,7 +12,8 @@ export function InteractiveDemo() {
         data={US}
         compare={BENCH}
         title="Conversion vs market"
-        style={{ width: 260, height: 30 }}
+        width={260}
+        height={30}
       />
     </DemoPanel>
   );

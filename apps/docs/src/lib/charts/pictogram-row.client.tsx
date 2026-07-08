@@ -27,7 +27,8 @@ export function InteractiveDemo() {
         value={STOPS[i]!}
         total={8}
         title="Capacity used"
-        style={{ width: 220, height: 26 }}
+        width={220}
+        height={26}
       />
     </DemoPanel>
   );

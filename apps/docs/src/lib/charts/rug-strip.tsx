@@ -57,16 +57,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return (
-    <RugStrip data={FIELD} highlight={62} summary={false} style={{ width: 120, height: 16 }} />
-  );
+  return <RugStrip data={FIELD} highlight={62} summary={false} width={120} height={16} />;
 }
 
 export const showcase = {
   hint: "distribution",
-  Node: () => (
-    <RugStrip data={FIELD} highlight={62} title="Pay band" style={{ width: 120, height: 16 }} />
-  ),
+  Node: () => <RugStrip data={FIELD} highlight={62} title="Pay band" width={120} height={16} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -107,26 +103,20 @@ export const recipes: Recipe[] = [
   {
     label: "you vs the field",
     code: `<RugStrip data={salaries} highlight={78000}\n  domain={[40000, 120000]} />`,
-    node: (
-      <RugStrip data={FIELD} highlight={75} summary={false} style={{ width: 160, height: 14 }} />
-    ),
+    node: <RugStrip data={FIELD} highlight={75} summary={false} width={160} height={14} />,
   },
   {
     label: "fixed domain across rows",
     code: `// same scale per row or the rugs lie\n<RugStrip data={p50} domain={[0, 200]} />\n<RugStrip data={p95} domain={[0, 200]} />`,
     node: (
       <span className="inline-flex flex-col gap-1">
-        <RugStrip
-          data={FIELD}
-          domain={[0, 200]}
-          summary={false}
-          style={{ width: 160, height: 10 }}
-        />
+        <RugStrip data={FIELD} domain={[0, 200]} summary={false} width={160} height={10} />
         <RugStrip
           data={FIELD.map((v) => v * 1.9)}
           domain={[0, 200]}
           summary={false}
-          style={{ width: 160, height: 10 }}
+          width={160}
+          height={10}
         />
       </span>
     ),

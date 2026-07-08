@@ -8,7 +8,8 @@ export function InteractiveDemo() {
       <MicroBoxInteractive
         stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }}
         title="Latency spread"
-        style={{ width: 260, height: 40 }}
+        width={260}
+        height={40}
       />
     </DemoPanel>
   );

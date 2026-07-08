@@ -13,7 +13,7 @@ const TEAM = [
 export function InteractiveDemo() {
   return (
     <DemoPanel hint="Hover a row or rove with ↑/↓ — each announces its name, value, and rank.">
-      <DotPlotInteractive data={TEAM} title="Review scores" style={{ width: 220, height: 110 }} />
+      <DotPlotInteractive data={TEAM} title="Review scores" width={220} height={110} />
     </DemoPanel>
   );
 }

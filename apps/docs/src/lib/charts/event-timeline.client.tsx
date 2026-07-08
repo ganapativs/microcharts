@@ -20,7 +20,8 @@ export function InteractiveDemo() {
         data={DATA}
         domain={WINDOW}
         title="API uptime"
-        style={{ width: 280, height: 36 }}
+        width={280}
+        height={36}
       />
     </DemoPanel>
   );

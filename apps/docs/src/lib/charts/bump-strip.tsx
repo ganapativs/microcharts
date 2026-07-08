@@ -57,12 +57,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <BumpStrip data={RANKS} summary={false} style={{ width: 130, height: 20 }} />;
+  return <BumpStrip data={RANKS} summary={false} width={130} height={20} />;
 }
 
 export const showcase = {
   hint: "rank",
-  Node: () => <BumpStrip data={RANKS} title="Category rank" style={{ width: 130, height: 20 }} />,
+  Node: () => <BumpStrip data={RANKS} title="Category rank" width={130} height={20} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -88,7 +88,8 @@ export const playground: PlaygroundSpec = {
       label={s.label as "ends" | "last" | "none"}
       dots={s.dots as "changes" | "none"}
       summary={false}
-      style={{ width: 260, height: 28 }}
+      width={260}
+      height={28}
     />
   ),
   code: (s) =>
@@ -107,20 +108,12 @@ export const recipes: Recipe[] = [
   {
     label: "leaderboard rows",
     code: `{products.map((p) => (\n  <BumpStrip key={p.id} data={p.ranks} maxRank={10} title={p.name} />\n))}`,
-    node: (
-      <BumpStrip data={RANKS} maxRank={10} summary={false} style={{ width: 160, height: 16 }} />
-    ),
+    node: <BumpStrip data={RANKS} maxRank={10} summary={false} width={160} height={16} />,
   },
   {
     label: "gaps for unranked weeks",
     code: `<BumpStrip data={[2, null, null, 3, 1, 1]} />`,
-    node: (
-      <BumpStrip
-        data={[2, null, null, 3, 1, 1]}
-        summary={false}
-        style={{ width: 120, height: 16 }}
-      />
-    ),
+    node: <BumpStrip data={[2, null, null, 3, 1, 1]} summary={false} width={120} height={16} />,
   },
 ];
 
@@ -130,7 +123,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
       data={props.data.map((v) => (Math.abs(Math.round(v)) % 8) + 1)}
       label="none"
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 12 }}
+      width={props.width ?? 60}
+      height={props.height ?? 12}
     />
   );
 }

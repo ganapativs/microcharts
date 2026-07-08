@@ -59,12 +59,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Seismogram data={BURSTS} summary={false} style={{ width: 120, height: 24 }} />;
+  return <Seismogram data={BURSTS} summary={false} width={120} height={24} />;
 }
 
 export const showcase = {
   hint: "events",
-  Node: () => <Seismogram data={BURSTS} title="Error bursts" style={{ width: 120, height: 24 }} />,
+  Node: () => <Seismogram data={BURSTS} title="Error bursts" width={120} height={24} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -84,7 +84,8 @@ export const playground: PlaygroundSpec = {
       mode={s.mode as "intensity" | "barcode"}
       positive={(s.signed as boolean) ? "up" : undefined}
       summary={false}
-      style={{ width: 260, height: 44 }}
+      width={260}
+      height={44}
     />
   ),
   code: (s) =>
@@ -102,15 +103,13 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "table row",
-    code: `<Seismogram data={service.bursts} style={{ width: 120, height: 14 }} />`,
-    node: <Seismogram data={BURSTS} summary={false} style={{ width: 120, height: 14 }} />,
+    code: `<Seismogram data={service.bursts} width={120} height={14} />`,
+    node: <Seismogram data={BURSTS} summary={false} width={120} height={14} />,
   },
   {
     label: "barcode (presence only)",
     code: `// heights are noise? declare it — uniform ticks say "when", not "how hard"\n<Seismogram data={deploys} mode="barcode" />`,
-    node: (
-      <Seismogram data={BURSTS} mode="barcode" summary={false} style={{ width: 120, height: 14 }} />
-    ),
+    node: <Seismogram data={BURSTS} mode="barcode" summary={false} width={120} height={14} />,
   },
 ];
 
@@ -119,7 +118,8 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <Seismogram
       data={props.data.map((v, i) => (i % 3 === 0 ? v : 0))}
       summary={false}
-      style={{ width: props.width ?? 60, height: props.height ?? 16 }}
+      width={props.width ?? 60}
+      height={props.height ?? 16}
     />
   );
 }
