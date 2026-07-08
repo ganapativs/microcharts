@@ -21,7 +21,7 @@
     },
     "activity-grid": {
       "static": "2.1 kB",
-      "interactive": "3.25 kB"
+      "interactive": "3.3 kB"
     },
     "trend-arrow": {
       "static": "1.7 kB",
@@ -45,7 +45,7 @@
     },
     "mini-bar": {
       "static": "2.25 kB",
-      "interactive": "3.25 kB"
+      "interactive": "3.3 kB"
     },
     "pictogram-row": {
       "static": "1.95 kB",
@@ -133,6 +133,14 @@
     "horizon": {
       "static": "2.9 kB",
       "interactive": "3.8 kB"
+    },
+    "calendar-strip": {
+      "static": "2.5 kB",
+      "interactive": "3.4 kB"
+    },
+    "event-timeline": {
+      "static": "3 kB",
+      "interactive": "4 kB"
     }
   }
 }

@@ -284,4 +284,31 @@ export const SCENARIOS = [
     floor: 20, // ≤ 3 fold paths + fold math per row
     props: (i) => ({ data: waves[i % POOL], summary: false }),
   },
+
+  {
+    slug: "calendar-strip",
+    component: "CalendarStrip",
+    floor: 5, // 28 date-keyed cells + UTC grid math — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 20 }, (_c, j) => ({
+        date: `2026-06-${String(1 + ((i * 3 + j) % 28)).padStart(2, "0")}`,
+        value: (i + j) % 5,
+      })),
+      end: "2026-06-28",
+      summary: false,
+    }),
+  },
+  {
+    slug: "event-timeline",
+    component: "EventTimeline",
+    floor: 15, // ≤ 12 spans/diamonds + interval merging
+    props: (i) => ({
+      data: Array.from({ length: 8 }, (_e, j) => ({
+        start: j * 10 + (i % 3),
+        end: j % 3 === 0 ? undefined : j * 10 + 6,
+      })),
+      domain: [0, 80],
+      summary: false,
+    }),
+  },
 ];

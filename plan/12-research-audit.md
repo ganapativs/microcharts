@@ -366,3 +366,15 @@ a plan↔code divergence per the working rule — rename in plan/21/22 wording a
 lists step, but on a two-line benchmark strip the step form reads as noise, and importing the step
 path builder pushed the entry past the 3 kB HARD cap (3 008 B measured). Divergence documented in
 the chart's docs page; revisit only with a measured trim elsewhere.
+
+**`core/calendar` module split (2026-07-08, W6):** `weekGrid`/`dayOfYear`/`daysInYear`/
+`monthStartDays`/`isoDate` moved to `core/calendar-grid.ts`; `calendar.ts` keeps only
+`parseUTCDay`. Chunk granularity (see the strings-module rationale): once CalendarStrip
+made calendar.ts a shared chunk, ActivityGrid would have carried the whole grid kernel
+for one day-parsing call. ActivityGrid interactive budget 3.25 → 3.3 kB — the 3.25 was
+measured-exact with zero headroom, and content-hash renames alone move gzip by ±5 B.
+
+**`normalizeShares` denormal fix (2026-07-08, W6):** the float remainder (1 − Σshares)
+was added to the LAST positive share; a denormal-tiny entry (counterexample
+`[4e-106, 2.4e-93, 5e-324, 0]`) went negative absorbing it. Remainder now folds into
+the LARGEST share, clamped at 0. Found by the fast-check invariant suite.

@@ -152,6 +152,18 @@ export interface SummaryStrings {
     lo: string,
     hi: string,
   ) => string;
+  /** "Tuesday, June 24: 12." */
+  dayAt: (dateLabel: string, value: string) => string;
+  /** "Tuesday, June 24: no data." */
+  dayEmpty: (dateLabel: string) => string;
+  /** "Active 18 of 28 days over 4 weeks." */
+  calendar: (activeDays: number, totalDays: number, weeks: number) => string;
+  /** "Deploy freeze: Jun 3, 09:00 to 13:30 — 4h 30m." */
+  spanAt: (label: string, startLabel: string, endLabel: string, duration: string) => string;
+  /** "Incident: Jun 3, 11:12." */
+  eventAt: (label: string, atLabel: string) => string;
+  /** "4 spans covering 82% of the window; 2 events." */
+  timeline: (spans: number, events: number, coveragePct: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

@@ -61,7 +61,7 @@
   {
     "name": "@microcharts/react/activity-grid/interactive",
     "path": "dist/charts/activity-grid/client.js",
-    "limit": "3.25 kB",
+    "limit": "3.3 kB",
     "gzip": true
   },
   {
@@ -133,7 +133,7 @@
   {
     "name": "@microcharts/react/mini-bar/interactive",
     "path": "dist/charts/mini-bar/client.js",
-    "limit": "3.25 kB",
+    "limit": "3.3 kB",
     "gzip": true
   },
   {
@@ -386,6 +386,30 @@
     "name": "@microcharts/react/horizon/interactive",
     "path": "dist/charts/horizon/client.js",
     "limit": "3.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/calendar-strip (static)",
+    "path": "dist/charts/calendar-strip/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/calendar-strip/interactive",
+    "path": "dist/charts/calendar-strip/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/event-timeline (static)",
+    "path": "dist/charts/event-timeline/index.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/event-timeline/interactive",
+    "path": "dist/charts/event-timeline/client.js",
+    "limit": "4 kB",
     "gzip": true
   },
   {

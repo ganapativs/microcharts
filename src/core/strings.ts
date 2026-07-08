@@ -14,6 +14,8 @@ import { EN_FLOW } from "./strings-flow.js";
 import { EN_VS } from "./strings-vs.js";
 import { EN_STACK } from "./strings-stack.js";
 import { EN_OHLC } from "./strings-ohlc.js";
+import { EN_CALENDAR } from "./strings-calendar.js";
+import { EN_TIMELINE } from "./strings-timeline.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -28,4 +30,6 @@ export const EN: SummaryStrings = {
   ...EN_VS,
   ...EN_STACK,
   ...EN_OHLC,
+  ...EN_CALENDAR,
+  ...EN_TIMELINE,
 };

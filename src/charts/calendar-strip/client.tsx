@@ -1,0 +1,210 @@
+"use client";
+// Interactive <CalendarStrip> (plan/22 #26). Hover a day or walk the grid in
+// 2-D (←/→ day, ↑/↓ week — ActivityGrid parity). Announces the real calendar
+// day: "Tuesday, June 24: 12." Composes the static component (canon).
+import { useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
+import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
+import { cellMetrics } from "../../shared/cell.js";
+import { calendarStripGeometry } from "./geometry.js";
+import {
+  CalendarStrip as StaticCalendarStrip,
+  calendarEntries,
+  calendarStripSummary,
+  CALENDAR_CELL,
+  CALENDAR_GAP,
+  type CalendarStripProps,
+} from "./index.js";
+
+export interface InteractiveCalendarStripProps extends CalendarStripProps {
+  strings?: CalendarStrings;
+  /** Announced day label (defaults to weekday + month + day, UTC). */
+  dateFormat?: DateFormat;
+}
+
+export function CalendarStrip(props: InteractiveCalendarStripProps): React.ReactNode {
+  const {
+    data,
+    weeks = 4,
+    end,
+    weekStart = 1,
+    steps = 5,
+    shape = "square",
+    domain,
+    format,
+    locale,
+    strings = EN_CALENDAR,
+    dateFormat,
+    title,
+    summary,
+    className,
+    style,
+    ...rest
+  } = props;
+
+  const endDay = useMemo(() => end ?? new Date(), [end]);
+  const geo = useMemo(
+    () =>
+      calendarStripGeometry({
+        weeks,
+        end: endDay,
+        weekStart,
+        entries: calendarEntries(data),
+        domain,
+        steps,
+        cell: CALENDAR_CELL,
+        gap: CALENDAR_GAP,
+      }),
+    [weeks, endDay, weekStart, data, domain, steps],
+  );
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  const dateFmt = useMemo(
+    () => makeDateFormatter(dateFormat, locale, { weekday: "long", month: "long", day: "numeric" }),
+    [dateFormat, locale],
+  );
+  const [active, setActive] = useState<number | null>(null);
+  if (!geo) return null;
+
+  const step = CALENDAR_CELL + CALENDAR_GAP;
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : calendarStripSummary(geo.activeDays, geo.totalDays, weeks, strings);
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  // past-or-present cells only (future is blank — not focusable)
+  const lastIndex = geo.totalDays - 1;
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (lastIndex < 0) return;
+    const cur = active ?? 0;
+    let next = cur;
+    switch (e.key) {
+      case "ArrowRight":
+        next = Math.min(lastIndex, cur + 1);
+        break;
+      case "ArrowLeft":
+        next = Math.max(0, cur - 1);
+        break;
+      case "ArrowDown":
+        next = Math.min(lastIndex, cur + 7);
+        break;
+      case "ArrowUp":
+        next = Math.max(0, cur - 7);
+        break;
+      case "Home":
+        next = 0;
+        break;
+      case "End":
+        next = lastIndex;
+        break;
+      case "Escape":
+        setActive(null);
+        return;
+      default:
+        return;
+    }
+    e.preventDefault();
+    setActive(next);
+  };
+
+  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return;
+    const x = ((e.clientX - r.left) / r.width) * geo.width;
+    const y = ((e.clientY - r.top) / r.height) * geo.height;
+    const col = Math.floor(x / step);
+    const row = Math.floor(y / step);
+    const i = row * 7 + col;
+    setActive(col >= 0 && col < 7 && i >= 0 && i <= lastIndex ? i : null);
+  };
+
+  const activeCell = active !== null ? geo.cells[active] : undefined;
+  const dayLabel = activeCell ? dateFmt(new Date(`${activeCell.date}T00:00:00Z`)) : "";
+  const announced =
+    activeCell === undefined
+      ? ""
+      : activeCell.value === null
+        ? strings.dayEmpty(dayLabel)
+        : strings.dayAt(dayLabel, fmt(activeCell.value));
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
+  return (
+    <span
+      className={className ? `mc-calendar-live ${className}` : "mc-calendar-live"}
+      style={wrapStyle}
+      tabIndex={0}
+      role="img"
+      aria-label={label}
+      onKeyDown={onKeyDown}
+      onPointerMove={onPointerMove}
+      onPointerLeave={() => setActive(null)}
+      onBlur={() => setActive(null)}
+    >
+      <StaticCalendarStrip
+        {...rest}
+        data={data}
+        weeks={weeks}
+        end={endDay}
+        weekStart={weekStart}
+        steps={steps}
+        shape={shape}
+        domain={domain}
+        strings={strings}
+        summary={false}
+      >
+        {activeCell
+          ? (() => {
+              const m = cellMetrics(CALENDAR_CELL, shape);
+              return (
+                <rect
+                  x={activeCell.x + m.inset - 0.5}
+                  y={activeCell.y + m.inset - 0.5}
+                  width={activeCell.size - m.inset * 2 + 1}
+                  height={activeCell.size - m.inset * 2 + 1}
+                  rx={m.rx + 0.5}
+                  fill="none"
+                  stroke="var(--mc-accent)"
+                  strokeWidth={1.5}
+                  vectorEffect="non-scaling-stroke"
+                />
+              );
+            })()
+          : null}
+        {rest.children}
+      </StaticCalendarStrip>
+      <span
+        aria-live="polite"
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          overflow: "hidden",
+          clip: "rect(0 0 0 0)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {announced}
+      </span>
+      {activeCell ? (
+        <span
+          className="mc-spark-readout"
+          style={{
+            left: `${((activeCell.x + activeCell.size / 2) / geo.width) * 100}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {activeCell.value === null ? "—" : fmt(activeCell.value)}
+        </span>
+      ) : null}
+    </span>
+  );
+}
