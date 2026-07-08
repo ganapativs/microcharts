@@ -8,6 +8,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: [
     "src/index.ts",
+    "src/annotations.ts",
     "src/charts/sparkline/index.tsx",
     "src/charts/sparkline/client.tsx",
     "src/charts/sparkbar/index.tsx",

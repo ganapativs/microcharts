@@ -1,11 +1,11 @@
 {
   "sparkline": {
-    "static": 3.34,
-    "interactive": 4.34
+    "static": 3.61,
+    "interactive": 4.61
   },
   "sparkbar": {
-    "static": 2.49,
-    "interactive": 2.7
+    "static": 2.78,
+    "interactive": 2.72
   },
   "delta": {
     "static": 0.92,
@@ -74,5 +74,8 @@
   "micro-scatter": {
     "static": 1.88,
     "interactive": 3.01
+  },
+  "annotations": {
+    "static": 1.46
   }
 }

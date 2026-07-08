@@ -342,3 +342,15 @@ different track widths, silently changing the scale row-to-row in a table column
 WIDENS the viewBox (total = width + gutter) and the track always spans the full given width;
 regression-tested (`progress/geometry.test.ts` comparability case). Same rule already used by
 TrendArrow `showValue`.
+
+**Annotations host-cost architecture (2026-07-08, Batch 1 W4 — plan/22 #28):** the spec's "hosts
+call the shared resolver" was first implemented with the resolver + all four mark renderers in one
+module — that bundled the whole annotation layer (+~1.4 kB gz, incl. celebrate/jitter) into EVERY
+host's static entry and blew sparkline's pinned exception to 4.76 kB. Restructured: each annotation
+component carries its mark renderer as a static field (ships with the consumer's
+`@microcharts/react/annotations` import, 1.46/1.5 kB), and hosts import only a tiny children walker
+(`shared/annotations-host.tsx`, ~0.29 kB incl. the scale frame). Residual: sparkline
+3.61/4.61 kB measured → budget set 3.65/4.65 kB, PENDING user sign-off at the batch gate (the prior
+3.35/4.35 exception + the spec-mandated host contract conflict; every other host absorbs the walker
+inside its normal headroom). Fragment children are unwrapped by the walker (React's Children.forEach
+does not descend into <>…</>).

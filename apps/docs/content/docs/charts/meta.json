@@ -2,6 +2,7 @@
   "title": "Charts",
   "pages": [
     "index",
+    "annotations",
     "sparkline",
     "sparkbar",
     "delta",

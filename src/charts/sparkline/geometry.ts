@@ -35,6 +35,9 @@ export interface SparkGeometry {
   band: { x: number; y: number; width: number; height: number } | null;
   /** Plot rectangle (inside the padding) for the interactive overlay. */
   plot: { x0: number; x1: number; y0: number; y1: number };
+  /** Resolved y-domain (explicit or auto-fit) — the annotations frame maps
+   *  data-space coordinates through it. */
+  domain: readonly [number, number];
 }
 
 /**
@@ -153,5 +156,5 @@ export function sparkGeometry(data: readonly Value[], opts: SparkGeometryOptions
     }
   }
 
-  return { points, linePoints, baselineY, last, min, max, band, plot };
+  return { points, linePoints, baselineY, last, min, max, band, plot, domain };
 }

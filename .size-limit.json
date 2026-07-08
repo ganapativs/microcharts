@@ -7,13 +7,13 @@
   {
     "name": "@microcharts/react/sparkline (static)",
     "path": "dist/charts/sparkline/index.js",
-    "limit": "3.35 kB",
+    "limit": "3.65 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/sparkline/interactive",
     "path": "dist/charts/sparkline/client.js",
-    "limit": "4.35 kB",
+    "limit": "4.65 kB",
     "gzip": true
   },
   {
@@ -230,6 +230,12 @@
     "name": "@microcharts/react/micro-scatter/interactive",
     "path": "dist/charts/micro-scatter/client.js",
     "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/annotations (static)",
+    "path": "dist/annotations.js",
+    "limit": "1.5 kB",
     "gzip": true
   },
   {

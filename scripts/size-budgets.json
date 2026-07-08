@@ -1,11 +1,11 @@
 {
   "$comment": "Per-subpath gzip budgets (plan/21 §1, budget model v2). Keys are export subpaths without './'. Every chart needs an entry — gen-size-limits.mjs fails on a missing one, so adding a chart forces a budget decision. Hard ceilings: static ≤ 3 kB (target 2 kB, Delta-class 1.5 kB), interactive ≤ static + 1 kB. `.size-limit.json` is GENERATED from this file + package.json#exports — never hand-edit it.",
-  "$exception": "Sparkline 3.35/4.35 kB is a USER-APPROVED flagship exception (2026-07-08) to the 3/4 kB hard caps — it carries the long-series guard + label=minmax on top of the densest feature set; every trim was measured and exhausted first (plan/12 audit). Every other chart holds the standard caps; do not cite this exception to justify another.",
+  "$exception": "Sparkline 3.35/4.35 kB was USER-APPROVED (2026-07-08) as a flagship exception to the 3/4 kB hard caps (long-series guard + label=minmax; trims exhausted first — plan/12). Batch 1 W4 raised it to 3.65/4.65 kB PENDING user sign-off at the batch gate: the plan/22 #28 annotations HOST contract adds the children walker + scale frame (~0.29 kB) to every S1/S2 host — the annotation MARK renderers ship in ./annotations (1.46 kB), which consumers import separately, so hosts only pay the walker. Not a precedent for other charts.",
   "styles": "12 kB",
   "charts": {
     "sparkline": {
-      "static": "3.35 kB",
-      "interactive": "4.35 kB"
+      "static": "3.65 kB",
+      "interactive": "4.65 kB"
     },
     "sparkbar": {
       "static": "3 kB",
@@ -78,6 +78,9 @@
     "micro-scatter": {
       "static": "2.7 kB",
       "interactive": "3.5 kB"
+    },
+    "annotations": {
+      "static": "1.5 kB"
     }
   }
 }

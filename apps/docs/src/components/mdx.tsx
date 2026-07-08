@@ -19,6 +19,7 @@ import { Dumbbell } from "@microcharts/react/dumbbell";
 import { PairedBars } from "@microcharts/react/paired-bars";
 import { Slope } from "@microcharts/react/slope";
 import { MicroScatter } from "@microcharts/react/micro-scatter";
+import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annotations";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -54,6 +55,10 @@ export function getMDXComponents(components?: MDXComponents) {
     PairedBars,
     Slope,
     MicroScatter,
+    Threshold,
+    TargetZone,
+    Marker,
+    Callout,
     SparkGroup,
     // docs building blocks
     Instrument,

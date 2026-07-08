@@ -307,6 +307,25 @@
     }
   }
 
+  /* <Marker celebrate> — one-shot burst from the marker to each particle's
+     rest position. Under reduced-motion the animation is stripped (base rule
+     above) and the particles sit still as a quiet starburst glyph. */
+  @keyframes mc-burst {
+    from {
+      transform: var(--mc-burst-from);
+      opacity: 0;
+    }
+    to {
+      transform: none;
+      opacity: 1;
+    }
+  }
+  :where(.mc-root .mc-celebrate) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: mc-burst 600ms var(--mc-easing) backwards;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     :where(.mc-root *),
     :where(.mc-root),
