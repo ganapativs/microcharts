@@ -22,7 +22,7 @@ export function GET() {
       staticImport: c.staticImport,
       interactiveImport: c.interactiveImport,
       dataShape: c.dataShape,
-      primaryEncoding: c.primaryEncoding,
+      primaryEncoding: c.encoding.channel,
       bestFor: c.bestFor,
       avoidFor: c.avoidFor,
       props: c.props.map((p) => ({ name: p.name, type: p.type, required: p.required })),

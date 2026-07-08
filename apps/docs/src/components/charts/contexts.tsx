@@ -1,82 +1,21 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
-import { Sparkline } from "@microcharts/react/sparkline";
-import { SparkBar } from "@microcharts/react/sparkbar";
 import { Delta } from "@microcharts/react/delta";
-import { Bullet } from "@microcharts/react/bullet";
-import { ActivityGrid } from "@microcharts/react/activity-grid";
-import { getChart, type ChartEntry } from "@/lib/catalog";
-
-/** A tiny chart sized for a given slug, reused across the four contexts. */
-function Mark({
-  chart,
-  data,
-  width,
-  height,
-}: {
-  chart: ChartEntry;
-  data: number[];
-  width?: number;
-  height?: number;
-}) {
-  const summary = false as const; // decorative here; the surrounding text explains it
-  switch (chart.slug) {
-    case "sparkline":
-      return <Sparkline data={data} width={width ?? 64} height={height ?? 18} summary={summary} />;
-    case "sparkbar":
-      return <SparkBar data={data} width={width ?? 64} height={height ?? 18} summary={summary} />;
-    case "delta":
-      return <Delta value={0.124} summary={summary} />;
-    case "bullet":
-      return (
-        <Bullet
-          value={72}
-          target={80}
-          bands={[50, 90]}
-          width={width ?? 90}
-          height={height ?? 16}
-          summary={summary}
-        />
-      );
-    case "activity-grid":
-      return <ActivityGrid data={data} layout="strip" cell={7} summary={summary} />;
-    default:
-      return null;
-  }
-}
-
-/** The JSX string for a chart's mark at a given size — mirrors <Mark> so the
- *  Code tab shows exactly the tag the reader would write for each context. */
-function markCode(chart: ChartEntry, width?: number, height?: number): string {
-  const size = width && height ? ` width={${width}} height={${height}}` : "";
-  switch (chart.slug) {
-    case "sparkline":
-      return `<Sparkline data={data}${size} />`;
-    case "sparkbar":
-      return `<SparkBar data={data}${size} />`;
-    case "delta":
-      return `<Delta value={0.124} />`;
-    case "bullet":
-      return `<Bullet value={72} target={80} bands={[50, 90]}${size} />`;
-    case "activity-grid":
-      return `<ActivityGrid data={data} layout="strip" cell={7} />`;
-    default:
-      return "";
-  }
-}
+import { getModule } from "@/lib/charts/registry";
+import type { ChartModule } from "@/lib/charts/types";
 
 /** Copy-ready snippet for each of the four placement contexts. */
-function contextCode(chart: ChartEntry, kind: "sentence" | "cell" | "kpi" | "tab"): string {
+function contextCode(mod: ChartModule, kind: "sentence" | "cell" | "kpi" | "tab"): string {
   switch (kind) {
     case "sentence":
-      return `<p>\n  Signups held steady ${markCode(chart)} through the quarter.\n</p>`;
+      return `<p>\n  Signups held steady ${mod.markCode()} through the quarter.\n</p>`;
     case "cell":
-      return `<td>${markCode(chart, 72, 16)}</td>`;
+      return `<td>${mod.markCode(72, 16)}</td>`;
     case "kpi":
-      return `<div className="kpi">\n  <span className="figure">14k</span>\n  <Delta value={0.124} />\n  ${markCode(chart, 200, 36)}\n</div>`;
+      return `<div className="kpi">\n  <span className="figure">14k</span>\n  <Delta value={0.124} />\n  ${mod.markCode(200, 36)}\n</div>`;
     case "tab":
-      return `<button className="tab">\n  Revenue ${markCode(chart, 44, 14)}\n</button>`;
+      return `<button className="tab">\n  Revenue ${mod.markCode(44, 14)}\n</button>`;
   }
 }
 
@@ -86,21 +25,22 @@ const tag = "mono-label";
 const previewBody = "flex min-h-36 flex-1 flex-col justify-center gap-2 p-4";
 
 export function FourContexts({ slug }: { slug: string }) {
-  const chart = getChart(slug);
+  const mod = getModule(slug);
   const [tab, setTab] = useState<"preview" | "code">("preview");
-  if (!chart) return null;
-  const data = chart.demo;
+  if (!mod) return null;
+  const { Mark } = mod;
+  const data = mod.entry.demo;
   const last = [...data].reverse().find((n) => Number.isFinite(n)) ?? 0;
 
   const contexts: { label: string; code: string; preview: ReactNode }[] = [
     {
       label: "In a sentence",
-      code: contextCode(chart, "sentence"),
+      code: contextCode(mod, "sentence"),
       preview: (
         <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
           Signups held steady{" "}
           <span className="mx-1 inline-flex align-middle">
-            <Mark chart={chart} data={data} />
+            <Mark data={data} />
           </span>{" "}
           through the quarter, closing at <span className="font-mono tabular-nums">{last}</span>.
         </p>
@@ -108,7 +48,7 @@ export function FourContexts({ slug }: { slug: string }) {
     },
     {
       label: "In a table cell",
-      code: contextCode(chart, "cell"),
+      code: contextCode(mod, "cell"),
       preview: (
         <table className="w-full text-sm tabular-nums">
           <tbody>
@@ -119,7 +59,7 @@ export function FourContexts({ slug }: { slug: string }) {
               <tr key={name as string} className="border-t border-fd-border/60 first:border-0">
                 <td className="py-1.5 pr-3 text-fd-muted-foreground">{name as string}</td>
                 <td className="py-1.5">
-                  <Mark chart={chart} data={series as number[]} width={72} height={16} />
+                  <Mark data={series as number[]} width={72} height={16} />
                 </td>
                 <td className="py-1.5 pl-3 text-right">
                   <Delta value={0.08} summary={false} />
@@ -132,7 +72,7 @@ export function FourContexts({ slug }: { slug: string }) {
     },
     {
       label: "In a KPI card",
-      code: contextCode(chart, "kpi"),
+      code: contextCode(mod, "kpi"),
       preview: (
         <>
           <div>
@@ -144,13 +84,13 @@ export function FourContexts({ slug }: { slug: string }) {
               </span>
             </div>
           </div>
-          <Mark chart={chart} data={data} width={200} height={36} />
+          <Mark data={data} width={200} height={36} />
         </>
       ),
     },
     {
       label: "In a tab header",
-      code: contextCode(chart, "tab"),
+      code: contextCode(mod, "tab"),
       preview: (
         <div className="flex flex-wrap gap-1.5">
           {[
@@ -166,7 +106,7 @@ export function FourContexts({ slug }: { slug: string }) {
               }`}
             >
               {name as string}
-              <Mark chart={chart} data={series as number[]} width={44} height={14} />
+              <Mark data={series as number[]} width={44} height={14} />
             </span>
           ))}
         </div>
