@@ -278,3 +278,45 @@ conflicted with plan/15's motion-as-encoding premise for E14–E17 (HeartbeatBli
 CometTrail, OrbitStatus). Resolved by a narrow plan/06 amendment: looping motion allowed only where
 motion is the documented primary encoding channel, only in client entries, always
 reduced-motion-gated with meaningful static equivalents. Everywhere else the ban stands.
+
+**ES2023 guard implemented as a compiler floor, not a grep (2026-07-08, Batch 0.D):** plan/21 §6.0.D
+called for a "grep/lint CI guard" for ES2023 array methods. Implemented stronger: `tsconfig.json`
+`lib` dropped ES2023 → **ES2022**, so `toSorted`/`toReversed`/`findLast`-class usage in any `src/`
+file is now a **type error** (CI typecheck), not a pattern match — no false negatives via renamed
+bindings, covers every future ES2023+ API automatically. Verified: full typecheck green on ES2022
+lib. Residual gap: untyped dev-only `.mjs` (bench/, scripts/) — acceptable, they never ship and run
+on pinned dev Node. plan/21 §6.0.D wording updated to match.
+
+**Sparkline budget conflict (2026-07-08, Batch 0.D — RESOLVED same day: user approved option (a), the documented flagship exception; size-budgets.json carries it as `$exception`):** the two
+plan-mandated sparkline hardening features collide with the plan/21 §1 hard caps. Measured
+(webpack+terser+gzip, the real import cost): baseline **2 965 B** static (35 B under the 3 kB cap);
+long-series min/max guard (plan/21 §6.0.D, decimation inlined in geometry reusing scaled points —
+the `core/downsample.decimateMinMax` variant measured 122 B heavier and was dropped from this path,
+the kernel export stays for waveform/seismogram/minimap) **+≈170 B**; `label="minmax"` grammar
+parity (plan/04) **+≈145 B** → **3 323 B static / 4 320 B interactive** (final: affordance-gated gutter labels — the beside-the-dot design collided with the stroke on review). Trim attempts measured and
+exhausted: JSX compaction (−11), kernel-import removal (−122), gutter-plumbing removal + reusing the
+endpoint-label placement pattern (−24); an esbuild --analyze pass found no dead weight (bundle =
+summary strings, formatter cache, 3 curve builders, Chart shell — all features). A first label
+design (vertical gutters above/below) was REJECTED by the containment suite: two font-height gutters
+invert the plot at the default 80×20 — labels now sit beside their dots with the proven
+endpoint-label clamps. Interim: `scripts/size-budgets.json` carries sparkline at **3.35/4.35 kB**
+with a `$pending` note so CI stays green and the exception is impossible to miss. User options:
+(a) bless a documented flagship exception (recommendation — sparkline is the feature-dense flagship;
+every other chart sits well under its cap), (b) drop `label="minmax"` (−≈180 B → ≈3 140, still over),
+(c) both features out (back to 2 965). Decision goes back into size-budgets.json + this entry.
+
+**ActivityGrid budget adjustment (2026-07-08, Batch 0.D — within model caps, no gate conflict):**
+`shape` variant + calendar-alignment retrofit measured 2 037 B static / 3 175 B interactive
+(was 1 677/2 762). Per-chart budgets in `scripts/size-budgets.json` raised 2→2.1 kB and
+3→3.25 kB — both far inside the 3/4 kB model hard caps. Note: the interactive−static delta was
+already over the "+1 kB" guideline before Batch 0 (1 085 B); the absolute per-chart budgets are
+the enforced contract (plan/21 §1 table is per-subpath).
+
+**Bench floor calibration (2026-07-08, Batch 0.D):** the plan/07 "≥ 50 rows/ms SSR" floor was
+calibrated on the single-path sparkline scenario; SSR cost scales with node count, so 24-rect
+SparkBar (~14 rows/ms) and 35-cell ActivityGrid (~9 rows/ms) can never meet it by construction.
+Bench v2 (`bench/scenarios.mjs` registry) keeps 50 for sparkline/delta-class charts and gives
+N-node charts regression floors at ~half their measured 2026-07-08 baseline (sparkbar 7, bullet 30,
+activity-grid 5) — tripwires, not aspirations; measured numbers in `bench/results.json`.
+Measurement fix in the same pass: warm every component process-wide before measuring any (the first
+chart otherwise pays renderToStaticMarkup JIT warmup and reads 3–4× slow), median of 5 windows.

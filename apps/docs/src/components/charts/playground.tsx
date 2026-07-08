@@ -1,13 +1,10 @@
 "use client";
 import { useState, type ReactNode } from "react";
-import { Sparkline } from "@microcharts/react/sparkline";
-import { SparkBar } from "@microcharts/react/sparkbar";
-import { Delta } from "@microcharts/react/delta";
-import { Bullet } from "@microcharts/react/bullet";
-import { ActivityGrid } from "@microcharts/react/activity-grid";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { RotateCw } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { getModule } from "@/lib/charts/registry";
+import type { Knob, KnobValue } from "@/lib/charts/types";
 
 /* ── shared control primitives ─────────────────────────────────────────── */
 
@@ -20,16 +17,16 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function Segmented<T extends string>({
+function Segmented({
   label,
   value,
   options,
   onChange,
 }: {
   label: string;
-  value: T;
-  options: readonly T[];
-  onChange: (v: T) => void;
+  value: string;
+  options: readonly string[];
+  onChange: (v: string) => void;
 }) {
   return (
     <Field label={label}>
@@ -162,254 +159,82 @@ function Shell({
   );
 }
 
-function wave(seed: number) {
-  return Array.from(
-    { length: 12 },
-    (_, i) => 6 + Math.round(Math.sin(i * 0.9 + seed) * 5 + i * 1.4 + ((i + seed) % 3) * 3),
-  );
-}
+/* ── the engine — interprets a chart module's declarative PlaygroundSpec ── */
 
-/* ── per-chart playgrounds ────────────────────────────────────────────────── */
-
-function SparklinePG() {
-  const [data, setData] = useState(wave(0));
-  const [curve, setCurve] = useState<"linear" | "smooth" | "step">("smooth");
-  const [dots, setDots] = useState<"auto" | "minmax" | "none">("minmax");
-  const [fill, setFill] = useState(false);
-  const [band, setBand] = useState(false);
-  const [label, setLabel] = useState(true);
-  const [seed, setSeed] = useState(1);
-  const code = [
-    "<Sparkline",
-    `  data={[${data.join(", ")}]}`,
-    `  curve="${curve}"`,
-    `  dots="${dots}"`,
-    fill && "  fill",
-    band && "  band={[10, 26]}",
-    label && '  label="last"',
-    "/>",
-  ]
-    .filter(Boolean)
-    .join("\n");
-  return (
-    <Shell
-      morphKey={`${curve}-${dots}-${fill}-${band}-${label}-${seed}`}
-      onShuffle={() => {
-        setData(wave(seed));
-        setSeed((s) => s + 1);
-      }}
-      preview={
-        <Sparkline
-          data={data}
-          width={340}
-          height={92}
-          curve={curve}
-          dots={dots}
-          fill={fill}
-          band={band ? [10, 26] : undefined}
-          label={label ? "last" : "none"}
-          className="w-full max-w-md"
-          title="Playground"
+function KnobControl({
+  knob,
+  value,
+  onChange,
+}: {
+  knob: Knob;
+  value: KnobValue;
+  onChange: (v: KnobValue) => void;
+}) {
+  const label = knob.label ?? knob.key;
+  switch (knob.kind) {
+    case "segmented":
+      return (
+        <Segmented
+          label={label}
+          value={value as string}
+          options={knob.options}
+          onChange={onChange}
         />
-      }
-      controls={
-        <>
-          <Segmented
-            label="curve"
-            value={curve}
-            options={["linear", "smooth", "step"] as const}
-            onChange={setCurve}
-          />
-          <Segmented
-            label="dots"
-            value={dots}
-            options={["auto", "minmax", "none"] as const}
-            onChange={setDots}
-          />
-          <Toggle label="fill" value={fill} onChange={setFill} />
-          <Toggle label="band" value={band} onChange={setBand} />
-          <Toggle label="label" value={label} onChange={setLabel} />
-        </>
-      }
-      code={code}
-    />
-  );
-}
-
-function SparkBarPG() {
-  const [data, setData] = useState([4, 6, 2, 8, 5, 9, 3, 7, 6, 10]);
-  const [mode, setMode] = useState<"bar" | "winloss">("bar");
-  const [label, setLabel] = useState(false);
-  const [seed, setSeed] = useState(1);
-  const shown = mode === "winloss" ? data.map((n) => (n % 2 === 0 ? 1 : -1)) : data;
-  const code = [
-    "<SparkBar",
-    `  data={[${shown.join(", ")}]}`,
-    `  mode="${mode}"`,
-    label && '  label="last"',
-    "/>",
-  ]
-    .filter(Boolean)
-    .join("\n");
-  return (
-    <Shell
-      morphKey={`${mode}-${label}-${seed}`}
-      onShuffle={() => {
-        setData(wave(seed));
-        setSeed((s) => s + 1);
-      }}
-      preview={
-        <SparkBar
-          data={shown}
-          width={340}
-          height={92}
-          mode={mode}
-          label={label ? "last" : "none"}
-          className="w-full max-w-md"
-          title="Playground"
+      );
+    case "toggle":
+      return <Toggle label={label} value={value as boolean} onChange={onChange} />;
+    case "range":
+      return (
+        <Range
+          label={label}
+          value={value as number}
+          min={knob.min}
+          max={knob.max}
+          step={knob.step}
+          onChange={onChange}
         />
-      }
-      controls={
-        <>
-          <Segmented
-            label="mode"
-            value={mode}
-            options={["bar", "winloss"] as const}
-            onChange={setMode}
-          />
-          <Toggle label="label" value={label} onChange={setLabel} />
-        </>
-      }
-      code={code}
-    />
-  );
+      );
+  }
 }
-
-function BulletPG() {
-  const [value, setValue] = useState(72);
-  const [target, setTarget] = useState(80);
-  const [bands, setBands] = useState(true);
-  const code = [
-    "<Bullet",
-    `  value={${value}}`,
-    `  target={${target}}`,
-    bands && "  bands={[50, 90]}",
-    "/>",
-  ]
-    .filter(Boolean)
-    .join("\n");
-  return (
-    <Shell
-      morphKey={`bands-${bands}`}
-      preview={
-        <Bullet
-          value={value}
-          target={target}
-          bands={bands ? [50, 90] : undefined}
-          width={300}
-          height={28}
-          className="w-full max-w-md"
-          title="Playground"
-        />
-      }
-      controls={
-        <>
-          <Range label="value" value={value} min={0} max={100} onChange={setValue} />
-          <Range label="target" value={target} min={0} max={100} onChange={setTarget} />
-          <Toggle label="bands" value={bands} onChange={setBands} />
-        </>
-      }
-      code={code}
-    />
-  );
-}
-
-function ActivityGridPG() {
-  const [data, setData] = useState(
-    Array.from({ length: 35 }, (_, i) => Math.round(Math.abs(Math.sin(i * 1.3)) * 4)),
-  );
-  const [layout, setLayout] = useState<"grid" | "strip">("grid");
-  const [cell, setCell] = useState<"9" | "12" | "15">("12");
-  const [seed, setSeed] = useState(1);
-  const code = [
-    "<ActivityGrid",
-    `  data={/* ${data.length} values */}`,
-    `  layout="${layout}"`,
-    `  cell={${cell}}`,
-    "/>",
-  ].join("\n");
-  return (
-    <Shell
-      onShuffle={() => {
-        setData(
-          Array.from({ length: 35 }, (_, i) => Math.round(Math.abs(Math.sin(i * 1.3 + seed)) * 4)),
-        );
-        setSeed((s) => s + 1);
-      }}
-      morphKey={`${layout}-${cell}-${seed}`}
-      preview={<ActivityGrid data={data} layout={layout} cell={Number(cell)} title="Playground" />}
-      controls={
-        <>
-          <Segmented
-            label="layout"
-            value={layout}
-            options={["grid", "strip"] as const}
-            onChange={setLayout}
-          />
-          <Segmented
-            label="cell"
-            value={cell}
-            options={["9", "12", "15"] as const}
-            onChange={setCell}
-          />
-        </>
-      }
-      code={code}
-    />
-  );
-}
-
-function DeltaPG() {
-  const [pct, setPct] = useState(12);
-  const [positive, setPositive] = useState<"up" | "down">("up");
-  const value = pct / 100;
-  const code = ["<Delta", `  value={${value}}`, positive === "down" && '  positive="down"', "/>"]
-    .filter(Boolean)
-    .join("\n");
-  return (
-    <Shell
-      morphKey={`delta-${positive}`}
-      preview={
-        <span className="text-3xl">
-          <Delta value={value} positive={positive} summary={false} />
-        </span>
-      }
-      controls={
-        <>
-          <Range label="change %" value={pct} min={-50} max={50} onChange={setPct} />
-          <Segmented
-            label="good dir"
-            value={positive}
-            options={["up", "down"] as const}
-            onChange={setPositive}
-          />
-        </>
-      }
-      code={code}
-    />
-  );
-}
-
-const MAP: Record<string, () => ReactNode> = {
-  sparkline: SparklinePG,
-  sparkbar: SparkBarPG,
-  bullet: BulletPG,
-  "activity-grid": ActivityGridPG,
-  delta: DeltaPG,
-};
 
 /** A live prop playground for any chart. `<Playground chart="bullet" />` */
 export function Playground({ chart }: { chart: string }) {
-  const Comp = MAP[chart];
-  return Comp ? <Comp /> : null;
+  const spec = getModule(chart)?.playground;
+  const [state, setState] = useState<Record<string, KnobValue>>(() =>
+    Object.fromEntries((spec?.knobs ?? []).map((k) => [k.key, k.init])),
+  );
+  const [data, setData] = useState<number[]>(spec?.data ?? []);
+  const [seed, setSeed] = useState(1);
+  if (!spec) return null;
+
+  // remount (and morph) on discrete-knob or data changes — never on slider drags
+  const morphKey = spec.knobs
+    .filter((k) => k.kind !== "range")
+    .map((k) => String(state[k.key]))
+    .concat(spec.shuffle ? [String(seed)] : [])
+    .join("-");
+
+  return (
+    <Shell
+      morphKey={morphKey}
+      onShuffle={
+        spec.shuffle
+          ? () => {
+              setData(spec.shuffle!(seed));
+              setSeed((s) => s + 1);
+            }
+          : undefined
+      }
+      preview={spec.render(state, data)}
+      controls={spec.knobs.map((k) => (
+        <KnobControl
+          key={k.key}
+          knob={k}
+          value={state[k.key]!}
+          onChange={(v) => setState((s) => ({ ...s, [k.key]: v }))}
+        />
+      ))}
+      code={spec.code(state, data)}
+    />
+  );
 }

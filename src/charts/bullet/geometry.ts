@@ -36,13 +36,26 @@ export interface BulletGeometryOptions {
 }
 
 export function bulletGeometry(opts: BulletGeometryOptions): BulletGeometry {
-  const { width, height, value, target, bands = [], pad = 1 } = opts;
+  const { width, height, pad = 1 } = opts;
+  // Non-finite inputs are documented no-shows: NaN/±Infinity value → zero-width
+  // measure, unusable target → no tick, bad bands/domain dropped (plan/09 —
+  // degenerates render as designed empties, never as NaN attributes).
+  const hasValue = Number.isFinite(opts.value);
+  const value = hasValue ? opts.value : 0;
+  const target = Number.isFinite(opts.target) ? opts.target : undefined;
+  const bands = (opts.bands ?? []).filter((b) => Number.isFinite(b));
+  const domain =
+    opts.domain && Number.isFinite(opts.domain[0]) && Number.isFinite(opts.domain[1])
+      ? opts.domain
+      : undefined;
   const x0 = pad;
   const x1 = width - pad;
 
-  const candidates = [value, target ?? 0, ...bands, opts.domain?.[1] ?? 0];
-  const max = opts.domain?.[1] ?? Math.max(1, ...candidates);
-  const min = opts.domain?.[0] ?? 0;
+  const candidates = [value, target ?? 0, ...bands, domain?.[1] ?? 0].filter((n) =>
+    Number.isFinite(n),
+  );
+  const max = domain?.[1] ?? Math.max(1, ...candidates);
+  const min = domain?.[0] ?? 0;
   const x = scaleLinear([min, max], [x0, x1]);
 
   const trackY = pad;
@@ -62,7 +75,7 @@ export function bulletGeometry(opts: BulletGeometryOptions): BulletGeometry {
   // Measure bar — centered, ~⅓ track height (Few's thin measure).
   const measureH = Math.max(2, trackH * 0.34);
   const measureY = trackY + (trackH - measureH) / 2;
-  const vx = clamp(x(value), x0, x1);
+  const vx = hasValue ? clamp(x(value), x0, x1) : x0;
   const measure = {
     x: x0,
     width: round2(Math.max(0, vx - x0)),

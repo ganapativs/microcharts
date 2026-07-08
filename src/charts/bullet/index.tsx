@@ -61,7 +61,12 @@ export function Bullet(props: BulletProps): ReactNode {
       ? false
       : typeof summary === "string"
         ? summary
-        : bulletSummary(fmt(value), target === undefined ? null : fmt(target));
+        : Number.isFinite(value)
+          ? bulletSummary(
+              fmt(value),
+              target !== undefined && Number.isFinite(target) ? fmt(target) : null,
+            )
+          : "No data.";
 
   // More bands → widen the shade spread so regions stay distinguishable.
   const steps = Math.max(1, geo.regions.length);

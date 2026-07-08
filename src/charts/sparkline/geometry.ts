@@ -6,6 +6,9 @@ import { niceDomain, scaleLinear } from "../../core/scale.js";
 import { seriesStats } from "../../core/stats.js";
 import { isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
 
+/** Series longer than this auto-decimate for line drawing (documented guard). */
+const DEFAULT_MAX_POINTS = 200;
+
 /** A placed mark: its position (viewBox px) + the underlying data value/index. */
 interface Mark {
   x: number;
@@ -15,8 +18,13 @@ interface Mark {
 }
 
 export interface SparkGeometry {
-  /** Scaled series in viewBox space; `null` preserves gaps for the path builders. */
+  /** Scaled series in viewBox space; `null` preserves gaps for the path builders.
+   *  Always 1:1 with `data` (the interactive overlay indexes it by data index). */
   points: (XY | null)[];
+  /** What the line/area actually draw: `points` itself for short series, or an
+   *  index-preserving min/max decimation past `maxPoints` (spikes survive at
+   *  their true x; summaries/marks always come from the raw data). */
+  linePoints: (XY | null)[];
   /** y of the area baseline (bottom for data-fit, y(0) when zero-anchored). */
   baselineY: number;
   /** Endpoint / extrema marks — `null` when the series has no finite value. */
@@ -59,6 +67,12 @@ export interface SparkGeometryOptions {
   pad?: number;
   /** Extra right inset reserved for a direct endpoint label (viewBox units). */
   gutterRight?: number | undefined;
+  /** Vertical insets reserved for min/max value labels (viewBox units). */
+  gutterTop?: number | undefined;
+  gutterBottom?: number | undefined;
+  /** Line-drawing point cap before min/max decimation kicks in (default 200).
+   *  `Infinity` opts out. */
+  maxPoints?: number | undefined;
 }
 
 /**
@@ -68,11 +82,11 @@ export interface SparkGeometryOptions {
  * scale maps a zero-span domain to its range midpoint).
  */
 export function sparkGeometry(data: readonly Value[], opts: SparkGeometryOptions): SparkGeometry {
-  const { width, height, pad = 2, gutterRight = 0 } = opts;
+  const { width, height, pad = 2, gutterRight = 0, gutterTop = 0, gutterBottom = 0 } = opts;
   const x0 = pad;
   const x1 = width - pad - gutterRight;
-  const y0 = pad;
-  const y1 = height - pad;
+  const y0 = pad + gutterTop;
+  const y1 = height - pad - gutterBottom;
   const plot = { x0, x1, y0, y1 };
 
   const domain = opts.domain ?? niceDomain(data, opts.zero);
@@ -83,6 +97,32 @@ export function sparkGeometry(data: readonly Value[], opts: SparkGeometryOptions
   const points: (XY | null)[] = data.map((v, i) =>
     isFiniteValue(v) ? [round2(xFor(i)), round2(yScale(v))] : null,
   );
+
+  // Long-series guard (plan/21 §6.0.D): past maxPoints the DRAWN line drops to
+  // an index-preserving min/max envelope — same rule as core/downsample, but
+  // reusing the already-scaled points so the guard costs no extra mapping.
+  // Spikes keep their true x/y, empty buckets stay gaps; marks/summaries always
+  // read the raw data.
+  const maxPoints = opts.maxPoints ?? DEFAULT_MAX_POINTS;
+  let linePoints = points;
+  if (n > maxPoints) {
+    const k = Math.max(1, Math.floor(maxPoints / 2));
+    linePoints = [];
+    for (let b = 0; b < k; b++) {
+      const end = Math.floor(((b + 1) * n) / k);
+      let lo = -1;
+      let hi = -1;
+      for (let j = Math.floor((b * n) / k); j < end; j++) {
+        const v = data[j];
+        if (!isFiniteValue(v)) continue;
+        if (lo < 0 || v < (data[lo] as number)) lo = j;
+        if (hi < 0 || v > (data[hi] as number)) hi = j;
+      }
+      if (lo < 0) linePoints.push(null);
+      else if (lo === hi) linePoints.push(points[lo]!);
+      else linePoints.push(points[Math.min(lo, hi)]!, points[Math.max(lo, hi)]!);
+    }
+  }
 
   const stats = seriesStats(data);
   const mark = (index: number, value: number): Mark => ({
@@ -113,5 +153,5 @@ export function sparkGeometry(data: readonly Value[], opts: SparkGeometryOptions
     }
   }
 
-  return { points, baselineY, last, min, max, band, plot };
+  return { points, linePoints, baselineY, last, min, max, band, plot };
 }

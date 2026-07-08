@@ -1,15 +1,15 @@
 ---
 title: SparkBar
-description: Compact bars for discrete magnitudes in React, or a win–loss streak of binary outcomes — static SVG and an interactive entry.
+description: Compact bars for discrete magnitudes in React, or a win–loss–tie streak of outcomes — static SVG and an interactive entry.
 ---
 
 SparkBar renders discrete values as compact bars from a zero baseline. In `winloss`
-mode it collapses each value to a single up/down mark — a streak you can read at a
-glance.
+mode it collapses each value to its sign — a streak you can read at a glance: wins
+above the mid-line, losses below, and a tie (`0`) as a thin neutral dash on it.
 
 <LiveDemo
   label="SparkBar"
-  meta="static · 2.21 kB"
+  sizeOf="sparkbar"
   code={`import { SparkBar } from "@microcharts/react/sparkbar";
 
 <SparkBar data={[4, 6, 2, 8, 5, 9]} title="Deploys per day" />`}
@@ -56,6 +56,20 @@ aspect ratio.
     height={32}
     mode="winloss"
     title="Win–loss streak"
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="winloss with ties"
+  code={`// a 0 is a tie — a neutral dash on the mid-line, never a win or a loss
+<SparkBar data={[1, -1, 0, 1, 0, -1, 1]} mode="winloss" />`}
+>
+  <SparkBar
+    data={[1, -1, 0, 1, 0, -1, 1]}
+    width={130}
+    height={32}
+    mode="winloss"
+    title="Win–loss–tie streak"
   />
 </LiveDemo>
 

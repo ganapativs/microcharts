@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { Sparkline } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const D = [4, 6, 5, 9, 7, 8, 11, 9, 13, 12];
 
@@ -56,6 +57,30 @@ describe("<Sparkline> static structure (plan/03, plan/09)", () => {
     expect(text.textContent).toBe("3");
   });
 
+  it("label='minmax' renders both extreme values in quiet label ink (when tall enough)", () => {
+    const { container } = draw(<Sparkline data={[4, 9, 2, 7]} height={40} label="minmax" />);
+    const labels = [...container.querySelectorAll('text[data-mc-ink="label"]')];
+    expect(labels.map((t) => t.textContent).sort()).toEqual(["2", "9"]);
+  });
+
+  it("label='minmax' on a flat series renders one label, not two copies", () => {
+    const { container } = draw(<Sparkline data={[5, 5, 5]} height={40} label="minmax" />);
+    expect(container.querySelectorAll('text[data-mc-ink="label"]')).toHaveLength(1);
+  });
+
+  it("label='minmax' below the affordance height renders no labels (documented)", () => {
+    const { container } = draw(<Sparkline data={[4, 9, 2, 7]} label="minmax" />);
+    expect(container.querySelectorAll('text[data-mc-ink="label"]')).toHaveLength(0);
+  });
+
+  it("long series → the drawn path is decimated, dots still mark raw extremes", () => {
+    const data = Array.from({ length: 5000 }, (_, i) => 50 + Math.sin(i / 9) * 30);
+    const { container } = draw(<Sparkline data={data} dots="minmax" />);
+    const d = container.querySelector('path[data-mc-ink="data"]')!.getAttribute("d")!;
+    expect((d.match(/L/g) ?? []).length).toBeLessThanOrEqual(220);
+    expect(container.querySelectorAll("circle").length).toBeGreaterThan(0);
+  });
+
   it("curve='step' emits H/V commands; 'smooth' emits C", () => {
     const step = draw(<Sparkline data={D} curve="step" />)
       .container.querySelector('[data-mc-ink="data"]')!
@@ -102,6 +127,10 @@ describe("<Sparkline> static structure (plan/03, plan/09)", () => {
   });
 });
 
+seriesEdgeSuite("Sparkline", (data) => (
+  <Sparkline data={[...data]} label="last" dots="minmax" title="Edge" />
+));
+
 describe("<Sparkline> edge inputs (plan/09)", () => {
   it("empty data → no path, 'No data.' summary, no crash", () => {
     const { container } = draw(<Sparkline data={[]} title="Empty" />);
@@ -146,6 +175,27 @@ describe("containment (CLAUDE.md: nothing paints outside the viewBox)", () => {
     const y = Number(text.getAttribute("y"));
     expect(y - fontSize * 0.55).toBeGreaterThanOrEqual(0);
     expect(y + fontSize * 0.55).toBeLessThanOrEqual(20);
+  });
+
+  it("minmax labels + estimated extents stay inside the viewBox", () => {
+    const { container } = render(
+      <Sparkline data={[3, 1284, 4, -917, 6]} width={80} height={36} label="minmax" />,
+    );
+    const labels = [...container.querySelectorAll('text[data-mc-ink="label"]')];
+    expect(labels.length).toBe(2);
+    for (const text of labels) {
+      const x = Number(text.getAttribute("x"));
+      const fontSize = Number(text.getAttribute("fontSize") ?? text.getAttribute("font-size"));
+      const half = (text.textContent!.length * fontSize * 0.62) / 2;
+      expect(x - half).toBeGreaterThanOrEqual(0);
+      expect(x + half).toBeLessThanOrEqual(80);
+      const y = Number(text.getAttribute("y"));
+      if (text.getAttribute("dominant-baseline") === "hanging") {
+        expect(y + fontSize).toBeLessThanOrEqual(36); // descends from y
+      } else {
+        expect(y - fontSize).toBeGreaterThanOrEqual(0); // ascends above y
+      }
+    }
   });
 
   it("all path/mark coordinates stay inside the viewBox with label gutter active", () => {

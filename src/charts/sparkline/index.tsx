@@ -34,8 +34,9 @@ export interface SparklineProps {
   band?: readonly [number, number] | undefined;
   /** Endpoint dot (`"auto"`, default), `+` min/max dots (`"minmax"`), or `"none"`. */
   dots?: "auto" | "minmax" | "none" | undefined;
-  /** Direct endpoint value label (plan/18 anchored, no measurement). */
-  label?: "none" | "last" | undefined;
+  /** Direct value labels (plan/18 anchored, no measurement): the endpoint
+   *  (`"last"`) or the extremes (`"minmax"`). */
+  label?: "none" | "last" | "minmax" | undefined;
   /** Series color override (any CSS color); `prop > CSS var > preset` (plan/04). */
   color?: string | undefined;
   /** Accessible name. A string overrides the auto-summary; `false` = decorative. */
@@ -44,6 +45,10 @@ export interface SparklineProps {
   /** Number formatting for the label + summary (`Intl` options or a fn). */
   format?: DescribeOptions["format"] | undefined;
   locale?: string | string[] | undefined;
+  /** Line-drawing point cap: series longer than this (default 200) decimate to
+   *  an index-preserving min/max envelope — spikes and gaps survive, summaries
+   *  and dots still come from the raw data. `Infinity` opts out. */
+  maxPoints?: number | undefined;
   /** Explicit id root (stable ids across hydration). */
   id?: string | undefined;
   className?: string | undefined;
@@ -68,6 +73,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
     summary,
     format,
     locale,
+    maxPoints,
     id,
     className,
     style,
@@ -83,6 +89,13 @@ export function Sparkline(props: SparklineProps): ReactNode {
   const labelText = label === "last" && last !== undefined ? fmt(last) : undefined;
   const metrics = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
 
+  // "minmax" labels reserve top/bottom gutters BEFORE geometry (plan/18) and
+  // sit above the max / below the min — the only spots the data can't occupy.
+  // Documented affordance: below ~28px tall the gutters would crush the plot,
+  // so the labels are omitted (the summary still reads the range).
+  const mmSize = Math.max(5, Math.min(Math.round(height * 0.22), 9));
+  const mmFont = label === "minmax" && height >= (mmSize + 1) * 2 + 12 ? mmSize : 0;
+
   const geo = sparkGeometry(data, {
     width,
     height,
@@ -90,8 +103,11 @@ export function Sparkline(props: SparklineProps): ReactNode {
     zero: fill,
     band,
     gutterRight: metrics?.gutter ?? 0,
+    gutterTop: mmFont && mmFont + 1,
+    gutterBottom: mmFont && mmFont + 1,
+    maxPoints,
   });
-  const d = CURVE[curve](geo.points);
+  const d = CURVE[curve](geo.linePoints);
 
   const accName = summary === false ? false : (summary ?? describeSeries(data, { format, locale }));
 
@@ -121,7 +137,11 @@ export function Sparkline(props: SparklineProps): ReactNode {
         />
       ) : null}
       {fill && d ? (
-        <path d={areaPath(geo.points, geo.baselineY, curve)} data-mc-ink="fill" style={fillStyle} />
+        <path
+          d={areaPath(geo.linePoints, geo.baselineY, curve)}
+          data-mc-ink="fill"
+          style={fillStyle}
+        />
       ) : null}
       {d ? (
         <path d={d} vectorEffect="non-scaling-stroke" data-mc-ink="data" style={strokeStyle} />
@@ -142,6 +162,28 @@ export function Sparkline(props: SparklineProps): ReactNode {
       {showEndpoint && geo.last ? (
         <circle cx={geo.last.x} cy={geo.last.y} r={2} data-mc-ink="accent" />
       ) : null}
+      {mmFont && geo.min && geo.max
+        ? /* a flat series has one extreme — labelling it twice is noise */
+          (geo.min.index === geo.max.index ? [geo.max] : [geo.max, geo.min]).map((m, i) => {
+            const kind = i ? "min" : "max";
+            const text = fmt(m.value);
+            const half = (text.length * mmFont * 0.62) / 2;
+            return (
+              <text
+                key={kind}
+                /* centered on the mark, clamped inside the viewBox (containment) */
+                x={Math.min(Math.max(m.x, half + 1), width - half - 1)}
+                y={i ? m.y + 3 : m.y - 3}
+                fontSize={mmFont}
+                textAnchor="middle"
+                dominantBaseline={i ? "hanging" : undefined}
+                data-mc-ink="label"
+              >
+                {text}
+              </text>
+            );
+          })
+        : null}
       {labelText !== undefined && metrics && geo.last ? (
         <text
           x={geo.last.x + 4}

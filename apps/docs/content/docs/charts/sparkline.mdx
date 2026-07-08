@@ -9,7 +9,7 @@ the quiet backbone of a KPI card.
 
 <LiveDemo
   label="Sparkline"
-  meta="static · 2.67 kB"
+  sizeOf="sparkline"
   code={`import { Sparkline } from "@microcharts/react/sparkline";
 
 <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />`}
@@ -81,6 +81,43 @@ Flip any of them to the Code tab.
     dots="minmax"
     label="last"
     title="Min/max dots"
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="minmax labels"
+  code={`// the extremes, labelled directly — no axis needed
+<Sparkline data={data} dots="minmax" label="minmax" />`}
+>
+  <Sparkline
+    data={[3, 5, 4, 8, 6, 9, 2, 7]}
+    width={130}
+    height={36}
+    dots="minmax"
+    label="minmax"
+    title="Extremes labelled"
+  />
+</LiveDemo>
+
+## Long series
+
+Past `maxPoints` (default 200) the drawn line decimates to a min/max-preserving
+envelope: every spike keeps its true position and height, gaps stay gaps, and the
+summary, dots, and hover values still come from the raw data — only the path gets
+lighter. Pass `maxPoints={Infinity}` to opt out.
+
+<LiveDemo
+  label="2,000 points"
+  code={`// renders ≤ 200 line points; the spike at i=1500 survives
+<Sparkline data={twoThousandPoints} />`}
+>
+  <Sparkline
+    data={Array.from({ length: 2000 }, (_, i) =>
+      i === 1500 ? 98 : 50 + Math.sin(i / 40) * 24 + ((i * 13) % 7),
+    )}
+    width={220}
+    height={40}
+    title="Two thousand points, one spike"
   />
 </LiveDemo>
 

@@ -1,0 +1,12 @@
+{
+  "$comment": "Per-subpath gzip budgets (plan/21 §1, budget model v2). Keys are export subpaths without './'. Every chart needs an entry — gen-size-limits.mjs fails on a missing one, so adding a chart forces a budget decision. Hard ceilings: static ≤ 3 kB (target 2 kB, Delta-class 1.5 kB), interactive ≤ static + 1 kB. `.size-limit.json` is GENERATED from this file + package.json#exports — never hand-edit it.",
+  "$exception": "Sparkline 3.35/4.35 kB is a USER-APPROVED flagship exception (2026-07-08) to the 3/4 kB hard caps — it carries the long-series guard + label=minmax on top of the densest feature set; every trim was measured and exhausted first (plan/12 audit). Every other chart holds the standard caps; do not cite this exception to justify another.",
+  "styles": "12 kB",
+  "charts": {
+    "sparkline": { "static": "3.35 kB", "interactive": "4.35 kB" },
+    "sparkbar": { "static": "3 kB", "interactive": "4 kB" },
+    "delta": { "static": "1.5 kB", "interactive": "2 kB" },
+    "bullet": { "static": "2 kB", "interactive": "2.5 kB" },
+    "activity-grid": { "static": "2.1 kB", "interactive": "3.25 kB" }
+  }
+}

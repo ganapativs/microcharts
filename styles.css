@@ -168,6 +168,11 @@
     fill: none;
     stroke: var(--mc-neutral);
   }
+  /* direct value labels (plan/18) — quieter than data ink, never the loudest mark */
+  :where(.mc-root text[data-mc-ink="label"]) {
+    fill: var(--mc-neutral);
+    stroke: none;
+  }
   /* filled marks (min/max endpoints) — solid data ink, no stroke */
   :where(.mc-root [data-mc-ink="point"]) {
     fill: var(--mc-stroke);

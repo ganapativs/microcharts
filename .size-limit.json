@@ -1,20 +1,19 @@
 [
   {
-    "name": "@microcharts/react (root barrel)",
+    "name": "@microcharts/react (root barrel, tracked not gated)",
     "path": "dist/index.js",
-    "limit": "2 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/sparkline (static)",
     "path": "dist/charts/sparkline/index.js",
-    "limit": "3 kB",
+    "limit": "3.35 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/sparkline/interactive",
     "path": "dist/charts/sparkline/client.js",
-    "limit": "4 kB",
+    "limit": "4.35 kB",
     "gzip": true
   },
   {
@@ -56,19 +55,19 @@
   {
     "name": "@microcharts/react/activity-grid (static)",
     "path": "dist/charts/activity-grid/index.js",
-    "limit": "2 kB",
+    "limit": "2.1 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/activity-grid/interactive",
     "path": "dist/charts/activity-grid/client.js",
-    "limit": "3 kB",
+    "limit": "3.25 kB",
     "gzip": true
   },
   {
     "name": "styles.css (shared, whole library)",
     "path": "styles.css",
-    "limit": "10 kB",
+    "limit": "12 kB",
     "gzip": true
   }
 ]

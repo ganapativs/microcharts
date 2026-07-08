@@ -11,6 +11,8 @@ import { activityGridGeometry } from "./geometry.js";
 import {
   ActivityGrid as StaticActivityGrid,
   activitySummary,
+  calendarOffset,
+  cellMetrics,
   LEVELS,
   type ActivityGridProps,
 } from "./index.js";
@@ -24,6 +26,9 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
   const {
     data,
     layout = "grid",
+    shape = "square",
+    start,
+    weekStart = 1,
     cell = 10,
     gap = 2,
     domain,
@@ -38,9 +43,10 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
   } = props;
 
   const rows = layout === "strip" ? 1 : 7;
+  const offset = layout === "grid" ? calendarOffset(start, weekStart) : 0;
   const geo = useMemo(
-    () => activityGridGeometry(data, { rows, cell, gap, levels: LEVELS, domain }),
-    [data, rows, cell, gap, domain],
+    () => activityGridGeometry(data, { rows, cell, gap, levels: LEVELS, domain, offset }),
+    [data, rows, cell, gap, domain, offset],
   );
   const step = cell + gap;
   const w = Math.max(geo.width, 1);
@@ -63,21 +69,24 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     (e: React.KeyboardEvent) => {
       if (geo.cells.length === 0) return;
       const cur = active ?? 0;
-      const col = Math.floor(cur / rows);
-      const row = cur % rows;
+      // navigate in SLOT space (data index + calendar offset), so a padded
+      // first column still walks like the grid the reader sees
+      const slot = cur + offset;
+      const col = Math.floor(slot / rows);
+      const row = slot % rows;
       let next: number | null = cur;
       switch (e.key) {
         case "ArrowDown":
-          next = row < rows - 1 ? clampIndex(cur + 1) : cur;
+          next = row < rows - 1 ? (clampIndex(cur + 1) ?? cur) : cur;
           break;
         case "ArrowUp":
-          next = row > 0 ? cur - 1 : cur;
+          next = row > 0 ? (clampIndex(cur - 1) ?? cur) : cur;
           break;
         case "ArrowRight":
-          next = clampIndex((col + 1) * rows + row) ?? cur;
+          next = clampIndex((col + 1) * rows + row - offset) ?? cur;
           break;
         case "ArrowLeft":
-          next = col > 0 ? col * rows + row - rows : cur;
+          next = clampIndex((col - 1) * rows + row - offset) ?? cur;
           break;
         case "Home":
           next = 0;
@@ -94,7 +103,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
       e.preventDefault();
       setActive(next);
     },
-    [active, rows, geo, clampIndex],
+    [active, rows, offset, geo, clampIndex],
   );
 
   // ONE listener on the wrapper; cell lookup is pure grid math.
@@ -106,10 +115,10 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
       const y = ((e.clientY - r.top) / r.height) * h;
       const col = Math.floor(x / step);
       const row = Math.floor(y / step);
-      const i = col * rows + row;
+      const i = col * rows + row - offset;
       setActive(row >= 0 && row < rows && i >= 0 && i < geo.cells.length ? i : null);
     },
-    [w, h, step, rows, geo],
+    [w, h, step, rows, offset, geo],
   );
 
   const activeCell = active !== null ? geo.cells[active] : undefined;
@@ -145,6 +154,9 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         {...rest}
         data={data}
         layout={layout}
+        shape={shape}
+        start={start}
+        weekStart={weekStart}
         cell={cell}
         gap={gap}
         domain={domain}
@@ -152,19 +164,25 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         locale={locale}
         summary={false}
       >
-        {activeCell ? (
-          <rect
-            x={activeCell.x - 0.5}
-            y={activeCell.y - 0.5}
-            width={activeCell.size + 1}
-            height={activeCell.size + 1}
-            rx={1.5}
-            fill="none"
-            stroke="var(--mc-accent)"
-            strokeWidth={1.5}
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {activeCell
+          ? (() => {
+              /* ring hugs the drawn mark, not the slot — shapes stay aligned */
+              const m = cellMetrics(cell, shape);
+              return (
+                <rect
+                  x={activeCell.x + m.inset - 0.5}
+                  y={activeCell.y + m.inset - 0.5}
+                  width={activeCell.size - m.inset * 2 + 1}
+                  height={activeCell.size - m.inset * 2 + 1}
+                  rx={m.rx + 0.5}
+                  fill="none"
+                  stroke="var(--mc-accent)"
+                  strokeWidth={1.5}
+                  vectorEffect="non-scaling-stroke"
+                />
+              );
+            })()
+          : null}
         {rest.children}
       </StaticActivityGrid>
       <span

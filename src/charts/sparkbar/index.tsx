@@ -1,6 +1,7 @@
 // <SparkBar> — discrete periods as bars (plan/05 §2, S1). Static, hook-free,
-// RSC-safe. Zero-anchored bars; `mode="winloss"` collapses to a binary
-// up/down streak. Negative bars take the negative token so direction is encoded
+// RSC-safe. Zero-anchored bars; `mode="winloss"` collapses magnitude to a
+// three-state streak: win above the mid-line, loss below, tie (0) a thin
+// neutral dash on it. Negative bars take the negative token so direction is encoded
 // by position AND color (plan/08 1.4.1). Endpoint bar gets accent emphasis.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
@@ -23,7 +24,7 @@ export interface SparkBarProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  /** `"bar"` (magnitude, default) or `"winloss"` (binary up/down streak). */
+  /** `"bar"` (magnitude, default) or `"winloss"` (win/loss/tie streak: sign only). */
   mode?: SparkBarMode | undefined;
   /** Empty fraction of each slot between bars (0–0.9). */
   gap?: number | undefined;
