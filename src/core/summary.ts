@@ -238,6 +238,12 @@ export interface SummaryStrings {
   ) => string;
   /** Net-flow all-zero, e.g. "No flow across 12 periods." */
   netFlowNoFlow: (n: number) => string;
+  /** Retention summary, e.g. "34% retained after 8 weeks; curve plateaus from week 5." */
+  retention: (last: string, n: number, unit: string, from: number) => string;
+  /** Retention summary, no plateau, e.g. "34% retained after 8 weeks." */
+  retentionNoPlateau: (last: string, n: number, unit: string) => string;
+  /** Retention period announcement, e.g. "week 3: 41% retained (benchmark 37%)." */
+  retentionAt: (unit: string, period: number, value: string, benchmark: string | null) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

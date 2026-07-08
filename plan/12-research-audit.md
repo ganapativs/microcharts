@@ -686,3 +686,31 @@ Gates: node 1122, browser 80, craft 196/0, size 2.61/3.41, bench 18.4 rows/ms (f
 docs build 168 pages + docs tests 92, tsc/oxlint/oxfmt/knip clean. Real-browser sweep: 0
 escapes / 0 text-on-mark, areas visible (0.2 area / 0.45 bars), mirror confirmed (inflow above
 zeroY, outflow below, both anchored at zero), interactive pairs gross + signed net.
+
+## Batch 2 wave 2 — RetentionCurve (2026-07-08)
+
+**RetentionCurve (plan/23 §7) — full DoD, static + interactive.** Provenance: plan/16 §Q12.
+The locked-[0,1]-domain + step-default rules are honest-encoding (non-negotiable #7 / plan/06),
+not empirical claims. **Plateau criterion** (mean |Δ| over the last `max(3, ⌈n/3⌉)` periods <
+0.005 = 0.5 pts/period) is a chart-local documented heuristic, property-tested: no plateau on a
+still-decaying tail, plateau on a flattened one, `from` = the window's first period.
+
+**Deviations from the plan §7 spec (deliberate):**
+- **Tokens corrected.** plan §7 names `--mc-muted` and `data-mc-ink="ghost"`; the ghost is a
+  dashed LINE (stroke) so it uses `data-mc-ink="muted"` (= `stroke:var(--mc-neutral)`) + dash,
+  NOT the fill-only `ghost` role added for RateVolume. Line = `data-mc-ink="data"` + inline
+  accent stroke (accent is the hero series, forced-colors keeps the tokenized width).
+- **`unit?: string` prop added (default "period").** The summary needs a period noun
+  ("weeks"/"week"); the spec example hard-codes "week" but lists no prop. English pluralization
+  (`${unit}s`) lives in the EN module.
+- **Interactive announce uses the 0-based period index** ("week 0" = cohort start), not "Month
+  3" — retention period 0 is the 100% signup point, so the index IS the honest period label.
+- **Static budget 2.64 kB > spec §7 target 2 kB** (Chart wrapper + scale + step/smooth paths +
+  strings floor), interactive 3.43 kB (spec 3). Both UNDER 3/4 hard caps. `smoothPath` is
+  bundled because `curve="smooth"` is a documented variant. Same budget-floor class; gate sign-off.
+
+Gates: node 1148, browser 82, craft 208/0, size 2.64/3.43, bench 40.1 rows/ms (floor 12), docs
+build 171 pages + docs tests 94, tsc/oxlint/oxfmt/knip clean. Real-browser sweep: 0 escapes / 0
+text-on-mark, accent line + dashed ghost + step confirmed, plateau marker present only when flat
+(still-leaking curve → 0 markers), retention 1.0 anchored at the top of the locked frame,
+interactive pairs retention + benchmark.

@@ -91,6 +91,8 @@ export default defineConfig({
     "src/charts/rate-volume/client.tsx",
     "src/charts/net-flow/index.tsx",
     "src/charts/net-flow/client.tsx",
+    "src/charts/retention-curve/index.tsx",
+    "src/charts/retention-curve/client.tsx",
   ],
   format: ["esm"],
   dts: true,

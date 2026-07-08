@@ -467,6 +467,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/retention-curve (static)",
+    "path": "dist/charts/retention-curve/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/retention-curve/interactive",
+    "path": "dist/charts/retention-curve/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

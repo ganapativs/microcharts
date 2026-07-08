@@ -43,6 +43,7 @@
     "graded-band",
     "icon-array",
     "rate-volume",
-    "net-flow"
+    "net-flow",
+    "retention-curve"
   ]
 }

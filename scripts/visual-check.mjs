@@ -17,6 +17,7 @@ const { GradedBand } = await D("graded-band");
 const { IconArray } = await D("icon-array");
 const { RateVolume } = await D("rate-volume");
 const { NetFlow } = await D("net-flow");
+const { RetentionCurve } = await D("retention-curve");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -64,6 +65,8 @@ const NF = [
   { in: 57, out: 43 },
 ];
 const KFMT = (n) => `${n}k`;
+const RET = [1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38, 0.379, 0.378];
+const RETB = [1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28, 0.279, 0.278];
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -171,6 +174,13 @@ const body = [
   row("bars", svg(NetFlow, { data: NF, format: KFMT, mode: "bars", width: 240, height: 28 })),
   row("paydown", svg(NetFlow, { data: NF, format: KFMT, positive: "down", width: 240, height: 28 })),
   row("gross only", svg(NetFlow, { data: NF, format: KFMT, net: false, width: 240, height: 28 })),
+
+  `<h2>RetentionCurve</h2>`,
+  row("default 80×20", svg(RetentionCurve, { data: RET, unit: "week", width: 80, height: 20 })),
+  row("step, last", svg(RetentionCurve, { data: RET, unit: "week", width: 240, height: 28 })),
+  row("benchmark", svg(RetentionCurve, { data: RET, benchmark: RETB, width: 240, height: 28 })),
+  row("smooth", svg(RetentionCurve, { data: RET, curve: "smooth", width: 240, height: 28 })),
+  row("still leaking", svg(RetentionCurve, { data: [1, 0.8, 0.6, 0.45, 0.32, 0.22], width: 240, height: 28 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

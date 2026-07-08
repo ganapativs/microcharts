@@ -514,6 +514,21 @@ add(
   ],
 );
 add(
+  "retention-curve",
+  "RetentionCurve",
+  [
+    { data: [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34], unit: "week" },
+    { data: [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34], benchmark: [1, 0.6, 0.44, 0.37, 0.33] },
+    { data: [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34], curve: "smooth" },
+    { data: [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34], label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
   "net-flow",
   "NetFlow",
   [{ data: NF }, { data: NF, mode: "bars" }, { data: NF, net: false }, { data: NF, label: "none" }],

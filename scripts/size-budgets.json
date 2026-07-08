@@ -169,6 +169,10 @@
     "net-flow": {
       "static": "2.7 kB",
       "interactive": "3.5 kB"
+    },
+    "retention-curve": {
+      "static": "2.8 kB",
+      "interactive": "3.6 kB"
     }
   }
 }

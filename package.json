@@ -348,6 +348,14 @@
       "types": "./dist/charts/net-flow/index.d.ts",
       "import": "./dist/charts/net-flow/index.js"
     },
+    "./retention-curve": {
+      "types": "./dist/charts/retention-curve/index.d.ts",
+      "import": "./dist/charts/retention-curve/index.js"
+    },
+    "./retention-curve/interactive": {
+      "types": "./dist/charts/retention-curve/client.d.ts",
+      "import": "./dist/charts/retention-curve/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

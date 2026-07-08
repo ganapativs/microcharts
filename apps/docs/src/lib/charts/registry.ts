@@ -51,6 +51,7 @@ import gradedBand from "./graded-band";
 import iconArray from "./icon-array";
 import rateVolume from "./rate-volume";
 import netFlow from "./net-flow";
+import retentionCurve from "./retention-curve";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -94,6 +95,7 @@ const MODULES: ChartModule[] = [
   iconArray,
   rateVolume,
   netFlow,
+  retentionCurve,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

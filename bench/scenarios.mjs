@@ -364,4 +364,13 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "retention-curve",
+    component: "RetentionCurve",
+    floor: 12, // step line + plateau scan — few nodes, per-period point loop
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, k) => Math.max(0, 1 - k / rugs[i % POOL].length - (v % 3) * 0.02)),
+      summary: false,
+    }),
+  },
 ];
