@@ -577,3 +577,18 @@ so containment stays exact; the PercentileLadder `log`-tag gutter is now font-si
 fixed 11 units → collided with p50 once the font grew). IconArray default bumped 60×24 →
 140×28 (the old 60px default was too narrow for a properly-sized ratio label + 20-cell grid).
 percentile-ladder trimmed the log-fallback `devWarn` to stay under the 3 kB hard cap.
+
+**Band invisibility — the unifying attribute-vs-CSS bug (2026-07-08, third user review).**
+BenchmarkStrip and GradedBand bands rendered near-invisible AGAIN after the ink-role refactor.
+Root cause is the SAME class as the font-size bug, now for `fill`: the band rects carry
+`data-mc-ink="band"` (kept for the craft/overlap + forced-colors exemption), whose
+`:where([data-mc-ink=band]){fill:var(--mc-band)}` rule (~8% alpha) OVERRODE the
+`fill="var(--mc-neutral|accent)"` ATTRIBUTE — an SVG presentation attribute loses to any
+`:where()` CSS even at 0 specificity. So bands rendered at ~8% × their `fillOpacity` ≈ 1–3% =
+invisible. FIX: set band fill via inline `style={{ fill, fillOpacity }}` (specificity 1000, wins),
+keeping `data-mc-ink="band"` only for the exemptions. Verified via `getComputedStyle`: benchmark
+bands now `--mc-neutral` 0.16/0.34, graded `--mc-accent` 0.14/0.26/0.38 — visible + distinct.
+**General rule for the rest of the batch: any COMPUTED color/size goes in inline `style`, never a
+`fill`/`stroke`/`font-size` attribute, on any element carrying `data-mc-ink` or on `<text>`.** The
+SSR craft gate (color-blind, attribute-reader) cannot catch this class — a real-browser
+`getComputedStyle` band-opacity check is now part of the mandatory pre-done sweep (see memory).
