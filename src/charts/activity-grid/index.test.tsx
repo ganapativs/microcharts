@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { ActivityGrid } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const days = Array.from({ length: 35 }, (_, i) => i % 7);
@@ -47,3 +48,5 @@ describe("<ActivityGrid> (plan/05 S1-binned, plan/08)", () => {
     await expectNoA11yViolations(container);
   });
 });
+
+seriesEdgeSuite("ActivityGrid", (data) => <ActivityGrid data={[...data]} title="Edge" />);

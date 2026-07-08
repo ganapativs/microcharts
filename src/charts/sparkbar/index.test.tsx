@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { SparkBar } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const D = [3, 5, 4, 7, 6, 9, 8, 11];
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
@@ -67,3 +68,5 @@ describe("<SparkBar> a11y (axe, plan/08)", () => {
     await expectNoA11yViolations(container);
   });
 });
+
+seriesEdgeSuite("SparkBar", (data) => <SparkBar data={[...data]} label="last" title="Edge" />);

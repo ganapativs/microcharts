@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { Delta } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { valueEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -101,3 +102,5 @@ describe("<Delta> (plan/05 S4, plan/08)", () => {
     await expectNoA11yViolations(container);
   });
 });
+
+valueEdgeSuite("Delta", (value) => <Delta value={value} title="Edge" />);

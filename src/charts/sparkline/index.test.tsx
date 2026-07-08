@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { Sparkline } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const D = [4, 6, 5, 9, 7, 8, 11, 9, 13, 12];
 
@@ -101,6 +102,10 @@ describe("<Sparkline> static structure (plan/03, plan/09)", () => {
     expect(container.querySelector('[data-testid="annot"]')).not.toBeNull();
   });
 });
+
+seriesEdgeSuite("Sparkline", (data) => (
+  <Sparkline data={[...data]} label="last" dots="minmax" title="Edge" />
+));
 
 describe("<Sparkline> edge inputs (plan/09)", () => {
   it("empty data → no path, 'No data.' summary, no crash", () => {

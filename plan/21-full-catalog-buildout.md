@@ -184,8 +184,9 @@ CI check: generated files match committed ones.
 - **Delta / Bullet**: best-practice re-review against canon (formatter caching already fixed
   2026-07-07); Bullet qualitative-band contrast re-check in dark presets. `bullet/geometry.ts`
   `.toSorted()` ES2022-floor violation found by three independent reviews 2026-07-08 and already
-  fixed (→ `.sort()` on the freshly filtered array). Batch 0 adds a grep/lint CI guard for ES2023
-  array methods so 93 new geometry files can't reintroduce the class.
+  fixed (→ `.sort()` on the freshly filtered array). Batch 0 guards the class at the compiler:
+  `tsconfig.json` lib floor dropped to **ES2022**, so ES2023+ APIs are type errors in CI (implemented
+  2026-07-08 — stronger than the originally planned grep; see plan/12 audit entry).
 - Whole-lib perf audit: re-run bench, confirm ≥ 50 rows/ms SSR, re-measure all gzip numbers,
   regenerate stats. This is the "fastest on the internet" receipts baseline — claims only from
   `bench/` (working rule).

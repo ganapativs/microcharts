@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { Bullet } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { valueEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -43,3 +44,7 @@ describe("<Bullet> (plan/05 S4, plan/08)", () => {
     await expectNoA11yViolations(container);
   });
 });
+
+valueEdgeSuite("Bullet", (value) => (
+  <Bullet value={value} target={80} bands={[50, 90]} title="Edge" />
+));

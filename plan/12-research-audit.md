@@ -278,3 +278,11 @@ conflicted with plan/15's motion-as-encoding premise for E14–E17 (HeartbeatBli
 CometTrail, OrbitStatus). Resolved by a narrow plan/06 amendment: looping motion allowed only where
 motion is the documented primary encoding channel, only in client entries, always
 reduced-motion-gated with meaningful static equivalents. Everywhere else the ban stands.
+
+**ES2023 guard implemented as a compiler floor, not a grep (2026-07-08, Batch 0.D):** plan/21 §6.0.D
+called for a "grep/lint CI guard" for ES2023 array methods. Implemented stronger: `tsconfig.json`
+`lib` dropped ES2023 → **ES2022**, so `toSorted`/`toReversed`/`findLast`-class usage in any `src/`
+file is now a **type error** (CI typecheck), not a pattern match — no false negatives via renamed
+bindings, covers every future ES2023+ API automatically. Verified: full typecheck green on ES2022
+lib. Residual gap: untyped dev-only `.mjs` (bench/, scripts/) — acceptable, they never ship and run
+on pinned dev Node. plan/21 §6.0.D wording updated to match.
