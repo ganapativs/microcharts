@@ -29,6 +29,13 @@ import dumbbell from "./dumbbell";
 import pairedBars from "./paired-bars";
 import slope from "./slope";
 import microScatter from "./micro-scatter";
+import segmentedBar from "./segmented-bar";
+import histogramStrip from "./histogram-strip";
+import microBox from "./micro-box";
+import progressRing from "./progress-ring";
+import microDonut from "./micro-donut";
+import funnel from "./funnel";
+import likertStrip from "./likert-strip";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -50,6 +57,13 @@ const MODULES: ChartModule[] = [
   pairedBars,
   slope,
   microScatter,
+  segmentedBar,
+  histogramStrip,
+  microBox,
+  progressRing,
+  microDonut,
+  funnel,
+  likertStrip,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

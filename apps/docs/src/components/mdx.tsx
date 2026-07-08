@@ -20,6 +20,13 @@ import { PairedBars } from "@microcharts/react/paired-bars";
 import { Slope } from "@microcharts/react/slope";
 import { MicroScatter } from "@microcharts/react/micro-scatter";
 import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annotations";
+import { SegmentedBar } from "@microcharts/react/segmented-bar";
+import { HistogramStrip } from "@microcharts/react/histogram-strip";
+import { MicroBox } from "@microcharts/react/micro-box";
+import { ProgressRing } from "@microcharts/react/progress-ring";
+import { MicroDonut } from "@microcharts/react/micro-donut";
+import { Funnel } from "@microcharts/react/funnel";
+import { LikertStrip } from "@microcharts/react/likert-strip";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -59,6 +66,13 @@ export function getMDXComponents(components?: MDXComponents) {
     TargetZone,
     Marker,
     Callout,
+    SegmentedBar,
+    HistogramStrip,
+    MicroBox,
+    ProgressRing,
+    MicroDonut,
+    Funnel,
+    LikertStrip,
     SparkGroup,
     // docs building blocks
     Instrument,

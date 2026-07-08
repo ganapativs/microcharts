@@ -1,0 +1,107 @@
+---
+title: Funnel
+description: A micro funnel for React — stepped columns with retained-share connectors, honest about non-monotonic pipelines.
+---
+
+Funnel answers "where does the pipeline leak?". Stepped rectangles, zero-anchored —
+never the classic tapered silhouette, which interpolates data that doesn't exist. The
+drop _between_ neighbors is the read.
+
+<LiveDemo
+  label="Funnel"
+  sizeOf="funnel"
+  code={`import { Funnel } from "@microcharts/react/funnel";
+
+<Funnel data={[
+  { label: "Visitors", value: 12400 },
+  { label: "Signups", value: 5704 },
+  { label: "Activated", value: 2730 },
+  { label: "Paid", value: 1116 },
+]} title="Signup funnel" />`}
+>
+  <Funnel
+    data={[
+      { label: "Visitors", value: 12400 },
+      { label: "Signups", value: 5704 },
+      { label: "Activated", value: 2730 },
+      { label: "Paid", value: 1116 },
+    ]}
+    title="Signup funnel"
+    style={{ width: 220, height: 66 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="funnel" />
+
+## Try it
+
+<Playground chart="funnel" />
+
+## Interactive
+
+<InteractiveDemo slug="funnel" />
+
+## When to use it
+
+- **Good for** — per-campaign funnels in table cells, conversion bridges in cards.
+- **Avoid for** — unordered categories (MiniBar) or more than 6 stages.
+
+## Sizing
+
+<Sizing chart="funnel" />
+
+## Variants
+
+<LiveDemo
+  label="rate mode"
+  code={`// every stage as % of the FIRST stage — cross-funnel comparison
+<Funnel data={stages} mode="rate" />`}
+>
+  <Funnel
+    data={[
+      { label: "Visitors", value: 12400 },
+      { label: "Signups", value: 5704 },
+      { label: "Paid", value: 1116 },
+    ]}
+    mode="rate"
+    title="Rate"
+    style={{ width: 220, height: 66 }}
+  />
+</LiveDemo>
+
+<LiveDemo label="the leak" code={`<Funnel data={stages} highlight="Activated" />`}>
+  <Funnel
+    data={[
+      { label: "Visitors", value: 12400 },
+      { label: "Signups", value: 5704 },
+      { label: "Activated", value: 2730 },
+      { label: "Paid", value: 1116 },
+    ]}
+    highlight="Activated"
+    title="The leak"
+    style={{ width: 220, height: 66 }}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="funnel" />
+
+## Why this default
+
+`rate` always normalizes to stage 1, never to the previous stage — per-stage rates hide
+compounding loss. A stage larger than its predecessor (re-engagement funnels) renders
+truthfully and the summary appends the inversion. The connectors and zero-anchored
+columns keep the read a measurement, not a shape.
+
+## Accessibility
+
+The accessible name is the conversion story — **"4 stages, 12,400 to 1,116 — overall
+9%."**, plus **"Stage 3 exceeds stage 2."** when a pipeline inverts. The interactive
+entry roves stages (**"Activated: 2,730 — 22% of Visitors."**).
+
+## Props
+
+<PropTable slug="funnel" />

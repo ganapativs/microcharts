@@ -1,0 +1,93 @@
+---
+title: MicroDonut
+description: An honest micro donut for React — capped at 4 wedges + Other, with a sanctioned decorative mode beside printed values.
+---
+
+MicroDonut answers "roughly what is this made of?" at icon size — an honest, capped
+concession to a ubiquitous demand. For any comparative read, use
+[SegmentedBar](/docs/charts/segmented-bar): a flat bar beats a donut of the same data at
+every size we ship. The wedge cap and labeled rollup are non-optional.
+
+<LiveDemo
+  label="MicroDonut"
+  sizeOf="micro-donut"
+  code={`import { MicroDonut } from "@microcharts/react/micro-donut";
+
+<MicroDonut data={mix} title="Traffic mix" />`}
+>
+  <MicroDonut
+    data={[
+      { label: "Chrome", value: 620 },
+      { label: "Safari", value: 240 },
+      { label: "Firefox", value: 90 },
+      { label: "Edge", value: 30 },
+      { label: "Arc", value: 20 },
+    ]}
+    size={48}
+    title="Traffic mix"
+    style={{ width: 72, height: 72 }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="micro-donut" />
+
+## Try it
+
+<Playground chart="micro-donut" />
+
+## Interactive
+
+<InteractiveDemo slug="micro-donut" />
+
+## When to use it
+
+- **Good for** — a mix icon beside the printed headline number in a KPI card.
+- **Avoid for** — any comparative read (SegmentedBar) — the docs steer there first.
+
+## Sizing
+
+<Sizing chart="micro-donut" />
+
+## Variants
+
+<LiveDemo
+  label="decorative"
+  code={`// the number is printed next to it; the donut repeats it
+<span>62% Chrome <MicroDonut data={mix} decorative /></span>`}
+>
+  <span className="text-lg">
+    62% Chrome{" "}
+    <MicroDonut
+      data={[
+        { label: "Chrome", value: 620 },
+        { label: "Safari", value: 240 },
+        { label: "Firefox", value: 140 },
+      ]}
+      decorative
+      style={{ width: "1em", height: "1em" }}
+    />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="micro-donut" />
+
+## Why this default
+
+The hole is mandatory — the donut's angle + arc-length double encoding beats the pie's
+area read, which is why pie stays unshipped. Never exploded, tilted, or shadowed. A
+single category renders a full annulus that looks like a 100% ProgressRing — the summary
+disambiguates.
+
+## Accessibility
+
+The accessible name is the full composition (same wording as SegmentedBar). `decorative`
+marks the chart aria-hidden for the one sanctioned ornamental use — beside a printed
+value — and the interactive entry refuses to make a decorative donut a tab stop.
+
+## Props
+
+<PropTable slug="micro-donut" />

@@ -21,6 +21,13 @@
     "dumbbell",
     "paired-bars",
     "slope",
-    "micro-scatter"
+    "micro-scatter",
+    "segmented-bar",
+    "histogram-strip",
+    "micro-box",
+    "progress-ring",
+    "micro-donut",
+    "funnel",
+    "likert-strip"
   ]
 }
