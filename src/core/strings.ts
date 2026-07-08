@@ -9,6 +9,7 @@ import { EN_DIST } from "./strings-dist.js";
 import { EN_SLOTS } from "./strings-slots.js";
 import { EN_PAIRED } from "./strings-paired.js";
 import { EN_SCATTER } from "./strings-scatter.js";
+import { EN_COMPOSITION } from "./strings-composition.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -18,4 +19,5 @@ export const EN: SummaryStrings = {
   ...EN_SLOTS,
   ...EN_PAIRED,
   ...EN_SCATTER,
+  ...EN_COMPOSITION,
 };

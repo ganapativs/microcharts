@@ -92,6 +92,37 @@ export interface SummaryStrings {
     direction: "positive" | "negative",
     r: string,
   ) => string;
+  /** One share clause, e.g. "Chrome 62%" (segmented-bar/micro-donut). */
+  shareClause: (label: string, pct: string) => string;
+  /** Joined composition, e.g. "Chrome 62%, Safari 24%, Other 5%." */
+  shares: (list: string) => string;
+  /** Share announcement, e.g. "Safari: 24%, 1,204." */
+  shareAt: (label: string, pct: string, value: string) => string;
+  /** Rollup announcement, e.g. "Other: 5%, 3 categories." */
+  shareOther: (label: string, pct: string, members: number) => string;
+  /** The rollup label ("Other"). */
+  otherLabel: string;
+  /** Funnel summary, e.g. "4 stages, 12,400 to 1,116 — overall 9%." */
+  funnel: (stages: number, first: string, last: string, overallPct: string) => string;
+  /** Non-monotonic note, e.g. "Stage 3 exceeds stage 2." */
+  funnelInversion: (stage: number, prev: number) => string;
+  /** Stage announcement, e.g. "Checkout: 2,730 — 22% of visitors." */
+  stageAt: (label: string, value: string, retainedPct: string, firstLabel: string) => string;
+  /** Likert composition, e.g. "62% agree, 24% disagree, 14% neutral." */
+  likert: (agreePct: string, disagreePct: string, neutralPct: string | null) => string;
+  /** Lean clause, e.g. "Leans positive." */
+  likertLean: (direction: "positive" | "negative" | "balanced") => string;
+  /** All-neutral / empty likert rows. */
+  allNeutral: string;
+  noResponses: string;
+  /** Histogram bin announcement, e.g. "40 to 50: 34 values." */
+  binAt: (lo: string, hi: string, count: number) => string;
+  /** Histogram summary, e.g. "120 values, most between 40 and 50." */
+  distribution: (count: number, modalLo: string, modalHi: string) => string;
+  /** Five-number summary, e.g. "Median 42, middle half 35 to 51, range 12 to 96." */
+  fiveNum: (median: string, q1: string, q3: string, min: string, max: string) => string;
+  /** Stat announcement, e.g. "Median: 42." */
+  boxStat: (which: "min" | "q1" | "median" | "q3" | "max", value: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

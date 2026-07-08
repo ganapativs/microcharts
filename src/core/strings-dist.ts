@@ -14,7 +14,15 @@ const ordinal = (n: number): string => {
 
 export type DistStrings = Pick<
   SummaryStrings,
-  "noData" | "observations" | "observation" | "events" | "noEvents"
+  | "noData"
+  | "observations"
+  | "observation"
+  | "events"
+  | "noEvents"
+  | "binAt"
+  | "distribution"
+  | "fiveNum"
+  | "boxStat"
 >;
 
 export const EN_DIST: DistStrings = {
@@ -24,4 +32,12 @@ export const EN_DIST: DistStrings = {
   observation: (value, rank, count) => `${value} — ${ordinal(rank)} of ${count}.`,
   events: (count, peak) => `${count} events, peak ${peak}.`,
   noEvents: "No events.",
+  binAt: (lo, hi, count) => `${lo} to ${hi}: ${count} ${count === 1 ? "value" : "values"}.`,
+  distribution: (count, lo, hi) => `${count} values, most between ${lo} and ${hi}.`,
+  fiveNum: (median, q1, q3, min, max) =>
+    `Median ${median}, middle half ${q1} to ${q3}, range ${min} to ${max}.`,
+  boxStat: (which, value) => {
+    const name = { min: "Min", q1: "Q1", median: "Median", q3: "Q3", max: "Max" }[which];
+    return `${name}: ${value}.`;
+  },
 };

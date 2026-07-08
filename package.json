@@ -192,6 +192,62 @@
       "types": "./dist/charts/micro-scatter/client.d.ts",
       "import": "./dist/charts/micro-scatter/client.js"
     },
+    "./segmented-bar": {
+      "types": "./dist/charts/segmented-bar/index.d.ts",
+      "import": "./dist/charts/segmented-bar/index.js"
+    },
+    "./segmented-bar/interactive": {
+      "types": "./dist/charts/segmented-bar/client.d.ts",
+      "import": "./dist/charts/segmented-bar/client.js"
+    },
+    "./histogram-strip": {
+      "types": "./dist/charts/histogram-strip/index.d.ts",
+      "import": "./dist/charts/histogram-strip/index.js"
+    },
+    "./histogram-strip/interactive": {
+      "types": "./dist/charts/histogram-strip/client.d.ts",
+      "import": "./dist/charts/histogram-strip/client.js"
+    },
+    "./micro-box": {
+      "types": "./dist/charts/micro-box/index.d.ts",
+      "import": "./dist/charts/micro-box/index.js"
+    },
+    "./micro-box/interactive": {
+      "types": "./dist/charts/micro-box/client.d.ts",
+      "import": "./dist/charts/micro-box/client.js"
+    },
+    "./progress-ring": {
+      "types": "./dist/charts/progress-ring/index.d.ts",
+      "import": "./dist/charts/progress-ring/index.js"
+    },
+    "./progress-ring/interactive": {
+      "types": "./dist/charts/progress-ring/client.d.ts",
+      "import": "./dist/charts/progress-ring/client.js"
+    },
+    "./micro-donut": {
+      "types": "./dist/charts/micro-donut/index.d.ts",
+      "import": "./dist/charts/micro-donut/index.js"
+    },
+    "./micro-donut/interactive": {
+      "types": "./dist/charts/micro-donut/client.d.ts",
+      "import": "./dist/charts/micro-donut/client.js"
+    },
+    "./funnel": {
+      "types": "./dist/charts/funnel/index.d.ts",
+      "import": "./dist/charts/funnel/index.js"
+    },
+    "./funnel/interactive": {
+      "types": "./dist/charts/funnel/client.d.ts",
+      "import": "./dist/charts/funnel/client.js"
+    },
+    "./likert-strip": {
+      "types": "./dist/charts/likert-strip/index.d.ts",
+      "import": "./dist/charts/likert-strip/index.js"
+    },
+    "./likert-strip/interactive": {
+      "types": "./dist/charts/likert-strip/client.d.ts",
+      "import": "./dist/charts/likert-strip/client.js"
+    },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"

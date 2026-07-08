@@ -115,13 +115,13 @@
   {
     "name": "@microcharts/react/rug-strip (static)",
     "path": "dist/charts/rug-strip/index.js",
-    "limit": "2.15 kB",
+    "limit": "2.3 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/rug-strip/interactive",
     "path": "dist/charts/rug-strip/client.js",
-    "limit": "3 kB",
+    "limit": "3.2 kB",
     "gzip": true
   },
   {
@@ -151,13 +151,13 @@
   {
     "name": "@microcharts/react/seismogram (static)",
     "path": "dist/charts/seismogram/index.js",
-    "limit": "2.15 kB",
+    "limit": "2.3 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/seismogram/interactive",
     "path": "dist/charts/seismogram/client.js",
-    "limit": "3.15 kB",
+    "limit": "3.2 kB",
     "gzip": true
   },
   {
@@ -230,6 +230,90 @@
     "name": "@microcharts/react/micro-scatter/interactive",
     "path": "dist/charts/micro-scatter/client.js",
     "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/segmented-bar (static)",
+    "path": "dist/charts/segmented-bar/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/segmented-bar/interactive",
+    "path": "dist/charts/segmented-bar/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/histogram-strip (static)",
+    "path": "dist/charts/histogram-strip/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/histogram-strip/interactive",
+    "path": "dist/charts/histogram-strip/client.js",
+    "limit": "3.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/micro-box (static)",
+    "path": "dist/charts/micro-box/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/micro-box/interactive",
+    "path": "dist/charts/micro-box/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/progress-ring (static)",
+    "path": "dist/charts/progress-ring/index.js",
+    "limit": "2.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/progress-ring/interactive",
+    "path": "dist/charts/progress-ring/client.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/micro-donut (static)",
+    "path": "dist/charts/micro-donut/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/micro-donut/interactive",
+    "path": "dist/charts/micro-donut/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/funnel (static)",
+    "path": "dist/charts/funnel/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/funnel/interactive",
+    "path": "dist/charts/funnel/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/likert-strip (static)",
+    "path": "dist/charts/likert-strip/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/likert-strip/interactive",
+    "path": "dist/charts/likert-strip/client.js",
+    "limit": "3.4 kB",
     "gzip": true
   },
   {

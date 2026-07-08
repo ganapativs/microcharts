@@ -20,6 +20,7 @@ export { EN_DIST, type DistStrings } from "./strings-dist.js";
 export { EN_SLOTS, type SlotStrings } from "./strings-slots.js";
 export { EN_PAIRED, type PairedStrings } from "./strings-paired.js";
 export { EN_SCATTER, type ScatterStrings } from "./strings-scatter.js";
+export { EN_COMPOSITION, type CompositionStrings } from "./strings-composition.js";
 export { EN } from "./strings.js";
 export {
   quantiles,

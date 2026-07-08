@@ -161,6 +161,55 @@ export const SCENARIOS = [
     }),
   },
   {
+    slug: "segmented-bar",
+    component: "SegmentedBar",
+    floor: 25, // ≤ 5 rects + rollup math
+    props: (i) => ({ data: cats[i % POOL], summary: false }),
+  },
+  {
+    slug: "histogram-strip",
+    component: "HistogramStrip",
+    floor: 15, // ≤ 12 bars + binning per row
+    props: (i) => ({ data: rugs[i % POOL], summary: false }),
+  },
+  {
+    slug: "micro-box",
+    component: "MicroBox",
+    floor: 20, // 4 marks + quantiles per row
+    props: (i) => ({ data: rugs[i % POOL], summary: false }),
+  },
+  {
+    slug: "progress-ring",
+    component: "ProgressRing",
+    floor: 40, // 2 arc paths
+    props: (i) => ({ value: (i % 100) / 100, summary: false }),
+  },
+  {
+    slug: "micro-donut",
+    component: "MicroDonut",
+    floor: 30, // ≤ 4 sector paths + rollup
+    props: (i) => ({ data: cats[i % POOL].slice(0, 4), summary: false }),
+  },
+  {
+    slug: "funnel",
+    component: "Funnel",
+    floor: 25, // ≤ 6 rects + slats
+    props: (i) => ({
+      data: cats[i % POOL].slice(0, 4).map((d, j) => ({
+        label: d.label,
+        value: Math.round(d.value / (j + 1)),
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "likert-strip",
+    component: "LikertStrip",
+    floor: 25, // ≤ 7 rects + diverging stack
+    props: (i) => ({ data: cats[i % POOL].slice(0, 5), summary: false }),
+  },
+
+  {
     slug: "micro-scatter",
     component: "MicroScatter",
     floor: 5, // 24 dot nodes/row (measured ~9 rows/ms — N-node class, half-of-measured floor)

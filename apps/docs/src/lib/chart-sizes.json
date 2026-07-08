@@ -36,8 +36,8 @@
     "interactive": 2.12
   },
   "rug-strip": {
-    "static": 2.11,
-    "interactive": 2.99
+    "static": 2.25,
+    "interactive": 3.12
   },
   "mini-bar": {
     "static": 2.18,
@@ -48,8 +48,8 @@
     "interactive": 2.21
   },
   "seismogram": {
-    "static": 2.07,
-    "interactive": 3.04
+    "static": 2.2,
+    "interactive": 3.17
   },
   "heat-strip": {
     "static": 2.27,
@@ -74,6 +74,34 @@
   "micro-scatter": {
     "static": 1.88,
     "interactive": 3.01
+  },
+  "segmented-bar": {
+    "static": 2.3,
+    "interactive": 3.19
+  },
+  "histogram-strip": {
+    "static": 2.07,
+    "interactive": 2.83
+  },
+  "micro-box": {
+    "static": 2.54,
+    "interactive": 3.35
+  },
+  "progress-ring": {
+    "static": 2.07,
+    "interactive": 2.47
+  },
+  "micro-donut": {
+    "static": 2.34,
+    "interactive": 3.3
+  },
+  "funnel": {
+    "static": 2.12,
+    "interactive": 2.96
+  },
+  "likert-strip": {
+    "static": 2.5,
+    "interactive": 3.26
   },
   "annotations": {
     "static": 1.46
