@@ -19,6 +19,7 @@ against a target line. It is the general form of any noisy metric with a complia
     data={Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0))}
     target={-23}
     title="Loudness"
+    format={{ maximumFractionDigits: 1 }}
     width={300}
     height={28}
   />

@@ -57,12 +57,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <StationGlyph {...OBS} summary={false} size={34} />;
+  return <StationGlyph {...OBS} summary={false} size={44} />;
 }
 
 export const showcase = {
   hint: "sky · wind · temp · dew · pressure",
-  Node: () => <StationGlyph {...OBS} title="KSFO observation" size={34} />,
+  Node: () => <StationGlyph {...OBS} title="KSFO observation" size={44} />,
 };
 
 export const playground: PlaygroundSpec = {

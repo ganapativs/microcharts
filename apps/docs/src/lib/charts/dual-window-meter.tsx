@@ -53,18 +53,34 @@ export const entry: ChartEntry = {
   demo: [-22],
   example: {
     title: "Loudness",
-    code: `import { DualWindowMeter } from "${PKG}/dual-window-meter";\n\n<DualWindowMeter data={samples} target={-23} title="Loudness" />`,
+    code: `import { DualWindowMeter } from "${PKG}/dual-window-meter";\n\n<DualWindowMeter data={samples} target={-23} format={{ maximumFractionDigits: 1 }} title="Loudness" />`,
   },
 };
 
 export function Preview() {
-  return <DualWindowMeter data={LOUDNESS} target={-23} summary={false} width={130} height={24} />;
+  return (
+    <DualWindowMeter
+      data={LOUDNESS}
+      target={-23}
+      format={{ maximumFractionDigits: 1 }}
+      summary={false}
+      width={130}
+      height={24}
+    />
+  );
 }
 
 export const showcase = {
   hint: "compliance",
   Node: () => (
-    <DualWindowMeter data={LOUDNESS} target={-23} title="Loudness" width={130} height={24} />
+    <DualWindowMeter
+      data={LOUDNESS}
+      target={-23}
+      format={{ maximumFractionDigits: 1 }}
+      title="Loudness"
+      width={130}
+      height={24}
+    />
   ),
 };
 
@@ -102,7 +118,16 @@ export const recipes: Recipe[] = [
   {
     label: "latency SLO cell",
     code: `<DualWindowMeter data={latency} target={200} width={80} height={16} />`,
-    node: <DualWindowMeter data={LOUDNESS} target={-23} summary={false} width={80} height={16} />,
+    node: (
+      <DualWindowMeter
+        data={LOUDNESS}
+        target={-23}
+        format={{ maximumFractionDigits: 1 }}
+        summary={false}
+        width={80}
+        height={16}
+      />
+    ),
   },
   {
     label: "with corridor",

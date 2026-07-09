@@ -69,7 +69,7 @@ export const entry: ChartEntry = {
 
 export function Preview() {
   return (
-    <Hypnogram data={SLEEP} states={STATES} domain={DOM} summary={false} width={130} height={26} />
+    <Hypnogram data={SLEEP} states={STATES} domain={DOM} summary={false} width={150} height={64} />
   );
 }
 
@@ -81,8 +81,8 @@ export const showcase = {
       states={STATES}
       domain={DOM}
       title="Sleep stages"
-      width={130}
-      height={26}
+      width={150}
+      height={64}
     />
   ),
 };
@@ -151,7 +151,7 @@ export const recipes: Recipe[] = [
         variant="lanes"
         summary={false}
         width={160}
-        height={26}
+        height={64}
       />
     ),
   },

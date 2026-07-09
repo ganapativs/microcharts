@@ -52,12 +52,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <WindBarb direction={225} magnitude={32} summary={false} size={28} />;
+  return <WindBarb direction={225} magnitude={32} summary={false} size={32} />;
 }
 
 export const showcase = {
   hint: "flow",
-  Node: () => <WindBarb direction={225} magnitude={32} label title="Wind" size={28} />,
+  Node: () => <WindBarb direction={225} magnitude={32} label title="Wind" size={32} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -107,7 +107,7 @@ export const recipes: Recipe[] = [
   {
     label: "with label",
     code: `<WindBarb direction={45} magnitude={25} label />`,
-    node: <WindBarb direction={45} magnitude={25} label summary={false} size={28} />,
+    node: <WindBarb direction={45} magnitude={25} label summary={false} size={32} />,
   },
 ];
 

@@ -60,12 +60,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <EventRaster data={RASTER} summary={false} width={150} height={32} />;
+  return <EventRaster data={RASTER} summary={false} width={220} height={56} />;
 }
 
 export const showcase = {
   hint: "sync",
-  Node: () => <EventRaster data={RASTER} title="Service events" width={150} height={32} />,
+  Node: () => <EventRaster data={RASTER} title="Service events" width={220} height={56} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -119,7 +119,7 @@ export const recipes: Recipe[] = [
   {
     label: "emphasis",
     code: `<EventRaster data={services} emphasis="api" />`,
-    node: <EventRaster data={RASTER} emphasis="api" summary={false} width={200} height={32} />,
+    node: <EventRaster data={RASTER} emphasis="api" summary={false} width={200} height={56} />,
   },
 ];
 

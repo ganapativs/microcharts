@@ -60,12 +60,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <StarSpoke data={PROFILE} summary={false} size={44} />;
+  return <StarSpoke data={PROFILE} summary={false} size={84} />;
 }
 
 export const showcase = {
   hint: "profile",
-  Node: () => <StarSpoke data={PROFILE} dots title="Product profile" size={44} />,
+  Node: () => <StarSpoke data={PROFILE} dots title="Product profile" size={84} />,
 };
 
 export const playground: PlaygroundSpec = {
