@@ -122,7 +122,7 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
       : (summary ?? quadrantSummary(geo, { xLabel, yLabel, quadrants }, fmt, strings));
   const accent = color ?? "var(--mc-accent)";
   const focalR = Math.max(1.6, Math.min(width, height) * 0.1);
-  const ghostR = Math.max(0.8, focalR * 0.46);
+  const ghostR = Math.max(1, focalR * 0.52);
 
   return (
     <Chart
@@ -169,11 +169,27 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* peer field — tiny, muted, behind the focal */}
+      {/* peer field — small, muted, behind the focal (0.42 so peers read on
+          dark; the role's 0.18 is tuned for large area marks, not tiny dots) */}
       {geo.ghosts.map((g) => (
-        <circle key={`${g.vx}:${g.vy}`} cx={g.x} cy={g.y} r={ghostR} data-mc-ink="ghost" />
+        <circle
+          key={`${g.vx}:${g.vy}`}
+          cx={g.x}
+          cy={g.y}
+          r={ghostR}
+          data-mc-ink="ghost"
+          style={{ fillOpacity: 0.42 }}
+        />
       ))}
-      {/* the focal item — accent, larger, on top */}
+      {/* the focal item — accent, larger, on top, over a soft accent glow (a
+          FILLED disc, not a hollow ring: a ring lets the cross line show as a
+          chord through it) so it is unmistakable against the peer cloud */}
+      <circle
+        cx={geo.dot.x}
+        cy={geo.dot.y}
+        r={focalR + 1.4}
+        style={{ fill: accent, fillOpacity: 0.18 }}
+      />
       <circle
         cx={geo.dot.x}
         cy={geo.dot.y}

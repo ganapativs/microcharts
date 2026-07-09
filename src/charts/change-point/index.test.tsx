@@ -26,7 +26,8 @@ describe("<ChangePoint> (plan/23 #19)", () => {
 
   it("renders regime shading, mean hairlines, the line, and a break marker", () => {
     const { container } = draw(<ChangePoint data={STEP} width={120} />);
-    expect(container.querySelectorAll('rect[data-mc-ink="region"]').length).toBe(2); // 2 regimes
+    // only the odd (2nd) regime is tinted → 1 shading rect for a 2-regime chart
+    expect(container.querySelectorAll('rect[data-mc-ink="region"]').length).toBe(1);
     expect(container.querySelectorAll('line[data-mc-ink="ghost"]').length).toBe(2); // mean hairlines
     expect(container.querySelector('path[data-mc-ink="data"]')).not.toBeNull(); // series line
     expect(container.querySelectorAll('[data-mc-ink="flag"]').length).toBe(2); // hairline + triangle
@@ -40,7 +41,7 @@ describe("<ChangePoint> (plan/23 #19)", () => {
   it("explicit breaks override detection (pure annotation)", () => {
     const flat = Array(40).fill(7);
     const { container } = draw(<ChangePoint data={flat} breaks={[20]} />);
-    expect(container.querySelectorAll('rect[data-mc-ink="region"]').length).toBe(2);
+    expect(container.querySelectorAll('rect[data-mc-ink="region"]').length).toBe(1);
   });
 
   it("label='delta' prints the signed % across the last break", () => {

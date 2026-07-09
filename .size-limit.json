@@ -541,13 +541,13 @@
   {
     "name": "@microcharts/react/ab-strips (static)",
     "path": "dist/charts/ab-strips/index.js",
-    "limit": "2.7 kB",
+    "limit": "2.85 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/ab-strips/interactive",
     "path": "dist/charts/ab-strips/client.js",
-    "limit": "3.6 kB",
+    "limit": "3.8 kB",
     "gzip": true
   },
   {

@@ -195,8 +195,8 @@
       "interactive": "3.4 kB"
     },
     "ab-strips": {
-      "static": "2.7 kB",
-      "interactive": "3.6 kB"
+      "static": "2.85 kB",
+      "interactive": "3.8 kB"
     },
     "shift-histogram": {
       "static": "2.98 kB",

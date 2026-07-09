@@ -127,23 +127,27 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* regime shading — alternating neutral tint, identity not valence. Tiles
-          gap-free from break to break (edges snap to 0 / width). */}
-      {geo.segments.map((sg, i) => {
-        const x0 = i === 0 ? 0 : geo.breaks[i - 1]!.x;
-        const x1 = i === geo.segments.length - 1 ? width : geo.breaks[i]!.x;
-        return (
+      {/* regime shading — only the ODD regimes are tinted (identity, not valence);
+          adjacent regimes therefore always contrast (bare vs tinted) at ONE
+          opacity that reads on light and dark. Tiles gap-free break→break. */}
+      {geo.segments.map((sg, i) =>
+        i % 2 === 1 ? (
           <rect
             key={sg.x0}
-            x={round2(x0)}
+            x={round2(geo.breaks[i - 1]!.x)}
             y={0}
-            width={round2(Math.max(0, x1 - x0))}
+            width={round2(
+              Math.max(
+                0,
+                (i === geo.segments.length - 1 ? width : geo.breaks[i]!.x) - geo.breaks[i - 1]!.x,
+              ),
+            )}
             height={height}
             data-mc-ink="region"
-            style={{ fill: "var(--mc-neutral)", fillOpacity: i % 2 === 0 ? 0.05 : 0.11 }}
+            style={{ fill: "var(--mc-neutral)", fillOpacity: 0.1 }}
           />
-        );
-      })}
+        ) : null,
+      )}
       {/* per-regime mean hairlines */}
       {means
         ? geo.segments.map((sg) =>

@@ -145,6 +145,13 @@ export function ABStrips(props: ABStripsProps): ReactNode {
         ? "var(--mc-positive)"
         : "var(--mc-negative)";
 
+  // the contested zone = the x-overlap of the two middle halves (p25–75)
+  const [rA, rB] = geo.rows;
+  const ovX0 = Math.max(rA.inner.x, rB.inner.x);
+  const ovX1 = Math.min(rA.inner.x + rA.inner.width, rB.inner.x + rB.inner.width);
+  const ovTop = Math.min(rA.y, rB.y) - 2.6;
+  const ovBot = Math.max(rA.y, rB.y) + 2.6;
+
   return (
     <Chart
       width={geo.totalWidth}
@@ -155,11 +162,25 @@ export function ABStrips(props: ABStripsProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {/* the CONTESTED ZONE — where the two middle-halves (p25–75) overlap. This
+          is the chart's thesis made visible: a narrow sliver = a clear win, a
+          wide band = inconclusive. Behind everything; skipped when they separate. */}
+      {ovX1 > ovX0 ? (
+        <rect
+          x={round2(ovX0)}
+          y={round2(ovTop)}
+          width={round2(ovX1 - ovX0)}
+          height={round2(ovBot - ovTop)}
+          rx={1}
+          data-mc-ink="region"
+          style={{ fill: "var(--mc-neutral)", fillOpacity: 0.14 }}
+        />
+      ) : null}
+      {/* the two strips: faint p5–95 outer, stronger p25–75 middle half */}
       {geo.rows.map((r, i) => {
         const ink = rowInk[i]!;
         return (
-          <g key={labels[i]}>
-            {/* p5–95 outer band — faintest */}
+          <g key={`band-${labels[i]}`}>
             <rect
               x={r.outer.x}
               y={round2(r.y - 0.9)}
@@ -167,9 +188,8 @@ export function ABStrips(props: ABStripsProps): ReactNode {
               height={1.8}
               rx={0.9}
               data-mc-ink="band"
-              style={{ fill: ink, fillOpacity: 0.16 }}
+              style={{ fill: ink, fillOpacity: i === 0 ? 0.26 : 0.2 }}
             />
-            {/* p25–75 inner (middle half) — stronger; the overlap reads here */}
             <rect
               x={r.inner.x}
               y={round2(r.y - 2)}
@@ -177,25 +197,41 @@ export function ABStrips(props: ABStripsProps): ReactNode {
               height={4}
               rx={1.5}
               data-mc-ink="band"
-              style={{ fill: ink, fillOpacity: 0.34 }}
+              style={{ fill: ink, fillOpacity: i === 0 ? 0.42 : 0.38 }}
             />
-            {/* median dot */}
-            <circle cx={r.median.x} cy={r.y} r={1.6} style={{ fill: ink }} />
-            {/* row tag */}
-            <text
-              x={round2(2)}
-              y={r.y}
-              textAnchor="start"
-              dominantBaseline="central"
-              data-mc-ink="label"
-              fontSize={FONT}
-              style={{ fontVariantNumeric: "tabular-nums" }}
-            >
-              {labels[i]}
-            </text>
           </g>
         );
       })}
+      {/* median-shift connector — A's median to B's median, so the size AND
+          direction of the shift read at a glance (the dots sit on top). */}
+      <line
+        x1={geo.rows[0].median.x}
+        y1={geo.rows[0].y}
+        x2={geo.rows[1].median.x}
+        y2={geo.rows[1].y}
+        stroke="var(--mc-neutral)"
+        strokeOpacity={0.6}
+        strokeWidth={0.7}
+        strokeDasharray="1.6 1.4"
+        vectorEffect="non-scaling-stroke"
+      />
+      {/* median dots + row tags, on top */}
+      {geo.rows.map((r, i) => (
+        <g key={`mark-${labels[i]}`}>
+          <circle cx={r.median.x} cy={r.y} r={1.7} style={{ fill: rowInk[i]! }} />
+          <text
+            x={round2(2)}
+            y={r.y}
+            textAnchor="start"
+            dominantBaseline="central"
+            data-mc-ink="label"
+            fontSize={FONT}
+            style={{ fontVariantNumeric: "tabular-nums" }}
+          >
+            {labels[i]}
+          </text>
+        </g>
+      ))}
       {showLabel ? (
         <text
           x={geo.labelX}
