@@ -36,6 +36,7 @@ import { DepthWedge } from "@microcharts/react/depth-wedge";
 import { PartitionStrip } from "@microcharts/react/partition-strip";
 import { CalibrationStrip } from "@microcharts/react/calibration-strip";
 import { ConfusionGrid } from "@microcharts/react/confusion-grid";
+import { FoldedDayBand } from "@microcharts/react/folded-day-band";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -148,6 +149,7 @@ export function getMDXComponents(components?: MDXComponents) {
     PartitionStrip,
     CalibrationStrip,
     ConfusionGrid,
+    FoldedDayBand,
     HistogramStrip,
     MicroBox,
     ProgressRing,

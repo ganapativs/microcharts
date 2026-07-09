@@ -698,6 +698,12 @@ export interface SummaryStrings {
   confusionAt: (actual: string, predicted: string, pct: string) => string;
   /** Empty-row note, e.g. "no dog samples" appended to the summary. */
   confusionEmpty: (cls: string) => string;
+  /** FoldedDayBand overview, e.g. "Median peaks at 14 (82)." (+ today clause). */
+  foldedBand: (pos: string, value: string, todayClause: string) => string;
+  /** Today-vs-typical clauses, indexed below-25 / typical / above-75. */
+  foldedToday: readonly [string, string, string];
+  /** Interactive fold-bin announce, e.g. "at 14: median 82, middle half 70–90." */
+  foldedAt: (pos: string, m: string, q1: string, q3: string, todayClause: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

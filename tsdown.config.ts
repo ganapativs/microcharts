@@ -192,6 +192,8 @@ export default defineConfig({
     "src/charts/calibration-strip/client.tsx",
     "src/charts/confusion-grid/index.tsx",
     "src/charts/confusion-grid/client.tsx",
+    "src/charts/folded-day-band/index.tsx",
+    "src/charts/folded-day-band/client.tsx",
   ],
   format: ["esm"],
   dts: true,

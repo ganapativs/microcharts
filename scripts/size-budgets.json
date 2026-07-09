@@ -372,6 +372,10 @@
     "confusion-grid": {
       "static": "2.4 kB",
       "interactive": "3.4 kB"
+    },
+    "folded-day-band": {
+      "static": "2.6 kB",
+      "interactive": "3.6 kB"
     }
   }
 }

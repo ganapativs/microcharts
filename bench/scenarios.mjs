@@ -863,4 +863,14 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "folded-day-band",
+    component: "FoldedDayBand",
+    floor: 6, // fold ~336 obs → per-bin quantiles — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 336 }, (_s, j) => ({ t: j, value: 40 + Math.sin((i + j) / 4) * 20 })),
+      period: 24,
+      summary: false,
+    }),
+  },
 ];

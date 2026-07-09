@@ -1103,6 +1103,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/folded-day-band (static)",
+    "path": "dist/charts/folded-day-band/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/folded-day-band/interactive",
+    "path": "dist/charts/folded-day-band/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

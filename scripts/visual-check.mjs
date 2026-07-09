@@ -71,6 +71,10 @@ const { DepthWedge } = await D("depth-wedge");
 const { PartitionStrip } = await D("partition-strip");
 const { CalibrationStrip } = await D("calibration-strip");
 const { ConfusionGrid } = await D("confusion-grid");
+const { FoldedDayBand } = await D("folded-day-band");
+const foldCurve = (h) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
+const foldData = Array.from({ length: 14 }, (_d, d) => Array.from({ length: 24 }, (_h, h) => ({ t: d * 24 + h, value: Math.round(foldCurve(h) + Math.sin(d + h) * 8) }))).flat();
+const foldToday = Array.from({ length: 24 }, (_h, h) => ({ t: h, value: Math.round(foldCurve(h) + 14) }));
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1068,6 +1072,11 @@ const body = [
   row("3×3", svg(ConfusionGrid, { data: { labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 62, 12], [3, 9, 58]] }, size: 110 })),
   row("errors accent + round", svg(ConfusionGrid, { data: { labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 40, 34], [3, 9, 58]] }, accent: "errors", shape: "round", size: 110 })),
   row("empty row", svg(ConfusionGrid, { data: { labels: ["cat", "dog"], counts: [[40, 10], [0, 0]] }, size: 90 })),
+
+  `<h2>FoldedDayBand</h2>`,
+  row("today vs typical", svg(FoldedDayBand, { data: foldData, today: foldToday, width: 320, height: 40 })),
+  row("one band", svg(FoldedDayBand, { data: foldData, bands: [[25, 75]], width: 320, height: 40 })),
+  row("cell", svg(FoldedDayBand, { data: foldData, width: 80, height: 20 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

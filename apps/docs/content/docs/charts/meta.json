@@ -94,6 +94,7 @@
     "depth-wedge",
     "partition-strip",
     "calibration-strip",
-    "confusion-grid"
+    "confusion-grid",
+    "folded-day-band"
   ]
 }

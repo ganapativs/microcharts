@@ -366,6 +366,10 @@
     "static": 2.29,
     "interactive": 3.21
   },
+  "folded-day-band": {
+    "static": 2.26,
+    "interactive": 3.04
+  },
   "annotations": {
     "static": 1.46
   }

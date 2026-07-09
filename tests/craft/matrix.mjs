@@ -279,6 +279,19 @@ add(
   ],
 );
 add(
+  "folded-day-band",
+  "FoldedDayBand",
+  [
+    {
+      data: Array.from({ length: 14 }, (_d, d) =>
+        Array.from({ length: 24 }, (_h, h) => ({ t: d * 24 + h, value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + Math.sin(d + h) * 8) })),
+      ).flat(),
+      today: Array.from({ length: 24 }, (_h, h) => ({ t: h, value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + 14) })),
+    },
+  ],
+  [[80, 20], [320, 40]],
+);
+add(
   "confusion-grid",
   "ConfusionGrid",
   [

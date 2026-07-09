@@ -102,6 +102,7 @@ import depthWedge from "./depth-wedge";
 import partitionStrip from "./partition-strip";
 import calibrationStrip from "./calibration-strip";
 import confusionGrid from "./confusion-grid";
+import foldedDayBand from "./folded-day-band";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -196,6 +197,7 @@ const MODULES: ChartModule[] = [
   partitionStrip,
   calibrationStrip,
   confusionGrid,
+  foldedDayBand,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(
