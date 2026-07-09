@@ -124,6 +124,16 @@ export interface SummaryStrings {
   polarClockAt: (label: string, value: string) => string;
   /** Weekday names for a 7-segment cycle (i18n contract; index 0 = Sunday). */
   weekdays: readonly string[];
+  /** S1 calendar spiral, e.g. "52 weeks; peak 480 in week 30, low in week 6." */
+  spiralYear: (
+    n: number,
+    cadence: "day" | "week",
+    max: string,
+    peakLabel: string,
+    minLabel: string,
+  ) => string;
+  /** Hovered/focused spiral mark, e.g. "week 30: 480." (spiral-year). */
+  spiralYearAt: (label: string, value: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

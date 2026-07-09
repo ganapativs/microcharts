@@ -48,6 +48,7 @@ const { CitySkyline } = await D("city-skyline");
 const { Honeycomb } = await D("honeycomb");
 const { Constellation } = await D("constellation");
 const { PolarClock } = await D("polar-clock");
+const { SpiralYear } = await D("spiral-year");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -739,6 +740,32 @@ const body = [
     svg(PolarClock, { data: [120, 200, 180, 210, 260, 90, 60], mode: "opacity", size: 64 }),
   ),
   row("with a null + a zero", svg(PolarClock, { data: [10, null, 30, 0, 25], size: 64 })),
+
+  `<h2>SpiralYear</h2>`,
+  row(
+    "52 weeks, month ticks",
+    svg(SpiralYear, {
+      data: Array.from({ length: 52 }, (_, i) => (i === 29 ? 480 : i === 5 ? 10 : 100 + i)),
+      size: 80,
+    }),
+  ),
+  row(
+    "arc marks",
+    svg(SpiralYear, {
+      data: Array.from({ length: 52 }, (_, i) => (i === 29 ? 480 : i === 5 ? 10 : 100 + i)),
+      mark: "arc",
+      size: 80,
+    }),
+  ),
+  row(
+    "200 days, steps 3, no ticks",
+    svg(SpiralYear, {
+      data: Array.from({ length: 200 }, (_, i) => (i * 37) % 100),
+      steps: 3,
+      monthTicks: false,
+      size: 80,
+    }),
+  ),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

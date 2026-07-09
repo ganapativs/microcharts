@@ -73,6 +73,7 @@ import { CitySkyline } from "@microcharts/react/city-skyline";
 import { Honeycomb } from "@microcharts/react/honeycomb";
 import { Constellation } from "@microcharts/react/constellation";
 import { PolarClock } from "@microcharts/react/polar-clock";
+import { SpiralYear } from "@microcharts/react/spiral-year";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -165,6 +166,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Honeycomb,
     Constellation,
     PolarClock,
+    SpiralYear,
     SparkGroup,
     // docs building blocks
     Instrument,

@@ -625,4 +625,14 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "spiral-year",
+    component: "SpiralYear",
+    floor: 6, // 52 marks grouped into ≤5 paths + month ticks
+    props: (i) => ({
+      data: Array.from({ length: 52 }, (_, w) => ((i + w * 3) % 100) + 1),
+      size: 48,
+      summary: false,
+    }),
+  },
 ];

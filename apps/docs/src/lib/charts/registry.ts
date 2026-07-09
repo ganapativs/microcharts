@@ -82,6 +82,7 @@ import citySkyline from "./city-skyline";
 import honeycomb from "./honeycomb";
 import constellation from "./constellation";
 import polarClock from "./polar-clock";
+import spiralYear from "./spiral-year";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -156,6 +157,7 @@ const MODULES: ChartModule[] = [
   honeycomb,
   constellation,
   polarClock,
+  spiralYear,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

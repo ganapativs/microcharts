@@ -839,6 +839,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/spiral-year (static)",
+    "path": "dist/charts/spiral-year/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/spiral-year/interactive",
+    "path": "dist/charts/spiral-year/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

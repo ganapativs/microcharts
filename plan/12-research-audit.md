@@ -1486,3 +1486,33 @@ angle stays true. New `strings-polar-clock` (polarClock / polarClockFlat / polar
 i18n array for n=7 labels). `OPACITY_STEPS` + `PolarSegment` un-exported (knip). Budget 2.89/3.78 kB >
 the §17 targets (2.5/3.5) but < the 3/4 hard caps (the arc builders) — gate sign-off with the other
 batch-3 divergences. Node 1653, browser 2, craft 531/0, bench 29.5 rows/ms, size 2.89/3.78, docs 261pp/154.
+
+### SpiralYear (18th shipped) — `spiral-year` — plan/24 §18
+
+Channel = 5-step (or 3-step) opacity of marks along an Archimedean spiral — LOW precision (opacity is
+the weakest ordered channel), so this is explicitly a PATTERN instrument and the page/summary steer any
+point read to ActivityGrid/HeatStrip. Notes:
+
+1. **Node budget via merged subpaths.** A year is 52–366 marks, but the per-cell node budget must hold.
+   Marks are grouped by their quantized opacity step into ≤ `steps` `<path>` nodes — each path a
+   concatenation of two-arc circle subpaths (`M…a…a…`, no `<circle>`) in dot mode, or short `arcPath`
+   segments in `mark="arc"` mode. So a 366-day spiral is ≤ 5 mark paths + 1 month-tick group, O(steps).
+
+2. **Radius = time, never value (honesty).** `r(θ) = r0 + k·(absolutePosition/periodsPerTurn)` — an
+   outer mark is a later date, full stop. The opacity carries the value. Documented so nobody reads the
+   radius as magnitude; the docs also warn that two adjacent turns put different years at the same angle
+   (calendar alignment, not similarity). `null` → a gap in the spiral (no mark), distinct from a faint
+   step-0 mark (missing ≠ low).
+
+3. **`mark="arc"` render split.** Dot marks are filled (fill + fill-opacity); arc marks are stroked
+   (fill:none + stroke + stroke-opacity) — the static entry branches on `mark` to set the right property,
+   because a fill-opacity on an open arc would do nothing. Rendering style only; the data meaning and the
+   opacity step are identical.
+
+Cadence inferred from length (≤ 60 → week, else day) unless given; `startDate` → `core/calendar-grid`
+`dayOfYear` → a start angle offset (never `Date.now()` — SSR-deterministic). Month ticks use a fixed
+non-leap reference year (2001) for `monthStartDays`, so they're deterministic and don't depend on the
+data's actual year. New `strings-spiral-year` (spiralYear / spiralYearAt; period words weeks/days chosen
+in the EN impl for i18n). Budget 2.73/3.61 kB > the §18 targets (2.5/3.5) but < the 3/4 hard caps (the
+arc + calendar-grid imports) — gate sign-off with the other batch-3 divergences. Node 1670, browser 2,
+craft 536/0, bench 14.5 rows/ms, size 2.73/3.61, docs 264pp/156.

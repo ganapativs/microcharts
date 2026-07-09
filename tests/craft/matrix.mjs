@@ -709,6 +709,20 @@ add(
   ],
   [[999, 999]],
 );
+const WEEKS = Array.from({ length: 52 }, (_, i) => (i === 29 ? 480 : i === 5 ? 10 : 100 + i));
+const DAYS = Array.from({ length: 200 }, (_, i) => (i * 37) % 100);
+add(
+  "spiral-year",
+  "SpiralYear",
+  [
+    { data: WEEKS, size: 48 },
+    { data: WEEKS, size: 48, steps: 3 },
+    { data: WEEKS, size: 48, mark: "arc" },
+    { data: DAYS, size: 48, monthTicks: false },
+    { data: [10, null, 30, 0, 25], size: 48 },
+  ],
+  [[999, 999]],
+);
 const SKYLINE = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },

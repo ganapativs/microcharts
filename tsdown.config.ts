@@ -153,6 +153,8 @@ export default defineConfig({
     "src/charts/constellation/client.tsx",
     "src/charts/polar-clock/index.tsx",
     "src/charts/polar-clock/client.tsx",
+    "src/charts/spiral-year/index.tsx",
+    "src/charts/spiral-year/client.tsx",
   ],
   format: ["esm"],
   dts: true,
