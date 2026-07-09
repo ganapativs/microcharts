@@ -580,6 +580,14 @@
       "types": "./dist/charts/honeycomb/client.d.ts",
       "import": "./dist/charts/honeycomb/client.js"
     },
+    "./constellation": {
+      "types": "./dist/charts/constellation/index.d.ts",
+      "import": "./dist/charts/constellation/index.js"
+    },
+    "./constellation/interactive": {
+      "types": "./dist/charts/constellation/client.d.ts",
+      "import": "./dist/charts/constellation/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

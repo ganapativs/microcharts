@@ -602,4 +602,17 @@ export const SCENARIOS = [
     floor: 40, // 2 merged paths, one hex loop
     props: (i) => ({ value: (i % 40) + 1, total: 40, summary: false }),
   },
+  {
+    slug: "constellation",
+    component: "Constellation",
+    floor: 20, // scale + jitter + per-event circle
+    props: (i) => ({
+      data: Array.from({ length: 10 }, (_, j) => ({
+        x: j,
+        y: ((i + j * 7) % 50) + 1,
+        m: (j % 5) + 1,
+      })),
+      summary: false,
+    }),
+  },
 ];

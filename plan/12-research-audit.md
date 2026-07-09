@@ -1422,3 +1422,35 @@ a hover "value / total" readout chip only; documented in the client header. `exa
 fix: the `honeycombSummary` opts object needed `| undefined` on each optional field (same pattern as
 FatDigits/Thermometer). New `strings-honeycomb` module (1 key, `honeycomb(value,total,unit)`). Node
 1617, browser 2, craft 517/0, bench 43.8 rows/ms, size 1.64/2.08 (caps 1.8/2.5), docs 255pp/150.
+
+### Constellation (16th shipped) — `constellation` — plan/24 §16
+
+Channel = position (x = time, y = value) with area-true dot size for magnitude (medium precision;
+the positional read is exact, the magnitude area is low and documented). Built for RARE events (≤ 12);
+dense streams steer to Seismogram/EventTimeline. Three points worth recording:
+
+1. **Connector ink role.** The spec called the chronology line "`--mc-band`-class ink," but `band` is a
+   FILL token (`fill: var(--mc-band); stroke: none`) — it cannot stroke a line (memory
+   `chart-legibility-and-review-practices`: band is fill, never a stroke). Used `data-mc-ink="ghost"`
+   instead: the element-split ghost rule strokes a `<path>` with `--mc-neutral` at 0.5 opacity — exactly
+   the intended faint hairline. Verified in the real-browser sweep (#8a8a8a light / #9a9a9a dark @0.5).
+
+2. **`label="max"` placement.** First draft placed the numeral ABOVE the largest event, which for a
+   top-of-chart event clamped onto its own circle — the craft geometry audit flagged TEXT-ON-MARK. Fixed
+   to place it BESIDE the event (right, flipped to the left near the right edge, vertically centered),
+   so the numeral never overlaps its mark. Craft-clean after the fix; only the attribute-based SSR craft
+   was needed here (the overlap was horizontal, so it caught it without the browser getBBox pass).
+
+3. **Value-less jitter honesty.** When no point supplies `y`, vertical position comes from `core/jitter`
+   seeded by the data (deterministic, SSR/hydration-stable, never `Math.random`) and ENCODES NOTHING.
+   In that mode the connector's slope is meaningless (it still runs in time order) and the summary never
+   references vertical position. Time is sacred: x is never jittered, so simultaneous (equal-x) events
+   share a cx (property-tested). Largest-event selection: max magnitude, else max value, else last in
+   time. `R_MIN = 0.5` radius floor so a logged near-zero-magnitude event never fully vanishes
+   (a small, documented departure from strict area-true, matching BubbleRow's zero=presence-ring spirit).
+
+New `strings-constellation` module (constellation / constellationOne / constellationAt). `xFormat`
+(x → label) added to the grammar for month-name summaries. `ConstellationStar` un-exported (knip).
+Budget: 2.7/3.66 kB > the §16 targets (2/3) but < the 3/4 hard caps — scaleLinear + jitter + makeFormatter;
+gate sign-off with the other batch-3 spec-vs-measured divergences. Node 1634, browser 2, craft 525/0,
+bench 30.3 rows/ms, size 2.7/3.66 (caps 2.8/3.75), docs 258pp/152.

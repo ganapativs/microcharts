@@ -285,6 +285,10 @@
     "honeycomb": {
       "static": "1.8 kB",
       "interactive": "2.5 kB"
+    },
+    "constellation": {
+      "static": "2.8 kB",
+      "interactive": "3.75 kB"
     }
   }
 }

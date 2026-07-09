@@ -675,6 +675,26 @@ add(
   [{ value: 34, total: 40 }, { value: 7, total: 10, rows: 1 }, { value: 28, total: 40, empty: "dim" }, { value: 45, total: 40 }],
   [[999, 999]],
 );
+const STARS = [
+  { x: 0, y: 40, m: 2 },
+  { x: 2, y: 90, m: 7 },
+  { x: 5, y: 30, m: 3 },
+  { x: 8, y: 65, m: 5 },
+];
+add(
+  "constellation",
+  "Constellation",
+  [
+    { data: STARS },
+    { data: STARS, label: "max" },
+    { data: STARS, connect: false },
+    { data: [{ x: 0 }, { x: 3 }, { x: 7 }, { x: 9 }] }, // value-less → jittered
+  ],
+  [
+    [999, 999],
+    [90, 24],
+  ],
+);
 const SKYLINE = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },

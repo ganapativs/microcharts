@@ -18,6 +18,7 @@ import { EN_BUBBLE } from "./strings-bubble.js";
 import { EN_TREE } from "./strings-tree.js";
 import { EN_SKYLINE } from "./strings-skyline.js";
 import { EN_HONEYCOMB } from "./strings-honeycomb.js";
+import { EN_CONSTELLATION } from "./strings-constellation.js";
 import { EN_CATEGORY } from "./strings-category.js";
 import { EN_DIST } from "./strings-dist.js";
 import { EN_SLOTS } from "./strings-slots.js";
@@ -67,6 +68,7 @@ export const EN: SummaryStrings = {
   ...EN_TREE,
   ...EN_SKYLINE,
   ...EN_HONEYCOMB,
+  ...EN_CONSTELLATION,
   ...EN_CATEGORY,
   ...EN_DIST,
   ...EN_SLOTS,

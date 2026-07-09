@@ -46,6 +46,7 @@ const { MusicStaff } = await D("music-staff");
 const { TreeRings } = await D("tree-rings");
 const { CitySkyline } = await D("city-skyline");
 const { Honeycomb } = await D("honeycomb");
+const { Constellation } = await D("constellation");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -675,6 +676,44 @@ const body = [
   row("34 of 40 (outline)", svg(Honeycomb, { value: 34, total: 40, unit: "seats", cellR: 5 })),
   row("strip (rows 1)", svg(Honeycomb, { value: 7, total: 10, rows: 1, cellR: 6 })),
   row("dim empties", svg(Honeycomb, { value: 28, total: 40, empty: "dim", cellR: 5 })),
+
+  `<h2>Constellation</h2>`,
+  row(
+    "connected + magnitude",
+    svg(Constellation, {
+      data: [
+        { x: 0, y: 40, m: 2 },
+        { x: 2, y: 90, m: 7 },
+        { x: 5, y: 30, m: 3 },
+        { x: 8, y: 65, m: 5 },
+      ],
+      width: 90,
+      height: 30,
+    }),
+  ),
+  row(
+    'label="max"',
+    svg(Constellation, {
+      data: [
+        { x: 0, y: 40, m: 2 },
+        { x: 2, y: 90, m: 7 },
+        { x: 5, y: 30, m: 3 },
+        { x: 8, y: 65, m: 5 },
+      ],
+      label: "max",
+      width: 90,
+      height: 30,
+    }),
+  ),
+  row(
+    "value-less (jittered), no connector",
+    svg(Constellation, {
+      data: [{ x: 0 }, { x: 3 }, { x: 5 }, { x: 7 }, { x: 9 }],
+      connect: false,
+      width: 90,
+      height: 30,
+    }),
+  ),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

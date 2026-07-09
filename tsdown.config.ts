@@ -149,6 +149,8 @@ export default defineConfig({
     "src/charts/city-skyline/client.tsx",
     "src/charts/honeycomb/index.tsx",
     "src/charts/honeycomb/client.tsx",
+    "src/charts/constellation/index.tsx",
+    "src/charts/constellation/client.tsx",
   ],
   format: ["esm"],
   dts: true,

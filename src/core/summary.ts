@@ -110,6 +110,12 @@ export interface SummaryStrings {
   citySkylineAtLit: (label: string, value: string, litPct: string) => string;
   /** S4 occupancy, e.g. "34 of 40 seats filled." (honeycomb). */
   honeycomb: (value: string, total: string, unit: string) => string;
+  /** S1 sparse events, e.g. "4 events between Jan and Jun; largest at Mar." */
+  constellation: (n: number, first: string, last: string, largest: string) => string;
+  /** Single sparse event, e.g. "1 event at Mar." (constellation). */
+  constellationOne: (label: string) => string;
+  /** Hovered/focused constellation event, e.g. "Mar: 82, magnitude 5." */
+  constellationAt: (label: string, value: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

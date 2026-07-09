@@ -815,6 +815,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/constellation (static)",
+    "path": "dist/charts/constellation/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/constellation/interactive",
+    "path": "dist/charts/constellation/client.js",
+    "limit": "3.75 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

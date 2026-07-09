@@ -80,6 +80,7 @@ import musicStaff from "./music-staff";
 import treeRings from "./tree-rings";
 import citySkyline from "./city-skyline";
 import honeycomb from "./honeycomb";
+import constellation from "./constellation";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -152,6 +153,7 @@ const MODULES: ChartModule[] = [
   treeRings,
   citySkyline,
   honeycomb,
+  constellation,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(
