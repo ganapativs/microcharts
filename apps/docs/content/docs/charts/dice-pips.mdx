@@ -1,0 +1,83 @@
+---
+title: DicePips
+description: A dice-pips chart for React — canonical die faces 1–6 read instantly by subitizing, with an honest numeral fallback past six.
+---
+
+DicePips answers "what is this small count or severity?" the way dice do — a face you read without
+counting. The brain subitizes the canonical 1–6 patterns instantly. Zero is an empty face (zero, not
+missing); above six there is no subitizable pattern, so the face shows the exact numeral rather than
+inventing a seven-pip layout. The face never pretends.
+
+<LiveDemo
+  label="DicePips"
+  sizeOf="dice-pips"
+  code={`import { DicePips } from "@microcharts/react/dice-pips";
+
+<DicePips value={4} title="Severity" />`}
+>
+  <span className="inline-flex gap-3 items-center">
+    <DicePips value={1} size={20} title="one" />
+    <DicePips value={2} size={20} title="two" />
+    <DicePips value={3} size={20} title="three" />
+    <DicePips value={4} size={20} title="four" />
+    <DicePips value={5} size={20} title="five" />
+    <DicePips value={6} size={20} title="six" />
+  </span>
+</LiveDemo>
+
+## Install
+
+<Usage chart="dice-pips" />
+
+## Try it
+
+<Playground chart="dice-pips" />
+
+## Interactive
+
+<InteractiveDemo slug="dice-pips" />
+
+## When to use it
+
+- **Good for** — a severity or rating 0–6 in a cell, an at-a-glance small count in a sentence, or an incident-severity badge.
+- **Avoid for** — counts above six (TallyMarks), magnitudes (MiniBar), or proportions (Progress).
+
+## Sizing
+
+<Sizing chart="dice-pips" />
+
+## Variants
+
+<LiveDemo
+  label="pips-only + numeral fallback"
+  code={`<DicePips value={5} face={false} />
+<DicePips value={9} />`}
+>
+  <span className="inline-flex gap-4 items-center">
+    <DicePips value={5} face={false} size={22} />
+    <DicePips value={9} size={22} />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="dice-pips" />
+
+## Why this default
+
+The face outline keeps a lone die legible on any surface, so it is on by default; `face={false}`
+drops it for repeated table columns where the header already frames the column. Six is the ceiling
+because pip patterns above six are not subitizable — asking the reader to count invented pips would
+be slower than reading a number, so the chart refuses and shows the numeral instead. That numeral
+fallback is the documented honesty rule, shown live at `value={7}` and above.
+
+## Accessibility
+
+The accessible name states the value against its range — **"4 out of 6."** — and drops the frame to
+just the exact number once past six (**"9."**). Zero reads "0 out of 6." (a real zero), and an
+invalid value reads "No data." The interactive entry cross-fades the pip set on change and announces
+the new face through a polite live region; the pips are one value, so there is no cursor to move.
+
+## Props
+
+<PropTable slug="dice-pips" />

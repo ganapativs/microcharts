@@ -670,6 +670,16 @@ add(
   ],
 );
 add(
+  "dice-pips",
+  "DicePips",
+  [{ value: 4 }, { value: 6 }, { value: 9 }, { value: 3, face: false }],
+  [
+    [16, 16],
+    [24, 24],
+    [40, 40],
+  ],
+);
+add(
   "shift-histogram",
   "ShiftHistogram",
   [

@@ -32,6 +32,7 @@ const { CyclePlot } = await D("cycle-plot");
 const { ChangePoint } = await D("change-point");
 const { EnsembleGhosts } = await D("ensemble-ghosts");
 const { TallyMarks } = await D("tally-marks");
+const { DicePips } = await D("dice-pips");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -558,6 +559,11 @@ const body = [
   row("30 max 25 (+5)", svg(TallyMarks, { value: 30, max: 25, height: 20, title: "Signatures" })),
   row("17 drawn", svg(TallyMarks, { value: 17, pen: "drawn", height: 20 })),
   row("38 max 20 clamp", svg(TallyMarks, { value: 38, max: 20, overflow: "clamp", height: 20 })),
+
+  `<h2>DicePips</h2>`,
+  row("faces 1–6", [1, 2, 3, 4, 5, 6].map((v) => svg(DicePips, { value: v, size: 22 })).join(" ")),
+  row("0 empty + 9 numeral", `${svg(DicePips, { value: 0, size: 22 })} ${svg(DicePips, { value: 9, size: 22, title: "nine" })}`),
+  row("pips-only", svg(DicePips, { value: 5, face: false, size: 22 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

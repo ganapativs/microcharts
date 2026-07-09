@@ -58,6 +58,7 @@
     "cycle-plot",
     "change-point",
     "ensemble-ghosts",
-    "tally-marks"
+    "tally-marks",
+    "dice-pips"
   ]
 }

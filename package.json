@@ -468,6 +468,14 @@
       "types": "./dist/charts/tally-marks/client.d.ts",
       "import": "./dist/charts/tally-marks/client.js"
     },
+    "./dice-pips": {
+      "types": "./dist/charts/dice-pips/index.d.ts",
+      "import": "./dist/charts/dice-pips/index.js"
+    },
+    "./dice-pips/interactive": {
+      "types": "./dist/charts/dice-pips/client.d.ts",
+      "import": "./dist/charts/dice-pips/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

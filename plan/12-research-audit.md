@@ -1201,3 +1201,13 @@ Budgets: static 1.47 / interactive 1.95 kB (caps 1.5 / 2.5). Node 1432, browser 
 craft 373/0, bench 146 rows/ms, docs build + tests 122, tsc/oxlint/oxfmt/knip clean. Real-browser
 sweep verified LIGHT (`--mc-stroke` #171717) and DARK (#ededed on a dark surface): tally clusters +
 `+N` numeral crisp, 0 escapes, both themes. Node budget 2 (merged stroke path + numeral) held.
+
+### DicePips (2) — `dice-pips` — plan/24 §2
+
+No API deviations. Pip layout = canonical dice only (module constant `PIP_LAYOUT`);
+`value > 6` renders the exact numeral in the face (the spec'd honesty fallback — no invented
+7/8/9 pattern), `0` is an empty face (zero ≠ missing), negatives/NaN are invalid (→ noData).
+Face outline uses `data-mc-ink="muted"` (neutral hairline, theme-tuned + forced-colors-mapped);
+pips + numeral use `data-mc-ink="point"` (`--mc-stroke`). Budgets 1.29/1.7 kB (caps 1.5/2.5).
+Real-browser sweep confirmed both themes (pips #171717 light / #ededed dark; face #8a8a8a / #9a9a9a).
+Node 1447, browser 2 (dice), craft 385/0, bench 74 rows/ms, docs 216pp + tests 124.

@@ -121,6 +121,8 @@ export default defineConfig({
     "src/charts/ensemble-ghosts/client.tsx",
     "src/charts/tally-marks/index.tsx",
     "src/charts/tally-marks/client.tsx",
+    "src/charts/dice-pips/index.tsx",
+    "src/charts/dice-pips/client.tsx",
   ],
   format: ["esm"],
   dts: true,

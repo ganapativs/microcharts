@@ -229,6 +229,10 @@
     "tally-marks": {
       "static": "1.5 kB",
       "interactive": "2.1 kB"
+    },
+    "dice-pips": {
+      "static": "1.4 kB",
+      "interactive": "1.9 kB"
     }
   }
 }

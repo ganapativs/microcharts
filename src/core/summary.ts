@@ -39,6 +39,10 @@ export interface SummaryStrings {
   countOf: (value: string, total: number) => string;
   /** S4 counted total, e.g. "23 counted." (tally-marks). */
   tally: (value: string) => string;
+  /** S4 dice face, e.g. "4 out of 6." (dice-pips). */
+  dicePips: (value: string) => string;
+  /** S4 dice numeral fallback for value > 6, e.g. "9." (dice-pips). */
+  dicePipsOver: (value: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

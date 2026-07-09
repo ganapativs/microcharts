@@ -506,4 +506,10 @@ export const SCENARIOS = [
     floor: 40, // one merged path, one pass over ≤ max strokes — trivially cheap
     props: (i) => ({ value: (i % 30) + 1, summary: false }),
   },
+  {
+    slug: "dice-pips",
+    component: "DicePips",
+    floor: 40, // ≤ 7 nodes, constant pip-layout lookup — trivially cheap
+    props: (i) => ({ value: i % 7, summary: false }),
+  },
 ];
