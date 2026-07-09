@@ -52,6 +52,11 @@
     "quantile-dots",
     "ab-strips",
     "shift-histogram",
-    "pareto-strip"
+    "pareto-strip",
+    "data-diff",
+    "quadrant-dot",
+    "cycle-plot",
+    "change-point",
+    "ensemble-ghosts"
   ]
 }

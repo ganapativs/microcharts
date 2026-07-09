@@ -140,7 +140,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
             width={round2(Math.max(0, x1 - x0))}
             height={height}
             data-mc-ink="region"
-            style={{ fill: "var(--mc-neutral)", fillOpacity: i % 2 === 0 ? 0.03 : 0.06 }}
+            style={{ fill: "var(--mc-neutral)", fillOpacity: i % 2 === 0 ? 0.05 : 0.11 }}
           />
         );
       })}
