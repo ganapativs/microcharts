@@ -1115,6 +1115,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/volume-profile (static)",
+    "path": "dist/charts/volume-profile/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/volume-profile/interactive",
+    "path": "dist/charts/volume-profile/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

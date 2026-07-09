@@ -194,6 +194,8 @@ export default defineConfig({
     "src/charts/confusion-grid/client.tsx",
     "src/charts/folded-day-band/index.tsx",
     "src/charts/folded-day-band/client.tsx",
+    "src/charts/volume-profile/index.tsx",
+    "src/charts/volume-profile/client.tsx",
   ],
   format: ["esm"],
   dts: true,

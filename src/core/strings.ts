@@ -72,6 +72,7 @@ import { EN_PARTITION } from "./strings-partition.js";
 import { EN_CALIBRATION } from "./strings-calibration.js";
 import { EN_CONFUSION } from "./strings-confusion.js";
 import { EN_FOLDED_BAND } from "./strings-folded-band.js";
+import { EN_VOLUME_PROFILE } from "./strings-volume-profile.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -144,4 +145,5 @@ export const EN: SummaryStrings = {
   ...EN_CALIBRATION,
   ...EN_CONFUSION,
   ...EN_FOLDED_BAND,
+  ...EN_VOLUME_PROFILE,
 };

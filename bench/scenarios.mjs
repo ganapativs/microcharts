@@ -873,4 +873,13 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "volume-profile",
+    component: "VolumeProfile",
+    floor: 20, // bin levels + value-area walk + one bar path
+    props: (i) => ({
+      data: Array.from({ length: 200 }, (_s, j) => 140 + Math.round(Math.sin((i + j) / 3) * 8)),
+      summary: false,
+    }),
+  },
 ];

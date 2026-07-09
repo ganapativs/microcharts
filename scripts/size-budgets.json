@@ -376,6 +376,10 @@
     "folded-day-band": {
       "static": "2.6 kB",
       "interactive": "3.6 kB"
+    },
+    "volume-profile": {
+      "static": "2.6 kB",
+      "interactive": "3.6 kB"
     }
   }
 }

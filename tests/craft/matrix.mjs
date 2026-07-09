@@ -279,6 +279,22 @@ add(
   ],
 );
 add(
+  "volume-profile",
+  "VolumeProfile",
+  [
+    {
+      data: [
+        { level: 138, weight: 11 },
+        { level: 140, weight: 18 },
+        { level: 142, weight: 26 },
+        { level: 144, weight: 20 },
+        { level: 146, weight: 12 },
+      ],
+    },
+  ],
+  [[48, 32], [120, 80]],
+);
+add(
   "folded-day-band",
   "FoldedDayBand",
   [

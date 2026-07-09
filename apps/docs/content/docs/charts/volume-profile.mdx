@@ -1,0 +1,91 @@
+---
+title: VolumeProfile
+description: A volume-at-price histogram for React — turned perpendicular to the trend axis so it answers where activity concentrated by level, not when, with the POC accented.
+---
+
+VolumeProfile answers "at which *level* did activity concentrate — not when?". It is a histogram
+turned perpendicular to the usual trend axis: the level runs vertically and bars extend horizontally
+by the mass of activity at each level. The modal level — the point of control, or POC — is accented,
+and the value area (the levels holding most of the activity) is shaded.
+
+<LiveDemo
+  label="VolumeProfile"
+  sizeOf="volume-profile"
+  code={`import { VolumeProfile } from "@microcharts/react/volume-profile";
+
+<VolumeProfile data={profile} title="Volume by price" />`}
+>
+  <VolumeProfile
+    data={[
+      { level: 134, weight: 3 },
+      { level: 136, weight: 6 },
+      { level: 138, weight: 11 },
+      { level: 140, weight: 18 },
+      { level: 142, weight: 26 },
+      { level: 144, weight: 20 },
+      { level: 146, weight: 12 },
+      { level: 148, weight: 7 },
+      { level: 150, weight: 4 },
+    ]}
+    title="Volume by price"
+    width={120}
+    height={90}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="volume-profile" />
+
+## Try it
+
+<Playground chart="volume-profile" />
+
+## Interactive
+
+<InteractiveDemo slug="volume-profile" />
+
+## When to use it
+
+- **Good for** — volume-at-price, level-of-activity distributions, load by tier.
+- **Avoid for** — a time series (Sparkline) or when the timing is what matters.
+
+## Sizing
+
+<Sizing chart="volume-profile" />
+
+## Variants
+
+<LiveDemo label="right side" code={`<VolumeProfile data={profile} side="right" />`}>
+  <VolumeProfile
+    data={[
+      { level: 138, weight: 11 },
+      { level: 140, weight: 18 },
+      { level: 142, weight: 26 },
+      { level: 144, weight: 20 },
+      { level: 146, weight: 12 },
+    ]}
+    side="right"
+    title="Right side"
+    width={120}
+    height={70}
+  />
+</LiveDemo>
+
+## Why this default
+
+A perpendicular histogram because "where" is a different question from "when", and no time-axis
+chart can answer it. The value area is a stated convention — 70% of the mass by default, visible in
+the docs and the summary — not an implied confidence interval. Because `SparkGroup` shares same-axis
+domains only, pairing this with a trend chart on the opposite side uses an explicit shared `domain`
+passed to both; cross-axis group binding is a v1 follow-up.
+
+## Accessibility
+
+The accessible name states where activity concentrates — **"Activity concentrates at 142 (POC); 70%
+within 140.4–143.6."** An even distribution reads **"Activity is evenly spread."** The interactive
+entry roves the levels with ↑/↓, announcing each level's share of activity and flagging the POC.
+
+## Props
+
+<PropTable slug="volume-profile" />

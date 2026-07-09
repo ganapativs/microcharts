@@ -370,6 +370,10 @@
     "static": 2.26,
     "interactive": 3.04
   },
+  "volume-profile": {
+    "static": 2.49,
+    "interactive": 3.35
+  },
   "annotations": {
     "static": 1.46
   }

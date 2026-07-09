@@ -95,6 +95,7 @@
     "partition-strip",
     "calibration-strip",
     "confusion-grid",
-    "folded-day-band"
+    "folded-day-band",
+    "volume-profile"
   ]
 }

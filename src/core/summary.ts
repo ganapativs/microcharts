@@ -704,6 +704,14 @@ export interface SummaryStrings {
   foldedToday: readonly [string, string, string];
   /** Interactive fold-bin announce, e.g. "at 14: median 82, middle half 70–90." */
   foldedAt: (pos: string, m: string, q1: string, q3: string, todayClause: string) => string;
+  /** VolumeProfile overview, e.g. "Activity concentrates at 142 (POC); 70% within 138–147." */
+  volumeProfile: (poc: string, va: string, lo: string, hi: string) => string;
+  /** Uniform distribution, e.g. "Activity is evenly spread." (volume-profile). */
+  volumeEven: string;
+  /** Interactive level announce, e.g. "level 142: 18% of activity (POC)." */
+  volumeAt: (level: string, pct: string, pocClause: string) => string;
+  /** POC clause appended to a level announce, e.g. " (POC)". */
+  volumePoc: string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

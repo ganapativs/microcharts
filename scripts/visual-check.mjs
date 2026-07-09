@@ -72,6 +72,8 @@ const { PartitionStrip } = await D("partition-strip");
 const { CalibrationStrip } = await D("calibration-strip");
 const { ConfusionGrid } = await D("confusion-grid");
 const { FoldedDayBand } = await D("folded-day-band");
+const { VolumeProfile } = await D("volume-profile");
+const volProfile = [{ level: 134, weight: 3 }, { level: 136, weight: 6 }, { level: 138, weight: 11 }, { level: 140, weight: 18 }, { level: 142, weight: 26 }, { level: 144, weight: 20 }, { level: 146, weight: 12 }, { level: 148, weight: 7 }, { level: 150, weight: 4 }];
 const foldCurve = (h) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
 const foldData = Array.from({ length: 14 }, (_d, d) => Array.from({ length: 24 }, (_h, h) => ({ t: d * 24 + h, value: Math.round(foldCurve(h) + Math.sin(d + h) * 8) }))).flat();
 const foldToday = Array.from({ length: 24 }, (_h, h) => ({ t: h, value: Math.round(foldCurve(h) + 14) }));
@@ -1077,6 +1079,11 @@ const body = [
   row("today vs typical", svg(FoldedDayBand, { data: foldData, today: foldToday, width: 320, height: 40 })),
   row("one band", svg(FoldedDayBand, { data: foldData, bands: [[25, 75]], width: 320, height: 40 })),
   row("cell", svg(FoldedDayBand, { data: foldData, width: 80, height: 20 })),
+
+  `<h2>VolumeProfile</h2>`,
+  row("left + POC", svg(VolumeProfile, { data: volProfile, width: 120, height: 90 })),
+  row("right side", svg(VolumeProfile, { data: volProfile, side: "right", width: 120, height: 90 })),
+  row("cell", svg(VolumeProfile, { data: volProfile, label: "none", width: 32, height: 32 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

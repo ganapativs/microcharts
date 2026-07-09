@@ -44,6 +44,7 @@ export { EN_PARTITION, type PartitionStrings } from "./strings-partition.js";
 export { EN_CALIBRATION, type CalibrationStrings } from "./strings-calibration.js";
 export { EN_CONFUSION, type ConfusionStrings } from "./strings-confusion.js";
 export { EN_FOLDED_BAND, type FoldedBandStrings } from "./strings-folded-band.js";
+export { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "./strings-volume-profile.js";
 export {
   quantiles,
   fiveNumber,
