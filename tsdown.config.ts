@@ -200,6 +200,8 @@ export default defineConfig({
     "src/charts/phase-trace/client.tsx",
     "src/charts/trace-fold/index.tsx",
     "src/charts/trace-fold/client.tsx",
+    "src/charts/tape-gauge/index.tsx",
+    "src/charts/tape-gauge/client.tsx",
   ],
   format: ["esm"],
   dts: true,

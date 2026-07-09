@@ -1402,6 +1402,33 @@ add(
     [120, 40],
   ],
 );
+add(
+  "tape-gauge",
+  "TapeGauge",
+  [
+    {
+      value: 142,
+      rate: 1,
+      zones: [
+        { from: 100, to: 130, tone: "pos" },
+        { from: 130, to: 150, tone: "warn" },
+        { from: 150, to: 200, tone: "neg" },
+      ],
+      span: 60,
+    },
+    {
+      value: 142,
+      rate: -1,
+      zones: [{ from: 130, to: 150, tone: "warn" }],
+      span: 60,
+      orientation: "horizontal",
+    },
+  ],
+  [
+    [28, 56],
+    [160, 30],
+  ],
+);
 
 // BY-DESIGN exemptions: EventTimeline span labels render CENTERED INSIDE their
 // span rects (plan/22 #27 — the rect is the label's home, at 0.7 fill opacity).

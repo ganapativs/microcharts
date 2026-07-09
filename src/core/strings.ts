@@ -75,6 +75,7 @@ import { EN_FOLDED_BAND } from "./strings-folded-band.js";
 import { EN_VOLUME_PROFILE } from "./strings-volume-profile.js";
 import { EN_PHASE_TRACE } from "./strings-phase-trace.js";
 import { EN_TRACE_FOLD } from "./strings-trace-fold.js";
+import { EN_TAPE_GAUGE } from "./strings-tape-gauge.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -150,4 +151,5 @@ export const EN: SummaryStrings = {
   ...EN_VOLUME_PROFILE,
   ...EN_PHASE_TRACE,
   ...EN_TRACE_FOLD,
+  ...EN_TAPE_GAUGE,
 };

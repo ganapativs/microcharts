@@ -75,6 +75,8 @@ const { FoldedDayBand } = await D("folded-day-band");
 const { VolumeProfile } = await D("volume-profile");
 const { PhaseTrace } = await D("phase-trace");
 const { TraceFold } = await D("trace-fold");
+const { TapeGauge } = await D("tape-gauge");
+const tapeZones = [{ from: 100, to: 130, tone: "pos" }, { from: 130, to: 150, tone: "warn" }, { from: 150, to: 200, tone: "neg" }];
 const traceSpans = [{ label: "request", start: 0, duration: 214, depth: 0 }, { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 }, { label: "auth", start: 0, duration: 8, depth: 1, parent: 0 }, { label: "render", start: 96, duration: 60, depth: 1, parent: 0 }, { label: "serialize", start: 156, duration: 40, depth: 1, parent: 0 }, { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 }, { label: "decode", start: 82, duration: 12, depth: 2, parent: 1 }, { label: "log", start: 200, duration: 14, depth: 1, parent: 0 }, { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 }];
 const phaseTraj = Array.from({ length: 40 }, (_, i) => { const t = (i / 40) * Math.PI * 2; return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 }; });
 const volProfile = [{ level: 134, weight: 3 }, { level: 136, weight: 6 }, { level: 138, weight: 11 }, { level: 140, weight: 18 }, { level: 142, weight: 26 }, { level: 144, weight: 20 }, { level: 146, weight: 12 }, { level: 148, weight: 7 }, { level: 150, weight: 4 }];
@@ -1098,6 +1100,11 @@ const body = [
   row("critical path", svg(TraceFold, { data: traceSpans, format: (n) => `${Math.round(n)} ms`, width: 320, height: 40 })),
   row("structure (none)", svg(TraceFold, { data: traceSpans, emphasis: "none", format: (n) => `${Math.round(n)} ms`, width: 320, height: 40 })),
   row("cell", svg(TraceFold, { data: traceSpans, labels: false, width: 80, height: 24 })),
+
+  `<h2>TapeGauge</h2>`,
+  row("rising / caution", svg(TapeGauge, { value: 142, rate: 1, zones: tapeZones, span: 60, width: 28, height: 72 })),
+  row("falling fast", svg(TapeGauge, { value: 118, rate: -3, zones: tapeZones, span: 60, width: 28, height: 72 })),
+  row("horizontal", svg(TapeGauge, { value: 142, rate: -1, zones: tapeZones, span: 60, orientation: "horizontal", width: 160, height: 30 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

@@ -382,6 +382,10 @@
     "static": 2.19,
     "interactive": 3.21
   },
+  "tape-gauge": {
+    "static": 2.78,
+    "interactive": 3.19
+  },
   "annotations": {
     "static": 1.46
   }

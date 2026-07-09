@@ -388,6 +388,10 @@
     "trace-fold": {
       "static": "2.4 kB",
       "interactive": "3.4 kB"
+    },
+    "tape-gauge": {
+      "static": "2.8 kB",
+      "interactive": "3.3 kB"
     }
   }
 }

@@ -40,6 +40,7 @@ import { FoldedDayBand } from "@microcharts/react/folded-day-band";
 import { VolumeProfile } from "@microcharts/react/volume-profile";
 import { PhaseTrace } from "@microcharts/react/phase-trace";
 import { TraceFold } from "@microcharts/react/trace-fold";
+import { TapeGauge } from "@microcharts/react/tape-gauge";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -156,6 +157,7 @@ export function getMDXComponents(components?: MDXComponents) {
     VolumeProfile,
     PhaseTrace,
     TraceFold,
+    TapeGauge,
     HistogramStrip,
     MicroBox,
     ProgressRing,

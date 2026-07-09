@@ -737,6 +737,12 @@ export interface SummaryStrings {
   ) => string;
   /** Critical-path clause appended to a span announce, e.g. ", on the critical path". */
   traceCritical: string;
+  /** TapeGauge reading, e.g. "Now 142, rising; in the 130–150 caution zone." */
+  tapeGauge: (value: string, rateClause: string, zoneClause: string) => string;
+  /** Rate words, indexed by chevron tier + 2: falling fast … steady … rising fast. */
+  tapeRates: readonly [string, string, string, string, string];
+  /** Zone clause, e.g. "; in the 130–150 zone" (tape-gauge). */
+  tapeZone: (from: string, to: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

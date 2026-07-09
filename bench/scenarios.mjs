@@ -911,4 +911,20 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "tape-gauge",
+    component: "TapeGauge",
+    floor: 80, // pointer + tick path + ≤4 zone rects — O(1) marks
+    props: (i) => ({
+      value: 120 + (i % 80),
+      rate: (i % 7) - 3,
+      zones: [
+        { from: 100, to: 130, tone: "pos" },
+        { from: 130, to: 150, tone: "warn" },
+        { from: 150, to: 200, tone: "neg" },
+      ],
+      span: 60,
+      summary: false,
+    }),
+  },
 ];

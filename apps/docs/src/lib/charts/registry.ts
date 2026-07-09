@@ -106,6 +106,7 @@ import foldedDayBand from "./folded-day-band";
 import volumeProfile from "./volume-profile";
 import phaseTrace from "./phase-trace";
 import traceFold from "./trace-fold";
+import tapeGauge from "./tape-gauge";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -204,6 +205,7 @@ const MODULES: ChartModule[] = [
   volumeProfile,
   phaseTrace,
   traceFold,
+  tapeGauge,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

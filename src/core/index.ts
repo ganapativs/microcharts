@@ -47,6 +47,7 @@ export { EN_FOLDED_BAND, type FoldedBandStrings } from "./strings-folded-band.js
 export { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "./strings-volume-profile.js";
 export { EN_PHASE_TRACE, type PhaseTraceStrings } from "./strings-phase-trace.js";
 export { EN_TRACE_FOLD, type TraceFoldStrings } from "./strings-trace-fold.js";
+export { EN_TAPE_GAUGE, type TapeGaugeStrings } from "./strings-tape-gauge.js";
 export {
   quantiles,
   fiveNumber,
