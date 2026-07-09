@@ -350,6 +350,10 @@
     "static": 2.33,
     "interactive": 3.17
   },
+  "depth-wedge": {
+    "static": 2.1,
+    "interactive": 2.89
+  },
   "annotations": {
     "static": 1.46
   }

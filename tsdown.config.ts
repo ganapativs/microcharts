@@ -184,6 +184,8 @@ export default defineConfig({
     "src/charts/minimap-strip/client.tsx",
     "src/charts/dual-window-meter/index.tsx",
     "src/charts/dual-window-meter/client.tsx",
+    "src/charts/depth-wedge/index.tsx",
+    "src/charts/depth-wedge/client.tsx",
   ],
   format: ["esm"],
   dts: true,

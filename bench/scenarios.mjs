@@ -814,4 +814,16 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "depth-wedge",
+    component: "DepthWedge",
+    floor: 40, // two cumulative step wedges
+    props: (i) => ({
+      data: {
+        demand: Array.from({ length: 8 }, (_l, k) => ({ level: 99.9 - k * 0.2, amount: ((i + k) % 9) * 40 + 40 })),
+        supply: Array.from({ length: 8 }, (_l, k) => ({ level: 100.1 + k * 0.2, amount: ((i + k + 3) % 9) * 40 + 40 })),
+      },
+      summary: false,
+    }),
+  },
 ];

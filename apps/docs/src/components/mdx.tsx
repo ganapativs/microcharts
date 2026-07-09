@@ -32,6 +32,7 @@ import { WindBarb } from "@microcharts/react/wind-barb";
 import { StarSpoke } from "@microcharts/react/star-spoke";
 import { MinimapStrip } from "@microcharts/react/minimap-strip";
 import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
+import { DepthWedge } from "@microcharts/react/depth-wedge";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -140,6 +141,7 @@ export function getMDXComponents(components?: MDXComponents) {
     StarSpoke,
     MinimapStrip,
     DualWindowMeter,
+    DepthWedge,
     HistogramStrip,
     MicroBox,
     ProgressRing,

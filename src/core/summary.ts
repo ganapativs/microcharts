@@ -662,6 +662,15 @@ export interface SummaryStrings {
   dualWindow: (slow: string, target: string, fast: string) => string;
   /** Interactive point announce, e.g. "fast −20.4, slow −23.1, target −23.0." */
   dualWindowAt: (fast: string, slow: string, target: string) => string;
+  /** DepthWedge overview, e.g.
+   *  "Demand outweighs supply 1.8× within the shown range; spread 0.25." */
+  depthWedge: (leadSide: string, laggSide: string, ratio: string, spread: string) => string;
+  /** Balanced book, e.g. "Demand and supply are balanced; spread 0.25." */
+  depthWedgeBalanced: (spread: string) => string;
+  /** Side names, indexed demand, supply. */
+  depthWedgeSides: readonly [string, string];
+  /** Interactive depth announce, e.g. "demand: 1,240 within 0.20 of mid." */
+  depthWedgeAt: (side: string, cum: string, dist: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

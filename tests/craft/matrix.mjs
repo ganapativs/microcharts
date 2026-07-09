@@ -279,6 +279,26 @@ add(
   ],
 );
 add(
+  "depth-wedge",
+  "DepthWedge",
+  [
+    {
+      data: {
+        demand: [
+          { level: 99.75, amount: 420 },
+          { level: 99.5, amount: 360 },
+          { level: 99, amount: 200 },
+        ],
+        supply: [
+          { level: 100.25, amount: 300 },
+          { level: 100.75, amount: 160 },
+        ],
+      },
+    },
+  ],
+  [[60, 16], [320, 30]],
+);
+add(
   "dual-window-meter",
   "DualWindowMeter",
   [

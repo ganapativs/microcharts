@@ -356,6 +356,10 @@
     "dual-window-meter": {
       "static": "2.4 kB",
       "interactive": "3.4 kB"
+    },
+    "depth-wedge": {
+      "static": "2.2 kB",
+      "interactive": "3.2 kB"
     }
   }
 }

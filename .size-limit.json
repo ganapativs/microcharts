@@ -1055,6 +1055,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/depth-wedge (static)",
+    "path": "dist/charts/depth-wedge/index.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/depth-wedge/interactive",
+    "path": "dist/charts/depth-wedge/client.js",
+    "limit": "3.2 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

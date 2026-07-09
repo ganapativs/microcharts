@@ -1,0 +1,136 @@
+// <DepthWedge> — how much pressure is stacked on each side of the current level,
+// and how wide the gap between them is (plan/25 §12, plan/17 F5). Static,
+// hook-free, RSC-safe. Two cumulative step-wedges meeting at the spread. The
+// y-scale is linear and the visible range is stated — never a silent log.
+import type { CSSProperties, ReactNode } from "react";
+import { Chart } from "../../shared/Chart.js";
+import { makeFormatter } from "../../core/format.js";
+import { EN_DEPTH_WEDGE, type DepthWedgeStrings } from "../../core/strings-depth-wedge.js";
+import { depthWedgeGeometry, type DepthWedgeResult, type Level } from "./geometry.js";
+
+export interface DepthWedgeDatum {
+  demand: readonly Level[];
+  supply: readonly Level[];
+}
+
+export interface DepthWedgeProps {
+  data: DepthWedgeDatum;
+  /** ± level distance from mid to include; the wedge shape depends on it. */
+  range?: number | undefined;
+  /** The gap is the headline number. */
+  label?: "spread" | "none" | undefined;
+  /** Plot cumulative shares per side instead of absolute amounts. */
+  normalize?: boolean | undefined;
+  width?: number | undefined;
+  height?: number | undefined;
+  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  locale?: string | string[] | undefined;
+  strings?: DepthWedgeStrings | undefined;
+  title?: string | undefined;
+  summary?: string | false | undefined;
+  id?: string | undefined;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
+  children?: ReactNode | undefined;
+}
+
+/** Shared summary — the lead side, its ratio, and the spread (range-scoped). */
+export function depthWedgeSummary(
+  geo: DepthWedgeResult,
+  strings: DepthWedgeStrings,
+  fmt: (n: number) => string,
+): string {
+  if (geo.demandTotal === 0 && geo.supplyTotal === 0) return strings.noData;
+  const spread = fmt(geo.spread);
+  if (geo.lead === 0) return strings.depthWedgeBalanced(spread);
+  const [demandName, supplyName] = strings.depthWedgeSides;
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const low = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+  const leadSide = geo.lead > 0 ? demandName : cap(supplyName);
+  const laggSide = geo.lead > 0 ? supplyName : low(demandName);
+  return strings.depthWedge(leadSide, laggSide, fmt(geo.ratio), spread);
+}
+
+export function DepthWedge(props: DepthWedgeProps): ReactNode {
+  const {
+    data,
+    range,
+    label = "spread",
+    normalize = false,
+    width = 100,
+    height = 24,
+    format,
+    locale,
+    strings = EN_DEPTH_WEDGE,
+    title,
+    summary,
+    id,
+    className,
+    style,
+    children,
+  } = props;
+
+  const fmt = makeFormatter(format, locale);
+  const fontSize = Math.max(5, Math.min(Math.round(height * 0.32), 7));
+  const geo = depthWedgeGeometry({
+    demand: data.demand,
+    supply: data.supply,
+    range: range ?? null,
+    normalize,
+    width,
+    height,
+  });
+  const accName = summary === false ? false : (summary ?? depthWedgeSummary(geo, strings, fmt));
+  const showSpread = label === "spread" && data.demand.length > 0 && data.supply.length > 0;
+
+  return (
+    <Chart
+      width={width}
+      height={height}
+      title={title}
+      summary={accName}
+      id={id}
+      className={className ? `mc-depth ${className}` : "mc-depth"}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+    >
+      {geo.demandPath ? (
+        <path
+          d={geo.demandPath}
+          style={{ fill: "var(--mc-positive)", fillOpacity: 0.5 }}
+          shapeRendering="crispEdges"
+        />
+      ) : null}
+      {geo.supplyPath ? (
+        <path
+          d={geo.supplyPath}
+          style={{ fill: "var(--mc-negative)", fillOpacity: 0.5 }}
+          shapeRendering="crispEdges"
+        />
+      ) : null}
+      {/* mid hairline in the gap */}
+      <line
+        x1={geo.midX}
+        x2={geo.midX}
+        y1={showSpread ? fontSize + 1 : 0.5}
+        y2={height - 0.5}
+        stroke="var(--mc-neutral)"
+        strokeWidth={0.75}
+        strokeDasharray="1.5 1.5"
+        vectorEffect="non-scaling-stroke"
+      />
+      {showSpread ? (
+        <text
+          x={geo.midX}
+          y={fontSize * 0.7}
+          dominantBaseline="central"
+          textAnchor="middle"
+          fontSize={fontSize}
+          data-mc-ink="label"
+        >
+          {fmt(geo.spread)}
+        </text>
+      ) : null}
+      {children}
+    </Chart>
+  );
+}

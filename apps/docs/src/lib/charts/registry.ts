@@ -98,6 +98,7 @@ import windBarb from "./wind-barb";
 import starSpoke from "./star-spoke";
 import minimapStrip from "./minimap-strip";
 import dualWindowMeter from "./dual-window-meter";
+import depthWedge from "./depth-wedge";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -188,6 +189,7 @@ const MODULES: ChartModule[] = [
   starSpoke,
   minimapStrip,
   dualWindowMeter,
+  depthWedge,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

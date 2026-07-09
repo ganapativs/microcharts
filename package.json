@@ -740,6 +740,14 @@
       "types": "./dist/charts/dual-window-meter/client.d.ts",
       "import": "./dist/charts/dual-window-meter/client.js"
     },
+    "./depth-wedge": {
+      "types": "./dist/charts/depth-wedge/index.d.ts",
+      "import": "./dist/charts/depth-wedge/index.js"
+    },
+    "./depth-wedge/interactive": {
+      "types": "./dist/charts/depth-wedge/client.d.ts",
+      "import": "./dist/charts/depth-wedge/client.js"
+    },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"

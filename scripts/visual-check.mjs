@@ -67,6 +67,7 @@ const { WindBarb } = await D("wind-barb");
 const { StarSpoke } = await D("star-spoke");
 const { MinimapStrip } = await D("minimap-strip");
 const { DualWindowMeter } = await D("dual-window-meter");
+const { DepthWedge } = await D("depth-wedge");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1044,6 +1045,11 @@ const body = [
   row("loudness", svg(DualWindowMeter, { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0)), target: -23, width: 320, height: 28 })),
   row("corridor", svg(DualWindowMeter, { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4), target: -23, band: [-25, -21], width: 320, height: 28 })),
   row("cell", svg(DualWindowMeter, { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4), target: -23, label: "none", width: 80, height: 16 })),
+
+  `<h2>DepthWedge</h2>`,
+  row("order book", svg(DepthWedge, { data: { demand: [{ level: 99.75, amount: 420 }, { level: 99.5, amount: 360 }, { level: 99.25, amount: 280 }, { level: 99, amount: 200 }, { level: 98.5, amount: 120 }], supply: [{ level: 100.25, amount: 300 }, { level: 100.5, amount: 240 }, { level: 100.75, amount: 160 }, { level: 101, amount: 90 }] }, width: 320, height: 30 })),
+  row("normalized", svg(DepthWedge, { data: { demand: [{ level: 99.5, amount: 420 }, { level: 99, amount: 260 }], supply: [{ level: 100.5, amount: 300 }, { level: 101, amount: 180 }] }, normalize: true, width: 320, height: 30 })),
+  row("cell", svg(DepthWedge, { data: { demand: [{ level: 99.5, amount: 400 }], supply: [{ level: 100.5, amount: 200 }] }, label: "none", width: 60, height: 16 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

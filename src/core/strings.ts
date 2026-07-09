@@ -67,6 +67,7 @@ import { EN_WIND_BARB } from "./strings-wind-barb.js";
 import { EN_STAR_SPOKE } from "./strings-star-spoke.js";
 import { EN_MINIMAP } from "./strings-minimap.js";
 import { EN_DUAL_WINDOW } from "./strings-dual-window.js";
+import { EN_DEPTH_WEDGE } from "./strings-depth-wedge.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -134,4 +135,5 @@ export const EN: SummaryStrings = {
   ...EN_STAR_SPOKE,
   ...EN_MINIMAP,
   ...EN_DUAL_WINDOW,
+  ...EN_DEPTH_WEDGE,
 };
