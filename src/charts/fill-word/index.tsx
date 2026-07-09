@@ -93,8 +93,9 @@ export function FillWord(props: FillWordProps): ReactNode {
     >
       {word.length > 0 ? (
         <>
-          {/* the muted base word — the "track" */}
-          <text {...textProps} data-mc-ink="label">
+          {/* the base word — a faded "track" (the not-yet-filled remainder), so
+              the accent copy on top reads as clearly advanced/done */}
+          <text {...textProps} data-mc-ink="label" style={{ fillOpacity: 0.4 }}>
             {word}
           </text>
           {/* the accent copy, clipped to the value fraction of its own extent */}

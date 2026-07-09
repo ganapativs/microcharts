@@ -15,6 +15,7 @@ color.
   code={`import { HeartbeatBlip } from "@microcharts/react/heartbeat-blip";
 
 // pass 'now' from your data layer — never Date.now() in a server render
+
 <HeartbeatBlip data={eventTimestamps} now={serverNow} title="Requests" />`}
 >
   <HeartbeatBlip data={[97000, 92000, 85000, 70000, 55000, 48000]} now={100000} title="Requests" width={90} />
@@ -55,7 +56,13 @@ goes flat and stays flat.
 <HeartbeatBlip data={[]} now={serverNow} />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <HeartbeatBlip data={[97000, 92000, 85000, 70000, 55000, 48000]} now={100000} label="count" width={90} summary={false} />
+    <HeartbeatBlip
+      data={[97000, 92000, 85000, 70000, 55000, 48000]}
+      now={100000}
+      label="count"
+      width={90}
+      summary={false}
+    />
     <HeartbeatBlip data={[]} now={100000} width={90} summary={false} />
   </span>
 </LiveDemo>

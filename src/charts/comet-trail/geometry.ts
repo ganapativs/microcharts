@@ -35,9 +35,15 @@ export function cometTrailGeometry(opts: {
   trail: number;
   pad: number;
   headR?: number | undefined;
+  /** Extra vertical inset so the head's side-label centres on it without
+   *  clipping the top/bottom edge when the head sits at a value extreme. */
+  vPad?: number | undefined;
 }): CometTrailGeometry {
   const { width, height, pad } = opts;
   const headR = opts.headR ?? Math.max(1.2, height * 0.14);
+  // The value scale must keep every point (esp. the head at min/max) at least a
+  // label half-height from the edge, so the side numeral always aligns to the head.
+  const vInset = Math.max(headR, opts.vPad ?? 0);
   const trailR = Math.max(0.8, headR * 0.7);
   const keep = Math.min(TRAIL_CAP, Math.max(0, Math.floor(opts.trail))) + 1;
 
@@ -64,7 +70,7 @@ export function cometTrailGeometry(opts: {
   if (yd[0] === yd[1]) yd = [yd[0] - 1, yd[1] + 1];
 
   const sx = scaleLinear([0, Math.max(1, count - 1)], [pad + headR, width - pad - headR]);
-  const sy = scaleLinear(yd, [height - pad - headR, pad + headR]);
+  const sy = scaleLinear(yd, [height - pad - vInset, pad + vInset]);
 
   // Index 0 = oldest shown, count-1 = head (newest, right).
   const headOrigIndex = finite.length - 1;

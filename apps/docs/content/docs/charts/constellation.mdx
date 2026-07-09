@@ -59,8 +59,30 @@ const month = (x) => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"][x];
 <Constellation data={events} connect={false} />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }, { x: 5, y: 30, m: 3 }, { x: 8, y: 65, m: 5 }]} label="max" width={110} height={32} summary={false} />
-    <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }, { x: 5, y: 30, m: 3 }, { x: 8, y: 65, m: 5 }]} connect={false} width={110} height={32} summary={false} />
+    <Constellation
+      data={[
+        { x: 0, y: 40, m: 2 },
+        { x: 2, y: 90, m: 7 },
+        { x: 5, y: 30, m: 3 },
+        { x: 8, y: 65, m: 5 },
+      ]}
+      label="max"
+      width={110}
+      height={32}
+      summary={false}
+    />
+    <Constellation
+      data={[
+        { x: 0, y: 40, m: 2 },
+        { x: 2, y: 90, m: 7 },
+        { x: 5, y: 30, m: 3 },
+        { x: 8, y: 65, m: 5 },
+      ]}
+      connect={false}
+      width={110}
+      height={32}
+      summary={false}
+    />
   </span>
 </LiveDemo>
 

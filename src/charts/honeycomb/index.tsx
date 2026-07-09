@@ -99,7 +99,7 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
           <path
             d={geo.emptyPath}
             data-mc-ink="muted"
-            style={{ fill: "none", strokeOpacity: 0.5 }}
+            style={{ fill: "none", strokeOpacity: 0.75 }}
           />
         )
       ) : null}

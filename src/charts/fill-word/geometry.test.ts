@@ -31,7 +31,12 @@ describe("fillWordGeometry (plan/24 #3) — the label is the bar", () => {
     const labelled = g(0.5, "quota", "fill", true);
     expect(labelled.numeralX).not.toBeNull();
     expect(labelled.width).toBeGreaterThan(plain.width);
-    expect(labelled.numeralX!).toBeGreaterThan(labelled.x + labelled.textLength);
+    // the numeral hugs the word's REAL rendered extent (~0.56 em/char), which sits
+    // inside the 0.62 containment over-estimate — so it clears the glyphs without
+    // the dead gap the over-estimate used to leave.
+    const realExtent = "quota".length * 0.56 * 12;
+    expect(labelled.numeralX!).toBeGreaterThan(labelled.x + realExtent);
+    expect(labelled.numeralX!).toBeLessThan(labelled.width);
   });
 
   test.prop([fc.double({ min: 0, max: 1, noNaN: true }), fc.boolean()])(

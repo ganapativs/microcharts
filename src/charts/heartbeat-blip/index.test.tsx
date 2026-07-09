@@ -29,7 +29,11 @@ describe("<HeartbeatBlip> (plan/24 #20)", () => {
   it("flat window renders the 'no events' shape, not a spike path", () => {
     const { container } = draw(<HeartbeatBlip data={[]} now={100_000} />);
     expect(container.querySelector(".mc-heartbeat-spikes")).toBeNull();
-    expect(container.querySelector('text[data-mc-ink="muted"]')!.textContent).toBe("no events");
+    // the empty label is FILLED muted text (data-mc-ink="label"), never the
+    // stroke-only "muted" role — that rendered the glyphs as heavy outlines.
+    const empty = container.querySelector('text[data-mc-ink="label"]')!;
+    expect(empty.textContent).toBe("no events");
+    expect(empty.getAttribute("data-mc-ink")).not.toBe("muted");
   });
 
   it('label="count" prints the event count', () => {

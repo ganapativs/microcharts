@@ -51,34 +51,6 @@ export function GalleryFilter({ counts }: { counts: Record<string, number> }) {
     return () => window.clearTimeout(t);
   }, []);
 
-  // Copy-import: one delegated click handler for every card's copy button.
-  useEffect(() => {
-    const root = document.querySelector<HTMLElement>(".mc-gallery");
-    if (!root) return;
-    let timer = 0;
-    const onClick = (e: MouseEvent) => {
-      const btn = (e.target as HTMLElement).closest<HTMLElement>(".gcard-copy");
-      if (!btn) return;
-      e.preventDefault();
-      const text = btn.dataset.import;
-      if (!text) return;
-      void navigator.clipboard?.writeText(text);
-      const label = btn.querySelector<HTMLElement>(".gcard-copy-label");
-      btn.dataset.copied = "true";
-      if (label) label.textContent = "copied";
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => {
-        delete btn.dataset.copied;
-        if (label) label.textContent = "import";
-      }, 1400);
-    };
-    root.addEventListener("click", onClick);
-    return () => {
-      root.removeEventListener("click", onClick);
-      window.clearTimeout(timer);
-    };
-  }, []);
-
   // Arrow-key roving navigation across the visible cards — Left/Right step one
   // card, Up/Down jump a row. Mirrors the 2-D keyboard nav the charts ship.
   useEffect(() => {

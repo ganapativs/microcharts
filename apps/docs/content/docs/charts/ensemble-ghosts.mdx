@@ -53,8 +53,30 @@ quantiles), so the same input renders identically every time.
 <EnsembleGhosts data={futures} emphasis="median" />`}
 >
   <span className="inline-flex gap-4 items-center">
-    <EnsembleGhosts data={[[40, 41, 43, 45, 47, 50], [40, 39, 38, 36, 35, 33], [40, 42, 44, 47, 49, 52], [40, 43, 47, 52, 56, 61], [40, 38, 35, 32, 30, 28]]} endpoints width={150} height={40} />
-    <EnsembleGhosts data={[[40, 41, 43, 45, 47, 50], [40, 39, 38, 36, 35, 33], [40, 42, 44, 47, 49, 52], [40, 43, 47, 52, 56, 61], [40, 38, 35, 32, 30, 28]]} emphasis="median" width={150} height={40} />
+    <EnsembleGhosts
+      data={[
+        [40, 41, 43, 45, 47, 50],
+        [40, 39, 38, 36, 35, 33],
+        [40, 42, 44, 47, 49, 52],
+        [40, 43, 47, 52, 56, 61],
+        [40, 38, 35, 32, 30, 28],
+      ]}
+      endpoints
+      width={150}
+      height={40}
+    />
+    <EnsembleGhosts
+      data={[
+        [40, 41, 43, 45, 47, 50],
+        [40, 39, 38, 36, 35, 33],
+        [40, 42, 44, 47, 49, 52],
+        [40, 43, 47, 52, 56, 61],
+        [40, 38, 35, 32, 30, 28],
+      ]}
+      emphasis="median"
+      width={150}
+      height={40}
+    />
   </span>
 </LiveDemo>
 

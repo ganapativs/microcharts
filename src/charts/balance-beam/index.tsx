@@ -112,7 +112,6 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     summary === false
       ? false
       : (summary ?? balanceBeamSummary(data, { mode, domain, strings, format, locale }));
-  const paint = color ?? "var(--mc-stroke)";
   const fmt = makeFormatter(format, locale);
   // keep a centered value numeral inside the box (the beam ends ride the edges)
   const labelX = (cx: number, text: string) => {
@@ -120,9 +119,13 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     return Math.min(Math.max(cx, half + 1), width - half - 1);
   };
 
-  const weightMark = (w: { cx: number; cy: number; half: number }, key: string) =>
-    shape === "round" ? (
-      <circle key={key} cx={w.cx} cy={w.cy} r={w.half} style={{ fill: paint }} />
+  // The heavier pan is accented — the "which side wins" read is instant, and it
+  // only reinforces the tilt (never the sole cue), so direction stays legible
+  // without colour. An explicit `color` overrides both pans (user intent wins).
+  const weightMark = (w: { cx: number; cy: number; half: number }, key: string, heavy: boolean) => {
+    const f = color ?? (heavy ? "var(--mc-accent)" : "var(--mc-stroke)");
+    return shape === "round" ? (
+      <circle key={key} cx={w.cx} cy={w.cy} r={w.half} style={{ fill: f }} />
     ) : (
       <rect
         key={key}
@@ -130,9 +133,10 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
         y={w.cy - w.half}
         width={w.half * 2}
         height={w.half * 2}
-        style={{ fill: paint }}
+        style={{ fill: f }}
       />
     );
+  };
 
   return (
     <Chart
@@ -154,9 +158,9 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
         y2={geo.beam.y2}
         data-mc-ink="data"
       />
-      {/* area-true weights */}
-      {weightMark(geo.weights[0], "wl")}
-      {weightMark(geo.weights[1], "wr")}
+      {/* area-true weights — the heavier pan carries the accent */}
+      {weightMark(geo.weights[0], "wl", geo.heavier === -1)}
+      {weightMark(geo.weights[1], "wr", geo.heavier === 1)}
       {label === "values" ? (
         <>
           <text

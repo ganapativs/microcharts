@@ -49,7 +49,7 @@ export function fillWordGeometry(opts: {
   // the over-estimate so the natural word never overflows.
   const wordExtent = round2(chars * 0.56 * fontSize);
   const numeralExtent = round2(4 * 0.62 * fontSize); // "100%"
-  const numeralX = label && chars > 0 ? round2(x + wordExtent + fontSize * 0.5) : null;
+  const numeralX = label && chars > 0 ? round2(x + wordExtent + fontSize * 0.3) : null;
   const width =
     label && chars > 0
       ? Math.max(1, Math.ceil((numeralX ?? 0) + numeralExtent + pad))

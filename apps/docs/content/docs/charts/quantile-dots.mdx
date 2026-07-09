@@ -55,20 +55,26 @@ odds you must trust, and a frequency reads truer than a bare percentage.
 >
   <span className="inline-flex flex-col gap-1.5">
     <QuantileDots
-      data={Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)))}
+      data={Array.from({ length: 200 }, (_, i) =>
+        Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)),
+      )}
       count={15}
       threshold={15}
       format={(n) => `${n} min`}
       title="15 dots"
-      width={220} height={28}
+      width={220}
+      height={28}
     />
     <QuantileDots
-      data={Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)))}
+      data={Array.from({ length: 200 }, (_, i) =>
+        Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)),
+      )}
       threshold={10}
       side="below"
       format={(n) => `${n} min`}
       title="under 10 min"
-      width={220} height={28}
+      width={220}
+      height={28}
     />
   </span>
 </LiveDemo>

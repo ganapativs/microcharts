@@ -12,7 +12,7 @@ const ACCTS: Row = [
   { label: "Gamma", value: 3 },
   { label: "Delta", value: 1 },
   { label: "Echo", value: 0 },
-  { label: "Foxtrot", value: 2 },
+  { label: "Foxx", value: 2 },
 ];
 
 export const entry: ChartEntry = {
@@ -60,7 +60,7 @@ export function Preview() {
 
 export const showcase = {
   hint: "seed → bloom",
-  Node: () => <SproutRow data={ACCTS} labels title="Account health" height={30} step={22} />,
+  Node: () => <SproutRow data={ACCTS} labels title="Account health" height={44} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -74,8 +74,7 @@ export const playground: PlaygroundSpec = {
       labels={s.labels as boolean}
       label={s.value ? "value" : "none"}
       summary={false}
-      height={s.labels ? 34 : 26}
-      step={22}
+      height={s.labels ? 46 : 26}
     />
   ),
   code: (s) =>
@@ -88,7 +87,7 @@ export const recipes: Recipe[] = [
   {
     label: "with category labels",
     code: `<SproutRow data={accounts} labels />`,
-    node: <SproutRow data={ACCTS} labels summary={false} height={32} step={24} />,
+    node: <SproutRow data={ACCTS} labels summary={false} height={44} />,
   },
   {
     label: "missing ≠ seed (null draws a soil tick only)",

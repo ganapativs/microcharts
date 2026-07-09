@@ -582,19 +582,33 @@ const body = [
 
   `<h2>DicePips</h2>`,
   row("faces 1–6", [1, 2, 3, 4, 5, 6].map((v) => svg(DicePips, { value: v, size: 22 })).join(" ")),
-  row("0 empty + 9 numeral", `${svg(DicePips, { value: 0, size: 22 })} ${svg(DicePips, { value: 9, size: 22, title: "nine" })}`),
+  row(
+    "0 empty + 9 numeral",
+    `${svg(DicePips, { value: 0, size: 22 })} ${svg(DicePips, { value: 9, size: 22, title: "nine" })}`,
+  ),
   row("pips-only", svg(DicePips, { value: 5, face: false, size: 22 })),
 
   `<h2>FillWord</h2>`,
-  row("uploading 62%", svg(FillWord, { word: "uploading", value: 0.62, fontSize: 16, title: "Upload" })),
+  row(
+    "uploading 62%",
+    svg(FillWord, { word: "uploading", value: 0.62, fontSize: 16, title: "Upload" }),
+  ),
   row("drain 70%", svg(FillWord, { word: "expiring", value: 0.7, mode: "drain", fontSize: 16 })),
-  row("label value 40%", svg(FillWord, { word: "storage", value: 0.4, label: "value", fontSize: 16 })),
+  row(
+    "label value 40%",
+    svg(FillWord, { word: "storage", value: 0.4, label: "value", fontSize: 16 }),
+  ),
   row("full 100%", svg(FillWord, { word: "complete", value: 1, fontSize: 16 })),
 
   `<h2>FatDigits</h2>`,
   row(
     "column scan",
-    [1204, 318, 76, 2100, 55].map((v) => `<span style="display:block;text-align:right">${svg(FatDigits, { value: v, domain: [0, 2100], fontSize: 15 })}</span>`).join(""),
+    [1204, 318, 76, 2100, 55]
+      .map(
+        (v) =>
+          `<span style="display:block;text-align:right">${svg(FatDigits, { value: v, domain: [0, 2100], fontSize: 15 })}</span>`,
+      )
+      .join(""),
   ),
   row("digit mode 1902", svg(FatDigits, { value: 1902, encode: "digit", fontSize: 18 })),
   row("3 tiers", svg(FatDigits, { value: 1204, domain: [0, 2100], tiers: 3, fontSize: 18 })),
@@ -604,7 +618,10 @@ const body = [
     "vertical: 40 / 72+target / 95 / label",
     `${svg(Thermometer, { value: 40 })} ${svg(Thermometer, { value: 72, target: 80 })} ${svg(Thermometer, { value: 95 })} ${svg(Thermometer, { value: 72, label: "value" })}`,
   ),
-  row("horizontal cell", svg(Thermometer, { value: 62, orientation: "horizontal", bulb: false, width: 120 })),
+  row(
+    "horizontal cell",
+    svg(Thermometer, { value: 62, orientation: "horizontal", bulb: false, width: 120 }),
+  ),
   row("over domain (140)", svg(Thermometer, { value: 140, target: 90 })),
 
   `<h2>MoonPhase</h2>`,
@@ -614,7 +631,9 @@ const body = [
   ),
   row(
     "cycle: new / first / full / last",
-    [0, 0.25, 0.5, 0.75].map((v) => svg(MoonPhase, { value: v, mode: "cycle", size: 24 })).join(" "),
+    [0, 0.25, 0.5, 0.75]
+      .map((v) => svg(MoonPhase, { value: v, mode: "cycle", size: 24 }))
+      .join(" "),
   ),
 
   `<h2>Hourglass</h2>`,
@@ -627,56 +646,170 @@ const body = [
   `<h2>BalanceBeam</h2>`,
   row(
     "left / balanced / right / saturated",
-    [[620, 480], [500, 500], [300, 800], [950, 50]]
-      .map((p) => svg(BalanceBeam, { data: [{ label: "A", value: p[0] }, { label: "B", value: p[1] }], width: 64, height: 26 }))
+    [
+      [620, 480],
+      [500, 500],
+      [300, 800],
+      [950, 50],
+    ]
+      .map((p) =>
+        svg(BalanceBeam, {
+          data: [
+            { label: "A", value: p[0] },
+            { label: "B", value: p[1] },
+          ],
+          width: 64,
+          height: 26,
+        }),
+      )
       .join(" "),
   ),
   row(
     "round + labelled",
-    `${svg(BalanceBeam, { data: [{ label: "In", value: 620 }, { label: "Out", value: 480 }], shape: "round", width: 72, height: 30 })} ${svg(BalanceBeam, { data: [{ label: "In", value: 620 }, { label: "Out", value: 480 }], label: "values", width: 80, height: 32 })}`,
+    `${svg(BalanceBeam, {
+      data: [
+        { label: "In", value: 620 },
+        { label: "Out", value: 480 },
+      ],
+      shape: "round",
+      width: 72,
+      height: 30,
+    })} ${svg(BalanceBeam, {
+      data: [
+        { label: "In", value: 620 },
+        { label: "Out", value: 480 },
+      ],
+      label: "values",
+      width: 80,
+      height: 32,
+    })}`,
   ),
 
   `<h2>SproutRow</h2>`,
   row(
     "stages 0–3 across a row",
-    svg(SproutRow, { data: [{ label: "A", value: 0 }, { label: "B", value: 1 }, { label: "C", value: 2 }, { label: "D", value: 3 }, { label: "E", value: 2 }, { label: "F", value: 3 }], height: 24, step: 20 }),
+    svg(SproutRow, {
+      data: [
+        { label: "A", value: 0 },
+        { label: "B", value: 1 },
+        { label: "C", value: 2 },
+        { label: "D", value: 3 },
+        { label: "E", value: 2 },
+        { label: "F", value: 3 },
+      ],
+      height: 24,
+      step: 20,
+    }),
   ),
   row(
     "labelled + missing (null)",
-    svg(SproutRow, { data: [{ label: "Acme", value: 3 }, { label: "Beta", value: null }, { label: "Gamma", value: 1 }], labels: true, height: 32, step: 30 }),
+    svg(SproutRow, {
+      data: [
+        { label: "Acme", value: 3 },
+        { label: "Beta", value: null },
+        { label: "Gamma", value: 1 },
+      ],
+      labels: true,
+      height: 32,
+      step: 30,
+    }),
+  ),
+  row(
+    "labelled 6 accounts (showcase config)",
+    svg(SproutRow, {
+      data: [
+        { label: "Acme", value: 3 },
+        { label: "Beta", value: 2 },
+        { label: "Gamma", value: 3 },
+        { label: "Delta", value: 1 },
+        { label: "Echo", value: 0 },
+        { label: "Foxx", value: 2 },
+      ],
+      labels: true,
+      height: 30,
+      step: 22,
+    }),
   ),
 
   `<h2>GardenGrid</h2>`,
-  row("grid 7 rows", svg(GardenGrid, { data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11], unit: "weeks" })),
+  row(
+    "grid 7 rows",
+    svg(GardenGrid, {
+      data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11],
+      unit: "weeks",
+    }),
+  ),
   row("strip (rows 1)", svg(GardenGrid, { data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22], rows: 1 })),
-  row("blank empties", svg(GardenGrid, { data: [12, 0, 8, 0, 0, 28, 34, 0, 0, 22], rows: 1, empty: "blank" })),
+  row(
+    "blank empties",
+    svg(GardenGrid, { data: [12, 0, 8, 0, 0, 28, 34, 0, 0, 22], rows: 1, empty: "blank" }),
+  ),
 
   `<h2>BubbleRow</h2>`,
-  (() => { const B = [{ label: "EMEA", value: 1240 }, { label: "AMER", value: 890 }, { label: "APAC", value: 560 }, { label: "LATAM", value: 210 }];
+  (() => {
+    const B = [
+      { label: "EMEA", value: 1240 },
+      { label: "AMER", value: 890 },
+      { label: "APAC", value: 560 },
+      { label: "LATAM", value: 210 },
+    ];
     return [
       row("values (default)", svg(BubbleRow, { data: B, height: 34 })),
       row("baseline align", svg(BubbleRow, { data: B, align: "baseline", height: 34 })),
       row("label both", svg(BubbleRow, { data: B, label: "both", height: 34 })),
-    ].join("\n"); })(),
+    ].join("\n");
+  })(),
 
   `<h2>MusicStaff</h2>`,
-  row("melody", svg(MusicStaff, { data: [3, 5, 4, 8, 6, 9, 7, 11], label: "last", width: 120, height: 26 })),
-  row("staff range", svg(MusicStaff, { data: [3, 5, 4, 8, 6, 9], range: "staff", width: 100, height: 24 })),
+  row(
+    "melody",
+    svg(MusicStaff, { data: [3, 5, 4, 8, 6, 9, 7, 11], label: "last", width: 120, height: 26 }),
+  ),
+  row(
+    "staff range",
+    svg(MusicStaff, { data: [3, 5, 4, 8, 6, 9], range: "staff", width: 100, height: 24 }),
+  ),
   row("with a rest", svg(MusicStaff, { data: [3, 5, null, 8, 6], width: 90, height: 24 })),
 
   `<h2>TreeRings</h2>`,
-  (() => { const Y = [8, 12, 10, 18, 22, 15, 20, 14]; return [
-    row("stroke + last", `<span style="display:inline-flex;gap:12px;align-items:center">${svg(TreeRings, { data: Y, label: "last", unit: "years", periodWord: "year", size: 40 })}${svg(TreeRings, { data: Y, size: 28 })}</span>`),
-    row("fill annuli", svg(TreeRings, { data: Y, rings: "fill", size: 44 })),
-    row("cohort (total 200)", svg(TreeRings, { data: Y, total: 200, size: 44 })),
-  ].join("\n"); })(),
+  (() => {
+    const Y = [8, 12, 10, 18, 22, 15, 20, 14];
+    return [
+      row(
+        "stroke + last",
+        `<span style="display:inline-flex;gap:12px;align-items:center">${svg(TreeRings, { data: Y, label: "last", unit: "years", periodWord: "year", size: 40 })}${svg(TreeRings, { data: Y, size: 28 })}</span>`,
+      ),
+      row("fill annuli", svg(TreeRings, { data: Y, rings: "fill", size: 44 })),
+      row("cohort (total 200)", svg(TreeRings, { data: Y, total: 200, size: 44 })),
+    ].join("\n");
+  })(),
 
   `<h2>CitySkyline</h2>`,
-  (() => { const T = [{ label: "Platform", value: 46, lit: 0.7 }, { label: "Core", value: 32, lit: 0.5 }, { label: "Web", value: 28, lit: 0.9 }, { label: "API", value: 40, lit: 0.3 }, { label: "Data", value: 18, lit: 0.6 }]; return [
-    row("labelled", svg(CitySkyline, { data: T, labels: true, unit: "teams", bw: 16, gap: 6, height: 40 })),
-    row("values", svg(CitySkyline, { data: T, label: "value", bw: 16, gap: 6, height: 36 })),
-    row("plain bars", svg(CitySkyline, { data: T.map((d) => ({ label: d.label, value: d.value })), bw: 14, gap: 5, height: 30 })),
-  ].join("\n"); })(),
+  (() => {
+    const T = [
+      { label: "Platform", value: 46, lit: 0.7 },
+      { label: "Core", value: 32, lit: 0.5 },
+      { label: "Web", value: 28, lit: 0.9 },
+      { label: "API", value: 40, lit: 0.3 },
+      { label: "Data", value: 18, lit: 0.6 },
+    ];
+    return [
+      row(
+        "labelled",
+        svg(CitySkyline, { data: T, labels: true, unit: "teams", bw: 16, gap: 6, height: 40 }),
+      ),
+      row("values", svg(CitySkyline, { data: T, label: "value", bw: 16, gap: 6, height: 36 })),
+      row(
+        "plain bars",
+        svg(CitySkyline, {
+          data: T.map((d) => ({ label: d.label, value: d.value })),
+          bw: 14,
+          gap: 5,
+          height: 30,
+        }),
+      ),
+    ].join("\n");
+  })(),
 
   `<h2>Honeycomb</h2>`,
   row("34 of 40 (outline)", svg(Honeycomb, { value: 34, total: 40, unit: "seats", cellR: 5 })),
@@ -749,14 +882,18 @@ const body = [
   row(
     "52 weeks, month ticks",
     svg(SpiralYear, {
-      data: Array.from({ length: 52 }, (_, i) => Math.round(200 + 150 * Math.sin(((i - 8) / 52) * Math.PI * 2))),
+      data: Array.from({ length: 52 }, (_, i) =>
+        Math.round(200 + 150 * Math.sin(((i - 8) / 52) * Math.PI * 2)),
+      ),
       size: 80,
     }),
   ),
   row(
     "arc marks",
     svg(SpiralYear, {
-      data: Array.from({ length: 52 }, (_, i) => Math.round(200 + 150 * Math.sin(((i - 8) / 52) * Math.PI * 2))),
+      data: Array.from({ length: 52 }, (_, i) =>
+        Math.round(200 + 150 * Math.sin(((i - 8) / 52) * Math.PI * 2)),
+      ),
       mark: "arc",
       size: 80,
     }),
@@ -808,7 +945,13 @@ const body = [
   `<h2>OrbitStatus</h2>`,
   row(
     "240ms, 12 calls/s",
-    svg(OrbitStatus, { latency: 240, rate: 12, latencyDomain: [0, 500], rateDomain: [0, 20], size: 56 }),
+    svg(OrbitStatus, {
+      latency: 240,
+      rate: 12,
+      latencyDomain: [0, 500],
+      rateDomain: [0, 20],
+      size: 56,
+    }),
   ),
   row(
     "alerting + label",
@@ -824,7 +967,13 @@ const body = [
   ),
   row(
     "idle (rate 0, solid orbit)",
-    svg(OrbitStatus, { latency: 100, rate: 0, latencyDomain: [0, 500], rateDomain: [0, 20], size: 56 }),
+    svg(OrbitStatus, {
+      latency: 100,
+      rate: 0,
+      latencyDomain: [0, 500],
+      rateDomain: [0, 20],
+      size: 56,
+    }),
   ),
   row("unknown", svg(OrbitStatus, { latency: NaN, rate: 5, size: 56 })),
 ].join("\n");

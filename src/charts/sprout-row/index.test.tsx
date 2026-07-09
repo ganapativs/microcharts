@@ -47,6 +47,29 @@ describe("<SproutRow> (plan/24 #9)", () => {
     expect([...withVals.querySelectorAll("text")].map((t) => t.textContent)).toContain("3");
   });
 
+  it("category labels: none dropped, legible, and inside the viewBox", () => {
+    const { container } = draw(<SproutRow data={ACCT} labels height={44} />);
+    const svg = container.querySelector("svg")!;
+    const [, , vbW] = svg.getAttribute("viewBox")!.split(" ").map(Number);
+    const cats = [...svg.querySelectorAll('text[data-mc-ink="label"]')];
+    // every name is rendered — the row widens to fit, it never drops a label
+    expect(cats.map((t) => t.textContent)).toEqual(ACCT.map((d) => d.label));
+    for (const t of cats) {
+      const x = Number(t.getAttribute("x"));
+      const fs = Number(t.getAttribute("font-size"));
+      expect(fs).toBeGreaterThanOrEqual(7); // library legibility floor, never shrunk to a caption
+      const half = (t.textContent!.length * 0.72 * fs) / 2;
+      expect(x - half).toBeGreaterThanOrEqual(0);
+      expect(x + half).toBeLessThanOrEqual(vbW!);
+    }
+    // labels stagger onto two tiers, so same-tier centres (two slots apart) are
+    // ≥ the widest label extent → no overlap within a tier
+    const xs = cats.map((t) => Number(t.getAttribute("x"))).sort((a, b) => a - b);
+    const fs = Number(cats[0]!.getAttribute("font-size"));
+    const widest = Math.max(...ACCT.map((d) => d.label.length * 0.72 * fs));
+    for (let i = 2; i < xs.length; i++) expect(xs[i]! - xs[i - 2]!).toBeGreaterThanOrEqual(widest);
+  });
+
   it("summary={false} hides it from assistive tech", () => {
     const { container } = draw(<SproutRow data={ACCT} summary={false} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBeNull();

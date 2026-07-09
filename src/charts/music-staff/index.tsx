@@ -93,18 +93,46 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
           style={{ strokeOpacity: 0.7 }}
         />
       ) : null}
-      {/* note heads */}
-      {geo.notes.map((nt) => (
-        <ellipse
-          key={`n${nt.index}`}
-          cx={nt.cx}
-          cy={nt.cy}
-          rx={nt.rx}
-          ry={nt.ry}
-          data-mc-ink="point"
-          style={paint ? { fill: paint } : undefined}
+      {/* melodic contour — a whisper of a line through the notes in time order, so
+          the SHAPE of the tune (rise/fall) reads at a glance; the noteheads stay
+          the precise marks, this is only the second-read guide */}
+      {geo.notes.length >= 2 ? (
+        <path
+          d={geo.notes
+            .map((nt, i) => {
+              // break the line across a rest (a gap in the original indices) so it
+              // never implies a note carried through silence
+              const brk = i === 0 || nt.index !== geo.notes[i - 1]!.index + 1;
+              return `${brk ? "M" : "L"}${nt.cx} ${nt.cy}`;
+            })
+            .join("")}
+          fill="none"
+          style={{
+            stroke: paint ?? "var(--mc-accent)",
+            strokeOpacity: 0.28,
+            strokeWidth: 0.75,
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+          }}
         />
-      ))}
+      ) : null}
+      {/* note heads — tilted ovals, as a real engraved notehead sits; the tilt is
+          what reads them as notes rather than squashed dots. The final note (the
+          current pitch) is accented — the "you are here" of the melody. */}
+      {geo.notes.map((nt, i) => {
+        const isLast = i === geo.notes.length - 1;
+        return (
+          <ellipse
+            key={`n${nt.index}`}
+            cx={nt.cx}
+            cy={nt.cy}
+            rx={nt.rx}
+            ry={nt.ry}
+            data-mc-ink="point"
+            style={paint ? { fill: paint } : isLast ? { fill: "var(--mc-accent)" } : undefined}
+          />
+        );
+      })}
       {showLabel && geo.lastX !== null ? (
         <text
           x={width - gutter + 1}

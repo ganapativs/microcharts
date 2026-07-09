@@ -57,7 +57,9 @@ export function Hourglass(props: HourglassProps): ReactNode {
   const showLabel = label !== "none";
   // 0.72 em/char (not 0.62): the % glyph is wide and under-reserves at 0.62
   const gutter = showLabel ? Math.ceil(`${pct}%`.length * 0.72 * fontSize + 3) : 0;
-  const boxW = props.width ?? 16;
+  // The glass box tracks height so the instrument keeps a natural hourglass
+  // proportion at ANY size — a fixed width made tall demos read as a thin sliver.
+  const boxW = props.width ?? Math.max(12, Math.round(height * 0.66));
   const width = boxW + gutter;
 
   const geo = hourglassGeometry({ value, width: boxW, height, pad: PAD });

@@ -46,8 +46,24 @@ const byWeek = [/* 52 weekly values */];
 <SpiralYear data={byWeek} steps={3} />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <SpiralYear data={Array.from({ length: 52 }, (_, i) => { const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2)); return i === 29 ? 480 : s; })} mark="arc" size={64} summary={false} />
-    <SpiralYear data={Array.from({ length: 52 }, (_, i) => { const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2)); return i === 29 ? 480 : s; })} steps={3} size={56} summary={false} />
+    <SpiralYear
+      data={Array.from({ length: 52 }, (_, i) => {
+        const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2));
+        return i === 29 ? 480 : s;
+      })}
+      mark="arc"
+      size={64}
+      summary={false}
+    />
+    <SpiralYear
+      data={Array.from({ length: 52 }, (_, i) => {
+        const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2));
+        return i === 29 ? 480 : s;
+      })}
+      steps={3}
+      size={56}
+      summary={false}
+    />
   </span>
 </LiveDemo>
 

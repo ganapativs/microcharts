@@ -56,8 +56,9 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     labels = false,
     label = "none",
     color,
-    height = 20,
-    step = 16,
+    // Labels stagger onto two tiers below the soil, so the default row is taller
+    // when names are shown (glyphs still get the upper half).
+    height = labels ? 40 : 20,
     strings = EN_SPROUT,
     title,
     summary,
@@ -66,19 +67,30 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height, 0.34);
-  // Category labels are constrained by the slot width, so they take the largest
-  // size the widest name fits (capped at the numeral size) — the stage numerals
-  // stay at the library-standard size.
-  const maxLabelLen = labels ? Math.max(1, ...data.map((d) => d.label.length)) : 1;
-  const catFont = Math.max(5, Math.min(fontSize, Math.floor((step - 1) / (maxLabelLen * 0.62))));
+  const fontSize = props.fontSize ?? labelFont(height, 0.3);
+  // Category labels render at the library-standard size and never shrink to an
+  // illegible caption. To keep the row compact they STAGGER onto two tiers below
+  // the soil (even slots near, odd slots far), so same-tier neighbours sit two
+  // steps apart — a name only needs to clear 2·step, not one. 0.72 em/char real
+  // extent + a half-em gutter; the row still widens if even 2·step is too tight.
+  const catExtent = labels
+    ? Math.max(0, ...data.map((d) => d.label.length * 0.72 * fontSize + fontSize * 0.5))
+    : 0;
+  const step = Math.max(props.step ?? 16, Math.ceil(catExtent / 2));
+  // Side gutter so the outermost name (half its extent past its centre) never
+  // clips the viewBox edge.
+  const padX = labels ? Math.max(PAD, Math.ceil(catExtent / 2 - step / 2)) : PAD;
+  // Two label lines below the soil (+1px gap each) when a second tier is used.
+  const twoTier = labels && data.length > 1;
+  const labelBand = labels ? fontSize + 1 + (twoTier ? fontSize + 1 : 0) : 0;
 
   const geo = sproutRowGeometry({
     stages: data.map((d) => d.value),
     height,
     step,
     pad: PAD,
-    bottomReserve: labels ? fontSize + 1 : 0,
+    padX,
+    bottomReserve: labelBand,
   });
   const accName = summary === false ? false : (summary ?? sproutRowSummary(data, strings));
   const paint = color;
@@ -130,23 +142,20 @@ export function SproutRow(props: SproutRowProps): ReactNode {
         : null}
       {labels
         ? geo.slots.map((s, i) => {
-            const text = data[i]!.label;
-            // drop a category label that still won't fit its slot (plan/18 §4;
-            // 0.72 em/char over-estimate — proportional names run wider than digits)
-            if (text.length * 0.72 * catFont > step - 1) return null;
-            // keep the end labels inside the viewBox (a wide name at slot 0 / last)
-            const halfW = (text.length * 0.72 * catFont) / 2;
-            const cx = Math.min(Math.max(s.x, halfW + PAD), geo.width - halfW - PAD);
+            // Even slots sit on the near tier, odd on the far tier — each name
+            // stays centred under its own glyph, so the column mapping is exact.
+            const far = twoTier && i % 2 === 1;
+            const y = s.baselineY + fontSize + 1 + (far ? fontSize + 1 : 0);
             return (
               <text
                 key={`l${s.x}`}
-                x={cx}
-                y={height - catFont * 0.42}
-                fontSize={catFont}
+                x={s.x}
+                y={y}
+                fontSize={fontSize}
                 textAnchor="middle"
                 data-mc-ink="label"
               >
-                {text}
+                {data[i]!.label}
               </text>
             );
           })

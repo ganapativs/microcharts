@@ -83,6 +83,7 @@ export function CometTrail(props: CometTrailProps): ReactNode {
     domain,
     trail,
     pad: PAD,
+    vPad: label === "last" ? fontSize * 0.6 : 0,
   });
   const accName =
     summary === false
@@ -125,11 +126,9 @@ export function CometTrail(props: CometTrailProps): ReactNode {
       {label === "last" && geo.head && Number.isFinite(geo.last) ? (
         <text
           x={geo.labelX}
-          y={Math.min(
-            Math.max(geo.head.cy + fontSize * 0.34, fontSize),
-            geo.height - fontSize * 0.3,
-          )}
+          y={Math.min(Math.max(geo.head.cy, fontSize * 0.6), geo.height - fontSize * 0.6)}
           fontSize={fontSize}
+          dominantBaseline="central"
           textAnchor="start"
           data-mc-ink="label"
         >

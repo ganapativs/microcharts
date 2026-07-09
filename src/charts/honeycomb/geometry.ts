@@ -61,10 +61,14 @@ export function honeycombGeometry(opts: {
     cells.push({ cx, cy, filled: i < filledCount, index: i });
   }
 
+  // Draw each hex a hair smaller than its layout cell so touching neighbours
+  // leave a thin gutter — without it, filled cells merge into one solid blob and
+  // the comb structure (the whole point) disappears.
+  const drawR = round2(r * 0.85);
   let filledPath = "";
   let emptyPath = "";
   for (const c of cells) {
-    const d = hexPath(c.cx, c.cy, r);
+    const d = hexPath(c.cx, c.cy, drawR);
     if (c.filled) filledPath += d;
     else emptyPath += d;
   }

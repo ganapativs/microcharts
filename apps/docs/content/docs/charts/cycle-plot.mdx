@@ -56,8 +56,20 @@ the same data — so they never share a mark.
 <CyclePlot data={daily} period={7} trend="none" />`}
 >
   <span className="inline-flex gap-4 items-center">
-    <CyclePlot data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]} period={7} center="median" width={150} height={32} />
-    <CyclePlot data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]} period={7} trend="none" width={150} height={32} />
+    <CyclePlot
+      data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]}
+      period={7}
+      center="median"
+      width={150}
+      height={32}
+    />
+    <CyclePlot
+      data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]}
+      period={7}
+      trend="none"
+      width={150}
+      height={32}
+    />
   </span>
 </LiveDemo>
 

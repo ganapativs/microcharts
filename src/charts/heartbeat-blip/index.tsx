@@ -148,10 +148,12 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
       ) : (
         <text
           x={geo.width / 2}
-          y={geo.baseline.y - 2}
+          y={height / 2}
           fontSize={fontSize}
           textAnchor="middle"
-          data-mc-ink="muted"
+          dominantBaseline="central"
+          data-mc-ink="label"
+          style={{ fillOpacity: 0.7 }}
         >
           no events
         </text>

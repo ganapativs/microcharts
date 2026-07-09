@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
-import { ArrowUpRight, Copy } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { docsMeta } from "@/lib/metadata";
 import { CATALOG_TARGET, CHART_MODULES, STABLE_CHARTS } from "@/lib/charts/registry";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
@@ -32,24 +32,6 @@ const COLLECTIONS: { key: ChartCollection; label: string; blurb: string }[] = [
 
 function keywords(c: ChartEntry): string {
   return [c.name, c.tagline, c.dataShape, c.encoding.channel, c.collection].join(" ").toLowerCase();
-}
-
-// Precision is documented as e.g. "high" or "low — use Delta when it matters".
-// The card badge shows only the leading grade; the full nuance is on the doc
-// page. Normalize the handful of shapes to a short, honest label.
-function precisionGrade(precision: string): string {
-  const p = precision.trim().toLowerCase();
-  if (p.startsWith("n/a")) return "N/A";
-  if (p.startsWith("medium-high")) return "MED-HIGH";
-  if (p.startsWith("high")) return "HIGH";
-  if (p.startsWith("medium")) return "MEDIUM";
-  if (p.startsWith("low")) return "LOW";
-  return (p.split(/[^a-z]/i)[0] || p).toUpperCase();
-}
-
-// The exact line a developer copies. Mirrors the import shown on the doc page.
-function importLine(c: ChartEntry): string {
-  return `import { ${c.name} } from "${c.staticImport}";`;
 }
 
 export default function GalleryPage() {
@@ -112,42 +94,32 @@ export default function GalleryPage() {
                     className="gcard group"
                     style={{ "--i": n } as CSSProperties}
                   >
-                    {/* the specimen: the chart at true word-size on graph paper,
-                        with a spec panel that rises on hover / focus. */}
+                    {/* the specimen: the chart at true word-size on graph paper */}
                     <div className="gcard-stage">
                       <Preview />
-                      <div className="gcard-spec" aria-hidden>
-                        <p className="gcard-spec-tag">{c.tagline}</p>
-                        <div className="gcard-spec-meta mono-label">
-                          <span className="gcard-spec-channel">{c.encoding.channel}</span>
-                          <span className="gcard-spec-grade">
-                            {precisionGrade(c.encoding.precision)}
-                          </span>
+                    </div>
+                    {/* footer — in the grid the description stays hidden and the
+                        name sits centered; on hover/focus the name lifts and the
+                        description reveals below with the open arrow. The wrappers
+                        collapse to `display:contents` in the sheet so its flat row
+                        layout is unchanged. */}
+                    <div className="gcard-foot">
+                      <span className="gcard-idx mono-label tabular-nums opacity-40">{idx}</span>
+                      <div className="gcard-body">
+                        <div className="gcard-head">
+                          {/* the name is the navigation target; its ::after
+                              stretches over the whole card = one big click target */}
+                          <Link
+                            href={`/docs/charts/${c.slug}`}
+                            className="gcard-name gcard-link display text-lg leading-tight text-fd-foreground transition-colors group-hover:text-fd-primary"
+                          >
+                            {c.name}
+                          </Link>
+                          <ArrowUpRight className="gcard-arrow size-4 shrink-0 text-fd-muted-foreground" />
                         </div>
-                        <button
-                          type="button"
-                          className="gcard-copy mono-label"
-                          data-import={importLine(c)}
-                          aria-label={`Copy import statement for ${c.name}`}
-                        >
-                          <Copy className="size-3" aria-hidden />
-                          <span className="gcard-copy-label">import</span>
-                        </button>
+                        <p className="gcard-desc text-fd-muted-foreground">{c.tagline}</p>
                       </div>
                     </div>
-                    <span className="gcard-idx mono-label tabular-nums opacity-40">{idx}</span>
-                    {/* the name is the navigation target; its ::after stretches
-                        over the whole card so the card is one big click target. */}
-                    <Link
-                      href={`/docs/charts/${c.slug}`}
-                      className="gcard-name gcard-link display text-lg leading-tight text-fd-foreground transition-colors group-hover:text-fd-primary"
-                    >
-                      {c.name}
-                    </Link>
-                    <span className="gcard-tag truncate text-sm text-fd-muted-foreground">
-                      {c.tagline}
-                    </span>
-                    <ArrowUpRight className="gcard-arrow size-4 shrink-0 text-fd-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
                   </div>
                 );
               })}

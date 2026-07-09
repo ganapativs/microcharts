@@ -47,8 +47,26 @@ dark", not a number. Omit `lit` everywhere and it's a plain, honest bar row.
 <CitySkyline data={teams} label="value" />`}
 >
   <span className="inline-flex gap-8 items-end">
-    <CitySkyline data={[{ label: "A", value: 46 }, { label: "B", value: 32 }, { label: "C", value: 40 }]} bw={14} gap={5} height={30} />
-    <CitySkyline data={[{ label: "A", value: 46, lit: 0.7 }, { label: "B", value: 32, lit: 0.4 }]} label="value" bw={16} gap={6} height={34} />
+    <CitySkyline
+      data={[
+        { label: "A", value: 46 },
+        { label: "B", value: 32 },
+        { label: "C", value: 40 },
+      ]}
+      bw={14}
+      gap={5}
+      height={30}
+    />
+    <CitySkyline
+      data={[
+        { label: "A", value: 46, lit: 0.7 },
+        { label: "B", value: 32, lit: 0.4 },
+      ]}
+      label="value"
+      bw={16}
+      gap={6}
+      height={34}
+    />
   </span>
 </LiveDemo>
 

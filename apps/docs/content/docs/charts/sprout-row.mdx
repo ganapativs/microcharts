@@ -50,8 +50,26 @@ The key, shown once: **seed → sprout → leaf → bloom**.
 <SproutRow data={[{ label: "A", value: 2 }, { label: "B", value: null }, { label: "C", value: 0 }]} />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <SproutRow data={[{ label: "A", value: 0 }, { label: "B", value: 1 }, { label: "C", value: 2 }, { label: "D", value: 3 }]} label="value" height={26} step={20} />
-    <SproutRow data={[{ label: "A", value: 2 }, { label: "B", value: null }, { label: "C", value: 0 }]} height={24} step={22} />
+    <SproutRow
+      data={[
+        { label: "A", value: 0 },
+        { label: "B", value: 1 },
+        { label: "C", value: 2 },
+        { label: "D", value: 3 },
+      ]}
+      label="value"
+      height={26}
+      step={20}
+    />
+    <SproutRow
+      data={[
+        { label: "A", value: 2 },
+        { label: "B", value: null },
+        { label: "C", value: 0 },
+      ]}
+      height={24}
+      step={22}
+    />
   </span>
 </LiveDemo>
 

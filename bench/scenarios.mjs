@@ -547,7 +547,10 @@ export const SCENARIOS = [
     component: "BalanceBeam",
     floor: 40, // ≤ 6 nodes, one rotation + two √ weights — trivially cheap
     props: (i) => ({
-      data: [{ label: "A", value: (i % 90) + 10 }, { label: "B", value: ((i * 3) % 90) + 10 }],
+      data: [
+        { label: "A", value: (i % 90) + 10 },
+        { label: "B", value: ((i * 3) % 90) + 10 },
+      ],
       summary: false,
     }),
   },
@@ -571,7 +574,9 @@ export const SCENARIOS = [
     component: "BubbleRow",
     floor: 15, // ≤ 8 bubbles + per-bubble format + greedy label layout (measured ~26)
     props: (i) => ({
-      data: rugs[i % POOL].slice(0, 6).map((v, j) => ({ label: `#${j}`, value: Math.abs(v) * 100 })),
+      data: rugs[i % POOL]
+        .slice(0, 6)
+        .map((v, j) => ({ label: `#${j}`, value: Math.abs(v) * 100 })),
       summary: false,
     }),
   },
@@ -579,7 +584,10 @@ export const SCENARIOS = [
     slug: "music-staff",
     component: "MusicStaff",
     floor: 15, // ≤ 16 notes + describeSeries (seriesStats) summary
-    props: (i) => ({ data: rugs[i % POOL].slice(0, 12).map((v) => Math.round(v * 5)), summary: false }),
+    props: (i) => ({
+      data: rugs[i % POOL].slice(0, 12).map((v) => Math.round(v * 5)),
+      summary: false,
+    }),
   },
   {
     slug: "tree-rings",
@@ -592,7 +600,11 @@ export const SCENARIOS = [
     component: "CitySkyline",
     floor: 10,
     props: (i) => ({
-      data: cats[i % POOL].map((c, j) => ({ label: c.label, value: c.value % 60, lit: (j % 5) / 5 })),
+      data: cats[i % POOL].map((c, j) => ({
+        label: c.label,
+        value: c.value % 60,
+        lit: (j % 5) / 5,
+      })),
       summary: false,
     }),
   },

@@ -672,7 +672,12 @@ add(
 add(
   "honeycomb",
   "Honeycomb",
-  [{ value: 34, total: 40 }, { value: 7, total: 10, rows: 1 }, { value: 28, total: 40, empty: "dim" }, { value: 45, total: 40 }],
+  [
+    { value: 34, total: 40 },
+    { value: 7, total: 10, rows: 1 },
+    { value: 28, total: 40, empty: "dim" },
+    { value: 45, total: 40 },
+  ],
   [[999, 999]],
 );
 const STARS = [
@@ -726,12 +731,7 @@ add(
 add(
   "breathing-dot",
   "BreathingDot",
-  [
-    { value: 0.2 },
-    { value: 0.65 },
-    { value: 0.92, label: "value" },
-    { value: null },
-  ],
+  [{ value: 0.2 }, { value: 0.65 }, { value: 0.92, label: "value" }, { value: null }],
   [[999, 999]],
 );
 const HB = [97000, 92000, 85000, 70000, 55000, 48000];
@@ -775,7 +775,12 @@ const SKYLINE = [
 add(
   "city-skyline",
   "CitySkyline",
-  [{ data: SKYLINE }, { data: SKYLINE, labels: true }, { data: SKYLINE, label: "value" }, { data: SKYLINE, ground: false }],
+  [
+    { data: SKYLINE },
+    { data: SKYLINE, labels: true },
+    { data: SKYLINE, label: "value" },
+    { data: SKYLINE, ground: false },
+  ],
   [
     [999, 24],
     [999, 40],
@@ -786,14 +791,24 @@ const RINGS = [8, 12, 10, 18, 22, 15, 20, 14];
 add(
   "tree-rings",
   "TreeRings",
-  [{ data: RINGS }, { data: RINGS, label: "last" }, { data: RINGS, rings: "fill" }, { data: RINGS, total: 200 }],
+  [
+    { data: RINGS },
+    { data: RINGS, label: "last" },
+    { data: RINGS, rings: "fill" },
+    { data: RINGS, total: 200 },
+  ],
   [[999, 999]],
 );
 const MELODY = [3, 5, 4, 8, 6, 9, 7, 11];
 add(
   "music-staff",
   "MusicStaff",
-  [{ data: MELODY }, { data: MELODY, label: "last" }, { data: MELODY, range: "staff" }, { data: [3, 5, null, 8, 6] }],
+  [
+    { data: MELODY },
+    { data: MELODY, label: "last" },
+    { data: MELODY, range: "staff" },
+    { data: [3, 5, null, 8, 6] },
+  ],
   [
     [60, 20],
     [120, 28],
@@ -809,7 +824,12 @@ const BUBBLES = [
 add(
   "bubble-row",
   "BubbleRow",
-  [{ data: BUBBLES }, { data: BUBBLES, label: "both" }, { data: BUBBLES, align: "baseline" }, { data: BUBBLES, label: "none" }],
+  [
+    { data: BUBBLES },
+    { data: BUBBLES, label: "both" },
+    { data: BUBBLES, align: "baseline" },
+    { data: BUBBLES, label: "none" },
+  ],
   [
     [999, 24],
     [999, 34],
@@ -820,7 +840,12 @@ const GARDEN = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11];
 add(
   "garden-grid",
   "GardenGrid",
-  [{ data: GARDEN }, { data: GARDEN, rows: 1 }, { data: GARDEN, steps: 3 }, { data: GARDEN, empty: "blank" }],
+  [
+    { data: GARDEN },
+    { data: GARDEN, rows: 1 },
+    { data: GARDEN, steps: 3 },
+    { data: GARDEN, empty: "blank" },
+  ],
   [[999, 999]],
 );
 const SPROUT = [
@@ -834,7 +859,17 @@ const SPROUT = [
 add(
   "sprout-row",
   "SproutRow",
-  [{ data: SPROUT }, { data: SPROUT, labels: true }, { data: SPROUT, label: "value" }, { data: [{ label: "A", value: 2 }, { label: "B", value: null }] }],
+  [
+    { data: SPROUT },
+    { data: SPROUT, labels: true },
+    { data: SPROUT, label: "value" },
+    {
+      data: [
+        { label: "A", value: 2 },
+        { label: "B", value: null },
+      ],
+    },
+  ],
   [
     [96, 20],
     [140, 30],
@@ -852,7 +887,12 @@ add(
     { data: BEAM },
     { data: BEAM, label: "values" },
     { data: BEAM, shape: "round" },
-    { data: [{ label: "A", value: 500 }, { label: "B", value: 500 }] },
+    {
+      data: [
+        { label: "A", value: 500 },
+        { label: "B", value: 500 },
+      ],
+    },
   ],
   [
     [48, 20],

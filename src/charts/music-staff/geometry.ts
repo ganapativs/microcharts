@@ -37,8 +37,10 @@ export function musicStaffGeometry(opts: {
   // note head sized from the nominal spacing, then the band is inset by ry so the
   // top/bottom notes never overflow the box
   const half0 = (height - 2 * pad) / (T - 1);
+  // round note-heads — a wide oval reads as vertically "pressed" once scaled up,
+  // so keep rx == ry (a clean disc on the staff, not a squashed ellipse).
   const ryConst = round2(half0 * 0.82);
-  const rxConst = round2(ryConst * 1.3);
+  const rxConst = ryConst;
   const bandTop = pad + ryConst;
   const half = (height - 2 * pad - 2 * ryConst) / (T - 1);
   const posY = (p: number) => round2(bandTop + p * half);

@@ -43,7 +43,7 @@ The satellite's angular speed is quantized to the same five steps as the static 
 motion and the still frame decode identically — you learn nothing extra from watching, you just feel the
 rate. This is the deliberate idle-loop exception, allowed because the loop rate is the datum. It pauses
 off-screen and, under `prefers-reduced-motion`, does not spin at all: the dash density already carries
-the rate. The satellite's angular *position* never means anything — only its speed does — so the docs
+the rate. The satellite's angular _position_ never means anything — only its speed does — so the docs
 say plainly not to read the angle.
 
 ## When to use it
@@ -59,8 +59,23 @@ say plainly not to read the angle.
 <OrbitStatus latency={100} rate={0} latencyDomain={[0, 500]} rateDomain={[0, 20]} />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <OrbitStatus latency={340} rate={8} alert={300} latencyDomain={[0, 500]} rateDomain={[0, 20]} size={40} summary={false} />
-    <OrbitStatus latency={100} rate={0} latencyDomain={[0, 500]} rateDomain={[0, 20]} size={40} summary={false} />
+    <OrbitStatus
+      latency={340}
+      rate={8}
+      alert={300}
+      latencyDomain={[0, 500]}
+      rateDomain={[0, 20]}
+      size={40}
+      summary={false}
+    />
+    <OrbitStatus
+      latency={100}
+      rate={0}
+      latencyDomain={[0, 500]}
+      rateDomain={[0, 20]}
+      size={40}
+      summary={false}
+    />
   </span>
 </LiveDemo>
 

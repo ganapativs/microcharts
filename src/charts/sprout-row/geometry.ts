@@ -50,21 +50,23 @@ export function sproutRowGeometry(opts: {
   height: number;
   step: number;
   pad: number;
+  /** Horizontal side gutter so outer labels never clip (defaults to `pad`). */
+  padX?: number;
   /** Space reserved below the soil for category labels. */
   bottomReserve?: number;
 }): SproutRowGeometry {
-  const { stages, height, step, pad, bottomReserve = 0 } = opts;
+  const { stages, height, step, pad, padX = pad, bottomReserve = 0 } = opts;
   const n = stages.length;
   const baselineY = round2(height - pad - 1 - bottomReserve);
   const slots = stages.map((s, i) => ({
-    x: round2(pad + step / 2 + i * step),
+    x: round2(padX + step / 2 + i * step),
     baselineY,
     stage: s === null || !Number.isFinite(s) ? null : Math.max(0, Math.min(3, Math.round(s))),
   }));
-  const width = Math.max(1, Math.ceil(n * step + 2 * pad));
+  const width = Math.max(1, Math.ceil(n * step + 2 * padX));
   return {
     slots,
-    soil: { x1: pad, y1: baselineY, x2: round2(width - pad), y2: baselineY },
+    soil: { x1: padX, y1: baselineY, x2: round2(width - padX), y2: baselineY },
     step,
     width,
   };

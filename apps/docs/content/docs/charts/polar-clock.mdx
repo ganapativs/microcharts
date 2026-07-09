@@ -49,7 +49,13 @@ const byHour = [/* 24 values, midnight → 23:00 */];
 <PolarClock data={week} mode="opacity" />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <PolarClock data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h))} labels label="max" size={64} summary={false} />
+    <PolarClock
+      data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h))}
+      labels
+      label="max"
+      size={64}
+      summary={false}
+    />
     <PolarClock data={[120, 200, 180, 210, 260, 90, 60]} mode="opacity" size={56} summary={false} />
   </span>
 </LiveDemo>

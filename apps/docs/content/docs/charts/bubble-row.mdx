@@ -47,7 +47,16 @@ value numerals are on by default, because a low-precision channel owes the reade
 <BubbleRow data={regions} label="both" />`}
 >
   <span className="inline-flex flex-col gap-4">
-    <BubbleRow data={[{ label: "EMEA", value: 1240 }, { label: "AMER", value: 890 }, { label: "APAC", value: 560 }, { label: "LATAM", value: 210 }]} align="baseline" height={36} />
+    <BubbleRow
+      data={[
+        { label: "EMEA", value: 1240 },
+        { label: "AMER", value: 890 },
+        { label: "APAC", value: 560 },
+        { label: "LATAM", value: 210 },
+      ]}
+      align="baseline"
+      height={36}
+    />
   </span>
 </LiveDemo>
 

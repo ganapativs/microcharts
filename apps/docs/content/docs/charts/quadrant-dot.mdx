@@ -61,10 +61,25 @@ overridable but **never hidden**), and the peers show as tiny muted ghosts. The 
 <QuadrantDot data={item} field={backlog} quadrants={["quick win", "big bet", "skip", "time sink"]} />`}
 >
   <span className="inline-flex gap-4 items-center">
-    <QuadrantDot data={{ x: 3, y: 9 }} xDomain={[0, 10]} domain={[0, 10]} split={[5, 5]} xLabel="effort" yLabel="impact" width={72} height={72} />
     <QuadrantDot
       data={{ x: 3, y: 9 }}
-      field={[{ x: 2, y: 8 }, { x: 8, y: 9 }, { x: 9, y: 2 }, { x: 6, y: 1 }, { x: 4, y: 3 }]}
+      xDomain={[0, 10]}
+      domain={[0, 10]}
+      split={[5, 5]}
+      xLabel="effort"
+      yLabel="impact"
+      width={72}
+      height={72}
+    />
+    <QuadrantDot
+      data={{ x: 3, y: 9 }}
+      field={[
+        { x: 2, y: 8 },
+        { x: 8, y: 9 },
+        { x: 9, y: 2 },
+        { x: 6, y: 1 },
+        { x: 4, y: 3 },
+      ]}
       xDomain={[0, 10]}
       domain={[0, 10]}
       quadrants={["quick win", "big bet", "skip", "time sink"]}

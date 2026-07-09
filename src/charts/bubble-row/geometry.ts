@@ -33,7 +33,9 @@ export function bubbleRowGeometry(opts: {
   );
   const max = finite.length ? Math.max(...finite) : 0;
   const bandTop = pad;
-  const bandH = Math.max(2, height - pad * 2 - labelBand);
+  // Reserve a 2px gap between the bubble band and the numeral band so the largest
+  // bubble's rim never touches its label's ascenders (a 1px kiss at max radius).
+  const bandH = Math.max(2, height - pad * 2 - labelBand - 2);
   const rMax = round2(bandH / 2);
   const minR = 0.5; // zero → a small presence ring
 

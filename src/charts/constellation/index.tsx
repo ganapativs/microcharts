@@ -129,23 +129,25 @@ export function Constellation(props: ConstellationProps): ReactNode {
 
   const largest = geo.stars.find((s) => s.index === geo.largestIndex);
 
-  // label="max": the magnitude numeral, placed as a callout above-right of the
-  // brightest star (flipped in near an edge) so it never sits on a mark.
-  let maxLabel: { x: number; y: number; text: string; anchor: "start" | "end" } | null = null;
+  // label="max": the magnitude numeral, centred over the brightest star and
+  // lifted clear of its halo ring so it never sits on a mark (drops below when
+  // the top edge is tight; nudged in horizontally at the sides).
+  let maxLabel: { x: number; y: number; text: string; anchor: "middle" } | null = null;
   if (label === "max" && largest) {
     const n = Number.isFinite(largest.m) ? largest.m : largest.value;
     if (Number.isFinite(n)) {
       const t = fmt(n);
       const textW = t.length * 0.62 * fontSize;
-      const rightX = largest.cx + largest.r + 1.5;
-      const fitsRight = rightX + textW <= geo.width - PAD;
-      const anchor = fitsRight ? "start" : "end";
-      const x = fitsRight ? rightX : largest.cx - largest.r - 1.5;
-      const y = Math.min(
-        Math.max(largest.cy - largest.r - 1, fontSize),
-        geo.height - fontSize * 0.3,
-      );
-      maxLabel = { x, y, text: t, anchor };
+      const haloR = largest.r + 1.6; // matches the halo circle below
+      const gap = 1.5;
+      // baseline above the halo; if the text would clip the top, put it below.
+      // 0.95·em ascent (glyph caps run taller than a 0.8 estimate — a 0.8 gap let
+      // the top of the numeral kiss the halo ring).
+      const ascent = fontSize * 0.95;
+      const aboveClears = largest.cy - haloR - gap - ascent >= PAD;
+      const y = aboveClears ? largest.cy - haloR - gap : largest.cy + haloR + gap + ascent;
+      const x = Math.min(Math.max(largest.cx, PAD + textW / 2), geo.width - PAD - textW / 2);
+      maxLabel = { x, y, text: t, anchor: "middle" };
     }
   }
 

@@ -84,8 +84,11 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
 
   const height = props.height ?? 24;
   const fontSize = props.fontSize ?? labelFont(height, 0.3);
-  const topPad = label === "value" ? fontSize + 1 : PAD;
-  const botPad = labels ? fontSize + 2 : PAD;
+  const topPad = label === "value" ? fontSize + 2 : PAD;
+  // Labels sit BELOW the ground line with a fixed ~4px of air — hugging the
+  // baseline made them read as part of the skyline. A constant gap (not em-scaled)
+  // keeps the buildings tall even when the label font is large.
+  const botPad = labels ? fontSize + 4 : PAD;
   const groundY = height - botPad;
   const geo = citySkylineGeometry({
     data,
@@ -151,7 +154,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
             <text
               key={`v${b.index}`}
               x={b.x + b.w / 2}
-              y={b.y - 1}
+              y={b.y - 2}
               fontSize={fontSize}
               textAnchor="middle"
               data-mc-ink="label"

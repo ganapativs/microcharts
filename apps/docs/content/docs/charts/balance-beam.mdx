@@ -48,8 +48,24 @@ area, not their width, is proportional to value). For a precise comparison, reac
 <BalanceBeam data={[{ label: "A", value: 500 }, { label: "B", value: 500 }]} />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <BalanceBeam data={[{ label: "Inflow", value: 620 }, { label: "Outflow", value: 480 }]} shape="round" label="values" width={90} height={34} />
-    <BalanceBeam data={[{ label: "A", value: 500 }, { label: "B", value: 500 }]} width={70} height={28} />
+    <BalanceBeam
+      data={[
+        { label: "Inflow", value: 620 },
+        { label: "Outflow", value: 480 },
+      ]}
+      shape="round"
+      label="values"
+      width={90}
+      height={34}
+    />
+    <BalanceBeam
+      data={[
+        { label: "A", value: 500 },
+        { label: "B", value: 500 },
+      ]}
+      width={70}
+      height={28}
+    />
   </span>
 </LiveDemo>
 
