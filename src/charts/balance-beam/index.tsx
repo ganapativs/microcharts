@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { balanceBeamGeometry, type BeamMode, type BeamShape } from "./geometry.js";
 
 export interface BeamDatum {
@@ -82,7 +83,6 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     color,
     width = 48,
     height = 20,
-    fontSize = 6,
     format,
     locale,
     strings = EN_BEAM,
@@ -93,6 +93,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height, 0.34);
 
   const [l, r] = data;
   const geo = balanceBeamGeometry({

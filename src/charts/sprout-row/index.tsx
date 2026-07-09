@@ -6,6 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
+import { labelFont } from "../../core/labels.js";
 import { sproutRowGeometry, stageGlyph } from "./geometry.js";
 
 export interface SproutDatum {
@@ -57,7 +58,6 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     color,
     height = 20,
     step = 16,
-    fontSize = 6,
     strings = EN_SPROUT,
     title,
     summary,
@@ -66,6 +66,12 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height, 0.34);
+  // Category labels are constrained by the slot width, so they take the largest
+  // size the widest name fits (capped at the numeral size) — the stage numerals
+  // stay at the library-standard size.
+  const maxLabelLen = labels ? Math.max(1, ...data.map((d) => d.label.length)) : 1;
+  const catFont = Math.max(5, Math.min(fontSize, Math.floor((step - 1) / (maxLabelLen * 0.62))));
 
   const geo = sproutRowGeometry({
     stages: data.map((d) => d.value),
@@ -125,14 +131,18 @@ export function SproutRow(props: SproutRowProps): ReactNode {
       {labels
         ? geo.slots.map((s, i) => {
             const text = data[i]!.label;
-            // drop a category label that would collide with its neighbour (plan/18 §4)
-            if (text.length * 0.62 * fontSize > step - 1) return null;
+            // drop a category label that still won't fit its slot (plan/18 §4;
+            // 0.72 em/char over-estimate — proportional names run wider than digits)
+            if (text.length * 0.72 * catFont > step - 1) return null;
+            // keep the end labels inside the viewBox (a wide name at slot 0 / last)
+            const halfW = (text.length * 0.72 * catFont) / 2;
+            const cx = Math.min(Math.max(s.x, halfW + PAD), geo.width - halfW - PAD);
             return (
               <text
                 key={`l${s.x}`}
-                x={s.x}
-                y={height - fontSize * 0.42}
-                fontSize={fontSize}
+                x={cx}
+                y={height - catFont * 0.42}
+                fontSize={catFont}
                 textAnchor="middle"
                 data-mc-ink="label"
               >

@@ -9,6 +9,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { orbitStatusGeometry } from "./geometry.js";
 
 export interface OrbitStatusProps {
@@ -65,7 +66,6 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
     label = "none",
     size = 20,
     color,
-    fontSize = 6,
     format,
     locale,
     strings = EN_ORBIT_STATUS,
@@ -76,6 +76,7 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(size);
 
   const geo = orbitStatusGeometry({
     latency,

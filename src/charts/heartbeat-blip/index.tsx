@@ -9,6 +9,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { heartbeatGeometry } from "./geometry.js";
 
 export interface HeartbeatBlipProps {
@@ -83,7 +84,6 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
     width = 60,
     height = 16,
     color,
-    fontSize = 6,
     format,
     locale,
     strings = EN_HEARTBEAT,
@@ -94,6 +94,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height);
 
   const resolvedNow = resolveNow(data, now);
   const labelBand = label === "count" ? fontSize * 2 : 0;

@@ -5,6 +5,17 @@
 // fit (caller falls back to its drop-out rule).
 import { round2 } from "./types.js";
 
+/**
+ * Canonical in-chart label size (viewBox units): scales with the chart's height
+ * and holds a **floor of 7** so text never reads smaller than the rest of the
+ * library. `factor` tunes weight per chart (default 0.55 — the common case;
+ * label-forward charts use ~0.62, dense strips ~0.4). Capped at 11. This is the
+ * one source of truth for label sizing — never hardcode a fixed fontSize.
+ */
+export function labelFont(height: number, factor = 0.55): number {
+  return Math.min(11, Math.max(7, Math.round(height * factor)));
+}
+
 export function spreadLabels(
   desired: readonly number[],
   pitch: number,

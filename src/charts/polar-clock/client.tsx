@@ -5,6 +5,7 @@
 // announces the focused segment. Composes the static component (canon).
 import { useCallback, useMemo, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { annulusSector } from "../../core/arc.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
 import { polarClockGeometry } from "./geometry.js";
@@ -50,7 +51,8 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
   );
   // The Chart viewBox gains a bottom gutter when the peak numeral is shown; the
   // clock still sits in the top square, so the pointer must map over the full height.
-  const vbHeight = geo.size + (rest.label === "max" ? (rest.fontSize ?? 6) + 2 : 0);
+  const vbHeight =
+    geo.size + (rest.label === "max" ? Math.ceil((rest.fontSize ?? labelFont(size)) * 1.35) : 0);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const seg = useCallback(
     (i: number) => (formatSegment ? formatSegment(i, n) : defaultSegmentLabel(strings, i, n)),

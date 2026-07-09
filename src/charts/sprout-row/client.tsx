@@ -3,6 +3,7 @@
 // pointer lookup; announces each item's stage; a focus ring lifts the active
 // glyph. Composes the static component (overlay ring as children).
 import { useMemo, useState } from "react";
+import { labelFont } from "../../core/labels.js";
 import { sproutRowGeometry } from "./geometry.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
 import { SproutRow as StaticSproutRow, sproutRowSummary, type SproutRowProps } from "./index.js";
@@ -19,9 +20,9 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     labels = false,
     height = 20,
     step = 16,
-    fontSize = 6,
     ...rest
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height, 0.34);
   const summary = sproutRowSummary(data, strings);
   const geo = useMemo(
     () =>

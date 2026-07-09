@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_SKYLINE, type SkylineStrings } from "../../core/strings-skyline.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { citySkylineGeometry } from "./geometry.js";
 
 export interface SkylineDatum {
@@ -70,7 +71,6 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
     unit = "groups",
     bw = 9,
     gap = 3,
-    fontSize = 6,
     format,
     locale,
     strings = EN_SKYLINE,
@@ -82,9 +82,10 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
     children,
   } = props;
 
+  const height = props.height ?? 24;
+  const fontSize = props.fontSize ?? labelFont(height, 0.3);
   const topPad = label === "value" ? fontSize + 1 : PAD;
   const botPad = labels ? fontSize + 2 : PAD;
-  const height = props.height ?? 24;
   const groundY = height - botPad;
   const geo = citySkylineGeometry({
     data,

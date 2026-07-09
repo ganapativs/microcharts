@@ -4,6 +4,7 @@
 // can't carry); the focused bubble gets a thicker ring. Composes the static.
 import { useMemo, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { bubbleRowGeometry } from "./geometry.js";
 import { EN_BUBBLE, type BubbleStrings } from "../../core/strings-bubble.js";
 import { BubbleRow as StaticBubbleRow, bubbleRowSummary, type BubbleRowProps } from "./index.js";
@@ -19,7 +20,6 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     label = "value",
     height = 30,
     gap = 2,
-    fontSize = 6,
     format,
     locale,
     title,
@@ -27,8 +27,22 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     strings = EN_BUBBLE,
     ...rest
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height, 0.34);
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   const labelBand = label === "none" ? 0 : fontSize + 2;
+  // Same numeral-width spread as the static, so the overlay ring aligns exactly.
+  const labelWidths = useMemo(
+    () =>
+      label === "none"
+        ? undefined
+        : data.map((d) => {
+            if (d.value === null) return 0;
+            const t = label === "both" ? `${d.label} ${fmt(d.value)}` : fmt(d.value);
+            return t.length * 0.72 * fontSize;
+          }),
+    [data, label, fmt, fontSize],
+  );
   const geo = useMemo(
     () =>
       bubbleRowGeometry({
@@ -38,10 +52,10 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
         align,
         pad: 1,
         labelBand,
+        labelWidths,
       }),
-    [data, height, gap, align, labelBand],
+    [data, height, gap, align, labelBand, labelWidths],
   );
-  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [active, setActive] = useState<number | null>(null);
 
   const accName =

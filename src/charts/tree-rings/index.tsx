@@ -9,6 +9,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
 import { ringAnnulus, treeRingsGeometry } from "./geometry.js";
 
@@ -80,7 +81,6 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
     unit = "periods",
     color,
     size = 24,
-    fontSize = 6,
     format,
     locale,
     strings = EN_TREE,
@@ -91,6 +91,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(size);
 
   const geo = treeRingsGeometry({ values: data, size, pad: PAD, total });
   const accIdx = accent === "last" ? data.length - 1 : accent === "none" ? -1 : accent;

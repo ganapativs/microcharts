@@ -67,12 +67,16 @@ export function FillWord(props: FillWordProps): ReactNode {
   const geo = fillWordGeometry({ value, word, fontSize, pad: PAD, mode, label: label === "value" });
   const accName =
     summary === false ? false : (summary ?? fillWordSummary(value, word, mode, strings));
+  // The word renders at its NATURAL width — no textLength/lengthAdjust, which
+  // distort the glyphs (the 0.62 estimate never matches a proportional font, so
+  // pinning the extent stretches or squeezes the letters). The estimate still
+  // drives the viewBox width + numeral gutter (a safe over-estimate for real task
+  // labels); the accent clip is a percentage of the text's OWN box, so the fill
+  // fraction stays exact regardless of the true rendered width.
   const textProps = {
     x: geo.x,
     y: geo.y,
     fontSize,
-    textLength: geo.textLength || undefined,
-    lengthAdjust: "spacingAndGlyphs" as const,
     dominantBaseline: "central" as const,
     textAnchor: "start" as const,
   };

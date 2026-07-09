@@ -4,6 +4,7 @@
 // (secondary channel). Composes the static component.
 import { useMemo, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { citySkylineGeometry } from "./geometry.js";
 import { EN_SKYLINE, type SkylineStrings } from "../../core/strings-skyline.js";
 import {
@@ -25,7 +26,6 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     unit = "groups",
     labels = false,
     label = "none",
-    fontSize = 6,
     height = 24,
     format,
     locale,
@@ -34,6 +34,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     strings = EN_SKYLINE,
     ...rest
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height, 0.3);
 
   const groundY = height - (labels ? fontSize + 2 : 2);
   const geo = useMemo(

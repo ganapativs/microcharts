@@ -49,8 +49,11 @@ export function thermometerGeometry(opts: {
   const tubeHalf = round2(acrossFull * 0.16);
   const acrossMid = round2(acrossFull / 2);
 
-  // along-axis endpoints in each orientation (bulb sits at the low end)
-  const alongLo = vertical ? height - pad - bulbR : pad + bulbR; // domain[0]
+  // along-axis endpoints (bulb sits at the low end). The horizontal low end has a
+  // rounded cap that bulges out by the tube radius, so when there's no bulb to
+  // cover it the low end must still reserve that cap (else it spills off the left).
+  const capLo = Math.max(bulbR, tubeHalf * 2);
+  const alongLo = vertical ? height - pad - bulbR : pad + capLo; // domain[0]
   const alongHi = vertical ? pad : width - pad; // domain[1]
   const scale = scaleLinear(domain, [alongLo, alongHi]);
   const clamped = clamp(value, domain[0], domain[1]);

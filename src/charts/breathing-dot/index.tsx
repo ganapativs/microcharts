@@ -9,6 +9,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { breathingDotGeometry } from "./geometry.js";
 
 const BAND_INK = ["positive", "neutral", "negative"] as const;
@@ -57,7 +58,6 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
     thresholds = [0.5, 0.8],
     label = "none",
     size = 16,
-    fontSize = 6,
     format,
     locale,
     strings = EN_BREATHING_DOT,
@@ -68,6 +68,7 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(size);
 
   const labelBand = label === "value" ? fontSize * 2.6 : 0;
   const geo = breathingDotGeometry({ value, size, thresholds, pad: PAD });

@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { polarClockGeometry } from "./geometry.js";
 
 export interface PolarClockProps {
@@ -92,7 +93,6 @@ export function PolarClock(props: PolarClockProps): ReactNode {
     formatSegment,
     size = 24,
     color,
-    fontSize = 6,
     format,
     locale,
     strings = EN_POLAR_CLOCK,
@@ -103,6 +103,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(size);
 
   const geo = polarClockGeometry({ values: data, size, inner, start, pad: PAD, mode, now });
   const accName =
@@ -112,7 +113,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
   const fill = color ?? "var(--mc-stroke)";
   const fmt = makeFormatter(format, locale);
 
-  const labelBand = label === "max" ? fontSize + 2 : 0;
+  const labelBand = label === "max" ? Math.ceil(fontSize * 1.35) : 0;
   const peakText =
     label === "max" && geo.peakIndex >= 0 && typeof data[geo.peakIndex] === "number"
       ? fmt(data[geo.peakIndex] as number)

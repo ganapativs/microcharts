@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { describeSeries } from "../../core/summary.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
 import { musicStaffGeometry } from "./geometry.js";
@@ -42,7 +43,6 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     color,
     width = 60,
     height = 20,
-    fontSize = 7,
     format,
     locale,
     title,
@@ -52,6 +52,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height);
 
   const fmt = makeFormatter(format, locale);
   const last = lastFinite(data);

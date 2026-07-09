@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BUBBLE, type BubbleStrings } from "../../core/strings-bubble.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { bubbleRowGeometry, type BubbleAlign } from "./geometry.js";
 
 export interface BubbleDatum {
@@ -69,7 +70,6 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
     color,
     height = 30,
     gap = 2,
-    fontSize = 6,
     format,
     locale,
     strings = EN_BUBBLE,
@@ -80,6 +80,26 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
     style,
     children,
   } = props;
+  // Numerals scale with height (floor 7) so they read at the library norm — a
+  // fixed size looked ~40 % smaller than every other chart's labels.
+  const fontSize = props.fontSize ?? labelFont(height, 0.34);
+  const fmt = makeFormatter(format, locale);
+  const fill = color ?? "var(--mc-accent)";
+
+  const text = (i: number): string | null => {
+    const d = data[i]!;
+    if (label === "none" || d.value === null) return null;
+    return label === "both" ? `${d.label} ${fmt(d.value)}` : fmt(d.value);
+  };
+  // Numeral widths feed the geometry so bubbles spread to fit every number — the
+  // low-precision channel OWES the reader the value, so none is ever dropped.
+  const labelWidths =
+    label === "none"
+      ? undefined
+      : data.map((_, i) => {
+          const t = text(i);
+          return t ? t.length * 0.72 * fontSize : 0;
+        });
 
   const labelBand = label === "none" ? 0 : fontSize + 2;
   const geo = bubbleRowGeometry({
@@ -89,33 +109,17 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
     align,
     pad: PAD,
     labelBand,
+    labelWidths,
   });
   const accName =
     summary === false ? false : (summary ?? bubbleRowSummary(data, { strings, format, locale }));
-  const fmt = makeFormatter(format, locale);
-  const fill = color ?? "var(--mc-accent)";
 
-  const text = (i: number): string | null => {
-    const d = data[i]!;
-    if (label === "none" || d.value === null) return null;
-    return label === "both" ? `${d.label} ${fmt(d.value)}` : fmt(d.value);
-  };
-
-  // Place each numeral at its bubble, clamped inside the box; then greedily drop
-  // any that would collide with the last one placed (plan/18 §4) — keeps dense /
-  // small bubble rows legible.
-  const placed: { index: number; x: number; text: string }[] = [];
-  let lastRight = -Infinity;
-  for (const b of geo.bubbles) {
-    const t = text(b.index);
-    if (t === null) continue;
-    const halfW = (t.length * 0.62 * fontSize) / 2;
-    const x = Math.min(Math.max(b.cx, halfW + PAD), geo.width - halfW - PAD);
-    if (x - halfW >= lastRight + 0.5) {
-      placed.push({ index: b.index, x, text: t });
-      lastRight = x + halfW;
-    }
-  }
+  const placed = geo.bubbles
+    .map((b) => {
+      const t = text(b.index);
+      return t === null ? null : { index: b.index, x: b.cx, text: t };
+    })
+    .filter((p): p is { index: number; x: number; text: string } => p !== null);
 
   return (
     <Chart

@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_COMET_TRAIL, type CometTrailStrings } from "../../core/strings-comet-trail.js";
 import { cometTrailGeometry } from "./geometry.js";
 import {
@@ -28,7 +29,6 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     domain,
     width = 60,
     height = 16,
-    fontSize = 6,
     format,
     locale,
     strings = EN_COMET_TRAIL,
@@ -36,6 +36,7 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     summary,
     ...rest
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height);
 
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();

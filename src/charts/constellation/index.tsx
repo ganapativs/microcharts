@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { constellationGeometry } from "./geometry.js";
 
 export interface ConstellationPoint {
@@ -97,7 +98,6 @@ export function Constellation(props: ConstellationProps): ReactNode {
     width = 60,
     height = 20,
     rBase = 1.6,
-    fontSize = 6,
     format,
     locale,
     strings = EN_CONSTELLATION,
@@ -108,6 +108,7 @@ export function Constellation(props: ConstellationProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height);
 
   const geo = constellationGeometry({
     points: data,

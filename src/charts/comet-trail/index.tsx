@@ -9,6 +9,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_COMET_TRAIL, type CometTrailStrings } from "../../core/strings-comet-trail.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { cometTrailGeometry } from "./geometry.js";
 
 export interface CometTrailProps {
@@ -62,7 +63,6 @@ export function CometTrail(props: CometTrailProps): ReactNode {
     width = 60,
     height = 16,
     color,
-    fontSize = 6,
     format,
     locale,
     strings = EN_COMET_TRAIL,
@@ -73,6 +73,7 @@ export function CometTrail(props: CometTrailProps): ReactNode {
     style,
     children,
   } = props;
+  const fontSize = props.fontSize ?? labelFont(height);
 
   const labelBand = label === "last" ? fontSize * 3 : 0;
   const geo = cometTrailGeometry({

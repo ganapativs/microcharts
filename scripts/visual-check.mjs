@@ -749,14 +749,14 @@ const body = [
   row(
     "52 weeks, month ticks",
     svg(SpiralYear, {
-      data: Array.from({ length: 52 }, (_, i) => (i === 29 ? 480 : i === 5 ? 10 : 100 + i)),
+      data: Array.from({ length: 52 }, (_, i) => Math.round(200 + 150 * Math.sin(((i - 8) / 52) * Math.PI * 2))),
       size: 80,
     }),
   ),
   row(
     "arc marks",
     svg(SpiralYear, {
-      data: Array.from({ length: 52 }, (_, i) => (i === 29 ? 480 : i === 5 ? 10 : 100 + i)),
+      data: Array.from({ length: 52 }, (_, i) => Math.round(200 + 150 * Math.sin(((i - 8) / 52) * Math.PI * 2))),
       mark: "arc",
       size: 80,
     }),
