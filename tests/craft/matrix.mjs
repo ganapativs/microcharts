@@ -622,6 +622,23 @@ add(
     [240, 40],
   ],
 );
+const CPSTEP = [...Array(14).fill(30), ...Array(20).fill(48)];
+const CPTWO = [...Array(10).fill(10), ...Array(10).fill(50), ...Array(10).fill(22)];
+add(
+  "change-point",
+  "ChangePoint",
+  [
+    { data: CPSTEP, label: "delta" },
+    { data: CPTWO },
+    { data: CPSTEP, means: false },
+    { data: CPSTEP, breaks: [14], label: "delta" },
+  ],
+  [
+    [80, 16],
+    [160, 24],
+    [240, 32],
+  ],
+);
 add(
   "shift-histogram",
   "ShiftHistogram",

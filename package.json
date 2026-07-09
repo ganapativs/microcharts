@@ -444,6 +444,14 @@
       "types": "./dist/charts/cycle-plot/client.d.ts",
       "import": "./dist/charts/cycle-plot/client.js"
     },
+    "./change-point": {
+      "types": "./dist/charts/change-point/index.d.ts",
+      "import": "./dist/charts/change-point/index.js"
+    },
+    "./change-point/interactive": {
+      "types": "./dist/charts/change-point/client.d.ts",
+      "import": "./dist/charts/change-point/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

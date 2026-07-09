@@ -29,6 +29,7 @@ const { ParetoStrip } = await D("pareto-strip");
 const { DataDiff } = await D("data-diff");
 const { QuadrantDot } = await D("quadrant-dot");
 const { CyclePlot } = await D("cycle-plot");
+const { ChangePoint } = await D("change-point");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -140,6 +141,8 @@ const QF = [
 const CYC = [];
 for (let w = 0; w < 6; w++) CYC.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
 const CDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const CPSTEP = [...Array(14).fill(30), ...Array(20).fill(48)];
+const CPTWO = [...Array(10).fill(10), ...Array(10).fill(50), ...Array(10).fill(22)];
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -518,6 +521,18 @@ const body = [
     "spine only",
     svg(CyclePlot, { data: CYC, period: 7, trend: "none", width: 200, height: 32 }),
   ),
+
+  `<h2>ChangePoint</h2>`,
+  row(
+    "clean step 80x16",
+    svg(ChangePoint, { data: CPSTEP, label: "delta", width: 80, height: 16 }),
+  ),
+  row(
+    "delta label",
+    svg(ChangePoint, { data: CPSTEP, label: "delta", width: 240, height: 24, title: "Error rate" }),
+  ),
+  row("two breaks", svg(ChangePoint, { data: CPTWO, width: 200, height: 24 })),
+  row("no means", svg(ChangePoint, { data: CPSTEP, means: false, width: 200, height: 24 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

@@ -63,6 +63,7 @@ import paretoStrip from "./pareto-strip";
 import dataDiff from "./data-diff";
 import quadrantDot from "./quadrant-dot";
 import cyclePlot from "./cycle-plot";
+import changePoint from "./change-point";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -118,6 +119,7 @@ const MODULES: ChartModule[] = [
   dataDiff,
   quadrantDot,
   cyclePlot,
+  changePoint,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

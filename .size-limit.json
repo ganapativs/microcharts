@@ -611,6 +611,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/change-point (static)",
+    "path": "dist/charts/change-point/index.js",
+    "limit": "2.98 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/change-point/interactive",
+    "path": "dist/charts/change-point/client.js",
+    "limit": "3.98 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

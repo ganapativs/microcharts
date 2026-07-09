@@ -438,6 +438,27 @@ export interface SummaryStrings {
   ) => string;
   /** Within-slot observation, e.g. "Mon, cycle 3 of 6: 44." */
   cyclePoint: (slotName: string, pos: number, total: number, value: string) => string;
+  /** ChangePoint summary, e.g. "Level shifted up 50% around point 34 (mean 32 → 48); stable since." */
+  changePoint: (
+    dir: "up" | "down",
+    delta: string,
+    i: number,
+    before: string,
+    after: string,
+    tail: "stable" | "again",
+  ) => string;
+  /** No detected shift, e.g. "No clear level shift across 90 points." */
+  changePointNone: (n: number) => string;
+  /** Point announcement, e.g. "Point 40: 51 — regime 2 of 3, mean 48." */
+  changePointAt: (
+    pos: number,
+    value: string,
+    regime: number,
+    regimes: number,
+    mean: string,
+  ) => string;
+  /** Break announcement, e.g. "Break at point 34: mean 32 to 48 (+50%)." */
+  changePointBreak: (i: number, before: string, after: string, signedDelta: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

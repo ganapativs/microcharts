@@ -1057,3 +1057,45 @@ the live page 0 escapes; 7 ticks + 7 slot lines + spine at default; `trend="none
 hero label == mdx flagship string; interactive slot announce + within-slot cycle announce + drift
 direction + readout chip all correct). New `EN_CYCLE` module (`cycle`, `cycleNoDrift`, `cycleAt`,
 `cyclePoint`). **14 of 21 done.**
+
+## Batch 2 wave 3 — ChangePoint (2026-07-09)
+
+**ChangePoint (plan/23 #19) — full DoD, static + interactive.** Provenance: plan/16 §Q8. Regime
+shading (alternating 3 %/6 % neutral — IDENTITY, not valence) + per-regime mean hairlines + the
+series line + break markers (hairline + top triangle). **The detector lives in `geometry.ts`, not
+core** (plan/21 §6.0.C), and is a documented HEURISTIC: two-segment mean-shift via binary
+segmentation over prefix-sum SS, accepted only when the SS-reduction ratio > `BREAK_SS_RATIO` (0.2)
+AND |Δmean| ≥ `BREAK_EFFECT_SIZE` (0.8) × the pooled SD; min segment `max(3, ⌈n/BREAK_MIN_SEG_DIVISOR
+(10)⌉)`; recurse to `max`. **All three constants are named exports, docs-stated, property-tested**:
+no break on constant / low-noise series (effect-size gate), exact index on a clean step, never more
+than `max`. `breaks` (`"auto"` or explicit indices → detection OFF, pure annotation — the recommended
+production path), `max` (1–3), `means`, `label="delta"`. `n < 8` → detection off (explicit honoured);
+nulls excluded from segment stats + line gaps; gradual ramp honestly finds no shift (named limitation
+→ Sparkline, shown in the docs ramp variant). Real accessible name: **"Level shifted up 60% around
+point 14 (mean 30 → 48); stable since."** (headline = the largest-|delta| break; tail "stable since"
+if it's the last, else "then shifted again"; the direction word carries the sign so the % is
+unsigned). Interactive: ←/→ step points (value + regime + regime mean), **Tab cycles the breaks as
+first-class stops** ("Break at point 14: mean 30 to 48 (+54%)."), crosshair + value readout chip.
+
+**Budget fight — this chart hit the 3/4 kB HARD caps and had to be trimmed to fit.** The detector +
+Chart + scale + line + `makeFormatter` + summary first measured **3.15/4.15 kB — OVER the 3/4 hard
+caps** (non-negotiable #2, not just the spec target). Trimmed under by: (1) inlining min/max instead
+of the `extent` import; (2) inlining both linear scales (dropped the `scaleLinear` import — replicated
+its degenerate→midpoint guard); (3) inlining the null-gap line builder (dropped the `linePath`
+import); (4) merging the two percent helpers; (5) dropping the `Stat.n` field; (6) **dropping the
+out-of-range-`breaks` `devWarn`** — the geometry still filters them (correct + property-tested), only
+the console message is gone. Final 2.93/3.93, under the caps. Deviation logged: the spec lists a dev
+warning for out-of-range explicit breaks; it was removed to satisfy the hard cap (behaviour
+preserved). Lesson: a chart carrying its own algorithm can blow the per-subpath cap — inline the
+kernel helpers it only lightly uses rather than importing them.
+
+**Craft:** the `+60%`/`+54%` delta label escaped the right gutter in the real-browser sweep
+(0.62·em/char under-reserves the wide `%` glyph — the RateVolume lesson) → bumped the delta gutter to
+**0.72·em/char** (it always carries `%`). SSR craft passed at 0.62; only the getBBox sweep caught it.
+
+Gates: node 1398, browser 106, craft 349/0, size 2.93/3.93 (budgets 2.98/3.98, AT the 3/4 caps),
+bench 22.9 rows/ms (floor 12 — the O(n²) segmentation over ≤500 pts), docs 207 pages + tests 118,
+real-browser sweep green (all 13 change-point SVGs 0 escapes after the gutter fix; 2/3 regime rects
+tile gap-free; break hairline+triangle; live hero == mdx flagship string; interactive point/regime +
+Tab-cycles-breaks + readout chip correct). New `EN_CHANGE_POINT` module (`changePoint`,
+`changePointNone`, `changePointAt`, `changePointBreak`). **15 of 21 done.**

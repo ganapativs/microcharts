@@ -429,6 +429,12 @@ export const SCENARIOS = [
     props: (i) => ({ data: diffs[i % POOL], summary: false }),
   },
   {
+    slug: "change-point",
+    component: "ChangePoint",
+    floor: 12, // detector: O(n²) binary segmentation over ≤500 pts, still cheap
+    props: (i) => ({ data: waves[i % POOL].map((v, j) => v + (j > 250 ? 30 : 0)), summary: false }),
+  },
+  {
     slug: "cycle-plot",
     component: "CyclePlot",
     floor: 20, // ≤ 12 slots × (line + tick) + spine; one bucketing pass

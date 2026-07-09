@@ -33,6 +33,7 @@ import { EN_PARETO } from "./strings-pareto.js";
 import { EN_DATA_DIFF } from "./strings-data-diff.js";
 import { EN_QUADRANT } from "./strings-quadrant.js";
 import { EN_CYCLE } from "./strings-cycle.js";
+import { EN_CHANGE_POINT } from "./strings-change-point.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -66,4 +67,5 @@ export const EN: SummaryStrings = {
   ...EN_DATA_DIFF,
   ...EN_QUADRANT,
   ...EN_CYCLE,
+  ...EN_CHANGE_POINT,
 };

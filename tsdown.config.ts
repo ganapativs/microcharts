@@ -115,6 +115,8 @@ export default defineConfig({
     "src/charts/quadrant-dot/client.tsx",
     "src/charts/cycle-plot/index.tsx",
     "src/charts/cycle-plot/client.tsx",
+    "src/charts/change-point/index.tsx",
+    "src/charts/change-point/client.tsx",
   ],
   format: ["esm"],
   dts: true,

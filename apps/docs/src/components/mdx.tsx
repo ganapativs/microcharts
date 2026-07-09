@@ -54,6 +54,7 @@ import { ParetoStrip } from "@microcharts/react/pareto-strip";
 import { DataDiff } from "@microcharts/react/data-diff";
 import { QuadrantDot } from "@microcharts/react/quadrant-dot";
 import { CyclePlot } from "@microcharts/react/cycle-plot";
+import { ChangePoint } from "@microcharts/react/change-point";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -127,6 +128,7 @@ export function getMDXComponents(components?: MDXComponents) {
     DataDiff,
     QuadrantDot,
     CyclePlot,
+    ChangePoint,
     SparkGroup,
     // docs building blocks
     Instrument,
