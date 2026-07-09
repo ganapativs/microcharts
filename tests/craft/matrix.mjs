@@ -537,6 +537,24 @@ const ABA = Array.from({ length: 60 }, (_, i) => 130 + ((i * 7) % 30) - 15);
 const ABB = Array.from({ length: 60 }, (_, i) => 118 + ((i * 7) % 30) - 15);
 const SHB = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
 const SHA = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+const PAR = [
+  { label: "Timeouts", value: 38 },
+  { label: "OOM", value: 24 },
+  { label: "Deploy", value: 15 },
+  { label: "Config", value: 9 },
+  { label: "Network", value: 7 },
+  { label: "Auth", value: 4 },
+];
+add(
+  "pareto-strip",
+  "ParetoStrip",
+  [{ data: PAR }, { data: PAR, max: 3 }, { data: PAR, threshold: false }, { data: PAR, label: "none" }],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
 add(
   "shift-histogram",
   "ShiftHistogram",

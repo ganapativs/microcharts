@@ -370,6 +370,14 @@ export interface SummaryStrings {
   shiftOneSide: (value: string, missing: string) => string;
   /** Shift bin announcement, e.g. "10–12 ms: 18% before, 6% after." */
   shiftBin: (lo: string, hi: string, beforePct: string, afterPct: string) => string;
+  /** Pareto summary, e.g. "Top 3 of 9 causes account for 82% of incidents." */
+  pareto: (k: number, n: number, unit: string, cumPct: string, metric: string) => string;
+  /** Pareto without a threshold, e.g. "Timeouts leads at 34%." */
+  paretoTop: (topLabel: string, topPct: string) => string;
+  /** Empty (zero total), e.g. "No recorded incidents." */
+  paretoEmpty: (metric: string) => string;
+  /** Pareto bar announcement, e.g. "Timeouts: 34% of total, cumulative 61%." */
+  paretoAt: (label: string, sharePct: string, cumPct: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

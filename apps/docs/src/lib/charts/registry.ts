@@ -59,6 +59,7 @@ import forecastCone from "./forecast-cone";
 import quantileDots from "./quantile-dots";
 import abStrips from "./ab-strips";
 import shiftHistogram from "./shift-histogram";
+import paretoStrip from "./pareto-strip";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -110,6 +111,7 @@ const MODULES: ChartModule[] = [
   quantileDots,
   abStrips,
   shiftHistogram,
+  paretoStrip,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

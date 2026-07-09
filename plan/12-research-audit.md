@@ -916,3 +916,38 @@ carries both.
 Gates: node 1303, browser 96, craft 292/0, size 2.94/3.88, bench 13.4 rows/ms (floor 6), docs 192
 pages + tests 108, real-browser sweep green (proper mirror before-up/after-down, overlay outlines,
 "0 ms" no-shift, 0 escapes; interactive bin proportions + M-jumps-to-median + readout chip).
+
+## Batch 2 wave 3 — ParetoStrip (2026-07-09)
+
+**ParetoStrip (plan/23 #15) — full DoD, static + interactive.** Provenance: line 150 (ASQ Pareto
+procedure; 80% a reference, not a law — CORROBORATED). Descending bars + a cumulative-share line
+on a **FIXED 0–100% scale spanning the full plot height** (never rescaled to steepen the curve —
+the classic Pareto lie). The accent stops at the threshold crossing (the vital few); the rest are
+muted — the chart's one job is "where do I stop reading". `Other` rolls the tail beyond `max`,
+renders honestly at true size, but is always last and **never eligible to be the crossing**.
+Real accessible name: **"Top 4 of 9 causes account for 82% of incidents."** (`threshold=false` →
+"Timeouts leads at 39%."; zero total → "No recorded incidents."). Interactive steps bars
+(share + running cumulative announce + `%·%` readout chip); **T** jumps to the crossing bar.
+
+**Honest edge caught in the real-browser sweep:** with `max` small enough that the head's top
+non-Other bars don't reach the threshold (top-3 = 79.4% < 80%, and `Other` = 20.6% would cross but
+is excluded), there is **no crossing → no vital accent, no "K of N" label** — the summary falls back
+to `paretoTop` ("top leads at X%"). This is correct and honest: if the shown causes don't get you to
+80%, the chart must not paint a fake vital few. Docs note it usually means `max` is too aggressive.
+
+**Typing fix:** the crossing was first computed by mutating a `{index,x}|null` inside a `rows.map()`
+callback — TS control-flow analysis can't track callback mutation and narrowed it to `never`
+(TS2339 "Property 'index' does not exist on type 'never'"). Restructured to a plain loop computing
+`cums[]` + `crossingIndex`, deriving `crossing`/`vitalCount`/`cumAtCrossing`/`line` from it. Lesson:
+never mutate an outer typed accumulator from inside a `.map()` — compute the index in a loop first.
+
+**MDX trap:** the accessibility prose used literal `<top>`/`<share>` placeholders — Fumadocs MDX
+parsed them as JSX tags ("Expected a closing tag for `<share>`") and `next build` failed though
+`pnpm test` was green. Reworded to plain words. Same class as the docs circular-import TDZ: a docs
+build is the only gate that catches MDX/Node-eval errors.
+
+Gates: node 1320, browser 98, craft 304/0, size 2.23/3.04 (well under caps), bench 25.1 rows/ms
+(floor 6), docs 195 pages + tests 110, real-browser sweep green (accent stops at crossing across
+default/rollup/no-threshold, cum line + threshold hairline present, rollup-below-threshold correctly
+shows no vital few, 0 escapes/overlaps; live hero label == mdx, interactive announce + T-jump +
+readout chip). **11 of 21 done.**

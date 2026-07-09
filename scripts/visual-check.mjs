@@ -25,6 +25,7 @@ const { ForecastCone } = await D("forecast-cone");
 const { QuantileDots } = await D("quantile-dots");
 const { ABStrips } = await D("ab-strips");
 const { ShiftHistogram } = await D("shift-histogram");
+const { ParetoStrip } = await D("pareto-strip");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -88,6 +89,7 @@ const ABB = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
 const ABMS = (n) => `${Math.round(n)} ms`;
 const SHB = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
 const SHA = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+const PAR = [{ label: "Timeouts", value: 38 }, { label: "OOM", value: 24 }, { label: "Deploy", value: 15 }, { label: "Config", value: 9 }, { label: "Network", value: 7 }, { label: "Auth", value: 4 }];
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -246,6 +248,12 @@ const body = [
   row("shift, mirror", svg(ShiftHistogram, { data: { before: SHB, after: SHA }, format: ABMS, width: 240, height: 30 })),
   row("overlay", svg(ShiftHistogram, { data: { before: SHB, after: SHA }, format: ABMS, mode: "overlay", width: 240, height: 30 })),
   row("no shift", svg(ShiftHistogram, { data: { before: SHB, after: SHB }, format: ABMS, width: 240, height: 30 })),
+
+  `<h2>ParetoStrip</h2>`,
+  row("default 80x20", svg(ParetoStrip, { data: PAR, unit: "causes", metric: "incidents", width: 80, height: 20 })),
+  row("count label", svg(ParetoStrip, { data: PAR, unit: "causes", metric: "incidents", width: 240, height: 30 })),
+  row("rollup max 3", svg(ParetoStrip, { data: PAR, max: 3, width: 240, height: 30 })),
+  row("no threshold", svg(ParetoStrip, { data: PAR, threshold: false, width: 240, height: 30 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

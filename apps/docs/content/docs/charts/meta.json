@@ -51,6 +51,7 @@
     "forecast-cone",
     "quantile-dots",
     "ab-strips",
-    "shift-histogram"
+    "shift-histogram",
+    "pareto-strip"
   ]
 }

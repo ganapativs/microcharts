@@ -412,6 +412,14 @@
       "types": "./dist/charts/shift-histogram/client.d.ts",
       "import": "./dist/charts/shift-histogram/client.js"
     },
+    "./pareto-strip": {
+      "types": "./dist/charts/pareto-strip/index.d.ts",
+      "import": "./dist/charts/pareto-strip/index.js"
+    },
+    "./pareto-strip/interactive": {
+      "types": "./dist/charts/pareto-strip/client.d.ts",
+      "import": "./dist/charts/pareto-strip/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

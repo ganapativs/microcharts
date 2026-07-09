@@ -29,6 +29,7 @@ import { EN_CONTROL } from "./strings-control.js";
 import { EN_FORECAST } from "./strings-forecast.js";
 import { EN_AB } from "./strings-ab.js";
 import { EN_SHIFT } from "./strings-shift.js";
+import { EN_PARETO } from "./strings-pareto.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -58,4 +59,5 @@ export const EN: SummaryStrings = {
   ...EN_FORECAST,
   ...EN_AB,
   ...EN_SHIFT,
+  ...EN_PARETO,
 };

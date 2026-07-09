@@ -50,6 +50,7 @@ import { ForecastCone } from "@microcharts/react/forecast-cone";
 import { QuantileDots } from "@microcharts/react/quantile-dots";
 import { ABStrips } from "@microcharts/react/ab-strips";
 import { ShiftHistogram } from "@microcharts/react/shift-histogram";
+import { ParetoStrip } from "@microcharts/react/pareto-strip";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -119,6 +120,7 @@ export function getMDXComponents(components?: MDXComponents) {
     QuantileDots,
     ABStrips,
     ShiftHistogram,
+    ParetoStrip,
     SparkGroup,
     // docs building blocks
     Instrument,

@@ -201,6 +201,10 @@
     "shift-histogram": {
       "static": "2.98 kB",
       "interactive": "3.95 kB"
+    },
+    "pareto-strip": {
+      "static": "2.5 kB",
+      "interactive": "3.3 kB"
     }
   }
 }

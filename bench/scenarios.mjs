@@ -406,6 +406,12 @@ export const SCENARIOS = [
     props: (i) => ({ data: rugs[i % POOL].map((v) => v * 10 + 40), rules: "we", summary: false }),
   },
   {
+    slug: "pareto-strip",
+    component: "ParetoStrip",
+    floor: 20, // ≤ 12 bars + cum line + sort — few nodes
+    props: (i) => ({ data: cats[i % POOL], summary: false }),
+  },
+  {
     slug: "shift-histogram",
     component: "ShiftHistogram",
     floor: 6, // ≤ 12 bins × 2 + double binning + medians (measured ~13 rows/ms, half-floor)
