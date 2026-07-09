@@ -301,6 +301,10 @@
     "breathing-dot": {
       "static": "1.6 kB",
       "interactive": "2.5 kB"
+    },
+    "heartbeat-blip": {
+      "static": "2 kB",
+      "interactive": "3 kB"
     }
   }
 }

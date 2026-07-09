@@ -1546,3 +1546,32 @@ Verified in the real browser: `core.getAnimations().length > 0` while loaded, `=
 (browser tests). New `strings-breathing-dot` (breathingDot / breathingDotUnknown + loadBands i18n array).
 Budget 1.57/2.42 kB (static just over the 1.5 Delta-class target, well under the 3/4 hard caps). Node
 1683, browser 5, craft 540/0, bench 124 rows/ms, size 1.57/2.42, docs 267pp/158.
+
+### HeartbeatBlip (20th shipped, motion, flagship) — `heartbeat-blip` — plan/24 §20
+
+Channel = a spike per event across the recent window (presence/density); exact counts steer to
+Seismogram/EventTimeline. Points:
+
+1. **SSR clock is a prop, not a call.** The static entry must never call `Date.now()` — a server render
+   and the client hydration would compute different "now"s and mismatch. `now` defaults to the latest
+   event and is documented as pass-from-your-data-layer. The client entry advances its own clock.
+
+2. **The one unforgivable lie, guarded.** Every spike is one real event; there is no timer that
+   synthesizes heartbeat pulses. An empty window renders an empty spike path + a "no events" text — the
+   flat baseline IS the down signal (shape, never color), and the summary distinguishes down
+   (`heartbeatFlat`) from no-data. Events after `now` are clamped to `now` (documented clock-skew), older-
+   than-window events drop.
+
+3. **Motion model (deviation, sign-off).** The spec calls for a WAAPI `translateX` sweep of a translating
+   group. Translating SVG content out of the viewBox risks a containment spill (`.mc-root` is
+   `overflow: visible`), so — as with EnsembleGhosts — the interactive advances a coarse live clock
+   (250 ms tick) and re-renders the static with the new `now`; old spikes drift left, new events enter at
+   the right, honestly. Reduced-motion → no tick (static re-renders on data change, identical info);
+   off-viewport → no tick (shared observer). A new event blips the endpoint once via WAAPI scale
+   (verified `getAnimations().length > 0` in the browser test). No per-spike keyboard nav — spikes are
+   transient, the summary is the record (documented).
+
+Duration wording (`minute` / `hour` / `N seconds` / `Ns` / `Nm`) lives in `strings-heartbeat`
+(`heartbeatWindow` / `heartbeatAgo`) so it stays translatable (canon: no English outside EN). NO budget
+divergence — 1.82/2.65 kB, within the §20 targets (2/3). Node 1698, browser 2, craft 544/0, bench 67.4
+rows/ms, size 1.82/2.65, docs 270pp/160.

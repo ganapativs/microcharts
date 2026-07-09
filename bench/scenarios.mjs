@@ -641,4 +641,14 @@ export const SCENARIOS = [
     floor: 120, // two circles + a threshold branch
     props: (i) => ({ value: (i % 100) / 100, summary: false }),
   },
+  {
+    slug: "heartbeat-blip",
+    component: "HeartbeatBlip",
+    floor: 40, // baseline + a spike glyph per event
+    props: (i) => ({
+      data: Array.from({ length: 12 }, (_, k) => 100000 - k * 4000 - (i % 500)),
+      now: 100000,
+      summary: false,
+    }),
+  },
 ];

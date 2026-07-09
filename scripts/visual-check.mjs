@@ -50,6 +50,7 @@ const { Constellation } = await D("constellation");
 const { PolarClock } = await D("polar-clock");
 const { SpiralYear } = await D("spiral-year");
 const { BreathingDot } = await D("breathing-dot");
+const { HeartbeatBlip } = await D("heartbeat-blip");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -773,6 +774,26 @@ const body = [
   row("elevated (0.65)", svg(BreathingDot, { value: 0.65, size: 40 })),
   row("strained (0.92) + label", svg(BreathingDot, { value: 0.92, label: "value", size: 40 })),
   row("unknown (null)", svg(BreathingDot, { value: null, size: 40 })),
+
+  `<h2>HeartbeatBlip</h2>`,
+  row(
+    "busy window",
+    svg(HeartbeatBlip, {
+      data: [97000, 92000, 85000, 70000, 55000, 48000],
+      now: 100000,
+      width: 90,
+    }),
+  ),
+  row(
+    "with count label",
+    svg(HeartbeatBlip, {
+      data: [97000, 92000, 85000, 70000, 55000, 48000],
+      now: 100000,
+      label: "count",
+      width: 90,
+    }),
+  ),
+  row("flatline (down)", svg(HeartbeatBlip, { data: [], now: 100000, width: 90 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

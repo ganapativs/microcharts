@@ -734,6 +734,18 @@ add(
   ],
   [[999, 999]],
 );
+const HB = [97000, 92000, 85000, 70000, 55000, 48000];
+add(
+  "heartbeat-blip",
+  "HeartbeatBlip",
+  [
+    { data: HB, now: 100000 },
+    { data: HB, now: 100000, label: "count" },
+    { data: [], now: 100000 },
+    { data: [99000], now: 100000 },
+  ],
+  [[999, 999]],
+);
 const SKYLINE = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },

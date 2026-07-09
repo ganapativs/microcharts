@@ -612,6 +612,14 @@
       "types": "./dist/charts/breathing-dot/client.d.ts",
       "import": "./dist/charts/breathing-dot/client.js"
     },
+    "./heartbeat-blip": {
+      "types": "./dist/charts/heartbeat-blip/index.d.ts",
+      "import": "./dist/charts/heartbeat-blip/index.js"
+    },
+    "./heartbeat-blip/interactive": {
+      "types": "./dist/charts/heartbeat-blip/client.d.ts",
+      "import": "./dist/charts/heartbeat-blip/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

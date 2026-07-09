@@ -22,6 +22,7 @@ import { EN_CONSTELLATION } from "./strings-constellation.js";
 import { EN_POLAR_CLOCK } from "./strings-polar-clock.js";
 import { EN_SPIRAL_YEAR } from "./strings-spiral-year.js";
 import { EN_BREATHING_DOT } from "./strings-breathing-dot.js";
+import { EN_HEARTBEAT } from "./strings-heartbeat.js";
 import { EN_CATEGORY } from "./strings-category.js";
 import { EN_DIST } from "./strings-dist.js";
 import { EN_SLOTS } from "./strings-slots.js";
@@ -75,6 +76,7 @@ export const EN: SummaryStrings = {
   ...EN_POLAR_CLOCK,
   ...EN_SPIRAL_YEAR,
   ...EN_BREATHING_DOT,
+  ...EN_HEARTBEAT,
   ...EN_CATEGORY,
   ...EN_DIST,
   ...EN_SLOTS,

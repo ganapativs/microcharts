@@ -140,6 +140,14 @@ export interface SummaryStrings {
   breathingDotUnknown: string;
   /** Load band words [calm, elevated, strained] (breathing-dot). */
   loadBands: readonly [string, string, string];
+  /** Structured events, e.g. "12 events in the last minute; last 3s ago." */
+  heartbeat: (n: number, windowLabel: string, ago: string) => string;
+  /** Flat (down) state, e.g. "No events in the last minute." (heartbeat-blip). */
+  heartbeatFlat: (windowLabel: string) => string;
+  /** Window duration → label, e.g. 60000 → "minute" (heartbeat-blip). */
+  heartbeatWindow: (ms: number) => string;
+  /** Elapsed ms → compact label, e.g. 3000 → "3s" (heartbeat-blip). */
+  heartbeatAgo: (ms: number) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

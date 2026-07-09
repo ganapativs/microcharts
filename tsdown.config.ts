@@ -157,6 +157,8 @@ export default defineConfig({
     "src/charts/spiral-year/client.tsx",
     "src/charts/breathing-dot/index.tsx",
     "src/charts/breathing-dot/client.tsx",
+    "src/charts/heartbeat-blip/index.tsx",
+    "src/charts/heartbeat-blip/client.tsx",
   ],
   format: ["esm"],
   dts: true,
