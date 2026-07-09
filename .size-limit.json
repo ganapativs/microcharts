@@ -743,6 +743,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/garden-grid (static)",
+    "path": "dist/charts/garden-grid/index.js",
+    "limit": "1.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/garden-grid/interactive",
+    "path": "dist/charts/garden-grid/client.js",
+    "limit": "2.9 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

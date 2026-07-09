@@ -532,6 +532,14 @@
       "types": "./dist/charts/sprout-row/client.d.ts",
       "import": "./dist/charts/sprout-row/client.js"
     },
+    "./garden-grid": {
+      "types": "./dist/charts/garden-grid/index.d.ts",
+      "import": "./dist/charts/garden-grid/index.js"
+    },
+    "./garden-grid/interactive": {
+      "types": "./dist/charts/garden-grid/client.d.ts",
+      "import": "./dist/charts/garden-grid/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

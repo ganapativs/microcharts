@@ -40,6 +40,7 @@ const { MoonPhase } = await D("moon-phase");
 const { Hourglass } = await D("hourglass");
 const { BalanceBeam } = await D("balance-beam");
 const { SproutRow } = await D("sprout-row");
+const { GardenGrid } = await D("garden-grid");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -632,6 +633,11 @@ const body = [
     "labelled + missing (null)",
     svg(SproutRow, { data: [{ label: "Acme", value: 3 }, { label: "Beta", value: null }, { label: "Gamma", value: 1 }], labels: true, height: 32, step: 30 }),
   ),
+
+  `<h2>GardenGrid</h2>`,
+  row("grid 7 rows", svg(GardenGrid, { data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11], unit: "weeks" })),
+  row("strip (rows 1)", svg(GardenGrid, { data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22], rows: 1 })),
+  row("blank empties", svg(GardenGrid, { data: [12, 0, 8, 0, 0, 28, 34, 0, 0, 22], rows: 1, empty: "blank" })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

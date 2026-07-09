@@ -84,6 +84,10 @@ export interface SummaryStrings {
   sproutStage: (label: string, stageName: string, k: number) => string;
   /** S2 sprout missing item, e.g. "Acme: no data." (sprout-row). */
   sproutEmpty: (label: string) => string;
+  /** S1 garden grid, e.g. "12 weeks; peak 34, 9 active." (garden-grid). */
+  gardenGrid: (n: number, unit: string, peak: string, active: number) => string;
+  /** S1 garden cell, e.g. "3 of 12: 8, step 2 of 5." (garden-grid). */
+  gardenCell: (pos: number, total: number, value: string, k: number, steps: number) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

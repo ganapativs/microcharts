@@ -1327,3 +1327,16 @@ step−1`) — the craft caught neighbour collision at narrow step. Stage names 
 `dispatchEvent(KeyboardEvent)` did NOT reach React's synthetic handler — used `userEvent.keyboard`
 after `.focus()` (the established pattern). Node 1542, browser 2, craft 469/0, bench 35 rows/ms,
 docs 237pp/138.
+
+### GardenGrid (10th shipped) — `garden-grid` — plan/24 §10
+
+No API deviations. ActivityGrid's grayscale sibling — dot AREA (single `--mc-stroke` ink) carries a
+5-step ordinal instead of color, so the rhythm survives print/monochrome. Radius is √-quantized
+(`r = rMax·√(k/S)`) so perceived AREA (r²) steps evenly — property-tested that area deltas are equal
+across steps; a linear radius map would exaggerate highs quadratically. Zero = a hairline ring
+(`data-mc-ink="muted"`, fill none — present but quiet); `null` = no mark (missing ≠ zero); both
+distinct, the print superpower this chart exists for. Reuses ActivityGrid's column-major grid layout
++ 2-D roving keyboard model. Announces the ordinal STEP ("step 2 of 5"), never a false-precise value
+(docs steer exact reads to ActivityGrid+hover/HeatStrip). `GardenCell` interface un-exported (knip
+flagged it — internal-only). Uses `makeFormatter` for the peak/announce. Node 1554, browser 2, craft
+473/0, bench 11.6 rows/ms (N-node class), docs 240pp/140.

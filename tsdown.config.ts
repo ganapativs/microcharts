@@ -137,6 +137,8 @@ export default defineConfig({
     "src/charts/balance-beam/client.tsx",
     "src/charts/sprout-row/index.tsx",
     "src/charts/sprout-row/client.tsx",
+    "src/charts/garden-grid/index.tsx",
+    "src/charts/garden-grid/client.tsx",
   ],
   format: ["esm"],
   dts: true,

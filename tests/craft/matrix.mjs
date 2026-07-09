@@ -669,6 +669,13 @@ add(
     [80, 32],
   ],
 );
+const GARDEN = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11];
+add(
+  "garden-grid",
+  "GardenGrid",
+  [{ data: GARDEN }, { data: GARDEN, rows: 1 }, { data: GARDEN, steps: 3 }, { data: GARDEN, empty: "blank" }],
+  [[999, 999]],
+);
 const SPROUT = [
   { label: "Acme", value: 3 },
   { label: "Beta", value: 2 },

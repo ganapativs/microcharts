@@ -560,4 +560,10 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "garden-grid",
+    component: "GardenGrid",
+    floor: 6, // one circle per cell — N-node class, per-cell loop
+    props: (i) => ({ data: rugs[i % POOL].map((v) => Math.round(v * 5)), summary: false }),
+  },
 ];
