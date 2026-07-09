@@ -55,6 +55,10 @@ export interface SummaryStrings {
   thermometer: (value: string, min: string, max: string) => string;
   /** S4 thermometer with a goal, e.g. "72 on a 0–100 scale; target 80." */
   thermometerTarget: (value: string, min: string, max: string, target: string) => string;
+  /** S4 moon progress, e.g. "68% of the cycle complete." (moon-phase). */
+  moonPhase: (pct: string) => string;
+  /** S4 moon cycle mode, e.g. "68% through the cycle." (moon-phase). */
+  moonPhaseCycle: (pct: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

@@ -129,6 +129,8 @@ export default defineConfig({
     "src/charts/fat-digits/client.tsx",
     "src/charts/thermometer/index.tsx",
     "src/charts/thermometer/client.tsx",
+    "src/charts/moon-phase/index.tsx",
+    "src/charts/moon-phase/client.tsx",
   ],
   format: ["esm"],
   dts: true,

@@ -70,6 +70,7 @@ import dicePips from "./dice-pips";
 import fillWord from "./fill-word";
 import fatDigits from "./fat-digits";
 import thermometer from "./thermometer";
+import moonPhase from "./moon-phase";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -132,6 +133,7 @@ const MODULES: ChartModule[] = [
   fillWord,
   fatDigits,
   thermometer,
+  moonPhase,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

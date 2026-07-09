@@ -530,4 +530,10 @@ export const SCENARIOS = [
     floor: 30, // ≤ 6 nodes, one linear scale + a few ticks
     props: (i) => ({ value: i % 100, target: 80, summary: false }),
   },
+  {
+    slug: "moon-phase",
+    component: "MoonPhase",
+    floor: 40, // 3 nodes, a closed-form terminator path — trivially cheap
+    props: (i) => ({ value: (i % 100) / 100, summary: false }),
+  },
 ];

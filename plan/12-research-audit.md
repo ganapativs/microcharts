@@ -1266,3 +1266,17 @@ Uses `makeFormatter` + `scaleLinear` → static 2.22 kB, above the spec's 2 kB �
 reduced-motion-gated fill transition (SVG geometry props y/height/width). Real-browser sweep both
 themes (fill/bulb/target accent, tube neutral 0.55), 0 escapes. Node 1492, browser 2, craft 421/0,
 bench 68 rows/ms, docs 225pp + tests 130.
+
+### MoonPhase (6, flagship) — `moon-phase` — plan/24 §6
+
+No API deviations. **Area-true illumination is the load-bearing honesty rule:** the lit area equals
+the value exactly, from the closed form — the terminator is a semi-ellipse with `rx = r·|2f−1|`, so
+lit = right semicircle ± semi-ellipse = `f·πr²` (verified by construction + property tests). NOT the
+phase-angle approximation, which under-lights mid-cycle. Waxing lights from the right; `mode="cycle"`
+maps 0 new → 0.5 full → 1 new (waxing then waning, lit mirrors to the left) — a data-semantic switch,
+never a preset (pretending the lunar cycle is monotonic would lie). Extremes snap (`f≤0.005` → empty
+dark path; `f≥0.995` → closed full disc) to avoid hairline slivers. Ink adapts to theme (lit =
+`--mc-stroke`: bright moon on dark, dark filled-fraction disc on light — consistent with every chart's
+ink polarity; the fraction reads unambiguously either way). Interactive cross-fades the lit region by
+OPACITY swap (never a `d:` path interpolation — no Safari). No `makeFormatter` (percent computed
+inline) → static 1.25 kB. Node 1505, browser 2, craft 433/0, bench 112 rows/ms, docs 228pp + tests 132.

@@ -9,6 +9,7 @@ import { EN_DICE } from "./strings-dice.js";
 import { EN_FILL_WORD } from "./strings-fill-word.js";
 import { EN_FAT } from "./strings-fat.js";
 import { EN_THERMOMETER } from "./strings-thermometer.js";
+import { EN_MOON } from "./strings-moon.js";
 import { EN_CATEGORY } from "./strings-category.js";
 import { EN_DIST } from "./strings-dist.js";
 import { EN_SLOTS } from "./strings-slots.js";
@@ -49,6 +50,7 @@ export const EN: SummaryStrings = {
   ...EN_FILL_WORD,
   ...EN_FAT,
   ...EN_THERMOMETER,
+  ...EN_MOON,
   ...EN_CATEGORY,
   ...EN_DIST,
   ...EN_SLOTS,

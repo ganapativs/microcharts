@@ -1,0 +1,81 @@
+---
+title: MoonPhase
+description: A moon-phase chart for React — the illuminated area of a disc encodes a 0–1 fraction, area-true and readable across cultures.
+---
+
+MoonPhase answers "how far through the cycle or period are we?" with a form almost everyone reads
+without a legend: the illuminated fraction of a disc. The lit **area** equals the value exactly — a
+closed-form terminator, not the phase-angle approximation that under-lights mid-cycle — so 50%
+genuinely lights half the disc. Progress mode fills monotonically; cycle mode maps the real lunar
+sequence.
+
+<LiveDemo
+  label="MoonPhase"
+  sizeOf="moon-phase"
+  code={`import { MoonPhase } from "@microcharts/react/moon-phase";
+
+<MoonPhase value={0.68} title="Sprint" />`}
+>
+  <span className="inline-flex gap-3 items-center">
+    <MoonPhase value={0.1} size={24} title="10%" />
+    <MoonPhase value={0.35} size={24} title="35%" />
+    <MoonPhase value={0.5} size={24} title="50%" />
+    <MoonPhase value={0.75} size={24} title="75%" />
+    <MoonPhase value={1} size={24} title="full" />
+  </span>
+</LiveDemo>
+
+## Install
+
+<Usage chart="moon-phase" />
+
+## Try it
+
+<Playground chart="moon-phase" />
+
+## Interactive
+
+<InteractiveDemo slug="moon-phase" />
+
+## When to use it
+
+- **Good for** — sprint or quota progress in a sentence, a billing-period or release-cycle marker, or any 0–1 completion that reads at a glance.
+- **Avoid for** — exact percentages (Progress), trends (Sparkline), or comparisons (MiniBar).
+
+## Sizing
+
+<Sizing chart="moon-phase" />
+
+## Variants
+
+<LiveDemo
+  label="cycle mode — real lunar phases"
+  code={`<MoonPhase value={0.25} mode="cycle" /> // first quarter
+<MoonPhase value={0.5} mode="cycle" />  // full moon`}
+>
+  <span className="inline-flex gap-3 items-center">
+    <MoonPhase value={0} mode="cycle" size={24} title="new" />
+    <MoonPhase value={0.25} mode="cycle" size={24} title="first quarter" />
+    <MoonPhase value={0.5} mode="cycle" size={24} title="full" />
+    <MoonPhase value={0.75} mode="cycle" size={24} title="last quarter" />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+Progress mode is the default because period-progress is the common need — a sprint or quota filling
+from new to full, monotonically. Pretending the real lunar cycle is monotonic would lie (it waxes
+then wanes), so `mode="cycle"` is a separate, explicit data-semantic switch, not a preset. The lit
+area is always exactly the value via the closed form — never the phase-angle shortcut. Because area
+comparison reads to about ±10%, steer exact reads to `Progress`; MoonPhase is for the glance.
+
+## Accessibility
+
+The accessible name states the fraction — **"68% of the cycle complete."** in progress mode, or
+"68% through the cycle." in cycle mode. The interactive entry cross-fades the lit region on change
+(an opacity swap, never a path interpolation), reveals the exact percent on hover or focus, and
+announces changes through a polite live region.
+
+## Props
+
+<PropTable slug="moon-phase" />

@@ -670,6 +670,16 @@ add(
   ],
 );
 add(
+  "moon-phase",
+  "MoonPhase",
+  [{ value: 0.1 }, { value: 0.5 }, { value: 0.85 }, { value: 0.5, mode: "cycle" }],
+  [
+    [16, 16],
+    [24, 24],
+    [40, 40],
+  ],
+);
+add(
   "thermometer",
   "Thermometer",
   [

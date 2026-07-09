@@ -695,6 +695,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/moon-phase (static)",
+    "path": "dist/charts/moon-phase/index.js",
+    "limit": "1.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/moon-phase/interactive",
+    "path": "dist/charts/moon-phase/client.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

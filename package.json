@@ -500,6 +500,14 @@
       "types": "./dist/charts/thermometer/client.d.ts",
       "import": "./dist/charts/thermometer/client.js"
     },
+    "./moon-phase": {
+      "types": "./dist/charts/moon-phase/index.d.ts",
+      "import": "./dist/charts/moon-phase/index.js"
+    },
+    "./moon-phase/interactive": {
+      "types": "./dist/charts/moon-phase/client.d.ts",
+      "import": "./dist/charts/moon-phase/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

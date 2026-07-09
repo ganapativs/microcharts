@@ -36,6 +36,7 @@ const { DicePips } = await D("dice-pips");
 const { FillWord } = await D("fill-word");
 const { FatDigits } = await D("fat-digits");
 const { Thermometer } = await D("thermometer");
+const { MoonPhase } = await D("moon-phase");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -589,6 +590,16 @@ const body = [
   ),
   row("horizontal cell", svg(Thermometer, { value: 62, orientation: "horizontal", bulb: false, width: 120 })),
   row("over domain (140)", svg(Thermometer, { value: 140, target: 90 })),
+
+  `<h2>MoonPhase</h2>`,
+  row(
+    "progress: 10 / 35 / 50 / 75 / 100",
+    [0.1, 0.35, 0.5, 0.75, 1].map((v) => svg(MoonPhase, { value: v, size: 24 })).join(" "),
+  ),
+  row(
+    "cycle: new / first / full / last",
+    [0, 0.25, 0.5, 0.75].map((v) => svg(MoonPhase, { value: v, mode: "cycle", size: 24 })).join(" "),
+  ),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}
