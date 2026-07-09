@@ -684,4 +684,19 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "time-in-range",
+    component: "TimeInRange",
+    floor: 40, // a handful of rects + a label
+    props: (i) => ({
+      data: {
+        severeBelow: 1,
+        below: (i % 15) + 1,
+        in: 60 + (i % 25),
+        above: (i % 15) + 1,
+        severeAbove: 1,
+      },
+      summary: false,
+    }),
+  },
 ];

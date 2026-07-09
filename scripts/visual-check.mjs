@@ -56,6 +56,7 @@ const { OrbitStatus } = await D("orbit-status");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
+const { TimeInRange } = await D("time-in-range");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -976,6 +977,12 @@ const body = [
     }),
   ),
   row("unknown", svg(OrbitStatus, { latency: NaN, rate: 5, size: 56 })),
+
+  `<h2>TimeInRange</h2>`,
+  row("in-range label", svg(TimeInRange, { data: { below: 9, in: 72, above: 19 }, width: 240, height: 22 })),
+  row("five zones, all", svg(TimeInRange, { data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }, label: "all", width: 240, height: 22 })),
+  row("vertical column", svg(TimeInRange, { data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }, orientation: "vertical", label: "all", width: 28, height: 130 })),
+  row("cell", svg(TimeInRange, { data: { below: 9, in: 72, above: 19 }, width: 60, height: 10 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

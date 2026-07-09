@@ -87,6 +87,7 @@ import breathingDot from "./breathing-dot";
 import heartbeatBlip from "./heartbeat-blip";
 import cometTrail from "./comet-trail";
 import orbitStatus from "./orbit-status";
+import timeInRange from "./time-in-range";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -166,6 +167,7 @@ const MODULES: ChartModule[] = [
   heartbeatBlip,
   cometTrail,
   orbitStatus,
+  timeInRange,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

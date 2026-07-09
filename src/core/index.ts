@@ -28,6 +28,7 @@ export { EN_OHLC, type OhlcStrings } from "./strings-ohlc.js";
 export { EN_CALENDAR, type CalendarStrings } from "./strings-calendar.js";
 export { EN_TIMELINE, type TimelineStrings } from "./strings-timeline.js";
 export { EN } from "./strings.js";
+export { EN_TIME_IN_RANGE, type TimeInRangeStrings } from "./strings-time-in-range.js";
 export {
   quantiles,
   fiveNumber,

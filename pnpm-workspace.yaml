@@ -28,3 +28,11 @@ allowBuilds:
   lefthook: true
   sharp: true
   workerd: true
+
+# tsdown@0.22.4 still declares its `typescript` peer as ^5||^6, but builds and
+# emits d.ts fine under TypeScript 7 (dts is generated via oxc, not tsc). Allow
+# TS 7 to satisfy that peer so install stays warning-free; drop once tsdown
+# widens its declared range.
+peerDependencyRules:
+  allowedVersions:
+    "tsdown>typescript": "7"

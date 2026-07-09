@@ -313,6 +313,10 @@
     "orbit-status": {
       "static": "2.1 kB",
       "interactive": "3 kB"
+    },
+    "time-in-range": {
+      "static": "2.2 kB",
+      "interactive": "3.1 kB"
     }
   }
 }

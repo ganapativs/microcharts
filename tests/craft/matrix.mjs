@@ -249,6 +249,18 @@ add(
   ],
 );
 add(
+  "time-in-range",
+  "TimeInRange",
+  [
+    { data: { below: 9, in: 72, above: 19 } },
+    { data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }, label: "all" },
+  ],
+  [
+    [60, 10],
+    [240, 22],
+  ],
+);
+add(
   "histogram-strip",
   "HistogramStrip",
   [

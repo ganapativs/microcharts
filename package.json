@@ -656,6 +656,14 @@
       "types": "./dist/charts/icon-array/client.d.ts",
       "import": "./dist/charts/icon-array/client.js"
     },
+    "./time-in-range": {
+      "types": "./dist/charts/time-in-range/index.d.ts",
+      "import": "./dist/charts/time-in-range/index.js"
+    },
+    "./time-in-range/interactive": {
+      "types": "./dist/charts/time-in-range/client.d.ts",
+      "import": "./dist/charts/time-in-range/client.js"
+    },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"
@@ -704,19 +712,19 @@
     "@vitest/browser": "^4.1.10",
     "@vitest/browser-playwright": "^4.1.10",
     "axe-core": "^4.12.1",
-    "fast-check": "^4.8.0",
+    "fast-check": "^4.9.0",
     "jsdom": "^29.1.1",
-    "knip": "^6.24.0",
-    "lefthook": "^2.1.9",
-    "oxfmt": "^0.57.0",
-    "oxlint": "^1.72.0",
+    "knip": "^6.25.0",
+    "lefthook": "^2.1.10",
+    "oxfmt": "^0.58.0",
+    "oxlint": "^1.73.0",
     "playwright": "^1.61.1",
     "publint": "^0.3.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "size-limit": "^12.1.0",
-    "tsdown": "^0.22.3",
-    "typescript": "^6.0.3",
+    "tsdown": "^0.22.4",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.10",
     "vitest-browser-react": "^2.2.0"
   },

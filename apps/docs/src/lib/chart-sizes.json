@@ -307,6 +307,10 @@
     "static": 2.06,
     "interactive": 2.94
   },
+  "time-in-range": {
+    "static": 2,
+    "interactive": 2.87
+  },
   "annotations": {
     "static": 1.46
   }

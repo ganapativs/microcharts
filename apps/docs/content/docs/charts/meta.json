@@ -79,6 +79,7 @@
     "breathing-dot",
     "heartbeat-blip",
     "comet-trail",
-    "orbit-status"
+    "orbit-status",
+    "time-in-range"
   ]
 }

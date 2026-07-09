@@ -590,6 +590,15 @@ export interface SummaryStrings {
   ensembleSingle: (end: string) => string;
   /** Member announcement, e.g. "Member 7 of 24; ends at 42." */
   ensembleAt: (pos: number, total: number, end: string) => string;
+  /** Zone display names, indexed severe-low → below → in → above → severe-high. */
+  tirNames: readonly [string, string, string, string, string];
+  /** One zone clause, e.g. "72% in range" (time-in-range). */
+  tirClause: (pct: string, name: string) => string;
+  /** Full time-in-range summary from a joined clause list, e.g.
+   *  "72% in range, 9% below, 19% above." */
+  timeInRange: (list: string) => string;
+  /** Interactive zone announce, e.g. "In range: 72%." (time-in-range). */
+  tirZone: (name: string, pct: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

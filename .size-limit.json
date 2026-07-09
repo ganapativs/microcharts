@@ -929,6 +929,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/time-in-range (static)",
+    "path": "dist/charts/time-in-range/index.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/time-in-range/interactive",
+    "path": "dist/charts/time-in-range/client.js",
+    "limit": "3.1 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",
