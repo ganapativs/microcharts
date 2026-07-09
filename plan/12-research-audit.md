@@ -1401,3 +1401,24 @@ ring alignment when label bands were present). Build error fixed: the `label` pr
 `const label` aria var in the client (→ `ariaLabel`). Category labels width-drop-out (long names like
 "Platform" drop at narrow `bw` — plan/18 §4; craft caught the collision). `SkylineBuilding` interface
 un-exported (knip). Node 1604, browser 2, craft 513/0, bench 32 rows/ms, docs 252pp/148.
+
+### Honeycomb (15th shipped) — `honeycomb` — plan/24 §15
+
+Channel = filled-cell COUNT (unit counting, S4), high precision only while units stay countable —
+`total > 60` devWarns and steers to Progress (a filled area is not a count past subitizing/tallying
+range). Area-filling pointy-top hex grid, odd rows offset half a column, near-square by default
+(`rows="auto"` → `round(√total)`); `rows={1}` gives a table-cell strip. Two design choices worth
+recording: (1) the whole grid is TWO merged `<path>` nodes — one for filled hexes, one for empty —
+so the SVG node count is O(1) regardless of `total` (a 60-cell honeycomb is still 2 nodes, inside the
+≤6-node typical budget). (2) Fill order is row-major from the top-left so occupancy reads as a sweep,
+not a scatter. Honesty: `value > total` renders all cells filled BUT the summary keeps the true value
+("45 of 40 filled."); `total = 0` → "No data." (not an empty grid). `empty="dim"` paints the empty
+cells with `data-mc-ink="fill"` (fill-opacity 0.12 in the CSS layer — verified 0.12 in the real-browser
+sweep, so "dim" is genuinely faint, not a near-foreground block) for dark/AMOLED surfaces where hairline
+outlines vanish; `empty="outline"` (default) strokes them in the muted token at 0.5 stroke-opacity.
+No per-cell keyboard navigation — hex cells are anonymous interchangeable units, not addressable data
+points (unlike ActivityGrid/GardenGrid days), so the interactive entry is live-announce-on-change +
+a hover "value / total" readout chip only; documented in the client header. `exactOptionalPropertyTypes`
+fix: the `honeycombSummary` opts object needed `| undefined` on each optional field (same pattern as
+FatDigits/Thermometer). New `strings-honeycomb` module (1 key, `honeycomb(value,total,unit)`). Node
+1617, browser 2, craft 517/0, bench 43.8 rows/ms, size 1.64/2.08 (caps 1.8/2.5), docs 255pp/150.

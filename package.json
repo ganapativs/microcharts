@@ -572,6 +572,14 @@
       "types": "./dist/charts/city-skyline/client.d.ts",
       "import": "./dist/charts/city-skyline/client.js"
     },
+    "./honeycomb": {
+      "types": "./dist/charts/honeycomb/index.d.ts",
+      "import": "./dist/charts/honeycomb/index.js"
+    },
+    "./honeycomb/interactive": {
+      "types": "./dist/charts/honeycomb/client.d.ts",
+      "import": "./dist/charts/honeycomb/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

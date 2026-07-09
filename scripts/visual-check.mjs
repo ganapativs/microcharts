@@ -45,6 +45,7 @@ const { BubbleRow } = await D("bubble-row");
 const { MusicStaff } = await D("music-staff");
 const { TreeRings } = await D("tree-rings");
 const { CitySkyline } = await D("city-skyline");
+const { Honeycomb } = await D("honeycomb");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -669,6 +670,11 @@ const body = [
     row("values", svg(CitySkyline, { data: T, label: "value", bw: 16, gap: 6, height: 36 })),
     row("plain bars", svg(CitySkyline, { data: T.map((d) => ({ label: d.label, value: d.value })), bw: 14, gap: 5, height: 30 })),
   ].join("\n"); })(),
+
+  `<h2>Honeycomb</h2>`,
+  row("34 of 40 (outline)", svg(Honeycomb, { value: 34, total: 40, unit: "seats", cellR: 5 })),
+  row("strip (rows 1)", svg(Honeycomb, { value: 7, total: 10, rows: 1, cellR: 6 })),
+  row("dim empties", svg(Honeycomb, { value: 28, total: 40, empty: "dim", cellR: 5 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

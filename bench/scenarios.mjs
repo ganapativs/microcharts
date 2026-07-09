@@ -590,10 +590,16 @@ export const SCENARIOS = [
   {
     slug: "city-skyline",
     component: "CitySkyline",
-    floor: 10, // ≤ 8 towers × (bar + windows path) + per-window loop
+    floor: 10,
     props: (i) => ({
       data: cats[i % POOL].map((c, j) => ({ label: c.label, value: c.value % 60, lit: (j % 5) / 5 })),
       summary: false,
     }),
+  },
+  {
+    slug: "honeycomb",
+    component: "Honeycomb",
+    floor: 40, // 2 merged paths, one hex loop
+    props: (i) => ({ value: (i % 40) + 1, total: 40, summary: false }),
   },
 ];

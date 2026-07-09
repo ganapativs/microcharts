@@ -803,6 +803,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/honeycomb (static)",
+    "path": "dist/charts/honeycomb/index.js",
+    "limit": "1.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/honeycomb/interactive",
+    "path": "dist/charts/honeycomb/client.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

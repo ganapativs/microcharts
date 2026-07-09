@@ -669,6 +669,12 @@ add(
     [80, 32],
   ],
 );
+add(
+  "honeycomb",
+  "Honeycomb",
+  [{ value: 34, total: 40 }, { value: 7, total: 10, rows: 1 }, { value: 28, total: 40, empty: "dim" }, { value: 45, total: 40 }],
+  [[999, 999]],
+);
 const SKYLINE = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },

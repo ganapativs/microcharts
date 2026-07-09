@@ -79,6 +79,7 @@ import bubbleRow from "./bubble-row";
 import musicStaff from "./music-staff";
 import treeRings from "./tree-rings";
 import citySkyline from "./city-skyline";
+import honeycomb from "./honeycomb";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -150,6 +151,7 @@ const MODULES: ChartModule[] = [
   musicStaff,
   treeRings,
   citySkyline,
+  honeycomb,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

@@ -108,6 +108,8 @@ export interface SummaryStrings {
   citySkylineAt: (label: string, value: string) => string;
   /** Skyline building with lit, e.g. "Platform: 46; 70% lit." (city-skyline). */
   citySkylineAtLit: (label: string, value: string, litPct: string) => string;
+  /** S4 occupancy, e.g. "34 of 40 seats filled." (honeycomb). */
+  honeycomb: (value: string, total: string, unit: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,
