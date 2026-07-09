@@ -171,6 +171,8 @@ export default defineConfig({
     "src/charts/eta-bar/client.tsx",
     "src/charts/waveform/index.tsx",
     "src/charts/waveform/client.tsx",
+    "src/charts/event-raster/index.tsx",
+    "src/charts/event-raster/client.tsx",
   ],
   format: ["esm"],
   dts: true,

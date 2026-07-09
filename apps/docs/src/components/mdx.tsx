@@ -25,6 +25,7 @@ import { TimeInRange } from "@microcharts/react/time-in-range";
 import { Hypnogram } from "@microcharts/react/hypnogram";
 import { EtaBar } from "@microcharts/react/eta-bar";
 import { Waveform } from "@microcharts/react/waveform";
+import { EventRaster } from "@microcharts/react/event-raster";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -126,6 +127,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Hypnogram,
     EtaBar,
     Waveform,
+    EventRaster,
     HistogramStrip,
     MicroBox,
     ProgressRing,

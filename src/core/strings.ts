@@ -60,6 +60,7 @@ import { EN_TIME_IN_RANGE } from "./strings-time-in-range.js";
 import { EN_HYPNOGRAM } from "./strings-hypnogram.js";
 import { EN_ETA_BAR } from "./strings-eta-bar.js";
 import { EN_WAVEFORM } from "./strings-waveform.js";
+import { EN_EVENT_RASTER } from "./strings-event-raster.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -120,4 +121,5 @@ export const EN: SummaryStrings = {
   ...EN_HYPNOGRAM,
   ...EN_ETA_BAR,
   ...EN_WAVEFORM,
+  ...EN_EVENT_RASTER,
 };

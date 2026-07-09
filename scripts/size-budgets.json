@@ -329,6 +329,10 @@
     "waveform": {
       "static": "2.4 kB",
       "interactive": "3.3 kB"
+    },
+    "event-raster": {
+      "static": "2.6 kB",
+      "interactive": "3.7 kB"
     }
   }
 }

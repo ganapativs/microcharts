@@ -617,6 +617,12 @@ export interface SummaryStrings {
   waveformSilent: string;
   /** Interactive bucket announce, e.g. "63% through, peak 0.82." (waveform). */
   waveformAt: (pct: string, value: string) => string;
+  /** EventRaster overview, e.g. "6 lanes, 214 events; busiest api (89)." */
+  eventRaster: (lanes: number, events: number, lane: string, count: number) => string;
+  /** Binned-lane disclosure appended to the raster summary, e.g. " api shown binned." */
+  eventRasterBinned: (lanes: string) => string;
+  /** Interactive event announce, e.g. "api, event at 42 (3 of 89)." (event-raster). */
+  eventRasterAt: (lane: string, t: string, k: number, n: number) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

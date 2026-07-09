@@ -977,6 +977,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/event-raster (static)",
+    "path": "dist/charts/event-raster/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/event-raster/interactive",
+    "path": "dist/charts/event-raster/client.js",
+    "limit": "3.7 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

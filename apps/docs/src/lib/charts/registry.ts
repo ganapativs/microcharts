@@ -91,6 +91,7 @@ import timeInRange from "./time-in-range";
 import hypnogram from "./hypnogram";
 import etaBar from "./eta-bar";
 import waveform from "./waveform";
+import eventRaster from "./event-raster";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -174,6 +175,7 @@ const MODULES: ChartModule[] = [
   hypnogram,
   etaBar,
   waveform,
+  eventRaster,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

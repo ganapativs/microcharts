@@ -60,6 +60,7 @@ const { TimeInRange } = await D("time-in-range");
 const { Hypnogram } = await D("hypnogram");
 const { EtaBar } = await D("eta-bar");
 const { Waveform } = await D("waveform");
+const { EventRaster } = await D("event-raster");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1003,6 +1004,11 @@ const body = [
   row("progress 63%", svg(Waveform, { data: Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220)), progress: 0.63, width: 300, height: 30 })),
   row("envelope", svg(Waveform, { data: Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220)), variant: "envelope", width: 300, height: 30 })),
   row("silent", svg(Waveform, { data: [0, 0, 0, 0, 0], width: 120, height: 24 })),
+
+  `<h2>EventRaster</h2>`,
+  row("services", svg(EventRaster, { data: [{ label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40, 41, 48, 55] }, { label: "db", events: [3, 6, 15, 21, 34, 41, 55] }, { label: "cache", events: [6, 21, 41, 55] }, { label: "queue", events: [10, 30, 50] }], width: 300, height: 36 })),
+  row("emphasis api", svg(EventRaster, { data: [{ label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40] }, { label: "db", events: [3, 6, 15, 21, 34] }, { label: "cache", events: [6, 21, 41] }], emphasis: "api", width: 300, height: 30 })),
+  row("dense → binned", svg(EventRaster, { data: [{ label: "spam", events: Array.from({ length: 300 }, (_, i) => i) }, { label: "rare", events: [10, 150, 280] }], domain: [0, 299], width: 300, height: 20 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

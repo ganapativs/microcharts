@@ -261,6 +261,23 @@ add(
   ],
 );
 add(
+  "event-raster",
+  "EventRaster",
+  [
+    {
+      data: [
+        { label: "api", events: [2, 5, 9, 20, 33, 48] },
+        { label: "db", events: [3, 15, 34] },
+        { label: "cache", events: [6, 41] },
+      ],
+    },
+  ],
+  [
+    [80, 24],
+    [300, 36],
+  ],
+);
+add(
   "waveform",
   "Waveform",
   [

@@ -733,4 +733,17 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "event-raster",
+    component: "EventRaster",
+    floor: 12, // ≤ 12 lanes, one tick path each — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 6 }, (_l, k) => ({
+        label: `lane${k}`,
+        events: Array.from({ length: 20 }, (_e, j) => (i + k + j * 5) % 120),
+      })),
+      domain: [0, 120],
+      summary: false,
+    }),
+  },
 ];
