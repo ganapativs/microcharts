@@ -27,6 +27,7 @@ const { ABStrips } = await D("ab-strips");
 const { ShiftHistogram } = await D("shift-histogram");
 const { ParetoStrip } = await D("pareto-strip");
 const { DataDiff } = await D("data-diff");
+const { QuadrantDot } = await D("quadrant-dot");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -124,6 +125,16 @@ const DDIFF = [
   { key: "tags", added: 24, removed: 8 },
   { key: "notes", added: 12, removed: 6 },
   { key: "flags", added: 8, removed: 3 },
+];
+const QF = [
+  { x: 2, y: 8 },
+  { x: 8, y: 9 },
+  { x: 3, y: 7 },
+  { x: 9, y: 2 },
+  { x: 7, y: 3 },
+  { x: 1, y: 1 },
+  { x: 5, y: 6 },
+  { x: 6, y: 8 },
 ];
 
 function row(title, ...cells) {
@@ -431,6 +442,56 @@ const body = [
       labels: true,
       width: 180,
       height: 48,
+    }),
+  ),
+
+  `<h2>QuadrantDot</h2>`,
+  row(
+    "glyph 24x24",
+    svg(QuadrantDot, {
+      data: { x: 3, y: 9 },
+      field: QF,
+      xDomain: [0, 10],
+      domain: [0, 10],
+      xLabel: "effort",
+      yLabel: "impact",
+    }),
+  ),
+  row(
+    "card 96x96",
+    svg(QuadrantDot, {
+      data: { x: 3, y: 9 },
+      field: QF,
+      xDomain: [0, 10],
+      domain: [0, 10],
+      xLabel: "effort",
+      yLabel: "impact",
+      width: 96,
+      height: 96,
+      title: "Effort vs impact",
+    }),
+  ),
+  row(
+    "lone glyph",
+    svg(QuadrantDot, {
+      data: { x: 3, y: 9 },
+      xDomain: [0, 10],
+      domain: [0, 10],
+      split: [5, 5],
+      width: 72,
+      height: 72,
+    }),
+  ),
+  row(
+    "no tint",
+    svg(QuadrantDot, {
+      data: { x: 8, y: 4 },
+      field: QF,
+      xDomain: [0, 10],
+      domain: [0, 10],
+      region: false,
+      width: 72,
+      height: 72,
     }),
   ),
 ].join("\n");

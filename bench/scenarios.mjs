@@ -34,6 +34,9 @@ const diffs = Array.from({ length: POOL }, (_, s) =>
     removed: ((s + 2) * (j + 1) * 17) % 300,
   })),
 );
+const quads = Array.from({ length: POOL }, (_, s) =>
+  Array.from({ length: 14 }, (_p, j) => ({ x: ((s + j) * 7) % 10, y: ((s + j) * 13) % 10 })),
+);
 
 export const SCENARIOS = [
   {
@@ -424,6 +427,18 @@ export const SCENARIOS = [
     component: "DataDiff",
     floor: 20, // ≤ 12 rows × 2 bars + hairline — few nodes, one linear pass
     props: (i) => ({ data: diffs[i % POOL], summary: false }),
+  },
+  {
+    slug: "quadrant-dot",
+    component: "QuadrantDot",
+    floor: 20, // ≤ 5 + 1/ghost (cap 30) glyph; extent + one sort per render
+    props: (i) => ({
+      data: { x: (i * 3) % 10, y: (i * 7) % 10 },
+      field: quads[i % POOL],
+      xDomain: [0, 10],
+      domain: [0, 10],
+      summary: false,
+    }),
   },
   {
     slug: "shift-histogram",

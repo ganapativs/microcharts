@@ -111,6 +111,8 @@ export default defineConfig({
     "src/charts/pareto-strip/client.tsx",
     "src/charts/data-diff/index.tsx",
     "src/charts/data-diff/client.tsx",
+    "src/charts/quadrant-dot/index.tsx",
+    "src/charts/quadrant-dot/client.tsx",
   ],
   format: ["esm"],
   dts: true,

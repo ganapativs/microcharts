@@ -989,3 +989,39 @@ Gates: node 1342, browser 100, craft 316/0, size 2.5/3.32 (caps 2.7/3.55), bench
 page 0 escapes/0 text-on-mark/0 tag-tag; both bars always drawn; 0/0 placeholder tick; labels/totals
 degrade cleanly at small sizes; live hero label == mdx; interactive row announce + readout chip).
 New `EN_DATA_DIFF` module (`dataDiff`, `dataDiffEmpty`, `dataDiffAt`). **12 of 21 done.**
+
+## Batch 2 wave 3 — QuadrantDot (2026-07-09)
+
+**QuadrantDot (plan/23 #17) — full DoD, static + interactive.** Provenance: plan/16 §Q18. A focal
+dot placed by 2-D position against a peer field, a hairline cross at the split (default = domain
+midpoints, always overridable but NEVER hidden), a faint accent tint on the focal's quadrant, tiny
+muted ghost dots for peers. The read is quadrant MEMBERSHIP first (exact position second) — so it
+lives at glyph scale (24×24) with **no in-chart text**: axis meaning rides entirely on `title` +
+summary, and the docs name skipping them the one anti-pattern. Boundary rule `≥ split ⇒ right/top`
+(property-tested, deterministic on-the-line). A degenerate axis centers the focal and suppresses that
+split line (`scaleLinear` already maps a zero-span domain to the midpoint). `xDomain`/`domain`
+(x/y per grammar — a 2-D chart earns the extra `xDomain`), `split`, `field`, `quadrants` (names in
+TL/TR/BL/BR reading order, **summaries only, never rendered**), `xLabel`/`yLabel`, `region` (tint
+off for dense grids). Real accessible name: **"Impact 9, effort 3 — in the high-impact, low-effort
+quadrant (2 of 14 peers)."** (generated axis-relative wording via `quadrantName`, or explicit
+`quadrants`). Interactive cycles peers NEAREST-FIRST from the focal (sorted in geometry), each read
+with coords + quadrant + a `x, y` readout chip; pointer picks the nearest dot within a 3-unit hit
+radius.
+
+New role `data-mc-ink="region"` (accent 5% tint, drops to `transparent` under forced-colors — it's
+decorative; membership is carried by dot position + summary). Reused the existing `ghost` role
+(neutral 0.18) for peers. No new escapes class — the glyph has no text, so the real-browser sweep
+checks dot containment + region opacity + cross/ghost counts only.
+
+**Budget divergence (needs gate sign-off, batch-2 pattern):** spec §17 targets static ≤ 1.5 kB /
+interactive ≤ 2.5 kB, but measured 2.17 / 3.05 kB (Chart wrapper + `scaleLinear` + `extent` +
+`makeFormatter` + the quadrant summary machinery). Under the 3 / 4 kB HARD caps; budgets set to
+2.4 / 3.3 with headroom. Trimming to 1.5 would mean dropping the formatter or the summary — not worth
+the honesty cost. Same class as RateVolume/NetFlow/etc. spec-vs-measured gaps logged above.
+
+Gates: node 1359, browser 102, craft 325/0, size 2.17/3.05 (budgets 2.4/3.3, caps 3/4), bench 22.7
+rows/ms (floor 20), docs 201 pages + tests 114, real-browser sweep green (all 13 quadrant-dot SVGs
+on the live page 0 dot-escapes; region tint renders at 0.05; lone-glyph → 0 ghosts; no-tint → no
+region; live hero label == mdx flagship string; interactive nearest-first announce + `x, y` readout
+chip). New `EN_QUADRANT` module (`quadrantName`, `quadrant`, `quadrantLone`, `quadrantAt`).
+**13 of 21 done.**

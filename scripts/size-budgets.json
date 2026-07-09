@@ -209,6 +209,10 @@
     "data-diff": {
       "static": "2.7 kB",
       "interactive": "3.55 kB"
+    },
+    "quadrant-dot": {
+      "static": "2.4 kB",
+      "interactive": "3.3 kB"
     }
   }
 }

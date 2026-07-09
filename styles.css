@@ -254,6 +254,14 @@
     fill-opacity: 0.18;
     stroke: none;
   }
+  /* QuadrantDot quadrant tint — a whisper of accent behind the focal's cell.
+     Decorative: membership is carried by dot position + summary, so it drops out
+     entirely under forced-colors (mapping below). */
+  :where(.mc-root [data-mc-ink="region"]) {
+    fill: var(--mc-accent);
+    fill-opacity: 0.05;
+    stroke: none;
+  }
   /* PercentileLadder tail flag — the emphasised accent tick/dot. Element-split:
      the line strokes, the dot fills. `color` prop still overrides inline. */
   :where(.mc-root line[data-mc-ink="flag"]) {
@@ -432,6 +440,10 @@
     /* ghost volume bars → quiet system ink, still readable as background context */
     :where(.mc-root [data-mc-ink="ghost"]) {
       fill: GrayText;
+    }
+    /* quadrant tint is purely decorative → drop it entirely in high contrast */
+    :where(.mc-root [data-mc-ink="region"]) {
+      fill: transparent;
     }
     /* tail flag keeps its emphasis, mapped to the system accent */
     :where(.mc-root line[data-mc-ink="flag"]) {

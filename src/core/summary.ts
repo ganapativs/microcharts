@@ -384,6 +384,36 @@ export interface SummaryStrings {
   dataDiffEmpty: (n: number) => string;
   /** DataDiff row announcement, e.g. "users: +340 added, −120 removed, net +220." */
   dataDiffAt: (key: string, added: string, removed: string, net: string) => string;
+  /** Quadrant name, e.g. "high-impact, low-effort" (reading: y then x). */
+  quadrantName: (yHigh: boolean, yLabel: string, xHigh: boolean, xLabel: string) => string;
+  /** QuadrantDot summary against a field, e.g. "Impact 9, effort 3 — in the high-impact, low-effort quadrant (2 of 14 peers)." */
+  quadrant: (
+    yLabel: string,
+    yv: string,
+    xLabel: string,
+    xv: string,
+    quadName: string,
+    k: number,
+    n: number,
+  ) => string;
+  /** QuadrantDot with no field, e.g. "Impact 9, effort 3 — in the high-impact, low-effort quadrant." */
+  quadrantLone: (
+    yLabel: string,
+    yv: string,
+    xLabel: string,
+    xv: string,
+    quadName: string,
+  ) => string;
+  /** Peer announcement, e.g. "Peer 3 of 12: effort 6, impact 4 — high-effort, low-impact." */
+  quadrantAt: (
+    pos: number,
+    total: number,
+    xLabel: string,
+    xv: string,
+    yLabel: string,
+    yv: string,
+    quadName: string,
+  ) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

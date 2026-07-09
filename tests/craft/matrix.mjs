@@ -583,6 +583,28 @@ add(
     [220, 80],
   ],
 );
+const QFIELD = [
+  { x: 2, y: 8 },
+  { x: 8, y: 9 },
+  { x: 3, y: 7 },
+  { x: 9, y: 2 },
+  { x: 7, y: 3 },
+  { x: 1, y: 1 },
+];
+add(
+  "quadrant-dot",
+  "QuadrantDot",
+  [
+    { data: { x: 3, y: 9 }, field: QFIELD, xDomain: [0, 10], domain: [0, 10] },
+    { data: { x: 3, y: 9 }, xDomain: [0, 10], domain: [0, 10], split: [5, 5] },
+    { data: { x: 3, y: 9 }, field: QFIELD, xDomain: [0, 10], domain: [0, 10], region: false },
+  ],
+  [
+    [24, 24],
+    [48, 48],
+    [120, 120],
+  ],
+);
 add(
   "shift-histogram",
   "ShiftHistogram",

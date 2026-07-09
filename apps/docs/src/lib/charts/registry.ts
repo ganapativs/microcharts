@@ -61,6 +61,7 @@ import abStrips from "./ab-strips";
 import shiftHistogram from "./shift-histogram";
 import paretoStrip from "./pareto-strip";
 import dataDiff from "./data-diff";
+import quadrantDot from "./quadrant-dot";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -114,6 +115,7 @@ const MODULES: ChartModule[] = [
   shiftHistogram,
   paretoStrip,
   dataDiff,
+  quadrantDot,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(
