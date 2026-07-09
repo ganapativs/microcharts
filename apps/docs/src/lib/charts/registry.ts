@@ -93,6 +93,7 @@ import etaBar from "./eta-bar";
 import waveform from "./waveform";
 import eventRaster from "./event-raster";
 import rubricStrip from "./rubric-strip";
+import tokenConfidence from "./token-confidence";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -178,6 +179,7 @@ const MODULES: ChartModule[] = [
   waveform,
   eventRaster,
   rubricStrip,
+  tokenConfidence,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

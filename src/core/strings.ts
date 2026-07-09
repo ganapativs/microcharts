@@ -62,6 +62,7 @@ import { EN_ETA_BAR } from "./strings-eta-bar.js";
 import { EN_WAVEFORM } from "./strings-waveform.js";
 import { EN_EVENT_RASTER } from "./strings-event-raster.js";
 import { EN_RUBRIC } from "./strings-rubric.js";
+import { EN_TOKEN_CONFIDENCE } from "./strings-token-confidence.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -124,4 +125,5 @@ export const EN: SummaryStrings = {
   ...EN_WAVEFORM,
   ...EN_EVENT_RASTER,
   ...EN_RUBRIC,
+  ...EN_TOKEN_CONFIDENCE,
 };

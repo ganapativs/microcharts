@@ -759,4 +759,16 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "token-confidence",
+    component: "TokenConfidence",
+    floor: 15, // one span per token (HTML host) — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 60 }, (_t, k) => ({
+        token: ` w${k}`,
+        confidence: ((i + k * 13) % 100) / 100,
+      })),
+      summary: false,
+    }),
+  },
 ];

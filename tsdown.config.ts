@@ -175,6 +175,8 @@ export default defineConfig({
     "src/charts/event-raster/client.tsx",
     "src/charts/rubric-strip/index.tsx",
     "src/charts/rubric-strip/client.tsx",
+    "src/charts/token-confidence/index.tsx",
+    "src/charts/token-confidence/client.tsx",
   ],
   format: ["esm"],
   dts: true,

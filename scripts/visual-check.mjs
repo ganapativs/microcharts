@@ -62,6 +62,7 @@ const { EtaBar } = await D("eta-bar");
 const { Waveform } = await D("waveform");
 const { EventRaster } = await D("event-raster");
 const { RubricStrip } = await D("rubric-strip");
+const { TokenConfidence } = await D("token-confidence");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1015,6 +1016,10 @@ const body = [
   row("weighted + target", svg(RubricStrip, { data: [{ label: "Correctness", score: 0.92, weight: 3 }, { label: "Coverage", score: 0.78, weight: 2 }, { label: "Clarity", score: 0.65, weight: 1 }, { label: "Style", score: 0.41, weight: 1 }], target: 0.7, width: 260, height: 44 })),
   row("unweighted", svg(RubricStrip, { data: [{ label: "Lint", score: 1 }, { label: "Types", score: 1 }, { label: "Tests", score: 0.8 }, { label: "Docs", score: 0.5 }], width: 260, height: 44 })),
   row("cell", svg(RubricStrip, { data: [{ label: "a", score: 0.9, weight: 3 }, { label: "b", score: 0.5, weight: 1 }], labels: false, width: 60, height: 24 })),
+
+  `<h2>TokenConfidence (HTML host)</h2>`,
+  row("flagged", svg(TokenConfidence, { data: [{ token: "The", confidence: 0.98 }, { token: " Treaty", confidence: 0.93 }, { token: " of", confidence: 0.99 }, { token: " Westphalia", confidence: 0.71 }, { token: " was signed in", confidence: 0.9 }, { token: " 1648", confidence: 0.44 }, { token: ", ending the", confidence: 0.9 }, { token: " Thirty", confidence: 0.63 }, { token: " Years' War over", confidence: 0.85 }, { token: " a decade", confidence: 0.31 }, { token: ".", confidence: 0.99 }], style: { fontSize: "15px" } })),
+  row("legend", svg(TokenConfidence, { data: [{ token: "Likely", confidence: 0.92 }, { token: " Paris", confidence: 0.62 }, { token: ", maybe", confidence: 0.3 }], legend: true, style: { fontSize: "15px" } })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

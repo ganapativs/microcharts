@@ -331,6 +331,10 @@
     "static": 2.12,
     "interactive": 2.95
   },
+  "token-confidence": {
+    "static": 0.91,
+    "interactive": 1.49
+  },
   "annotations": {
     "static": 1.46
   }

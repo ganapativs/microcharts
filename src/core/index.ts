@@ -34,6 +34,7 @@ export { EN_ETA_BAR, type EtaBarStrings } from "./strings-eta-bar.js";
 export { EN_WAVEFORM, type WaveformStrings } from "./strings-waveform.js";
 export { EN_EVENT_RASTER, type EventRasterStrings } from "./strings-event-raster.js";
 export { EN_RUBRIC, type RubricStrings } from "./strings-rubric.js";
+export { EN_TOKEN_CONFIDENCE, type TokenConfidenceStrings } from "./strings-token-confidence.js";
 export {
   quantiles,
   fiveNumber,

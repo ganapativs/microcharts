@@ -85,6 +85,7 @@
     "eta-bar",
     "waveform",
     "event-raster",
-    "rubric-strip"
+    "rubric-strip",
+    "token-confidence"
   ]
 }

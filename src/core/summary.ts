@@ -628,6 +628,12 @@ export interface SummaryStrings {
   rubric: (n: number, hi: string, hiScore: string, lo: string, loScore: string) => string;
   /** Interactive criterion announce, e.g. "Correctness: 0.92, weight 40% of total." */
   rubricRow: (label: string, score: string, weightPct: string) => string;
+  /** TokenConfidence overview, e.g. "42 tokens: 33 confident, 6 unsure, 3 guessing." */
+  tokenConfidence: (n: number, confident: number, unsure: number, guessing: number) => string;
+  /** Tier display names, indexed confident → unsure → guessing. */
+  tokenTierNames: readonly [string, string, string];
+  /** Interactive token announce, e.g. "sauce: guessing, 0.22." (token-confidence). */
+  tokenAt: (token: string, tier: string, confidence: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

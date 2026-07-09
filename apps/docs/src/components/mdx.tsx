@@ -27,6 +27,7 @@ import { EtaBar } from "@microcharts/react/eta-bar";
 import { Waveform } from "@microcharts/react/waveform";
 import { EventRaster } from "@microcharts/react/event-raster";
 import { RubricStrip } from "@microcharts/react/rubric-strip";
+import { TokenConfidence } from "@microcharts/react/token-confidence";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -130,6 +131,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Waveform,
     EventRaster,
     RubricStrip,
+    TokenConfidence,
     HistogramStrip,
     MicroBox,
     ProgressRing,
