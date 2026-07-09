@@ -102,6 +102,12 @@ export interface SummaryStrings {
   treeRings: (n: number, unit: string, last: string, max: string, argmaxLabel: string) => string;
   /** S1 ring announcement, e.g. "Year 5: 22." (tree-rings). */
   treeRingAt: (label: string, value: string) => string;
+  /** Structured skyline, e.g. "5 teams; tallest Platform at 46." (city-skyline). */
+  citySkyline: (n: number, unit: string, tallLabel: string, tallValue: string) => string;
+  /** Skyline building (no lit), e.g. "Platform: 46." (city-skyline). */
+  citySkylineAt: (label: string, value: string) => string;
+  /** Skyline building with lit, e.g. "Platform: 46; 70% lit." (city-skyline). */
+  citySkylineAtLit: (label: string, value: string, litPct: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

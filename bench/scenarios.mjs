@@ -587,4 +587,13 @@ export const SCENARIOS = [
     floor: 10, // ≤ 24 boundary circles + cumulative-radius pass
     props: (i) => ({ data: rugs[i % POOL].map((v) => Math.abs(v) + 1), summary: false }),
   },
+  {
+    slug: "city-skyline",
+    component: "CitySkyline",
+    floor: 10, // ≤ 8 towers × (bar + windows path) + per-window loop
+    props: (i) => ({
+      data: cats[i % POOL].map((c, j) => ({ label: c.label, value: c.value % 60, lit: (j % 5) / 5 })),
+      summary: false,
+    }),
+  },
 ];

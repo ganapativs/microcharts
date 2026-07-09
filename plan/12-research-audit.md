@@ -1386,3 +1386,18 @@ for unused d strings (bench 8.7→10.2 rows/ms). Two craft/sweep fixes: the `lab
 moved from the disc top (TEXT-ON-MARK over the concentric rings) to a right gutter; `rOuter` clamped
 to `maxR` (24 rings × round2 drift overshot the containment tolerance). Radial pointer lookup
 (distance from centre → ring). Node 1591, browser 2, craft 501/0, bench 10 rows/ms, docs 249pp/146.
+
+### CitySkyline (14th shipped, flagship) — `city-skyline` — plan/24 §14
+
+No API deviations. Two variables ARE the story (plan/05 §1 escape clause): building HEIGHT
+(zero-anchored bars, high precision, primary) + lit-window FRACTION (secondary, low precision —
+"mostly lit / half lit / dark", not a number; quantized to the window count, 2 fixed columns, filled
+bottom-up). Omit `lit` everywhere → a plain honest bar row. NO roofline/antenna/width variation
+(width, roof, ground are constants — earn every mark). The secondary channel drops out before the
+primary: a tower too short for a window row is solid, and its `lit` still shows in the summary/hover.
+Geometry refactored mid-build from a height/pad + g-transform model to absolute `groundY`/`maxH`
+inputs, so the client's overlay coords match the static exactly (the translate had broken the focus
+ring alignment when label bands were present). Build error fixed: the `label` prop collided with a
+`const label` aria var in the client (→ `ariaLabel`). Category labels width-drop-out (long names like
+"Platform" drop at narrow `bw` — plan/18 §4; craft caught the collision). `SkylineBuilding` interface
+un-exported (knip). Node 1604, browser 2, craft 513/0, bench 32 rows/ms, docs 252pp/148.

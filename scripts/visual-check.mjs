@@ -44,6 +44,7 @@ const { GardenGrid } = await D("garden-grid");
 const { BubbleRow } = await D("bubble-row");
 const { MusicStaff } = await D("music-staff");
 const { TreeRings } = await D("tree-rings");
+const { CitySkyline } = await D("city-skyline");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -660,6 +661,13 @@ const body = [
     row("stroke + last", `<span style="display:inline-flex;gap:12px;align-items:center">${svg(TreeRings, { data: Y, label: "last", unit: "years", periodWord: "year", size: 40 })}${svg(TreeRings, { data: Y, size: 28 })}</span>`),
     row("fill annuli", svg(TreeRings, { data: Y, rings: "fill", size: 44 })),
     row("cohort (total 200)", svg(TreeRings, { data: Y, total: 200, size: 44 })),
+  ].join("\n"); })(),
+
+  `<h2>CitySkyline</h2>`,
+  (() => { const T = [{ label: "Platform", value: 46, lit: 0.7 }, { label: "Core", value: 32, lit: 0.5 }, { label: "Web", value: 28, lit: 0.9 }, { label: "API", value: 40, lit: 0.3 }, { label: "Data", value: 18, lit: 0.6 }]; return [
+    row("labelled", svg(CitySkyline, { data: T, labels: true, unit: "teams", bw: 16, gap: 6, height: 40 })),
+    row("values", svg(CitySkyline, { data: T, label: "value", bw: 16, gap: 6, height: 36 })),
+    row("plain bars", svg(CitySkyline, { data: T.map((d) => ({ label: d.label, value: d.value })), bw: 14, gap: 5, height: 30 })),
   ].join("\n"); })(),
 ].join("\n");
 

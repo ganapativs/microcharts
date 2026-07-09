@@ -1,0 +1,73 @@
+---
+title: CitySkyline
+description: A city-skyline chart for React — building height for group size and lit windows for activation, two variables in one glanceable row.
+---
+
+CitySkyline answers "how do these groups compare on size, and how activated is each?" — two variables
+in one row. **Height** is the primary, precise channel (zero-anchored bars, like a MiniBar); the
+**lit-window fraction** is a secondary, low-precision channel you read as "mostly lit, half lit, or
+dark", not a number. Omit `lit` everywhere and it's a plain, honest bar row.
+
+<LiveDemo
+  label="CitySkyline"
+  sizeOf="city-skyline"
+  code={`import { CitySkyline } from "@microcharts/react/city-skyline";
+
+<CitySkyline data={teams} unit="teams" title="Team sizes" />`}
+>
+  <CitySkyline data={[{ label: "Platform", value: 46, lit: 0.7 }, { label: "Core", value: 32, lit: 0.5 }, { label: "Web", value: 28, lit: 0.9 }, { label: "API", value: 40, lit: 0.3 }, { label: "Data", value: 18, lit: 0.6 }]} labels unit="teams" title="Team sizes" bw={16} gap={6} height={40} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="city-skyline" />
+
+## Try it
+
+<Playground chart="city-skyline" />
+
+## Interactive
+
+<InteractiveDemo slug="city-skyline" />
+
+## When to use it
+
+- **Good for** — team or region size plus an activation read, an org KPI where two variables are the story, or a per-BU comparison with utilization.
+- **Avoid for** — a single variable (that's `MiniBar`), precise activation reads, or more than about eight groups.
+
+## Sizing
+
+<Sizing chart="city-skyline" />
+
+## Variants
+
+<LiveDemo
+  label="plain bars (no lit) + values"
+  code={`<CitySkyline data={teams.map(({ label, value }) => ({ label, value }))} />
+<CitySkyline data={teams} label="value" />`}
+>
+  <span className="inline-flex gap-8 items-end">
+    <CitySkyline data={[{ label: "A", value: 46 }, { label: "B", value: 32 }, { label: "C", value: 40 }]} bw={14} gap={5} height={30} />
+    <CitySkyline data={[{ label: "A", value: 46, lit: 0.7 }, { label: "B", value: 32, lit: 0.4 }]} label="value" bw={16} gap={6} height={34} />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+Windows come on when `lit` is present, because the two-variable read is exactly why this beats a
+`MiniBar` — the docs page shows the same data as MiniBar for the comparison. Heights are always
+zero-anchored bars; the lit windows are quantized to the window count and filled bottom-up, so the
+activation reads as a fill level. There is no roofline variation, no antennas, and nothing encoded in
+building width — width, roof, and ground are constants, because every mark must earn its place. The
+secondary channel drops out before the primary: a building too short for any window row is a solid
+tower, and its `lit` still shows in the summary and on hover.
+
+## Accessibility
+
+The accessible name names the count and the tallest — **"5 teams; tallest Platform at 46."** The
+interactive entry roves the buildings with ←/→ (or hover), announcing each as "Platform: 46; 70%
+lit." — the size precisely, the activation as a percent.
+
+## Props
+
+<PropTable slug="city-skyline" />

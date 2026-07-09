@@ -69,6 +69,7 @@ import { GardenGrid } from "@microcharts/react/garden-grid";
 import { BubbleRow } from "@microcharts/react/bubble-row";
 import { MusicStaff } from "@microcharts/react/music-staff";
 import { TreeRings } from "@microcharts/react/tree-rings";
+import { CitySkyline } from "@microcharts/react/city-skyline";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -157,6 +158,7 @@ export function getMDXComponents(components?: MDXComponents) {
     BubbleRow,
     MusicStaff,
     TreeRings,
+    CitySkyline,
     SparkGroup,
     // docs building blocks
     Instrument,

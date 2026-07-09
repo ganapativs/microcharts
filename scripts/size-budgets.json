@@ -277,6 +277,10 @@
     "tree-rings": {
       "static": "1.9 kB",
       "interactive": "2.8 kB"
+    },
+    "city-skyline": {
+      "static": "2.1 kB",
+      "interactive": "2.9 kB"
     }
   }
 }

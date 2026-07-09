@@ -145,6 +145,8 @@ export default defineConfig({
     "src/charts/music-staff/client.tsx",
     "src/charts/tree-rings/index.tsx",
     "src/charts/tree-rings/client.tsx",
+    "src/charts/city-skyline/index.tsx",
+    "src/charts/city-skyline/client.tsx",
   ],
   format: ["esm"],
   dts: true,

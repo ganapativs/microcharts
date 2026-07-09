@@ -564,6 +564,14 @@
       "types": "./dist/charts/tree-rings/client.d.ts",
       "import": "./dist/charts/tree-rings/client.js"
     },
+    "./city-skyline": {
+      "types": "./dist/charts/city-skyline/index.d.ts",
+      "import": "./dist/charts/city-skyline/index.js"
+    },
+    "./city-skyline/interactive": {
+      "types": "./dist/charts/city-skyline/client.d.ts",
+      "import": "./dist/charts/city-skyline/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

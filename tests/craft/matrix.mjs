@@ -669,6 +669,23 @@ add(
     [80, 32],
   ],
 );
+const SKYLINE = [
+  { label: "Platform", value: 46, lit: 0.7 },
+  { label: "Core", value: 32, lit: 0.5 },
+  { label: "Web", value: 28, lit: 0.9 },
+  { label: "API", value: 40, lit: 0.3 },
+  { label: "Data", value: 18, lit: 0.6 },
+];
+add(
+  "city-skyline",
+  "CitySkyline",
+  [{ data: SKYLINE }, { data: SKYLINE, labels: true }, { data: SKYLINE, label: "value" }, { data: SKYLINE, ground: false }],
+  [
+    [999, 24],
+    [999, 40],
+    [999, 52],
+  ],
+);
 const RINGS = [8, 12, 10, 18, 22, 15, 20, 14];
 add(
   "tree-rings",
