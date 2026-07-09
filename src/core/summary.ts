@@ -611,6 +611,12 @@ export interface SummaryStrings {
   etaBarStalled: (pct: string) => string;
   /** Completed, e.g. "Done." (eta-bar). */
   etaBarDone: string;
+  /** Waveform overview, e.g. "Peak 0.82 at 63% through 4,096 samples." */
+  waveform: (peak: string, pct: string, n: string) => string;
+  /** All-silence, e.g. "Silent." (waveform). */
+  waveformSilent: string;
+  /** Interactive bucket announce, e.g. "63% through, peak 0.82." (waveform). */
+  waveformAt: (pct: string, value: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

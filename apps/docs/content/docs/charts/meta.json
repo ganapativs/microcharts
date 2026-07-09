@@ -82,6 +82,7 @@
     "orbit-status",
     "time-in-range",
     "hypnogram",
-    "eta-bar"
+    "eta-bar",
+    "waveform"
   ]
 }

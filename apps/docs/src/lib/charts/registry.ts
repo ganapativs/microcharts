@@ -90,6 +90,7 @@ import orbitStatus from "./orbit-status";
 import timeInRange from "./time-in-range";
 import hypnogram from "./hypnogram";
 import etaBar from "./eta-bar";
+import waveform from "./waveform";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -172,6 +173,7 @@ const MODULES: ChartModule[] = [
   timeInRange,
   hypnogram,
   etaBar,
+  waveform,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

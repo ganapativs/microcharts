@@ -59,6 +59,7 @@ const { HeatCell } = await D("heat-cell");
 const { TimeInRange } = await D("time-in-range");
 const { Hypnogram } = await D("hypnogram");
 const { EtaBar } = await D("eta-bar");
+const { Waveform } = await D("waveform");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -996,6 +997,12 @@ const body = [
   row("stalled", svg(EtaBar, { progress: 0.3, elapsed: 40, rate: 0, width: 300, height: 16 })),
   row("percent", svg(EtaBar, { progress: 0.42, elapsed: 10, rate: 0.05, label: "percent", width: 300, height: 16 })),
   row("cell", svg(EtaBar, { progress: 0.64, elapsed: 128, rate: 0.5, width: 60, height: 8 })),
+
+  `<h2>Waveform</h2>`,
+  row("bars + peak", svg(Waveform, { data: Array.from({ length: 200 }, (_, i) => (i === 126 ? 0.82 : Math.sin(i / 3) * 0.15 + Math.sin(i / 11) * 0.35) * (1 - Math.abs(i - 100) / 260)), width: 300, height: 30 })),
+  row("progress 63%", svg(Waveform, { data: Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220)), progress: 0.63, width: 300, height: 30 })),
+  row("envelope", svg(Waveform, { data: Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220)), variant: "envelope", width: 300, height: 30 })),
+  row("silent", svg(Waveform, { data: [0, 0, 0, 0, 0], width: 120, height: 24 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

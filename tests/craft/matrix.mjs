@@ -261,6 +261,18 @@ add(
   ],
 );
 add(
+  "waveform",
+  "Waveform",
+  [
+    { data: Array.from({ length: 200 }, (_, i) => (i === 126 ? 0.82 : Math.sin(i / 3) * 0.3)) },
+    { data: Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.3), variant: "envelope" },
+  ],
+  [
+    [60, 14],
+    [300, 30],
+  ],
+);
+add(
   "eta-bar",
   "EtaBar",
   [

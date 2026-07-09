@@ -680,6 +680,14 @@
       "types": "./dist/charts/eta-bar/client.d.ts",
       "import": "./dist/charts/eta-bar/client.js"
     },
+    "./waveform": {
+      "types": "./dist/charts/waveform/index.d.ts",
+      "import": "./dist/charts/waveform/index.js"
+    },
+    "./waveform/interactive": {
+      "types": "./dist/charts/waveform/client.d.ts",
+      "import": "./dist/charts/waveform/client.js"
+    },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"

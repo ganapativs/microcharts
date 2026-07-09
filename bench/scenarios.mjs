@@ -724,4 +724,13 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "waveform",
+    component: "Waveform",
+    floor: 8, // downsample 2k samples → one bar path — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 2048 }, (_s, j) => Math.sin((i + j) / 7) * (1 - Math.abs(j - 1024) / 2200)),
+      summary: false,
+    }),
+  },
 ];

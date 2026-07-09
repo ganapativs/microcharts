@@ -965,6 +965,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/waveform (static)",
+    "path": "dist/charts/waveform/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/waveform/interactive",
+    "path": "dist/charts/waveform/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

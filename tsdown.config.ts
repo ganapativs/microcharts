@@ -169,6 +169,8 @@ export default defineConfig({
     "src/charts/hypnogram/client.tsx",
     "src/charts/eta-bar/index.tsx",
     "src/charts/eta-bar/client.tsx",
+    "src/charts/waveform/index.tsx",
+    "src/charts/waveform/client.tsx",
   ],
   format: ["esm"],
   dts: true,

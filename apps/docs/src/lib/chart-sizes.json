@@ -319,6 +319,10 @@
     "static": 1.97,
     "interactive": 2.42
   },
+  "waveform": {
+    "static": 2.26,
+    "interactive": 3.14
+  },
   "annotations": {
     "static": 1.46
   }
