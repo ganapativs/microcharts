@@ -368,6 +368,10 @@
     "calibration-strip": {
       "static": "2.4 kB",
       "interactive": "3.4 kB"
+    },
+    "confusion-grid": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
     }
   }
 }

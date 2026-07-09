@@ -42,6 +42,7 @@ export { EN_DUAL_WINDOW, type DualWindowStrings } from "./strings-dual-window.js
 export { EN_DEPTH_WEDGE, type DepthWedgeStrings } from "./strings-depth-wedge.js";
 export { EN_PARTITION, type PartitionStrings } from "./strings-partition.js";
 export { EN_CALIBRATION, type CalibrationStrings } from "./strings-calibration.js";
+export { EN_CONFUSION, type ConfusionStrings } from "./strings-confusion.js";
 export {
   quantiles,
   fiveNumber,

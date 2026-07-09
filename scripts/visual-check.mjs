@@ -70,6 +70,7 @@ const { DualWindowMeter } = await D("dual-window-meter");
 const { DepthWedge } = await D("depth-wedge");
 const { PartitionStrip } = await D("partition-strip");
 const { CalibrationStrip } = await D("calibration-strip");
+const { ConfusionGrid } = await D("confusion-grid");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1061,6 +1062,12 @@ const body = [
   `<h2>CalibrationStrip</h2>`,
   row("dots + support", svg(CalibrationStrip, { data: [{ predicted: 0.05, observed: 0.05, count: 100 }, { predicted: 0.25, observed: 0.24, count: 80 }, { predicted: 0.45, observed: 0.44, count: 60 }, { predicted: 0.65, observed: 0.63, count: 40 }, { predicted: 0.7, observed: 0.52, count: 30 }, { predicted: 0.85, observed: 0.83, count: 8 }, { predicted: 0.95, observed: 0.9, count: 5 }], width: 300, height: 44 })),
   row("bars", svg(CalibrationStrip, { data: [{ predicted: 0.1, observed: 0.08, count: 90 }, { predicted: 0.3, observed: 0.36, count: 70 }, { predicted: 0.5, observed: 0.44, count: 55 }, { predicted: 0.7, observed: 0.52, count: 30 }, { predicted: 0.9, observed: 0.85, count: 8 }], variant: "bars", width: 300, height: 40 })),
+
+  `<h2>ConfusionGrid</h2>`,
+  row("2×2 + accuracy", svg(ConfusionGrid, { data: { labels: ["cat", "dog"], counts: [[88, 12], [10, 59]] }, label: "accuracy", size: 90 })),
+  row("3×3", svg(ConfusionGrid, { data: { labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 62, 12], [3, 9, 58]] }, size: 110 })),
+  row("errors accent + round", svg(ConfusionGrid, { data: { labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 40, 34], [3, 9, 58]] }, accent: "errors", shape: "round", size: 110 })),
+  row("empty row", svg(ConfusionGrid, { data: { labels: ["cat", "dog"], counts: [[40, 10], [0, 0]] }, size: 90 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

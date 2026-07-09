@@ -279,6 +279,15 @@ add(
   ],
 );
 add(
+  "confusion-grid",
+  "ConfusionGrid",
+  [
+    { data: { labels: ["cat", "dog"], counts: [[88, 12], [10, 59]] } },
+    { data: { labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 62, 12], [3, 9, 58]] }, label: "accuracy" },
+  ],
+  [[44, 44], [120, 120]],
+);
+add(
   "calibration-strip",
   "CalibrationStrip",
   [

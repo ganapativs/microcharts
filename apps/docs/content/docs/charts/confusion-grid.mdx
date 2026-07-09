@@ -1,0 +1,77 @@
+---
+title: ConfusionGrid
+description: A k×k agreement matrix for React at glyph scale — rows are actual, columns predicted, cell ink is the row-normalized share, and the diagonal is accented by shape.
+---
+
+ConfusionGrid answers "where do the errors go?" — the one thing accuracy-as-a-number hides. Rows
+are the actual class, columns the predicted class, and each cell's ink is the row-normalized share:
+of the actual X, where did the predictions go? The diagonal (agreement) is accented by shape, never
+by colour, so good and bad are positions on the grid, not hues. The one-line key — rows actual,
+columns predicted — belongs next to every example.
+
+<LiveDemo
+  label="ConfusionGrid"
+  sizeOf="confusion-grid"
+  code={`import { ConfusionGrid } from "@microcharts/react/confusion-grid";
+
+<ConfusionGrid data={{ labels: ["cat", "dog"], counts }} title="Classifier" />`}
+>
+  <ConfusionGrid
+    data={{ labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 62, 12], [3, 9, 58]] }}
+    label="accuracy"
+    title="Classifier"
+    size={120}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="confusion-grid" />
+
+## Try it
+
+<Playground chart="confusion-grid" />
+
+## Interactive
+
+<InteractiveDemo slug="confusion-grid" />
+
+## When to use it
+
+- **Good for** — classifier evaluation, and any paired-classification agreement (triage vs outcome, plan vs actual, rater A vs rater B).
+- **Avoid for** — a single accuracy number (Delta) or more than four classes (use a full-size heatmap).
+
+## Sizing
+
+<Sizing chart="confusion-grid" />
+
+## Variants
+
+<LiveDemo label="worst-confusion accent" code={`<ConfusionGrid data={cm} accent="errors" />`}>
+  <ConfusionGrid
+    data={{ labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 40, 34], [3, 9, 58]] }}
+    accent="errors"
+    title="Worst confusion"
+    size={110}
+  />
+</LiveDemo>
+
+## Why this default
+
+The row view answers the question practitioners actually ask — "of the real cats, how many did we
+call dogs?" — so row-normalization is stated in the summary phrasing ("% of cats") and the
+denominator travels with every number. Accuracy is off by default and never rendered without the
+grid: the number may not leave its context. The diagonal accent is a shape (an inset stroke), and
+the ink ramp is identical for agreement and error cells — good and bad are positions, not colours,
+which is what keeps it readable under forced colours.
+
+## Accessibility
+
+The accessible name states accuracy and the worst confusion — **"Accuracy 87%. Most confused: cat
+predicted as dog (12% of cats)."** A perfect classifier reads **"Accuracy 100%. No confusion."** The
+interactive entry roves the cells with the arrow keys (Home/End jump the diagonal), announcing each
+cell's actual and predicted class as a share of the actual class.
+
+## Props
+
+<PropTable slug="confusion-grid" />

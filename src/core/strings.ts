@@ -70,6 +70,7 @@ import { EN_DUAL_WINDOW } from "./strings-dual-window.js";
 import { EN_DEPTH_WEDGE } from "./strings-depth-wedge.js";
 import { EN_PARTITION } from "./strings-partition.js";
 import { EN_CALIBRATION } from "./strings-calibration.js";
+import { EN_CONFUSION } from "./strings-confusion.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -140,4 +141,5 @@ export const EN: SummaryStrings = {
   ...EN_DEPTH_WEDGE,
   ...EN_PARTITION,
   ...EN_CALIBRATION,
+  ...EN_CONFUSION,
 };

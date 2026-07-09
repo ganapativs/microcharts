@@ -359,7 +359,11 @@
     "interactive": 3.04
   },
   "calibration-strip": {
-    "static": 2.39,
+    "static": 2.4,
+    "interactive": 3.22
+  },
+  "confusion-grid": {
+    "static": 2.29,
     "interactive": 3.21
   },
   "annotations": {

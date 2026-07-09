@@ -93,6 +93,7 @@
     "dual-window-meter",
     "depth-wedge",
     "partition-strip",
-    "calibration-strip"
+    "calibration-strip",
+    "confusion-grid"
   ]
 }

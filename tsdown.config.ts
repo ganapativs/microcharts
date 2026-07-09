@@ -190,6 +190,8 @@ export default defineConfig({
     "src/charts/partition-strip/client.tsx",
     "src/charts/calibration-strip/index.tsx",
     "src/charts/calibration-strip/client.tsx",
+    "src/charts/confusion-grid/index.tsx",
+    "src/charts/confusion-grid/client.tsx",
   ],
   format: ["esm"],
   dts: true,

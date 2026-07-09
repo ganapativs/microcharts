@@ -847,4 +847,20 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "confusion-grid",
+    component: "ConfusionGrid",
+    floor: 40, // ≤ 16 cells + labels
+    props: (i) => ({
+      data: {
+        labels: ["A", "B", "C"],
+        counts: [
+          [70 - (i % 5), 8, 2],
+          [6, 62, 12],
+          [3, 9, 58 + (i % 4)],
+        ],
+      },
+      summary: false,
+    }),
+  },
 ];

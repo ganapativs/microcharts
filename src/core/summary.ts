@@ -689,6 +689,15 @@ export interface SummaryStrings {
   calibrationAt: (p: string, o: string, n: number, lowClause: string) => string;
   /** Low-support clause appended to a bin announce, e.g. ", low support". */
   calibrationLow: string;
+  /** ConfusionGrid overview, e.g.
+   *  "Accuracy 87%. Most confused: cat predicted as dog (12% of cats)." */
+  confusion: (acc: string, actual: string, predicted: string, pct: string) => string;
+  /** Perfect diagonal, e.g. "Accuracy 100%. No confusion." (confusion-grid). */
+  confusionPerfect: (acc: string) => string;
+  /** Interactive cell announce, e.g. "Actual cat, predicted dog: 12% of cats." */
+  confusionAt: (actual: string, predicted: string, pct: string) => string;
+  /** Empty-row note, e.g. "no dog samples" appended to the summary. */
+  confusionEmpty: (cls: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive
