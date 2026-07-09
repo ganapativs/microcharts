@@ -28,6 +28,7 @@ const { ShiftHistogram } = await D("shift-histogram");
 const { ParetoStrip } = await D("pareto-strip");
 const { DataDiff } = await D("data-diff");
 const { QuadrantDot } = await D("quadrant-dot");
+const { CyclePlot } = await D("cycle-plot");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -136,6 +137,9 @@ const QF = [
   { x: 5, y: 6 },
   { x: 6, y: 8 },
 ];
+const CYC = [];
+for (let w = 0; w < 6; w++) CYC.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
+const CDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -493,6 +497,26 @@ const body = [
       width: 72,
       height: 72,
     }),
+  ),
+
+  `<h2>CyclePlot</h2>`,
+  row("default 80x20", svg(CyclePlot, { data: CYC, period: 7, slots: CDAYS, cycleUnit: "weeks" })),
+  row(
+    "card 240x40",
+    svg(CyclePlot, {
+      data: CYC,
+      period: 7,
+      slots: CDAYS,
+      cycleUnit: "weeks",
+      width: 240,
+      height: 40,
+      title: "Weekly shape",
+    }),
+  ),
+  row("median", svg(CyclePlot, { data: CYC, period: 7, center: "median", width: 200, height: 32 })),
+  row(
+    "spine only",
+    svg(CyclePlot, { data: CYC, period: 7, trend: "none", width: 200, height: 32 }),
   ),
 ].join("\n");
 

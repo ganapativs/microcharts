@@ -53,6 +53,7 @@ import { ShiftHistogram } from "@microcharts/react/shift-histogram";
 import { ParetoStrip } from "@microcharts/react/pareto-strip";
 import { DataDiff } from "@microcharts/react/data-diff";
 import { QuadrantDot } from "@microcharts/react/quadrant-dot";
+import { CyclePlot } from "@microcharts/react/cycle-plot";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -125,6 +126,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ParetoStrip,
     DataDiff,
     QuadrantDot,
+    CyclePlot,
     SparkGroup,
     // docs building blocks
     Instrument,

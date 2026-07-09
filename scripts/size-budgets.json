@@ -213,6 +213,10 @@
     "quadrant-dot": {
       "static": "2.4 kB",
       "interactive": "3.3 kB"
+    },
+    "cycle-plot": {
+      "static": "2.5 kB",
+      "interactive": "3.5 kB"
     }
   }
 }

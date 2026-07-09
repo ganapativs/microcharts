@@ -1025,3 +1025,35 @@ on the live page 0 dot-escapes; region tint renders at 0.05; lone-glyph → 0 gh
 region; live hero label == mdx flagship string; interactive nearest-first announce + `x, y` readout
 chip). New `EN_QUADRANT` module (`quadrantName`, `quadrant`, `quadrantLone`, `quadrantAt`).
 **13 of 21 done.**
+
+## Batch 2 wave 3 — CyclePlot (2026-07-09)
+
+**CyclePlot (plan/23 #18) — full DoD, static + interactive.** Provenance: plan/16 §Q19 (cycle plot /
+seasonal-subseries chart, Cleveland). The flat series is reshaped row-major into `period` slots
+(slot = i mod period). Per slot: a muted polyline of that slot's raw values across cycles IN TIME
+ORDER + a mean/median tick; across slots the accent spine connects the centers. **The two reads are
+separate by construction** (property-tested): the spine is only centers, the local lines are only
+raw within-slot values, and **nothing is ever smoothed or joined across a slot boundary** — each
+slot's polyline begins and ends inside its own column (verified: every line x ∈ [x0, x1]).
+`period` (4–12, `devWarn` outside), `slots` (names for summaries), `center` (`mean`/`median`,
+computed INLINE — the ShiftHistogram lesson, no `quantile` import for one median), `trend`
+(`line`/`none`), `spine` (off → drift-only), `cycleUnit`. Edge cases: ragged final cycle → per-slot
+counts differ and are carried (`slotCounts`); `period ≥ length` → every slot ≤ 1 point, no lines,
+spine only; nulls excluded from a slot's center/line, never interpolated; empty slot → spine skips it
+(never joins across the gap). Real accessible name: **"Peaks Fri (61), dips Sun (38); Mon rising
+across 6 weeks."** — the drift clause appears only when a slot's |drift| leads AND exceeds 10 % of
+the spine range, else `cycleNoDrift`. Interactive: ←/→ step slots (mean + cycle count + drift dir),
+↑/↓ step the individual observations within the focused slot (a `{slot, cycle}` selection model),
+`x`-nearest pointer, value readout chip.
+
+**Budget divergence (needs gate sign-off, batch-2 pattern):** spec §18 targets static ≤ 2 /
+interactive ≤ 3 kB; measured 2.44 / 3.46 (Chart + `scaleLinear` + `extent` + `makeFormatter` +
+bucketing + summary). Under the 3 / 4 hard caps; budgets set 2.5 / 3.5 with headroom. Same class as
+the other batch-2 spec-vs-measured gaps.
+
+Gates: node 1376, browser 104, craft 337/0, size 2.44/3.46 (budgets 2.5/3.5, caps 3/4), bench 21.2
+rows/ms (floor 20), docs 204 pages + tests 116, real-browser sweep green (all 13 cycle-plot SVGs on
+the live page 0 escapes; 7 ticks + 7 slot lines + spine at default; `trend="none"` → 0 lines; live
+hero label == mdx flagship string; interactive slot announce + within-slot cycle announce + drift
+direction + readout chip all correct). New `EN_CYCLE` module (`cycle`, `cycleNoDrift`, `cycleAt`,
+`cyclePoint`). **14 of 21 done.**

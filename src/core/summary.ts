@@ -414,6 +414,30 @@ export interface SummaryStrings {
     yv: string,
     quadName: string,
   ) => string;
+  /** CyclePlot summary with a leading drift, e.g. "Peaks Fri (61), dips Sun (38); Mon rising across 6 weeks." */
+  cycle: (
+    peakSlot: string,
+    peak: string,
+    dipSlot: string,
+    dip: string,
+    driftSlot: string,
+    driftDir: "rising" | "falling",
+    cycles: number,
+    cycleUnit: string,
+  ) => string;
+  /** CyclePlot summary, no notable drift, e.g. "Peaks Fri (61), dips Sun (38)." */
+  cycleNoDrift: (peakSlot: string, peak: string, dipSlot: string, dip: string) => string;
+  /** Slot announcement, e.g. "Mondays: mean 42 across 6 weeks, rising." */
+  cycleAt: (
+    slotName: string,
+    center: "mean" | "median",
+    value: string,
+    cycles: number,
+    cycleUnit: string,
+    driftDir: "rising" | "falling" | "steady",
+  ) => string;
+  /** Within-slot observation, e.g. "Mon, cycle 3 of 6: 44." */
+  cyclePoint: (slotName: string, pos: number, total: number, value: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

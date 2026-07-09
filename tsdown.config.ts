@@ -113,6 +113,8 @@ export default defineConfig({
     "src/charts/data-diff/client.tsx",
     "src/charts/quadrant-dot/index.tsx",
     "src/charts/quadrant-dot/client.tsx",
+    "src/charts/cycle-plot/index.tsx",
+    "src/charts/cycle-plot/client.tsx",
   ],
   format: ["esm"],
   dts: true,

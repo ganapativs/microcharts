@@ -429,6 +429,12 @@ export const SCENARIOS = [
     props: (i) => ({ data: diffs[i % POOL], summary: false }),
   },
   {
+    slug: "cycle-plot",
+    component: "CyclePlot",
+    floor: 20, // ≤ 12 slots × (line + tick) + spine; one bucketing pass
+    props: (i) => ({ data: waves[i % POOL], period: 7, summary: false }),
+  },
+  {
     slug: "quadrant-dot",
     component: "QuadrantDot",
     floor: 20, // ≤ 5 + 1/ghost (cap 30) glyph; extent + one sort per render

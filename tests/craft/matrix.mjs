@@ -605,6 +605,23 @@ add(
     [120, 120],
   ],
 );
+const CYCLE = [];
+for (let w = 0; w < 6; w++) CYCLE.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
+add(
+  "cycle-plot",
+  "CyclePlot",
+  [
+    { data: CYCLE, period: 7 },
+    { data: CYCLE, period: 7, center: "median" },
+    { data: CYCLE, period: 7, trend: "none" },
+    { data: CYCLE, period: 7, spine: false },
+  ],
+  [
+    [80, 20],
+    [160, 32],
+    [240, 40],
+  ],
+);
 add(
   "shift-histogram",
   "ShiftHistogram",

@@ -436,6 +436,14 @@
       "types": "./dist/charts/quadrant-dot/client.d.ts",
       "import": "./dist/charts/quadrant-dot/client.js"
     },
+    "./cycle-plot": {
+      "types": "./dist/charts/cycle-plot/index.d.ts",
+      "import": "./dist/charts/cycle-plot/index.js"
+    },
+    "./cycle-plot/interactive": {
+      "types": "./dist/charts/cycle-plot/client.d.ts",
+      "import": "./dist/charts/cycle-plot/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

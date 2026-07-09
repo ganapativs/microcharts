@@ -599,6 +599,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/cycle-plot (static)",
+    "path": "dist/charts/cycle-plot/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/cycle-plot/interactive",
+    "path": "dist/charts/cycle-plot/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",
