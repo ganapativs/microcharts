@@ -335,6 +335,9 @@
     "static": 0.91,
     "interactive": 1.49
   },
+  "wind-barb": {
+    "static": 2.3
+  },
   "annotations": {
     "static": 1.46
   }

@@ -771,4 +771,10 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "wind-barb",
+    component: "WindBarb",
+    floor: 120, // one glyph — shaft + barbs + quantization
+    props: (i) => ({ direction: (i * 13) % 360, magnitude: (i % 90) + 1, summary: false }),
+  },
 ];

@@ -35,6 +35,7 @@ export { EN_WAVEFORM, type WaveformStrings } from "./strings-waveform.js";
 export { EN_EVENT_RASTER, type EventRasterStrings } from "./strings-event-raster.js";
 export { EN_RUBRIC, type RubricStrings } from "./strings-rubric.js";
 export { EN_TOKEN_CONFIDENCE, type TokenConfidenceStrings } from "./strings-token-confidence.js";
+export { EN_WIND_BARB, octant, type WindBarbStrings } from "./strings-wind-barb.js";
 export {
   quantiles,
   fiveNumber,

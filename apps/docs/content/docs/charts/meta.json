@@ -86,6 +86,7 @@
     "waveform",
     "event-raster",
     "rubric-strip",
-    "token-confidence"
+    "token-confidence",
+    "wind-barb"
   ]
 }

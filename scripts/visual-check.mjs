@@ -63,6 +63,7 @@ const { Waveform } = await D("waveform");
 const { EventRaster } = await D("event-raster");
 const { RubricStrip } = await D("rubric-strip");
 const { TokenConfidence } = await D("token-confidence");
+const { WindBarb } = await D("wind-barb");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1020,6 +1021,11 @@ const body = [
   `<h2>TokenConfidence (HTML host)</h2>`,
   row("flagged", svg(TokenConfidence, { data: [{ token: "The", confidence: 0.98 }, { token: " Treaty", confidence: 0.93 }, { token: " of", confidence: 0.99 }, { token: " Westphalia", confidence: 0.71 }, { token: " was signed in", confidence: 0.9 }, { token: " 1648", confidence: 0.44 }, { token: ", ending the", confidence: 0.9 }, { token: " Thirty", confidence: 0.63 }, { token: " Years' War over", confidence: 0.85 }, { token: " a decade", confidence: 0.31 }, { token: ".", confidence: 0.99 }], style: { fontSize: "15px" } })),
   row("legend", svg(TokenConfidence, { data: [{ token: "Likely", confidence: 0.92 }, { token: " Paris", confidence: 0.62 }, { token: ", maybe", confidence: 0.3 }], legend: true, style: { fontSize: "15px" } })),
+
+  `<h2>WindBarb</h2>`,
+  row("compass 8", [0, 45, 90, 135, 180, 225, 270, 315].map((d) => svg(WindBarb, { direction: d, magnitude: 35, size: 44 })).join("")),
+  row("magnitudes", [5, 15, 32, 55, 80].map((m) => svg(WindBarb, { direction: 90, magnitude: m, label: true, size: 48 })).join("")),
+  row("calm / arrow", svg(WindBarb, { direction: 0, magnitude: 1, size: 44 }) + svg(WindBarb, { direction: 45, magnitude: 25, variant: "arrow", size: 44 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

@@ -341,6 +341,9 @@
     "token-confidence": {
       "static": "1.5 kB",
       "interactive": "2.5 kB"
+    },
+    "wind-barb": {
+      "static": "2.5 kB"
     }
   }
 }

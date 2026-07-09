@@ -279,6 +279,16 @@ add(
   ],
 );
 add(
+  "wind-barb",
+  "WindBarb",
+  [
+    { direction: 225, magnitude: 32 },
+    { direction: 45, magnitude: 65, label: true },
+    { direction: 0, magnitude: 1 },
+  ],
+  [[24, 24], [64, 64]],
+);
+add(
   "event-raster",
   "EventRaster",
   [

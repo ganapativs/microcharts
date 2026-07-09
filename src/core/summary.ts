@@ -634,6 +634,12 @@ export interface SummaryStrings {
   tokenTierNames: readonly [string, string, string];
   /** Interactive token announce, e.g. "sauce: guessing, 0.22." (token-confidence). */
   tokenAt: (token: string, tier: string, confidence: string) => string;
+  /** WindBarb reading, e.g. "Southwest (225°), magnitude 32." */
+  windBarb: (compass: string, deg: string, value: string) => string;
+  /** Calm state, e.g. "Calm." (wind-barb). */
+  windBarbCalm: string;
+  /** Compass octant names, indexed N, NE, E, SE, S, SW, W, NW. */
+  compass8: readonly [string, string, string, string, string, string, string, string];
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

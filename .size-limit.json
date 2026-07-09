@@ -1013,6 +1013,12 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/wind-barb (static)",
+    "path": "dist/charts/wind-barb/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

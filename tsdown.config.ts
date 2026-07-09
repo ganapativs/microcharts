@@ -177,6 +177,7 @@ export default defineConfig({
     "src/charts/rubric-strip/client.tsx",
     "src/charts/token-confidence/index.tsx",
     "src/charts/token-confidence/client.tsx",
+    "src/charts/wind-barb/index.tsx",
   ],
   format: ["esm"],
   dts: true,
