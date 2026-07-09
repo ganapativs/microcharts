@@ -50,6 +50,7 @@
     "control-strip",
     "forecast-cone",
     "quantile-dots",
-    "ab-strips"
+    "ab-strips",
+    "shift-histogram"
   ]
 }

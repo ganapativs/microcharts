@@ -890,3 +890,29 @@ quantile-dot-row variant deferred: needs ≥28px height; the band form is the ho
 Gates: node 1287, browser 94, craft 280/0, size 2.56/3.49, bench 24.9 rows/ms (floor 20), docs
 189 pages + tests 106, real-browser sweep green (2 nested bands/row 0.16/0.34, medians, A/B tags
 no-collision, delta valence-colored, row+edge interactive + readout chip). Starts wave 3.
+
+## Batch 2 wave 3 — ShiftHistogram (2026-07-09)
+
+**ShiftHistogram (plan/23 #14) — full DoD, static + interactive.** Provenance: plan/16 §Q7. Two
+mirrored histograms over SHARED bin edges (`core/bin.uniformBins`, union domain + one auto bin
+count reused for both sides). Heights = per-side PROPORTIONS on one shared scale (max proportion
+across both) — property-tested: identical distributions at 10× the n produce matching up/down
+heights (unequal n cannot fake a shift). Median shift is the precise takeaway; medians never
+smoothed/trimmed. One side empty → single histogram + "no <side> sample"; unequal n → summary
+carries both.
+
+**Two fixes caught during the build:**
+1. **Static 3.02 kB was OVER the 3 kB HARD cap** (imported both `core/bin` AND `core/quantile`).
+   Trimmed by computing the two medians INLINE (5-line sort + middle) instead of pulling the whole
+   quantile module for one 0.5 quantile → 2.94 kB, under the cap. Lesson: a histogram bundle
+   should not drag the quantile module for a single median.
+2. **Side tags ("before"/"after") collided with the bars at EVERY micro size** — the craft gate
+   caught 8 TEXT-ON-MARK/ESCAPE issues (full-word tags over the full-width bars, no clear space).
+   DROPPED the on-chart tags: side identity rides on POSITION (before up / after down) + color +
+   the summary, and position survives grayscale + forced-colors (both bars map to CanvasText, but
+   up≠down still distinguishes). This is the plan's "drop first under the degradation order",
+   applied always at these sizes. Deviation from plan §14 (which lists side tags) logged here.
+
+Gates: node 1303, browser 96, craft 292/0, size 2.94/3.88, bench 13.4 rows/ms (floor 6), docs 192
+pages + tests 108, real-browser sweep green (proper mirror before-up/after-down, overlay outlines,
+"0 ms" no-shift, 0 escapes; interactive bin proportions + M-jumps-to-median + readout chip).

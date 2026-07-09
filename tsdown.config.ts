@@ -105,6 +105,8 @@ export default defineConfig({
     "src/charts/quantile-dots/client.tsx",
     "src/charts/ab-strips/index.tsx",
     "src/charts/ab-strips/client.tsx",
+    "src/charts/shift-histogram/index.tsx",
+    "src/charts/shift-histogram/client.tsx",
   ],
   format: ["esm"],
   dts: true,

@@ -406,6 +406,15 @@ export const SCENARIOS = [
     props: (i) => ({ data: rugs[i % POOL].map((v) => v * 10 + 40), rules: "we", summary: false }),
   },
   {
+    slug: "shift-histogram",
+    component: "ShiftHistogram",
+    floor: 6, // ≤ 12 bins × 2 + double binning + medians (measured ~13 rows/ms, half-floor)
+    props: (i) => ({
+      data: { before: rugs[i % POOL].map((v) => v * 10 + 40), after: rugs[(i + 1) % POOL].map((v) => v * 10 + 30) },
+      summary: false,
+    }),
+  },
+  {
     slug: "ab-strips",
     component: "ABStrips",
     floor: 20, // 2 rows × (2 bands + median) + quantiles — few nodes

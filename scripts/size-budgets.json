@@ -197,6 +197,10 @@
     "ab-strips": {
       "static": "2.7 kB",
       "interactive": "3.6 kB"
+    },
+    "shift-histogram": {
+      "static": "2.98 kB",
+      "interactive": "3.95 kB"
     }
   }
 }

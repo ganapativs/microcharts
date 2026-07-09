@@ -360,6 +360,16 @@ export interface SummaryStrings {
   ) => string;
   /** A/B edge announcement, e.g. "B p75: 140 ms." */
   abEdge: (label: string, p: number, value: string) => string;
+  /** Shift summary, e.g. "Median fell from 130 ms to 106 ms." */
+  shift: (direction: "fell" | "rose", before: string, after: string) => string;
+  /** No-change shift, e.g. "Median unchanged at 130 ms." */
+  shiftHeld: (value: string) => string;
+  /** Appended when the two sides have unequal n, e.g. " On 6,400 / 7,100 samples." */
+  shiftSamples: (nBefore: number, nAfter: number) => string;
+  /** One-sided (the other side is empty), e.g. "Median 130 ms; no after sample." */
+  shiftOneSide: (value: string, missing: string) => string;
+  /** Shift bin announcement, e.g. "10–12 ms: 18% before, 6% after." */
+  shiftBin: (lo: string, hi: string, beforePct: string, afterPct: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

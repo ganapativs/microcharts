@@ -404,6 +404,14 @@
       "types": "./dist/charts/ab-strips/client.d.ts",
       "import": "./dist/charts/ab-strips/client.js"
     },
+    "./shift-histogram": {
+      "types": "./dist/charts/shift-histogram/index.d.ts",
+      "import": "./dist/charts/shift-histogram/index.js"
+    },
+    "./shift-histogram/interactive": {
+      "types": "./dist/charts/shift-histogram/client.d.ts",
+      "import": "./dist/charts/shift-histogram/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

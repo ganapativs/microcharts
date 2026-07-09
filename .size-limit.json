@@ -551,6 +551,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/shift-histogram (static)",
+    "path": "dist/charts/shift-histogram/index.js",
+    "limit": "2.98 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/shift-histogram/interactive",
+    "path": "dist/charts/shift-histogram/client.js",
+    "limit": "3.95 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

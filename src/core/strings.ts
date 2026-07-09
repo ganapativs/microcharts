@@ -28,6 +28,7 @@ import { EN_ERROR_BUDGET } from "./strings-error-budget.js";
 import { EN_CONTROL } from "./strings-control.js";
 import { EN_FORECAST } from "./strings-forecast.js";
 import { EN_AB } from "./strings-ab.js";
+import { EN_SHIFT } from "./strings-shift.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -56,4 +57,5 @@ export const EN: SummaryStrings = {
   ...EN_CONTROL,
   ...EN_FORECAST,
   ...EN_AB,
+  ...EN_SHIFT,
 };

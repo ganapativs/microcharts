@@ -535,6 +535,18 @@ const FC_FORE = {
 const QD = Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 40) * 0.4 + (i % 7) * 1.5));
 const ABA = Array.from({ length: 60 }, (_, i) => 130 + ((i * 7) % 30) - 15);
 const ABB = Array.from({ length: 60 }, (_, i) => 118 + ((i * 7) % 30) - 15);
+const SHB = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+const SHA = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+add(
+  "shift-histogram",
+  "ShiftHistogram",
+  [{ data: { before: SHB, after: SHA } }, { data: { before: SHB, after: SHA }, mode: "overlay" }, { data: { before: SHB, after: SHA }, bins: 6 }, { data: { before: SHB, after: SHA }, label: "none" }],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
 add(
   "ab-strips",
   "ABStrips",

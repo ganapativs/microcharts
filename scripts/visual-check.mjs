@@ -24,6 +24,7 @@ const { ControlStrip } = await D("control-strip");
 const { ForecastCone } = await D("forecast-cone");
 const { QuantileDots } = await D("quantile-dots");
 const { ABStrips } = await D("ab-strips");
+const { ShiftHistogram } = await D("shift-histogram");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -85,6 +86,8 @@ const MINF = (n) => `${n} min`;
 const ABA = Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22);
 const ABB = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
 const ABMS = (n) => `${Math.round(n)} ms`;
+const SHB = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+const SHA = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -237,6 +240,12 @@ const body = [
   row("delta, tags", svg(ABStrips, { data: { a: ABA, b: ABB }, format: ABMS, positive: "down", width: 240, height: 28 })),
   row("separated", svg(ABStrips, { data: { a: ABA.map((v) => v + 40), b: ABB }, format: ABMS, positive: "down", width: 240, height: 28 })),
   row("small n", svg(ABStrips, { data: { a: [100, 130, 145], b: ABB }, format: ABMS, width: 240, height: 28 })),
+
+  `<h2>ShiftHistogram</h2>`,
+  row("default 80x20", svg(ShiftHistogram, { data: { before: SHB, after: SHA }, format: ABMS, width: 80, height: 20 })),
+  row("shift, mirror", svg(ShiftHistogram, { data: { before: SHB, after: SHA }, format: ABMS, width: 240, height: 30 })),
+  row("overlay", svg(ShiftHistogram, { data: { before: SHB, after: SHA }, format: ABMS, mode: "overlay", width: 240, height: 30 })),
+  row("no shift", svg(ShiftHistogram, { data: { before: SHB, after: SHB }, format: ABMS, width: 240, height: 30 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}
