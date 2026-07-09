@@ -827,6 +827,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/polar-clock (static)",
+    "path": "dist/charts/polar-clock/index.js",
+    "limit": "2.95 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/polar-clock/interactive",
+    "path": "dist/charts/polar-clock/client.js",
+    "limit": "3.85 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

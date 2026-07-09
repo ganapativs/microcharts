@@ -289,6 +289,10 @@
     "constellation": {
       "static": "2.8 kB",
       "interactive": "3.75 kB"
+    },
+    "polar-clock": {
+      "static": "2.95 kB",
+      "interactive": "3.85 kB"
     }
   }
 }

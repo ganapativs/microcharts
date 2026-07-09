@@ -151,6 +151,8 @@ export default defineConfig({
     "src/charts/honeycomb/client.tsx",
     "src/charts/constellation/index.tsx",
     "src/charts/constellation/client.tsx",
+    "src/charts/polar-clock/index.tsx",
+    "src/charts/polar-clock/client.tsx",
   ],
   format: ["esm"],
   dts: true,

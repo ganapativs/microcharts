@@ -116,6 +116,14 @@ export interface SummaryStrings {
   constellationOne: (label: string) => string;
   /** Hovered/focused constellation event, e.g. "Mar: 82, magnitude 5." */
   constellationAt: (label: string, value: string) => string;
+  /** S1 cyclic, e.g. "Peaks at 14:00 (312); quietest 04:00." (polar-clock). */
+  polarClock: (peakLabel: string, max: string, minLabel: string) => string;
+  /** Flat cycle, e.g. "Flat at 120 across the cycle." (polar-clock). */
+  polarClockFlat: (value: string) => string;
+  /** Hovered/focused cycle segment, e.g. "14:00: 312." (polar-clock). */
+  polarClockAt: (label: string, value: string) => string;
+  /** Weekday names for a 7-segment cycle (i18n contract; index 0 = Sunday). */
+  weekdays: readonly string[];
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

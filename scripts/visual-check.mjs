@@ -47,6 +47,7 @@ const { TreeRings } = await D("tree-rings");
 const { CitySkyline } = await D("city-skyline");
 const { Honeycomb } = await D("honeycomb");
 const { Constellation } = await D("constellation");
+const { PolarClock } = await D("polar-clock");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -714,6 +715,30 @@ const body = [
       height: 30,
     }),
   ),
+
+  `<h2>PolarClock</h2>`,
+  row(
+    "24h day, now=14",
+    svg(PolarClock, {
+      data: Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h)),
+      now: 14,
+      size: 64,
+    }),
+  ),
+  row(
+    'labels + label="max"',
+    svg(PolarClock, {
+      data: Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h)),
+      labels: true,
+      label: "max",
+      size: 64,
+    }),
+  ),
+  row(
+    "week, opacity mode",
+    svg(PolarClock, { data: [120, 200, 180, 210, 260, 90, 60], mode: "opacity", size: 64 }),
+  ),
+  row("with a null + a zero", svg(PolarClock, { data: [10, null, 30, 0, 25], size: 64 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

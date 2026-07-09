@@ -588,6 +588,14 @@
       "types": "./dist/charts/constellation/client.d.ts",
       "import": "./dist/charts/constellation/client.js"
     },
+    "./polar-clock": {
+      "types": "./dist/charts/polar-clock/index.d.ts",
+      "import": "./dist/charts/polar-clock/index.js"
+    },
+    "./polar-clock/interactive": {
+      "types": "./dist/charts/polar-clock/client.d.ts",
+      "import": "./dist/charts/polar-clock/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

@@ -1454,3 +1454,35 @@ New `strings-constellation` module (constellation / constellationOne / constella
 Budget: 2.7/3.66 kB > the §16 targets (2/3) but < the 3/4 hard caps — scaleLinear + jitter + makeFormatter;
 gate sign-off with the other batch-3 spec-vs-measured divergences. Node 1634, browser 2, craft 525/0,
 bench 30.3 rows/ms, size 2.7/3.66 (caps 2.8/3.75), docs 258pp/152.
+
+### PolarClock (17th shipped, flagship) — `polar-clock` — plan/24 §17
+
+Channel = radial bar LENGTH at a fixed cycle angle (medium precision — radial-length comparison;
+exact reads steer to SparkBar over the unrolled cycle). Built directly on `core/arc.annulusSector`
+(the 12 o'clock / clockwise radian convention already lives there, so no angle math is re-derived at
+the chart). Points recorded:
+
+1. **`label="max"` placement.** The spec put the peak numeral "at the peak segment," but at the tiny
+   default 24×24 (or even 64×64) a numeral at a rim sector overflows the canvas and lands on other bars.
+   Placed it instead in a RESERVED bottom gutter (viewBox height += fontSize+2, the clock stays in the
+   top square) — always contained, never on a mark. Documented deviation; the interactive readout and
+   summary carry per-segment exact values.
+
+2. **`mode="opacity"` render.** Length mode is one merged `<path>` (all annulus sectors, single fill) +
+   an accent path for `now` — node budget 3. Opacity mode can't share one fill (per-segment opacity), so
+   sectors are grouped by their quantized 5-level step into ≤5 paths (`data-mc-ink="cell"` + inline
+   `fill-opacity`), a bounded node count. This is a data-semantic channel switch (hence `mode`, not a
+   cosmetic flag) — the radial ActivityGrid for sizes where length can't be judged.
+
+3. **Honesty — length, not area.** Equal-value bars at the rim sweep more area than ones near the hub, so
+   an area reading exaggerates the outer cycle; `r0 > 0` (default inner 0.35) curbs that and bars are
+   always zero-anchored at r0. Docs state "compare lengths, not wedges." `null` segment → gap (the guide
+   ring shows the hole, missing ≠ zero); all-equal → `polarClockFlat`; zero → collapses to the baseline
+   (no bar) but is still a real reading distinct from null.
+
+Pointer lookup: `atan2(dx, -dy)` (12 o'clock, clockwise) → cycle position → data index via the `start`
+rotation; the interactive maps over the FULL viewBox height (which may include the label gutter) so the
+angle stays true. New `strings-polar-clock` (polarClock / polarClockFlat / polarClockAt + a `weekdays`
+i18n array for n=7 labels). `OPACITY_STEPS` + `PolarSegment` un-exported (knip). Budget 2.89/3.78 kB >
+the §17 targets (2.5/3.5) but < the 3/4 hard caps (the arc builders) — gate sign-off with the other
+batch-3 divergences. Node 1653, browser 2, craft 531/0, bench 29.5 rows/ms, size 2.89/3.78, docs 261pp/154.

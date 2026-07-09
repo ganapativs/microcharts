@@ -615,4 +615,14 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "polar-clock",
+    component: "PolarClock",
+    floor: 8, // 24 annulus sectors + guide
+    props: (i) => ({
+      data: Array.from({ length: 24 }, (_, h) => ((i + h * 5) % 100) + 1),
+      now: i % 24,
+      summary: false,
+    }),
+  },
 ];

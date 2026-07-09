@@ -695,6 +695,20 @@ add(
     [90, 24],
   ],
 );
+const DAY = Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h));
+add(
+  "polar-clock",
+  "PolarClock",
+  [
+    { data: DAY },
+    { data: DAY, now: 14 },
+    { data: DAY, label: "max" },
+    { data: DAY, labels: true },
+    { data: [120, 200, 180, 210, 260, 90, 60], mode: "opacity" },
+    { data: [10, null, 30, 0, 25] },
+  ],
+  [[999, 999]],
+);
 const SKYLINE = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },

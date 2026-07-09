@@ -1,0 +1,77 @@
+---
+title: PolarClock
+description: A polar clock chart for React — a cyclic series drawn as radial bars around a clock face, so the shape of a day or week reads at a glance.
+---
+
+PolarClock answers "what's the shape of the day or week cycle — when is it busy?" Each value in the
+cycle becomes a radial bar at its fixed angle, growing outward from an inner baseline; longer bars are
+busier times. Midnight (or your week-start) sits at 12 o'clock and the cycle runs clockwise, so the
+rhythm of a metric across the cycle is immediately legible.
+
+<LiveDemo
+  label="PolarClock"
+  sizeOf="polar-clock"
+  code={`import { PolarClock } from "@microcharts/react/polar-clock";
+
+const byHour = [/* 24 values, midnight → 23:00 */];
+
+<PolarClock data={byHour} now={14} title="Traffic by hour" />`}
+>
+  <PolarClock data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h))} now={14} title="Traffic by hour" size={72} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="polar-clock" />
+
+## Try it
+
+<Playground chart="polar-clock" />
+
+## Interactive
+
+<InteractiveDemo slug="polar-clock" />
+
+## When to use it
+
+- **Good for** — the shape of a 24-hour or 7-day cycle, when a metric is busy across the cycle, or a compact seasonal read in a KPI card.
+- **Avoid for** — exact value comparison (unroll the cycle into a `SparkBar`), a non-cyclic trend (`Sparkline`), or more than a few dozen segments.
+
+## Sizing
+
+<Sizing chart="polar-clock" />
+
+## Variants
+
+<LiveDemo
+  label="cardinal ticks, or opacity mode for tiny sizes"
+  code={`<PolarClock data={byHour} labels label="max" />
+<PolarClock data={week} mode="opacity" />`}
+>
+  <span className="inline-flex gap-6 items-center">
+    <PolarClock data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h))} labels label="max" size={64} summary={false} />
+    <PolarClock data={[120, 200, 180, 210, 260, 90, 60]} mode="opacity" size={56} summary={false} />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+The channel is radial **length from the inner baseline**, not sector area. Equal-value bars at the rim
+span more area than ones near the hub, so an area reading would exaggerate the outer segments — the
+inner radius is nonzero precisely to curb that distortion, and the docs ask you to compare lengths, not
+wedges. Bars are always zero-anchored at that baseline. For very small sizes where length is hard to
+judge, `mode="opacity"` switches the channel to a five-step fill — a radial `ActivityGrid` — which is a
+deliberate, named change of encoding, not a cosmetic one. A `null` segment leaves a gap (the baseline
+ring shows the hole) because missing is not the same as zero.
+
+## Accessibility
+
+The accessible name states the peak and the quiet point of the cycle — **"Peaks at 14:00 (312);
+quietest 04:00."** — with hour labels for a 24-segment cycle and weekday names for a 7-segment one. The
+interactive entry lets you arrow through the segments circularly, each announced with its label and
+value through a polite live region, and the accented `now` segment carries position and color, never
+color alone.
+
+## Props
+
+<PropTable slug="polar-clock" />
