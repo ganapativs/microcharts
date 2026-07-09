@@ -927,4 +927,18 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "station-glyph",
+    component: "StationGlyph",
+    floor: 80, // disc + sector + barb + ≤3 numerals — O(1) marks
+    props: (i) => ({
+      station: "KSFO",
+      cloud: (i % 20) / 20,
+      wind: { direction: (i * 15) % 360, magnitude: (i % 12) * 5 },
+      temp: 10 + (i % 25),
+      dewpoint: 4 + (i % 15),
+      pressure: 1000 + (i % 30),
+      summary: false,
+    }),
+  },
 ];

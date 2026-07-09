@@ -386,6 +386,10 @@
     "static": 2.78,
     "interactive": 3.19
   },
+  "station-glyph": {
+    "static": 2.96,
+    "interactive": 3.52
+  },
   "annotations": {
     "static": 1.46
   }

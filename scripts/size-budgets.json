@@ -392,6 +392,10 @@
     "tape-gauge": {
       "static": "2.8 kB",
       "interactive": "3.3 kB"
+    },
+    "station-glyph": {
+      "static": "3 kB",
+      "interactive": "3.6 kB"
     }
   }
 }

@@ -743,6 +743,14 @@ export interface SummaryStrings {
   tapeRates: readonly [string, string, string, string, string];
   /** Zone clause, e.g. "; in the 130–150 zone" (tape-gauge). */
   tapeZone: (from: string, to: string) => string;
+  /** StationGlyph reading, e.g. "KSFO, wind southwest 15; sky broken, 16° / 9°, 1013." */
+  stationGlyph: (station: string, windClause: string, sky: string, fieldsClause: string) => string;
+  /** Sky-cover words indexed by round(fraction·4): clear … overcast. */
+  stationSky: readonly [string, string, string, string, string];
+  /** Wind clause, e.g. ", wind southwest 15" (station-glyph). */
+  stationWind: (octantName: string, magnitude: string) => string;
+  /** Calm-wind clause, e.g. ", wind calm" (station-glyph). */
+  stationCalm: string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

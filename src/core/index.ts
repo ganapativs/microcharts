@@ -48,6 +48,7 @@ export { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "./strings-volume-p
 export { EN_PHASE_TRACE, type PhaseTraceStrings } from "./strings-phase-trace.js";
 export { EN_TRACE_FOLD, type TraceFoldStrings } from "./strings-trace-fold.js";
 export { EN_TAPE_GAUGE, type TapeGaugeStrings } from "./strings-tape-gauge.js";
+export { EN_STATION_GLYPH, type StationGlyphStrings } from "./strings-station-glyph.js";
 export {
   quantiles,
   fiveNumber,

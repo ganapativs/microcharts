@@ -202,6 +202,8 @@ export default defineConfig({
     "src/charts/trace-fold/client.tsx",
     "src/charts/tape-gauge/index.tsx",
     "src/charts/tape-gauge/client.tsx",
+    "src/charts/station-glyph/index.tsx",
+    "src/charts/station-glyph/client.tsx",
   ],
   format: ["esm"],
   dts: true,

@@ -107,6 +107,7 @@ import volumeProfile from "./volume-profile";
 import phaseTrace from "./phase-trace";
 import traceFold from "./trace-fold";
 import tapeGauge from "./tape-gauge";
+import stationGlyph from "./station-glyph";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -206,6 +207,7 @@ const MODULES: ChartModule[] = [
   phaseTrace,
   traceFold,
   tapeGauge,
+  stationGlyph,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

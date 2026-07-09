@@ -77,6 +77,7 @@ const { PhaseTrace } = await D("phase-trace");
 const { TraceFold } = await D("trace-fold");
 const { TapeGauge } = await D("tape-gauge");
 const tapeZones = [{ from: 100, to: 130, tone: "pos" }, { from: 130, to: 150, tone: "warn" }, { from: 150, to: 200, tone: "neg" }];
+const { StationGlyph } = await D("station-glyph");
 const traceSpans = [{ label: "request", start: 0, duration: 214, depth: 0 }, { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 }, { label: "auth", start: 0, duration: 8, depth: 1, parent: 0 }, { label: "render", start: 96, duration: 60, depth: 1, parent: 0 }, { label: "serialize", start: 156, duration: 40, depth: 1, parent: 0 }, { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 }, { label: "decode", start: 82, duration: 12, depth: 2, parent: 1 }, { label: "log", start: 200, duration: 14, depth: 1, parent: 0 }, { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 }];
 const phaseTraj = Array.from({ length: 40 }, (_, i) => { const t = (i / 40) * Math.PI * 2; return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 }; });
 const volProfile = [{ level: 134, weight: 3 }, { level: 136, weight: 6 }, { level: 138, weight: 11 }, { level: 140, weight: 18 }, { level: 142, weight: 26 }, { level: 144, weight: 20 }, { level: 146, weight: 12 }, { level: 148, weight: 7 }, { level: 150, weight: 4 }];
@@ -1105,6 +1106,11 @@ const body = [
   row("rising / caution", svg(TapeGauge, { value: 142, rate: 1, zones: tapeZones, span: 60, width: 28, height: 72 })),
   row("falling fast", svg(TapeGauge, { value: 118, rate: -3, zones: tapeZones, span: 60, width: 28, height: 72 })),
   row("horizontal", svg(TapeGauge, { value: 142, rate: -1, zones: tapeZones, span: 60, orientation: "horizontal", width: 160, height: 30 })),
+
+  `<h2>StationGlyph</h2>`,
+  row("KSFO obs", svg(StationGlyph, { station: "KSFO", cloud: 0.75, wind: { direction: 225, magnitude: 15 }, temp: 16, dewpoint: 9, pressure: 1013, size: 40 })),
+  row("clear + calm", svg(StationGlyph, { station: "STN", cloud: 0, wind: { direction: 0, magnitude: 0 }, temp: 22, dewpoint: 8, size: 40 })),
+  row("overcast + gale", svg(StationGlyph, { station: "KJFK", cloud: 1, wind: { direction: 300, magnitude: 45 }, temp: 4, dewpoint: 2, pressure: 988, size: 40 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

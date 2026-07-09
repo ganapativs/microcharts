@@ -1429,6 +1429,31 @@ add(
     [160, 30],
   ],
 );
+add(
+  "station-glyph",
+  "StationGlyph",
+  [
+    {
+      station: "KSFO",
+      cloud: 0.75,
+      wind: { direction: 225, magnitude: 15 },
+      temp: 16,
+      dewpoint: 9,
+      pressure: 1013,
+      size: 34,
+    },
+    {
+      station: "KJFK",
+      cloud: 1,
+      wind: { direction: 300, magnitude: 45 },
+      temp: 4,
+      dewpoint: 2,
+      pressure: 988,
+      size: 34,
+    },
+  ],
+  [[999, 0]],
+);
 
 // BY-DESIGN exemptions: EventTimeline span labels render CENTERED INSIDE their
 // span rects (plan/22 #27 — the rect is the label's home, at 0.7 fill opacity).

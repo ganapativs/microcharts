@@ -41,6 +41,7 @@ import { VolumeProfile } from "@microcharts/react/volume-profile";
 import { PhaseTrace } from "@microcharts/react/phase-trace";
 import { TraceFold } from "@microcharts/react/trace-fold";
 import { TapeGauge } from "@microcharts/react/tape-gauge";
+import { StationGlyph } from "@microcharts/react/station-glyph";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -158,6 +159,7 @@ export function getMDXComponents(components?: MDXComponents) {
     PhaseTrace,
     TraceFold,
     TapeGauge,
+    StationGlyph,
     HistogramStrip,
     MicroBox,
     ProgressRing,

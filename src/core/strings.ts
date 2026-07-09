@@ -76,6 +76,7 @@ import { EN_VOLUME_PROFILE } from "./strings-volume-profile.js";
 import { EN_PHASE_TRACE } from "./strings-phase-trace.js";
 import { EN_TRACE_FOLD } from "./strings-trace-fold.js";
 import { EN_TAPE_GAUGE } from "./strings-tape-gauge.js";
+import { EN_STATION_GLYPH } from "./strings-station-glyph.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -152,4 +153,5 @@ export const EN: SummaryStrings = {
   ...EN_PHASE_TRACE,
   ...EN_TRACE_FOLD,
   ...EN_TAPE_GAUGE,
+  ...EN_STATION_GLYPH,
 };

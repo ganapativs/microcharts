@@ -99,6 +99,7 @@
     "volume-profile",
     "phase-trace",
     "trace-fold",
-    "tape-gauge"
+    "tape-gauge",
+    "station-glyph"
   ]
 }
