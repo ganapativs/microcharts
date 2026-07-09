@@ -40,6 +40,7 @@ export { EN_STAR_SPOKE, type StarSpokeStrings } from "./strings-star-spoke.js";
 export { EN_MINIMAP, type MinimapStrings } from "./strings-minimap.js";
 export { EN_DUAL_WINDOW, type DualWindowStrings } from "./strings-dual-window.js";
 export { EN_DEPTH_WEDGE, type DepthWedgeStrings } from "./strings-depth-wedge.js";
+export { EN_PARTITION, type PartitionStrings } from "./strings-partition.js";
 export {
   quantiles,
   fiveNumber,

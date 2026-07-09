@@ -354,6 +354,10 @@
     "static": 2.1,
     "interactive": 2.89
   },
+  "partition-strip": {
+    "static": 2.08,
+    "interactive": 3.04
+  },
   "annotations": {
     "static": 1.46
   }

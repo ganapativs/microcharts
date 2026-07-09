@@ -91,6 +91,7 @@
     "star-spoke",
     "minimap-strip",
     "dual-window-meter",
-    "depth-wedge"
+    "depth-wedge",
+    "partition-strip"
   ]
 }

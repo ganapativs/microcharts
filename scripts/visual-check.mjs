@@ -68,6 +68,7 @@ const { StarSpoke } = await D("star-spoke");
 const { MinimapStrip } = await D("minimap-strip");
 const { DualWindowMeter } = await D("dual-window-meter");
 const { DepthWedge } = await D("depth-wedge");
+const { PartitionStrip } = await D("partition-strip");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1050,6 +1051,11 @@ const body = [
   row("order book", svg(DepthWedge, { data: { demand: [{ level: 99.75, amount: 420 }, { level: 99.5, amount: 360 }, { level: 99.25, amount: 280 }, { level: 99, amount: 200 }, { level: 98.5, amount: 120 }], supply: [{ level: 100.25, amount: 300 }, { level: 100.5, amount: 240 }, { level: 100.75, amount: 160 }, { level: 101, amount: 90 }] }, width: 320, height: 30 })),
   row("normalized", svg(DepthWedge, { data: { demand: [{ level: 99.5, amount: 420 }, { level: 99, amount: 260 }], supply: [{ level: 100.5, amount: 300 }, { level: 101, amount: 180 }] }, normalize: true, width: 320, height: 30 })),
   row("cell", svg(DepthWedge, { data: { demand: [{ level: 99.5, amount: 400 }], supply: [{ level: 100.5, amount: 200 }] }, label: "none", width: 60, height: 16 })),
+
+  `<h2>PartitionStrip</h2>`,
+  row("bundle", svg(PartitionStrip, { data: [{ label: "JS", children: [{ label: "react", value: 28 }, { label: "vendor", value: 12 }, { label: "app", value: 8 }] }, { label: "CSS", children: [{ label: "tailwind", value: 16 }, { label: "custom", value: 8 }] }, { label: "img", value: 18 }, { label: "font", value: 10 }], width: 320, height: 30 })),
+  row("emphasis react", svg(PartitionStrip, { data: [{ label: "JS", children: [{ label: "react", value: 28 }, { label: "vendor", value: 12 }] }, { label: "CSS", children: [{ label: "tailwind", value: 16 }, { label: "custom", value: 8 }] }, { label: "img", value: 18 }], emphasis: "react", width: 320, height: 30 })),
+  row("cell", svg(PartitionStrip, { data: [{ label: "A", children: [{ label: "a1", value: 3 }, { label: "a2", value: 2 }] }, { label: "B", value: 4 }], labels: false, width: 80, height: 16 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

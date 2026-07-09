@@ -671,6 +671,15 @@ export interface SummaryStrings {
   depthWedgeSides: readonly [string, string];
   /** Interactive depth announce, e.g. "demand: 1,240 within 0.20 of mid." */
   depthWedgeAt: (side: string, cum: string, dist: string) => string;
+  /** PartitionStrip overview, e.g.
+   *  "3 groups, 8 parts; largest JS → react (28% of the whole)." */
+  partition: (groups: number, parts: number, parent: string, child: string, pct: string) => string;
+  /** Single-level partition, e.g. "3 groups; largest JS (44% of the whole)." */
+  partitionFlat: (groups: number, parent: string, pct: string) => string;
+  /** Interactive node announce, e.g. "react: 28% of the whole, 63% of JS." */
+  partitionAt: (label: string, pct: string, parentClause: string) => string;
+  /** Parent clause appended for a child node, e.g. ", 63% of JS". */
+  partitionParent: (pct: string, parent: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

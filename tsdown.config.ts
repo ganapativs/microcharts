@@ -186,6 +186,8 @@ export default defineConfig({
     "src/charts/dual-window-meter/client.tsx",
     "src/charts/depth-wedge/index.tsx",
     "src/charts/depth-wedge/client.tsx",
+    "src/charts/partition-strip/index.tsx",
+    "src/charts/partition-strip/client.tsx",
   ],
   format: ["esm"],
   dts: true,

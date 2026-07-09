@@ -68,6 +68,7 @@ import { EN_STAR_SPOKE } from "./strings-star-spoke.js";
 import { EN_MINIMAP } from "./strings-minimap.js";
 import { EN_DUAL_WINDOW } from "./strings-dual-window.js";
 import { EN_DEPTH_WEDGE } from "./strings-depth-wedge.js";
+import { EN_PARTITION } from "./strings-partition.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -136,4 +137,5 @@ export const EN: SummaryStrings = {
   ...EN_MINIMAP,
   ...EN_DUAL_WINDOW,
   ...EN_DEPTH_WEDGE,
+  ...EN_PARTITION,
 };

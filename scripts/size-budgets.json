@@ -360,6 +360,10 @@
     "depth-wedge": {
       "static": "2.2 kB",
       "interactive": "3.2 kB"
+    },
+    "partition-strip": {
+      "static": "2.3 kB",
+      "interactive": "3.3 kB"
     }
   }
 }

@@ -279,6 +279,20 @@ add(
   ],
 );
 add(
+  "partition-strip",
+  "PartitionStrip",
+  [
+    {
+      data: [
+        { label: "JS", children: [{ label: "react", value: 28 }, { label: "vendor", value: 12 }] },
+        { label: "CSS", children: [{ label: "tw", value: 16 }, { label: "custom", value: 8 }] },
+        { label: "img", value: 18 },
+      ],
+    },
+  ],
+  [[80, 16], [320, 30]],
+);
+add(
   "depth-wedge",
   "DepthWedge",
   [

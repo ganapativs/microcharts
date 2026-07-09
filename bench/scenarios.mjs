@@ -826,4 +826,16 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "partition-strip",
+    component: "PartitionStrip",
+    floor: 20, // ≤ 24 segments, two normalized rows — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 4 }, (_p, k) => ({
+        label: `g${k}`,
+        children: Array.from({ length: 3 }, (_c, j) => ({ label: `c${k}${j}`, value: ((i + k + j) % 9) * 10 + 10 })),
+      })),
+      summary: false,
+    }),
+  },
 ];
