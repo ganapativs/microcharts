@@ -98,6 +98,10 @@ export interface SummaryStrings {
   ) => string;
   /** S2 bubble announcement, e.g. "EMEA: 1,240." (bubble-row). */
   bubbleAt: (label: string, value: string) => string;
+  /** S1 tree rings, e.g. "8 years; latest 14, biggest 22 in year 5." (tree-rings). */
+  treeRings: (n: number, unit: string, last: string, max: string, argmaxLabel: string) => string;
+  /** S1 ring announcement, e.g. "Year 5: 22." (tree-rings). */
+  treeRingAt: (label: string, value: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

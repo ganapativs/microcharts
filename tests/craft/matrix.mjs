@@ -669,6 +669,13 @@ add(
     [80, 32],
   ],
 );
+const RINGS = [8, 12, 10, 18, 22, 15, 20, 14];
+add(
+  "tree-rings",
+  "TreeRings",
+  [{ data: RINGS }, { data: RINGS, label: "last" }, { data: RINGS, rings: "fill" }, { data: RINGS, total: 200 }],
+  [[999, 999]],
+);
 const MELODY = [3, 5, 4, 8, 6, 9, 7, 11];
 add(
   "music-staff",

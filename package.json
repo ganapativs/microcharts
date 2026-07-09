@@ -556,6 +556,14 @@
       "types": "./dist/charts/music-staff/client.d.ts",
       "import": "./dist/charts/music-staff/client.js"
     },
+    "./tree-rings": {
+      "types": "./dist/charts/tree-rings/index.d.ts",
+      "import": "./dist/charts/tree-rings/index.js"
+    },
+    "./tree-rings/interactive": {
+      "types": "./dist/charts/tree-rings/client.d.ts",
+      "import": "./dist/charts/tree-rings/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

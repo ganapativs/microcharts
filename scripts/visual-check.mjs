@@ -43,6 +43,7 @@ const { SproutRow } = await D("sprout-row");
 const { GardenGrid } = await D("garden-grid");
 const { BubbleRow } = await D("bubble-row");
 const { MusicStaff } = await D("music-staff");
+const { TreeRings } = await D("tree-rings");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -653,6 +654,13 @@ const body = [
   row("melody", svg(MusicStaff, { data: [3, 5, 4, 8, 6, 9, 7, 11], label: "last", width: 120, height: 26 })),
   row("staff range", svg(MusicStaff, { data: [3, 5, 4, 8, 6, 9], range: "staff", width: 100, height: 24 })),
   row("with a rest", svg(MusicStaff, { data: [3, 5, null, 8, 6], width: 90, height: 24 })),
+
+  `<h2>TreeRings</h2>`,
+  (() => { const Y = [8, 12, 10, 18, 22, 15, 20, 14]; return [
+    row("stroke + last", `<span style="display:inline-flex;gap:12px;align-items:center">${svg(TreeRings, { data: Y, label: "last", unit: "years", periodWord: "year", size: 40 })}${svg(TreeRings, { data: Y, size: 28 })}</span>`),
+    row("fill annuli", svg(TreeRings, { data: Y, rings: "fill", size: 44 })),
+    row("cohort (total 200)", svg(TreeRings, { data: Y, total: 200, size: 44 })),
+  ].join("\n"); })(),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

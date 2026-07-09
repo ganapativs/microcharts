@@ -77,6 +77,7 @@ import sproutRow from "./sprout-row";
 import gardenGrid from "./garden-grid";
 import bubbleRow from "./bubble-row";
 import musicStaff from "./music-staff";
+import treeRings from "./tree-rings";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -146,6 +147,7 @@ const MODULES: ChartModule[] = [
   gardenGrid,
   bubbleRow,
   musicStaff,
+  treeRings,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

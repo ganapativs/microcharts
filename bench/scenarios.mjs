@@ -581,4 +581,10 @@ export const SCENARIOS = [
     floor: 15, // ≤ 16 notes + describeSeries (seriesStats) summary
     props: (i) => ({ data: rugs[i % POOL].slice(0, 12).map((v) => Math.round(v * 5)), summary: false }),
   },
+  {
+    slug: "tree-rings",
+    component: "TreeRings",
+    floor: 10, // ≤ 24 boundary circles + cumulative-radius pass
+    props: (i) => ({ data: rugs[i % POOL].map((v) => Math.abs(v) + 1), summary: false }),
+  },
 ];

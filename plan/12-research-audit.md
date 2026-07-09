@@ -1369,3 +1369,20 @@ ellipses never overflow the box — the real-browser getBBox sweep caught the ov
 attribute-based text check doesn't measure ellipse extents). Sparkline interactive model (nearest-
 note ←/→, EN.point announce, ring on focus). Node 1579, browser 2, craft 497/0, bench 25 rows/ms,
 docs 246pp/144.
+
+### TreeRings (13th shipped, flagship) — `tree-rings` — plan/24 §13
+
+**Naming deviation (plan/12):** the spec's render variant `style="stroke"|"fill"` collides with the
+universal `style?: CSSProperties`; ships as `rings="stroke"|"fill"` (2nd chart after TallyMarks' `pen`
+to rename a spec `style` variant). Channel = radial ring THICKNESS ∝ per-period value (property-
+tested: a 2× period is 2× thicker), oldest at centre. Docs state the channel is thickness NOT area
+(equal thickness at a larger radius spans more area — the ring illusion). No minimum visual thickness
+(a zero-value period collapses its two boundaries — coincident, honest). `accent` = 1.5× weight +
+accent color (never color-alone); `total` scales the disc to Σdata/total of the radius (cohort-age
+story). Full-annulus path INLINED (two circles + `fill-rule: evenodd`, not `core/arc`) → static
+1.78 kB (arc.ts import pushed it to 2.11). The annulus string is built ONLY in the fill branch (in
+the component), not in geometry for every ring — the stroke variant (and the bench) was paying ~2×
+for unused d strings (bench 8.7→10.2 rows/ms). Two craft/sweep fixes: the `label="last"` numeral
+moved from the disc top (TEXT-ON-MARK over the concentric rings) to a right gutter; `rOuter` clamped
+to `maxR` (24 rings × round2 drift overshot the containment tolerance). Radial pointer lookup
+(distance from centre → ring). Node 1591, browser 2, craft 501/0, bench 10 rows/ms, docs 249pp/146.
