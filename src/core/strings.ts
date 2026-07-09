@@ -57,6 +57,7 @@ import { EN_CYCLE } from "./strings-cycle.js";
 import { EN_CHANGE_POINT } from "./strings-change-point.js";
 import { EN_ENSEMBLE } from "./strings-ensemble.js";
 import { EN_TIME_IN_RANGE } from "./strings-time-in-range.js";
+import { EN_HYPNOGRAM } from "./strings-hypnogram.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -114,4 +115,5 @@ export const EN: SummaryStrings = {
   ...EN_CHANGE_POINT,
   ...EN_ENSEMBLE,
   ...EN_TIME_IN_RANGE,
+  ...EN_HYPNOGRAM,
 };

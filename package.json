@@ -664,6 +664,14 @@
       "types": "./dist/charts/time-in-range/client.d.ts",
       "import": "./dist/charts/time-in-range/client.js"
     },
+    "./hypnogram": {
+      "types": "./dist/charts/hypnogram/index.d.ts",
+      "import": "./dist/charts/hypnogram/index.js"
+    },
+    "./hypnogram/interactive": {
+      "types": "./dist/charts/hypnogram/client.d.ts",
+      "import": "./dist/charts/hypnogram/client.js"
+    },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"

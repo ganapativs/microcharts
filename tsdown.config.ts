@@ -165,6 +165,8 @@ export default defineConfig({
     "src/charts/orbit-status/client.tsx",
     "src/charts/time-in-range/index.tsx",
     "src/charts/time-in-range/client.tsx",
+    "src/charts/hypnogram/index.tsx",
+    "src/charts/hypnogram/client.tsx",
   ],
   format: ["esm"],
   dts: true,

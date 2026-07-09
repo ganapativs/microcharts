@@ -57,6 +57,7 @@ const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
 const { TimeInRange } = await D("time-in-range");
+const { Hypnogram } = await D("hypnogram");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -983,6 +984,11 @@ const body = [
   row("five zones, all", svg(TimeInRange, { data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }, label: "all", width: 240, height: 22 })),
   row("vertical column", svg(TimeInRange, { data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }, orientation: "vertical", label: "all", width: 28, height: 130 })),
   row("cell", svg(TimeInRange, { data: { below: 9, in: 72, above: 19 }, width: 60, height: 10 })),
+
+  `<h2>Hypnogram</h2>`,
+  row("sleep stages", svg(Hypnogram, { data: [{ t: 0, state: "Awake" }, { t: 8, state: "Light" }, { t: 22, state: "Deep" }, { t: 38, state: "Light" }, { t: 50, state: "REM" }, { t: 62, state: "Light" }, { t: 74, state: "Deep" }, { t: 110, state: "Awake" }], states: ["Awake", "REM", "Light", "Deep"], domain: [0, 120], width: 300, height: 30 })),
+  row("emphasis Deep", svg(Hypnogram, { data: [{ t: 0, state: "Awake" }, { t: 8, state: "Light" }, { t: 22, state: "Deep" }, { t: 74, state: "Deep" }, { t: 110, state: "Awake" }], states: ["Awake", "REM", "Light", "Deep"], domain: [0, 120], emphasis: "Deep", width: 300, height: 30 })),
+  row("lanes", svg(Hypnogram, { data: [{ t: 0, state: "Awake" }, { t: 30, state: "REM" }, { t: 60, state: "Deep" }, { t: 90, state: "Light" }], states: ["Awake", "REM", "Light", "Deep"], domain: [0, 120], variant: "lanes", width: 260, height: 30 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

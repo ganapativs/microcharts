@@ -22,6 +22,7 @@ import { MicroScatter } from "@microcharts/react/micro-scatter";
 import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annotations";
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { TimeInRange } from "@microcharts/react/time-in-range";
+import { Hypnogram } from "@microcharts/react/hypnogram";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -120,6 +121,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Callout,
     SegmentedBar,
     TimeInRange,
+    Hypnogram,
     HistogramStrip,
     MicroBox,
     ProgressRing,

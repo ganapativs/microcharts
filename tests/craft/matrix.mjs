@@ -261,6 +261,28 @@ add(
   ],
 );
 add(
+  "hypnogram",
+  "Hypnogram",
+  [
+    {
+      data: [
+        { t: 0, state: "Awake" },
+        { t: 8, state: "Light" },
+        { t: 22, state: "Deep" },
+        { t: 50, state: "REM" },
+        { t: 90, state: "Light" },
+        { t: 110, state: "Awake" },
+      ],
+      states: ["Awake", "REM", "Light", "Deep"],
+      domain: [0, 120],
+    },
+  ],
+  [
+    [80, 16],
+    [300, 30],
+  ],
+);
+add(
   "histogram-strip",
   "HistogramStrip",
   [

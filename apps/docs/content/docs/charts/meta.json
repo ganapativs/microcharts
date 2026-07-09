@@ -80,6 +80,7 @@
     "heartbeat-blip",
     "comet-trail",
     "orbit-status",
-    "time-in-range"
+    "time-in-range",
+    "hypnogram"
   ]
 }

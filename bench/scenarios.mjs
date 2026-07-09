@@ -699,4 +699,18 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "hypnogram",
+    component: "Hypnogram",
+    floor: 20, // run merge + H/V step path
+    props: (i) => ({
+      data: Array.from({ length: 12 }, (_e, j) => ({
+        t: j * 10,
+        state: ["Awake", "Light", "Deep", "REM"][(i + j) % 4],
+      })),
+      states: ["Awake", "REM", "Light", "Deep"],
+      domain: [0, 120],
+      summary: false,
+    }),
+  },
 ];

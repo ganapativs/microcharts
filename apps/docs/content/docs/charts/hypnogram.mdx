@@ -1,0 +1,120 @@
+---
+title: Hypnogram
+description: A categorical step strip for React — which discrete state the system was in over time, drawn with right angles only because a state is a fact, not a sample.
+---
+
+Hypnogram answers "which discrete state was the system in over time, and how choppy were the
+transitions?". It refuses interpolation — there are no diagonals, ever — because a state is a
+fact that holds until the next one, not a sample of a continuum a line chart can slope between.
+
+<LiveDemo
+  label="Hypnogram"
+  sizeOf="hypnogram"
+  code={`import { Hypnogram } from "@microcharts/react/hypnogram";
+
+<Hypnogram
+  data={sleep}
+  states={["Awake", "REM", "Light", "Deep"]}
+  title="Sleep stages"
+/>`}
+>
+  <Hypnogram
+    data={[
+      { t: 0, state: "Awake" },
+      { t: 8, state: "Light" },
+      { t: 22, state: "Deep" },
+      { t: 38, state: "Light" },
+      { t: 50, state: "REM" },
+      { t: 62, state: "Light" },
+      { t: 74, state: "Deep" },
+      { t: 86, state: "Light" },
+      { t: 98, state: "REM" },
+      { t: 110, state: "Awake" },
+    ]}
+    states={["Awake", "REM", "Light", "Deep"]}
+    domain={[0, 120]}
+    title="Sleep stages"
+    width={300}
+    height={30}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="hypnogram" />
+
+## Try it
+
+<Playground chart="hypnogram" />
+
+## Interactive
+
+<InteractiveDemo slug="hypnogram" />
+
+## When to use it
+
+- **Good for** — sleep stages, deploy / machine / incident state over time.
+- **Avoid for** — continuous signals (Sparkline) or a single current state (StatusDot).
+
+## Sizing
+
+<Sizing chart="hypnogram" />
+
+## Variants
+
+<LiveDemo label="lanes (nominal)" code={`<Hypnogram data={deploys} variant="lanes" />`}>
+  <Hypnogram
+    data={[
+      { t: 0, state: "Awake" },
+      { t: 30, state: "REM" },
+      { t: 60, state: "Deep" },
+      { t: 90, state: "Light" },
+    ]}
+    states={["Awake", "REM", "Light", "Deep"]}
+    domain={[0, 120]}
+    variant="lanes"
+    title="Lanes"
+    width={260}
+    height={30}
+  />
+</LiveDemo>
+
+<LiveDemo label="emphasis" code={`<Hypnogram data={sleep} emphasis="Deep" />`}>
+  <Hypnogram
+    data={[
+      { t: 0, state: "Awake" },
+      { t: 8, state: "Light" },
+      { t: 22, state: "Deep" },
+      { t: 38, state: "Light" },
+      { t: 74, state: "Deep" },
+      { t: 110, state: "Awake" },
+    ]}
+    states={["Awake", "REM", "Light", "Deep"]}
+    domain={[0, 120]}
+    emphasis="Deep"
+    title="Deep emphasised"
+    width={260}
+    height={30}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="hypnogram" />
+
+## Why this default
+
+Right-angle steps with an explicit `states` order are the clinically proven read. Order is
+meaningful — for ordinal states (sleep depth, incident severity) pass it explicitly; for nominal
+states with no rank, use `variant="lanes"` so the vertical axis never implies one. Any smoothing or
+easing of the step corners would be a lie about the data, so entrance animation is opacity only.
+
+## Accessibility
+
+The accessible name summarises the shape — **"9 transitions across 4 states; longest run Deep."**
+The interactive entry roves the runs; each announces its state and span (**"Light, from 8 to
+22."**).
+
+## Props
+
+<PropTable slug="hypnogram" />

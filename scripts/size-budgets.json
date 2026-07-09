@@ -317,6 +317,10 @@
     "time-in-range": {
       "static": "2.2 kB",
       "interactive": "3.1 kB"
+    },
+    "hypnogram": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
     }
   }
 }

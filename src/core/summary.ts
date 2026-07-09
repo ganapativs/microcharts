@@ -599,6 +599,12 @@ export interface SummaryStrings {
   timeInRange: (list: string) => string;
   /** Interactive zone announce, e.g. "In range: 72%." (time-in-range). */
   tirZone: (name: string, pct: string) => string;
+  /** Hypnogram overview, e.g. "14 transitions across 4 states; longest run Light." */
+  hypnogram: (transitions: number, states: number, longest: string) => string;
+  /** Single-run hypnogram, e.g. "1 state, no transitions; Awake throughout." */
+  hypnogramFlat: (state: string) => string;
+  /** Interactive run announce, e.g. "Light, from 90 to 240." (hypnogram). */
+  hypnogramRun: (state: string, t0: string, t1: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

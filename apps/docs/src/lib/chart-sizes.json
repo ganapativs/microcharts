@@ -311,6 +311,10 @@
     "static": 2,
     "interactive": 2.87
   },
+  "hypnogram": {
+    "static": 2.17,
+    "interactive": 3.1
+  },
   "annotations": {
     "static": 1.46
   }
