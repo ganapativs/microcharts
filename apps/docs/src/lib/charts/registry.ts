@@ -105,6 +105,7 @@ import confusionGrid from "./confusion-grid";
 import foldedDayBand from "./folded-day-band";
 import volumeProfile from "./volume-profile";
 import phaseTrace from "./phase-trace";
+import traceFold from "./trace-fold";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -202,6 +203,7 @@ const MODULES: ChartModule[] = [
   foldedDayBand,
   volumeProfile,
   phaseTrace,
+  traceFold,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

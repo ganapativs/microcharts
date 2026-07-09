@@ -896,4 +896,19 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "trace-fold",
+    component: "TraceFold",
+    floor: 15, // ≤ 40 span rects + critical-path walk — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 24 }, (_s, j) => ({
+        label: `span${j}`,
+        start: (i + j) % 200,
+        duration: ((i + j) % 40) + 5,
+        depth: j % 4,
+        parent: j > 0 ? j - 1 : undefined,
+      })),
+      summary: false,
+    }),
+  },
 ];

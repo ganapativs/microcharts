@@ -198,6 +198,8 @@ export default defineConfig({
     "src/charts/volume-profile/client.tsx",
     "src/charts/phase-trace/index.tsx",
     "src/charts/phase-trace/client.tsx",
+    "src/charts/trace-fold/index.tsx",
+    "src/charts/trace-fold/client.tsx",
   ],
   format: ["esm"],
   dts: true,

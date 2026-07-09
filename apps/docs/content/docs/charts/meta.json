@@ -97,6 +97,7 @@
     "confusion-grid",
     "folded-day-band",
     "volume-profile",
-    "phase-trace"
+    "phase-trace",
+    "trace-fold"
   ]
 }

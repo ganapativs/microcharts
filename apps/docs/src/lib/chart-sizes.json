@@ -378,6 +378,10 @@
     "static": 2.27,
     "interactive": 3.13
   },
+  "trace-fold": {
+    "static": 2.19,
+    "interactive": 3.21
+  },
   "annotations": {
     "static": 1.46
   }

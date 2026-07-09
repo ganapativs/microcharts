@@ -384,6 +384,10 @@
     "phase-trace": {
       "static": "2.4 kB",
       "interactive": "3.3 kB"
+    },
+    "trace-fold": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
     }
   }
 }

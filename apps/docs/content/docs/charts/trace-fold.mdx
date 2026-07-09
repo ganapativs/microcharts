@@ -1,0 +1,93 @@
+---
+title: TraceFold
+description: A folded micro-trace for React — one rect per span by start, duration, and depth, with the critical path accented so "where did the latency go" reads without a console.
+---
+
+TraceFold answers "where did the latency go — which spans, at which depth, on the path that actually
+determined the total?". Each span is a rect placed by its start time, sized by its duration, and
+stacked by its nesting depth. The critical path — the chain of spans that bound the total — is
+accented and everything else muted, so the answer to "which spans mattered" is immediate.
+
+<LiveDemo
+  label="TraceFold"
+  sizeOf="trace-fold"
+  code={`import { TraceFold } from "@microcharts/react/trace-fold";
+
+<TraceFold data={spans} title="Request trace" />`}
+>
+  <TraceFold
+    data={[
+      { label: "request", start: 0, duration: 214, depth: 0 },
+      { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
+      { label: "auth", start: 0, duration: 8, depth: 1, parent: 0 },
+      { label: "render", start: 96, duration: 60, depth: 1, parent: 0 },
+      { label: "serialize", start: 156, duration: 40, depth: 1, parent: 0 },
+      { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 },
+      { label: "decode", start: 82, duration: 12, depth: 2, parent: 1 },
+      { label: "log", start: 200, duration: 14, depth: 1, parent: 0 },
+      { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 },
+    ]}
+    format={(n) => `${Math.round(n)} ms`}
+    title="Request trace"
+    width={300}
+    height={40}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="trace-fold" />
+
+## Try it
+
+<Playground chart="trace-fold" />
+
+## Interactive
+
+<InteractiveDemo slug="trace-fold" />
+
+## When to use it
+
+- **Good for** — request traces, flame charts, p95-exemplar latency breakdowns.
+- **Avoid for** — a single duration (Bullet) or a time series (Sparkline).
+
+## Sizing
+
+<Sizing chart="trace-fold" />
+
+## Variants
+
+<LiveDemo label="structure audit" code={`<TraceFold data={spans} emphasis="none" />`}>
+  <TraceFold
+    data={[
+      { label: "request", start: 0, duration: 214, depth: 0 },
+      { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
+      { label: "render", start: 96, duration: 60, depth: 1, parent: 0 },
+      { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 },
+    ]}
+    emphasis="none"
+    format={(n) => `${Math.round(n)} ms`}
+    title="Structure"
+    width={300}
+    height={36}
+  />
+</LiveDemo>
+
+## Why this default
+
+Accenting the critical path because "which spans mattered" is the question a uniform flame strip
+doesn't answer — the eye goes straight to the chain that set the total. Widths are durations on one
+linear shared time scale, never per-row normalized, so a wide span is genuinely a slow span. The
+only documented width distortion is a one-unit floor for zero-duration spans, and the critical-path
+walk is deterministic (ties resolve to the earliest start).
+
+## Accessibility
+
+The accessible name names the biggest span and its path status — **"9 spans over 214 ms; longest
+db.query (86 ms) on the critical path."** The interactive entry roves spans within a depth with ←/→
+and between depths with ↑/↓, announcing each span's duration, share of the total, depth, and whether
+it is on the critical path.
+
+## Props
+
+<PropTable slug="trace-fold" />

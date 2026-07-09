@@ -718,6 +718,25 @@ export interface SummaryStrings {
   phaseHeadings: readonly [string, string, string, string, string];
   /** Interactive point announce, e.g. "point 8 of 20: CPU 62, Latency 130." */
   phaseAt: (i: number, n: number, xLabel: string, x: string, yLabel: string, y: string) => string;
+  /** TraceFold overview, e.g.
+   *  "9 spans over 214 ms; longest db.query (86 ms) on the critical path." */
+  traceFold: (
+    n: number,
+    total: string,
+    label: string,
+    duration: string,
+    onCritical: boolean,
+  ) => string;
+  /** Interactive span announce, e.g. "db.query, 86 ms, 40% of total, depth 2, on the critical path." */
+  traceFoldAt: (
+    label: string,
+    duration: string,
+    pct: string,
+    depth: number,
+    criticalClause: string,
+  ) => string;
+  /** Critical-path clause appended to a span announce, e.g. ", on the critical path". */
+  traceCritical: string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

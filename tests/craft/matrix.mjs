@@ -279,6 +279,22 @@ add(
   ],
 );
 add(
+  "trace-fold",
+  "TraceFold",
+  [
+    {
+      data: [
+        { label: "request", start: 0, duration: 214, depth: 0 },
+        { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
+        { label: "render", start: 96, duration: 60, depth: 1, parent: 0 },
+        { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 },
+      ],
+      format: (n) => `${Math.round(n)} ms`,
+    },
+  ],
+  [[80, 24], [320, 40]],
+);
+add(
   "phase-trace",
   "PhaseTrace",
   [
