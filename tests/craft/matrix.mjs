@@ -533,6 +533,23 @@ const FC_FORE = {
   ],
 };
 const QD = Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 40) * 0.4 + (i % 7) * 1.5));
+const ABA = Array.from({ length: 60 }, (_, i) => 130 + ((i * 7) % 30) - 15);
+const ABB = Array.from({ length: 60 }, (_, i) => 118 + ((i * 7) % 30) - 15);
+add(
+  "ab-strips",
+  "ABStrips",
+  [
+    { data: { a: ABA, b: ABB } },
+    { data: { a: ABA, b: ABB }, labels: ["Ctrl", "Test"] },
+    { data: { a: ABA, b: ABB }, label: "none" },
+    { data: { a: [100, 130, 145], b: ABB } },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
 add(
   "quantile-dots",
   "QuantileDots",

@@ -23,6 +23,7 @@ const { ErrorBudget } = await D("error-budget");
 const { ControlStrip } = await D("control-strip");
 const { ForecastCone } = await D("forecast-cone");
 const { QuantileDots } = await D("quantile-dots");
+const { ABStrips } = await D("ab-strips");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -80,7 +81,10 @@ const CTRL = [74,73,75,74,76,73,74,75,74,73,82,74,75,73,74,76,74,73,75,74,66,74,
 const FCH = [30, 32, 31, 34, 36, 35, 38];
 const FCF = { mid: [39, 40, 41, 42], p80: [[36, 42], [35, 45], [34, 50], [33, 55]], p50: [[37, 41], [37, 43], [36, 46], [35, 49]] };
 const QD = Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)));
-const MINF = (n) => ` min`;
+const MINF = (n) => `${n} min`;
+const ABA = Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22);
+const ABB = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
+const ABMS = (n) => `${Math.round(n)} ms`;
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -227,6 +231,12 @@ const body = [
   row("threshold, count", svg(QuantileDots, { data: QD, threshold: 15, format: MINF, width: 240, height: 30 })),
   row("15 dots", svg(QuantileDots, { data: QD, count: 15, threshold: 15, format: MINF, width: 240, height: 30 })),
   row("no threshold", svg(QuantileDots, { data: QD, width: 240, height: 30 })),
+
+  `<h2>ABStrips</h2>`,
+  row("default 80x20", svg(ABStrips, { data: { a: ABA, b: ABB }, format: ABMS, positive: "down", width: 80, height: 20 })),
+  row("delta, tags", svg(ABStrips, { data: { a: ABA, b: ABB }, format: ABMS, positive: "down", width: 240, height: 28 })),
+  row("separated", svg(ABStrips, { data: { a: ABA.map((v) => v + 40), b: ABB }, format: ABMS, positive: "down", width: 240, height: 28 })),
+  row("small n", svg(ABStrips, { data: { a: [100, 130, 145], b: ABB }, format: ABMS, width: 240, height: 28 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

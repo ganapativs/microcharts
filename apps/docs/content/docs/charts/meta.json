@@ -49,6 +49,7 @@
     "error-budget",
     "control-strip",
     "forecast-cone",
-    "quantile-dots"
+    "quantile-dots",
+    "ab-strips"
   ]
 }

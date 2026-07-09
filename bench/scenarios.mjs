@@ -406,6 +406,15 @@ export const SCENARIOS = [
     props: (i) => ({ data: rugs[i % POOL].map((v) => v * 10 + 40), rules: "we", summary: false }),
   },
   {
+    slug: "ab-strips",
+    component: "ABStrips",
+    floor: 20, // 2 rows × (2 bands + median) + quantiles — few nodes
+    props: (i) => ({
+      data: { a: rugs[i % POOL], b: rugs[(i + 1) % POOL].map((v) => v + 1) },
+      summary: false,
+    }),
+  },
+  {
     slug: "quantile-dots",
     component: "QuantileDots",
     floor: 6, // 20 dot nodes/render — N-node class, per-dot loop

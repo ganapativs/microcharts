@@ -396,6 +396,14 @@
       "types": "./dist/charts/quantile-dots/client.d.ts",
       "import": "./dist/charts/quantile-dots/client.js"
     },
+    "./ab-strips": {
+      "types": "./dist/charts/ab-strips/index.d.ts",
+      "import": "./dist/charts/ab-strips/index.js"
+    },
+    "./ab-strips/interactive": {
+      "types": "./dist/charts/ab-strips/client.d.ts",
+      "import": "./dist/charts/ab-strips/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

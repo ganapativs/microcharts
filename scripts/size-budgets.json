@@ -193,6 +193,10 @@
     "quantile-dots": {
       "static": "2.6 kB",
       "interactive": "3.4 kB"
+    },
+    "ab-strips": {
+      "static": "2.7 kB",
+      "interactive": "3.6 kB"
     }
   }
 }

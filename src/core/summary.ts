@@ -338,6 +338,28 @@ export interface SummaryStrings {
   forecastAtHistory: (unit: string, period: number, value: string) => string;
   /** Forecast-region announcement, e.g. "Week 14 (forecast): median 42, 80% between 33 and 55." */
   forecastAtForecast: (unit: string, period: number, mid: string, lo: string, hi: string) => string;
+  /** A/B summary, e.g. "B median 118 ms vs A 130 ms (−9%); middle halves overlap 40%." */
+  ab: (
+    bLabel: string,
+    bMed: string,
+    aLabel: string,
+    aMed: string,
+    delta: string,
+    overlapPct: string,
+  ) => string;
+  /** Appended verdict when overlap is total / none. */
+  abSeparated: string;
+  abNoDiff: string;
+  /** A/B row announcement, e.g. "B median 118 ms, 12 ms below A." */
+  abRow: (
+    label: string,
+    med: string,
+    amount: string,
+    dir: "below" | "above",
+    other: string,
+  ) => string;
+  /** A/B edge announcement, e.g. "B p75: 140 ms." */
+  abEdge: (label: string, p: number, value: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

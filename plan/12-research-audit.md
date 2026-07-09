@@ -866,3 +866,27 @@ strings chunk that another chart already imports at its budget edge.
 Gates: node 1272, browser 92, craft 268/0, size (quantile-dots 2.51/3.3, icon-array back under),
 docs 186 pages + tests 104, real-browser sweep green (20 dots, flags re-inked+ringed, "10 in 20"
 label, probe recomputes + rounds clean, 0 escapes).
+
+## Batch 2 wave 3 — ABStrips (2026-07-09, branch batch-2-decision-w3)
+
+**ABStrips (plan/23 #13) — full DoD, static + interactive.** Provenance: plan/16 §Q6. Two graded
+quantile strips (p5–95 / p25–75 / median) on ONE shared scale via `core/quantile.quantiles`
+(NOT by importing GradedBand — geometry reused via the kernel, per spec). The middle-half OVERLAP
+is always computed + always in the summary (overlap is the honest answer — plan/16); never a bare
+mean bar. Edge cases property-tested: identical → overlap 1 / "no clear difference"; disjoint →
+overlap 0 / "clearly separated"; n < 8 arm → min–max outer band (BenchmarkStrip small-n rule).
+
+**Craft-vs-browser lesson (reinforced).** The A/B row tags sit at the two row centers, only
+`height/2` apart. The SSR craft gate (attribute-based text-extent estimate) passed `FONT=8` at
+80×20, but the real-browser getBBox showed the tags OVERLAP (a 7-8px label in a 9px row gap).
+Dropped to `FONT = clamp(round(height·0.3), 6, 8)` (→6 at h20); browser re-verified 0 tag
+overlaps. **The mandatory real-browser sweep caught what craft could not — again.** (`dots`
+quantile-dot-row variant deferred: needs ≥28px height; the band form is the honest default here.)
+
+**Deviations:** `dots` variant deferred (cosmetic, height-gated); clearance/delta polarity via
+`positive` (higher-is-good default; sign always in text). Static 2.56 / interactive 3.49 kB
+(budgets 2.7/3.6) — under 3/4 hard caps, same budget-floor class.
+
+Gates: node 1287, browser 94, craft 280/0, size 2.56/3.49, bench 24.9 rows/ms (floor 20), docs
+189 pages + tests 106, real-browser sweep green (2 nested bands/row 0.16/0.34, medians, A/B tags
+no-collision, delta valence-colored, row+edge interactive + readout chip). Starts wave 3.
