@@ -59,6 +59,8 @@ export interface SummaryStrings {
   moonPhase: (pct: string) => string;
   /** S4 moon cycle mode, e.g. "68% through the cycle." (moon-phase). */
   moonPhaseCycle: (pct: string) => string;
+  /** S4 hourglass, e.g. "75% elapsed, 25% remaining." (hourglass). */
+  hourglass: (elapsed: string, remaining: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

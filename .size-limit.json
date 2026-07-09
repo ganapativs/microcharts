@@ -707,6 +707,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/hourglass (static)",
+    "path": "dist/charts/hourglass/index.js",
+    "limit": "1.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/hourglass/interactive",
+    "path": "dist/charts/hourglass/client.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

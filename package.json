@@ -508,6 +508,14 @@
       "types": "./dist/charts/moon-phase/client.d.ts",
       "import": "./dist/charts/moon-phase/client.js"
     },
+    "./hourglass": {
+      "types": "./dist/charts/hourglass/index.d.ts",
+      "import": "./dist/charts/hourglass/index.js"
+    },
+    "./hourglass/interactive": {
+      "types": "./dist/charts/hourglass/client.d.ts",
+      "import": "./dist/charts/hourglass/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

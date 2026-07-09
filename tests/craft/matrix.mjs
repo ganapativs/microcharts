@@ -670,6 +670,16 @@ add(
   ],
 );
 add(
+  "hourglass",
+  "Hourglass",
+  [{ value: 0.5 }, { value: 0.75, label: "remaining" }, { value: 0 }, { value: 1 }],
+  [
+    [16, 24],
+    [20, 30],
+    [24, 36],
+  ],
+);
+add(
   "moon-phase",
   "MoonPhase",
   [{ value: 0.1 }, { value: 0.5 }, { value: 0.85 }, { value: 0.5, mode: "cycle" }],

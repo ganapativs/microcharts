@@ -37,6 +37,7 @@ const { FillWord } = await D("fill-word");
 const { FatDigits } = await D("fat-digits");
 const { Thermometer } = await D("thermometer");
 const { MoonPhase } = await D("moon-phase");
+const { Hourglass } = await D("hourglass");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -600,6 +601,13 @@ const body = [
     "cycle: new / first / full / last",
     [0, 0.25, 0.5, 0.75].map((v) => svg(MoonPhase, { value: v, mode: "cycle", size: 24 })).join(" "),
   ),
+
+  `<h2>Hourglass</h2>`,
+  row(
+    "0 / 25 / 50 / 75 / 100 elapsed",
+    [0, 0.25, 0.5, 0.75, 1].map((v) => svg(Hourglass, { value: v, height: 32 })).join(" "),
+  ),
+  row("labelled remaining", svg(Hourglass, { value: 0.7, label: "remaining", height: 36 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

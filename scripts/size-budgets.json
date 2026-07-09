@@ -249,6 +249,10 @@
     "moon-phase": {
       "static": "1.4 kB",
       "interactive": "2 kB"
+    },
+    "hourglass": {
+      "static": "1.6 kB",
+      "interactive": "2.2 kB"
     }
   }
 }

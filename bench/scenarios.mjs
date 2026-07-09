@@ -536,4 +536,10 @@ export const SCENARIOS = [
     floor: 40, // 3 nodes, a closed-form terminator path — trivially cheap
     props: (i) => ({ value: (i % 100) / 100, summary: false }),
   },
+  {
+    slug: "hourglass",
+    component: "Hourglass",
+    floor: 40, // 4 nodes, two area-true closed forms — trivially cheap
+    props: (i) => ({ value: (i % 100) / 100, summary: false }),
+  },
 ];

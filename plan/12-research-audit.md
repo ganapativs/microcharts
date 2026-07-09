@@ -1280,3 +1280,18 @@ dark path; `f≥0.995` → closed full disc) to avoid hairline slivers. Ink adap
 ink polarity; the fraction reads unambiguously either way). Interactive cross-fades the lit region by
 OPACITY swap (never a `d:` path interpolation — no Safari). No `makeFormatter` (percent computed
 inline) → static 1.25 kB. Node 1505, browser 2, craft 433/0, bench 112 rows/ms, docs 228pp + tests 132.
+
+### Hourglass (7) — `hourglass` — plan/24 §7
+
+No API deviations. **Area-true sand is the load-bearing honesty rule:** in a triangular bulb a naive
+linear-height fill would overstate early progress by up to 2×, so closed forms give exact
+proportional area — top (remaining `r`) fills from the neck apex up to `H·√r`; bottom (elapsed `e`)
+fills from the base up to `H·(1−√(1−e))`. Verified by a shoelace-area property test (elapsed area
+fraction ≈ value across the range). `value` = elapsed (Progress polarity, so the two compose). The
+neck stream is a binary running-state mark (only `0<value<1`; finished/not-started are shape-distinct)
+— never animated in the static entry. Top sand = `data-mc-ink="neutral"` (remaining), bottom =
+`--mc-stroke`/color (elapsed). **The `%`-label gutter escaped by ~2 units** — the SSR craft passed
+(its text-extent estimate uses 0.62 em/char attribute-based) but the real-browser getBBox sweep
+caught it; fixed to 0.72 em/char per the wide-`%`-glyph handoff rule (a repeat of the DataDiff/
+RateVolume lesson — only the browser sweep catches this). No `makeFormatter` (percents inline).
+Node 1518, browser 2, craft 445/0, bench 98 rows/ms, docs 231pp + tests 134.

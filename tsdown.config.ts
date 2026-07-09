@@ -131,6 +131,8 @@ export default defineConfig({
     "src/charts/thermometer/client.tsx",
     "src/charts/moon-phase/index.tsx",
     "src/charts/moon-phase/client.tsx",
+    "src/charts/hourglass/index.tsx",
+    "src/charts/hourglass/client.tsx",
   ],
   format: ["esm"],
   dts: true,
