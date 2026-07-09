@@ -44,7 +44,7 @@ export function EventRaster(props: EventRasterProps): React.ReactNode {
     [lanes],
   );
   const gutter = labels
-    ? Math.min(width * 0.4, Math.max(...lanes.map((d) => d.label.length), 1) * fontSize * 0.6 + 3)
+    ? Math.min(width * 0.45, Math.max(...lanes.map((d) => d.label.length), 1) * fontSize * 0.66 + 4)
     : 0;
   const plotX0 = gutter;
   const plotW = Math.max(1, width - gutter - 1);

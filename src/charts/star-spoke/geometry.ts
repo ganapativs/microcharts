@@ -22,11 +22,13 @@ export function starSpokeGeometry(opts: {
   domain: [number, number];
   width: number;
   height: number;
+  /** Margin from the edge — larger reserves a ring for tip labels. */
+  pad?: number;
 }): { spokes: Spoke[]; guidePath: string; spokePath: string } {
-  const { values, domain, width, height } = opts;
+  const { values, domain, width, height, pad = 2 } = opts;
   const cx = width / 2;
   const cy = height / 2;
-  const R = Math.min(width, height) / 2 - 2;
+  const R = Math.min(width, height) / 2 - pad;
   const [d0, d1] = domain;
   const span = d1 - d0 || 1;
   const n = Math.max(1, values.length);

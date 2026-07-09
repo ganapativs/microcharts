@@ -14,6 +14,7 @@ export function StarSpoke(props: StarSpokeProps): React.ReactNode {
     data,
     domain = [0, 1],
     size = 32,
+    labels = false,
     format,
     locale,
     strings = EN_STAR_SPOKE,
@@ -22,10 +23,17 @@ export function StarSpoke(props: StarSpokeProps): React.ReactNode {
     ...rest
   } = props;
 
+  const pad = labels && size >= 48 ? Math.max(10, size * 0.2) : 2;
   const geo = useMemo(
     () =>
-      starSpokeGeometry({ values: data.map((d) => d.value), domain, width: size, height: size }),
-    [data, domain, size],
+      starSpokeGeometry({
+        values: data.map((d) => d.value),
+        domain,
+        width: size,
+        height: size,
+        pad,
+      }),
+    [data, domain, size, pad],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const n = data.length;
@@ -103,6 +111,7 @@ export function StarSpoke(props: StarSpokeProps): React.ReactNode {
         data={data}
         domain={domain}
         size={size}
+        labels={labels}
         format={format}
         locale={locale}
         strings={strings}

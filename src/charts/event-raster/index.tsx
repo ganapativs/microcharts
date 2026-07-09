@@ -85,8 +85,8 @@ export function EventRaster(props: EventRasterProps): ReactNode {
 
   const gutter = labels
     ? Math.min(
-        width * 0.4,
-        Math.max(...data.slice(0, LANE_CAP).map((d) => d.label.length), 1) * fontSize * 0.6 + 3,
+        width * 0.45,
+        Math.max(...data.slice(0, LANE_CAP).map((d) => d.label.length), 1) * fontSize * 0.66 + 4,
       )
     : 0;
 

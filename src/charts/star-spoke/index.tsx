@@ -89,11 +89,15 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
     devWarn("<StarSpoke> value outside domain — clamped.");
 
   const fmt = makeFormatter(format, locale);
+  const showLabels = labels && size >= 48;
+  // reserve a label ring when labels are shown, so tip text stays inside
+  const pad = showLabels ? Math.max(10, size * 0.2) : 2;
   const geo = starSpokeGeometry({
     values: data.map((d) => d.value),
     domain,
     width: size,
     height: size,
+    pad,
   });
   const cmp = compare
     ? starSpokeGeometry({
@@ -101,10 +105,12 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
         domain,
         width: size,
         height: size,
+        pad,
       })
     : null;
-  const showLabels = labels && size >= 48;
-  const fontSize = Math.max(5, Math.min(Math.round(size * 0.14), 7));
+  const fontSize = showLabels
+    ? Math.max(5, Math.min(Math.round(size * 0.1), 6))
+    : Math.max(5, Math.min(Math.round(size * 0.14), 7));
   const accName = summary === false ? false : (summary ?? starSpokeSummary(data, strings, fmt));
 
   return (
