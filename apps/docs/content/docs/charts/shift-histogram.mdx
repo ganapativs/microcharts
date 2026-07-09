@@ -1,0 +1,101 @@
+---
+title: ShiftHistogram
+description: A before/after distribution chart for React — mirrored histograms on shared bins with the median shift, so unequal sample sizes can't fake a change.
+---
+
+ShiftHistogram answers "did the fix actually change the distribution?". It mirrors two
+histograms around a center line — **before** upward (muted), **after** downward (accent) — on
+**shared bin edges**, with the median shift as the precise takeaway. Bar heights are per-side
+proportions on one shared scale, so a bigger sample on one side can't fake a shift. The mirror
+carries **identity**, not valence (up isn't "good") — that's the whole point of the symmetry.
+
+<LiveDemo
+  label="ShiftHistogram"
+  sizeOf="shift-histogram"
+  code={`import { ShiftHistogram } from "@microcharts/react/shift-histogram";
+
+<ShiftHistogram data={{ before, after }} title="The fix" />`}
+>
+  <ShiftHistogram
+    data={{
+      before: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
+      after: Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20),
+    }}
+    format={(n) => `${Math.round(n)} ms`}
+    title="The fix"
+    width={260} height={30}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="shift-histogram" />
+
+## Try it
+
+<Playground chart="shift-histogram" />
+
+## Interactive
+
+<InteractiveDemo slug="shift-histogram" />
+
+## When to use it
+
+- **Good for** — a "the fix, proven" read in a KPI card, before/after distributions in an experiments table, showing a change is real (not just a mean move).
+- **Avoid for** — a single distribution (HistogramStrip) or two labelled arms (ABStrips).
+
+## Sizing
+
+<Sizing chart="shift-histogram" />
+
+## Variants
+
+<LiveDemo
+  label="overlay + no shift"
+  code={`<ShiftHistogram data={{ before, after }} mode="overlay" />`}
+>
+  <span className="inline-flex flex-col gap-2">
+    <ShiftHistogram
+      data={{
+        before: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
+        after: Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20),
+      }}
+      format={(n) => `${Math.round(n)} ms`}
+      mode="overlay"
+      title="Overlay"
+      width={240} height={26}
+    />
+    <ShiftHistogram
+      data={{
+        before: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
+        after: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
+      }}
+      format={(n) => `${Math.round(n)} ms`}
+      title="No shift"
+      width={240} height={26}
+    />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="shift-histogram" />
+
+## Why this default
+
+Mirror, because before/after symmetry makes the shift a visible displacement. The only
+normalization allowed is per-side proportions — each side's counts over its own n — on one
+shared height scale, so unequal sample sizes never fake a shift, and the rule is stated. The
+bins are shared across both sides always, and the medians are never smoothed or trimmed. Side
+identity rides on position (up vs before, down vs after) so it survives grayscale and
+forced-colors; the summary names the direction and, when the sample sizes differ, carries both.
+
+## Accessibility
+
+The accessible name states the median shift plainly — **"Median fell from 116 ms to 92 ms."**
+— appending "On N / M samples" when the sizes differ. The interactive entry steps the bins and
+announces each bin's before/after proportions; **M** jumps to the two median bins.
+
+## Props
+
+<PropTable slug="shift-histogram" />

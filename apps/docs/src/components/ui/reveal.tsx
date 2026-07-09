@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { cn } from "@/lib/cn";
 
 /**
  * Fades + rises its children once when scrolled into view. Motion is gated on
@@ -67,7 +66,12 @@ export function Reveal({
     <Tag
       // @ts-expect-error polymorphic ref across the small tag union
       ref={ref}
-      className={cn(className, shown && "reveal")}
+      // Rendered hidden by default (SSR + first client paint) so the element
+      // NEVER paints visible-then-hides — that one visible frame was the
+      // "appears, gets removed, fades in" flicker. It transitions pending→in
+      // only when scrolled into view. See [data-reveal] rules in global.css.
+      data-reveal={shown ? "in" : "pending"}
+      className={className}
       style={shown && delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {children}

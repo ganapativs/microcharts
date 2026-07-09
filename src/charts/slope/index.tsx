@@ -171,7 +171,11 @@ export function Slope(props: SlopeProps): ReactNode {
                 x2={line.x1}
                 y2={line.y1}
                 stroke={stroke}
-                strokeWidth={isHl ? 1.5 : 1}
+                style={{
+                  strokeWidth: isHl
+                    ? "calc(var(--mc-stroke-width) * 1.5)"
+                    : "var(--mc-stroke-width)",
+                }}
                 vectorEffect="non-scaling-stroke"
               />
             ) : incomplete && (line.y0 !== null || line.y1 !== null) ? (
@@ -182,7 +186,7 @@ export function Slope(props: SlopeProps): ReactNode {
                 x2={line.y0 !== null ? line.x0 + 6 : line.x1}
                 y2={(line.y0 ?? line.y1)!}
                 stroke={stroke}
-                strokeWidth={1}
+                style={{ strokeWidth: "var(--mc-stroke-width)" }}
                 strokeDasharray="1.5 1.5"
                 vectorEffect="non-scaling-stroke"
               />

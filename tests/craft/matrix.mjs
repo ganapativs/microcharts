@@ -22,6 +22,22 @@ const SURVEY = [
   { label: "Strongly agree", value: 28 },
 ];
 
+const RV = [
+  { rate: 2.3, volume: 120 },
+  { rate: 3.1, volume: 90 },
+  { rate: 2.8, volume: 140 },
+  { rate: 3.6, volume: 70 },
+  { rate: 4.1, volume: 38 },
+];
+const NF = [
+  { in: 4, out: 3 },
+  { in: 5, out: 4 },
+  { in: 6, out: 4 },
+  { in: 5, out: 6 },
+  { in: 7, out: 5 },
+  { in: 8, out: 6 },
+];
+
 const CASES = [];
 const add = (slug, comp, variants, sizes) => CASES.push({ slug, comp, variants, sizes });
 
@@ -451,6 +467,357 @@ add(
     [80, 12],
     [160, 14],
     [280, 36],
+  ],
+);
+
+// ── Batch 2 wave 1 — decision strips + icon array ──────────────────────────
+const LATENCY = [120, 135, 128, 480, 142, 2100, 155, 138, 900, 148, 132, 470];
+add(
+  "coverage-strip",
+  "CoverageStrip",
+  [{ data: [1, null, 3, null, null, 5, 8] }, { data: [1, null, 3], expected: 8, label: "percent" }],
+  [
+    [80, 10],
+    [160, 14],
+  ],
+);
+add(
+  "benchmark-strip",
+  "BenchmarkStrip",
+  [
+    { data: LATENCY, value: 155 },
+    { data: LATENCY, value: 155, label: "value" },
+    { data: [1, 2, 3, 4, 5], value: 3 },
+  ],
+  [
+    [80, 12],
+    [160, 16],
+  ],
+);
+add(
+  "percentile-ladder",
+  "PercentileLadder",
+  [{ data: LATENCY }, { data: LATENCY, scale: "log" }, { data: LATENCY, label: "values" }],
+  [
+    [80, 12],
+    [160, 16],
+    [240, 20],
+  ],
+);
+add(
+  "graded-band",
+  "GradedBand",
+  [{ data: LATENCY }, { data: LATENCY, softEdge: true }, { data: LATENCY, label: "median" }],
+  [
+    [80, 12],
+    [160, 16],
+  ],
+);
+const BURN = { plan: [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0], actual: [40, 38, 36, 34, 32, 30] };
+const EB = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
+const CTRL = [10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16, 10, 9, 11, 10];
+const FC_HIST = [30, 32, 31, 34, 36, 35, 38];
+const FC_FORE = {
+  mid: [39, 40, 41, 42],
+  p80: [
+    [36, 42],
+    [35, 45],
+    [34, 50],
+    [33, 55],
+  ],
+  p50: [
+    [37, 41],
+    [37, 43],
+    [36, 46],
+    [35, 49],
+  ],
+};
+const QD = Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 40) * 0.4 + (i % 7) * 1.5));
+const ABA = Array.from({ length: 60 }, (_, i) => 130 + ((i * 7) % 30) - 15);
+const ABB = Array.from({ length: 60 }, (_, i) => 118 + ((i * 7) % 30) - 15);
+const SHB = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+const SHA = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+const PAR = [
+  { label: "Timeouts", value: 38 },
+  { label: "OOM", value: 24 },
+  { label: "Deploy", value: 15 },
+  { label: "Config", value: 9 },
+  { label: "Network", value: 7 },
+  { label: "Auth", value: 4 },
+];
+add(
+  "pareto-strip",
+  "ParetoStrip",
+  [
+    { data: PAR },
+    { data: PAR, max: 3 },
+    { data: PAR, threshold: false },
+    { data: PAR, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+const DDIFF = [
+  { key: "users", added: 340, removed: 120 },
+  { key: "orders", added: 88, removed: 30 },
+  { key: "items", added: 40, removed: 20 },
+  { key: "tags", added: 24, removed: 8 },
+  { key: "notes", added: 12, removed: 6 },
+  { key: "flags", added: 8, removed: 3 },
+];
+add(
+  "data-diff",
+  "DataDiff",
+  [
+    { data: DDIFF },
+    { data: DDIFF, labels: true },
+    { data: DDIFF, net: true, label: "totals" },
+    { data: DDIFF, sort: "net" },
+  ],
+  [
+    [80, 20],
+    [160, 56],
+    [220, 80],
+  ],
+);
+const QFIELD = [
+  { x: 2, y: 8 },
+  { x: 8, y: 9 },
+  { x: 3, y: 7 },
+  { x: 9, y: 2 },
+  { x: 7, y: 3 },
+  { x: 1, y: 1 },
+];
+add(
+  "quadrant-dot",
+  "QuadrantDot",
+  [
+    { data: { x: 3, y: 9 }, field: QFIELD, xDomain: [0, 10], domain: [0, 10] },
+    { data: { x: 3, y: 9 }, xDomain: [0, 10], domain: [0, 10], split: [5, 5] },
+    { data: { x: 3, y: 9 }, field: QFIELD, xDomain: [0, 10], domain: [0, 10], region: false },
+  ],
+  [
+    [24, 24],
+    [48, 48],
+    [120, 120],
+  ],
+);
+const CYCLE = [];
+for (let w = 0; w < 6; w++) CYCLE.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
+add(
+  "cycle-plot",
+  "CyclePlot",
+  [
+    { data: CYCLE, period: 7 },
+    { data: CYCLE, period: 7, center: "median" },
+    { data: CYCLE, period: 7, trend: "none" },
+    { data: CYCLE, period: 7, spine: false },
+  ],
+  [
+    [80, 20],
+    [160, 32],
+    [240, 40],
+  ],
+);
+const CPSTEP = [...Array(14).fill(30), ...Array(20).fill(48)];
+const CPTWO = [...Array(10).fill(10), ...Array(10).fill(50), ...Array(10).fill(22)];
+add(
+  "change-point",
+  "ChangePoint",
+  [
+    { data: CPSTEP, label: "delta" },
+    { data: CPTWO },
+    { data: CPSTEP, means: false },
+    { data: CPSTEP, breaks: [14], label: "delta" },
+  ],
+  [
+    [80, 16],
+    [160, 24],
+    [240, 32],
+  ],
+);
+const ENSF = Array.from({ length: 24 }, (_m, i) =>
+  Array.from({ length: 10 }, (_t, t) =>
+    Math.round(40 + (i - 12) * 0.55 * t * 0.4 + 3 * Math.sin(i + t) + t * 0.5),
+  ),
+);
+add(
+  "ensemble-ghosts",
+  "EnsembleGhosts",
+  [
+    { data: ENSF },
+    { data: ENSF, endpoints: true },
+    { data: ENSF, emphasis: "median" },
+    { data: ENSF, ghosts: 12 },
+  ],
+  [
+    [80, 20],
+    [160, 32],
+    [240, 44],
+  ],
+);
+add(
+  "shift-histogram",
+  "ShiftHistogram",
+  [
+    { data: { before: SHB, after: SHA } },
+    { data: { before: SHB, after: SHA }, mode: "overlay" },
+    { data: { before: SHB, after: SHA }, bins: 6 },
+    { data: { before: SHB, after: SHA }, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "ab-strips",
+  "ABStrips",
+  [
+    { data: { a: ABA, b: ABB } },
+    { data: { a: ABA, b: ABB }, labels: ["Ctrl", "Test"] },
+    { data: { a: ABA, b: ABB }, label: "none" },
+    { data: { a: [100, 130, 145], b: ABB } },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "quantile-dots",
+  "QuantileDots",
+  [
+    { data: QD },
+    { data: QD, threshold: 15 },
+    { data: QD, count: 15 },
+    { data: QD, threshold: 15, side: "below" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "forecast-cone",
+  "ForecastCone",
+  [
+    { data: FC_HIST, forecast: FC_FORE },
+    { data: FC_HIST, forecast: { mid: FC_FORE.mid, p80: FC_FORE.p80 } },
+    { data: FC_HIST, forecast: FC_FORE, target: 45 },
+    { data: FC_HIST, forecast: FC_FORE, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "control-strip",
+  "ControlStrip",
+  [
+    { data: CTRL },
+    { data: CTRL, rules: "we" },
+    { data: CTRL, dots: "all" },
+    { data: CTRL.slice(0, 6) },
+  ],
+  [
+    [80, 16],
+    [160, 24],
+    [240, 28],
+  ],
+);
+add(
+  "error-budget",
+  "ErrorBudget",
+  [
+    { data: EB, window: 30 },
+    { data: EB },
+    { data: EB, rates: [1] },
+    { data: [1, 0.6, 0.3, 0.05, 0], window: 12, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "burn-chart",
+  "BurnChart",
+  [
+    { data: BURN },
+    { data: BURN, projection: false },
+    { data: { plan: [0, 4, 8, 12, 16, 20, 24, 28], actual: [0, 3, 6, 9] }, mode: "up" },
+    { data: BURN, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "retention-curve",
+  "RetentionCurve",
+  [
+    { data: [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34], unit: "week" },
+    {
+      data: [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34],
+      benchmark: [1, 0.6, 0.44, 0.37, 0.33],
+    },
+    { data: [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34], curve: "smooth" },
+    { data: [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34], label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "net-flow",
+  "NetFlow",
+  [{ data: NF }, { data: NF, mode: "bars" }, { data: NF, net: false }, { data: NF, label: "none" }],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "rate-volume",
+  "RateVolume",
+  [
+    { data: RV },
+    { data: RV, minVolume: 50 },
+    { data: RV, curve: "step" },
+    { data: RV, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "icon-array",
+  "IconArray",
+  [
+    { value: 0.15, of: 20 },
+    { value: 0.15, of: 20, label: "percent" },
+    { value: 0.6, of: 10, shape: "round" },
+  ],
+  [
+    [60, 24],
+    [120, 40],
   ],
 );
 

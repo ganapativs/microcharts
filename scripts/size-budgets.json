@@ -1,6 +1,6 @@
 {
-  "$comment": "Per-subpath gzip budgets (plan/21 §1, budget model v2). Keys are export subpaths without './'. Every chart needs an entry — gen-size-limits.mjs fails on a missing one, so adding a chart forces a budget decision. Hard ceilings: static ≤ 3 kB (target 2 kB, Delta-class 1.5 kB), interactive ≤ static + 1 kB. `.size-limit.json` is GENERATED from this file + package.json#exports — never hand-edit it.",
-  "$exception": "Sparkline 3.35/4.35 kB was USER-APPROVED (2026-07-08) as a flagship exception to the 3/4 kB hard caps (long-series guard + label=minmax; trims exhausted first — plan/12). Batch 1 W4 raised it to 3.65/4.65 kB PENDING user sign-off at the batch gate: the plan/22 #28 annotations HOST contract adds the children walker + scale frame (~0.29 kB) to every S1/S2 host — the annotation MARK renderers ship in ./annotations (1.46 kB), which consumers import separately, so hosts only pay the walker. Not a precedent for other charts.",
+  "$comment": "Per-subpath gzip budgets (plan/21 \u00a71, budget model v2). Keys are export subpaths without './'. Every chart needs an entry \u2014 gen-size-limits.mjs fails on a missing one, so adding a chart forces a budget decision. Hard ceilings: static \u2264 3 kB (target 2 kB, Delta-class 1.5 kB), interactive \u2264 static + 1 kB. `.size-limit.json` is GENERATED from this file + package.json#exports \u2014 never hand-edit it.",
+  "$exception": "Sparkline 3.35/4.35 kB was USER-APPROVED (2026-07-08) as a flagship exception to the 3/4 kB hard caps (long-series guard + label=minmax; trims exhausted first \u2014 plan/12). Batch 1 W4 raised it to 3.65/4.65 kB PENDING user sign-off at the batch gate: the plan/22 #28 annotations HOST contract adds the children walker + scale frame (~0.29 kB) to every S1/S2 host \u2014 the annotation MARK renderers ship in ./annotations (1.46 kB), which consumers import separately, so hosts only pay the walker. Not a precedent for other charts.",
   "styles": "12 kB",
   "charts": {
     "sparkline": {
@@ -52,8 +52,8 @@
       "interactive": "2.4 kB"
     },
     "seismogram": {
-      "static": "2.3 kB",
-      "interactive": "3.2 kB"
+      "static": "2.4 kB",
+      "interactive": "3.35 kB"
     },
     "heat-strip": {
       "static": "2.35 kB",
@@ -141,6 +141,90 @@
     "event-timeline": {
       "static": "3 kB",
       "interactive": "4 kB"
+    },
+    "coverage-strip": {
+      "static": "2.4 kB",
+      "interactive": "3.15 kB"
+    },
+    "benchmark-strip": {
+      "static": "2.8 kB",
+      "interactive": "3.6 kB"
+    },
+    "percentile-ladder": {
+      "static": "3 kB",
+      "interactive": "3.9 kB"
+    },
+    "graded-band": {
+      "static": "2.75 kB",
+      "interactive": "3.55 kB"
+    },
+    "icon-array": {
+      "static": "2.2 kB",
+      "interactive": "3 kB"
+    },
+    "rate-volume": {
+      "static": "2.6 kB",
+      "interactive": "3.55 kB"
+    },
+    "net-flow": {
+      "static": "2.7 kB",
+      "interactive": "3.5 kB"
+    },
+    "retention-curve": {
+      "static": "2.8 kB",
+      "interactive": "3.6 kB"
+    },
+    "burn-chart": {
+      "static": "2.9 kB",
+      "interactive": "3.8 kB"
+    },
+    "error-budget": {
+      "static": "2.5 kB",
+      "interactive": "3.3 kB"
+    },
+    "control-strip": {
+      "static": "2.8 kB",
+      "interactive": "3.7 kB"
+    },
+    "forecast-cone": {
+      "static": "2.95 kB",
+      "interactive": "3.85 kB"
+    },
+    "quantile-dots": {
+      "static": "2.6 kB",
+      "interactive": "3.4 kB"
+    },
+    "ab-strips": {
+      "static": "2.85 kB",
+      "interactive": "3.8 kB"
+    },
+    "shift-histogram": {
+      "static": "2.98 kB",
+      "interactive": "3.95 kB"
+    },
+    "pareto-strip": {
+      "static": "2.5 kB",
+      "interactive": "3.3 kB"
+    },
+    "data-diff": {
+      "static": "2.7 kB",
+      "interactive": "3.55 kB"
+    },
+    "quadrant-dot": {
+      "static": "2.4 kB",
+      "interactive": "3.3 kB"
+    },
+    "cycle-plot": {
+      "static": "2.5 kB",
+      "interactive": "3.5 kB"
+    },
+    "change-point": {
+      "static": "2.98 kB",
+      "interactive": "3.98 kB"
+    },
+    "ensemble-ghosts": {
+      "static": "2.5 kB",
+      "interactive": "3.5 kB"
     }
   }
 }

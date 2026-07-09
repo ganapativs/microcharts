@@ -1,0 +1,84 @@
+---
+title: CyclePlot
+description: A cycle plot (seasonal-subseries chart) for React — a slot-mean spine plus raw within-slot micro-trends, so seasonality and drift stay separate reads.
+---
+
+CyclePlot answers "what repeats beneath the trend — and is any slot itself drifting?". The series is
+reshaped into `period` slots (7 for weekdays, 12 for months); each slot shows its own raw values
+across cycles as a muted polyline in **time order**, plus a mean tick, and the accent spine connects
+the slot means. Seasonality (the spine) and drift (the within-slot lines) are different questions of
+the same data — so they never share a mark.
+
+<LiveDemo
+  label="CyclePlot"
+  sizeOf="cycle-plot"
+  code={`import { CyclePlot } from "@microcharts/react/cycle-plot";
+
+<CyclePlot data={daily} period={7} slots={weekdays} cycleUnit="weeks" title="Weekly shape" />`}
+>
+  <CyclePlot
+    data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44, 38, 46, 45, 48, 52, 61, 44, 38, 48, 45, 48, 52, 61, 44, 38, 50, 45, 48, 52, 61, 44]}
+    period={7}
+    slots={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
+    cycleUnit="weeks"
+    title="Weekly shape"
+    width={200}
+    height={40}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="cycle-plot" />
+
+## Try it
+
+<Playground chart="cycle-plot" />
+
+## Interactive
+
+<InteractiveDemo slug="cycle-plot" />
+
+## When to use it
+
+- **Good for** — a KPI card that says "the week has a shape", weekday traffic / hourly load / monthly sales seasonality, or spotting one slot that is itself drifting.
+- **Avoid for** — a plain time series (Sparkline) or one composition (SegmentedBar).
+
+## Sizing
+
+<Sizing chart="cycle-plot" />
+
+## Variants
+
+<LiveDemo
+  label="median center + spine only"
+  code={`<CyclePlot data={daily} period={7} center="median" />
+<CyclePlot data={daily} period={7} trend="none" />`}
+>
+  <span className="inline-flex gap-4 items-center">
+    <CyclePlot data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]} period={7} center="median" width={150} height={32} />
+    <CyclePlot data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]} period={7} trend="none" width={150} height={32} />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="cycle-plot" />
+
+## Why this default
+
+A mean spine plus raw slot lines, because seasonality and drift are different questions asked of the
+same data — and answering both on one mark would blur them. The within-slot lines are never smoothed
+and never joined across a slot boundary: each slot's polyline begins and ends inside its own column,
+so a Monday trend can never bleed into Tuesday. The `center` choice is explicit — mean by default,
+median when a slot's distribution is skewed — and the summary names which one it used.
+
+## Accessibility
+
+The accessible name states the peak and dip slots and any leading drift — **"Peaks Fri (61), dips
+Sun (38); Mon rising across 6 weeks."** The interactive entry steps the slots (mean, cycle count,
+drift) with ←/→, and steps the individual observations within a slot with ↑/↓.
+
+## Props
+
+<PropTable slug="cycle-plot" />

@@ -1,0 +1,85 @@
+---
+title: ChangePoint
+description: A change-point chart for React — regime shading plus a break marker over the series line, from a documented mean-shift heuristic. Context for every anomaly.
+---
+
+ChangePoint answers "when did the behavior change level?". It shades each detected regime, draws a
+per-regime mean, and marks the break where one level became another — because a spike means nothing
+without the regime it broke. The detector is a **documented heuristic, not statistics**; for
+production anomaly pipelines, pass your own break indices and the chart becomes pure annotation.
+
+<LiveDemo
+  label="ChangePoint"
+  sizeOf="change-point"
+  code={`import { ChangePoint } from "@microcharts/react/change-point";
+
+<ChangePoint data={errors} label="delta" title="Error rate" />`}
+>
+  <ChangePoint
+    data={[30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48]}
+    label="delta"
+    title="Error rate"
+    width={200}
+    height={24}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="change-point" />
+
+## Try it
+
+<Playground chart="change-point" />
+
+## Interactive
+
+<InteractiveDemo slug="change-point" />
+
+## When to use it
+
+- **Good for** — context for an anomaly, an error rate / latency / cost that stepped to a new level, or annotating a known deploy or incident (pass explicit `breaks`).
+- **Avoid for** — a gradual trend (Sparkline) or a plain time series with no regime question.
+
+## Sizing
+
+<Sizing chart="change-point" />
+
+## Variants
+
+<LiveDemo
+  label="explicit break + gradual ramp"
+  code={`<ChangePoint data={errors} breaks={[14]} />
+<ChangePoint data={ramp} />`}
+>
+  <span className="inline-flex gap-4 items-center">
+    <ChangePoint data={[30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48]} breaks={[14]} width={150} height={22} />
+    <ChangePoint data={[20, 21, 23, 24, 26, 27, 29, 30, 32, 33, 35, 36, 38, 39, 41, 42, 44, 45, 47, 48]} width={150} height={22} />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="change-point" />
+
+## Why this default
+
+Context for every anomaly — the shading names the regime a value belongs to, and the break marks
+where the level truly changed, so a reader sees "errors stepped up here" rather than "errors are
+high". The detector is a **labelled heuristic**: a two-segment mean-shift found by binary
+segmentation, accepted only when the split both cuts the variance enough and clears an effect-size
+threshold, so constant and low-noise series show no break. It is deliberately conservative — a
+gradual ramp is not a level shift, and the ramp variant above shows the chart honestly finding
+nothing. For anomaly pipelines that already know their breakpoints, `breaks={[…]}` turns the
+detection off and the chart becomes a faithful annotation.
+
+## Accessibility
+
+The accessible name states the shift, the break, the regime means, and what happened after —
+**"Level shifted up 60% around point 14 (mean 30 → 48); stable since."** — or, with no detected
+shift, "No clear level shift across N points." The interactive entry steps the points with ←/→
+(value + regime) and cycles the breaks with Tab, each announcing its mean shift.
+
+## Props
+
+<PropTable slug="change-point" />

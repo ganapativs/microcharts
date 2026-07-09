@@ -1,0 +1,97 @@
+---
+title: GradedBand
+description: A nested-interval strip for React — how sure we are about one number, graded by opacity, never a bar from zero.
+---
+
+GradedBand answers "how sure are we about this one number?". Nested central intervals are
+graded by opacity, with a median tick. It is **never** a bar from zero — a bar with an
+error bar induces edge-literalism bias, so this form exists precisely to avoid it. Opacity
+maps to probability level and nothing else.
+
+<LiveDemo
+  label="GradedBand"
+  sizeOf="graded-band"
+  code={`import { GradedBand } from "@microcharts/react/graded-band";
+
+<GradedBand data={posterior} label="median" title="Forecast estimate" />`}
+>
+  <GradedBand
+    data={Array.from({ length: 160 }, (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)))}
+    label="median"
+    title="Forecast estimate"
+    width={240} height={16}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="graded-band" />
+
+## Try it
+
+<Playground chart="graded-band" />
+
+## Interactive
+
+<InteractiveDemo slug="graded-band" />
+
+## When to use it
+
+- **Good for** — a forecast with its uncertainty, estimate-vs-actual in a KPI card, posterior summaries.
+- **Avoid for** — countable odds (QuantileDots) or a forecast over time (ForecastCone).
+
+## Sizing
+
+<Sizing chart="graded-band" />
+
+## Variants
+
+<LiveDemo
+  label="value + soft edge"
+  code={`<GradedBand data={posterior} value={28} />
+<GradedBand data={posterior} softEdge />`}
+>
+  <span className="inline-flex flex-col gap-1.5">
+    <GradedBand
+      data={Array.from(
+        { length: 160 },
+        (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
+      )}
+      value={28}
+      title="Estimate vs actual"
+      width={200}
+      height={14}
+    />
+    <GradedBand
+      data={Array.from(
+        { length: 160 },
+        (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
+      )}
+      softEdge
+      title="Soft edge"
+      width={200}
+      height={14}
+    />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="graded-band" />
+
+## Why this default
+
+Nested central intervals graded by opacity — never a bar from zero. A bar with an error
+whisker invites reading the bar's end as "the answer" and the whisker as noise; the graded
+band has no endpoint to over-read, so opacity maps to probability and nothing else. Inner
+intervals are clipped inside their outer, so quantile rounding can never invert the nesting.
+
+## Accessibility
+
+The accessible name states the median and the innermost + outermost intervals — **"Median
+50; 50% within 25–75, 95% within 2.5–97.5."**. The interactive entry roves the band edges
+and announces each interval's coverage and bounds.
+
+## Props
+
+<PropTable slug="graded-band" />

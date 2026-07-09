@@ -35,6 +35,27 @@ import { Ohlc } from "@microcharts/react/ohlc";
 import { Horizon } from "@microcharts/react/horizon";
 import { CalendarStrip } from "@microcharts/react/calendar-strip";
 import { EventTimeline } from "@microcharts/react/event-timeline";
+import { CoverageStrip } from "@microcharts/react/coverage-strip";
+import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
+import { PercentileLadder } from "@microcharts/react/percentile-ladder";
+import { GradedBand } from "@microcharts/react/graded-band";
+import { IconArray } from "@microcharts/react/icon-array";
+import { RateVolume } from "@microcharts/react/rate-volume";
+import { NetFlow } from "@microcharts/react/net-flow";
+import { RetentionCurve } from "@microcharts/react/retention-curve";
+import { BurnChart } from "@microcharts/react/burn-chart";
+import { ErrorBudget } from "@microcharts/react/error-budget";
+import { ControlStrip } from "@microcharts/react/control-strip";
+import { ForecastCone } from "@microcharts/react/forecast-cone";
+import { QuantileDots } from "@microcharts/react/quantile-dots";
+import { ABStrips } from "@microcharts/react/ab-strips";
+import { ShiftHistogram } from "@microcharts/react/shift-histogram";
+import { ParetoStrip } from "@microcharts/react/pareto-strip";
+import { DataDiff } from "@microcharts/react/data-diff";
+import { QuadrantDot } from "@microcharts/react/quadrant-dot";
+import { CyclePlot } from "@microcharts/react/cycle-plot";
+import { ChangePoint } from "@microcharts/react/change-point";
+import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -89,6 +110,27 @@ export function getMDXComponents(components?: MDXComponents) {
     Horizon,
     CalendarStrip,
     EventTimeline,
+    CoverageStrip,
+    BenchmarkStrip,
+    PercentileLadder,
+    GradedBand,
+    IconArray,
+    RateVolume,
+    NetFlow,
+    RetentionCurve,
+    BurnChart,
+    ErrorBudget,
+    ControlStrip,
+    ForecastCone,
+    QuantileDots,
+    ABStrips,
+    ShiftHistogram,
+    ParetoStrip,
+    DataDiff,
+    QuadrantDot,
+    CyclePlot,
+    ChangePoint,
+    EnsembleGhosts,
     SparkGroup,
     // docs building blocks
     Instrument,

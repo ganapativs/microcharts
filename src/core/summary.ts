@@ -164,6 +164,307 @@ export interface SummaryStrings {
   eventAt: (label: string, atLabel: string) => string;
   /** "4 spans covering 82% of the window; 2 events." */
   timeline: (spans: number, events: number, coveragePct: string) => string;
+
+  /* ── Batch 2 — decision micrographs ──────────────────────────────────── */
+
+  /** Coverage summary, e.g. "18 of 24 slots measured (75%); longest gap 4 slots." */
+  coverage: (measured: number, expected: number, coveragePct: string, longestGap: number) => string;
+  /** Coverage slot announcement, e.g. "Slot 14: 3.2." / "Slot 14: no measurement." */
+  coverageSlot: (slot: number, value: string | null) => string;
+  /** Benchmark summary, e.g. "312 ms — 68th percentile of 42 peers (middle half 250–420 ms)." */
+  benchmark: (value: string, percentile: number, n: number, p25: string, p75: string) => string;
+  /** Benchmark all-equal peers, e.g. "312 ms — all 8 peers at 312 ms." */
+  benchmarkFlat: (value: string, n: number, peerValue: string) => string;
+  /** Benchmark edge announcement, e.g. "p75: 420 ms." */
+  benchmarkEdge: (name: string, value: string) => string;
+  /** Percentile-ladder summary, e.g. "p50 120 ms, p90 480 ms, p99 2.1 s — the slowest 1% take 17× the median." */
+  ladder: (list: string, tailShare: string, ratio: string) => string;
+  /** One ladder tick, e.g. "p90 480 ms" (list) — joined by the summary. */
+  ladderTick: (p: string, value: string) => string;
+  /** Ladder probe announcement, e.g. "p99: 2.1 s — 17× the median." */
+  ladderProbe: (p: string, value: string, ratio: string) => string;
+  /** Ladder all-equal, e.g. "All percentiles equal at 120 ms." */
+  ladderFlat: (value: string) => string;
+  /** Graded-band summary, e.g. "Median 21; 50% within 17–26, 95% within 9–38." */
+  gradedBand: (median: string, clauses: string) => string;
+  /** One band clause, e.g. "50% within 17–26" — joined by the summary. */
+  bandClause: (level: number, lo: string, hi: string) => string;
+  /** Band edge announcement, e.g. "80% interval: 17 to 26." */
+  bandEdge: (level: number, lo: string, hi: string) => string;
+  /** Graded band with no spread, e.g. "Point value 21, no interval." */
+  bandPoint: (value: string) => string;
+  /** Icon-array summary, e.g. "3 in 20. About 15%." (+ note for degenerate/sub-unit). */
+  iconArray: (k: number, n: number, pct: string, note: "none" | "all" | "sub" | null) => string;
+  /** Icon-array unit announcement, e.g. "Unit 7 of 20 — filled. 3 of 20 filled." */
+  iconArrayUnit: (index: number, n: number, filled: boolean, filledCount: number) => string;
+  /** Quantile-dots with a threshold, e.g. "4 in 20 chances above 15 min." */
+  quantileDots: (past: number, count: number, side: string, threshold: string) => string;
+  /** Quantile-dots without a threshold, e.g. "Most likely 12–15; range 4 to 38." */
+  quantileDotsRange: (modeLo: string, modeHi: string, min: string, max: string) => string;
+  /** Rate-volume summary, e.g. "4.1% on 38 events (low volume); up from 2.3% across 12 periods." */
+  rateVolume: (
+    rateLast: string,
+    volumeLast: string,
+    unit: string,
+    low: boolean,
+    direction: "up" | "down",
+    rateFirst: string,
+    n: number,
+  ) => string;
+  /** Rate-volume, single/degenerate, e.g. "4.1% on 38 events (low volume)." */
+  rateVolumeShort: (rateLast: string, volumeLast: string, unit: string, low: boolean) => string;
+  /** Rate-volume period announcement, e.g. "Period 4 of 12: 4.1% on 38 events (low volume)." */
+  rateVolumeAt: (
+    position: number,
+    total: number,
+    rate: string,
+    volume: string,
+    unit: string,
+    low: boolean,
+  ) => string;
+  /** Rate-volume zero-volume period, e.g. "Period 5 of 12: no events." */
+  rateVolumeNoEvents: (position: number, total: number) => string;
+  /** Net-flow summary, e.g. "Net +1.1k last period; in 4.2k vs out 3.1k; net positive 9 of 12 periods." */
+  netFlow: (
+    netLast: string,
+    inLast: string,
+    outLast: string,
+    netPositive: number,
+    n: number,
+  ) => string;
+  /** Net-flow period announcement, e.g. "Period 6 of 12: in 4.2k, out 3.1k, net +1.1k." */
+  netFlowAt: (
+    position: number,
+    total: number,
+    inValue: string,
+    outValue: string,
+    net: string,
+  ) => string;
+  /** Net-flow all-zero, e.g. "No flow across 12 periods." */
+  netFlowNoFlow: (n: number) => string;
+  /** Retention summary, e.g. "34% retained after 8 weeks; curve plateaus from week 5." */
+  retention: (last: string, n: number, unit: string, from: number) => string;
+  /** Retention summary, no plateau, e.g. "34% retained after 8 weeks." */
+  retentionNoPlateau: (last: string, n: number, unit: string) => string;
+  /** Retention period announcement, e.g. "week 3: 41% retained (benchmark 37%)." */
+  retentionAt: (unit: string, period: number, value: string, benchmark: string | null) => string;
+  /** Burn summary, e.g. "12 of 20 days in: 34 points remain vs 28 planned — projected to finish 3 days late." */
+  burn: (
+    elapsed: number,
+    total: number,
+    unit: string,
+    nowActual: string,
+    work: string,
+    verb: string,
+    nowPlan: string,
+    landing: string,
+  ) => string;
+  /** Burn summary, no plan line, e.g. "12 days in: 34 points remain." */
+  burnNoPlan: (
+    elapsed: number,
+    unit: string,
+    nowActual: string,
+    work: string,
+    verb: string,
+  ) => string;
+  /** Landing clause, e.g. "projected to finish 3 days late" / "...on time". */
+  burnLanding: (delta: number, unit: string) => string;
+  /** Flatlined projection clause. */
+  burnFlatlined: string;
+  /** Burn "remain" (down) / "done" (up) verb. */
+  burnRemain: string;
+  burnDone: string;
+  /** Burn period announcement, e.g. "day 12: 34 points remain, plan 28." */
+  burnAt: (
+    unit: string,
+    period: number,
+    nowActual: string,
+    work: string,
+    verb: string,
+    nowPlan: string | null,
+  ) => string;
+  /** Projected-region announcement, e.g. "day 18 (projected): 9 points remain." */
+  burnAtProjected: (
+    unit: string,
+    period: number,
+    value: string,
+    work: string,
+    verb: string,
+  ) => string;
+  /** Error-budget summary, e.g. "62% of error budget remains at day 12 of 30 — burning at 0.9× the steady rate." */
+  errorBudget: (
+    remaining: string,
+    elapsed: number,
+    total: number,
+    unit: string,
+    rate: string,
+  ) => string;
+  /** Exhausted-budget summary, e.g. "Budget exhausted at day 19 of 30." */
+  errorBudgetExhausted: (unit: string, at: number, total: number) => string;
+  /** Error-budget step announcement, e.g. "day 12 of 30: 62% budget remaining, burning at 1.4× steady rate." */
+  errorBudgetAt: (
+    unit: string,
+    at: number,
+    total: number,
+    remaining: string,
+    rate: string,
+  ) => string;
+  /** Control summary, e.g. "2 of 30 points outside control limits (center 74.2, limits 69.0–79.4)." */
+  control: (k: number, n: number, center: string, lo: string, hi: string) => string;
+  /** In-control summary, e.g. "All 30 points within control limits (center 74.2, limits 69.0–79.4)." */
+  controlInControl: (n: number, center: string, lo: string, hi: string) => string;
+  /** Provisional-limits clause appended when n < 10, e.g. " Limits provisional (n=6)." */
+  controlProvisional: (n: number) => string;
+  /** Control point announcement, e.g. "Point 14 of 30: 82.1 — above the upper limit (79.4)." */
+  controlAt: (
+    position: number,
+    total: number,
+    value: string,
+    side: "upper" | "lower" | null,
+    limit: string,
+  ) => string;
+  /** Forecast summary, e.g. "Median forecast 42 by week 14 (80% between 33 and 55), from 38 today." */
+  forecast: (
+    mid: string,
+    at: number,
+    unit: string,
+    lo: string,
+    hi: string,
+    now: string | null,
+  ) => string;
+  /** Clearance clause, e.g. " The 80% band clears the 45 target." */
+  forecastClearance: (status: "clears" | "straddles" | "misses", target: string) => string;
+  /** History-region announcement, e.g. "Week 9: 38." */
+  forecastAtHistory: (unit: string, period: number, value: string) => string;
+  /** Forecast-region announcement, e.g. "Week 14 (forecast): median 42, 80% between 33 and 55." */
+  forecastAtForecast: (unit: string, period: number, mid: string, lo: string, hi: string) => string;
+  /** A/B summary, e.g. "B median 118 ms vs A 130 ms (−9%); middle halves overlap 40%." */
+  ab: (
+    bLabel: string,
+    bMed: string,
+    aLabel: string,
+    aMed: string,
+    delta: string,
+    overlapPct: string,
+  ) => string;
+  /** Appended verdict when overlap is total / none. */
+  abSeparated: string;
+  abNoDiff: string;
+  /** A/B row announcement, e.g. "B median 118 ms, 12 ms below A." */
+  abRow: (
+    label: string,
+    med: string,
+    amount: string,
+    dir: "below" | "above",
+    other: string,
+  ) => string;
+  /** A/B edge announcement, e.g. "B p75: 140 ms." */
+  abEdge: (label: string, p: number, value: string) => string;
+  /** Shift summary, e.g. "Median fell from 130 ms to 106 ms." */
+  shift: (direction: "fell" | "rose", before: string, after: string) => string;
+  /** No-change shift, e.g. "Median unchanged at 130 ms." */
+  shiftHeld: (value: string) => string;
+  /** Appended when the two sides have unequal n, e.g. " On 6,400 / 7,100 samples." */
+  shiftSamples: (nBefore: number, nAfter: number) => string;
+  /** One-sided (the other side is empty), e.g. "Median 130 ms; no after sample." */
+  shiftOneSide: (value: string, missing: string) => string;
+  /** Shift bin announcement, e.g. "10–12 ms: 18% before, 6% after." */
+  shiftBin: (lo: string, hi: string, beforePct: string, afterPct: string) => string;
+  /** Pareto summary, e.g. "Top 3 of 9 causes account for 82% of incidents." */
+  pareto: (k: number, n: number, unit: string, cumPct: string, metric: string) => string;
+  /** Pareto without a threshold, e.g. "Timeouts leads at 34%." */
+  paretoTop: (topLabel: string, topPct: string) => string;
+  /** Empty (zero total), e.g. "No recorded incidents." */
+  paretoEmpty: (metric: string) => string;
+  /** Pareto bar announcement, e.g. "Timeouts: 34% of total, cumulative 61%." */
+  paretoAt: (label: string, sharePct: string, cumPct: string) => string;
+  /** DataDiff summary, e.g. "+512 added, −187 removed across 6 keys; largest change: users (+340)." */
+  dataDiff: (added: string, removed: string, n: number, key: string, net: string) => string;
+  /** DataDiff with no net change anywhere, e.g. "No changes across 6 keys." */
+  dataDiffEmpty: (n: number) => string;
+  /** DataDiff row announcement, e.g. "users: +340 added, −120 removed, net +220." */
+  dataDiffAt: (key: string, added: string, removed: string, net: string) => string;
+  /** Quadrant name, e.g. "high-impact, low-effort" (reading: y then x). */
+  quadrantName: (yHigh: boolean, yLabel: string, xHigh: boolean, xLabel: string) => string;
+  /** QuadrantDot summary against a field, e.g. "Impact 9, effort 3 — in the high-impact, low-effort quadrant (2 of 14 peers)." */
+  quadrant: (
+    yLabel: string,
+    yv: string,
+    xLabel: string,
+    xv: string,
+    quadName: string,
+    k: number,
+    n: number,
+  ) => string;
+  /** QuadrantDot with no field, e.g. "Impact 9, effort 3 — in the high-impact, low-effort quadrant." */
+  quadrantLone: (
+    yLabel: string,
+    yv: string,
+    xLabel: string,
+    xv: string,
+    quadName: string,
+  ) => string;
+  /** Peer announcement, e.g. "Peer 3 of 12: effort 6, impact 4 — high-effort, low-impact." */
+  quadrantAt: (
+    pos: number,
+    total: number,
+    xLabel: string,
+    xv: string,
+    yLabel: string,
+    yv: string,
+    quadName: string,
+  ) => string;
+  /** CyclePlot summary with a leading drift, e.g. "Peaks Fri (61), dips Sun (38); Mon rising across 6 weeks." */
+  cycle: (
+    peakSlot: string,
+    peak: string,
+    dipSlot: string,
+    dip: string,
+    driftSlot: string,
+    driftDir: "rising" | "falling",
+    cycles: number,
+    cycleUnit: string,
+  ) => string;
+  /** CyclePlot summary, no notable drift, e.g. "Peaks Fri (61), dips Sun (38)." */
+  cycleNoDrift: (peakSlot: string, peak: string, dipSlot: string, dip: string) => string;
+  /** Slot announcement, e.g. "Mondays: mean 42 across 6 weeks, rising." */
+  cycleAt: (
+    slotName: string,
+    center: "mean" | "median",
+    value: string,
+    cycles: number,
+    cycleUnit: string,
+    driftDir: "rising" | "falling" | "steady",
+  ) => string;
+  /** Within-slot observation, e.g. "Mon, cycle 3 of 6: 44." */
+  cyclePoint: (slotName: string, pos: number, total: number, value: string) => string;
+  /** ChangePoint summary, e.g. "Level shifted up 50% around point 34 (mean 32 → 48); stable since." */
+  changePoint: (
+    dir: "up" | "down",
+    delta: string,
+    i: number,
+    before: string,
+    after: string,
+    tail: "stable" | "again",
+  ) => string;
+  /** No detected shift, e.g. "No clear level shift across 90 points." */
+  changePointNone: (n: number) => string;
+  /** Point announcement, e.g. "Point 40: 51 — regime 2 of 3, mean 48." */
+  changePointAt: (
+    pos: number,
+    value: string,
+    regime: number,
+    regimes: number,
+    mean: string,
+  ) => string;
+  /** Break announcement, e.g. "Break at point 34: mean 32 to 48 (+50%)." */
+  changePointBreak: (i: number, before: string, after: string, signedDelta: string) => string;
+  /** Ensemble summary, e.g. "24 simulated paths end between 31 and 58; typical path ends near 44." */
+  ensemble: (n: number, lo: string, hi: string, mid: string) => string;
+  /** Single-member ensemble, e.g. "Single path, ends at 44." */
+  ensembleSingle: (end: string) => string;
+  /** Member announcement, e.g. "Member 7 of 24; ends at 42." */
+  ensembleAt: (pos: number, total: number, end: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

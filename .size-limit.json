@@ -151,13 +151,13 @@
   {
     "name": "@microcharts/react/seismogram (static)",
     "path": "dist/charts/seismogram/index.js",
-    "limit": "2.3 kB",
+    "limit": "2.4 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/seismogram/interactive",
     "path": "dist/charts/seismogram/client.js",
-    "limit": "3.2 kB",
+    "limit": "3.35 kB",
     "gzip": true
   },
   {
@@ -410,6 +410,258 @@
     "name": "@microcharts/react/event-timeline/interactive",
     "path": "dist/charts/event-timeline/client.js",
     "limit": "4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/coverage-strip (static)",
+    "path": "dist/charts/coverage-strip/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/coverage-strip/interactive",
+    "path": "dist/charts/coverage-strip/client.js",
+    "limit": "3.15 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/benchmark-strip (static)",
+    "path": "dist/charts/benchmark-strip/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/benchmark-strip/interactive",
+    "path": "dist/charts/benchmark-strip/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/percentile-ladder (static)",
+    "path": "dist/charts/percentile-ladder/index.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/percentile-ladder/interactive",
+    "path": "dist/charts/percentile-ladder/client.js",
+    "limit": "3.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/graded-band (static)",
+    "path": "dist/charts/graded-band/index.js",
+    "limit": "2.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/graded-band/interactive",
+    "path": "dist/charts/graded-band/client.js",
+    "limit": "3.55 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/net-flow (static)",
+    "path": "dist/charts/net-flow/index.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/retention-curve (static)",
+    "path": "dist/charts/retention-curve/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/retention-curve/interactive",
+    "path": "dist/charts/retention-curve/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/burn-chart (static)",
+    "path": "dist/charts/burn-chart/index.js",
+    "limit": "2.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/burn-chart/interactive",
+    "path": "dist/charts/burn-chart/client.js",
+    "limit": "3.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/error-budget (static)",
+    "path": "dist/charts/error-budget/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/error-budget/interactive",
+    "path": "dist/charts/error-budget/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/control-strip (static)",
+    "path": "dist/charts/control-strip/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/control-strip/interactive",
+    "path": "dist/charts/control-strip/client.js",
+    "limit": "3.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/forecast-cone (static)",
+    "path": "dist/charts/forecast-cone/index.js",
+    "limit": "2.95 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/forecast-cone/interactive",
+    "path": "dist/charts/forecast-cone/client.js",
+    "limit": "3.85 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/quantile-dots (static)",
+    "path": "dist/charts/quantile-dots/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/quantile-dots/interactive",
+    "path": "dist/charts/quantile-dots/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ab-strips (static)",
+    "path": "dist/charts/ab-strips/index.js",
+    "limit": "2.85 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ab-strips/interactive",
+    "path": "dist/charts/ab-strips/client.js",
+    "limit": "3.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/shift-histogram (static)",
+    "path": "dist/charts/shift-histogram/index.js",
+    "limit": "2.98 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/shift-histogram/interactive",
+    "path": "dist/charts/shift-histogram/client.js",
+    "limit": "3.95 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/pareto-strip (static)",
+    "path": "dist/charts/pareto-strip/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/pareto-strip/interactive",
+    "path": "dist/charts/pareto-strip/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/data-diff (static)",
+    "path": "dist/charts/data-diff/index.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/data-diff/interactive",
+    "path": "dist/charts/data-diff/client.js",
+    "limit": "3.55 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/quadrant-dot (static)",
+    "path": "dist/charts/quadrant-dot/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/quadrant-dot/interactive",
+    "path": "dist/charts/quadrant-dot/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/cycle-plot (static)",
+    "path": "dist/charts/cycle-plot/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/cycle-plot/interactive",
+    "path": "dist/charts/cycle-plot/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/change-point (static)",
+    "path": "dist/charts/change-point/index.js",
+    "limit": "2.98 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/change-point/interactive",
+    "path": "dist/charts/change-point/client.js",
+    "limit": "3.98 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ensemble-ghosts (static)",
+    "path": "dist/charts/ensemble-ghosts/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ensemble-ghosts/interactive",
+    "path": "dist/charts/ensemble-ghosts/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/net-flow/interactive",
+    "path": "dist/charts/net-flow/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/rate-volume (static)",
+    "path": "dist/charts/rate-volume/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/rate-volume/interactive",
+    "path": "dist/charts/rate-volume/client.js",
+    "limit": "3.55 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/icon-array (static)",
+    "path": "dist/charts/icon-array/index.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/icon-array/interactive",
+    "path": "dist/charts/icon-array/client.js",
+    "limit": "3 kB",
     "gzip": true
   },
   {

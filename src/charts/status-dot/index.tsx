@@ -103,7 +103,7 @@ export function StatusDot(props: StatusDotProps): ReactNode {
           data-mc-status={state.glyph}
           style={
             mark.hollow
-              ? { fill: "none", stroke: fill, strokeWidth: 1.2 }
+              ? { fill: "none", stroke: fill, strokeWidth: "calc(var(--mc-stroke-width) * 0.8)" }
               : { fill, stroke: "none" }
           }
         />
@@ -116,7 +116,11 @@ export function StatusDot(props: StatusDotProps): ReactNode {
             cy={mark.cy}
             r={mark.r}
             data-mc-status="half"
-            style={{ fill: "none", stroke: fill, strokeWidth: 1.2 }}
+            style={{
+              fill: "none",
+              stroke: fill,
+              strokeWidth: "calc(var(--mc-stroke-width) * 0.8)",
+            }}
           />
           <path d={mark.d} style={{ fill, stroke: "none" }} />
         </>

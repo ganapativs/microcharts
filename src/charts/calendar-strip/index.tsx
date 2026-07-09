@@ -144,9 +144,17 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
             data-mc-ink={c.state === "empty" ? "band" : "cell"}
             style={
               c.state === "empty"
-                ? { fill: "none", stroke: "var(--mc-band)", strokeWidth: 0.5 }
+                ? // no-data: a visible hollow outline — never the invisible 8% band
+                  {
+                    fill: "none",
+                    stroke: "var(--mc-neutral)",
+                    strokeOpacity: 0.45,
+                    strokeWidth: 0.6,
+                  }
                 : {
-                    fillOpacity: stepOpacity(c.step ?? 0, steps),
+                    // a real zero must read as present-but-lowest, not vanish into
+                    // the 0.06 empty-track look (keeps "empty ≠ zero" legible)
+                    fillOpacity: c.state === "zero" ? 0.14 : stepOpacity(c.step ?? 0, steps),
                     ...(color && c.state === "value" ? { fill: color } : null),
                   }
             }

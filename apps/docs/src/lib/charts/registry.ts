@@ -44,6 +44,27 @@ import ohlc from "./ohlc";
 import horizon from "./horizon";
 import calendarStrip from "./calendar-strip";
 import eventTimeline from "./event-timeline";
+import coverageStrip from "./coverage-strip";
+import benchmarkStrip from "./benchmark-strip";
+import percentileLadder from "./percentile-ladder";
+import gradedBand from "./graded-band";
+import iconArray from "./icon-array";
+import rateVolume from "./rate-volume";
+import netFlow from "./net-flow";
+import retentionCurve from "./retention-curve";
+import burnChart from "./burn-chart";
+import errorBudget from "./error-budget";
+import controlStrip from "./control-strip";
+import forecastCone from "./forecast-cone";
+import quantileDots from "./quantile-dots";
+import abStrips from "./ab-strips";
+import shiftHistogram from "./shift-histogram";
+import paretoStrip from "./pareto-strip";
+import dataDiff from "./data-diff";
+import quadrantDot from "./quadrant-dot";
+import cyclePlot from "./cycle-plot";
+import changePoint from "./change-point";
+import ensembleGhosts from "./ensemble-ghosts";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -80,6 +101,27 @@ const MODULES: ChartModule[] = [
   horizon,
   calendarStrip,
   eventTimeline,
+  coverageStrip,
+  benchmarkStrip,
+  percentileLadder,
+  gradedBand,
+  iconArray,
+  rateVolume,
+  netFlow,
+  retentionCurve,
+  burnChart,
+  errorBudget,
+  controlStrip,
+  forecastCone,
+  quantileDots,
+  abStrips,
+  shiftHistogram,
+  paretoStrip,
+  dataDiff,
+  quadrantDot,
+  cyclePlot,
+  changePoint,
+  ensembleGhosts,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

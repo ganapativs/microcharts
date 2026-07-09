@@ -100,9 +100,8 @@ export const playground: PlaygroundSpec = {
       highlight={(s.highlight as boolean) ? "East" : undefined}
       orientation={s.orientation as "horizontal" | "vertical"}
       summary={false}
-      style={
-        s.orientation === "horizontal" ? { width: 160, height: 96 } : { width: 160, height: 52 }
-      }
+      width={160}
+      height={s.orientation === "horizontal" ? 96 : 52}
     />
   ),
   code: (s) =>

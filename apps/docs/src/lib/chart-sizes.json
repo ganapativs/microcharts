@@ -5,7 +5,7 @@
   },
   "sparkbar": {
     "static": 2.78,
-    "interactive": 2.72
+    "interactive": 3.68
   },
   "delta": {
     "static": 0.92,
@@ -36,8 +36,8 @@
     "interactive": 2.13
   },
   "rug-strip": {
-    "static": 2.25,
-    "interactive": 3.12
+    "static": 2.26,
+    "interactive": 3.13
   },
   "mini-bar": {
     "static": 2.18,
@@ -48,12 +48,12 @@
     "interactive": 2.21
   },
   "seismogram": {
-    "static": 2.2,
-    "interactive": 3.17
+    "static": 2.38,
+    "interactive": 3.34
   },
   "heat-strip": {
-    "static": 2.27,
-    "interactive": 3.09
+    "static": 2.28,
+    "interactive": 3.1
   },
   "dot-plot": {
     "static": 2.19,
@@ -68,8 +68,8 @@
     "interactive": 3.17
   },
   "slope": {
-    "static": 2.92,
-    "interactive": 3.92
+    "static": 2.95,
+    "interactive": 3.94
   },
   "micro-scatter": {
     "static": 1.88,
@@ -84,8 +84,8 @@
     "interactive": 2.83
   },
   "micro-box": {
-    "static": 2.54,
-    "interactive": 3.35
+    "static": 2.56,
+    "interactive": 3.37
   },
   "progress-ring": {
     "static": 2.08,
@@ -128,12 +128,32 @@
     "interactive": 3.16
   },
   "calendar-strip": {
-    "static": 2.27,
-    "interactive": 3.42
+    "static": 2.29,
+    "interactive": 3.44
   },
   "event-timeline": {
     "static": 2.64,
-    "interactive": 3.74
+    "interactive": 3.75
+  },
+  "coverage-strip": {
+    "static": 2.27,
+    "interactive": 3.04
+  },
+  "benchmark-strip": {
+    "static": 2.72,
+    "interactive": 3.48
+  },
+  "percentile-ladder": {
+    "static": 3,
+    "interactive": 3.77
+  },
+  "graded-band": {
+    "static": 2.65,
+    "interactive": 3.42
+  },
+  "icon-array": {
+    "static": 2.09,
+    "interactive": 2.96
   },
   "annotations": {
     "static": 1.46

@@ -530,6 +530,17 @@ body {
     box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
     transform: translateY(-2px);
   }
+
+  /* Specimen index — rows share ONE glass plate per collection, seamed by
+     `divide-hairline`. A row can't leave the shared surface, so hover brightens
+     it toward the accent instead of lifting. The first/last rows inherit the
+     plate's rounded corners via the wrapper's `overflow: hidden`. */
+  .specimen-row {
+    transition: background-color 0.25s var(--ease-out-quint);
+  }
+  .specimen-row:hover {
+    background-color: color-mix(in oklab, var(--accent) 6%, transparent);
+  }
 }
 
 /* Primary CTA — a solid accent lozenge (kept opaque for punch + contrast) with
@@ -957,8 +968,25 @@ a:where(:has(> div > svg[class~="lucide-chevron-right"])):hover {
     filter: blur(0);
   }
 }
-.reveal {
+/* Scroll-reveal states. `pending` is the hidden rest state rendered on the
+   server + first client paint — so the element never flashes visible before
+   the observer fires. `in` plays the entrance once, in view. */
+[data-reveal="pending"] {
+  opacity: 0;
+  transform: translateY(16px);
+  filter: blur(6px);
+  will-change: opacity, transform, filter;
+}
+[data-reveal="in"] {
   animation: rise-in 0.72s var(--ease-out-quint) both;
+}
+/* No-JS: the observer never runs, so reveal everything. */
+@media (scripting: none) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
 }
 
 @keyframes pop-in {
@@ -992,7 +1020,7 @@ a:where(:has(> div > svg[class~="lucide-chevron-right"])):hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal,
+  [data-reveal],
   .route-fade,
   .pop-in,
   .mc-morph,
@@ -1008,7 +1036,13 @@ a:where(:has(> div > svg[class~="lucide-chevron-right"])):hover {
   .cta-accent::after {
     display: none;
   }
-  .reveal,
+  /* No motion → no hidden rest state; show content outright (either reveal
+     phase, so a never-observed pending element can't stay invisible). */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  [data-reveal],
   .pop-in {
     filter: none;
   }

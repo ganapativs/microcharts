@@ -16,6 +16,25 @@ import { EN_STACK } from "./strings-stack.js";
 import { EN_OHLC } from "./strings-ohlc.js";
 import { EN_CALENDAR } from "./strings-calendar.js";
 import { EN_TIMELINE } from "./strings-timeline.js";
+import { EN_COVERAGE } from "./strings-coverage.js";
+import { EN_QUANTILE } from "./strings-quantile.js";
+import { EN_FREQ } from "./strings-freq.js";
+import { EN_QUANTILE_DOTS } from "./strings-quantile-dots.js";
+import { EN_RATE_VOLUME } from "./strings-rate-volume.js";
+import { EN_NET_FLOW } from "./strings-net-flow.js";
+import { EN_RETENTION } from "./strings-retention.js";
+import { EN_BURN } from "./strings-burn.js";
+import { EN_ERROR_BUDGET } from "./strings-error-budget.js";
+import { EN_CONTROL } from "./strings-control.js";
+import { EN_FORECAST } from "./strings-forecast.js";
+import { EN_AB } from "./strings-ab.js";
+import { EN_SHIFT } from "./strings-shift.js";
+import { EN_PARETO } from "./strings-pareto.js";
+import { EN_DATA_DIFF } from "./strings-data-diff.js";
+import { EN_QUADRANT } from "./strings-quadrant.js";
+import { EN_CYCLE } from "./strings-cycle.js";
+import { EN_CHANGE_POINT } from "./strings-change-point.js";
+import { EN_ENSEMBLE } from "./strings-ensemble.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -32,4 +51,23 @@ export const EN: SummaryStrings = {
   ...EN_OHLC,
   ...EN_CALENDAR,
   ...EN_TIMELINE,
+  ...EN_COVERAGE,
+  ...EN_QUANTILE,
+  ...EN_FREQ,
+  ...EN_QUANTILE_DOTS,
+  ...EN_RATE_VOLUME,
+  ...EN_NET_FLOW,
+  ...EN_RETENTION,
+  ...EN_BURN,
+  ...EN_ERROR_BUDGET,
+  ...EN_CONTROL,
+  ...EN_FORECAST,
+  ...EN_AB,
+  ...EN_SHIFT,
+  ...EN_PARETO,
+  ...EN_DATA_DIFF,
+  ...EN_QUADRANT,
+  ...EN_CYCLE,
+  ...EN_CHANGE_POINT,
+  ...EN_ENSEMBLE,
 };

@@ -1,0 +1,159 @@
+import { RetentionCurve } from "@microcharts/react/retention-curve";
+import { InteractiveDemo } from "./retention-curve.client";
+import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+
+export { InteractiveDemo };
+
+const PKG = "@microcharts/react";
+// a weekly cohort that decays then plateaus around 38%
+export const DEMO = [1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38, 0.379, 0.378];
+// a leakier peer/industry curve (the subordinate ghost)
+export const BENCH = [1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28, 0.279, 0.278];
+
+export const entry: ChartEntry = {
+  name: "RetentionCurve",
+  slug: "retention-curve",
+  status: "stable",
+  collection: "decision",
+  tagline: "Do they stay — and does the curve plateau?",
+  staticImport: `${PKG}/retention-curve`,
+  interactiveImport: `${PKG}/retention-curve/interactive`,
+  dataShape: "number[] — fraction retained per period (period 0 ≈ 1.0)",
+  encoding: {
+    channel: "step-line position on a locked [0,1] scale",
+    precision: "high — the full range is the honest frame for a share",
+  },
+  nodeBudget: "≤ 6",
+  bestFor: [
+    "a cohort retention curve in a KPI card",
+    "your decay vs an industry benchmark",
+    "spotting whether retention plateaus (or keeps leaking)",
+  ],
+  avoidFor: ["a continuous signal (Sparkline)", "one-number retention (Progress / Delta)"],
+  props: [
+    {
+      name: "data",
+      type: "number[]",
+      required: true,
+      description: "Fraction retained per period (0–1 or 0–100); period 0 is typically 1.0.",
+    },
+    {
+      name: "benchmark",
+      type: "number[]",
+      required: false,
+      description: "Peer/industry curve, drawn as a subordinate dashed ghost.",
+    },
+    {
+      name: "plateau",
+      type: "boolean",
+      required: false,
+      description: "Detect + mark a plateau (default true).",
+    },
+    {
+      name: "curve",
+      type: '"step" | "smooth"',
+      required: false,
+      description: "Step (default — cohorts are discrete) or smooth (editorial).",
+    },
+    {
+      name: "label",
+      type: '"last" | "none"',
+      required: false,
+      description: "Final retention in a right gutter.",
+    },
+  ],
+  demo: DEMO,
+  example: {
+    title: "W12 cohort",
+    code: `import { RetentionCurve } from "${PKG}/retention-curve";\n\n<RetentionCurve data={cohort} unit="week" title="W12 cohort" />`,
+  },
+};
+
+export function Preview() {
+  return <RetentionCurve data={DEMO} summary={false} width={150} height={26} />;
+}
+
+export const showcase = {
+  hint: "cohort decay",
+  Node: () => (
+    <RetentionCurve
+      data={DEMO}
+      benchmark={BENCH}
+      unit="week"
+      title="W12 cohort"
+      width={150}
+      height={26}
+    />
+  ),
+};
+
+export const playground: PlaygroundSpec = {
+  knobs: [
+    { kind: "toggle", key: "benchmark", label: "benchmark", init: true },
+    { kind: "toggle", key: "plateau", label: "plateau", init: true },
+    { kind: "segmented", key: "curve", label: "curve", options: ["step", "smooth"], init: "step" },
+  ],
+  render: (s) => (
+    <RetentionCurve
+      data={DEMO}
+      benchmark={s.benchmark ? BENCH : undefined}
+      plateau={s.plateau as boolean}
+      curve={s.curve as "step" | "smooth"}
+      unit="week"
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  code: (s) =>
+    [
+      "<RetentionCurve",
+      "  data={cohort}",
+      s.benchmark && "  benchmark={industry}",
+      s.plateau === false && "  plateau={false}",
+      s.curve !== "step" && `  curve="${s.curve}"`,
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+};
+
+export const recipes: Recipe[] = [
+  {
+    label: "vs industry benchmark",
+    code: `<RetentionCurve data={cohort} benchmark={industry} />`,
+    node: <RetentionCurve data={DEMO} benchmark={BENCH} summary={false} width={170} height={26} />,
+  },
+  {
+    label: "smooth (editorial)",
+    code: `// step is the honest default for cohort data\n<RetentionCurve data={cohort} curve="smooth" />`,
+    node: <RetentionCurve data={DEMO} curve="smooth" summary={false} width={170} height={26} />,
+  },
+];
+
+export function Mark(props: { data: number[]; width?: number; height?: number }) {
+  const norm = props.data.map((v, j) => Math.max(0.1, 1 - j * 0.12 - (Math.abs(v) % 3) * 0.02));
+  return (
+    <RetentionCurve
+      data={norm}
+      summary={false}
+      width={props.width ?? 70}
+      height={props.height ?? 18}
+    />
+  );
+}
+
+export function markCode(): string {
+  return `<RetentionCurve data={cohort} />`;
+}
+
+export default {
+  entry,
+  Preview,
+  showcase,
+  InteractiveDemo,
+  playground,
+  recipes,
+  Mark,
+  markCode,
+} satisfies ChartModule;

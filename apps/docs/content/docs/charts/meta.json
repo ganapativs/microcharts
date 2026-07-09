@@ -36,6 +36,27 @@
     "ohlc",
     "horizon",
     "calendar-strip",
-    "event-timeline"
+    "event-timeline",
+    "coverage-strip",
+    "benchmark-strip",
+    "percentile-ladder",
+    "graded-band",
+    "icon-array",
+    "rate-volume",
+    "net-flow",
+    "retention-curve",
+    "burn-chart",
+    "error-budget",
+    "control-strip",
+    "forecast-cone",
+    "quantile-dots",
+    "ab-strips",
+    "shift-histogram",
+    "pareto-strip",
+    "data-diff",
+    "quadrant-dot",
+    "cycle-plot",
+    "change-point",
+    "ensemble-ghosts"
   ]
 }

@@ -1,10 +1,7 @@
 "use client";
 import { Seismogram as SeismogramInteractive } from "@microcharts/react/seismogram/interactive";
 import { DemoPanel } from "@/components/charts/demo-panel";
-
-const BURSTS = Array.from({ length: 48 }, (_, i) =>
-  i % 9 === 0 ? (i % 27 === 0 ? 8 : 3) : i % 13 === 0 ? 1 : 0,
-);
+import { BURSTS } from "./seismogram";
 
 export function InteractiveDemo() {
   return (

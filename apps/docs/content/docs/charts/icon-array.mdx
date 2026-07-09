@@ -1,0 +1,54 @@
+---
+title: IconArray
+description: A countable-rate grid for React — one stated probability made countable, with the denominator always visible.
+---
+
+IconArray answers "how likely is this, really?". A stated rate becomes countable: filled
+units in a fixed N-unit grid, with the denominator visible. Two moves kill denominator
+neglect — the ratio label and the fixed grid. Fill order is contiguous reading-order
+(scattered is harder to count), and there are **no partial-unit fills ever**: a sub-unit
+rate is flagged, never faked.
+
+<LiveDemo
+  label="IconArray"
+  sizeOf="icon-array"
+  code={`import { IconArray } from "@microcharts/react/icon-array";
+
+<IconArray value={0.15} of={20} title="Adverse events" />`}
+>
+  <IconArray value={0.15} of={20} title="Adverse events" width={140} height={30} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="icon-array" />
+
+## Try it
+
+<Playground chart="icon-array" />
+
+## Interactive
+
+<InteractiveDemo slug="icon-array" />
+
+## When to use it
+
+- **Good for** — risk in a sentence, uptake / adoption rates, lay-audience probabilities.
+- **Avoid for** — a trend (Sparkline) or a full distribution (QuantileDots).
+
+## Sizing
+
+<Sizing chart="icon-array" />
+
+## Variants
+
+<LiveDemo
+  label="framing + polarity"
+  code={`<IconArray value={0.1} of={10} />
+<IconArray value={0.15} of={20} positive="down" />`}
+>
+  <span className="inline-flex flex-col gap-2">
+    <IconArray value={0.1} of={10} title="1 in 10" width={130} height={28} />
+    <IconArray value={0.15} of={20} positive="down" title="Risk polarity" width={150} height={28} />
+  </span>
+</LiveDemo>

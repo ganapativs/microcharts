@@ -26,6 +26,17 @@ const cats = Array.from({ length: POOL }, (_, s) =>
 const bursts = Array.from({ length: POOL }, (_, s) =>
   Array.from({ length: 40 }, (_b, j) => ((s + j) % 9 === 0 ? (j % 7) + 1 : 0)),
 );
+const DIFF_KEYS = ["users", "orders", "items", "tags", "notes", "flags"];
+const diffs = Array.from({ length: POOL }, (_, s) =>
+  DIFF_KEYS.map((key, j) => ({
+    key,
+    added: ((s + 1) * (j + 2) * 29) % 400,
+    removed: ((s + 2) * (j + 1) * 17) % 300,
+  })),
+);
+const quads = Array.from({ length: POOL }, (_, s) =>
+  Array.from({ length: 14 }, (_p, j) => ({ x: ((s + j) * 7) % 10, y: ((s + j) * 13) % 10 })),
+);
 
 export const SCENARIOS = [
   {
@@ -310,5 +321,183 @@ export const SCENARIOS = [
       domain: [0, 80],
       summary: false,
     }),
+  },
+
+  {
+    slug: "coverage-strip",
+    component: "CoverageStrip",
+    floor: 8, // ≤ 120 cells, one rect each — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 40 }, (_c, j) => ((i + j) % 4 === 0 ? null : (i + j) % 9)),
+      summary: false,
+    }),
+  },
+  {
+    slug: "benchmark-strip",
+    component: "BenchmarkStrip",
+    floor: 30, // ≤ 6 nodes + quantile pass
+    props: (i) => ({ data: rugs[i % POOL], value: 4 + (i % 5), summary: false }),
+  },
+  {
+    slug: "percentile-ladder",
+    component: "PercentileLadder",
+    floor: 25, // ≤ 8 nodes + quantile pass
+    props: (i) => ({ data: rugs[i % POOL], summary: false }),
+  },
+  {
+    slug: "graded-band",
+    component: "GradedBand",
+    floor: 25, // ≤ 6 nodes + nested quantiles
+    props: (i) => ({ data: rugs[i % POOL], summary: false }),
+  },
+  {
+    slug: "icon-array",
+    component: "IconArray",
+    floor: 7, // 20 units/render — N-node class (measured ~15 rows/ms, half-floor)
+    props: (i) => ({ value: (i % 20) / 20, of: 20, summary: false }),
+  },
+  {
+    slug: "rate-volume",
+    component: "RateVolume",
+    floor: 3, // 1 bar + object alloc/period — N-node class (measured ~7.6 rows/ms, half-floor)
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, k) => ({ rate: v, volume: 40 + ((k * 7) % 120) })),
+      minVolume: 50,
+      summary: false,
+    }),
+  },
+  {
+    slug: "net-flow",
+    component: "NetFlow",
+    floor: 8, // 2 area paths + net line — few nodes, per-period point loop
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, k) => ({ in: Math.abs(v), out: Math.abs(v) * 0.7 + (k % 5) })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "retention-curve",
+    component: "RetentionCurve",
+    floor: 12, // step line + plateau scan — few nodes, per-period point loop
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, k) =>
+        Math.max(0, 1 - k / rugs[i % POOL].length - (v % 3) * 0.02),
+      ),
+      summary: false,
+    }),
+  },
+  {
+    slug: "burn-chart",
+    component: "BurnChart",
+    floor: 10, // plan + actual + projection + fit — few nodes, per-period loop
+    props: (i) => {
+      const src = rugs[i % POOL];
+      const total = src.length;
+      const plan = Array.from({ length: total }, (_, k) => Math.max(0, total - k));
+      const actual = src
+        .slice(0, Math.ceil(total / 2))
+        .map((v, k) => Math.max(0, total - k * 0.7 + (v % 3)));
+      return { data: { plan, actual }, summary: false };
+    },
+  },
+  {
+    slug: "error-budget",
+    component: "ErrorBudget",
+    floor: 12, // diagonal + wedges + line + per-step rate loop — few nodes
+    props: (i) => ({
+      data: rugs[i % POOL].map((_, k, a) => Math.max(0, 1 - k / a.length)),
+      window: 30,
+      summary: false,
+    }),
+  },
+  {
+    slug: "control-strip",
+    component: "ControlStrip",
+    floor: 12, // band + line + per-point out-test + MR estimator
+    props: (i) => ({ data: rugs[i % POOL].map((v) => v * 10 + 40), rules: "we", summary: false }),
+  },
+  {
+    slug: "pareto-strip",
+    component: "ParetoStrip",
+    floor: 20, // ≤ 12 bars + cum line + sort — few nodes
+    props: (i) => ({ data: cats[i % POOL], summary: false }),
+  },
+  {
+    slug: "data-diff",
+    component: "DataDiff",
+    floor: 20, // ≤ 12 rows × 2 bars + hairline — few nodes, one linear pass
+    props: (i) => ({ data: diffs[i % POOL], summary: false }),
+  },
+  {
+    slug: "ensemble-ghosts",
+    component: "EnsembleGhosts",
+    floor: 12, // ≤12 ghost paths + median/nearest-median scan over the ensemble
+    props: (i) => ({
+      data: Array.from({ length: 24 }, (_, m) => waves[(i + m) % POOL].slice(0, 12)),
+      summary: false,
+    }),
+  },
+  {
+    slug: "change-point",
+    component: "ChangePoint",
+    floor: 12, // detector: O(n²) binary segmentation over ≤500 pts, still cheap
+    props: (i) => ({ data: waves[i % POOL].map((v, j) => v + (j > 250 ? 30 : 0)), summary: false }),
+  },
+  {
+    slug: "cycle-plot",
+    component: "CyclePlot",
+    floor: 20, // ≤ 12 slots × (line + tick) + spine; one bucketing pass
+    props: (i) => ({ data: waves[i % POOL], period: 7, summary: false }),
+  },
+  {
+    slug: "quadrant-dot",
+    component: "QuadrantDot",
+    floor: 20, // ≤ 5 + 1/ghost (cap 30) glyph; extent + one sort per render
+    props: (i) => ({
+      data: { x: (i * 3) % 10, y: (i * 7) % 10 },
+      field: quads[i % POOL],
+      xDomain: [0, 10],
+      domain: [0, 10],
+      summary: false,
+    }),
+  },
+  {
+    slug: "shift-histogram",
+    component: "ShiftHistogram",
+    floor: 6, // ≤ 12 bins × 2 + double binning + medians (measured ~13 rows/ms, half-floor)
+    props: (i) => ({
+      data: {
+        before: rugs[i % POOL].map((v) => v * 10 + 40),
+        after: rugs[(i + 1) % POOL].map((v) => v * 10 + 30),
+      },
+      summary: false,
+    }),
+  },
+  {
+    slug: "ab-strips",
+    component: "ABStrips",
+    floor: 20, // 2 rows × (2 bands + median) + quantiles — few nodes
+    props: (i) => ({
+      data: { a: rugs[i % POOL], b: rugs[(i + 1) % POOL].map((v) => v + 1) },
+      summary: false,
+    }),
+  },
+  {
+    slug: "quantile-dots",
+    component: "QuantileDots",
+    floor: 6, // 20 dot nodes/render — N-node class, per-dot loop
+    props: (i) => ({ data: rugs[i % POOL], threshold: 5, summary: false }),
+  },
+  {
+    slug: "forecast-cone",
+    component: "ForecastCone",
+    floor: 10, // 2 band polygons + history + mid — few nodes, per-point loop
+    props: (i) => {
+      const src = rugs[i % POOL];
+      const hist = src.slice(0, 20).map((v) => v * 5 + 30);
+      const mid = src.slice(20).map((v) => v * 5 + 42);
+      const p80 = mid.map((v, j) => [v - 4 - j, v + 4 + j]);
+      return { data: hist, forecast: { mid, p80 }, summary: false };
+    },
   },
 ];
