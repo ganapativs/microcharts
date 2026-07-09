@@ -524,4 +524,10 @@ export const SCENARIOS = [
     floor: 40, // one text node + a tier lookup — a cached formatter call
     props: (i) => ({ value: (i * 37) % 2100, domain: [0, 2100], summary: false }),
   },
+  {
+    slug: "thermometer",
+    component: "Thermometer",
+    floor: 30, // ≤ 6 nodes, one linear scale + a few ticks
+    props: (i) => ({ value: i % 100, target: 80, summary: false }),
+  },
 ];

@@ -51,6 +51,10 @@ export interface SummaryStrings {
   fatDigits: (value: string, tier: number, tiers: number) => string;
   /** S4 fat-digits digit-mode plain value, e.g. "1,204." (fat-digits). */
   fatDigitsPlain: (value: string) => string;
+  /** S4 calibrated tube, e.g. "72 on a 0–100 scale." (thermometer). */
+  thermometer: (value: string, min: string, max: string) => string;
+  /** S4 thermometer with a goal, e.g. "72 on a 0–100 scale; target 80." */
+  thermometerTarget: (value: string, min: string, max: string, target: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

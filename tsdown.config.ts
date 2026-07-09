@@ -127,6 +127,8 @@ export default defineConfig({
     "src/charts/fill-word/client.tsx",
     "src/charts/fat-digits/index.tsx",
     "src/charts/fat-digits/client.tsx",
+    "src/charts/thermometer/index.tsx",
+    "src/charts/thermometer/client.tsx",
   ],
   format: ["esm"],
   dts: true,

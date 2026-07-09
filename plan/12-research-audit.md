@@ -1250,3 +1250,19 @@ the spec's 1.5 kB Delta-class target but under the 3 kB hard cap — logged for 
 class as the Batch-2 budget divergences). Variant names kept as spec (`encode`/`tiers`, no `style`
 collision). One motion-layer CSS rule transitions weight; tspans inside `.mc-root` → reduced-motion
 block gates it. Node 1477, browser 2, craft 409/0, bench 127 rows/ms, docs 222pp + tests 128.
+
+### Thermometer (5) — `thermometer` — plan/24 §5
+
+No API deviations. Calibrated linear tube: `scaleLinear(domain, [bulbEnd, top])`; fill anchors at
+domain[0], never re-zeroed/log. The fill rect width equals the tube inner width, so no clipPath/id
+is needed (geometry keeps the rect inside the tube). Bulb = instrument chrome (always full, accent
+fill + neutral hairline), never data. Target = a line ACROSS the tube via `data-mc-ink="flag"`
+(accent stroke; distinct shape from the neutral side ticks — never color-alone). Vertical (default)
+and horizontal share one "along/across" axis abstraction. Over-domain values clamp the fill + set
+an `overflow` flag; the accessible name always reports the true value (never silently clipped).
+`overflow` visual notch deferred — clamped fill + honest summary suffice at word size (noted).
+Uses `makeFormatter` + `scaleLinear` → static 2.22 kB, above the spec's 2 kB §6 target but under the
+3 kB hard cap (gate note, same class as Batch-2 divergences). Interactive: hover/focus readout +
+reduced-motion-gated fill transition (SVG geometry props y/height/width). Real-browser sweep both
+themes (fill/bulb/target accent, tube neutral 0.55), 0 escapes. Node 1492, browser 2, craft 421/0,
+bench 68 rows/ms, docs 225pp + tests 130.

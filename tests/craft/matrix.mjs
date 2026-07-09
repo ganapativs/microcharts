@@ -670,6 +670,21 @@ add(
   ],
 );
 add(
+  "thermometer",
+  "Thermometer",
+  [
+    { value: 72, target: 80 },
+    { value: 72, target: 80, label: "value" },
+    { value: 62, orientation: "horizontal", bulb: false },
+    { value: 140 },
+  ],
+  [
+    [16, 48],
+    [20, 56],
+    [24, 64],
+  ],
+);
+add(
   "fat-digits",
   "FatDigits",
   [

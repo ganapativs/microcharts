@@ -60,6 +60,7 @@ import { TallyMarks } from "@microcharts/react/tally-marks";
 import { DicePips } from "@microcharts/react/dice-pips";
 import { FillWord } from "@microcharts/react/fill-word";
 import { FatDigits } from "@microcharts/react/fat-digits";
+import { Thermometer } from "@microcharts/react/thermometer";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -139,6 +140,7 @@ export function getMDXComponents(components?: MDXComponents) {
     DicePips,
     FillWord,
     FatDigits,
+    Thermometer,
     SparkGroup,
     // docs building blocks
     Instrument,

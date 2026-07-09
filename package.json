@@ -492,6 +492,14 @@
       "types": "./dist/charts/fat-digits/client.d.ts",
       "import": "./dist/charts/fat-digits/client.js"
     },
+    "./thermometer": {
+      "types": "./dist/charts/thermometer/index.d.ts",
+      "import": "./dist/charts/thermometer/index.js"
+    },
+    "./thermometer/interactive": {
+      "types": "./dist/charts/thermometer/client.d.ts",
+      "import": "./dist/charts/thermometer/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

@@ -1,0 +1,74 @@
+---
+title: Thermometer
+description: A thermometer chart for React — a calibrated ticked tube with an optional goal, for a value read against a stated range.
+---
+
+Thermometer answers "where does this value sit on a calibrated range, and how close to the goal?" A
+column fills a ticked tube; the ticks calibrate the read, which is what buys the precision. The fill
+always anchors at the bottom of the range — never re-zeroed, never log — and an optional target line
+crosses the tube to mark the goal. The bulb is instrument chrome (always full); it is not data, so
+its area means nothing.
+
+<LiveDemo
+  label="Thermometer"
+  sizeOf="thermometer"
+  code={`import { Thermometer } from "@microcharts/react/thermometer";
+
+<Thermometer value={72} target={80} title="Fundraiser" />`}
+>
+  <Thermometer value={72} target={80} title="Fundraiser" height={56} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="thermometer" />
+
+## Try it
+
+<Playground chart="thermometer" />
+
+## Interactive
+
+<InteractiveDemo slug="thermometer" />
+
+## When to use it
+
+- **Good for** — a fundraising or goal-progress read, a capacity or utilization gauge in a cell, or any value against a stated range.
+- **Avoid for** — trends (Sparkline), proportions of a whole (SegmentedBar), or many series.
+
+## Sizing
+
+<Sizing chart="thermometer" />
+
+## Variants
+
+<LiveDemo
+  label="horizontal cell + explicit ticks"
+  code={`<Thermometer value={62} orientation="horizontal" bulb={false} />
+<Thermometer value={72} domain={[32, 100]} ticks={[32, 50, 68, 86, 100]} />`}
+>
+  <span className="inline-flex gap-6 items-center">
+    <Thermometer value={62} orientation="horizontal" bulb={false} width={110} />
+    <Thermometer value={72} domain={[32, 100]} ticks={[32, 50, 68, 86, 100]} height={60} />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+Vertical with the bulb is the default because the instrument metaphor is the point — a filling tube
+reads as "toward the goal" instantly. Horizontal exists for table cells where a vertical tube cannot
+fit, and `bulb={false}` drops the reservoir when the metaphor runs too warm for the context. The
+`domain` defaults to `[0, 100]` because a calibrated instrument needs a stated range; auto-fitting
+would silently move the scale under the reader. A value beyond the domain clamps the fill but the
+accessible name always reports the true number — the reading is never silently clipped.
+
+## Accessibility
+
+The accessible name states the value on its scale, and the goal when set — **"72 on a 0–100 scale;
+target 80."** The interactive entry reveals the exact value on hover or focus, glides the fill to its
+new level with a reduced-motion-gated transition, and announces each change through a polite live
+region.
+
+## Props
+
+<PropTable slug="thermometer" />

@@ -69,6 +69,7 @@ import tallyMarks from "./tally-marks";
 import dicePips from "./dice-pips";
 import fillWord from "./fill-word";
 import fatDigits from "./fat-digits";
+import thermometer from "./thermometer";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -130,6 +131,7 @@ const MODULES: ChartModule[] = [
   dicePips,
   fillWord,
   fatDigits,
+  thermometer,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

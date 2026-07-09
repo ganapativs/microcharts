@@ -35,6 +35,7 @@ const { TallyMarks } = await D("tally-marks");
 const { DicePips } = await D("dice-pips");
 const { FillWord } = await D("fill-word");
 const { FatDigits } = await D("fat-digits");
+const { Thermometer } = await D("thermometer");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -580,6 +581,14 @@ const body = [
   ),
   row("digit mode 1902", svg(FatDigits, { value: 1902, encode: "digit", fontSize: 18 })),
   row("3 tiers", svg(FatDigits, { value: 1204, domain: [0, 2100], tiers: 3, fontSize: 18 })),
+
+  `<h2>Thermometer</h2>`,
+  row(
+    "vertical: 40 / 72+target / 95 / label",
+    `${svg(Thermometer, { value: 40 })} ${svg(Thermometer, { value: 72, target: 80 })} ${svg(Thermometer, { value: 95 })} ${svg(Thermometer, { value: 72, label: "value" })}`,
+  ),
+  row("horizontal cell", svg(Thermometer, { value: 62, orientation: "horizontal", bulb: false, width: 120 })),
+  row("over domain (140)", svg(Thermometer, { value: 140, target: 90 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}
