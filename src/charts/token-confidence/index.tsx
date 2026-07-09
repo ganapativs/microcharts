@@ -81,14 +81,22 @@ export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
     <span className={rootClass} style={style} id={id} {...aria}>
       {tokens.map((t, i) => {
         const cls = CLASS[t.tier] ?? (show === "all" ? "mc-tc-seen" : undefined);
-        // eslint-disable-next-line react/no-array-index-key -- tokens repeat; index is the only stable key
-        return cls ? (
-          <span key={i} className={cls}>
-            {t.token}
-          </span>
-        ) : (
+        if (!cls)
           // eslint-disable-next-line react/no-array-index-key -- tokens repeat; index is the only stable key
-          <span key={i}>{t.token}</span>
+          return <span key={i}>{t.token}</span>;
+        // underline the WORD only — keep leading/trailing whitespace outside the
+        // marked span so the mark never bleeds under the space between tokens.
+        const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(t.token);
+        const lead = m?.[1] ?? "";
+        const core = m?.[2] ?? t.token;
+        const trail = m?.[3] ?? "";
+        return (
+          // eslint-disable-next-line react/no-array-index-key -- tokens repeat; index is the only stable key
+          <span key={i}>
+            {lead}
+            <span className={cls}>{core}</span>
+            {trail}
+          </span>
         );
       })}
       {legend ? (

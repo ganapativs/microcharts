@@ -5,6 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_EVENT_RASTER, type EventRasterStrings } from "../../core/strings-event-raster.js";
 import { eventRasterGeometry, LANE_CAP, rasterDomain, type RasterLaneInput } from "./geometry.js";
 
@@ -32,7 +33,7 @@ export interface EventRasterProps {
   children?: ReactNode | undefined;
 }
 
-const LANE_UNIT = 8;
+const LANE_UNIT = 14;
 
 /** Shared summary — lane/event totals, the busiest lane, binned disclosure. */
 export function eventRasterSummary(
@@ -81,7 +82,8 @@ export function EventRaster(props: EventRasterProps): ReactNode {
   const lanesN = Math.max(1, Math.min(LANE_CAP, data.length));
   const height = heightProp ?? lanesN * LANE_UNIT;
   const labels = labelsProp ?? lanesN <= 8;
-  const fontSize = Math.max(5, Math.min(Math.round((height / lanesN) * 0.7), 7));
+  const laneH = height / lanesN;
+  const fontSize = labelFont(laneH, 0.56);
 
   const gutter = labels
     ? Math.min(
@@ -106,6 +108,20 @@ export function EventRaster(props: EventRasterProps): ReactNode {
       className={className ? `mc-raster ${className}` : "mc-raster"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
+      {/* zebra lane bands so each row reads as a distinct track */}
+      {geo.lanes.map((lane, i) =>
+        i % 2 === 1 ? (
+          <rect
+            key={`band-${lane.label}`}
+            x={round2(gutter)}
+            y={lane.y}
+            width={round2(width - gutter)}
+            height={lane.laneH}
+            data-mc-ink="band"
+            shapeRendering="crispEdges"
+          />
+        ) : null,
+      )}
       {geo.lanes.map((lane) => {
         const active = emphasis ? lane.label === emphasis : true;
         const stroke = emphasis
@@ -115,15 +131,15 @@ export function EventRaster(props: EventRasterProps): ReactNode {
           : "var(--mc-stroke)";
         const cy = round2(lane.y + lane.laneH / 2);
         return (
-          <g key={lane.label} opacity={emphasis && !active ? 0.4 : 1}>
+          <g key={lane.label} opacity={emphasis && !active ? 0.45 : 1}>
             {lane.binned ? (
               lane.bins.map((b) => (
                 <rect
                   key={b.x}
                   x={b.x}
-                  y={round2(lane.y + lane.laneH * 0.2)}
+                  y={round2(lane.y + lane.laneH * 0.16)}
                   width={b.width}
-                  height={round2(lane.laneH * 0.6)}
+                  height={round2(lane.laneH * 0.68)}
                   shapeRendering="crispEdges"
                   style={{ fill: stroke, fillOpacity: b.opacity }}
                 />
@@ -133,14 +149,14 @@ export function EventRaster(props: EventRasterProps): ReactNode {
                 d={lane.path}
                 fill="none"
                 stroke={stroke}
-                strokeWidth={0.9}
-                shapeRendering="crispEdges"
+                strokeWidth={1.4}
+                strokeLinecap="round"
                 vectorEffect="non-scaling-stroke"
               />
             )}
             {labels ? (
               <text
-                x={round2(gutter - 2)}
+                x={round2(gutter - 3)}
                 y={cy}
                 dominantBaseline="central"
                 textAnchor="end"

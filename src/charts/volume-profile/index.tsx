@@ -5,6 +5,7 @@
 // convention, never an implied confidence interval.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "../../core/strings-volume-profile.js";
 import { volumeProfileGeometry, type LevelRow } from "./geometry.js";
@@ -71,7 +72,7 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.2), 7));
+  const fontSize = labelFont(height, 0.11);
   // preliminary pass to size the POC-label gutter
   const pre = volumeProfileGeometry({ data, bins, valueArea, side, width, height, gutter: 0 });
   const pocText = label === "poc" && pre.poc ? fmt(pre.poc.level) : undefined;

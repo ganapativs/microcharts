@@ -4,6 +4,7 @@
 // by position first, color second — a clinically proven grammar (AGP lineage).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_TIME_IN_RANGE, type TimeInRangeStrings } from "../../core/strings-time-in-range.js";
 import {
   timeInRangeGeometry,
@@ -89,7 +90,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
 
   const geo = timeInRangeGeometry({ data, width, height, orientation });
   const pct = zonePercentMap(data);
-  const fontSize = Math.max(5, Math.min(Math.round(Math.min(width, height) * 0.6), 8));
+  const fontSize = labelFont(Math.min(width, height), 0.55);
   const accName = summary === false ? false : (summary ?? timeInRangeSummary(data, strings));
   const horizontal = orientation !== "vertical";
 

@@ -4,6 +4,7 @@
 // is NO total bar and none may be added — that is the whole point.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_RUBRIC, type RubricStrings } from "../../core/strings-rubric.js";
@@ -75,18 +76,25 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
   } = props;
 
   const n = Math.max(1, data.length);
-  const height = heightProp ?? Math.min(32, Math.max(12, n * 8));
+  // one legible row per criterion — floor-7 labels need ~13 units of row height
+  const height = heightProp ?? Math.max(14, n * 13);
   const fmt = makeFormatter(format, locale);
-  const fontSize = Math.max(5, Math.min(7, Math.round((height / n) * 0.6)));
+  const fontSize = labelFont(height / n, 0.6);
+  // drop row labels when the rows are shorter than the font (they'd collide)
+  const labelsFit = height / n >= fontSize * 1.15;
 
   if (data.some((d) => d.weight != null && d.weight <= 0))
     devWarn("<RubricStrip> non-positive weight — treated as equal split.");
   if (data.some((d) => d.score < domain[0] || d.score > domain[1]))
     devWarn("<RubricStrip> score outside domain — clamped.");
 
-  const gutter = labels
-    ? Math.min(width * 0.62, Math.max(...data.map((d) => d.label.length), 1) * fontSize * 0.64 + 4)
-    : 0;
+  const gutter =
+    labels && labelsFit
+      ? Math.min(
+          width * 0.62,
+          Math.max(...data.map((d) => d.label.length), 1) * fontSize * 0.64 + 4,
+        )
+      : 0;
 
   const geo = rubricStripGeometry({ data: toInputs(data), domain, width, height, gutter, gap: 1 });
   const accName = summary === false ? false : (summary ?? rubricStripSummary(data, strings, fmt));
@@ -103,6 +111,8 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
     >
       {geo.rows.map((row) => {
         const cy = round2(row.y + row.height / 2);
+        // keep the row label inside the viewBox even when rows are shorter than the font
+        const ty = round2(Math.max(fontSize * 0.5, Math.min(height - fontSize * 0.5, cy)));
         const pass = target != null ? row.score >= target : null;
         const fill =
           pass == null ? "var(--mc-accent)" : pass ? "var(--mc-positive)" : "var(--mc-negative)";
@@ -127,10 +137,10 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
               shapeRendering="crispEdges"
               style={{ fill }}
             />
-            {labels ? (
+            {labels && labelsFit ? (
               <text
                 x={round2(gutter - 2)}
-                y={cy}
+                y={ty}
                 dominantBaseline="central"
                 textAnchor="end"
                 fontSize={fontSize}

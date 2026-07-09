@@ -5,6 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_ETA_BAR, type EtaBarStrings } from "../../core/strings-eta-bar.js";
 import { etaBarGeometry, hatchPath } from "./geometry.js";
 
@@ -73,7 +74,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const p = Math.max(0, Math.min(1, Number.isFinite(progress) ? progress : 0));
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.66), 8));
+  const fontSize = labelFont(height, 0.62);
 
   // preliminary geometry to know remaining time for the label
   const pre = etaBarGeometry({ progress, elapsed, rate: rate ?? null, width, height });

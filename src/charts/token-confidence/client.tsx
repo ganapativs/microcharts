@@ -115,6 +115,11 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
         const flaggedPos = flagged.indexOf(i);
         const isFlagged = flaggedPos >= 0;
         const cls = CLASS[t.tier] ?? (show === "all" ? "mc-tc-seen" : undefined);
+        // underline the WORD only — whitespace stays outside the marked span
+        const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(t.token);
+        const lead = m?.[1] ?? "";
+        const core = m?.[2] ?? t.token;
+        const trail = m?.[3] ?? "";
         return (
           <span
             // eslint-disable-next-line react/no-array-index-key -- tokens repeat; index is the only stable key
@@ -122,7 +127,6 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
             ref={(el) => {
               refs.current[i] = el;
             }}
-            className={cls}
             id={isFlagged ? `${baseId}-${i}` : undefined}
             tabIndex={
               isFlagged
@@ -140,7 +144,15 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
                 : undefined
             }
           >
-            {t.token}
+            {cls ? (
+              <>
+                {lead}
+                <span className={cls}>{core}</span>
+                {trail}
+              </>
+            ) : (
+              t.token
+            )}
           </span>
         );
       })}

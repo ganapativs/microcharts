@@ -6,6 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
+import { labelFont } from "../../core/labels.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_STAR_SPOKE, type StarSpokeStrings } from "../../core/strings-star-spoke.js";
 import { starSpokeGeometry } from "./geometry.js";
@@ -69,9 +70,9 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
     dots = false,
     guides = true,
     compare,
-    labels = false,
+    labels = true,
     domain = [0, 1],
-    size = 32,
+    size = 80,
     format,
     locale,
     strings = EN_STAR_SPOKE,
@@ -89,9 +90,10 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
     devWarn("<StarSpoke> value outside domain — clamped.");
 
   const fmt = makeFormatter(format, locale);
-  const showLabels = labels && size >= 48;
+  const showLabels = labels && size >= 44;
+  const fontSize = showLabels ? labelFont(size, 0.1) : labelFont(size, 0.14);
   // reserve a label ring when labels are shown, so tip text stays inside
-  const pad = showLabels ? Math.max(10, size * 0.2) : 2;
+  const pad = showLabels ? Math.max(fontSize * 2, size * 0.22) : 2;
   const geo = starSpokeGeometry({
     values: data.map((d) => d.value),
     domain,
@@ -108,9 +110,6 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
         pad,
       })
     : null;
-  const fontSize = showLabels
-    ? Math.max(5, Math.min(Math.round(size * 0.1), 6))
-    : Math.max(5, Math.min(Math.round(size * 0.14), 7));
   const accName = summary === false ? false : (summary ?? starSpokeSummary(data, strings, fmt));
 
   return (
@@ -159,19 +158,31 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
       ) : null}
       {showLabels
         ? geo.spokes.map((s, i) => {
+            const label = data[i]!.label;
             const dx = Math.cos(s.angle);
+            const dy = Math.sin(s.angle);
             const anchor = dx > 0.3 ? "start" : dx < -0.3 ? "end" : "middle";
+            const est = 0.62 * fontSize * label.length;
+            // push labels just past the tip, then clamp so text never escapes
+            let x = s.tx + dx * (fontSize * 0.5);
+            const half = anchor === "middle" ? est / 2 : anchor === "start" ? est : 0;
+            const rightRoom = anchor === "start" ? est : anchor === "middle" ? est / 2 : 0;
+            x = Math.max(half + 0.5, Math.min(size - rightRoom - 0.5, x));
+            const y = Math.max(
+              fontSize * 0.6,
+              Math.min(size - fontSize * 0.4, s.ty + dy * (fontSize * 0.5)),
+            );
             return (
               <text
-                key={data[i]!.label}
-                x={round2(s.tx + dx * 1.5)}
-                y={round2(s.ty + Math.sin(s.angle) * 1.5)}
+                key={label}
+                x={round2(x)}
+                y={round2(y)}
                 dominantBaseline="central"
                 textAnchor={anchor}
                 fontSize={fontSize}
                 data-mc-ink="label"
               >
-                {data[i]!.label}
+                {label}
               </text>
             );
           })

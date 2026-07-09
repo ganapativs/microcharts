@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_WIND_BARB, octant, type WindBarbStrings } from "../../core/strings-wind-barb.js";
 import { windBarbGeometry } from "./geometry.js";
 
@@ -56,7 +57,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
     step = 10,
     label = false,
     variant = "barb",
-    size = 24,
+    size = 32,
     format,
     locale,
     strings = EN_WIND_BARB,
@@ -74,7 +75,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
   const mag = Math.abs(magnitude);
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = Math.max(5, Math.min(Math.round(size * 0.3), 8));
+  const fontSize = labelFont(size, 0.26);
   const labelText = label || variant === "arrow" ? fmt(mag) : undefined;
   const gutter = labelText ? labelText.length * fontSize * 0.62 + 3 : 0;
   const totalW = size + gutter;
@@ -125,7 +126,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
             y2={geo.shaft.y2}
             data-mc-ink="data"
             strokeLinecap="round"
-            style={{ strokeWidth: "var(--mc-stroke-width)" }}
+            style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.25)" }}
           />
           {variant === "arrow" && arrowHead ? (
             <path
@@ -133,7 +134,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
               data-mc-ink="data"
               fill="none"
               strokeLinecap="round"
-              style={{ strokeWidth: "var(--mc-stroke-width)" }}
+              style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.25)" }}
             />
           ) : (
             <>
@@ -143,7 +144,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
                   data-mc-ink="data"
                   fill="none"
                   strokeLinecap="round"
-                  style={{ strokeWidth: "var(--mc-stroke-width)" }}
+                  style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.25)" }}
                 />
               ) : null}
               {geo.pennants.map((p, i) => (

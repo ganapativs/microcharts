@@ -25,7 +25,8 @@ describe("<TokenConfidence> (plan/25 §7, plan/17 F12)", () => {
   it("renders one span per token; docs-as-tests summary", () => {
     const { container } = draw(<TokenConfidence data={SENT} />);
     const host = container.querySelector(".mc-token-confidence")!;
-    expect(host.querySelectorAll("span").length).toBe(10);
+    // one outer span per token (flagged tokens nest an inner underline span)
+    expect(host.querySelectorAll(":scope > span").length).toBe(10);
     expect(
       tokenConfidenceSummary(tokenTiers({ data: SENT, tiers: [0.5, 0.8] }), EN_TOKEN_CONFIDENCE),
     ).toBe("10 tokens: 6 confident, 2 unsure, 2 guessing.");

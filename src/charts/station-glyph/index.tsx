@@ -5,6 +5,7 @@
 // four channels, no legend — the meteorologist's station model, shrunk to a word.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_STATION_GLYPH, type StationGlyphStrings } from "../../core/strings-station-glyph.js";
@@ -104,7 +105,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     dewpoint,
     pressure,
     station,
-    size = 30,
+    size = 44,
     format,
     locale,
     strings = EN_STATION_GLYPH,
@@ -117,7 +118,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const font = Math.max(5, Math.min(Math.round(size * 0.2), 7));
+  const font = labelFont(size, 0.17);
 
   const est = (s: string): number => 0.62 * font * s.length;
   const tempT = temp != null && Number.isFinite(temp) ? `${fmt(temp)}°` : null;

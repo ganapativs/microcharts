@@ -5,6 +5,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
+import { round2 } from "../../core/types.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_HYPNOGRAM, type HypnogramStrings } from "../../core/strings-hypnogram.js";
 import { firstAppearance, hypnogramGeometry, mergeRuns, type HypnoEntry } from "./geometry.js";
 
@@ -18,6 +20,8 @@ export interface HypnogramProps {
   emphasis?: string | undefined;
   /** Vertical transition strokes; off for ultra-dense strips. */
   connectors?: boolean | undefined;
+  /** Left-gutter state names (default: on when width ≥ 96). */
+  labels?: boolean | undefined;
   /** `"lanes"` renders nominal states as filled blocks — no implied rank.
    *  (plan/21 §3 names this `style`; React reserves that for CSS — logged.) */
   variant?: "steps" | "lanes" | undefined;
@@ -88,9 +92,10 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
     emphasis,
     connectors = true,
     variant = "steps",
+    labels: labelsProp,
     domain: domainProp,
-    width = 120,
-    height = 24,
+    width = 140,
+    height: heightProp,
     strings = EN_HYPNOGRAM,
     title,
     summary,
@@ -108,8 +113,25 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
     devWarn(`<Hypnogram> states not in \`states\`: ${extra.join(", ")} (appended).`);
   const rowStates = [...states, ...extra];
 
+  const rowsN = Math.max(1, rowStates.length);
+  // one legible row per state — the strip grows with the state count, never crushes
+  const height = heightProp ?? Math.max(36, rowsN * 13);
+  const labels = labelsProp ?? width >= 96;
+  const fontSize = labelFont(height / rowsN, 0.62);
+  const gutter = labels
+    ? Math.min(width * 0.4, Math.max(...rowStates.map((s) => s.length), 1) * fontSize * 0.6 + 4)
+    : 0;
+
   const domain = domainProp ?? resolveDomain(data);
-  const geo = hypnogramGeometry({ data, states: rowStates, domain, width, height, style: variant });
+  const geo = hypnogramGeometry({
+    data,
+    states: rowStates,
+    domain,
+    width,
+    height,
+    style: variant,
+    gutter,
+  });
   const accName =
     summary === false ? false : (summary ?? hypnogramSummary(data, rowStates, domain, strings));
 
@@ -125,23 +147,36 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-hypno ${className}` : "mc-hypno"}
-      style={style}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* faint row guides — a read-back scaffold, quieter than the data */}
-      {rowStates.map((_s, r) => {
-        const y = geo.rowHeight * (r + 0.5) + 1;
+      {/* faint row guides + state names — a read-back scaffold, quieter than the data */}
+      {rowStates.map((s, r) => {
+        const y = geo.rowY[r] ?? geo.rowHeight * (r + 0.5) + 1;
         return (
-          <line
-            key={r}
-            x1={1}
-            x2={width - 1}
-            y1={y}
-            y2={y}
-            stroke="var(--mc-neutral)"
-            strokeOpacity={0.14}
-            strokeWidth={0.5}
-            vectorEffect="non-scaling-stroke"
-          />
+          <g key={s}>
+            <line
+              x1={round2(gutter + 1)}
+              x2={width - 1}
+              y1={y}
+              y2={y}
+              stroke="var(--mc-neutral)"
+              strokeOpacity={0.16}
+              strokeWidth={0.5}
+              vectorEffect="non-scaling-stroke"
+            />
+            {labels ? (
+              <text
+                x={round2(gutter - 3)}
+                y={y}
+                dominantBaseline="central"
+                textAnchor="end"
+                fontSize={fontSize}
+                data-mc-ink="label"
+              >
+                {s}
+              </text>
+            ) : null}
+          </g>
         );
       })}
 
@@ -183,7 +218,8 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
             data-mc-ink={emphasis ? "muted" : "data"}
             fill="none"
             strokeLinecap="round"
-            style={{ strokeWidth: "var(--mc-stroke-width)" }}
+            strokeLinejoin="round"
+            style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.35)" }}
           />
           {emphasis && emphRuns.length > 0 ? (
             <path

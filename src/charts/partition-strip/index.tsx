@@ -4,6 +4,7 @@
 // channel. Two levels max — grandchildren are ignored with a dev warning.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_PARTITION, type PartitionStrings } from "../../core/strings-partition.js";
 import { partitionStripGeometry, parentValue, type PartitionNode } from "./geometry.js";
@@ -86,7 +87,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
     );
 
   const geo = partitionStripGeometry({ data, width, height, gap: 1 });
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.28), 7));
+  const fontSize = labelFont(height, 0.42);
   const inset = 0.5;
   const rowH = (height - inset * 2 - 1) / 2;
   const accName = summary === false ? false : (summary ?? partitionStripSummary(data, strings));

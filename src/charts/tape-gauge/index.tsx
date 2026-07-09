@@ -95,8 +95,8 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     rateTiers: tiersProp,
     orientation = "vertical",
     label = "value",
-    width = 28,
-    height = 48,
+    width = 40,
+    height = 56,
     format,
     locale,
     strings = EN_TAPE_GAUGE,
@@ -111,7 +111,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const span = spanProp && spanProp > 0 ? spanProp : autoSpan(value, zones, rate);
   const tiers = tiersProp ?? [span / 60, span / 15];
   const fmt = makeFormatter(format, locale);
-  const tickFont = 5;
+  const tickFont = 6;
   const vertical = orientation !== "horizontal";
   const geo = tapeGaugeGeometry({ value, span, zones, tick: null, width, height, orientation });
   const accName =
@@ -123,15 +123,13 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const tier = finite ? chevronTier(rate ?? 0, tiers) : 0;
   const valueText = finite ? fmt(value) : "";
 
-  // readout font is clamped so the number always fits its gutter (any digit count)
+  // the readout is the hero number — sized large, then clamped to fit its gutter
   const est = (chars: number, f: number): number => 0.62 * f * chars;
-  const readoutAvail = (vertical ? geo.readout.gutter : width) - 1.4;
+  const readoutAvail = (vertical ? geo.readout.gutter : width) - 1.6;
+  const readoutBase = Math.min(12, Math.max(8, Math.round(Math.min(width, height) * 0.22)));
   const readoutFont = Math.max(
-    4.5,
-    Math.min(
-      Math.min(7, Math.max(6, Math.round(Math.min(width, height) * 0.18))),
-      readoutAvail / est(valueText.length || 1, 1),
-    ),
+    6.5,
+    Math.min(readoutBase, readoutAvail / est(valueText.length || 1, 1)),
   );
 
   // thin tick labels to those that fit their column and don't collide

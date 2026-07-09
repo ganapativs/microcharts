@@ -34,7 +34,7 @@ describe("<RubricStrip> (plan/25 §6, plan/17 F13)", () => {
   });
 
   it("labels render the criterion names in the gutter", () => {
-    const { container } = draw(<RubricStrip data={RUBRIC} width={120} height={32} />);
+    const { container } = draw(<RubricStrip data={RUBRIC} width={120} height={56} />);
     const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);
     expect(texts).toEqual(["Correctness", "Coverage", "Clarity", "Style"]);
   });

@@ -4,6 +4,7 @@
 // y-scale is linear and the visible range is stated — never a silent log.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DEPTH_WEDGE, type DepthWedgeStrings } from "../../core/strings-depth-wedge.js";
 import { depthWedgeGeometry, type DepthWedgeResult, type Level } from "./geometry.js";
@@ -71,7 +72,7 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.32), 7));
+  const fontSize = labelFont(height, 0.18);
   const geo = depthWedgeGeometry({
     demand: data.demand,
     supply: data.supply,

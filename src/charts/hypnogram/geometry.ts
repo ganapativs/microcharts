@@ -40,25 +40,40 @@ export function hypnogramGeometry(opts: {
   width: number;
   height: number;
   style: "steps" | "lanes";
-}): { runs: HypnoRun[]; path: string; connectors: string; rowHeight: number } {
-  const { data, states, domain, width, height, style } = opts;
+  /** Left gutter reserved for row labels (plot starts here). */
+  gutter?: number;
+}): { runs: HypnoRun[]; path: string; connectors: string; rowHeight: number; rowY: number[] } {
+  const { data, states, domain, width, height, style, gutter = 0 } = opts;
   const merged = mergeRuns(data, domain[1]);
-  if (merged.length === 0) return { runs: [], path: "", connectors: "", rowHeight: 0 };
+  const n0 = Math.max(1, states.length);
+  const rowY0 = Array.from({ length: n0 }, (_v, r) =>
+    round2(PAD + ((height - PAD * 2) / n0) * (r + 0.5)),
+  );
+  if (merged.length === 0)
+    return {
+      runs: [],
+      path: "",
+      connectors: "",
+      rowHeight: round2((height - PAD * 2) / n0),
+      rowY: rowY0,
+    };
 
   const [d0, d1] = domain;
   const span = d1 - d0 || 1;
-  const innerW = width - PAD * 2;
+  const x0 = gutter + PAD;
+  const innerW = width - gutter - PAD * 2;
   const innerH = height - PAD * 2;
   const n = Math.max(1, states.length);
   const rowH = innerH / n;
 
-  const xOf = (t: number): number => round2(PAD + ((t - d0) / span) * innerW);
+  const xOf = (t: number): number => round2(x0 + ((t - d0) / span) * innerW);
   const rowIndex = (state: string): number => {
     const i = states.indexOf(state);
     return i < 0 ? 0 : i;
   };
   const stepY = (row: number): number => round2(PAD + rowH * (row + 0.5));
   const laneY = (row: number): number => round2(PAD + rowH * row);
+  const rowY = Array.from({ length: n }, (_v, r) => stepY(r));
 
   const runs: HypnoRun[] = merged.map((e, i) => {
     const t0 = e.t;
@@ -87,7 +102,7 @@ export function hypnogramGeometry(opts: {
     }
   }
 
-  return { runs, path, connectors, rowHeight: round2(rowH) };
+  return { runs, path, connectors, rowHeight: round2(rowH), rowY };
 }
 
 /** Distinct states in first-appearance order (the default row order). */

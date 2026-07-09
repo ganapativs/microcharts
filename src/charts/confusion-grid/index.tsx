@@ -5,6 +5,7 @@
 // is off by default and never leaves the grid.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_CONFUSION, type ConfusionStrings } from "../../core/strings-confusion.js";
 import { confusionGridGeometry } from "./geometry.js";
@@ -87,8 +88,8 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
     devWarn("<ConfusionGrid> counts must be a square k×k matrix.");
   const kk = Math.max(2, Math.min(4, k));
 
-  const size = props.size ?? 40 + (kk - 2) * 4;
-  const fontSize = Math.max(5, Math.min(Math.round(size * 0.16), 7));
+  const size = props.size ?? 54 + (kk - 2) * 8;
+  const fontSize = labelFont(size, 0.16);
   const gutterCh = fontSize + 1;
   const accLabel =
     label === "accuracy" ? `${Math.round(confGeoAccuracy(counts, kk) * 100)}%` : undefined;

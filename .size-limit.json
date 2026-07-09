@@ -943,13 +943,13 @@
   {
     "name": "@microcharts/react/hypnogram (static)",
     "path": "dist/charts/hypnogram/index.js",
-    "limit": "2.4 kB",
+    "limit": "2.6 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/hypnogram/interactive",
     "path": "dist/charts/hypnogram/client.js",
-    "limit": "3.4 kB",
+    "limit": "3.5 kB",
     "gzip": true
   },
   {
@@ -1021,13 +1021,13 @@
   {
     "name": "@microcharts/react/star-spoke (static)",
     "path": "dist/charts/star-spoke/index.js",
-    "limit": "2 kB",
+    "limit": "2.2 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/star-spoke/interactive",
     "path": "dist/charts/star-spoke/client.js",
-    "limit": "3 kB",
+    "limit": "3.1 kB",
     "gzip": true
   },
   {

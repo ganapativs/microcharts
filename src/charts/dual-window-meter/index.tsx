@@ -4,11 +4,12 @@
 // a target line. The window sizes are part of the reading and appear in docs.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DUAL_WINDOW, type DualWindowStrings } from "../../core/strings-dual-window.js";
 import { clamp } from "../../core/scale.js";
-import type { Value } from "../../core/types.js";
+import { round2, type Value } from "../../core/types.js";
 import { dualWindowGeometry } from "./geometry.js";
 
 export interface DualWindowMeterProps {
@@ -81,7 +82,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
   }
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.36), 7));
+  const fontSize = labelFont(height, 0.32);
   // preliminary pass to size the gutter from the last readings
   const pre = dualWindowGeometry({
     data,
@@ -120,18 +121,24 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
       ? false
       : (summary ?? dualWindowSummary(geo.fastLast, geo.slowLast, target, strings, fmt));
 
+  // both readings need ~2.4× the font of vertical room; below that, show only the
+  // sustained (slow) reading rather than crush two numbers together
+  const bothFit = height >= fontSize * 2.4;
   const showLabels = label === "last";
-  // clamp label baselines inside the viewBox; when both show, force a gap so the
-  // two readings never overlap (they end-anchor at the same x)
-  const clampY = (y: number) => clamp(y, fontSize * 0.7, height - fontSize * 0.4);
+  const showFast = showLabels && bothFit;
+  const clampY = (y: number) => clamp(y, fontSize * 0.6, height - fontSize * 0.4);
   let slowY = geo.slowLastY == null ? 0 : clampY(geo.slowLastY);
   let fastY = geo.fastLastY == null ? 0 : clampY(geo.fastLastY);
-  if (geo.slowLastY != null && geo.fastLastY != null) {
-    const gap = fontSize * 1.3;
-    const center = clamp((geo.slowLastY + geo.fastLastY) / 2, gap, height - gap);
+  if (bothFit && geo.slowLastY != null && geo.fastLastY != null) {
+    const gap = Math.min(fontSize * 1.3, height - fontSize * 0.9);
+    const center = clamp(
+      (geo.slowLastY + geo.fastLastY) / 2,
+      fontSize * 0.6 + gap / 2,
+      height - fontSize * 0.4 - gap / 2,
+    );
     const slowBelow = geo.slowLastY >= geo.fastLastY;
-    slowY = center + (slowBelow ? gap / 2 : -gap / 2);
-    fastY = center + (slowBelow ? -gap / 2 : gap / 2);
+    slowY = round2(center + (slowBelow ? gap / 2 : -gap / 2));
+    fastY = round2(center + (slowBelow ? -gap / 2 : gap / 2));
   }
 
   return (
@@ -192,7 +199,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
           {fmt(geo.slowLast)}
         </text>
       ) : null}
-      {showLabels && geo.fastLast != null ? (
+      {showFast && geo.fastLast != null ? (
         <text
           x={width}
           y={fastY}

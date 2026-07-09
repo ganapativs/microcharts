@@ -110,7 +110,7 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
           <path
             key={bi}
             d={geo.bandPaths[bi]}
-            style={{ fill: "var(--mc-stroke)", fillOpacity: bi === 0 ? 0.16 : 0.08 }}
+            style={{ fill: "var(--mc-stroke)", fillOpacity: bi === 0 ? 0.22 : 0.12 }}
           />
         ) : null,
       )}
@@ -121,7 +121,7 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
           fill="none"
           strokeLinejoin="round"
           strokeLinecap="round"
-          style={{ strokeWidth: "var(--mc-stroke-width)" }}
+          style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.25)" }}
         />
       ) : null}
       {geo.todayPath ? (

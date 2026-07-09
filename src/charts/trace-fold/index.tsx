@@ -4,6 +4,7 @@
 // depth); the critical path is accented so "which spans mattered" reads at once.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_TRACE_FOLD, type TraceFoldStrings } from "../../core/strings-trace-fold.js";
 import { traceFoldGeometry, type Span } from "./geometry.js";
@@ -67,7 +68,7 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
   const height = heightProp ?? Math.min(48, Math.max(16, depthCount * 10));
   const rowGap = 1.2;
   const fmt = makeFormatter(format, locale);
-  const fontSize = Math.max(5, Math.min(Math.round((height / depthCount) * 0.5), 7));
+  const fontSize = labelFont(height / depthCount, 0.5);
 
   const geo = traceFoldGeometry({ data, width, height, rowGap });
   const accName = summary === false ? false : (summary ?? traceFoldSummary(geo, strings, fmt));

@@ -319,8 +319,8 @@
       "interactive": "3.1 kB"
     },
     "hypnogram": {
-      "static": "2.4 kB",
-      "interactive": "3.4 kB"
+      "static": "2.6 kB",
+      "interactive": "3.5 kB"
     },
     "eta-bar": {
       "static": "2.1 kB",
@@ -346,8 +346,8 @@
       "static": "2.5 kB"
     },
     "star-spoke": {
-      "static": "2 kB",
-      "interactive": "3 kB"
+      "static": "2.2 kB",
+      "interactive": "3.1 kB"
     },
     "minimap-strip": {
       "static": "2.4 kB",
