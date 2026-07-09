@@ -524,6 +524,14 @@
       "types": "./dist/charts/balance-beam/client.d.ts",
       "import": "./dist/charts/balance-beam/client.js"
     },
+    "./sprout-row": {
+      "types": "./dist/charts/sprout-row/index.d.ts",
+      "import": "./dist/charts/sprout-row/index.js"
+    },
+    "./sprout-row/interactive": {
+      "types": "./dist/charts/sprout-row/client.d.ts",
+      "import": "./dist/charts/sprout-row/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

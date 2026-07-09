@@ -257,6 +257,10 @@
     "balance-beam": {
       "static": "2 kB",
       "interactive": "3 kB"
+    },
+    "sprout-row": {
+      "static": "2 kB",
+      "interactive": "3 kB"
     }
   }
 }

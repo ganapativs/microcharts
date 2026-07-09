@@ -551,4 +551,13 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "sprout-row",
+    component: "SproutRow",
+    floor: 20, // one glyph path per item (≤ 12) + soil
+    props: (i) => ({
+      data: Array.from({ length: 8 }, (_, j) => ({ label: `#${j}`, value: (i + j) % 4 })),
+      summary: false,
+    }),
+  },
 ];

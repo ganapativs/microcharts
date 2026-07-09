@@ -135,6 +135,8 @@ export default defineConfig({
     "src/charts/hourglass/client.tsx",
     "src/charts/balance-beam/index.tsx",
     "src/charts/balance-beam/client.tsx",
+    "src/charts/sprout-row/index.tsx",
+    "src/charts/sprout-row/client.tsx",
   ],
   format: ["esm"],
   dts: true,

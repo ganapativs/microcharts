@@ -1311,3 +1311,19 @@ ride the tilted beam ends near the edges — x clamped to keep the centered nume
 to `height − fontSize·0.42` (the `ideographic` baseline dropped the glyph below the bottom edge — the
 SSR craft caught this vertical escape). `mode="difference"` scales imbalance by a shared domain so
 same-scale rows tilt comparably. Node 1532, browser 2, craft 457/0, bench 74 rows/ms, docs 234pp/136.
+
+### SproutRow (9th shipped) — `sprout-row` — plan/24 §9
+
+Minor deviation: the spec suggested STAGE_PATHS as unit-scale constant strings + a `placedPath`
+translator; shipped as a pure `stageGlyph(stage, cx, by, gh)` builder instead (equivalent, cleaner,
+and it scales the glyph to the usable height — fixed-size constants overflowed short canvases when
+labels reserved a bottom band). Glyph height is STRICTLY monotonic in stage (STEM_FRAC + leaf/head
+positions as fractions of `gh`) — property-tested so the ordering reads untrained. Each item is ONE
+filled path (thin filled stem + Q-curve leaves + head circle) with `data-mc-ink="point"` (earns the
+forced-colors remap; `color` prop inlines). `null` = missing (soil tick only, distinct from a seed —
+"no data yet" ≠ "just planted"). Category labels width-drop-out (skip when `label.length·0.62·fs >
+step−1`) — the craft caught neighbour collision at narrow step. Stage names live in
+`sproutStageNames` (the i18n contract for the metaphor). Browser keyboard test: raw
+`dispatchEvent(KeyboardEvent)` did NOT reach React's synthetic handler — used `userEvent.keyboard`
+after `.focus()` (the established pattern). Node 1542, browser 2, craft 469/0, bench 35 rows/ms,
+docs 237pp/138.

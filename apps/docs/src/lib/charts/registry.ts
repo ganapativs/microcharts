@@ -73,6 +73,7 @@ import thermometer from "./thermometer";
 import moonPhase from "./moon-phase";
 import hourglass from "./hourglass";
 import balanceBeam from "./balance-beam";
+import sproutRow from "./sprout-row";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -138,6 +139,7 @@ const MODULES: ChartModule[] = [
   moonPhase,
   hourglass,
   balanceBeam,
+  sproutRow,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

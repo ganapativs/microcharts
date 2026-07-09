@@ -76,6 +76,14 @@ export interface SummaryStrings {
     rightLabel: string,
     rightValue: string,
   ) => string;
+  /** S2 ordinal growth stages (seed/sprout/leaf/bloom). (sprout-row) */
+  sproutStageNames: readonly [string, string, string, string];
+  /** S2 sprout summary, e.g. "6 accounts; 2 at bloom, 1 at seed." (sprout-row). */
+  sproutRow: (n: number, bloom: number, seed: number) => string;
+  /** S2 sprout per-item, e.g. "Acme: bloom, stage 4 of 4." (sprout-row). */
+  sproutStage: (label: string, stageName: string, k: number) => string;
+  /** S2 sprout missing item, e.g. "Acme: no data." (sprout-row). */
+  sproutEmpty: (label: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

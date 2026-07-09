@@ -669,6 +669,24 @@ add(
     [80, 32],
   ],
 );
+const SPROUT = [
+  { label: "Acme", value: 3 },
+  { label: "Beta", value: 2 },
+  { label: "Gamma", value: 3 },
+  { label: "Delta", value: 1 },
+  { label: "Echo", value: 0 },
+  { label: "Foxtrot", value: 2 },
+];
+add(
+  "sprout-row",
+  "SproutRow",
+  [{ data: SPROUT }, { data: SPROUT, labels: true }, { data: SPROUT, label: "value" }, { data: [{ label: "A", value: 2 }, { label: "B", value: null }] }],
+  [
+    [96, 20],
+    [140, 30],
+    [180, 36],
+  ],
+);
 const BEAM = [
   { label: "Inflow", value: 620 },
   { label: "Outflow", value: 480 },

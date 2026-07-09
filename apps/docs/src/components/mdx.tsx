@@ -64,6 +64,7 @@ import { Thermometer } from "@microcharts/react/thermometer";
 import { MoonPhase } from "@microcharts/react/moon-phase";
 import { Hourglass } from "@microcharts/react/hourglass";
 import { BalanceBeam } from "@microcharts/react/balance-beam";
+import { SproutRow } from "@microcharts/react/sprout-row";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -147,6 +148,7 @@ export function getMDXComponents(components?: MDXComponents) {
     MoonPhase,
     Hourglass,
     BalanceBeam,
+    SproutRow,
     SparkGroup,
     // docs building blocks
     Instrument,

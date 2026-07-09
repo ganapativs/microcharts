@@ -12,6 +12,7 @@ import { EN_THERMOMETER } from "./strings-thermometer.js";
 import { EN_MOON } from "./strings-moon.js";
 import { EN_HOURGLASS } from "./strings-hourglass.js";
 import { EN_BEAM } from "./strings-beam.js";
+import { EN_SPROUT } from "./strings-sprout.js";
 import { EN_CATEGORY } from "./strings-category.js";
 import { EN_DIST } from "./strings-dist.js";
 import { EN_SLOTS } from "./strings-slots.js";
@@ -55,6 +56,7 @@ export const EN: SummaryStrings = {
   ...EN_MOON,
   ...EN_HOURGLASS,
   ...EN_BEAM,
+  ...EN_SPROUT,
   ...EN_CATEGORY,
   ...EN_DIST,
   ...EN_SLOTS,

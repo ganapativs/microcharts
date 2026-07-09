@@ -39,6 +39,7 @@ const { Thermometer } = await D("thermometer");
 const { MoonPhase } = await D("moon-phase");
 const { Hourglass } = await D("hourglass");
 const { BalanceBeam } = await D("balance-beam");
+const { SproutRow } = await D("sprout-row");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -620,6 +621,16 @@ const body = [
   row(
     "round + labelled",
     `${svg(BalanceBeam, { data: [{ label: "In", value: 620 }, { label: "Out", value: 480 }], shape: "round", width: 72, height: 30 })} ${svg(BalanceBeam, { data: [{ label: "In", value: 620 }, { label: "Out", value: 480 }], label: "values", width: 80, height: 32 })}`,
+  ),
+
+  `<h2>SproutRow</h2>`,
+  row(
+    "stages 0–3 across a row",
+    svg(SproutRow, { data: [{ label: "A", value: 0 }, { label: "B", value: 1 }, { label: "C", value: 2 }, { label: "D", value: 3 }, { label: "E", value: 2 }, { label: "F", value: 3 }], height: 24, step: 20 }),
+  ),
+  row(
+    "labelled + missing (null)",
+    svg(SproutRow, { data: [{ label: "Acme", value: 3 }, { label: "Beta", value: null }, { label: "Gamma", value: 1 }], labels: true, height: 32, step: 30 }),
   ),
 ].join("\n");
 
