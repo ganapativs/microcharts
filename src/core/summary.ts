@@ -605,6 +605,12 @@ export interface SummaryStrings {
   hypnogramFlat: (state: string) => string;
   /** Interactive run announce, e.g. "Light, from 90 to 240." (hypnogram). */
   hypnogramRun: (state: string, t0: string, t1: string) => string;
+  /** ETA forecast, e.g. "64% done; about 2 min remaining at the current rate." */
+  etaBar: (pct: string, remaining: string) => string;
+  /** Stalled transfer, e.g. "64% done; stalled." (eta-bar). */
+  etaBarStalled: (pct: string) => string;
+  /** Completed, e.g. "Done." (eta-bar). */
+  etaBarDone: string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

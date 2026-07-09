@@ -315,6 +315,10 @@
     "static": 2.17,
     "interactive": 3.1
   },
+  "eta-bar": {
+    "static": 1.97,
+    "interactive": 2.42
+  },
   "annotations": {
     "static": 1.46
   }

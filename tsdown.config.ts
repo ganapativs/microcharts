@@ -167,6 +167,8 @@ export default defineConfig({
     "src/charts/time-in-range/client.tsx",
     "src/charts/hypnogram/index.tsx",
     "src/charts/hypnogram/client.tsx",
+    "src/charts/eta-bar/index.tsx",
+    "src/charts/eta-bar/client.tsx",
   ],
   format: ["esm"],
   dts: true,

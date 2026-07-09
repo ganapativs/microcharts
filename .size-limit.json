@@ -953,6 +953,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/eta-bar (static)",
+    "path": "dist/charts/eta-bar/index.js",
+    "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/eta-bar/interactive",
+    "path": "dist/charts/eta-bar/client.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

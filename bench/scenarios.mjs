@@ -713,4 +713,15 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "eta-bar",
+    component: "EtaBar",
+    floor: 60, // two rects + a divider + forecast math
+    props: (i) => ({
+      progress: ((i % 90) + 5) / 100,
+      elapsed: (i % 50) + 1,
+      rate: 0.02 + (i % 5) / 200,
+      summary: false,
+    }),
+  },
 ];

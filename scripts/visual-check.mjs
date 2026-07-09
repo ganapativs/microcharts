@@ -58,6 +58,7 @@ const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
 const { TimeInRange } = await D("time-in-range");
 const { Hypnogram } = await D("hypnogram");
+const { EtaBar } = await D("eta-bar");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -989,6 +990,12 @@ const body = [
   row("sleep stages", svg(Hypnogram, { data: [{ t: 0, state: "Awake" }, { t: 8, state: "Light" }, { t: 22, state: "Deep" }, { t: 38, state: "Light" }, { t: 50, state: "REM" }, { t: 62, state: "Light" }, { t: 74, state: "Deep" }, { t: 110, state: "Awake" }], states: ["Awake", "REM", "Light", "Deep"], domain: [0, 120], width: 300, height: 30 })),
   row("emphasis Deep", svg(Hypnogram, { data: [{ t: 0, state: "Awake" }, { t: 8, state: "Light" }, { t: 22, state: "Deep" }, { t: 74, state: "Deep" }, { t: 110, state: "Awake" }], states: ["Awake", "REM", "Light", "Deep"], domain: [0, 120], emphasis: "Deep", width: 300, height: 30 })),
   row("lanes", svg(Hypnogram, { data: [{ t: 0, state: "Awake" }, { t: 30, state: "REM" }, { t: 60, state: "Deep" }, { t: 90, state: "Light" }], states: ["Awake", "REM", "Light", "Deep"], domain: [0, 120], variant: "lanes", width: 260, height: 30 })),
+
+  `<h2>EtaBar</h2>`,
+  row("64% + eta", svg(EtaBar, { progress: 0.64, elapsed: 3.6, rate: 0.18, formatEta: (t) => `${Math.round(t)} min`, width: 300, height: 16 })),
+  row("stalled", svg(EtaBar, { progress: 0.3, elapsed: 40, rate: 0, width: 300, height: 16 })),
+  row("percent", svg(EtaBar, { progress: 0.42, elapsed: 10, rate: 0.05, label: "percent", width: 300, height: 16 })),
+  row("cell", svg(EtaBar, { progress: 0.64, elapsed: 128, rate: 0.5, width: 60, height: 8 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

@@ -89,6 +89,7 @@ import cometTrail from "./comet-trail";
 import orbitStatus from "./orbit-status";
 import timeInRange from "./time-in-range";
 import hypnogram from "./hypnogram";
+import etaBar from "./eta-bar";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -170,6 +171,7 @@ const MODULES: ChartModule[] = [
   orbitStatus,
   timeInRange,
   hypnogram,
+  etaBar,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

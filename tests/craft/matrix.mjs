@@ -261,6 +261,19 @@ add(
   ],
 );
 add(
+  "eta-bar",
+  "EtaBar",
+  [
+    { progress: 0.64, elapsed: 3.6, rate: 0.18, formatEta: (t) => `${Math.round(t)} min` },
+    { progress: 0.3, elapsed: 40, rate: 0 },
+    { progress: 0.42, elapsed: 10, rate: 0.05, label: "percent" },
+  ],
+  [
+    [80, 8],
+    [300, 16],
+  ],
+);
+add(
   "hypnogram",
   "Hypnogram",
   [

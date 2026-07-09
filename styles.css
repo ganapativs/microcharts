@@ -168,6 +168,14 @@
   :where(.mc-progress-live .mc-progress-fill) {
     transition: width var(--mc-duration) var(--mc-easing);
   }
+  /* interactive EtaBar: the elapsed/remainder split eases as the rate updates
+     (SVG geometry props; jumps where unsupported). Inside .mc-root → the
+     reduced-motion block below gates it. Never animate ahead of received data. */
+  :where(.mc-eta-live rect) {
+    transition:
+      x var(--mc-duration) var(--mc-easing),
+      width var(--mc-duration) var(--mc-easing);
+  }
   /* interactive FillWord: the ink edge glides along the word (the accent copy
      is inside .mc-root, so the reduced-motion block below already gates it) */
   :where(.mc-fillword-live text[data-mc-ink="accent"]) {
