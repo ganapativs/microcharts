@@ -53,8 +53,20 @@ production anomaly pipelines, pass your own break indices and the chart becomes 
 <ChangePoint data={ramp} />`}
 >
   <span className="inline-flex gap-4 items-center">
-    <ChangePoint data={[30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48]} breaks={[14]} width={150} height={22} />
-    <ChangePoint data={[20, 21, 23, 24, 26, 27, 29, 30, 32, 33, 35, 36, 38, 39, 41, 42, 44, 45, 47, 48]} width={150} height={22} />
+    <ChangePoint
+      data={[
+        30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 48, 48, 48, 48, 48, 48, 48, 48, 48,
+        48,
+      ]}
+      breaks={[14]}
+      width={150}
+      height={22}
+    />
+    <ChangePoint
+      data={[20, 21, 23, 24, 26, 27, 29, 30, 32, 33, 35, 36, 38, 39, 41, 42, 44, 45, 47, 48]}
+      width={150}
+      height={22}
+    />
   </span>
 </LiveDemo>
 

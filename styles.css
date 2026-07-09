@@ -17,6 +17,7 @@
     --mc-neutral: #8a8a8a; /* no-valence data */
     --mc-accent: #0072b2; /* emphasis: endpoint dot, active */
     --mc-band: color-mix(in oklab, var(--mc-stroke) 8%, transparent);
+    --mc-moon: #c99a3a; /* warm moonlight (MoonPhase lit area) */
 
     /* categorical (valence-free series) — yellow omitted from the default order */
     --mc-cat-1: #e69f00;
@@ -55,6 +56,7 @@
       --mc-negative: #ff8a4c;
       --mc-accent: #4cc2ff;
       --mc-neutral: #9a9a9a;
+      --mc-moon: #ecc766; /* brighter warm on dark surfaces */
     }
   }
   :where([data-mc-theme="dark"]) {
@@ -63,6 +65,7 @@
     --mc-negative: #ff8a4c;
     --mc-accent: #4cc2ff;
     --mc-neutral: #9a9a9a;
+    --mc-moon: #ecc766;
   }
 
   /* Presets = token bundles (plan/06 §3, layer 2). Visual only. */
@@ -80,6 +83,7 @@
     --mc-negative: var(--mc-stroke);
     --mc-accent: var(--mc-stroke);
     --mc-neutral: var(--mc-stroke);
+    --mc-moon: var(--mc-stroke);
   }
   :where([data-mc-theme="vivid"]) {
     --mc-positive: #00c896;
@@ -163,6 +167,37 @@
   /* interactive Progress: the fill glides to its new width (gated below) */
   :where(.mc-progress-live .mc-progress-fill) {
     transition: width var(--mc-duration) var(--mc-easing);
+  }
+  /* interactive FillWord: the ink edge glides along the word (the accent copy
+     is inside .mc-root, so the reduced-motion block below already gates it) */
+  :where(.mc-fillword-live text[data-mc-ink="accent"]) {
+    transition: clip-path var(--mc-duration) var(--mc-easing);
+  }
+  /* interactive FatDigits: the weight eases on variable fonts (snaps otherwise);
+     tspans are inside .mc-root, so reduced-motion gates it below */
+  :where(.mc-fat-live tspan) {
+    transition: font-weight var(--mc-duration) var(--mc-easing);
+  }
+  /* interactive Thermometer: the fill glides to its new level (SVG geometry
+     properties; jumps where unsupported). Inside .mc-root → reduced-motion-gated */
+  :where(.mc-thermo-live rect) {
+    transition:
+      y var(--mc-duration) var(--mc-easing),
+      height var(--mc-duration) var(--mc-easing),
+      width var(--mc-duration) var(--mc-easing);
+  }
+  /* interactive BalanceBeam: the beam + weights ease to the new tilt (SVG
+     geometry props; jump where unsupported). Inside .mc-root → reduced-motion-gated */
+  :where(.mc-beam-live :is(line, rect, circle)) {
+    transition:
+      x1 var(--mc-duration) var(--mc-easing),
+      y1 var(--mc-duration) var(--mc-easing),
+      x2 var(--mc-duration) var(--mc-easing),
+      y2 var(--mc-duration) var(--mc-easing),
+      x var(--mc-duration) var(--mc-easing),
+      y var(--mc-duration) var(--mc-easing),
+      cx var(--mc-duration) var(--mc-easing),
+      cy var(--mc-duration) var(--mc-easing);
   }
 }
 

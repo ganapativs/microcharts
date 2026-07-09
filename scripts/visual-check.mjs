@@ -31,6 +31,28 @@ const { QuadrantDot } = await D("quadrant-dot");
 const { CyclePlot } = await D("cycle-plot");
 const { ChangePoint } = await D("change-point");
 const { EnsembleGhosts } = await D("ensemble-ghosts");
+const { TallyMarks } = await D("tally-marks");
+const { DicePips } = await D("dice-pips");
+const { FillWord } = await D("fill-word");
+const { FatDigits } = await D("fat-digits");
+const { Thermometer } = await D("thermometer");
+const { MoonPhase } = await D("moon-phase");
+const { Hourglass } = await D("hourglass");
+const { BalanceBeam } = await D("balance-beam");
+const { SproutRow } = await D("sprout-row");
+const { GardenGrid } = await D("garden-grid");
+const { BubbleRow } = await D("bubble-row");
+const { MusicStaff } = await D("music-staff");
+const { TreeRings } = await D("tree-rings");
+const { CitySkyline } = await D("city-skyline");
+const { Honeycomb } = await D("honeycomb");
+const { Constellation } = await D("constellation");
+const { PolarClock } = await D("polar-clock");
+const { SpiralYear } = await D("spiral-year");
+const { BreathingDot } = await D("breathing-dot");
+const { HeartbeatBlip } = await D("heartbeat-blip");
+const { CometTrail } = await D("comet-trail");
+const { OrbitStatus } = await D("orbit-status");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -551,6 +573,409 @@ const body = [
     svg(EnsembleGhosts, { data: ENSF, emphasis: "median", width: 200, height: 32 }),
   ),
   row("12 ghosts", svg(EnsembleGhosts, { data: ENSF, ghosts: 12, width: 200, height: 32 })),
+
+  `<h2>TallyMarks</h2>`,
+  row("23 ruled", svg(TallyMarks, { value: 23, height: 16 })),
+  row("30 max 25 (+5)", svg(TallyMarks, { value: 30, max: 25, height: 20, title: "Signatures" })),
+  row("17 drawn", svg(TallyMarks, { value: 17, pen: "drawn", height: 20 })),
+  row("38 max 20 clamp", svg(TallyMarks, { value: 38, max: 20, overflow: "clamp", height: 20 })),
+
+  `<h2>DicePips</h2>`,
+  row("faces 1–6", [1, 2, 3, 4, 5, 6].map((v) => svg(DicePips, { value: v, size: 22 })).join(" ")),
+  row(
+    "0 empty + 9 numeral",
+    `${svg(DicePips, { value: 0, size: 22 })} ${svg(DicePips, { value: 9, size: 22, title: "nine" })}`,
+  ),
+  row("pips-only", svg(DicePips, { value: 5, face: false, size: 22 })),
+
+  `<h2>FillWord</h2>`,
+  row(
+    "uploading 62%",
+    svg(FillWord, { word: "uploading", value: 0.62, fontSize: 16, title: "Upload" }),
+  ),
+  row("drain 70%", svg(FillWord, { word: "expiring", value: 0.7, mode: "drain", fontSize: 16 })),
+  row(
+    "label value 40%",
+    svg(FillWord, { word: "storage", value: 0.4, label: "value", fontSize: 16 }),
+  ),
+  row("full 100%", svg(FillWord, { word: "complete", value: 1, fontSize: 16 })),
+
+  `<h2>FatDigits</h2>`,
+  row(
+    "column scan",
+    [1204, 318, 76, 2100, 55]
+      .map(
+        (v) =>
+          `<span style="display:block;text-align:right">${svg(FatDigits, { value: v, domain: [0, 2100], fontSize: 15 })}</span>`,
+      )
+      .join(""),
+  ),
+  row("digit mode 1902", svg(FatDigits, { value: 1902, encode: "digit", fontSize: 18 })),
+  row("3 tiers", svg(FatDigits, { value: 1204, domain: [0, 2100], tiers: 3, fontSize: 18 })),
+
+  `<h2>Thermometer</h2>`,
+  row(
+    "vertical: 40 / 72+target / 95 / label",
+    `${svg(Thermometer, { value: 40 })} ${svg(Thermometer, { value: 72, target: 80 })} ${svg(Thermometer, { value: 95 })} ${svg(Thermometer, { value: 72, label: "value" })}`,
+  ),
+  row(
+    "horizontal cell",
+    svg(Thermometer, { value: 62, orientation: "horizontal", bulb: false, width: 120 }),
+  ),
+  row("over domain (140)", svg(Thermometer, { value: 140, target: 90 })),
+
+  `<h2>MoonPhase</h2>`,
+  row(
+    "progress: 10 / 35 / 50 / 75 / 100",
+    [0.1, 0.35, 0.5, 0.75, 1].map((v) => svg(MoonPhase, { value: v, size: 24 })).join(" "),
+  ),
+  row(
+    "cycle: new / first / full / last",
+    [0, 0.25, 0.5, 0.75]
+      .map((v) => svg(MoonPhase, { value: v, mode: "cycle", size: 24 }))
+      .join(" "),
+  ),
+
+  `<h2>Hourglass</h2>`,
+  row(
+    "0 / 25 / 50 / 75 / 100 elapsed",
+    [0, 0.25, 0.5, 0.75, 1].map((v) => svg(Hourglass, { value: v, height: 32 })).join(" "),
+  ),
+  row("labelled remaining", svg(Hourglass, { value: 0.7, label: "remaining", height: 36 })),
+
+  `<h2>BalanceBeam</h2>`,
+  row(
+    "left / balanced / right / saturated",
+    [
+      [620, 480],
+      [500, 500],
+      [300, 800],
+      [950, 50],
+    ]
+      .map((p) =>
+        svg(BalanceBeam, {
+          data: [
+            { label: "A", value: p[0] },
+            { label: "B", value: p[1] },
+          ],
+          width: 64,
+          height: 26,
+        }),
+      )
+      .join(" "),
+  ),
+  row(
+    "round + labelled",
+    `${svg(BalanceBeam, {
+      data: [
+        { label: "In", value: 620 },
+        { label: "Out", value: 480 },
+      ],
+      shape: "round",
+      width: 72,
+      height: 30,
+    })} ${svg(BalanceBeam, {
+      data: [
+        { label: "In", value: 620 },
+        { label: "Out", value: 480 },
+      ],
+      label: "values",
+      width: 80,
+      height: 32,
+    })}`,
+  ),
+
+  `<h2>SproutRow</h2>`,
+  row(
+    "stages 0–3 across a row",
+    svg(SproutRow, {
+      data: [
+        { label: "A", value: 0 },
+        { label: "B", value: 1 },
+        { label: "C", value: 2 },
+        { label: "D", value: 3 },
+        { label: "E", value: 2 },
+        { label: "F", value: 3 },
+      ],
+      height: 24,
+      step: 20,
+    }),
+  ),
+  row(
+    "labelled + missing (null)",
+    svg(SproutRow, {
+      data: [
+        { label: "Acme", value: 3 },
+        { label: "Beta", value: null },
+        { label: "Gamma", value: 1 },
+      ],
+      labels: true,
+      height: 32,
+      step: 30,
+    }),
+  ),
+  row(
+    "labelled 6 accounts (showcase config)",
+    svg(SproutRow, {
+      data: [
+        { label: "Acme", value: 3 },
+        { label: "Beta", value: 2 },
+        { label: "Gamma", value: 3 },
+        { label: "Delta", value: 1 },
+        { label: "Echo", value: 0 },
+        { label: "Foxx", value: 2 },
+      ],
+      labels: true,
+      height: 30,
+      step: 22,
+    }),
+  ),
+
+  `<h2>GardenGrid</h2>`,
+  row(
+    "grid 7 rows",
+    svg(GardenGrid, {
+      data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11],
+      unit: "weeks",
+    }),
+  ),
+  row("strip (rows 1)", svg(GardenGrid, { data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22], rows: 1 })),
+  row(
+    "blank empties",
+    svg(GardenGrid, { data: [12, 0, 8, 0, 0, 28, 34, 0, 0, 22], rows: 1, empty: "blank" }),
+  ),
+
+  `<h2>BubbleRow</h2>`,
+  (() => {
+    const B = [
+      { label: "EMEA", value: 1240 },
+      { label: "AMER", value: 890 },
+      { label: "APAC", value: 560 },
+      { label: "LATAM", value: 210 },
+    ];
+    return [
+      row("values (default)", svg(BubbleRow, { data: B, height: 34 })),
+      row("baseline align", svg(BubbleRow, { data: B, align: "baseline", height: 34 })),
+      row("label both", svg(BubbleRow, { data: B, label: "both", height: 34 })),
+    ].join("\n");
+  })(),
+
+  `<h2>MusicStaff</h2>`,
+  row(
+    "melody",
+    svg(MusicStaff, { data: [3, 5, 4, 8, 6, 9, 7, 11], label: "last", width: 120, height: 26 }),
+  ),
+  row(
+    "staff range",
+    svg(MusicStaff, { data: [3, 5, 4, 8, 6, 9], range: "staff", width: 100, height: 24 }),
+  ),
+  row("with a rest", svg(MusicStaff, { data: [3, 5, null, 8, 6], width: 90, height: 24 })),
+
+  `<h2>TreeRings</h2>`,
+  (() => {
+    const Y = [8, 12, 10, 18, 22, 15, 20, 14];
+    return [
+      row(
+        "stroke + last",
+        `<span style="display:inline-flex;gap:12px;align-items:center">${svg(TreeRings, { data: Y, label: "last", unit: "years", periodWord: "year", size: 40 })}${svg(TreeRings, { data: Y, size: 28 })}</span>`,
+      ),
+      row("fill annuli", svg(TreeRings, { data: Y, rings: "fill", size: 44 })),
+      row("cohort (total 200)", svg(TreeRings, { data: Y, total: 200, size: 44 })),
+    ].join("\n");
+  })(),
+
+  `<h2>CitySkyline</h2>`,
+  (() => {
+    const T = [
+      { label: "Platform", value: 46, lit: 0.7 },
+      { label: "Core", value: 32, lit: 0.5 },
+      { label: "Web", value: 28, lit: 0.9 },
+      { label: "API", value: 40, lit: 0.3 },
+      { label: "Data", value: 18, lit: 0.6 },
+    ];
+    return [
+      row(
+        "labelled",
+        svg(CitySkyline, { data: T, labels: true, unit: "teams", bw: 16, gap: 6, height: 40 }),
+      ),
+      row("values", svg(CitySkyline, { data: T, label: "value", bw: 16, gap: 6, height: 36 })),
+      row(
+        "plain bars",
+        svg(CitySkyline, {
+          data: T.map((d) => ({ label: d.label, value: d.value })),
+          bw: 14,
+          gap: 5,
+          height: 30,
+        }),
+      ),
+    ].join("\n");
+  })(),
+
+  `<h2>Honeycomb</h2>`,
+  row("34 of 40 (outline)", svg(Honeycomb, { value: 34, total: 40, unit: "seats", cellR: 5 })),
+  row("strip (rows 1)", svg(Honeycomb, { value: 7, total: 10, rows: 1, cellR: 6 })),
+  row("dim empties", svg(Honeycomb, { value: 28, total: 40, empty: "dim", cellR: 5 })),
+
+  `<h2>Constellation</h2>`,
+  row(
+    "connected + magnitude",
+    svg(Constellation, {
+      data: [
+        { x: 0, y: 40, m: 2 },
+        { x: 2, y: 90, m: 7 },
+        { x: 5, y: 30, m: 3 },
+        { x: 8, y: 65, m: 5 },
+      ],
+      width: 90,
+      height: 30,
+    }),
+  ),
+  row(
+    'label="max"',
+    svg(Constellation, {
+      data: [
+        { x: 0, y: 40, m: 2 },
+        { x: 2, y: 90, m: 7 },
+        { x: 5, y: 30, m: 3 },
+        { x: 8, y: 65, m: 5 },
+      ],
+      label: "max",
+      width: 90,
+      height: 30,
+    }),
+  ),
+  row(
+    "value-less (jittered), no connector",
+    svg(Constellation, {
+      data: [{ x: 0 }, { x: 3 }, { x: 5 }, { x: 7 }, { x: 9 }],
+      connect: false,
+      width: 90,
+      height: 30,
+    }),
+  ),
+
+  `<h2>PolarClock</h2>`,
+  row(
+    "24h day, now=14",
+    svg(PolarClock, {
+      data: Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h)),
+      now: 14,
+      size: 64,
+    }),
+  ),
+  row(
+    'labels + label="max"',
+    svg(PolarClock, {
+      data: Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h)),
+      labels: true,
+      label: "max",
+      size: 64,
+    }),
+  ),
+  row(
+    "week, opacity mode",
+    svg(PolarClock, { data: [120, 200, 180, 210, 260, 90, 60], mode: "opacity", size: 64 }),
+  ),
+  row("with a null + a zero", svg(PolarClock, { data: [10, null, 30, 0, 25], size: 64 })),
+
+  `<h2>SpiralYear</h2>`,
+  row(
+    "52 weeks, month ticks",
+    svg(SpiralYear, {
+      data: Array.from({ length: 52 }, (_, i) =>
+        Math.round(200 + 150 * Math.sin(((i - 8) / 52) * Math.PI * 2)),
+      ),
+      size: 80,
+    }),
+  ),
+  row(
+    "arc marks",
+    svg(SpiralYear, {
+      data: Array.from({ length: 52 }, (_, i) =>
+        Math.round(200 + 150 * Math.sin(((i - 8) / 52) * Math.PI * 2)),
+      ),
+      mark: "arc",
+      size: 80,
+    }),
+  ),
+  row(
+    "200 days, steps 3, no ticks",
+    svg(SpiralYear, {
+      data: Array.from({ length: 200 }, (_, i) => (i * 37) % 100),
+      steps: 3,
+      monthTicks: false,
+      size: 80,
+    }),
+  ),
+
+  `<h2>BreathingDot</h2>`,
+  row("calm (0.2)", svg(BreathingDot, { value: 0.2, size: 40 })),
+  row("elevated (0.65)", svg(BreathingDot, { value: 0.65, size: 40 })),
+  row("strained (0.92) + label", svg(BreathingDot, { value: 0.92, label: "value", size: 40 })),
+  row("unknown (null)", svg(BreathingDot, { value: null, size: 40 })),
+
+  `<h2>HeartbeatBlip</h2>`,
+  row(
+    "busy window",
+    svg(HeartbeatBlip, {
+      data: [97000, 92000, 85000, 70000, 55000, 48000],
+      now: 100000,
+      width: 90,
+    }),
+  ),
+  row(
+    "with count label",
+    svg(HeartbeatBlip, {
+      data: [97000, 92000, 85000, 70000, 55000, 48000],
+      now: 100000,
+      label: "count",
+      width: 90,
+    }),
+  ),
+  row("flatline (down)", svg(HeartbeatBlip, { data: [], now: 100000, width: 90 })),
+
+  `<h2>CometTrail</h2>`,
+  row(
+    "rising trail + head",
+    svg(CometTrail, { data: [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87], width: 90 }),
+  ),
+  row("volatile", svg(CometTrail, { data: [50, 80, 30, 70, 40, 90, 55, 62], width: 90 })),
+  row("single point", svg(CometTrail, { data: [42], width: 90 })),
+
+  `<h2>OrbitStatus</h2>`,
+  row(
+    "240ms, 12 calls/s",
+    svg(OrbitStatus, {
+      latency: 240,
+      rate: 12,
+      latencyDomain: [0, 500],
+      rateDomain: [0, 20],
+      size: 56,
+    }),
+  ),
+  row(
+    "alerting + label",
+    svg(OrbitStatus, {
+      latency: 350,
+      rate: 5,
+      latencyDomain: [0, 500],
+      rateDomain: [0, 20],
+      alert: 300,
+      label: "latency",
+      size: 56,
+    }),
+  ),
+  row(
+    "idle (rate 0, solid orbit)",
+    svg(OrbitStatus, {
+      latency: 100,
+      rate: 0,
+      latencyDomain: [0, 500],
+      rateDomain: [0, 20],
+      size: 56,
+    }),
+  ),
+  row("unknown", svg(OrbitStatus, { latency: NaN, rate: 5, size: 56 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

@@ -4,6 +4,27 @@
 // module so a 12-px glyph never bundles series templates.
 import { EN_SERIES, type SummaryStrings } from "./summary.js";
 import { EN_SCALAR } from "./strings-scalar.js";
+import { EN_TALLY } from "./strings-tally.js";
+import { EN_DICE } from "./strings-dice.js";
+import { EN_FILL_WORD } from "./strings-fill-word.js";
+import { EN_FAT } from "./strings-fat.js";
+import { EN_THERMOMETER } from "./strings-thermometer.js";
+import { EN_MOON } from "./strings-moon.js";
+import { EN_HOURGLASS } from "./strings-hourglass.js";
+import { EN_BEAM } from "./strings-beam.js";
+import { EN_SPROUT } from "./strings-sprout.js";
+import { EN_GARDEN } from "./strings-garden.js";
+import { EN_BUBBLE } from "./strings-bubble.js";
+import { EN_TREE } from "./strings-tree.js";
+import { EN_SKYLINE } from "./strings-skyline.js";
+import { EN_HONEYCOMB } from "./strings-honeycomb.js";
+import { EN_CONSTELLATION } from "./strings-constellation.js";
+import { EN_POLAR_CLOCK } from "./strings-polar-clock.js";
+import { EN_SPIRAL_YEAR } from "./strings-spiral-year.js";
+import { EN_BREATHING_DOT } from "./strings-breathing-dot.js";
+import { EN_HEARTBEAT } from "./strings-heartbeat.js";
+import { EN_COMET_TRAIL } from "./strings-comet-trail.js";
+import { EN_ORBIT_STATUS } from "./strings-orbit-status.js";
 import { EN_CATEGORY } from "./strings-category.js";
 import { EN_DIST } from "./strings-dist.js";
 import { EN_SLOTS } from "./strings-slots.js";
@@ -39,6 +60,27 @@ import { EN_ENSEMBLE } from "./strings-ensemble.js";
 export const EN: SummaryStrings = {
   ...EN_SERIES,
   ...EN_SCALAR,
+  ...EN_TALLY,
+  ...EN_DICE,
+  ...EN_FILL_WORD,
+  ...EN_FAT,
+  ...EN_THERMOMETER,
+  ...EN_MOON,
+  ...EN_HOURGLASS,
+  ...EN_BEAM,
+  ...EN_SPROUT,
+  ...EN_GARDEN,
+  ...EN_BUBBLE,
+  ...EN_TREE,
+  ...EN_SKYLINE,
+  ...EN_HONEYCOMB,
+  ...EN_CONSTELLATION,
+  ...EN_POLAR_CLOCK,
+  ...EN_SPIRAL_YEAR,
+  ...EN_BREATHING_DOT,
+  ...EN_HEARTBEAT,
+  ...EN_COMET_TRAIL,
+  ...EN_ORBIT_STATUS,
   ...EN_CATEGORY,
   ...EN_DIST,
   ...EN_SLOTS,

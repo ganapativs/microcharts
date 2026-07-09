@@ -660,6 +660,322 @@ add(
   ],
 );
 add(
+  "tally-marks",
+  "TallyMarks",
+  [{ value: 23 }, { value: 30, max: 25 }, { value: 17, pen: "drawn" }, { value: 8, max: 40 }],
+  [
+    [80, 16],
+    [80, 24],
+    [80, 32],
+  ],
+);
+add(
+  "honeycomb",
+  "Honeycomb",
+  [
+    { value: 34, total: 40 },
+    { value: 7, total: 10, rows: 1 },
+    { value: 28, total: 40, empty: "dim" },
+    { value: 45, total: 40 },
+  ],
+  [[999, 999]],
+);
+const STARS = [
+  { x: 0, y: 40, m: 2 },
+  { x: 2, y: 90, m: 7 },
+  { x: 5, y: 30, m: 3 },
+  { x: 8, y: 65, m: 5 },
+];
+add(
+  "constellation",
+  "Constellation",
+  [
+    { data: STARS },
+    { data: STARS, label: "max" },
+    { data: STARS, connect: false },
+    { data: [{ x: 0 }, { x: 3 }, { x: 7 }, { x: 9 }] }, // value-less → jittered
+  ],
+  [
+    [999, 999],
+    [90, 24],
+  ],
+);
+const DAY = Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h));
+add(
+  "polar-clock",
+  "PolarClock",
+  [
+    { data: DAY },
+    { data: DAY, now: 14 },
+    { data: DAY, label: "max" },
+    { data: DAY, labels: true },
+    { data: [120, 200, 180, 210, 260, 90, 60], mode: "opacity" },
+    { data: [10, null, 30, 0, 25] },
+  ],
+  [[999, 999]],
+);
+const WEEKS = Array.from({ length: 52 }, (_, i) => (i === 29 ? 480 : i === 5 ? 10 : 100 + i));
+const DAYS = Array.from({ length: 200 }, (_, i) => (i * 37) % 100);
+add(
+  "spiral-year",
+  "SpiralYear",
+  [
+    { data: WEEKS, size: 48 },
+    { data: WEEKS, size: 48, steps: 3 },
+    { data: WEEKS, size: 48, mark: "arc" },
+    { data: DAYS, size: 48, monthTicks: false },
+    { data: [10, null, 30, 0, 25], size: 48 },
+  ],
+  [[999, 999]],
+);
+add(
+  "breathing-dot",
+  "BreathingDot",
+  [{ value: 0.2 }, { value: 0.65 }, { value: 0.92, label: "value" }, { value: null }],
+  [[999, 999]],
+);
+const HB = [97000, 92000, 85000, 70000, 55000, 48000];
+add(
+  "heartbeat-blip",
+  "HeartbeatBlip",
+  [
+    { data: HB, now: 100000 },
+    { data: HB, now: 100000, label: "count" },
+    { data: [], now: 100000 },
+    { data: [99000], now: 100000 },
+  ],
+  [[999, 999]],
+);
+const CT = [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87];
+add(
+  "comet-trail",
+  "CometTrail",
+  [{ data: CT }, { data: CT, label: "none" }, { data: [99, 12, 88] }, { data: [42] }],
+  [[999, 999]],
+);
+add(
+  "orbit-status",
+  "OrbitStatus",
+  [
+    { latency: 240, rate: 12, latencyDomain: [0, 500], rateDomain: [0, 20] },
+    { latency: 350, rate: 5, latencyDomain: [0, 500], rateDomain: [0, 20], alert: 300 },
+    { latency: 240, rate: 12, latencyDomain: [0, 500], rateDomain: [0, 20], label: "latency" },
+    { latency: 100, rate: 0, latencyDomain: [0, 500], rateDomain: [0, 20] },
+    { latency: NaN, rate: 5 },
+  ],
+  [[999, 999]],
+);
+const SKYLINE = [
+  { label: "Platform", value: 46, lit: 0.7 },
+  { label: "Core", value: 32, lit: 0.5 },
+  { label: "Web", value: 28, lit: 0.9 },
+  { label: "API", value: 40, lit: 0.3 },
+  { label: "Data", value: 18, lit: 0.6 },
+];
+add(
+  "city-skyline",
+  "CitySkyline",
+  [
+    { data: SKYLINE },
+    { data: SKYLINE, labels: true },
+    { data: SKYLINE, label: "value" },
+    { data: SKYLINE, ground: false },
+  ],
+  [
+    [999, 24],
+    [999, 40],
+    [999, 52],
+  ],
+);
+const RINGS = [8, 12, 10, 18, 22, 15, 20, 14];
+add(
+  "tree-rings",
+  "TreeRings",
+  [
+    { data: RINGS },
+    { data: RINGS, label: "last" },
+    { data: RINGS, rings: "fill" },
+    { data: RINGS, total: 200 },
+  ],
+  [[999, 999]],
+);
+const MELODY = [3, 5, 4, 8, 6, 9, 7, 11];
+add(
+  "music-staff",
+  "MusicStaff",
+  [
+    { data: MELODY },
+    { data: MELODY, label: "last" },
+    { data: MELODY, range: "staff" },
+    { data: [3, 5, null, 8, 6] },
+  ],
+  [
+    [60, 20],
+    [120, 28],
+    [220, 40],
+  ],
+);
+const BUBBLES = [
+  { label: "EMEA", value: 1240 },
+  { label: "AMER", value: 890 },
+  { label: "APAC", value: 560 },
+  { label: "LATAM", value: 210 },
+];
+add(
+  "bubble-row",
+  "BubbleRow",
+  [
+    { data: BUBBLES },
+    { data: BUBBLES, label: "both" },
+    { data: BUBBLES, align: "baseline" },
+    { data: BUBBLES, label: "none" },
+  ],
+  [
+    [999, 24],
+    [999, 34],
+    [999, 44],
+  ],
+);
+const GARDEN = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11];
+add(
+  "garden-grid",
+  "GardenGrid",
+  [
+    { data: GARDEN },
+    { data: GARDEN, rows: 1 },
+    { data: GARDEN, steps: 3 },
+    { data: GARDEN, empty: "blank" },
+  ],
+  [[999, 999]],
+);
+const SPROUT = [
+  { label: "Acme", value: 3 },
+  { label: "Beta", value: 2 },
+  { label: "Gamma", value: 3 },
+  { label: "Delta", value: 1 },
+  { label: "Echo", value: 0 },
+  { label: "Foxtrot", value: 2 },
+];
+add(
+  "sprout-row",
+  "SproutRow",
+  [
+    { data: SPROUT },
+    { data: SPROUT, labels: true },
+    { data: SPROUT, label: "value" },
+    {
+      data: [
+        { label: "A", value: 2 },
+        { label: "B", value: null },
+      ],
+    },
+  ],
+  [
+    [96, 20],
+    [140, 30],
+    [180, 36],
+  ],
+);
+const BEAM = [
+  { label: "Inflow", value: 620 },
+  { label: "Outflow", value: 480 },
+];
+add(
+  "balance-beam",
+  "BalanceBeam",
+  [
+    { data: BEAM },
+    { data: BEAM, label: "values" },
+    { data: BEAM, shape: "round" },
+    {
+      data: [
+        { label: "A", value: 500 },
+        { label: "B", value: 500 },
+      ],
+    },
+  ],
+  [
+    [48, 20],
+    [80, 30],
+    [120, 44],
+  ],
+);
+add(
+  "hourglass",
+  "Hourglass",
+  [{ value: 0.5 }, { value: 0.75, label: "remaining" }, { value: 0 }, { value: 1 }],
+  [
+    [16, 24],
+    [20, 30],
+    [24, 36],
+  ],
+);
+add(
+  "moon-phase",
+  "MoonPhase",
+  [{ value: 0.1 }, { value: 0.5 }, { value: 0.85 }, { value: 0.5, mode: "cycle" }],
+  [
+    [16, 16],
+    [24, 24],
+    [40, 40],
+  ],
+);
+add(
+  "thermometer",
+  "Thermometer",
+  [
+    { value: 72, target: 80 },
+    { value: 72, target: 80, label: "value" },
+    { value: 62, orientation: "horizontal", bulb: false },
+    { value: 140 },
+  ],
+  [
+    [16, 48],
+    [20, 56],
+    [24, 64],
+  ],
+);
+add(
+  "fat-digits",
+  "FatDigits",
+  [
+    { value: 1204, domain: [0, 2100] },
+    { value: 2100, domain: [0, 2100] },
+    { value: 1902, encode: "digit" },
+    { value: 318, domain: [0, 2100], tiers: 3 },
+  ],
+  [
+    [60, 20],
+    [80, 24],
+    [120, 28],
+  ],
+);
+add(
+  "fill-word",
+  "FillWord",
+  [
+    { word: "uploading", value: 0.62 },
+    { word: "expiring", value: 0.7, mode: "drain" },
+    { word: "storage", value: 0.4, label: "value" },
+    { word: "processing", value: 1 },
+  ],
+  [
+    [80, 18],
+    [120, 20],
+    [180, 24],
+  ],
+);
+add(
+  "dice-pips",
+  "DicePips",
+  [{ value: 4 }, { value: 6 }, { value: 9 }, { value: 3, face: false }],
+  [
+    [16, 16],
+    [24, 24],
+    [40, 40],
+  ],
+);
+add(
   "shift-histogram",
   "ShiftHistogram",
   [
@@ -824,7 +1140,13 @@ add(
 // BY-DESIGN exemptions: EventTimeline span labels render CENTERED INSIDE their
 // span rects (plan/22 #27 — the rect is the label's home, at 0.7 fill opacity).
 const ALLOWED = (line) =>
-  /^event-timeline .*TEXT-ON-MARK "(Freeze|Healthy|[^"]*)" over rect/.test(line);
+  /^event-timeline .*TEXT-ON-MARK "(Freeze|Healthy|[^"]*)" over rect/.test(line) ||
+  // FillWord stacks an accent copy of the word ON the muted base — that exact
+  // same-word overlap IS the "label is the bar" encoding, not a collision.
+  /^fill-word .*TEXT-TEXT "([^"]+)" × "\1"$/.test(line) ||
+  // The "NN%" hugs the word using its REAL extent (~0.56 em/char); the craft
+  // 0.62 over-estimate reads a phantom overlap that the browser sweep disproves.
+  /^fill-word .*TEXT-TEXT "[^"]+" × "\d+%"$/.test(line);
 
 let total = 0,
   bad = 0;

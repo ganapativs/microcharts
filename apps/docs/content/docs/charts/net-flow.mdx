@@ -60,23 +60,33 @@ answers both.
   <span className="inline-flex flex-col gap-1.5">
     <NetFlow
       data={[
-        { in: 45, out: 29 }, { in: 40, out: 44 }, { in: 52, out: 38 },
-        { in: 44, out: 52 }, { in: 60, out: 41 }, { in: 57, out: 43 },
+        { in: 45, out: 29 },
+        { in: 40, out: 44 },
+        { in: 52, out: 38 },
+        { in: 44, out: 52 },
+        { in: 60, out: 41 },
+        { in: 57, out: 43 },
       ]}
       format={(n) => `${n}k`}
       mode="bars"
       title="Mirrored bars"
-      width={220} height={28}
+      width={220}
+      height={28}
     />
     <NetFlow
       data={[
-        { in: 45, out: 29 }, { in: 40, out: 44 }, { in: 52, out: 38 },
-        { in: 44, out: 52 }, { in: 60, out: 41 }, { in: 57, out: 43 },
+        { in: 45, out: 29 },
+        { in: 40, out: 44 },
+        { in: 52, out: 38 },
+        { in: 44, out: 52 },
+        { in: 60, out: 41 },
+        { in: 57, out: 43 },
       ]}
       format={(n) => `${n}k`}
       positive="down"
       title="Outflow is the goal"
-      width={220} height={28}
+      width={220}
+      height={28}
     />
   </span>
 </LiveDemo>

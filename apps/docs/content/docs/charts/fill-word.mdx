@@ -1,0 +1,72 @@
+---
+title: FillWord
+description: A fill-word chart for React — a word whose own glyphs fill with an accent to show progress, where the label is the bar.
+---
+
+FillWord answers "how far along is this named task?" by making the label _be_ the bar. A muted word
+is overlaid with an accent copy of itself, clipped to the value fraction of the word's own inked
+extent — so 50% visually bisects the word. The fill is a percentage of the glyphs you see, never of
+a hidden wider track. It trades some precision for a read that needs no separate label.
+
+<LiveDemo
+  label="FillWord"
+  sizeOf="fill-word"
+  code={`import { FillWord } from "@microcharts/react/fill-word";
+
+<FillWord word="uploading" value={0.62} title="Upload" />`}
+>
+  <FillWord word="uploading" value={0.62} title="Upload" fontSize={18} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="fill-word" />
+
+## Try it
+
+<Playground chart="fill-word" />
+
+## Interactive
+
+<InteractiveDemo slug="fill-word" />
+
+## When to use it
+
+- **Good for** — a labelled progress read in a sentence or cell, a sync/upload status where the label names the task, or a quota/TTL where the word is the metric.
+- **Avoid for** — precise percentages (Progress), trends (Sparkline), or many parallel bars (MiniBar).
+
+## Sizing
+
+<Sizing chart="fill-word" />
+
+## Variants
+
+<LiveDemo
+  label="drain mode + inline percent"
+  code={`<FillWord word="expiring" value={0.7} mode="drain" />
+<FillWord word="storage" value={0.4} label="value" />`}
+>
+  <span className="inline-flex gap-5 items-center">
+    <FillWord word="expiring" value={0.7} mode="drain" fontSize={16} />
+    <FillWord word="storage" value={0.4} label="value" fontSize={16} />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+Fill (not drain) is the default because progress is the ninety-percent case — a word filling as a
+step completes. `mode="drain"` empties the ink from the left as the value rises, the remaining-time
+story that fill cannot tell (TTLs, expiring sessions). Because glyph ink is uneven, fine reads are
+±5% — the fill edge lands between letters, not on an exact tick. When you need the number, add
+`label="value"` for the percent alongside, or reach for `Progress` when precision is the point.
+
+## Accessibility
+
+The accessible name names the task and its state — **"uploading: 62% complete."** — or, in drain
+mode, **"session: 25% remaining."** An empty word reads "No data." The interactive entry glides the
+ink edge with a reduced-motion-gated clip-path transition and announces changes through a polite
+live region, throttled to at most once a second so a streaming value never spams.
+
+## Props
+
+<PropTable slug="fill-word" />

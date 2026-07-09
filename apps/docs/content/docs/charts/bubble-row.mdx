@@ -1,0 +1,81 @@
+---
+title: BubbleRow
+description: A bubble-row chart for React — circle area for a few magnitudes, the catalog's honest low-precision exemplar. For a precise comparison, use MiniBar.
+---
+
+BubbleRow answers "roughly how do these few magnitudes compare?" with physical presence — a row of
+circles whose **area** (not width) is proportional to value. Area is the weakest common channel, so
+this is the catalog's honest low-precision exemplar: **for a precise comparison, use `MiniBar`.** The
+value numerals are on by default, because a low-precision channel owes the reader the number.
+
+<LiveDemo
+  label="BubbleRow"
+  sizeOf="bubble-row"
+  code={`import { BubbleRow } from "@microcharts/react/bubble-row";
+
+<BubbleRow data={regions} title="Market size" />`}
+>
+  <BubbleRow data={[{ label: "EMEA", value: 1240 }, { label: "AMER", value: 890 }, { label: "APAC", value: 560 }, { label: "LATAM", value: 210 }]} title="Market size" height={36} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="bubble-row" />
+
+## Try it
+
+<Playground chart="bubble-row" />
+
+## Interactive
+
+<InteractiveDemo slug="bubble-row" />
+
+## When to use it
+
+- **Good for** — a few magnitudes with physical presence in a sentence, a market-size or segment impression in a KPI card, or an editorial callout where the number is printed too.
+- **Avoid for** — precise comparison (that's `MiniBar`), trends (Sparkline), or more than about eight items.
+
+## Sizing
+
+<Sizing chart="bubble-row" />
+
+## Variants
+
+<LiveDemo
+  label="baseline align + labels"
+  code={`<BubbleRow data={regions} align="baseline" />
+<BubbleRow data={regions} label="both" />`}
+>
+  <span className="inline-flex flex-col gap-4">
+    <BubbleRow
+      data={[
+        { label: "EMEA", value: 1240 },
+        { label: "AMER", value: 890 },
+        { label: "APAC", value: 560 },
+        { label: "LATAM", value: 210 },
+      ]}
+      align="baseline"
+      height={36}
+    />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+Value numerals are on by default because area lies quietly — a bubble twice the diameter is four
+times the area, and the eye can't reliably invert that, so the number keeps the read honest. The
+radius is always `r ∝ √value` with no exceptions; a linear-radius map would be a roughly squared lie.
+There is no sorting prop: the order is your data's order, because reordering is your statement, not
+the chart's. The LOW precision rating and the MiniBar steer are printed in the catalog, the machine
+`/catalog.json`, and this page's header — BubbleRow is the catalog's worked example of an honest
+low-precision admission.
+
+## Accessibility
+
+The accessible name names the extremes — **"4 regions; largest EMEA at 1,240, smallest LATAM at
+210."** The interactive entry roves the bubbles with ←/→ (or hover), announcing each one's exact
+value — **"EMEA: 1,240."** — the number the area itself can't carry.
+
+## Props
+
+<PropTable slug="bubble-row" />

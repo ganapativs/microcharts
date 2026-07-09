@@ -531,15 +531,280 @@ body {
     transform: translateY(-2px);
   }
 
-  /* Specimen index — rows share ONE glass plate per collection, seamed by
-     `divide-hairline`. A row can't leave the shared surface, so hover brightens
-     it toward the accent instead of lifting. The first/last rows inherit the
-     plate's rounded corners via the wrapper's `overflow: hidden`. */
-  .specimen-row {
+  /* ── Gallery: one card markup, two layouts ────────────────────────────────
+     `.gcard` places its five parts (stage · idx · name · tag · arrow) with grid
+     AREAS, so switching the container's [data-view] re-flows the SAME DOM into a
+     card grid or a dense specimen sheet — no double render, no chart JS. The
+     charts keep true word-size; only the frame around them changes. */
+  .gcard-stage svg {
+    height: auto;
+    max-width: 100%;
+  }
+  /* the card is the positioning context for the stretched name-link. */
+  .gcard {
+    position: relative;
+  }
+  /* the name link's ::after turns the whole card into one click target. */
+  .gcard-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .gcard-stage {
+    transition: background-color 0.3s var(--ease-out-quint);
+  }
+  /* the open arrow is the hover/focus affordance in both views. */
+  .gcard-arrow {
+    opacity: 0;
+    transform: translateY(1px);
+    transition:
+      opacity 0.28s var(--ease-out-quint),
+      transform 0.28s var(--ease-out-quint);
+  }
+  .gcard:hover .gcard-arrow,
+  .gcard:focus-within .gcard-arrow {
+    opacity: 1;
+    transform: none;
+    color: var(--fd-primary, var(--accent));
+  }
+
+  /* keyboard focus — one accent ring, both views, never clipped by overflow */
+  .gcard:focus-visible,
+  .gcard:focus-within .gcard-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-panel);
+  }
+  /* settle-in reward: the index stamp lights to the accent on hover, both views */
+  .gcard-idx {
+    transition:
+      color 0.25s var(--ease-out-quint),
+      opacity 0.25s var(--ease-out-quint);
+  }
+  .gcard:hover .gcard-idx,
+  .gcard:focus-within .gcard-idx {
+    color: var(--accent);
+    opacity: 0.85;
+  }
+
+  /* One-time entrance cascade — cards rise + fade in sequence on first paint,
+     a diagonal ripple down the catalog. `--i` (set per card) staggers the
+     delay; capped so the tail never drags. `backwards` fill keeps a card
+     invisible only through its delay, then reverts to base so :hover still
+     lifts. The client marks [data-entered] after it plays so the search filter
+     never replays it; with JS off it simply plays once. */
+  @media (prefers-reduced-motion: no-preference) {
+    .mc-gallery:not([data-entered]) .gcard {
+      animation: gcard-in 0.5s var(--ease-out-quint) backwards;
+      animation-delay: min(calc(var(--i, 0) * 24ms), 360ms);
+    }
+  }
+  @keyframes gcard-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ══ GRID VIEW (default) ══════════════════════════════════════════════════
+     Each chart is an instrument plate: the specimen on graph paper up top, a
+     footer below whose body vertically centres the name. On hover / focus the
+     description reveals below the name (clamped to 3 lines) and the name lifts —
+     the footer height is reserved so nothing shifts. */
+  [data-view="grid"] .gband {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 0.875rem;
+  }
+  [data-view="grid"] .gcard {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-panel);
+    background-color: var(--glass-surface);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--glass-edge), var(--glass-shadow);
+    transition:
+      border-color 0.3s var(--ease-out-quint),
+      box-shadow 0.3s var(--ease-out-quint),
+      transform 0.3s var(--ease-out-quint);
+  }
+  [data-view="grid"] .gcard:hover {
+    border-color: color-mix(in oklab, var(--accent) 40%, var(--hairline));
+    box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
+    transform: translateY(-2px);
+  }
+  [data-view="grid"] .gcard:hover .gcard-stage {
+    background-color: color-mix(in oklab, var(--accent) 5%, transparent);
+  }
+  [data-view="grid"] .gcard-stage {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 7.5rem;
+    padding: 1.125rem;
+    border-bottom: 1px solid var(--hairline);
+    /* graph-paper etched under the specimen (no mask fade — it's a full plate) */
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--rule) 45%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--rule) 45%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 1.375rem 1.375rem;
+  }
+  /* footer: a fixed height reserves room for the name + a 3-line description so
+     the reveal never grows the card. */
+  [data-view="grid"] .gcard-foot {
+    flex: none;
+    display: flex;
+    align-items: stretch;
+    height: 5rem;
+    padding: 0 1rem;
+  }
+  /* the catalog number is a quiet plate stamp in the stage corner, not part of
+     the reading flow — the footer belongs entirely to the name + description. */
+  [data-view="grid"] .gcard-idx {
+    position: absolute;
+    bottom: 0.65rem;
+    right: 0.9rem;
+    z-index: 1;
+  }
+  /* it steps aside on hover/focus so the name + description own the footer */
+  [data-view="grid"] .gcard:hover .gcard-idx,
+  [data-view="grid"] .gcard:focus-within .gcard-idx {
+    opacity: 0;
+  }
+  [data-view="grid"] .gcard-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+  }
+  [data-view="grid"] .gcard-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  [data-view="grid"] .gcard-name {
+    min-width: 0;
+  }
+  [data-view="grid"] .gcard-arrow {
+    margin-left: auto;
+  }
+  [data-view="grid"] .gcard-desc {
+    font-size: 0.78rem;
+    line-height: 1.35;
+    max-height: 0;
+    opacity: 0;
+    /* reveal to a 3-line clamp on hover/focus */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    transition:
+      max-height 0.32s var(--ease-out-quint),
+      opacity 0.32s var(--ease-out-quint);
+  }
+  [data-view="grid"] .gcard:hover .gcard-desc,
+  [data-view="grid"] .gcard:focus-within .gcard-desc {
+    max-height: 3.4rem;
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-view="grid"] .gcard {
+      transition: none;
+    }
+    [data-view="grid"] .gcard:hover {
+      transform: none;
+    }
+    [data-view="grid"] .gcard-desc {
+      transition: opacity 0.2s linear;
+    }
+  }
+
+  /* ══ SHEET VIEW ═══════════════════════════════════════════════════════════
+     The wrappers collapse to `display: contents` so the leaves (idx · name ·
+     desc · stage · arrow) form one flat, dense row. */
+  [data-view="sheet"] .gband {
+    overflow: hidden;
+    border-radius: var(--radius-panel);
+    background-color: var(--glass-surface);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--glass-edge), var(--glass-shadow);
+  }
+  [data-view="sheet"] .gcard-foot,
+  [data-view="sheet"] .gcard-body,
+  [data-view="sheet"] .gcard-head {
+    display: contents;
+  }
+  [data-view="sheet"] .gcard {
+    display: grid;
+    grid-template:
+      "idx name stage arrow" auto
+      "idx desc stage arrow" auto / auto minmax(0, 1fr) 12rem auto;
+    align-items: center;
+    column-gap: 1.125rem;
+    row-gap: 0.125rem;
+    padding: 1rem 1.125rem;
     transition: background-color 0.25s var(--ease-out-quint);
   }
-  .specimen-row:hover {
+  [data-view="sheet"] .gcard-stage {
+    grid-area: stage;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 3.5rem;
+  }
+  [data-view="sheet"] .gcard-idx {
+    grid-area: idx;
+    align-self: center;
+  }
+  [data-view="sheet"] .gcard-name {
+    grid-area: name;
+  }
+  [data-view="sheet"] .gcard-arrow {
+    grid-area: arrow;
+  }
+  [data-view="sheet"] .gcard-desc {
+    grid-area: desc;
+    font-size: 0.875rem;
+    color: var(--color-fd-muted-foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  [data-view="sheet"] .gcard + .gcard {
+    border-top: 1px solid var(--hairline);
+  }
+  [data-view="sheet"] .gcard:hover {
     background-color: color-mix(in oklab, var(--accent) 6%, transparent);
+  }
+
+  /* On a phone the description + index are noise; the name + live chart carry
+     the row. Drop them in the sheet, tighten to name | specimen. */
+  @media (max-width: 40rem) {
+    [data-view="sheet"] .gcard {
+      grid-template: "name stage arrow" auto / minmax(0, 1fr) 9rem auto;
+      column-gap: 0.75rem;
+    }
+    [data-view="sheet"] .gcard-idx,
+    [data-view="sheet"] .gcard-desc {
+      display: none;
+    }
   }
 }
 

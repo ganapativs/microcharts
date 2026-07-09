@@ -60,23 +60,31 @@ remove the bars: a rate without its denominator is the lie this type exists to p
   <span className="inline-flex flex-col gap-1.5">
     <RateVolume
       data={[
-        { rate: 0.023, volume: 220 }, { rate: 0.028, volume: 160 }, { rate: 0.031, volume: 110 },
-        { rate: 0.036, volume: 66 }, { rate: 0.041, volume: 38 },
+        { rate: 0.023, volume: 220 },
+        { rate: 0.028, volume: 160 },
+        { rate: 0.031, volume: 110 },
+        { rate: 0.036, volume: 66 },
+        { rate: 0.041, volume: 38 },
       ]}
       format={{ style: "percent", maximumFractionDigits: 1 }}
       minVolume={50}
       title="Low-volume flag"
-      width={220} height={26}
+      width={220}
+      height={26}
     />
     <RateVolume
       data={[
-        { rate: 0.023, volume: 220 }, { rate: 0.028, volume: 160 }, { rate: 0.031, volume: 110 },
-        { rate: 0.036, volume: 66 }, { rate: 0.041, volume: 38 },
+        { rate: 0.023, volume: 220 },
+        { rate: 0.028, volume: 160 },
+        { rate: 0.031, volume: 110 },
+        { rate: 0.036, volume: 66 },
+        { rate: 0.041, volume: 38 },
       ]}
       format={{ style: "percent", maximumFractionDigits: 1 }}
       curve="step"
       title="Per-period step"
-      width={220} height={26}
+      width={220}
+      height={26}
     />
   </span>
 </LiveDemo>

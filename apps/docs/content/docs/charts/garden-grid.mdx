@@ -1,0 +1,73 @@
+---
+title: GardenGrid
+description: A garden-grid chart for React — ActivityGrid's grayscale sibling, encoding a calendar rhythm as quantized dot area so it survives print and monochrome.
+---
+
+GardenGrid answers "what's the rhythm of activity over time?" the way ActivityGrid does — but with a
+single ink. Instead of color, dot **area** carries a five-step ordinal, so the rhythm reads in
+grayscale and print where a color heatmap would collapse. The radius is √-quantized so perceived area
+steps evenly. A zero cell is a hairline ring (present, but quiet); a `null` cell is nothing at all,
+because "missing" is not "zero".
+
+<LiveDemo
+  label="GardenGrid"
+  sizeOf="garden-grid"
+  code={`import { GardenGrid } from "@microcharts/react/garden-grid";
+
+<GardenGrid data={weeks} title="Activity" unit="weeks" />`}
+>
+  <GardenGrid data={[12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26]} unit="weeks" title="Activity" cell={11} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="garden-grid" />
+
+## Try it
+
+<Playground chart="garden-grid" />
+
+## Interactive
+
+<InteractiveDemo slug="garden-grid" />
+
+## When to use it
+
+- **Good for** — a contribution or activity rhythm you print or read in grayscale, a per-repo or per-team activity strip, or any calendar-shaped intensity where color isn't available.
+- **Avoid for** — exact per-cell values (ActivityGrid with hover, or HeatStrip) or trends (Sparkline).
+
+## Sizing
+
+<Sizing chart="garden-grid" />
+
+## Variants
+
+<LiveDemo
+  label="strip mode + blank empties"
+  code={`<GardenGrid data={weeks} rows={1} />
+<GardenGrid data={weeks} empty="blank" />`}
+>
+  <span className="inline-flex flex-col gap-3">
+    <GardenGrid data={[12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9]} rows={1} cell={11} />
+    <GardenGrid data={[12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0]} empty="blank" cell={11} />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+Rings for zero are the default because print and grayscale lose the zero-versus-missing distinction
+that color grids get for free — this chart exists for exactly that medium, so it makes "present but
+quiet" visible. The radius is √-quantized so **area** carries the ordinal; a linear radius map would
+exaggerate the highs quadratically. The steps are ordinal, not values: the docs say "read rhythm and
+rank, not numbers", and point at `ActivityGrid` for the color twin with exact hover reads.
+
+## Accessibility
+
+The accessible name summarizes the rhythm — **"12 weeks; peak 34, 9 active."** The interactive entry
+walks the grid in 2-D with the arrow keys (or hover), announcing each cell as its ordinal step —
+**"3 of 12: 8, step 2 of 5."** — never a false-precise value, since dot area reads to a step, not a
+number.
+
+## Props
+
+<PropTable slug="garden-grid" />

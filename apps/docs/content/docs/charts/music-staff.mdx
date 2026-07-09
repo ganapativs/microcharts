@@ -1,0 +1,74 @@
+---
+title: MusicStaff
+description: A music-staff chart for React — the shape of a short series read as a melody, pitch on a five-line staff, with no clefs, stems, or bars.
+---
+
+MusicStaff answers "what's the shape of this short series?" by reading it as a melody: each value is a
+note, its **pitch** (vertical position on a five-line staff) is the value, and left-to-right is time.
+Pitch is the only channel — there are no clefs, stems, beams, or bar lines, because every other
+notation convention would be decoration. The read is in steps (nine to thirteen positions), so exact
+values steer to `Sparkline` with a label.
+
+<LiveDemo
+  label="MusicStaff"
+  sizeOf="music-staff"
+  code={`import { MusicStaff } from "@microcharts/react/music-staff";
+
+<MusicStaff data={weeks} title="Sprint melody" />`}
+>
+  <MusicStaff data={[3, 5, 4, 8, 6, 9, 7, 11]} label="last" title="Sprint melody" width={120} height={26} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="music-staff" />
+
+## Try it
+
+<Playground chart="music-staff" />
+
+## Interactive
+
+<InteractiveDemo slug="music-staff" />
+
+## When to use it
+
+- **Good for** — a weekly-rhythm read in a sentence, the shape of a sprint or short series in a cell, or a per-channel melody in a tab.
+- **Avoid for** — exact values (Sparkline with a label), long series (over sixteen points), or trends where the exact slope matters.
+
+## Sizing
+
+<Sizing chart="music-staff" />
+
+## Variants
+
+<LiveDemo
+  label="staff range + a rest"
+  code={`<MusicStaff data={weeks} range="staff" />
+<MusicStaff data={[3, 5, null, 8, 6]} />`}
+>
+  <span className="inline-flex gap-6 items-center">
+    <MusicStaff data={[3, 5, 4, 8, 6, 9]} range="staff" width={100} height={24} />
+    <MusicStaff data={[3, 5, null, 8, 6]} width={90} height={24} />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+The ledger range is the default because clipping pitch silently is worse than two extra hairline
+ledger ticks — a note above or below the staff still reads truly. `range="staff"` exists for dense
+cells where ledger lines would collide with a neighbour; there, out-of-range pitches clamp to the
+staff and the clamp is stated in the cell's accessible name. Two adjacent equal values are spaced by
+the time axis, never dodged vertically, because moving a note vertically would change its pitch — and
+pitch is the data.
+
+## Accessibility
+
+MusicStaff reuses the same natural-language summary as `Sparkline`, verbatim — for `[3, 5, 4, 8, 6,
+9]`, **"Trending up 200%. Range 3 to 9. Last value 9."** The interactive entry steps the notes with
+←/→, announcing each as "Point 3 of 6: 4." The sonification idea (playing the pitches) is one
+paragraph of future work; no audio ships today.
+
+## Props
+
+<PropTable slug="music-staff" />

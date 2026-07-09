@@ -1,0 +1,152 @@
+import { CitySkyline } from "@microcharts/react/city-skyline";
+import { InteractiveDemo } from "./city-skyline.client";
+import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+
+export { InteractiveDemo };
+
+const PKG = "@microcharts/react";
+type Team = { label: string; value: number; lit?: number };
+const TEAMS: Team[] = [
+  { label: "Platform", value: 46, lit: 0.7 },
+  { label: "Core", value: 32, lit: 0.5 },
+  { label: "Web", value: 28, lit: 0.9 },
+  { label: "API", value: 40, lit: 0.3 },
+  { label: "Data", value: 18, lit: 0.6 },
+];
+
+export const entry: ChartEntry = {
+  name: "CitySkyline",
+  slug: "city-skyline",
+  status: "stable",
+  collection: "expressive",
+  tagline: "How groups compare on size, and how activated each is.",
+  staticImport: `${PKG}/city-skyline`,
+  interactiveImport: `${PKG}/city-skyline/interactive`,
+  dataShape: "{ label: string; value: number; lit?: number }[]",
+  encoding: {
+    channel: "building height (primary) + lit-window fraction (secondary)",
+    precision: "high height / low lit",
+  },
+  nodeBudget: "2 per building + 1 (n ≤ 8)",
+  bestFor: [
+    "team or region size plus an activation read",
+    "an org KPI where two variables are the story",
+    "a per-BU comparison with utilization",
+  ],
+  avoidFor: ["a single variable (MiniBar)", "precise activation reads", "more than ~8 groups"],
+  props: [
+    {
+      name: "data",
+      type: "{ label, value, lit? }[]",
+      required: true,
+      description: "value = height; lit = 0–1 window fraction.",
+    },
+    {
+      name: "labels",
+      type: "boolean",
+      required: false,
+      description: "Category labels under the buildings.",
+    },
+    {
+      name: "ground",
+      type: "boolean",
+      required: false,
+      description: "The baseline hairline (default true).",
+    },
+    {
+      name: "label",
+      type: '"none" | "value"',
+      required: false,
+      description: "Numeral above each building.",
+    },
+  ],
+  demo: [46, 32, 28, 40, 18],
+  example: {
+    title: "Team sizes",
+    code: `import { CitySkyline } from "${PKG}/city-skyline";\n\n<CitySkyline data={teams} unit="teams" title="Team sizes" />`,
+  },
+};
+
+export function Preview() {
+  return <CitySkyline data={TEAMS} summary={false} height={26} />;
+}
+
+export const showcase = {
+  hint: "size + activation",
+  Node: () => <CitySkyline data={TEAMS} labels unit="teams" title="Team sizes" height={32} />,
+};
+
+export const playground: PlaygroundSpec = {
+  knobs: [
+    { kind: "toggle", key: "labels", label: "labels", init: false },
+    { kind: "toggle", key: "value", label: "values", init: false },
+    { kind: "toggle", key: "ground", label: "ground", init: true },
+  ],
+  render: (s) => (
+    <CitySkyline
+      data={TEAMS}
+      labels={s.labels as boolean}
+      label={s.value ? "value" : "none"}
+      ground={s.ground as boolean}
+      unit="teams"
+      summary={false}
+      bw={16}
+      gap={6}
+      height={s.labels || s.value ? 52 : 44}
+    />
+  ),
+  code: (s) =>
+    [
+      "<CitySkyline",
+      "  data={teams}",
+      s.labels && "  labels",
+      s.value && '  label="value"',
+      s.ground === false && "  ground={false}",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+};
+
+export const recipes: Recipe[] = [
+  {
+    label: "omit lit for a plain bar row",
+    code: `<CitySkyline data={teams.map(({ label, value }) => ({ label, value }))} />`,
+    node: (
+      <CitySkyline
+        data={TEAMS.map(({ label, value }) => ({ label, value }))}
+        summary={false}
+        height={28}
+      />
+    ),
+  },
+  {
+    label: "labelled, the two-variable read",
+    code: `<CitySkyline data={teams} labels />`,
+    node: <CitySkyline data={TEAMS} labels summary={false} height={34} bw={14} gap={5} />,
+  },
+];
+
+export function Mark(props: { data: number[]; width?: number; height?: number }) {
+  const data = (props.data.length ? props.data.slice(0, 5) : [46, 32, 28, 40, 18]).map((v, i) => ({
+    label: `#${i}`,
+    value: Math.abs(v),
+    lit: ((i * 3) % 10) / 10,
+  }));
+  return <CitySkyline data={data} summary={false} height={props.height ?? 22} bw={7} gap={3} />;
+}
+
+export function markCode(): string {
+  return `<CitySkyline data={teams} />`;
+}
+
+export default {
+  entry,
+  Preview,
+  showcase,
+  InteractiveDemo,
+  playground,
+  recipes,
+  Mark,
+  markCode,
+} satisfies ChartModule;

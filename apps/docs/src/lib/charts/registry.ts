@@ -65,6 +65,28 @@ import quadrantDot from "./quadrant-dot";
 import cyclePlot from "./cycle-plot";
 import changePoint from "./change-point";
 import ensembleGhosts from "./ensemble-ghosts";
+import tallyMarks from "./tally-marks";
+import dicePips from "./dice-pips";
+import fillWord from "./fill-word";
+import fatDigits from "./fat-digits";
+import thermometer from "./thermometer";
+import moonPhase from "./moon-phase";
+import hourglass from "./hourglass";
+import balanceBeam from "./balance-beam";
+import sproutRow from "./sprout-row";
+import gardenGrid from "./garden-grid";
+import bubbleRow from "./bubble-row";
+import musicStaff from "./music-staff";
+import treeRings from "./tree-rings";
+import citySkyline from "./city-skyline";
+import honeycomb from "./honeycomb";
+import constellation from "./constellation";
+import polarClock from "./polar-clock";
+import spiralYear from "./spiral-year";
+import breathingDot from "./breathing-dot";
+import heartbeatBlip from "./heartbeat-blip";
+import cometTrail from "./comet-trail";
+import orbitStatus from "./orbit-status";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -122,6 +144,28 @@ const MODULES: ChartModule[] = [
   cyclePlot,
   changePoint,
   ensembleGhosts,
+  tallyMarks,
+  dicePips,
+  fillWord,
+  fatDigits,
+  thermometer,
+  moonPhase,
+  hourglass,
+  balanceBeam,
+  sproutRow,
+  gardenGrid,
+  bubbleRow,
+  musicStaff,
+  treeRings,
+  citySkyline,
+  honeycomb,
+  constellation,
+  polarClock,
+  spiralYear,
+  breathingDot,
+  heartbeatBlip,
+  cometTrail,
+  orbitStatus,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

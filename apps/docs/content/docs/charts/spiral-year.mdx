@@ -1,0 +1,93 @@
+---
+title: SpiralYear
+description: A spiral year chart for React — a calendar series wound onto a spiral so a year's seasonal shape reads at a glance.
+---
+
+SpiralYear answers "how did the year breathe?" It winds a calendar series onto an Archimedean spiral:
+the angle is the position in the year (January at 12 o'clock, running clockwise) and each turn outward
+is the next year. The value becomes a five-step opacity, so busy stretches read as darker arcs of the
+spiral. This is a **pattern instrument** — opacity is the weakest ordered channel, so for an exact
+day's value reach for `ActivityGrid` or `HeatStrip`.
+
+<LiveDemo
+  label="SpiralYear"
+  sizeOf="spiral-year"
+  code={`import { SpiralYear } from "@microcharts/react/spiral-year";
+
+const byWeek = [/* 52 weekly values */];
+
+<SpiralYear data={byWeek} title="Seasonality" />`}
+>
+  <SpiralYear data={Array.from({ length: 52 }, (_, i) => { const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2)); return i === 29 ? 480 : s; })} title="Seasonality" size={80} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="spiral-year" />
+
+## Try it
+
+<Playground chart="spiral-year" />
+
+## Interactive
+
+<InteractiveDemo slug="spiral-year" />
+
+## When to use it
+
+- **Good for** — the seasonal shape of a year at a glance, spotting a busy season or a quiet stretch, or a compact "the year in one square".
+- **Avoid for** — reading an exact day's value (`ActivityGrid` / `HeatStrip`), a non-cyclic trend (`Sparkline`), or more than about three years.
+
+## Variants
+
+<LiveDemo
+  label="arc marks, or three steps for tiny sizes"
+  code={`<SpiralYear data={byWeek} mark="arc" />
+<SpiralYear data={byWeek} steps={3} />`}
+>
+  <span className="inline-flex gap-6 items-center">
+    <SpiralYear
+      data={Array.from({ length: 52 }, (_, i) => {
+        const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2));
+        return i === 29 ? 480 : s;
+      })}
+      mark="arc"
+      size={64}
+      summary={false}
+    />
+    <SpiralYear
+      data={Array.from({ length: 52 }, (_, i) => {
+        const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2));
+        return i === 29 ? 480 : s;
+      })}
+      steps={3}
+      size={56}
+      summary={false}
+    />
+  </span>
+</LiveDemo>
+
+## Sizing
+
+<Sizing chart="spiral-year" />
+
+## Why this default
+
+Month ticks are on by default because without a temporal anchor the spiral is just texture — the ticks
+are what make "when" readable. Five steps is the ceiling: ordered opacity supports about five
+discriminable levels, and more would be false precision. The spiral **radius encodes time only, never
+value** — an outer mark is simply a later date, not a bigger number. Two adjacent turns place different
+years at the same angle; that radial adjacency is calendar alignment, not similarity, and the chart
+never asks you to compare across it. A `null` day leaves a gap in the spiral, distinct from a faint
+step-one mark, because missing is not the same as low.
+
+## Accessibility
+
+The accessible name states the count, the peak, and the low — **"52 weeks; peak 480 in week 30, low in
+week 48."** The interactive entry lets you arrow along the spiral chronologically, each mark announced
+with its period and value through a polite live region. Because the channel is ordinal opacity, the
+docs and summary steer any exact read to `ActivityGrid`.
+
+## Props
+
+<PropTable slug="spiral-year" />

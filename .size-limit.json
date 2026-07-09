@@ -635,6 +635,270 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/tally-marks (static)",
+    "path": "dist/charts/tally-marks/index.js",
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/tally-marks/interactive",
+    "path": "dist/charts/tally-marks/client.js",
+    "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dice-pips (static)",
+    "path": "dist/charts/dice-pips/index.js",
+    "limit": "1.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dice-pips/interactive",
+    "path": "dist/charts/dice-pips/client.js",
+    "limit": "1.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/fill-word (static)",
+    "path": "dist/charts/fill-word/index.js",
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/fill-word/interactive",
+    "path": "dist/charts/fill-word/client.js",
+    "limit": "1.95 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/fat-digits (static)",
+    "path": "dist/charts/fat-digits/index.js",
+    "limit": "1.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/fat-digits/interactive",
+    "path": "dist/charts/fat-digits/client.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/thermometer (static)",
+    "path": "dist/charts/thermometer/index.js",
+    "limit": "2.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/thermometer/interactive",
+    "path": "dist/charts/thermometer/client.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/moon-phase (static)",
+    "path": "dist/charts/moon-phase/index.js",
+    "limit": "1.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/moon-phase/interactive",
+    "path": "dist/charts/moon-phase/client.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/hourglass (static)",
+    "path": "dist/charts/hourglass/index.js",
+    "limit": "1.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/hourglass/interactive",
+    "path": "dist/charts/hourglass/client.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/balance-beam (static)",
+    "path": "dist/charts/balance-beam/index.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/balance-beam/interactive",
+    "path": "dist/charts/balance-beam/client.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/sprout-row (static)",
+    "path": "dist/charts/sprout-row/index.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/sprout-row/interactive",
+    "path": "dist/charts/sprout-row/client.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/garden-grid (static)",
+    "path": "dist/charts/garden-grid/index.js",
+    "limit": "1.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/garden-grid/interactive",
+    "path": "dist/charts/garden-grid/client.js",
+    "limit": "2.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/bubble-row (static)",
+    "path": "dist/charts/bubble-row/index.js",
+    "limit": "1.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/bubble-row/interactive",
+    "path": "dist/charts/bubble-row/client.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/music-staff (static)",
+    "path": "dist/charts/music-staff/index.js",
+    "limit": "2.55 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/music-staff/interactive",
+    "path": "dist/charts/music-staff/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/tree-rings (static)",
+    "path": "dist/charts/tree-rings/index.js",
+    "limit": "1.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/tree-rings/interactive",
+    "path": "dist/charts/tree-rings/client.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/city-skyline (static)",
+    "path": "dist/charts/city-skyline/index.js",
+    "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/city-skyline/interactive",
+    "path": "dist/charts/city-skyline/client.js",
+    "limit": "2.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/honeycomb (static)",
+    "path": "dist/charts/honeycomb/index.js",
+    "limit": "1.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/honeycomb/interactive",
+    "path": "dist/charts/honeycomb/client.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/constellation (static)",
+    "path": "dist/charts/constellation/index.js",
+    "limit": "2.85 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/constellation/interactive",
+    "path": "dist/charts/constellation/client.js",
+    "limit": "3.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/polar-clock (static)",
+    "path": "dist/charts/polar-clock/index.js",
+    "limit": "2.95 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/polar-clock/interactive",
+    "path": "dist/charts/polar-clock/client.js",
+    "limit": "3.85 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/spiral-year (static)",
+    "path": "dist/charts/spiral-year/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/spiral-year/interactive",
+    "path": "dist/charts/spiral-year/client.js",
+    "limit": "3.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/breathing-dot (static)",
+    "path": "dist/charts/breathing-dot/index.js",
+    "limit": "1.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/breathing-dot/interactive",
+    "path": "dist/charts/breathing-dot/client.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/heartbeat-blip (static)",
+    "path": "dist/charts/heartbeat-blip/index.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/heartbeat-blip/interactive",
+    "path": "dist/charts/heartbeat-blip/client.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/comet-trail (static)",
+    "path": "dist/charts/comet-trail/index.js",
+    "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/comet-trail/interactive",
+    "path": "dist/charts/comet-trail/client.js",
+    "limit": "3.15 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/orbit-status (static)",
+    "path": "dist/charts/orbit-status/index.js",
+    "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/orbit-status/interactive",
+    "path": "dist/charts/orbit-status/client.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

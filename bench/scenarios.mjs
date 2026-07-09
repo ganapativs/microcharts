@@ -500,4 +500,188 @@ export const SCENARIOS = [
       return { data: hist, forecast: { mid, p80 }, summary: false };
     },
   },
+  {
+    slug: "tally-marks",
+    component: "TallyMarks",
+    floor: 40, // one merged path, one pass over ≤ max strokes — trivially cheap
+    props: (i) => ({ value: (i % 30) + 1, summary: false }),
+  },
+  {
+    slug: "dice-pips",
+    component: "DicePips",
+    floor: 40, // ≤ 7 nodes, constant pip-layout lookup — trivially cheap
+    props: (i) => ({ value: i % 7, summary: false }),
+  },
+  {
+    slug: "fill-word",
+    component: "FillWord",
+    floor: 40, // 2 text nodes + a clip inset — no per-point work
+    props: (i) => ({ word: "processing", value: (i % 100) / 100, summary: false }),
+  },
+  {
+    slug: "fat-digits",
+    component: "FatDigits",
+    floor: 40, // one text node + a tier lookup — a cached formatter call
+    props: (i) => ({ value: (i * 37) % 2100, domain: [0, 2100], summary: false }),
+  },
+  {
+    slug: "thermometer",
+    component: "Thermometer",
+    floor: 30, // ≤ 6 nodes, one linear scale + a few ticks
+    props: (i) => ({ value: i % 100, target: 80, summary: false }),
+  },
+  {
+    slug: "moon-phase",
+    component: "MoonPhase",
+    floor: 40, // 3 nodes, a closed-form terminator path — trivially cheap
+    props: (i) => ({ value: (i % 100) / 100, summary: false }),
+  },
+  {
+    slug: "hourglass",
+    component: "Hourglass",
+    floor: 40, // 4 nodes, two area-true closed forms — trivially cheap
+    props: (i) => ({ value: (i % 100) / 100, summary: false }),
+  },
+  {
+    slug: "balance-beam",
+    component: "BalanceBeam",
+    floor: 40, // ≤ 6 nodes, one rotation + two √ weights — trivially cheap
+    props: (i) => ({
+      data: [
+        { label: "A", value: (i % 90) + 10 },
+        { label: "B", value: ((i * 3) % 90) + 10 },
+      ],
+      summary: false,
+    }),
+  },
+  {
+    slug: "sprout-row",
+    component: "SproutRow",
+    floor: 20, // one glyph path per item (≤ 12) + soil
+    props: (i) => ({
+      data: Array.from({ length: 8 }, (_, j) => ({ label: `#${j}`, value: (i + j) % 4 })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "garden-grid",
+    component: "GardenGrid",
+    floor: 6, // one circle per cell — N-node class, per-cell loop
+    props: (i) => ({ data: rugs[i % POOL].map((v) => Math.round(v * 5)), summary: false }),
+  },
+  {
+    slug: "bubble-row",
+    component: "BubbleRow",
+    floor: 15, // ≤ 8 bubbles + per-bubble format + greedy label layout (measured ~26)
+    props: (i) => ({
+      data: rugs[i % POOL]
+        .slice(0, 6)
+        .map((v, j) => ({ label: `#${j}`, value: Math.abs(v) * 100 })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "music-staff",
+    component: "MusicStaff",
+    floor: 15, // ≤ 16 notes + describeSeries (seriesStats) summary
+    props: (i) => ({
+      data: rugs[i % POOL].slice(0, 12).map((v) => Math.round(v * 5)),
+      summary: false,
+    }),
+  },
+  {
+    slug: "tree-rings",
+    component: "TreeRings",
+    floor: 10, // ≤ 24 boundary circles + cumulative-radius pass
+    props: (i) => ({ data: rugs[i % POOL].map((v) => Math.abs(v) + 1), summary: false }),
+  },
+  {
+    slug: "city-skyline",
+    component: "CitySkyline",
+    floor: 10,
+    props: (i) => ({
+      data: cats[i % POOL].map((c, j) => ({
+        label: c.label,
+        value: c.value % 60,
+        lit: (j % 5) / 5,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "honeycomb",
+    component: "Honeycomb",
+    floor: 40, // 2 merged paths, one hex loop
+    props: (i) => ({ value: (i % 40) + 1, total: 40, summary: false }),
+  },
+  {
+    slug: "constellation",
+    component: "Constellation",
+    floor: 20, // scale + jitter + per-event circle
+    props: (i) => ({
+      data: Array.from({ length: 10 }, (_, j) => ({
+        x: j,
+        y: ((i + j * 7) % 50) + 1,
+        m: (j % 5) + 1,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "polar-clock",
+    component: "PolarClock",
+    floor: 8, // 24 annulus sectors + guide
+    props: (i) => ({
+      data: Array.from({ length: 24 }, (_, h) => ((i + h * 5) % 100) + 1),
+      now: i % 24,
+      summary: false,
+    }),
+  },
+  {
+    slug: "spiral-year",
+    component: "SpiralYear",
+    floor: 6, // 52 marks grouped into ≤5 paths + month ticks
+    props: (i) => ({
+      data: Array.from({ length: 52 }, (_, w) => ((i + w * 3) % 100) + 1),
+      size: 48,
+      summary: false,
+    }),
+  },
+  {
+    slug: "breathing-dot",
+    component: "BreathingDot",
+    floor: 120, // two circles + a threshold branch
+    props: (i) => ({ value: (i % 100) / 100, summary: false }),
+  },
+  {
+    slug: "heartbeat-blip",
+    component: "HeartbeatBlip",
+    floor: 40, // baseline + a spike glyph per event
+    props: (i) => ({
+      data: Array.from({ length: 12 }, (_, k) => 100000 - k * 4000 - (i % 500)),
+      now: 100000,
+      summary: false,
+    }),
+  },
+  {
+    slug: "comet-trail",
+    component: "CometTrail",
+    floor: 12, // a circle per trail point + head + per-point format
+    props: (i) => ({
+      data: Array.from({ length: 13 }, (_, k) => ((i + k * 4) % 100) + 1),
+      summary: false,
+    }),
+  },
+  {
+    slug: "orbit-status",
+    component: "OrbitStatus",
+    floor: 80, // three circles + a scale + dash math
+    props: (i) => ({
+      latency: (i % 500) + 1,
+      rate: i % 20,
+      latencyDomain: [0, 500],
+      rateDomain: [0, 20],
+      summary: false,
+    }),
+  },
 ];

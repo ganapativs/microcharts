@@ -1,6 +1,6 @@
 ---
 title: All charts
-description: The five v1 microcharts — Sparkline, SparkBar, Delta, Bullet, and ActivityGrid — with the data shape each one answers.
+description: Browse the full microcharts catalog — every shipped chart at word-size, grouped by the data shape and decision each one answers.
 ---
 
 Every chart shares one grammar: `data` alone always renders something correct, and
@@ -8,20 +8,16 @@ the same prop names mean the same thing everywhere. Pick by the shape of your da
 and the decision you need someone to make in a single glance.
 
 <Cards>
-  <Card title="Sparkline" href="/docs/charts/sparkline" description="Trend over ordered values." />
   <Card
-    title="SparkBar"
-    href="/docs/charts/sparkbar"
-    description="Magnitude, or a win–loss streak."
-  />
-  <Card title="Delta" href="/docs/charts/delta" description="Signed change between two values." />
-  <Card title="Bullet" href="/docs/charts/bullet" description="A measure against a target." />
-  <Card
-    title="ActivityGrid"
-    href="/docs/charts/activity-grid"
-    description="Calendar or matrix intensity."
+    title="Open the gallery"
+    href="/gallery"
+    description="The whole catalog, visual — every shipped chart at word-size in a searchable card grid (or a dense specimen sheet). The fastest way to find the right one."
   />
 </Cards>
+
+The sidebar lists every chart individually. Not sure which you need? Start from the
+[gallery](/gallery) — search by name, data shape, or the question you're answering,
+and filter by collection (core, decision, expressive, frontier).
 
 ## Two entries per chart
 
@@ -34,5 +30,5 @@ import { Sparkline } from "@microcharts/react/sparkline"; // static, RSC-safe
 import { Sparkline } from "@microcharts/react/sparkline/interactive"; // hover + keyboard
 ```
 
-Not seeing the chart you need? The catalog grows toward 100 planned types — browse the
-[gallery](/gallery) for what's shipped and what's next.
+The catalog grows toward 100 planned types — the [gallery](/gallery) shows what's
+shipped and what's still on the way.

@@ -1171,3 +1171,472 @@ Per-chart dark-mode pass (measured every decision-chart mark's composited lumina
 - **ChangePoint** — regime shading was two faint alphas (.05/.11); the .05 washed out on dark. Reworked to shade only the ODD regimes at a single visible .10 so adjacent regimes always contrast (bare vs tinted) in both themes.
 
 **Audit-tool caveat:** the composited-luminance audit is BLIND to `oklab()`/`color-mix` colors (it can't parse them to RGB), so it false-positived ControlStrip's `--mc-band` (an `oklab(0.925 …/0.12)` near-white fill that is genuinely visible on dark — confirmed by screenshot). A speculative `--mc-band` 8%→12% bump was made then REVERTED once the false positive was understood; ControlStrip's band was always fine. Ground truth for dark visibility = real-browser screenshots, not the numeric audit. All gates green: node 1417, browser 108, craft 361/0, size pass, docs 210.
+
+## Batch 3 (expressive, 22 types) — started 2026-07-09 (branch `batch-3-expressive`)
+
+Branched off `batch-2-decision-w3` (the complete local Batch-2 tip; PR #5 merged into
+`batch-2-decision`, PR #4 → main still open). Batch-2 gate items above remain open for the
+user; the user authorized moving to Batch 3.
+
+### TallyMarks (1) — `tally-marks` — deviations from plan/24 §1
+
+1. **Variant prop `style` → `pen`.** plan/24 named the ruled/drawn variant `style="ruled"|"drawn"`,
+   but all 54 existing charts expose `style?: CSSProperties` (the React style passthrough to the
+   root `<Chart>`). Two `style` props can't coexist, so the variant ships as `pen?: "ruled"|"drawn"`
+   — evocative (ruled = ruler-drawn, drawn = hand-drawn) and non-colliding. **Several later Batch-3
+   charts also use `style` as a variant name in the spec (TreeRings `style="fill"`, SpiralYear, …);
+   each will get a per-chart non-colliding name and be logged here.** No shared `variant` rename was
+   forced (each chart's variant is a distinct semantic).
+2. **Dropped `format`/`locale` props + `makeFormatter`.** plan/24 §1 lists no `format` prop; I had
+   added one gratuitously. The count is always a non-negative integer, so the summary formats it with
+   `String(count)` — SSR-deterministic (a locale formatter risks a server/client hydration mismatch
+   on the accessible name) and it drops the whole `core/format` dependency from the static entry.
+3. **Inlined mulberry32 (not `core/jitter`) for the `drawn` pen.** The seed is just the integer
+   count, so a 6-line local `seededFrom(count+1)` replaces `import { seeded }` — this kept the static
+   entry at 1.47 kB, under the Delta-class 1.5 kB HARD cap (importing `core/jitter` pushed it to
+   1.56 kB). Same "inline lightly-used kernel helpers" pattern as ChangePoint. Determinism preserved
+   and property-tested.
+
+Budgets: static 1.47 / interactive 1.95 kB (caps 1.5 / 2.5). Node 1432, browser 3 (tally),
+craft 373/0, bench 146 rows/ms, docs build + tests 122, tsc/oxlint/oxfmt/knip clean. Real-browser
+sweep verified LIGHT (`--mc-stroke` #171717) and DARK (#ededed on a dark surface): tally clusters +
+`+N` numeral crisp, 0 escapes, both themes. Node budget 2 (merged stroke path + numeral) held.
+
+### DicePips (2) — `dice-pips` — plan/24 §2
+
+No API deviations. Pip layout = canonical dice only (module constant `PIP_LAYOUT`);
+`value > 6` renders the exact numeral in the face (the spec'd honesty fallback — no invented
+7/8/9 pattern), `0` is an empty face (zero ≠ missing), negatives/NaN are invalid (→ noData).
+Face outline uses `data-mc-ink="muted"` (neutral hairline, theme-tuned + forced-colors-mapped);
+pips + numeral use `data-mc-ink="point"` (`--mc-stroke`). Budgets 1.29/1.7 kB (caps 1.5/2.5).
+Real-browser sweep confirmed both themes (pips #171717 light / #ededed dark; face #8a8a8a / #9a9a9a).
+Node 1447, browser 2 (dice), craft 385/0, bench 74 rows/ms, docs 216pp + tests 124.
+
+### FillWord (3) — `fill-word` — plan/24 §3 + risk #4 RESOLVED
+
+**Risk #4 (clip-path on SVG `<text>`) resolved:** the one-time spike passed. A CSS
+`clip-path: inset(...)` set inline on an accent `<text>` copy (avoiding a `<clipPath>` element
+and thus any generated id) reliably clips the glyphs to the value fraction in the real browser —
+fill mode grows the accent from the left (`inset(0 {100(1−v)}% 0 0)`), drain empties from the left
+(`inset(0 0 0 {100v}%)`). `textLength` + `lengthAdjust="spacingAndGlyphs"` pin the glyph extent so
+the 0.62 em/char estimate is exact server-side and containment is provable without measurement.
+No fallback re-spec was needed. (Cross-engine confirmation rides the Argos visual matrix.)
+
+Base word = `data-mc-ink="label"` (neutral, theme-tuned + forced-colors-mapped); accent copy =
+`data-mc-ink="accent"` (`--mc-accent`). One motion-layer CSS rule transitions the accent clip-path;
+the accent copy lives inside `.mc-root`, so the existing `@media(prefers-reduced-motion)` `.mc-root *`
+block already disables it — no per-wrapper reduced-motion rule needed. Dropped `format`/`makeFormatter`
+(percent is `Math.round(v*100)`, SSR-deterministic). Variant `label` kept as spec (no `style`
+collision here). Craft gate: added an ALLOWED exception for the intentional same-word base+accent
+overlap (the audit's TEXT-TEXT check can't know the stack is the encoding). Budgets 1.38/1.75 kB
+(caps 1.5/2.5). Real-browser sweep verified LIGHT + DARK two-tone (accent #0072b2 / base #8a8a8a),
+0 escapes. Node 1461, browser 2, craft 397/0, bench 103 rows/ms, docs 219pp + tests 126.
+
+### FatDigits (4) — `fat-digits` — plan/24 §4 + FatFonts deviation (risk #1)
+
+**FatFonts adaptation (recorded deviation, was plan/24 risk #1):** the FatFonts research encodes
+magnitude as glyph ink AREA via a custom font. Shipping a font would break zero-dep (non-negotiable
+#1), so FatDigits maps magnitude to discrete `font-weight` tiers (5: 300/450/600/750/900; 3:
+400/550/750) on the INHERITED font instead. Weight is ordinal (never claimed continuous); the
+numeral is always the exact value. On a non-variable host font the browser snaps to the nearest
+available weight (~2 effective tiers) — documented graceful degradation, numeral unaffected. True
+ink-area digits remain future `@microcharts/outline` territory. Real-browser sweep confirmed the
+weight tiers render visibly distinct (system-ui supports 300–900) in both themes.
+
+`encode="value"` weights the whole numeral (one `<tspan>`); `encode="digit"` weights each digit by
+its own magnitude (⌈(d+1)/(10/tiers)⌉). No `domain` → the middle tier (docs steer to always pass
+one). Uses `makeFormatter` (needed for grouped numerals + the tier summary) → static 1.6 kB, above
+the spec's 1.5 kB Delta-class target but under the 3 kB hard cap — logged for the batch gate (same
+class as the Batch-2 budget divergences). Variant names kept as spec (`encode`/`tiers`, no `style`
+collision). One motion-layer CSS rule transitions weight; tspans inside `.mc-root` → reduced-motion
+block gates it. Node 1477, browser 2, craft 409/0, bench 127 rows/ms, docs 222pp + tests 128.
+
+### Thermometer (5) — `thermometer` — plan/24 §5
+
+No API deviations. Calibrated linear tube: `scaleLinear(domain, [bulbEnd, top])`; fill anchors at
+domain[0], never re-zeroed/log. The fill rect width equals the tube inner width, so no clipPath/id
+is needed (geometry keeps the rect inside the tube). Bulb = instrument chrome (always full, accent
+fill + neutral hairline), never data. Target = a line ACROSS the tube via `data-mc-ink="flag"`
+(accent stroke; distinct shape from the neutral side ticks — never color-alone). Vertical (default)
+and horizontal share one "along/across" axis abstraction. Over-domain values clamp the fill + set
+an `overflow` flag; the accessible name always reports the true value (never silently clipped).
+`overflow` visual notch deferred — clamped fill + honest summary suffice at word size (noted).
+Uses `makeFormatter` + `scaleLinear` → static 2.22 kB, above the spec's 2 kB §6 target but under the
+3 kB hard cap (gate note, same class as Batch-2 divergences). Interactive: hover/focus readout +
+reduced-motion-gated fill transition (SVG geometry props y/height/width). Real-browser sweep both
+themes (fill/bulb/target accent, tube neutral 0.55), 0 escapes. Node 1492, browser 2, craft 421/0,
+bench 68 rows/ms, docs 225pp + tests 130.
+
+### MoonPhase (6, flagship) — `moon-phase` — plan/24 §6
+
+No API deviations. **Area-true illumination is the load-bearing honesty rule:** the lit area equals
+the value exactly, from the closed form — the terminator is a semi-ellipse with `rx = r·|2f−1|`, so
+lit = right semicircle ± semi-ellipse = `f·πr²` (verified by construction + property tests). NOT the
+phase-angle approximation, which under-lights mid-cycle. Waxing lights from the right; `mode="cycle"`
+maps 0 new → 0.5 full → 1 new (waxing then waning, lit mirrors to the left) — a data-semantic switch,
+never a preset (pretending the lunar cycle is monotonic would lie). Extremes snap (`f≤0.005` → empty
+dark path; `f≥0.995` → closed full disc) to avoid hairline slivers. Ink adapts to theme (lit =
+`--mc-stroke`: bright moon on dark, dark filled-fraction disc on light — consistent with every chart's
+ink polarity; the fraction reads unambiguously either way). Interactive cross-fades the lit region by
+OPACITY swap (never a `d:` path interpolation — no Safari). No `makeFormatter` (percent computed
+inline) → static 1.25 kB. Node 1505, browser 2, craft 433/0, bench 112 rows/ms, docs 228pp + tests 132.
+
+### Hourglass (7) — `hourglass` — plan/24 §7
+
+No API deviations. **Area-true sand is the load-bearing honesty rule:** in a triangular bulb a naive
+linear-height fill would overstate early progress by up to 2×, so closed forms give exact
+proportional area — top (remaining `r`) fills from the neck apex up to `H·√r`; bottom (elapsed `e`)
+fills from the base up to `H·(1−√(1−e))`. Verified by a shoelace-area property test (elapsed area
+fraction ≈ value across the range). `value` = elapsed (Progress polarity, so the two compose). The
+neck stream is a binary running-state mark (only `0<value<1`; finished/not-started are shape-distinct)
+— never animated in the static entry. Top sand = `data-mc-ink="neutral"` (remaining), bottom =
+`--mc-stroke`/color (elapsed). **The `%`-label gutter escaped by ~2 units** — the SSR craft passed
+(its text-extent estimate uses 0.62 em/char attribute-based) but the real-browser getBBox sweep
+caught it; fixed to 0.72 em/char per the wide-`%`-glyph handoff rule (a repeat of the DataDiff/
+RateVolume lesson — only the browser sweep catches this). No `makeFormatter` (percents inline).
+Node 1518, browser 2, craft 445/0, bench 98 rows/ms, docs 231pp + tests 134.
+
+### BalanceBeam (9→8th shipped) — `balance-beam` — plan/24 §8
+
+No API deviations. Tilt SATURATES at `maxTilt` (documented honesty: past a point a steeper beam
+implies precision the eye can't extract — read direction + rough magnitude, not exact ratio; docs
+steer precise ratios to PairedBars/Delta). Weights area-true (half = k·√value). Beam endpoints
+pre-rotated in geometry (cos/sin about the pivot) — no SVG transform in the static entry, so
+containment is provable from coords. **Heavier label ships VERBATIM** (not lowercased — the spec
+example "…; inflow heavier." lowercased casually, but verbatim is correct for proper nouns). Two
+layout fixes from the containment property test + craft: (1) the 20px-tall canvas is short for
+fulcrum-below + weights-above, so pivot moved to 0.6·h and `maxHalf` bounded by all three of
+(vertical room above the beam, horizontal room at the beam end, beam-half fraction); (2) value labels
+ride the tilted beam ends near the edges — x clamped to keep the centered numeral inside, and y set
+to `height − fontSize·0.42` (the `ideographic` baseline dropped the glyph below the bottom edge — the
+SSR craft caught this vertical escape). `mode="difference"` scales imbalance by a shared domain so
+same-scale rows tilt comparably. Node 1532, browser 2, craft 457/0, bench 74 rows/ms, docs 234pp/136.
+
+### SproutRow (9th shipped) — `sprout-row` — plan/24 §9
+
+Minor deviation: the spec suggested STAGE_PATHS as unit-scale constant strings + a `placedPath`
+translator; shipped as a pure `stageGlyph(stage, cx, by, gh)` builder instead (equivalent, cleaner,
+and it scales the glyph to the usable height — fixed-size constants overflowed short canvases when
+labels reserved a bottom band). Glyph height is STRICTLY monotonic in stage (STEM_FRAC + leaf/head
+positions as fractions of `gh`) — property-tested so the ordering reads untrained. Each item is ONE
+filled path (thin filled stem + Q-curve leaves + head circle) with `data-mc-ink="point"` (earns the
+forced-colors remap; `color` prop inlines). `null` = missing (soil tick only, distinct from a seed —
+"no data yet" ≠ "just planted"). Category labels width-drop-out (skip when `label.length·0.62·fs >
+step−1`) — the craft caught neighbour collision at narrow step. Stage names live in
+`sproutStageNames` (the i18n contract for the metaphor). Browser keyboard test: raw
+`dispatchEvent(KeyboardEvent)` did NOT reach React's synthetic handler — used `userEvent.keyboard`
+after `.focus()` (the established pattern). Node 1542, browser 2, craft 469/0, bench 35 rows/ms,
+docs 237pp/138.
+
+### GardenGrid (10th shipped) — `garden-grid` — plan/24 §10
+
+No API deviations. ActivityGrid's grayscale sibling — dot AREA (single `--mc-stroke` ink) carries a
+5-step ordinal instead of color, so the rhythm survives print/monochrome. Radius is √-quantized
+(`r = rMax·√(k/S)`) so perceived AREA (r²) steps evenly — property-tested that area deltas are equal
+across steps; a linear radius map would exaggerate highs quadratically. Zero = a hairline ring
+(`data-mc-ink="muted"`, fill none — present but quiet); `null` = no mark (missing ≠ zero); both
+distinct, the print superpower this chart exists for. Reuses ActivityGrid's column-major grid layout
++ 2-D roving keyboard model. Announces the ordinal STEP ("step 2 of 5"), never a false-precise value
+(docs steer exact reads to ActivityGrid+hover/HeatStrip). `GardenCell` interface un-exported (knip
+flagged it — internal-only). Uses `makeFormatter` for the peak/announce. Node 1554, browser 2, craft
+473/0, bench 11.6 rows/ms (N-node class), docs 240pp/140.
+
+### BubbleRow (11th shipped, honesty exemplar) — `bubble-row` — plan/24 §11
+
+No API deviations. THE catalog's LOW-precision honesty exemplar: `r ∝ √value` with no exceptions
+(area-true, property-tested — a linear-radius map is a ~squared lie) and NO sorting prop (order =
+data order). The LOW rating + standing "for precise comparison, use MiniBar" steer ship in the
+`encoding.precision` field (→ catalog.json), the docs header, and code comments. Value numerals ON by
+default (a low channel owes the reader the number); `label="both"` = "label value" combined; zero →
+a 0.5-unit presence ring. Label containment took three fixes surfaced by the craft gate: (1) numeral
+descender dropped past the bottom → y = `height − pad − fontSize·0.32`; (2) wide `both` labels on the
+first/last bubble escaped the sides → x clamped inside; (3) clamping then caused collisions → a greedy
+left-to-right drop-out on the CLAMPED positions (skip any numeral overlapping the last placed). Bench
+floor recalibrated 30 → 15 (per-bubble `makeFormatter` + greedy layout make it an ~26 rows/ms N-node
+chart, not a trivial one). Node 1566, browser 2, craft 485/0, bench 26 rows/ms, docs 243pp/142.
+
+### MusicStaff (12th shipped) — `music-staff` — plan/24 §12
+
+No API deviations. Pitch (position on a 5-line staff, quantized to 9 on-staff or 13 ledger
+positions) is the ONLY channel — no clefs/stems/beams/bar lines (every other notation convention is
+decor, per the spec constraint). Coincident equal values are spread by the time axis, never dodged
+vertically (that would change pitch = the data). **Reuses `describeSeries` verbatim** for the
+accessible name (same S1 pipeline as Sparkline; no new template) — hence static 2.32 kB (the
+seriesStats machinery), above the spec's 2 kB §6 target but under the 3 kB hard cap (gate note; same
+class as the Batch-2 budget divergences). Note heads are sized from the nominal position spacing and
+the whole staff band is inset by ry, and the x range inset by rx, so the top/bottom/edge note
+ellipses never overflow the box — the real-browser getBBox sweep caught the overflow (SSR craft's
+attribute-based text check doesn't measure ellipse extents). Sparkline interactive model (nearest-
+note ←/→, EN.point announce, ring on focus). Node 1579, browser 2, craft 497/0, bench 25 rows/ms,
+docs 246pp/144.
+
+### TreeRings (13th shipped, flagship) — `tree-rings` — plan/24 §13
+
+**Naming deviation (plan/12):** the spec's render variant `style="stroke"|"fill"` collides with the
+universal `style?: CSSProperties`; ships as `rings="stroke"|"fill"` (2nd chart after TallyMarks' `pen`
+to rename a spec `style` variant). Channel = radial ring THICKNESS ∝ per-period value (property-
+tested: a 2× period is 2× thicker), oldest at centre. Docs state the channel is thickness NOT area
+(equal thickness at a larger radius spans more area — the ring illusion). No minimum visual thickness
+(a zero-value period collapses its two boundaries — coincident, honest). `accent` = 1.5× weight +
+accent color (never color-alone); `total` scales the disc to Σdata/total of the radius (cohort-age
+story). Full-annulus path INLINED (two circles + `fill-rule: evenodd`, not `core/arc`) → static
+1.78 kB (arc.ts import pushed it to 2.11). The annulus string is built ONLY in the fill branch (in
+the component), not in geometry for every ring — the stroke variant (and the bench) was paying ~2×
+for unused d strings (bench 8.7→10.2 rows/ms). Two craft/sweep fixes: the `label="last"` numeral
+moved from the disc top (TEXT-ON-MARK over the concentric rings) to a right gutter; `rOuter` clamped
+to `maxR` (24 rings × round2 drift overshot the containment tolerance). Radial pointer lookup
+(distance from centre → ring). Node 1591, browser 2, craft 501/0, bench 10 rows/ms, docs 249pp/146.
+
+### CitySkyline (14th shipped, flagship) — `city-skyline` — plan/24 §14
+
+No API deviations. Two variables ARE the story (plan/05 §1 escape clause): building HEIGHT
+(zero-anchored bars, high precision, primary) + lit-window FRACTION (secondary, low precision —
+"mostly lit / half lit / dark", not a number; quantized to the window count, 2 fixed columns, filled
+bottom-up). Omit `lit` everywhere → a plain honest bar row. NO roofline/antenna/width variation
+(width, roof, ground are constants — earn every mark). The secondary channel drops out before the
+primary: a tower too short for a window row is solid, and its `lit` still shows in the summary/hover.
+Geometry refactored mid-build from a height/pad + g-transform model to absolute `groundY`/`maxH`
+inputs, so the client's overlay coords match the static exactly (the translate had broken the focus
+ring alignment when label bands were present). Build error fixed: the `label` prop collided with a
+`const label` aria var in the client (→ `ariaLabel`). Category labels width-drop-out (long names like
+"Platform" drop at narrow `bw` — plan/18 §4; craft caught the collision). `SkylineBuilding` interface
+un-exported (knip). Node 1604, browser 2, craft 513/0, bench 32 rows/ms, docs 252pp/148.
+
+### Honeycomb (15th shipped) — `honeycomb` — plan/24 §15
+
+Channel = filled-cell COUNT (unit counting, S4), high precision only while units stay countable —
+`total > 60` devWarns and steers to Progress (a filled area is not a count past subitizing/tallying
+range). Area-filling pointy-top hex grid, odd rows offset half a column, near-square by default
+(`rows="auto"` → `round(√total)`); `rows={1}` gives a table-cell strip. Two design choices worth
+recording: (1) the whole grid is TWO merged `<path>` nodes — one for filled hexes, one for empty —
+so the SVG node count is O(1) regardless of `total` (a 60-cell honeycomb is still 2 nodes, inside the
+≤6-node typical budget). (2) Fill order is row-major from the top-left so occupancy reads as a sweep,
+not a scatter. Honesty: `value > total` renders all cells filled BUT the summary keeps the true value
+("45 of 40 filled."); `total = 0` → "No data." (not an empty grid). `empty="dim"` paints the empty
+cells with `data-mc-ink="fill"` (fill-opacity 0.12 in the CSS layer — verified 0.12 in the real-browser
+sweep, so "dim" is genuinely faint, not a near-foreground block) for dark/AMOLED surfaces where hairline
+outlines vanish; `empty="outline"` (default) strokes them in the muted token at 0.5 stroke-opacity.
+No per-cell keyboard navigation — hex cells are anonymous interchangeable units, not addressable data
+points (unlike ActivityGrid/GardenGrid days), so the interactive entry is live-announce-on-change +
+a hover "value / total" readout chip only; documented in the client header. `exactOptionalPropertyTypes`
+fix: the `honeycombSummary` opts object needed `| undefined` on each optional field (same pattern as
+FatDigits/Thermometer). New `strings-honeycomb` module (1 key, `honeycomb(value,total,unit)`). Node
+1617, browser 2, craft 517/0, bench 43.8 rows/ms, size 1.64/2.08 (caps 1.8/2.5), docs 255pp/150.
+
+### Constellation (16th shipped) — `constellation` — plan/24 §16
+
+Channel = position (x = time, y = value) with area-true dot size for magnitude (medium precision;
+the positional read is exact, the magnitude area is low and documented). Built for RARE events (≤ 12);
+dense streams steer to Seismogram/EventTimeline. Three points worth recording:
+
+1. **Connector ink role.** The spec called the chronology line "`--mc-band`-class ink," but `band` is a
+   FILL token (`fill: var(--mc-band); stroke: none`) — it cannot stroke a line (memory
+   `chart-legibility-and-review-practices`: band is fill, never a stroke). Used `data-mc-ink="ghost"`
+   instead: the element-split ghost rule strokes a `<path>` with `--mc-neutral` at 0.5 opacity — exactly
+   the intended faint hairline. Verified in the real-browser sweep (#8a8a8a light / #9a9a9a dark @0.5).
+
+2. **`label="max"` placement.** First draft placed the numeral ABOVE the largest event, which for a
+   top-of-chart event clamped onto its own circle — the craft geometry audit flagged TEXT-ON-MARK. Fixed
+   to place it BESIDE the event (right, flipped to the left near the right edge, vertically centered),
+   so the numeral never overlaps its mark. Craft-clean after the fix; only the attribute-based SSR craft
+   was needed here (the overlap was horizontal, so it caught it without the browser getBBox pass).
+
+3. **Value-less jitter honesty.** When no point supplies `y`, vertical position comes from `core/jitter`
+   seeded by the data (deterministic, SSR/hydration-stable, never `Math.random`) and ENCODES NOTHING.
+   In that mode the connector's slope is meaningless (it still runs in time order) and the summary never
+   references vertical position. Time is sacred: x is never jittered, so simultaneous (equal-x) events
+   share a cx (property-tested). Largest-event selection: max magnitude, else max value, else last in
+   time. `R_MIN = 0.5` radius floor so a logged near-zero-magnitude event never fully vanishes
+   (a small, documented departure from strict area-true, matching BubbleRow's zero=presence-ring spirit).
+
+New `strings-constellation` module (constellation / constellationOne / constellationAt). `xFormat`
+(x → label) added to the grammar for month-name summaries. `ConstellationStar` un-exported (knip).
+Budget: 2.7/3.66 kB > the §16 targets (2/3) but < the 3/4 hard caps — scaleLinear + jitter + makeFormatter;
+gate sign-off with the other batch-3 spec-vs-measured divergences. Node 1634, browser 2, craft 525/0,
+bench 30.3 rows/ms, size 2.7/3.66 (caps 2.8/3.75), docs 258pp/152.
+
+### PolarClock (17th shipped, flagship) — `polar-clock` — plan/24 §17
+
+Channel = radial bar LENGTH at a fixed cycle angle (medium precision — radial-length comparison;
+exact reads steer to SparkBar over the unrolled cycle). Built directly on `core/arc.annulusSector`
+(the 12 o'clock / clockwise radian convention already lives there, so no angle math is re-derived at
+the chart). Points recorded:
+
+1. **`label="max"` placement.** The spec put the peak numeral "at the peak segment," but at the tiny
+   default 24×24 (or even 64×64) a numeral at a rim sector overflows the canvas and lands on other bars.
+   Placed it instead in a RESERVED bottom gutter (viewBox height += fontSize+2, the clock stays in the
+   top square) — always contained, never on a mark. Documented deviation; the interactive readout and
+   summary carry per-segment exact values.
+
+2. **`mode="opacity"` render.** Length mode is one merged `<path>` (all annulus sectors, single fill) +
+   an accent path for `now` — node budget 3. Opacity mode can't share one fill (per-segment opacity), so
+   sectors are grouped by their quantized 5-level step into ≤5 paths (`data-mc-ink="cell"` + inline
+   `fill-opacity`), a bounded node count. This is a data-semantic channel switch (hence `mode`, not a
+   cosmetic flag) — the radial ActivityGrid for sizes where length can't be judged.
+
+3. **Honesty — length, not area.** Equal-value bars at the rim sweep more area than ones near the hub, so
+   an area reading exaggerates the outer cycle; `r0 > 0` (default inner 0.35) curbs that and bars are
+   always zero-anchored at r0. Docs state "compare lengths, not wedges." `null` segment → gap (the guide
+   ring shows the hole, missing ≠ zero); all-equal → `polarClockFlat`; zero → collapses to the baseline
+   (no bar) but is still a real reading distinct from null.
+
+Pointer lookup: `atan2(dx, -dy)` (12 o'clock, clockwise) → cycle position → data index via the `start`
+rotation; the interactive maps over the FULL viewBox height (which may include the label gutter) so the
+angle stays true. New `strings-polar-clock` (polarClock / polarClockFlat / polarClockAt + a `weekdays`
+i18n array for n=7 labels). `OPACITY_STEPS` + `PolarSegment` un-exported (knip). Budget 2.89/3.78 kB >
+the §17 targets (2.5/3.5) but < the 3/4 hard caps (the arc builders) — gate sign-off with the other
+batch-3 divergences. Node 1653, browser 2, craft 531/0, bench 29.5 rows/ms, size 2.89/3.78, docs 261pp/154.
+
+### SpiralYear (18th shipped) — `spiral-year` — plan/24 §18
+
+Channel = 5-step (or 3-step) opacity of marks along an Archimedean spiral — LOW precision (opacity is
+the weakest ordered channel), so this is explicitly a PATTERN instrument and the page/summary steer any
+point read to ActivityGrid/HeatStrip. Notes:
+
+1. **Node budget via merged subpaths.** A year is 52–366 marks, but the per-cell node budget must hold.
+   Marks are grouped by their quantized opacity step into ≤ `steps` `<path>` nodes — each path a
+   concatenation of two-arc circle subpaths (`M…a…a…`, no `<circle>`) in dot mode, or short `arcPath`
+   segments in `mark="arc"` mode. So a 366-day spiral is ≤ 5 mark paths + 1 month-tick group, O(steps).
+
+2. **Radius = time, never value (honesty).** `r(θ) = r0 + k·(absolutePosition/periodsPerTurn)` — an
+   outer mark is a later date, full stop. The opacity carries the value. Documented so nobody reads the
+   radius as magnitude; the docs also warn that two adjacent turns put different years at the same angle
+   (calendar alignment, not similarity). `null` → a gap in the spiral (no mark), distinct from a faint
+   step-0 mark (missing ≠ low).
+
+3. **`mark="arc"` render split.** Dot marks are filled (fill + fill-opacity); arc marks are stroked
+   (fill:none + stroke + stroke-opacity) — the static entry branches on `mark` to set the right property,
+   because a fill-opacity on an open arc would do nothing. Rendering style only; the data meaning and the
+   opacity step are identical.
+
+Cadence inferred from length (≤ 60 → week, else day) unless given; `startDate` → `core/calendar-grid`
+`dayOfYear` → a start angle offset (never `Date.now()` — SSR-deterministic). Month ticks use a fixed
+non-leap reference year (2001) for `monthStartDays`, so they're deterministic and don't depend on the
+data's actual year. New `strings-spiral-year` (spiralYear / spiralYearAt; period words weeks/days chosen
+in the EN impl for i18n). Budget 2.73/3.61 kB > the §18 targets (2.5/3.5) but < the 3/4 hard caps (the
+arc + calendar-grid imports) — gate sign-off with the other batch-3 divergences. Node 1670, browser 2,
+craft 536/0, bench 14.5 rows/ms, size 2.73/3.61, docs 264pp/156.
+
+### BreathingDot (19th shipped, motion) — `breathing-dot` — plan/24 §19
+
+First of the four MOTION charts (the reduced-motion gate). Channel = pulse rate + amplitude by level
+(interactive) / ring offset by level (static) — LOW precision ambient status; docs steer exact reads to
+Progress/Sparkline. Design points:
+
+1. **Static frame is a real chart (mandatory).** The core dot's band color (positive/neutral/negative
+   by threshold) + the level ring's distance from the core carry the full read with zero JS. The pulse
+   is an *enhancement*, not the only encoding — so a reduced-motion or off-viewport reader loses nothing.
+
+2. **Shared motion infra.** Introduced `src/shared/motion.ts` — `usePrefersReducedMotion` (live
+   matchMedia) + `useInViewport` backed by ONE module-level IntersectionObserver shared across every
+   motion chart on the page (plan/03). The pulse runs only when `!reduced && inView && !unknown`; it's a
+   WAAPI `element.animate()` on the *static* core (found by `.mc-breathing-core` querySelector + given
+   `transform-box: fill-box; transform-origin: center` so scale is about the dot's own center), cancelled
+   on cleanup. No setState-per-frame.
+
+3. **Snapped, nameable motion.** Rate and amplitude are per-band constants (3.6/1.8/0.9 s, 5/11/18 %),
+   not a continuous lerp, so the three states (calm/elevated/strained) are re-readable, and the animation
+   restarts only on band change. Loop allowed because the loop parameter (rate) IS the datum (plan/06 §5).
+
+4. **Honesty — unknown must not look calm.** `null`/`NaN` → gray core, no ring, and the pulse never
+   starts. Band color is always doubled (ring offset statically, pulse rate in motion) — never
+   color-alone. The live region announces band changes only (quiet on mount), never per tick.
+
+Verified in the real browser: `core.getAnimations().length > 0` while loaded, `=== 0` while unknown
+(browser tests). New `strings-breathing-dot` (breathingDot / breathingDotUnknown + loadBands i18n array).
+Budget 1.57/2.42 kB (static just over the 1.5 Delta-class target, well under the 3/4 hard caps). Node
+1683, browser 5, craft 540/0, bench 124 rows/ms, size 1.57/2.42, docs 267pp/158.
+
+### HeartbeatBlip (20th shipped, motion, flagship) — `heartbeat-blip` — plan/24 §20
+
+Channel = a spike per event across the recent window (presence/density); exact counts steer to
+Seismogram/EventTimeline. Points:
+
+1. **SSR clock is a prop, not a call.** The static entry must never call `Date.now()` — a server render
+   and the client hydration would compute different "now"s and mismatch. `now` defaults to the latest
+   event and is documented as pass-from-your-data-layer. The client entry advances its own clock.
+
+2. **The one unforgivable lie, guarded.** Every spike is one real event; there is no timer that
+   synthesizes heartbeat pulses. An empty window renders an empty spike path + a "no events" text — the
+   flat baseline IS the down signal (shape, never color), and the summary distinguishes down
+   (`heartbeatFlat`) from no-data. Events after `now` are clamped to `now` (documented clock-skew), older-
+   than-window events drop.
+
+3. **Motion model (deviation, sign-off).** The spec calls for a WAAPI `translateX` sweep of a translating
+   group. Translating SVG content out of the viewBox risks a containment spill (`.mc-root` is
+   `overflow: visible`), so — as with EnsembleGhosts — the interactive advances a coarse live clock
+   (250 ms tick) and re-renders the static with the new `now`; old spikes drift left, new events enter at
+   the right, honestly. Reduced-motion → no tick (static re-renders on data change, identical info);
+   off-viewport → no tick (shared observer). A new event blips the endpoint once via WAAPI scale
+   (verified `getAnimations().length > 0` in the browser test). No per-spike keyboard nav — spikes are
+   transient, the summary is the record (documented).
+
+Duration wording (`minute` / `hour` / `N seconds` / `Ns` / `Nm`) lives in `strings-heartbeat`
+(`heartbeatWindow` / `heartbeatAgo`) so it stays translatable (canon: no English outside EN). NO budget
+divergence — 1.82/2.65 kB, within the §20 targets (2/3). Node 1698, browser 2, craft 544/0, bench 67.4
+rows/ms, size 1.82/2.65, docs 270pp/160.
+
+### CometTrail (21st shipped, motion) — `comet-trail` — plan/24 §21
+
+Channel = head-dot position (current value) + opacity-fading positional trail (recent history) — medium
+precision for the head, qualitative for the trail; full history steers to Sparkline. Points:
+
+1. **No idle loop.** Unlike BreathingDot/OrbitStatus, this type animates ONLY on a data change — the head
+   eases from its previous pixel position to the new one (WAAPI `transform: translate`, in SVG user units
+   via `px`, ~220 ms ease-out); the previous head steps into the trail on the next render. A stalled
+   stream simply stops moving, and that stillness is the honest staleness signal. No exception to the
+   no-loop rule is needed or taken.
+
+2. **Opacity = age, never value (honesty, property-tested).** The trail dots step down over 5 age levels
+   (0.7 newest → 0.1 oldest); a low recent value is still bright. The y position carries value. `trail`
+   length is context only — the geometry test asserts `last` (the head read) is identical for trail=2 vs
+   trail=12. Capped at 20 (past that it's a sparkline, and the docs say so). The dot never interpolates
+   phantom intermediate positions — it jumps to truth, eased.
+
+3. **Reduced motion + off-viewport.** Reduced-motion → instant reposition (the static decaying
+   dot-sparkline is already the complete encoding); off-viewport → the ease is skipped (shared observer).
+   Verified `head.getAnimations().length > 0` after a data change in the browser test. ←/→ walk the trail
+   (`cometTrailAt` = "k updates ago: v"), returning to the summary at the head.
+
+New `strings-comet-trail` (cometTrail / cometTrailNow / cometTrailAt + `cometTrends` [falling, steady,
+rising] indexed by sign+1). Budget: static 1.97 (within §21's 2 kB), interactive 3.07 > the 3 kB target
+but < the 4 kB hard cap — gate sign-off. Node 1716, browser 3, craft 548/0, bench 23.8 rows/ms, size
+1.97/3.07, docs 273pp/162.
+
+### OrbitStatus (22nd shipped, motion) — `orbit-status` — plan/24 §22 — **BATCH 3 COMPLETE**
+
+Channel = orbit radius (latency) + orbit dash density / satellite speed (rate) — LOW precision, two
+ambient ordinal channels (docs steer exact reads to Sparkline for latency + Delta/MiniBar for rate).
+Points:
+
+1. **Static frame carries BOTH variables (the survivor test).** A paused satellite says nothing, so the
+   rate had to be encoded statically too: `stroke-dasharray` density on the orbit, quantized to 5 steps
+   via `core/arc.evenDashes` (dash count from the true circumference, so density is exact at any radius).
+   The interactive satellite's angular speed uses the SAME 5 steps, so motion and still frames decode
+   identically — you gain nothing from watching, you just feel the rate.
+
+2. **Rotation implementation.** WAAPI `rotate(0→360deg)` on the satellite with `transform-box: view-box`
+   + `transform-origin` at the service center (user units), so it revolves around the center, not its
+   own centroid. Period per rate step [4000,3000,2200,1500,900] ms (busier = faster). `rate=0` →
+   `rateStep=0` → a solid dash-free orbit and no rotation. The radius transition on latency change was
+   left instant (a documented minor deviation — the same class as EnsembleGhosts/HeartbeatBlip motion
+   simplifications; the radius read is already correct statically).
+
+3. **Honesty.** Both channels quantized to 5 ordinal steps; radius + speed always from the same domains
+   in both frames (no drift). The satellite's angular POSITION encodes nothing (it starts at the top) —
+   documented so nobody reads the angle. `alert` doubles the satellite size AND repaints it
+   `--mc-negative` AND flags the summary (never color-alone). Unknown latency/rate → gray center, no
+   satellite, no spin (an unknown dependency must not look healthy). Domains are insisted on (a lone
+   radius is meaningless — the FatDigits steer). Craft caught the `label="latency"` ms-numeral gutter
+   spilling right (the real "ms" glyph runs wider than the 0.62 estimate) — bumped the reservation to
+   0.7·em/char, verified 0 escapes in the real-browser sweep.
+
+New `strings-orbit-status` (orbitStatus / orbitAlert / orbitUnknown; ms + "calls/s" units in the EN
+template for i18n). NO budget divergence — 2.02/2.9 kB, within the §22 targets (2/3). Node 1730, browser
+4, craft 553/0, bench 84.5 rows/ms, size 2.02/2.9, docs 276pp/164.
+
+**Batch 3 (expressive) complete — 22/22.** Shared `src/shared/motion.ts` (reduced-motion + one shared
+IntersectionObserver) underpins all four motion charts; every motion chart's reduced-motion frame is its
+static frame (not a paused pose), and the browser suite asserts `getAnimations()` starts/stops per the
+gate. Accumulated budget spec-vs-measured divergences (all < the 3/4 hard caps) + motion deviations
+listed in STATUS.md await the batch-gate user sign-off.

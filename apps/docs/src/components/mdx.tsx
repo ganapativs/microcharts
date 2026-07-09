@@ -56,6 +56,28 @@ import { QuadrantDot } from "@microcharts/react/quadrant-dot";
 import { CyclePlot } from "@microcharts/react/cycle-plot";
 import { ChangePoint } from "@microcharts/react/change-point";
 import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
+import { TallyMarks } from "@microcharts/react/tally-marks";
+import { DicePips } from "@microcharts/react/dice-pips";
+import { FillWord } from "@microcharts/react/fill-word";
+import { FatDigits } from "@microcharts/react/fat-digits";
+import { Thermometer } from "@microcharts/react/thermometer";
+import { MoonPhase } from "@microcharts/react/moon-phase";
+import { Hourglass } from "@microcharts/react/hourglass";
+import { BalanceBeam } from "@microcharts/react/balance-beam";
+import { SproutRow } from "@microcharts/react/sprout-row";
+import { GardenGrid } from "@microcharts/react/garden-grid";
+import { BubbleRow } from "@microcharts/react/bubble-row";
+import { MusicStaff } from "@microcharts/react/music-staff";
+import { TreeRings } from "@microcharts/react/tree-rings";
+import { CitySkyline } from "@microcharts/react/city-skyline";
+import { Honeycomb } from "@microcharts/react/honeycomb";
+import { Constellation } from "@microcharts/react/constellation";
+import { PolarClock } from "@microcharts/react/polar-clock";
+import { SpiralYear } from "@microcharts/react/spiral-year";
+import { BreathingDot } from "@microcharts/react/breathing-dot";
+import { HeartbeatBlip } from "@microcharts/react/heartbeat-blip";
+import { CometTrail } from "@microcharts/react/comet-trail";
+import { OrbitStatus } from "@microcharts/react/orbit-status";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -131,6 +153,28 @@ export function getMDXComponents(components?: MDXComponents) {
     CyclePlot,
     ChangePoint,
     EnsembleGhosts,
+    TallyMarks,
+    DicePips,
+    FillWord,
+    FatDigits,
+    Thermometer,
+    MoonPhase,
+    Hourglass,
+    BalanceBeam,
+    SproutRow,
+    GardenGrid,
+    BubbleRow,
+    MusicStaff,
+    TreeRings,
+    CitySkyline,
+    Honeycomb,
+    Constellation,
+    PolarClock,
+    SpiralYear,
+    BreathingDot,
+    HeartbeatBlip,
+    CometTrail,
+    OrbitStatus,
     SparkGroup,
     // docs building blocks
     Instrument,

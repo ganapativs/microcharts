@@ -1,0 +1,77 @@
+---
+title: Hourglass
+description: An hourglass chart for React — sand area splits elapsed and remaining, area-true, for the two-sided time story Progress can't tell.
+---
+
+Hourglass answers "how much time is gone _and_ how much remains?" — the two-sided story a progress
+bar can't tell. Sand fills the top chamber (remaining) and the bottom (elapsed), and both areas are
+**area-true**: a naive linear-height fill in a triangular bulb would overstate early progress by up
+to 2×, so the geometry solves for true proportional area. A thin stream at the neck marks "running";
+it disappears at both ends, because finished and not-started are shape-distinct states.
+
+<LiveDemo
+  label="Hourglass"
+  sizeOf="hourglass"
+  code={`import { Hourglass } from "@microcharts/react/hourglass";
+
+<Hourglass value={0.75} title="Session" />`}
+>
+  <span className="inline-flex gap-4 items-center">
+    <Hourglass value={0.15} height={40} title="15% elapsed" />
+    <Hourglass value={0.5} height={40} title="half" />
+    <Hourglass value={0.85} height={40} title="85% elapsed" />
+  </span>
+</LiveDemo>
+
+## Install
+
+<Usage chart="hourglass" />
+
+## Try it
+
+<Playground chart="hourglass" />
+
+## Interactive
+
+<InteractiveDemo slug="hourglass" />
+
+## When to use it
+
+- **Good for** — a deadline or session-expiry read in a sentence, a TTL cell where remaining is the story, or a time-boxed tab or countdown.
+- **Avoid for** — exact percentages (Progress), trends (Sparkline), or non-time fractions.
+
+## Sizing
+
+<Sizing chart="hourglass" />
+
+## Variants
+
+<LiveDemo
+  label="labelled remaining + finished"
+  code={`<Hourglass value={0.7} label="remaining" />
+<Hourglass value={1} />`}
+>
+  <span className="inline-flex gap-6 items-center">
+    <Hourglass value={0.7} label="remaining" height={44} />
+    <Hourglass value={1} height={44} />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+`value` is the elapsed fraction — the same polarity as `Progress` — so the two compose in one product
+without re-learning which way is which. The area-true solve is the load-bearing honesty rule: in an
+inherently nonlinear container, the sand areas are exactly proportional to elapsed and remaining, so
+the read never lies (lie factor 1). The stream is a binary state mark, not decoration, and is never
+animated in the static entry — it simply renders while `0 < value < 1`.
+
+## Accessibility
+
+The accessible name carries both sides — **"75% elapsed, 25% remaining."** The interactive entry
+cross-fades the sand levels on change (an opacity swap, never a path interpolation) and announces
+only when the total crosses a documented threshold (50 / 90 / 100%), so a streaming value never
+spams.
+
+## Props
+
+<PropTable slug="hourglass" />

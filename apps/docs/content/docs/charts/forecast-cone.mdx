@@ -61,20 +61,40 @@ fails to widen is flagged, never quietly inflated.
   <span className="inline-flex flex-col gap-1.5">
     <ForecastCone
       data={[30, 32, 31, 34, 36, 35, 38]}
-      forecast={{ mid: [39, 40, 41, 42], p80: [[36, 42], [35, 45], [34, 50], [33, 55]] }}
+      forecast={{
+        mid: [39, 40, 41, 42],
+        p80: [
+          [36, 42],
+          [35, 45],
+          [34, 50],
+          [33, 55],
+        ],
+      }}
       title="Single band"
-      width={220} height={26}
+      width={220}
+      height={26}
     />
     <ForecastCone
       data={[30, 32, 31, 34, 36, 35, 38]}
       forecast={{
         mid: [39, 40, 41, 42],
-        p80: [[36, 42], [35, 45], [34, 50], [33, 55]],
-        p50: [[37, 41], [37, 43], [36, 46], [35, 49]],
+        p80: [
+          [36, 42],
+          [35, 45],
+          [34, 50],
+          [33, 55],
+        ],
+        p50: [
+          [37, 41],
+          [37, 43],
+          [36, 46],
+          [35, 49],
+        ],
       }}
       target={50}
       title="Vs a higher target"
-      width={220} height={26}
+      width={220}
+      height={26}
     />
   </span>
 </LiveDemo>

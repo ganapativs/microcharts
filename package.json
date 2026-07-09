@@ -460,6 +460,182 @@
       "types": "./dist/charts/ensemble-ghosts/client.d.ts",
       "import": "./dist/charts/ensemble-ghosts/client.js"
     },
+    "./tally-marks": {
+      "types": "./dist/charts/tally-marks/index.d.ts",
+      "import": "./dist/charts/tally-marks/index.js"
+    },
+    "./tally-marks/interactive": {
+      "types": "./dist/charts/tally-marks/client.d.ts",
+      "import": "./dist/charts/tally-marks/client.js"
+    },
+    "./dice-pips": {
+      "types": "./dist/charts/dice-pips/index.d.ts",
+      "import": "./dist/charts/dice-pips/index.js"
+    },
+    "./dice-pips/interactive": {
+      "types": "./dist/charts/dice-pips/client.d.ts",
+      "import": "./dist/charts/dice-pips/client.js"
+    },
+    "./fill-word": {
+      "types": "./dist/charts/fill-word/index.d.ts",
+      "import": "./dist/charts/fill-word/index.js"
+    },
+    "./fill-word/interactive": {
+      "types": "./dist/charts/fill-word/client.d.ts",
+      "import": "./dist/charts/fill-word/client.js"
+    },
+    "./fat-digits": {
+      "types": "./dist/charts/fat-digits/index.d.ts",
+      "import": "./dist/charts/fat-digits/index.js"
+    },
+    "./fat-digits/interactive": {
+      "types": "./dist/charts/fat-digits/client.d.ts",
+      "import": "./dist/charts/fat-digits/client.js"
+    },
+    "./thermometer": {
+      "types": "./dist/charts/thermometer/index.d.ts",
+      "import": "./dist/charts/thermometer/index.js"
+    },
+    "./thermometer/interactive": {
+      "types": "./dist/charts/thermometer/client.d.ts",
+      "import": "./dist/charts/thermometer/client.js"
+    },
+    "./moon-phase": {
+      "types": "./dist/charts/moon-phase/index.d.ts",
+      "import": "./dist/charts/moon-phase/index.js"
+    },
+    "./moon-phase/interactive": {
+      "types": "./dist/charts/moon-phase/client.d.ts",
+      "import": "./dist/charts/moon-phase/client.js"
+    },
+    "./hourglass": {
+      "types": "./dist/charts/hourglass/index.d.ts",
+      "import": "./dist/charts/hourglass/index.js"
+    },
+    "./hourglass/interactive": {
+      "types": "./dist/charts/hourglass/client.d.ts",
+      "import": "./dist/charts/hourglass/client.js"
+    },
+    "./balance-beam": {
+      "types": "./dist/charts/balance-beam/index.d.ts",
+      "import": "./dist/charts/balance-beam/index.js"
+    },
+    "./balance-beam/interactive": {
+      "types": "./dist/charts/balance-beam/client.d.ts",
+      "import": "./dist/charts/balance-beam/client.js"
+    },
+    "./sprout-row": {
+      "types": "./dist/charts/sprout-row/index.d.ts",
+      "import": "./dist/charts/sprout-row/index.js"
+    },
+    "./sprout-row/interactive": {
+      "types": "./dist/charts/sprout-row/client.d.ts",
+      "import": "./dist/charts/sprout-row/client.js"
+    },
+    "./garden-grid": {
+      "types": "./dist/charts/garden-grid/index.d.ts",
+      "import": "./dist/charts/garden-grid/index.js"
+    },
+    "./garden-grid/interactive": {
+      "types": "./dist/charts/garden-grid/client.d.ts",
+      "import": "./dist/charts/garden-grid/client.js"
+    },
+    "./bubble-row": {
+      "types": "./dist/charts/bubble-row/index.d.ts",
+      "import": "./dist/charts/bubble-row/index.js"
+    },
+    "./bubble-row/interactive": {
+      "types": "./dist/charts/bubble-row/client.d.ts",
+      "import": "./dist/charts/bubble-row/client.js"
+    },
+    "./music-staff": {
+      "types": "./dist/charts/music-staff/index.d.ts",
+      "import": "./dist/charts/music-staff/index.js"
+    },
+    "./music-staff/interactive": {
+      "types": "./dist/charts/music-staff/client.d.ts",
+      "import": "./dist/charts/music-staff/client.js"
+    },
+    "./tree-rings": {
+      "types": "./dist/charts/tree-rings/index.d.ts",
+      "import": "./dist/charts/tree-rings/index.js"
+    },
+    "./tree-rings/interactive": {
+      "types": "./dist/charts/tree-rings/client.d.ts",
+      "import": "./dist/charts/tree-rings/client.js"
+    },
+    "./city-skyline": {
+      "types": "./dist/charts/city-skyline/index.d.ts",
+      "import": "./dist/charts/city-skyline/index.js"
+    },
+    "./city-skyline/interactive": {
+      "types": "./dist/charts/city-skyline/client.d.ts",
+      "import": "./dist/charts/city-skyline/client.js"
+    },
+    "./honeycomb": {
+      "types": "./dist/charts/honeycomb/index.d.ts",
+      "import": "./dist/charts/honeycomb/index.js"
+    },
+    "./honeycomb/interactive": {
+      "types": "./dist/charts/honeycomb/client.d.ts",
+      "import": "./dist/charts/honeycomb/client.js"
+    },
+    "./constellation": {
+      "types": "./dist/charts/constellation/index.d.ts",
+      "import": "./dist/charts/constellation/index.js"
+    },
+    "./constellation/interactive": {
+      "types": "./dist/charts/constellation/client.d.ts",
+      "import": "./dist/charts/constellation/client.js"
+    },
+    "./polar-clock": {
+      "types": "./dist/charts/polar-clock/index.d.ts",
+      "import": "./dist/charts/polar-clock/index.js"
+    },
+    "./polar-clock/interactive": {
+      "types": "./dist/charts/polar-clock/client.d.ts",
+      "import": "./dist/charts/polar-clock/client.js"
+    },
+    "./spiral-year": {
+      "types": "./dist/charts/spiral-year/index.d.ts",
+      "import": "./dist/charts/spiral-year/index.js"
+    },
+    "./spiral-year/interactive": {
+      "types": "./dist/charts/spiral-year/client.d.ts",
+      "import": "./dist/charts/spiral-year/client.js"
+    },
+    "./breathing-dot": {
+      "types": "./dist/charts/breathing-dot/index.d.ts",
+      "import": "./dist/charts/breathing-dot/index.js"
+    },
+    "./breathing-dot/interactive": {
+      "types": "./dist/charts/breathing-dot/client.d.ts",
+      "import": "./dist/charts/breathing-dot/client.js"
+    },
+    "./heartbeat-blip": {
+      "types": "./dist/charts/heartbeat-blip/index.d.ts",
+      "import": "./dist/charts/heartbeat-blip/index.js"
+    },
+    "./heartbeat-blip/interactive": {
+      "types": "./dist/charts/heartbeat-blip/client.d.ts",
+      "import": "./dist/charts/heartbeat-blip/client.js"
+    },
+    "./comet-trail": {
+      "types": "./dist/charts/comet-trail/index.d.ts",
+      "import": "./dist/charts/comet-trail/index.js"
+    },
+    "./comet-trail/interactive": {
+      "types": "./dist/charts/comet-trail/client.d.ts",
+      "import": "./dist/charts/comet-trail/client.js"
+    },
+    "./orbit-status": {
+      "types": "./dist/charts/orbit-status/index.d.ts",
+      "import": "./dist/charts/orbit-status/index.js"
+    },
+    "./orbit-status/interactive": {
+      "types": "./dist/charts/orbit-status/client.d.ts",
+      "import": "./dist/charts/orbit-status/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

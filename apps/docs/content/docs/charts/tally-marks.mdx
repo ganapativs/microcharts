@@ -1,0 +1,77 @@
+---
+title: TallyMarks
+description: A tally-marks chart for React — four-and-strike clusters of five that a reader counts back exactly, with an honest +N numeral past the cap.
+---
+
+TallyMarks answers "how many?" the way a human actually counts — in four-and-strike clusters of
+five. The count reads back exactly: no scale to calibrate, no color to decode. Past `max` the marks
+stop growing and a `+N` numeral tells the truth, so a cell never blows out its width. Marks are
+never resized to fit — width grows with the count until the cap, then the numeral takes over.
+
+<LiveDemo
+  label="TallyMarks"
+  sizeOf="tally-marks"
+  code={`import { TallyMarks } from "@microcharts/react/tally-marks";
+
+<TallyMarks value={23} title="Signatures" />`}
+>
+  <TallyMarks value={23} title="Signatures" height={20} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="tally-marks" />
+
+## Try it
+
+<Playground chart="tally-marks" />
+
+## Interactive
+
+<InteractiveDemo slug="tally-marks" />
+
+## When to use it
+
+- **Good for** — a small running count in a sentence or cell, a live event or score counter, or an editorial hand-tallied context.
+- **Avoid for** — large magnitudes (MiniBar), trends over time (Sparkline), or proportions (Progress).
+
+## Sizing
+
+<Sizing chart="tally-marks" />
+
+## Variants
+
+<LiveDemo
+  label="hand-drawn pen + capped width"
+  code={`<TallyMarks value={17} pen="drawn" />
+<TallyMarks value={38} max={20} />`}
+>
+  <span className="inline-flex gap-4 items-center">
+    <TallyMarks value={17} pen="drawn" height={20} />
+    <TallyMarks value={38} max={20} height={20} />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="tally-marks" />
+
+## Why this default
+
+The ruled pen is the default because product tables want precision first — evenly ruled strokes
+count back fastest. The `drawn` pen adds a seeded, deterministic jitter (same count always renders
+identically, on the server and after hydration) for the editorial voice, and it only perturbs how
+each stroke is drawn — the count is never touched. Past `max`, the default `overflow="numeral"`
+appends a `+N` so the true total survives even when the marks can't; `overflow="clamp"` suppresses
+the numeral for dense columns, and the accessible name still carries the exact count.
+
+## Accessibility
+
+The accessible name is the exact count — **"23 counted."** — always the true value, even when the
+marks overflow to a `+N` numeral or clamp. The interactive entry announces the new total through a
+polite live region on change and draws newly added marks in with a brief, reduced-motion-gated
+sweep. A count has no sub-parts, so focus reads the summary and there is no cursor to move.
+
+## Props
+
+<PropTable slug="tally-marks" />

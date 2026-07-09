@@ -37,6 +37,131 @@ export interface SummaryStrings {
   stepsDone: (done: number, total: number) => string;
   /** S3 discrete units, e.g. "5 of 8." (pictogram-row). */
   countOf: (value: string, total: number) => string;
+  /** S4 counted total, e.g. "23 counted." (tally-marks). */
+  tally: (value: string) => string;
+  /** S4 dice face, e.g. "4 out of 6." (dice-pips). */
+  dicePips: (value: string) => string;
+  /** S4 dice numeral fallback for value > 6, e.g. "9." (dice-pips). */
+  dicePipsOver: (value: string) => string;
+  /** S4 label-is-the-bar, e.g. "uploading: 62% complete." (fill-word). */
+  fillWord: (word: string, pct: string) => string;
+  /** S4 fill-word drain mode, e.g. "session: 25% remaining." (fill-word). */
+  fillWordRemaining: (word: string, pct: string) => string;
+  /** S4 weighted numeral, e.g. "1,204 — tier 4 of 5." (fat-digits). */
+  fatDigits: (value: string, tier: number, tiers: number) => string;
+  /** S4 fat-digits digit-mode plain value, e.g. "1,204." (fat-digits). */
+  fatDigitsPlain: (value: string) => string;
+  /** S4 calibrated tube, e.g. "72 on a 0–100 scale." (thermometer). */
+  thermometer: (value: string, min: string, max: string) => string;
+  /** S4 thermometer with a goal, e.g. "72 on a 0–100 scale; target 80." */
+  thermometerTarget: (value: string, min: string, max: string, target: string) => string;
+  /** S4 moon progress, e.g. "68% of the cycle complete." (moon-phase). */
+  moonPhase: (pct: string) => string;
+  /** S4 moon cycle mode, e.g. "68% through the cycle." (moon-phase). */
+  moonPhaseCycle: (pct: string) => string;
+  /** S4 hourglass, e.g. "75% elapsed, 25% remaining." (hourglass). */
+  hourglass: (elapsed: string, remaining: string) => string;
+  /** S2 two-sided balance, e.g. "Inflow 620 vs outflow 480; inflow heavier." */
+  balanceBeam: (
+    leftLabel: string,
+    leftValue: string,
+    rightLabel: string,
+    rightValue: string,
+    heavierLabel: string,
+  ) => string;
+  /** S2 balanced beam, e.g. "A 500 vs B 500; balanced." (balance-beam). */
+  balanceBeamBalanced: (
+    leftLabel: string,
+    leftValue: string,
+    rightLabel: string,
+    rightValue: string,
+  ) => string;
+  /** S2 ordinal growth stages (seed/sprout/leaf/bloom). (sprout-row) */
+  sproutStageNames: readonly [string, string, string, string];
+  /** S2 sprout summary, e.g. "6 accounts; 2 at bloom, 1 at seed." (sprout-row). */
+  sproutRow: (n: number, bloom: number, seed: number) => string;
+  /** S2 sprout per-item, e.g. "Acme: bloom, stage 4 of 4." (sprout-row). */
+  sproutStage: (label: string, stageName: string, k: number) => string;
+  /** S2 sprout missing item, e.g. "Acme: no data." (sprout-row). */
+  sproutEmpty: (label: string) => string;
+  /** S1 garden grid, e.g. "12 weeks; peak 34, 9 active." (garden-grid). */
+  gardenGrid: (n: number, unit: string, peak: string, active: number) => string;
+  /** S1 garden cell, e.g. "3 of 12: 8, step 2 of 5." (garden-grid). */
+  gardenCell: (pos: number, total: number, value: string, k: number, steps: number) => string;
+  /** S2 bubble row, e.g. "4 items; largest EMEA at 1,240, smallest LATAM at 210." */
+  bubbleRow: (
+    n: number,
+    maxLabel: string,
+    maxValue: string,
+    minLabel: string,
+    minValue: string,
+  ) => string;
+  /** S2 bubble announcement, e.g. "EMEA: 1,240." (bubble-row). */
+  bubbleAt: (label: string, value: string) => string;
+  /** S1 tree rings, e.g. "8 years; latest 14, biggest 22 in year 5." (tree-rings). */
+  treeRings: (n: number, unit: string, last: string, max: string, argmaxLabel: string) => string;
+  /** S1 ring announcement, e.g. "Year 5: 22." (tree-rings). */
+  treeRingAt: (label: string, value: string) => string;
+  /** Structured skyline, e.g. "5 teams; tallest Platform at 46." (city-skyline). */
+  citySkyline: (n: number, unit: string, tallLabel: string, tallValue: string) => string;
+  /** Skyline building (no lit), e.g. "Platform: 46." (city-skyline). */
+  citySkylineAt: (label: string, value: string) => string;
+  /** Skyline building with lit, e.g. "Platform: 46; 70% lit." (city-skyline). */
+  citySkylineAtLit: (label: string, value: string, litPct: string) => string;
+  /** S4 occupancy, e.g. "34 of 40 seats filled." (honeycomb). */
+  honeycomb: (value: string, total: string, unit: string) => string;
+  /** S1 sparse events, e.g. "4 events between Jan and Jun; largest at Mar." */
+  constellation: (n: number, first: string, last: string, largest: string) => string;
+  /** Single sparse event, e.g. "1 event at Mar." (constellation). */
+  constellationOne: (label: string) => string;
+  /** Hovered/focused constellation event, e.g. "Mar: 82, magnitude 5." */
+  constellationAt: (label: string, value: string) => string;
+  /** S1 cyclic, e.g. "Peaks at 14:00 (312); quietest 04:00." (polar-clock). */
+  polarClock: (peakLabel: string, max: string, minLabel: string) => string;
+  /** Flat cycle, e.g. "Flat at 120 across the cycle." (polar-clock). */
+  polarClockFlat: (value: string) => string;
+  /** Hovered/focused cycle segment, e.g. "14:00: 312." (polar-clock). */
+  polarClockAt: (label: string, value: string) => string;
+  /** Weekday names for a 7-segment cycle (i18n contract; index 0 = Sunday). */
+  weekdays: readonly string[];
+  /** S1 calendar spiral, e.g. "52 weeks; peak 480 in week 30, low in week 6." */
+  spiralYear: (
+    n: number,
+    cadence: "day" | "week",
+    max: string,
+    peakLabel: string,
+    minLabel: string,
+  ) => string;
+  /** Hovered/focused spiral mark, e.g. "week 30: 480." (spiral-year). */
+  spiralYearAt: (label: string, value: string) => string;
+  /** S4 ambient load, e.g. "Load 42% — calm." (breathing-dot). */
+  breathingDot: (pct: string, bandWord: string) => string;
+  /** Unknown load state, e.g. "Load unknown." (breathing-dot). */
+  breathingDotUnknown: string;
+  /** Load band words [calm, elevated, strained] (breathing-dot). */
+  loadBands: readonly [string, string, string];
+  /** Structured events, e.g. "12 events in the last minute; last 3s ago." */
+  heartbeat: (n: number, windowLabel: string, ago: string) => string;
+  /** Flat (down) state, e.g. "No events in the last minute." (heartbeat-blip). */
+  heartbeatFlat: (windowLabel: string) => string;
+  /** Window duration → label, e.g. 60000 → "minute" (heartbeat-blip). */
+  heartbeatWindow: (ms: number) => string;
+  /** Elapsed ms → compact label, e.g. 3000 → "3s" (heartbeat-blip). */
+  heartbeatAgo: (ms: number) => string;
+  /** S1 rolling window, e.g. "Now 87, rising over the last 12 updates." */
+  cometTrail: (last: string, trendWord: string, n: number) => string;
+  /** Single point, e.g. "Now 87." (comet-trail). */
+  cometTrailNow: (last: string) => string;
+  /** Stepped-back trail point, e.g. "3 updates ago: 74." (comet-trail). */
+  cometTrailAt: (k: number, value: string) => string;
+  /** Trend words indexed by sign+1: [falling, steady, rising] (comet-trail). */
+  cometTrends: readonly [string, string, string];
+  /** Two live variables, e.g. "240ms latency at 12 calls/s." (orbit-status). */
+  orbitStatus: (latency: string, rate: string, alerted: boolean) => string;
+  /** Threshold-crossing announce, e.g. "Latency high — 240ms." (orbit-status). */
+  orbitAlert: (latency: string) => string;
+  /** Unknown state, e.g. "Latency unknown." (orbit-status). */
+  orbitUnknown: string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

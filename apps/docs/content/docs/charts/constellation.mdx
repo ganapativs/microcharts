@@ -1,0 +1,110 @@
+---
+title: Constellation
+description: A constellation chart for React — sparse events plotted by time and value, with area-true dot size for magnitude and a faint chronology line.
+---
+
+Constellation answers "when did the rare events happen, and how big were they?" Each event is a dot
+placed by time (x) and value (y), with an optional magnitude driving its area-true size. A hairline
+line connects the events in time order, so the sequence of a handful of incidents reads at a glance.
+It is built for _rare_ events — a dozen or fewer; dense streams belong to `Seismogram` or
+`EventTimeline`.
+
+<LiveDemo
+  label="Constellation"
+  sizeOf="constellation"
+  code={`import { Constellation } from "@microcharts/react/constellation";
+
+const month = (x) => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"][x];
+
+<Constellation
+  data={[
+    { x: 0, y: 40, m: 2 },
+    { x: 2, y: 90, m: 7 },
+    { x: 5, y: 30, m: 3 },
+    { x: 8, y: 65, m: 5 },
+  ]}
+  xFormat={month}
+  title="Incidents"
+/>`}
+>
+  <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }, { x: 5, y: 30, m: 3 }, { x: 8, y: 65, m: 5 }]} xFormat={(x) => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"][x]} title="Incidents" width={120} height={34} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="constellation" />
+
+## Try it
+
+<Playground chart="constellation" />
+
+## Interactive
+
+<InteractiveDemo slug="constellation" />
+
+## When to use it
+
+- **Good for** — sparse incidents or outages on a timeline, milestones carrying a magnitude, or any rare events where the sequence is the story.
+- **Avoid for** — dense event streams (`Seismogram`, `EventTimeline`), a continuous trend (`Sparkline`), or precise value comparison (dot area is a low-precision channel).
+
+## Sizing
+
+<Sizing chart="constellation" />
+
+## Variants
+
+<LiveDemo
+  label="label the biggest, or drop the chronology line"
+  code={`<Constellation data={events} label="max" />
+<Constellation data={events} connect={false} />`}
+>
+  <span className="inline-flex gap-6 items-center">
+    <Constellation
+      data={[
+        { x: 0, y: 40, m: 2 },
+        { x: 2, y: 90, m: 7 },
+        { x: 5, y: 30, m: 3 },
+        { x: 8, y: 65, m: 5 },
+      ]}
+      label="max"
+      width={110}
+      height={32}
+      summary={false}
+    />
+    <Constellation
+      data={[
+        { x: 0, y: 40, m: 2 },
+        { x: 2, y: 90, m: 7 },
+        { x: 5, y: 30, m: 3 },
+        { x: 8, y: 65, m: 5 },
+      ]}
+      connect={false}
+      width={110}
+      height={32}
+      summary={false}
+    />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+The chronology line is on by default because the sequence is usually the story of rare events — you
+want to see the order and rhythm, not just a scatter. Dot size is _area-true_ (`r ∝ √m`), because area
+is how the eye reads magnitude; it is a deliberately low-precision channel, so the number lives in the
+summary and the hover readout, not in a size you are asked to measure.
+
+When no event carries a value, the vertical position is **deterministic jitter that encodes nothing** —
+it only spreads the dots so they do not stack. In that case the connector's slope is meaningless
+(it still runs in time order), and the summary never mentions vertical position. Time is sacred: the
+x position is never jittered, so simultaneous events sit at the same x.
+
+## Accessibility
+
+The accessible name states the count, the span, and the largest event — **"4 events between Jan and
+Sep; largest at Mar."** The interactive entry lets you arrow through the events chronologically, each
+announced with its time, value, and magnitude through a polite live region; a hover readout shows the
+same. Magnitude is redundant with the dot size, never carried by it alone.
+
+## Props
+
+<PropTable slug="constellation" />
