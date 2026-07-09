@@ -841,13 +841,25 @@
   {
     "name": "@microcharts/react/spiral-year (static)",
     "path": "dist/charts/spiral-year/index.js",
-    "limit": "2.5 kB",
+    "limit": "2.8 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/spiral-year/interactive",
     "path": "dist/charts/spiral-year/client.js",
-    "limit": "3.5 kB",
+    "limit": "3.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/breathing-dot (static)",
+    "path": "dist/charts/breathing-dot/index.js",
+    "limit": "1.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/breathing-dot/interactive",
+    "path": "dist/charts/breathing-dot/client.js",
+    "limit": "2.5 kB",
     "gzip": true
   },
   {

@@ -1516,3 +1516,33 @@ data's actual year. New `strings-spiral-year` (spiralYear / spiralYearAt; period
 in the EN impl for i18n). Budget 2.73/3.61 kB > the §18 targets (2.5/3.5) but < the 3/4 hard caps (the
 arc + calendar-grid imports) — gate sign-off with the other batch-3 divergences. Node 1670, browser 2,
 craft 536/0, bench 14.5 rows/ms, size 2.73/3.61, docs 264pp/156.
+
+### BreathingDot (19th shipped, motion) — `breathing-dot` — plan/24 §19
+
+First of the four MOTION charts (the reduced-motion gate). Channel = pulse rate + amplitude by level
+(interactive) / ring offset by level (static) — LOW precision ambient status; docs steer exact reads to
+Progress/Sparkline. Design points:
+
+1. **Static frame is a real chart (mandatory).** The core dot's band color (positive/neutral/negative
+   by threshold) + the level ring's distance from the core carry the full read with zero JS. The pulse
+   is an *enhancement*, not the only encoding — so a reduced-motion or off-viewport reader loses nothing.
+
+2. **Shared motion infra.** Introduced `src/shared/motion.ts` — `usePrefersReducedMotion` (live
+   matchMedia) + `useInViewport` backed by ONE module-level IntersectionObserver shared across every
+   motion chart on the page (plan/03). The pulse runs only when `!reduced && inView && !unknown`; it's a
+   WAAPI `element.animate()` on the *static* core (found by `.mc-breathing-core` querySelector + given
+   `transform-box: fill-box; transform-origin: center` so scale is about the dot's own center), cancelled
+   on cleanup. No setState-per-frame.
+
+3. **Snapped, nameable motion.** Rate and amplitude are per-band constants (3.6/1.8/0.9 s, 5/11/18 %),
+   not a continuous lerp, so the three states (calm/elevated/strained) are re-readable, and the animation
+   restarts only on band change. Loop allowed because the loop parameter (rate) IS the datum (plan/06 §5).
+
+4. **Honesty — unknown must not look calm.** `null`/`NaN` → gray core, no ring, and the pulse never
+   starts. Band color is always doubled (ring offset statically, pulse rate in motion) — never
+   color-alone. The live region announces band changes only (quiet on mount), never per tick.
+
+Verified in the real browser: `core.getAnimations().length > 0` while loaded, `=== 0` while unknown
+(browser tests). New `strings-breathing-dot` (breathingDot / breathingDotUnknown + loadBands i18n array).
+Budget 1.57/2.42 kB (static just over the 1.5 Delta-class target, well under the 3/4 hard caps). Node
+1683, browser 5, craft 540/0, bench 124 rows/ms, size 1.57/2.42, docs 267pp/158.

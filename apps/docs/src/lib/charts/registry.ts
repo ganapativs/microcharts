@@ -83,6 +83,7 @@ import honeycomb from "./honeycomb";
 import constellation from "./constellation";
 import polarClock from "./polar-clock";
 import spiralYear from "./spiral-year";
+import breathingDot from "./breathing-dot";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -158,6 +159,7 @@ const MODULES: ChartModule[] = [
   constellation,
   polarClock,
   spiralYear,
+  breathingDot,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

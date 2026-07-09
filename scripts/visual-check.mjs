@@ -49,6 +49,7 @@ const { Honeycomb } = await D("honeycomb");
 const { Constellation } = await D("constellation");
 const { PolarClock } = await D("polar-clock");
 const { SpiralYear } = await D("spiral-year");
+const { BreathingDot } = await D("breathing-dot");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -766,6 +767,12 @@ const body = [
       size: 80,
     }),
   ),
+
+  `<h2>BreathingDot</h2>`,
+  row("calm (0.2)", svg(BreathingDot, { value: 0.2, size: 40 })),
+  row("elevated (0.65)", svg(BreathingDot, { value: 0.65, size: 40 })),
+  row("strained (0.92) + label", svg(BreathingDot, { value: 0.92, label: "value", size: 40 })),
+  row("unknown (null)", svg(BreathingDot, { value: null, size: 40 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

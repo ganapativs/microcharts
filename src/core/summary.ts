@@ -134,6 +134,12 @@ export interface SummaryStrings {
   ) => string;
   /** Hovered/focused spiral mark, e.g. "week 30: 480." (spiral-year). */
   spiralYearAt: (label: string, value: string) => string;
+  /** S4 ambient load, e.g. "Load 42% — calm." (breathing-dot). */
+  breathingDot: (pct: string, bandWord: string) => string;
+  /** Unknown load state, e.g. "Load unknown." (breathing-dot). */
+  breathingDotUnknown: string;
+  /** Load band words [calm, elevated, strained] (breathing-dot). */
+  loadBands: readonly [string, string, string];
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

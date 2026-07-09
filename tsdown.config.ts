@@ -155,6 +155,8 @@ export default defineConfig({
     "src/charts/polar-clock/client.tsx",
     "src/charts/spiral-year/index.tsx",
     "src/charts/spiral-year/client.tsx",
+    "src/charts/breathing-dot/index.tsx",
+    "src/charts/breathing-dot/client.tsx",
   ],
   format: ["esm"],
   dts: true,

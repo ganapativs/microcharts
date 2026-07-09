@@ -297,6 +297,10 @@
     "spiral-year": {
       "static": "2.8 kB",
       "interactive": "3.7 kB"
+    },
+    "breathing-dot": {
+      "static": "1.6 kB",
+      "interactive": "2.5 kB"
     }
   }
 }

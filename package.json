@@ -604,6 +604,14 @@
       "types": "./dist/charts/spiral-year/client.d.ts",
       "import": "./dist/charts/spiral-year/client.js"
     },
+    "./breathing-dot": {
+      "types": "./dist/charts/breathing-dot/index.d.ts",
+      "import": "./dist/charts/breathing-dot/index.js"
+    },
+    "./breathing-dot/interactive": {
+      "types": "./dist/charts/breathing-dot/client.d.ts",
+      "import": "./dist/charts/breathing-dot/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

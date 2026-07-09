@@ -723,6 +723,17 @@ add(
   ],
   [[999, 999]],
 );
+add(
+  "breathing-dot",
+  "BreathingDot",
+  [
+    { value: 0.2 },
+    { value: 0.65 },
+    { value: 0.92, label: "value" },
+    { value: null },
+  ],
+  [[999, 999]],
+);
 const SKYLINE = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },

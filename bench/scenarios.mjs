@@ -635,4 +635,10 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "breathing-dot",
+    component: "BreathingDot",
+    floor: 120, // two circles + a threshold branch
+    props: (i) => ({ value: (i % 100) / 100, summary: false }),
+  },
 ];
