@@ -789,4 +789,19 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "minimap-strip",
+    component: "MinimapStrip",
+    floor: 8, // downsample 1.2k content + fog + window — N-node class
+    props: (i) => ({
+      data: {
+        content: Array.from({ length: 1200 }, (_c, j) => Math.sin((i + j) / 40) + 1),
+        window: [(i * 7) % 1000, ((i * 7) % 1000) + 140],
+        marks: [100, 600, 1100],
+        known: [[0, 1104]],
+      },
+      domain: [0, 1200],
+      summary: false,
+    }),
+  },
 ];

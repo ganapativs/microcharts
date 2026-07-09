@@ -96,6 +96,7 @@ import rubricStrip from "./rubric-strip";
 import tokenConfidence from "./token-confidence";
 import windBarb from "./wind-barb";
 import starSpoke from "./star-spoke";
+import minimapStrip from "./minimap-strip";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -184,6 +185,7 @@ const MODULES: ChartModule[] = [
   tokenConfidence,
   windBarb,
   starSpoke,
+  minimapStrip,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

@@ -65,6 +65,7 @@ const { RubricStrip } = await D("rubric-strip");
 const { TokenConfidence } = await D("token-confidence");
 const { WindBarb } = await D("wind-barb");
 const { StarSpoke } = await D("star-spoke");
+const { MinimapStrip } = await D("minimap-strip");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1032,6 +1033,11 @@ const body = [
   row("profile + dots", svg(StarSpoke, { data: [{ label: "Speed", value: 0.9 }, { label: "Power", value: 0.6 }, { label: "Range", value: 0.5 }, { label: "Cost", value: 0.3 }, { label: "Ease", value: 0.7 }], dots: true, size: 110 })),
   row("vs baseline", svg(StarSpoke, { data: [{ label: "a", value: 0.9 }, { label: "b", value: 0.4 }, { label: "c", value: 0.7 }, { label: "d", value: 0.5 }], compare: [0.5, 0.5, 0.5, 0.5], dots: true, size: 110 })),
   row("labels", svg(StarSpoke, { data: [{ label: "Speed", value: 0.9 }, { label: "Power", value: 0.6 }, { label: "Range", value: 0.5 }, { label: "Cost", value: 0.3 }], labels: true, size: 96 })),
+
+  `<h2>MinimapStrip</h2>`,
+  row("bars + fog", svg(MinimapStrip, { data: { content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6), window: [520, 660], marks: [100, 600, 1100], known: [[0, 1104]] }, domain: [0, 1200], width: 320, height: 18 })),
+  row("heat", svg(MinimapStrip, { data: { content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + 0.4), window: [300, 440], marks: [600, 1000] }, domain: [0, 1200], variant: "heat", width: 320, height: 18 })),
+  row("cell", svg(MinimapStrip, { data: { content: Array.from({ length: 400 }, (_, i) => Math.abs(Math.sin(i / 20)) + 0.3), window: [120, 200] }, domain: [0, 400], width: 80, height: 12 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

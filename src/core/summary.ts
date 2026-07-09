@@ -644,6 +644,20 @@ export interface SummaryStrings {
   starSpoke: (n: number, hi: string, hiValue: string, lo: string, loValue: string) => string;
   /** Interactive spoke announce, e.g. "Speed: 0.9." (star-spoke). */
   spokeAt: (label: string, value: string) => string;
+  /** MinimapStrip overview, e.g.
+   *  "Viewing 12% of the whole (520–660 of 1,200); 3 marks; 8% unknown." */
+  minimap: (
+    pct: string,
+    a: string,
+    b: string,
+    total: string,
+    marks: number,
+    unknownClause: string,
+  ) => string;
+  /** Unknown-share clause appended to the minimap summary, e.g. "; 8% unknown". */
+  minimapUnknown: (pct: string) => string;
+  /** Interactive window announce, e.g. "Viewing 520 to 660 of 1,200." (minimap). */
+  minimapView: (a: string, b: string, total: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

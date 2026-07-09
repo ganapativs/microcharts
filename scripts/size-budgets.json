@@ -348,6 +348,10 @@
     "star-spoke": {
       "static": "2 kB",
       "interactive": "3 kB"
+    },
+    "minimap-strip": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
     }
   }
 }

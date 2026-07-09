@@ -88,6 +88,7 @@
     "rubric-strip",
     "token-confidence",
     "wind-barb",
-    "star-spoke"
+    "star-spoke",
+    "minimap-strip"
   ]
 }

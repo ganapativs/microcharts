@@ -279,6 +279,22 @@ add(
   ],
 );
 add(
+  "minimap-strip",
+  "MinimapStrip",
+  [
+    {
+      data: {
+        content: Array.from({ length: 600 }, (_, i) => Math.abs(Math.sin(i / 30)) + 0.5),
+        window: [220, 320],
+        marks: [50, 300, 550],
+        known: [[0, 552]],
+      },
+      domain: [0, 600],
+    },
+  ],
+  [[80, 12], [300, 18]],
+);
+add(
   "star-spoke",
   "StarSpoke",
   [

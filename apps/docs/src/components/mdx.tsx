@@ -30,6 +30,7 @@ import { RubricStrip } from "@microcharts/react/rubric-strip";
 import { TokenConfidence } from "@microcharts/react/token-confidence";
 import { WindBarb } from "@microcharts/react/wind-barb";
 import { StarSpoke } from "@microcharts/react/star-spoke";
+import { MinimapStrip } from "@microcharts/react/minimap-strip";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -136,6 +137,7 @@ export function getMDXComponents(components?: MDXComponents) {
     TokenConfidence,
     WindBarb,
     StarSpoke,
+    MinimapStrip,
     HistogramStrip,
     MicroBox,
     ProgressRing,

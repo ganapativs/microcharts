@@ -180,6 +180,8 @@ export default defineConfig({
     "src/charts/wind-barb/index.tsx",
     "src/charts/star-spoke/index.tsx",
     "src/charts/star-spoke/client.tsx",
+    "src/charts/minimap-strip/index.tsx",
+    "src/charts/minimap-strip/client.tsx",
   ],
   format: ["esm"],
   dts: true,
