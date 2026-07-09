@@ -1602,3 +1602,41 @@ New `strings-comet-trail` (cometTrail / cometTrailNow / cometTrailAt + `cometTre
 rising] indexed by sign+1). Budget: static 1.97 (within §21's 2 kB), interactive 3.07 > the 3 kB target
 but < the 4 kB hard cap — gate sign-off. Node 1716, browser 3, craft 548/0, bench 23.8 rows/ms, size
 1.97/3.07, docs 273pp/162.
+
+### OrbitStatus (22nd shipped, motion) — `orbit-status` — plan/24 §22 — **BATCH 3 COMPLETE**
+
+Channel = orbit radius (latency) + orbit dash density / satellite speed (rate) — LOW precision, two
+ambient ordinal channels (docs steer exact reads to Sparkline for latency + Delta/MiniBar for rate).
+Points:
+
+1. **Static frame carries BOTH variables (the survivor test).** A paused satellite says nothing, so the
+   rate had to be encoded statically too: `stroke-dasharray` density on the orbit, quantized to 5 steps
+   via `core/arc.evenDashes` (dash count from the true circumference, so density is exact at any radius).
+   The interactive satellite's angular speed uses the SAME 5 steps, so motion and still frames decode
+   identically — you gain nothing from watching, you just feel the rate.
+
+2. **Rotation implementation.** WAAPI `rotate(0→360deg)` on the satellite with `transform-box: view-box`
+   + `transform-origin` at the service center (user units), so it revolves around the center, not its
+   own centroid. Period per rate step [4000,3000,2200,1500,900] ms (busier = faster). `rate=0` →
+   `rateStep=0` → a solid dash-free orbit and no rotation. The radius transition on latency change was
+   left instant (a documented minor deviation — the same class as EnsembleGhosts/HeartbeatBlip motion
+   simplifications; the radius read is already correct statically).
+
+3. **Honesty.** Both channels quantized to 5 ordinal steps; radius + speed always from the same domains
+   in both frames (no drift). The satellite's angular POSITION encodes nothing (it starts at the top) —
+   documented so nobody reads the angle. `alert` doubles the satellite size AND repaints it
+   `--mc-negative` AND flags the summary (never color-alone). Unknown latency/rate → gray center, no
+   satellite, no spin (an unknown dependency must not look healthy). Domains are insisted on (a lone
+   radius is meaningless — the FatDigits steer). Craft caught the `label="latency"` ms-numeral gutter
+   spilling right (the real "ms" glyph runs wider than the 0.62 estimate) — bumped the reservation to
+   0.7·em/char, verified 0 escapes in the real-browser sweep.
+
+New `strings-orbit-status` (orbitStatus / orbitAlert / orbitUnknown; ms + "calls/s" units in the EN
+template for i18n). NO budget divergence — 2.02/2.9 kB, within the §22 targets (2/3). Node 1730, browser
+4, craft 553/0, bench 84.5 rows/ms, size 2.02/2.9, docs 276pp/164.
+
+**Batch 3 (expressive) complete — 22/22.** Shared `src/shared/motion.ts` (reduced-motion + one shared
+IntersectionObserver) underpins all four motion charts; every motion chart's reduced-motion frame is its
+static frame (not a paused pose), and the browser suite asserts `getAnimations()` starts/stops per the
+gate. Accumulated budget spec-vs-measured divergences (all < the 3/4 hard caps) + motion deviations
+listed in STATUS.md await the batch-gate user sign-off.

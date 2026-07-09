@@ -309,6 +309,10 @@
     "comet-trail": {
       "static": "2 kB",
       "interactive": "3.15 kB"
+    },
+    "orbit-status": {
+      "static": "2.1 kB",
+      "interactive": "3 kB"
     }
   }
 }

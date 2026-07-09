@@ -628,6 +628,14 @@
       "types": "./dist/charts/comet-trail/client.d.ts",
       "import": "./dist/charts/comet-trail/client.js"
     },
+    "./orbit-status": {
+      "types": "./dist/charts/orbit-status/index.d.ts",
+      "import": "./dist/charts/orbit-status/index.js"
+    },
+    "./orbit-status/interactive": {
+      "types": "./dist/charts/orbit-status/client.d.ts",
+      "import": "./dist/charts/orbit-status/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

@@ -660,4 +660,16 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "orbit-status",
+    component: "OrbitStatus",
+    floor: 80, // three circles + a scale + dash math
+    props: (i) => ({
+      latency: (i % 500) + 1,
+      rate: i % 20,
+      latencyDomain: [0, 500],
+      rateDomain: [0, 20],
+      summary: false,
+    }),
+  },
 ];

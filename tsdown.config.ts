@@ -161,6 +161,8 @@ export default defineConfig({
     "src/charts/heartbeat-blip/client.tsx",
     "src/charts/comet-trail/index.tsx",
     "src/charts/comet-trail/client.tsx",
+    "src/charts/orbit-status/index.tsx",
+    "src/charts/orbit-status/client.tsx",
   ],
   format: ["esm"],
   dts: true,

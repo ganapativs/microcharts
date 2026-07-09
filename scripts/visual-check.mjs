@@ -52,6 +52,7 @@ const { SpiralYear } = await D("spiral-year");
 const { BreathingDot } = await D("breathing-dot");
 const { HeartbeatBlip } = await D("heartbeat-blip");
 const { CometTrail } = await D("comet-trail");
+const { OrbitStatus } = await D("orbit-status");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -803,6 +804,29 @@ const body = [
   ),
   row("volatile", svg(CometTrail, { data: [50, 80, 30, 70, 40, 90, 55, 62], width: 90 })),
   row("single point", svg(CometTrail, { data: [42], width: 90 })),
+
+  `<h2>OrbitStatus</h2>`,
+  row(
+    "240ms, 12 calls/s",
+    svg(OrbitStatus, { latency: 240, rate: 12, latencyDomain: [0, 500], rateDomain: [0, 20], size: 56 }),
+  ),
+  row(
+    "alerting + label",
+    svg(OrbitStatus, {
+      latency: 350,
+      rate: 5,
+      latencyDomain: [0, 500],
+      rateDomain: [0, 20],
+      alert: 300,
+      label: "latency",
+      size: 56,
+    }),
+  ),
+  row(
+    "idle (rate 0, solid orbit)",
+    svg(OrbitStatus, { latency: 100, rate: 0, latencyDomain: [0, 500], rateDomain: [0, 20], size: 56 }),
+  ),
+  row("unknown", svg(OrbitStatus, { latency: NaN, rate: 5, size: 56 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

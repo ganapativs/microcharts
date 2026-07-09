@@ -156,6 +156,12 @@ export interface SummaryStrings {
   cometTrailAt: (k: number, value: string) => string;
   /** Trend words indexed by sign+1: [falling, steady, rising] (comet-trail). */
   cometTrends: readonly [string, string, string];
+  /** Two live variables, e.g. "240ms latency at 12 calls/s." (orbit-status). */
+  orbitStatus: (latency: string, rate: string, alerted: boolean) => string;
+  /** Threshold-crossing announce, e.g. "Latency high — 240ms." (orbit-status). */
+  orbitAlert: (latency: string) => string;
+  /** Unknown state, e.g. "Latency unknown." (orbit-status). */
+  orbitUnknown: string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

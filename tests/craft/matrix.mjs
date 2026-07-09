@@ -753,6 +753,18 @@ add(
   [{ data: CT }, { data: CT, label: "none" }, { data: [99, 12, 88] }, { data: [42] }],
   [[999, 999]],
 );
+add(
+  "orbit-status",
+  "OrbitStatus",
+  [
+    { latency: 240, rate: 12, latencyDomain: [0, 500], rateDomain: [0, 20] },
+    { latency: 350, rate: 5, latencyDomain: [0, 500], rateDomain: [0, 20], alert: 300 },
+    { latency: 240, rate: 12, latencyDomain: [0, 500], rateDomain: [0, 20], label: "latency" },
+    { latency: 100, rate: 0, latencyDomain: [0, 500], rateDomain: [0, 20] },
+    { latency: NaN, rate: 5 },
+  ],
+  [[999, 999]],
+);
 const SKYLINE = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },
