@@ -1,6 +1,6 @@
 {
   "name": "@microcharts/react",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Word-sized charts for React. Zero dependencies, tiny, accessible by default.",
   "keywords": [
     "accessible",
