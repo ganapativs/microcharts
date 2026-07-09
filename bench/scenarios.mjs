@@ -518,4 +518,10 @@ export const SCENARIOS = [
     floor: 40, // 2 text nodes + a clip inset — no per-point work
     props: (i) => ({ word: "processing", value: (i % 100) / 100, summary: false }),
   },
+  {
+    slug: "fat-digits",
+    component: "FatDigits",
+    floor: 40, // one text node + a tier lookup — a cached formatter call
+    props: (i) => ({ value: (i * 37) % 2100, domain: [0, 2100], summary: false }),
+  },
 ];

@@ -1231,3 +1231,22 @@ collision here). Craft gate: added an ALLOWED exception for the intentional same
 overlap (the audit's TEXT-TEXT check can't know the stack is the encoding). Budgets 1.38/1.75 kB
 (caps 1.5/2.5). Real-browser sweep verified LIGHT + DARK two-tone (accent #0072b2 / base #8a8a8a),
 0 escapes. Node 1461, browser 2, craft 397/0, bench 103 rows/ms, docs 219pp + tests 126.
+
+### FatDigits (4) — `fat-digits` — plan/24 §4 + FatFonts deviation (risk #1)
+
+**FatFonts adaptation (recorded deviation, was plan/24 risk #1):** the FatFonts research encodes
+magnitude as glyph ink AREA via a custom font. Shipping a font would break zero-dep (non-negotiable
+#1), so FatDigits maps magnitude to discrete `font-weight` tiers (5: 300/450/600/750/900; 3:
+400/550/750) on the INHERITED font instead. Weight is ordinal (never claimed continuous); the
+numeral is always the exact value. On a non-variable host font the browser snaps to the nearest
+available weight (~2 effective tiers) — documented graceful degradation, numeral unaffected. True
+ink-area digits remain future `@microcharts/outline` territory. Real-browser sweep confirmed the
+weight tiers render visibly distinct (system-ui supports 300–900) in both themes.
+
+`encode="value"` weights the whole numeral (one `<tspan>`); `encode="digit"` weights each digit by
+its own magnitude (⌈(d+1)/(10/tiers)⌉). No `domain` → the middle tier (docs steer to always pass
+one). Uses `makeFormatter` (needed for grouped numerals + the tier summary) → static 1.6 kB, above
+the spec's 1.5 kB Delta-class target but under the 3 kB hard cap — logged for the batch gate (same
+class as the Batch-2 budget divergences). Variant names kept as spec (`encode`/`tiers`, no `style`
+collision). One motion-layer CSS rule transitions weight; tspans inside `.mc-root` → reduced-motion
+block gates it. Node 1477, browser 2, craft 409/0, bench 127 rows/ms, docs 222pp + tests 128.

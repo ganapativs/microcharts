@@ -670,6 +670,21 @@ add(
   ],
 );
 add(
+  "fat-digits",
+  "FatDigits",
+  [
+    { value: 1204, domain: [0, 2100] },
+    { value: 2100, domain: [0, 2100] },
+    { value: 1902, encode: "digit" },
+    { value: 318, domain: [0, 2100], tiers: 3 },
+  ],
+  [
+    [60, 20],
+    [80, 24],
+    [120, 28],
+  ],
+);
+add(
   "fill-word",
   "FillWord",
   [

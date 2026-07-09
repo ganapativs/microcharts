@@ -68,6 +68,7 @@ import ensembleGhosts from "./ensemble-ghosts";
 import tallyMarks from "./tally-marks";
 import dicePips from "./dice-pips";
 import fillWord from "./fill-word";
+import fatDigits from "./fat-digits";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -128,6 +129,7 @@ const MODULES: ChartModule[] = [
   tallyMarks,
   dicePips,
   fillWord,
+  fatDigits,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

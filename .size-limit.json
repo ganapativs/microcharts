@@ -671,6 +671,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/fat-digits (static)",
+    "path": "dist/charts/fat-digits/index.js",
+    "limit": "1.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/fat-digits/interactive",
+    "path": "dist/charts/fat-digits/client.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

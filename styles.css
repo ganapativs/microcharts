@@ -169,6 +169,11 @@
   :where(.mc-fillword-live text[data-mc-ink="accent"]) {
     transition: clip-path var(--mc-duration) var(--mc-easing);
   }
+  /* interactive FatDigits: the weight eases on variable fonts (snaps otherwise);
+     tspans are inside .mc-root, so reduced-motion gates it below */
+  :where(.mc-fat-live tspan) {
+    transition: font-weight var(--mc-duration) var(--mc-easing);
+  }
 }
 
 @layer microcharts.charts {

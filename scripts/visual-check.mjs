@@ -34,6 +34,7 @@ const { EnsembleGhosts } = await D("ensemble-ghosts");
 const { TallyMarks } = await D("tally-marks");
 const { DicePips } = await D("dice-pips");
 const { FillWord } = await D("fill-word");
+const { FatDigits } = await D("fat-digits");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -571,6 +572,14 @@ const body = [
   row("drain 70%", svg(FillWord, { word: "expiring", value: 0.7, mode: "drain", fontSize: 16 })),
   row("label value 40%", svg(FillWord, { word: "storage", value: 0.4, label: "value", fontSize: 16 })),
   row("full 100%", svg(FillWord, { word: "complete", value: 1, fontSize: 16 })),
+
+  `<h2>FatDigits</h2>`,
+  row(
+    "column scan",
+    [1204, 318, 76, 2100, 55].map((v) => `<span style="display:block;text-align:right">${svg(FatDigits, { value: v, domain: [0, 2100], fontSize: 15 })}</span>`).join(""),
+  ),
+  row("digit mode 1902", svg(FatDigits, { value: 1902, encode: "digit", fontSize: 18 })),
+  row("3 tiers", svg(FatDigits, { value: 1204, domain: [0, 2100], tiers: 3, fontSize: 18 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

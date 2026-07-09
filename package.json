@@ -484,6 +484,14 @@
       "types": "./dist/charts/fill-word/client.d.ts",
       "import": "./dist/charts/fill-word/client.js"
     },
+    "./fat-digits": {
+      "types": "./dist/charts/fat-digits/index.d.ts",
+      "import": "./dist/charts/fat-digits/index.js"
+    },
+    "./fat-digits/interactive": {
+      "types": "./dist/charts/fat-digits/client.d.ts",
+      "import": "./dist/charts/fat-digits/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

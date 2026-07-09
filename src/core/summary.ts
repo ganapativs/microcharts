@@ -47,6 +47,10 @@ export interface SummaryStrings {
   fillWord: (word: string, pct: string) => string;
   /** S4 fill-word drain mode, e.g. "session: 25% remaining." (fill-word). */
   fillWordRemaining: (word: string, pct: string) => string;
+  /** S4 weighted numeral, e.g. "1,204 — tier 4 of 5." (fat-digits). */
+  fatDigits: (value: string, tier: number, tiers: number) => string;
+  /** S4 fat-digits digit-mode plain value, e.g. "1,204." (fat-digits). */
+  fatDigitsPlain: (value: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

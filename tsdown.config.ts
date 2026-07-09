@@ -125,6 +125,8 @@ export default defineConfig({
     "src/charts/dice-pips/client.tsx",
     "src/charts/fill-word/index.tsx",
     "src/charts/fill-word/client.tsx",
+    "src/charts/fat-digits/index.tsx",
+    "src/charts/fat-digits/client.tsx",
   ],
   format: ["esm"],
   dts: true,
