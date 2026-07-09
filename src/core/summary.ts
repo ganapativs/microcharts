@@ -640,6 +640,10 @@ export interface SummaryStrings {
   windBarbCalm: string;
   /** Compass octant names, indexed N, NE, E, SE, S, SW, W, NW. */
   compass8: readonly [string, string, string, string, string, string, string, string];
+  /** StarSpoke overview, e.g. "5 metrics; highest Speed (0.9), lowest Cost (0.3)." */
+  starSpoke: (n: number, hi: string, hiValue: string, lo: string, loValue: string) => string;
+  /** Interactive spoke announce, e.g. "Speed: 0.9." (star-spoke). */
+  spokeAt: (label: string, value: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

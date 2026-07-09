@@ -87,6 +87,7 @@
     "event-raster",
     "rubric-strip",
     "token-confidence",
-    "wind-barb"
+    "wind-barb",
+    "star-spoke"
   ]
 }

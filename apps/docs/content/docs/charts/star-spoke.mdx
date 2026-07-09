@@ -1,0 +1,85 @@
+---
+title: StarSpoke
+description: A star glyph for React — spokes radiate from a center, length is value, and there is deliberately no connecting polygon, so profiles compare honestly.
+---
+
+StarSpoke answers "what is this entity's profile across a few metrics — and which entity in a set is
+the odd one out?". Spokes radiate from the center and their length encodes each value. There is no
+connecting polygon, ever: the enclosed area of a radar chart lies about magnitude and axis order,
+and the research is clear that contour-free wins for spotting outliers.
+
+<LiveDemo
+  label="StarSpoke"
+  sizeOf="star-spoke"
+  code={`import { StarSpoke } from "@microcharts/react/star-spoke";
+
+<StarSpoke data={metrics} title="Product profile" />`}
+>
+  <StarSpoke
+    data={[
+      { label: "Speed", value: 0.9 },
+      { label: "Power", value: 0.6 },
+      { label: "Range", value: 0.5 },
+      { label: "Cost", value: 0.3 },
+      { label: "Ease", value: 0.7 },
+    ]}
+    dots
+    title="Product profile"
+    size={110}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="star-spoke" />
+
+## Try it
+
+<Playground chart="star-spoke" />
+
+## Interactive
+
+<InteractiveDemo slug="star-spoke" />
+
+## When to use it
+
+- **Good for** — entity profiles in small multiples, skill / capability comparison.
+- **Avoid for** — fewer than 3 metrics (PairedBars) or precise values (MiniBar).
+
+## Sizing
+
+<Sizing chart="star-spoke" />
+
+## Variants
+
+<LiveDemo label="vs baseline" code={`<StarSpoke data={metrics} compare={baseline} dots />`}>
+  <StarSpoke
+    data={[
+      { label: "Speed", value: 0.9 },
+      { label: "Power", value: 0.6 },
+      { label: "Range", value: 0.5 },
+      { label: "Cost", value: 0.3 },
+      { label: "Ease", value: 0.7 },
+    ]}
+    compare={[0.5, 0.5, 0.5, 0.5, 0.5]}
+    dots
+    title="vs baseline"
+    size={110}
+  />
+</LiveDemo>
+
+## Why this default
+
+Contour-free is the point: a connecting polygon is decoration that changes the read, exaggerating
+area for high-variance profiles and hiding the individual spoke lengths that actually matter for
+comparison. One shared domain governs every spoke in a glyph — mixed-domain metrics are the caller's
+normalization to state, so a set of small multiples stays honestly comparable.
+
+## Accessibility
+
+The accessible name names the extremes — **"5 metrics; highest Speed (0.9), lowest Cost (0.3)."**
+The interactive entry rotates focus through the spokes with ←/→, announcing each metric and value.
+
+## Props
+
+<PropTable slug="star-spoke" />

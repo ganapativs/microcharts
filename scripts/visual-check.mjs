@@ -64,6 +64,7 @@ const { EventRaster } = await D("event-raster");
 const { RubricStrip } = await D("rubric-strip");
 const { TokenConfidence } = await D("token-confidence");
 const { WindBarb } = await D("wind-barb");
+const { StarSpoke } = await D("star-spoke");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1026,6 +1027,11 @@ const body = [
   row("compass 8", [0, 45, 90, 135, 180, 225, 270, 315].map((d) => svg(WindBarb, { direction: d, magnitude: 35, size: 44 })).join("")),
   row("magnitudes", [5, 15, 32, 55, 80].map((m) => svg(WindBarb, { direction: 90, magnitude: m, label: true, size: 48 })).join("")),
   row("calm / arrow", svg(WindBarb, { direction: 0, magnitude: 1, size: 44 }) + svg(WindBarb, { direction: 45, magnitude: 25, variant: "arrow", size: 44 })),
+
+  `<h2>StarSpoke</h2>`,
+  row("profile + dots", svg(StarSpoke, { data: [{ label: "Speed", value: 0.9 }, { label: "Power", value: 0.6 }, { label: "Range", value: 0.5 }, { label: "Cost", value: 0.3 }, { label: "Ease", value: 0.7 }], dots: true, size: 110 })),
+  row("vs baseline", svg(StarSpoke, { data: [{ label: "a", value: 0.9 }, { label: "b", value: 0.4 }, { label: "c", value: 0.7 }, { label: "d", value: 0.5 }], compare: [0.5, 0.5, 0.5, 0.5], dots: true, size: 110 })),
+  row("labels", svg(StarSpoke, { data: [{ label: "Speed", value: 0.9 }, { label: "Power", value: 0.6 }, { label: "Range", value: 0.5 }, { label: "Cost", value: 0.3 }], labels: true, size: 96 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

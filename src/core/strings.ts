@@ -64,6 +64,7 @@ import { EN_EVENT_RASTER } from "./strings-event-raster.js";
 import { EN_RUBRIC } from "./strings-rubric.js";
 import { EN_TOKEN_CONFIDENCE } from "./strings-token-confidence.js";
 import { EN_WIND_BARB } from "./strings-wind-barb.js";
+import { EN_STAR_SPOKE } from "./strings-star-spoke.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -128,4 +129,5 @@ export const EN: SummaryStrings = {
   ...EN_RUBRIC,
   ...EN_TOKEN_CONFIDENCE,
   ...EN_WIND_BARB,
+  ...EN_STAR_SPOKE,
 };

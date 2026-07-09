@@ -338,6 +338,10 @@
   "wind-barb": {
     "static": 2.3
   },
+  "star-spoke": {
+    "static": 1.93,
+    "interactive": 2.78
+  },
   "annotations": {
     "static": 1.46
   }

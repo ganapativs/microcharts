@@ -777,4 +777,16 @@ export const SCENARIOS = [
     floor: 120, // one glyph — shaft + barbs + quantization
     props: (i) => ({ direction: (i * 13) % 360, magnitude: (i % 90) + 1, summary: false }),
   },
+  {
+    slug: "star-spoke",
+    component: "StarSpoke",
+    floor: 60, // ≤ 8 spokes as two paths + trig
+    props: (i) => ({
+      data: Array.from({ length: 6 }, (_m, k) => ({
+        label: `m${k}`,
+        value: ((i + k * 17) % 100) / 100,
+      })),
+      summary: false,
+    }),
+  },
 ];

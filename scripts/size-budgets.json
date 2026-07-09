@@ -344,6 +344,10 @@
     },
     "wind-barb": {
       "static": "2.5 kB"
+    },
+    "star-spoke": {
+      "static": "2 kB",
+      "interactive": "3 kB"
     }
   }
 }

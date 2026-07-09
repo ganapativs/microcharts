@@ -36,6 +36,7 @@ export { EN_EVENT_RASTER, type EventRasterStrings } from "./strings-event-raster
 export { EN_RUBRIC, type RubricStrings } from "./strings-rubric.js";
 export { EN_TOKEN_CONFIDENCE, type TokenConfidenceStrings } from "./strings-token-confidence.js";
 export { EN_WIND_BARB, octant, type WindBarbStrings } from "./strings-wind-barb.js";
+export { EN_STAR_SPOKE, type StarSpokeStrings } from "./strings-star-spoke.js";
 export {
   quantiles,
   fiveNumber,

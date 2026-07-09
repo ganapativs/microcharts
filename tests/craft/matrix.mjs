@@ -279,6 +279,23 @@ add(
   ],
 );
 add(
+  "star-spoke",
+  "StarSpoke",
+  [
+    {
+      data: [
+        { label: "Speed", value: 0.9 },
+        { label: "Power", value: 0.6 },
+        { label: "Range", value: 0.5 },
+        { label: "Cost", value: 0.3 },
+        { label: "Ease", value: 0.7 },
+      ],
+      dots: true,
+    },
+  ],
+  [[32, 32], [110, 110]],
+);
+add(
   "wind-barb",
   "WindBarb",
   [

@@ -29,6 +29,7 @@ import { EventRaster } from "@microcharts/react/event-raster";
 import { RubricStrip } from "@microcharts/react/rubric-strip";
 import { TokenConfidence } from "@microcharts/react/token-confidence";
 import { WindBarb } from "@microcharts/react/wind-barb";
+import { StarSpoke } from "@microcharts/react/star-spoke";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -134,6 +135,7 @@ export function getMDXComponents(components?: MDXComponents) {
     RubricStrip,
     TokenConfidence,
     WindBarb,
+    StarSpoke,
     HistogramStrip,
     MicroBox,
     ProgressRing,
