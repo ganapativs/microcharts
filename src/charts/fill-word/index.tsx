@@ -1,0 +1,117 @@
+// <FillWord> — how far along a named task is, where the label IS the bar
+// (plan/24 #3, S4). A muted word with an accent copy clipped to the value
+// fraction of the word's OWN inked extent (percentage inset → 50% bisects the
+// word, never a hidden wider track). No <clipPath> element → no generated id
+// (canon-safe). font-size is an SVG attribute (plan/18); textLength pins the
+// glyph extent so containment is provable server-side. Static, hook-free, RSC-safe.
+import type { CSSProperties, ReactNode } from "react";
+import { Chart } from "../../shared/Chart.js";
+import { EN_FILL_WORD, type FillWordStrings } from "../../core/strings-fill-word.js";
+import { fillWordGeometry, type FillMode } from "./geometry.js";
+
+export interface FillWordProps {
+  /** The text that is the chart. */
+  word: string;
+  /** Fraction 0–1 (clamped). fill = complete; drain = remaining. */
+  value: number;
+  /** `fill` (default) grows the ink; `drain` empties it (TTL / expiry). */
+  mode?: FillMode | undefined;
+  /** `value` appends the percent numeral after the word. */
+  label?: "none" | "value" | undefined;
+  fontSize?: number | undefined;
+  strings?: FillWordStrings | undefined;
+  title?: string | undefined;
+  summary?: string | false | undefined;
+  id?: string | undefined;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
+  children?: ReactNode | undefined;
+}
+
+const PAD = 2;
+
+/** Whole-percent shown for the context (fill = complete, drain = remaining). */
+function shownPct(value: number, mode: FillMode): number {
+  const v = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
+  const pct = Math.round(v * 100);
+  return mode === "drain" ? 100 - pct : pct;
+}
+
+export function fillWordSummary(
+  value: number,
+  word: string,
+  mode: FillMode = "fill",
+  strings: FillWordStrings = EN_FILL_WORD,
+): string {
+  if (word.length === 0) return strings.noData;
+  const pct = `${shownPct(value, mode)}%`;
+  return mode === "drain" ? strings.fillWordRemaining(word, pct) : strings.fillWord(word, pct);
+}
+
+export function FillWord(props: FillWordProps): ReactNode {
+  const {
+    word,
+    value,
+    mode = "fill",
+    label = "none",
+    fontSize = 12,
+    strings = EN_FILL_WORD,
+    title,
+    summary,
+    id,
+    className,
+    style,
+    children,
+  } = props;
+
+  const geo = fillWordGeometry({ value, word, fontSize, pad: PAD, mode, label: label === "value" });
+  const accName =
+    summary === false ? false : (summary ?? fillWordSummary(value, word, mode, strings));
+  const textProps = {
+    x: geo.x,
+    y: geo.y,
+    fontSize,
+    textLength: geo.textLength || undefined,
+    lengthAdjust: "spacingAndGlyphs" as const,
+    dominantBaseline: "central" as const,
+    textAnchor: "start" as const,
+  };
+
+  return (
+    <Chart
+      width={geo.width}
+      height={geo.height}
+      title={title}
+      summary={accName}
+      id={id}
+      className={className ? `mc-fillword ${className}` : "mc-fillword"}
+      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+    >
+      {word.length > 0 ? (
+        <>
+          {/* the muted base word — the "track" */}
+          <text {...textProps} data-mc-ink="label">
+            {word}
+          </text>
+          {/* the accent copy, clipped to the value fraction of its own extent */}
+          <text {...textProps} data-mc-ink="accent" style={{ clipPath: geo.clip ?? undefined }}>
+            {word}
+          </text>
+        </>
+      ) : null}
+      {geo.numeralX !== null ? (
+        <text
+          x={geo.numeralX}
+          y={geo.y}
+          fontSize={fontSize}
+          dominantBaseline="central"
+          textAnchor="start"
+          data-mc-ink="label"
+        >
+          {`${shownPct(value, mode)}%`}
+        </text>
+      ) : null}
+      {children}
+    </Chart>
+  );
+}

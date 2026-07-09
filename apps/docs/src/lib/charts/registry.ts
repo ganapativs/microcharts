@@ -67,6 +67,7 @@ import changePoint from "./change-point";
 import ensembleGhosts from "./ensemble-ghosts";
 import tallyMarks from "./tally-marks";
 import dicePips from "./dice-pips";
+import fillWord from "./fill-word";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -126,6 +127,7 @@ const MODULES: ChartModule[] = [
   ensembleGhosts,
   tallyMarks,
   dicePips,
+  fillWord,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

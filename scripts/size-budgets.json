@@ -233,6 +233,10 @@
     "dice-pips": {
       "static": "1.4 kB",
       "interactive": "1.9 kB"
+    },
+    "fill-word": {
+      "static": "1.5 kB",
+      "interactive": "1.95 kB"
     }
   }
 }

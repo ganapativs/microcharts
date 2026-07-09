@@ -476,6 +476,14 @@
       "types": "./dist/charts/dice-pips/client.d.ts",
       "import": "./dist/charts/dice-pips/client.js"
     },
+    "./fill-word": {
+      "types": "./dist/charts/fill-word/index.d.ts",
+      "import": "./dist/charts/fill-word/index.js"
+    },
+    "./fill-word/interactive": {
+      "types": "./dist/charts/fill-word/client.d.ts",
+      "import": "./dist/charts/fill-word/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

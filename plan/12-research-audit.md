@@ -1211,3 +1211,23 @@ Face outline uses `data-mc-ink="muted"` (neutral hairline, theme-tuned + forced-
 pips + numeral use `data-mc-ink="point"` (`--mc-stroke`). Budgets 1.29/1.7 kB (caps 1.5/2.5).
 Real-browser sweep confirmed both themes (pips #171717 light / #ededed dark; face #8a8a8a / #9a9a9a).
 Node 1447, browser 2 (dice), craft 385/0, bench 74 rows/ms, docs 216pp + tests 124.
+
+### FillWord (3) — `fill-word` — plan/24 §3 + risk #4 RESOLVED
+
+**Risk #4 (clip-path on SVG `<text>`) resolved:** the one-time spike passed. A CSS
+`clip-path: inset(...)` set inline on an accent `<text>` copy (avoiding a `<clipPath>` element
+and thus any generated id) reliably clips the glyphs to the value fraction in the real browser —
+fill mode grows the accent from the left (`inset(0 {100(1−v)}% 0 0)`), drain empties from the left
+(`inset(0 0 0 {100v}%)`). `textLength` + `lengthAdjust="spacingAndGlyphs"` pin the glyph extent so
+the 0.62 em/char estimate is exact server-side and containment is provable without measurement.
+No fallback re-spec was needed. (Cross-engine confirmation rides the Argos visual matrix.)
+
+Base word = `data-mc-ink="label"` (neutral, theme-tuned + forced-colors-mapped); accent copy =
+`data-mc-ink="accent"` (`--mc-accent`). One motion-layer CSS rule transitions the accent clip-path;
+the accent copy lives inside `.mc-root`, so the existing `@media(prefers-reduced-motion)` `.mc-root *`
+block already disables it — no per-wrapper reduced-motion rule needed. Dropped `format`/`makeFormatter`
+(percent is `Math.round(v*100)`, SSR-deterministic). Variant `label` kept as spec (no `style`
+collision here). Craft gate: added an ALLOWED exception for the intentional same-word base+accent
+overlap (the audit's TEXT-TEXT check can't know the stack is the encoding). Budgets 1.38/1.75 kB
+(caps 1.5/2.5). Real-browser sweep verified LIGHT + DARK two-tone (accent #0072b2 / base #8a8a8a),
+0 escapes. Node 1461, browser 2, craft 397/0, bench 103 rows/ms, docs 219pp + tests 126.

@@ -659,6 +659,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/fill-word (static)",
+    "path": "dist/charts/fill-word/index.js",
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/fill-word/interactive",
+    "path": "dist/charts/fill-word/client.js",
+    "limit": "1.95 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

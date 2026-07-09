@@ -43,6 +43,10 @@ export interface SummaryStrings {
   dicePips: (value: string) => string;
   /** S4 dice numeral fallback for value > 6, e.g. "9." (dice-pips). */
   dicePipsOver: (value: string) => string;
+  /** S4 label-is-the-bar, e.g. "uploading: 62% complete." (fill-word). */
+  fillWord: (word: string, pct: string) => string;
+  /** S4 fill-word drain mode, e.g. "session: 25% remaining." (fill-word). */
+  fillWordRemaining: (word: string, pct: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

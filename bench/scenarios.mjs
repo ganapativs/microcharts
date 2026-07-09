@@ -512,4 +512,10 @@ export const SCENARIOS = [
     floor: 40, // ≤ 7 nodes, constant pip-layout lookup — trivially cheap
     props: (i) => ({ value: i % 7, summary: false }),
   },
+  {
+    slug: "fill-word",
+    component: "FillWord",
+    floor: 40, // 2 text nodes + a clip inset — no per-point work
+    props: (i) => ({ word: "processing", value: (i % 100) / 100, summary: false }),
+  },
 ];

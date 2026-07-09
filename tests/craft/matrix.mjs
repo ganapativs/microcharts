@@ -670,6 +670,21 @@ add(
   ],
 );
 add(
+  "fill-word",
+  "FillWord",
+  [
+    { word: "uploading", value: 0.62 },
+    { word: "expiring", value: 0.7, mode: "drain" },
+    { word: "storage", value: 0.4, label: "value" },
+    { word: "processing", value: 1 },
+  ],
+  [
+    [80, 18],
+    [120, 20],
+    [180, 24],
+  ],
+);
+add(
   "dice-pips",
   "DicePips",
   [{ value: 4 }, { value: 6 }, { value: 9 }, { value: 3, face: false }],
@@ -844,7 +859,10 @@ add(
 // BY-DESIGN exemptions: EventTimeline span labels render CENTERED INSIDE their
 // span rects (plan/22 #27 — the rect is the label's home, at 0.7 fill opacity).
 const ALLOWED = (line) =>
-  /^event-timeline .*TEXT-ON-MARK "(Freeze|Healthy|[^"]*)" over rect/.test(line);
+  /^event-timeline .*TEXT-ON-MARK "(Freeze|Healthy|[^"]*)" over rect/.test(line) ||
+  // FillWord stacks an accent copy of the word ON the muted base — that exact
+  // same-word overlap IS the "label is the bar" encoding, not a collision.
+  /^fill-word .*TEXT-TEXT "([^"]+)" × "\1"$/.test(line);
 
 let total = 0,
   bad = 0;

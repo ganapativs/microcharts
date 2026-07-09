@@ -123,6 +123,8 @@ export default defineConfig({
     "src/charts/tally-marks/client.tsx",
     "src/charts/dice-pips/index.tsx",
     "src/charts/dice-pips/client.tsx",
+    "src/charts/fill-word/index.tsx",
+    "src/charts/fill-word/client.tsx",
   ],
   format: ["esm"],
   dts: true,
