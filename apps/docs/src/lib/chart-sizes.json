@@ -374,6 +374,10 @@
     "static": 2.49,
     "interactive": 3.35
   },
+  "phase-trace": {
+    "static": 2.27,
+    "interactive": 3.13
+  },
   "annotations": {
     "static": 1.46
   }

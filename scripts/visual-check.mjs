@@ -73,6 +73,8 @@ const { CalibrationStrip } = await D("calibration-strip");
 const { ConfusionGrid } = await D("confusion-grid");
 const { FoldedDayBand } = await D("folded-day-band");
 const { VolumeProfile } = await D("volume-profile");
+const { PhaseTrace } = await D("phase-trace");
+const phaseTraj = Array.from({ length: 40 }, (_, i) => { const t = (i / 40) * Math.PI * 2; return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 }; });
 const volProfile = [{ level: 134, weight: 3 }, { level: 136, weight: 6 }, { level: 138, weight: 11 }, { level: 140, weight: 18 }, { level: 142, weight: 26 }, { level: 144, weight: 20 }, { level: 146, weight: 12 }, { level: 148, weight: 7 }, { level: 150, weight: 4 }];
 const foldCurve = (h) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
 const foldData = Array.from({ length: 14 }, (_d, d) => Array.from({ length: 24 }, (_h, h) => ({ t: d * 24 + h, value: Math.round(foldCurve(h) + Math.sin(d + h) * 8) }))).flat();
@@ -1084,6 +1086,11 @@ const body = [
   row("left + POC", svg(VolumeProfile, { data: volProfile, width: 120, height: 90 })),
   row("right side", svg(VolumeProfile, { data: volProfile, side: "right", width: 120, height: 90 })),
   row("cell", svg(VolumeProfile, { data: volProfile, label: "none", width: 32, height: 32 })),
+
+  `<h2>PhaseTrace</h2>`,
+  row("trajectory + grid", svg(PhaseTrace, { data: phaseTraj, xLabel: "CPU", yLabel: "Latency", grid: true, width: 110, height: 100 })),
+  row("longer tail + start", svg(PhaseTrace, { data: phaseTraj, xLabel: "CPU", yLabel: "Latency", tail: 0.4, startDot: true, width: 110, height: 100 })),
+  row("cell", svg(PhaseTrace, { data: phaseTraj, xLabel: "x", yLabel: "y", width: 32, height: 28 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

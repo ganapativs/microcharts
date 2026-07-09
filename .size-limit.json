@@ -1127,6 +1127,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/phase-trace (static)",
+    "path": "dist/charts/phase-trace/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/phase-trace/interactive",
+    "path": "dist/charts/phase-trace/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

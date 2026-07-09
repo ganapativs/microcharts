@@ -38,6 +38,7 @@ import { CalibrationStrip } from "@microcharts/react/calibration-strip";
 import { ConfusionGrid } from "@microcharts/react/confusion-grid";
 import { FoldedDayBand } from "@microcharts/react/folded-day-band";
 import { VolumeProfile } from "@microcharts/react/volume-profile";
+import { PhaseTrace } from "@microcharts/react/phase-trace";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -152,6 +153,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ConfusionGrid,
     FoldedDayBand,
     VolumeProfile,
+    PhaseTrace,
     HistogramStrip,
     MicroBox,
     ProgressRing,

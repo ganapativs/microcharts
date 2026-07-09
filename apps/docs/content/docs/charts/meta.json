@@ -96,6 +96,7 @@
     "calibration-strip",
     "confusion-grid",
     "folded-day-band",
-    "volume-profile"
+    "volume-profile",
+    "phase-trace"
   ]
 }

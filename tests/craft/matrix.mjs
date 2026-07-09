@@ -279,6 +279,22 @@ add(
   ],
 );
 add(
+  "phase-trace",
+  "PhaseTrace",
+  [
+    {
+      data: Array.from({ length: 40 }, (_, i) => {
+        const t = (i / 40) * Math.PI * 2;
+        return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+      }),
+      xLabel: "CPU",
+      yLabel: "Latency",
+      grid: true,
+    },
+  ],
+  [[40, 32], [110, 100]],
+);
+add(
   "volume-profile",
   "VolumeProfile",
   [

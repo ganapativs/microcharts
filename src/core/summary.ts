@@ -712,6 +712,12 @@ export interface SummaryStrings {
   volumeAt: (level: string, pct: string, pocClause: string) => string;
   /** POC clause appended to a level announce, e.g. " (POC)". */
   volumePoc: string;
+  /** PhaseTrace overview, e.g. "Latency vs CPU: now 62, 130; heading up-right." */
+  phaseTrace: (yLabel: string, xLabel: string, x: string, y: string, direction: string) => string;
+  /** Heading words, indexed up-right / up-left / down-right / down-left / steady. */
+  phaseHeadings: readonly [string, string, string, string, string];
+  /** Interactive point announce, e.g. "point 8 of 20: CPU 62, Latency 130." */
+  phaseAt: (i: number, n: number, xLabel: string, x: string, yLabel: string, y: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

@@ -196,6 +196,8 @@ export default defineConfig({
     "src/charts/folded-day-band/client.tsx",
     "src/charts/volume-profile/index.tsx",
     "src/charts/volume-profile/client.tsx",
+    "src/charts/phase-trace/index.tsx",
+    "src/charts/phase-trace/client.tsx",
   ],
   format: ["esm"],
   dts: true,

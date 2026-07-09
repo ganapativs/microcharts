@@ -380,6 +380,10 @@
     "volume-profile": {
       "static": "2.6 kB",
       "interactive": "3.6 kB"
+    },
+    "phase-trace": {
+      "static": "2.4 kB",
+      "interactive": "3.3 kB"
     }
   }
 }

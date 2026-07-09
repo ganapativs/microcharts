@@ -882,4 +882,18 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "phase-trace",
+    component: "PhaseTrace",
+    floor: 40, // trail/tail split + heading + arrow
+    props: (i) => ({
+      data: Array.from({ length: 60 }, (_s, j) => {
+        const t = ((i + j) / 60) * Math.PI * 2;
+        return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+      }),
+      xLabel: "CPU",
+      yLabel: "Latency",
+      summary: false,
+    }),
+  },
 ];

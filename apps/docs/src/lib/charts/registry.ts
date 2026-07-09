@@ -104,6 +104,7 @@ import calibrationStrip from "./calibration-strip";
 import confusionGrid from "./confusion-grid";
 import foldedDayBand from "./folded-day-band";
 import volumeProfile from "./volume-profile";
+import phaseTrace from "./phase-trace";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -200,6 +201,7 @@ const MODULES: ChartModule[] = [
   confusionGrid,
   foldedDayBand,
   volumeProfile,
+  phaseTrace,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(
