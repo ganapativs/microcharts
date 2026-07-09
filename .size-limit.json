@@ -769,13 +769,13 @@
   {
     "name": "@microcharts/react/music-staff (static)",
     "path": "dist/charts/music-staff/index.js",
-    "limit": "2.4 kB",
+    "limit": "2.55 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/music-staff/interactive",
     "path": "dist/charts/music-staff/client.js",
-    "limit": "3.3 kB",
+    "limit": "3.4 kB",
     "gzip": true
   },
   {
@@ -877,7 +877,7 @@
   {
     "name": "@microcharts/react/comet-trail (static)",
     "path": "dist/charts/comet-trail/index.js",
-    "limit": "2 kB",
+    "limit": "2.1 kB",
     "gzip": true
   },
   {

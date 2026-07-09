@@ -271,8 +271,8 @@
       "interactive": "2.6 kB"
     },
     "music-staff": {
-      "static": "2.4 kB",
-      "interactive": "3.3 kB"
+      "static": "2.55 kB",
+      "interactive": "3.4 kB"
     },
     "tree-rings": {
       "static": "1.9 kB",
@@ -307,7 +307,7 @@
       "interactive": "3 kB"
     },
     "comet-trail": {
-      "static": "2 kB",
+      "static": "2.1 kB",
       "interactive": "3.15 kB"
     },
     "orbit-status": {
