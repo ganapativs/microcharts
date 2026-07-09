@@ -669,6 +669,25 @@ add(
     [80, 32],
   ],
 );
+const BEAM = [
+  { label: "Inflow", value: 620 },
+  { label: "Outflow", value: 480 },
+];
+add(
+  "balance-beam",
+  "BalanceBeam",
+  [
+    { data: BEAM },
+    { data: BEAM, label: "values" },
+    { data: BEAM, shape: "round" },
+    { data: [{ label: "A", value: 500 }, { label: "B", value: 500 }] },
+  ],
+  [
+    [48, 20],
+    [80, 30],
+    [120, 44],
+  ],
+);
 add(
   "hourglass",
   "Hourglass",

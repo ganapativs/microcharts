@@ -61,6 +61,21 @@ export interface SummaryStrings {
   moonPhaseCycle: (pct: string) => string;
   /** S4 hourglass, e.g. "75% elapsed, 25% remaining." (hourglass). */
   hourglass: (elapsed: string, remaining: string) => string;
+  /** S2 two-sided balance, e.g. "Inflow 620 vs outflow 480; inflow heavier." */
+  balanceBeam: (
+    leftLabel: string,
+    leftValue: string,
+    rightLabel: string,
+    rightValue: string,
+    heavierLabel: string,
+  ) => string;
+  /** S2 balanced beam, e.g. "A 500 vs B 500; balanced." (balance-beam). */
+  balanceBeamBalanced: (
+    leftLabel: string,
+    leftValue: string,
+    rightLabel: string,
+    rightValue: string,
+  ) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

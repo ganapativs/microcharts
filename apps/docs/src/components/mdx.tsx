@@ -63,6 +63,7 @@ import { FatDigits } from "@microcharts/react/fat-digits";
 import { Thermometer } from "@microcharts/react/thermometer";
 import { MoonPhase } from "@microcharts/react/moon-phase";
 import { Hourglass } from "@microcharts/react/hourglass";
+import { BalanceBeam } from "@microcharts/react/balance-beam";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -145,6 +146,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Thermometer,
     MoonPhase,
     Hourglass,
+    BalanceBeam,
     SparkGroup,
     // docs building blocks
     Instrument,

@@ -133,6 +133,8 @@ export default defineConfig({
     "src/charts/moon-phase/client.tsx",
     "src/charts/hourglass/index.tsx",
     "src/charts/hourglass/client.tsx",
+    "src/charts/balance-beam/index.tsx",
+    "src/charts/balance-beam/client.tsx",
   ],
   format: ["esm"],
   dts: true,

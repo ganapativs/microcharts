@@ -182,6 +182,19 @@
       height var(--mc-duration) var(--mc-easing),
       width var(--mc-duration) var(--mc-easing);
   }
+  /* interactive BalanceBeam: the beam + weights ease to the new tilt (SVG
+     geometry props; jump where unsupported). Inside .mc-root → reduced-motion-gated */
+  :where(.mc-beam-live :is(line, rect, circle)) {
+    transition:
+      x1 var(--mc-duration) var(--mc-easing),
+      y1 var(--mc-duration) var(--mc-easing),
+      x2 var(--mc-duration) var(--mc-easing),
+      y2 var(--mc-duration) var(--mc-easing),
+      x var(--mc-duration) var(--mc-easing),
+      y var(--mc-duration) var(--mc-easing),
+      cx var(--mc-duration) var(--mc-easing),
+      cy var(--mc-duration) var(--mc-easing);
+  }
 }
 
 @layer microcharts.charts {

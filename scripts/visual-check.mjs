@@ -38,6 +38,7 @@ const { FatDigits } = await D("fat-digits");
 const { Thermometer } = await D("thermometer");
 const { MoonPhase } = await D("moon-phase");
 const { Hourglass } = await D("hourglass");
+const { BalanceBeam } = await D("balance-beam");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -608,6 +609,18 @@ const body = [
     [0, 0.25, 0.5, 0.75, 1].map((v) => svg(Hourglass, { value: v, height: 32 })).join(" "),
   ),
   row("labelled remaining", svg(Hourglass, { value: 0.7, label: "remaining", height: 36 })),
+
+  `<h2>BalanceBeam</h2>`,
+  row(
+    "left / balanced / right / saturated",
+    [[620, 480], [500, 500], [300, 800], [950, 50]]
+      .map((p) => svg(BalanceBeam, { data: [{ label: "A", value: p[0] }, { label: "B", value: p[1] }], width: 64, height: 26 }))
+      .join(" "),
+  ),
+  row(
+    "round + labelled",
+    `${svg(BalanceBeam, { data: [{ label: "In", value: 620 }, { label: "Out", value: 480 }], shape: "round", width: 72, height: 30 })} ${svg(BalanceBeam, { data: [{ label: "In", value: 620 }, { label: "Out", value: 480 }], label: "values", width: 80, height: 32 })}`,
+  ),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

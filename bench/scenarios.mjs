@@ -542,4 +542,13 @@ export const SCENARIOS = [
     floor: 40, // 4 nodes, two area-true closed forms — trivially cheap
     props: (i) => ({ value: (i % 100) / 100, summary: false }),
   },
+  {
+    slug: "balance-beam",
+    component: "BalanceBeam",
+    floor: 40, // ≤ 6 nodes, one rotation + two √ weights — trivially cheap
+    props: (i) => ({
+      data: [{ label: "A", value: (i % 90) + 10 }, { label: "B", value: ((i * 3) % 90) + 10 }],
+      summary: false,
+    }),
+  },
 ];

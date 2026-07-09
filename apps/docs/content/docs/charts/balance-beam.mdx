@@ -1,0 +1,73 @@
+---
+title: BalanceBeam
+description: A balance-beam chart for React — a tilting beam shows which of two sides outweighs, with area-true weights.
+---
+
+BalanceBeam answers "which of two sides outweighs, and roughly by how much?" A beam tilts toward the
+heavier side; the direction is instant and the angle grows with the imbalance, but it **saturates** —
+read it as direction plus rough magnitude, not an exact ratio. The two weights are area-true (their
+area, not their width, is proportional to value). For a precise comparison, reach for `PairedBars` or
+`Delta`; this is for the glance.
+
+<LiveDemo
+  label="BalanceBeam"
+  sizeOf="balance-beam"
+  code={`import { BalanceBeam } from "@microcharts/react/balance-beam";
+
+<BalanceBeam data={[{ label: "Inflow", value: 620 }, { label: "Outflow", value: 480 }]} />`}
+>
+  <BalanceBeam data={[{ label: "Inflow", value: 620 }, { label: "Outflow", value: 480 }]} label="values" title="Cash flow" width={80} height={30} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="balance-beam" />
+
+## Try it
+
+<Playground chart="balance-beam" />
+
+## Interactive
+
+<InteractiveDemo slug="balance-beam" />
+
+## When to use it
+
+- **Good for** — a buy vs sell or in vs out read in a sentence, a pro vs con weight in a KPI card, or an A-vs-B pair where direction is the story.
+- **Avoid for** — exact ratios (PairedBars / Delta), more than two items (MiniBar), or trends.
+
+## Sizing
+
+<Sizing chart="balance-beam" />
+
+## Variants
+
+<LiveDemo
+  label="round weights + balanced"
+  code={`<BalanceBeam data={pair} shape="round" label="values" />
+<BalanceBeam data={[{ label: "A", value: 500 }, { label: "B", value: 500 }]} />`}
+>
+  <span className="inline-flex gap-6 items-center">
+    <BalanceBeam data={[{ label: "Inflow", value: 620 }, { label: "Outflow", value: 480 }]} shape="round" label="values" width={90} height={34} />
+    <BalanceBeam data={[{ label: "A", value: 500 }, { label: "B", value: 500 }]} width={70} height={28} />
+  </span>
+</LiveDemo>
+
+## Why this default
+
+Ratio mode is the default because most two-sided comparisons are share-of-whole questions, and square
+weights are the default because circles under-read area at this size. The tilt saturates at `maxTilt`
+degrees — a deliberate honesty choice: past a point, a steeper beam would imply a precision the eye
+can't extract, so the angle levels off and the docs show the saturation curve. Direction and rough
+magnitude always agree, and the two channels (tilt and weight area) never disagree. For same-scale
+rows that should tilt comparably, `mode="difference"` scales the imbalance by a shared `domain`.
+
+## Accessibility
+
+The accessible name states both sides and the winner — **"Inflow 620 vs outflow 480; Inflow
+heavier."** — or "…; balanced." when they match. The interactive entry eases the beam to its new tilt,
+reveals a side's value on hover or ←/→, and announces when the heavier side flips.
+
+## Props
+
+<PropTable slug="balance-beam" />

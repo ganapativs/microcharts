@@ -719,6 +719,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/balance-beam (static)",
+    "path": "dist/charts/balance-beam/index.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/balance-beam/interactive",
+    "path": "dist/charts/balance-beam/client.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

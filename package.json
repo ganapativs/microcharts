@@ -516,6 +516,14 @@
       "types": "./dist/charts/hourglass/client.d.ts",
       "import": "./dist/charts/hourglass/client.js"
     },
+    "./balance-beam": {
+      "types": "./dist/charts/balance-beam/index.d.ts",
+      "import": "./dist/charts/balance-beam/index.js"
+    },
+    "./balance-beam/interactive": {
+      "types": "./dist/charts/balance-beam/client.d.ts",
+      "import": "./dist/charts/balance-beam/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

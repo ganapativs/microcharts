@@ -1295,3 +1295,19 @@ neck stream is a binary running-state mark (only `0<value<1`; finished/not-start
 caught it; fixed to 0.72 em/char per the wide-`%`-glyph handoff rule (a repeat of the DataDiff/
 RateVolume lesson — only the browser sweep catches this). No `makeFormatter` (percents inline).
 Node 1518, browser 2, craft 445/0, bench 98 rows/ms, docs 231pp + tests 134.
+
+### BalanceBeam (9→8th shipped) — `balance-beam` — plan/24 §8
+
+No API deviations. Tilt SATURATES at `maxTilt` (documented honesty: past a point a steeper beam
+implies precision the eye can't extract — read direction + rough magnitude, not exact ratio; docs
+steer precise ratios to PairedBars/Delta). Weights area-true (half = k·√value). Beam endpoints
+pre-rotated in geometry (cos/sin about the pivot) — no SVG transform in the static entry, so
+containment is provable from coords. **Heavier label ships VERBATIM** (not lowercased — the spec
+example "…; inflow heavier." lowercased casually, but verbatim is correct for proper nouns). Two
+layout fixes from the containment property test + craft: (1) the 20px-tall canvas is short for
+fulcrum-below + weights-above, so pivot moved to 0.6·h and `maxHalf` bounded by all three of
+(vertical room above the beam, horizontal room at the beam end, beam-half fraction); (2) value labels
+ride the tilted beam ends near the edges — x clamped to keep the centered numeral inside, and y set
+to `height − fontSize·0.42` (the `ideographic` baseline dropped the glyph below the bottom edge — the
+SSR craft caught this vertical escape). `mode="difference"` scales imbalance by a shared domain so
+same-scale rows tilt comparably. Node 1532, browser 2, craft 457/0, bench 74 rows/ms, docs 234pp/136.
