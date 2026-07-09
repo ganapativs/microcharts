@@ -669,6 +669,17 @@ add(
     [80, 32],
   ],
 );
+const MELODY = [3, 5, 4, 8, 6, 9, 7, 11];
+add(
+  "music-staff",
+  "MusicStaff",
+  [{ data: MELODY }, { data: MELODY, label: "last" }, { data: MELODY, range: "staff" }, { data: [3, 5, null, 8, 6] }],
+  [
+    [60, 20],
+    [120, 28],
+    [220, 40],
+  ],
+);
 const BUBBLES = [
   { label: "EMEA", value: 1240 },
   { label: "AMER", value: 890 },

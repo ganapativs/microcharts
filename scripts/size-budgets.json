@@ -269,6 +269,10 @@
     "bubble-row": {
       "static": "1.9 kB",
       "interactive": "2.6 kB"
+    },
+    "music-staff": {
+      "static": "2.4 kB",
+      "interactive": "3.3 kB"
     }
   }
 }

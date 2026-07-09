@@ -575,4 +575,10 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "music-staff",
+    component: "MusicStaff",
+    floor: 15, // ≤ 16 notes + describeSeries (seriesStats) summary
+    props: (i) => ({ data: rugs[i % POOL].slice(0, 12).map((v) => Math.round(v * 5)), summary: false }),
+  },
 ];

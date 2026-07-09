@@ -141,6 +141,8 @@ export default defineConfig({
     "src/charts/garden-grid/client.tsx",
     "src/charts/bubble-row/index.tsx",
     "src/charts/bubble-row/client.tsx",
+    "src/charts/music-staff/index.tsx",
+    "src/charts/music-staff/client.tsx",
   ],
   format: ["esm"],
   dts: true,

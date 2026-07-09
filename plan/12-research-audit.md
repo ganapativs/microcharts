@@ -1354,3 +1354,18 @@ first/last bubble escaped the sides → x clamped inside; (3) clamping then caus
 left-to-right drop-out on the CLAMPED positions (skip any numeral overlapping the last placed). Bench
 floor recalibrated 30 → 15 (per-bubble `makeFormatter` + greedy layout make it an ~26 rows/ms N-node
 chart, not a trivial one). Node 1566, browser 2, craft 485/0, bench 26 rows/ms, docs 243pp/142.
+
+### MusicStaff (12th shipped) — `music-staff` — plan/24 §12
+
+No API deviations. Pitch (position on a 5-line staff, quantized to 9 on-staff or 13 ledger
+positions) is the ONLY channel — no clefs/stems/beams/bar lines (every other notation convention is
+decor, per the spec constraint). Coincident equal values are spread by the time axis, never dodged
+vertically (that would change pitch = the data). **Reuses `describeSeries` verbatim** for the
+accessible name (same S1 pipeline as Sparkline; no new template) — hence static 2.32 kB (the
+seriesStats machinery), above the spec's 2 kB §6 target but under the 3 kB hard cap (gate note; same
+class as the Batch-2 budget divergences). Note heads are sized from the nominal position spacing and
+the whole staff band is inset by ry, and the x range inset by rx, so the top/bottom/edge note
+ellipses never overflow the box — the real-browser getBBox sweep caught the overflow (SSR craft's
+attribute-based text check doesn't measure ellipse extents). Sparkline interactive model (nearest-
+note ←/→, EN.point announce, ring on focus). Node 1579, browser 2, craft 497/0, bench 25 rows/ms,
+docs 246pp/144.

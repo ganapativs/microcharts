@@ -548,6 +548,14 @@
       "types": "./dist/charts/bubble-row/client.d.ts",
       "import": "./dist/charts/bubble-row/client.js"
     },
+    "./music-staff": {
+      "types": "./dist/charts/music-staff/index.d.ts",
+      "import": "./dist/charts/music-staff/index.js"
+    },
+    "./music-staff/interactive": {
+      "types": "./dist/charts/music-staff/client.d.ts",
+      "import": "./dist/charts/music-staff/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"
