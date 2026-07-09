@@ -23,7 +23,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
     label = "none",
     domain,
     width = 60,
-    height = 20,
+    height = 28,
     fontSize = 7,
     format,
     locale,

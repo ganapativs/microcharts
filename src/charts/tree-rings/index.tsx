@@ -105,7 +105,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
   // the last-value label sits in a gutter to the RIGHT of the disc (over the
   // concentric rings it would collide), so it needs a wider viewBox
   const showLabel = label === "last" && isFiniteValue(last);
-  const gutter = showLabel ? Math.ceil(`${fmt(last as number)}`.length * 0.62 * fontSize + 2) : 0;
+  const gutter = showLabel ? Math.ceil(`${fmt(last as number)}`.length * 0.62 * fontSize + 5) : 0;
 
   return (
     <Chart
@@ -152,7 +152,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
       <circle cx={geo.center.cx} cy={geo.center.cy} r={geo.r0 * 0.5} data-mc-ink="point" />
       {showLabel ? (
         <text
-          x={size + 1}
+          x={size + 4}
           y={size / 2}
           fontSize={fontSize}
           dominantBaseline="central"

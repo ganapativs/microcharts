@@ -98,7 +98,9 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
       ? undefined
       : data.map((_, i) => {
           const t = text(i);
-          return t ? t.length * 0.72 * fontSize : 0;
+          // 0.72 em/char real extent + a full em of breathing room, so numbers
+          // under adjacent bubbles never crowd.
+          return t ? t.length * 0.72 * fontSize + fontSize : 0;
         });
 
   const labelBand = label === "none" ? 0 : fontSize + 2;

@@ -134,17 +134,36 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           style={{ fill: paint, stroke: "var(--mc-neutral)", strokeWidth: 0.5 }}
         />
       ) : null}
-      {/* fill column — width == tube inner width, so no clip is needed */}
+      {/* tube capsule — the empty channel (rounded, reads closed) */}
       <rect
-        x={geo.fill.x}
-        y={geo.fill.y}
-        width={geo.fill.width}
-        height={geo.fill.height}
-        shapeRendering="crispEdges"
-        style={{ fill: paint }}
+        x={geo.tube.x}
+        y={geo.tube.y}
+        width={geo.tube.width}
+        height={geo.tube.height}
+        rx={geo.tube.r}
+        data-mc-ink="fill"
       />
+      {/* fill capsule — from the bulb end to the value edge */}
+      {geo.fill.width > 0.1 && geo.fill.height > 0.1 ? (
+        <rect
+          x={geo.fill.x}
+          y={geo.fill.y}
+          width={geo.fill.width}
+          height={geo.fill.height}
+          rx={geo.fill.r}
+          style={{ fill: paint }}
+        />
+      ) : null}
       {/* tube outline — instrument chrome, drawn over the fill */}
-      <path d={geo.tube} data-mc-ink="muted" style={{ strokeOpacity: 0.55, fill: "none" }} />
+      <rect
+        x={geo.tube.x}
+        y={geo.tube.y}
+        width={geo.tube.width}
+        height={geo.tube.height}
+        rx={geo.tube.r}
+        data-mc-ink="muted"
+        style={{ strokeOpacity: 0.55, fill: "none" }}
+      />
       {/* calibration ticks */}
       {geo.tickLines.length ? (
         <path

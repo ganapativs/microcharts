@@ -58,7 +58,7 @@ export function heartbeatGeometry(opts: {
   return {
     baseline: { x1: round2(pad), x2: round2(width - pad), y: baseY },
     spikesPath,
-    nowDot: { cx: round2(width - pad), cy: baseY, r: 1 },
+    nowDot: { cx: round2(width - pad - 1.5), cy: baseY, r: 1 },
     count: inWindow.length,
     lastAgoMs,
     width: Math.max(1, Math.round(width)),

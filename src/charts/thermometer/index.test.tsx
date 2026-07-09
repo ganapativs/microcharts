@@ -22,8 +22,9 @@ describe("<Thermometer> (plan/24 #5)", () => {
   it("renders bulb, fill, tube, ticks", () => {
     const { container } = draw(<Thermometer value={72} />);
     expect(container.querySelectorAll("circle").length).toBe(1); // bulb
-    expect(container.querySelectorAll("rect").length).toBe(1); // fill
-    expect(container.querySelectorAll("path").length).toBe(2); // tube + ticks
+    // tube channel + fill + tube outline (all rounded-rect capsules)
+    expect(container.querySelectorAll("rect").length).toBe(3);
+    expect(container.querySelectorAll("path").length).toBe(1); // ticks
   });
 
   it("target renders a distinct flag line; bulb={false} drops the reservoir", () => {

@@ -27,9 +27,9 @@ describe("<Constellation> (plan/24 #16)", () => {
     expect(constellationSummary([{ x: 2, y: 5 }], { xFormat: monthFmt })).toBe("1 event at Mar.");
   });
 
-  it("renders a connector path + one circle per event", () => {
+  it("renders a connector path + one circle per event (+ the brightest-star halo)", () => {
     const { container } = draw(<Constellation data={EVENTS} />);
-    expect(container.querySelectorAll("circle").length).toBe(3);
+    expect(container.querySelectorAll("circle").length).toBe(4); // 3 events + 1 halo
     expect(container.querySelector('path[data-mc-ink="ghost"]')).not.toBeNull();
   });
 
@@ -40,7 +40,7 @@ describe("<Constellation> (plan/24 #16)", () => {
 
   it('label="max" places a numeral at the largest event', () => {
     const { container } = draw(<Constellation data={EVENTS} label="max" />);
-    const t = container.querySelector('text[data-mc-ink="label"]');
+    const t = container.querySelector("text");
     expect(t).not.toBeNull();
     expect(t!.textContent).toBe("7"); // magnitude of the Mar event
   });

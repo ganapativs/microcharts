@@ -93,7 +93,9 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height, 0.34);
+  const fontSize = props.fontSize ?? labelFont(height, 0.4);
+  // value numerals sit in their own gutter below the apparatus (never over the beam)
+  const labelBand = label === "values" ? Math.ceil(fontSize * 1.3) : 0;
 
   const [l, r] = data;
   const geo = balanceBeamGeometry({
@@ -135,7 +137,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
   return (
     <Chart
       width={width}
-      height={height}
+      height={height + labelBand}
       title={title}
       summary={accName}
       id={id}
@@ -159,7 +161,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
         <>
           <text
             x={labelX(geo.weights[0].cx, fmt(l.value))}
-            y={height - fontSize * 0.42}
+            y={height + labelBand - fontSize * 0.32}
             fontSize={fontSize}
             textAnchor="middle"
             data-mc-ink="label"
@@ -168,7 +170,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
           </text>
           <text
             x={labelX(geo.weights[1].cx, fmt(r.value))}
-            y={height - fontSize * 0.42}
+            y={height + labelBand - fontSize * 0.32}
             fontSize={fontSize}
             textAnchor="middle"
             data-mc-ink="label"

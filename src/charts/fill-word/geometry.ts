@@ -43,10 +43,17 @@ export function fillWordGeometry(opts: {
   const height = Math.ceil(fontSize * 1.4);
   const x = pad;
   const y = round2(height / 2);
-  // reserve " 100%" (5 glyphs incl. a leading space) when labelling
-  const gutter = label ? round2(5 * 0.62 * fontSize) : 0;
-  const numeralX = label && chars > 0 ? round2(x + textLength + 0.62 * fontSize) : null;
-  const width = Math.max(1, Math.ceil(textLength + gutter + 2 * pad));
+  // The numeral hugs the word: place it at the word's REAL extent (~0.53 em/char
+  // for a proportional font) plus a snug gap, not at the 0.62 containment
+  // over-estimate (which left a big dead space). The containment box still uses
+  // the over-estimate so the natural word never overflows.
+  const wordExtent = round2(chars * 0.56 * fontSize);
+  const numeralExtent = round2(4 * 0.62 * fontSize); // "100%"
+  const numeralX = label && chars > 0 ? round2(x + wordExtent + fontSize * 0.5) : null;
+  const width =
+    label && chars > 0
+      ? Math.max(1, Math.ceil((numeralX ?? 0) + numeralExtent + pad))
+      : Math.max(1, Math.ceil(textLength + 2 * pad));
 
   // fill: accent grows from the left → clip the right (1−v) away.
   // drain: accent (remaining) empties from the left as v rises → clip the left v away.

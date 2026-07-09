@@ -98,7 +98,7 @@ export function cometTrailGeometry(opts: {
   return {
     trail,
     head,
-    labelX: round2(head.cx + headR + 1),
+    labelX: round2(head.cx + headR + 3),
     last,
     trend,
     count,

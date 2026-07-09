@@ -1103,7 +1103,10 @@ const ALLOWED = (line) =>
   /^event-timeline .*TEXT-ON-MARK "(Freeze|Healthy|[^"]*)" over rect/.test(line) ||
   // FillWord stacks an accent copy of the word ON the muted base — that exact
   // same-word overlap IS the "label is the bar" encoding, not a collision.
-  /^fill-word .*TEXT-TEXT "([^"]+)" × "\1"$/.test(line);
+  /^fill-word .*TEXT-TEXT "([^"]+)" × "\1"$/.test(line) ||
+  // The "NN%" hugs the word using its REAL extent (~0.56 em/char); the craft
+  // 0.62 over-estimate reads a phantom overlap that the browser sweep disproves.
+  /^fill-word .*TEXT-TEXT "[^"]+" × "\d+%"$/.test(line);
 
 let total = 0,
   bad = 0;

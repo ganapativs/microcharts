@@ -9,8 +9,9 @@ import { round2 } from "../../core/types.js";
 export type Orientation = "vertical" | "horizontal";
 
 export interface ThermometerGeometry {
-  tube: string;
-  fill: { x: number; y: number; width: number; height: number };
+  /** Tube + fill are rounded-rect capsules (rx = r) so the ends read closed. */
+  tube: { x: number; y: number; width: number; height: number; r: number };
+  fill: { x: number; y: number; width: number; height: number; r: number };
   bulb: { cx: number; cy: number; r: number } | null;
   tickLines: { x1: number; y1: number; x2: number; y2: number }[];
   targetTick: { x1: number; y1: number; x2: number; y2: number } | null;
@@ -49,47 +50,59 @@ export function thermometerGeometry(opts: {
   const tubeHalf = round2(acrossFull * 0.16);
   const acrossMid = round2(acrossFull / 2);
 
-  // along-axis endpoints (bulb sits at the low end). The horizontal low end has a
-  // rounded cap that bulges out by the tube radius, so when there's no bulb to
-  // cover it the low end must still reserve that cap (else it spills off the left).
-  const capLo = Math.max(bulbR, tubeHalf * 2);
-  const alongLo = vertical ? height - pad - bulbR : pad + capLo; // domain[0]
+  // along-axis endpoints (bulb sits at the low end). Tube + fill are rounded-rect
+  // capsules, so the rounded end is drawn INSIDE the rect — no cap overflow, and
+  // the far end reads cleanly closed. The tube overlaps the bulb by r so they fuse.
+  const r = tubeHalf;
+  const alongLo = vertical ? height - pad - bulbR : pad + bulbR; // domain[0], bulb centre
   const alongHi = vertical ? pad : width - pad; // domain[1]
   const scale = scaleLinear(domain, [alongLo, alongHi]);
   const clamped = clamp(value, domain[0], domain[1]);
   const edge = round2(scale(clamped));
   const overflow = value < domain[0] || value > domain[1];
 
-  // fill rect (from the bulb end to the value edge)
-  const fill = vertical
+  // tube capsule (rounded rect, rx = r) spanning the full scale.
+  const tube = vertical
     ? {
-        x: round2(acrossMid - tubeHalf),
-        y: edge,
-        width: round2(tubeHalf * 2),
-        height: round2(alongLo - edge),
+        x: round2(acrossMid - r),
+        y: alongHi,
+        width: round2(r * 2),
+        height: round2(alongLo - alongHi),
+        r,
       }
     : {
         x: alongLo,
-        y: round2(acrossMid - tubeHalf),
-        width: round2(edge - alongLo),
-        height: round2(tubeHalf * 2),
+        y: round2(acrossMid - r),
+        width: round2(alongHi - alongLo),
+        height: round2(r * 2),
+        r,
       };
 
-  // tube outline — a capsule along the axis (rounded ends), stroked over the fill
-  const r = tubeHalf;
-  const tube = vertical
-    ? `M${round2(acrossMid - r)} ${alongLo}L${round2(acrossMid - r)} ${round2(alongHi + r)}` +
-      `A${r} ${r} 0 0 1 ${round2(acrossMid + r)} ${round2(alongHi + r)}L${round2(acrossMid + r)} ${alongLo}`
-    : `M${alongHi} ${round2(acrossMid - r)}L${round2(alongLo - r)} ${round2(acrossMid - r)}` +
-      `A${r} ${r} 0 0 0 ${round2(alongLo - r)} ${round2(acrossMid + r)}L${alongHi} ${round2(acrossMid + r)}`;
+  // fill capsule — from the bulb (low) end to the value edge.
+  const fill = vertical
+    ? {
+        x: round2(acrossMid - r),
+        y: edge,
+        width: round2(r * 2),
+        height: round2(alongLo - edge),
+        r,
+      }
+    : {
+        x: alongLo,
+        y: round2(acrossMid - r),
+        width: round2(edge - alongLo),
+        height: round2(r * 2),
+        r,
+      };
 
-  // ticks — short marks on one side of the tube, one merged path
+  // ticks — short marks on one side of the tube, evenly aligned.
+  const tickLen = round2(acrossFull * 0.16);
   const tv = ticksToValues(ticks, domain);
   const tickLines = tv.map((t) => {
     const a = round2(scale(t));
     return vertical
-      ? { x1: round2(acrossMid + r), y1: a, x2: round2(acrossMid + r + acrossFull * 0.14), y2: a }
-      : { x1: a, y1: round2(acrossMid + r), x2: a, y2: round2(acrossMid + r + acrossFull * 0.14) };
+      ? { x1: round2(acrossMid + r + 1), y1: a, x2: round2(acrossMid + r + 1 + tickLen), y2: a }
+      : { x1: a, y1: round2(acrossMid + r + 1), x2: a, y2: round2(acrossMid + r + 1 + tickLen) };
   });
 
   // target — a line ACROSS the tube (distinct shape from side ticks)

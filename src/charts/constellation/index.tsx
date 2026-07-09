@@ -127,27 +127,25 @@ export function Constellation(props: ConstellationProps): ReactNode {
   const fill = color ?? "var(--mc-stroke)";
   const fmt = makeFormatter(format, locale);
 
-  // label="max": one numeral BESIDE the largest event (its magnitude, else
-  // value). Placed to the right, flipped left near the edge, and vertically
-  // centered so it never sits on its own mark (craft TEXT-ON-MARK gate).
+  const largest = geo.stars.find((s) => s.index === geo.largestIndex);
+
+  // label="max": the magnitude numeral, placed as a callout above-right of the
+  // brightest star (flipped in near an edge) so it never sits on a mark.
   let maxLabel: { x: number; y: number; text: string; anchor: "start" | "end" } | null = null;
-  if (label === "max" && geo.largestIndex >= 0) {
-    const star = geo.stars.find((s) => s.index === geo.largestIndex);
-    if (star) {
-      const n = Number.isFinite(star.m) ? star.m : star.value;
-      if (Number.isFinite(n)) {
-        const t = fmt(n);
-        const textW = t.length * 0.62 * fontSize;
-        const rightX = star.cx + star.r + 1;
-        const fitsRight = rightX + textW <= geo.width - PAD;
-        const anchor = fitsRight ? "start" : "end";
-        const x = fitsRight ? rightX : star.cx - star.r - 1;
-        const y = Math.min(
-          Math.max(star.cy + fontSize * 0.32, fontSize),
-          geo.height - fontSize * 0.3,
-        );
-        maxLabel = { x, y, text: t, anchor };
-      }
+  if (label === "max" && largest) {
+    const n = Number.isFinite(largest.m) ? largest.m : largest.value;
+    if (Number.isFinite(n)) {
+      const t = fmt(n);
+      const textW = t.length * 0.62 * fontSize;
+      const rightX = largest.cx + largest.r + 1.5;
+      const fitsRight = rightX + textW <= geo.width - PAD;
+      const anchor = fitsRight ? "start" : "end";
+      const x = fitsRight ? rightX : largest.cx - largest.r - 1.5;
+      const y = Math.min(
+        Math.max(largest.cy - largest.r - 1, fontSize),
+        geo.height - fontSize * 0.3,
+      );
+      maxLabel = { x, y, text: t, anchor };
     }
   }
 
@@ -164,8 +162,26 @@ export function Constellation(props: ConstellationProps): ReactNode {
       {geo.connectorPath ? (
         <path d={geo.connectorPath} data-mc-ink="ghost" style={{ strokeWidth: 0.75 }} />
       ) : null}
+      {/* faint halo behind the brightest event — a star that stands out */}
+      {largest ? (
+        <circle
+          cx={largest.cx}
+          cy={largest.cy}
+          r={largest.r + 1.6}
+          fill="none"
+          stroke="var(--mc-accent)"
+          strokeWidth={0.75}
+          strokeOpacity={0.4}
+        />
+      ) : null}
       {geo.stars.map((s) => (
-        <circle key={`s${s.index}`} cx={s.cx} cy={s.cy} r={s.r} style={{ fill }} />
+        <circle
+          key={`s${s.index}`}
+          cx={s.cx}
+          cy={s.cy}
+          r={s.r}
+          style={{ fill: s.index === geo.largestIndex ? "var(--mc-accent)" : fill }}
+        />
       ))}
       {maxLabel ? (
         <text
@@ -173,7 +189,7 @@ export function Constellation(props: ConstellationProps): ReactNode {
           y={maxLabel.y}
           fontSize={fontSize}
           textAnchor={maxLabel.anchor}
-          data-mc-ink="label"
+          style={{ fill: "var(--mc-accent)" }}
         >
           {maxLabel.text}
         </text>

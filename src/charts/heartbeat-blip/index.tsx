@@ -110,7 +110,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
     summary === false
       ? false
       : (summary ?? heartbeatSummary(data, { window: win, now, strings, format, locale }));
-  const spikeColor = color ?? "var(--mc-stroke)";
+  const spikeColor = color ?? "var(--mc-accent)";
   const fmt = makeFormatter(format, locale);
 
   return (
@@ -130,14 +130,20 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
         x2={geo.baseline.x2}
         y2={geo.baseline.y}
         data-mc-ink="muted"
-        style={{ strokeWidth: 0.5, strokeOpacity: 0.6 }}
+        style={{ strokeWidth: 0.5, strokeOpacity: 0.55 }}
       />
-      {/* spikes — one glyph per real event */}
+      {/* spikes — one clean glyph per real event, rounded like a monitor trace */}
       {geo.spikesPath ? (
         <path
           className="mc-heartbeat-spikes"
           d={geo.spikesPath}
-          style={{ fill: "none", stroke: spikeColor, strokeWidth: 1, strokeLinejoin: "round" }}
+          style={{
+            fill: "none",
+            stroke: spikeColor,
+            strokeWidth: 1.4,
+            strokeLinejoin: "round",
+            strokeLinecap: "round",
+          }}
         />
       ) : (
         <text
@@ -150,12 +156,12 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
           no events
         </text>
       )}
-      {/* now endpoint */}
+      {/* now endpoint — the live accent cursor */}
       <circle
         className="mc-heartbeat-now"
         cx={geo.nowDot.cx}
         cy={geo.nowDot.cy}
-        r={geo.nowDot.r}
+        r={geo.nowDot.r + 0.6}
         data-mc-ink="accent"
       />
       {label === "count" ? (

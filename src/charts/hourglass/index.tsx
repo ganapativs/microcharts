@@ -73,14 +73,30 @@ export function Hourglass(props: HourglassProps): ReactNode {
       className={className ? `mc-hourglass ${className}` : "mc-hourglass"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* top sand — remaining (muted) */}
-      {geo.topSand ? <path d={geo.topSand} data-mc-ink="neutral" /> : null}
-      {/* bottom sand — elapsed; dynamic color → inline */}
-      {geo.bottomSand ? (
-        <path d={geo.bottomSand} style={{ fill: color ?? "var(--mc-stroke)" }} />
+      {/* glass — a faint filled silhouette gives the instrument body */}
+      <path d={geo.frame} data-mc-ink="fill" />
+      {/* top sand — remaining (warm, lighter) */}
+      {geo.topSand ? (
+        <path d={geo.topSand} style={{ fill: color ?? "var(--mc-moon)", fillOpacity: 0.5 }} />
       ) : null}
-      {/* frame — two hairline triangles meeting at the neck */}
+      {/* bottom sand — elapsed (warm, full) */}
+      {geo.bottomSand ? (
+        <path d={geo.bottomSand} style={{ fill: color ?? "var(--mc-moon)" }} />
+      ) : null}
+      {/* glass outline over the sand */}
       <path d={geo.frame} data-mc-ink="muted" style={{ fill: "none", strokeOpacity: 0.7 }} />
+      {/* frame end-cap plates */}
+      {geo.caps.map((c) => (
+        <rect
+          key={`cap${c.y}`}
+          x={c.x}
+          y={c.y}
+          width={c.width}
+          height={c.height}
+          rx={c.r}
+          data-mc-ink="neutral"
+        />
+      ))}
       {/* running-sand cue — a state mark, only while 0<value<1 */}
       {stream && geo.stream ? (
         <line
@@ -88,8 +104,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
           y1={geo.stream.y1}
           x2={geo.stream.x}
           y2={geo.stream.y2}
-          data-mc-ink="muted"
-          style={{ strokeWidth: 0.75 }}
+          style={{ stroke: color ?? "var(--mc-moon)", strokeWidth: 1, strokeLinecap: "round" }}
         />
       ) : null}
       {showLabel ? (

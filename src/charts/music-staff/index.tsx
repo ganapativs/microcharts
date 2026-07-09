@@ -42,7 +42,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     domain,
     color,
     width = 60,
-    height = 20,
+    height = 28,
     format,
     locale,
     title,

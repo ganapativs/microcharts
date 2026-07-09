@@ -16,7 +16,9 @@ describe("<Hourglass> (plan/24 #7)", () => {
 
   it("renders top sand, bottom sand, frame, and the running stream mid-run", () => {
     const { container } = draw(<Hourglass value={0.5} />);
-    expect(container.querySelectorAll("path").length).toBe(3); // top + bottom + frame
+    // glass-fill + top sand + bottom sand + glass-outline
+    expect(container.querySelectorAll("path").length).toBe(4);
+    expect(container.querySelectorAll("rect").length).toBe(2); // end-cap plates
     expect(container.querySelectorAll("line").length).toBe(1); // stream
   });
 

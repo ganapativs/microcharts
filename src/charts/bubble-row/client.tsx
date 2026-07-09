@@ -39,7 +39,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
         : data.map((d) => {
             if (d.value === null) return 0;
             const t = label === "both" ? `${d.label} ${fmt(d.value)}` : fmt(d.value);
-            return t.length * 0.72 * fontSize;
+            return t.length * 0.72 * fontSize + fontSize;
           }),
     [data, label, fmt, fontSize],
   );

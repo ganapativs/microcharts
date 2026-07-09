@@ -37,7 +37,7 @@ describe("heartbeatGeometry (plan/24 #20) — event liveness", () => {
   it("baseline spans the width; now dot sits at the right edge", () => {
     const geo = g([90_000]);
     expect(geo.baseline.x1).toBeLessThan(geo.baseline.x2);
-    expect(geo.nowDot.cx).toBeCloseTo(geo.width - 1, 1);
+    expect(geo.nowDot.cx).toBeCloseTo(geo.width - 2.5, 1); // inset for the accent cursor
   });
 
   test.prop([fc.array(fc.integer({ min: 40_000, max: 100_000 }), { maxLength: 30 })])(
