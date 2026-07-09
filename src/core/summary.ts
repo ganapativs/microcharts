@@ -88,6 +88,16 @@ export interface SummaryStrings {
   gardenGrid: (n: number, unit: string, peak: string, active: number) => string;
   /** S1 garden cell, e.g. "3 of 12: 8, step 2 of 5." (garden-grid). */
   gardenCell: (pos: number, total: number, value: string, k: number, steps: number) => string;
+  /** S2 bubble row, e.g. "4 items; largest EMEA at 1,240, smallest LATAM at 210." */
+  bubbleRow: (
+    n: number,
+    maxLabel: string,
+    maxValue: string,
+    minLabel: string,
+    minValue: string,
+  ) => string;
+  /** S2 bubble announcement, e.g. "EMEA: 1,240." (bubble-row). */
+  bubbleAt: (label: string, value: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

@@ -14,6 +14,7 @@ import { EN_HOURGLASS } from "./strings-hourglass.js";
 import { EN_BEAM } from "./strings-beam.js";
 import { EN_SPROUT } from "./strings-sprout.js";
 import { EN_GARDEN } from "./strings-garden.js";
+import { EN_BUBBLE } from "./strings-bubble.js";
 import { EN_CATEGORY } from "./strings-category.js";
 import { EN_DIST } from "./strings-dist.js";
 import { EN_SLOTS } from "./strings-slots.js";
@@ -59,6 +60,7 @@ export const EN: SummaryStrings = {
   ...EN_BEAM,
   ...EN_SPROUT,
   ...EN_GARDEN,
+  ...EN_BUBBLE,
   ...EN_CATEGORY,
   ...EN_DIST,
   ...EN_SLOTS,

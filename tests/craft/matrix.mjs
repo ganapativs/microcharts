@@ -669,6 +669,22 @@ add(
     [80, 32],
   ],
 );
+const BUBBLES = [
+  { label: "EMEA", value: 1240 },
+  { label: "AMER", value: 890 },
+  { label: "APAC", value: 560 },
+  { label: "LATAM", value: 210 },
+];
+add(
+  "bubble-row",
+  "BubbleRow",
+  [{ data: BUBBLES }, { data: BUBBLES, label: "both" }, { data: BUBBLES, align: "baseline" }, { data: BUBBLES, label: "none" }],
+  [
+    [999, 24],
+    [999, 34],
+    [999, 44],
+  ],
+);
 const GARDEN = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11];
 add(
   "garden-grid",

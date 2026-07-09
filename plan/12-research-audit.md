@@ -1340,3 +1340,17 @@ distinct, the print superpower this chart exists for. Reuses ActivityGrid's colu
 (docs steer exact reads to ActivityGrid+hover/HeatStrip). `GardenCell` interface un-exported (knip
 flagged it — internal-only). Uses `makeFormatter` for the peak/announce. Node 1554, browser 2, craft
 473/0, bench 11.6 rows/ms (N-node class), docs 240pp/140.
+
+### BubbleRow (11th shipped, honesty exemplar) — `bubble-row` — plan/24 §11
+
+No API deviations. THE catalog's LOW-precision honesty exemplar: `r ∝ √value` with no exceptions
+(area-true, property-tested — a linear-radius map is a ~squared lie) and NO sorting prop (order =
+data order). The LOW rating + standing "for precise comparison, use MiniBar" steer ship in the
+`encoding.precision` field (→ catalog.json), the docs header, and code comments. Value numerals ON by
+default (a low channel owes the reader the number); `label="both"` = "label value" combined; zero →
+a 0.5-unit presence ring. Label containment took three fixes surfaced by the craft gate: (1) numeral
+descender dropped past the bottom → y = `height − pad − fontSize·0.32`; (2) wide `both` labels on the
+first/last bubble escaped the sides → x clamped inside; (3) clamping then caused collisions → a greedy
+left-to-right drop-out on the CLAMPED positions (skip any numeral overlapping the last placed). Bench
+floor recalibrated 30 → 15 (per-bubble `makeFormatter` + greedy layout make it an ~26 rows/ms N-node
+chart, not a trivial one). Node 1566, browser 2, craft 485/0, bench 26 rows/ms, docs 243pp/142.

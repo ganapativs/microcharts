@@ -41,6 +41,7 @@ const { Hourglass } = await D("hourglass");
 const { BalanceBeam } = await D("balance-beam");
 const { SproutRow } = await D("sprout-row");
 const { GardenGrid } = await D("garden-grid");
+const { BubbleRow } = await D("bubble-row");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -638,6 +639,14 @@ const body = [
   row("grid 7 rows", svg(GardenGrid, { data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11], unit: "weeks" })),
   row("strip (rows 1)", svg(GardenGrid, { data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22], rows: 1 })),
   row("blank empties", svg(GardenGrid, { data: [12, 0, 8, 0, 0, 28, 34, 0, 0, 22], rows: 1, empty: "blank" })),
+
+  `<h2>BubbleRow</h2>`,
+  (() => { const B = [{ label: "EMEA", value: 1240 }, { label: "AMER", value: 890 }, { label: "APAC", value: 560 }, { label: "LATAM", value: 210 }];
+    return [
+      row("values (default)", svg(BubbleRow, { data: B, height: 34 })),
+      row("baseline align", svg(BubbleRow, { data: B, align: "baseline", height: 34 })),
+      row("label both", svg(BubbleRow, { data: B, label: "both", height: 34 })),
+    ].join("\n"); })(),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

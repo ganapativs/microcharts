@@ -139,6 +139,8 @@ export default defineConfig({
     "src/charts/sprout-row/client.tsx",
     "src/charts/garden-grid/index.tsx",
     "src/charts/garden-grid/client.tsx",
+    "src/charts/bubble-row/index.tsx",
+    "src/charts/bubble-row/client.tsx",
   ],
   format: ["esm"],
   dts: true,

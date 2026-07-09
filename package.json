@@ -540,6 +540,14 @@
       "types": "./dist/charts/garden-grid/client.d.ts",
       "import": "./dist/charts/garden-grid/client.js"
     },
+    "./bubble-row": {
+      "types": "./dist/charts/bubble-row/index.d.ts",
+      "import": "./dist/charts/bubble-row/index.js"
+    },
+    "./bubble-row/interactive": {
+      "types": "./dist/charts/bubble-row/client.d.ts",
+      "import": "./dist/charts/bubble-row/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

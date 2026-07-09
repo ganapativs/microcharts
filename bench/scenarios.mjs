@@ -566,4 +566,13 @@ export const SCENARIOS = [
     floor: 6, // one circle per cell — N-node class, per-cell loop
     props: (i) => ({ data: rugs[i % POOL].map((v) => Math.round(v * 5)), summary: false }),
   },
+  {
+    slug: "bubble-row",
+    component: "BubbleRow",
+    floor: 15, // ≤ 8 bubbles + per-bubble format + greedy label layout (measured ~26)
+    props: (i) => ({
+      data: rugs[i % POOL].slice(0, 6).map((v, j) => ({ label: `#${j}`, value: Math.abs(v) * 100 })),
+      summary: false,
+    }),
+  },
 ];
