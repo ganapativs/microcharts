@@ -324,8 +324,12 @@
     "interactive": 3.14
   },
   "event-raster": {
-    "static": 2.41,
-    "interactive": 3.51
+    "static": 2.27,
+    "interactive": 3.48
+  },
+  "rubric-strip": {
+    "static": 2.12,
+    "interactive": 2.95
   },
   "annotations": {
     "static": 1.46

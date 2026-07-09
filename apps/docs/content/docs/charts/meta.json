@@ -84,6 +84,7 @@
     "hypnogram",
     "eta-bar",
     "waveform",
-    "event-raster"
+    "event-raster",
+    "rubric-strip"
   ]
 }

@@ -61,6 +61,7 @@ const { Hypnogram } = await D("hypnogram");
 const { EtaBar } = await D("eta-bar");
 const { Waveform } = await D("waveform");
 const { EventRaster } = await D("event-raster");
+const { RubricStrip } = await D("rubric-strip");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1009,6 +1010,11 @@ const body = [
   row("services", svg(EventRaster, { data: [{ label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40, 41, 48, 55] }, { label: "db", events: [3, 6, 15, 21, 34, 41, 55] }, { label: "cache", events: [6, 21, 41, 55] }, { label: "queue", events: [10, 30, 50] }], width: 300, height: 36 })),
   row("emphasis api", svg(EventRaster, { data: [{ label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40] }, { label: "db", events: [3, 6, 15, 21, 34] }, { label: "cache", events: [6, 21, 41] }], emphasis: "api", width: 300, height: 30 })),
   row("dense → binned", svg(EventRaster, { data: [{ label: "spam", events: Array.from({ length: 300 }, (_, i) => i) }, { label: "rare", events: [10, 150, 280] }], domain: [0, 299], width: 300, height: 20 })),
+
+  `<h2>RubricStrip</h2>`,
+  row("weighted + target", svg(RubricStrip, { data: [{ label: "Correctness", score: 0.92, weight: 3 }, { label: "Coverage", score: 0.78, weight: 2 }, { label: "Clarity", score: 0.65, weight: 1 }, { label: "Style", score: 0.41, weight: 1 }], target: 0.7, width: 260, height: 44 })),
+  row("unweighted", svg(RubricStrip, { data: [{ label: "Lint", score: 1 }, { label: "Types", score: 1 }, { label: "Tests", score: 0.8 }, { label: "Docs", score: 0.5 }], width: 260, height: 44 })),
+  row("cell", svg(RubricStrip, { data: [{ label: "a", score: 0.9, weight: 3 }, { label: "b", score: 0.5, weight: 1 }], labels: false, width: 60, height: 24 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

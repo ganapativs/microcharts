@@ -173,6 +173,8 @@ export default defineConfig({
     "src/charts/waveform/client.tsx",
     "src/charts/event-raster/index.tsx",
     "src/charts/event-raster/client.tsx",
+    "src/charts/rubric-strip/index.tsx",
+    "src/charts/rubric-strip/client.tsx",
   ],
   format: ["esm"],
   dts: true,

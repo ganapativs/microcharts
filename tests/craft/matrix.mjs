@@ -261,6 +261,24 @@ add(
   ],
 );
 add(
+  "rubric-strip",
+  "RubricStrip",
+  [
+    {
+      data: [
+        { label: "Correctness", score: 0.92, weight: 3 },
+        { label: "Coverage", score: 0.78, weight: 2 },
+        { label: "Style", score: 0.41, weight: 1 },
+      ],
+      target: 0.7,
+    },
+  ],
+  [
+    [80, 24],
+    [240, 40],
+  ],
+);
+add(
   "event-raster",
   "EventRaster",
   [

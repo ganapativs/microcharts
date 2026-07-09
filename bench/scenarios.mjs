@@ -746,4 +746,17 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "rubric-strip",
+    component: "RubricStrip",
+    floor: 25, // ≤ 8 rows × (track + bar) + normalize
+    props: (i) => ({
+      data: Array.from({ length: 5 }, (_r, k) => ({
+        label: `crit${k}`,
+        score: ((i + k * 17) % 100) / 100,
+        weight: ((i + k) % 4) + 1,
+      })),
+      summary: false,
+    }),
+  },
 ];

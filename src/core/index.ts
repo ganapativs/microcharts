@@ -33,6 +33,7 @@ export { EN_HYPNOGRAM, type HypnogramStrings } from "./strings-hypnogram.js";
 export { EN_ETA_BAR, type EtaBarStrings } from "./strings-eta-bar.js";
 export { EN_WAVEFORM, type WaveformStrings } from "./strings-waveform.js";
 export { EN_EVENT_RASTER, type EventRasterStrings } from "./strings-event-raster.js";
+export { EN_RUBRIC, type RubricStrings } from "./strings-rubric.js";
 export {
   quantiles,
   fiveNumber,

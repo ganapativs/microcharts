@@ -623,6 +623,11 @@ export interface SummaryStrings {
   eventRasterBinned: (lanes: string) => string;
   /** Interactive event announce, e.g. "api, event at 42 (3 of 89)." (event-raster). */
   eventRasterAt: (lane: string, t: string, k: number, n: number) => string;
+  /** RubricStrip overview, e.g.
+   *  "4 criteria; highest Correctness (0.92), lowest Style (0.41)." */
+  rubric: (n: number, hi: string, hiScore: string, lo: string, loScore: string) => string;
+  /** Interactive criterion announce, e.g. "Correctness: 0.92, weight 40% of total." */
+  rubricRow: (label: string, score: string, weightPct: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive
