@@ -66,6 +66,7 @@ import { EN_TOKEN_CONFIDENCE } from "./strings-token-confidence.js";
 import { EN_WIND_BARB } from "./strings-wind-barb.js";
 import { EN_STAR_SPOKE } from "./strings-star-spoke.js";
 import { EN_MINIMAP } from "./strings-minimap.js";
+import { EN_DUAL_WINDOW } from "./strings-dual-window.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -132,4 +133,5 @@ export const EN: SummaryStrings = {
   ...EN_WIND_BARB,
   ...EN_STAR_SPOKE,
   ...EN_MINIMAP,
+  ...EN_DUAL_WINDOW,
 };

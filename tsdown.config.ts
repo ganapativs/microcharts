@@ -182,6 +182,8 @@ export default defineConfig({
     "src/charts/star-spoke/client.tsx",
     "src/charts/minimap-strip/index.tsx",
     "src/charts/minimap-strip/client.tsx",
+    "src/charts/dual-window-meter/index.tsx",
+    "src/charts/dual-window-meter/client.tsx",
   ],
   format: ["esm"],
   dts: true,

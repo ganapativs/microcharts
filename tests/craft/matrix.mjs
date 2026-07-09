@@ -279,6 +279,15 @@ add(
   ],
 );
 add(
+  "dual-window-meter",
+  "DualWindowMeter",
+  [
+    { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 - (i > 40 ? 2 : 0)), target: -23 },
+    { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4), target: -23, band: [-25, -21] },
+  ],
+  [[80, 16], [320, 28]],
+);
+add(
   "minimap-strip",
   "MinimapStrip",
   [

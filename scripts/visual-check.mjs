@@ -66,6 +66,7 @@ const { TokenConfidence } = await D("token-confidence");
 const { WindBarb } = await D("wind-barb");
 const { StarSpoke } = await D("star-spoke");
 const { MinimapStrip } = await D("minimap-strip");
+const { DualWindowMeter } = await D("dual-window-meter");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1038,6 +1039,11 @@ const body = [
   row("bars + fog", svg(MinimapStrip, { data: { content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6), window: [520, 660], marks: [100, 600, 1100], known: [[0, 1104]] }, domain: [0, 1200], width: 320, height: 18 })),
   row("heat", svg(MinimapStrip, { data: { content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + 0.4), window: [300, 440], marks: [600, 1000] }, domain: [0, 1200], variant: "heat", width: 320, height: 18 })),
   row("cell", svg(MinimapStrip, { data: { content: Array.from({ length: 400 }, (_, i) => Math.abs(Math.sin(i / 20)) + 0.3), window: [120, 200] }, domain: [0, 400], width: 80, height: 12 })),
+
+  `<h2>DualWindowMeter</h2>`,
+  row("loudness", svg(DualWindowMeter, { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0)), target: -23, width: 320, height: 28 })),
+  row("corridor", svg(DualWindowMeter, { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4), target: -23, band: [-25, -21], width: 320, height: 28 })),
+  row("cell", svg(DualWindowMeter, { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4), target: -23, label: "none", width: 80, height: 16 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

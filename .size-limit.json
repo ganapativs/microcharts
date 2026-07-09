@@ -1043,6 +1043,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/dual-window-meter (static)",
+    "path": "dist/charts/dual-window-meter/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dual-window-meter/interactive",
+    "path": "dist/charts/dual-window-meter/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

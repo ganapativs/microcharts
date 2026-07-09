@@ -804,4 +804,14 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "dual-window-meter",
+    component: "DualWindowMeter",
+    floor: 30, // two rolling-mean passes + two paths
+    props: (i) => ({
+      data: Array.from({ length: 60 }, (_s, j) => 74 + Math.sin((i + j) / 4) * 3),
+      target: 75,
+      summary: false,
+    }),
+  },
 ];

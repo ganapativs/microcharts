@@ -31,6 +31,7 @@ import { TokenConfidence } from "@microcharts/react/token-confidence";
 import { WindBarb } from "@microcharts/react/wind-barb";
 import { StarSpoke } from "@microcharts/react/star-spoke";
 import { MinimapStrip } from "@microcharts/react/minimap-strip";
+import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -138,6 +139,7 @@ export function getMDXComponents(components?: MDXComponents) {
     WindBarb,
     StarSpoke,
     MinimapStrip,
+    DualWindowMeter,
     HistogramStrip,
     MicroBox,
     ProgressRing,

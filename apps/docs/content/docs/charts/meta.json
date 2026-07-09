@@ -89,6 +89,7 @@
     "token-confidence",
     "wind-barb",
     "star-spoke",
-    "minimap-strip"
+    "minimap-strip",
+    "dual-window-meter"
   ]
 }

@@ -658,6 +658,10 @@ export interface SummaryStrings {
   minimapUnknown: (pct: string) => string;
   /** Interactive window announce, e.g. "Viewing 520 to 660 of 1,200." (minimap). */
   minimapView: (a: string, b: string, total: string) => string;
+  /** DualWindowMeter overview, e.g. "Slow window −23.1 vs target −23.0; fast −20.4." */
+  dualWindow: (slow: string, target: string, fast: string) => string;
+  /** Interactive point announce, e.g. "fast −20.4, slow −23.1, target −23.0." */
+  dualWindowAt: (fast: string, slow: string, target: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

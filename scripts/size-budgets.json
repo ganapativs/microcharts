@@ -352,6 +352,10 @@
     "minimap-strip": {
       "static": "2.4 kB",
       "interactive": "3.4 kB"
+    },
+    "dual-window-meter": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
     }
   }
 }

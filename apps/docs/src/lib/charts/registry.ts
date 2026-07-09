@@ -97,6 +97,7 @@ import tokenConfidence from "./token-confidence";
 import windBarb from "./wind-barb";
 import starSpoke from "./star-spoke";
 import minimapStrip from "./minimap-strip";
+import dualWindowMeter from "./dual-window-meter";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -186,6 +187,7 @@ const MODULES: ChartModule[] = [
   windBarb,
   starSpoke,
   minimapStrip,
+  dualWindowMeter,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

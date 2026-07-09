@@ -339,12 +339,16 @@
     "static": 2.3
   },
   "star-spoke": {
-    "static": 1.94,
-    "interactive": 2.79
+    "static": 1.97,
+    "interactive": 2.84
   },
   "minimap-strip": {
     "static": 2.35,
     "interactive": 3.07
+  },
+  "dual-window-meter": {
+    "static": 2.33,
+    "interactive": 3.17
   },
   "annotations": {
     "static": 1.46
