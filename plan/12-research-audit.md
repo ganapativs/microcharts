@@ -1155,3 +1155,10 @@ CyclePlot 2.44, EnsembleGhosts 2.28; **ChangePoint 2.93/3.93 sits AT the caps**)
 citation gap (W1), and the two EnsembleGhosts interactive deviations (setState-not-WAAPI HOP; no
 readout chip by design). None violate a non-negotiable; all are logged above. **Do NOT start Batch 3
 (expressive, plan/24) before this gate is signed off.** **16 of 16 W2/W3 · 21 of 21 batch.**
+
+## Batch 2 post-completion review — docs nav + dark-mode (2026-07-09)
+
+User review of the shipped Batch 2 surfaced two real issues, both fixed:
+
+1. **5 charts missing from the docs sidebar.** `apps/docs/content/docs/charts/meta.json` `pages[]` is a MANUAL ordered nav list — it stopped at `pareto-strip`, so data-diff/quadrant-dot/cycle-plot/change-point/ensemble-ghosts existed + were URL-reachable but invisible in nav. (The gallery / catalog.json / llms surfaces are registry-driven and already had them.) Added the 5 slugs.
+2. **Line-based ghosts rendered invisible (worst on dark).** The `data-mc-ink="ghost"` CSS role is a FILL role (`fill:neutral; stroke:none`); on a stroked `<line>`/`<path>` its `stroke:none` (CSS beats the inline `stroke=` attr) killed the stroke and `fill:neutral` filled the open polyline into a faint wedge — EnsembleGhosts member paths, CyclePlot slot lines, ChangePoint regime-mean hairlines all near-invisible, gone on the dark surface. Fixed by ELEMENT-SPLITTING the `ghost` role (rect/circle/ellipse/polygon → fill; path/line/polyline → `stroke:neutral; stroke-opacity:.5; fill:none`) + a matching forced-colors split. Also floored two ultra-faint decorative tints for dark parity: QuadrantDot region .05→.08, ChangePoint regime shading .03/.06→.05/.11 (still subtle on light). Verified both themes in a real browser across the gallery + each new chart. Neither the SSR craft gate nor the getBBox sweep catches an invisible-stroke mark — only eyeballing light AND dark does; added to the review checklist (memory `chart-legibility-and-review-practices`). Gates re-run green: node 1417, browser 108, craft 361/0, size pass, docs 210 pages.
