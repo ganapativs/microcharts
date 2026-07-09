@@ -1079,6 +1079,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/calibration-strip (static)",
+    "path": "dist/charts/calibration-strip/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/calibration-strip/interactive",
+    "path": "dist/charts/calibration-strip/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

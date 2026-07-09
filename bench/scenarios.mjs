@@ -838,4 +838,13 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "calibration-strip",
+    component: "CalibrationStrip",
+    floor: 15, // bin 800 raw pairs → dots + support — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 800 }, (_s, j) => ({ p: ((i + j) % 100) / 100, outcome: (i + j) % 3 === 0 ? 1 : 0 })),
+      summary: false,
+    }),
+  },
 ];

@@ -34,6 +34,7 @@ import { MinimapStrip } from "@microcharts/react/minimap-strip";
 import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
 import { DepthWedge } from "@microcharts/react/depth-wedge";
 import { PartitionStrip } from "@microcharts/react/partition-strip";
+import { CalibrationStrip } from "@microcharts/react/calibration-strip";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -144,6 +145,7 @@ export function getMDXComponents(components?: MDXComponents) {
     DualWindowMeter,
     DepthWedge,
     PartitionStrip,
+    CalibrationStrip,
     HistogramStrip,
     MicroBox,
     ProgressRing,

@@ -69,6 +69,7 @@ const { MinimapStrip } = await D("minimap-strip");
 const { DualWindowMeter } = await D("dual-window-meter");
 const { DepthWedge } = await D("depth-wedge");
 const { PartitionStrip } = await D("partition-strip");
+const { CalibrationStrip } = await D("calibration-strip");
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1056,6 +1057,10 @@ const body = [
   row("bundle", svg(PartitionStrip, { data: [{ label: "JS", children: [{ label: "react", value: 28 }, { label: "vendor", value: 12 }, { label: "app", value: 8 }] }, { label: "CSS", children: [{ label: "tailwind", value: 16 }, { label: "custom", value: 8 }] }, { label: "img", value: 18 }, { label: "font", value: 10 }], width: 320, height: 30 })),
   row("emphasis react", svg(PartitionStrip, { data: [{ label: "JS", children: [{ label: "react", value: 28 }, { label: "vendor", value: 12 }] }, { label: "CSS", children: [{ label: "tailwind", value: 16 }, { label: "custom", value: 8 }] }, { label: "img", value: 18 }], emphasis: "react", width: 320, height: 30 })),
   row("cell", svg(PartitionStrip, { data: [{ label: "A", children: [{ label: "a1", value: 3 }, { label: "a2", value: 2 }] }, { label: "B", value: 4 }], labels: false, width: 80, height: 16 })),
+
+  `<h2>CalibrationStrip</h2>`,
+  row("dots + support", svg(CalibrationStrip, { data: [{ predicted: 0.05, observed: 0.05, count: 100 }, { predicted: 0.25, observed: 0.24, count: 80 }, { predicted: 0.45, observed: 0.44, count: 60 }, { predicted: 0.65, observed: 0.63, count: 40 }, { predicted: 0.7, observed: 0.52, count: 30 }, { predicted: 0.85, observed: 0.83, count: 8 }, { predicted: 0.95, observed: 0.9, count: 5 }], width: 300, height: 44 })),
+  row("bars", svg(CalibrationStrip, { data: [{ predicted: 0.1, observed: 0.08, count: 90 }, { predicted: 0.3, observed: 0.36, count: 70 }, { predicted: 0.5, observed: 0.44, count: 55 }, { predicted: 0.7, observed: 0.52, count: 30 }, { predicted: 0.9, observed: 0.85, count: 8 }], variant: "bars", width: 300, height: 40 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

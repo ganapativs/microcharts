@@ -100,6 +100,7 @@ import minimapStrip from "./minimap-strip";
 import dualWindowMeter from "./dual-window-meter";
 import depthWedge from "./depth-wedge";
 import partitionStrip from "./partition-strip";
+import calibrationStrip from "./calibration-strip";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -192,6 +193,7 @@ const MODULES: ChartModule[] = [
   dualWindowMeter,
   depthWedge,
   partitionStrip,
+  calibrationStrip,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

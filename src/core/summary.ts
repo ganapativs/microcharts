@@ -680,6 +680,15 @@ export interface SummaryStrings {
   partitionAt: (label: string, pct: string, parentClause: string) => string;
   /** Parent clause appended for a child node, e.g. ", 63% of JS". */
   partitionParent: (pct: string, parent: string) => string;
+  /** CalibrationStrip overview, e.g.
+   *  "10 bins; largest gap at 0.7 predicted (observed 0.52); 2 low-support bins." */
+  calibration: (bins: number, p: string, o: string, low: number) => string;
+  /** Perfect calibration, e.g. "10 bins; well calibrated." (calibration-strip). */
+  calibrationGood: (bins: number) => string;
+  /** Interactive bin announce, e.g. "predicted 0.7, observed 0.52, 40 samples." */
+  calibrationAt: (p: string, o: string, n: number, lowClause: string) => string;
+  /** Low-support clause appended to a bin announce, e.g. ", low support". */
+  calibrationLow: string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

@@ -279,6 +279,22 @@ add(
   ],
 );
 add(
+  "calibration-strip",
+  "CalibrationStrip",
+  [
+    {
+      data: [
+        { predicted: 0.1, observed: 0.08, count: 90 },
+        { predicted: 0.3, observed: 0.36, count: 70 },
+        { predicted: 0.5, observed: 0.44, count: 55 },
+        { predicted: 0.7, observed: 0.52, count: 30 },
+        { predicted: 0.9, observed: 0.85, count: 8 },
+      ],
+    },
+  ],
+  [[80, 24], [300, 44]],
+);
+add(
   "partition-strip",
   "PartitionStrip",
   [

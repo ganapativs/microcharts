@@ -1,0 +1,92 @@
+---
+title: CalibrationStrip
+description: A reliability diagram for React — predicted vs observed probability against the identity diagonal, with an always-on support lane so tiny bins never look authoritative.
+---
+
+CalibrationStrip answers "when this model says 70%, does it happen 70% of the time — and where is
+there enough data to even ask?". Each bin is a dot at its predicted probability and its observed
+frequency, read against the identity diagonal, with a quiet support lane underneath. Bins with too
+little data render open and faded, so a confident-looking dot is never backed by three samples.
+
+<LiveDemo
+  label="CalibrationStrip"
+  sizeOf="calibration-strip"
+  code={`import { CalibrationStrip } from "@microcharts/react/calibration-strip";
+
+<CalibrationStrip data={reliability} title="Model calibration" />`}
+>
+  <CalibrationStrip
+    data={[
+      { predicted: 0.05, observed: 0.05, count: 100 },
+      { predicted: 0.15, observed: 0.16, count: 90 },
+      { predicted: 0.25, observed: 0.24, count: 80 },
+      { predicted: 0.35, observed: 0.36, count: 70 },
+      { predicted: 0.45, observed: 0.44, count: 60 },
+      { predicted: 0.55, observed: 0.56, count: 50 },
+      { predicted: 0.65, observed: 0.63, count: 40 },
+      { predicted: 0.7, observed: 0.52, count: 30 },
+      { predicted: 0.85, observed: 0.83, count: 8 },
+      { predicted: 0.95, observed: 0.9, count: 5 },
+    ]}
+    title="Model calibration"
+    width={300}
+    height={44}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="calibration-strip" />
+
+## Try it
+
+<Playground chart="calibration-strip" />
+
+## Interactive
+
+<InteractiveDemo slug="calibration-strip" />
+
+## When to use it
+
+- **Good for** — classifier reliability / trust, probability-forecast auditing.
+- **Avoid for** — a single accuracy number (Delta) or where the errors go ([ConfusionGrid](/docs/charts/confusion-grid)).
+
+## Sizing
+
+<Sizing chart="calibration-strip" />
+
+## Variants
+
+<LiveDemo label="deviation bars" code={`<CalibrationStrip data={reliability} variant="bars" />`}>
+  <CalibrationStrip
+    data={[
+      { predicted: 0.1, observed: 0.08, count: 90 },
+      { predicted: 0.3, observed: 0.36, count: 70 },
+      { predicted: 0.5, observed: 0.44, count: 55 },
+      { predicted: 0.7, observed: 0.52, count: 30 },
+      { predicted: 0.9, observed: 0.85, count: 8 },
+    ]}
+    variant="bars"
+    title="Deviation"
+    width={300}
+    height={40}
+  />
+</LiveDemo>
+
+## Why this default
+
+Dots plus an always-on support lane because "how sure" and "based on how much" must travel together
+— a reliability read without support disclosure is exactly the failure this chart exists to prevent.
+Low-support bins are drawn open and faded and the count is never disableable. There is deliberately
+no single-number calibration score (ECE) rendered or announced: one number would hide precisely the
+per-bin structure the chart exists to show.
+
+## Accessibility
+
+The accessible name reports the worst miscalibration and the support gaps — **"10 bins; largest gap
+at 0.7 predicted (observed 0.52); 2 low-support bins."** The interactive entry roves the bins with
+←/→, announcing each bin's predicted and observed probability and its sample support.
+
+## Props
+
+<PropTable slug="calibration-strip" />

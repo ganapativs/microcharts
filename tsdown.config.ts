@@ -188,6 +188,8 @@ export default defineConfig({
     "src/charts/depth-wedge/client.tsx",
     "src/charts/partition-strip/index.tsx",
     "src/charts/partition-strip/client.tsx",
+    "src/charts/calibration-strip/index.tsx",
+    "src/charts/calibration-strip/client.tsx",
   ],
   format: ["esm"],
   dts: true,

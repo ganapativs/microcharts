@@ -10,6 +10,13 @@ function XMark() {
   );
 }
 
+// A handful of flagship charts — the footer is a signpost, not the catalog.
+// The full list lives in the gallery (linked below); 90 rows here overflowed it.
+const FEATURED_SLUGS = ["sparkline", "sparkbar", "delta", "bullet", "activity-grid"];
+const featured = FEATURED_SLUGS.map((slug) => STABLE_CHARTS.find((c) => c.slug === slug)).filter(
+  (c): c is (typeof STABLE_CHARTS)[number] => c !== undefined,
+);
+
 const cols: { title: string; links: { href: string; label: string; external?: boolean }[] }[] = [
   {
     title: "Docs",
@@ -23,7 +30,10 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
   },
   {
     title: "Charts",
-    links: STABLE_CHARTS.map((c) => ({ href: `/docs/charts/${c.slug}`, label: c.name })),
+    links: [
+      ...featured.map((c) => ({ href: `/docs/charts/${c.slug}`, label: c.name })),
+      { href: "/gallery", label: `All ${STABLE_CHARTS.length} charts →` },
+    ],
   },
   {
     title: "Machine",

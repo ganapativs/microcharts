@@ -756,6 +756,14 @@
       "types": "./dist/charts/partition-strip/client.d.ts",
       "import": "./dist/charts/partition-strip/client.js"
     },
+    "./calibration-strip": {
+      "types": "./dist/charts/calibration-strip/index.d.ts",
+      "import": "./dist/charts/calibration-strip/index.js"
+    },
+    "./calibration-strip/interactive": {
+      "types": "./dist/charts/calibration-strip/client.d.ts",
+      "import": "./dist/charts/calibration-strip/client.js"
+    },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"

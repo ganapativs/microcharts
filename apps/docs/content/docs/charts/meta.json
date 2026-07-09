@@ -92,6 +92,7 @@
     "minimap-strip",
     "dual-window-meter",
     "depth-wedge",
-    "partition-strip"
+    "partition-strip",
+    "calibration-strip"
   ]
 }

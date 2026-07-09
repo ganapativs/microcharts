@@ -69,6 +69,7 @@ import { EN_MINIMAP } from "./strings-minimap.js";
 import { EN_DUAL_WINDOW } from "./strings-dual-window.js";
 import { EN_DEPTH_WEDGE } from "./strings-depth-wedge.js";
 import { EN_PARTITION } from "./strings-partition.js";
+import { EN_CALIBRATION } from "./strings-calibration.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -138,4 +139,5 @@ export const EN: SummaryStrings = {
   ...EN_DUAL_WINDOW,
   ...EN_DEPTH_WEDGE,
   ...EN_PARTITION,
+  ...EN_CALIBRATION,
 };
