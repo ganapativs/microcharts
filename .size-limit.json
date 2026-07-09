@@ -623,6 +623,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/ensemble-ghosts (static)",
+    "path": "dist/charts/ensemble-ghosts/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ensemble-ghosts/interactive",
+    "path": "dist/charts/ensemble-ghosts/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

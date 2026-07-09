@@ -639,6 +639,26 @@ add(
     [240, 32],
   ],
 );
+const ENSF = Array.from({ length: 24 }, (_m, i) =>
+  Array.from({ length: 10 }, (_t, t) =>
+    Math.round(40 + (i - 12) * 0.55 * t * 0.4 + 3 * Math.sin(i + t) + t * 0.5),
+  ),
+);
+add(
+  "ensemble-ghosts",
+  "EnsembleGhosts",
+  [
+    { data: ENSF },
+    { data: ENSF, endpoints: true },
+    { data: ENSF, emphasis: "median" },
+    { data: ENSF, ghosts: 12 },
+  ],
+  [
+    [80, 20],
+    [160, 32],
+    [240, 44],
+  ],
+);
 add(
   "shift-histogram",
   "ShiftHistogram",

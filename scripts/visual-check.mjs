@@ -30,6 +30,7 @@ const { DataDiff } = await D("data-diff");
 const { QuadrantDot } = await D("quadrant-dot");
 const { CyclePlot } = await D("cycle-plot");
 const { ChangePoint } = await D("change-point");
+const { EnsembleGhosts } = await D("ensemble-ghosts");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -143,6 +144,11 @@ for (let w = 0; w < 6; w++) CYC.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
 const CDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const CPSTEP = [...Array(14).fill(30), ...Array(20).fill(48)];
 const CPTWO = [...Array(10).fill(10), ...Array(10).fill(50), ...Array(10).fill(22)];
+const ENSF = Array.from({ length: 24 }, (_m, i) =>
+  Array.from({ length: 10 }, (_t, t) =>
+    Math.round(40 + (i - 12) * 0.55 * t * 0.4 + 3 * Math.sin(i + t) + t * 0.5),
+  ),
+);
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -533,6 +539,18 @@ const body = [
   ),
   row("two breaks", svg(ChangePoint, { data: CPTWO, width: 200, height: 24 })),
   row("no means", svg(ChangePoint, { data: CPSTEP, means: false, width: 200, height: 24 })),
+
+  `<h2>EnsembleGhosts</h2>`,
+  row("default 80x20", svg(EnsembleGhosts, { data: ENSF, width: 80, height: 20 })),
+  row(
+    "endpoints 240x44",
+    svg(EnsembleGhosts, { data: ENSF, endpoints: true, width: 240, height: 44, title: "Futures" }),
+  ),
+  row(
+    "synthetic median",
+    svg(EnsembleGhosts, { data: ENSF, emphasis: "median", width: 200, height: 32 }),
+  ),
+  row("12 ghosts", svg(EnsembleGhosts, { data: ENSF, ghosts: 12, width: 200, height: 32 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

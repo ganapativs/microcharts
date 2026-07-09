@@ -452,6 +452,14 @@
       "types": "./dist/charts/change-point/client.d.ts",
       "import": "./dist/charts/change-point/client.js"
     },
+    "./ensemble-ghosts": {
+      "types": "./dist/charts/ensemble-ghosts/index.d.ts",
+      "import": "./dist/charts/ensemble-ghosts/index.js"
+    },
+    "./ensemble-ghosts/interactive": {
+      "types": "./dist/charts/ensemble-ghosts/client.d.ts",
+      "import": "./dist/charts/ensemble-ghosts/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

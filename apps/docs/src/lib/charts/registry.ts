@@ -64,6 +64,7 @@ import dataDiff from "./data-diff";
 import quadrantDot from "./quadrant-dot";
 import cyclePlot from "./cycle-plot";
 import changePoint from "./change-point";
+import ensembleGhosts from "./ensemble-ghosts";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -120,6 +121,7 @@ const MODULES: ChartModule[] = [
   quadrantDot,
   cyclePlot,
   changePoint,
+  ensembleGhosts,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

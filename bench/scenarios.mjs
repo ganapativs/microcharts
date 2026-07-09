@@ -429,6 +429,15 @@ export const SCENARIOS = [
     props: (i) => ({ data: diffs[i % POOL], summary: false }),
   },
   {
+    slug: "ensemble-ghosts",
+    component: "EnsembleGhosts",
+    floor: 12, // ≤12 ghost paths + median/nearest-median scan over the ensemble
+    props: (i) => ({
+      data: Array.from({ length: 24 }, (_, m) => waves[(i + m) % POOL].slice(0, 12)),
+      summary: false,
+    }),
+  },
+  {
     slug: "change-point",
     component: "ChangePoint",
     floor: 12, // detector: O(n²) binary segmentation over ≤500 pts, still cheap

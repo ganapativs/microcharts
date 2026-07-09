@@ -1099,3 +1099,59 @@ real-browser sweep green (all 13 change-point SVGs 0 escapes after the gutter fi
 tile gap-free; break hairline+triangle; live hero == mdx flagship string; interactive point/regime +
 Tab-cycles-breaks + readout chip correct). New `EN_CHANGE_POINT` module (`changePoint`,
 `changePointNone`, `changePointAt`, `changePointBreak`). **15 of 21 done.**
+
+## Batch 2 wave 3 — EnsembleGhosts (2026-07-09) — BATCH 2 COMPLETE
+
+**EnsembleGhosts (plan/23 #20) — full DoD, static + interactive. The final Batch 2 chart.**
+Provenance: plan/16 §Q4 (hypothetical-outcome plots / ensemble spaghetti, Hullman et al.). A faint
+bundle of member paths + one emphasised representative, because a mean line hides that futures
+disagree in SHAPE, not just endpoint. **Ghost selection is DETERMINISTIC** (`selectGhosts`): members
+ranked by endpoint value, picked at evenly spaced quantiles of that ranking — no `Math.random`, no
+jitter, so SSR == hydration == every render (property-tested: same input → identical member set).
+`ghosts` (default 8, cap 12), `emphasis` (`"nearest-median"` = the real member with the smallest L2
+distance to the pointwise median / `"median"` = the synthetic pointwise-median path, `member: null`,
+flagged / a pinned member index), `endpoints` (ghost endpoint dots). Unequal-length members each draw
+to their own length on a shared index x-scale (never truncated); NaN members excluded (dev-warned);
+single member → memberCount 1 (docs → Sparkline). Real accessible name: **"8 simulated paths end
+between 28 and 61; typical path ends near 46."** (spread = endpoint range across ALL members; typical
+= the emphasised path's endpoint).
+
+**The interactive entry is THE HOP LOOP — the one place animation adds measured value (plan/16 Q4).**
+On hover/focus it cycles members one at a time at ~400 ms/frame (≈ 2.5 Hz, the studied HOP cadence)
+via a `setInterval` that swaps the surfaced accent path, looping until the pointer leaves.
+**Reduced-motion: no loop** — ←/→ step members discretely (the same information without motion), read
+off `matchMedia('(prefers-reduced-motion: reduce)')`. The live region announces **only** on a keyboard
+step or when the loop stops — NEVER per frame — via a `announce` state decoupled from the per-frame
+`active` state (so a screen reader isn't spammed at 2.5 Hz). Honesty enforced: a static frame is NOT
+a HOP; no static copy claims the HOP findings; the loop is reduced-motion-gated with the stated
+non-animated equivalent.
+
+**Deviations logged:** (1) the HOP frames are `setState` swaps, not the spec's "WAAPI opacity on
+pre-rendered paths (no re-render per frame)" — at ≤12 paths / 2.5 Hz a re-render is negligible and the
+`useMemo`'d geometry means no recompute per frame; the WAAPI micro-opt wasn't worth the ref-juggling
+complexity. (2) No `.mc-spark-readout` chip — the cycling full-accent path IS the visible feedback
+(the HOP), and a per-frame number chip would fight the calm 2.5 Hz cadence and contradict the
+"announce not per frame" rule; the visible-feedback DoD is met by the emphasised path. Both noted for
+gate sign-off. Median computed inline (no `quantile` import) per the ShiftHistogram budget lesson;
+scales + line builder inlined (like ChangePoint) — static a lean 2.28 kB (spec ≤ 2, but see: it's
+UNDER even the tight spec target once — actually 2.28 > 2 spec, < 3 cap; interactive 3.13 < 3.5).
+
+Gates: node 1417, browser 108, craft 361/0, size 2.28/3.13 (budgets 2.5/3.5, caps 3/4), bench 15.1
+rows/ms (floor 12), docs 210 pages + tests 120, real-browser sweep green (all 13 ensemble SVGs 0
+escapes; ghost bundle + accent emphasis; endpoints dots; synthetic-median variant; 12-ghost cap; live
+hero == mdx string; interactive ←/→ member announce correct). New `EN_ENSEMBLE` module (`ensemble`,
+`ensembleSingle`, `ensembleAt`).
+
+### ⛳ BATCH 2 (decision micrographs, 21 types) COMPLETE — needs the batch gate
+
+All 21 decision charts are shipped (W1: CoverageStrip, BenchmarkStrip, PercentileLadder, GradedBand,
+IconArray; W2: RateVolume, NetFlow, RetentionCurve, BurnChart, ErrorBudget, ControlStrip,
+ForecastCone, QuantileDots; W3: ABStrips, ShiftHistogram, ParetoStrip, DataDiff, QuadrantDot,
+CyclePlot, ChangePoint, EnsembleGhosts). **Open items for the user's batch-gate sign-off** (per
+plan/23 gate = "DoD ×21 + research-claim audit entries + craft bar"): the accumulated spec-vs-measured
+BUDGET divergences (most static charts landed above their spec §-target but under the 3/4 kB HARD
+caps — RateVolume 2.55, NetFlow 2.61, Retention 2.64, Burn 2.82, ForecastCone 2.83, QuadrantDot 2.17,
+CyclePlot 2.44, EnsembleGhosts 2.28; **ChangePoint 2.93/3.93 sits AT the caps**), the BenchmarkStrip
+citation gap (W1), and the two EnsembleGhosts interactive deviations (setState-not-WAAPI HOP; no
+readout chip by design). None violate a non-negotiable; all are logged above. **Do NOT start Batch 3
+(expressive, plan/24) before this gate is signed off.** **16 of 16 W2/W3 · 21 of 21 batch.**

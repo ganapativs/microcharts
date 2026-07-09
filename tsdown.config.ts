@@ -117,6 +117,8 @@ export default defineConfig({
     "src/charts/cycle-plot/client.tsx",
     "src/charts/change-point/index.tsx",
     "src/charts/change-point/client.tsx",
+    "src/charts/ensemble-ghosts/index.tsx",
+    "src/charts/ensemble-ghosts/client.tsx",
   ],
   format: ["esm"],
   dts: true,

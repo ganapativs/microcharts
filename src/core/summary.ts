@@ -459,6 +459,12 @@ export interface SummaryStrings {
   ) => string;
   /** Break announcement, e.g. "Break at point 34: mean 32 to 48 (+50%)." */
   changePointBreak: (i: number, before: string, after: string, signedDelta: string) => string;
+  /** Ensemble summary, e.g. "24 simulated paths end between 31 and 58; typical path ends near 44." */
+  ensemble: (n: number, lo: string, hi: string, mid: string) => string;
+  /** Single-member ensemble, e.g. "Single path, ends at 44." */
+  ensembleSingle: (end: string) => string;
+  /** Member announcement, e.g. "Member 7 of 24; ends at 42." */
+  ensembleAt: (pos: number, total: number, end: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

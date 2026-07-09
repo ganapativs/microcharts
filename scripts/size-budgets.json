@@ -221,6 +221,10 @@
     "change-point": {
       "static": "2.98 kB",
       "interactive": "3.98 kB"
+    },
+    "ensemble-ghosts": {
+      "static": "2.5 kB",
+      "interactive": "3.5 kB"
     }
   }
 }
