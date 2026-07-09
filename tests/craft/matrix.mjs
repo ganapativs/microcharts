@@ -548,17 +548,50 @@ const PAR = [
 add(
   "pareto-strip",
   "ParetoStrip",
-  [{ data: PAR }, { data: PAR, max: 3 }, { data: PAR, threshold: false }, { data: PAR, label: "none" }],
+  [
+    { data: PAR },
+    { data: PAR, max: 3 },
+    { data: PAR, threshold: false },
+    { data: PAR, label: "none" },
+  ],
   [
     [80, 20],
     [160, 28],
     [240, 32],
   ],
 );
+const DDIFF = [
+  { key: "users", added: 340, removed: 120 },
+  { key: "orders", added: 88, removed: 30 },
+  { key: "items", added: 40, removed: 20 },
+  { key: "tags", added: 24, removed: 8 },
+  { key: "notes", added: 12, removed: 6 },
+  { key: "flags", added: 8, removed: 3 },
+];
+add(
+  "data-diff",
+  "DataDiff",
+  [
+    { data: DDIFF },
+    { data: DDIFF, labels: true },
+    { data: DDIFF, net: true, label: "totals" },
+    { data: DDIFF, sort: "net" },
+  ],
+  [
+    [80, 20],
+    [160, 56],
+    [220, 80],
+  ],
+);
 add(
   "shift-histogram",
   "ShiftHistogram",
-  [{ data: { before: SHB, after: SHA } }, { data: { before: SHB, after: SHA }, mode: "overlay" }, { data: { before: SHB, after: SHA }, bins: 6 }, { data: { before: SHB, after: SHA }, label: "none" }],
+  [
+    { data: { before: SHB, after: SHA } },
+    { data: { before: SHB, after: SHA }, mode: "overlay" },
+    { data: { before: SHB, after: SHA }, bins: 6 },
+    { data: { before: SHB, after: SHA }, label: "none" },
+  ],
   [
     [80, 20],
     [160, 28],

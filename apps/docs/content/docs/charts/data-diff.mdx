@@ -1,0 +1,107 @@
+---
+title: DataDiff
+description: A diverging diff chart for React — removed left, added right, one symmetric scale per key, so churn never hides behind a small net.
+---
+
+DataDiff answers "what changed between these two versions?". Each key gets a diverging bar:
+**removed leftward, added rightward, both always drawn** on one symmetric shared scale. Net is a
+mark you can turn on, never a replacement for the two bars — a +500/−480 churn and a +20/−0 trickle
+must never look alike.
+
+<LiveDemo
+  label="DataDiff"
+  sizeOf="data-diff"
+  code={`import { DataDiff } from "@microcharts/react/data-diff";
+
+<DataDiff data={diff} title="Schema diff" />`}
+>
+  <DataDiff
+    data={[
+      { key: "users", added: 340, removed: 120 },
+      { key: "orders", added: 88, removed: 30 },
+      { key: "items", added: 40, removed: 20 },
+      { key: "tags", added: 24, removed: 8 },
+      { key: "notes", added: 12, removed: 6 },
+      { key: "flags", added: 8, removed: 3 },
+    ]}
+    labels
+    title="Schema diff"
+    width={200}
+    height={72}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="data-diff" />
+
+## Try it
+
+<Playground chart="data-diff" />
+
+## Interactive
+
+<InteractiveDemo slug="data-diff" />
+
+## When to use it
+
+- **Good for** — a table cell per dataset version, a KPI card for a sync or import job, any per-key added/removed audit where churn matters.
+- **Avoid for** — a plain ranking (MiniBar) or parts of a single whole (SegmentedBar).
+
+## Sizing
+
+<Sizing chart="data-diff" />
+
+## Variants
+
+<LiveDemo
+  label="key tags + net + totals"
+  code={`<DataDiff data={diff} labels />
+<DataDiff data={diff} net label="totals" />`}
+>
+  <span className="inline-flex gap-4">
+    <DataDiff
+      data={[
+        { key: "users", added: 340, removed: 120 },
+        { key: "orders", added: 88, removed: 30 },
+        { key: "items", added: 40, removed: 20 },
+      ]}
+      labels
+      width={150}
+      height={56}
+    />
+    <DataDiff
+      data={[
+        { key: "users", added: 340, removed: 120 },
+        { key: "orders", added: 88, removed: 30 },
+        { key: "items", added: 40, removed: 20 },
+      ]}
+      net
+      label="totals"
+      width={150}
+      height={56}
+    />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="data-diff" />
+
+## Why this default
+
+Both directions are always drawn, because net-only diffs hide churn: a table that added 500 rows
+and dropped 480 is not the same event as one that added 20 and dropped nothing, even though both net
+to roughly the same number. One symmetric scale spans every row so a big change never shrinks to fit
+a small one, and a key with no change still gets a hairline tick — the absence of a change is not the
+absence of the key. Cross-chart comparison goes through a shared `domain`.
+
+## Accessibility
+
+The accessible name states the totals, the key count, and the single largest change — **"+512
+added, −187 removed across 6 keys; largest change: users (+220)."** The interactive entry steps the
+rows and announces each key's added, removed, and net change.
+
+## Props
+
+<PropTable slug="data-diff" />

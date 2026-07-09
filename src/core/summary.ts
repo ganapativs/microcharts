@@ -378,6 +378,12 @@ export interface SummaryStrings {
   paretoEmpty: (metric: string) => string;
   /** Pareto bar announcement, e.g. "Timeouts: 34% of total, cumulative 61%." */
   paretoAt: (label: string, sharePct: string, cumPct: string) => string;
+  /** DataDiff summary, e.g. "+512 added, −187 removed across 6 keys; largest change: users (+340)." */
+  dataDiff: (added: string, removed: string, n: number, key: string, net: string) => string;
+  /** DataDiff with no net change anywhere, e.g. "No changes across 6 keys." */
+  dataDiffEmpty: (n: number) => string;
+  /** DataDiff row announcement, e.g. "users: +340 added, −120 removed, net +220." */
+  dataDiffAt: (key: string, added: string, removed: string, net: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

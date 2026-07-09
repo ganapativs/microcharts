@@ -575,6 +575,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/data-diff (static)",
+    "path": "dist/charts/data-diff/index.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/data-diff/interactive",
+    "path": "dist/charts/data-diff/client.js",
+    "limit": "3.55 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

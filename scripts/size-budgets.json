@@ -205,6 +205,10 @@
     "pareto-strip": {
       "static": "2.5 kB",
       "interactive": "3.3 kB"
+    },
+    "data-diff": {
+      "static": "2.7 kB",
+      "interactive": "3.55 kB"
     }
   }
 }

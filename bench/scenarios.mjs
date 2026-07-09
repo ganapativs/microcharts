@@ -26,6 +26,14 @@ const cats = Array.from({ length: POOL }, (_, s) =>
 const bursts = Array.from({ length: POOL }, (_, s) =>
   Array.from({ length: 40 }, (_b, j) => ((s + j) % 9 === 0 ? (j % 7) + 1 : 0)),
 );
+const DIFF_KEYS = ["users", "orders", "items", "tags", "notes", "flags"];
+const diffs = Array.from({ length: POOL }, (_, s) =>
+  DIFF_KEYS.map((key, j) => ({
+    key,
+    added: ((s + 1) * (j + 2) * 29) % 400,
+    removed: ((s + 2) * (j + 1) * 17) % 300,
+  })),
+);
 
 export const SCENARIOS = [
   {
@@ -412,11 +420,20 @@ export const SCENARIOS = [
     props: (i) => ({ data: cats[i % POOL], summary: false }),
   },
   {
+    slug: "data-diff",
+    component: "DataDiff",
+    floor: 20, // ≤ 12 rows × 2 bars + hairline — few nodes, one linear pass
+    props: (i) => ({ data: diffs[i % POOL], summary: false }),
+  },
+  {
     slug: "shift-histogram",
     component: "ShiftHistogram",
     floor: 6, // ≤ 12 bins × 2 + double binning + medians (measured ~13 rows/ms, half-floor)
     props: (i) => ({
-      data: { before: rugs[i % POOL].map((v) => v * 10 + 40), after: rugs[(i + 1) % POOL].map((v) => v * 10 + 30) },
+      data: {
+        before: rugs[i % POOL].map((v) => v * 10 + 40),
+        after: rugs[(i + 1) % POOL].map((v) => v * 10 + 30),
+      },
       summary: false,
     }),
   },

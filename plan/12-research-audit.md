@@ -951,3 +951,41 @@ Gates: node 1320, browser 98, craft 304/0, size 2.23/3.04 (well under caps), ben
 default/rollup/no-threshold, cum line + threshold hairline present, rollup-below-threshold correctly
 shows no vital few, 0 escapes/overlaps; live hero label == mdx, interactive announce + T-jump +
 readout chip). **11 of 21 done.**
+
+## Batch 2 wave 3 — DataDiff (2026-07-09)
+
+**DataDiff (plan/23 #16) — full DoD, static + interactive.** Provenance: plan/16 §Q17. One diverging
+bar per key — removed leftward (`--mc-negative`), added rightward (`--mc-positive`), **both always
+drawn on ONE symmetric shared scale** (max(added,removed) across all rows), so a +500/−480 churn can
+never look like a +20/−0 trickle (property-tested). `labels` (in-chart key tags), `net` (a tick at
+added−removed — a summary mark, never a stand-in for the bars), `sort` (`"none"` keeps input order,
+which is often meaningful), `label="totals"` (a `+added / −removed` footer), `domain` (shared scale
+for cross-chart comparison). Negative counts are magnitudes → clamped to 0; a 0/0 key keeps a
+hairline placeholder tick (absence of change ≠ absent key); >12 rows warns via `core/dev.devWarn`
+and steers to a table of DataDiffs — never silent truncation. Real accessible name: **"+512 added,
+−187 removed across 6 keys; largest change: users (+220)."** (largest by |net|, signed; all-zero →
+"No changes across N keys."). Interactive = pointer-y/↑↓ grid lookup over rows, announcing each key's
+added/removed/net + a `+added · −removed` readout chip.
+
+**The important craft fix — CSS var beats the font-size ATTRIBUTE in the browser.** Key tags at many
+rows first escaped/overlapped. Fit-gating helped (tags only when a row clears ~10 px; tag font ≤
+0.5·rowH; totals footer reserves its own bottom band and only appears at height ≥ 34), and the SSR
+craft gate (which reads the `font-size` **attribute**) went green — but the **real-browser** sweep
+still showed 5 tag-tag overlaps, with `getBBox().height` frozen at ~11.5 no matter the attribute.
+Cause: `styles.css` has `:where(.mc-root text){ font-size: var(--mc-label-size) }`, and a CSS
+declaration **beats a presentation attribute**, so every tag was pinned to `--mc-label-size` (=FONT)
+regardless of `fontSize={tagFont}`. Fix: set the tag size **inline** (`style={{ fontSize: tagFont }}`)
+— inline style beats the zero-specificity `:where` rule. Lesson (amends the memory note "fontSize as
+an attribute"): the attribute is enough only when a chart's text is ALL one size == `--mc-label-size`;
+a chart with a SECOND, smaller text size must set it inline, and only the real-browser getBBox sweep
+catches the miss (SSR craft reads the attribute and is blind to it).
+
+**Also:** playground toggle knob kind is `"toggle"`, not `"boolean"` (typecheck at docs build caught
+it); `format` prop must be typed `Format` (from `core/format`), not `string`; MDX prose avoided
+literal `<key>` placeholders (the ParetoStrip `<share>` trap).
+
+Gates: node 1342, browser 100, craft 316/0, size 2.5/3.32 (caps 2.7/3.55), bench 25.9 rows/ms
+(floor 20), docs 198 pages + tests 112, real-browser sweep green (all 13 data-diff SVGs on the live
+page 0 escapes/0 text-on-mark/0 tag-tag; both bars always drawn; 0/0 placeholder tick; labels/totals
+degrade cleanly at small sizes; live hero label == mdx; interactive row announce + readout chip).
+New `EN_DATA_DIFF` module (`dataDiff`, `dataDiffEmpty`, `dataDiffAt`). **12 of 21 done.**

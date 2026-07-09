@@ -109,6 +109,8 @@ export default defineConfig({
     "src/charts/shift-histogram/client.tsx",
     "src/charts/pareto-strip/index.tsx",
     "src/charts/pareto-strip/client.tsx",
+    "src/charts/data-diff/index.tsx",
+    "src/charts/data-diff/client.tsx",
   ],
   format: ["esm"],
   dts: true,

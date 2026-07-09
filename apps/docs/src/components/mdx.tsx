@@ -51,6 +51,7 @@ import { QuantileDots } from "@microcharts/react/quantile-dots";
 import { ABStrips } from "@microcharts/react/ab-strips";
 import { ShiftHistogram } from "@microcharts/react/shift-histogram";
 import { ParetoStrip } from "@microcharts/react/pareto-strip";
+import { DataDiff } from "@microcharts/react/data-diff";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -121,6 +122,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ABStrips,
     ShiftHistogram,
     ParetoStrip,
+    DataDiff,
     SparkGroup,
     // docs building blocks
     Instrument,

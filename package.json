@@ -420,6 +420,14 @@
       "types": "./dist/charts/pareto-strip/client.d.ts",
       "import": "./dist/charts/pareto-strip/client.js"
     },
+    "./data-diff": {
+      "types": "./dist/charts/data-diff/index.d.ts",
+      "import": "./dist/charts/data-diff/index.js"
+    },
+    "./data-diff/interactive": {
+      "types": "./dist/charts/data-diff/client.d.ts",
+      "import": "./dist/charts/data-diff/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

@@ -30,6 +30,7 @@ import { EN_FORECAST } from "./strings-forecast.js";
 import { EN_AB } from "./strings-ab.js";
 import { EN_SHIFT } from "./strings-shift.js";
 import { EN_PARETO } from "./strings-pareto.js";
+import { EN_DATA_DIFF } from "./strings-data-diff.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -60,4 +61,5 @@ export const EN: SummaryStrings = {
   ...EN_AB,
   ...EN_SHIFT,
   ...EN_PARETO,
+  ...EN_DATA_DIFF,
 };
