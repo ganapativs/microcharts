@@ -500,4 +500,10 @@ export const SCENARIOS = [
       return { data: hist, forecast: { mid, p80 }, summary: false };
     },
   },
+  {
+    slug: "tally-marks",
+    component: "TallyMarks",
+    floor: 40, // one merged path, one pass over ≤ max strokes — trivially cheap
+    props: (i) => ({ value: (i % 30) + 1, summary: false }),
+  },
 ];

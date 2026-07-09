@@ -635,6 +635,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/tally-marks (static)",
+    "path": "dist/charts/tally-marks/index.js",
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/tally-marks/interactive",
+    "path": "dist/charts/tally-marks/client.js",
+    "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

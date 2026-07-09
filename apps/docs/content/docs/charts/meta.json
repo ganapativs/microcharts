@@ -57,6 +57,7 @@
     "quadrant-dot",
     "cycle-plot",
     "change-point",
-    "ensemble-ghosts"
+    "ensemble-ghosts",
+    "tally-marks"
   ]
 }

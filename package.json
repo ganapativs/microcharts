@@ -460,6 +460,14 @@
       "types": "./dist/charts/ensemble-ghosts/client.d.ts",
       "import": "./dist/charts/ensemble-ghosts/client.js"
     },
+    "./tally-marks": {
+      "types": "./dist/charts/tally-marks/index.d.ts",
+      "import": "./dist/charts/tally-marks/index.js"
+    },
+    "./tally-marks/interactive": {
+      "types": "./dist/charts/tally-marks/client.d.ts",
+      "import": "./dist/charts/tally-marks/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

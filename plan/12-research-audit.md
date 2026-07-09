@@ -1171,3 +1171,33 @@ Per-chart dark-mode pass (measured every decision-chart mark's composited lumina
 - **ChangePoint** — regime shading was two faint alphas (.05/.11); the .05 washed out on dark. Reworked to shade only the ODD regimes at a single visible .10 so adjacent regimes always contrast (bare vs tinted) in both themes.
 
 **Audit-tool caveat:** the composited-luminance audit is BLIND to `oklab()`/`color-mix` colors (it can't parse them to RGB), so it false-positived ControlStrip's `--mc-band` (an `oklab(0.925 …/0.12)` near-white fill that is genuinely visible on dark — confirmed by screenshot). A speculative `--mc-band` 8%→12% bump was made then REVERTED once the false positive was understood; ControlStrip's band was always fine. Ground truth for dark visibility = real-browser screenshots, not the numeric audit. All gates green: node 1417, browser 108, craft 361/0, size pass, docs 210.
+
+## Batch 3 (expressive, 22 types) — started 2026-07-09 (branch `batch-3-expressive`)
+
+Branched off `batch-2-decision-w3` (the complete local Batch-2 tip; PR #5 merged into
+`batch-2-decision`, PR #4 → main still open). Batch-2 gate items above remain open for the
+user; the user authorized moving to Batch 3.
+
+### TallyMarks (1) — `tally-marks` — deviations from plan/24 §1
+
+1. **Variant prop `style` → `pen`.** plan/24 named the ruled/drawn variant `style="ruled"|"drawn"`,
+   but all 54 existing charts expose `style?: CSSProperties` (the React style passthrough to the
+   root `<Chart>`). Two `style` props can't coexist, so the variant ships as `pen?: "ruled"|"drawn"`
+   — evocative (ruled = ruler-drawn, drawn = hand-drawn) and non-colliding. **Several later Batch-3
+   charts also use `style` as a variant name in the spec (TreeRings `style="fill"`, SpiralYear, …);
+   each will get a per-chart non-colliding name and be logged here.** No shared `variant` rename was
+   forced (each chart's variant is a distinct semantic).
+2. **Dropped `format`/`locale` props + `makeFormatter`.** plan/24 §1 lists no `format` prop; I had
+   added one gratuitously. The count is always a non-negative integer, so the summary formats it with
+   `String(count)` — SSR-deterministic (a locale formatter risks a server/client hydration mismatch
+   on the accessible name) and it drops the whole `core/format` dependency from the static entry.
+3. **Inlined mulberry32 (not `core/jitter`) for the `drawn` pen.** The seed is just the integer
+   count, so a 6-line local `seededFrom(count+1)` replaces `import { seeded }` — this kept the static
+   entry at 1.47 kB, under the Delta-class 1.5 kB HARD cap (importing `core/jitter` pushed it to
+   1.56 kB). Same "inline lightly-used kernel helpers" pattern as ChangePoint. Determinism preserved
+   and property-tested.
+
+Budgets: static 1.47 / interactive 1.95 kB (caps 1.5 / 2.5). Node 1432, browser 3 (tally),
+craft 373/0, bench 146 rows/ms, docs build + tests 122, tsc/oxlint/oxfmt/knip clean. Real-browser
+sweep verified LIGHT (`--mc-stroke` #171717) and DARK (#ededed on a dark surface): tally clusters +
+`+N` numeral crisp, 0 escapes, both themes. Node budget 2 (merged stroke path + numeral) held.

@@ -660,6 +660,16 @@ add(
   ],
 );
 add(
+  "tally-marks",
+  "TallyMarks",
+  [{ value: 23 }, { value: 30, max: 25 }, { value: 17, pen: "drawn" }, { value: 8, max: 40 }],
+  [
+    [80, 16],
+    [80, 24],
+    [80, 32],
+  ],
+);
+add(
   "shift-histogram",
   "ShiftHistogram",
   [

@@ -119,6 +119,8 @@ export default defineConfig({
     "src/charts/change-point/client.tsx",
     "src/charts/ensemble-ghosts/index.tsx",
     "src/charts/ensemble-ghosts/client.tsx",
+    "src/charts/tally-marks/index.tsx",
+    "src/charts/tally-marks/client.tsx",
   ],
   format: ["esm"],
   dts: true,

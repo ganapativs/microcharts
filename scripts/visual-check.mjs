@@ -31,6 +31,7 @@ const { QuadrantDot } = await D("quadrant-dot");
 const { CyclePlot } = await D("cycle-plot");
 const { ChangePoint } = await D("change-point");
 const { EnsembleGhosts } = await D("ensemble-ghosts");
+const { TallyMarks } = await D("tally-marks");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -551,6 +552,12 @@ const body = [
     svg(EnsembleGhosts, { data: ENSF, emphasis: "median", width: 200, height: 32 }),
   ),
   row("12 ghosts", svg(EnsembleGhosts, { data: ENSF, ghosts: 12, width: 200, height: 32 })),
+
+  `<h2>TallyMarks</h2>`,
+  row("23 ruled", svg(TallyMarks, { value: 23, height: 16 })),
+  row("30 max 25 (+5)", svg(TallyMarks, { value: 30, max: 25, height: 20, title: "Signatures" })),
+  row("17 drawn", svg(TallyMarks, { value: 17, pen: "drawn", height: 20 })),
+  row("38 max 20 clamp", svg(TallyMarks, { value: 38, max: 20, overflow: "clamp", height: 20 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

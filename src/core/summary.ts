@@ -37,6 +37,8 @@ export interface SummaryStrings {
   stepsDone: (done: number, total: number) => string;
   /** S3 discrete units, e.g. "5 of 8." (pictogram-row). */
   countOf: (value: string, total: number) => string;
+  /** S4 counted total, e.g. "23 counted." (tally-marks). */
+  tally: (value: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

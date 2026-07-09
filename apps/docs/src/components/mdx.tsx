@@ -56,6 +56,7 @@ import { QuadrantDot } from "@microcharts/react/quadrant-dot";
 import { CyclePlot } from "@microcharts/react/cycle-plot";
 import { ChangePoint } from "@microcharts/react/change-point";
 import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
+import { TallyMarks } from "@microcharts/react/tally-marks";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -131,6 +132,7 @@ export function getMDXComponents(components?: MDXComponents) {
     CyclePlot,
     ChangePoint,
     EnsembleGhosts,
+    TallyMarks,
     SparkGroup,
     // docs building blocks
     Instrument,
