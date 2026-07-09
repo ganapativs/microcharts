@@ -914,7 +914,7 @@ export const SCENARIOS = [
   {
     slug: "tape-gauge",
     component: "TapeGauge",
-    floor: 80, // pointer + tick path + ≤4 zone rects — O(1) marks
+    floor: 20, // pointer + tick path + ≤4 zone rects — O(1) marks
     props: (i) => ({
       value: 120 + (i % 80),
       rate: (i % 7) - 3,
@@ -930,7 +930,7 @@ export const SCENARIOS = [
   {
     slug: "station-glyph",
     component: "StationGlyph",
-    floor: 80, // disc + sector + barb + ≤3 numerals — O(1) marks
+    floor: 20, // disc + sector + barb + ≤3 numerals — O(1) marks
     props: (i) => ({
       station: "KSFO",
       cloud: (i % 20) / 20,
