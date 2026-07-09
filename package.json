@@ -396,6 +396,70 @@
       "types": "./dist/charts/quantile-dots/client.d.ts",
       "import": "./dist/charts/quantile-dots/client.js"
     },
+    "./ab-strips": {
+      "types": "./dist/charts/ab-strips/index.d.ts",
+      "import": "./dist/charts/ab-strips/index.js"
+    },
+    "./ab-strips/interactive": {
+      "types": "./dist/charts/ab-strips/client.d.ts",
+      "import": "./dist/charts/ab-strips/client.js"
+    },
+    "./shift-histogram": {
+      "types": "./dist/charts/shift-histogram/index.d.ts",
+      "import": "./dist/charts/shift-histogram/index.js"
+    },
+    "./shift-histogram/interactive": {
+      "types": "./dist/charts/shift-histogram/client.d.ts",
+      "import": "./dist/charts/shift-histogram/client.js"
+    },
+    "./pareto-strip": {
+      "types": "./dist/charts/pareto-strip/index.d.ts",
+      "import": "./dist/charts/pareto-strip/index.js"
+    },
+    "./pareto-strip/interactive": {
+      "types": "./dist/charts/pareto-strip/client.d.ts",
+      "import": "./dist/charts/pareto-strip/client.js"
+    },
+    "./data-diff": {
+      "types": "./dist/charts/data-diff/index.d.ts",
+      "import": "./dist/charts/data-diff/index.js"
+    },
+    "./data-diff/interactive": {
+      "types": "./dist/charts/data-diff/client.d.ts",
+      "import": "./dist/charts/data-diff/client.js"
+    },
+    "./quadrant-dot": {
+      "types": "./dist/charts/quadrant-dot/index.d.ts",
+      "import": "./dist/charts/quadrant-dot/index.js"
+    },
+    "./quadrant-dot/interactive": {
+      "types": "./dist/charts/quadrant-dot/client.d.ts",
+      "import": "./dist/charts/quadrant-dot/client.js"
+    },
+    "./cycle-plot": {
+      "types": "./dist/charts/cycle-plot/index.d.ts",
+      "import": "./dist/charts/cycle-plot/index.js"
+    },
+    "./cycle-plot/interactive": {
+      "types": "./dist/charts/cycle-plot/client.d.ts",
+      "import": "./dist/charts/cycle-plot/client.js"
+    },
+    "./change-point": {
+      "types": "./dist/charts/change-point/index.d.ts",
+      "import": "./dist/charts/change-point/index.js"
+    },
+    "./change-point/interactive": {
+      "types": "./dist/charts/change-point/client.d.ts",
+      "import": "./dist/charts/change-point/client.js"
+    },
+    "./ensemble-ghosts": {
+      "types": "./dist/charts/ensemble-ghosts/index.d.ts",
+      "import": "./dist/charts/ensemble-ghosts/index.js"
+    },
+    "./ensemble-ghosts/interactive": {
+      "types": "./dist/charts/ensemble-ghosts/client.d.ts",
+      "import": "./dist/charts/ensemble-ghosts/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

@@ -193,6 +193,38 @@
     "quantile-dots": {
       "static": "2.6 kB",
       "interactive": "3.4 kB"
+    },
+    "ab-strips": {
+      "static": "2.85 kB",
+      "interactive": "3.8 kB"
+    },
+    "shift-histogram": {
+      "static": "2.98 kB",
+      "interactive": "3.95 kB"
+    },
+    "pareto-strip": {
+      "static": "2.5 kB",
+      "interactive": "3.3 kB"
+    },
+    "data-diff": {
+      "static": "2.7 kB",
+      "interactive": "3.55 kB"
+    },
+    "quadrant-dot": {
+      "static": "2.4 kB",
+      "interactive": "3.3 kB"
+    },
+    "cycle-plot": {
+      "static": "2.5 kB",
+      "interactive": "3.5 kB"
+    },
+    "change-point": {
+      "static": "2.98 kB",
+      "interactive": "3.98 kB"
+    },
+    "ensemble-ghosts": {
+      "static": "2.5 kB",
+      "interactive": "3.5 kB"
     }
   }
 }

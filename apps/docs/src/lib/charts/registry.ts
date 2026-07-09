@@ -57,6 +57,14 @@ import errorBudget from "./error-budget";
 import controlStrip from "./control-strip";
 import forecastCone from "./forecast-cone";
 import quantileDots from "./quantile-dots";
+import abStrips from "./ab-strips";
+import shiftHistogram from "./shift-histogram";
+import paretoStrip from "./pareto-strip";
+import dataDiff from "./data-diff";
+import quadrantDot from "./quadrant-dot";
+import cyclePlot from "./cycle-plot";
+import changePoint from "./change-point";
+import ensembleGhosts from "./ensemble-ghosts";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -106,6 +114,14 @@ const MODULES: ChartModule[] = [
   controlStrip,
   forecastCone,
   quantileDots,
+  abStrips,
+  shiftHistogram,
+  paretoStrip,
+  dataDiff,
+  quadrantDot,
+  cyclePlot,
+  changePoint,
+  ensembleGhosts,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

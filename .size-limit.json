@@ -539,6 +539,102 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/ab-strips (static)",
+    "path": "dist/charts/ab-strips/index.js",
+    "limit": "2.85 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ab-strips/interactive",
+    "path": "dist/charts/ab-strips/client.js",
+    "limit": "3.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/shift-histogram (static)",
+    "path": "dist/charts/shift-histogram/index.js",
+    "limit": "2.98 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/shift-histogram/interactive",
+    "path": "dist/charts/shift-histogram/client.js",
+    "limit": "3.95 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/pareto-strip (static)",
+    "path": "dist/charts/pareto-strip/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/pareto-strip/interactive",
+    "path": "dist/charts/pareto-strip/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/data-diff (static)",
+    "path": "dist/charts/data-diff/index.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/data-diff/interactive",
+    "path": "dist/charts/data-diff/client.js",
+    "limit": "3.55 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/quadrant-dot (static)",
+    "path": "dist/charts/quadrant-dot/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/quadrant-dot/interactive",
+    "path": "dist/charts/quadrant-dot/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/cycle-plot (static)",
+    "path": "dist/charts/cycle-plot/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/cycle-plot/interactive",
+    "path": "dist/charts/cycle-plot/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/change-point (static)",
+    "path": "dist/charts/change-point/index.js",
+    "limit": "2.98 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/change-point/interactive",
+    "path": "dist/charts/change-point/client.js",
+    "limit": "3.98 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ensemble-ghosts (static)",
+    "path": "dist/charts/ensemble-ghosts/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/ensemble-ghosts/interactive",
+    "path": "dist/charts/ensemble-ghosts/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

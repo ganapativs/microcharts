@@ -49,6 +49,14 @@
     "error-budget",
     "control-strip",
     "forecast-cone",
-    "quantile-dots"
+    "quantile-dots",
+    "ab-strips",
+    "shift-histogram",
+    "pareto-strip",
+    "data-diff",
+    "quadrant-dot",
+    "cycle-plot",
+    "change-point",
+    "ensemble-ghosts"
   ]
 }

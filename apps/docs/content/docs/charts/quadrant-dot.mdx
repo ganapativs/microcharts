@@ -1,0 +1,98 @@
+---
+title: QuadrantDot
+description: A 2×2 quadrant chart for React — a focal dot placed against a peer field, with a split cross and axis-relative summaries. A position read, not a scatter plot.
+---
+
+QuadrantDot answers "where does this item sit in the 2×2 — against the field?". A focal dot is
+placed by 2-D position, a hairline cross marks the split (the domain midpoints by default, always
+overridable but **never hidden**), and the peers show as tiny muted ghosts. The read is quadrant
+**membership** first; exact position is the second read — which is why it lives at glyph scale.
+
+<LiveDemo
+  label="QuadrantDot"
+  sizeOf="quadrant-dot"
+  code={`import { QuadrantDot } from "@microcharts/react/quadrant-dot";
+
+<QuadrantDot data={item} field={backlog} xLabel="effort" yLabel="impact" title="Effort vs impact" />`}
+>
+  <QuadrantDot
+    data={{ x: 3, y: 9 }}
+    field={[
+      { x: 2, y: 8 }, { x: 8, y: 9 }, { x: 3, y: 7 }, { x: 9, y: 2 }, { x: 7, y: 3 },
+      { x: 1, y: 1 }, { x: 5, y: 6 }, { x: 6, y: 8 }, { x: 4, y: 3 }, { x: 8, y: 5 },
+      { x: 2, y: 4 }, { x: 7, y: 7 }, { x: 3, y: 2 }, { x: 6, y: 1 },
+    ]}
+    xDomain={[0, 10]}
+    domain={[0, 10]}
+    xLabel="effort"
+    yLabel="impact"
+    title="Effort vs impact"
+    width={96}
+    height={96}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="quadrant-dot" />
+
+## Try it
+
+<Playground chart="quadrant-dot" />
+
+## Interactive
+
+<InteractiveDemo slug="quadrant-dot" />
+
+## When to use it
+
+- **Good for** — the classic prioritization 2×2 (one cell per initiative in a table), an effort-vs-impact read in a KPI card, any "which quadrant, against the field" decision.
+- **Avoid for** — a full scatter plot (MicroScatter) or a single ranked list (MiniBar).
+
+## Sizing
+
+<Sizing chart="quadrant-dot" />
+
+## Variants
+
+<LiveDemo
+  label="lone glyph + named quadrants"
+  code={`<QuadrantDot data={item} xLabel="effort" yLabel="impact" />
+<QuadrantDot data={item} field={backlog} quadrants={["quick win", "big bet", "skip", "time sink"]} />`}
+>
+  <span className="inline-flex gap-4 items-center">
+    <QuadrantDot data={{ x: 3, y: 9 }} xDomain={[0, 10]} domain={[0, 10]} split={[5, 5]} xLabel="effort" yLabel="impact" width={72} height={72} />
+    <QuadrantDot
+      data={{ x: 3, y: 9 }}
+      field={[{ x: 2, y: 8 }, { x: 8, y: 9 }, { x: 9, y: 2 }, { x: 6, y: 1 }, { x: 4, y: 3 }]}
+      xDomain={[0, 10]}
+      domain={[0, 10]}
+      quadrants={["quick win", "big bet", "skip", "time sink"]}
+      width={72}
+      height={72}
+    />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="quadrant-dot" />
+
+## Why this default
+
+24×24, because the 2×2 is a **position** read, not a scatter plot — you want to know the quadrant at
+a glance, and the exact coordinates only when you look closer. The split is data, not decoration: it
+renders wherever the split truly is and is always overridable, never invisible. With the axes
+unlabeled at glyph size, the `title` and `summary` are load-bearing — skipping them is the one named
+anti-pattern for this chart, so always pass `xLabel`, `yLabel`, and a `title`.
+
+## Accessibility
+
+The accessible name states the focal position, the axis-relative quadrant, and how crowded that
+quadrant is — **"Impact 9, effort 3 — in the high-impact, low-effort quadrant (2 of 14 peers)."** —
+or your own words via `quadrants={["quick win", …]}`. The interactive entry cycles the peers
+nearest-first, each announced with its coordinates and quadrant.
+
+## Props
+
+<PropTable slug="quadrant-dot" />

@@ -48,6 +48,14 @@ import { ErrorBudget } from "@microcharts/react/error-budget";
 import { ControlStrip } from "@microcharts/react/control-strip";
 import { ForecastCone } from "@microcharts/react/forecast-cone";
 import { QuantileDots } from "@microcharts/react/quantile-dots";
+import { ABStrips } from "@microcharts/react/ab-strips";
+import { ShiftHistogram } from "@microcharts/react/shift-histogram";
+import { ParetoStrip } from "@microcharts/react/pareto-strip";
+import { DataDiff } from "@microcharts/react/data-diff";
+import { QuadrantDot } from "@microcharts/react/quadrant-dot";
+import { CyclePlot } from "@microcharts/react/cycle-plot";
+import { ChangePoint } from "@microcharts/react/change-point";
+import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -115,6 +123,14 @@ export function getMDXComponents(components?: MDXComponents) {
     ControlStrip,
     ForecastCone,
     QuantileDots,
+    ABStrips,
+    ShiftHistogram,
+    ParetoStrip,
+    DataDiff,
+    QuadrantDot,
+    CyclePlot,
+    ChangePoint,
+    EnsembleGhosts,
     SparkGroup,
     // docs building blocks
     Instrument,

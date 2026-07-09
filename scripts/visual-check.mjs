@@ -23,6 +23,14 @@ const { ErrorBudget } = await D("error-budget");
 const { ControlStrip } = await D("control-strip");
 const { ForecastCone } = await D("forecast-cone");
 const { QuantileDots } = await D("quantile-dots");
+const { ABStrips } = await D("ab-strips");
+const { ShiftHistogram } = await D("shift-histogram");
+const { ParetoStrip } = await D("pareto-strip");
+const { DataDiff } = await D("data-diff");
+const { QuadrantDot } = await D("quadrant-dot");
+const { CyclePlot } = await D("cycle-plot");
+const { ChangePoint } = await D("change-point");
+const { EnsembleGhosts } = await D("ensemble-ghosts");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -76,11 +84,71 @@ const BPLAN = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];
 const BACT = [40, 35, 31, 27, 24, 21];
 const EB = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
 const EBURN = [1, 0.82, 0.6, 0.38, 0.18, 0.04, 0];
-const CTRL = [74,73,75,74,76,73,74,75,74,73,82,74,75,73,74,76,74,73,75,74,66,74,75,74,73,76,74,75,74,73];
+const CTRL = [
+  74, 73, 75, 74, 76, 73, 74, 75, 74, 73, 82, 74, 75, 73, 74, 76, 74, 73, 75, 74, 66, 74, 75, 74,
+  73, 76, 74, 75, 74, 73,
+];
 const FCH = [30, 32, 31, 34, 36, 35, 38];
-const FCF = { mid: [39, 40, 41, 42], p80: [[36, 42], [35, 45], [34, 50], [33, 55]], p50: [[37, 41], [37, 43], [36, 46], [35, 49]] };
-const QD = Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)));
-const MINF = (n) => ` min`;
+const FCF = {
+  mid: [39, 40, 41, 42],
+  p80: [
+    [36, 42],
+    [35, 45],
+    [34, 50],
+    [33, 55],
+  ],
+  p50: [
+    [37, 41],
+    [37, 43],
+    [36, 46],
+    [35, 49],
+  ],
+};
+const QD = Array.from({ length: 200 }, (_, i) =>
+  Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)),
+);
+const MINF = (n) => `${n} min`;
+const ABA = Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22);
+const ABB = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
+const ABMS = (n) => `${Math.round(n)} ms`;
+const SHB = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+const SHA = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+const PAR = [
+  { label: "Timeouts", value: 38 },
+  { label: "OOM", value: 24 },
+  { label: "Deploy", value: 15 },
+  { label: "Config", value: 9 },
+  { label: "Network", value: 7 },
+  { label: "Auth", value: 4 },
+];
+const DDIFF = [
+  { key: "users", added: 340, removed: 120 },
+  { key: "orders", added: 88, removed: 30 },
+  { key: "items", added: 40, removed: 20 },
+  { key: "tags", added: 24, removed: 8 },
+  { key: "notes", added: 12, removed: 6 },
+  { key: "flags", added: 8, removed: 3 },
+];
+const QF = [
+  { x: 2, y: 8 },
+  { x: 8, y: 9 },
+  { x: 3, y: 7 },
+  { x: 9, y: 2 },
+  { x: 7, y: 3 },
+  { x: 1, y: 1 },
+  { x: 5, y: 6 },
+  { x: 6, y: 8 },
+];
+const CYC = [];
+for (let w = 0; w < 6; w++) CYC.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
+const CDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const CPSTEP = [...Array(14).fill(30), ...Array(20).fill(48)];
+const CPTWO = [...Array(10).fill(10), ...Array(10).fill(50), ...Array(10).fill(22)];
+const ENSF = Array.from({ length: 24 }, (_m, i) =>
+  Array.from({ length: 10 }, (_t, t) =>
+    Math.round(40 + (i - 12) * 0.55 * t * 0.4 + 3 * Math.sin(i + t) + t * 0.5),
+  ),
+);
 
 function row(title, ...cells) {
   return `<div class="row"><div class="t">${title}</div>${cells.map((c) => `<div class="c">${c}</div>`).join("")}</div>`;
@@ -186,7 +254,10 @@ const body = [
   row("default 80×20", svg(NetFlow, { data: NF, format: KFMT, width: 80, height: 20 })),
   row("area, last", svg(NetFlow, { data: NF, format: KFMT, width: 240, height: 28 })),
   row("bars", svg(NetFlow, { data: NF, format: KFMT, mode: "bars", width: 240, height: 28 })),
-  row("paydown", svg(NetFlow, { data: NF, format: KFMT, positive: "down", width: 240, height: 28 })),
+  row(
+    "paydown",
+    svg(NetFlow, { data: NF, format: KFMT, positive: "down", width: 240, height: 28 }),
+  ),
   row("gross only", svg(NetFlow, { data: NF, format: KFMT, net: false, width: 240, height: 28 })),
 
   `<h2>RetentionCurve</h2>`,
@@ -194,39 +265,292 @@ const body = [
   row("step, last", svg(RetentionCurve, { data: RET, unit: "week", width: 240, height: 28 })),
   row("benchmark", svg(RetentionCurve, { data: RET, benchmark: RETB, width: 240, height: 28 })),
   row("smooth", svg(RetentionCurve, { data: RET, curve: "smooth", width: 240, height: 28 })),
-  row("still leaking", svg(RetentionCurve, { data: [1, 0.8, 0.6, 0.45, 0.32, 0.22], width: 240, height: 28 })),
+  row(
+    "still leaking",
+    svg(RetentionCurve, { data: [1, 0.8, 0.6, 0.45, 0.32, 0.22], width: 240, height: 28 }),
+  ),
 
   `<h2>BurnChart</h2>`,
-  row("default 80×20", svg(BurnChart, { data: { plan: BPLAN, actual: BACT }, width: 80, height: 20 })),
-  row("behind, gap", svg(BurnChart, { data: { plan: BPLAN, actual: BACT }, width: 240, height: 28 })),
-  row("ahead", svg(BurnChart, { data: { plan: BPLAN, actual: [40, 34, 28, 22, 16, 10] }, width: 240, height: 28 })),
-  row("burn-up", svg(BurnChart, { data: { plan: BPLAN.map((v) => 40 - v), actual: BACT.map((v) => 40 - v) }, mode: "up", width: 240, height: 28 })),
-  row("flatlined", svg(BurnChart, { data: { plan: BPLAN, actual: [40, 38, 37, 36, 36, 36] }, width: 240, height: 28 })),
+  row(
+    "default 80×20",
+    svg(BurnChart, { data: { plan: BPLAN, actual: BACT }, width: 80, height: 20 }),
+  ),
+  row(
+    "behind, gap",
+    svg(BurnChart, { data: { plan: BPLAN, actual: BACT }, width: 240, height: 28 }),
+  ),
+  row(
+    "ahead",
+    svg(BurnChart, {
+      data: { plan: BPLAN, actual: [40, 34, 28, 22, 16, 10] },
+      width: 240,
+      height: 28,
+    }),
+  ),
+  row(
+    "burn-up",
+    svg(BurnChart, {
+      data: { plan: BPLAN.map((v) => 40 - v), actual: BACT.map((v) => 40 - v) },
+      mode: "up",
+      width: 240,
+      height: 28,
+    }),
+  ),
+  row(
+    "flatlined",
+    svg(BurnChart, {
+      data: { plan: BPLAN, actual: [40, 38, 37, 36, 36, 36] },
+      width: 240,
+      height: 28,
+    }),
+  ),
 
   `<h2>ErrorBudget</h2>`,
   row("default 80×20", svg(ErrorBudget, { data: EB, window: 30, width: 80, height: 20 })),
   row("on pace, remaining", svg(ErrorBudget, { data: EB, window: 30, width: 240, height: 28 })),
   row("fast-burn", svg(ErrorBudget, { data: EBURN, window: 20, width: 240, height: 28 })),
-  row("exhausted", svg(ErrorBudget, { data: [1, 0.5, 0.2, 0.05, 0], window: 12, width: 240, height: 28 })),
-  row("diagonal only", svg(ErrorBudget, { data: EB, window: 30, rates: [1], width: 240, height: 28 })),
+  row(
+    "exhausted",
+    svg(ErrorBudget, { data: [1, 0.5, 0.2, 0.05, 0], window: 12, width: 240, height: 28 }),
+  ),
+  row(
+    "diagonal only",
+    svg(ErrorBudget, { data: EB, window: 30, rates: [1], width: 240, height: 28 }),
+  ),
 
   `<h2>ControlStrip</h2>`,
   row("default 80x16", svg(ControlStrip, { data: CTRL, width: 80, height: 16 })),
   row("we rules", svg(ControlStrip, { data: CTRL, rules: "we", width: 240, height: 24 })),
   row("all dots", svg(ControlStrip, { data: CTRL, dots: "all", width: 240, height: 24 })),
-  row("provisional", svg(ControlStrip, { data: CTRL.slice(0,6), width: 240, height: 24 })),
+  row("provisional", svg(ControlStrip, { data: CTRL.slice(0, 6), width: 240, height: 24 })),
 
   `<h2>ForecastCone</h2>`,
   row("default 80x20", svg(ForecastCone, { data: FCH, forecast: FCF, width: 80, height: 20 })),
-  row("target", svg(ForecastCone, { data: FCH, forecast: FCF, target: 45, width: 240, height: 28 })),
-  row("single band", svg(ForecastCone, { data: FCH, forecast: { mid: FCF.mid, p80: FCF.p80 }, width: 240, height: 28 })),
+  row(
+    "target",
+    svg(ForecastCone, { data: FCH, forecast: FCF, target: 45, width: 240, height: 28 }),
+  ),
+  row(
+    "single band",
+    svg(ForecastCone, {
+      data: FCH,
+      forecast: { mid: FCF.mid, p80: FCF.p80 },
+      width: 240,
+      height: 28,
+    }),
+  ),
   row("cone only", svg(ForecastCone, { data: [], forecast: FCF, width: 240, height: 28 })),
 
   `<h2>QuantileDots</h2>`,
-  row("default 80x20", svg(QuantileDots, { data: QD, threshold: 15, format: MINF, width: 80, height: 20 })),
-  row("threshold, count", svg(QuantileDots, { data: QD, threshold: 15, format: MINF, width: 240, height: 30 })),
-  row("15 dots", svg(QuantileDots, { data: QD, count: 15, threshold: 15, format: MINF, width: 240, height: 30 })),
+  row(
+    "default 80x20",
+    svg(QuantileDots, { data: QD, threshold: 15, format: MINF, width: 80, height: 20 }),
+  ),
+  row(
+    "threshold, count",
+    svg(QuantileDots, { data: QD, threshold: 15, format: MINF, width: 240, height: 30 }),
+  ),
+  row(
+    "15 dots",
+    svg(QuantileDots, { data: QD, count: 15, threshold: 15, format: MINF, width: 240, height: 30 }),
+  ),
   row("no threshold", svg(QuantileDots, { data: QD, width: 240, height: 30 })),
+
+  `<h2>ABStrips</h2>`,
+  row(
+    "default 80x20",
+    svg(ABStrips, {
+      data: { a: ABA, b: ABB },
+      format: ABMS,
+      positive: "down",
+      width: 80,
+      height: 20,
+    }),
+  ),
+  row(
+    "delta, tags",
+    svg(ABStrips, {
+      data: { a: ABA, b: ABB },
+      format: ABMS,
+      positive: "down",
+      width: 240,
+      height: 28,
+    }),
+  ),
+  row(
+    "separated",
+    svg(ABStrips, {
+      data: { a: ABA.map((v) => v + 40), b: ABB },
+      format: ABMS,
+      positive: "down",
+      width: 240,
+      height: 28,
+    }),
+  ),
+  row(
+    "small n",
+    svg(ABStrips, { data: { a: [100, 130, 145], b: ABB }, format: ABMS, width: 240, height: 28 }),
+  ),
+
+  `<h2>ShiftHistogram</h2>`,
+  row(
+    "default 80x20",
+    svg(ShiftHistogram, { data: { before: SHB, after: SHA }, format: ABMS, width: 80, height: 20 }),
+  ),
+  row(
+    "shift, mirror",
+    svg(ShiftHistogram, {
+      data: { before: SHB, after: SHA },
+      format: ABMS,
+      width: 240,
+      height: 30,
+    }),
+  ),
+  row(
+    "overlay",
+    svg(ShiftHistogram, {
+      data: { before: SHB, after: SHA },
+      format: ABMS,
+      mode: "overlay",
+      width: 240,
+      height: 30,
+    }),
+  ),
+  row(
+    "no shift",
+    svg(ShiftHistogram, {
+      data: { before: SHB, after: SHB },
+      format: ABMS,
+      width: 240,
+      height: 30,
+    }),
+  ),
+
+  `<h2>ParetoStrip</h2>`,
+  row(
+    "default 80x20",
+    svg(ParetoStrip, { data: PAR, unit: "causes", metric: "incidents", width: 80, height: 20 }),
+  ),
+  row(
+    "count label",
+    svg(ParetoStrip, { data: PAR, unit: "causes", metric: "incidents", width: 240, height: 30 }),
+  ),
+  row("rollup max 3", svg(ParetoStrip, { data: PAR, max: 3, width: 240, height: 30 })),
+  row("no threshold", svg(ParetoStrip, { data: PAR, threshold: false, width: 240, height: 30 })),
+
+  `<h2>DataDiff</h2>`,
+  row("default 80x20", svg(DataDiff, { data: DDIFF, width: 80, height: 20 })),
+  row("labels", svg(DataDiff, { data: DDIFF, labels: true, width: 200, height: 72 })),
+  row(
+    "net + totals",
+    svg(DataDiff, { data: DDIFF, net: true, label: "totals", width: 200, height: 72 }),
+  ),
+  row(
+    "0/0 placeholder",
+    svg(DataDiff, {
+      data: [
+        { key: "same", added: 0, removed: 0 },
+        { key: "chg", added: 12, removed: 4 },
+      ],
+      labels: true,
+      width: 180,
+      height: 48,
+    }),
+  ),
+
+  `<h2>QuadrantDot</h2>`,
+  row(
+    "glyph 24x24",
+    svg(QuadrantDot, {
+      data: { x: 3, y: 9 },
+      field: QF,
+      xDomain: [0, 10],
+      domain: [0, 10],
+      xLabel: "effort",
+      yLabel: "impact",
+    }),
+  ),
+  row(
+    "card 96x96",
+    svg(QuadrantDot, {
+      data: { x: 3, y: 9 },
+      field: QF,
+      xDomain: [0, 10],
+      domain: [0, 10],
+      xLabel: "effort",
+      yLabel: "impact",
+      width: 96,
+      height: 96,
+      title: "Effort vs impact",
+    }),
+  ),
+  row(
+    "lone glyph",
+    svg(QuadrantDot, {
+      data: { x: 3, y: 9 },
+      xDomain: [0, 10],
+      domain: [0, 10],
+      split: [5, 5],
+      width: 72,
+      height: 72,
+    }),
+  ),
+  row(
+    "no tint",
+    svg(QuadrantDot, {
+      data: { x: 8, y: 4 },
+      field: QF,
+      xDomain: [0, 10],
+      domain: [0, 10],
+      region: false,
+      width: 72,
+      height: 72,
+    }),
+  ),
+
+  `<h2>CyclePlot</h2>`,
+  row("default 80x20", svg(CyclePlot, { data: CYC, period: 7, slots: CDAYS, cycleUnit: "weeks" })),
+  row(
+    "card 240x40",
+    svg(CyclePlot, {
+      data: CYC,
+      period: 7,
+      slots: CDAYS,
+      cycleUnit: "weeks",
+      width: 240,
+      height: 40,
+      title: "Weekly shape",
+    }),
+  ),
+  row("median", svg(CyclePlot, { data: CYC, period: 7, center: "median", width: 200, height: 32 })),
+  row(
+    "spine only",
+    svg(CyclePlot, { data: CYC, period: 7, trend: "none", width: 200, height: 32 }),
+  ),
+
+  `<h2>ChangePoint</h2>`,
+  row(
+    "clean step 80x16",
+    svg(ChangePoint, { data: CPSTEP, label: "delta", width: 80, height: 16 }),
+  ),
+  row(
+    "delta label",
+    svg(ChangePoint, { data: CPSTEP, label: "delta", width: 240, height: 24, title: "Error rate" }),
+  ),
+  row("two breaks", svg(ChangePoint, { data: CPTWO, width: 200, height: 24 })),
+  row("no means", svg(ChangePoint, { data: CPSTEP, means: false, width: 200, height: 24 })),
+
+  `<h2>EnsembleGhosts</h2>`,
+  row("default 80x20", svg(EnsembleGhosts, { data: ENSF, width: 80, height: 20 })),
+  row(
+    "endpoints 240x44",
+    svg(EnsembleGhosts, { data: ENSF, endpoints: true, width: 240, height: 44, title: "Futures" }),
+  ),
+  row(
+    "synthetic median",
+    svg(EnsembleGhosts, { data: ENSF, emphasis: "median", width: 200, height: 32 }),
+  ),
+  row("12 ghosts", svg(EnsembleGhosts, { data: ENSF, ghosts: 12, width: 200, height: 32 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

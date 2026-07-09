@@ -533,6 +533,162 @@ const FC_FORE = {
   ],
 };
 const QD = Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 40) * 0.4 + (i % 7) * 1.5));
+const ABA = Array.from({ length: 60 }, (_, i) => 130 + ((i * 7) % 30) - 15);
+const ABB = Array.from({ length: 60 }, (_, i) => 118 + ((i * 7) % 30) - 15);
+const SHB = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+const SHA = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+const PAR = [
+  { label: "Timeouts", value: 38 },
+  { label: "OOM", value: 24 },
+  { label: "Deploy", value: 15 },
+  { label: "Config", value: 9 },
+  { label: "Network", value: 7 },
+  { label: "Auth", value: 4 },
+];
+add(
+  "pareto-strip",
+  "ParetoStrip",
+  [
+    { data: PAR },
+    { data: PAR, max: 3 },
+    { data: PAR, threshold: false },
+    { data: PAR, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+const DDIFF = [
+  { key: "users", added: 340, removed: 120 },
+  { key: "orders", added: 88, removed: 30 },
+  { key: "items", added: 40, removed: 20 },
+  { key: "tags", added: 24, removed: 8 },
+  { key: "notes", added: 12, removed: 6 },
+  { key: "flags", added: 8, removed: 3 },
+];
+add(
+  "data-diff",
+  "DataDiff",
+  [
+    { data: DDIFF },
+    { data: DDIFF, labels: true },
+    { data: DDIFF, net: true, label: "totals" },
+    { data: DDIFF, sort: "net" },
+  ],
+  [
+    [80, 20],
+    [160, 56],
+    [220, 80],
+  ],
+);
+const QFIELD = [
+  { x: 2, y: 8 },
+  { x: 8, y: 9 },
+  { x: 3, y: 7 },
+  { x: 9, y: 2 },
+  { x: 7, y: 3 },
+  { x: 1, y: 1 },
+];
+add(
+  "quadrant-dot",
+  "QuadrantDot",
+  [
+    { data: { x: 3, y: 9 }, field: QFIELD, xDomain: [0, 10], domain: [0, 10] },
+    { data: { x: 3, y: 9 }, xDomain: [0, 10], domain: [0, 10], split: [5, 5] },
+    { data: { x: 3, y: 9 }, field: QFIELD, xDomain: [0, 10], domain: [0, 10], region: false },
+  ],
+  [
+    [24, 24],
+    [48, 48],
+    [120, 120],
+  ],
+);
+const CYCLE = [];
+for (let w = 0; w < 6; w++) CYCLE.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
+add(
+  "cycle-plot",
+  "CyclePlot",
+  [
+    { data: CYCLE, period: 7 },
+    { data: CYCLE, period: 7, center: "median" },
+    { data: CYCLE, period: 7, trend: "none" },
+    { data: CYCLE, period: 7, spine: false },
+  ],
+  [
+    [80, 20],
+    [160, 32],
+    [240, 40],
+  ],
+);
+const CPSTEP = [...Array(14).fill(30), ...Array(20).fill(48)];
+const CPTWO = [...Array(10).fill(10), ...Array(10).fill(50), ...Array(10).fill(22)];
+add(
+  "change-point",
+  "ChangePoint",
+  [
+    { data: CPSTEP, label: "delta" },
+    { data: CPTWO },
+    { data: CPSTEP, means: false },
+    { data: CPSTEP, breaks: [14], label: "delta" },
+  ],
+  [
+    [80, 16],
+    [160, 24],
+    [240, 32],
+  ],
+);
+const ENSF = Array.from({ length: 24 }, (_m, i) =>
+  Array.from({ length: 10 }, (_t, t) =>
+    Math.round(40 + (i - 12) * 0.55 * t * 0.4 + 3 * Math.sin(i + t) + t * 0.5),
+  ),
+);
+add(
+  "ensemble-ghosts",
+  "EnsembleGhosts",
+  [
+    { data: ENSF },
+    { data: ENSF, endpoints: true },
+    { data: ENSF, emphasis: "median" },
+    { data: ENSF, ghosts: 12 },
+  ],
+  [
+    [80, 20],
+    [160, 32],
+    [240, 44],
+  ],
+);
+add(
+  "shift-histogram",
+  "ShiftHistogram",
+  [
+    { data: { before: SHB, after: SHA } },
+    { data: { before: SHB, after: SHA }, mode: "overlay" },
+    { data: { before: SHB, after: SHA }, bins: 6 },
+    { data: { before: SHB, after: SHA }, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "ab-strips",
+  "ABStrips",
+  [
+    { data: { a: ABA, b: ABB } },
+    { data: { a: ABA, b: ABB }, labels: ["Ctrl", "Test"] },
+    { data: { a: ABA, b: ABB }, label: "none" },
+    { data: { a: [100, 130, 145], b: ABB } },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
 add(
   "quantile-dots",
   "QuantileDots",

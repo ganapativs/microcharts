@@ -246,12 +246,28 @@
     stroke-opacity: 0.35;
     stroke-width: 0.5;
   }
-  /* RateVolume ghost bars — the volume denominator, deliberately low-precision
-     context behind the rate line (never a second precise series). Static neutral
-     fill lives here (not inline) to earn the forced-colors mapping below. */
-  :where(.mc-root [data-mc-ink="ghost"]) {
+  /* Ghost = low-precision context behind the primary mark (RateVolume volume
+     bars, QuadrantDot peer dots, CyclePlot slot lines, ChangePoint regime means,
+     EnsembleGhosts member paths). ELEMENT-SPLIT: filled marks (bar/dot) take a
+     faint fill; stroked marks (line/path) take a faint STROKE — a single role
+     with a plain `fill: neutral` would fill an open polyline into a wedge and
+     kill its stroke. Neutral lives here (not inline) to earn forced-colors. */
+  :where(.mc-root :is(rect, circle, ellipse, polygon)[data-mc-ink="ghost"]) {
     fill: var(--mc-neutral);
     fill-opacity: 0.18;
+    stroke: none;
+  }
+  :where(.mc-root :is(path, line, polyline)[data-mc-ink="ghost"]) {
+    fill: none;
+    stroke: var(--mc-neutral);
+    stroke-opacity: 0.5;
+  }
+  /* QuadrantDot quadrant tint — a whisper of accent behind the focal's cell.
+     Decorative: membership is carried by dot position + summary, so it drops out
+     entirely under forced-colors (mapping below). */
+  :where(.mc-root [data-mc-ink="region"]) {
+    fill: var(--mc-accent);
+    fill-opacity: 0.08;
     stroke: none;
   }
   /* PercentileLadder tail flag — the emphasised accent tick/dot. Element-split:
@@ -429,9 +445,16 @@
       stroke: GrayText;
       stroke-opacity: 1;
     }
-    /* ghost volume bars → quiet system ink, still readable as background context */
-    :where(.mc-root [data-mc-ink="ghost"]) {
+    /* ghost context → quiet system ink (element-split: fills fill, lines stroke) */
+    :where(.mc-root :is(rect, circle, ellipse, polygon)[data-mc-ink="ghost"]) {
       fill: GrayText;
+    }
+    :where(.mc-root :is(path, line, polyline)[data-mc-ink="ghost"]) {
+      stroke: GrayText;
+    }
+    /* quadrant tint is purely decorative → drop it entirely in high contrast */
+    :where(.mc-root [data-mc-ink="region"]) {
+      fill: transparent;
     }
     /* tail flag keeps its emphasis, mapped to the system accent */
     :where(.mc-root line[data-mc-ink="flag"]) {

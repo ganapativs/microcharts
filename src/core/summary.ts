@@ -338,6 +338,133 @@ export interface SummaryStrings {
   forecastAtHistory: (unit: string, period: number, value: string) => string;
   /** Forecast-region announcement, e.g. "Week 14 (forecast): median 42, 80% between 33 and 55." */
   forecastAtForecast: (unit: string, period: number, mid: string, lo: string, hi: string) => string;
+  /** A/B summary, e.g. "B median 118 ms vs A 130 ms (−9%); middle halves overlap 40%." */
+  ab: (
+    bLabel: string,
+    bMed: string,
+    aLabel: string,
+    aMed: string,
+    delta: string,
+    overlapPct: string,
+  ) => string;
+  /** Appended verdict when overlap is total / none. */
+  abSeparated: string;
+  abNoDiff: string;
+  /** A/B row announcement, e.g. "B median 118 ms, 12 ms below A." */
+  abRow: (
+    label: string,
+    med: string,
+    amount: string,
+    dir: "below" | "above",
+    other: string,
+  ) => string;
+  /** A/B edge announcement, e.g. "B p75: 140 ms." */
+  abEdge: (label: string, p: number, value: string) => string;
+  /** Shift summary, e.g. "Median fell from 130 ms to 106 ms." */
+  shift: (direction: "fell" | "rose", before: string, after: string) => string;
+  /** No-change shift, e.g. "Median unchanged at 130 ms." */
+  shiftHeld: (value: string) => string;
+  /** Appended when the two sides have unequal n, e.g. " On 6,400 / 7,100 samples." */
+  shiftSamples: (nBefore: number, nAfter: number) => string;
+  /** One-sided (the other side is empty), e.g. "Median 130 ms; no after sample." */
+  shiftOneSide: (value: string, missing: string) => string;
+  /** Shift bin announcement, e.g. "10–12 ms: 18% before, 6% after." */
+  shiftBin: (lo: string, hi: string, beforePct: string, afterPct: string) => string;
+  /** Pareto summary, e.g. "Top 3 of 9 causes account for 82% of incidents." */
+  pareto: (k: number, n: number, unit: string, cumPct: string, metric: string) => string;
+  /** Pareto without a threshold, e.g. "Timeouts leads at 34%." */
+  paretoTop: (topLabel: string, topPct: string) => string;
+  /** Empty (zero total), e.g. "No recorded incidents." */
+  paretoEmpty: (metric: string) => string;
+  /** Pareto bar announcement, e.g. "Timeouts: 34% of total, cumulative 61%." */
+  paretoAt: (label: string, sharePct: string, cumPct: string) => string;
+  /** DataDiff summary, e.g. "+512 added, −187 removed across 6 keys; largest change: users (+340)." */
+  dataDiff: (added: string, removed: string, n: number, key: string, net: string) => string;
+  /** DataDiff with no net change anywhere, e.g. "No changes across 6 keys." */
+  dataDiffEmpty: (n: number) => string;
+  /** DataDiff row announcement, e.g. "users: +340 added, −120 removed, net +220." */
+  dataDiffAt: (key: string, added: string, removed: string, net: string) => string;
+  /** Quadrant name, e.g. "high-impact, low-effort" (reading: y then x). */
+  quadrantName: (yHigh: boolean, yLabel: string, xHigh: boolean, xLabel: string) => string;
+  /** QuadrantDot summary against a field, e.g. "Impact 9, effort 3 — in the high-impact, low-effort quadrant (2 of 14 peers)." */
+  quadrant: (
+    yLabel: string,
+    yv: string,
+    xLabel: string,
+    xv: string,
+    quadName: string,
+    k: number,
+    n: number,
+  ) => string;
+  /** QuadrantDot with no field, e.g. "Impact 9, effort 3 — in the high-impact, low-effort quadrant." */
+  quadrantLone: (
+    yLabel: string,
+    yv: string,
+    xLabel: string,
+    xv: string,
+    quadName: string,
+  ) => string;
+  /** Peer announcement, e.g. "Peer 3 of 12: effort 6, impact 4 — high-effort, low-impact." */
+  quadrantAt: (
+    pos: number,
+    total: number,
+    xLabel: string,
+    xv: string,
+    yLabel: string,
+    yv: string,
+    quadName: string,
+  ) => string;
+  /** CyclePlot summary with a leading drift, e.g. "Peaks Fri (61), dips Sun (38); Mon rising across 6 weeks." */
+  cycle: (
+    peakSlot: string,
+    peak: string,
+    dipSlot: string,
+    dip: string,
+    driftSlot: string,
+    driftDir: "rising" | "falling",
+    cycles: number,
+    cycleUnit: string,
+  ) => string;
+  /** CyclePlot summary, no notable drift, e.g. "Peaks Fri (61), dips Sun (38)." */
+  cycleNoDrift: (peakSlot: string, peak: string, dipSlot: string, dip: string) => string;
+  /** Slot announcement, e.g. "Mondays: mean 42 across 6 weeks, rising." */
+  cycleAt: (
+    slotName: string,
+    center: "mean" | "median",
+    value: string,
+    cycles: number,
+    cycleUnit: string,
+    driftDir: "rising" | "falling" | "steady",
+  ) => string;
+  /** Within-slot observation, e.g. "Mon, cycle 3 of 6: 44." */
+  cyclePoint: (slotName: string, pos: number, total: number, value: string) => string;
+  /** ChangePoint summary, e.g. "Level shifted up 50% around point 34 (mean 32 → 48); stable since." */
+  changePoint: (
+    dir: "up" | "down",
+    delta: string,
+    i: number,
+    before: string,
+    after: string,
+    tail: "stable" | "again",
+  ) => string;
+  /** No detected shift, e.g. "No clear level shift across 90 points." */
+  changePointNone: (n: number) => string;
+  /** Point announcement, e.g. "Point 40: 51 — regime 2 of 3, mean 48." */
+  changePointAt: (
+    pos: number,
+    value: string,
+    regime: number,
+    regimes: number,
+    mean: string,
+  ) => string;
+  /** Break announcement, e.g. "Break at point 34: mean 32 to 48 (+50%)." */
+  changePointBreak: (i: number, before: string, after: string, signedDelta: string) => string;
+  /** Ensemble summary, e.g. "24 simulated paths end between 31 and 58; typical path ends near 44." */
+  ensemble: (n: number, lo: string, hi: string, mid: string) => string;
+  /** Single-member ensemble, e.g. "Single path, ends at 44." */
+  ensembleSingle: (end: string) => string;
+  /** Member announcement, e.g. "Member 7 of 24; ends at 42." */
+  ensembleAt: (pos: number, total: number, end: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

@@ -1,0 +1,88 @@
+---
+title: EnsembleGhosts
+description: An ensemble / hypothetical-outcome chart for React — a faint bundle of simulated paths with one emphasized representative, so futures that disagree in shape stay visible.
+---
+
+EnsembleGhosts answers "what could happen, across the simulated futures?". It draws a faint bundle of
+member paths with one emphasized representative — because a mean line hides that futures disagree in
+**shape**, not just endpoint. Ghost selection is fully deterministic (evenly spaced endpoint-rank
+quantiles), so the same input renders identically every time.
+
+<LiveDemo
+  label="EnsembleGhosts"
+  sizeOf="ensemble-ghosts"
+  code={`import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
+
+<EnsembleGhosts data={futures} title="Simulated futures" />`}
+>
+  <EnsembleGhosts
+    data={[[40, 41, 43, 45, 47, 50], [40, 39, 38, 36, 35, 33], [40, 42, 44, 47, 49, 52], [40, 40, 41, 41, 42, 43], [40, 43, 47, 52, 56, 61], [40, 38, 35, 32, 30, 28], [40, 41, 42, 44, 45, 46], [40, 39, 40, 41, 42, 44]]}
+    endpoints
+    title="Simulated futures"
+    width={200}
+    height={44}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="ensemble-ghosts" />
+
+## Try it
+
+<Playground chart="ensemble-ghosts" />
+
+## Interactive
+
+<InteractiveDemo slug="ensemble-ghosts" />
+
+## When to use it
+
+- **Good for** — a KPI card that shows the futures, not the average; Monte-Carlo / simulation output where paths disagree in shape; showing that outcomes fan out.
+- **Avoid for** — interval precision (ForecastCone) or a single path (Sparkline).
+
+## Sizing
+
+<Sizing chart="ensemble-ghosts" />
+
+## Variants
+
+<LiveDemo
+  label="endpoint dots + synthetic median"
+  code={`<EnsembleGhosts data={futures} endpoints />
+<EnsembleGhosts data={futures} emphasis="median" />`}
+>
+  <span className="inline-flex gap-4 items-center">
+    <EnsembleGhosts data={[[40, 41, 43, 45, 47, 50], [40, 39, 38, 36, 35, 33], [40, 42, 44, 47, 49, 52], [40, 43, 47, 52, 56, 61], [40, 38, 35, 32, 30, 28]]} endpoints width={150} height={40} />
+    <EnsembleGhosts data={[[40, 41, 43, 45, 47, 50], [40, 39, 38, 36, 35, 33], [40, 42, 44, 47, 49, 52], [40, 43, 47, 52, 56, 61], [40, 38, 35, 32, 30, 28]]} emphasis="median" width={150} height={40} />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="ensemble-ghosts" />
+
+## Why this default
+
+A few faint paths and one emphasized, because a mean line hides that futures disagree in shape, not
+just endpoint — two ensembles can share an average and a final range while telling completely
+different stories along the way. The emphasized path defaults to the **real member** closest to the
+pointwise median, so the representative is an outcome that actually happened in the simulation, not a
+synthetic average of paths that never occurred (`emphasis="median"` draws that synthetic path
+instead, and the summary calls it out). Selection and emphasis are deterministic — nothing about this
+chart varies between renders of the same data.
+
+The static frame is not a hypothetical-outcome plot. The **loop** — flipping through the members one
+at a time on hover — is the HOP, and it lives only in the interactive entry, gated on reduced motion
+with arrow-key stepping as the non-animated equivalent.
+
+## Accessibility
+
+The accessible name states the endpoint spread and the typical path — **"8 simulated paths end
+between 28 and 61; typical path ends near 46."** The interactive entry flips through the members
+(the HOP loop) on hover; with reduced motion, ←/→ step them discretely, and each member is announced
+with its endpoint.
+
+## Props
+
+<PropTable slug="ensemble-ghosts" />

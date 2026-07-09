@@ -1,0 +1,103 @@
+---
+title: ABStrips
+description: A two-sample comparison for React — two graded quantile strips on one scale where the visible overlap of the middle halves is the answer.
+---
+
+ABStrips answers "did B beat A — and by more than the overlap?". It draws **two graded
+quantile strips on one shared scale**: a faint p5–95 band, a stronger p25–75 middle half, and
+a median dot, with row A muted and row B accent. The visible overlap of the two middle halves
+is the answer — and the overlap number is always in the summary, because an average delta
+without its spread is how A/B results lie.
+
+<LiveDemo
+  label="ABStrips"
+  sizeOf="ab-strips"
+  code={`import { ABStrips } from "@microcharts/react/ab-strips";
+
+<ABStrips data={{ a: control, b: test }} positive="down" title="Latency A/B" />`}
+>
+  <ABStrips
+    data={{
+      a: Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22),
+      b: Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22),
+    }}
+    format={(n) => `${Math.round(n)} ms`}
+    positive="down"
+    title="Latency A/B"
+    width={260} height={26}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="ab-strips" />
+
+## Try it
+
+<Playground chart="ab-strips" />
+
+## Interactive
+
+<InteractiveDemo slug="ab-strips" />
+
+## When to use it
+
+- **Good for** — an A/B experiment result in a KPI card, control vs test in an experiments table, any two-sample comparison where the spread matters.
+- **Avoid for** — a single distribution (BenchmarkStrip) or more than two arms (small multiples).
+
+## Sizing
+
+<Sizing chart="ab-strips" />
+
+## Variants
+
+<LiveDemo
+  label="labelled arms + clearly separated"
+  code={`<ABStrips data={{ a: control, b: test }} labels={["Control", "Test"]} />`}
+>
+  <span className="inline-flex flex-col gap-2">
+    <ABStrips
+      data={{
+        a: Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22),
+        b: Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22),
+      }}
+      format={(n) => `${Math.round(n)} ms`}
+      labels={["Ctrl", "Test"]}
+      title="Labelled"
+      width={240} height={24}
+    />
+    <ABStrips
+      data={{
+        a: Array.from({ length: 80 }, (_, i) => 170 + ((i * 13) % 44) - 22),
+        b: Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22),
+      }}
+      format={(n) => `${Math.round(n)} ms`}
+      positive="down"
+      title="Clearly separated"
+      width={240} height={24}
+    />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="ab-strips" />
+
+## Why this default
+
+Overlap in the summary, because an average delta without spread is how A/B results lie. The
+strips are mandatory context — it never degrades to a bare mean bar — and the delta label
+never appears without the distributions behind it. When the middle halves fully overlap the
+summary says "no clear difference"; when they're disjoint it says "clearly separated"; and an
+arm with fewer than 8 points falls back to a min–max band, with both sample sizes carried.
+
+## Accessibility
+
+The accessible name states both medians, the delta, and the overlap — **"B median 115 ms vs A
+129 ms (-11%); middle halves overlap 35%."**. The interactive entry roves the rows (↑/↓) and
+the quantile edges (←/→): the median announces the delta vs the other arm, other edges announce
+the percentile.
+
+## Props
+
+<PropTable slug="ab-strips" />

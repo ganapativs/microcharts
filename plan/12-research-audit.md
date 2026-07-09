@@ -866,3 +866,308 @@ strings chunk that another chart already imports at its budget edge.
 Gates: node 1272, browser 92, craft 268/0, size (quantile-dots 2.51/3.3, icon-array back under),
 docs 186 pages + tests 104, real-browser sweep green (20 dots, flags re-inked+ringed, "10 in 20"
 label, probe recomputes + rounds clean, 0 escapes).
+
+## Batch 2 wave 3 — ABStrips (2026-07-09, branch batch-2-decision-w3)
+
+**ABStrips (plan/23 #13) — full DoD, static + interactive.** Provenance: plan/16 §Q6. Two graded
+quantile strips (p5–95 / p25–75 / median) on ONE shared scale via `core/quantile.quantiles`
+(NOT by importing GradedBand — geometry reused via the kernel, per spec). The middle-half OVERLAP
+is always computed + always in the summary (overlap is the honest answer — plan/16); never a bare
+mean bar. Edge cases property-tested: identical → overlap 1 / "no clear difference"; disjoint →
+overlap 0 / "clearly separated"; n < 8 arm → min–max outer band (BenchmarkStrip small-n rule).
+
+**Craft-vs-browser lesson (reinforced).** The A/B row tags sit at the two row centers, only
+`height/2` apart. The SSR craft gate (attribute-based text-extent estimate) passed `FONT=8` at
+80×20, but the real-browser getBBox showed the tags OVERLAP (a 7-8px label in a 9px row gap).
+Dropped to `FONT = clamp(round(height·0.3), 6, 8)` (→6 at h20); browser re-verified 0 tag
+overlaps. **The mandatory real-browser sweep caught what craft could not — again.** (`dots`
+quantile-dot-row variant deferred: needs ≥28px height; the band form is the honest default here.)
+
+**Deviations:** `dots` variant deferred (cosmetic, height-gated); clearance/delta polarity via
+`positive` (higher-is-good default; sign always in text). Static 2.56 / interactive 3.49 kB
+(budgets 2.7/3.6) — under 3/4 hard caps, same budget-floor class.
+
+Gates: node 1287, browser 94, craft 280/0, size 2.56/3.49, bench 24.9 rows/ms (floor 20), docs
+189 pages + tests 106, real-browser sweep green (2 nested bands/row 0.16/0.34, medians, A/B tags
+no-collision, delta valence-colored, row+edge interactive + readout chip). Starts wave 3.
+
+## Batch 2 wave 3 — ShiftHistogram (2026-07-09)
+
+**ShiftHistogram (plan/23 #14) — full DoD, static + interactive.** Provenance: plan/16 §Q7. Two
+mirrored histograms over SHARED bin edges (`core/bin.uniformBins`, union domain + one auto bin
+count reused for both sides). Heights = per-side PROPORTIONS on one shared scale (max proportion
+across both) — property-tested: identical distributions at 10× the n produce matching up/down
+heights (unequal n cannot fake a shift). Median shift is the precise takeaway; medians never
+smoothed/trimmed. One side empty → single histogram + "no <side> sample"; unequal n → summary
+carries both.
+
+**Two fixes caught during the build:**
+1. **Static 3.02 kB was OVER the 3 kB HARD cap** (imported both `core/bin` AND `core/quantile`).
+   Trimmed by computing the two medians INLINE (5-line sort + middle) instead of pulling the whole
+   quantile module for one 0.5 quantile → 2.94 kB, under the cap. Lesson: a histogram bundle
+   should not drag the quantile module for a single median.
+2. **Side tags ("before"/"after") collided with the bars at EVERY micro size** — the craft gate
+   caught 8 TEXT-ON-MARK/ESCAPE issues (full-word tags over the full-width bars, no clear space).
+   DROPPED the on-chart tags: side identity rides on POSITION (before up / after down) + color +
+   the summary, and position survives grayscale + forced-colors (both bars map to CanvasText, but
+   up≠down still distinguishes). This is the plan's "drop first under the degradation order",
+   applied always at these sizes. Deviation from plan §14 (which lists side tags) logged here.
+
+Gates: node 1303, browser 96, craft 292/0, size 2.94/3.88, bench 13.4 rows/ms (floor 6), docs 192
+pages + tests 108, real-browser sweep green (proper mirror before-up/after-down, overlay outlines,
+"0 ms" no-shift, 0 escapes; interactive bin proportions + M-jumps-to-median + readout chip).
+
+## Batch 2 wave 3 — ParetoStrip (2026-07-09)
+
+**ParetoStrip (plan/23 #15) — full DoD, static + interactive.** Provenance: line 150 (ASQ Pareto
+procedure; 80% a reference, not a law — CORROBORATED). Descending bars + a cumulative-share line
+on a **FIXED 0–100% scale spanning the full plot height** (never rescaled to steepen the curve —
+the classic Pareto lie). The accent stops at the threshold crossing (the vital few); the rest are
+muted — the chart's one job is "where do I stop reading". `Other` rolls the tail beyond `max`,
+renders honestly at true size, but is always last and **never eligible to be the crossing**.
+Real accessible name: **"Top 4 of 9 causes account for 82% of incidents."** (`threshold=false` →
+"Timeouts leads at 39%."; zero total → "No recorded incidents."). Interactive steps bars
+(share + running cumulative announce + `%·%` readout chip); **T** jumps to the crossing bar.
+
+**Honest edge caught in the real-browser sweep:** with `max` small enough that the head's top
+non-Other bars don't reach the threshold (top-3 = 79.4% < 80%, and `Other` = 20.6% would cross but
+is excluded), there is **no crossing → no vital accent, no "K of N" label** — the summary falls back
+to `paretoTop` ("top leads at X%"). This is correct and honest: if the shown causes don't get you to
+80%, the chart must not paint a fake vital few. Docs note it usually means `max` is too aggressive.
+
+**Typing fix:** the crossing was first computed by mutating a `{index,x}|null` inside a `rows.map()`
+callback — TS control-flow analysis can't track callback mutation and narrowed it to `never`
+(TS2339 "Property 'index' does not exist on type 'never'"). Restructured to a plain loop computing
+`cums[]` + `crossingIndex`, deriving `crossing`/`vitalCount`/`cumAtCrossing`/`line` from it. Lesson:
+never mutate an outer typed accumulator from inside a `.map()` — compute the index in a loop first.
+
+**MDX trap:** the accessibility prose used literal `<top>`/`<share>` placeholders — Fumadocs MDX
+parsed them as JSX tags ("Expected a closing tag for `<share>`") and `next build` failed though
+`pnpm test` was green. Reworded to plain words. Same class as the docs circular-import TDZ: a docs
+build is the only gate that catches MDX/Node-eval errors.
+
+Gates: node 1320, browser 98, craft 304/0, size 2.23/3.04 (well under caps), bench 25.1 rows/ms
+(floor 6), docs 195 pages + tests 110, real-browser sweep green (accent stops at crossing across
+default/rollup/no-threshold, cum line + threshold hairline present, rollup-below-threshold correctly
+shows no vital few, 0 escapes/overlaps; live hero label == mdx, interactive announce + T-jump +
+readout chip). **11 of 21 done.**
+
+## Batch 2 wave 3 — DataDiff (2026-07-09)
+
+**DataDiff (plan/23 #16) — full DoD, static + interactive.** Provenance: plan/16 §Q17. One diverging
+bar per key — removed leftward (`--mc-negative`), added rightward (`--mc-positive`), **both always
+drawn on ONE symmetric shared scale** (max(added,removed) across all rows), so a +500/−480 churn can
+never look like a +20/−0 trickle (property-tested). `labels` (in-chart key tags), `net` (a tick at
+added−removed — a summary mark, never a stand-in for the bars), `sort` (`"none"` keeps input order,
+which is often meaningful), `label="totals"` (a `+added / −removed` footer), `domain` (shared scale
+for cross-chart comparison). Negative counts are magnitudes → clamped to 0; a 0/0 key keeps a
+hairline placeholder tick (absence of change ≠ absent key); >12 rows warns via `core/dev.devWarn`
+and steers to a table of DataDiffs — never silent truncation. Real accessible name: **"+512 added,
+−187 removed across 6 keys; largest change: users (+220)."** (largest by |net|, signed; all-zero →
+"No changes across N keys."). Interactive = pointer-y/↑↓ grid lookup over rows, announcing each key's
+added/removed/net + a `+added · −removed` readout chip.
+
+**The important craft fix — CSS var beats the font-size ATTRIBUTE in the browser.** Key tags at many
+rows first escaped/overlapped. Fit-gating helped (tags only when a row clears ~10 px; tag font ≤
+0.5·rowH; totals footer reserves its own bottom band and only appears at height ≥ 34), and the SSR
+craft gate (which reads the `font-size` **attribute**) went green — but the **real-browser** sweep
+still showed 5 tag-tag overlaps, with `getBBox().height` frozen at ~11.5 no matter the attribute.
+Cause: `styles.css` has `:where(.mc-root text){ font-size: var(--mc-label-size) }`, and a CSS
+declaration **beats a presentation attribute**, so every tag was pinned to `--mc-label-size` (=FONT)
+regardless of `fontSize={tagFont}`. Fix: set the tag size **inline** (`style={{ fontSize: tagFont }}`)
+— inline style beats the zero-specificity `:where` rule. Lesson (amends the memory note "fontSize as
+an attribute"): the attribute is enough only when a chart's text is ALL one size == `--mc-label-size`;
+a chart with a SECOND, smaller text size must set it inline, and only the real-browser getBBox sweep
+catches the miss (SSR craft reads the attribute and is blind to it).
+
+**Also:** playground toggle knob kind is `"toggle"`, not `"boolean"` (typecheck at docs build caught
+it); `format` prop must be typed `Format` (from `core/format`), not `string`; MDX prose avoided
+literal `<key>` placeholders (the ParetoStrip `<share>` trap).
+
+Gates: node 1342, browser 100, craft 316/0, size 2.5/3.32 (caps 2.7/3.55), bench 25.9 rows/ms
+(floor 20), docs 198 pages + tests 112, real-browser sweep green (all 13 data-diff SVGs on the live
+page 0 escapes/0 text-on-mark/0 tag-tag; both bars always drawn; 0/0 placeholder tick; labels/totals
+degrade cleanly at small sizes; live hero label == mdx; interactive row announce + readout chip).
+New `EN_DATA_DIFF` module (`dataDiff`, `dataDiffEmpty`, `dataDiffAt`). **12 of 21 done.**
+
+## Batch 2 wave 3 — QuadrantDot (2026-07-09)
+
+**QuadrantDot (plan/23 #17) — full DoD, static + interactive.** Provenance: plan/16 §Q18. A focal
+dot placed by 2-D position against a peer field, a hairline cross at the split (default = domain
+midpoints, always overridable but NEVER hidden), a faint accent tint on the focal's quadrant, tiny
+muted ghost dots for peers. The read is quadrant MEMBERSHIP first (exact position second) — so it
+lives at glyph scale (24×24) with **no in-chart text**: axis meaning rides entirely on `title` +
+summary, and the docs name skipping them the one anti-pattern. Boundary rule `≥ split ⇒ right/top`
+(property-tested, deterministic on-the-line). A degenerate axis centers the focal and suppresses that
+split line (`scaleLinear` already maps a zero-span domain to the midpoint). `xDomain`/`domain`
+(x/y per grammar — a 2-D chart earns the extra `xDomain`), `split`, `field`, `quadrants` (names in
+TL/TR/BL/BR reading order, **summaries only, never rendered**), `xLabel`/`yLabel`, `region` (tint
+off for dense grids). Real accessible name: **"Impact 9, effort 3 — in the high-impact, low-effort
+quadrant (2 of 14 peers)."** (generated axis-relative wording via `quadrantName`, or explicit
+`quadrants`). Interactive cycles peers NEAREST-FIRST from the focal (sorted in geometry), each read
+with coords + quadrant + a `x, y` readout chip; pointer picks the nearest dot within a 3-unit hit
+radius.
+
+New role `data-mc-ink="region"` (accent 5% tint, drops to `transparent` under forced-colors — it's
+decorative; membership is carried by dot position + summary). Reused the existing `ghost` role
+(neutral 0.18) for peers. No new escapes class — the glyph has no text, so the real-browser sweep
+checks dot containment + region opacity + cross/ghost counts only.
+
+**Budget divergence (needs gate sign-off, batch-2 pattern):** spec §17 targets static ≤ 1.5 kB /
+interactive ≤ 2.5 kB, but measured 2.17 / 3.05 kB (Chart wrapper + `scaleLinear` + `extent` +
+`makeFormatter` + the quadrant summary machinery). Under the 3 / 4 kB HARD caps; budgets set to
+2.4 / 3.3 with headroom. Trimming to 1.5 would mean dropping the formatter or the summary — not worth
+the honesty cost. Same class as RateVolume/NetFlow/etc. spec-vs-measured gaps logged above.
+
+Gates: node 1359, browser 102, craft 325/0, size 2.17/3.05 (budgets 2.4/3.3, caps 3/4), bench 22.7
+rows/ms (floor 20), docs 201 pages + tests 114, real-browser sweep green (all 13 quadrant-dot SVGs
+on the live page 0 dot-escapes; region tint renders at 0.05; lone-glyph → 0 ghosts; no-tint → no
+region; live hero label == mdx flagship string; interactive nearest-first announce + `x, y` readout
+chip). New `EN_QUADRANT` module (`quadrantName`, `quadrant`, `quadrantLone`, `quadrantAt`).
+**13 of 21 done.**
+
+## Batch 2 wave 3 — CyclePlot (2026-07-09)
+
+**CyclePlot (plan/23 #18) — full DoD, static + interactive.** Provenance: plan/16 §Q19 (cycle plot /
+seasonal-subseries chart, Cleveland). The flat series is reshaped row-major into `period` slots
+(slot = i mod period). Per slot: a muted polyline of that slot's raw values across cycles IN TIME
+ORDER + a mean/median tick; across slots the accent spine connects the centers. **The two reads are
+separate by construction** (property-tested): the spine is only centers, the local lines are only
+raw within-slot values, and **nothing is ever smoothed or joined across a slot boundary** — each
+slot's polyline begins and ends inside its own column (verified: every line x ∈ [x0, x1]).
+`period` (4–12, `devWarn` outside), `slots` (names for summaries), `center` (`mean`/`median`,
+computed INLINE — the ShiftHistogram lesson, no `quantile` import for one median), `trend`
+(`line`/`none`), `spine` (off → drift-only), `cycleUnit`. Edge cases: ragged final cycle → per-slot
+counts differ and are carried (`slotCounts`); `period ≥ length` → every slot ≤ 1 point, no lines,
+spine only; nulls excluded from a slot's center/line, never interpolated; empty slot → spine skips it
+(never joins across the gap). Real accessible name: **"Peaks Fri (61), dips Sun (38); Mon rising
+across 6 weeks."** — the drift clause appears only when a slot's |drift| leads AND exceeds 10 % of
+the spine range, else `cycleNoDrift`. Interactive: ←/→ step slots (mean + cycle count + drift dir),
+↑/↓ step the individual observations within the focused slot (a `{slot, cycle}` selection model),
+`x`-nearest pointer, value readout chip.
+
+**Budget divergence (needs gate sign-off, batch-2 pattern):** spec §18 targets static ≤ 2 /
+interactive ≤ 3 kB; measured 2.44 / 3.46 (Chart + `scaleLinear` + `extent` + `makeFormatter` +
+bucketing + summary). Under the 3 / 4 hard caps; budgets set 2.5 / 3.5 with headroom. Same class as
+the other batch-2 spec-vs-measured gaps.
+
+Gates: node 1376, browser 104, craft 337/0, size 2.44/3.46 (budgets 2.5/3.5, caps 3/4), bench 21.2
+rows/ms (floor 20), docs 204 pages + tests 116, real-browser sweep green (all 13 cycle-plot SVGs on
+the live page 0 escapes; 7 ticks + 7 slot lines + spine at default; `trend="none"` → 0 lines; live
+hero label == mdx flagship string; interactive slot announce + within-slot cycle announce + drift
+direction + readout chip all correct). New `EN_CYCLE` module (`cycle`, `cycleNoDrift`, `cycleAt`,
+`cyclePoint`). **14 of 21 done.**
+
+## Batch 2 wave 3 — ChangePoint (2026-07-09)
+
+**ChangePoint (plan/23 #19) — full DoD, static + interactive.** Provenance: plan/16 §Q8. Regime
+shading (alternating 3 %/6 % neutral — IDENTITY, not valence) + per-regime mean hairlines + the
+series line + break markers (hairline + top triangle). **The detector lives in `geometry.ts`, not
+core** (plan/21 §6.0.C), and is a documented HEURISTIC: two-segment mean-shift via binary
+segmentation over prefix-sum SS, accepted only when the SS-reduction ratio > `BREAK_SS_RATIO` (0.2)
+AND |Δmean| ≥ `BREAK_EFFECT_SIZE` (0.8) × the pooled SD; min segment `max(3, ⌈n/BREAK_MIN_SEG_DIVISOR
+(10)⌉)`; recurse to `max`. **All three constants are named exports, docs-stated, property-tested**:
+no break on constant / low-noise series (effect-size gate), exact index on a clean step, never more
+than `max`. `breaks` (`"auto"` or explicit indices → detection OFF, pure annotation — the recommended
+production path), `max` (1–3), `means`, `label="delta"`. `n < 8` → detection off (explicit honoured);
+nulls excluded from segment stats + line gaps; gradual ramp honestly finds no shift (named limitation
+→ Sparkline, shown in the docs ramp variant). Real accessible name: **"Level shifted up 60% around
+point 14 (mean 30 → 48); stable since."** (headline = the largest-|delta| break; tail "stable since"
+if it's the last, else "then shifted again"; the direction word carries the sign so the % is
+unsigned). Interactive: ←/→ step points (value + regime + regime mean), **Tab cycles the breaks as
+first-class stops** ("Break at point 14: mean 30 to 48 (+54%)."), crosshair + value readout chip.
+
+**Budget fight — this chart hit the 3/4 kB HARD caps and had to be trimmed to fit.** The detector +
+Chart + scale + line + `makeFormatter` + summary first measured **3.15/4.15 kB — OVER the 3/4 hard
+caps** (non-negotiable #2, not just the spec target). Trimmed under by: (1) inlining min/max instead
+of the `extent` import; (2) inlining both linear scales (dropped the `scaleLinear` import — replicated
+its degenerate→midpoint guard); (3) inlining the null-gap line builder (dropped the `linePath`
+import); (4) merging the two percent helpers; (5) dropping the `Stat.n` field; (6) **dropping the
+out-of-range-`breaks` `devWarn`** — the geometry still filters them (correct + property-tested), only
+the console message is gone. Final 2.93/3.93, under the caps. Deviation logged: the spec lists a dev
+warning for out-of-range explicit breaks; it was removed to satisfy the hard cap (behaviour
+preserved). Lesson: a chart carrying its own algorithm can blow the per-subpath cap — inline the
+kernel helpers it only lightly uses rather than importing them.
+
+**Craft:** the `+60%`/`+54%` delta label escaped the right gutter in the real-browser sweep
+(0.62·em/char under-reserves the wide `%` glyph — the RateVolume lesson) → bumped the delta gutter to
+**0.72·em/char** (it always carries `%`). SSR craft passed at 0.62; only the getBBox sweep caught it.
+
+Gates: node 1398, browser 106, craft 349/0, size 2.93/3.93 (budgets 2.98/3.98, AT the 3/4 caps),
+bench 22.9 rows/ms (floor 12 — the O(n²) segmentation over ≤500 pts), docs 207 pages + tests 118,
+real-browser sweep green (all 13 change-point SVGs 0 escapes after the gutter fix; 2/3 regime rects
+tile gap-free; break hairline+triangle; live hero == mdx flagship string; interactive point/regime +
+Tab-cycles-breaks + readout chip correct). New `EN_CHANGE_POINT` module (`changePoint`,
+`changePointNone`, `changePointAt`, `changePointBreak`). **15 of 21 done.**
+
+## Batch 2 wave 3 — EnsembleGhosts (2026-07-09) — BATCH 2 COMPLETE
+
+**EnsembleGhosts (plan/23 #20) — full DoD, static + interactive. The final Batch 2 chart.**
+Provenance: plan/16 §Q4 (hypothetical-outcome plots / ensemble spaghetti, Hullman et al.). A faint
+bundle of member paths + one emphasised representative, because a mean line hides that futures
+disagree in SHAPE, not just endpoint. **Ghost selection is DETERMINISTIC** (`selectGhosts`): members
+ranked by endpoint value, picked at evenly spaced quantiles of that ranking — no `Math.random`, no
+jitter, so SSR == hydration == every render (property-tested: same input → identical member set).
+`ghosts` (default 8, cap 12), `emphasis` (`"nearest-median"` = the real member with the smallest L2
+distance to the pointwise median / `"median"` = the synthetic pointwise-median path, `member: null`,
+flagged / a pinned member index), `endpoints` (ghost endpoint dots). Unequal-length members each draw
+to their own length on a shared index x-scale (never truncated); NaN members excluded (dev-warned);
+single member → memberCount 1 (docs → Sparkline). Real accessible name: **"8 simulated paths end
+between 28 and 61; typical path ends near 46."** (spread = endpoint range across ALL members; typical
+= the emphasised path's endpoint).
+
+**The interactive entry is THE HOP LOOP — the one place animation adds measured value (plan/16 Q4).**
+On hover/focus it cycles members one at a time at ~400 ms/frame (≈ 2.5 Hz, the studied HOP cadence)
+via a `setInterval` that swaps the surfaced accent path, looping until the pointer leaves.
+**Reduced-motion: no loop** — ←/→ step members discretely (the same information without motion), read
+off `matchMedia('(prefers-reduced-motion: reduce)')`. The live region announces **only** on a keyboard
+step or when the loop stops — NEVER per frame — via a `announce` state decoupled from the per-frame
+`active` state (so a screen reader isn't spammed at 2.5 Hz). Honesty enforced: a static frame is NOT
+a HOP; no static copy claims the HOP findings; the loop is reduced-motion-gated with the stated
+non-animated equivalent.
+
+**Deviations logged:** (1) the HOP frames are `setState` swaps, not the spec's "WAAPI opacity on
+pre-rendered paths (no re-render per frame)" — at ≤12 paths / 2.5 Hz a re-render is negligible and the
+`useMemo`'d geometry means no recompute per frame; the WAAPI micro-opt wasn't worth the ref-juggling
+complexity. (2) No `.mc-spark-readout` chip — the cycling full-accent path IS the visible feedback
+(the HOP), and a per-frame number chip would fight the calm 2.5 Hz cadence and contradict the
+"announce not per frame" rule; the visible-feedback DoD is met by the emphasised path. Both noted for
+gate sign-off. Median computed inline (no `quantile` import) per the ShiftHistogram budget lesson;
+scales + line builder inlined (like ChangePoint) — static a lean 2.28 kB (spec ≤ 2, but see: it's
+UNDER even the tight spec target once — actually 2.28 > 2 spec, < 3 cap; interactive 3.13 < 3.5).
+
+Gates: node 1417, browser 108, craft 361/0, size 2.28/3.13 (budgets 2.5/3.5, caps 3/4), bench 15.1
+rows/ms (floor 12), docs 210 pages + tests 120, real-browser sweep green (all 13 ensemble SVGs 0
+escapes; ghost bundle + accent emphasis; endpoints dots; synthetic-median variant; 12-ghost cap; live
+hero == mdx string; interactive ←/→ member announce correct). New `EN_ENSEMBLE` module (`ensemble`,
+`ensembleSingle`, `ensembleAt`).
+
+### ⛳ BATCH 2 (decision micrographs, 21 types) COMPLETE — needs the batch gate
+
+All 21 decision charts are shipped (W1: CoverageStrip, BenchmarkStrip, PercentileLadder, GradedBand,
+IconArray; W2: RateVolume, NetFlow, RetentionCurve, BurnChart, ErrorBudget, ControlStrip,
+ForecastCone, QuantileDots; W3: ABStrips, ShiftHistogram, ParetoStrip, DataDiff, QuadrantDot,
+CyclePlot, ChangePoint, EnsembleGhosts). **Open items for the user's batch-gate sign-off** (per
+plan/23 gate = "DoD ×21 + research-claim audit entries + craft bar"): the accumulated spec-vs-measured
+BUDGET divergences (most static charts landed above their spec §-target but under the 3/4 kB HARD
+caps — RateVolume 2.55, NetFlow 2.61, Retention 2.64, Burn 2.82, ForecastCone 2.83, QuadrantDot 2.17,
+CyclePlot 2.44, EnsembleGhosts 2.28; **ChangePoint 2.93/3.93 sits AT the caps**), the BenchmarkStrip
+citation gap (W1), and the two EnsembleGhosts interactive deviations (setState-not-WAAPI HOP; no
+readout chip by design). None violate a non-negotiable; all are logged above. **Do NOT start Batch 3
+(expressive, plan/24) before this gate is signed off.** **16 of 16 W2/W3 · 21 of 21 batch.**
+
+## Batch 2 post-completion review — docs nav + dark-mode (2026-07-09)
+
+User review of the shipped Batch 2 surfaced two real issues, both fixed:
+
+1. **5 charts missing from the docs sidebar.** `apps/docs/content/docs/charts/meta.json` `pages[]` is a MANUAL ordered nav list — it stopped at `pareto-strip`, so data-diff/quadrant-dot/cycle-plot/change-point/ensemble-ghosts existed + were URL-reachable but invisible in nav. (The gallery / catalog.json / llms surfaces are registry-driven and already had them.) Added the 5 slugs.
+2. **Line-based ghosts rendered invisible (worst on dark).** The `data-mc-ink="ghost"` CSS role is a FILL role (`fill:neutral; stroke:none`); on a stroked `<line>`/`<path>` its `stroke:none` (CSS beats the inline `stroke=` attr) killed the stroke and `fill:neutral` filled the open polyline into a faint wedge — EnsembleGhosts member paths, CyclePlot slot lines, ChangePoint regime-mean hairlines all near-invisible, gone on the dark surface. Fixed by ELEMENT-SPLITTING the `ghost` role (rect/circle/ellipse/polygon → fill; path/line/polyline → `stroke:neutral; stroke-opacity:.5; fill:none`) + a matching forced-colors split. Also floored two ultra-faint decorative tints for dark parity: QuadrantDot region .05→.08, ChangePoint regime shading .03/.06→.05/.11 (still subtle on light). Verified both themes in a real browser across the gallery + each new chart. Neither the SSR craft gate nor the getBBox sweep catches an invisible-stroke mark — only eyeballing light AND dark does; added to the review checklist (memory `chart-legibility-and-review-practices`). Gates re-run green: node 1417, browser 108, craft 361/0, size pass, docs 210 pages.
+
+## Batch 2 post-completion review, round 2 — visual polish (2026-07-09)
+
+Per-chart dark-mode pass (measured every decision-chart mark's composited luminance-delta vs the dark bg). Improvements:
+- **ABStrips** — the chart's thesis ("does B beat A by more than the *overlap*") was not drawn; you inferred it from two parallel strips. Added (1) a shaded **contested-zone** rect = the x-overlap of the two p25–75 middle halves (narrow sliver = clear win, wide = inconclusive; skipped when they separate), and (2) a dashed **median-shift connector** from A's median to B's median (size + direction of the shift at a glance). Bumped the strip band opacities for dark (outer .16→.26/.20, inner .34→.42/.38). Budget 2.79/3.70 (was over the .7/.6 spec budget — bumped to 2.85/3.8, still < 3/4 hard caps).
+- **QuadrantDot** — peer ghost dots were .18 (the ghost fill role is tuned for large-area marks, invisible as tiny dots on dark) → .42 + larger radius; focal gained a soft accent **glow disc** (a FILLED disc, not a hollow ring — craft caught the cross line showing as a chord through a ring) so it reads unmistakably against the peer cloud.
+- **ChangePoint** — regime shading was two faint alphas (.05/.11); the .05 washed out on dark. Reworked to shade only the ODD regimes at a single visible .10 so adjacent regimes always contrast (bare vs tinted) in both themes.
+
+**Audit-tool caveat:** the composited-luminance audit is BLIND to `oklab()`/`color-mix` colors (it can't parse them to RGB), so it false-positived ControlStrip's `--mc-band` (an `oklab(0.925 …/0.12)` near-white fill that is genuinely visible on dark — confirmed by screenshot). A speculative `--mc-band` 8%→12% bump was made then REVERTED once the false positive was understood; ControlStrip's band was always fine. Ground truth for dark visibility = real-browser screenshots, not the numeric audit. All gates green: node 1417, browser 108, craft 361/0, size pass, docs 210.
