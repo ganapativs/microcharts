@@ -620,6 +620,14 @@
       "types": "./dist/charts/heartbeat-blip/client.d.ts",
       "import": "./dist/charts/heartbeat-blip/client.js"
     },
+    "./comet-trail": {
+      "types": "./dist/charts/comet-trail/index.d.ts",
+      "import": "./dist/charts/comet-trail/index.js"
+    },
+    "./comet-trail/interactive": {
+      "types": "./dist/charts/comet-trail/client.d.ts",
+      "import": "./dist/charts/comet-trail/client.js"
+    },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
       "import": "./dist/charts/net-flow/client.js"

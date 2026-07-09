@@ -875,6 +875,18 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/comet-trail (static)",
+    "path": "dist/charts/comet-trail/index.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/comet-trail/interactive",
+    "path": "dist/charts/comet-trail/client.js",
+    "limit": "3.15 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
     "limit": "3.5 kB",

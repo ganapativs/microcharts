@@ -1575,3 +1575,30 @@ Duration wording (`minute` / `hour` / `N seconds` / `Ns` / `Nm`) lives in `strin
 (`heartbeatWindow` / `heartbeatAgo`) so it stays translatable (canon: no English outside EN). NO budget
 divergence — 1.82/2.65 kB, within the §20 targets (2/3). Node 1698, browser 2, craft 544/0, bench 67.4
 rows/ms, size 1.82/2.65, docs 270pp/160.
+
+### CometTrail (21st shipped, motion) — `comet-trail` — plan/24 §21
+
+Channel = head-dot position (current value) + opacity-fading positional trail (recent history) — medium
+precision for the head, qualitative for the trail; full history steers to Sparkline. Points:
+
+1. **No idle loop.** Unlike BreathingDot/OrbitStatus, this type animates ONLY on a data change — the head
+   eases from its previous pixel position to the new one (WAAPI `transform: translate`, in SVG user units
+   via `px`, ~220 ms ease-out); the previous head steps into the trail on the next render. A stalled
+   stream simply stops moving, and that stillness is the honest staleness signal. No exception to the
+   no-loop rule is needed or taken.
+
+2. **Opacity = age, never value (honesty, property-tested).** The trail dots step down over 5 age levels
+   (0.7 newest → 0.1 oldest); a low recent value is still bright. The y position carries value. `trail`
+   length is context only — the geometry test asserts `last` (the head read) is identical for trail=2 vs
+   trail=12. Capped at 20 (past that it's a sparkline, and the docs say so). The dot never interpolates
+   phantom intermediate positions — it jumps to truth, eased.
+
+3. **Reduced motion + off-viewport.** Reduced-motion → instant reposition (the static decaying
+   dot-sparkline is already the complete encoding); off-viewport → the ease is skipped (shared observer).
+   Verified `head.getAnimations().length > 0` after a data change in the browser test. ←/→ walk the trail
+   (`cometTrailAt` = "k updates ago: v"), returning to the summary at the head.
+
+New `strings-comet-trail` (cometTrail / cometTrailNow / cometTrailAt + `cometTrends` [falling, steady,
+rising] indexed by sign+1). Budget: static 1.97 (within §21's 2 kB), interactive 3.07 > the 3 kB target
+but < the 4 kB hard cap — gate sign-off. Node 1716, browser 3, craft 548/0, bench 23.8 rows/ms, size
+1.97/3.07, docs 273pp/162.

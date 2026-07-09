@@ -85,6 +85,7 @@ import polarClock from "./polar-clock";
 import spiralYear from "./spiral-year";
 import breathingDot from "./breathing-dot";
 import heartbeatBlip from "./heartbeat-blip";
+import cometTrail from "./comet-trail";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -162,6 +163,7 @@ const MODULES: ChartModule[] = [
   spiralYear,
   breathingDot,
   heartbeatBlip,
+  cometTrail,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

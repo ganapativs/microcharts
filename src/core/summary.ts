@@ -148,6 +148,14 @@ export interface SummaryStrings {
   heartbeatWindow: (ms: number) => string;
   /** Elapsed ms → compact label, e.g. 3000 → "3s" (heartbeat-blip). */
   heartbeatAgo: (ms: number) => string;
+  /** S1 rolling window, e.g. "Now 87, rising over the last 12 updates." */
+  cometTrail: (last: string, trendWord: string, n: number) => string;
+  /** Single point, e.g. "Now 87." (comet-trail). */
+  cometTrailNow: (last: string) => string;
+  /** Stepped-back trail point, e.g. "3 updates ago: 74." (comet-trail). */
+  cometTrailAt: (k: number, value: string) => string;
+  /** Trend words indexed by sign+1: [falling, steady, rising] (comet-trail). */
+  cometTrends: readonly [string, string, string];
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,

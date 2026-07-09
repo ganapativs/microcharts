@@ -746,6 +746,13 @@ add(
   ],
   [[999, 999]],
 );
+const CT = [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87];
+add(
+  "comet-trail",
+  "CometTrail",
+  [{ data: CT }, { data: CT, label: "none" }, { data: [99, 12, 88] }, { data: [42] }],
+  [[999, 999]],
+);
 const SKYLINE = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },

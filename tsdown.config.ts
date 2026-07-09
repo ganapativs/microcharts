@@ -159,6 +159,8 @@ export default defineConfig({
     "src/charts/breathing-dot/client.tsx",
     "src/charts/heartbeat-blip/index.tsx",
     "src/charts/heartbeat-blip/client.tsx",
+    "src/charts/comet-trail/index.tsx",
+    "src/charts/comet-trail/client.tsx",
   ],
   format: ["esm"],
   dts: true,

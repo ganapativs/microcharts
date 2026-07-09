@@ -651,4 +651,13 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "comet-trail",
+    component: "CometTrail",
+    floor: 12, // a circle per trail point + head + per-point format
+    props: (i) => ({
+      data: Array.from({ length: 13 }, (_, k) => ((i + k * 4) % 100) + 1),
+      summary: false,
+    }),
+  },
 ];

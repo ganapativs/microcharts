@@ -51,6 +51,7 @@ const { PolarClock } = await D("polar-clock");
 const { SpiralYear } = await D("spiral-year");
 const { BreathingDot } = await D("breathing-dot");
 const { HeartbeatBlip } = await D("heartbeat-blip");
+const { CometTrail } = await D("comet-trail");
 const { Progress } = await D("progress");
 const { Bullet } = await D("bullet");
 const { HeatCell } = await D("heat-cell");
@@ -794,6 +795,14 @@ const body = [
     }),
   ),
   row("flatline (down)", svg(HeartbeatBlip, { data: [], now: 100000, width: 90 })),
+
+  `<h2>CometTrail</h2>`,
+  row(
+    "rising trail + head",
+    svg(CometTrail, { data: [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87], width: 90 }),
+  ),
+  row("volatile", svg(CometTrail, { data: [50, 80, 30, 70, 40, 90, 55, 62], width: 90 })),
+  row("single point", svg(CometTrail, { data: [42], width: 90 })),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}

@@ -76,6 +76,7 @@ import { PolarClock } from "@microcharts/react/polar-clock";
 import { SpiralYear } from "@microcharts/react/spiral-year";
 import { BreathingDot } from "@microcharts/react/breathing-dot";
 import { HeartbeatBlip } from "@microcharts/react/heartbeat-blip";
+import { CometTrail } from "@microcharts/react/comet-trail";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -171,6 +172,7 @@ export function getMDXComponents(components?: MDXComponents) {
     SpiralYear,
     BreathingDot,
     HeartbeatBlip,
+    CometTrail,
     SparkGroup,
     // docs building blocks
     Instrument,
