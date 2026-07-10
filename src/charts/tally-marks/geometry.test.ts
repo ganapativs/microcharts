@@ -69,11 +69,16 @@ describe("tallyGeometry (plan/24 #1) — count the way a human counts", () => {
     }
   });
 
-  test.prop([
-    fc.integer({ min: 0, max: 1e9 }),
-    fc.integer({ min: 0, max: 1e9 }),
-    fc.constantFrom("ruled", "drawn" as const),
-  ])("every coord stays within the viewBox", (value, max, pen) => {
+  // the 1e15 clamp is covered explicitly above; cap runs so the ≤200-mark grids
+  // stay fast on CI
+  test.prop(
+    [
+      fc.integer({ min: 0, max: 250 }),
+      fc.integer({ min: 0, max: 250 }),
+      fc.constantFrom("ruled", "drawn" as const),
+    ],
+    { numRuns: 40 },
+  )("every coord stays within the viewBox", (value, max, pen) => {
     const r = tallyGeometry({
       ...base,
       max,

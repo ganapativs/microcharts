@@ -10,7 +10,7 @@ export interface Level {
   amount: number;
 }
 
-export interface DepthStep {
+interface DepthStep {
   level: number;
   cum: number;
   x: number;

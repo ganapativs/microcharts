@@ -11,7 +11,7 @@ export interface RasterLaneInput {
   events: readonly number[];
 }
 
-export interface RasterBin {
+interface RasterBin {
   x: number;
   width: number;
   opacity: number;

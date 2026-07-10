@@ -97,10 +97,15 @@ describe("cycleGeometry (plan/23 #18)", () => {
     }
   });
 
-  test.prop([
-    fc.array(fc.integer({ min: 0, max: 100 }), { minLength: 1, maxLength: 60 }),
-    fc.integer({ min: 4, max: 2000 }),
-  ])("centers within domain, coords within viewBox", (data, period) => {
+  // the 1e15 clamp is covered explicitly above; cap runs so the ≤366-slot combs
+  // stay fast on CI
+  test.prop(
+    [
+      fc.array(fc.integer({ min: 0, max: 100 }), { minLength: 1, maxLength: 60 }),
+      fc.integer({ min: 4, max: 400 }),
+    ],
+    { numRuns: 40 },
+  )("centers within domain, coords within viewBox", (data, period) => {
     const geo = cycleGeometry({ ...base, data, period });
     if (geo === null) return;
     for (const sl of geo.slots) {

@@ -12,7 +12,7 @@ export interface TP {
   value: number;
 }
 
-export interface FoldedBinStat {
+interface FoldedBinStat {
   bin: number;
   x: number;
   median: number;

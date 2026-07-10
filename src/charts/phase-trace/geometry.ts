@@ -14,7 +14,7 @@ export interface Pt {
 
 export type Heading = 0 | 1 | 2 | 3 | 4; // up-right, up-left, down-right, down-left, steady
 
-export interface PhasePoint {
+interface PhasePoint {
   x: number;
   y: number;
   dataX: number;

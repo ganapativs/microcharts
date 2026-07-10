@@ -27,10 +27,6 @@ export interface Rect {
   height: number;
 }
 
-export function isRaw(data: readonly (LevelRow | number)[]): data is readonly number[] {
-  return data.length > 0 && typeof data[0] === "number";
-}
-
 /** Aggregate weight per uniform level bin (raw levels → counts). Robust to null
  *  entries in either shape. */
 export function binMass(

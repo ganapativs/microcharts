@@ -104,5 +104,3 @@ export function partitionStripGeometry(opts: {
 
   return { segments, total: round2(total), groups: parents.length };
 }
-
-export { SEGMENT_CAP };

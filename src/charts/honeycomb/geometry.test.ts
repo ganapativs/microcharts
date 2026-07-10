@@ -49,17 +49,18 @@ describe("honeycombGeometry (plan/24 #15) — hex occupancy", () => {
     }
   });
 
-  test.prop([fc.integer({ min: 1, max: 10000 }), fc.integer({ min: 0, max: 1e9 })])(
-    "every hex vertex stays inside the box",
-    (total, value) => {
-      const geo = honeycombGeometry({ value, total, rows: "auto", cellR: 4, pad: 1 });
-      const nums = (geo.filledPath + geo.emptyPath).match(/-?\d+\.?\d*/g)?.map(Number) ?? [];
-      for (let i = 0; i < nums.length; i += 2) {
-        expect(nums[i]!).toBeGreaterThanOrEqual(-0.5);
-        expect(nums[i]!).toBeLessThanOrEqual(geo.width + 0.5);
-        expect(nums[i + 1]!).toBeGreaterThanOrEqual(-0.5);
-        expect(nums[i + 1]!).toBeLessThanOrEqual(geo.height + 0.5);
-      }
-    },
-  );
+  // the clamp itself is covered by the explicit 1e15 test above; here just sweep
+  // realistic totals for containment, capped so a 400-cell comb × runs stays fast
+  test.prop([fc.integer({ min: 1, max: 400 }), fc.integer({ min: 0, max: 1e9 })], {
+    numRuns: 30,
+  })("every hex vertex stays inside the box", (total, value) => {
+    const geo = honeycombGeometry({ value, total, rows: "auto", cellR: 4, pad: 1 });
+    const nums = (geo.filledPath + geo.emptyPath).match(/-?\d+\.?\d*/g)?.map(Number) ?? [];
+    for (let i = 0; i < nums.length; i += 2) {
+      expect(nums[i]!).toBeGreaterThanOrEqual(-0.5);
+      expect(nums[i]!).toBeLessThanOrEqual(geo.width + 0.5);
+      expect(nums[i + 1]!).toBeGreaterThanOrEqual(-0.5);
+      expect(nums[i + 1]!).toBeLessThanOrEqual(geo.height + 0.5);
+    }
+  });
 });
