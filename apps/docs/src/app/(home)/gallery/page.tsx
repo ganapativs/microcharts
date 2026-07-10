@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { docsMeta } from "@/lib/metadata";
-import { CATALOG_TARGET, CHART_MODULES, STABLE_CHARTS } from "@/lib/charts/registry";
+import { CHART_MODULES, STABLE_CHARTS } from "@/lib/charts/registry";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
 import { GalleryDock } from "./gallery-dock";
 
@@ -48,7 +48,7 @@ export default function GalleryPage() {
         <header className="g2-head">
           <span className="mono-label text-fd-primary">The catalog</span>
           <h1 className="display mt-3 text-fluid-h2 text-[length:var(--text-fluid-h2)]">
-            {STABLE_CHARTS.length} of {CATALOG_TARGET}, at true size.
+            {STABLE_CHARTS.length} charts, at true size.
           </h1>
           <p className="mt-4 text-fd-muted-foreground">
             Every shipped microchart on one plane — at the size it lives in your interface, beside

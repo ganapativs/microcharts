@@ -358,7 +358,7 @@ export function GalleryDock({
 
         {/* live count */}
         <span className="g2-dock-count" role="status" aria-live="polite">
-          {shown !== null && shown !== total ? `${shown} / ${total}` : total}
+          {shown !== null && shown !== total ? shown : total}
         </span>
 
         {/* back to top — appears once scrolled */}
