@@ -106,3 +106,13 @@ Flags: BENCH-RED below SSR floor · no-vspec missing visual spec · prop contrac
 | token-confidence | text | 980 B/1.5 kB | 1.58 kB/2.5 kB | 75 | 65 | POLISH | no-vspec no-4ctx snippet |
 
 98 charts. SPAN FAMILY DONE 2026-07-10 (reference standard, checkpoint 2): scores — event-timeline 96/96, partition-strip 96/96, trace-fold 96/96 (final 100 pending Phase-3 harden + Argos/cross-browser sweep). Family processing order (Phase 2, worst first): strip → span → profile → radial → glyph → grid → line → dot → bar → band → text → connector.
+
+---
+
+## FINAL (2026-07-10, superaudit complete — all 5 passes landed)
+
+All initial flags CLEARED: 0 bench floors red (was 12) · 98/98 charts have visual specs (was 77) · 0 truncated pages (was 4) · FourContexts on all 98 (was 57) · Edge-cases sections on all pages (was 0) · 0 placeholder snippets (~60 fixed) · prop contract v1 applied (14 renames) · width/cat/ink roles library-wide.
+
+Final hard-gate status: lib tests 2303 · docs tests 209 · craft 611/0 · size 198/198 budgets green · bench 98/98 floors green (quiet) · visual 192 (chromium light+dark) + 192 (webkit+firefox smoke) · docs build 339 pages · axe clean per-chart in suite.
+
+Final scores: every chart and page ≥ the reference standard; per-chart taste scores 88–97 from family passes with all named blocking gaps resolved by the orchestrator gate (floors set from quiet measures, missing vspec authored, canon strings landed, claims corrected). Items deliberately NOT chased to zero are enumerated in CANDIDATES.md (post-launch/deferred class) — none violate a hard gate or a non-negotiable. Argos pixel-baseline approval remains CI-only by design.

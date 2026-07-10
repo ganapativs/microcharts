@@ -1,6 +1,6 @@
 ---
 title: Performance
-description: microcharts is zero-dependency and budget-gated — around 1 kB gzip per chart, ~6 SVG nodes typical, and 500 charts server-rendered in about 5 milliseconds. Every number is reproducible.
+description: microcharts is zero-dependency and budget-gated — 1–3 kB gzip per static chart (median 2.3 kB), ~6 SVG nodes typical, and 500 charts server-rendered in about 5 milliseconds. Every number is reproducible.
 ---
 
 Performance is a promise, not a marketing line. Every figure below is produced by a command
@@ -13,11 +13,14 @@ measured in CI by `pnpm size` and gated — a chart that grows past budget fails
 
 | Chart        | Static  | Interactive |
 | ------------ | ------- | ----------- |
-| Sparkline    | 2.67 kB | 3.03 kB     |
-| SparkBar     | 2.21 kB | 2.56 kB     |
-| Delta        | 0.81 kB | 1.07 kB     |
-| Bullet       | 1.44 kB | 1.90 kB     |
-| ActivityGrid | 1.56 kB | 2.01 kB     |
+| Sparkline    | 3.62 kB | 4.61 kB     |
+| SparkBar     | 2.78 kB | 3.69 kB     |
+| Delta        | 0.92 kB | 1.17 kB     |
+| Bullet       | 1.66 kB | 2.02 kB     |
+| ActivityGrid | 2.08 kB | 3.25 kB     |
+
+Across all 98 charts the static entries span 0.9–3.6 kB with a median of 2.3 kB; every
+chart page shows its own measured number in the hero demo's header.
 
 The whole library carries **zero runtime dependencies** — no chart engine, no D3. That
 constraint is enforced by CI, permanently.
@@ -29,9 +32,9 @@ with no client JavaScript. Throughput, measured by `pnpm bench`:
 
 | Charts | Time    | Per chart | Payload |
 | ------ | ------- | --------- | ------- |
-| 100    | 1.8 ms  | 0.018 ms  | ~551 B  |
-| 500    | 5.4 ms  | 0.011 ms  | ~551 B  |
-| 1000   | 12.3 ms | 0.012 ms  | ~551 B  |
+| 100    | 1.0 ms  | 0.010 ms  | ~550 B  |
+| 500    | 5.4 ms  | 0.011 ms  | ~550 B  |
+| 1000   | 10.8 ms | 0.011 ms  | ~550 B  |
 
 A table with 500 sparklines becomes HTML in about five milliseconds, and none of it ships
 JavaScript to the browser.

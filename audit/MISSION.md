@@ -1,5 +1,7 @@
 # Superaudit 2026-07-10 — mission tracker
 
+> **STATUS: COMPLETE** (2026-07-10). All 98 charts + 98 pages through the 5 gated passes; every hard gate green (tests/craft/size/bench/visual/docs, webkit+firefox smoke). Deliverables: audit/CHANGELOG.md, audit/CANDIDATES.md, audit/AUDIT-TABLE.md (final section), this tracker. Branch `superaudit`, ready for PR + Argos CI baseline review.
+
 Prompt: full audit/rebuild/verify of all ~100 charts + docs pages. 8 dimensions (size, speed, visual, consistency, prop contract, theming, responsiveness, composability) + self-legibility + a11y + delight. Happiness 100/100 per chart + page. Hard gates: size budgets, bench no-regress, visual-regression intended-only, axe zero, tests green.
 
 ## Phases
