@@ -1,0 +1,92 @@
+---
+title: TokenConfidence
+description: A confidence display for React where the text is the chart — tinted underlines beneath generated tokens flag which parts to double-check, in three discrete tiers.
+---
+
+TokenConfidence answers "which parts of this generated text should I double-check?". The text
+itself is the chart: confidence becomes a typographic underline beneath each token, in three
+discrete tiers — confident tokens get no mark at all, so reading stays primary and only the
+uncertain words draw the eye.
+
+<LiveDemo
+  label="TokenConfidence"
+  sizeOf="token-confidence"
+  code={`import { TokenConfidence } from "@microcharts/react/token-confidence";
+
+<TokenConfidence data={tokens} title="Model answer" />`}
+>
+  <TokenConfidence
+    data={[
+      { token: "The", confidence: 0.98 },
+      { token: " Treaty", confidence: 0.93 },
+      { token: " of", confidence: 0.99 },
+      { token: " Westphalia", confidence: 0.71 },
+      { token: " was", confidence: 0.96 },
+      { token: " signed", confidence: 0.9 },
+      { token: " in", confidence: 0.97 },
+      { token: " 1648", confidence: 0.44 },
+      { token: ", ending the Thirty", confidence: 0.63 },
+      { token: " Years' War", confidence: 0.85 },
+      { token: " over", confidence: 0.31 },
+      { token: " a decade", confidence: 0.38 },
+      { token: ".", confidence: 0.99 },
+    ]}
+    title="Model answer"
+    style={{ fontSize: "1.05rem" }}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="token-confidence" />
+
+## Try it
+
+<Playground chart="token-confidence" />
+
+## Interactive
+
+<InteractiveDemo slug="token-confidence" />
+
+## When to use it
+
+- **Good for** — LLM answers in chat or transcripts, flagging text to review.
+- **Avoid for** — numeric confidence auditing (use CalibrationStrip) or a single score (Delta).
+
+## Sizing
+
+The text is the chart, so it inherits the surrounding font size — there is no `width`/`height`. Set
+`style={{ fontSize }}` or let it flow inline with your prose.
+
+## Variants
+
+<LiveDemo label="with legend" code={`<TokenConfidence data={tokens} legend />`}>
+  <TokenConfidence
+    data={[
+      { token: "Likely", confidence: 0.92 },
+      { token: " Paris", confidence: 0.62 },
+      { token: ", maybe", confidence: 0.3 },
+      { token: " Lyon", confidence: 0.28 },
+    ]}
+    legend
+    style={{ fontSize: "1.05rem" }}
+  />
+</LiveDemo>
+
+## Why this default
+
+The tiers are discrete — confident, unsure, guessing — never a continuous gradient, because people
+calibrate categorically: a smooth colour ramp reads as noise, but "double-check this word" reads
+instantly. Confident tokens carry no mark at all (earn every mark), and each tier is distinguished
+by colour **and** underline thickness **and** stroke style, so it never depends on colour alone. For
+auditing exact probabilities, reach for [CalibrationStrip](/docs/charts/calibration-strip) instead.
+
+## Accessibility
+
+The accessible name is the tier tally — **"19 tokens: 14 confident, 2 unsure, 3 guessing."** The
+interactive entry gives each flagged token a roving tab stop; ←/→ move between them (skipping
+confident tokens), announcing each one's tier and confidence.
+
+## Props
+
+<PropTable slug="token-confidence" />

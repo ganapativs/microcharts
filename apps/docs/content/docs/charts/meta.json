@@ -79,6 +79,27 @@
     "breathing-dot",
     "heartbeat-blip",
     "comet-trail",
-    "orbit-status"
+    "orbit-status",
+    "time-in-range",
+    "hypnogram",
+    "eta-bar",
+    "waveform",
+    "event-raster",
+    "rubric-strip",
+    "token-confidence",
+    "wind-barb",
+    "star-spoke",
+    "minimap-strip",
+    "dual-window-meter",
+    "depth-wedge",
+    "partition-strip",
+    "calibration-strip",
+    "confusion-grid",
+    "folded-day-band",
+    "volume-profile",
+    "phase-trace",
+    "trace-fold",
+    "tape-gauge",
+    "station-glyph"
   ]
 }

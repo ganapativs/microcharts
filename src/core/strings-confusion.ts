@@ -1,0 +1,19 @@
+// ConfusionGrid summary templates (confusion-grid) — its OWN module. Row-
+// normalization is stated in the phrasing ("% of cats") so the denominator
+// travels with every number. English lives only in core string modules (canon).
+import type { SummaryStrings } from "./summary.js";
+
+export type ConfusionStrings = Pick<
+  SummaryStrings,
+  "noData" | "confusion" | "confusionPerfect" | "confusionAt" | "confusionEmpty"
+>;
+
+export const EN_CONFUSION: ConfusionStrings = {
+  noData: "No data.",
+  confusion: (acc, actual, predicted, pct) =>
+    `Accuracy ${acc}. Most confused: ${actual} predicted as ${predicted} (${pct} of ${actual}s).`,
+  confusionPerfect: (acc) => `Accuracy ${acc}. No confusion.`,
+  confusionAt: (actual, predicted, pct) =>
+    `Actual ${actual}, predicted ${predicted}: ${pct} of ${actual}s.`,
+  confusionEmpty: (cls) => `no ${cls} samples`,
+};

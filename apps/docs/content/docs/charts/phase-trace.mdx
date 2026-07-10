@@ -1,0 +1,84 @@
+---
+title: PhaseTrace
+description: A phase portrait for React — two synchronized signals plotted as one x×y trajectory where path order is time, so loops expose lag and clusters expose regimes.
+---
+
+PhaseTrace answers "how do two coupled signals move _together_?". Plotting one against the other as a
+single trajectory turns lag into loops and regimes into clusters — structure that two separate
+sparklines hide. Path order carries time, and the current state is a directed endpoint with an
+arrowhead, so "now, and how it got here" reads at a glance.
+
+<LiveDemo
+  label="PhaseTrace"
+  sizeOf="phase-trace"
+  code={`import { PhaseTrace } from "@microcharts/react/phase-trace";
+
+<PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" title="Phase portrait" />`}
+>
+  <PhaseTrace
+    data={Array.from({ length: 40 }, (_, i) => { const t = (i / 40) * Math.PI * 2; return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 }; })}
+    xLabel="CPU"
+    yLabel="Latency"
+    grid
+    title="Phase portrait"
+    width={110}
+    height={100}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="phase-trace" />
+
+## Try it
+
+<Playground chart="phase-trace" />
+
+## Interactive
+
+<InteractiveDemo slug="phase-trace" />
+
+## When to use it
+
+- **Good for** — coupled-signal phase portraits (CPU × latency, inflation × unemployment).
+- **Avoid for** — reading exact values (DualSparkline) or a single series (Sparkline).
+
+## Sizing
+
+<Sizing chart="phase-trace" />
+
+## Variants
+
+<LiveDemo label="longer tail" code={`<PhaseTrace data={traj} tail={0.4} startDot />`}>
+  <PhaseTrace
+    data={Array.from({ length: 40 }, (_, i) => {
+      const t = (i / 40) * Math.PI * 2;
+      return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+    })}
+    xLabel="CPU"
+    yLabel="Latency"
+    tail={0.4}
+    startDot
+    title="Longer tail"
+    width={110}
+    height={100}
+  />
+</LiveDemo>
+
+## Why this default
+
+A muted trail with an accent tail because "now, and how it got here" is the question — the eye lands
+on the recent motion first, then reads the history. Axis and scale choices are stated, never silently
+transformed: the axes are named, the domains are linear, and the framing is disclosed. The tail,
+endpoint, and arrowhead trio may be restyled but never all removed, because the recoverable time
+direction is what separates a phase trace from a scatter.
+
+## Accessibility
+
+The accessible name states the current point and heading — **"Latency vs CPU: now 62, 130; heading
+up-right."** The interactive entry steps through the trajectory in time order with ←/→, announcing
+each point's index and its value on both named axes.
+
+## Props
+
+<PropTable slug="phase-trace" />

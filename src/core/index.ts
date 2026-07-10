@@ -28,6 +28,27 @@ export { EN_OHLC, type OhlcStrings } from "./strings-ohlc.js";
 export { EN_CALENDAR, type CalendarStrings } from "./strings-calendar.js";
 export { EN_TIMELINE, type TimelineStrings } from "./strings-timeline.js";
 export { EN } from "./strings.js";
+export { EN_TIME_IN_RANGE, type TimeInRangeStrings } from "./strings-time-in-range.js";
+export { EN_HYPNOGRAM, type HypnogramStrings } from "./strings-hypnogram.js";
+export { EN_ETA_BAR, type EtaBarStrings } from "./strings-eta-bar.js";
+export { EN_WAVEFORM, type WaveformStrings } from "./strings-waveform.js";
+export { EN_EVENT_RASTER, type EventRasterStrings } from "./strings-event-raster.js";
+export { EN_RUBRIC, type RubricStrings } from "./strings-rubric.js";
+export { EN_TOKEN_CONFIDENCE, type TokenConfidenceStrings } from "./strings-token-confidence.js";
+export { EN_WIND_BARB, octant, type WindBarbStrings } from "./strings-wind-barb.js";
+export { EN_STAR_SPOKE, type StarSpokeStrings } from "./strings-star-spoke.js";
+export { EN_MINIMAP, type MinimapStrings } from "./strings-minimap.js";
+export { EN_DUAL_WINDOW, type DualWindowStrings } from "./strings-dual-window.js";
+export { EN_DEPTH_WEDGE, type DepthWedgeStrings } from "./strings-depth-wedge.js";
+export { EN_PARTITION, type PartitionStrings } from "./strings-partition.js";
+export { EN_CALIBRATION, type CalibrationStrings } from "./strings-calibration.js";
+export { EN_CONFUSION, type ConfusionStrings } from "./strings-confusion.js";
+export { EN_FOLDED_BAND, type FoldedBandStrings } from "./strings-folded-band.js";
+export { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "./strings-volume-profile.js";
+export { EN_PHASE_TRACE, type PhaseTraceStrings } from "./strings-phase-trace.js";
+export { EN_TRACE_FOLD, type TraceFoldStrings } from "./strings-trace-fold.js";
+export { EN_TAPE_GAUGE, type TapeGaugeStrings } from "./strings-tape-gauge.js";
+export { EN_STATION_GLYPH, type StationGlyphStrings } from "./strings-station-glyph.js";
 export {
   quantiles,
   fiveNumber,

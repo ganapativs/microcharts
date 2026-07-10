@@ -1,0 +1,91 @@
+---
+title: StationGlyph
+description: A meteorological station model for React — sky cover, wind, temperature, dew point, and pressure packed into one glyph, each on its own honest channel, no legend.
+---
+
+StationGlyph packs a full point observation into one character, the way a meteorologist's station
+model does: the center disc fills with sky cover, a wind barb gives direction and quantized speed, and
+up to three corner numerals carry temperature, dew point, and pressure. Five fields, one glyph, no
+legend — dense enough to tile a map, legible enough to read in a table cell.
+
+<LiveDemo
+  label="StationGlyph"
+  sizeOf="station-glyph"
+  code={`import { StationGlyph } from "@microcharts/react/station-glyph";
+
+<StationGlyph
+  station="KSFO"
+  cloud={0.75}
+  wind={{ direction: 225, magnitude: 15 }}
+  temp={16}
+  dewpoint={9}
+  pressure={1013}
+/>`}
+>
+  <StationGlyph
+    station="KSFO"
+    cloud={0.75}
+    wind={{ direction: 225, magnitude: 15 }}
+    temp={16}
+    dewpoint={9}
+    pressure={1013}
+    size={48}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="station-glyph" />
+
+## Try it
+
+<Playground chart="station-glyph" />
+
+## Interactive
+
+<InteractiveDemo slug="station-glyph" />
+
+## When to use it
+
+- **Good for** — a dense weather station model, or any multi-field reading that must fit one cell.
+- **Avoid for** — a single value (Delta) or a trend over time (Sparkline).
+
+## Sizing
+
+<Sizing chart="station-glyph" />
+
+## Variants
+
+<LiveDemo
+  label="overcast + gale"
+  code={`<StationGlyph station="KJFK" cloud={1} wind={{ direction: 300, magnitude: 45 }} temp={4} dewpoint={2} pressure={988} />`}
+>
+  <StationGlyph
+    station="KJFK"
+    cloud={1}
+    wind={{ direction: 300, magnitude: 45 }}
+    temp={4}
+    dewpoint={2}
+    pressure={988}
+    size={48}
+  />
+</LiveDemo>
+
+## Why this default
+
+Each field rides its own channel, so nothing is inferred from a shared one: sky cover is disc area,
+wind is the barb (direction as angle, speed quantized into barbs so the per-barb quantum is honest),
+and the numerals are placed where a forecaster expects them. Wind speed is quantized rather than drawn
+to scale for the same reason WindBarb quantizes it — a barb count reads exactly, a tiny length does
+not. Absent fields simply don't render; the glyph never invents a zero.
+
+## Accessibility
+
+The accessible name is the whole observation — **"KSFO, wind southwest 15; sky broken, 16° / 9°,
+1,013."** The interactive entry roves the fields with ←/→ so a screen-reader user can step through
+station, wind, sky, temperature, dew point, and pressure one at a time, and Home returns to the full
+reading.
+
+## Props
+
+<PropTable slug="station-glyph" />

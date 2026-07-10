@@ -34,6 +34,12 @@ export interface CycleGeometry {
   degenerate: boolean;
 }
 
+// Saturate the slot count. `period` is a caller prop; a non-physical value
+// (e.g. 1e15) would otherwise allocate that many slot arrays (OOM) and drive
+// colW → 0. The largest sane cycle is day-of-year, so bound there; the summary
+// still reports the requested period. Beyond this, buckets simply wrap.
+export const CYCLE_MAX_PERIOD = 366;
+
 const meanOf = (a: readonly number[]): number => a.reduce((s, v) => s + v, 0) / a.length;
 
 function medianOf(a: readonly number[]): number {
@@ -51,7 +57,7 @@ export function cycleGeometry(opts: {
   domain?: readonly [number, number] | undefined;
   pad?: number | undefined;
 }): CycleGeometry | null {
-  const period = Math.max(1, Math.round(opts.period));
+  const period = Math.min(Math.max(1, Math.round(opts.period)), CYCLE_MAX_PERIOD);
   const { width, height } = opts;
   const pad = opts.pad ?? 2;
 

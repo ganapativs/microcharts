@@ -929,6 +929,252 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/time-in-range (static)",
+    "path": "dist/charts/time-in-range/index.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/time-in-range/interactive",
+    "path": "dist/charts/time-in-range/client.js",
+    "limit": "3.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/hypnogram (static)",
+    "path": "dist/charts/hypnogram/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/hypnogram/interactive",
+    "path": "dist/charts/hypnogram/client.js",
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/eta-bar (static)",
+    "path": "dist/charts/eta-bar/index.js",
+    "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/eta-bar/interactive",
+    "path": "dist/charts/eta-bar/client.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/waveform (static)",
+    "path": "dist/charts/waveform/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/waveform/interactive",
+    "path": "dist/charts/waveform/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/event-raster (static)",
+    "path": "dist/charts/event-raster/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/event-raster/interactive",
+    "path": "dist/charts/event-raster/client.js",
+    "limit": "3.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/rubric-strip (static)",
+    "path": "dist/charts/rubric-strip/index.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/rubric-strip/interactive",
+    "path": "dist/charts/rubric-strip/client.js",
+    "limit": "3.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/token-confidence (static)",
+    "path": "dist/charts/token-confidence/index.js",
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/token-confidence/interactive",
+    "path": "dist/charts/token-confidence/client.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/wind-barb (static)",
+    "path": "dist/charts/wind-barb/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/star-spoke (static)",
+    "path": "dist/charts/star-spoke/index.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/star-spoke/interactive",
+    "path": "dist/charts/star-spoke/client.js",
+    "limit": "3.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/minimap-strip (static)",
+    "path": "dist/charts/minimap-strip/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/minimap-strip/interactive",
+    "path": "dist/charts/minimap-strip/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dual-window-meter (static)",
+    "path": "dist/charts/dual-window-meter/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/dual-window-meter/interactive",
+    "path": "dist/charts/dual-window-meter/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/depth-wedge (static)",
+    "path": "dist/charts/depth-wedge/index.js",
+    "limit": "2.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/depth-wedge/interactive",
+    "path": "dist/charts/depth-wedge/client.js",
+    "limit": "3.2 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/partition-strip (static)",
+    "path": "dist/charts/partition-strip/index.js",
+    "limit": "2.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/partition-strip/interactive",
+    "path": "dist/charts/partition-strip/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/calibration-strip (static)",
+    "path": "dist/charts/calibration-strip/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/calibration-strip/interactive",
+    "path": "dist/charts/calibration-strip/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/confusion-grid (static)",
+    "path": "dist/charts/confusion-grid/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/confusion-grid/interactive",
+    "path": "dist/charts/confusion-grid/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/folded-day-band (static)",
+    "path": "dist/charts/folded-day-band/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/folded-day-band/interactive",
+    "path": "dist/charts/folded-day-band/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/volume-profile (static)",
+    "path": "dist/charts/volume-profile/index.js",
+    "limit": "2.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/volume-profile/interactive",
+    "path": "dist/charts/volume-profile/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/phase-trace (static)",
+    "path": "dist/charts/phase-trace/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/phase-trace/interactive",
+    "path": "dist/charts/phase-trace/client.js",
+    "limit": "3.3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/trace-fold (static)",
+    "path": "dist/charts/trace-fold/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/trace-fold/interactive",
+    "path": "dist/charts/trace-fold/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/tape-gauge (static)",
+    "path": "dist/charts/tape-gauge/index.js",
+    "limit": "2.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/tape-gauge/interactive",
+    "path": "dist/charts/tape-gauge/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/station-glyph (static)",
+    "path": "dist/charts/station-glyph/index.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/station-glyph/interactive",
+    "path": "dist/charts/station-glyph/client.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

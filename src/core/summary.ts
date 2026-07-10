@@ -590,6 +590,167 @@ export interface SummaryStrings {
   ensembleSingle: (end: string) => string;
   /** Member announcement, e.g. "Member 7 of 24; ends at 42." */
   ensembleAt: (pos: number, total: number, end: string) => string;
+  /** Zone display names, indexed severe-low → below → in → above → severe-high. */
+  tirNames: readonly [string, string, string, string, string];
+  /** One zone clause, e.g. "72% in range" (time-in-range). */
+  tirClause: (pct: string, name: string) => string;
+  /** Full time-in-range summary from a joined clause list, e.g.
+   *  "72% in range, 9% below, 19% above." */
+  timeInRange: (list: string) => string;
+  /** Interactive zone announce, e.g. "In range: 72%." (time-in-range). */
+  tirZone: (name: string, pct: string) => string;
+  /** Hypnogram overview, e.g. "14 transitions across 4 states; longest run Light." */
+  hypnogram: (transitions: number, states: number, longest: string) => string;
+  /** Single-run hypnogram, e.g. "1 state, no transitions; Awake throughout." */
+  hypnogramFlat: (state: string) => string;
+  /** Interactive run announce, e.g. "Light, from 90 to 240." (hypnogram). */
+  hypnogramRun: (state: string, t0: string, t1: string) => string;
+  /** ETA forecast, e.g. "64% done; about 2 min remaining at the current rate." */
+  etaBar: (pct: string, remaining: string) => string;
+  /** Stalled transfer, e.g. "64% done; stalled." (eta-bar). */
+  etaBarStalled: (pct: string) => string;
+  /** Completed, e.g. "Done." (eta-bar). */
+  etaBarDone: string;
+  /** Waveform overview, e.g. "Peak 0.82 at 63% through 4,096 samples." */
+  waveform: (peak: string, pct: string, n: string) => string;
+  /** All-silence, e.g. "Silent." (waveform). */
+  waveformSilent: string;
+  /** Interactive bucket announce, e.g. "63% through, peak 0.82." (waveform). */
+  waveformAt: (pct: string, value: string) => string;
+  /** EventRaster overview, e.g. "6 lanes, 214 events; busiest api (89)." */
+  eventRaster: (lanes: number, events: number, lane: string, count: number) => string;
+  /** Binned-lane disclosure appended to the raster summary, e.g. " api shown binned." */
+  eventRasterBinned: (lanes: string) => string;
+  /** Interactive event announce, e.g. "api, event at 42 (3 of 89)." (event-raster). */
+  eventRasterAt: (lane: string, t: string, k: number, n: number) => string;
+  /** RubricStrip overview, e.g.
+   *  "4 criteria; highest Correctness (0.92), lowest Style (0.41)." */
+  rubric: (n: number, hi: string, hiScore: string, lo: string, loScore: string) => string;
+  /** Interactive criterion announce, e.g. "Correctness: 0.92, weight 40% of total." */
+  rubricRow: (label: string, score: string, weightPct: string) => string;
+  /** TokenConfidence overview, e.g. "42 tokens: 33 confident, 6 unsure, 3 guessing." */
+  tokenConfidence: (n: number, confident: number, unsure: number, guessing: number) => string;
+  /** Tier display names, indexed confident → unsure → guessing. */
+  tokenTierNames: readonly [string, string, string];
+  /** Interactive token announce, e.g. "sauce: guessing, 0.22." (token-confidence). */
+  tokenAt: (token: string, tier: string, confidence: string) => string;
+  /** WindBarb reading, e.g. "Southwest (225°), magnitude 32." */
+  windBarb: (compass: string, deg: string, value: string) => string;
+  /** Calm state, e.g. "Calm." (wind-barb). */
+  windBarbCalm: string;
+  /** Compass octant names, indexed N, NE, E, SE, S, SW, W, NW. */
+  compass8: readonly [string, string, string, string, string, string, string, string];
+  /** StarSpoke overview, e.g. "5 metrics; highest Speed (0.9), lowest Cost (0.3)." */
+  starSpoke: (n: number, hi: string, hiValue: string, lo: string, loValue: string) => string;
+  /** Interactive spoke announce, e.g. "Speed: 0.9." (star-spoke). */
+  spokeAt: (label: string, value: string) => string;
+  /** MinimapStrip overview, e.g.
+   *  "Viewing 12% of the whole (520–660 of 1,200); 3 marks; 8% unknown." */
+  minimap: (
+    pct: string,
+    a: string,
+    b: string,
+    total: string,
+    marks: number,
+    unknownClause: string,
+  ) => string;
+  /** Unknown-share clause appended to the minimap summary, e.g. "; 8% unknown". */
+  minimapUnknown: (pct: string) => string;
+  /** Interactive window announce, e.g. "Viewing 520 to 660 of 1,200." (minimap). */
+  minimapView: (a: string, b: string, total: string) => string;
+  /** DualWindowMeter overview, e.g. "Slow window −23.1 vs target −23.0; fast −20.4." */
+  dualWindow: (slow: string, target: string, fast: string) => string;
+  /** Interactive point announce, e.g. "fast −20.4, slow −23.1, target −23.0." */
+  dualWindowAt: (fast: string, slow: string, target: string) => string;
+  /** DepthWedge overview, e.g.
+   *  "Demand outweighs supply 1.8× within the shown range; spread 0.25." */
+  depthWedge: (leadSide: string, laggSide: string, ratio: string, spread: string) => string;
+  /** Balanced book, e.g. "Demand and supply are balanced; spread 0.25." */
+  depthWedgeBalanced: (spread: string) => string;
+  /** Side names, indexed demand, supply. */
+  depthWedgeSides: readonly [string, string];
+  /** Interactive depth announce, e.g. "demand: 1,240 within 0.20 of mid." */
+  depthWedgeAt: (side: string, cum: string, dist: string) => string;
+  /** PartitionStrip overview, e.g.
+   *  "3 groups, 8 parts; largest JS → react (28% of the whole)." */
+  partition: (groups: number, parts: number, parent: string, child: string, pct: string) => string;
+  /** Single-level partition, e.g. "3 groups; largest JS (44% of the whole)." */
+  partitionFlat: (groups: number, parent: string, pct: string) => string;
+  /** Interactive node announce, e.g. "react: 28% of the whole, 63% of JS." */
+  partitionAt: (label: string, pct: string, parentClause: string) => string;
+  /** Parent clause appended for a child node, e.g. ", 63% of JS". */
+  partitionParent: (pct: string, parent: string) => string;
+  /** CalibrationStrip overview, e.g.
+   *  "10 bins; largest gap at 0.7 predicted (observed 0.52); 2 low-support bins." */
+  calibration: (bins: number, p: string, o: string, low: number) => string;
+  /** Perfect calibration, e.g. "10 bins; well calibrated." (calibration-strip). */
+  calibrationGood: (bins: number) => string;
+  /** Interactive bin announce, e.g. "predicted 0.7, observed 0.52, 40 samples." */
+  calibrationAt: (p: string, o: string, n: number, lowClause: string) => string;
+  /** Low-support clause appended to a bin announce, e.g. ", low support". */
+  calibrationLow: string;
+  /** ConfusionGrid overview, e.g.
+   *  "Accuracy 87%. Most confused: cat predicted as dog (12% of cats)." */
+  confusion: (acc: string, actual: string, predicted: string, pct: string) => string;
+  /** Perfect diagonal, e.g. "Accuracy 100%. No confusion." (confusion-grid). */
+  confusionPerfect: (acc: string) => string;
+  /** Interactive cell announce, e.g. "Actual cat, predicted dog: 12% of cats." */
+  confusionAt: (actual: string, predicted: string, pct: string) => string;
+  /** Empty-row note, e.g. "no dog samples" appended to the summary. */
+  confusionEmpty: (cls: string) => string;
+  /** FoldedDayBand overview, e.g. "Median peaks at 14 (82)." (+ today clause). */
+  foldedBand: (pos: string, value: string, todayClause: string) => string;
+  /** Today-vs-typical clauses, indexed below-25 / typical / above-75. */
+  foldedToday: readonly [string, string, string];
+  /** Interactive fold-bin announce, e.g. "at 14: median 82, middle half 70–90." */
+  foldedAt: (pos: string, m: string, q1: string, q3: string, todayClause: string) => string;
+  /** VolumeProfile overview, e.g. "Activity concentrates at 142 (POC); 70% within 138–147." */
+  volumeProfile: (poc: string, va: string, lo: string, hi: string) => string;
+  /** Uniform distribution, e.g. "Activity is evenly spread." (volume-profile). */
+  volumeEven: string;
+  /** Interactive level announce, e.g. "level 142: 18% of activity (POC)." */
+  volumeAt: (level: string, pct: string, pocClause: string) => string;
+  /** POC clause appended to a level announce, e.g. " (POC)". */
+  volumePoc: string;
+  /** PhaseTrace overview, e.g. "Latency vs CPU: now 62, 130; heading up-right." */
+  phaseTrace: (yLabel: string, xLabel: string, x: string, y: string, direction: string) => string;
+  /** Heading words, indexed up-right / up-left / down-right / down-left / steady. */
+  phaseHeadings: readonly [string, string, string, string, string];
+  /** Interactive point announce, e.g. "point 8 of 20: CPU 62, Latency 130." */
+  phaseAt: (i: number, n: number, xLabel: string, x: string, yLabel: string, y: string) => string;
+  /** TraceFold overview, e.g.
+   *  "9 spans over 214 ms; longest db.query (86 ms) on the critical path." */
+  traceFold: (
+    n: number,
+    total: string,
+    label: string,
+    duration: string,
+    onCritical: boolean,
+  ) => string;
+  /** Interactive span announce, e.g. "db.query, 86 ms, 40% of total, depth 2, on the critical path." */
+  traceFoldAt: (
+    label: string,
+    duration: string,
+    pct: string,
+    depth: number,
+    criticalClause: string,
+  ) => string;
+  /** Critical-path clause appended to a span announce, e.g. ", on the critical path". */
+  traceCritical: string;
+  /** TapeGauge reading, e.g. "Now 142, rising; in the 130–150 caution zone." */
+  tapeGauge: (value: string, rateClause: string, zoneClause: string) => string;
+  /** Rate words, indexed by chevron tier + 2: falling fast … steady … rising fast. */
+  tapeRates: readonly [string, string, string, string, string];
+  /** Zone clause, e.g. "; in the 130–150 zone" (tape-gauge). */
+  tapeZone: (from: string, to: string) => string;
+  /** StationGlyph reading, e.g. "KSFO, wind southwest 15; sky broken, 16° / 9°, 1013." */
+  stationGlyph: (station: string, windClause: string, sky: string, fieldsClause: string) => string;
+  /** Sky-cover words indexed by round(fraction·4): clear … overcast. */
+  stationSky: readonly [string, string, string, string, string];
+  /** Wind clause, e.g. ", wind southwest 15" (station-glyph). */
+  stationWind: (octantName: string, magnitude: string) => string;
+  /** Calm-wind clause, e.g. ", wind calm" (station-glyph). */
+  stationCalm: string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

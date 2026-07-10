@@ -87,6 +87,27 @@ import breathingDot from "./breathing-dot";
 import heartbeatBlip from "./heartbeat-blip";
 import cometTrail from "./comet-trail";
 import orbitStatus from "./orbit-status";
+import timeInRange from "./time-in-range";
+import hypnogram from "./hypnogram";
+import etaBar from "./eta-bar";
+import waveform from "./waveform";
+import eventRaster from "./event-raster";
+import rubricStrip from "./rubric-strip";
+import tokenConfidence from "./token-confidence";
+import windBarb from "./wind-barb";
+import starSpoke from "./star-spoke";
+import minimapStrip from "./minimap-strip";
+import dualWindowMeter from "./dual-window-meter";
+import depthWedge from "./depth-wedge";
+import partitionStrip from "./partition-strip";
+import calibrationStrip from "./calibration-strip";
+import confusionGrid from "./confusion-grid";
+import foldedDayBand from "./folded-day-band";
+import volumeProfile from "./volume-profile";
+import phaseTrace from "./phase-trace";
+import traceFold from "./trace-fold";
+import tapeGauge from "./tape-gauge";
+import stationGlyph from "./station-glyph";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -166,6 +187,27 @@ const MODULES: ChartModule[] = [
   heartbeatBlip,
   cometTrail,
   orbitStatus,
+  timeInRange,
+  hypnogram,
+  etaBar,
+  waveform,
+  eventRaster,
+  rubricStrip,
+  tokenConfidence,
+  windBarb,
+  starSpoke,
+  minimapStrip,
+  dualWindowMeter,
+  depthWedge,
+  partitionStrip,
+  calibrationStrip,
+  confusionGrid,
+  foldedDayBand,
+  volumeProfile,
+  phaseTrace,
+  traceFold,
+  tapeGauge,
+  stationGlyph,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

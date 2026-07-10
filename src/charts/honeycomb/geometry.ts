@@ -16,6 +16,13 @@ export interface HoneycombGeometry {
 
 const SQRT3 = Math.sqrt(3);
 
+// Saturate drawn cells at a legible-comb bound. `total` is a caller prop; a
+// non-physical value (e.g. 1e15) would otherwise loop unbounded, allocating
+// trillions of cell objects (OOM) and blowing the auto-sized viewBox to a huge
+// coordinate. Occupancy still reads correctly — the summary reports the true
+// total/value; only the grid saturates. Catalog admits total ≤ 60 typical.
+export const HONEYCOMB_MAX_CELLS = 400;
+
 /** Pointy-top hexagon path at (cx, cy) with circumradius r. */
 export function hexPath(cx: number, cy: number, r: number): string {
   const hw = round2((SQRT3 / 2) * r);
@@ -38,7 +45,7 @@ export function honeycombGeometry(opts: {
   pad: number;
 }): HoneycombGeometry {
   const { cellR: r, pad } = opts;
-  const total = Math.max(0, Math.floor(opts.total));
+  const total = Math.min(Math.max(0, Math.floor(opts.total)), HONEYCOMB_MAX_CELLS);
   const value = Math.max(0, Math.round(opts.value));
   const filledCount = Math.min(value, total);
 

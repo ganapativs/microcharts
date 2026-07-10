@@ -684,4 +684,279 @@ export const SCENARIOS = [
       summary: false,
     }),
   },
+  {
+    slug: "time-in-range",
+    component: "TimeInRange",
+    floor: 40, // a handful of rects + a label
+    props: (i) => ({
+      data: {
+        severeBelow: 1,
+        below: (i % 15) + 1,
+        in: 60 + (i % 25),
+        above: (i % 15) + 1,
+        severeAbove: 1,
+      },
+      summary: false,
+    }),
+  },
+  {
+    slug: "hypnogram",
+    component: "Hypnogram",
+    floor: 20, // run merge + H/V step path
+    props: (i) => ({
+      data: Array.from({ length: 12 }, (_e, j) => ({
+        t: j * 10,
+        state: ["Awake", "Light", "Deep", "REM"][(i + j) % 4],
+      })),
+      states: ["Awake", "REM", "Light", "Deep"],
+      domain: [0, 120],
+      summary: false,
+    }),
+  },
+  {
+    slug: "eta-bar",
+    component: "EtaBar",
+    floor: 60, // two rects + a divider + forecast math
+    props: (i) => ({
+      progress: ((i % 90) + 5) / 100,
+      elapsed: (i % 50) + 1,
+      rate: 0.02 + (i % 5) / 200,
+      summary: false,
+    }),
+  },
+  {
+    slug: "waveform",
+    component: "Waveform",
+    floor: 8, // downsample 2k samples → one bar path — N-node class
+    props: (i) => ({
+      data: Array.from(
+        { length: 2048 },
+        (_s, j) => Math.sin((i + j) / 7) * (1 - Math.abs(j - 1024) / 2200),
+      ),
+      summary: false,
+    }),
+  },
+  {
+    slug: "event-raster",
+    component: "EventRaster",
+    floor: 12, // ≤ 12 lanes, one tick path each — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 6 }, (_l, k) => ({
+        label: `lane${k}`,
+        events: Array.from({ length: 20 }, (_e, j) => (i + k + j * 5) % 120),
+      })),
+      domain: [0, 120],
+      summary: false,
+    }),
+  },
+  {
+    slug: "rubric-strip",
+    component: "RubricStrip",
+    floor: 25, // ≤ 8 rows × (track + bar) + normalize
+    props: (i) => ({
+      data: Array.from({ length: 5 }, (_r, k) => ({
+        label: `crit${k}`,
+        score: ((i + k * 17) % 100) / 100,
+        weight: ((i + k) % 4) + 1,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "token-confidence",
+    component: "TokenConfidence",
+    floor: 15, // one span per token (HTML host) — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 60 }, (_t, k) => ({
+        token: ` w${k}`,
+        confidence: ((i + k * 13) % 100) / 100,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "wind-barb",
+    component: "WindBarb",
+    floor: 120, // one glyph — shaft + barbs + quantization
+    props: (i) => ({ direction: (i * 13) % 360, magnitude: (i % 90) + 1, summary: false }),
+  },
+  {
+    slug: "star-spoke",
+    component: "StarSpoke",
+    floor: 60, // ≤ 8 spokes as two paths + trig
+    props: (i) => ({
+      data: Array.from({ length: 6 }, (_m, k) => ({
+        label: `m${k}`,
+        value: ((i + k * 17) % 100) / 100,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "minimap-strip",
+    component: "MinimapStrip",
+    floor: 8, // downsample 1.2k content + fog + window — N-node class
+    props: (i) => ({
+      data: {
+        content: Array.from({ length: 1200 }, (_c, j) => Math.sin((i + j) / 40) + 1),
+        window: [(i * 7) % 1000, ((i * 7) % 1000) + 140],
+        marks: [100, 600, 1100],
+        known: [[0, 1104]],
+      },
+      domain: [0, 1200],
+      summary: false,
+    }),
+  },
+  {
+    slug: "dual-window-meter",
+    component: "DualWindowMeter",
+    floor: 30, // two rolling-mean passes + two paths
+    props: (i) => ({
+      data: Array.from({ length: 60 }, (_s, j) => 74 + Math.sin((i + j) / 4) * 3),
+      target: 75,
+      summary: false,
+    }),
+  },
+  {
+    slug: "depth-wedge",
+    component: "DepthWedge",
+    floor: 40, // two cumulative step wedges
+    props: (i) => ({
+      data: {
+        demand: Array.from({ length: 8 }, (_l, k) => ({
+          level: 99.9 - k * 0.2,
+          amount: ((i + k) % 9) * 40 + 40,
+        })),
+        supply: Array.from({ length: 8 }, (_l, k) => ({
+          level: 100.1 + k * 0.2,
+          amount: ((i + k + 3) % 9) * 40 + 40,
+        })),
+      },
+      summary: false,
+    }),
+  },
+  {
+    slug: "partition-strip",
+    component: "PartitionStrip",
+    floor: 20, // ≤ 24 segments, two normalized rows — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 4 }, (_p, k) => ({
+        label: `g${k}`,
+        children: Array.from({ length: 3 }, (_c, j) => ({
+          label: `c${k}${j}`,
+          value: ((i + k + j) % 9) * 10 + 10,
+        })),
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "calibration-strip",
+    component: "CalibrationStrip",
+    floor: 15, // bin 800 raw pairs → dots + support — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 800 }, (_s, j) => ({
+        p: ((i + j) % 100) / 100,
+        outcome: (i + j) % 3 === 0 ? 1 : 0,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "confusion-grid",
+    component: "ConfusionGrid",
+    floor: 40, // ≤ 16 cells + labels
+    props: (i) => ({
+      data: {
+        labels: ["A", "B", "C"],
+        counts: [
+          [70 - (i % 5), 8, 2],
+          [6, 62, 12],
+          [3, 9, 58 + (i % 4)],
+        ],
+      },
+      summary: false,
+    }),
+  },
+  {
+    slug: "folded-day-band",
+    component: "FoldedDayBand",
+    floor: 6, // fold ~336 obs → per-bin quantiles — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 336 }, (_s, j) => ({
+        t: j,
+        value: 40 + Math.sin((i + j) / 4) * 20,
+      })),
+      period: 24,
+      summary: false,
+    }),
+  },
+  {
+    slug: "volume-profile",
+    component: "VolumeProfile",
+    floor: 20, // bin levels + value-area walk + one bar path
+    props: (i) => ({
+      data: Array.from({ length: 200 }, (_s, j) => 140 + Math.round(Math.sin((i + j) / 3) * 8)),
+      summary: false,
+    }),
+  },
+  {
+    slug: "phase-trace",
+    component: "PhaseTrace",
+    floor: 40, // trail/tail split + heading + arrow
+    props: (i) => ({
+      data: Array.from({ length: 60 }, (_s, j) => {
+        const t = ((i + j) / 60) * Math.PI * 2;
+        return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+      }),
+      xLabel: "CPU",
+      yLabel: "Latency",
+      summary: false,
+    }),
+  },
+  {
+    slug: "trace-fold",
+    component: "TraceFold",
+    floor: 15, // ≤ 40 span rects + critical-path walk — N-node class
+    props: (i) => ({
+      data: Array.from({ length: 24 }, (_s, j) => ({
+        label: `span${j}`,
+        start: (i + j) % 200,
+        duration: ((i + j) % 40) + 5,
+        depth: j % 4,
+        parent: j > 0 ? j - 1 : undefined,
+      })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "tape-gauge",
+    component: "TapeGauge",
+    floor: 20, // pointer + tick path + ≤4 zone rects — O(1) marks
+    props: (i) => ({
+      value: 120 + (i % 80),
+      rate: (i % 7) - 3,
+      zones: [
+        { from: 100, to: 130, tone: "pos" },
+        { from: 130, to: 150, tone: "warn" },
+        { from: 150, to: 200, tone: "neg" },
+      ],
+      span: 60,
+      summary: false,
+    }),
+  },
+  {
+    slug: "station-glyph",
+    component: "StationGlyph",
+    floor: 20, // disc + sector + barb + ≤3 numerals — O(1) marks
+    props: (i) => ({
+      station: "KSFO",
+      cloud: (i % 20) / 20,
+      wind: { direction: (i * 15) % 360, magnitude: (i % 12) * 5 },
+      temp: 10 + (i % 25),
+      dewpoint: 4 + (i % 15),
+      pressure: 1000 + (i % 30),
+      summary: false,
+    }),
+  },
 ];

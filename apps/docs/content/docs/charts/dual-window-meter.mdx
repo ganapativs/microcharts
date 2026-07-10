@@ -1,0 +1,78 @@
+---
+title: DualWindowMeter
+description: A compliance meter for React — two rolling means of one series (a thin fast window and a thick slow window) co-plotted against a target, so spikes and drift read apart.
+---
+
+DualWindowMeter answers "is the level compliant against its target both right now and on average —
+momentary spikes vs sustained drift?". From one raw series it computes two rolling means: a thin
+fast window that reacts instantly and a thick slow window that carries the sustained read, both
+against a target line. It is the general form of any noisy metric with a compliance target.
+
+<LiveDemo
+  label="DualWindowMeter"
+  sizeOf="dual-window-meter"
+  code={`import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
+
+<DualWindowMeter data={samples} target={-23} title="Loudness" />`}
+>
+  <DualWindowMeter
+    data={Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0))}
+    target={-23}
+    title="Loudness"
+    format={{ maximumFractionDigits: 1 }}
+    width={300}
+    height={28}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="dual-window-meter" />
+
+## Try it
+
+<Playground chart="dual-window-meter" />
+
+## Interactive
+
+<InteractiveDemo slug="dual-window-meter" />
+
+## When to use it
+
+- **Good for** — loudness / LUFS metering, latency SLO or CPU-headroom compliance.
+- **Avoid for** — a single series (Sparkline) or anything without a target to compare against.
+
+## Sizing
+
+<Sizing chart="dual-window-meter" />
+
+## Variants
+
+<LiveDemo label="corridor" code={`<DualWindowMeter data={cpu} target={70} band={[60, 80]} />`}>
+  <DualWindowMeter
+    data={Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2)}
+    target={-23}
+    band={[-25, -21]}
+    title="Corridor"
+    width={300}
+    height={28}
+  />
+</LiveDemo>
+
+## Why this default
+
+Thin-fast, thick-slow because the sustained read should carry more ink — a momentary spike on the
+fast trace matters less than a slow-window drift away from target. The window sizes are part of the
+reading, not a hidden implementation detail, so they are documented on every example and available
+to the summary. Both traces always share one domain; a trace begins only where its window has
+filled, never faking a partial-window value.
+
+## Accessibility
+
+The accessible name leads with the sustained read — **"Slow window 23.1 vs target 23; fast 20.4."**
+The interactive entry roves the samples with ←/→, announcing the fast value, the slow value, and
+the target at each point.
+
+## Props
+
+<PropTable slug="dual-window-meter" />

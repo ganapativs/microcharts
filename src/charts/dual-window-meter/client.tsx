@@ -1,0 +1,170 @@
+"use client";
+// Interactive <DualWindowMeter> (plan/25 §11). One pointer listener; nearest
+// sample by x reveals both window values against the target. ←/→ rove points.
+// Composes the static component (canon).
+import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { makeFormatter } from "../../core/format.js";
+import { EN_DUAL_WINDOW } from "../../core/strings-dual-window.js";
+import { rollingMean } from "./geometry.js";
+import {
+  DualWindowMeter as StaticDualWindowMeter,
+  dualWindowSummary,
+  type DualWindowMeterProps,
+} from "./index.js";
+
+const FILL: CSSProperties = { width: "100%", height: "auto" };
+
+export function DualWindowMeter(props: DualWindowMeterProps): React.ReactNode {
+  const {
+    data,
+    target,
+    windows = [3, 30],
+    label = "last",
+    width = 100,
+    height = 24,
+    format,
+    locale,
+    strings = EN_DUAL_WINDOW,
+    title,
+    summary,
+    ...rest
+  } = props;
+
+  const [wf, ws] = windows[0] < windows[1] ? windows : [windows[1], windows[0]];
+  const fast = useMemo(() => rollingMean(data, wf), [data, wf]);
+  const slow = useMemo(() => rollingMean(data, ws), [data, ws]);
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  const fontSize = Math.max(5, Math.min(Math.round(height * 0.36), 7));
+  const gutter =
+    label === "last"
+      ? Math.min(
+          width * 0.35,
+          Math.max(fmt(lastFinite(fast) ?? 0).length, fmt(lastFinite(slow) ?? 0).length, 1) *
+            fontSize *
+            0.62 +
+            3,
+        )
+      : 0;
+  const pad = 1;
+  const plotW = Math.max(1, width - gutter - pad * 2);
+  const n = Math.max(1, data.length - 1);
+  const xOf = (i: number) => pad + (i / n) * plotW;
+
+  const [active, setActive] = useState<number | null>(null);
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : dualWindowSummary(lastFinite(fast), lastFinite(slow), target, strings, fmt);
+  const labelText = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const onPointerMove = useCallback(
+    (e: PointerEvent<HTMLElement>) => {
+      if (data.length === 0) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      if (r.width === 0) return;
+      const x = ((e.clientX - r.left) / r.width) * width;
+      const i = Math.max(0, Math.min(data.length - 1, Math.round(((x - pad) / plotW) * n)));
+      setActive(i);
+    },
+    [data.length, width, plotW, n],
+  );
+
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (data.length === 0) return;
+      setActive((prev) => {
+        const cur = prev ?? data.length - 1;
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          return Math.min(data.length - 1, cur + 1);
+        }
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          return Math.max(0, cur - 1);
+        }
+        if (e.key === "Escape") return null;
+        return prev;
+      });
+    },
+    [data.length],
+  );
+
+  const f = active != null ? fast[active] : null;
+  const s = active != null ? slow[active] : null;
+  const announced =
+    active != null
+      ? strings.dualWindowAt(f == null ? "—" : fmt(f), s == null ? "—" : fmt(s), fmt(target))
+      : "";
+  const crossX = active != null ? xOf(active) : 0;
+
+  return (
+    <span
+      className="mc-dualwin-live"
+      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      tabIndex={0}
+      role="img"
+      aria-label={labelText}
+      onPointerMove={onPointerMove}
+      onPointerLeave={() => setActive(null)}
+      onKeyDown={onKeyDown}
+      onBlur={() => setActive(null)}
+    >
+      <StaticDualWindowMeter
+        {...rest}
+        data={data}
+        target={target}
+        windows={[wf, ws]}
+        label={label}
+        width={width}
+        height={height}
+        format={format}
+        locale={locale}
+        strings={strings}
+        summary={false}
+        style={FILL}
+      >
+        {active != null ? (
+          <line
+            x1={crossX}
+            x2={crossX}
+            y1={0.5}
+            y2={height - 0.5}
+            data-mc-ink="muted"
+            strokeWidth={0.75}
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+      </StaticDualWindowMeter>
+      <span
+        aria-live="polite"
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          overflow: "hidden",
+          clip: "rect(0 0 0 0)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {announced}
+      </span>
+      {active != null ? (
+        <span
+          className="mc-spark-readout"
+          style={{ left: `${(crossX / width) * 100}%`, transform: "translateX(-50%)" }}
+        >
+          {`${f == null ? "—" : fmt(f)} · ${s == null ? "—" : fmt(s)}`}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+function lastFinite(arr: readonly (number | null)[]): number | null {
+  for (let i = arr.length - 1; i >= 0; i--)
+    if (arr[i] != null && Number.isFinite(arr[i]!)) return arr[i]!;
+  return null;
+}

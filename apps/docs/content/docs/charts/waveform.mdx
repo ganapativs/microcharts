@@ -1,0 +1,77 @@
+---
+title: Waveform
+description: An amplitude strip for React — the shape of a high-frequency signal at word width, compressed by max-per-bucket so a spike can never be averaged away.
+---
+
+Waveform answers "what is the shape of a high-frequency signal — where are its spikes and
+silences — at word width?". It compresses with max-per-bucket, never a mean, so a single spike
+survives the squeeze to a sparkline width. The peak is disclosed in the accessible summary.
+
+<LiveDemo
+  label="Waveform"
+  sizeOf="waveform"
+  code={`import { Waveform } from "@microcharts/react/waveform";
+
+<Waveform data={samples} title="Voice memo" />`}
+>
+  <Waveform
+    data={Array.from({ length: 200 }, (_, i) => (i === 126 ? 0.82 : Math.sin(i / 3) * 0.15 + Math.sin(i / 11) * 0.35) * (1 - Math.abs(i - 100) / 260))}
+    progress={0.63}
+    title="Voice memo"
+    width={300}
+    height={30}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="waveform" />
+
+## Try it
+
+<Playground chart="waveform" />
+
+## Interactive
+
+<InteractiveDemo slug="waveform" />
+
+## When to use it
+
+- **Good for** — voice-memo / audio scrubbers, high-frequency log or request volume.
+- **Avoid for** — exact values (Sparkline) or categorical state (Hypnogram).
+
+## Sizing
+
+<Sizing chart="waveform" />
+
+## Variants
+
+<LiveDemo label="envelope" code={`<Waveform data={samples} variant="envelope" />`}>
+  <Waveform
+    data={Array.from(
+      { length: 200 },
+      (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220),
+    )}
+    variant="envelope"
+    title="Envelope"
+    width={280}
+    height={30}
+  />
+</LiveDemo>
+
+## Why this default
+
+Bars with max-per-bucket are the only compression that can't hide an incident — averaging a bucket
+would erase the very spike someone is looking for. The auto domain is symmetric ±max|data|, which
+reads shape honestly and discloses the peak in the summary; for absolute loudness comparison across
+rows, pass an explicit shared `domain` so quiet data is never silently rescaled to look loud.
+
+## Accessibility
+
+The accessible name discloses the peak — **"Peak 0.82 at 63% through 200 samples."** Pure silence
+reads **"Silent."** rather than blank. The interactive entry roves the buckets, announcing each
+bucket's position and peak amplitude.
+
+## Props
+
+<PropTable slug="waveform" />

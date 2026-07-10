@@ -16,6 +16,9 @@ export default defineConfig({
           environment: "jsdom",
           include: ["src/**/*.test.{ts,tsx}"],
           exclude: ["src/**/*.browser.test.{ts,tsx}"],
+          // unmount rendered trees after each test so a reused worker fork does
+          // not accumulate DOM across its files and OOM (see setup.ts)
+          setupFiles: ["./src/test/setup.ts"],
         },
       },
       {

@@ -21,6 +21,27 @@ import { Slope } from "@microcharts/react/slope";
 import { MicroScatter } from "@microcharts/react/micro-scatter";
 import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annotations";
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
+import { TimeInRange } from "@microcharts/react/time-in-range";
+import { Hypnogram } from "@microcharts/react/hypnogram";
+import { EtaBar } from "@microcharts/react/eta-bar";
+import { Waveform } from "@microcharts/react/waveform";
+import { EventRaster } from "@microcharts/react/event-raster";
+import { RubricStrip } from "@microcharts/react/rubric-strip";
+import { TokenConfidence } from "@microcharts/react/token-confidence";
+import { WindBarb } from "@microcharts/react/wind-barb";
+import { StarSpoke } from "@microcharts/react/star-spoke";
+import { MinimapStrip } from "@microcharts/react/minimap-strip";
+import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
+import { DepthWedge } from "@microcharts/react/depth-wedge";
+import { PartitionStrip } from "@microcharts/react/partition-strip";
+import { CalibrationStrip } from "@microcharts/react/calibration-strip";
+import { ConfusionGrid } from "@microcharts/react/confusion-grid";
+import { FoldedDayBand } from "@microcharts/react/folded-day-band";
+import { VolumeProfile } from "@microcharts/react/volume-profile";
+import { PhaseTrace } from "@microcharts/react/phase-trace";
+import { TraceFold } from "@microcharts/react/trace-fold";
+import { TapeGauge } from "@microcharts/react/tape-gauge";
+import { StationGlyph } from "@microcharts/react/station-glyph";
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { MicroBox } from "@microcharts/react/micro-box";
 import { ProgressRing } from "@microcharts/react/progress-ring";
@@ -118,6 +139,27 @@ export function getMDXComponents(components?: MDXComponents) {
     Marker,
     Callout,
     SegmentedBar,
+    TimeInRange,
+    Hypnogram,
+    EtaBar,
+    Waveform,
+    EventRaster,
+    RubricStrip,
+    TokenConfidence,
+    WindBarb,
+    StarSpoke,
+    MinimapStrip,
+    DualWindowMeter,
+    DepthWedge,
+    PartitionStrip,
+    CalibrationStrip,
+    ConfusionGrid,
+    FoldedDayBand,
+    VolumeProfile,
+    PhaseTrace,
+    TraceFold,
+    TapeGauge,
+    StationGlyph,
     HistogramStrip,
     MicroBox,
     ProgressRing,

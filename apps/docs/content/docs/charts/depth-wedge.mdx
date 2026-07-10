@@ -1,0 +1,97 @@
+---
+title: DepthWedge
+description: An order-book depth glyph for React — two cumulative step-wedges meeting at the spread, showing supply vs demand posture on a linear scale.
+---
+
+DepthWedge answers "how much pressure is stacked on each side of the current level, and how wide is
+the gap between them?". Demand accumulates leftward from the spread and supply rightward, so the two
+filled wedges show the book's posture in a glyph. The y-scale is linear, full stop — log-depth
+reading belongs to full-size tools.
+
+<LiveDemo
+  label="DepthWedge"
+  sizeOf="depth-wedge"
+  code={`import { DepthWedge } from "@microcharts/react/depth-wedge";
+
+<DepthWedge data={{ demand, supply }} title="Order book" />`}
+>
+  <DepthWedge
+    data={{
+      demand: [
+        { level: 99.75, amount: 420 },
+        { level: 99.5, amount: 360 },
+        { level: 99.25, amount: 280 },
+        { level: 99, amount: 200 },
+        { level: 98.5, amount: 120 },
+      ],
+      supply: [
+        { level: 100.25, amount: 300 },
+        { level: 100.5, amount: 240 },
+        { level: 100.75, amount: 160 },
+        { level: 101, amount: 90 },
+      ],
+    }}
+    title="Order book"
+    width={300}
+    height={30}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="depth-wedge" />
+
+## Try it
+
+<Playground chart="depth-wedge" />
+
+## Interactive
+
+<InteractiveDemo slug="depth-wedge" />
+
+## When to use it
+
+- **Good for** — order-book depth / liquidity, supply vs demand posture.
+- **Avoid for** — a time series (Sparkline) or a single ratio (Delta).
+
+## Sizing
+
+<Sizing chart="depth-wedge" />
+
+## Variants
+
+<LiveDemo label="normalized" code={`<DepthWedge data={book} normalize />`}>
+  <DepthWedge
+    data={{
+      demand: [
+        { level: 99.5, amount: 420 },
+        { level: 99, amount: 260 },
+      ],
+      supply: [
+        { level: 100.5, amount: 300 },
+        { level: 101, amount: 180 },
+      ],
+    }}
+    normalize
+    title="Normalized"
+    width={300}
+    height={30}
+  />
+</LiveDemo>
+
+## Why this default
+
+Linear scale plus a stated `range` because a wedge you can't interrogate must not editorialize — a
+silent log axis would exaggerate near-spread depth and flatter thin books. The visible range is part
+of the claim, so the summary always carries "within the shown range", and the spread — the gap
+between the best bid and best ask — is the headline number above the mid line.
+
+## Accessibility
+
+The accessible name states the posture, range-scoped — **"Demand outweighs supply 1.8× within the
+shown range; spread 0.2."** The interactive entry walks the levels with ←/→, announcing the
+cumulative depth on each side and its distance from the mid.
+
+## Props
+
+<PropTable slug="depth-wedge" />

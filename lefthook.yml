@@ -3,7 +3,8 @@ pre-commit:
   parallel: true
   commands:
     format:
-      glob: "*.{ts,tsx,js,jsx,json,css}"
+      # match what CI's `oxfmt --check` covers (incl. .mjs/.cjs/.mts + .mdx docs)
+      glob: "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,json,css,mdx}"
       run: pnpm oxfmt --check {staged_files}
     lint:
       glob: "*.{ts,tsx}"
@@ -11,9 +12,16 @@ pre-commit:
       run: pnpm oxlint --no-error-on-unmatched-pattern {staged_files}
 
 pre-push:
-  parallel: true
+  # Sequential (piped), not parallel: typecheck, then the node (jsdom) project,
+  # then the browser (Playwright) project. The node project runs in one process
+  # at default parallelism and peaks ~0.7 GB — well under a worker's 4 GB V8 heap.
+  # (It used to OOM, but the cause was a single chart emitting unbounded geometry
+  # on a non-physical input, not the suite size — fixed in wind-barb/geometry.ts.)
+  piped: true
   commands:
-    typecheck:
+    1_typecheck:
       run: pnpm typecheck
-    test:
-      run: pnpm test
+    2_test_node:
+      run: pnpm vitest run --project node
+    3_test_browser:
+      run: pnpm vitest run --project browser

@@ -3,31 +3,24 @@ import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { docsMeta } from "@/lib/metadata";
-import { CATALOG_TARGET, CHART_MODULES, STABLE_CHARTS } from "@/lib/charts/registry";
+import { CHART_MODULES, STABLE_CHARTS } from "@/lib/charts/registry";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
-import { GalleryFilter } from "./gallery-filter";
+import { GalleryDock } from "./gallery-dock";
 
 export const metadata: Metadata = docsMeta({
-  title: "All charts",
+  title: "Gallery",
   description:
-    "Every shipped microchart, shown at its true word-size beside the data shape it answers — the full visual catalog, searchable, in a card grid or a dense specimen sheet.",
+    "The full microcharts catalog as one immersive plane — every shipped chart at true word-size, searchable, filterable, and tilting to your cursor. A contact sheet for word-sized instruments.",
   path: "/gallery",
 });
 
-// Collection order + editorial framing. Only groups with shipped charts render.
-const COLLECTIONS: { key: ChartCollection; label: string; blurb: string }[] = [
-  { key: "core", label: "Core", blurb: "The everyday instruments — trend, magnitude, change." },
-  { key: "decision", label: "Decision", blurb: "Charts tuned to answer one question and move on." },
-  {
-    key: "expressive",
-    label: "Expressive",
-    blurb: "Unusual encodings, earned by an unusually apt fit.",
-  },
-  {
-    key: "frontier",
-    label: "Frontier",
-    blurb: "Newer forms pushing what a word-sized chart can say.",
-  },
+// Collection framing — used for the dock filters + the per-card tag. This is a
+// continuous plane, so collections are metadata, never section walls.
+const COLLECTIONS: { key: ChartCollection; label: string }[] = [
+  { key: "core", label: "Core" },
+  { key: "decision", label: "Decision" },
+  { key: "expressive", label: "Expressive" },
+  { key: "frontier", label: "Frontier" },
 ];
 
 function keywords(c: ChartEntry): string {
@@ -35,109 +28,93 @@ function keywords(c: ChartEntry): string {
 }
 
 export default function GalleryPage() {
-  const byCollection = COLLECTIONS.map((group) => ({
-    ...group,
-    charts: STABLE_CHARTS.filter((c) => c.collection === group.key),
-  })).filter((g) => g.charts.length > 0);
+  // One flat, catalog-ordered plane. Collection order first, then registry order
+  // within — so the sequence is stable and the corner index reads left-to-right.
+  const order: Record<ChartCollection, number> = {
+    core: 0,
+    decision: 1,
+    expressive: 2,
+    frontier: 3,
+  };
+  const charts = [...STABLE_CHARTS].sort((a, b) => order[a.collection] - order[b.collection]);
 
-  const counts: Record<string, number> = { all: STABLE_CHARTS.length };
-  for (const g of byCollection) counts[g.key] = g.charts.length;
-
-  // A stable catalog index number (01…) across the whole catalog.
-  let n = 0;
+  const counts: Record<string, number> = { all: charts.length };
+  for (const c of charts) counts[c.collection] = (counts[c.collection] ?? 0) + 1;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      {/* ── Masthead ─────────────────────────────────────────────────────── */}
-      <header className="max-w-2xl">
-        <span className="mono-label text-fd-primary">The catalog</span>
-        <h1 className="display mt-3 text-fluid-h2 text-[length:var(--text-fluid-h2)]">
-          {STABLE_CHARTS.length} of {CATALOG_TARGET} shipped.
-        </h1>
-        <p className="mt-4 text-fd-muted-foreground">
-          The full catalog, visual — every chart at the size it lives in your interface, beside the
-          data it answers. Browse the cards, or switch to the specimen sheet for a dense scan. Each
-          earns its place: a unique story, an honest encoding, a read that needs no training.
-        </p>
-      </header>
+    <>
+      <div className="g2">
+        {/* ── masthead — just scrolls away with the content ─────────────────── */}
+        <header className="g2-head">
+          <span className="mono-label text-fd-primary">The catalog</span>
+          <h1 className="display mt-3 text-fluid-h2 text-[length:var(--text-fluid-h2)]">
+            {STABLE_CHARTS.length} charts, at true size.
+          </h1>
+          <p className="mt-4 text-fd-muted-foreground">
+            Every shipped microchart on one plane — at the size it lives in your interface, beside
+            the data it answers. Filter, search, and scan; each plate lights and tilts to your
+            cursor. The controls float at the bottom, where your hands already are.
+          </p>
+        </header>
 
-      <GalleryFilter counts={counts} />
-
-      {/* ── The catalog ──────────────────────────────────────────────────────
-          One container, two layouts: `data-view="grid"` (cards, default) and
-          `data-view="sheet"` (dense rows). The client filter owns data-view and
-          restores the last choice — with JS off you get the grid, fully SSR. */}
-      <div className="mc-gallery mt-8 flex flex-col gap-12" data-view="grid">
-        {byCollection.map((group) => (
-          <section key={group.key} data-collection-section>
-            <div className="mb-3 flex items-baseline justify-between gap-4 px-1">
-              <div className="flex items-baseline gap-3">
-                <h2 className="mono-label text-fd-primary">{group.label}</h2>
-                <p className="hidden text-sm text-fd-muted-foreground sm:block">{group.blurb}</p>
-              </div>
-              <span className="mono-label whitespace-nowrap opacity-50">
-                {group.charts.length} shipped
-              </span>
-            </div>
-
-            {/* The band: a CSS grid of instrument cards, or one seamed plate. */}
-            <div className="gband">
-              {group.charts.map((c) => {
-                const Preview = CHART_MODULES[c.slug]!.Preview;
-                const idx = String(++n).padStart(2, "0");
-                return (
-                  <div
-                    key={c.slug}
-                    data-gallery-card
-                    data-collection={c.collection}
-                    data-keywords={keywords(c)}
-                    className="gcard group"
-                    style={{ "--i": n } as CSSProperties}
-                  >
-                    {/* the specimen: the chart at true word-size on graph paper */}
-                    <div className="gcard-stage">
-                      <Preview />
-                    </div>
-                    {/* footer — in the grid the description stays hidden and the
-                        name sits centered; on hover/focus the name lifts and the
-                        description reveals below with the open arrow. The wrappers
-                        collapse to `display:contents` in the sheet so its flat row
-                        layout is unchanged. */}
-                    <div className="gcard-foot">
-                      <span className="gcard-idx mono-label tabular-nums opacity-40">{idx}</span>
-                      <div className="gcard-body">
-                        <div className="gcard-head">
-                          {/* the name is the navigation target; its ::after
-                              stretches over the whole card = one big click target */}
-                          <Link
-                            href={`/docs/charts/${c.slug}`}
-                            className="gcard-name gcard-link display text-lg leading-tight text-fd-foreground transition-colors group-hover:text-fd-primary"
-                          >
-                            {c.name}
-                          </Link>
-                          <ArrowUpRight className="gcard-arrow size-4 shrink-0 text-fd-muted-foreground" />
-                        </div>
-                        <p className="gcard-desc text-fd-muted-foreground">{c.tagline}</p>
-                      </div>
-                    </div>
+        {/* ── the plane ─────────────────────────────────────────────────────
+            One flat grid of instrument plates. The dock (client) toggles each
+            [data-gallery-card]'s `hidden` from data-* keywords — with JS off,
+            every chart still renders in the default grid, fully SSR. */}
+        <div className="g2-grid" data-density="comfortable">
+          {charts.map((c, i) => {
+            const Preview = CHART_MODULES[c.slug]!.Preview;
+            const idx = String(i + 1).padStart(2, "0");
+            return (
+              <article
+                key={c.slug}
+                className="g2-cell"
+                data-gallery-card
+                data-collection={c.collection}
+                data-keywords={keywords(c)}
+                style={{ "--i": i } as CSSProperties}
+              >
+                <Link
+                  href={`/docs/charts/${c.slug}`}
+                  className="g2-card"
+                  aria-label={`${c.name} — ${c.tagline}`}
+                >
+                  <span className="g2-spot" aria-hidden />
+                  <ArrowUpRight className="g2-arrow size-4" aria-hidden />
+                  <div className="g2-stage">
+                    <Preview />
+                    <span className="g2-idx" aria-hidden>
+                      {idx}
+                    </span>
                   </div>
-                );
-              })}
-            </div>
-          </section>
-        ))}
+                  <div className="g2-meta">
+                    <div className="g2-meta-head">
+                      <span className="g2-name">{c.name}</span>
+                      <span className="g2-coll">{c.collection}</span>
+                    </div>
+                    <p className="g2-tag">{c.tagline}</p>
+                  </div>
+                </Link>
+              </article>
+            );
+          })}
+        </div>
+
+        {/* empty state — toggled by the dock when nothing matches; the dock
+            writes the searched term into [data-empty-q] so the miss feels
+            answered, not generic. */}
+        <div className="g2-empty" data-gallery-empty hidden>
+          <p className="text-sm">
+            Nothing in the catalog answers{" "}
+            <span data-empty-q className="text-fd-foreground">
+              that
+            </span>{" "}
+            yet — try another term, or clear the filter.
+          </p>
+        </div>
       </div>
 
-      {/* empty state — toggled by the filter when nothing matches */}
-      <div data-gallery-empty hidden className="mt-8 px-1 text-fd-muted-foreground">
-        <p className="text-sm">No charts match. Try another term or clear the filter.</p>
-      </div>
-
-      {/* honest tail: the rest of the catalog is on the way */}
-      <p className="mono-label mt-12 border-t border-hairline pt-6 opacity-60">
-        +{CATALOG_TARGET - STABLE_CHARTS.length} more — core, decision, expressive, and frontier
-        charts, all before launch.
-      </p>
-    </div>
+      <GalleryDock counts={counts} collections={COLLECTIONS} />
+    </>
   );
 }

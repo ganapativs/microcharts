@@ -1,0 +1,84 @@
+---
+title: EventRaster
+description: A spike raster for React — one lane per source, one tick per event, so vertical banding reveals synchronization and sparse rows reveal silence.
+---
+
+EventRaster answers "when did each source fire — and do sources fire together, in sequence, or not
+at all?". Vertical bands reveal synchronization, diagonals reveal propagation, and sparse rows
+reveal silence. One tick is always one event — the only exception is the disclosed `overflow="bin"`
+mode for aliasing lanes.
+
+<LiveDemo
+  label="EventRaster"
+  sizeOf="event-raster"
+  code={`import { EventRaster } from "@microcharts/react/event-raster";
+
+<EventRaster data={services} title="Service events" />`}
+>
+  <EventRaster
+    data={[
+      { label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40, 41, 48, 55] },
+      { label: "db", events: [3, 6, 15, 21, 34, 41, 55] },
+      { label: "cache", events: [6, 21, 41, 55] },
+      { label: "queue", events: [10, 30, 50] },
+    ]}
+    title="Service events"
+    width={300}
+    height={56}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="event-raster" />
+
+## Try it
+
+<Playground chart="event-raster" />
+
+## Interactive
+
+<InteractiveDemo slug="event-raster" />
+
+## When to use it
+
+- **Good for** — service events across sources, agent steps, cron / sensor triggers.
+- **Avoid for** — a single lane (RugStrip) or continuous rates (Sparkline).
+
+## Sizing
+
+<Sizing chart="event-raster" />
+
+## Variants
+
+<LiveDemo label="emphasis" code={`<EventRaster data={services} emphasis="api" />`}>
+  <EventRaster
+    data={[
+      { label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40, 41, 48, 55] },
+      { label: "db", events: [3, 6, 15, 21, 34, 41, 55] },
+      { label: "cache", events: [6, 21, 41, 55] },
+    ]}
+    emphasis="api"
+    title="api emphasised"
+    width={280}
+    height={56}
+  />
+</LiveDemo>
+
+## Why this default
+
+Lanes stay aligned to a shared time domain because vertical banding — several sources firing at the
+same instant — is the phenomenon the chart exists to reveal. An empty lane is kept, not dropped:
+silence is signal. When a lane is so dense that ticks would alias into a solid smear, `overflow="bin"`
+switches it to per-bucket counts shown as opacity and the summary says which lanes were binned —
+the encoding change never hides.
+
+## Accessibility
+
+The accessible name summarises the field — **"4 lanes, 25 events; busiest api (11)."** The
+interactive entry roves lanes with ↑/↓ and events with ←/→, announcing each event's lane, time, and
+position within the lane.
+
+## Props
+
+<PropTable slug="event-raster" />

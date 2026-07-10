@@ -656,6 +656,170 @@
       "types": "./dist/charts/icon-array/client.d.ts",
       "import": "./dist/charts/icon-array/client.js"
     },
+    "./time-in-range": {
+      "types": "./dist/charts/time-in-range/index.d.ts",
+      "import": "./dist/charts/time-in-range/index.js"
+    },
+    "./time-in-range/interactive": {
+      "types": "./dist/charts/time-in-range/client.d.ts",
+      "import": "./dist/charts/time-in-range/client.js"
+    },
+    "./hypnogram": {
+      "types": "./dist/charts/hypnogram/index.d.ts",
+      "import": "./dist/charts/hypnogram/index.js"
+    },
+    "./hypnogram/interactive": {
+      "types": "./dist/charts/hypnogram/client.d.ts",
+      "import": "./dist/charts/hypnogram/client.js"
+    },
+    "./eta-bar": {
+      "types": "./dist/charts/eta-bar/index.d.ts",
+      "import": "./dist/charts/eta-bar/index.js"
+    },
+    "./eta-bar/interactive": {
+      "types": "./dist/charts/eta-bar/client.d.ts",
+      "import": "./dist/charts/eta-bar/client.js"
+    },
+    "./waveform": {
+      "types": "./dist/charts/waveform/index.d.ts",
+      "import": "./dist/charts/waveform/index.js"
+    },
+    "./waveform/interactive": {
+      "types": "./dist/charts/waveform/client.d.ts",
+      "import": "./dist/charts/waveform/client.js"
+    },
+    "./event-raster": {
+      "types": "./dist/charts/event-raster/index.d.ts",
+      "import": "./dist/charts/event-raster/index.js"
+    },
+    "./event-raster/interactive": {
+      "types": "./dist/charts/event-raster/client.d.ts",
+      "import": "./dist/charts/event-raster/client.js"
+    },
+    "./rubric-strip": {
+      "types": "./dist/charts/rubric-strip/index.d.ts",
+      "import": "./dist/charts/rubric-strip/index.js"
+    },
+    "./rubric-strip/interactive": {
+      "types": "./dist/charts/rubric-strip/client.d.ts",
+      "import": "./dist/charts/rubric-strip/client.js"
+    },
+    "./token-confidence": {
+      "types": "./dist/charts/token-confidence/index.d.ts",
+      "import": "./dist/charts/token-confidence/index.js"
+    },
+    "./token-confidence/interactive": {
+      "types": "./dist/charts/token-confidence/client.d.ts",
+      "import": "./dist/charts/token-confidence/client.js"
+    },
+    "./wind-barb": {
+      "types": "./dist/charts/wind-barb/index.d.ts",
+      "import": "./dist/charts/wind-barb/index.js"
+    },
+    "./star-spoke": {
+      "types": "./dist/charts/star-spoke/index.d.ts",
+      "import": "./dist/charts/star-spoke/index.js"
+    },
+    "./star-spoke/interactive": {
+      "types": "./dist/charts/star-spoke/client.d.ts",
+      "import": "./dist/charts/star-spoke/client.js"
+    },
+    "./minimap-strip": {
+      "types": "./dist/charts/minimap-strip/index.d.ts",
+      "import": "./dist/charts/minimap-strip/index.js"
+    },
+    "./minimap-strip/interactive": {
+      "types": "./dist/charts/minimap-strip/client.d.ts",
+      "import": "./dist/charts/minimap-strip/client.js"
+    },
+    "./dual-window-meter": {
+      "types": "./dist/charts/dual-window-meter/index.d.ts",
+      "import": "./dist/charts/dual-window-meter/index.js"
+    },
+    "./dual-window-meter/interactive": {
+      "types": "./dist/charts/dual-window-meter/client.d.ts",
+      "import": "./dist/charts/dual-window-meter/client.js"
+    },
+    "./depth-wedge": {
+      "types": "./dist/charts/depth-wedge/index.d.ts",
+      "import": "./dist/charts/depth-wedge/index.js"
+    },
+    "./depth-wedge/interactive": {
+      "types": "./dist/charts/depth-wedge/client.d.ts",
+      "import": "./dist/charts/depth-wedge/client.js"
+    },
+    "./partition-strip": {
+      "types": "./dist/charts/partition-strip/index.d.ts",
+      "import": "./dist/charts/partition-strip/index.js"
+    },
+    "./partition-strip/interactive": {
+      "types": "./dist/charts/partition-strip/client.d.ts",
+      "import": "./dist/charts/partition-strip/client.js"
+    },
+    "./calibration-strip": {
+      "types": "./dist/charts/calibration-strip/index.d.ts",
+      "import": "./dist/charts/calibration-strip/index.js"
+    },
+    "./calibration-strip/interactive": {
+      "types": "./dist/charts/calibration-strip/client.d.ts",
+      "import": "./dist/charts/calibration-strip/client.js"
+    },
+    "./confusion-grid": {
+      "types": "./dist/charts/confusion-grid/index.d.ts",
+      "import": "./dist/charts/confusion-grid/index.js"
+    },
+    "./confusion-grid/interactive": {
+      "types": "./dist/charts/confusion-grid/client.d.ts",
+      "import": "./dist/charts/confusion-grid/client.js"
+    },
+    "./folded-day-band": {
+      "types": "./dist/charts/folded-day-band/index.d.ts",
+      "import": "./dist/charts/folded-day-band/index.js"
+    },
+    "./folded-day-band/interactive": {
+      "types": "./dist/charts/folded-day-band/client.d.ts",
+      "import": "./dist/charts/folded-day-band/client.js"
+    },
+    "./volume-profile": {
+      "types": "./dist/charts/volume-profile/index.d.ts",
+      "import": "./dist/charts/volume-profile/index.js"
+    },
+    "./volume-profile/interactive": {
+      "types": "./dist/charts/volume-profile/client.d.ts",
+      "import": "./dist/charts/volume-profile/client.js"
+    },
+    "./phase-trace": {
+      "types": "./dist/charts/phase-trace/index.d.ts",
+      "import": "./dist/charts/phase-trace/index.js"
+    },
+    "./phase-trace/interactive": {
+      "types": "./dist/charts/phase-trace/client.d.ts",
+      "import": "./dist/charts/phase-trace/client.js"
+    },
+    "./trace-fold": {
+      "types": "./dist/charts/trace-fold/index.d.ts",
+      "import": "./dist/charts/trace-fold/index.js"
+    },
+    "./trace-fold/interactive": {
+      "types": "./dist/charts/trace-fold/client.d.ts",
+      "import": "./dist/charts/trace-fold/client.js"
+    },
+    "./tape-gauge": {
+      "types": "./dist/charts/tape-gauge/index.d.ts",
+      "import": "./dist/charts/tape-gauge/index.js"
+    },
+    "./tape-gauge/interactive": {
+      "types": "./dist/charts/tape-gauge/client.d.ts",
+      "import": "./dist/charts/tape-gauge/client.js"
+    },
+    "./station-glyph": {
+      "types": "./dist/charts/station-glyph/index.d.ts",
+      "import": "./dist/charts/station-glyph/index.js"
+    },
+    "./station-glyph/interactive": {
+      "types": "./dist/charts/station-glyph/client.d.ts",
+      "import": "./dist/charts/station-glyph/client.js"
+    },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"
@@ -704,19 +868,19 @@
     "@vitest/browser": "^4.1.10",
     "@vitest/browser-playwright": "^4.1.10",
     "axe-core": "^4.12.1",
-    "fast-check": "^4.8.0",
+    "fast-check": "^4.9.0",
     "jsdom": "^29.1.1",
-    "knip": "^6.24.0",
-    "lefthook": "^2.1.9",
-    "oxfmt": "^0.57.0",
-    "oxlint": "^1.72.0",
+    "knip": "^6.25.0",
+    "lefthook": "^2.1.10",
+    "oxfmt": "^0.58.0",
+    "oxlint": "^1.73.0",
     "playwright": "^1.61.1",
     "publint": "^0.3.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "size-limit": "^12.1.0",
-    "tsdown": "^0.22.3",
-    "typescript": "^6.0.3",
+    "tsdown": "^0.22.4",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.10",
     "vitest-browser-react": "^2.2.0"
   },

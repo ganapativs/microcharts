@@ -313,6 +313,89 @@
     "orbit-status": {
       "static": "2.1 kB",
       "interactive": "3 kB"
+    },
+    "time-in-range": {
+      "static": "2.2 kB",
+      "interactive": "3.1 kB"
+    },
+    "hypnogram": {
+      "static": "2.6 kB",
+      "interactive": "3.5 kB"
+    },
+    "eta-bar": {
+      "static": "2.1 kB",
+      "interactive": "2.7 kB"
+    },
+    "waveform": {
+      "static": "2.4 kB",
+      "interactive": "3.3 kB"
+    },
+    "event-raster": {
+      "static": "2.6 kB",
+      "interactive": "3.7 kB"
+    },
+    "rubric-strip": {
+      "static": "2.2 kB",
+      "interactive": "3.2 kB"
+    },
+    "token-confidence": {
+      "static": "1.5 kB",
+      "interactive": "2.5 kB"
+    },
+    "wind-barb": {
+      "static": "2.5 kB"
+    },
+    "star-spoke": {
+      "static": "2.2 kB",
+      "interactive": "3.1 kB"
+    },
+    "minimap-strip": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
+    },
+    "dual-window-meter": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
+    },
+    "depth-wedge": {
+      "static": "2.2 kB",
+      "interactive": "3.2 kB"
+    },
+    "partition-strip": {
+      "static": "2.3 kB",
+      "interactive": "3.3 kB"
+    },
+    "calibration-strip": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
+    },
+    "confusion-grid": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
+    },
+    "folded-day-band": {
+      "static": "2.6 kB",
+      "interactive": "3.6 kB"
+    },
+    "volume-profile": {
+      "static": "2.6 kB",
+      "interactive": "3.6 kB"
+    },
+    "phase-trace": {
+      "static": "2.4 kB",
+      "interactive": "3.3 kB"
+    },
+    "trace-fold": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
+    },
+    "tape-gauge": {
+      "static": "2.9 kB",
+      "interactive": "3.4 kB"
+    },
+    "station-glyph": {
+      "static": "3 kB",
+      "interactive": "3.6 kB"
     }
   }
 }

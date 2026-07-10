@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { cycleGeometry } from "./geometry.js";
+import { cycleGeometry, CYCLE_MAX_PERIOD } from "./geometry.js";
 
 const base = { width: 84, height: 20 };
 // 6 weeks × 7 weekdays; Fri (idx 5) peaks, Sun (idx 0) dips, Mon (idx 1) rises
@@ -84,10 +84,28 @@ describe("cycleGeometry (plan/23 #18)", () => {
     expect(geo.degenerate).toBe(true);
   });
 
-  test.prop([
-    fc.array(fc.integer({ min: 0, max: 100 }), { minLength: 1, maxLength: 60 }),
-    fc.integer({ min: 4, max: 12 }),
-  ])("centers within domain, coords within viewBox", (data, period) => {
+  it("saturates a non-physical period — bounded slots, contained coords", () => {
+    // 1e15 once allocated 1e15 slot arrays (OOM) and drove colW → 0; the slot
+    // count must clamp to CYCLE_MAX_PERIOD. Summary still reports the request.
+    const geo = cycleGeometry({ ...base, data: [1, 2, 3, 4, 5], period: 1e15 })!;
+    expect(geo.slots.length).toBe(CYCLE_MAX_PERIOD);
+    for (const sl of geo.slots) {
+      expect(sl.center.x).toBeGreaterThanOrEqual(0);
+      expect(sl.center.x).toBeLessThanOrEqual(base.width);
+      expect(sl.x0).toBeLessThanOrEqual(base.width);
+      expect(sl.x1).toBeLessThanOrEqual(base.width + 0.01);
+    }
+  });
+
+  // the 1e15 clamp is covered explicitly above; cap runs so the ≤366-slot combs
+  // stay fast on CI
+  test.prop(
+    [
+      fc.array(fc.integer({ min: 0, max: 100 }), { minLength: 1, maxLength: 60 }),
+      fc.integer({ min: 4, max: 400 }),
+    ],
+    { numRuns: 40 },
+  )("centers within domain, coords within viewBox", (data, period) => {
     const geo = cycleGeometry({ ...base, data, period });
     if (geo === null) return;
     for (const sl of geo.slots) {

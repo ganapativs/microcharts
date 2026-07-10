@@ -1,0 +1,167 @@
+"use client";
+// Interactive <Hypnogram> (plan/25 §2). One pointer listener; run lookup by x.
+// ←/→ rove runs, Home/End jump. Composes the static component (canon).
+import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { makeFormatter } from "../../core/format.js";
+import { EN_HYPNOGRAM } from "../../core/strings-hypnogram.js";
+import { firstAppearance, hypnogramGeometry } from "./geometry.js";
+import {
+  Hypnogram as StaticHypnogram,
+  hypnogramSummary,
+  resolveDomain,
+  type HypnogramProps,
+} from "./index.js";
+
+const FILL: CSSProperties = { width: "100%", height: "auto" };
+
+export function Hypnogram(props: HypnogramProps): React.ReactNode {
+  const {
+    data,
+    states: statesProp,
+    variant = "steps",
+    domain: domainProp,
+    width = 120,
+    height = 24,
+    strings = EN_HYPNOGRAM,
+    format,
+    locale,
+    title,
+    summary,
+    ...rest
+  } = props as HypnogramProps & {
+    format?: Intl.NumberFormatOptions | ((n: number) => string);
+    locale?: string | string[];
+  };
+
+  const appearance = useMemo(() => firstAppearance(data), [data]);
+  const rowStates = useMemo(() => {
+    if (!statesProp) return appearance;
+    const extra = appearance.filter((s) => !statesProp.includes(s));
+    return [...statesProp, ...extra];
+  }, [statesProp, appearance]);
+  const domain = useMemo(() => domainProp ?? resolveDomain(data), [domainProp, data]);
+  const geo = useMemo(
+    () => hypnogramGeometry({ data, states: rowStates, domain, width, height, style: variant }),
+    [data, rowStates, domain, width, height, variant],
+  );
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  const [active, setActive] = useState<number | null>(null);
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : hypnogramSummary(data, rowStates, domain, strings);
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const onPointerMove = useCallback(
+    (e: PointerEvent<HTMLElement>) => {
+      if (geo.runs.length === 0) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      if (r.width === 0) return;
+      const x = ((e.clientX - r.left) / r.width) * width;
+      const i = geo.runs.findIndex((run) => x >= run.x0 && x <= run.x1);
+      setActive(i >= 0 ? i : null);
+    },
+    [geo, width],
+  );
+
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (geo.runs.length === 0) return;
+      const cur = active ?? 0;
+      let next = cur;
+      switch (e.key) {
+        case "ArrowRight":
+          next = Math.min(geo.runs.length - 1, cur + 1);
+          break;
+        case "ArrowLeft":
+          next = Math.max(0, cur - 1);
+          break;
+        case "Home":
+          next = 0;
+          break;
+        case "End":
+          next = geo.runs.length - 1;
+          break;
+        case "Escape":
+          setActive(null);
+          return;
+        default:
+          return;
+      }
+      e.preventDefault();
+      setActive(next);
+    },
+    [active, geo],
+  );
+
+  const run = active !== null ? geo.runs[active] : undefined;
+  const announced = run ? strings.hypnogramRun(run.state, fmt(run.t0), fmt(run.t1)) : "";
+
+  return (
+    <span
+      className="mc-hypno-live"
+      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      tabIndex={0}
+      role="img"
+      aria-label={label}
+      onPointerMove={onPointerMove}
+      onPointerLeave={() => setActive(null)}
+      onKeyDown={onKeyDown}
+      onBlur={() => setActive(null)}
+    >
+      <StaticHypnogram
+        {...rest}
+        data={data}
+        states={statesProp}
+        variant={variant}
+        style={FILL}
+        width={width}
+        height={height}
+        domain={domain}
+        strings={strings}
+        summary={false}
+      >
+        {run ? (
+          <rect
+            x={run.x0 - 0.5}
+            y={0.5}
+            width={Math.max(1, run.x1 - run.x0) + 1}
+            height={height - 1}
+            fill="none"
+            stroke="var(--mc-accent)"
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {rest.children}
+      </StaticHypnogram>
+      <span
+        aria-live="polite"
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          overflow: "hidden",
+          clip: "rect(0 0 0 0)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {announced}
+      </span>
+      {run ? (
+        <span
+          className="mc-spark-readout"
+          style={{
+            left: `${((run.x0 + run.x1) / 2 / width) * 100}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {run.state}
+        </span>
+      ) : null}
+    </span>
+  );
+}

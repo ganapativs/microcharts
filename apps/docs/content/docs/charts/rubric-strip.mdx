@@ -1,0 +1,84 @@
+---
+title: RubricStrip
+description: A weighted scorecard for React — bar length is the score, bar thickness is the criterion's weight, and there is deliberately no composite total.
+---
+
+RubricStrip answers "how did this thing score per criterion — with each criterion's importance
+visible — without a fake composite number?". Each bar's length is its score and its thickness is
+its weight share, so the things that matter most are literally the biggest marks. There is no total
+bar, and none may be added — the type exists to resist collapsing quality into one number.
+
+<LiveDemo
+  label="RubricStrip"
+  sizeOf="rubric-strip"
+  code={`import { RubricStrip } from "@microcharts/react/rubric-strip";
+
+<RubricStrip data={criteria} target={0.7} title="Model eval" />`}
+>
+  <RubricStrip
+    data={[
+      { label: "Correctness", score: 0.92, weight: 3 },
+      { label: "Coverage", score: 0.78, weight: 2 },
+      { label: "Clarity", score: 0.65, weight: 1 },
+      { label: "Style", score: 0.41, weight: 1 },
+    ]}
+    target={0.7}
+    title="Model eval"
+    width={240}
+    height={44}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="rubric-strip" />
+
+## Try it
+
+<Playground chart="rubric-strip" />
+
+## Interactive
+
+<InteractiveDemo slug="rubric-strip" />
+
+## When to use it
+
+- **Good for** — model / code-review scorecards, weighted vendor comparison.
+- **Avoid for** — a single criterion (Bullet) or parts of a whole (SegmentedBar).
+
+## Sizing
+
+<Sizing chart="rubric-strip" />
+
+## Variants
+
+<LiveDemo label="unweighted" code={`<RubricStrip data={checks} />`}>
+  <RubricStrip
+    data={[
+      { label: "Lint", score: 1 },
+      { label: "Types", score: 1 },
+      { label: "Tests", score: 0.8 },
+      { label: "Docs", score: 0.5 },
+    ]}
+    title="Checklist"
+    width={240}
+    height={44}
+  />
+</LiveDemo>
+
+## Why this default
+
+Weight-as-thickness keeps "importance" visible where a table hides it — a light criterion that
+scores well can't visually outweigh a heavy one that scores poorly. The summary names the extremes,
+never a weighted average, because the whole point is that a single number throws away the structure.
+A `target` draws one honest pass line across every row instead.
+
+## Accessibility
+
+The accessible name names the extremes — **"4 criteria; highest Correctness (0.92), lowest Style
+(0.41)."** The interactive entry roves the criteria, announcing each one's score and its weight
+share of the total (**"Coverage: 0.78, weight 33% of total."**).
+
+## Props
+
+<PropTable slug="rubric-strip" />

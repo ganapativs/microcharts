@@ -1,0 +1,89 @@
+---
+title: EtaBar
+description: A progress bar for React that re-forecasts honestly — the remainder is sized by the observed rate, not linear interpolation, so a stalling transfer shows it.
+---
+
+EtaBar answers "how long is this actually going to take, given how it has actually been going?".
+Its x-axis is time, not fraction: the solid part is the elapsed share of the predicted total, and
+the muted remainder is sized by the observed rate. When the rate drops, the remainder honestly
+grows — the download bar, told truthfully.
+
+<LiveDemo
+  label="EtaBar"
+  sizeOf="eta-bar"
+  code={`import { EtaBar } from "@microcharts/react/eta-bar";
+
+<EtaBar
+  progress={0.64}
+  elapsed={3.6}
+  rate={0.18}
+  formatEta={(t) => \`\${Math.round(t)} min\`}
+  title="Export"
+/>`}
+>
+  <EtaBar progress={0.64} elapsed={3.6} rate={0.18} formatEta={(t) => `${Math.round(t)} min`} title="Export" width={280} height={16} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="eta-bar" />
+
+## Try it
+
+<Playground chart="eta-bar" />
+
+## Interactive
+
+<InteractiveDemo slug="eta-bar" />
+
+## When to use it
+
+- **Good for** — download / export progress, job-queue ETAs, deploy timers.
+- **Avoid for** — fraction-only progress (Progress) or unbounded counters (Delta).
+
+## Sizing
+
+<Sizing chart="eta-bar" />
+
+## Variants
+
+<LiveDemo label="stalled" code={`<EtaBar progress={0.3} elapsed={40} rate={0} />`}>
+  <EtaBar progress={0.3} elapsed={40} rate={0} title="Stalled transfer" width={280} height={16} />
+</LiveDemo>
+
+<LiveDemo
+  label="percent"
+  code={`<EtaBar progress={0.42} elapsed={10} rate={0.05} label="percent" />`}
+>
+  <EtaBar
+    progress={0.42}
+    elapsed={10}
+    rate={0.05}
+    label="percent"
+    title="Percent"
+    width={280}
+    height={16}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="eta-bar" />
+
+## Why this default
+
+The ETA label is the default because "how long?" is the question a plain progress bar pretends to
+answer. The remainder is sized by the observed rate, never linear interpolation — so a stalling
+transfer looks stalled instead of marching to a fake finish. When the rate is unknown or zero the
+remainder becomes an indeterminate texture and the summary says so, rather than inventing a
+countdown.
+
+## Accessibility
+
+The accessible name is the honest forecast — **"64% done; about 2 min remaining at the current
+rate."** A stalled transfer reads **"30% done; stalled."** and a finished one **"Done."** The
+interactive entry re-announces on a throttle as the forecast changes.
+
+## Props
+
+<PropTable slug="eta-bar" />

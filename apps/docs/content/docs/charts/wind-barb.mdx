@@ -1,0 +1,71 @@
+---
+title: WindBarb
+description: A direction-and-magnitude glyph for React — shaft angle is the bearing, quantized WMO barbs are the strength, all in one character.
+---
+
+WindBarb answers "which way is it flowing and roughly how hard — in one character?". The shaft
+points along the bearing and the barbs count the magnitude: a half barb, a full barb, and a pennant
+are fixed quanta, so the glyph reads at a glance without a scale. Quantization is the honesty here,
+not a limitation — the per-barb quantum is stated next to every example.
+
+<LiveDemo
+  label="WindBarb"
+  sizeOf="wind-barb"
+  code={`import { WindBarb } from "@microcharts/react/wind-barb";
+
+<WindBarb direction={225} magnitude={32} step={10} title="Wind" />`}
+>
+  <WindBarb direction={225} magnitude={32} step={10} label title="Wind" size={64} />
+</LiveDemo>
+
+## Install
+
+<Usage chart="wind-barb" />
+
+## Try it
+
+<Playground chart="wind-barb" />
+
+## Reading the barb
+
+WindBarb has no interactive mode — a single glyph carries the whole reading, so its accessible name
+is the full sentence. This gallery is the read-back key: each full barb is one `step`, a half barb
+is half a `step`, and a pennant is five.
+
+<InteractiveDemo slug="wind-barb" />
+
+## When to use it
+
+- **Good for** — wind or current direction + strength, traffic flow, net migration, request routing.
+- **Avoid for** — exact magnitude (add `label`) or a time series (Sparkline).
+
+## Sizing
+
+<Sizing chart="wind-barb" />
+
+## Variants
+
+<LiveDemo label="calm" code={`<WindBarb direction={0} magnitude={1} />`}>
+  <WindBarb direction={0} magnitude={1} title="Calm" size={44} />
+</LiveDemo>
+
+<LiveDemo label="arrow" code={`<WindBarb direction={45} magnitude={25} variant="arrow" />`}>
+  <WindBarb direction={45} magnitude={25} variant="arrow" title="Arrow" size={44} />
+</LiveDemo>
+
+## Why this default
+
+Quantized barbs read faster and more honestly than a scaled arrow whose length you'd have to measure
+against a legend — the glyph is calibrated to its `step`, so counting barbs gives the magnitude
+directly. A near-zero magnitude renders the conventional open circle for calm rather than a
+zero-length shaft, and a negative magnitude flips the bearing 180° with a dev warning.
+
+## Accessibility
+
+The accessible name is the full reading — **"Southwest (225°), magnitude 32."** Calm renders as
+**"Calm."** Because the glyph is self-describing, rows of barbs get their interaction from the host
+table or list, not from the mark.
+
+## Props
+
+<PropTable slug="wind-barb" />

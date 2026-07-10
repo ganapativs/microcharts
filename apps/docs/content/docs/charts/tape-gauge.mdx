@@ -1,0 +1,92 @@
+---
+title: TapeGauge
+description: A moving-scale micro instrument for React — the level now, the zone it's in, and how fast it's moving, with the eye parked in one place. Position encodes level, chevrons encode rate, and the two never blend.
+---
+
+TapeGauge answers "what is it now, is that OK, and where is it heading?" for a single live reading —
+airspeed, throughput, temperature, queue depth. The scale scrolls past a fixed center pointer, so the
+value stays parked where your eye already is; semantic zones mark the safe, caution, and danger bands;
+and a stack of chevrons encodes the rate of change as a channel entirely separate from the level. It
+is the aviation primary-flight-display tape, shrunk to a word.
+
+<LiveDemo
+  label="TapeGauge"
+  sizeOf="tape-gauge"
+  code={`import { TapeGauge } from "@microcharts/react/tape-gauge";
+
+<TapeGauge value={142} rate={1} zones={zones} title="Airspeed" />`}
+>
+  <TapeGauge
+    value={142}
+    rate={1}
+    zones={[
+      { from: 100, to: 130, tone: "pos" },
+      { from: 130, to: 150, tone: "warn" },
+      { from: 150, to: 200, tone: "neg" },
+    ]}
+    title="Airspeed"
+    width={46}
+    height={72}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="tape-gauge" />
+
+## Try it
+
+<Playground chart="tape-gauge" />
+
+## Interactive
+
+<InteractiveDemo slug="tape-gauge" />
+
+## When to use it
+
+- **Good for** — a live changing reading with a safe/caution band; value plus trend at a glance.
+- **Avoid for** — a history you want to scan (Sparkline) or a single static number (Delta).
+
+## Sizing
+
+<Sizing chart="tape-gauge" />
+
+## Variants
+
+<LiveDemo
+  label="horizontal"
+  code={`<TapeGauge value={142} rate={-1} zones={zones} orientation="horizontal" />`}
+>
+  <TapeGauge
+    value={142}
+    rate={-1}
+    zones={[
+      { from: 100, to: 130, tone: "pos" },
+      { from: 130, to: 150, tone: "warn" },
+      { from: 150, to: 200, tone: "neg" },
+    ]}
+    orientation="horizontal"
+    title="Airspeed"
+    width={160}
+    height={30}
+  />
+</LiveDemo>
+
+## Why this default
+
+The value is pinned at the pointer and the scale moves instead, because on a live instrument the one
+thing you never want to hunt for is the current reading. Rate lives on its own channel — chevrons, not
+position — so a fast climb and a high value are never confused for one another, the failure mode that
+sinks a naïve gauge. The visible span is fixed while the value updates, so a jump reads as motion of
+the scale rather than a silent rescale that hides how far it moved.
+
+## Accessibility
+
+The accessible name states the level, the trend word, and the containing zone — **"Now 142, rising;
+in the 130–150 zone."** The interactive entry re-announces the reading through a polite live region,
+throttled so a rapidly changing value never floods a screen reader, and focus reads the full summary
+on demand.
+
+## Props
+
+<PropTable slug="tape-gauge" />

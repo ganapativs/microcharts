@@ -56,6 +56,27 @@ import { EN_QUADRANT } from "./strings-quadrant.js";
 import { EN_CYCLE } from "./strings-cycle.js";
 import { EN_CHANGE_POINT } from "./strings-change-point.js";
 import { EN_ENSEMBLE } from "./strings-ensemble.js";
+import { EN_TIME_IN_RANGE } from "./strings-time-in-range.js";
+import { EN_HYPNOGRAM } from "./strings-hypnogram.js";
+import { EN_ETA_BAR } from "./strings-eta-bar.js";
+import { EN_WAVEFORM } from "./strings-waveform.js";
+import { EN_EVENT_RASTER } from "./strings-event-raster.js";
+import { EN_RUBRIC } from "./strings-rubric.js";
+import { EN_TOKEN_CONFIDENCE } from "./strings-token-confidence.js";
+import { EN_WIND_BARB } from "./strings-wind-barb.js";
+import { EN_STAR_SPOKE } from "./strings-star-spoke.js";
+import { EN_MINIMAP } from "./strings-minimap.js";
+import { EN_DUAL_WINDOW } from "./strings-dual-window.js";
+import { EN_DEPTH_WEDGE } from "./strings-depth-wedge.js";
+import { EN_PARTITION } from "./strings-partition.js";
+import { EN_CALIBRATION } from "./strings-calibration.js";
+import { EN_CONFUSION } from "./strings-confusion.js";
+import { EN_FOLDED_BAND } from "./strings-folded-band.js";
+import { EN_VOLUME_PROFILE } from "./strings-volume-profile.js";
+import { EN_PHASE_TRACE } from "./strings-phase-trace.js";
+import { EN_TRACE_FOLD } from "./strings-trace-fold.js";
+import { EN_TAPE_GAUGE } from "./strings-tape-gauge.js";
+import { EN_STATION_GLYPH } from "./strings-station-glyph.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -112,4 +133,25 @@ export const EN: SummaryStrings = {
   ...EN_CYCLE,
   ...EN_CHANGE_POINT,
   ...EN_ENSEMBLE,
+  ...EN_TIME_IN_RANGE,
+  ...EN_HYPNOGRAM,
+  ...EN_ETA_BAR,
+  ...EN_WAVEFORM,
+  ...EN_EVENT_RASTER,
+  ...EN_RUBRIC,
+  ...EN_TOKEN_CONFIDENCE,
+  ...EN_WIND_BARB,
+  ...EN_STAR_SPOKE,
+  ...EN_MINIMAP,
+  ...EN_DUAL_WINDOW,
+  ...EN_DEPTH_WEDGE,
+  ...EN_PARTITION,
+  ...EN_CALIBRATION,
+  ...EN_CONFUSION,
+  ...EN_FOLDED_BAND,
+  ...EN_VOLUME_PROFILE,
+  ...EN_PHASE_TRACE,
+  ...EN_TRACE_FOLD,
+  ...EN_TAPE_GAUGE,
+  ...EN_STATION_GLYPH,
 };

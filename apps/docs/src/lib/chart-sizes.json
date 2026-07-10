@@ -200,8 +200,8 @@
     "interactive": 3.07
   },
   "cycle-plot": {
-    "static": 2.44,
-    "interactive": 3.46
+    "static": 2.45,
+    "interactive": 3.47
   },
   "change-point": {
     "static": 2.92,
@@ -213,7 +213,7 @@
   },
   "tally-marks": {
     "static": 1.47,
-    "interactive": 1.95
+    "interactive": 1.96
   },
   "dice-pips": {
     "static": 1.29,
@@ -269,7 +269,7 @@
   },
   "honeycomb": {
     "static": 1.66,
-    "interactive": 2.09
+    "interactive": 2.1
   },
   "constellation": {
     "static": 2.81,
@@ -306,6 +306,89 @@
   "icon-array": {
     "static": 2.06,
     "interactive": 2.94
+  },
+  "time-in-range": {
+    "static": 2.01,
+    "interactive": 2.88
+  },
+  "hypnogram": {
+    "static": 2.48,
+    "interactive": 3.42
+  },
+  "eta-bar": {
+    "static": 1.98,
+    "interactive": 2.43
+  },
+  "waveform": {
+    "static": 2.26,
+    "interactive": 3.14
+  },
+  "event-raster": {
+    "static": 2.36,
+    "interactive": 3.58
+  },
+  "rubric-strip": {
+    "static": 2.17,
+    "interactive": 3
+  },
+  "token-confidence": {
+    "static": 0.98,
+    "interactive": 1.58
+  },
+  "wind-barb": {
+    "static": 2.39
+  },
+  "star-spoke": {
+    "static": 2.08,
+    "interactive": 2.95
+  },
+  "minimap-strip": {
+    "static": 2.35,
+    "interactive": 3.07
+  },
+  "dual-window-meter": {
+    "static": 2.37,
+    "interactive": 3.21
+  },
+  "depth-wedge": {
+    "static": 2.11,
+    "interactive": 2.91
+  },
+  "partition-strip": {
+    "static": 2.1,
+    "interactive": 3.06
+  },
+  "calibration-strip": {
+    "static": 2.4,
+    "interactive": 3.22
+  },
+  "confusion-grid": {
+    "static": 2.31,
+    "interactive": 3.24
+  },
+  "folded-day-band": {
+    "static": 2.26,
+    "interactive": 3.04
+  },
+  "volume-profile": {
+    "static": 2.51,
+    "interactive": 3.36
+  },
+  "phase-trace": {
+    "static": 2.27,
+    "interactive": 3.13
+  },
+  "trace-fold": {
+    "static": 2.2,
+    "interactive": 3.23
+  },
+  "tape-gauge": {
+    "static": 2.81,
+    "interactive": 3.23
+  },
+  "station-glyph": {
+    "static": 2.96,
+    "interactive": 3.53
   },
   "annotations": {
     "static": 1.46

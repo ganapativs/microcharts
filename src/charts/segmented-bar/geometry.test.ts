@@ -54,8 +54,11 @@ describe("segmentedBarGeometry (plan/22 #14)", () => {
       expect(s.x + s.w).toBeLessThanOrEqual(60.01);
       sum += s.share;
     }
-    expect(sum).toBeGreaterThan(0.98);
-    expect(sum).toBeLessThan(1.02);
+    // shares are 2-dp rounded, so the sum can drift up to ±0.005 per segment
+    // from the exact 1; the tolerance must scale with segment count.
+    const tol = geo.segments.length * 0.005 + 1e-9;
+    expect(sum).toBeGreaterThanOrEqual(1 - tol);
+    expect(sum).toBeLessThanOrEqual(1 + tol);
     expect(largestRemainderPercents(geo.segments.map((s) => s.share)).reduce((a, b) => a + b)).toBe(
       100,
     );

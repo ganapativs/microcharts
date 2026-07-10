@@ -168,6 +168,14 @@
   :where(.mc-progress-live .mc-progress-fill) {
     transition: width var(--mc-duration) var(--mc-easing);
   }
+  /* interactive EtaBar: the elapsed/remainder split eases as the rate updates
+     (SVG geometry props; jumps where unsupported). Inside .mc-root → the
+     reduced-motion block below gates it. Never animate ahead of received data. */
+  :where(.mc-eta-live rect) {
+    transition:
+      x var(--mc-duration) var(--mc-easing),
+      width var(--mc-duration) var(--mc-easing);
+  }
   /* interactive FillWord: the ink edge glides along the word (the accent copy
      is inside .mc-root, so the reduced-motion block below already gates it) */
   :where(.mc-fillword-live text[data-mc-ink="accent"]) {
@@ -319,6 +327,46 @@
      wrapper (styled here so the client entry stays under its size budget). */
   :where(.mc-spark-interactive [data-mc-ink="muted"]) {
     stroke-dasharray: 1.5 2;
+  }
+
+  /* TokenConfidence (plan/25 §7) — the text IS the chart. Three discrete tiers
+     as typographic underlines: tier = color AND thickness AND stroke style, so
+     it is never color-alone. Confident tokens get NO mark (reading stays
+     primary). The host is inline HTML, not SVG. */
+  :where(.mc-token-confidence) {
+    font: var(--mc-font);
+    line-height: 1.7;
+    position: relative;
+  }
+  :where(.mc-token-confidence .mc-tc-unsure) {
+    text-decoration: underline solid var(--mc-cat-1);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+  }
+  :where(.mc-token-confidence .mc-tc-guessing) {
+    text-decoration: underline dotted var(--mc-negative);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+  }
+  /* show="all": a hairline under confident tokens for audit completeness */
+  :where(.mc-token-confidence .mc-tc-seen) {
+    text-decoration: underline solid var(--mc-neutral);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    opacity: 0.55;
+  }
+  :where(.mc-token-confidence .mc-tc-legend) {
+    color: var(--mc-neutral);
+    font-size: 0.85em;
+    white-space: nowrap;
+  }
+  :where(.mc-tc-live :is(.mc-tc-unsure, .mc-tc-guessing, .mc-tc-seen)) {
+    cursor: default;
+    border-radius: 2px;
+  }
+  :where(.mc-tc-live :is(.mc-tc-unsure, .mc-tc-guessing, .mc-tc-seen):focus-visible) {
+    outline: 2px solid var(--mc-accent);
+    outline-offset: 1px;
   }
 
   /* Interactive readout — the value revealed on hover/focus. A small chip on an

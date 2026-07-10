@@ -249,6 +249,351 @@ add(
   ],
 );
 add(
+  "time-in-range",
+  "TimeInRange",
+  [
+    { data: { below: 9, in: 72, above: 19 } },
+    { data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }, label: "all" },
+  ],
+  [
+    [60, 10],
+    [240, 22],
+  ],
+);
+add(
+  "rubric-strip",
+  "RubricStrip",
+  [
+    {
+      data: [
+        { label: "Correctness", score: 0.92, weight: 3 },
+        { label: "Coverage", score: 0.78, weight: 2 },
+        { label: "Style", score: 0.41, weight: 1 },
+      ],
+      target: 0.7,
+    },
+  ],
+  [
+    [80, 24],
+    [240, 40],
+  ],
+);
+add(
+  "trace-fold",
+  "TraceFold",
+  [
+    {
+      data: [
+        { label: "request", start: 0, duration: 214, depth: 0 },
+        { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
+        { label: "render", start: 96, duration: 60, depth: 1, parent: 0 },
+        { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 },
+      ],
+      format: (n) => `${Math.round(n)} ms`,
+    },
+  ],
+  [
+    [80, 24],
+    [320, 40],
+  ],
+);
+add(
+  "phase-trace",
+  "PhaseTrace",
+  [
+    {
+      data: Array.from({ length: 40 }, (_, i) => {
+        const t = (i / 40) * Math.PI * 2;
+        return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+      }),
+      xLabel: "CPU",
+      yLabel: "Latency",
+      grid: true,
+    },
+  ],
+  [
+    [40, 32],
+    [110, 100],
+  ],
+);
+add(
+  "volume-profile",
+  "VolumeProfile",
+  [
+    {
+      data: [
+        { level: 138, weight: 11 },
+        { level: 140, weight: 18 },
+        { level: 142, weight: 26 },
+        { level: 144, weight: 20 },
+        { level: 146, weight: 12 },
+      ],
+    },
+  ],
+  [
+    [48, 32],
+    [120, 80],
+  ],
+);
+add(
+  "folded-day-band",
+  "FoldedDayBand",
+  [
+    {
+      data: Array.from({ length: 14 }, (_d, d) =>
+        Array.from({ length: 24 }, (_h, h) => ({
+          t: d * 24 + h,
+          value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + Math.sin(d + h) * 8),
+        })),
+      ).flat(),
+      today: Array.from({ length: 24 }, (_h, h) => ({
+        t: h,
+        value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + 14),
+      })),
+    },
+  ],
+  [
+    [80, 20],
+    [320, 40],
+  ],
+);
+add(
+  "confusion-grid",
+  "ConfusionGrid",
+  [
+    {
+      data: {
+        labels: ["cat", "dog"],
+        counts: [
+          [88, 12],
+          [10, 59],
+        ],
+      },
+    },
+    {
+      data: {
+        labels: ["A", "B", "C"],
+        counts: [
+          [70, 8, 2],
+          [6, 62, 12],
+          [3, 9, 58],
+        ],
+      },
+      label: "accuracy",
+    },
+  ],
+  [
+    [44, 44],
+    [120, 120],
+  ],
+);
+add(
+  "calibration-strip",
+  "CalibrationStrip",
+  [
+    {
+      data: [
+        { predicted: 0.1, observed: 0.08, count: 90 },
+        { predicted: 0.3, observed: 0.36, count: 70 },
+        { predicted: 0.5, observed: 0.44, count: 55 },
+        { predicted: 0.7, observed: 0.52, count: 30 },
+        { predicted: 0.9, observed: 0.85, count: 8 },
+      ],
+    },
+  ],
+  [
+    [80, 24],
+    [300, 44],
+  ],
+);
+add(
+  "partition-strip",
+  "PartitionStrip",
+  [
+    {
+      data: [
+        {
+          label: "JS",
+          children: [
+            { label: "react", value: 28 },
+            { label: "vendor", value: 12 },
+          ],
+        },
+        {
+          label: "CSS",
+          children: [
+            { label: "tw", value: 16 },
+            { label: "custom", value: 8 },
+          ],
+        },
+        { label: "img", value: 18 },
+      ],
+    },
+  ],
+  [
+    [80, 16],
+    [320, 30],
+  ],
+);
+add(
+  "depth-wedge",
+  "DepthWedge",
+  [
+    {
+      data: {
+        demand: [
+          { level: 99.75, amount: 420 },
+          { level: 99.5, amount: 360 },
+          { level: 99, amount: 200 },
+        ],
+        supply: [
+          { level: 100.25, amount: 300 },
+          { level: 100.75, amount: 160 },
+        ],
+      },
+    },
+  ],
+  [
+    [60, 16],
+    [320, 30],
+  ],
+);
+add(
+  "dual-window-meter",
+  "DualWindowMeter",
+  [
+    {
+      data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 - (i > 40 ? 2 : 0)),
+      target: -23,
+    },
+    {
+      data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4),
+      target: -23,
+      band: [-25, -21],
+    },
+  ],
+  [
+    [80, 16],
+    [320, 28],
+  ],
+);
+add(
+  "minimap-strip",
+  "MinimapStrip",
+  [
+    {
+      data: {
+        content: Array.from({ length: 600 }, (_, i) => Math.abs(Math.sin(i / 30)) + 0.5),
+        window: [220, 320],
+        marks: [50, 300, 550],
+        known: [[0, 552]],
+      },
+      domain: [0, 600],
+    },
+  ],
+  [
+    [80, 12],
+    [300, 18],
+  ],
+);
+add(
+  "star-spoke",
+  "StarSpoke",
+  [
+    {
+      data: [
+        { label: "Speed", value: 0.9 },
+        { label: "Power", value: 0.6 },
+        { label: "Range", value: 0.5 },
+        { label: "Cost", value: 0.3 },
+        { label: "Ease", value: 0.7 },
+      ],
+      dots: true,
+    },
+  ],
+  [
+    [32, 32],
+    [110, 110],
+  ],
+);
+add(
+  "wind-barb",
+  "WindBarb",
+  [
+    { direction: 225, magnitude: 32 },
+    { direction: 45, magnitude: 65, label: true },
+    { direction: 0, magnitude: 1 },
+  ],
+  [
+    [24, 24],
+    [64, 64],
+  ],
+);
+add(
+  "event-raster",
+  "EventRaster",
+  [
+    {
+      data: [
+        { label: "api", events: [2, 5, 9, 20, 33, 48] },
+        { label: "db", events: [3, 15, 34] },
+        { label: "cache", events: [6, 41] },
+      ],
+    },
+  ],
+  [
+    [80, 24],
+    [300, 36],
+  ],
+);
+add(
+  "waveform",
+  "Waveform",
+  [
+    { data: Array.from({ length: 200 }, (_, i) => (i === 126 ? 0.82 : Math.sin(i / 3) * 0.3)) },
+    { data: Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.3), variant: "envelope" },
+  ],
+  [
+    [60, 14],
+    [300, 30],
+  ],
+);
+add(
+  "eta-bar",
+  "EtaBar",
+  [
+    { progress: 0.64, elapsed: 3.6, rate: 0.18, formatEta: (t) => `${Math.round(t)} min` },
+    { progress: 0.3, elapsed: 40, rate: 0 },
+    { progress: 0.42, elapsed: 10, rate: 0.05, label: "percent" },
+  ],
+  [
+    [80, 8],
+    [300, 16],
+  ],
+);
+add(
+  "hypnogram",
+  "Hypnogram",
+  [
+    {
+      data: [
+        { t: 0, state: "Awake" },
+        { t: 8, state: "Light" },
+        { t: 22, state: "Deep" },
+        { t: 50, state: "REM" },
+        { t: 90, state: "Light" },
+        { t: 110, state: "Awake" },
+      ],
+      states: ["Awake", "REM", "Light", "Deep"],
+      domain: [0, 120],
+    },
+  ],
+  [
+    [80, 16],
+    [300, 30],
+  ],
+);
+add(
   "histogram-strip",
   "HistogramStrip",
   [
@@ -1135,6 +1480,58 @@ add(
     [60, 24],
     [120, 40],
   ],
+);
+add(
+  "tape-gauge",
+  "TapeGauge",
+  [
+    {
+      value: 142,
+      rate: 1,
+      zones: [
+        { from: 100, to: 130, tone: "pos" },
+        { from: 130, to: 150, tone: "warn" },
+        { from: 150, to: 200, tone: "neg" },
+      ],
+      span: 60,
+    },
+    {
+      value: 142,
+      rate: -1,
+      zones: [{ from: 130, to: 150, tone: "warn" }],
+      span: 60,
+      orientation: "horizontal",
+    },
+  ],
+  [
+    [46, 60],
+    [160, 30],
+  ],
+);
+add(
+  "station-glyph",
+  "StationGlyph",
+  [
+    {
+      station: "KSFO",
+      cloud: 0.75,
+      wind: { direction: 225, magnitude: 15 },
+      temp: 16,
+      dewpoint: 9,
+      pressure: 1013,
+      size: 34,
+    },
+    {
+      station: "KJFK",
+      cloud: 1,
+      wind: { direction: 300, magnitude: 45 },
+      temp: 4,
+      dewpoint: 2,
+      pressure: 988,
+      size: 34,
+    },
+  ],
+  [[999, 0]],
 );
 
 // BY-DESIGN exemptions: EventTimeline span labels render CENTERED INSIDE their
