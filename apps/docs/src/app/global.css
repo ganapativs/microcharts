@@ -531,79 +531,305 @@ body {
     transform: translateY(-2px);
   }
 
-  /* ── Gallery: one card markup, two layouts ────────────────────────────────
-     `.gcard` places its five parts (stage · idx · name · tag · arrow) with grid
-     AREAS, so switching the container's [data-view] re-flows the SAME DOM into a
-     card grid or a dense specimen sheet — no double render, no chart JS. The
-     charts keep true word-size; only the frame around them changes. */
-  .gcard-stage svg {
-    height: auto;
-    max-width: 100%;
+  /* ══════════════════════════════════════════════════════════════════════════
+     GALLERY — "contact sheet". A full-bleed, continuous plane of instrument
+     plates. Chrome auto-hides; a floating dock owns the controls; each plate
+     tilts + lights toward the pointer. Everything below reuses the SAME tokens
+     as the rest of the site (--accent, --glass-*, --hairline, --rule) so it
+     reads as one material, and every motion is reduced-motion gated.
+     ══════════════════════════════════════════════════════════════════════════ */
+
+  /* nav auto-hide — only while a gallery-2 page is mounted (the client sets
+     [data-g2-mounted] on <html> and flips [data-g2-nav]). Scoped so the shared
+     header behaves normally everywhere else. */
+  :root[data-g2-mounted] header.glass-rail {
+    transition: transform 0.4s var(--ease-out-quint);
+    will-change: transform;
   }
-  /* the card is the positioning context for the stretched name-link. */
-  .gcard {
+  :root[data-g2-mounted][data-g2-nav="hidden"] header.glass-rail {
+    transform: translateY(-100%);
+  }
+
+  .g2 {
+    /* full-bleed: slim viewport gutters, no max-width cap */
+    width: 100%;
+    padding-inline: clamp(0.75rem, 2.5vw, 2.25rem);
+    padding-bottom: 2rem;
+  }
+
+  /* ── masthead — just scrolls away with the content, no fade ───────────── */
+  .g2-head {
+    max-width: 44rem;
+    padding-block: clamp(2.5rem, 6vh, 4.5rem) 1.5rem;
+  }
+
+  /* ── the plane ────────────────────────────────────────────────────────── */
+  .g2-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--g2-min, 16rem), 1fr));
+    gap: clamp(0.4rem, 0.7vw, 0.6rem);
+  }
+  .g2-grid[data-density="compact"] {
+    --g2-min: 12rem;
+    gap: clamp(0.3rem, 0.5vw, 0.45rem);
+  }
+
+  /* the perspective host — filtering toggles this element's [hidden].
+     NOTE: do NOT put `content-visibility: auto` here — it forces `contain:
+     paint`, which clips the plate's hover lift-shadow, focus ring, and the
+     3-D tilt overflow to the cell box, flattening the signature effect. The
+     94 live SVGs are tiny; offscreen-skip isn't worth losing the depth. */
+  .g2-cell {
+    perspective: 1000px;
+  }
+  .g2-cell[hidden] {
+    display: none;
+  }
+
+  /* the plate itself. transform carries BOTH the pointer tilt (--rx/--ry, set
+     by the dock's single delegated pointermove) and the hover lift (--lift),
+     composited on one layer. Vars default to 0 so with JS off it's flat. */
+  .g2-card {
+    --rx: 0deg;
+    --ry: 0deg;
+    --lift: 0px;
+    --mx: 50%;
+    --my: 50%;
     position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--radius-panel);
+    background-color: var(--glass-surface);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--glass-edge), var(--glass-shadow);
+    transform-style: preserve-3d;
+    transform: rotateX(var(--ry)) rotateY(var(--rx)) translate3d(0, var(--lift), 0);
+    transition:
+      transform 0.4s var(--ease-out-quint),
+      border-color 0.4s var(--ease-out-quint),
+      box-shadow 0.4s var(--ease-out-quint);
   }
-  /* the name link's ::after turns the whole card into one click target. */
-  .gcard-link::after {
-    content: "";
+  /* while a plate is actively tracked, drop the transform transition so tilt is
+     1:1 with the cursor (the dock adds [data-live]); promote to its own layer. */
+  .g2-card[data-live] {
+    transition:
+      border-color 0.4s var(--ease-out-quint),
+      box-shadow 0.4s var(--ease-out-quint);
+    will-change: transform;
+  }
+  .g2-cell:focus-within .g2-card {
+    border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline));
+    box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
+  }
+  /* explicit keyboard ring on the plate itself (never clipped — the cell has
+     `perspective`, not `overflow`), distinct from the softer focus-within tint. */
+  .g2-card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .g2-card:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* pointer spotlight — an accent bloom that follows the cursor, revealed on
+     hover. Sits above the graph paper, below the chart. */
+  .g2-spot {
     position: absolute;
     inset: 0;
     z-index: 0;
-  }
-  .gcard-stage {
-    transition: background-color 0.3s var(--ease-out-quint);
-  }
-  /* the open arrow is the hover/focus affordance in both views. */
-  .gcard-arrow {
+    border-radius: inherit;
+    pointer-events: none;
     opacity: 0;
-    transform: translateY(1px);
-    transition:
-      opacity 0.28s var(--ease-out-quint),
-      transform 0.28s var(--ease-out-quint);
+    background: radial-gradient(
+      12rem 12rem at var(--mx) var(--my),
+      color-mix(in oklab, var(--accent) 13%, transparent),
+      transparent 62%
+    );
+    transition: opacity 0.35s var(--ease-out-quint);
   }
-  .gcard:hover .gcard-arrow,
-  .gcard:focus-within .gcard-arrow {
+  .g2-cell:focus-within .g2-spot {
+    opacity: 1;
+  }
+
+  /* a quiet catalog stamp in the stage corner — not part of the reading flow,
+     it just marks position. Small, low, mono; lights a hair on hover. */
+  .g2-idx {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.6rem;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-fd-muted-foreground);
+    opacity: 0.35;
+    transition:
+      color 0.3s var(--ease-out-quint),
+      opacity 0.3s var(--ease-out-quint);
+    pointer-events: none;
+    user-select: none;
+  }
+  .g2-cell:focus-within .g2-idx {
+    color: var(--accent);
+    opacity: 0.7;
+  }
+
+  /* the specimen stage — graph paper, chart lifted forward in 3-D */
+  .g2-stage {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--g2-stage-h, 8.5rem);
+    padding: clamp(1rem, 2vw, 1.6rem);
+    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+    transform: translateZ(16px);
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--rule) 42%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--rule) 42%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 1.375rem 1.375rem;
+    transition: background-color 0.35s var(--ease-out-quint);
+  }
+  .g2-grid[data-density="compact"] .g2-stage {
+    --g2-stage-h: 6rem;
+  }
+  .g2-stage svg {
+    height: auto;
+    max-width: 100%;
+  }
+
+  /* meta shelf — name + collection tag always visible; tagline reveals */
+  .g2-meta {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.85rem 1rem 0.95rem;
+    border-top: 1px solid var(--hairline);
+    transform: translateZ(8px);
+  }
+  .g2-meta-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .g2-name {
+    min-width: 0;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    line-height: 1.2;
+    color: var(--color-fd-foreground);
+    transition: color 0.25s var(--ease-out-quint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .g2-cell:focus-within .g2-name {
+    color: var(--accent);
+  }
+  .g2-coll {
+    margin-left: auto;
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-fd-muted-foreground);
+    opacity: 0.6;
+  }
+  /* Its two-line space is ALWAYS reserved (fixed height) so hover never grows
+     the plate or shifts a neighbour — only the text fades in. */
+  .g2-tag {
+    font-size: 0.8rem;
+    line-height: 1.35;
+    height: 2.16rem; /* 2 lines × 1.35 × 0.8rem */
+    color: var(--color-fd-muted-foreground);
+    opacity: 0.62;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    transition: opacity 0.3s var(--ease-out-quint);
+  }
+  .g2-cell:focus-within .g2-tag {
+    opacity: 1;
+  }
+  .g2-arrow {
+    position: absolute;
+    top: 0.9rem;
+    left: 0.9rem;
+    z-index: 2;
+    opacity: 0;
+    transform: translate(-2px, 2px);
+    color: var(--accent);
+    transition:
+      opacity 0.3s var(--ease-out-quint),
+      transform 0.3s var(--ease-out-quint);
+  }
+  .g2-cell:focus-within .g2-arrow {
     opacity: 1;
     transform: none;
-    color: var(--fd-primary, var(--accent));
   }
 
-  /* keyboard focus — one accent ring, both views, never clipped by overflow */
-  .gcard:focus-visible,
-  .gcard:focus-within .gcard-link:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-    border-radius: var(--radius-panel);
-  }
-  /* settle-in reward: the index stamp lights to the accent on hover, both views */
-  .gcard-idx {
-    transition:
-      color 0.25s var(--ease-out-quint),
-      opacity 0.25s var(--ease-out-quint);
-  }
-  .gcard:hover .gcard-idx,
-  .gcard:focus-within .gcard-idx {
-    color: var(--accent);
-    opacity: 0.85;
-  }
-
-  /* One-time entrance cascade — cards rise + fade in sequence on first paint,
-     a diagonal ripple down the catalog. `--i` (set per card) staggers the
-     delay; capped so the tail never drags. `backwards` fill keeps a card
-     invisible only through its delay, then reverts to base so :hover still
-     lifts. The client marks [data-entered] after it plays so the search filter
-     never replays it; with JS off it simply plays once. */
-  @media (prefers-reduced-motion: no-preference) {
-    .mc-gallery:not([data-entered]) .gcard {
-      animation: gcard-in 0.5s var(--ease-out-quint) backwards;
-      animation-delay: min(calc(var(--i, 0) * 24ms), 360ms);
+  /* Hover visuals live ONLY on hover-capable devices, so a touch tap (which
+     emulates :hover and would leave it stuck) never lifts/lights a plate. Touch
+     gets feedback through :focus-within instead; tilt is already off on coarse
+     pointers (the dock's pointer handler gates on `(pointer: fine)`). */
+  @media (hover: hover) {
+    .g2-card:hover {
+      --lift: -3px;
+      border-color: color-mix(in oklab, var(--accent) 34%, var(--hairline));
+      box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
+    }
+    .g2-card:hover .g2-spot {
+      opacity: 1;
+    }
+    .g2-card:hover .g2-idx {
+      color: var(--accent);
+      opacity: 0.7;
+    }
+    .g2-card:hover .g2-stage {
+      background-color: color-mix(in oklab, var(--accent) 5%, transparent);
+    }
+    .g2-card:hover .g2-name {
+      color: var(--accent);
+    }
+    .g2-card:hover .g2-tag {
+      opacity: 1;
+    }
+    .g2-card:hover .g2-arrow {
+      opacity: 1;
+      transform: none;
     }
   }
-  @keyframes gcard-in {
+
+  /* one-time staggered entrance — a ripple down the plane on first paint */
+  @media (prefers-reduced-motion: no-preference) {
+    .g2:not([data-entered]) .g2-cell {
+      animation: g2-rise 0.55s var(--ease-out-expo) backwards;
+      animation-delay: min(calc(var(--i, 0) * 22ms), 420ms);
+    }
+  }
+  @keyframes g2-rise {
     from {
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateY(14px) scale(0.985);
     }
     to {
       opacity: 1;
@@ -611,199 +837,226 @@ body {
     }
   }
 
-  /* ══ GRID VIEW (default) ══════════════════════════════════════════════════
-     Each chart is an instrument plate: the specimen on graph paper up top, a
-     footer below whose body vertically centres the name. On hover / focus the
-     description reveals below the name (clamped to 3 lines) and the name lifts —
-     the footer height is reserved so nothing shifts. */
-  [data-view="grid"] .gband {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-    gap: 0.875rem;
-  }
-  [data-view="grid"] .gcard {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border-radius: var(--radius-panel);
-    background-color: var(--glass-surface);
-    border: 1px solid var(--hairline);
-    box-shadow: var(--glass-edge), var(--glass-shadow);
+  /* ── the floating dock ────────────────────────────────────────────────── */
+  .g2-dock {
+    position: fixed;
+    left: 50%;
+    bottom: clamp(0.9rem, 3vh, 1.75rem);
+    z-index: 45;
+    transform: translateX(-50%);
+    max-width: calc(100vw - 1.5rem);
+    animation: g2-dock-in 0.6s var(--ease-out-expo) 0.2s backwards;
     transition:
-      border-color 0.3s var(--ease-out-quint),
-      box-shadow 0.3s var(--ease-out-quint),
-      transform 0.3s var(--ease-out-quint);
+      transform 0.4s var(--ease-out-quint),
+      opacity 0.4s var(--ease-out-quint);
   }
-  [data-view="grid"] .gcard:hover {
-    border-color: color-mix(in oklab, var(--accent) 40%, var(--hairline));
-    box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
-    transform: translateY(-2px);
+  /* slips out of the way once the footer is reached, so it never covers it */
+  .g2-dock[data-hidden] {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 160%);
   }
-  [data-view="grid"] .gcard:hover .gcard-stage {
-    background-color: color-mix(in oklab, var(--accent) 5%, transparent);
+  @keyframes g2-dock-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%);
+    }
   }
-  [data-view="grid"] .gcard-stage {
-    flex: none;
+  .g2-dock-bar {
     display: flex;
     align-items: center;
-    justify-content: center;
-    min-height: 7.5rem;
-    padding: 1.125rem;
-    border-bottom: 1px solid var(--hairline);
-    /* graph-paper etched under the specimen (no mask fade — it's a full plate) */
-    background-image:
-      linear-gradient(
-        to right,
-        color-mix(in oklab, var(--rule) 45%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        to bottom,
-        color-mix(in oklab, var(--rule) 45%, transparent) 1px,
-        transparent 1px
-      );
-    background-size: 1.375rem 1.375rem;
+    gap: 0.4rem;
+    padding: 0.4rem;
+    border-radius: 999px;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
-  /* footer: a fixed height reserves room for the name + a 3-line description so
-     the reveal never grows the card. */
-  [data-view="grid"] .gcard-foot {
-    flex: none;
+  .g2-dock-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .g2-seg {
     display: flex;
-    align-items: stretch;
-    height: 5rem;
-    padding: 0 1rem;
-  }
-  /* the catalog number is a quiet plate stamp in the stage corner, not part of
-     the reading flow — the footer belongs entirely to the name + description. */
-  [data-view="grid"] .gcard-idx {
-    position: absolute;
-    bottom: 0.65rem;
-    right: 0.9rem;
-    z-index: 1;
-  }
-  /* it steps aside on hover/focus so the name + description own the footer */
-  [data-view="grid"] .gcard:hover .gcard-idx,
-  [data-view="grid"] .gcard:focus-within .gcard-idx {
-    opacity: 0;
-  }
-  [data-view="grid"] .gcard-body {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
     gap: 0.15rem;
+    padding: 0.15rem;
+    border-radius: 999px;
+    border: 1px solid var(--hairline);
   }
-  [data-view="grid"] .gcard-head {
+  .g2-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    border-radius: 999px;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.82rem;
+    color: var(--color-fd-muted-foreground);
+    transition:
+      color 0.2s var(--ease-out-quint),
+      background-color 0.2s var(--ease-out-quint);
+  }
+  .g2-pill:hover {
+    color: var(--color-fd-foreground);
+  }
+  .g2-pill[aria-pressed="true"] {
+    color: var(--color-fd-primary);
+    background-color: color-mix(in oklab, var(--accent) 16%, transparent);
+  }
+  .g2-pill:disabled {
+    color: color-mix(in oklab, var(--color-fd-muted-foreground) 50%, transparent);
+    cursor: default;
+  }
+  /* one focus ring language for every dock control */
+  .g2-pill:focus-visible,
+  .g2-icon-btn:focus-visible,
+  .g2-dock-search input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .g2-pill-n {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    opacity: 0.55;
+  }
+  .g2-dock-search {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
   }
-  [data-view="grid"] .gcard-name {
-    min-width: 0;
+  .g2-dock-search input {
+    width: 8.5rem;
+    background: transparent;
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    padding: 0.4rem 0.75rem 0.4rem 2rem;
+    font-size: 0.82rem;
+    color: var(--color-fd-foreground);
+    outline: none;
+    transition:
+      width 0.35s var(--ease-out-quint),
+      border-color 0.2s var(--ease-out-quint);
   }
-  [data-view="grid"] .gcard-arrow {
-    margin-left: auto;
+  .g2-dock-search input:focus {
+    width: 11rem;
+    border-color: color-mix(in oklab, var(--accent) 45%, var(--hairline));
   }
-  [data-view="grid"] .gcard-desc {
-    font-size: 0.78rem;
-    line-height: 1.35;
-    max-height: 0;
+  .g2-dock-search svg {
+    position: absolute;
+    left: 0.65rem;
+    pointer-events: none;
+    color: var(--color-fd-muted-foreground);
+  }
+  .g2-dock-div {
+    width: 1px;
+    align-self: stretch;
+    margin-block: 0.2rem;
+    background: var(--hairline);
+  }
+  .g2-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    color: var(--color-fd-muted-foreground);
+    transition:
+      color 0.2s var(--ease-out-quint),
+      background-color 0.2s var(--ease-out-quint),
+      opacity 0.3s var(--ease-out-quint);
+  }
+  .g2-icon-btn:hover {
+    color: var(--color-fd-foreground);
+    background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+  }
+  .g2-icon-btn[aria-pressed="true"] {
+    color: var(--color-fd-primary);
+    background-color: color-mix(in oklab, var(--accent) 16%, transparent);
+  }
+  /* Fingers need bigger targets than a cursor — grow the dock controls to the
+     44px minimum on touch/coarse pointers, without bloating the mouse layout. */
+  @media (pointer: coarse) {
+    .g2-pill {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.9rem;
+    }
+    .g2-icon-btn {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+    .g2-dock-search input {
+      padding-block: 0.6rem;
+      font-size: 0.9rem;
+    }
+  }
+  .g2-top {
     opacity: 0;
-    /* reveal to a 3-line clamp on hover/focus */
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    width: 0;
+    padding: 0;
+    pointer-events: none;
     overflow: hidden;
     transition:
-      max-height 0.32s var(--ease-out-quint),
-      opacity 0.32s var(--ease-out-quint);
+      opacity 0.3s var(--ease-out-quint),
+      width 0.3s var(--ease-out-quint);
   }
-  [data-view="grid"] .gcard:hover .gcard-desc,
-  [data-view="grid"] .gcard:focus-within .gcard-desc {
-    max-height: 3.4rem;
+  .g2-top[data-show] {
     opacity: 1;
+    width: 2rem;
+    pointer-events: auto;
   }
-  @media (prefers-reduced-motion: reduce) {
-    [data-view="grid"] .gcard {
-      transition: none;
-    }
-    [data-view="grid"] .gcard:hover {
-      transform: none;
-    }
-    [data-view="grid"] .gcard-desc {
-      transition: opacity 0.2s linear;
-    }
-  }
-
-  /* ══ SHEET VIEW ═══════════════════════════════════════════════════════════
-     The wrappers collapse to `display: contents` so the leaves (idx · name ·
-     desc · stage · arrow) form one flat, dense row. */
-  [data-view="sheet"] .gband {
-    overflow: hidden;
-    border-radius: var(--radius-panel);
-    background-color: var(--glass-surface);
-    border: 1px solid var(--hairline);
-    box-shadow: var(--glass-edge), var(--glass-shadow);
-  }
-  [data-view="sheet"] .gcard-foot,
-  [data-view="sheet"] .gcard-body,
-  [data-view="sheet"] .gcard-head {
-    display: contents;
-  }
-  [data-view="sheet"] .gcard {
-    display: grid;
-    grid-template:
-      "idx name stage arrow" auto
-      "idx desc stage arrow" auto / auto minmax(0, 1fr) 12rem auto;
-    align-items: center;
-    column-gap: 1.125rem;
-    row-gap: 0.125rem;
-    padding: 1rem 1.125rem;
-    transition: background-color 0.25s var(--ease-out-quint);
-  }
-  [data-view="sheet"] .gcard-stage {
-    grid-area: stage;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    height: 3.5rem;
-  }
-  [data-view="sheet"] .gcard-idx {
-    grid-area: idx;
-    align-self: center;
-  }
-  [data-view="sheet"] .gcard-name {
-    grid-area: name;
-  }
-  [data-view="sheet"] .gcard-arrow {
-    grid-area: arrow;
-  }
-  [data-view="sheet"] .gcard-desc {
-    grid-area: desc;
-    font-size: 0.875rem;
+  .g2-dock-count {
+    padding-inline: 0.5rem 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
     color: var(--color-fd-muted-foreground);
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
-  [data-view="sheet"] .gcard + .gcard {
-    border-top: 1px solid var(--hairline);
-  }
-  [data-view="sheet"] .gcard:hover {
-    background-color: color-mix(in oklab, var(--accent) 6%, transparent);
+  .g2-empty {
+    padding: 4rem 1rem;
+    text-align: center;
+    color: var(--color-fd-muted-foreground);
   }
 
-  /* On a phone the description + index are noise; the name + live chart carry
-     the row. Drop them in the sheet, tighten to name | specimen. */
-  @media (max-width: 40rem) {
-    [data-view="sheet"] .gcard {
-      grid-template: "name stage arrow" auto / minmax(0, 1fr) 9rem auto;
-      column-gap: 0.75rem;
+  @media (prefers-reduced-motion: reduce) {
+    .g2-card,
+    .g2-stage,
+    .g2-meta {
+      transform: none !important;
     }
-    [data-view="sheet"] .gcard-idx,
-    [data-view="sheet"] .gcard-desc {
-      display: none;
+    .g2-card {
+      transition:
+        border-color 0.3s linear,
+        box-shadow 0.3s linear;
+    }
+    .g2-dock,
+    .g2:not([data-entered]) .g2-cell {
+      animation: none;
+    }
+  }
+
+  /* phones: dock spans a full-width bar; tilt is off via RM/touch anyway */
+  @media (max-width: 34rem) {
+    .g2-dock {
+      left: 0.6rem;
+      right: 0.6rem;
+      bottom: 0.6rem;
+      transform: none;
+      max-width: none;
+    }
+    .g2-dock[data-hidden] {
+      transform: translateY(160%);
+    }
+    .g2-dock-search input,
+    .g2-dock-search input:focus {
+      width: 100%;
+      flex: 1;
+    }
+    .g2-dock-search {
+      flex: 1;
     }
   }
 }
