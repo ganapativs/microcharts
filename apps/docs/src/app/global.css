@@ -1524,6 +1524,18 @@ a:where(:has(> div > svg[class~="lucide-chevron-right"])):hover {
   transform: translateY(-2px);
 }
 
+/* Breathing room + a closure hairline above the built-in prev/next page nav —
+   it otherwise butts straight against the last content block. Scoped to the
+   grid that holds the chevron cards, so it never touches content <Cards>. */
+div:where(
+  :has(> a > div > svg[class~="lucide-chevron-left"]),
+  :has(> a > div > svg[class~="lucide-chevron-right"])
+) {
+  margin-top: 3rem;
+  padding-top: 2.25rem;
+  border-top: 1px solid var(--hairline);
+}
+
 /* Chip / swatch press feedback in the picker. */
 @keyframes chip-pop {
   0% {
