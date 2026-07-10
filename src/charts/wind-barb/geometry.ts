@@ -65,11 +65,11 @@ export function windBarbGeometry(opts: {
 
   // quantize to pennant / full / half (nearest half-step overall)
   let rem = Math.round(m / (step / 2)) * (step / 2);
-  const pennant = Math.floor(rem / (5 * step));
+  let pennant = Math.floor(rem / (5 * step));
   rem -= pennant * 5 * step;
-  const full = Math.floor(rem / step);
+  let full = Math.floor(rem / step);
   rem -= full * step;
-  const half = rem >= step / 2 ? 1 : 0;
+  let half = rem >= step / 2 ? 1 : 0;
 
   // barb direction: rotate the shaft direction back-and-to-the-side (~120°)
   const [bx, by] = rot(dx, dy, (120 * Math.PI) / 180);
@@ -78,6 +78,24 @@ export function windBarbGeometry(opts: {
   const penLen = R * 0.55;
   const penW = 2.6;
   const spacing = 2.2;
+
+  // Saturate at the shaft's capacity. A non-physical magnitude (e.g. 1e15) would
+  // otherwise emit trillions of marks — unbounded allocation AND a viewBox
+  // escape. Clamp the DRAWN glyph count to what fits along the shaft; the summary
+  // still reports the true magnitude, so the encoding stays honest.
+  const penStep = penW + 0.6;
+  const maxPennant = Math.max(0, Math.floor(R / penStep));
+  if (pennant > maxPennant) {
+    pennant = maxPennant;
+    full = 0;
+    half = 0;
+  } else {
+    const maxFull = Math.max(0, Math.floor((R - pennant * penStep) / spacing));
+    if (full > maxFull) {
+      full = maxFull;
+      half = 0;
+    }
+  }
 
   const barbs: Seg[] = [];
   const pennants: string[] = [];

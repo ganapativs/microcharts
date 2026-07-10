@@ -13,6 +13,28 @@ describe("windBarbGeometry (plan/25 §8, plan/17 F3)", () => {
     expect(geo.counts).toEqual({ pennant: 0, full: 3, half: 0 }); // 32 → 30
   });
 
+  it("saturates a non-physical magnitude — bounded, contained glyph", () => {
+    // 1e15 once looped ~2e13 times (unbounded alloc + viewBox escape); the drawn
+    // glyph must clamp to what fits the shaft. Summary still reports the real value.
+    const geo = windBarbGeometry({
+      direction: 45,
+      magnitude: 1e15,
+      step: 10,
+      width: 24,
+      height: 24,
+    });
+    expect(geo.calm).toBe(false);
+    expect(geo.barbs.length + geo.pennants.length).toBeLessThan(20);
+    const coords = [
+      ...geo.barbs.flatMap((b) => [b.x1, b.y1, b.x2, b.y2]),
+      ...geo.pennants.flatMap((p) => p.match(/-?\d+(?:\.\d+)?/g)!.map(Number)),
+    ];
+    for (const c of coords) {
+      expect(c).toBeGreaterThanOrEqual(-2);
+      expect(c).toBeLessThanOrEqual(26);
+    }
+  });
+
   it("near-zero magnitude → calm (no shaft, no barbs)", () => {
     const geo = windBarbGeometry({ direction: 90, magnitude: 1, step: 10, width: 24, height: 24 });
     expect(geo.calm).toBe(true);
