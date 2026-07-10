@@ -11,14 +11,26 @@ import type { ChartCollection } from "./charts/types";
 const RANK: Record<ChartCollection, number> = { core: 0, decision: 1, expressive: 2, frontier: 3 };
 
 describe("sidebar order ↔ gallery order parity", () => {
-  it("meta.json lists charts in collection-grouped registry order", () => {
+  it("meta.json lists charts in collection-grouped registry order, with a section separator opening each collection", () => {
     const meta = JSON.parse(
       readFileSync(resolve(process.cwd(), "content/docs/charts/meta.json"), "utf8"),
     ) as { pages: string[] };
-    const sidebarCharts = meta.pages.filter((p) => p !== "index" && p !== "annotations");
+    const entries = meta.pages.filter((p) => p !== "index" && p !== "annotations");
+    const sidebarCharts = entries.filter((p) => !p.startsWith("---"));
     const galleryOrder = [...STABLE_CHARTS]
       .sort((a, b) => RANK[a.collection] - RANK[b.collection])
       .map((c) => c.slug);
     expect(sidebarCharts).toEqual(galleryOrder);
+
+    // separators sit exactly at the collection boundaries, correctly labeled
+    const bySlug = new Map(STABLE_CHARTS.map((c) => [c.slug, c.collection]));
+    let current: string | null = null;
+    for (const p of entries) {
+      if (p.startsWith("---")) {
+        current = p.slice(3, -3).toLowerCase();
+        continue;
+      }
+      expect(bySlug.get(p), p).toBe(current);
+    }
   });
 });
