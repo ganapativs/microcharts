@@ -17,7 +17,7 @@ export const entry: ChartEntry = {
   interactiveImport: `${PKG}/tree-rings/interactive`,
   dataShape: "number[] (oldest first)",
   encoding: { channel: "radial ring thickness ∝ per-period value", precision: "medium" },
-  nodeBudget: "n + 1 (n ≤ 24)",
+  nodeBudget: "≤ 4 (merged ring path + highlighted ring + centre dot + label)",
   bestFor: [
     "account or company age at a glance",
     "a cohort-age marker in a table cell",
@@ -32,10 +32,10 @@ export const entry: ChartEntry = {
       description: "Per-period growth, oldest first.",
     },
     {
-      name: "accent",
+      name: "highlight",
       type: '"last" | "none" | number',
       required: false,
-      description: "Which boundary to emphasize.",
+      description: "Which period's ring to pick out.",
     },
     {
       name: "total",
@@ -53,7 +53,11 @@ export const entry: ChartEntry = {
   demo: YEARS,
   example: {
     title: "Account age",
-    code: `import { TreeRings } from "${PKG}/tree-rings";\n\n<TreeRings data={years} unit="years" periodWord="year" title="Account age" />`,
+    code: `import { TreeRings } from "${PKG}/tree-rings";
+
+const years = [8, 12, 10, 18, 22, 15, 20, 14];
+
+<TreeRings data={years} unit="years" periodWord="year" title="Account age" />`,
   },
 };
 
@@ -84,14 +88,20 @@ export const playground: PlaygroundSpec = {
       options: ["stroke", "fill"],
       init: "stroke",
     },
-    { kind: "segmented", key: "accent", label: "accent", options: ["last", "none"], init: "last" },
+    {
+      kind: "segmented",
+      key: "highlight",
+      label: "highlight",
+      options: ["last", "none"],
+      init: "last",
+    },
     { kind: "toggle", key: "label", label: "last value", init: false },
   ],
   render: (s) => (
     <TreeRings
       data={YEARS}
       rings={s.rings as "stroke" | "fill"}
-      accent={s.accent as "last" | "none"}
+      highlight={s.highlight as "last" | "none"}
       label={s.label ? "last" : "none"}
       unit="years"
       periodWord="year"
@@ -104,7 +114,7 @@ export const playground: PlaygroundSpec = {
       "<TreeRings",
       "  data={years}",
       s.rings !== "stroke" && `  rings="${s.rings}"`,
-      s.accent !== "last" && `  accent="${s.accent}"`,
+      s.highlight !== "last" && `  highlight="${s.highlight}"`,
       s.label && '  label="last"',
       "/>",
     ]

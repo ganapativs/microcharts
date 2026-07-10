@@ -22,7 +22,7 @@ export const entry: ChartEntry = {
   interactiveImport: `${PKG}/spiral-year/interactive`,
   dataShape: "(number | null)[]",
   encoding: { channel: "5-step opacity of marks along a calendar spiral", precision: "low" },
-  nodeBudget: "7",
+  nodeBudget: "≤ 6 (merged month-tick path + ≤ 5 step paths)",
   bestFor: [
     "the seasonal shape of a year at a glance",
     "spotting a busy season or a quiet stretch",
@@ -62,7 +62,16 @@ export const entry: ChartEntry = {
   demo: YEAR,
   example: {
     title: "Seasonality",
-    code: `import { SpiralYear } from "${PKG}/spiral-year";\n\nconst byWeek = [/* 52 weekly values */];\n\n<SpiralYear data={byWeek} title="Seasonality" />`,
+    code: `import { SpiralYear } from "${PKG}/spiral-year";
+
+// 52 weekly values, a summer peak in week 30
+const byWeek = [
+  85, 95, 107, 120, 135, 150, 166, 183, 200, 217, 234, 250, 265, 280, 293, 305, 315, 324, 331, 336,
+  339, 340, 339, 336, 331, 324, 315, 305, 293, 480, 265, 250, 234, 217, 200, 183, 166, 150, 135,
+  120, 107, 95, 85, 76, 69, 64, 61, 60, 61, 64, 69, 76,
+];
+
+<SpiralYear data={byWeek} title="Seasonality" />`,
   },
 };
 

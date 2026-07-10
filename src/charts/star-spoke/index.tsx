@@ -18,15 +18,15 @@ export interface StarSpokeDatum {
 
 export interface StarSpokeProps {
   data: readonly StarSpokeDatum[];
-  /** Endpoint dots sharpen the outlier read at larger sizes. */
-  dots?: boolean | undefined;
+  /** `"tips"` draws endpoint dots to sharpen the outlier read at larger sizes; `"none"` (default) omits them. */
+  dots?: "tips" | "none" | undefined;
   /** Hairline full-length guide spokes (the read-back scaffold). */
   guides?: boolean | undefined;
   /** Same-length baseline values as muted ghost spokes — profile vs baseline. */
   compare?: readonly number[] | undefined;
   /** Spoke labels at the tips (drop out below 48-unit size). */
   labels?: boolean | undefined;
-  domain?: [number, number] | undefined;
+  domain?: readonly [number, number] | undefined;
   size?: number | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
   locale?: string | string[] | undefined;
@@ -67,7 +67,7 @@ function circlesPath(pts: readonly { x: number; y: number }[], r: number): strin
 export function StarSpoke(props: StarSpokeProps): ReactNode {
   const {
     data,
-    dots = false,
+    dots = "none",
     guides = true,
     compare,
     labels = true,
@@ -89,7 +89,6 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
   if (data.some((d) => d.value > domain[1] || d.value < domain[0]))
     devWarn("<StarSpoke> value outside domain — clamped.");
 
-  const fmt = makeFormatter(format, locale);
   const showLabels = labels && size >= 44;
   const fontSize = showLabels ? labelFont(size, 0.1) : labelFont(size, 0.14);
   // reserve a label ring when labels are shown, so tip text stays inside
@@ -110,7 +109,12 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
         pad,
       })
     : null;
-  const accName = summary === false ? false : (summary ?? starSpokeSummary(data, strings, fmt));
+  // fmt (an Intl.NumberFormat lookup) is only needed for the auto summary — skip
+  // it entirely when summary is explicitly off (SSR hot path: plan/25 §9 bench).
+  const accName =
+    summary === false
+      ? false
+      : (summary ?? starSpokeSummary(data, strings, makeFormatter(format, locale)));
 
   return (
     <Chart
@@ -125,10 +129,9 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
       {guides ? (
         <path
           d={geo.guidePath}
-          fill="none"
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
+          data-mc-w="hair"
           strokeOpacity={0.22}
-          strokeWidth={0.5}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -147,7 +150,7 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
         strokeLinecap="round"
         style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.2)" }}
       />
-      {dots ? (
+      {dots === "tips" ? (
         <path
           d={circlesPath(
             geo.spokes.map((s) => ({ x: s.tx, y: s.ty })),
@@ -157,22 +160,34 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
         />
       ) : null}
       {showLabels
-        ? geo.spokes.map((s, i) => {
+        ? geo.spokes.flatMap((s, i) => {
             const label = data[i]!.label;
             const dx = Math.cos(s.angle);
             const dy = Math.sin(s.angle);
             const anchor = dx > 0.3 ? "start" : dx < -0.3 ? "end" : "middle";
             const est = 0.62 * fontSize * label.length;
-            // push labels just past the tip, then clamp so text never escapes
-            let x = s.tx + dx * (fontSize * 0.5);
+            const naturalX = s.tx + dx * (fontSize * 0.5);
+            // seat gate: a label must fit its anchor side without heavy
+            // clamping (many spokes / long labels), or it drops out cleanly —
+            // self-legibility: identity comes from the fixed clock order +
+            // guides even where a long label doesn't seat.
+            const roomRight = size - naturalX;
+            const roomLeft = naturalX;
+            const fits =
+              anchor === "start"
+                ? est <= roomRight - 0.5
+                : anchor === "end"
+                  ? est <= roomLeft - 0.5
+                  : est / 2 <= Math.min(roomLeft, roomRight) - 0.5;
+            if (!fits) return [];
             const half = anchor === "middle" ? est / 2 : anchor === "start" ? est : 0;
             const rightRoom = anchor === "start" ? est : anchor === "middle" ? est / 2 : 0;
-            x = Math.max(half + 0.5, Math.min(size - rightRoom - 0.5, x));
+            const x = Math.max(half + 0.5, Math.min(size - rightRoom - 0.5, naturalX));
             const y = Math.max(
               fontSize * 0.6,
               Math.min(size - fontSize * 0.4, s.ty + dy * (fontSize * 0.5)),
             );
-            return (
+            return [
               <text
                 key={label}
                 x={round2(x)}
@@ -183,8 +198,8 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
                 data-mc-ink="label"
               >
                 {label}
-              </text>
-            );
+              </text>,
+            ];
           })
         : null}
       {children}

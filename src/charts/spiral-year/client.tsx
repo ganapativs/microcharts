@@ -155,7 +155,7 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
             r={activeMark.r + 1.5}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

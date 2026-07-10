@@ -11,12 +11,12 @@ import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
-import { ringAnnulus, treeRingsGeometry } from "./geometry.js";
+import { ringAnnulus, ringOutline, treeRingsGeometry } from "./geometry.js";
 
 export interface TreeRingsProps {
   data: readonly number[];
-  /** Which boundary to emphasize: `last` (default), `none`, or an index. */
-  accent?: "last" | "none" | number | undefined;
+  /** Which period's ring to pick out: `last` (default), `none`, or an index (plan/04 §8: datum addressing → `highlight`). */
+  highlight?: "last" | "none" | number | undefined;
   /** Expected lifetime Σ — the disc fills only Σdata/total of the radius. */
   total?: number | undefined;
   /** `stroke` boundary rings (default) or `fill` alternating annuli. */
@@ -73,7 +73,7 @@ export function treeRingsSummary(
 export function TreeRings(props: TreeRingsProps): ReactNode {
   const {
     data,
-    accent = "last",
+    highlight = "last",
     total,
     rings = "stroke",
     label = "none",
@@ -94,7 +94,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
   const fontSize = props.fontSize ?? labelFont(size);
 
   const geo = treeRingsGeometry({ values: data, size, pad: PAD, total });
-  const accIdx = accent === "last" ? data.length - 1 : accent === "none" ? -1 : accent;
+  const accIdx = highlight === "last" ? data.length - 1 : highlight === "none" ? -1 : highlight;
   const accName =
     summary === false
       ? false
@@ -106,6 +106,15 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
   // concentric rings it would collide), so it needs a wider viewBox
   const showLabel = label === "last" && isFiniteValue(last);
   const gutter = showLabel ? Math.ceil(`${fmt(last as number)}`.length * 0.62 * fontSize + 5) : 0;
+
+  // SSR hot path (rings="stroke", the default): up to 24 boundary circles all
+  // share the same muted style, so they merge into one path — one node instead
+  // of N. The highlighted ring alone keeps its own element (distinct color/weight).
+  const accentRing = geo.rings.find((r) => r.index === accIdx && r.rOuter > r.rInner);
+  const mutedRingsPath = geo.rings
+    .filter((r) => r.rOuter > r.rInner && r.index !== accIdx)
+    .map((r) => ringOutline(geo.center.cx, geo.center.cy, r.rOuter))
+    .join("");
 
   return (
     <Chart
@@ -131,23 +140,27 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
               />
             ),
           )
-        : geo.rings.map((r) =>
-            r.rOuter <= r.rInner ? null : (
+        : [
+            mutedRingsPath ? (
+              <path
+                key="rings"
+                d={mutedRingsPath}
+                fill="none"
+                data-mc-ink="muted"
+                style={{ strokeOpacity: 0.55 }}
+              />
+            ) : null,
+            accentRing ? (
               <circle
-                key={`s${r.index}`}
+                key="accent"
                 cx={geo.center.cx}
                 cy={geo.center.cy}
-                r={r.rOuter}
+                r={accentRing.rOuter}
                 fill="none"
-                data-mc-ink={r.index === accIdx ? undefined : "muted"}
-                style={
-                  r.index === accIdx
-                    ? { stroke: paint, strokeWidth: "calc(var(--mc-stroke-width) * 1.5)" }
-                    : { strokeOpacity: 0.55 }
-                }
+                style={{ stroke: paint, strokeWidth: "calc(var(--mc-stroke-width) * 1.5)" }}
               />
-            ),
-          )}
+            ) : null,
+          ]}
       {/* centre dot */}
       <circle cx={geo.center.cx} cy={geo.center.cy} r={geo.r0 * 0.5} data-mc-ink="point" />
       {showLabel ? (

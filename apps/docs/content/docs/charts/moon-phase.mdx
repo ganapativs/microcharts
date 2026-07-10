@@ -61,6 +61,23 @@ sequence.
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="out-of-range values clamp, they don't overflow"
+  code={`<MoonPhase value={-0.4} title="Below zero" /> // clamps to 0 — new, dark disc
+<MoonPhase value={1.6} title="Above one" />    // clamps to 1 — full, lit disc`}
+>
+  <span className="inline-flex gap-3 items-center">
+    <MoonPhase value={-0.4} size={28} title="Below zero" />
+    <MoonPhase value={1.6} size={28} title="Above one" />
+  </span>
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="moon-phase" />
+
 ## Why this default
 
 Progress mode is the default because period-progress is the common need — a sprint or quota filling

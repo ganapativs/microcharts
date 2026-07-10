@@ -14,7 +14,12 @@ day's value reach for `ActivityGrid` or `HeatStrip`.
   sizeOf="spiral-year"
   code={`import { SpiralYear } from "@microcharts/react/spiral-year";
 
-const byWeek = [/* 52 weekly values */];
+// 52 weekly values, a summer peak in week 30
+const byWeek = [
+85, 95, 107, 120, 135, 150, 166, 183, 200, 217, 234, 250, 265, 280, 293, 305, 315, 324, 331, 336,
+339, 340, 339, 336, 331, 324, 315, 305, 293, 480, 265, 250, 234, 217, 200, 183, 166, 150, 135,
+120, 107, 95, 85, 76, 69, 64, 61, 60, 61, 64, 69, 76,
+];
 
 <SpiralYear data={byWeek} title="Seasonality" />`}
 >
@@ -42,7 +47,12 @@ const byWeek = [/* 52 weekly values */];
 
 <LiveDemo
   label="arc marks, or three steps for tiny sizes"
-  code={`<SpiralYear data={byWeek} mark="arc" />
+  code={`const byWeek = Array.from({ length: 52 }, (_, i) => {
+  const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2));
+  return i === 29 ? 480 : s; // a summer peak in week 30
+});
+
+<SpiralYear data={byWeek} mark="arc" />
 <SpiralYear data={byWeek} steps={3} />`}
 >
   <span className="inline-flex gap-6 items-center">
@@ -67,9 +77,49 @@ const byWeek = [/* 52 weekly values */];
   </span>
 </LiveDemo>
 
+`locale` doesn't change any in-chart mark — opacity steps carry the value, never a printed number —
+but it does localize the peak and low values named in the accessible summary:
+
+<LiveDemo
+  label="locale — the accessible summary follows it (no visible mark changes)"
+  code={`const byWeek = Array.from({ length: 52 }, (_, i) => {
+  const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2));
+  return i === 29 ? 1480 : s;
+});
+
+<SpiralYear data={byWeek} locale="de-DE" />`}
+>
+  <SpiralYear
+    data={Array.from({ length: 52 }, (_, i) => {
+      const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2));
+      return i === 29 ? 1480 : s;
+    })}
+    locale="de-DE"
+    title="Localized summary"
+    size={64}
+  />
+</LiveDemo>
+
 ## Sizing
 
 <Sizing chart="spiral-year" />
+
+## Edge cases
+
+<LiveDemo
+  label="a gap — a null week leaves a hole, not a low mark"
+  code={`<SpiralYear data={[80, 120, null, 90, 140]} title="With a gap" />`}
+>
+  <SpiralYear data={[80, 120, null, 90, 140]} title="With a gap" size={56} />
+</LiveDemo>
+
+<LiveDemo label="no data yet" code={`<SpiralYear data={[]} title="Empty" />`}>
+  <SpiralYear data={[]} title="Empty" size={56} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="spiral-year" />
 
 ## Why this default
 

@@ -19,7 +19,7 @@ export const entry: ChartEntry = {
   interactiveImport: `${PKG}/polar-clock/interactive`,
   dataShape: "(number | null)[]",
   encoding: { channel: "radial bar length at a fixed cycle angle", precision: "medium" },
-  nodeBudget: "3",
+  nodeBudget: "4",
   bestFor: [
     "the shape of a 24-hour or 7-day cycle",
     "when a metric is busy across the cycle",
@@ -55,11 +55,26 @@ export const entry: ChartEntry = {
       required: false,
       description: "Index rendered at 12 o'clock (week-start / midnight).",
     },
+    {
+      name: "labels",
+      type: "boolean",
+      required: false,
+      description:
+        "Hairline cardinal ticks at 0/¼/½/¾ — the at-rest orientation cue. Default true.",
+    },
   ],
   demo: DAY,
   example: {
     title: "Traffic by hour",
-    code: `import { PolarClock } from "${PKG}/polar-clock";\n\nconst byHour = [/* 24 values, midnight → 23:00 */];\n\n<PolarClock data={byHour} now={14} title="Traffic by hour" />`,
+    code: `import { PolarClock } from "${PKG}/polar-clock";
+
+// 24 hourly values, midnight → 23:00
+const byHour = [
+  80, 81, 82, 83, 20, 85, 86, 87, 88, 89, 90, 91, 92, 93, 312, 95, 96, 97, 98, 99, 100, 101, 102,
+  103,
+];
+
+<PolarClock data={byHour} now={14} title="Traffic by hour" />`,
   },
 };
 
@@ -82,7 +97,7 @@ export const playground: PlaygroundSpec = {
       options: ["length", "opacity"],
       init: "length",
     },
-    { kind: "segmented", key: "labels", label: "ticks", options: ["off", "on"], init: "off" },
+    { kind: "segmented", key: "labels", label: "ticks", options: ["on", "off"], init: "on" },
   ],
   render: (s) => (
     <PolarClock
@@ -100,7 +115,7 @@ export const playground: PlaygroundSpec = {
       "  data={byHour}",
       `  now={${s.now}}`,
       s.mode !== "length" && `  mode="${s.mode}"`,
-      s.labels === "on" && "  labels",
+      s.labels === "off" && "  labels={false}",
       "/>",
     ]
       .filter(Boolean)

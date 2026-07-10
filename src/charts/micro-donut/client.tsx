@@ -137,7 +137,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
             d={wedge.d}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

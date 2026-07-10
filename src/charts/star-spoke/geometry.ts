@@ -19,7 +19,7 @@ export interface Spoke {
 
 export function starSpokeGeometry(opts: {
   values: readonly number[];
-  domain: [number, number];
+  domain: readonly [number, number];
   width: number;
   height: number;
   /** Margin from the edge — larger reserves a ring for tip labels. */

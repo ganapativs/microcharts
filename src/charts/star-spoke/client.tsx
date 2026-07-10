@@ -1,13 +1,11 @@
 "use client";
 // Interactive <StarSpoke> (plan/25 §9). One pointer listener; nearest spoke by
 // angle. ←/→ rotate focus through the spokes. Composes the static component.
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useMemo, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_STAR_SPOKE } from "../../core/strings-star-spoke.js";
 import { starSpokeGeometry } from "./geometry.js";
 import { StarSpoke as StaticStarSpoke, starSpokeSummary, type StarSpokeProps } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export function StarSpoke(props: StarSpokeProps): React.ReactNode {
   const {
@@ -116,7 +114,6 @@ export function StarSpoke(props: StarSpokeProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
       >
         {spoke ? (
           <line
@@ -126,7 +123,7 @@ export function StarSpoke(props: StarSpokeProps): React.ReactNode {
             y2={spoke.y2}
             stroke="var(--mc-accent)"
             strokeLinecap="round"
-            strokeWidth={1.8}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

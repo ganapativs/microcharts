@@ -100,6 +100,8 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
             r={(ring.rInner + ring.rOuter) / 2}
             fill="none"
             stroke="var(--mc-accent)"
+            // geometric, not a role: this literal IS the ring's own thickness
+            // (the data-encoded channel), so the focus halo matches its width exactly
             strokeWidth={Math.max(1, ring.rOuter - ring.rInner)}
             strokeOpacity={0.3}
             vectorEffect="non-scaling-stroke"

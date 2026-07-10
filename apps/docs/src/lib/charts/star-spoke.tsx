@@ -35,9 +35,9 @@ export const entry: ChartEntry = {
     },
     {
       name: "dots",
-      type: "boolean",
+      type: '"tips" | "none"',
       required: false,
-      description: "Endpoint dots sharpen the outlier read.",
+      description: '`"tips"` draws endpoint dots to sharpen the outlier read.',
     },
     {
       name: "guides",
@@ -55,7 +55,17 @@ export const entry: ChartEntry = {
   demo: [90, 60, 50, 30, 70],
   example: {
     title: "Product profile",
-    code: `import { StarSpoke } from "${PKG}/star-spoke";\n\n<StarSpoke data={metrics} title="Product profile" />`,
+    code: `import { StarSpoke } from "${PKG}/star-spoke";
+
+const metrics = [
+  { label: "Speed", value: 0.9 },
+  { label: "Power", value: 0.6 },
+  { label: "Range", value: 0.5 },
+  { label: "Cost", value: 0.3 },
+  { label: "Ease", value: 0.7 },
+];
+
+<StarSpoke data={metrics} title="Product profile" />`,
   },
 };
 
@@ -65,7 +75,7 @@ export function Preview() {
 
 export const showcase = {
   hint: "profile",
-  Node: () => <StarSpoke data={PROFILE} dots title="Product profile" size={84} />,
+  Node: () => <StarSpoke data={PROFILE} dots="tips" title="Product profile" size={84} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -78,7 +88,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <StarSpoke
       data={PROFILE}
-      dots={s.dots as boolean}
+      dots={s.dots ? "tips" : "none"}
       guides={s.guides as boolean}
       compare={s.compare ? [0.5, 0.5, 0.5, 0.5, 0.5] : undefined}
       labels={s.labels as boolean}
@@ -90,7 +100,7 @@ export const playground: PlaygroundSpec = {
     [
       "<StarSpoke",
       "  data={metrics}",
-      s.dots === true && "  dots",
+      s.dots === true && '  dots="tips"',
       s.guides === false && "  guides={false}",
       s.compare === true && "  compare={baseline}",
       s.labels === true && "  labels",
@@ -108,12 +118,12 @@ export const recipes: Recipe[] = [
   },
   {
     label: "vs baseline",
-    code: `<StarSpoke data={metrics} compare={baseline} dots />`,
+    code: `<StarSpoke data={metrics} compare={baseline} dots="tips" />`,
     node: (
       <StarSpoke
         data={PROFILE}
         compare={[0.5, 0.5, 0.5, 0.5, 0.5]}
-        dots
+        dots="tips"
         summary={false}
         size={64}
       />

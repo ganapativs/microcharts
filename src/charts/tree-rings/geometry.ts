@@ -20,8 +20,9 @@ export interface TreeRingsGeometry {
   maxR: number;
 }
 
-/** A full circle as two half-arcs, 2-dp. */
-function circle(cx: number, cy: number, r: number): string {
+/** A full circle as two half-arcs, 2-dp — exported so multiple ring outlines
+ *  can be merged into one path (SSR hot path: one node, not N — plan/25 brief §per-chart 4). */
+export function ringOutline(cx: number, cy: number, r: number): string {
   const l = round2(cx - r);
   const rt = round2(cx + r);
   const rr = round2(r);
@@ -31,7 +32,7 @@ function circle(cx: number, cy: number, r: number): string {
 /** Full annulus (outer + inner ring); render with fill-rule evenodd. Inlined
  *  (not core/arc) and built only for the fill variant to keep the static lean. */
 export function ringAnnulus(cx: number, cy: number, rOuter: number, rInner: number): string {
-  return `${circle(cx, cy, rOuter)}${circle(cx, cy, rInner)}`;
+  return `${ringOutline(cx, cy, rOuter)}${ringOutline(cx, cy, rInner)}`;
 }
 
 export function treeRingsGeometry(opts: {

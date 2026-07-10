@@ -10,6 +10,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_SPIRAL_YEAR, type SpiralYearStrings } from "../../core/strings-spiral-year.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { dayOfYear } from "../../core/calendar-grid.js";
+import type { Value } from "../../core/types.js";
 import { spiralYearGeometry } from "./geometry.js";
 
 /** Opacity ramp indexed by step (up to 5). Newest/highest = most opaque. */
@@ -17,7 +18,7 @@ const OPACITY = [0.16, 0.34, 0.52, 0.72, 1] as const;
 const OPACITY_3 = [0.24, 0.56, 1] as const;
 
 export interface SpiralYearProps {
-  data: readonly (number | null)[];
+  data: readonly Value[];
   /** Cadence; inferred from length (≈52 → week, else day) when omitted. */
   cadence?: "day" | "week" | undefined;
   /** ISO date anchoring index 0 to a calendar angle. */
@@ -53,7 +54,7 @@ export function periodLabel(index: number, cadence: "day" | "week"): string {
 }
 
 export function spiralYearSummary(
-  data: readonly (number | null)[],
+  data: readonly Value[],
   opts: {
     cadence?: "day" | "week" | undefined;
     strings?: SpiralYearStrings | undefined;
@@ -124,7 +125,6 @@ export function SpiralYear(props: SpiralYearProps): ReactNode {
     summary === false
       ? false
       : (summary ?? spiralYearSummary(data, { cadence: cadenceProp, strings, format, locale }));
-  const fill = color ?? "var(--mc-stroke)";
   const ramp = steps === 3 ? OPACITY_3 : OPACITY;
   const isArc = mark === "arc";
 
@@ -138,28 +138,25 @@ export function SpiralYear(props: SpiralYearProps): ReactNode {
       className={className ? `mc-spiral ${className}` : "mc-spiral"}
       style={style}
     >
-      {monthTicks
-        ? geo.monthTicks.map((t) => (
-            <line
-              key={`m${t.x1}-${t.y1}`}
-              x1={t.x1}
-              y1={t.y1}
-              x2={t.x2}
-              y2={t.y2}
-              data-mc-ink="muted"
-              style={{ strokeWidth: 0.4, strokeOpacity: 0.5 }}
-            />
-          ))
-        : null}
+      {monthTicks && geo.monthTicksPath ? (
+        <path
+          d={geo.monthTicksPath}
+          data-mc-ink="muted"
+          data-mc-w="hair"
+          style={{ strokeOpacity: 0.5 }}
+        />
+      ) : null}
       {geo.stepPaths.map((d, step) =>
         d ? (
           <path
             key={`s${ramp[step]}`}
             d={d}
+            data-mc-ink={isArc ? "data" : "bar"}
+            data-mc-w={isArc ? "support" : undefined}
             style={
               isArc
-                ? { fill: "none", stroke: fill, strokeWidth: 1, strokeOpacity: ramp[step] }
-                : { fill, fillOpacity: ramp[step] }
+                ? { ...(color ? { stroke: color } : null), strokeOpacity: ramp[step] }
+                : { ...(color ? { fill: color } : null), fillOpacity: ramp[step] }
             }
           />
         ) : null,

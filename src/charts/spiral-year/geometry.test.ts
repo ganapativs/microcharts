@@ -57,12 +57,13 @@ describe("spiralYearGeometry (plan/24 #18) — calendar spiral", () => {
     expect(Math.min(...steps)).toBe(0);
   });
 
-  it("day cadence emits 12 month ticks", () => {
+  it("day cadence emits 12 month ticks merged into one path", () => {
     const geo = g(
       Array.from({ length: 365 }, (_, i) => i),
       { cadence: "day" },
     );
-    expect(geo.monthTicks.length).toBe(12);
+    // 12 "M" (moveto) commands = 12 ticks, all in one path string (one node).
+    expect((geo.monthTicksPath.match(/M/g) ?? []).length).toBe(12);
   });
 
   it("mark='arc' produces arc subpaths, not circles", () => {

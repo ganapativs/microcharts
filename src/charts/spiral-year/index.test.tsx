@@ -22,15 +22,17 @@ describe("<SpiralYear> (plan/24 #18)", () => {
     expect(spiralYearSummary(days)).toBe("120 days; peak 119 in day 120, low in day 1.");
   });
 
-  it("renders month ticks + ≤ steps mark paths", () => {
+  it("renders the 12 month ticks merged into one path + ≤ steps mark paths", () => {
     const { container } = draw(<SpiralYear data={YEAR} size={48} />);
-    expect(container.querySelectorAll('line[data-mc-ink="muted"]').length).toBe(12);
-    expect(container.querySelectorAll("path").length).toBeLessThanOrEqual(5);
+    const ticks = container.querySelector('path[data-mc-ink="muted"]');
+    expect(ticks).not.toBeNull();
+    expect((ticks!.getAttribute("d")!.match(/M/g) ?? []).length).toBe(12);
+    expect(container.querySelectorAll("path").length).toBeLessThanOrEqual(6);
   });
 
   it("monthTicks={false} drops the ticks", () => {
     const { container } = draw(<SpiralYear data={YEAR} monthTicks={false} />);
-    expect(container.querySelector('line[data-mc-ink="muted"]')).toBeNull();
+    expect(container.querySelector('path[data-mc-ink="muted"]')).toBeNull();
   });
 
   it("steps=3 quantizes to three levels", () => {
