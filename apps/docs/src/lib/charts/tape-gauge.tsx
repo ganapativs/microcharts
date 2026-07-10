@@ -71,13 +71,13 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <TapeGauge value={142} rate={1} zones={ZONES} summary={false} width={40} height={56} />;
+  return <TapeGauge value={142} rate={1} zones={ZONES} summary={false} width={46} height={60} />;
 }
 
 export const showcase = {
   hint: "rising into caution",
   Node: () => (
-    <TapeGauge value={142} rate={1} zones={ZONES} title="Airspeed" width={40} height={56} />
+    <TapeGauge value={142} rate={1} zones={ZONES} title="Airspeed" width={46} height={60} />
   ),
 };
 
@@ -125,7 +125,7 @@ export const recipes: Recipe[] = [
   {
     label: "KPI card",
     code: `<TapeGauge value={142} rate={1} zones={zones} title="Airspeed" />`,
-    node: <TapeGauge value={142} rate={1} zones={ZONES} summary={false} width={40} height={64} />,
+    node: <TapeGauge value={142} rate={1} zones={ZONES} summary={false} width={46} height={68} />,
   },
   {
     label: "horizontal cell",

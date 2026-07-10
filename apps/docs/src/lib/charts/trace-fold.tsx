@@ -62,12 +62,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <TraceFold data={TRACE} format={ms} summary={false} width={140} height={32} />;
+  return <TraceFold data={TRACE} format={ms} summary={false} width={180} height={48} />;
 }
 
 export const showcase = {
   hint: "critical path",
-  Node: () => <TraceFold data={TRACE} format={ms} title="Request trace" width={140} height={32} />,
+  Node: () => <TraceFold data={TRACE} format={ms} title="Request trace" width={180} height={48} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -89,7 +89,7 @@ export const playground: PlaygroundSpec = {
       format={ms}
       summary={false}
       width={320}
-      height={40}
+      height={48}
     />
   ),
   code: (s) =>
@@ -113,7 +113,7 @@ export const recipes: Recipe[] = [
   {
     label: "structure audit",
     code: `<TraceFold data={spans} emphasis="none" />`,
-    node: <TraceFold data={TRACE} emphasis="none" summary={false} width={220} height={36} />,
+    node: <TraceFold data={TRACE} emphasis="none" summary={false} width={220} height={44} />,
   },
 ];
 

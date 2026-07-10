@@ -65,7 +65,7 @@ seriesEdgeSuite("Hypnogram", (data: readonly Value[]) => (
   // edge values go in the numeric `t` field (what geometry consumes); states are
   // stable labels so the leak check tests numbers, not deliberately-named states
   <Hypnogram
-    data={data.map((v, i) => ({ t: v, state: ["Wake", "Light", "Deep"][i % 3]! }))}
+    data={data.map((v, i) => ({ t: v as number, state: ["Wake", "Light", "Deep"][i % 3]! }))}
     title="Edge"
   />
 ));

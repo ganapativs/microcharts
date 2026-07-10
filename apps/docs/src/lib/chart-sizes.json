@@ -380,14 +380,14 @@
   },
   "trace-fold": {
     "static": 2.2,
-    "interactive": 3.22
+    "interactive": 3.23
   },
   "tape-gauge": {
     "static": 2.78,
     "interactive": 3.2
   },
   "station-glyph": {
-    "static": 2.98,
+    "static": 2.97,
     "interactive": 3.54
   },
   "annotations": {

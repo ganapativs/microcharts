@@ -95,8 +95,8 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     rateTiers: tiersProp,
     orientation = "vertical",
     label = "value",
-    width = 40,
-    height = 56,
+    width = 46,
+    height = 60,
     format,
     locale,
     strings = EN_TAPE_GAUGE,
@@ -111,7 +111,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const span = spanProp && spanProp > 0 ? spanProp : autoSpan(value, zones, rate);
   const tiers = tiersProp ?? [span / 60, span / 15];
   const fmt = makeFormatter(format, locale);
-  const tickFont = 6;
+  const tickFont = 7;
   const vertical = orientation !== "horizontal";
   const geo = tapeGaugeGeometry({ value, span, zones, tick: null, width, height, orientation });
   const accName =
@@ -126,7 +126,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   // the readout is the hero number — sized large, then clamped to fit its gutter
   const est = (chars: number, f: number): number => 0.62 * f * chars;
   const readoutAvail = (vertical ? geo.readout.gutter : width) - 1.6;
-  const readoutBase = Math.min(12, Math.max(8, Math.round(Math.min(width, height) * 0.22)));
+  const readoutBase = Math.min(13, Math.max(9, Math.round(Math.min(width, height) * 0.24)));
   const readoutFont = Math.max(
     6.5,
     Math.min(readoutBase, readoutAvail / est(valueText.length || 1, 1)),

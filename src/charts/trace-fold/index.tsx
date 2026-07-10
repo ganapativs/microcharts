@@ -65,10 +65,11 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
   } = props;
 
   const depthCount = Math.max(1, new Set(data.slice(0, 40).map((s) => s.depth)).size);
-  const height = heightProp ?? Math.min(48, Math.max(16, depthCount * 10));
+  // rows tall enough to seat a legible in-bar label
+  const height = heightProp ?? Math.min(72, Math.max(24, depthCount * 16));
   const rowGap = 1.2;
   const fmt = makeFormatter(format, locale);
-  const fontSize = labelFont(height / depthCount, 0.5);
+  const fontSize = labelFont(height / depthCount, 0.6);
 
   const geo = traceFoldGeometry({ data, width, height, rowGap });
   const accName = summary === false ? false : (summary ?? traceFoldSummary(geo, strings, fmt));

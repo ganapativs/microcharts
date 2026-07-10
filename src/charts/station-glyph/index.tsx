@@ -105,7 +105,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     dewpoint,
     pressure,
     station,
-    size = 44,
+    size = 48,
     format,
     locale,
     strings = EN_STATION_GLYPH,
@@ -118,7 +118,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const font = labelFont(size, 0.17);
+  const font = labelFont(size, 0.22);
 
   const est = (s: string): number => 0.62 * font * s.length;
   const tempT = temp != null && Number.isFinite(temp) ? `${fmt(temp)}°` : null;
