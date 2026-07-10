@@ -39,7 +39,7 @@
 
 **SCOPE DECISION 2026-07-08 (user):** the release-scope fork is resolved — **all 100 catalog types ship in `@microcharts/react` (single package, `@microcharts/expressive` cancelled) BEFORE launch** (96 planned + 4 research-verified additions 2026-07-08: MicroScatter #35, LikertStrip #36, IconArray Q21, ConfusionGrid F21 — plan/12 audit). Master plan [21-full-catalog-buildout.md](21-full-catalog-buildout.md); batch briefs plan/22–25; Checkpoint 3 + Phase 4 launch move after the buildout (Phase 3.75). Next execution front = **Batch 0** (plan/21 §6): docs registry refactor → size/stats generators → kernel additions → shipped-five hardening/variant pass.
 
-Pending one-time account setup (unblocks release/visual workflows): npmjs Trusted Publisher for `@microcharts/react`, `ARGOS_TOKEN` secret.
+Account setup: npmjs Trusted Publisher **CONFIGURED + WORKING** (0.1.0 published via OIDC 2026-07-09, run 29033491214). Still pending: `ARGOS_TOKEN` secret (visual.yml uploads).
 
 **RESOLVED (2026-07-08, user):** sparkline **3.35/4.35 kB approved as a documented flagship exception** to the 3/4 kB hard caps (long-series guard + `label="minmax"` on the densest chart; trim ledger in plan/12). Recorded in `scripts/size-budgets.json` `$exception` + plan/21 §1. Standard caps stay law for every other chart.
 
