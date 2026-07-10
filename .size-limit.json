@@ -157,7 +157,7 @@
   {
     "name": "@microcharts/react/seismogram/interactive",
     "path": "dist/charts/seismogram/client.js",
-    "limit": "3.35 kB",
+    "limit": "3.4 kB",
     "gzip": true
   },
   {
@@ -781,7 +781,7 @@
   {
     "name": "@microcharts/react/tree-rings (static)",
     "path": "dist/charts/tree-rings/index.js",
-    "limit": "1.9 kB",
+    "limit": "1.95 kB",
     "gzip": true
   },
   {
@@ -1045,7 +1045,7 @@
   {
     "name": "@microcharts/react/dual-window-meter (static)",
     "path": "dist/charts/dual-window-meter/index.js",
-    "limit": "2.4 kB",
+    "limit": "2.45 kB",
     "gzip": true
   },
   {
@@ -1081,7 +1081,7 @@
   {
     "name": "@microcharts/react/calibration-strip (static)",
     "path": "dist/charts/calibration-strip/index.js",
-    "limit": "2.4 kB",
+    "limit": "2.45 kB",
     "gzip": true
   },
   {

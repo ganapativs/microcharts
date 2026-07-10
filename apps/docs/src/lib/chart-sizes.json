@@ -49,10 +49,10 @@
   },
   "seismogram": {
     "static": 2.38,
-    "interactive": 3.34
+    "interactive": 3.36
   },
   "heat-strip": {
-    "static": 2.28,
+    "static": 2.27,
     "interactive": 3.1
   },
   "dot-plot": {
@@ -76,15 +76,15 @@
     "interactive": 3.01
   },
   "segmented-bar": {
-    "static": 2.33,
-    "interactive": 3.21
+    "static": 2.35,
+    "interactive": 3.23
   },
   "histogram-strip": {
     "static": 2.07,
     "interactive": 2.83
   },
   "micro-box": {
-    "static": 2.56,
+    "static": 2.57,
     "interactive": 3.37
   },
   "progress-ring": {
@@ -92,12 +92,12 @@
     "interactive": 2.48
   },
   "micro-donut": {
-    "static": 2.35,
+    "static": 2.34,
     "interactive": 3.31
   },
   "funnel": {
-    "static": 2.12,
-    "interactive": 2.96
+    "static": 2.14,
+    "interactive": 2.99
   },
   "likert-strip": {
     "static": 2.6,
@@ -120,8 +120,8 @@
     "interactive": 3.85
   },
   "ohlc": {
-    "static": 2.4,
-    "interactive": 3.22
+    "static": 2.42,
+    "interactive": 3.23
   },
   "horizon": {
     "static": 2.29,
@@ -132,23 +132,23 @@
     "interactive": 3.44
   },
   "event-timeline": {
-    "static": 2.64,
-    "interactive": 3.75
+    "static": 2.63,
+    "interactive": 3.74
   },
   "coverage-strip": {
-    "static": 2.24,
-    "interactive": 3.11
+    "static": 2.22,
+    "interactive": 3.1
   },
   "benchmark-strip": {
     "static": 2.7,
-    "interactive": 3.48
+    "interactive": 3.47
   },
   "percentile-ladder": {
-    "static": 2.92,
-    "interactive": 3.78
+    "static": 2.91,
+    "interactive": 3.75
   },
   "graded-band": {
-    "static": 2.68,
+    "static": 2.67,
     "interactive": 3.52
   },
   "net-flow": {
@@ -169,7 +169,7 @@
   },
   "control-strip": {
     "static": 2.68,
-    "interactive": 3.56
+    "interactive": 3.55
   },
   "forecast-cone": {
     "static": 2.83,
@@ -180,8 +180,8 @@
     "interactive": 3.2
   },
   "ab-strips": {
-    "static": 2.79,
-    "interactive": 3.7
+    "static": 2.75,
+    "interactive": 3.66
   },
   "shift-histogram": {
     "static": 2.87,
@@ -233,7 +233,7 @@
   },
   "moon-phase": {
     "static": 1.25,
-    "interactive": 1.84
+    "interactive": 1.86
   },
   "hourglass": {
     "static": 1.65,
@@ -260,8 +260,8 @@
     "interactive": 3.32
   },
   "tree-rings": {
-    "static": 1.86,
-    "interactive": 2.67
+    "static": 1.93,
+    "interactive": 2.73
   },
   "city-skyline": {
     "static": 1.94,
@@ -276,12 +276,12 @@
     "interactive": 3.75
   },
   "polar-clock": {
-    "static": 2.94,
-    "interactive": 3.82
+    "static": 2.89,
+    "interactive": 3.77
   },
   "spiral-year": {
-    "static": 2.73,
-    "interactive": 3.61
+    "static": 2.66,
+    "interactive": 3.56
   },
   "breathing-dot": {
     "static": 1.6,
@@ -296,8 +296,8 @@
     "interactive": 3.14
   },
   "orbit-status": {
-    "static": 2.09,
-    "interactive": 2.97
+    "static": 2.07,
+    "interactive": 2.96
   },
   "rate-volume": {
     "static": 2.55,
@@ -308,8 +308,8 @@
     "interactive": 2.94
   },
   "time-in-range": {
-    "static": 2.01,
-    "interactive": 2.88
+    "static": 2.17,
+    "interactive": 3.05
   },
   "hypnogram": {
     "static": 2.48,
@@ -328,8 +328,8 @@
     "interactive": 3.58
   },
   "rubric-strip": {
-    "static": 2.17,
-    "interactive": 3
+    "static": 2.18,
+    "interactive": 3.02
   },
   "token-confidence": {
     "static": 0.98,
@@ -339,28 +339,28 @@
     "static": 2.39
   },
   "star-spoke": {
-    "static": 2.08,
-    "interactive": 2.95
+    "static": 2.13,
+    "interactive": 3
   },
   "minimap-strip": {
-    "static": 2.35,
-    "interactive": 3.07
+    "static": 2.36,
+    "interactive": 3.08
   },
   "dual-window-meter": {
-    "static": 2.37,
-    "interactive": 3.21
+    "static": 2.4,
+    "interactive": 3.24
   },
   "depth-wedge": {
-    "static": 2.11,
-    "interactive": 2.91
+    "static": 2.1,
+    "interactive": 2.89
   },
   "partition-strip": {
-    "static": 2.1,
-    "interactive": 3.06
+    "static": 2.04,
+    "interactive": 3
   },
   "calibration-strip": {
-    "static": 2.4,
-    "interactive": 3.22
+    "static": 2.42,
+    "interactive": 3.23
   },
   "confusion-grid": {
     "static": 2.31,
@@ -371,20 +371,20 @@
     "interactive": 3.04
   },
   "volume-profile": {
-    "static": 2.51,
-    "interactive": 3.36
+    "static": 2.58,
+    "interactive": 3.48
   },
   "phase-trace": {
     "static": 2.27,
     "interactive": 3.13
   },
   "trace-fold": {
-    "static": 2.2,
-    "interactive": 3.23
+    "static": 2.14,
+    "interactive": 3.18
   },
   "tape-gauge": {
-    "static": 2.81,
-    "interactive": 3.23
+    "static": 2.8,
+    "interactive": 3.22
   },
   "station-glyph": {
     "static": 2.96,

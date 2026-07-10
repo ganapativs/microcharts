@@ -41,7 +41,7 @@ function gallery(): string {
     svg({ data: LATENCY, width: 120, title: "p50/90/99" }),
     svg({ data: LATENCY, scale: "log", width: 120, title: "log" }),
     svg({ data: LATENCY, ps: [50, 95, 99.9], label: "values", width: 140, title: "values" }),
-    svg({ data: LATENCY, dots: true, width: 120, title: "dots" }),
+    svg({ data: LATENCY, marks: "dot", width: 120, title: "dots" }),
     svg({ data: [7, 7, 7, 7], width: 120, title: "all equal" }),
   ].join(" ");
 

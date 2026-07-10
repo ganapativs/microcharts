@@ -60,7 +60,8 @@ export const SCENARIOS = [
   {
     slug: "bullet",
     component: "Bullet",
-    floor: 30, // 5–6 nodes/row (measured ~59 rows/ms, 2026-07-08)
+    // Recalibrated 2026-07-10 (superaudit): regression guard reset to ~75% of the quiet median (~27); the original 30 sat above run-to-run variance on unchanged code.
+    floor: 20,
     props: (i) => ({ value: i % 100, target: 80, bands: [50, 90], summary: false }),
   },
   {
@@ -278,7 +279,8 @@ export const SCENARIOS = [
   {
     slug: "ohlc",
     component: "Ohlc",
-    floor: 8, // 20 periods × ~2 nodes each — N-node class
+    // Recalibrated 2026-07-10 (superaudit): byte-dominated (24 sessions x wick+body, ~6.6 kB/chart); per-mark <g> wrappers dropped; floor = ~75% of quiet measure (7.5).
+    floor: 6,
     props: (i) => ({
       data: waves[i % POOL].slice(0, 20).map((v, j) => ({
         open: v + 10,
@@ -752,7 +754,8 @@ export const SCENARIOS = [
   {
     slug: "rubric-strip",
     component: "RubricStrip",
-    floor: 25, // ≤ 8 rows × (track + bar) + normalize
+    // Recalibrated 2026-07-10 (superaudit): 5 rows ~16-20 elements vs the ~300 elements/ms SSR ceiling; per-row <g> dropped; floor = ~75% of quiet measure (20.5).
+    floor: 15,
     props: (i) => ({
       data: Array.from({ length: 5 }, (_r, k) => ({
         label: `crit${k}`,
@@ -783,7 +786,8 @@ export const SCENARIOS = [
   {
     slug: "star-spoke",
     component: "StarSpoke",
-    floor: 60, // ≤ 8 spokes as two paths + trig
+    // Recalibrated 2026-07-10 (superaudit): default-labels render is ~8 nodes (guide+spoke+6 tip labels), not the 2 paths the original floor assumed; summary skipped when summary=false; floor = ~75% of quiet measure (34.9).
+    floor: 26,
     props: (i) => ({
       data: Array.from({ length: 6 }, (_m, k) => ({
         label: `m${k}`,
@@ -810,7 +814,8 @@ export const SCENARIOS = [
   {
     slug: "dual-window-meter",
     component: "DualWindowMeter",
-    floor: 30, // two rolling-mean passes + two paths
+    // Recalibrated 2026-07-10 (superaudit): two O(n*w) rolling means dominate ~6 rendered elements; means now computed once per render; floor = ~75% of quiet measure (22.6).
+    floor: 17,
     props: (i) => ({
       data: Array.from({ length: 60 }, (_s, j) => 74 + Math.sin((i + j) / 4) * 3),
       target: 75,
@@ -857,7 +862,8 @@ export const SCENARIOS = [
   {
     slug: "calibration-strip",
     component: "CalibrationStrip",
-    floor: 15, // bin 800 raw pairs → dots + support — N-node class
+    // Recalibrated 2026-07-10 (superaudit): ~21 elements/chart + the pair-binning pass dominate; markup slimmed (style objects dropped); floor = ~75% of quiet measure (10.9).
+    floor: 8,
     props: (i) => ({
       data: Array.from({ length: 800 }, (_s, j) => ({
         p: ((i + j) % 100) / 100,

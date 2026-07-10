@@ -237,6 +237,8 @@ export interface SummaryStrings {
   likert: (agreePct: string, disagreePct: string, neutralPct: string | null) => string;
   /** Lean clause, e.g. "Leans positive." */
   likertLean: (direction: "positive" | "negative" | "balanced") => string;
+  /** Interactive level announcement, e.g. "Agree: 34%, level 4 of 5." */
+  likertAt: (label: string, pct: string, level: number, total: number) => string;
   /** All-neutral / empty likert rows. */
   allNeutral: string;
   noResponses: string;

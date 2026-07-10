@@ -1543,6 +1543,9 @@ const ALLOWED = (line) =>
   // invisible to the gate via a data-mc-ink="band" attr the superaudit removed
   // as a role misuse.)
   /^(trace-fold|partition-strip) .*TEXT-ON-MARK "[^"]*" over rect/.test(line) ||
+  // TimeInRange zone percents render CENTERED INSIDE their zone rects with
+  // on-fill ink (plan/25 §1) — the rect is the label's home.
+  /^time-in-range .*TEXT-ON-MARK "\d+%" over rect/.test(line) ||
   // FillWord stacks an accent copy of the word ON the muted base — that exact
   // same-word overlap IS the "label is the bar" encoding, not a collision.
   /^fill-word .*TEXT-TEXT "([^"]+)" × "\1"$/.test(line) ||

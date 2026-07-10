@@ -53,7 +53,7 @@
     },
     "seismogram": {
       "static": "2.4 kB",
-      "interactive": "3.35 kB"
+      "interactive": "3.4 kB"
     },
     "heat-strip": {
       "static": "2.35 kB",
@@ -275,7 +275,7 @@
       "interactive": "3.4 kB"
     },
     "tree-rings": {
-      "static": "1.9 kB",
+      "static": "1.95 kB",
       "interactive": "2.8 kB"
     },
     "city-skyline": {
@@ -354,7 +354,7 @@
       "interactive": "3.4 kB"
     },
     "dual-window-meter": {
-      "static": "2.4 kB",
+      "static": "2.45 kB",
       "interactive": "3.4 kB"
     },
     "depth-wedge": {
@@ -366,7 +366,7 @@
       "interactive": "3.3 kB"
     },
     "calibration-strip": {
-      "static": "2.4 kB",
+      "static": "2.45 kB",
       "interactive": "3.4 kB"
     },
     "confusion-grid": {

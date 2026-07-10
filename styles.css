@@ -232,6 +232,15 @@
     fill: none;
     stroke: var(--mc-accent);
   }
+  /* valence on stroked marks (seismogram spikes) — same element-split */
+  :where(.mc-root :is(path, line, polyline)[data-mc-ink="positive"]) {
+    fill: none;
+    stroke: var(--mc-positive);
+  }
+  :where(.mc-root :is(path, line, polyline)[data-mc-ink="negative"]) {
+    fill: none;
+    stroke: var(--mc-negative);
+  }
   /* width roles — orthogonal to ink (color) roles, composable on any stroked
      mark. Ratios of the primary width so presets and prefers-contrast retune
      every stroke in a chart, not just the data line. At the default 1.5 these
