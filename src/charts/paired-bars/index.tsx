@@ -127,7 +127,7 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
                 width={p.refRect.w}
                 height={p.refRect.h}
                 shapeRendering="crispEdges"
-                fill="var(--mc-neutral)"
+                data-mc-ink="neutral"
                 fillOpacity={0.55}
               />
             ) : null}

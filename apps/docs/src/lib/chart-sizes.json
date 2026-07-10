@@ -5,7 +5,7 @@
   },
   "sparkbar": {
     "static": 2.78,
-    "interactive": 3.68
+    "interactive": 3.69
   },
   "delta": {
     "static": 0.92,
@@ -36,16 +36,16 @@
     "interactive": 2.13
   },
   "rug-strip": {
-    "static": 2.26,
+    "static": 2.25,
     "interactive": 3.13
   },
   "mini-bar": {
-    "static": 2.18,
-    "interactive": 3.17
+    "static": 2.17,
+    "interactive": 3.18
   },
   "pictogram-row": {
-    "static": 1.89,
-    "interactive": 2.21
+    "static": 1.91,
+    "interactive": 2.23
   },
   "seismogram": {
     "static": 2.38,
@@ -64,7 +64,7 @@
     "interactive": 3.56
   },
   "paired-bars": {
-    "static": 2.25,
+    "static": 2.24,
     "interactive": 3.17
   },
   "slope": {
@@ -72,15 +72,15 @@
     "interactive": 3.94
   },
   "micro-scatter": {
-    "static": 1.88,
-    "interactive": 3.01
+    "static": 1.89,
+    "interactive": 3.02
   },
   "segmented-bar": {
-    "static": 2.35,
-    "interactive": 3.23
+    "static": 2.32,
+    "interactive": 3.21
   },
   "histogram-strip": {
-    "static": 2.07,
+    "static": 2.08,
     "interactive": 2.83
   },
   "micro-box": {
@@ -116,15 +116,15 @@
     "interactive": 3.81
   },
   "stacked-area": {
-    "static": 2.81,
-    "interactive": 3.85
+    "static": 2.82,
+    "interactive": 3.86
   },
   "ohlc": {
     "static": 2.42,
     "interactive": 3.23
   },
   "horizon": {
-    "static": 2.29,
+    "static": 2.31,
     "interactive": 3.16
   },
   "calendar-strip": {
@@ -172,12 +172,12 @@
     "interactive": 3.55
   },
   "forecast-cone": {
-    "static": 2.83,
-    "interactive": 3.71
+    "static": 2.97,
+    "interactive": 3.85
   },
   "quantile-dots": {
     "static": 2.41,
-    "interactive": 3.2
+    "interactive": 3.21
   },
   "ab-strips": {
     "static": 2.75,
@@ -252,8 +252,8 @@
     "interactive": 2.66
   },
   "bubble-row": {
-    "static": 1.83,
-    "interactive": 2.6
+    "static": 1.85,
+    "interactive": 2.62
   },
   "music-staff": {
     "static": 2.49,
@@ -272,7 +272,7 @@
     "interactive": 2.09
   },
   "constellation": {
-    "static": 2.81,
+    "static": 2.82,
     "interactive": 3.75
   },
   "polar-clock": {
@@ -293,7 +293,7 @@
   },
   "comet-trail": {
     "static": 2.04,
-    "interactive": 3.14
+    "interactive": 3.17
   },
   "orbit-status": {
     "static": 2.07,
@@ -304,8 +304,8 @@
     "interactive": 3.51
   },
   "icon-array": {
-    "static": 2.06,
-    "interactive": 2.94
+    "static": 2.07,
+    "interactive": 2.95
   },
   "time-in-range": {
     "static": 2.17,

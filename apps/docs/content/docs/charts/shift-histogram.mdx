@@ -14,6 +14,9 @@ carries **identity**, not valence (up isn't "good") — that's the whole point o
   sizeOf="shift-histogram"
   code={`import { ShiftHistogram } from "@microcharts/react/shift-histogram";
 
+const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+
 <ShiftHistogram data={{ before, after }} title="The fix" />`}
 >
   <ShiftHistogram
@@ -52,7 +55,11 @@ carries **identity**, not valence (up isn't "good") — that's the whole point o
 
 <LiveDemo
   label="overlay + no shift"
-  code={`<ShiftHistogram data={{ before, after }} mode="overlay" />`}
+  code={`const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+
+<ShiftHistogram data={{ before, after }} mode="overlay" />
+<ShiftHistogram data={{ before, after: before }} />`}
 >
   <span className="inline-flex flex-col gap-2">
     <ShiftHistogram
@@ -78,6 +85,57 @@ carries **identity**, not valence (up isn't "good") — that's the whole point o
     />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<ShiftHistogram
+  data={{ before: [12000, 12400, 12800], after: [9600, 10000, 10400] }}
+  locale="de-DE"
+/>`}
+>
+  <ShiftHistogram
+    data={{ before: [12000, 12400, 12800], after: [9600, 10000, 10400] }}
+    locale="de-DE"
+    title="Localized medians"
+    width={200}
+    height={26}
+  />
+</LiveDemo>
+
+The median shift label and accessible summary follow `format`/`locale` — 12000 reads
+"12.000" under `de-DE` rather than the English "12,000".
+
+## Edge cases
+
+<LiveDemo
+  label="one side empty"
+  code={`// the after sample hasn't landed yet — before renders alone
+const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+
+<ShiftHistogram data={{ before, after: [] }} title="Awaiting after sample" />`}
+>
+  <ShiftHistogram
+    data={{
+      before: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
+      after: [],
+    }}
+    format={(n) => `${Math.round(n)} ms`}
+    title="Awaiting after sample"
+    width={240}
+    height={26}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="both empty"
+  code={`<ShiftHistogram data={{ before: [], after: [] }} title="No data yet" />`}
+>
+  <ShiftHistogram data={{ before: [], after: [] }} title="No data yet" width={200} height={26} />
+</LiveDemo>
+
+With one side empty the chart still renders the populated side's bins alone, and the summary
+names the gap directly — **"Median 116 ms; no after sample."** — never a fabricated shift. With
+both sides empty nothing is plottable and the accessible name says **"No data."**
 
 ## Four homes
 

@@ -41,7 +41,7 @@ describe("<FoldedDayBand> (plan/25 §15, plan/17 F7)", () => {
 
   it("today overlay renders an accent line", () => {
     const { container } = draw(<FoldedDayBand data={DATA} today={TODAY} />);
-    expect(container.querySelector('path[stroke="var(--mc-accent)"]')).not.toBeNull();
+    expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
   });
 
   it("no today → no today clause", () => {

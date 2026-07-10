@@ -142,7 +142,7 @@ export function FoldedDayBand(props: FoldedDayBandProps): React.ReactNode {
             y1={0.5}
             y2={height - 0.5}
             data-mc-ink="muted"
-            strokeWidth={0.75}
+            data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

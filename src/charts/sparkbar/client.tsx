@@ -178,7 +178,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
             height={activeBar.height}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
             shapeRendering="crispEdges"
           />

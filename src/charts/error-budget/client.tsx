@@ -144,7 +144,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
               x2={p.x}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
-              strokeWidth={1}
+              data-mc-w="support"
               strokeDasharray="1.5 2"
               vectorEffect="non-scaling-stroke"
             />
@@ -154,7 +154,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
               r={2.4}
               fill="none"
               stroke="var(--mc-accent)"
-              strokeWidth={1}
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
           </>

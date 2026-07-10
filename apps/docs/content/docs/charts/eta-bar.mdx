@@ -45,11 +45,18 @@ grows — the download bar, told truthfully.
 
 <Sizing chart="eta-bar" />
 
-## Variants
+## Motion, and reduced motion
 
-<LiveDemo label="stalled" code={`<EtaBar progress={0.3} elapsed={40} rate={0} />`}>
-  <EtaBar progress={0.3} elapsed={40} rate={0} title="Stalled transfer" width={280} height={16} />
-</LiveDemo>
+The interactive entry eases the elapsed/remainder split (SVG `x`/`width`) to its new geometry
+whenever `progress`, `elapsed`, or `rate` change — the split only ever moves to a value computed
+from data you passed in on that render; it never interpolates ahead of an as-yet-unseen future
+frame. The transition lives in shared CSS (`.mc-eta-live rect`), so it inherits the shared
+`:where(.mc-root *) { transition: none }` reduced-motion block: with `prefers-reduced-motion:
+reduce` the bar snaps straight to each new split instead of easing. The live region re-announces
+the forecast on a throttle (`announceEvery`, default 10 s) so a fast-updating value doesn't spam
+a screen reader.
+
+## Variants
 
 <LiveDemo
   label="percent"
@@ -65,6 +72,60 @@ grows — the download bar, told truthfully.
     height={16}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`// no formatEta → the remaining-time NUMBER (not a unit string) follows locale
+<EtaBar progress={0.42} elapsed={10} rate={0.05} locale="de-DE" />`}
+>
+  <EtaBar
+    progress={0.42}
+    elapsed={10}
+    rate={0.05}
+    locale="de-DE"
+    title="Localized ETA"
+    width={280}
+    height={16}
+  />
+</LiveDemo>
+
+Without a `formatEta`, the remaining-time figure falls back to `format`/`locale` — under
+`de-DE` that's a decimal comma ("11,6") rather than the English decimal point ("11.6"). Pass
+`formatEta` (as the hero example does) to add a unit; it always receives the raw number, so it
+can format the unit itself in whatever locale-aware way the caller needs.
+
+## Edge cases
+
+<LiveDemo label="rate hits zero (stalled)" code={`<EtaBar progress={0.3} elapsed={40} rate={0} />`}>
+  <EtaBar progress={0.3} elapsed={40} rate={0} title="Stalled transfer" width={280} height={16} />
+</LiveDemo>
+
+<LiveDemo
+  label="remainder far exceeds elapsed (overflow)"
+  code={`// predicted total ≫ elapsed → the done share clamps to a visible 10%
+// sliver plus a chevron, instead of shrinking to an unreadable hairline
+<EtaBar progress={0.08} elapsed={30} rate={0.001} />`}
+>
+  <EtaBar
+    progress={0.08}
+    elapsed={30}
+    rate={0.001}
+    title="Barely started"
+    width={280}
+    height={16}
+  />
+</LiveDemo>
+
+<LiveDemo label="done" code={`<EtaBar progress={1} elapsed={12} rate={0.1} />`}>
+  <EtaBar progress={1} elapsed={12} rate={0.1} title="Complete" width={280} height={16} />
+</LiveDemo>
+
+A zero or absent `rate` (and no positive average derivable from `elapsed`) renders the remainder
+as a diagonal-hatched texture instead of a solid bar — "unknown," not a hidden guess — and the
+summary says **"stalled"** rather than naming a duration. When the predicted remainder is far
+larger than the elapsed time, the done segment would round to an unreadable sliver, so the
+geometry clamps it to a visible 10% and adds a chevron marking the clamp as approximate. At
+`progress >= 1` the bar fills completely regardless of `rate`.
 
 ## Four homes
 

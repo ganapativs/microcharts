@@ -25,10 +25,10 @@ describe("rugGeometry (plan/22 #5)", () => {
     expect(geo.tiers.map((t) => t.opacity).sort()).toEqual([0.35, 0.6, 0.85]);
   });
 
-  it("highlight resolves to a clamped position; non-finite → null", () => {
-    const geo = rugGeometry({ ...base, values: [0, 10], highlight: 99 });
+  it("markValue resolves to a clamped position; non-finite → null", () => {
+    const geo = rugGeometry({ ...base, values: [0, 10], markValue: 99 });
     expect(geo.highlightPos).toBeLessThanOrEqual(60);
-    const none = rugGeometry({ ...base, values: [0, 10], highlight: Number.NaN });
+    const none = rugGeometry({ ...base, values: [0, 10], markValue: Number.NaN });
     expect(none.highlightPos).toBeNull();
   });
 
@@ -41,8 +41,8 @@ describe("rugGeometry (plan/22 #5)", () => {
   test.prop([
     fc.array(fc.double({ noNaN: true, min: -1e6, max: 1e6 }), { maxLength: 120 }),
     fc.option(fc.double({ noNaN: true, min: -1e6, max: 1e6 }), { nil: undefined }),
-  ])("containment: every tick + highlight within [0, length]", (values, highlight) => {
-    const geo = rugGeometry({ ...base, values, highlight });
+  ])("containment: every tick + markValue within [0, length]", (values, markValue) => {
+    const geo = rugGeometry({ ...base, values, markValue });
     for (const t of geo.ticks) {
       expect(t.pos).toBeGreaterThanOrEqual(0);
       expect(t.pos).toBeLessThanOrEqual(60);

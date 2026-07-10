@@ -12,6 +12,12 @@ thickness at 16 px stops being readable.
   sizeOf="stacked-area"
   code={`import { StackedArea } from "@microcharts/react/stacked-area";
 
+const mix = [
+{ label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
+{ label: "Web", values: [50, 48, 47, 45, 42, 41, 38, 36, 35, 33, 32, 30] },
+{ label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
+];
+
 <StackedArea data={mix} title="Traffic mix" />`}
 >
   <StackedArea
@@ -51,6 +57,12 @@ thickness at 16 px stops being readable.
 <LiveDemo
   label="ridge"
   code={`// same stack, overlapping-crest skin
+const mix = [
+  { label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
+  { label: "Web", values: [50, 48, 47, 45, 42, 41, 38, 36, 35, 33, 32, 30] },
+  { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
+];
+
 <StackedArea data={mix} variant="ridge" />`}
 >
   <StackedArea
@@ -66,7 +78,16 @@ thickness at 16 px stops being readable.
   />
 </LiveDemo>
 
-<LiveDemo label="smallest on top" code={`<StackedArea data={mix} order="asc" />`}>
+<LiveDemo
+  label="smallest on top"
+  code={`const mix = [
+  { label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
+  { label: "Web", values: [50, 48, 47, 45, 42, 41, 38, 36, 35, 33, 32, 30] },
+  { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
+];
+
+<StackedArea data={mix} order="asc" />`}
+>
   <StackedArea
     data={[
       { label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
@@ -79,6 +100,75 @@ thickness at 16 px stops being readable.
     height={30}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`const mix = [
+  { label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
+  { label: "Web", values: [50, 48, 47, 45, 42, 41, 38, 36, 35, 33, 32, 30] },
+  { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
+];
+
+<StackedArea data={mix} locale="de-DE" label="last" />`}
+>
+  <StackedArea
+    data={[
+      { label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
+      { label: "Web", values: [50, 48, 47, 45, 42, 41, 38, 36, 35, 33, 32, 30] },
+      { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
+    ]}
+    locale="de-DE"
+    label="last"
+    title="Localized shares"
+    width={220}
+    height={30}
+  />
+</LiveDemo>
+
+`format`/`locale` control the share numbers — the accessible summary and endpoint labels follow
+the locale's own percent formatting ("66 %" in German, with a space before the sign, not "66%").
+The stack itself never changes shape; only the announced and printed numbers localize.
+
+## Edge cases
+
+<LiveDemo
+  label="single column"
+  code={`<StackedArea data={[{ label: "A", values: [10] }, { label: "B", values: [5] }]} title="Single column" />`}
+>
+  <StackedArea
+    data={[
+      { label: "A", values: [10] },
+      { label: "B", values: [5] },
+    ]}
+    title="Single column"
+    width={160}
+    height={30}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="a series at zero"
+  code={`<StackedArea
+  data={[
+    { label: "A", values: [0, 0, 0, 0] },
+    { label: "B", values: [5, 5, 5, 5] },
+  ]}
+/>`}
+>
+  <StackedArea
+    data={[
+      { label: "A", values: [0, 0, 0, 0] },
+      { label: "B", values: [5, 5, 5, 5] },
+    ]}
+    title="A series at zero"
+    width={160}
+    height={30}
+  />
+</LiveDemo>
+
+A single column still stacks normally — share is well-defined from one point, it's just a
+vertical slice with no width to run across. A series pinned at zero collapses to a zero-height
+layer rather than distorting the others: the remaining series still sum to 100% of what's left.
 
 ## Four homes
 

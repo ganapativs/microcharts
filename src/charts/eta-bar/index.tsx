@@ -111,7 +111,9 @@ export function EtaBar(props: EtaBarProps): ReactNode {
       className={className ? `mc-eta ${className}` : "mc-eta"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* track */}
+      {/* track — a faint neutral wash, deliberately lighter than the shared
+          --mc-band token (which is stroke-derived and reads too dark under a
+          solid accent fill); the 14% literal is a justified, tuned exception */}
       <rect
         x={geo.done.x}
         y={geo.done.y}
@@ -127,7 +129,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
         width={geo.done.width}
         height={geo.done.height}
         rx={geo.done.height / 2}
-        style={{ fill: "var(--mc-accent)" }}
+        data-mc-ink="accent"
       />
       {/* remaining texture when stalled */}
       {geo.indeterminate && geo.remaining ? (
@@ -135,7 +137,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           d={hatchPath(geo.remaining)}
           stroke="var(--mc-neutral)"
           strokeOpacity={0.5}
-          strokeWidth={0.6}
+          data-mc-w="hair"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -147,7 +149,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           y1={geo.done.y - 0.5}
           y2={geo.done.y + geo.done.height + 0.5}
           stroke="var(--mc-stroke)"
-          strokeWidth={0.75}
+          data-mc-w="tick"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -157,7 +159,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           d={`M${round2(barWidth - 3)} ${round2(geo.done.y + 1)}L${round2(barWidth - 1)} ${round2(height / 2)}L${round2(barWidth - 3)} ${round2(geo.done.y + geo.done.height - 1)}`}
           fill="none"
           stroke="var(--mc-neutral)"
-          strokeWidth={0.75}
+          data-mc-w="tick"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}

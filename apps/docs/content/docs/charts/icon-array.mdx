@@ -14,9 +14,9 @@ rate is flagged, never faked.
   sizeOf="icon-array"
   code={`import { IconArray } from "@microcharts/react/icon-array";
 
-<IconArray value={0.15} of={20} title="Adverse events" />`}
+<IconArray value={0.15} total={20} title="Adverse events" />`}
 >
-  <IconArray value={0.15} of={20} title="Adverse events" width={140} height={30} />
+  <IconArray value={0.15} total={20} title="Adverse events" width={140} height={30} />
 </LiveDemo>
 
 ## Install
@@ -44,11 +44,89 @@ rate is flagged, never faked.
 
 <LiveDemo
   label="framing + polarity"
-  code={`<IconArray value={0.1} of={10} />
-<IconArray value={0.15} of={20} positive="down" />`}
+  code={`<IconArray value={0.1} total={10} />
+<IconArray value={0.15} total={20} positive="down" />`}
 >
   <span className="inline-flex flex-col gap-2">
-    <IconArray value={0.1} of={10} title="1 in 10" width={130} height={28} />
-    <IconArray value={0.15} of={20} positive="down" title="Risk polarity" width={150} height={28} />
+    <IconArray value={0.1} total={10} title="1 in 10" width={130} height={28} />
+    <IconArray
+      value={0.15}
+      total={20}
+      positive="down"
+      title="Risk polarity"
+      width={150}
+      height={28}
+    />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="label, shape, and a 100-unit grid"
+  code={`<IconArray value={0.15} total={20} label="percent" />
+<IconArray value={0.6} total={10} shape="round" />
+<IconArray value={0.37} total={100} label="none" />`}
+>
+  <span className="inline-flex flex-col gap-2">
+    <IconArray
+      value={0.15}
+      total={20}
+      label="percent"
+      title="Percent label"
+      width={110}
+      height={26}
+    />
+    <IconArray value={0.6} total={10} shape="round" title="Round units" width={130} height={28} />
+    <IconArray value={0.37} total={100} label="none" title="100-unit grid" width={90} height={90} />
+  </span>
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="zero rate" code={`<IconArray value={0} total={20} title="No adverse events" />`}>
+  <IconArray value={0} total={20} title="No adverse events" width={140} height={30} />
+</LiveDemo>
+
+<LiveDemo
+  label="sub-unit rate"
+  code={`// a real but tiny rate rounds to 0 units — flagged, never a fractional fill
+<IconArray value={0.01} total={20} title="Rare event" />`}
+>
+  <IconArray value={0.01} total={20} title="Rare event" width={140} height={30} />
+</LiveDemo>
+
+<LiveDemo
+  label="every unit filled"
+  code={`<IconArray value={1} total={20} title="All affected" />`}
+>
+  <IconArray value={1} total={20} title="All affected" width={140} height={30} />
+</LiveDemo>
+
+A rate of exactly 0 draws every unit hollow. A rate that is real but rounds to 0 whole
+units (`note: "sub"`) still shows a hollow grid but the summary says so explicitly —
+never a fractional unit standing in for "almost none." `value` is clamped to `[0, 1]`
+and non-finite input renders as 0, so a bad upstream number never breaks the grid.
+
+## Four homes
+
+<FourContexts slug="icon-array" />
+
+## Why this default
+
+`total={20}` and `label="ratio"` are the default pairing because "3 in 20" reads faster
+and more honestly for a lay audience than "15%" — the denominator stays visible instead
+of being computed in the reader's head. Units fill in reading order from the top-left,
+never scattered: medical-risk-communication research finds scattered fills measurably
+harder to count at a glance, and counting is the whole point of this chart. There is no
+partial-unit fill — a 37% rate is never drawn as a unit that's 37% full, because a
+sub-pixel sliver of color is a precision claim this chart doesn't make.
+
+## Accessibility
+
+The accessible name states the count and the rate — **"3 in 20. About 15%."** — and
+degenerate rates say so plainly ("0 in 20", "20 in 20 — all."). The interactive entry
+roves the grid in reading order with the arrow keys (2-D, row-major) and announces each
+unit's state plus the running count: **"Unit 1 of 20 — filled. 3 of 20 filled."**
+
+## Props
+
+<PropTable slug="icon-array" />

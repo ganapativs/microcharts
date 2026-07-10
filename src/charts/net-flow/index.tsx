@@ -177,16 +177,12 @@ export function NetFlow(props: NetFlowProps): ReactNode {
         y2={geo.zeroY}
         stroke="var(--mc-neutral)"
         strokeOpacity={0.4}
-        strokeWidth={0.6}
+        data-mc-w="hair"
         vectorEffect="non-scaling-stroke"
       />
       {net && !geo.degenerate ? (
-        <path
-          d={geo.netLine.d}
-          data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: "var(--mc-stroke-width)" }}
-        />
+        // stroke-width already comes from [data-mc-ink="data"] — no width role needed
+        <path d={geo.netLine.d} data-mc-ink="data" vectorEffect="non-scaling-stroke" />
       ) : null}
       {net && !geo.degenerate && geo.last ? (
         <circle cx={geo.last.x} cy={geo.last.y} r={1.8} data-mc-ink="point" />

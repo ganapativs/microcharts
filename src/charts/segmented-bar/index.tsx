@@ -48,7 +48,7 @@ export interface SegmentedBarProps {
   children?: ReactNode | undefined;
 }
 
-const CAT_TOKENS = ["--mc-cat-1", "--mc-cat-2", "--mc-cat-3", "--mc-cat-4", "--mc-cat-5"];
+const CAT_N = 5; // --mc-cat-1 … --mc-cat-5 via data-mc-cat roles
 
 export function SegmentedBar(props: SegmentedBarProps): ReactNode {
   const {
@@ -115,9 +115,8 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
               width={seg.w}
               height={height - 2}
               shapeRendering="crispEdges"
-              style={{
-                fill: isOther ? "var(--mc-neutral)" : `var(${CAT_TOKENS[i % CAT_TOKENS.length]})`,
-              }}
+              data-mc-ink={isOther ? "neutral" : undefined}
+              data-mc-cat={isOther ? undefined : (i % CAT_N) + 1}
             />
             {text !== undefined && seg.labelFits(text.length) ? (
               <text

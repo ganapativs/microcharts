@@ -174,8 +174,8 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
             x2={crossX}
             y2={height}
             data-mc-ink="muted"
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
-            style={{ strokeWidth: 1 }}
           />
         ) : null}
         {rest.children}

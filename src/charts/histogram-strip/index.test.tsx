@@ -20,8 +20,8 @@ describe("<HistogramStrip> (plan/22 #15, S1 distribution)", () => {
     expect(label).toMatch(/^120 values, most between \d+(\.\d+)? and \d+(\.\d+)?\.$/);
   });
 
-  it("highlight accents one bin, mutes the rest", () => {
-    const { container } = draw(<HistogramStrip data={TIMES} highlight={45} />);
+  it("markValue accents one bin, mutes the rest", () => {
+    const { container } = draw(<HistogramStrip data={TIMES} markValue={45} />);
     const accent = [...container.querySelectorAll("rect")].filter(
       (r) => (r as SVGElement).style.fill === "var(--mc-accent)",
     );

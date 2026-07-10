@@ -20,9 +20,19 @@ describe("<Horizon> (plan/22 #25, S1)", () => {
 
   it("signed series → negative bands in the negative token", () => {
     const { container } = draw(<Horizon data={SERIES} />);
-    const fills = [...container.querySelectorAll("path")].map((p) => (p as SVGElement).style.fill);
-    expect(fills).toContain("var(--mc-accent)");
-    expect(fills).toContain("var(--mc-negative)");
+    const inks = [...container.querySelectorAll("path")].map((p) => p.getAttribute("data-mc-ink"));
+    expect(inks).toContain("accent");
+    expect(inks).toContain("negative");
+  });
+
+  it("custom color overrides the positive fill, negative stays the fixed token", () => {
+    const { container } = draw(<Horizon data={SERIES} color="var(--custom-accent)" />);
+    const paths = [...container.querySelectorAll("path")];
+    const positive = paths.filter((p) => p.getAttribute("data-mc-ink") !== "negative");
+    expect(positive.every((p) => (p as SVGElement).style.fill === "var(--custom-accent)")).toBe(
+      true,
+    );
+    expect(container.querySelector('path[data-mc-ink="negative"]')).not.toBeNull();
   });
 
   it("same series renders identically across rows (no auto fold switching)", () => {

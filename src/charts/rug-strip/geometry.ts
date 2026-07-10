@@ -41,10 +41,10 @@ export function rugGeometry(opts: {
   thickness: number;
   values: readonly Value[];
   domain?: readonly [number, number] | undefined;
-  highlight?: number | undefined;
+  markValue?: number | undefined;
   orientation: "horizontal" | "vertical";
 }): RugGeometry {
-  const { length, thickness, values, highlight, orientation } = opts;
+  const { length, thickness, values, markValue, orientation } = opts;
   const finite = values.filter(isFiniteValue).sort((a, b) => a - b);
   const domain =
     opts.domain && Number.isFinite(opts.domain[0]) && Number.isFinite(opts.domain[1])
@@ -76,8 +76,8 @@ export function rugGeometry(opts: {
     .filter((t) => t.d !== "");
 
   const highlightPos =
-    highlight !== undefined && Number.isFinite(highlight)
-      ? round2(clamp(scale(highlight), pad, length - pad))
+    markValue !== undefined && Number.isFinite(markValue)
+      ? round2(clamp(scale(markValue), pad, length - pad))
       : null;
 
   return { tiers, ticks, highlightPos, domain };

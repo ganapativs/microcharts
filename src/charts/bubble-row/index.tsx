@@ -139,7 +139,10 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
           cx={b.cx}
           cy={b.cy}
           r={b.r}
-          style={{ fill, fillOpacity: 0.8, stroke: fill, strokeWidth: 0.5 }}
+          data-mc-ink={color ? undefined : "accent"}
+          data-mc-w="hair"
+          fillOpacity={0.8}
+          style={{ stroke: fill, ...(color ? { fill } : null) }}
         />
       ))}
       {placed.map((p) => (

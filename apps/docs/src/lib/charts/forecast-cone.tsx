@@ -72,7 +72,16 @@ export const entry: ChartEntry = {
   demo: [...HIST, ...FORE.mid],
   example: {
     title: "Q4 revenue",
-    code: `import { ForecastCone } from "${PKG}/forecast-cone";\n\n<ForecastCone data={history} forecast={forecast} target={45} title="Q4 revenue" />`,
+    code: `import { ForecastCone } from "${PKG}/forecast-cone";
+
+const history = [30, 32, 31, 34, 36, 35, 38];
+const forecast = {
+  mid: [39, 40, 41, 42],
+  p80: [[36, 42], [35, 45], [34, 50], [33, 55]],
+  p50: [[37, 41], [37, 43], [36, 46], [35, 49]],
+};
+
+<ForecastCone data={history} forecast={forecast} target={45} title="Q4 revenue" />`,
   },
 };
 

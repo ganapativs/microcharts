@@ -14,6 +14,12 @@ answers both.
   sizeOf="net-flow"
   code={`import { NetFlow } from "@microcharts/react/net-flow";
 
+const months = [
+{ in: 42, out: 31 }, { in: 38, out: 35 }, { in: 45, out: 29 }, { in: 40, out: 44 },
+{ in: 52, out: 38 }, { in: 48, out: 41 }, { in: 55, out: 36 }, { in: 50, out: 47 },
+{ in: 58, out: 39 }, { in: 44, out: 52 }, { in: 60, out: 41 }, { in: 57, out: 43 },
+];
+
 <NetFlow data={months} title="Monthly cash flow" />`}
 >
   <NetFlow
@@ -54,7 +60,16 @@ answers both.
 
 <LiveDemo
   label="mirrored bars + debt paydown"
-  code={`<NetFlow data={months} mode="bars" />
+  code={`const months = [
+  { in: 45, out: 29 },
+  { in: 40, out: 44 },
+  { in: 52, out: 38 },
+  { in: 44, out: 52 },
+  { in: 60, out: 41 },
+  { in: 57, out: 43 },
+];
+
+<NetFlow data={months} mode="bars" />
 <NetFlow data={months} positive="down" />`}
 >
   <span className="inline-flex flex-col gap-1.5">
@@ -90,6 +105,58 @@ answers both.
     />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<NetFlow
+  data={[
+    { in: 42000, out: 31000 },
+    { in: 38000, out: 35000 },
+  ]}
+  locale="de-DE"
+/>`}
+>
+  <NetFlow
+    data={[
+      { in: 42000, out: 31000 },
+      { in: 38000, out: 35000 },
+    ]}
+    locale="de-DE"
+    title="Localized flow"
+    width={140}
+    height={26}
+  />
+</LiveDemo>
+
+The net label and accessible summary both follow `format`/`locale` — 42000 reads "42.000"
+under `de-DE` rather than the English "42,000".
+
+## Edge cases
+
+<LiveDemo
+  label="single period (forces bars)"
+  code={`// an area through one point is a lie about continuity — NetFlow forces
+// mode="bars" whenever there's only one period, regardless of the mode prop
+<NetFlow data={[{ in: 40, out: 25 }]} title="This month" />`}
+>
+  <NetFlow data={[{ in: 40, out: 25 }]} title="This month" width={140} height={28} />
+</LiveDemo>
+
+<LiveDemo
+  label="negative inputs coerced to zero"
+  code={`// in/out are magnitudes; a negative reading is invalid data, not a
+// direction — it renders as 0, never as flow the other way
+<NetFlow data={[{ in: -5, out: -3 }]} title="Bad reading" />`}
+>
+  <NetFlow data={[{ in: -5, out: -3 }]} title="Bad reading" width={140} height={28} />
+</LiveDemo>
+
+A single period always renders as mirrored bars, never an area — an area drawn through one
+point would imply continuity the data doesn't have. `in`/`out` are magnitudes: a negative value
+is invalid input, not a reversed direction, so it's coerced to `0`. When every period's
+magnitudes are zero (all periods coerced or genuinely empty), NetFlow draws only the zero
+baseline — no areas, no bars, no net line — and the accessible name says so plainly: **"No flow
+across 1 periods."**
 
 ## Four homes
 

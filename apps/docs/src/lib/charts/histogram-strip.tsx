@@ -31,7 +31,7 @@ export const entry: ChartEntry = {
       description: "Bin count; auto = min(12, √n).",
     },
     {
-      name: "highlight",
+      name: "markValue",
       type: "number",
       required: false,
       description: "A VALUE whose bin gets accent.",
@@ -46,7 +46,13 @@ export const entry: ChartEntry = {
   demo: TIMES.slice(0, 40),
   example: {
     title: "Response times",
-    code: `import { HistogramStrip } from "${PKG}/histogram-strip";\n\n<HistogramStrip data={times} title="Response times" />`,
+    code: `import { HistogramStrip } from "${PKG}/histogram-strip";
+
+const responseTimes = Array.from({ length: 120 }, (_, i) =>
+  i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
+);
+
+<HistogramStrip data={responseTimes} title="Response times" />`,
   },
 };
 
@@ -57,20 +63,20 @@ export function Preview() {
 export const showcase = {
   hint: "distribution",
   Node: () => (
-    <HistogramStrip data={TIMES} highlight={45} title="Response times" width={130} height={34} />
+    <HistogramStrip data={TIMES} markValue={45} title="Response times" width={130} height={34} />
   ),
 };
 
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "bins", label: "bins", min: 3, max: 12, init: 8 },
-    { kind: "toggle", key: "highlight", label: "highlight 45", init: false },
+    { kind: "toggle", key: "markValue", label: "mark 45", init: false },
   ],
   render: (s) => (
     <HistogramStrip
       data={TIMES}
       bins={s.bins as number}
-      highlight={(s.highlight as boolean) ? 45 : undefined}
+      markValue={(s.markValue as boolean) ? 45 : undefined}
       summary={false}
       width={260}
       height={64}
@@ -81,7 +87,7 @@ export const playground: PlaygroundSpec = {
       "<HistogramStrip",
       "  data={times}",
       `  bins={${s.bins}}`,
-      (s.highlight as boolean) && "  highlight={45}",
+      (s.markValue as boolean) && "  markValue={45}",
       "/>",
     ]
       .filter(Boolean)
@@ -91,12 +97,20 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "where you fall",
-    code: `<HistogramStrip data={salaries} highlight={yourSalary} />`,
-    node: <HistogramStrip data={TIMES} highlight={45} summary={false} width={140} height={32} />,
+    code: `const responseTimes = Array.from({ length: 120 }, (_, i) =>
+  i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
+);
+
+<HistogramStrip data={responseTimes} markValue={45} />`,
+    node: <HistogramStrip data={TIMES} markValue={45} summary={false} width={140} height={32} />,
   },
   {
     label: "fixed edges across rows",
-    code: `<HistogramStrip data={rowA} domain={[0, 100]} />\n<HistogramStrip data={rowB} domain={[0, 100]} />`,
+    code: `const responseTimes = Array.from({ length: 120 }, (_, i) =>
+  i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
+);
+
+<HistogramStrip data={responseTimes} domain={[0, 100]} />`,
     node: <HistogramStrip data={TIMES} domain={[0, 100]} summary={false} width={140} height={32} />,
   },
 ];

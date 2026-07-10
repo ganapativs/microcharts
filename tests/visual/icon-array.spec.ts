@@ -10,35 +10,35 @@ const styles = readFileSync(fileURLToPath(new URL("../../styles.css", import.met
 const svg = (props: Record<string, unknown>) => renderToStaticMarkup(h(IconArray as never, props));
 
 function gallery(): string {
-  const sentence = `Adverse events ${svg({ value: 0.15, of: 20, width: 90, height: 22, title: "Adverse events" })} in this cohort.`;
+  const sentence = `Adverse events ${svg({ value: 0.15, total: 20, width: 90, height: 22, title: "Adverse events" })} in this cohort.`;
 
   const cell = `<table><tbody>
-    <tr><td>arm A</td><td>${svg({ value: 0.15, of: 20, summary: false })}</td></tr>
-    <tr><td>arm B</td><td>${svg({ value: 0.4, of: 20, summary: false })}</td></tr>
-    <tr><td>arm C</td><td>${svg({ value: 0.05, of: 20, summary: false })}</td></tr>
+    <tr><td>arm A</td><td>${svg({ value: 0.15, total: 20, summary: false })}</td></tr>
+    <tr><td>arm B</td><td>${svg({ value: 0.4, total: 20, summary: false })}</td></tr>
+    <tr><td>arm C</td><td>${svg({ value: 0.05, total: 20, summary: false })}</td></tr>
   </tbody></table>`;
 
   const kpi = `<div class="card">
     <div class="label">Adverse events</div>
     <div class="value">3 in 20</div>
-    ${svg({ value: 0.15, of: 20, width: 130, height: 30, title: "Adverse events" })}
+    ${svg({ value: 0.15, total: 20, width: 130, height: 30, title: "Adverse events" })}
   </div>`;
 
-  const tab = `<div class="tab"><span>Risk</span> ${svg({ value: 0.1, of: 10, label: "none", width: 40, height: 16, summary: false })}</div>`;
+  const tab = `<div class="tab"><span>Risk</span> ${svg({ value: 0.1, total: 10, label: "none", width: 40, height: 16, summary: false })}</div>`;
 
   const variants = [
-    svg({ value: 0.15, of: 20, title: "3 in 20" }),
-    svg({ value: 0.1, of: 10, title: "1 in 10" }),
-    svg({ value: 0.15, of: 20, label: "percent", title: "percent" }),
-    svg({ value: 0.6, of: 10, shape: "round", title: "round" }),
-    svg({ value: 0.15, of: 20, positive: "down", title: "risk polarity" }),
-    svg({ value: 0.37, of: 100, width: 90, height: 44, label: "none", title: "of 100" }),
+    svg({ value: 0.15, total: 20, title: "3 in 20" }),
+    svg({ value: 0.1, total: 10, title: "1 in 10" }),
+    svg({ value: 0.15, total: 20, label: "percent", title: "percent" }),
+    svg({ value: 0.6, total: 10, shape: "round", title: "round" }),
+    svg({ value: 0.15, total: 20, positive: "down", title: "risk polarity" }),
+    svg({ value: 0.37, total: 100, width: 90, height: 44, label: "none", title: "total 100" }),
   ].join(" ");
 
   const presets = ["editorial", "mono", "vivid"]
     .map(
       (p) =>
-        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ value: 0.15, of: 20, summary: false })}</span>`,
+        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ value: 0.15, total: 20, summary: false })}</span>`,
     )
     .join(" ");
 

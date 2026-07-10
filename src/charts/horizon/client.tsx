@@ -133,8 +133,8 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
               x2={crossX}
               y2={height}
               data-mc-ink="muted"
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
-              style={{ strokeWidth: 1 }}
             />
             {isFiniteValue(value) ? (
               <circle cx={crossX} cy={geo.foldedY(value)} r={1.75} data-mc-ink="accent" />

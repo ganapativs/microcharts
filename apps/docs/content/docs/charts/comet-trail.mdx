@@ -34,7 +34,8 @@ trail is recency context, never data you have to decode.
 ## Motion, and reduced motion
 
 Motion happens **only on a data change** — there is no idle loop. When a new value arrives the head
-eases (~220 ms) from its old position to the new one and the previous head steps down into the trail; a
+eases (~200 ms, the library's canonical strong ease-out) from its old position to the new one and the
+previous head steps down into the trail; a
 continuous stream produces the comet, a stalled stream simply goes still, which is itself the signal
 (staleness reads as stillness). The dot jumps to the truth, eased — it never simulates phantom positions
 between updates. Under `prefers-reduced-motion` the head repositions instantly (the static encoding is
@@ -67,6 +68,32 @@ already complete), and the sweep pauses off-screen.
     />
   </span>
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="empty" code={`<CometTrail data={[]} title="No stream yet" />`}>
+  <CometTrail data={[]} title="No stream yet" width={90} />
+</LiveDemo>
+
+<LiveDemo label="single point" code={`<CometTrail data={[52]} title="First reading" />`}>
+  <CometTrail data={[52]} title="First reading" width={90} />
+</LiveDemo>
+
+<LiveDemo
+  label="trail longer than the data"
+  code={`// trail=20 but only 4 points exist — every point shows, no padding
+<CometTrail data={[40, 55, 48, 62]} trail={20} title="Short stream" />`}
+>
+  <CometTrail data={[40, 55, 48, 62]} trail={20} title="Short stream" width={90} />
+</LiveDemo>
+
+Empty data draws just the frame, with "No data." as the summary. A single point has no
+trail to fade — just the head and "Now 52." A `trail` larger than the data never
+backfills or pads: the trail simply shows every point there is.
+
+## Four homes
+
+<FourContexts slug="comet-trail" />
 
 ## Why this default
 

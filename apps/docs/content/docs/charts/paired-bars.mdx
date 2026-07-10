@@ -56,7 +56,13 @@ is the cardinal grouped-bar lie — and the reference is muted by two structural
 <LiveDemo
   label="overlay"
   code={`// the ghost is always the REFERENCE, never the value
-<PairedBars data={regions} mode="overlay" />`}
+<PairedBars
+  data={[
+    { label: "East", value: 940, ref: 1200 },
+    { label: "West", value: 410, ref: 400 },
+  ]}
+  mode="overlay"
+/>`}
 >
   <PairedBars
     data={[
@@ -70,7 +76,16 @@ is the cardinal grouped-bar lie — and the reference is muted by two structural
   />
 </LiveDemo>
 
-<LiveDemo label="valence" code={`<PairedBars data={regions} positive="up" />`}>
+<LiveDemo
+  label="valence"
+  code={`<PairedBars
+  data={[
+    { label: "East", value: 940, ref: 1200 },
+    { label: "West", value: 410, ref: 400 },
+  ]}
+  positive="up"
+/>`}
+>
   <PairedBars
     data={[
       { label: "East", value: 940, ref: 1200 },
@@ -82,6 +97,57 @@ is the cardinal grouped-bar lie — and the reference is muted by two structural
     height={44}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<PairedBars
+  data={[{ label: "East", value: 9400, ref: 12000 }]}
+  locale="de-DE"
+/>`}
+>
+  <PairedBars
+    data={[{ label: "East", value: 9400, ref: 12000 }]}
+    locale="de-DE"
+    title="Localized"
+    width={80}
+    height={44}
+  />
+</LiveDemo>
+
+The gap named in the summary follows `format`/`locale` — 12000 reads "12.000" under `de-DE`
+rather than the English "12,000".
+
+## Edge cases
+
+<LiveDemo
+  label="missing reference"
+  code={`// value bar alone; the interactive entry announces "no reference"
+<PairedBars data={[{ label: "East", value: 940, ref: null }]} />`}
+>
+  <PairedBars
+    data={[{ label: "East", value: 940, ref: null }]}
+    title="No plan yet"
+    width={100}
+    height={44}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="single pair"
+  code={`<PairedBars data={[{ label: "East", value: 940, ref: 1200 }]} />`}
+>
+  <PairedBars
+    data={[{ label: "East", value: 940, ref: 1200 }]}
+    title="Single pair"
+    width={80}
+    height={44}
+  />
+</LiveDemo>
+
+A pair whose `ref` is `null` draws its value bar alone — no ghost, no zero-width placeholder —
+and the interactive entry announces it as **"East: 940, no reference."** rather than pretending
+a comparison exists. Past 5 pairs the grouped read blurs into noise, so the component still
+renders every pair but logs a dev warning steering toward a table or a full bar chart.
 
 ## Four homes
 

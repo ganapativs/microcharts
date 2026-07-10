@@ -162,7 +162,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
             {...ring}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

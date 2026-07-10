@@ -7,10 +7,19 @@ Horizon answers "what happened across this wide-range series — in a 12-pixel r
 series is cut into bands and folded: layer opacity carries magnitude, so extremes stay
 visible at heights where a sparkline would flatten into noise.
 
+**How to read it** — every band rises from the row's bottom edge, positive or negative; darker
+means farther from the baseline, not which direction. Above-baseline values shade in the accent
+color, below-baseline in the negative color, so direction is never color-alone even though both
+fold upward the same way.
+
 <LiveDemo
   label="Horizon"
   sizeOf="horizon"
   code={`import { Horizon } from "@microcharts/react/horizon";
+
+const cpuLoad = [
+2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
+];
 
 <Horizon data={cpuLoad} title="Cluster load" />`}
 >
@@ -47,6 +56,10 @@ visible at heights where a sparkline would flatten into noise.
 <LiveDemo
   label="three folds"
   code={`// 3 folds only when the range genuinely spans them
+const cpuLoad = [
+  2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
+];
+
 <Horizon data={cpuLoad} folds={3} />`}
 >
   <Horizon
@@ -60,17 +73,73 @@ visible at heights where a sparkline would flatten into noise.
   />
 </LiveDemo>
 
-<LiveDemo label="fold around a target" code={`<Horizon data={latency} baseline={20} />`}>
+<LiveDemo
+  label="fold around a target"
+  code={`const latencyMs = [18, 22, 19, 25, 31, 20, 17, 24, 29, 21, 19, 26];
+
+<Horizon data={latencyMs} baseline={20} />`}
+>
   <Horizon
-    data={[
-      2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
-    ]}
+    data={[18, 22, 19, 25, 31, 20, 17, 24, 29, 21, 19, 26]}
     baseline={20}
-    title="Baseline 20"
+    title="Latency vs 20 ms SLA"
     width={220}
     height={22}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`const cpuLoadWatts = [
+  200, 500, 900, 1400, 2200, 3100, 2600, 1800, 1200, 2400, 3800, 4500,
+];
+
+<Horizon data={cpuLoadWatts} format={{ maximumFractionDigits: 0 }} locale="de-DE" />`}
+>
+  <Horizon
+    data={[
+      200, 500, 900, 1400, 2200, 3100, 2600, 1800, 1200, 2400, 3800, 4500,
+    ]}
+    format={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="Localized cluster load"
+    width={220}
+    height={22}
+  />
+</LiveDemo>
+
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's range
+and last-value numbers follow that locale's own grouping ("4.500" in German, not "4,500"). The
+interactive readout's per-point values localize the same way; the folded geometry never changes.
+
+## Edge cases
+
+<LiveDemo
+  label="negative values — the mirrored read"
+  code={`const netFlow = [5, -3, 8, -12, 2, -6, 10];
+
+<Horizon data={netFlow} title="Net flow" />`}
+>
+  <Horizon
+    data={[5, -3, 8, -12, 2, -6, 10]}
+    title="Net flow"
+    width={160}
+    height={22}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="identical values → a flat block, not empty"
+  code={`<Horizon data={[5, 5, 5, 5, 5]} title="Flat" />`}
+>
+  <Horizon data={[5, 5, 5, 5, 5]} title="Flat" width={160} height={22} />
+</LiveDemo>
+
+Negative values take the negative token and fold from the same bottom edge as positive values
+(the default `mode="mirror"`) — both directions get darker as they move away from the baseline,
+so "denser" always means "farther from typical," never "which sign." Identical values across the
+whole row still render as a solid block rather than vanishing, keeping "flat" visibly distinct
+from "no data."
 
 ## Four homes
 

@@ -43,12 +43,12 @@ export function iconArrayGeometry(opts: {
   width: number;
   height: number;
   value: number;
-  of: IconArrayN;
+  total: IconArrayN;
   shape: CellShape;
   gutterCh?: number;
   fontSize?: number;
 }): IconArrayGeometry {
-  const { width, height, value, of: n, shape } = opts;
+  const { width, height, value, total: n, shape } = opts;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 4 : 0;

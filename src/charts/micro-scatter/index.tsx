@@ -107,25 +107,26 @@ export function MicroScatter(props: MicroScatterProps): ReactNode {
           y1={geo.trendLine.y1}
           x2={geo.trendLine.x2}
           y2={geo.trendLine.y2}
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
+          data-mc-w="support"
           strokeOpacity={0.45}
-          strokeWidth={1.25}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {geo.dots.map((dot) => (
-        <circle
-          key={dot.index}
-          cx={dot.x}
-          cy={dot.y}
-          r={rad}
-          data-mc-ink="point"
-          fillOpacity={focal === dot.index ? 1 : 0.75}
-          style={
-            focal === dot.index ? { fill: "var(--mc-accent)" } : color ? { fill: color } : undefined
-          }
-        />
-      ))}
+      {geo.dots.map((dot) => {
+        const isFocal = focal === dot.index;
+        return (
+          <circle
+            key={dot.index}
+            cx={dot.x}
+            cy={dot.y}
+            r={rad}
+            data-mc-ink={isFocal ? "accent" : color ? undefined : "point"}
+            fillOpacity={isFocal ? 1 : 0.75}
+            style={!isFocal && color ? { fill: color } : undefined}
+          />
+        );
+      })}
       {children}
     </Chart>
   );

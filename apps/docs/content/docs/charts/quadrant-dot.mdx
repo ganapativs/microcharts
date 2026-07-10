@@ -89,6 +89,61 @@ overridable but **never hidden**), and the peers show as tiny muted ghosts. The 
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="degenerate axis — split line hidden on that axis only"
+  code={`<QuadrantDot
+  data={{ x: 5, y: 5 }}
+  field={[{ x: 1, y: 5 }, { x: 8, y: 5 }]}
+/>`}
+>
+  <QuadrantDot
+    data={{ x: 5, y: 5 }}
+    field={[
+      { x: 1, y: 5 },
+      { x: 8, y: 5 },
+    ]}
+    xLabel="effort"
+    yLabel="impact"
+    title="Flat impact"
+    width={72}
+    height={72}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="a peer coincident with the focal"
+  code={`<QuadrantDot data={{ x: 5, y: 5 }} field={[{ x: 5, y: 5 }, { x: 1, y: 1 }]} />`}
+>
+  <QuadrantDot
+    data={{ x: 5, y: 5 }}
+    field={[
+      { x: 5, y: 5 },
+      { x: 1, y: 1 },
+    ]}
+    xLabel="effort"
+    yLabel="impact"
+    title="Coincident peer"
+    width={72}
+    height={72}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="non-finite focal"
+  code={`<QuadrantDot data={{ x: NaN, y: 5 }} title="Bad input" />`}
+>
+  <QuadrantDot data={{ x: Number.NaN, y: 5 }} title="Bad input" width={72} height={72} />
+</LiveDemo>
+
+When every field value on one axis equals the focal's, that axis's domain collapses to a
+point — the split line on that axis is dropped rather than drawn at an arbitrary spot,
+while the other axis's split still renders. A peer exactly on top of the focal is still
+counted (distance 0) and sorts first in the interactive entry's nearest-first order. A
+non-finite focal position renders nothing but the frame, with the "No data." summary —
+the same degenerate path an empty series takes elsewhere in the library.
+
 ## Four homes
 
 <FourContexts slug="quadrant-dot" />

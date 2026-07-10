@@ -15,7 +15,7 @@ maps to probability level and nothing else.
 
 const posterior = Array.from(
 { length: 160 },
-(\_, i) => 21 + Math.round(9 _ Math.sin(i) + 6 _ Math.sin(i \* 2.3)),
+(_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
 );
 
 <GradedBand data={posterior} label="median" title="Forecast estimate" />`}

@@ -15,7 +15,7 @@ against a target line. It is the general form of any noisy metric with a complia
 
 const samples = Array.from(
 { length: 60 },
-(\_, i) => -22 + Math.sin(i / 3) _ 4 + Math.sin(i / 11) _ 2 - (i > 40 ? 2 : 0),
+(_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0),
 );
 
 <DualWindowMeter

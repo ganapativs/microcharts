@@ -79,7 +79,15 @@ export const entry: ChartEntry = {
   demo: DEMO.map((d) => d.rate),
   example: {
     title: "Conversion rate",
-    code: `import { RateVolume } from "${PKG}/rate-volume";\n\n<RateVolume data={periods} minVolume={50} title="Conversion rate" />`,
+    code: `import { RateVolume } from "${PKG}/rate-volume";
+
+const periods = [
+  { rate: 0.023, volume: 220 }, { rate: 0.025, volume: 190 }, { rate: 0.028, volume: 160 },
+  { rate: 0.029, volume: 130 }, { rate: 0.031, volume: 110 }, { rate: 0.034, volume: 90 },
+  { rate: 0.036, volume: 66 }, { rate: 0.041, volume: 38 },
+];
+
+<RateVolume data={periods} minVolume={50} title="Conversion rate" />`,
   },
 };
 
@@ -147,14 +155,27 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "flag thin denominators",
-    code: `// a 4.1% rate on 38 events renders hollow — read it with caution\n<RateVolume data={periods} minVolume={50} />`,
+    code: `// a 4.1% rate on 38 events renders hollow — read it with caution
+const periods = [
+  { rate: 0.023, volume: 220 }, { rate: 0.025, volume: 190 }, { rate: 0.028, volume: 160 },
+  { rate: 0.029, volume: 130 }, { rate: 0.031, volume: 110 }, { rate: 0.034, volume: 90 },
+  { rate: 0.036, volume: 66 }, { rate: 0.041, volume: 38 },
+];
+
+<RateVolume data={periods} minVolume={50} />`,
     node: (
       <RateVolume data={FRAC} format={PCT} minVolume={50} summary={false} width={170} height={24} />
     ),
   },
   {
     label: "per-period step rates",
-    code: `<RateVolume data={periods} curve="step" />`,
+    code: `const periods = [
+  { rate: 0.023, volume: 220 }, { rate: 0.025, volume: 190 }, { rate: 0.028, volume: 160 },
+  { rate: 0.029, volume: 130 }, { rate: 0.031, volume: 110 }, { rate: 0.034, volume: 90 },
+  { rate: 0.036, volume: 66 }, { rate: 0.041, volume: 38 },
+];
+
+<RateVolume data={periods} curve="step" />`,
     node: (
       <RateVolume data={FRAC} format={PCT} curve="step" summary={false} width={170} height={24} />
     ),

@@ -20,7 +20,7 @@ export const entry: ChartEntry = {
     channel: "tick position; density via ink accumulation",
     precision: "high per observation, medium for density",
   },
-  nodeBudget: "≤ 4 (opacity-tiered tick paths + highlight)",
+  nodeBudget: "≤ 4 (opacity-tiered tick paths + markValue)",
   bestFor: ['"you are here" in a band', "distribution beside a stat", "margin composition"],
   avoidFor: ["> 400 observations (HistogramStrip)", "trends over time (Sparkline)"],
   props: [
@@ -31,7 +31,7 @@ export const entry: ChartEntry = {
       description: "Raw observations — position = value.",
     },
     {
-      name: "highlight",
+      name: "markValue",
       type: "number",
       required: false,
       description: "One value emphasized against the field.",
@@ -52,22 +52,22 @@ export const entry: ChartEntry = {
   demo: FIELD,
   example: {
     title: "Salary band",
-    code: `import { RugStrip } from "${PKG}/rug-strip";\n\n<RugStrip data={salaries} highlight={yourOffer} title="Pay band" />`,
+    code: `import { RugStrip } from "${PKG}/rug-strip";\n\n<RugStrip data={salaries} markValue={yourOffer} title="Pay band" />`,
   },
 };
 
 export function Preview() {
-  return <RugStrip data={FIELD} highlight={62} summary={false} width={120} height={16} />;
+  return <RugStrip data={FIELD} markValue={62} summary={false} width={120} height={16} />;
 }
 
 export const showcase = {
   hint: "distribution",
-  Node: () => <RugStrip data={FIELD} highlight={62} title="Pay band" width={120} height={16} />,
+  Node: () => <RugStrip data={FIELD} markValue={62} title="Pay band" width={120} height={16} />,
 };
 
 export const playground: PlaygroundSpec = {
   knobs: [
-    { kind: "toggle", key: "highlight", label: "highlight", init: true },
+    { kind: "toggle", key: "markValue", label: "markValue", init: true },
     {
       kind: "segmented",
       key: "orientation",
@@ -81,7 +81,7 @@ export const playground: PlaygroundSpec = {
   render: (s, data) => (
     <RugStrip
       data={data}
-      highlight={(s.highlight as boolean) ? data[Math.floor(data.length / 2)] : undefined}
+      markValue={(s.markValue as boolean) ? data[Math.floor(data.length / 2)] : undefined}
       orientation={s.orientation as "horizontal" | "vertical"}
       summary={false}
       style={s.orientation === "vertical" ? { width: 20, height: 140 } : { width: 220, height: 22 }}
@@ -91,7 +91,7 @@ export const playground: PlaygroundSpec = {
     [
       "<RugStrip",
       "  data={observations}",
-      (s.highlight as boolean) && "  highlight={you}",
+      (s.markValue as boolean) && "  markValue={you}",
       s.orientation === "vertical" && '  orientation="vertical"',
       "/>",
     ]
@@ -102,8 +102,8 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "you vs the field",
-    code: `<RugStrip data={salaries} highlight={78000}\n  domain={[40000, 120000]} />`,
-    node: <RugStrip data={FIELD} highlight={75} summary={false} width={160} height={14} />,
+    code: `<RugStrip data={salaries} markValue={78000}\n  domain={[40000, 120000]} />`,
+    node: <RugStrip data={FIELD} markValue={75} summary={false} width={160} height={14} />,
   },
   {
     label: "fixed domain across rows",

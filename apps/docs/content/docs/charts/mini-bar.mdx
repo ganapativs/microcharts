@@ -57,7 +57,15 @@ order carries meaning that ranking would destroy, so `sort` is explicit, never s
 <LiveDemo
   label="ranked"
   code={`// reordering changes what the chart SAYS, so it's a data prop
-<MiniBar data={regions} sort="desc" />`}
+<MiniBar
+  data={[
+    { label: "East", value: 940 },
+    { label: "West", value: 410 },
+    { label: "South", value: 620 },
+    { label: "North", value: 120 },
+  ]}
+  sort="desc"
+/>`}
 >
   <MiniBar
     data={[
@@ -73,7 +81,18 @@ order carries meaning that ranking would destroy, so `sort` is explicit, never s
   />
 </LiveDemo>
 
-<LiveDemo label="highlight" code={`<MiniBar data={regions} highlight="South" />`}>
+<LiveDemo
+  label="highlight"
+  code={`<MiniBar
+  data={[
+    { label: "East", value: 940 },
+    { label: "West", value: 410 },
+    { label: "South", value: 620 },
+    { label: "North", value: 120 },
+  ]}
+  highlight="South"
+/>`}
+>
   <MiniBar
     data={[
       { label: "East", value: 940 },
@@ -91,7 +110,16 @@ order carries meaning that ranking would destroy, so `sort` is explicit, never s
 <LiveDemo
   label="signed + polarity"
   code={`// bars extend below zero; positive engages the valence tokens
-<MiniBar data={dailyDelta} positive="up" />`}
+<MiniBar
+  data={[
+    { label: "Mon", value: 4 },
+    { label: "Tue", value: -2 },
+    { label: "Wed", value: 6 },
+    { label: "Thu", value: -1 },
+    { label: "Fri", value: 3 },
+  ]}
+  positive="up"
+/>`}
 >
   <MiniBar
     data={[
@@ -107,6 +135,65 @@ order carries meaning that ranking would destroy, so `sort` is explicit, never s
     height={36}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<MiniBar
+  data={[
+    { label: "East", value: 12400 },
+    { label: "West", value: 8600 },
+  ]}
+  locale="de-DE"
+/>`}
+>
+  <MiniBar
+    data={[
+      { label: "East", value: 12400 },
+      { label: "West", value: 8600 },
+    ]}
+    locale="de-DE"
+    title="Localized values"
+    width={80}
+    height={36}
+  />
+</LiveDemo>
+
+The extremes named in the summary follow `format`/`locale` — 12400 reads "12.400" under
+`de-DE` rather than the English "12,400".
+
+## Edge cases
+
+<LiveDemo
+  label="null keeps its slot"
+  code={`// a missing category leaves a gap instead of shifting its neighbors
+<MiniBar data={[
+  { label: "a", value: 5 },
+  { label: "b", value: null },
+  { label: "c", value: 7 },
+]} />`}
+>
+  <MiniBar
+    data={[
+      { label: "a", value: 5 },
+      { label: "b", value: null },
+      { label: "c", value: 7 },
+    ]}
+    title="Gap preserved"
+    width={120}
+    height={36}
+  />
+</LiveDemo>
+
+<LiveDemo label="single category" code={`<MiniBar data={[{ label: "Only", value: 4 }]} />`}>
+  <MiniBar data={[{ label: "Only", value: 4 }]} title="Single" width={80} height={36} />
+</LiveDemo>
+
+A `null` value draws no bar but keeps its band, so the two real bars around it stay exactly as
+far apart as a fully populated row — alignment across a column of MiniBars survives missing
+data. A single category still renders and its summary says so plainly ("1 category…") rather
+than degenerating into a bare-bar special case. Past 8 categories the component still renders
+every bar (nothing is dropped or truncated) but logs a dev warning — MiniBar is a cell chart,
+and a wider comparison belongs in a full bar chart.
 
 ## Four homes
 

@@ -37,10 +37,10 @@ describe("<MiniBar> (plan/22 #6, S2)", () => {
     expect([...sorted].sort((a, b) => b - a)).toEqual(sorted);
   });
 
-  it("highlight by label or index → accent fill", () => {
+  it("highlight by label or index → accent ink", () => {
     const { container } = draw(<MiniBar data={DATA} highlight="South" />);
     const bars = [...container.querySelectorAll("rect")];
-    expect((bars[2] as SVGElement).style.fill).toBe("var(--mc-accent)");
+    expect((bars[2] as SVGElement).getAttribute("data-mc-ink")).toBe("accent");
   });
 
   it("null keeps its slot (gap, alignment survives)", () => {

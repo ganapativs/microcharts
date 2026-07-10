@@ -4,7 +4,7 @@ import { IconArray } from "./client.js";
 
 describe("interactive <IconArray> (plan/23 #21)", () => {
   it("2-D roving announces the running count", async () => {
-    const screen = await render(<IconArray value={0.15} of={20} title="Risk" />);
+    const screen = await render(<IconArray value={0.15} total={20} title="Risk" />);
     const wrap = screen.container.querySelector(".mc-icon-array-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
@@ -16,7 +16,7 @@ describe("interactive <IconArray> (plan/23 #21)", () => {
   });
 
   it("hover finds the nearest unit", async () => {
-    const screen = await render(<IconArray value={0.5} of={20} />);
+    const screen = await render(<IconArray value={0.5} total={20} />);
     const wrap = screen.container.querySelector(".mc-icon-array-live") as HTMLElement;
     const r = wrap.getBoundingClientRect();
     wrap.dispatchEvent(

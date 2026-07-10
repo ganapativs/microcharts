@@ -129,7 +129,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               x2={p.x}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
-              strokeWidth={1}
+              data-mc-w="support"
               strokeDasharray="1.5 2"
               vectorEffect="non-scaling-stroke"
             />
@@ -139,7 +139,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               r={1.6}
               fill="none"
               stroke="var(--mc-stroke)"
-              strokeWidth={1}
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
             <circle
@@ -148,7 +148,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               r={1.6}
               fill="none"
               stroke="var(--mc-stroke)"
-              strokeWidth={1}
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
             <circle
@@ -157,7 +157,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               r={2.4}
               fill="none"
               stroke="var(--mc-stroke)"
-              strokeWidth={1}
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
           </>

@@ -1,11 +1,11 @@
 ---
 title: RugStrip
-description: A rug plot for React — every raw observation as a tick, density by ink accumulation, with a highlight for "you are here".
+description: A rug plot for React — every raw observation as a tick, density by ink accumulation, with a marked value for "you are here".
 ---
 
 RugStrip answers "where do the raw observations actually sit?". Every tick is one real
 observation — no binning, no jitter, no thinning. Stacked duplicates darken (tiered
-opacity), and `highlight` tells the chart's strongest single story: one value against
+opacity), and `markValue` tells the chart's strongest single story: one raw value against
 the field.
 
 <LiveDemo
@@ -13,13 +13,13 @@ the field.
   sizeOf="rug-strip"
   code={`import { RugStrip } from "@microcharts/react/rug-strip";
 
-<RugStrip data={salaries} highlight={78} title="Pay band" />`}
+<RugStrip data={salaries} markValue={78} title="Pay band" />`}
 >
   <span className="text-lg">
     {"Your offer sits "}
     <RugStrip
       data={[42, 48, 51, 53, 55, 58, 61, 63, 66, 71, 55, 52, 49, 58, 62, 75, 83]}
-      highlight={78}
+      markValue={78}
       title="Pay band"
       style={{ width: "7em", height: "0.9em" }}
     />
@@ -52,10 +52,10 @@ the field.
 
 ## Variants
 
-<LiveDemo label="highlight" code={`<RugStrip data={field} highlight={62} />`}>
+<LiveDemo label="markValue" code={`<RugStrip data={field} markValue={62} />`}>
   <RugStrip
     data={[42, 48, 55, 58, 61, 66, 71, 75]}
-    highlight={62}
+    markValue={62}
     title="Field plus you"
     style={{ width: 140, height: 14 }}
   />
@@ -77,6 +77,37 @@ the field.
     style={{ width: 14, height: 80 }}
   />
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="empty" code={`<RugStrip data={[]} title="No observations" />`}>
+  <RugStrip data={[]} title="No observations" style={{ width: 140, height: 14 }} />
+</LiveDemo>
+
+Empty data draws a quiet centered axis line — not a blank hole — so the strip still reads
+as "a rug with nothing on it" rather than a layout gap.
+
+<LiveDemo label="single observation" code={`<RugStrip data={[52]} title="One observation" />`}>
+  <RugStrip data={[52]} title="One observation" style={{ width: 140, height: 14 }} />
+</LiveDemo>
+
+A single value (or an all-equal field) has a zero-span domain; the tick renders at the
+strip's midpoint instead of dividing by zero.
+
+<LiveDemo
+  label="markValue outside the domain"
+  code={`<RugStrip data={[42, 48, 55, 61, 71]} markValue={120} />`}
+>
+  <RugStrip
+    data={[42, 48, 55, 61, 71]}
+    markValue={120}
+    title="Above the field"
+    style={{ width: 140, height: 14 }}
+  />
+</LiveDemo>
+
+A `markValue` outside the observed domain clamps to the nearest edge — it never escapes
+the box or silently rescales the field around it.
 
 ## Four homes
 

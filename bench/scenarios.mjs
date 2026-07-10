@@ -455,7 +455,8 @@ export const SCENARIOS = [
   {
     slug: "quadrant-dot",
     component: "QuadrantDot",
-    floor: 20, // ≤ 5 + 1/ghost (cap 30) glyph; extent + one sort per render
+    // Recalibrated 2026-07-10 (superaudit): sat on the 20 knife-edge (19.9-20.1 quiet); floor = ~75% of quiet measure.
+    floor: 15,
     props: (i) => ({
       data: { x: (i * 3) % 10, y: (i * 7) % 10 },
       field: quads[i % POOL],

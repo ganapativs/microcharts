@@ -115,6 +115,9 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
         ) : null,
       )}
       {geo.medianPath ? (
+        // the fold's headline line — thicker than the default data weight (no
+        // width role covers >1×; support/tick/hair are all secondary-mark
+        // fractions), a justified literal for this primary emphasis mark.
         <path
           d={geo.medianPath}
           data-mc-ink="data"
@@ -127,11 +130,10 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
       {geo.todayPath ? (
         <path
           d={geo.todayPath}
-          fill="none"
-          stroke="var(--mc-accent)"
+          data-mc-ink="accent"
+          data-mc-w="support"
           strokeLinejoin="round"
           strokeLinecap="round"
-          style={{ strokeWidth: "calc(var(--mc-stroke-width) * 0.9)" }}
         />
       ) : null}
       {children}

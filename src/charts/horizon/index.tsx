@@ -70,16 +70,20 @@ export function Horizon(props: HorizonProps): ReactNode {
       className={className ? `mc-horizon ${className}` : "mc-horizon"}
       style={style}
     >
-      {geo.bands.map((band, i) => (
-        <path
-          key={i}
-          d={band.d}
-          style={{
-            fill: band.sign > 0 ? (color ?? "var(--mc-accent)") : "var(--mc-negative)",
-            fillOpacity: geo.opacities[band.fold - 1],
-          }}
-        />
-      ))}
+      {geo.bands.map((band, i) => {
+        const positive = band.sign > 0;
+        return (
+          <path
+            key={i}
+            d={band.d}
+            data-mc-ink={positive && color ? undefined : positive ? "accent" : "negative"}
+            style={{
+              fill: positive ? color : undefined,
+              fillOpacity: geo.opacities[band.fold - 1],
+            }}
+          />
+        );
+      })}
       {children}
     </Chart>
   );

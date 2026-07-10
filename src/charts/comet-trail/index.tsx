@@ -89,7 +89,6 @@ export function CometTrail(props: CometTrailProps): ReactNode {
     summary === false
       ? false
       : (summary ?? cometTrailSummary(data, { trail, strings, format, locale }));
-  const headFill = color ?? "var(--mc-accent)";
   const fmt = makeFormatter(format, locale);
 
   return (
@@ -110,7 +109,7 @@ export function CometTrail(props: CometTrailProps): ReactNode {
           cy={t.cy}
           r={t.r}
           data-mc-ink="point"
-          style={{ fillOpacity: t.opacity }}
+          fillOpacity={t.opacity}
         />
       ))}
       {/* head — the current value */}
@@ -120,7 +119,8 @@ export function CometTrail(props: CometTrailProps): ReactNode {
           cx={geo.head.cx}
           cy={geo.head.cy}
           r={geo.head.r}
-          style={{ fill: headFill }}
+          data-mc-ink={color ? undefined : "accent"}
+          style={color ? { fill: color } : undefined}
         />
       ) : null}
       {label === "last" && geo.head && Number.isFinite(geo.last) ? (

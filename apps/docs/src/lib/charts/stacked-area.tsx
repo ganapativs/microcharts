@@ -56,7 +56,15 @@ export const entry: ChartEntry = {
   demo: MIX[0].values,
   example: {
     title: "Traffic mix",
-    code: `import { StackedArea } from "${PKG}/stacked-area";\n\n<StackedArea data={mix} title="Traffic mix" />`,
+    code: `import { StackedArea } from "${PKG}/stacked-area";
+
+const mix = [
+  { label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
+  { label: "Web", values: [50, 48, 47, 45, 42, 41, 38, 36, 35, 33, 32, 30] },
+  { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
+];
+
+<StackedArea data={mix} title="Traffic mix" />`,
   },
 };
 

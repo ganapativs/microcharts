@@ -128,7 +128,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
             r={b.r}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1.5}
+            data-mc-w="full"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

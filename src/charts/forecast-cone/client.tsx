@@ -144,18 +144,22 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
               y1={0.5}
               x2={p.x}
               y2={height - 0.5}
-              stroke="var(--mc-neutral)"
-              strokeWidth={1}
+              data-mc-ink="muted"
+              data-mc-w="support"
               strokeDasharray="1.5 2"
               vectorEffect="non-scaling-stroke"
             />
+            {/* circle isn't covered by the path/line/polyline accent element-split
+                (styles.css) — a plain data-mc-ink="accent" would fill it solid and
+                drop the stroke, so ink stays a justified literal; width still takes
+                a role (orthogonal to ink). */}
             <circle
               cx={p.x}
               cy={p.y}
               r={2.4}
               fill="none"
               stroke="var(--mc-accent)"
-              strokeWidth={1}
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
           </>

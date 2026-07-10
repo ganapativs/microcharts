@@ -517,7 +517,7 @@
   {
     "name": "@microcharts/react/forecast-cone (static)",
     "path": "dist/charts/forecast-cone/index.js",
-    "limit": "2.95 kB",
+    "limit": "3 kB",
     "gzip": true
   },
   {
@@ -763,7 +763,7 @@
   {
     "name": "@microcharts/react/bubble-row/interactive",
     "path": "dist/charts/bubble-row/client.js",
-    "limit": "2.6 kB",
+    "limit": "2.65 kB",
     "gzip": true
   },
   {
@@ -823,7 +823,7 @@
   {
     "name": "@microcharts/react/constellation/interactive",
     "path": "dist/charts/constellation/client.js",
-    "limit": "3.75 kB",
+    "limit": "3.8 kB",
     "gzip": true
   },
   {
@@ -883,7 +883,7 @@
   {
     "name": "@microcharts/react/comet-trail/interactive",
     "path": "dist/charts/comet-trail/client.js",
-    "limit": "3.15 kB",
+    "limit": "3.2 kB",
     "gzip": true
   },
   {

@@ -12,6 +12,14 @@ is silently dropped. A flat bar beats a donut of the same data at every size we 
   sizeOf="segmented-bar"
   code={`import { SegmentedBar } from "@microcharts/react/segmented-bar";
 
+const mix = [
+{ label: "Chrome", value: 620 },
+{ label: "Safari", value: 240 },
+{ label: "Firefox", value: 90 },
+{ label: "Edge", value: 30 },
+{ label: "Arc", value: 20 },
+];
+
 <SegmentedBar data={mix} title="Browser share" />`}
 >
   <SegmentedBar
@@ -50,7 +58,17 @@ is silently dropped. A flat bar beats a donut of the same data at every size we 
 
 ## Variants
 
-<LiveDemo label="percents" code={`<SegmentedBar data={mix} label="percent" />`}>
+<LiveDemo
+  label="percents"
+  code={`<SegmentedBar
+  data={[
+    { label: "Chrome", value: 620 },
+    { label: "Safari", value: 240 },
+    { label: "Firefox", value: 140 },
+  ]}
+  label="percent"
+/>`}
+>
   <SegmentedBar
     data={[
       { label: "Chrome", value: 620 },
@@ -64,7 +82,17 @@ is silently dropped. A flat bar beats a donut of the same data at every size we 
   />
 </LiveDemo>
 
-<LiveDemo label="ranked" code={`<SegmentedBar data={mix} order="desc" />`}>
+<LiveDemo
+  label="ranked"
+  code={`<SegmentedBar
+  data={[
+    { label: "Firefox", value: 90 },
+    { label: "Chrome", value: 620 },
+    { label: "Safari", value: 240 },
+  ]}
+  order="desc"
+/>`}
+>
   <SegmentedBar
     data={[
       { label: "Firefox", value: 90 },
@@ -77,6 +105,79 @@ is silently dropped. A flat bar beats a donut of the same data at every size we 
     height={20}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<SegmentedBar
+  data={[
+    { label: "Chrome", value: 12400 },
+    { label: "Safari", value: 6200 },
+  ]}
+  label="value"
+  locale="de-DE"
+/>`}
+>
+  <SegmentedBar
+    data={[
+      { label: "Chrome", value: 12400 },
+      { label: "Safari", value: 6200 },
+    ]}
+    label="value"
+    locale="de-DE"
+    title="Localized values"
+    width={220}
+    height={20}
+  />
+</LiveDemo>
+
+`label="value"` follows `format`/`locale` — 12400 reads "12.400" under `de-DE` rather than the
+English "12,400". `label="percent"` is unaffected: the largest-remainder shares are always
+plain integers, never locale-formatted, because a percent point is the same everywhere.
+
+## Edge cases
+
+<LiveDemo
+  label="past maxSegments → Other rollup"
+  code={`<SegmentedBar data={[
+  { label: "Chrome", value: 620 },
+  { label: "Safari", value: 240 },
+  { label: "Firefox", value: 90 },
+  { label: "Edge", value: 30 },
+  { label: "Arc", value: 12 },
+  { label: "Brave", value: 8 },
+]} label="percent" />`}
+>
+  <SegmentedBar
+    data={[
+      { label: "Chrome", value: 620 },
+      { label: "Safari", value: 240 },
+      { label: "Firefox", value: 90 },
+      { label: "Edge", value: 30 },
+      { label: "Arc", value: 12 },
+      { label: "Brave", value: 8 },
+    ]}
+    label="percent"
+    title="Six sources, five segments"
+    width={220}
+    height={20}
+  />
+</LiveDemo>
+
+<LiveDemo label="single category" code={`<SegmentedBar data={[{ label: "Chrome", value: 1 }]} />`}>
+  <SegmentedBar
+    data={[{ label: "Chrome", value: 1 }]}
+    label="percent"
+    title="Single category"
+    width={100}
+    height={20}
+  />
+</LiveDemo>
+
+Past `maxSegments` (default 5) the smallest categories merge into a labeled "Other" — nothing
+is dropped, only rolled up, and the interactive entry announces its member count. A single
+category still renders as one full-width, 100% segment rather than a special-cased bare bar.
+Negative values can't exist in a part-to-whole, so they're excluded from the bar entirely (not
+clamped to zero) and the component logs a dev warning steering toward Waterfall.
 
 ## Four homes
 

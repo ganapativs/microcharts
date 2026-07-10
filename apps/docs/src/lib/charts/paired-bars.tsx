@@ -54,7 +54,16 @@ export const entry: ChartEntry = {
   demo: BUDGET.map((d) => d.value),
   example: {
     title: "Budget vs actual",
-    code: `import { PairedBars } from "${PKG}/paired-bars";\n\n<PairedBars data={regions} title="Actual vs plan" />`,
+    code: `import { PairedBars } from "${PKG}/paired-bars";
+
+const regions = [
+  { label: "East", value: 940, ref: 1200 },
+  { label: "West", value: 410, ref: 400 },
+  { label: "South", value: 620, ref: 600 },
+  { label: "North", value: 120, ref: 300 },
+];
+
+<PairedBars data={regions} title="Actual vs plan" />`,
   },
 };
 

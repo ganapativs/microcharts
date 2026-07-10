@@ -24,11 +24,11 @@ describe("histogramGeometry (plan/22 #15)", () => {
     expect(geo.bars.length).toBeLessThanOrEqual(2);
   });
 
-  it("highlight marks the bin of a VALUE; never re-bins", () => {
+  it("markValue marks the bin of a VALUE; never re-bins", () => {
     const values = Array.from({ length: 40 }, (_, i) => i % 10);
-    const with_ = histogramGeometry({ ...base, values, highlight: 9 });
+    const with_ = histogramGeometry({ ...base, values, markValue: 9 });
     const without = histogramGeometry({ ...base, values });
-    expect(with_.highlightBin).toBeGreaterThanOrEqual(0);
+    expect(with_.markBin).toBeGreaterThanOrEqual(0);
     expect(with_.bars.map((b) => b.x1)).toEqual(without.bars.map((b) => b.x1));
   });
 

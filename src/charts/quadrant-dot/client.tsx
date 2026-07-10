@@ -168,7 +168,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
             r={Math.max(1.6, Math.min(width, height) * 0.1) + 1.4}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={0.8}
+            data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

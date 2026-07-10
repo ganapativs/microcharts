@@ -6,6 +6,7 @@
 // widen is flagged (never auto-inflated).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.js";
 import { forecastConeGeometry, type ForecastConeGeometry, type ForecastInput } from "./geometry.js";
@@ -122,6 +123,12 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
     );
   }
 
+  if (!geo.widening) {
+    devWarn(
+      "<ForecastCone> forecast bands don't widen over the horizon — rendered as given, never auto-inflated (an estimate's uncertainty should grow with distance).",
+    );
+  }
+
   const accName =
     summary === false
       ? false
@@ -139,13 +146,17 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* fan bands — faintest (80) first; accent tint via inline style (band ink
-          role would override the fill to the neutral --mc-band token) */}
+      {/* fan bands — faintest (80) first. This is the uncertainty ENCODING, not
+          a neutral reference zone, so it takes an accent tint via inline style
+          rather than `data-mc-ink="band"` (that role means the muted
+          `--mc-band` background token, and — as a side effect — exempts the
+          mark from the craft gate's text-on-mark check; misapplying it here
+          would be borrowing that exemption for a mark it doesn't describe). */}
       {geo.bands.map((b) => (
         <path
           key={b.p}
           d={b.d}
-          data-mc-ink="band"
+          className="mc-cone-band"
           style={{ fill: accent, fillOpacity: BAND_OPACITY[b.p] }}
         />
       ))}
@@ -165,9 +176,9 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
         y1={1}
         x2={geo.boundary.x}
         y2={height - 1}
-        stroke="var(--mc-neutral)"
+        data-mc-ink="muted"
+        data-mc-w="hair"
         strokeOpacity={0.4}
-        strokeWidth={0.6}
         vectorEffect="non-scaling-stroke"
       />
       {geo.now !== null ? (
@@ -188,10 +199,10 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
           y1={geo.target.y}
           x2={width}
           y2={geo.target.y}
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
+          data-mc-w="hair"
           strokeOpacity={0.6}
           strokeDasharray="1 1.5"
-          strokeWidth={0.6}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}

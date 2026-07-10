@@ -26,10 +26,10 @@ export function iconArraySummary(
 }
 
 export interface IconArrayProps {
-  /** The rate, 0–1 (rounded to the nearest whole unit of `of`). */
+  /** The rate, 0–1 (rounded to the nearest whole unit of `total`). */
   value: number;
   /** Denominator / grid size (default 20). */
-  of?: IconArrayN | undefined;
+  total?: IconArrayN | undefined;
   /** `"ratio"` (default, "3 in 20") | `"percent"` | `"none"`. */
   label?: "ratio" | "percent" | "none" | undefined;
   /** Shared cell vocabulary. */
@@ -52,7 +52,7 @@ export interface IconArrayProps {
 export function IconArray(props: IconArrayProps): ReactNode {
   const {
     value,
-    of = 20,
+    total = 20,
     label = "ratio",
     shape = "square",
     positive,
@@ -74,22 +74,25 @@ export function IconArray(props: IconArrayProps): ReactNode {
   const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
   const showLabel = label !== "none";
   const gutterCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
-  const geo = iconArrayGeometry({ width, height, value, of, shape, gutterCh, fontSize: FONT });
+  const geo = iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT });
 
-  if (of === 100 && (width < 40 || height < 40)) {
-    devWarn("<IconArray> of=100 needs ≥ 40×40 — unit size falls below the crispness floor.");
+  if (total === 100 && (width < 40 || height < 40)) {
+    devWarn("<IconArray> total=100 needs ≥ 40×40 — unit size falls below the crispness floor.");
   }
 
   const pctFmt = makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale);
   const accName = summary === false ? false : (summary ?? iconArraySummary(geo, pctFmt, strings));
 
-  const fillColor =
-    color ??
-    (positive === "down"
-      ? "var(--mc-negative)"
+  // no custom color: the fill role token IS the ink role (bound in
+  // styles.css, retunes with presets); a custom color stays inline since it
+  // has no token
+  const fillRole = color
+    ? undefined
+    : positive === "down"
+      ? "negative"
       : positive === "up"
-        ? "var(--mc-positive)"
-        : "var(--mc-accent)");
+        ? "positive"
+        : "accent";
   const labelText = label === "percent" ? pctFmt(geo.k / geo.n) : `${geo.k} in ${geo.n}`;
   // pin the label size to viewBox units (see coverage-strip / plan/12)
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
@@ -114,14 +117,15 @@ export function IconArray(props: IconArrayProps): ReactNode {
             height={geo.cell}
             rx={geo.rx}
             shapeRendering={geo.crisp ? "crispEdges" : undefined}
-            data-mc-ink="unit"
-            style={{ fill: fillColor }}
+            data-mc-ink={fillRole ?? "unit"}
+            style={color ? { fill: color } : undefined}
           />
         ) : (
           // empty unit — a visible faint-fill slot with a hairline, never a
           // void. Coloring lives in the "unit-off" ink-role rule (styles.css)
-          // so forced-colors can remap it; the FILLED unit stays inline (its
-          // fill is dynamic — accent/positive/negative by `positive`).
+          // so forced-colors can remap it; the filled unit is an ink role too
+          // (accent/positive/negative by `positive`) unless a custom `color`
+          // is given, which has no token and stays inline.
           <rect
             key={u.index}
             x={u.x}

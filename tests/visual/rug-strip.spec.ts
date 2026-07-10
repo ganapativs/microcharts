@@ -13,7 +13,7 @@ const svg = (props: Record<string, unknown>) => renderToStaticMarkup(h(RugStrip 
 const FIELD = Array.from({ length: 38 }, (_, i) => 40 + ((i * 13) % 45) + (i % 3 === 0 ? 8 : 0));
 
 function gallery(): string {
-  const sentence = `Your offer sits ${svg({ data: FIELD, highlight: 78, domain: [35, 95], width: 90, height: 12, title: "Pay band" })} inside the band.`;
+  const sentence = `Your offer sits ${svg({ data: FIELD, markValue: 78, domain: [35, 95], width: 90, height: 12, title: "Pay band" })} inside the band.`;
 
   const cell = `<table><tbody>
     <tr><td>p50 latency</td><td>${svg({ data: FIELD, summary: false })}</td></tr>
@@ -23,14 +23,14 @@ function gallery(): string {
   const kpi = `<div class="card">
     <div class="label">Response times (ms)</div>
     <div class="value">48 median</div>
-    ${svg({ data: FIELD, highlight: 48, width: 140, height: 12, title: "Response times" })}
+    ${svg({ data: FIELD, markValue: 48, width: 140, height: 12, title: "Response times" })}
   </div>`;
 
   const tab = `<div class="tab"><span>Spread</span> ${svg({ data: FIELD.slice(0, 20), width: 44, height: 10, summary: false })}</div>`;
 
   const variants = [
     svg({ data: FIELD, title: "field" }),
-    svg({ data: FIELD, highlight: 62, title: "highlight" }),
+    svg({ data: FIELD, markValue: 62, title: "markValue" }),
     svg({ data: [50, 50, 50, 50, 62, 71], title: "stacked duplicates" }),
     svg({ data: FIELD.slice(0, 12), orientation: "vertical", title: "vertical" }),
     svg({ data: [], title: "empty" }),
@@ -39,7 +39,7 @@ function gallery(): string {
   const presets = ["editorial", "mono", "vivid"]
     .map(
       (p) =>
-        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ data: FIELD.slice(0, 20), highlight: 60, summary: false })}</span>`,
+        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ data: FIELD.slice(0, 20), markValue: 60, summary: false })}</span>`,
     )
     .join(" ");
 

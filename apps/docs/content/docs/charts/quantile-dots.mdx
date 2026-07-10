@@ -79,6 +79,65 @@ odds you must trust, and a frequency reads truer than a bare percentage.
   </span>
 </LiveDemo>
 
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the announced threshold
+follows that locale's own grouping and decimal marks.
+
+<LiveDemo
+  label="locale"
+  code={`<QuantileDots
+  data={waits}
+  threshold={15000}
+  format={{ style: "unit", unit: "minute", unitDisplay: "narrow" }}
+  locale="de-DE"
+/>`}
+>
+  <QuantileDots
+    data={Array.from({ length: 200 }, (_, i) =>
+      Math.round(4000 + (i % 30) * 350 + ((i * 7) % 13) * 1100 + (i % 50 === 0 ? 20000 : 0)),
+    )}
+    threshold={15000}
+    format={{ style: "unit", unit: "minute", unitDisplay: "narrow" }}
+    locale="de-DE"
+    title="Localized threshold"
+    width={220}
+    height={26}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="empty" code={`<QuantileDots data={[]} title="No samples" />`}>
+  <QuantileDots data={[]} title="No samples" width={140} height={20} />
+</LiveDemo>
+
+<LiveDemo
+  label="all-equal sample (certainty)"
+  code={`<QuantileDots data={[7, 7, 7, 7, 7]} title="Certain outcome" />`}
+>
+  <QuantileDots data={[7, 7, 7, 7, 7]} title="Certain outcome" width={140} height={20} />
+</LiveDemo>
+
+<LiveDemo
+  label="threshold outside the data range"
+  code={`<QuantileDots data={waits} threshold={9999} side="above" />`}
+>
+  <QuantileDots
+    data={Array.from({ length: 200 }, (_, i) =>
+      Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1),
+    )}
+    threshold={9999}
+    side="above"
+    title="Threshold past the max"
+    width={140}
+    height={20}
+  />
+</LiveDemo>
+
+Empty data draws nothing and the summary says so plainly. An all-equal sample collapses
+every dot into one column — genuine certainty, not a rendering glitch. A threshold
+outside the observed range reads as 0 in N (or N in N) — the count is always honest
+about what fraction of the field it's actually catching.
+
 ## Four homes
 
 <FourContexts slug="quantile-dots" />

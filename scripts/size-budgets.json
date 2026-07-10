@@ -187,7 +187,7 @@
       "interactive": "3.7 kB"
     },
     "forecast-cone": {
-      "static": "2.95 kB",
+      "static": "3 kB",
       "interactive": "3.85 kB"
     },
     "quantile-dots": {
@@ -268,7 +268,7 @@
     },
     "bubble-row": {
       "static": "1.9 kB",
-      "interactive": "2.6 kB"
+      "interactive": "2.65 kB"
     },
     "music-staff": {
       "static": "2.55 kB",
@@ -288,7 +288,7 @@
     },
     "constellation": {
       "static": "2.85 kB",
-      "interactive": "3.75 kB"
+      "interactive": "3.8 kB"
     },
     "polar-clock": {
       "static": "2.95 kB",
@@ -308,7 +308,7 @@
     },
     "comet-trail": {
       "static": "2.1 kB",
-      "interactive": "3.15 kB"
+      "interactive": "3.2 kB"
     },
     "orbit-status": {
       "static": "2.1 kB",

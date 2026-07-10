@@ -59,7 +59,12 @@ export const entry: ChartEntry = {
   demo: AFTER,
   example: {
     title: "The fix",
-    code: `import { ShiftHistogram } from "${PKG}/shift-histogram";\n\n<ShiftHistogram data={{ before, after }} title="The fix" />`,
+    code: `import { ShiftHistogram } from "${PKG}/shift-histogram";
+
+const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+
+<ShiftHistogram data={{ before, after }} title="The fix" />`,
   },
 };
 
@@ -128,7 +133,10 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "overlay for similar shapes",
-    code: `<ShiftHistogram data={{ before, after }} mode="overlay" />`,
+    code: `const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
+
+<ShiftHistogram data={{ before, after }} mode="overlay" />`,
     node: (
       <ShiftHistogram
         data={{ before: BEFORE, after: AFTER }}
@@ -142,7 +150,9 @@ export const recipes: Recipe[] = [
   },
   {
     label: "no real shift",
-    code: `<ShiftHistogram data={{ before, after: before }} />`,
+    code: `const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
+
+<ShiftHistogram data={{ before, after: before }} />`,
     node: (
       <ShiftHistogram
         data={{ before: BEFORE, after: BEFORE }}

@@ -163,7 +163,7 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
             r={rad + 1.25}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

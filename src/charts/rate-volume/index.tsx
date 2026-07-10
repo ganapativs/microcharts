@@ -190,7 +190,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
             r={1.8}
             fill="var(--mc-surface)"
             stroke={lineColor}
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null,

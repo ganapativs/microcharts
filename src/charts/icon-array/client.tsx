@@ -17,7 +17,7 @@ export interface InteractiveIconArrayProps extends IconArrayProps {
 export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
   const {
     value,
-    of = 20,
+    total = 20,
     label = "ratio",
     shape = "square",
     width = 140,
@@ -32,8 +32,8 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
   const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
   const gutterCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
   const geo = useMemo(
-    () => iconArrayGeometry({ width, height, value, of, shape, gutterCh, fontSize: FONT }),
-    [width, height, value, of, shape, gutterCh, FONT],
+    () => iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT }),
+    [width, height, value, total, shape, gutterCh, FONT],
   );
   const pctFmt = useMemo(
     () => makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale),
@@ -125,7 +125,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
       <StaticIconArray
         {...rest}
         value={value}
-        of={of}
+        total={total}
         label={label}
         shape={shape}
         width={width}
@@ -143,7 +143,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
             rx={geo.rx + 0.75}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1.5}
+            data-mc-w="full"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

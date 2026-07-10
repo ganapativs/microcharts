@@ -60,7 +60,11 @@ export const entry: ChartEntry = {
   demo: DEMO,
   example: {
     title: "Checkout SLO",
-    code: `import { ErrorBudget } from "${PKG}/error-budget";\n\n<ErrorBudget data={remaining} window={30} title="Checkout SLO" />`,
+    code: `import { ErrorBudget } from "${PKG}/error-budget";
+
+const remaining = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
+
+<ErrorBudget data={remaining} window={30} title="Checkout SLO" />`,
   },
 };
 
@@ -122,12 +126,15 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "fast-burn exhausts the window",
-    code: `<ErrorBudget data={remaining} window={20} />`,
+    code: `<ErrorBudget data={[1, 0.82, 0.6, 0.38, 0.18, 0.04, 0]} window={20} />`,
     node: <ErrorBudget data={BURNED} window={20} summary={false} width={170} height={26} />,
   },
   {
     label: "diagonal only (quietest form)",
-    code: `<ErrorBudget data={remaining} rates={[1]} />`,
+    code: `<ErrorBudget
+  data={[1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62]}
+  rates={[1]}
+/>`,
     node: (
       <ErrorBudget
         data={DEMO}

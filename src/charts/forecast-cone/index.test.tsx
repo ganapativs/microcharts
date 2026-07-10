@@ -1,10 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { ForecastCone } from "./index.js";
 import type { ForecastInput } from "./geometry.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const HIST = [30, 32, 31, 34, 36, 35, 38];
@@ -48,7 +52,7 @@ describe("<ForecastCone> (plan/23 #11)", () => {
 
   it("2 bands + solid history + dashed median", () => {
     const { container } = draw(<ForecastCone data={HIST} forecast={FC} />);
-    expect(container.querySelectorAll('path[data-mc-ink="band"]').length).toBe(2);
+    expect(container.querySelectorAll("path.mc-cone-band").length).toBe(2);
     const mid = [...container.querySelectorAll("path")].find(
       (p) => p.getAttribute("stroke-dasharray") === "2.5 2.5",
     );
@@ -59,7 +63,26 @@ describe("<ForecastCone> (plan/23 #11)", () => {
     const { container } = draw(
       <ForecastCone data={HIST} forecast={{ mid: FC.mid, p80: FC.p80 }} />,
     );
-    expect(container.querySelectorAll('path[data-mc-ink="band"]').length).toBe(1);
+    expect(container.querySelectorAll("path.mc-cone-band").length).toBe(1);
+  });
+
+  it("a non-widening cone dev-warns and renders as given (never auto-inflated)", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { container } = draw(
+      <ForecastCone
+        data={[10, 11]}
+        forecast={{
+          mid: [12, 13, 14],
+          p80: [
+            [9, 15],
+            [10, 14],
+            [11, 13],
+          ],
+        }}
+      />,
+    );
+    expect(warn).toHaveBeenCalled();
+    expect(container.querySelectorAll("path.mc-cone-band").length).toBe(1);
   });
 
   it("label='landing' states the median endpoint; 'none' shows no text", () => {

@@ -15,5 +15,5 @@ export const EN_NET_FLOW: NetFlowStrings = {
     `Net ${netLast} last period; in ${inLast} vs out ${outLast}; net positive ${netPositive} of ${n} periods.`,
   netFlowAt: (position, total, inValue, outValue, net) =>
     `Period ${position} of ${total}: in ${inValue}, out ${outValue}, net ${net}.`,
-  netFlowNoFlow: (n) => `No flow across ${n} periods.`,
+  netFlowNoFlow: (n) => `No flow across ${n} ${n === 1 ? "period" : "periods"}.`,
 };

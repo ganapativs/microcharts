@@ -60,7 +60,16 @@ export const entry: ChartEntry = {
   demo: MIX.map((d) => d.value),
   example: {
     title: "Regional mix",
-    code: `import { MiniBar } from "${PKG}/mini-bar";\n\n<MiniBar data={regions} title="Sales by region" />`,
+    code: `import { MiniBar } from "${PKG}/mini-bar";
+
+const regions = [
+  { label: "East", value: 940 },
+  { label: "West", value: 410 },
+  { label: "South", value: 620 },
+  { label: "North", value: 120 },
+];
+
+<MiniBar data={regions} title="Sales by region" />`,
   },
 };
 
@@ -125,7 +134,15 @@ export const recipes: Recipe[] = [
   },
   {
     label: "signed with polarity",
-    code: `<MiniBar data={dailyDelta} positive="up" />`,
+    code: `<MiniBar
+  data={[
+    { label: "Mon", value: 4 },
+    { label: "Tue", value: -2 },
+    { label: "Wed", value: 6 },
+    { label: "Thu", value: -1 },
+  ]}
+  positive="up"
+/>`,
     node: (
       <MiniBar
         data={[
