@@ -32,7 +32,7 @@ export function waveformGeometry(opts: {
   width: number;
   height: number;
   buckets: number;
-  domain: [number, number] | null;
+  domain: readonly [number, number] | null;
   mirror: boolean;
 }): { bars: WaveBar[]; path: string; peak: number; peakIndex: number } {
   const { data, width, height, buckets, domain, mirror } = opts;
@@ -89,7 +89,7 @@ export function envelopePath(opts: {
   width: number;
   height: number;
   buckets: number;
-  domain: [number, number] | null;
+  domain: readonly [number, number] | null;
   mirror: boolean;
 }): string {
   const { data, width, height, buckets, domain, mirror } = opts;

@@ -98,15 +98,12 @@ export function HeatCell(props: HeatCellProps): ReactNode {
         height={geo.h}
         rx={geo.rx}
         shapeRendering={geo.crisp ? "crispEdges" : undefined}
-        data-mc-ink={geo.step === null ? "band" : "cell"}
-        style={
-          geo.step === null
-            ? undefined
-            : {
-                fillOpacity: valueStepOpacity(geo.step, steps),
-                ...(color ? { fill: color } : null),
-              }
-        }
+        // no-data uses "gap" (a measured-nothing-here slot), never "band" — a
+        // real background band would be the invisible 8% fill this cell must
+        // NOT collapse into (empty must read distinct from any real value)
+        data-mc-ink={geo.step === null ? "gap" : "cell"}
+        fillOpacity={geo.step === null ? undefined : valueStepOpacity(geo.step, steps)}
+        style={geo.step === null || !color ? undefined : { fill: color }}
       />
       {showLabel ? (
         <text

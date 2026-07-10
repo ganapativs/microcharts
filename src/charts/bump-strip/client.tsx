@@ -136,7 +136,7 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
             r={2.5}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1.25}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

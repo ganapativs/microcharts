@@ -26,7 +26,7 @@ export function InteractiveDemo() {
     <DemoPanel hint="A live event firehose. Each blip is one real event arriving; the trace sweeps left as time passes and the rate you see IS the event rate. Stop the firehose and, after the window empties, the flat baseline is the down signal — never a fake pulse. Reduced-motion readers get the same trace, re-rendered on each event instead of swept.">
       <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-start" }}>
         <HeartbeatBlipInteractive
-          data={events}
+          events={events}
           now={now}
           window={20_000}
           label="count"

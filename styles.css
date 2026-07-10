@@ -245,6 +245,9 @@
      mark. Ratios of the primary width so presets and prefers-contrast retune
      every stroke in a chart, not just the data line. At the default 1.5 these
      resolve to 1 / 0.75 / 0.5 — the weights the charts were hand-tuned to. */
+  :where(.mc-root [data-mc-w="full"]) {
+    stroke-width: var(--mc-stroke-width);
+  }
   :where(.mc-root [data-mc-w="support"]) {
     stroke-width: calc(var(--mc-stroke-width) * 2 / 3);
   }

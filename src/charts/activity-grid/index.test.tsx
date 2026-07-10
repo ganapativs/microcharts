@@ -19,8 +19,8 @@ describe("<ActivityGrid> (plan/05 S1-binned, plan/08)", () => {
     const { container } = draw(<ActivityGrid data={[0, 10]} domain={[0, 10]} />);
     const rects = container.querySelectorAll('rect[data-mc-ink="cell"]');
     expect(rects).toHaveLength(2);
-    const o0 = Number((rects[0] as HTMLElement).style.fillOpacity);
-    const o1 = Number((rects[1] as HTMLElement).style.fillOpacity);
+    const o0 = Number(rects[0]!.getAttribute("fill-opacity"));
+    const o1 = Number(rects[1]!.getAttribute("fill-opacity"));
     expect(o1).toBeGreaterThan(o0);
   });
 

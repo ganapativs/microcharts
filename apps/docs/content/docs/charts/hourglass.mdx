@@ -57,6 +57,42 @@ it disappears at both ends, because finished and not-started are shape-distinct 
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="zero — not started, no stream"
+  code={`<Hourglass value={0} title="Not started" />`}
+>
+  <Hourglass value={0} title="Not started" height={36} />
+</LiveDemo>
+
+<LiveDemo
+  label="finished — no stream, all sand settled"
+  code={`<Hourglass value={1} title="Finished" />`}
+>
+  <Hourglass value={1} title="Finished" height={36} />
+</LiveDemo>
+
+<LiveDemo
+  label="out-of-range clamps to 0–1 — visually and in the accessible name"
+  code={`// unlike Thermometer, Hourglass has no calibrated domain to overflow past —
+// value is a fraction, so 1.4 reads identically to 1 (finished)
+<Hourglass value={1.4} title="Overrun" />`}
+>
+  <Hourglass value={1.4} title="Overrun" height={36} />
+</LiveDemo>
+
+<LiveDemo
+  label="NaN — treated as 0 elapsed (documented)"
+  code={`<Hourglass value={Number.NaN} title="Invalid" />`}
+>
+  <Hourglass value={Number.NaN} title="Invalid" height={36} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="hourglass" />
+
 ## Why this default
 
 `value` is the elapsed fraction — the same polarity as `Progress` — so the two compose in one product

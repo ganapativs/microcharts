@@ -14,7 +14,11 @@ subordinate ghost.
   sizeOf="retention-curve"
   code={`import { RetentionCurve } from "@microcharts/react/retention-curve";
 
-<RetentionCurve data={cohort} unit="week" title="W12 cohort" />`}
+<RetentionCurve
+  data={[1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38, 0.379, 0.378]}
+  unit="week"
+  title="W12 cohort"
+/>`}
 >
   <RetentionCurve
     data={[1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38, 0.379, 0.378]}
@@ -50,8 +54,14 @@ subordinate ghost.
 
 <LiveDemo
   label="benchmark ghost + smooth"
-  code={`<RetentionCurve data={cohort} benchmark={industry} />
-<RetentionCurve data={cohort} curve="smooth" />`}
+  code={`<RetentionCurve
+  data={[1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38]}
+  benchmark={[1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28]}
+/>
+<RetentionCurve
+  data={[1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38]}
+  curve="smooth"
+/>`}
 >
   <span className="inline-flex flex-col gap-1.5">
     <RetentionCurve
@@ -72,6 +82,52 @@ subordinate ghost.
     />
   </span>
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="one period" code={`<RetentionCurve data={[1]} unit="week" />`}>
+  <RetentionCurve data={[1]} unit="week" title="Week zero only" width={140} height={26} />
+</LiveDemo>
+
+<LiveDemo
+  label="0–100 input"
+  code={`// values over 1.001 are auto-detected as percent, not fraction — same curve
+<RetentionCurve data={[100, 72, 55, 47, 42, 40, 39]} unit="week" />`}
+>
+  <RetentionCurve
+    data={[100, 72, 55, 47, 42, 40, 39]}
+    unit="week"
+    title="Percent-scale input"
+    width={180}
+    height={26}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<RetentionCurve
+  data={[1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39]}
+  unit="week"
+  label="last"
+  locale="de-DE"
+/>`}
+>
+  <RetentionCurve
+    data={[1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39]}
+    unit="week"
+    label="last"
+    locale="de-DE"
+    title="Localized retention"
+    width={180}
+    height={26}
+  />
+</LiveDemo>
+
+A single period is too short for plateau detection (the window needs at least three finite
+points) and renders as a single step with no visible line. `data` accepts either a 0–1
+fraction or a 0–100 percent series — whichever the max value implies — so a raw percent
+export renders identically to its fraction form without a manual divide. With a `locale`, the
+percent label and every announced number follow that locale's own formatting.
 
 ## Four homes
 

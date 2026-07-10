@@ -16,20 +16,20 @@
     "interactive": 2.02
   },
   "activity-grid": {
-    "static": 2.09,
-    "interactive": 3.26
+    "static": 2.08,
+    "interactive": 3.25
   },
   "trend-arrow": {
     "static": 1.66,
     "interactive": 1.96
   },
   "status-dot": {
-    "static": 1.58,
-    "interactive": 1.83
+    "static": 1.57,
+    "interactive": 1.82
   },
   "heat-cell": {
     "static": 1.77,
-    "interactive": 2.15
+    "interactive": 2.16
   },
   "progress": {
     "static": 1.84,
@@ -128,8 +128,8 @@
     "interactive": 3.16
   },
   "calendar-strip": {
-    "static": 2.29,
-    "interactive": 3.44
+    "static": 2.28,
+    "interactive": 3.46
   },
   "event-timeline": {
     "static": 2.63,
@@ -157,11 +157,11 @@
   },
   "retention-curve": {
     "static": 2.64,
-    "interactive": 3.51
+    "interactive": 3.52
   },
   "burn-chart": {
-    "static": 2.82,
-    "interactive": 3.76
+    "static": 2.83,
+    "interactive": 3.77
   },
   "error-budget": {
     "static": 2.41,
@@ -204,20 +204,20 @@
     "interactive": 3.47
   },
   "change-point": {
-    "static": 2.92,
+    "static": 2.93,
     "interactive": 3.92
   },
   "ensemble-ghosts": {
     "static": 2.28,
-    "interactive": 3.13
+    "interactive": 3.14
   },
   "tally-marks": {
     "static": 1.47,
-    "interactive": 1.96
+    "interactive": 1.98
   },
   "dice-pips": {
     "static": 1.29,
-    "interactive": 1.7
+    "interactive": 1.72
   },
   "fill-word": {
     "static": 1.38,
@@ -236,8 +236,8 @@
     "interactive": 1.86
   },
   "hourglass": {
-    "static": 1.65,
-    "interactive": 2.1
+    "static": 1.66,
+    "interactive": 2.12
   },
   "balance-beam": {
     "static": 1.98,
@@ -248,7 +248,7 @@
     "interactive": 2.48
   },
   "garden-grid": {
-    "static": 1.74,
+    "static": 1.75,
     "interactive": 2.66
   },
   "bubble-row": {
@@ -257,7 +257,7 @@
   },
   "music-staff": {
     "static": 2.49,
-    "interactive": 3.32
+    "interactive": 3.33
   },
   "tree-rings": {
     "static": 1.93,
@@ -268,8 +268,8 @@
     "interactive": 2.76
   },
   "honeycomb": {
-    "static": 1.66,
-    "interactive": 2.1
+    "static": 1.65,
+    "interactive": 2.09
   },
   "constellation": {
     "static": 2.81,
@@ -284,12 +284,12 @@
     "interactive": 3.56
   },
   "breathing-dot": {
-    "static": 1.6,
-    "interactive": 2.46
+    "static": 1.59,
+    "interactive": 2.45
   },
   "heartbeat-blip": {
-    "static": 1.89,
-    "interactive": 2.72
+    "static": 1.9,
+    "interactive": 2.75
   },
   "comet-trail": {
     "static": 2.04,
@@ -312,8 +312,8 @@
     "interactive": 3.05
   },
   "hypnogram": {
-    "static": 2.48,
-    "interactive": 3.42
+    "static": 2.45,
+    "interactive": 3.4
   },
   "eta-bar": {
     "static": 1.98,
@@ -321,11 +321,11 @@
   },
   "waveform": {
     "static": 2.26,
-    "interactive": 3.14
+    "interactive": 3.15
   },
   "event-raster": {
-    "static": 2.36,
-    "interactive": 3.58
+    "static": 2.39,
+    "interactive": 3.62
   },
   "rubric-strip": {
     "static": 2.18,
@@ -336,7 +336,7 @@
     "interactive": 1.58
   },
   "wind-barb": {
-    "static": 2.39
+    "static": 2.4
   },
   "star-spoke": {
     "static": 2.13,
@@ -363,8 +363,8 @@
     "interactive": 3.23
   },
   "confusion-grid": {
-    "static": 2.31,
-    "interactive": 3.24
+    "static": 2.35,
+    "interactive": 3.27
   },
   "folded-day-band": {
     "static": 2.26,
@@ -375,8 +375,8 @@
     "interactive": 3.48
   },
   "phase-trace": {
-    "static": 2.27,
-    "interactive": 3.13
+    "static": 2.28,
+    "interactive": 3.14
   },
   "trace-fold": {
     "static": 2.14,
@@ -387,8 +387,8 @@
     "interactive": 3.22
   },
   "station-glyph": {
-    "static": 2.96,
-    "interactive": 3.53
+    "static": 3.01,
+    "interactive": 3.57
   },
   "annotations": {
     "static": 1.46

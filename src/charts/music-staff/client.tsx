@@ -130,7 +130,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
             r={activeNote.rx + 1.5}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

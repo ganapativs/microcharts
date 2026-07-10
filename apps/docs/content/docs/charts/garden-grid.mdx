@@ -14,6 +14,8 @@ because "missing" is not "zero".
   sizeOf="garden-grid"
   code={`import { GardenGrid } from "@microcharts/react/garden-grid";
 
+const weeks = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26];
+
 <GardenGrid data={weeks} title="Activity" unit="weeks" />`}
 >
   <GardenGrid data={[12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26]} unit="weeks" title="Activity" cell={11} />
@@ -44,7 +46,9 @@ because "missing" is not "zero".
 
 <LiveDemo
   label="strip mode + blank empties"
-  code={`<GardenGrid data={weeks} rows={1} />
+  code={`const weeks = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9];
+
+<GardenGrid data={weeks} rows={1} />
 <GardenGrid data={weeks} empty="blank" />`}
 >
   <span className="inline-flex flex-col gap-3">
@@ -52,6 +56,34 @@ because "missing" is not "zero".
     <GardenGrid data={[12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0]} empty="blank" cell={11} />
   </span>
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="empty data" code={`<GardenGrid data={[]} title="No history" />`}>
+  <GardenGrid data={[]} title="No history" cell={11} />
+</LiveDemo>
+
+<LiveDemo
+  label="all-zero (present, quiet — never missing)"
+  code={`<GardenGrid data={[0, 0, 0, 0, 0, 0, 0]} title="Quiet week" />`}
+>
+  <GardenGrid data={[0, 0, 0, 0, 0, 0, 0]} title="Quiet week" cell={11} />
+</LiveDemo>
+
+<LiveDemo
+  label="nulls render nothing (missing ≠ zero)"
+  code={`<GardenGrid data={[5, null, 8, null, null, 3]} title="Gaps" />`}
+>
+  <GardenGrid data={[5, null, 8, null, null, 3]} title="Gaps" cell={11} />
+</LiveDemo>
+
+<LiveDemo label="single cell" code={`<GardenGrid data={[12]} title="One" />`}>
+  <GardenGrid data={[12]} title="One" cell={11} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="garden-grid" />
 
 ## Why this default
 

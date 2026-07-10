@@ -31,8 +31,8 @@ describe("<CalendarStrip> (plan/22 #26, structured)", () => {
   it("empty ≠ zero: no-record days render as outline, zero days as track fill", () => {
     const { container } = draw(<CalendarStrip data={DATA} end={END} />);
     const rects = [...container.querySelectorAll("rect")];
-    const empty = rects.filter((r) => r.getAttribute("style")?.includes("fill: none"));
-    const filled = rects.filter((r) => !r.getAttribute("style")?.includes("fill: none"));
+    const empty = rects.filter((r) => r.getAttribute("data-mc-ink") === "muted");
+    const filled = rects.filter((r) => r.getAttribute("data-mc-ink") === "cell");
     expect(empty.length).toBe(24); // 28 days − 3 value − 1 zero
     expect(filled.length).toBe(4);
   });

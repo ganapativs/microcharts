@@ -30,7 +30,9 @@ describe("<BreathingDot> (plan/24 #19)", () => {
 
   it("unknown → gray core, no ring", () => {
     const { container } = draw(<BreathingDot value={null} />);
-    expect(container.querySelector('.mc-breathing-core[data-mc-ink="muted"]')).not.toBeNull();
+    // filled neutral (role), not "muted" (stroke-oriented) — the unknown core
+    // is a solid gray dot, not an outline.
+    expect(container.querySelector('.mc-breathing-core[data-mc-ink="neutral"]')).not.toBeNull();
     expect(container.querySelectorAll("circle").length).toBe(1);
   });
 

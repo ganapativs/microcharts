@@ -28,7 +28,11 @@ describe("<ConfusionGrid> (plan/25 §21, plan/17 F21)", () => {
 
   it("accents the diagonal by shape (an inset stroke), not color alone", () => {
     const { container } = draw(<ConfusionGrid data={CATDOG} />);
-    expect(container.querySelectorAll('rect[data-mc-ink="accent"]').length).toBe(2); // 2 diagonal cells
+    const rings = container.querySelectorAll('rect[data-mc-ring="accent"]');
+    expect(rings.length).toBe(2); // 2 diagonal cells
+    // fill="none" must actually win (no ink-role fill collision) — the ring
+    // reads as an inset STROKE, never a solid accent-filled square
+    expect(rings[0]!.getAttribute("fill")).toBe("none");
   });
 
   it("perfect diagonal → No confusion.", () => {

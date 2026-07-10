@@ -77,6 +77,51 @@ read; for longer ordinal histories, use ActivityGrid.
   />
 </LiveDemo>
 
+`cell`/`gap` bump the edge length and spacing directly — grid-sibling parity with
+ActivityGrid and GardenGrid.
+
+<LiveDemo
+  label="larger cells"
+  code={`<CalendarStrip data={days} end="2026-07-01" cell={10} gap={2} />`}
+>
+  <CalendarStrip
+    data={Array.from({ length: 18 }, (_, i) => ({
+      date: `2026-06-${String(4 + i).padStart(2, "0")}`,
+      value: i % 4 === 3 ? 0 : (i % 7) + 1,
+    }))}
+    end="2026-07-01"
+    cell={10}
+    gap={2}
+    title="Larger cells"
+    style={{ width: 200, height: 112 }}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="empty data — window still renders"
+  code={`<CalendarStrip data={[]} end="2026-07-01" />`}
+>
+  <CalendarStrip data={[]} end="2026-07-01" title="No records" style={{ width: 150, height: 84 }} />
+</LiveDemo>
+
+<LiveDemo
+  label="all-zero (a filled track cell every day, never an outline)"
+  code={`<CalendarStrip data={days} end="2026-07-01" weeks={2} />`}
+>
+  <CalendarStrip
+    data={Array.from({ length: 14 }, (_, i) => ({
+      date: `2026-06-${String(18 + i).padStart(2, "0")}`,
+      value: 0,
+    }))}
+    end="2026-07-01"
+    weeks={2}
+    title="Quiet fortnight"
+    style={{ width: 150, height: 42 }}
+  />
+</LiveDemo>
+
 ## Four homes
 
 <FourContexts slug="calendar-strip" />

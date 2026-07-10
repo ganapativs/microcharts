@@ -148,9 +148,9 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
         <path
           d={geo.dCompare}
           data-mc-ink="muted"
+          data-mc-w="support"
           strokeDasharray="4 2"
           vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: 1 }}
         />
       ) : null}
       {geo.dPrimary ? (

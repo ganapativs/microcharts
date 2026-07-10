@@ -15,7 +15,7 @@ import { isFiniteValue } from "../../core/types.js";
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-function extent(vals: number[]): [number, number] {
+function extent(vals: number[]): readonly [number, number] {
   let lo = Infinity;
   let hi = -Infinity;
   for (const v of vals) {
@@ -147,7 +147,7 @@ export function PhaseTrace(props: PhaseTraceProps): React.ReactNode {
             r={2.4}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={0.9}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

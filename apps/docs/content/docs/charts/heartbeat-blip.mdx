@@ -16,9 +16,9 @@ color.
 
 // pass 'now' from your data layer — never Date.now() in a server render
 
-<HeartbeatBlip data={eventTimestamps} now={serverNow} title="Requests" />`}
+<HeartbeatBlip events={eventTimestamps} now={serverNow} title="Requests" />`}
 >
-  <HeartbeatBlip data={[97000, 92000, 85000, 70000, 55000, 48000]} now={100000} title="Requests" width={90} />
+  <HeartbeatBlip events={[97000, 92000, 85000, 70000, 55000, 48000]} now={100000} title="Requests" width={90} />
 </LiveDemo>
 
 ## Install
@@ -52,20 +52,73 @@ goes flat and stays flat.
 
 <LiveDemo
   label="count label, and the flatline down-signal"
-  code={`<HeartbeatBlip data={events} now={serverNow} label="count" />
-<HeartbeatBlip data={[]} now={serverNow} />`}
+  code={`<HeartbeatBlip events={events} now={serverNow} label="count" />
+<HeartbeatBlip events={[]} now={serverNow} />`}
 >
   <span className="inline-flex gap-6 items-center">
     <HeartbeatBlip
-      data={[97000, 92000, 85000, 70000, 55000, 48000]}
+      events={[97000, 92000, 85000, 70000, 55000, 48000]}
       now={100000}
       label="count"
       width={90}
       summary={false}
     />
-    <HeartbeatBlip data={[]} now={100000} width={90} summary={false} />
+    <HeartbeatBlip events={[]} now={100000} width={90} summary={false} />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<HeartbeatBlip
+  events={[97000, 92000, 85000]}
+  now={100000}
+  label="count"
+  format={{ useGrouping: false }}
+  locale="de-DE"
+/>`}
+>
+  <HeartbeatBlip
+    events={[97000, 92000, 85000]}
+    now={100000}
+    label="count"
+    format={{ useGrouping: false }}
+    locale="de-DE"
+    title="Requests"
+    width={90}
+  />
+</LiveDemo>
+
+`format`/`locale` only reach the `label="count"` numeral — the accessible summary's count is a
+plain integer (never run through the formatter), and the in-chart spikes never carry text, so
+there's nothing else to localize.
+
+## Edge cases
+
+<LiveDemo
+  label="empty — the flat down-signal"
+  code={`<HeartbeatBlip events={[]} now={100000} title="Requests" />`}
+>
+  <HeartbeatBlip events={[]} now={100000} title="Requests" width={90} />
+</LiveDemo>
+
+<LiveDemo
+  label="non-finite timestamps are dropped, not drawn as spikes"
+  code={`<HeartbeatBlip events={[97000, Number.NaN, 92000]} now={100000} title="Requests" />`}
+>
+  <HeartbeatBlip events={[97000, Number.NaN, 92000]} now={100000} title="Requests" width={90} />
+</LiveDemo>
+
+<LiveDemo
+  label="events outside the window are dropped, not clamped"
+  code={`// window defaults to 60s; only the in-window events draw a spike
+<HeartbeatBlip events={[95000, 10000]} now={100000} title="Requests" />`}
+>
+  <HeartbeatBlip events={[95000, 10000]} now={100000} title="Requests" width={90} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="heartbeat-blip" />
 
 ## Why this default
 

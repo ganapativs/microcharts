@@ -107,10 +107,10 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
             })
             .join("")}
           fill="none"
+          data-mc-w="tick"
           style={{
             stroke: paint ?? "var(--mc-accent)",
             strokeOpacity: 0.28,
-            strokeWidth: 0.75,
             strokeLinecap: "round",
             strokeLinejoin: "round",
           }}

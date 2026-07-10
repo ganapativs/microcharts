@@ -160,9 +160,9 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         <path
           d={geo.plan.d}
           data-mc-ink="muted"
+          data-mc-w="support"
           fill="none"
           strokeDasharray="2.5 2.5"
-          strokeWidth={1}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -174,7 +174,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         y2={height - 1}
         stroke="var(--mc-neutral)"
         strokeOpacity={0.4}
-        strokeWidth={0.6}
+        data-mc-w="hair"
         vectorEffect="non-scaling-stroke"
       />
       {/* projection — dotted + provisional; the fitted slope, never optimistic */}

@@ -52,6 +52,26 @@ never resized to fit — width grows with the count until the cap, then the nume
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="zero — no marks, a real '0 counted.'" code={`<TallyMarks value={0} />`}>
+  <TallyMarks value={0} height={20} />
+</LiveDemo>
+
+<LiveDemo
+  label="negative clamps to 0; the summary states the clamp, not a negative count"
+  code={`<TallyMarks value={-5} />`}
+>
+  <TallyMarks value={-5} height={20} />
+</LiveDemo>
+
+<LiveDemo
+  label="a non-physical value saturates at the 200-mark ceiling"
+  code={`<TallyMarks value={5000} total={5000} />`}
+>
+  <TallyMarks value={5000} total={5000} height={20} />
+</LiveDemo>
+
 ## Four homes
 
 <FourContexts slug="tally-marks" />

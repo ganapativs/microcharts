@@ -80,6 +80,10 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     el.style.transformBox = "fill-box";
     el.style.transformOrigin = "center";
     const amp = AMPLITUDE[geo.band];
+    // ease-in-out (not the canonical strong ease-out curve): a symmetric
+    // inhale/exhale needs to decelerate at BOTH extremes, not just the end —
+    // the documented physiological-timing exception (Emil ruling), same as
+    // HeartbeatBlip's sweep cadence.
     const anim = el.animate(
       [{ transform: "scale(1)" }, { transform: `scale(${1 + amp})` }, { transform: "scale(1)" }],
       { duration: PERIOD_MS[geo.band], iterations: Infinity, easing: "ease-in-out" },

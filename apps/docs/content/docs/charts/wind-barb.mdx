@@ -15,7 +15,7 @@ not a limitation — the per-barb quantum is stated next to every example.
 
 <WindBarb direction={225} magnitude={32} step={10} title="Wind" />`}
 >
-  <WindBarb direction={225} magnitude={32} step={10} label title="Wind" size={64} />
+  <WindBarb direction={225} magnitude={32} step={10} label="value" title="Wind" size={64} />
 </LiveDemo>
 
 ## Install
@@ -52,6 +52,59 @@ is half a `step`, and a pennant is five.
 <LiveDemo label="arrow" code={`<WindBarb direction={45} magnitude={25} variant="arrow" />`}>
   <WindBarb direction={45} magnitude={25} variant="arrow" title="Arrow" size={44} />
 </LiveDemo>
+
+<LiveDemo
+  label="label"
+  code={`<WindBarb direction={225} magnitude={32} step={10} label="value" />`}
+>
+  <WindBarb direction={225} magnitude={32} step={10} label="value" title="Wind" size={44} />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="calm — the open-circle glyph, not a zero-length shaft"
+  code={`<WindBarb direction={0} magnitude={0} />`}
+>
+  <WindBarb direction={0} magnitude={0} title="Calm" size={40} />
+</LiveDemo>
+
+<LiveDemo
+  label="negative magnitude flips the bearing 180° (dev warning, not an error)"
+  code={`<WindBarb direction={90} magnitude={-25} />`}
+>
+  <WindBarb direction={90} magnitude={-25} title="Flipped" size={40} />
+</LiveDemo>
+
+<LiveDemo
+  label="a magnitude past what the shaft can hold saturates the drawn barbs; the summary keeps the true number"
+  code={`<WindBarb direction={225} magnitude={5000} step={10} label="value" />`}
+>
+  <WindBarb direction={225} magnitude={5000} step={10} label="value" title="Extreme" size={40} />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<WindBarb direction={225} magnitude={32} step={10} label="value" format={{ maximumFractionDigits: 0 }} locale="de-DE" />`}
+>
+  <WindBarb
+    direction={225}
+    magnitude={32}
+    step={10}
+    label="value"
+    format={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="Wind"
+    size={44}
+  />
+</LiveDemo>
+
+`format`/`locale` reach the `label="value"` numeral and the accessible summary's magnitude
+together — the component builds one formatter and reuses it for both.
+
+## Four homes
+
+<FourContexts slug="wind-barb" />
 
 ## Why this default
 

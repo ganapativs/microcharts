@@ -120,7 +120,8 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
           rx={mark.rx}
           shapeRendering={mark.crisp ? "crispEdges" : undefined}
           data-mc-ink="cell"
-          style={{ fillOpacity: levelOpacity(c.level), ...(color ? { fill: color } : null) }}
+          fillOpacity={levelOpacity(c.level)}
+          style={color ? { fill: color } : undefined}
         />
       ))}
       {children}

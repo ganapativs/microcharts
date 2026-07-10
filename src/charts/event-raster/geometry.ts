@@ -32,7 +32,7 @@ export interface RasterLane {
 export const LANE_CAP = 12;
 
 /** Default domain: min/max over every event across all lanes. */
-export function rasterDomain(data: readonly RasterLaneInput[]): [number, number] {
+export function rasterDomain(data: readonly RasterLaneInput[]): readonly [number, number] {
   let lo = Infinity;
   let hi = -Infinity;
   for (const lane of data)
@@ -47,7 +47,7 @@ export function rasterDomain(data: readonly RasterLaneInput[]): [number, number]
 
 export function eventRasterGeometry(opts: {
   data: readonly RasterLaneInput[];
-  domain: [number, number];
+  domain: readonly [number, number];
   width: number;
   height: number;
   gutter: number;

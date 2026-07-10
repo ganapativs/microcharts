@@ -13,7 +13,14 @@ production anomaly pipelines, pass your own break indices and the chart becomes 
   sizeOf="change-point"
   code={`import { ChangePoint } from "@microcharts/react/change-point";
 
-<ChangePoint data={errors} label="delta" title="Error rate" />`}
+<ChangePoint
+  data={[
+    30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
+    48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
+  ]}
+  label="delta"
+  title="Error rate"
+/>`}
 >
   <ChangePoint
     data={[30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48]}
@@ -49,8 +56,13 @@ production anomaly pipelines, pass your own break indices and the chart becomes 
 
 <LiveDemo
   label="explicit break + gradual ramp"
-  code={`<ChangePoint data={errors} breaks={[14]} />
-<ChangePoint data={ramp} />`}
+  code={`<ChangePoint
+  data={[
+    30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
+  ]}
+  breaks={[14]}
+/>
+<ChangePoint data={[20, 21, 23, 24, 26, 27, 29, 30, 32, 33, 35, 36, 38, 39, 41, 42, 44, 45, 47, 48]} />`}
 >
   <span className="inline-flex gap-4 items-center">
     <ChangePoint
@@ -69,6 +81,46 @@ production anomaly pipelines, pass your own break indices and the chart becomes 
     />
   </span>
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="locale"
+  code={`<ChangePoint
+  data={[3000, 3000, 3000, 3000, 3000, 3000, 3000, 5200, 5200, 5200, 5200, 5200, 5200]}
+  label="delta"
+  locale="de-DE"
+/>`}
+>
+  <ChangePoint
+    data={[3000, 3000, 3000, 3000, 3000, 3000, 3000, 5200, 5200, 5200, 5200, 5200, 5200]}
+    label="delta"
+    locale="de-DE"
+    title="Localized regime means"
+    width={200}
+    height={24}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="short series — detection stays off"
+  code={`// n < 8: auto-detection never fires, even on an obvious jump —
+// pass explicit breaks for series this short
+<ChangePoint data={[10, 10, 10, 50, 50, 50]} />`}
+>
+  <ChangePoint data={[10, 10, 10, 50, 50, 50]} title="Six points" width={150} height={22} />
+</LiveDemo>
+
+<LiveDemo label="single point" code={`<ChangePoint data={[42]} />`}>
+  <ChangePoint data={[42]} title="One point" width={100} height={22} />
+</LiveDemo>
+
+With a `locale`, the summary and delta label format their numbers in that locale's own
+grouping and decimal marks. Auto-detection (`breaks="auto"`) only runs past 8 points — a
+six-point series with an obvious jump still renders as one flat, unbroken regime unless you
+pass `breaks` explicitly; this is deliberate, since a two-segment fit on that few points is
+mostly noise. A single point has no line to draw and no break to find; `data={[]}` renders the
+frame with the "no data" summary and no marks.
 
 ## Four homes
 

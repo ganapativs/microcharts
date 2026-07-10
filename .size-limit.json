@@ -1165,7 +1165,7 @@
   {
     "name": "@microcharts/react/station-glyph (static)",
     "path": "dist/charts/station-glyph/index.js",
-    "limit": "3 kB",
+    "limit": "3.05 kB",
     "gzip": true
   },
   {

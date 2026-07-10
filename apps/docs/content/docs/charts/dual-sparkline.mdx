@@ -12,7 +12,11 @@ benchmark whispers: dashed, thinner, neutral — never distinguished by color al
   sizeOf="dual-sparkline"
   code={`import { DualSparkline } from "@microcharts/react/dual-sparkline";
 
-<DualSparkline data={ours} compare={market} title="Conversion vs market" />`}
+<DualSparkline
+  data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
+  compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
+  title="Conversion vs market"
+/>`}
 >
   <DualSparkline
     data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
@@ -47,7 +51,11 @@ benchmark whispers: dashed, thinner, neutral — never distinguished by color al
 
 <LiveDemo
   label="endpoint label"
-  code={`<DualSparkline data={ours} compare={market} label="last" />`}
+  code={`<DualSparkline
+  data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
+  compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
+  label="last"
+/>`}
 >
   <DualSparkline
     data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
@@ -61,7 +69,11 @@ benchmark whispers: dashed, thinner, neutral — never distinguished by color al
 
 <LiveDemo
   label="normal-range band"
-  code={`<DualSparkline data={ours} compare={market} band={[13, 16]} />`}
+  code={`<DualSparkline
+  data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
+  compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
+  band={[13, 16]}
+/>`}
 >
   <DualSparkline
     data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
@@ -72,6 +84,61 @@ benchmark whispers: dashed, thinner, neutral — never distinguished by color al
     height={28}
   />
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="benchmark ends early"
+  code={`// the benchmark is 4 points shorter — it simply ends, never stretched
+// to match (stretching would fake a correlation that isn't there)
+<DualSparkline data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5]} compare={[12, 12.4, 12.8, 13.1]} />`}
+>
+  <DualSparkline
+    data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5]}
+    compare={[12, 12.4, 12.8, 13.1]}
+    title="Benchmark ends early"
+    width={200}
+    height={28}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="gaps in both series"
+  code={`<DualSparkline data={[12, null, 12.4, 14, null, 14.8, 16]} compare={[12, 12.4, null, 13.1, 13.6, null, 14.2]} />`}
+>
+  <DualSparkline
+    data={[12, null, 12.4, 14, null, 14.8, 16]}
+    compare={[12, 12.4, null, 13.1, 13.6, null, 14.2]}
+    title="Independent gaps"
+    width={200}
+    height={28}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<DualSparkline
+  data={[1200, 1300, 1240, 1400, 1520, 1480, 1600]}
+  compare={[1200, 1240, 1280, 1310, 1360, 1400, 1420]}
+  label="last"
+  locale="de-DE"
+/>`}
+>
+  <DualSparkline
+    data={[1200, 1300, 1240, 1400, 1520, 1480, 1600]}
+    compare={[1200, 1240, 1280, 1310, 1360, 1400, 1420]}
+    label="last"
+    locale="de-DE"
+    title="Localized values"
+    width={220}
+    height={28}
+  />
+</LiveDemo>
+
+Each series carries its own gaps independently — a `null` in `data` breaks only the primary
+line at that index, a `null` in `compare` only the benchmark, and the nearest-x hover still
+reports both values (or "no data" for whichever side is missing). With a `locale`, the
+endpoint label and both hover values follow that locale's grouping.
 
 ## Four homes
 

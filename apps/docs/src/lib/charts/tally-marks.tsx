@@ -35,7 +35,7 @@ export const entry: ChartEntry = {
       description: "The count. Floored; negatives clamp to 0.",
     },
     {
-      name: "max",
+      name: "total",
       type: "number",
       required: false,
       description: "Marks drawn before overflow (default 25).",
@@ -73,7 +73,7 @@ export const showcase = {
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value", min: 0, max: 40, step: 1, init: 23 },
-    { kind: "range", key: "max", label: "max", min: 5, max: 40, step: 5, init: 25 },
+    { kind: "range", key: "total", label: "total", min: 5, max: 40, step: 5, init: 25 },
     { kind: "segmented", key: "pen", label: "pen", options: ["ruled", "drawn"], init: "ruled" },
     {
       kind: "segmented",
@@ -86,7 +86,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <TallyMarks
       value={s.value as number}
-      max={s.max as number}
+      total={s.total as number}
       pen={s.pen as "ruled" | "drawn"}
       overflow={s.overflow as "numeral" | "clamp"}
       title="Count"
@@ -98,7 +98,7 @@ export const playground: PlaygroundSpec = {
     [
       "<TallyMarks",
       `  value={${s.value}}`,
-      s.max !== 25 && `  max={${s.max}}`,
+      s.total !== 25 && `  total={${s.total}}`,
       s.pen !== "ruled" && `  pen="${s.pen}"`,
       s.overflow !== "numeral" && `  overflow="${s.overflow}"`,
       "/>",
@@ -114,9 +114,9 @@ export const recipes: Recipe[] = [
     node: <TallyMarks value={17} pen="drawn" summary={false} height={20} />,
   },
   {
-    label: "cap the width — the numeral tells the truth past max",
-    code: `<TallyMarks value={38} max={20} />`,
-    node: <TallyMarks value={38} max={20} summary={false} height={20} />,
+    label: "cap the width — the numeral tells the truth past total",
+    code: `<TallyMarks value={38} total={20} />`,
+    node: <TallyMarks value={38} total={20} summary={false} height={20} />,
   },
 ];
 

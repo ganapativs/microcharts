@@ -5,7 +5,7 @@
 // boundary) + a mean/median tick. Across slots: the spine of slot centers. Two
 // reads kept separate by construction. Coords 2-dp, integer viewBox.
 import { scaleLinear, extent } from "../../core/scale.js";
-import { round2, isFiniteValue } from "../../core/types.js";
+import { round2, isFiniteValue, type Value } from "../../core/types.js";
 
 interface Slot {
   x0: number;
@@ -51,7 +51,7 @@ function medianOf(a: readonly number[]): number {
 export function cycleGeometry(opts: {
   width: number;
   height: number;
-  data: readonly (number | null)[];
+  data: readonly Value[];
   period: number;
   center?: "mean" | "median" | undefined;
   domain?: readonly [number, number] | undefined;

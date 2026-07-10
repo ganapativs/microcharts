@@ -26,9 +26,10 @@ describe("<Honeycomb> (plan/24 #15)", () => {
     expect(container.querySelectorAll("path").length).toBe(1);
   });
 
-  it("empty='dim' fills the empty cells at low opacity", () => {
-    const { container } = draw(<Honeycomb value={6} total={12} empty="dim" />);
-    expect(container.querySelector('path[data-mc-ink="fill"]')).not.toBeNull();
+  it("empty='blank' draws nothing for the empty cells (GardenGrid's pattern)", () => {
+    const { container } = draw(<Honeycomb value={6} total={12} empty="blank" />);
+    // only the filled path remains — no empty-cell path at all
+    expect(container.querySelectorAll("path").length).toBe(1);
   });
 
   it("total 0 → 'No data.'", () => {

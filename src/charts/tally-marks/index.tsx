@@ -1,6 +1,6 @@
 // <TallyMarks> — how many, counted the way a human counts (plan/24 #1, S4).
 // Four-and-strike clusters of five, then the remainder; the count reads back
-// exactly up to `max`, after which a `+N` numeral tells the truth (marks are
+// exactly up to `total`, after which a `+N` numeral tells the truth (marks are
 // never resized to fit — width grows, honesty holds). Static, hook-free,
 // RSC-safe. `pen="drawn"` perturbs stroke rendering only; the count is unchanged.
 //
@@ -14,8 +14,9 @@ import { tallyGeometry, type TallyOverflow, type TallyPen } from "./geometry.js"
 export interface TallyMarksProps {
   /** The count. Floored to an integer; negatives clamp to 0 (documented). */
   value: number;
-  /** Marks drawn before the numeral/clamp overflow. Default 25. */
-  max?: number | undefined;
+  /** Marks drawn before the numeral/clamp overflow. Default 25 (plan/04 §8 —
+   *  discrete-count denominator, renamed from `max`). */
+  total?: number | undefined;
   /** `numeral` appends `+N`; `clamp` stops drawing (summary keeps the truth). */
   overflow?: TallyOverflow | undefined;
   /** `ruled` (default) or hand-`drawn` (seeded jitter, editorial voice). */
@@ -43,7 +44,7 @@ export function tallySummary(value: number, strings: TallyStrings = EN_TALLY): s
 export function TallyMarks(props: TallyMarksProps): ReactNode {
   const {
     value,
-    max = 25,
+    total = 25,
     overflow = "numeral",
     pen = "ruled",
     height = 16,
@@ -56,7 +57,7 @@ export function TallyMarks(props: TallyMarksProps): ReactNode {
     children,
   } = props;
 
-  const geo = tallyGeometry({ value, max, height, pad: PAD, pen, overflow, fontSize: FONT });
+  const geo = tallyGeometry({ value, total, height, pad: PAD, pen, overflow, fontSize: FONT });
   const accName = summary === false ? false : (summary ?? tallySummary(value, strings));
 
   return (

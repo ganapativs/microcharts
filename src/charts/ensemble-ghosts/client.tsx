@@ -162,11 +162,10 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
           <path
             d={activePath.d}
             fill="none"
-            stroke="var(--mc-accent)"
-            strokeWidth={1.4}
             strokeLinejoin="round"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
+            style={{ stroke: "var(--mc-accent)", strokeWidth: "var(--mc-stroke-width)" }}
           />
         ) : null}
         {rest.children}

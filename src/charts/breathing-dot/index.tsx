@@ -89,24 +89,26 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
       className={className ? `mc-breathing ${className}` : "mc-breathing"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* level ring — its distance from the core is the static level read */}
+      {/* level ring — its distance from the core is the static level read.
+          Secondary stroke: role hair (⅓ of --mc-stroke-width), not a literal. */}
       {!geo.unknown ? (
         <circle
           cx={geo.ring.cx}
           cy={geo.ring.cy}
           r={geo.ring.r}
           data-mc-ink="muted"
-          style={{ fill: "none", strokeWidth: 0.5, strokeOpacity: 0.7 }}
+          data-mc-w="hair"
+          style={{ fill: "none", strokeOpacity: 0.7 }}
         />
       ) : null}
-      {/* core dot — colored by band, or gray when unknown */}
+      {/* core dot — colored by band, or a filled neutral (role) when unknown */}
       <circle
         className="mc-breathing-core"
         cx={geo.core.cx}
         cy={geo.core.cy}
         r={geo.core.r}
-        data-mc-ink={geo.unknown ? "muted" : BAND_INK[geo.band]}
-        style={geo.unknown ? { fill: "var(--mc-neutral)", fillOpacity: 0.5 } : undefined}
+        data-mc-ink={geo.unknown ? "neutral" : BAND_INK[geo.band]}
+        style={geo.unknown ? { fillOpacity: 0.5 } : undefined}
       />
       {pctText !== null ? (
         <text

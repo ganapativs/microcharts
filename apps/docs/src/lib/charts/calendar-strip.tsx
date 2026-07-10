@@ -59,6 +59,18 @@ export const entry: ChartEntry = {
       required: false,
       description: "Shared cell vocabulary.",
     },
+    {
+      name: "cell",
+      type: "number",
+      required: false,
+      description: "Cell edge length in viewBox units (default 7).",
+    },
+    {
+      name: "gap",
+      type: "number",
+      required: false,
+      description: "Gap between cells (default 1).",
+    },
   ],
   demo: DATA.map((d) => d.value),
   example: {

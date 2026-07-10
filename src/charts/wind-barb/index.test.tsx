@@ -26,8 +26,8 @@ describe("<WindBarb> (plan/25 §8, plan/17 F3)", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("Calm.");
   });
 
-  it("label renders the magnitude beside the glyph", () => {
-    const { container } = draw(<WindBarb direction={45} magnitude={25} label />);
+  it('label="value" renders the magnitude beside the glyph', () => {
+    const { container } = draw(<WindBarb direction={45} magnitude={25} label="value" />);
     expect(container.querySelector("text")!.textContent).toBe("25");
   });
 

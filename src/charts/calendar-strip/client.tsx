@@ -36,6 +36,8 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
     steps = 5,
     shape = "square",
     domain,
+    cell = CALENDAR_CELL,
+    gap = CALENDAR_GAP,
     format,
     locale,
     strings = EN_CALENDAR,
@@ -57,10 +59,10 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         entries: calendarEntries(data),
         domain,
         steps,
-        cell: CALENDAR_CELL,
-        gap: CALENDAR_GAP,
+        cell,
+        gap,
       }),
-    [weeks, endDay, weekStart, data, domain, steps],
+    [weeks, endDay, weekStart, data, domain, steps, cell, gap],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const dateFmt = useMemo(
@@ -70,7 +72,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
   const [active, setActive] = useState<number | null>(null);
   if (!geo) return null;
 
-  const step = CALENDAR_CELL + CALENDAR_GAP;
+  const step = cell + gap;
   const accName =
     summary === false
       ? undefined
@@ -163,13 +165,15 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         steps={steps}
         shape={shape}
         domain={domain}
+        cell={cell}
+        gap={gap}
         strings={strings}
         summary={false}
         style={FILL}
       >
         {activeCell
           ? (() => {
-              const m = cellMetrics(CALENDAR_CELL, shape);
+              const m = cellMetrics(cell, shape);
               return (
                 <rect
                   x={activeCell.x + m.inset - 0.5}

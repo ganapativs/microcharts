@@ -25,11 +25,13 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     if (before === value) return;
     prev.current = value;
     if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      wrap.current
-        ?.querySelectorAll<SVGPathElement>("path")
-        .forEach((p) =>
-          p.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: "ease-out" }),
-        );
+      // ≤200ms, canonical strong ease-out (Emil ruling).
+      wrap.current?.querySelectorAll<SVGPathElement>("path").forEach((p) =>
+        p.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 200,
+          easing: "cubic-bezier(0.23, 1, 0.32, 1)",
+        }),
+      );
     }
     // announce only when a documented threshold was crossed
     const crossed = THRESHOLDS.some((t) => before < t !== value < t);

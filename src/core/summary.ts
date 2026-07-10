@@ -148,6 +148,8 @@ export interface SummaryStrings {
   heartbeatWindow: (ms: number) => string;
   /** Elapsed ms → compact label, e.g. 3000 → "3s" (heartbeat-blip). */
   heartbeatAgo: (ms: number) => string;
+  /** Static empty-state in-chart label (heartbeat-blip). */
+  heartbeatEmpty: string;
   /** S1 rolling window, e.g. "Now 87, rising over the last 12 updates." */
   cometTrail: (last: string, trendWord: string, n: number) => string;
   /** Single point, e.g. "Now 87." (comet-trail). */
@@ -753,6 +755,13 @@ export interface SummaryStrings {
   stationWind: (octantName: string, magnitude: string) => string;
   /** Calm-wind clause, e.g. ", wind calm" (station-glyph). */
   stationCalm: string;
+  /** Interactive field-by-field readouts (station-glyph roving keyboard). */
+  stationFieldWindCalm: string;
+  stationFieldWind: (octantName: string, magnitude: string) => string;
+  stationFieldSky: (sky: string) => string;
+  stationFieldTemp: (v: string) => string;
+  stationFieldDew: (v: string) => string;
+  stationFieldPressure: (v: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

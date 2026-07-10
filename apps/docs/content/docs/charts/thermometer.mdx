@@ -53,6 +53,48 @@ its area means nothing.
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="out-of-domain clamps the fill; the accessible name keeps the true value"
+  code={`<Thermometer value={130} domain={[0, 100]} title="Overrun" />`}
+>
+  <Thermometer value={130} domain={[0, 100]} title="Overrun" height={48} />
+</LiveDemo>
+
+<LiveDemo label="value at the domain floor" code={`<Thermometer value={0} title="Empty" />`}>
+  <Thermometer value={0} title="Empty" height={48} />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<Thermometer
+  value={7234}
+  domain={[0, 10000]}
+  target={8000}
+  format={{ maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <Thermometer
+    value={7234}
+    domain={[0, 10000]}
+    target={8000}
+    format={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    label="value"
+    title="Fundraiser"
+    height={56}
+  />
+</LiveDemo>
+
+The accessible summary's value, domain, and target all go through the same locale-aware
+formatter, so "7,234" becomes "7.234" in German grouping.
+
+## Four homes
+
+<FourContexts slug="thermometer" />
+
 ## Why this default
 
 Vertical with the bulb is the default because the instrument metaphor is the point — a filling tube

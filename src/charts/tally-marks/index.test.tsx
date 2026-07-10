@@ -12,20 +12,20 @@ describe("<TallyMarks> (plan/24 #1)", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("23 counted.");
   });
 
-  it("draws one merged stroke path, no numeral below max", () => {
+  it("draws one merged stroke path, no numeral below total", () => {
     const { container } = draw(<TallyMarks value={12} />);
     expect(container.querySelectorAll("path").length).toBe(1);
     expect(container.querySelector("text")).toBeNull();
   });
 
-  it("value > max → a +N overflow numeral, count in the summary stays true", () => {
-    const { container } = draw(<TallyMarks value={30} max={25} />);
+  it("value > total → a +N overflow numeral, count in the summary stays true", () => {
+    const { container } = draw(<TallyMarks value={30} total={25} />);
     expect(container.querySelector("text")!.textContent).toBe("+5");
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("30 counted.");
   });
 
   it("overflow='clamp' drops the numeral but keeps the true count in the name", () => {
-    const { container } = draw(<TallyMarks value={30} max={25} overflow="clamp" />);
+    const { container } = draw(<TallyMarks value={30} total={25} overflow="clamp" />);
     expect(container.querySelector("text")).toBeNull();
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("30 counted.");
   });

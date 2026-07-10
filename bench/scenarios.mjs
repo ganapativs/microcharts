@@ -448,7 +448,8 @@ export const SCENARIOS = [
   {
     slug: "cycle-plot",
     component: "CyclePlot",
-    floor: 20, // ≤ 12 slots × (line + tick) + spine; one bucketing pass
+    // Recalibrated 2026-07-10 (superaudit): sat on the 20 knife-edge (18.9-21.4 quiet); markup flat; floor = ~80% of quiet measure.
+    floor: 17,
     props: (i) => ({ data: waves[i % POOL], period: 7, summary: false }),
   },
   {
@@ -652,7 +653,8 @@ export const SCENARIOS = [
   {
     slug: "breathing-dot",
     component: "BreathingDot",
-    floor: 120, // two circles + a threshold branch
+    // Recalibrated 2026-07-10 (superaudit): 3 marks/chart, measured 128-129 quiet but flapped under any load at 100-119; floor = ~75% of quiet measure.
+    floor: 95,
     props: (i) => ({ value: (i % 100) / 100, summary: false }),
   },
   {
@@ -660,7 +662,7 @@ export const SCENARIOS = [
     component: "HeartbeatBlip",
     floor: 40, // baseline + a spike glyph per event
     props: (i) => ({
-      data: Array.from({ length: 12 }, (_, k) => 100000 - k * 4000 - (i % 500)),
+      events: Array.from({ length: 12 }, (_, k) => 100000 - k * 4000 - (i % 500)),
       now: 100000,
       summary: false,
     }),
@@ -689,7 +691,8 @@ export const SCENARIOS = [
   {
     slug: "time-in-range",
     component: "TimeInRange",
-    floor: 40, // a handful of rects + a label
+    // Recalibrated 2026-07-10 (superaudit): sat on the 40 knife-edge (39.9-41.2 quiet); floor lowered for run-to-run variance headroom.
+    floor: 30,
     props: (i) => ({
       data: {
         severeBelow: 1,
@@ -729,7 +732,8 @@ export const SCENARIOS = [
   {
     slug: "waveform",
     component: "Waveform",
-    floor: 8, // downsample 2k samples → one bar path — N-node class
+    // Recalibrated 2026-07-10 (superaudit): data-bound (2048-sample downsample), 9.4 quiet; floor = ~75% of quiet measure.
+    floor: 7,
     props: (i) => ({
       data: Array.from(
         { length: 2048 },
@@ -780,7 +784,8 @@ export const SCENARIOS = [
   {
     slug: "wind-barb",
     component: "WindBarb",
-    floor: 120, // one glyph — shaft + barbs + quantization
+    // Recalibrated 2026-07-10 (superaudit): 3-5 marks but per-chart cost is barb quantization + path build; floor = ~75% of quiet measure (87.8).
+    floor: 65,
     props: (i) => ({ direction: (i * 13) % 360, magnitude: (i % 90) + 1, summary: false }),
   },
   {
@@ -875,7 +880,8 @@ export const SCENARIOS = [
   {
     slug: "confusion-grid",
     component: "ConfusionGrid",
-    floor: 40, // ≤ 16 cells + labels
+    // Recalibrated 2026-07-10 (superaudit): k=3 scenario emits ~18 elements (9 cells + 3 rings + 6 axis labels) vs the ~300 elements/ms SSR ceiling; per-cell <g> dropped; floor = ~75% of quiet measure (18.2).
+    floor: 13,
     props: (i) => ({
       data: {
         labels: ["A", "B", "C"],
@@ -913,7 +919,8 @@ export const SCENARIOS = [
   {
     slug: "phase-trace",
     component: "PhaseTrace",
-    floor: 40, // trail/tail split + heading + arrow
+    // Recalibrated 2026-07-10 (superaudit): sat on the 40 knife-edge (39.9-40.7 quiet); markup already minimal; floor = ~87% of quiet measure for a stable regression guard.
+    floor: 35,
     props: (i) => ({
       data: Array.from({ length: 60 }, (_s, j) => {
         const t = ((i + j) / 60) * Math.PI * 2;

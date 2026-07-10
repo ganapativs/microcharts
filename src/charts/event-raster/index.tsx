@@ -19,7 +19,7 @@ export interface EventRasterProps {
   labels?: boolean | undefined;
   /** `"bin"` switches an aliasing lane to per-bucket counts (disclosed). */
   overflow?: "bin" | "clip" | undefined;
-  domain?: [number, number] | undefined;
+  domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
@@ -122,52 +122,62 @@ export function EventRaster(props: EventRasterProps): ReactNode {
           />
         ) : null,
       )}
-      {geo.lanes.map((lane) => {
+      {/* flat siblings, no per-lane <g> — up to LANE_CAP lanes puts this well
+          past the >10-element SSR hot-path line; the dim multiplier is repeated
+          as a plain `opacity` on each lane's own marks instead of one group */}
+      {geo.lanes.flatMap((lane) => {
         const active = emphasis ? lane.label === emphasis : true;
-        const stroke = emphasis
-          ? active
-            ? "var(--mc-accent)"
-            : "var(--mc-neutral)"
-          : "var(--mc-stroke)";
+        const dim = emphasis && !active ? 0.45 : 1;
+        const ink = emphasis ? (active ? "accent" : "neutral") : undefined;
         const cy = round2(lane.y + lane.laneH / 2);
-        return (
-          <g key={lane.label} opacity={emphasis && !active ? 0.45 : 1}>
-            {lane.binned ? (
-              lane.bins.map((b) => (
-                <rect
-                  key={b.x}
-                  x={b.x}
-                  y={round2(lane.y + lane.laneH * 0.16)}
-                  width={b.width}
-                  height={round2(lane.laneH * 0.68)}
-                  shapeRendering="crispEdges"
-                  style={{ fill: stroke, fillOpacity: b.opacity }}
-                />
-              ))
-            ) : (
+        const nodes: ReactNode[] = lane.binned
+          ? lane.bins.map((b) => (
+              <rect
+                key={`b-${lane.label}-${b.x}`}
+                x={b.x}
+                y={round2(lane.y + lane.laneH * 0.16)}
+                width={b.width}
+                height={round2(lane.laneH * 0.68)}
+                shapeRendering="crispEdges"
+                data-mc-ink={ink ?? "bar"}
+                opacity={dim}
+                fillOpacity={b.opacity}
+              />
+            ))
+          : [
               <path
+                key={`p-${lane.label}`}
                 d={lane.path}
                 fill="none"
-                stroke={stroke}
+                // no-emphasis default stays a literal stroke (not the "data" ink
+                // role): that role also sets stroke-width via CSS, which would
+                // beat the literal strokeWidth below for THIS state only and
+                // leave emphasized/muted lanes 0.1 thinner — every lane must
+                // stay the same tick weight regardless of emphasis state
+                data-mc-ink={ink}
+                stroke={ink ? undefined : "var(--mc-stroke)"}
                 strokeWidth={1.4}
                 strokeLinecap="round"
+                opacity={dim}
                 vectorEffect="non-scaling-stroke"
-              />
-            )}
-            {labels ? (
-              <text
-                x={round2(gutter - 3)}
-                y={cy}
-                dominantBaseline="central"
-                textAnchor="end"
-                fontSize={fontSize}
-                data-mc-ink="label"
-              >
-                {lane.label}
-              </text>
-            ) : null}
-          </g>
-        );
+              />,
+            ];
+        if (labels)
+          nodes.push(
+            <text
+              key={`t-${lane.label}`}
+              x={round2(gutter - 3)}
+              y={cy}
+              dominantBaseline="central"
+              textAnchor="end"
+              fontSize={fontSize}
+              data-mc-ink="label"
+              opacity={dim}
+            >
+              {lane.label}
+            </text>,
+          );
+        return nodes;
       })}
       {children}
     </Chart>

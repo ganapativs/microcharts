@@ -1084,10 +1084,10 @@ add(
   "heartbeat-blip",
   "HeartbeatBlip",
   [
-    { data: HB, now: 100000 },
-    { data: HB, now: 100000, label: "count" },
-    { data: [], now: 100000 },
-    { data: [99000], now: 100000 },
+    { events: HB, now: 100000 },
+    { events: HB, now: 100000, label: "count" },
+    { events: [], now: 100000 },
+    { events: [99000], now: 100000 },
   ],
   [[999, 999]],
 );

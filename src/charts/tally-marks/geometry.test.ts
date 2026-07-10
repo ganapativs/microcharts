@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { tallyGeometry, TALLY_MAX_MARKS } from "./geometry.js";
 
-const base = { max: 25, height: 16, pad: 2, fontSize: 9 } as const;
+const base = { total: 25, height: 16, pad: 2, fontSize: 9 } as const;
 const g = (
   value: number,
   over: "numeral" | "clamp" = "numeral",
@@ -20,7 +20,7 @@ describe("tallyGeometry (plan/24 #1) — count the way a human counts", () => {
     expect(r.numeralX).toBeNull();
   });
 
-  it("value > max → marks cap at max, numeral carries the rest", () => {
+  it("value > total → marks cap at total, numeral carries the rest", () => {
     const r = g(27);
     expect(r.drawn).toBe(25);
     expect(r.overflow).toBe(2);
@@ -54,10 +54,16 @@ describe("tallyGeometry (plan/24 #1) — count the way a human counts", () => {
     expect(g(17, "numeral", "drawn").d).not.toBe(g(17).d);
   });
 
-  it("saturates a non-physical max — bounded marks, numeral carries the rest", () => {
-    // value 1e15 with max 1e15 once looped ~1e15 times (unbounded alloc, runaway
+  it("saturates a non-physical total — bounded marks, numeral carries the rest", () => {
+    // value 1e15 with total 1e15 once looped ~1e15 times (unbounded alloc, runaway
     // width); drawn must clamp to TALLY_MAX_MARKS while overflow stays truthful.
-    const r = tallyGeometry({ ...base, max: 1e15, value: 1e15, overflow: "numeral", pen: "ruled" });
+    const r = tallyGeometry({
+      ...base,
+      total: 1e15,
+      value: 1e15,
+      overflow: "numeral",
+      pen: "ruled",
+    });
     expect(r.drawn).toBe(TALLY_MAX_MARKS);
     expect(r.overflow).toBe(1e15 - TALLY_MAX_MARKS);
     const nums = (r.d.match(/-?\d+\.?\d*/g) ?? []).map(Number);
@@ -78,10 +84,10 @@ describe("tallyGeometry (plan/24 #1) — count the way a human counts", () => {
       fc.constantFrom("ruled", "drawn" as const),
     ],
     { numRuns: 40 },
-  )("every coord stays within the viewBox", (value, max, pen) => {
+  )("every coord stays within the viewBox", (value, total, pen) => {
     const r = tallyGeometry({
       ...base,
-      max,
+      total,
       value,
       overflow: "numeral",
       pen: pen as "ruled" | "drawn",

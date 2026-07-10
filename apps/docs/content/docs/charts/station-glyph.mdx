@@ -71,6 +71,57 @@ legend — dense enough to tile a map, legible enough to read in a table cell.
   />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="calm wind — no barb drawn at all (below the quarter-step threshold)"
+  code={`<StationGlyph station="STN" cloud={0.3} wind={{ direction: 0, magnitude: 0 }} />`}
+>
+  <StationGlyph station="STN" cloud={0.3} wind={{ direction: 0, magnitude: 0 }} size={44} />
+</LiveDemo>
+
+<LiveDemo label="sky only — no wind, no numerals" code={`<StationGlyph cloud={0.4} />`}>
+  <StationGlyph cloud={0.4} size={44} />
+</LiveDemo>
+
+<LiveDemo label="no fields at all — an empty disc" code={`<StationGlyph />`}>
+  <StationGlyph size={44} />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<StationGlyph
+  station="EDDF"
+  cloud={0.6}
+  wind={{ direction: 90, magnitude: 22 }}
+  temp={-3}
+  dewpoint={-9}
+  pressure={1024}
+  format={{ maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <StationGlyph
+    station="EDDF"
+    cloud={0.6}
+    wind={{ direction: 90, magnitude: 22 }}
+    temp={-3}
+    dewpoint={-9}
+    pressure={1024}
+    format={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    size={48}
+  />
+</LiveDemo>
+
+`format`/`locale` flow through every corner numeral (temp, dew point, pressure) and the wind
+speed and numerals named in the accessible summary — one formatter, one locale, no per-field
+overrides.
+
+## Four homes
+
+<FourContexts slug="station-glyph" />
+
 ## Why this default
 
 Each field rides its own channel, so nothing is inferred from a shared one: sky cover is disc area,

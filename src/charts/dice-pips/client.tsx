@@ -26,7 +26,10 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const marks = wrap.current?.querySelectorAll<SVGElement>('[data-mc-ink="point"]');
     marks?.forEach((m) =>
-      m.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 150, easing: "ease-out" }),
+      m.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: 150,
+        easing: "cubic-bezier(0.23, 1, 0.32, 1)",
+      }),
     );
   }, [value, live, summary]);
 

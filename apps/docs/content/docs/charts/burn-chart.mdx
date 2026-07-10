@@ -14,7 +14,13 @@ smoothed or optimistic curve. The gap label states the signed schedule landing, 
   sizeOf="burn-chart"
   code={`import { BurnChart } from "@microcharts/react/burn-chart";
 
-<BurnChart data={{ plan, actual }} title="Sprint 12" />`}
+<BurnChart
+  data={{
+    plan: [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0],
+    actual: [40, 35, 31, 27, 24, 21],
+  }}
+  title="Sprint 12"
+/>`}
 >
   <BurnChart
     data={{ plan: [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0], actual: [40, 35, 31, 27, 24, 21] }}
@@ -49,8 +55,14 @@ smoothed or optimistic curve. The gap label states the signed schedule landing, 
 
 <LiveDemo
   label="retrospective + burn-up"
-  code={`<BurnChart data={{ plan, actual }} projection={false} />
-<BurnChart data={{ plan, actual }} mode="up" />`}
+  code={`<BurnChart
+  data={{ plan: [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0], actual: [40, 35, 31, 27, 24, 21] }}
+  projection={false}
+/>
+<BurnChart
+  data={{ plan: [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40], actual: [0, 5, 9, 13, 16, 19] }}
+  mode="up"
+/>`}
 >
   <span className="inline-flex flex-col gap-1.5">
     <BurnChart
@@ -69,6 +81,73 @@ smoothed or optimistic curve. The gap label states the signed schedule landing, 
     />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<BurnChart
+  data={{ plan: [4000, 3200, 2400, 1600, 800, 0], actual: [4000, 3400, 2800, 2300] }}
+  locale="de-DE"
+/>`}
+>
+  <BurnChart
+    data={{ plan: [4000, 3200, 2400, 1600, 800, 0], actual: [4000, 3400, 2800, 2300] }}
+    locale="de-DE"
+    title="Localized point counts"
+    width={220}
+    height={28}
+  />
+</LiveDemo>
+
+With a `locale`, both the gap label and the accessible summary's numbers follow that locale's
+own grouping — "2.300" in German, not "2,300".
+
+## Edge cases
+
+<LiveDemo
+  label="no plan yet"
+  code={`// plan=[] — history draws, the projection still runs toward zero, but the
+// summary reports it without a "vs planned" comparison
+<BurnChart data={{ plan: [], actual: [40, 35, 31, 27, 24, 21] }} />`}
+>
+  <BurnChart
+    data={{ plan: [], actual: [40, 35, 31, 27, 24, 21] }}
+    title="No plan recorded"
+    width={220}
+    height={28}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="stalled burn"
+  code={`// actual isn't dropping — the projection never reaches zero, and the
+// summary says so instead of implying a landing date
+<BurnChart data={{ plan: [40, 36, 32, 28, 24, 20], actual: [40, 40, 40, 40] }} />`}
+>
+  <BurnChart
+    data={{ plan: [40, 36, 32, 28, 24, 20], actual: [40, 40, 40, 40] }}
+    title="Stalled"
+    width={220}
+    height={28}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="day one"
+  code={`<BurnChart data={{ plan: [40, 36, 32, 28, 24, 20], actual: [40] }} />`}
+>
+  <BurnChart
+    data={{ plan: [40, 36, 32, 28, 24, 20], actual: [40] }}
+    title="Day one"
+    width={220}
+    height={28}
+  />
+</LiveDemo>
+
+With no plan (`plan: []`), the projection still runs — the fitted slope only needs `actual` —
+but there's nothing to compare it to, so the label and summary drop the "vs planned" clause. A
+stalled burn (`actual` flat) never reaches zero, so `finishes` is `false` and the summary states
+that plainly rather than extrapolating a fake landing. A single `actual` point draws no
+projection at all (the fit needs at least two).
 
 ## Four homes
 

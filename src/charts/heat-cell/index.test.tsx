@@ -18,8 +18,9 @@ describe("<HeatCell> (plan/22 #3, S4)", () => {
   it("higher value → higher opacity (calibrated, discrete)", () => {
     const op = (v: number) =>
       Number(
-        draw(<HeatCell value={v} domain={[0, 100]} />).container.querySelector("rect")!.style
-          .fillOpacity,
+        draw(<HeatCell value={v} domain={[0, 100]} />)
+          .container.querySelector("rect")!
+          .getAttribute("fill-opacity"),
       );
     expect(op(90)).toBeGreaterThan(op(50));
     expect(op(50)).toBeGreaterThan(op(30));
@@ -53,7 +54,7 @@ describe("<HeatCell> (plan/22 #3, S4)", () => {
 
   it("non-finite → empty track cell + 'No data.'", () => {
     const { container } = draw(<HeatCell value={Number.NaN} />);
-    expect(container.querySelector("rect")!.getAttribute("data-mc-ink")).toBe("band");
+    expect(container.querySelector("rect")!.getAttribute("data-mc-ink")).toBe("gap");
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
   });
 

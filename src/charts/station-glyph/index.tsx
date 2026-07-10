@@ -154,7 +154,8 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     >
       {barb ? (
         <>
-          {/* shaft + feather barbs as one stroked path */}
+          {/* shaft + feather barbs as one stroked path — width already comes
+              from the "data" ink role, no literal needed */}
           <path
             d={
               `M${barb.shaft.x1} ${barb.shaft.y1}L${barb.shaft.x2} ${barb.shaft.y2}` +
@@ -163,20 +164,20 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
             data-mc-ink="data"
             fill="none"
             strokeLinecap="round"
-            style={{ strokeWidth: "var(--mc-stroke-width)" }}
           />
           {barb.pennants.map((p, i) => (
-            <path key={i} d={p} style={{ fill: "var(--mc-stroke)" }} />
+            <path key={i} d={p} data-mc-ink="point" />
           ))}
         </>
       ) : null}
-      {/* filled disc masks the inner shaft + carries the ring; sky sector on top */}
+      {/* filled disc masks the inner shaft + carries the ring; sky sector on top.
+          Stroke width already comes from the "data" ink role (CSS beats this
+          presentation attribute) — no literal needed. */}
       <circle
         cx={geo.disc.cx}
         cy={geo.disc.cy}
         r={geo.disc.r}
         data-mc-ink="data"
-        strokeWidth={1}
         vectorEffect="non-scaling-stroke"
         style={{ fill: "var(--mc-surface)" }}
       />
@@ -200,7 +201,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
           dominantBaseline="central"
           textAnchor="end"
           fontSize={font}
-          style={{ fill: "var(--mc-cat-1)" }}
+          data-mc-cat="1"
         >
           {tempT}
         </text>
@@ -212,7 +213,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
           dominantBaseline="central"
           textAnchor="end"
           fontSize={font}
-          style={{ fill: "var(--mc-cat-2)" }}
+          data-mc-cat="2"
         >
           {dewT}
         </text>

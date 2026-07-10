@@ -82,6 +82,16 @@ must never let two states share a silhouette.
   />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="an unknown status key renders 'off' with a dev warning"
+  code={`// no "degraded" entry in the built-in map, and none supplied via \`states\`
+<StatusDot status="degraded" />`}
+>
+  <StatusDot status="degraded" title="Unknown key" style={{ width: 18, height: 18 }} />
+</LiveDemo>
+
 ## Four homes
 
 <FourContexts slug="status-dot" />

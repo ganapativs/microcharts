@@ -44,7 +44,7 @@ export const entry: ChartEntry = {
     },
     {
       name: "empty",
-      type: '"outline" | "dim"',
+      type: '"outline" | "blank"',
       required: false,
       description: "How empty cells render (default outline).",
     },
@@ -57,12 +57,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Honeycomb value={34} total={40} unit="seats" summary={false} cellR={4} />;
+  return <Honeycomb value={34} total={40} unit="seats" summary={false} cell={4} />;
 }
 
 export const showcase = {
   hint: "of capacity",
-  Node: () => <Honeycomb value={34} total={40} unit="seats" title="Occupancy" cellR={5} />,
+  Node: () => <Honeycomb value={34} total={40} unit="seats" title="Occupancy" cell={5} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -73,7 +73,7 @@ export const playground: PlaygroundSpec = {
       kind: "segmented",
       key: "empty",
       label: "empty",
-      options: ["outline", "dim"],
+      options: ["outline", "blank"],
       init: "outline",
     },
   ],
@@ -81,10 +81,10 @@ export const playground: PlaygroundSpec = {
     <Honeycomb
       value={s.value as number}
       total={s.total as number}
-      empty={s.empty as "outline" | "dim"}
+      empty={s.empty as "outline" | "blank"}
       unit="seats"
       summary={false}
-      cellR={7}
+      cell={7}
     />
   ),
   code: (s) =>
@@ -103,19 +103,19 @@ export const recipes: Recipe[] = [
   {
     label: "strip mode for a table cell",
     code: `<Honeycomb value={7} total={10} rows={1} />`,
-    node: <Honeycomb value={7} total={10} rows={1} summary={false} cellR={5} />,
+    node: <Honeycomb value={7} total={10} rows={1} summary={false} cell={5} />,
   },
   {
-    label: "dim empties for dark / AMOLED surfaces",
-    code: `<Honeycomb value={28} total={40} empty="dim" />`,
-    node: <Honeycomb value={28} total={40} empty="dim" summary={false} cellR={4} />,
+    label: "blank empties for a quieter, uncluttered surface",
+    code: `<Honeycomb value={28} total={40} empty="blank" />`,
+    node: <Honeycomb value={28} total={40} empty="blank" summary={false} cell={4} />,
   },
 ];
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const v = props.data.length ? Math.abs(Math.round(props.data[0]!)) % 40 : 28;
   return (
-    <Honeycomb value={v} total={40} summary={false} cellR={props.height ? props.height / 6 : 3} />
+    <Honeycomb value={v} total={40} summary={false} cell={props.height ? props.height / 6 : 3} />
   );
 }
 
