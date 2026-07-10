@@ -14,7 +14,7 @@ export type StreakDatum = number | boolean | null | undefined;
 export const MAX_RUNS = 40;
 
 /** One placed run. `on` = a streak-outcome (ok) run; `!on` = a break (fail) run. */
-export interface StreakRun {
+interface StreakRun {
   x: number;
   y: number;
   width: number;
@@ -34,7 +34,7 @@ export interface StreakRun {
 }
 
 /** Faint placeholder for runs merged off the left when the cap is exceeded. */
-export interface StreakEllipsis {
+interface StreakEllipsis {
   x: number;
   y: number;
   width: number;

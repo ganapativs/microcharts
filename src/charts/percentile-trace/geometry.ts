@@ -9,7 +9,7 @@ import { clamp, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
 
 /** How the entity's standing moved relative to the middle half (p25–75). */
-export type PercentileMovement =
+type PercentileMovement =
   | "roseAbove"
   | "fellBelow"
   | "enteredMiddle"

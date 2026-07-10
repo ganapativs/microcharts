@@ -28,7 +28,7 @@ export interface CohortRow {
   values: readonly Value[];
 }
 
-export interface CohortCell {
+interface CohortCell {
   row: number;
   col: number;
   x: number;
@@ -40,7 +40,7 @@ export interface CohortCell {
   gap: boolean;
 }
 
-export interface CohortLabel {
+interface CohortLabel {
   row: number;
   label: string;
   x: number;

@@ -7,7 +7,7 @@
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
-export type QueueTrend = "up" | "down" | "flat";
+type QueueTrend = "up" | "down" | "flat";
 
 interface QueuePoint {
   index: number;

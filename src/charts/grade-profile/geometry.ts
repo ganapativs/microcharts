@@ -15,7 +15,7 @@ export interface GradePoint {
   elev: number;
 }
 
-export interface GradeSegment {
+interface GradeSegment {
   /** Baseline-anchored quad (flat-to-baseline trapezoid). */
   path: string;
   /** 0 = flat/descent … 3 = brutal. Quantized by `bins`. */
