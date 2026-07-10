@@ -13,7 +13,21 @@ accented and everything else muted, so the answer to "which spans mattered" is i
   sizeOf="trace-fold"
   code={`import { TraceFold } from "@microcharts/react/trace-fold";
 
-<TraceFold data={spans} title="Request trace" />`}
+<TraceFold
+  data={[
+    { label: "request", start: 0, duration: 214, depth: 0 },
+    { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
+    { label: "auth", start: 0, duration: 8, depth: 1, parent: 0 },
+    { label: "render", start: 96, duration: 60, depth: 1, parent: 0 },
+    { label: "serialize", start: 156, duration: 40, depth: 1, parent: 0 },
+    { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 },
+    { label: "decode", start: 82, duration: 12, depth: 2, parent: 1 },
+    { label: "log", start: 200, duration: 14, depth: 1, parent: 0 },
+    { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 },
+  ]}
+  format={(n) => \`\${Math.round(n)} ms\`}
+  title="Request trace"
+/>`}
 >
   <TraceFold
     data={[
@@ -57,7 +71,19 @@ accented and everything else muted, so the answer to "which spans mattered" is i
 
 ## Variants
 
-<LiveDemo label="structure audit" code={`<TraceFold data={spans} emphasis="none" />`}>
+<LiveDemo
+  label="structure audit"
+  code={`<TraceFold
+  data={[
+    { label: "request", start: 0, duration: 214, depth: 0 },
+    { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
+    { label: "render", start: 96, duration: 60, depth: 1, parent: 0 },
+    { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 },
+  ]}
+  emphasis="none"
+  format={(n) => \`\${Math.round(n)} ms\`}
+/>`}
+>
   <TraceFold
     data={[
       { label: "request", start: 0, duration: 214, depth: 0 },
@@ -72,6 +98,78 @@ accented and everything else muted, so the answer to "which spans mattered" is i
     height={44}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<TraceFold
+  data={[
+    { label: "request", start: 0, duration: 14868, depth: 0 },
+    { label: "db.query", start: 1200, duration: 9234, depth: 1, parent: 0 },
+  ]}
+  format={{ style: "unit", unit: "millisecond", unitDisplay: "narrow", maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <TraceFold
+    data={[
+      { label: "request", start: 0, duration: 14868, depth: 0 },
+      { label: "db.query", start: 1200, duration: 9234, depth: 1, parent: 0 },
+    ]}
+    format={{ style: "unit", unit: "millisecond", unitDisplay: "narrow", maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="Localized durations"
+    width={220}
+    height={32}
+  />
+</LiveDemo>
+
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's
+numbers follow that locale's own grouping and decimal marks ("14.868 ms" in German, not
+"14,868 ms"). In-rect text stays the plain span label either way; only the announced numbers
+are localized.
+
+## Edge cases
+
+<LiveDemo
+  label="single span"
+  code={`<TraceFold data={[{ label: "request", start: 0, duration: 42, depth: 0 }]} title="Single span" />`}
+>
+  <TraceFold
+    data={[{ label: "request", start: 0, duration: 42, depth: 0 }]}
+    title="Single span"
+    width={160}
+    height={24}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="labels drop out"
+  code={`// 3 depths squeezed into a 24px cell — each row falls under the floor
+// font's seat height, so labels drop everywhere instead of overlapping
+<TraceFold
+  data={[
+    { label: "request", start: 0, duration: 120, depth: 0 },
+    { label: "db.query", start: 10, duration: 70, depth: 1, parent: 0 },
+    { label: "index-scan", start: 12, duration: 40, depth: 2, parent: 1 },
+  ]}
+  height={24}
+/>`}
+>
+  <TraceFold
+    data={[
+      { label: "request", start: 0, duration: 120, depth: 0 },
+      { label: "db.query", start: 10, duration: 70, depth: 1, parent: 0 },
+      { label: "index-scan", start: 12, duration: 40, depth: 2, parent: 1 },
+    ]}
+    title="Squeezed"
+    width={200}
+    height={24}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="trace-fold" />
 
 ## Why this default
 

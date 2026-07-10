@@ -14,7 +14,28 @@ become unreadable texture at this size.
   sizeOf="partition-strip"
   code={`import { PartitionStrip } from "@microcharts/react/partition-strip";
 
-<PartitionStrip data={bundle} title="Bundle composition" />`}
+<PartitionStrip
+  data={[
+    {
+      label: "JS",
+      children: [
+        { label: "react", value: 28 },
+        { label: "vendor", value: 12 },
+        { label: "app", value: 8 },
+      ],
+    },
+    {
+      label: "CSS",
+      children: [
+        { label: "tailwind", value: 16 },
+        { label: "custom", value: 8 },
+      ],
+    },
+    { label: "img", value: 18 },
+    { label: "font", value: 10 },
+  ]}
+  title="Bundle composition"
+/>`}
 >
   <PartitionStrip
     data={[
@@ -52,7 +73,30 @@ become unreadable texture at this size.
 
 ## Variants
 
-<LiveDemo label="emphasis" code={`<PartitionStrip data={bundle} emphasis="react" />`}>
+<LiveDemo
+  label="emphasis"
+  code={`<PartitionStrip
+  data={[
+    {
+      label: "JS",
+      children: [
+        { label: "react", value: 28 },
+        { label: "vendor", value: 12 },
+        { label: "app", value: 8 },
+      ],
+    },
+    {
+      label: "CSS",
+      children: [
+        { label: "tailwind", value: 16 },
+        { label: "custom", value: 8 },
+      ],
+    },
+    { label: "img", value: 18 },
+  ]}
+  emphasis="react"
+/>`}
+>
   <PartitionStrip
     data={[
       {
@@ -78,6 +122,73 @@ become unreadable texture at this size.
     height={30}
   />
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="flat data (no children)"
+  code={`// no node has children → the parent row alone carries the whole chart,
+// the child row stays empty
+<PartitionStrip
+  data={[
+    { label: "img", value: 18 },
+    { label: "font", value: 10 },
+    { label: "css", value: 6 },
+  ]}
+  title="Flat parts"
+/>`}
+>
+  <PartitionStrip
+    data={[
+      { label: "img", value: 18 },
+      { label: "font", value: 10 },
+      { label: "css", value: 6 },
+    ]}
+    title="Flat parts"
+    width={220}
+    height={24}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="labels drop out"
+  code={`// squeezed into an 18px row, the parent row can't seat the floor font —
+// labels drop cleanly instead of overlapping (width here is generous;
+// height is the gate)
+<PartitionStrip
+  data={[
+    {
+      label: "JS",
+      children: [
+        { label: "react", value: 28 },
+        { label: "vendor", value: 12 },
+      ],
+    },
+    { label: "CSS", children: [{ label: "tailwind", value: 16 }] },
+  ]}
+  height={18}
+/>`}
+>
+  <PartitionStrip
+    data={[
+      {
+        label: "JS",
+        children: [
+          { label: "react", value: 28 },
+          { label: "vendor", value: 12 },
+        ],
+      },
+      { label: "CSS", children: [{ label: "tailwind", value: 16 }] },
+    ]}
+    title="Squeezed"
+    width={220}
+    height={18}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="partition-strip" />
 
 ## Why this default
 

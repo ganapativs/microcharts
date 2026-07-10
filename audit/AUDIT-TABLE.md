@@ -82,9 +82,9 @@ Flags: BENCH-RED below SSR floor · no-vspec missing visual spec · prop contrac
 | spiral-year | radial | 2.73 kB/2.8 kB | 3.61 kB/3.7 kB | 75 | 75 | POLISH | prop no-4ctx |
 | star-spoke | radial | 2.08 kB/2.2 kB | 2.95 kB/3.1 kB | 55 | 75 | REWORK | BENCH-RED no-vspec prop no-4ctx |
 | tree-rings | radial | 1.86 kB/1.9 kB | 2.67 kB/2.8 kB | 75 | 65 | POLISH | prop no-4ctx snippet |
-| event-timeline | span | 2.64 kB/3 kB | 3.75 kB/4 kB | 85 | 88 | VERIFY | — |
-| partition-strip | span | 2.1 kB/2.3 kB | 3.06 kB/3.3 kB | 55 | 75 | REWORK | BENCH-RED no-vspec no-4ctx |
-| trace-fold | span | 2.2 kB/2.4 kB | 3.23 kB/3.4 kB | 55 | 75 | REWORK | BENCH-RED no-vspec no-4ctx |
+| event-timeline | span ✅ | 2.64 kB/3 kB | 3.75 kB/4 kB | 85 | 88 | VERIFY | — |
+| partition-strip | span ✅ | 2.1 kB/2.3 kB | 3.06 kB/3.3 kB | 55 | 75 | REWORK | BENCH-RED no-vspec no-4ctx |
+| trace-fold | span ✅ | 2.2 kB/2.4 kB | 3.23 kB/3.4 kB | 55 | 75 | REWORK | BENCH-RED no-vspec no-4ctx |
 | ab-strips | strip | 2.79 kB/2.85 kB | 3.7 kB/3.8 kB | 85 | 88 | VERIFY | — |
 | benchmark-strip | strip | 2.7 kB/2.8 kB | 3.48 kB/3.6 kB | 75 | 40 | REWORK | prop TRUNCATED no-4ctx snippet |
 | calibration-strip | strip | 2.4 kB/2.4 kB | 3.22 kB/3.4 kB | 55 | 75 | REWORK | BENCH-RED no-vspec no-4ctx |
@@ -105,4 +105,4 @@ Flags: BENCH-RED below SSR floor · no-vspec missing visual spec · prop contrac
 | fill-word | text | 1.38 kB/1.5 kB | 1.75 kB/1.95 kB | 85 | 75 | POLISH | no-4ctx |
 | token-confidence | text | 980 B/1.5 kB | 1.58 kB/2.5 kB | 75 | 65 | POLISH | no-vspec no-4ctx snippet |
 
-98 charts. Family processing order (Phase 2, worst first): strip → span → profile → radial → glyph → grid → line → dot → bar → band → text → connector.
+98 charts. SPAN FAMILY DONE 2026-07-10 (reference standard, checkpoint 2): scores — event-timeline 96/96, partition-strip 96/96, trace-fold 96/96 (final 100 pending Phase-3 harden + Argos/cross-browser sweep). Family processing order (Phase 2, worst first): strip → span → profile → radial → glyph → grid → line → dot → bar → band → text → connector.
