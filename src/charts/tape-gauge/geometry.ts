@@ -76,8 +76,9 @@ export function tapeGaugeGeometry(opts: {
   const lo = value - span / 2;
   const hi = value + span / 2;
 
-  // scale column: vertical → left of the pointer; horizontal → above it
-  const tapeExtent = vertical ? width * 0.56 : height * 0.56;
+  // scale column: vertical → left of the pointer; horizontal → above it. Kept
+  // narrow so the readout gutter beside it can seat a legible value.
+  const tapeExtent = vertical ? width * 0.46 : height * 0.46;
   const scaleEdge = round2(tapeExtent - ZONE); // ticks + labels live left/above of the zone stripe
   const along = vertical ? height : width;
   const alongInner = along - pad * 2;
@@ -133,7 +134,8 @@ export function tapeGaugeGeometry(opts: {
     const y = round2(height / 2);
     pointer = {
       path: `M${round2(tapeExtent)} ${y}l3 -2.5v5z`, // triangle pointing left into the tape
-      labelX: round2((tapeExtent + width) / 2),
+      // readout centered in the space to the RIGHT of the pointer tip (never over it)
+      labelX: round2((tapeExtent + 3 + width) / 2),
       labelY: y,
     };
   } else {
@@ -141,10 +143,11 @@ export function tapeGaugeGeometry(opts: {
     pointer = {
       path: `M${x} ${round2(tapeExtent)}l-2.5 3h5z`,
       labelX: x,
-      labelY: round2((tapeExtent + height) / 2),
+      labelY: round2((tapeExtent + 3 + height) / 2),
     };
   }
-  const gutter = vertical ? round2(width - tapeExtent) : round2(width);
+  // gutter available to the readout = space past the pointer tip
+  const gutter = vertical ? round2(width - tapeExtent - 3) : round2(width);
 
   const containingZone =
     zones.find((z) => value >= Math.min(z.from, z.to) && value <= Math.max(z.from, z.to)) ?? null;

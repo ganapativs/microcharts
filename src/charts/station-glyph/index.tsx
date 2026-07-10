@@ -55,15 +55,8 @@ export function stationGlyphSummary(
   fmt: (n: number) => string,
 ): string {
   const { cloud, wind, step = 10, temp, dewpoint, pressure, station = "" } = props;
-  const geo = stationGlyphGeometry({
-    cloud: cloud ?? null,
-    wind: null,
-    step,
-    cx: 0,
-    cy: 0,
-    coreR: 1,
-    barbBox: 30,
-  });
+  const f = cloud == null || !Number.isFinite(cloud) ? 0 : Math.max(0, Math.min(1, cloud));
+  const okta = Math.round(f * 4);
 
   let windClause = "";
   if (wind && Number.isFinite(wind.magnitude)) {
@@ -88,12 +81,7 @@ export function stationGlyphSummary(
   if (pressure != null && Number.isFinite(pressure)) parts.push(fmt(pressure));
   const fieldsClause = parts.length ? `, ${parts.join(", ")}` : "";
 
-  return strings.stationGlyph(
-    station,
-    windClause,
-    strings.stationSky[geo.oktaIndex]!,
-    fieldsClause,
-  );
+  return strings.stationGlyph(station, windClause, strings.stationSky[okta]!, fieldsClause);
 }
 
 export function StationGlyph(props: StationGlyphProps): ReactNode {
@@ -118,26 +106,28 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const font = labelFont(size, 0.22);
+  const font = labelFont(size, 0.24);
 
-  const est = (s: string): number => 0.62 * font * s.length;
   const tempT = temp != null && Number.isFinite(temp) ? `${fmt(temp)}°` : null;
   const dewT = dewpoint != null && Number.isFinite(dewpoint) ? `${fmt(dewpoint)}°` : null;
   const presT = pressure != null && Number.isFinite(pressure) ? fmt(pressure) : null;
   const stationT = station || null;
 
-  // reserve numeral gutters, then place the disc center in absolute coords
-  const leftW = Math.max(tempT ? est(tempT) : 0, dewT ? est(dewT) : 0);
-  const rightW = presT ? est(presT) : 0;
-  const padXL = round2((leftW > 0 ? leftW + 1.5 : 1) + 0.5);
-  const padXR = round2((rightW > 0 ? rightW + 1.5 : 1) + 0.5);
+  // reserve numeral gutters sized to the widest numeral on each side, then place
+  // the disc center in absolute coords
+  const gap = 3;
+  const gutW = (s: string | null): number => (s ? 0.62 * font * s.length + gap : 1);
+  const padXL = round2(Math.max(gutW(tempT), gutW(dewT)) + 0.5);
+  const padXR = round2(gutW(presT) + 0.5);
   const padY = round2(font + 2);
   const W = round2(padXL + size + padXR);
   const H = round2(size + padY * 2);
   const r = round2(size * 0.24);
   const dcx = round2(padXL + size / 2);
   const dcy = round2(padY + size / 2);
-  const yOff = round2(r * 0.55);
+  // push temp/dew toward the top/bottom of the disc (where it is narrowest and
+  // the radial barb is furthest away), so the numerals clear both disc and barb
+  const yOff = round2(r * 0.78);
 
   const geo = stationGlyphGeometry({
     cloud: cloud ?? null,
@@ -146,7 +136,8 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     cx: dcx,
     cy: dcy,
     coreR: r,
-    barbBox: size,
+    // a compact barb that stays near the disc rather than reaching into the numerals
+    barbBox: size * 0.64,
   });
   const accName = summary === false ? false : (summary ?? stationGlyphSummary(props, strings, fmt));
   const barb = geo.barb;
@@ -163,24 +154,17 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     >
       {barb ? (
         <>
-          <line
-            x1={barb.shaft.x1}
-            y1={barb.shaft.y1}
-            x2={barb.shaft.x2}
-            y2={barb.shaft.y2}
+          {/* shaft + feather barbs as one stroked path */}
+          <path
+            d={
+              `M${barb.shaft.x1} ${barb.shaft.y1}L${barb.shaft.x2} ${barb.shaft.y2}` +
+              barb.barbs.map((b) => `M${b.x1} ${b.y1}L${b.x2} ${b.y2}`).join("")
+            }
             data-mc-ink="data"
+            fill="none"
             strokeLinecap="round"
             style={{ strokeWidth: "var(--mc-stroke-width)" }}
           />
-          {barb.barbs.length > 0 ? (
-            <path
-              d={barb.barbs.map((b) => `M${b.x1} ${b.y1}L${b.x2} ${b.y2}`).join("")}
-              data-mc-ink="data"
-              fill="none"
-              strokeLinecap="round"
-              style={{ strokeWidth: "var(--mc-stroke-width)" }}
-            />
-          ) : null}
           {barb.pennants.map((p, i) => (
             <path key={i} d={p} style={{ fill: "var(--mc-stroke)" }} />
           ))}
@@ -204,15 +188,15 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
           dominantBaseline="central"
           textAnchor="start"
           fontSize={font}
-          data-mc-ink="muted"
+          data-mc-ink="label"
         >
           {stationT}
         </text>
       ) : null}
       {tempT ? (
         <text
-          x={round2(dcx - r - 2)}
-          y={round2(dcy - yOff)}
+          x={dcx - r - gap}
+          y={dcy - yOff}
           dominantBaseline="central"
           textAnchor="end"
           fontSize={font}
@@ -223,8 +207,8 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
       ) : null}
       {dewT ? (
         <text
-          x={round2(dcx - r - 2)}
-          y={round2(dcy + yOff)}
+          x={dcx - r - gap}
+          y={dcy + yOff}
           dominantBaseline="central"
           textAnchor="end"
           fontSize={font}
@@ -235,8 +219,8 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
       ) : null}
       {presT ? (
         <text
-          x={round2(dcx + r + 2)}
-          y={round2(dcy - yOff)}
+          x={dcx + r + gap}
+          y={dcy - yOff}
           dominantBaseline="central"
           textAnchor="start"
           fontSize={font}

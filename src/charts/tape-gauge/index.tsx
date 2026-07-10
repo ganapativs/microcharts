@@ -126,9 +126,10 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   // the readout is the hero number — sized large, then clamped to fit its gutter
   const est = (chars: number, f: number): number => 0.62 * f * chars;
   const readoutAvail = (vertical ? geo.readout.gutter : width) - 1.6;
-  const readoutBase = Math.min(13, Math.max(9, Math.round(Math.min(width, height) * 0.24)));
+  const readoutBase = Math.min(13, Math.max(10, Math.round(Math.min(width, height) * 0.25)));
+  // containment wins over a floor at extreme narrow widths (default 46 renders ~11)
   const readoutFont = Math.max(
-    6.5,
+    5,
     Math.min(readoutBase, readoutAvail / est(valueText.length || 1, 1)),
   );
 
@@ -155,16 +156,19 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   if (tier !== 0) {
     const n = Math.abs(tier);
     const up = tier > 0;
+    // clear the readout number: first chevron sits just past its half-height
+    const clearV = readoutFont / 2 + 2.5;
     for (let k = 0; k < n; k++) {
       if (vertical) {
-        const y = geo.pointer.labelY + (up ? -6 - k * 3 : 6 + k * 3);
+        const y = geo.pointer.labelY + (up ? -(clearV + k * 3) : clearV + k * 3);
         chevrons.push(
           up
             ? `M${geo.pointer.labelX - 2} ${round2(y + 1)}l2 -1.6l2 1.6`
             : `M${geo.pointer.labelX - 2} ${round2(y - 1)}l2 1.6l2 -1.6`,
         );
       } else {
-        const x = geo.pointer.labelX + (up ? 7 + k * 3 : -7 - k * 3);
+        const clearH = est(valueText.length || 1, readoutFont) / 2 + 3;
+        const x = geo.pointer.labelX + (up ? clearH + k * 3 : -clearH - k * 3);
         chevrons.push(
           up
             ? `M${round2(x - 1)} ${geo.pointer.labelY - 2}l1.6 2l-1.6 2`

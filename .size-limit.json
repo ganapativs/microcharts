@@ -1153,13 +1153,13 @@
   {
     "name": "@microcharts/react/tape-gauge (static)",
     "path": "dist/charts/tape-gauge/index.js",
-    "limit": "2.8 kB",
+    "limit": "2.9 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/tape-gauge/interactive",
     "path": "dist/charts/tape-gauge/client.js",
-    "limit": "3.3 kB",
+    "limit": "3.4 kB",
     "gzip": true
   },
   {
