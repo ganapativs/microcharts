@@ -60,7 +60,7 @@ describe("windBarbGeometry (plan/25 §8, plan/17 F3)", () => {
     expect(east.shaft.x2).toBeGreaterThan(east.shaft.x1); // tip right of center
   });
 
-  test.prop([fc.integer({ min: 0, max: 359 }), fc.double({ min: 0, max: 200, noNaN: true })])(
+  test.prop([fc.integer({ min: 0, max: 359 }), fc.double({ min: 0, max: 1e12, noNaN: true })])(
     "shaft + barbs stay inside the glyph box",
     (direction, magnitude) => {
       const geo = windBarbGeometry({ direction, magnitude, step: 10, width: 24, height: 24 });

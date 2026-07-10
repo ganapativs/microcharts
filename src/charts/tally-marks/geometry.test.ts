@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { tallyGeometry } from "./geometry.js";
+import { tallyGeometry, TALLY_MAX_MARKS } from "./geometry.js";
 
 const base = { max: 25, height: 16, pad: 2, fontSize: 9 } as const;
 const g = (
@@ -54,24 +54,42 @@ describe("tallyGeometry (plan/24 #1) — count the way a human counts", () => {
     expect(g(17, "numeral", "drawn").d).not.toBe(g(17).d);
   });
 
-  test.prop([fc.integer({ min: 0, max: 40 }), fc.constantFrom("ruled", "drawn" as const)])(
-    "every coord stays within the viewBox",
-    (value, pen) => {
-      const r = tallyGeometry({
-        ...base,
-        value,
-        overflow: "numeral",
-        pen: pen as "ruled" | "drawn",
-      });
-      const nums = (r.d.match(/-?\d+\.?\d*/g) ?? []).map(Number);
-      for (let i = 0; i < nums.length; i += 2) {
-        const x = nums[i]!;
-        const y = nums[i + 1]!;
-        expect(x).toBeGreaterThanOrEqual(0);
-        expect(x).toBeLessThanOrEqual(r.width);
-        expect(y).toBeGreaterThanOrEqual(0);
-        expect(y).toBeLessThanOrEqual(base.height);
-      }
-    },
-  );
+  it("saturates a non-physical max — bounded marks, numeral carries the rest", () => {
+    // value 1e15 with max 1e15 once looped ~1e15 times (unbounded alloc, runaway
+    // width); drawn must clamp to TALLY_MAX_MARKS while overflow stays truthful.
+    const r = tallyGeometry({ ...base, max: 1e15, value: 1e15, overflow: "numeral", pen: "ruled" });
+    expect(r.drawn).toBe(TALLY_MAX_MARKS);
+    expect(r.overflow).toBe(1e15 - TALLY_MAX_MARKS);
+    const nums = (r.d.match(/-?\d+\.?\d*/g) ?? []).map(Number);
+    for (let i = 0; i < nums.length; i += 2) {
+      expect(nums[i]!).toBeGreaterThanOrEqual(0);
+      expect(nums[i]!).toBeLessThanOrEqual(r.width);
+      expect(nums[i + 1]!).toBeGreaterThanOrEqual(0);
+      expect(nums[i + 1]!).toBeLessThanOrEqual(base.height);
+    }
+  });
+
+  test.prop([
+    fc.integer({ min: 0, max: 1e9 }),
+    fc.integer({ min: 0, max: 1e9 }),
+    fc.constantFrom("ruled", "drawn" as const),
+  ])("every coord stays within the viewBox", (value, max, pen) => {
+    const r = tallyGeometry({
+      ...base,
+      max,
+      value,
+      overflow: "numeral",
+      pen: pen as "ruled" | "drawn",
+    });
+    expect(r.drawn).toBeLessThanOrEqual(TALLY_MAX_MARKS);
+    const nums = (r.d.match(/-?\d+\.?\d*/g) ?? []).map(Number);
+    for (let i = 0; i < nums.length; i += 2) {
+      const x = nums[i]!;
+      const y = nums[i + 1]!;
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x).toBeLessThanOrEqual(r.width);
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y).toBeLessThanOrEqual(base.height);
+    }
+  });
 });

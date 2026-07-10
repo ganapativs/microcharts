@@ -35,6 +35,13 @@ export interface TallyGeometry {
   numeralX: number | null;
 }
 
+// Saturate drawn marks at a legible bound. `max` is a caller prop; a
+// non-physical value (e.g. 1e15, with a matching value) would otherwise loop
+// unbounded — trillions of stroke segments (OOM) running off the growing
+// viewBox. The overflow numeral carries the remainder, so the summary stays
+// truthful; only the drawn marks saturate.
+export const TALLY_MAX_MARKS = 200;
+
 const STROKE_GAP = 3; // horizontal gap between verticals within a cluster
 const CLUSTER_GAP = 5; // gap between clusters (clears the diagonal strike)
 const VERT_SPAN = 3 * STROKE_GAP; // span of a full cluster's 4 verticals
@@ -53,7 +60,7 @@ export function tallyGeometry(opts: {
   const { value, max, height, pad, pen, overflow, fontSize } = opts;
   // count is floored + never negative; the summary always carries the truth.
   const count = Math.max(0, Math.floor(isFinite(value) ? value : 0));
-  const cap = Math.max(0, Math.floor(max));
+  const cap = Math.min(Math.max(0, Math.floor(max)), TALLY_MAX_MARKS);
   const drawn = Math.min(count, cap);
   const overflowCount = count - drawn;
 
