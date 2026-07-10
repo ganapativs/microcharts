@@ -54,7 +54,7 @@ describe("<PartitionStrip> (plan/25 §13, plan/17 F20)", () => {
     const { container } = draw(
       <PartitionStrip data={TREE} emphasis="react" width={200} height={24} />,
     );
-    expect(container.querySelector('rect[style*="--mc-accent"]')).not.toBeNull();
+    expect(container.querySelector('rect[data-mc-ink="accent"]')).not.toBeNull();
   });
 
   it("is axe-clean", async () => {

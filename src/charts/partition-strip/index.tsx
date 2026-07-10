@@ -5,7 +5,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
-import { ON_FILL_INK } from "../../core/color.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_PARTITION, type PartitionStrings } from "../../core/strings-partition.js";
 import { partitionStripGeometry, parentValue, type PartitionNode } from "./geometry.js";
@@ -29,7 +28,7 @@ export interface PartitionStripProps {
   children?: ReactNode | undefined;
 }
 
-const CAT = ["--mc-cat-1", "--mc-cat-2", "--mc-cat-3", "--mc-cat-4", "--mc-cat-5", "--mc-cat-6"];
+const CAT_N = 6; // --mc-cat-1 … --mc-cat-6 via data-mc-cat roles
 
 /** Shared summary — group/part counts + the largest leaf and its parent. */
 export function partitionStripSummary(
@@ -105,52 +104,62 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
       className={className ? `mc-partition ${className}` : "mc-partition"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {geo.segments.map((seg) => {
+      {geo.segments.flatMap((seg) => {
         const y = seg.row === 0 ? inset : inset + rowH + 1;
-        let fill: string;
-        let opacity: number;
+        // fills via ink/cat roles + .mc-partition rules in styles.css — flat
+        // siblings, minimal attributes: the segment list is this chart's SSR
+        // hot path (bench floor 20 charts/ms). fontSize stays an attribute
+        // (the craft gate + containment estimates read it).
+        let ink: Record<string, string | number | undefined>;
+        let opacity: number | undefined;
         if (emphasis) {
           if (seg.label === emphasis) {
-            fill = "var(--mc-accent)";
-            opacity = 1;
+            ink = { "data-mc-ink": "accent" };
+            opacity = undefined;
           } else if (seg.group === emphGroup) {
-            fill = `var(${CAT[seg.group % CAT.length]})`;
+            ink = { "data-mc-cat": (seg.group % CAT_N) + 1 };
             opacity = seg.row === 0 ? 0.85 : 0.55;
           } else {
-            fill = "var(--mc-neutral)";
+            ink = { "data-mc-ink": "neutral" };
             opacity = 0.28;
           }
         } else {
-          fill = `var(${CAT[seg.group % CAT.length]})`;
+          ink = { "data-mc-cat": (seg.group % CAT_N) + 1 };
           opacity = seg.row === 0 ? 0.9 : 0.55;
         }
-        const fits = labels && seg.row === 0 && seg.width >= seg.label.length * fontSize * 0.6 + 2;
-        return (
-          <g key={`${seg.row}-${seg.label}-${seg.x}`}>
-            <rect
-              x={seg.x}
-              y={y}
-              width={seg.width}
-              height={rowH}
-              rx={0.5}
-              shapeRendering="crispEdges"
-              data-mc-ink="band"
-              style={{ fill, fillOpacity: opacity }}
-            />
-            {fits ? (
-              <text
-                x={round2(seg.x + seg.width / 2)}
-                y={round2(y + rowH / 2)}
-                dominantBaseline="central"
-                textAnchor="middle"
-                fontSize={fontSize}
-                style={{ fill: ON_FILL_INK, fontWeight: 600 }}
-              >
-                {seg.label}
-              </text>
-            ) : null}
-          </g>
-        );
+        // seat gate: wide enough for the text AND a parent row tall enough to
+        // hold the floor font without bleeding — else labels drop out cleanly
+        const fits =
+          labels &&
+          seg.row === 0 &&
+          rowH >= fontSize + 0.8 &&
+          seg.width >= seg.label.length * fontSize * 0.6 + 2;
+        const key = `${seg.row}-${seg.label}-${seg.x}`;
+        const nodes = [
+          <rect
+            key={key}
+            x={seg.x}
+            y={y}
+            width={seg.width}
+            height={rowH}
+            fillOpacity={opacity}
+            {...ink}
+          />,
+        ];
+        if (fits)
+          nodes.push(
+            <text
+              key={`t-${key}`}
+              x={round2(seg.x + seg.width / 2)}
+              y={round2(y + rowH / 2)}
+              dominantBaseline="central"
+              textAnchor="middle"
+              fontSize={fontSize}
+            >
+              {seg.label}
+            </text>,
+          );
+        return nodes;
       })}
       {children}
     </Chart>

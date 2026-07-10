@@ -187,7 +187,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
             height={height - 1}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={0.75}
+            data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

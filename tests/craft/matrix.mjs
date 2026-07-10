@@ -1538,6 +1538,11 @@ add(
 // span rects (plan/22 #27 — the rect is the label's home, at 0.7 fill opacity).
 const ALLOWED = (line) =>
   /^event-timeline .*TEXT-ON-MARK "(Freeze|Healthy|[^"]*)" over rect/.test(line) ||
+  // TraceFold spans + PartitionStrip segments label INSIDE their rects with
+  // on-fill ink (plan/25 §13/§18) — the rect is the label's home. (Previously
+  // invisible to the gate via a data-mc-ink="band" attr the superaudit removed
+  // as a role misuse.)
+  /^(trace-fold|partition-strip) .*TEXT-ON-MARK "[^"]*" over rect/.test(line) ||
   // FillWord stacks an accent copy of the word ON the muted base — that exact
   // same-word overlap IS the "label is the bar" encoding, not a collision.
   /^fill-word .*TEXT-TEXT "([^"]+)" × "\1"$/.test(line) ||

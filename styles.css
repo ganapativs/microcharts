@@ -225,6 +225,13 @@
     fill: var(--mc-accent);
     stroke: none;
   }
+  /* accent on stroked marks (now-line, focus guides) — element-split like ghost:
+     an open polyline with a plain accent FILL would paint a wedge and lose its
+     stroke, so line-shaped accents stroke instead. */
+  :where(.mc-root :is(path, line, polyline)[data-mc-ink="accent"]) {
+    fill: none;
+    stroke: var(--mc-accent);
+  }
   /* width roles — orthogonal to ink (color) roles, composable on any stroked
      mark. Ratios of the primary width so presets and prefers-contrast retune
      every stroke in a chart, not just the data line. At the default 1.5 these
@@ -337,6 +344,52 @@
     fill: var(--mc-accent);
   }
 
+  /* categorical fill roles — the --mc-cat-N palette as roles, so segment charts
+     emit one short attribute instead of an inline var() string per mark. */
+  :where(.mc-root [data-mc-cat="1"]) {
+    fill: var(--mc-cat-1);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="2"]) {
+    fill: var(--mc-cat-2);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="3"]) {
+    fill: var(--mc-cat-3);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="4"]) {
+    fill: var(--mc-cat-4);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="5"]) {
+    fill: var(--mc-cat-5);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="6"]) {
+    fill: var(--mc-cat-6);
+    stroke: none;
+  }
+
+  /* TraceFold + PartitionStrip — dense span/segment strips. Shared presentation
+     lives here (not per-mark attributes): these charts render 20–40 rects and
+     the attribute count is their SSR hot path. Label ink over saturated fills
+     = ON_FILL_INK (core/color.ts) — the one sanctioned on-fill literal. */
+  :where(.mc-trace, .mc-partition) :where(rect) {
+    shape-rendering: crispEdges;
+    rx: 0.5;
+  }
+  /* anchor/baseline stay SVG attributes on the marks — the craft gate computes
+     text extents from raw attributes; only paint moves here */
+  :where(.mc-trace, .mc-partition) :where(text) {
+    font-weight: 600;
+    fill: rgba(255, 255, 255, 0.96);
+  }
+  /* a label on a muted (non-critical) span recedes to the page surface */
+  :where(.mc-trace) :where(text[data-mc-dim]) {
+    fill: var(--mc-surface, Canvas);
+  }
+
   /* Interactive sparkline crosshair — a dashed guide reads as "measuring" the
      focused point rather than just crossing it. Scoped to the interactive
      wrapper (styled here so the client entry stays under its size budget). */
@@ -408,6 +461,24 @@
 }
 
 @layer microcharts.motion {
+  /* Readout chip enter — 140ms strong ease-out rise (opacity + independent
+     translate/scale, composing with the chip's inline centering transform).
+     @starting-style is progressive: older engines show the chip instantly.
+     Exit is unmount (instant) — deliberate enter/exit asymmetry. */
+  :where(.mc-spark-readout) {
+    translate: 0 0;
+    scale: 1;
+    transition:
+      opacity 140ms cubic-bezier(0.23, 1, 0.32, 1),
+      translate 140ms cubic-bezier(0.23, 1, 0.32, 1),
+      scale 140ms cubic-bezier(0.23, 1, 0.32, 1);
+    @starting-style {
+      opacity: 0;
+      translate: 0 2px;
+      scale: 0.97;
+    }
+  }
+
   @keyframes mc-pulse {
     0% {
       transform: scale(1);
@@ -476,7 +547,8 @@
   @media (prefers-reduced-motion: reduce) {
     :where(.mc-root *),
     :where(.mc-root),
-    :where(.mc-delta-live .mc-delta-num) {
+    :where(.mc-delta-live .mc-delta-num),
+    :where(.mc-spark-readout) {
       animation: none !important;
       transition: none !important;
     }

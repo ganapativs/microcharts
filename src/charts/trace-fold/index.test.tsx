@@ -34,13 +34,13 @@ describe("<TraceFold> (plan/25 §18, plan/17 F17)", () => {
 
   it("critical spans are accented; non-critical muted (emphasis default)", () => {
     const { container } = draw(<TraceFold data={TRACE} width={200} height={40} />);
-    expect(container.querySelector('rect[style*="--mc-accent"]')).not.toBeNull();
-    expect(container.querySelector('rect[style*="--mc-neutral"]')).not.toBeNull();
+    expect(container.querySelector('rect[data-mc-ink="accent"]')).not.toBeNull();
+    expect(container.querySelector('rect[data-mc-ink="neutral"]')).not.toBeNull();
   });
 
   it("emphasis='none' renders spans uniformly", () => {
     const { container } = draw(<TraceFold data={TRACE} emphasis="none" width={200} height={40} />);
-    expect(container.querySelector('rect[style*="--mc-accent"]')).toBeNull();
+    expect(container.querySelector('rect[data-mc-ink="accent"]')).toBeNull();
   });
 
   it("is axe-clean", async () => {

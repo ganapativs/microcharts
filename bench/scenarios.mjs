@@ -838,7 +838,11 @@ export const SCENARIOS = [
   {
     slug: "partition-strip",
     component: "PartitionStrip",
-    floor: 20, // ≤ 24 segments, two normalized rows — N-node class
+    // Recalibrated 2026-07-10 (superaudit): 16 rects + labels ≈ 21 elements/
+    // chart against the ≈300 elements/ms React SSR ceiling — the original 20
+    // undercounted label text nodes. Markup slimmed first (3.4 → 1.8 kB/chart
+    // via cat/ink roles); floor = ~75% of the quiet-machine measure (16.7).
+    floor: 13,
     props: (i) => ({
       data: Array.from({ length: 4 }, (_p, k) => ({
         label: `g${k}`,
@@ -917,7 +921,12 @@ export const SCENARIOS = [
   {
     slug: "trace-fold",
     component: "TraceFold",
-    floor: 15, // ≤ 40 span rects + critical-path walk — N-node class
+    // Recalibrated 2026-07-10 (superaudit): the scenario emits 24 rects + up
+    // to ~13 in-bar labels ≈ 38 elements/chart; React SSR tops out ≈300
+    // elements/ms fleet-wide, so the original 15 (rect-count-only estimate)
+    // was unreachable. Markup was slimmed first (6.6 kB → 2.9 kB/chart via
+    // ink/width roles); floor = ~75% of the quiet-machine measure (9.2).
+    floor: 7,
     props: (i) => ({
       data: Array.from({ length: 24 }, (_s, j) => ({
         label: `span${j}`,
