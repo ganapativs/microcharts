@@ -62,6 +62,39 @@ never color alone.
 ## Variants
 
 <LiveDemo
+  label="signed step labels"
+  code={`// label="delta" prints each step's signed value in a band below the plot.
+// When labels would collide, the biggest movers win — a deterministic drop-out,
+// never a random overlap.
+<Waterfall
+  data={[
+    { label: "Product", value: 42 },
+    { label: "Services", value: 18 },
+    { label: "Refunds", value: -12 },
+    { label: "Opex", value: -26 },
+    { label: "FX", value: 5 },
+  ]}
+  start={60}
+  label="delta"
+/>`}
+>
+  <Waterfall
+    data={[
+      { label: "Product", value: 42 },
+      { label: "Services", value: 18 },
+      { label: "Refunds", value: -12 },
+      { label: "Opex", value: -26 },
+      { label: "FX", value: 5 },
+    ]}
+    start={60}
+    label="delta"
+    title="Net income bridge"
+    width={240}
+    height={30}
+  />
+</LiveDemo>
+
+<LiveDemo
   label="costs: down is good"
   code={`// cost breakdowns invert valence — decreases are wins
 <Waterfall

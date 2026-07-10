@@ -1,12 +1,22 @@
 import { HeatStrip } from "@microcharts/react/heat-strip";
 import { InteractiveDemo } from "./heat-strip.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const LOAD = Array.from({ length: 30 }, (_, i) => Math.round(Math.sin(i / 4) * 40 + 50));
 const D: [number, number] = [0, 100];
+// Same 20-minute window shown in the top-of-page demo (matches `example.code`
+// and `sampleData` below) — reused across the four homes so the copy quotes
+// numbers a reader can actually see on the page.
+const HOURLY_LOAD = [
+  12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35,
+];
+const TENANTS: { name: string; load: number[] }[] = [
+  { name: "Acme", load: HOURLY_LOAD },
+  { name: "Globex", load: HOURLY_LOAD.map((v) => Math.round(v * 0.4)) },
+];
 
 export const entry: ChartEntry = {
   name: "HeatStrip",
@@ -59,6 +69,12 @@ const hourlyLoad = [12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 
 
 <HeatStrip data={hourlyLoad} domain={[0, 100]} title="Load per hour" />`,
   },
+  sampleData: [
+    {
+      name: "hourlyLoad",
+      code: `const hourlyLoad = [12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -71,6 +87,10 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
+  // `domain` isn't a knob: HeatStrip's whole point is calibrating against ONE
+  // shared domain across rows (see "shared-domain rows" below) — a slider
+  // that rescales just this one strip would demo the anti-pattern the page
+  // warns against. `data` gets the shuffle button instead of a knob.
   knobs: [
     { kind: "range", key: "steps", label: "steps", min: 2, max: 9, init: 5 },
     {
@@ -132,6 +152,79 @@ export const recipes: Recipe[] = [
   },
 ];
 
+/* The four homes — HeatStrip always doing the one thing it's for: a shared-domain
+   intensity ribbon over time. Every host is a load/pressure monitoring surface
+   quoting the same 20-minute window, never a generic "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        API load over the last 20 minutes{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <HeatStrip data={HOURLY_LOAD} domain={D} summary={false} width={110} height={14} />
+        </span>{" "}
+        — peaked at 90% by minute 8, dipped to 28%, spiked again, then closed at 35%.
+      </p>
+    ),
+    code: `<p>\n  API load over the last 20 minutes{" "}\n  <HeatStrip data={hourlyLoad} domain={[0, 100]} height={14} /> — peaked at 90%, closed at 35%.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {TENANTS.map((t) => (
+            <tr key={t.name} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{t.name}</td>
+              <td className="py-1.5">
+                <HeatStrip data={t.load} domain={D} summary={false} width={90} height={14} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                {Math.max(...t.load)}% peak
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `// one shared domain — rows stay comparable\n{tenants.map((t) => (\n  <tr key={t.name}>\n    <td>{t.name}</td>\n    <td><HeatStrip data={t.load} domain={[0, 100]} /></td>\n  </tr>\n))}`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Load, last 20 min</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">90%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">peak, minute 8</span>
+          </div>
+        </div>
+        <HeatStrip data={HOURLY_LOAD} domain={D} summary={false} width={200} height={30} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">90%</span>\n  <span className="unit">peak, minute 8</span>\n  <HeatStrip data={hourlyLoad} domain={[0, 100]} width={200} height={30} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {TENANTS.map((t, i) => (
+          <span
+            key={t.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {t.name}
+            <HeatStrip data={t.load} domain={D} summary={false} width={44} height={12} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Acme <HeatStrip data={hourlyLoad} domain={[0, 100]} height={12} />\n</button>`,
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <HeatStrip
@@ -154,6 +247,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

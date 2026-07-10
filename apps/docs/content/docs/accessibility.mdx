@@ -1,56 +1,131 @@
 ---
 title: Accessibility
-description: How microcharts stays accessible by default — data-generated summaries, keyboard navigation, forced-colors and reduced-motion support, and never encoding meaning in color alone.
+description: Accessible by default — every chart is an img with a natural-language summary generated from your data, keyboard-navigable when interactive, localizable, and correct under forced-colors, reduced-motion, and high-contrast. Meaning is never carried by color alone.
 ---
 
-Accessibility is not a setting in microcharts. Every chart is accessible the moment you
-render it, because the accessible name is generated from your data.
+Accessibility isn't a setting in microcharts. Every chart is accessible the moment you render
+it, because the accessible name is generated from your data — there's no `alt` text to forget
+and nothing to drift out of sync when the numbers change.
 
 ## Summaries that write themselves
 
-By default a chart is an `img` whose accessible name is a natural-language sentence built
-from the series. No `alt` text to forget, no summary to drift out of sync with the data.
+By default a chart is an `img` whose accessible name is a natural-language sentence built from
+the series. It's the flagship feature of the library: the same words a screen reader announces
+are the words a crawler indexes and a model can quote.
 
 <LiveDemo
   label="Announced automatically"
   code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />
-// announced as:
+// accessible name:
 // "Weekly revenue. Trending up 200%. Range 3 to 9. Last value 9."`}
 >
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={140} height={36} title="Weekly revenue" />
 </LiveDemo>
 
-Degenerate data produces honest short forms rather than a broken chart — empty and all-null
-become "No data.", a single point becomes "Single value X.", and a flat line becomes "Flat
-at X."
+The name is `title` + the generated summary, joined into one sentence. The summary is
+deterministic — the same data always produces the same words — so it's testable, and every
+one of these strings in the docs is the real output, not an approximation.
+
+### Degenerate data stays honest
+
+The single most common accessibility bug in charting is a broken summary for empty, single, or
+flat data. microcharts produces an honest short form instead — every string below is the
+literal output of `describeSeries`:
+
+| Data                | Accessible summary  |
+| ------------------- | ------------------- |
+| `[]` / all-null     | `No data.`          |
+| `[7]`               | `Single value 7.`   |
+| `[5, 5, 5, 5]`      | `Flat at 5.`        |
+| `[9, 7, 8, 4, 5, 2]` | `Trending down 78%. Range 2 to 9. Last value 2.` |
+
+## Every chart is an `img`
+
+The accessible name is composed deterministically — no module-level id counters that could
+desync between server and client and cause a hydration mismatch. Two levels:
+
+- **Default** — a chart renders `role="img"` with a computed `aria-label` (and an id-less
+  `<title>`). Nothing to wire; it just has a name.
+- **Explicit `id`** — pass an `id` and the chart upgrades to a `<title>`/`<desc>` pair referenced
+  by `aria-labelledby`, the richest form, for when you want the title and description addressable.
+
+Override the whole sentence with a string when you have better words than the generator:
+
+```tsx
+<Sparkline data={data} summary="Revenue per week, Q3 — up 40% and accelerating." />
+```
 
 ## Decorative opt-out
 
-When the surrounding text already describes the data, mark the chart decorative with
-`summary={false}` so screen readers skip the redundancy.
+When the surrounding text already describes the data — the common case for a word-sized chart
+_inside_ a sentence — mark the chart decorative with `summary={false}` so screen readers skip
+the redundancy rather than reading it twice.
 
 ```tsx
 <p>
-  Revenue climbed steadily this week <Sparkline data={data} summary={false} />.
+  Revenue climbed steadily <Sparkline data={data} summary={false} /> through the quarter.
 </p>
 ```
 
 ## Keyboard and live regions
 
 The `/interactive` entries are focusable and fully keyboard-navigable. Arrow keys walk the
-points (or move in two dimensions across an ActivityGrid), and each focused value is read
-through a polite live region.
+points — or move in two dimensions across an ActivityGrid — and each focused value is announced
+through a polite live region, so a keyboard or screen-reader user reads the same detail a mouse
+user gets on hover. The static entries carry no listeners at all; interactivity is opt-in.
 
 ## Color is never the only channel
 
-Direction and state are always doubled. Delta pairs a triangle glyph with its color; SparkBar
-encodes sign by position above or below the baseline; ActivityGrid always ships a numeric
-summary alongside its intensity. Default strokes clear 4.5:1 contrast in both themes.
+Direction and state are always doubled, so a chart survives with no color at all:
+
+- **Delta** pairs a ▲/▼ glyph with its color — the glyph carries the sign.
+- **SparkBar** encodes sign by _position_ above or below the baseline, not hue.
+- **ActivityGrid** always ships a numeric summary alongside its intensity ramp.
+
+Default strokes clear **4.5:1 contrast** against the page in both light and dark themes, and
+those dark values are hand-tuned per token — never an inversion that could wash out.
+
+## Internationalization and RTL
+
+Nothing about a chart is hard-coded to English or to left-to-right layout.
+
+- **Localized numbers.** Every rendered number and every number in the summary goes through
+  `Intl.NumberFormat`. Pass `locale` and `format` and the digits, grouping, and units follow
+  the reader's locale:
+
+  ```tsx
+  <Sparkline data={data} locale="de-DE" format={{ style: "currency", currency: "EUR" }} />
+  ```
+
+- **Localized words.** The summary templates are a swappable contract (`SummaryStrings`; English
+  ships as the default). Provide translated templates via the interactive `strings` prop, or
+  override the whole sentence with a `summary` string, and the announcement speaks your language.
+
+- **RTL layouts.** A chart is direction-neutral SVG with a localized text name, so it drops into
+  an RTL document without breaking — it's an `img`, not a run of text. Time-ordered charts keep
+  their conventional oldest-to-newest reading order; you localize the summary and the number
+  formatting, which is what a screen-reader user actually hears.
 
 ## System preferences, handled
 
-- **`prefers-reduced-motion`** — entrance and update animations resolve instantly to their
-  final state.
-- **`forced-colors`** — data ink maps to system `CanvasText`, accents to `Highlight`, muted
-  marks to `GrayText`.
+- **`prefers-reduced-motion`** — entrance and update animations resolve instantly to their final
+  state. Static charts never animate at all.
+- **`forced-colors`** — data ink maps to system `CanvasText`, accents to `Highlight`, muted marks
+  to `GrayText`, so a Windows High Contrast user sees a correct chart, not a blank box.
 - **`prefers-contrast`** — strokes thicken and bands deepen automatically.
+
+## Verify it yourself
+
+Because the summary is deterministic and the markup is plain SVG, accessibility is testable in
+CI, not a manual audit:
+
+```tsx
+import { axe } from "vitest-axe";
+
+const { container } = render(<Sparkline data={data} title="Revenue" />);
+expect(await axe(container)).toHaveNoViolations();
+// and assert the exact announced sentence:
+expect(container.querySelector("[role=img]")).toHaveAccessibleName(
+  "Revenue. Trending up 200%. Range 3 to 9. Last value 9.",
+);
+```

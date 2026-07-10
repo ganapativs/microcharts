@@ -1,8 +1,10 @@
 "use client";
 import { useState, type ReactNode } from "react";
-import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { cn } from "@/lib/cn";
 import { CHART_GZIP } from "@/lib/stats";
+import { CodeWithData } from "@/components/ui/code-with-data";
+import { getChart } from "@/lib/catalog";
+import type { SampleData } from "@/lib/charts/types";
 
 type Tab = "preview" | "code";
 
@@ -17,6 +19,8 @@ export function LiveDemo({
   label,
   meta,
   sizeOf,
+  dataOf,
+  sampleData,
   grid = false,
 }: {
   children: ReactNode;
@@ -25,13 +29,19 @@ export function LiveDemo({
   label?: string;
   meta?: string;
   /** Chart slug — renders the MEASURED static gzip size as the meta text, so
-      doc pages never hand-key a number that can go stale. */
+      doc pages never hand-key a number that can go stale. Also resolves the
+      chart's sample-data so any `data={var}` in the snippet stays runnable. */
   sizeOf?: string;
+  /** Override the slug used to resolve sample-data, when it differs from sizeOf. */
+  dataOf?: string;
+  /** Explicit sample-data for pages not in the chart registry (e.g. annotations). */
+  sampleData?: SampleData[];
   grid?: boolean;
 }) {
   const [tab, setTab] = useState<Tab>("preview");
   const size = sizeOf ? CHART_GZIP[sizeOf]?.static : undefined;
   const metaText = meta ?? (size !== undefined ? `static · ${size} kB` : undefined);
+  const data = sampleData ?? getChart(dataOf ?? sizeOf ?? "")?.sampleData;
 
   return (
     <div className="not-prose my-6 panel overflow-hidden">
@@ -71,9 +81,7 @@ export function LiveDemo({
           {children}
         </div>
       ) : (
-        <div className="code-inset">
-          <DynamicCodeBlock lang={lang} code={code} />
-        </div>
+        <CodeWithData code={code} sampleData={data} lang={lang} />
       )}
     </div>
   );

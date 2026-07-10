@@ -1,6 +1,6 @@
 import { ProgressRing } from "@microcharts/react/progress-ring";
 import { InteractiveDemo } from "./progress-ring.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
@@ -69,6 +69,8 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
+  // `max` isn't its own knob: `pct` already expresses value as value/max — a
+  // second denominator control would just relabel the same fraction.
   knobs: [
     { kind: "range", key: "pct", label: "value %", min: 0, max: 120, init: 68 },
     { kind: "toggle", key: "sweep", label: "sweep (countdown)", init: false },
@@ -117,6 +119,90 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const JOBS: { name: string; value: number }[] = [
+  { name: "Database", value: 0.82 },
+  { name: "Media", value: 0.35 },
+  { name: "Config", value: 1 },
+];
+
+const COOLDOWNS: { name: string; value: number }[] = [
+  { name: "Photos", value: 0.4 },
+  { name: "Videos", value: 0.85 },
+];
+
+/* The four homes — ProgressRing always answering "how complete is this?" at
+   icon size. Every host is a sync/backup/quota surface (its actual job),
+   never a generic "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Nightly backup is{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <ProgressRing value={0.68} summary={false} style={{ width: 18, height: 18 }} />
+        </span>{" "}
+        two-thirds through, about 12 minutes left.
+      </p>
+    ),
+    code: `<p>\n  Nightly backup is{" "}\n  <ProgressRing value={0.68} style={{ width: 18, height: 18 }} /> two-thirds through.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {JOBS.map((j) => (
+            <tr key={j.name} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{j.name}</td>
+              <td className="py-1.5">
+                <ProgressRing value={j.value} summary={false} style={{ width: 18, height: 18 }} />
+              </td>
+              <td className="py-1.5 pl-3 text-right font-mono text-fd-muted-foreground">
+                {Math.round(j.value * 100)}%
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <ProgressRing value={0.82} style={{ width: 18, height: 18 }} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Storage used</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">142</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">of 200 GB</span>
+          </div>
+        </div>
+        <ProgressRing value={0.71} summary={false} style={{ width: 32, height: 32 }} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">142</span>\n  <span className="unit">of 200 GB</span>\n  <ProgressRing value={0.71} style={{ width: 32, height: 32 }} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {COOLDOWNS.map((c, i) => (
+          <span
+            key={c.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {c.name}
+            <ProgressRing value={c.value} sweep summary={false} style={{ width: 14, height: 14 }} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Photos <ProgressRing value={0.4} sweep style={{ width: 14, height: 14 }} />\n</button>`,
+  },
+};
+
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
   return <ProgressRing value={0.68} summary={false} style={{ width: 18, height: 18 }} />;
 }
@@ -132,6 +218,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

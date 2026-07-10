@@ -1,6 +1,6 @@
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { InteractiveDemo } from "./segmented-bar.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
@@ -12,6 +12,29 @@ const MIX = [
   { label: "Edge", value: 30 },
   { label: "Arc", value: 20 },
 ];
+// Developers read docs on Chrome; readers hit the blog from a phone. Two real
+// pages, two honestly different browser mixes — the "traffic mix per row" story.
+const DOCS_MIX = [
+  { label: "Chrome", value: 700 },
+  { label: "Safari", value: 90 },
+  { label: "Firefox", value: 60 },
+  { label: "Edge", value: 40 },
+];
+const BLOG_MIX = [
+  { label: "Safari", value: 410 },
+  { label: "Chrome", value: 340 },
+  { label: "Firefox", value: 40 },
+];
+const PAGES = [
+  { path: "/", mix: MIX },
+  { path: "/docs", mix: DOCS_MIX },
+  { path: "/blog", mix: BLOG_MIX },
+];
+function topShare(mix: { label: string; value: number }[]): { label: string; pct: number } {
+  const total = mix.reduce((s, d) => s + d.value, 0);
+  const top = mix.reduce((a, b) => (b.value > a.value ? b : a));
+  return { label: top.label, pct: Math.round((top.value / total) * 100) };
+}
 
 export const entry: ChartEntry = {
   name: "SegmentedBar",
@@ -67,6 +90,18 @@ const mix = [
 
 <SegmentedBar data={mix} title="Browser share" />`,
   },
+  sampleData: [
+    {
+      name: "mix",
+      code: `const mix = [
+  { label: "Chrome", value: 620 },
+  { label: "Safari", value: 240 },
+  { label: "Firefox", value: 90 },
+  { label: "Edge", value: 30 },
+  { label: "Arc", value: 20 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -78,6 +113,11 @@ export const showcase = {
   Node: () => <SegmentedBar data={MIX} title="Browser share" width={130} height={16} />,
 };
 
+// format/locale/strings/title/summary/id/className/style/children/width/height:
+// styling/formatting escape hatches, not chart-shape knobs — no interactive
+// control (consistent with every other chart's playground); locale is demoed
+// inline on the docs page instead. Every documented chart-shape prop
+// (maxSegments, order, label) has a knob below.
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -137,6 +177,87 @@ export const recipes: Recipe[] = [
   },
 ];
 
+/* The four homes — SegmentedBar always doing the one thing it's for: reading a
+   composition at a glance. Every host is a real traffic-mix surface (site-wide,
+   per-page, per-property), never a generic "signups/revenue" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        This week&apos;s sessions skew Chrome{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <SegmentedBar data={MIX} summary={false} width={90} height={14} />
+        </span>{" "}
+        — 62% Chrome, 24% Safari, the rest long tail.
+      </p>
+    ),
+    code: `<p>\n  This week's sessions skew Chrome{" "}\n  <SegmentedBar data={mix} width={90} height={14} /> — 62% Chrome, 24% Safari, the rest long tail.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {PAGES.map((p) => {
+            const top = topShare(p.mix);
+            return (
+              <tr key={p.path} className="border-t border-fd-border/60 first:border-0">
+                <td className="py-1.5 pr-3 text-fd-muted-foreground">{p.path}</td>
+                <td className="py-1.5">
+                  <SegmentedBar data={p.mix} summary={false} width={90} height={12} />
+                </td>
+                <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                  {top.label} {top.pct}%
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <SegmentedBar data={row.mix} width={90} height={12} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Browser coverage</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">62%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">sessions on Chrome</span>
+          </div>
+        </div>
+        <SegmentedBar data={MIX} label="percent" summary={false} width={200} height={20} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">62%</span>\n  <span className="unit">sessions on Chrome</span>\n  <SegmentedBar data={mix} label="percent" width={200} height={20} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {(
+          [
+            ["Marketing", MIX],
+            ["Docs", DOCS_MIX],
+          ] as const
+        ).map(([name, mix], i) => (
+          <span
+            key={name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {name}
+            <SegmentedBar data={mix} summary={false} width={54} height={12} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Marketing <SegmentedBar data={mix} width={54} height={12} />\n</button>`,
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <SegmentedBar
@@ -159,6 +280,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

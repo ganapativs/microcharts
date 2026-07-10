@@ -1,10 +1,10 @@
 "use client";
 import { useState, type ReactNode } from "react";
-import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { RotateCw } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { getModule } from "@/lib/charts/registry";
-import type { Knob, KnobValue } from "@/lib/charts/types";
+import { CodeWithData } from "@/components/ui/code-with-data";
+import type { Knob, KnobValue, SampleData } from "@/lib/charts/types";
 
 /* ── shared control primitives ─────────────────────────────────────────── */
 
@@ -118,12 +118,14 @@ function Shell({
   preview,
   controls,
   code,
+  sampleData,
   morphKey,
 }: {
   onShuffle?: () => void;
   preview: ReactNode;
   controls: ReactNode;
   code: string;
+  sampleData?: SampleData[];
   /** Replays a gentle morph when this changes — pass only discrete props, never
       slider values, so dragging doesn't strobe. */
   morphKey?: string;
@@ -152,9 +154,7 @@ function Shell({
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-t border-hairline px-4 py-4">
         {controls}
       </div>
-      <div className="code-inset border-t border-hairline">
-        <DynamicCodeBlock lang="tsx" code={code} />
-      </div>
+      <CodeWithData code={code} sampleData={sampleData} className="border-t border-hairline" />
     </div>
   );
 }
@@ -199,7 +199,8 @@ function KnobControl({
 
 /** A live prop playground for any chart. `<Playground chart="bullet" />` */
 export function Playground({ chart }: { chart: string }) {
-  const spec = getModule(chart)?.playground;
+  const mod = getModule(chart);
+  const spec = mod?.playground;
   const [state, setState] = useState<Record<string, KnobValue>>(() =>
     Object.fromEntries((spec?.knobs ?? []).map((k) => [k.key, k.init])),
   );
@@ -225,6 +226,7 @@ export function Playground({ chart }: { chart: string }) {
             }
           : undefined
       }
+      sampleData={mod?.entry.sampleData}
       preview={spec.render(state, data)}
       controls={spec.knobs.map((k) => (
         <KnobControl

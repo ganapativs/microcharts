@@ -1,21 +1,20 @@
 ---
 title: Introduction
-description: Word-sized charts for React — zero dependencies, ~1 kB each, accessible by default, and server-component safe.
+description: Word-sized charts for React — zero dependencies, 0.9–3.6 kB gzip each, accessible by default, and server-component safe. 106 chart types, one grammar.
 ---
 
-microcharts is a set of tiny, handcrafted charts for React. They are built to sit
-_inside_ an interface — in a sentence, a table cell, a KPI card, a tab header —
-where a full chart library would be too heavy and too loud.
+microcharts is a set of tiny, handcrafted charts for React. They're built to sit _inside_ an
+interface — in a sentence, a table cell, a KPI card, a tab header — where a full chart library
+would be too heavy and too loud. One quiet signal, read at a glance.
 
 <PackageTabs />
 
-Every chart renders from `data` alone, ships as pure SVG with **zero runtime
-dependencies**, and carries an accessible description generated from the data
-itself.
+Every chart renders from `data` alone, ships as pure SVG with **zero runtime dependencies**,
+and carries an accessible description generated from the data itself.
 
 <LiveDemo
   label="Sparkline"
-  meta="static · RSC-safe"
+  sizeOf="sparkline"
   code={`import { Sparkline } from "@microcharts/react/sparkline";
 
 <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />`}
@@ -25,13 +24,31 @@ itself.
 
 ## Why microcharts
 
-- **Zero dependencies.** No chart engine, no D3. Just SVG. CI-enforced, forever.
-- **Server-component safe.** Static charts are hook-free and listener-free — they
-  render to HTML with zero client JavaScript.
-- **Accessible by default.** Each chart is an `img` with a natural-language
-  summary built from your data. Nothing to remember, nothing to drift.
-- **Tiny.** Around 1 kB gzip per chart, budget-gated in CI.
+- **Zero dependencies.** No chart engine, no D3 — just SVG. CI-enforced, forever.
+- **Server-component safe.** Static charts are hook-free and listener-free; they render to HTML
+  with zero client JavaScript, and add interactivity only from a separate `/interactive` subpath.
+- **Accessible by default.** Each chart is an `img` with a natural-language summary built from
+  your data — nothing to remember, nothing to drift.
+- **Tiny.** Static charts span **0.9–3.6 kB gzip** (median 2.3), each imported from its own
+  subpath and budget-gated in CI.
 
-## The five
+## One catalog, one grammar
+
+The library ships a full catalog of chart types, grouped by the question each one answers.
+`data` alone always renders something correct, and a prop name means the same thing on every
+chart — so you pick by the _decision_ you need read, not by fighting an options bag.
+
+<CatalogFacts />
+
+Browse them all on the [All charts](/docs/charts) page, which files every type under the
+question it answers — start from what you need someone to see, and land on the chart.
+
+## Where they live
+
+The point of a word-sized chart is that it belongs _in_ your interface, not in a dashboard
+off to the side. Here's the same chart doing its job in four different homes:
 
 <FourContexts slug="sparkline" />
+
+Ready to render one? The [Quickstart](/docs/quickstart) gets you from install to a live chart
+in three steps.

@@ -1,6 +1,6 @@
 import { Dumbbell } from "@microcharts/react/dumbbell";
 import { InteractiveDemo } from "./dumbbell.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
@@ -10,6 +10,11 @@ const BANDS = [
   { label: "Berlin", from: 48, to: 68 },
   { label: "Oslo", from: 66, to: 60 },
   { label: "Rome", from: 44, to: 50 },
+];
+const LEVELS = [
+  { label: "L3", from: 58, to: 66 },
+  { label: "L4", from: 68, to: 82 },
+  { label: "L5", from: 84, to: 104 },
 ];
 
 export const entry: ChartEntry = {
@@ -51,6 +56,17 @@ export const entry: ChartEntry = {
     title: "Salary band move",
     code: `import { Dumbbell } from "${PKG}/dumbbell";\n\n<Dumbbell data={[{ from: 62000, to: 84000 }]} title="Band move" />`,
   },
+  sampleData: [
+    {
+      name: "bands",
+      code: `const bands = [
+  { label: "Paris", from: 52, to: 61 },
+  { label: "Berlin", from: 48, to: 68 },
+  { label: "Oslo", from: 66, to: 60 },
+  { label: "Rome", from: 44, to: 50 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -63,6 +79,10 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
+  // data isn't a knob — it's the dataset the other knobs act on.
+  // domain/color/format/locale/strings are styling/formatting overrides,
+  // not interactive read decisions; every remaining documented prop
+  // (positive, label, highlight) has a control below.
   knobs: [
     { kind: "toggle", key: "positive", label: "valence", init: false },
     { kind: "toggle", key: "values", label: "value labels", init: false },
@@ -105,6 +125,85 @@ export const recipes: Recipe[] = [
   },
 ];
 
+/* The four homes — Dumbbell always doing the one thing it's for: showing where
+   a row started and where it landed. Every host is a comp-review surface
+   (office bands, level bands), never a generic "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Berlin&apos;s band moved{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <Dumbbell data={[{ from: 48, to: 68 }]} summary={false} width={70} height={14} />
+        </span>{" "}
+        from €48k to €68k after the review — up 42%.
+      </p>
+    ),
+    code: `<p>\n  Berlin's band moved{" "}\n  <Dumbbell data={[{ from: 48, to: 68 }]} width={70} height={14} /> from €48k to €68k — up 42%.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {BANDS.map((b) => (
+            <tr key={b.label} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{b.label}</td>
+              <td className="py-1.5">
+                <Dumbbell data={[b]} summary={false} width={70} height={14} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                {b.to - b.from >= 0 ? "+" : ""}
+                {b.to - b.from}k
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <Dumbbell data={[{ label: "Berlin", from: 48, to: 68 }]} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Largest band move</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">€48k → €68k</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">Berlin, up 42%</span>
+          </div>
+        </div>
+        <Dumbbell data={BANDS} summary={false} positive="up" width={130} height={52} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">€48k → €68k</span>\n  <span className="unit">Berlin, up 42%</span>\n  <Dumbbell data={bands} positive="up" width={130} height={52} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {(
+          [
+            ["Offices", BANDS],
+            ["Levels", LEVELS],
+          ] as const
+        ).map(([name, rows], i) => (
+          <span
+            key={name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {name}
+            <Dumbbell data={rows} summary={false} width={60} height={12} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Offices <Dumbbell data={bands} width={60} height={12} />\n</button>`,
+  },
+};
+
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
   return <Dumbbell data={[{ from: 48, to: 68 }]} summary={false} width={60} height={12} />;
 }
@@ -120,6 +219,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

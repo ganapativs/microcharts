@@ -117,7 +117,22 @@ import { Playground } from "@/components/charts/playground";
 import { Usage } from "@/components/charts/usage";
 import { InteractiveDemo } from "@/components/charts/interactive";
 import { PropTable } from "@/components/charts/prop-table";
+import { ChartChooser } from "@/components/charts/chooser";
 import { PackageTabs } from "@/components/ui/package-tabs";
+import { StreamDemo } from "@/components/charts/stream-demo";
+import { GrammarExplorer } from "@/components/charts/ai-guide";
+import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
+import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
+import { Accordions, Accordion } from "fumadocs-ui/components/accordion";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import {
+  SizeDistribution,
+  SizeTable,
+  ScalingTable,
+  ThroughputSummary,
+  CatalogFacts,
+} from "@/components/ui/perf";
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -244,7 +259,24 @@ export function getMDXComponents(components?: MDXComponents) {
     Usage,
     InteractiveDemo,
     PropTable,
+    ChartChooser,
     PackageTabs,
+    StreamDemo,
+    GrammarExplorer,
+    ProviderWall,
+    SurfaceCards,
+    DynamicCodeBlock,
+    Accordions,
+    Accordion,
+    Tab,
+    Tabs,
+    Step,
+    Steps,
+    SizeDistribution,
+    SizeTable,
+    ScalingTable,
+    ThroughputSummary,
+    CatalogFacts,
     ...components,
   } satisfies MDXComponents;
 }

@@ -3,40 +3,25 @@ import { useState, type ReactNode } from "react";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { Delta } from "@microcharts/react/delta";
 import { getModule } from "@/lib/charts/registry";
-import type { ChartModule } from "@/lib/charts/types";
+import type { ChartContexts, ChartModule } from "@/lib/charts/types";
 
-/** Copy-ready snippet for each of the four placement contexts. */
-function contextCode(mod: ChartModule, kind: "sentence" | "cell" | "kpi" | "tab"): string {
-  switch (kind) {
-    case "sentence":
-      return `<p>\n  Signups held steady ${mod.markCode()} through the quarter.\n</p>`;
-    case "cell":
-      return `<td>${mod.markCode(72, 16)}</td>`;
-    case "kpi":
-      return `<div className="kpi">\n  <span className="figure">14k</span>\n  <Delta value={0.124} />\n  ${mod.markCode(200, 36)}\n</div>`;
-    case "tab":
-      return `<button className="tab">\n  Revenue ${mod.markCode(44, 14)}\n</button>`;
-  }
-}
+const HOMES = [
+  { key: "sentence", label: "In a sentence" },
+  { key: "cell", label: "In a table cell" },
+  { key: "kpi", label: "In a KPI card" },
+  { key: "tab", label: "In a tab header" },
+] as const;
 
-const tag = "mono-label";
-/** Preview body: same fixed min-height as the code well so the card box — and
- *  therefore the header + title — never shifts when toggling Preview↔Code. */
-const previewBody = "flex min-h-36 flex-1 flex-col justify-center gap-2 p-4";
-
-export function FourContexts({ slug }: { slug: string }) {
-  const mod = getModule(slug);
-  const [tab, setTab] = useState<"preview" | "code">("preview");
-  if (!mod) return null;
+/* ── generic fallback (migration only) ────────────────────────────────────
+   Used only for charts that haven't authored `contexts` yet. Deliberately
+   plain so an un-migrated page reads as "placeholder", not "finished". */
+function genericContexts(mod: ChartModule): ChartContexts {
   const { Mark } = mod;
   const data = mod.entry.demo;
   const last = [...data].reverse().find((n) => Number.isFinite(n)) ?? 0;
-
-  const contexts: { label: string; code: string; preview: ReactNode }[] = [
-    {
-      label: "In a sentence",
-      code: contextCode(mod, "sentence"),
-      preview: (
+  return {
+    sentence: {
+      render: () => (
         <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
           Signups held steady{" "}
           <span className="mx-1 inline-flex align-middle">
@@ -45,11 +30,10 @@ export function FourContexts({ slug }: { slug: string }) {
           through the quarter, closing at <span className="font-mono tabular-nums">{last}</span>.
         </p>
       ),
+      code: `<p>\n  Signups held steady ${mod.markCode()} through the quarter.\n</p>`,
     },
-    {
-      label: "In a table cell",
-      code: contextCode(mod, "cell"),
-      preview: (
+    cell: {
+      render: () => (
         <table className="w-full text-sm tabular-nums">
           <tbody>
             {[
@@ -69,11 +53,10 @@ export function FourContexts({ slug }: { slug: string }) {
           </tbody>
         </table>
       ),
+      code: `<td>${mod.markCode(72, 16)}</td>`,
     },
-    {
-      label: "In a KPI card",
-      code: contextCode(mod, "kpi"),
-      preview: (
+    kpi: {
+      render: () => (
         <>
           <div>
             <div className="text-fd-muted-foreground text-xs">Weekly active</div>
@@ -87,11 +70,10 @@ export function FourContexts({ slug }: { slug: string }) {
           <Mark data={data} width={200} height={36} />
         </>
       ),
+      code: `<div className="kpi">\n  <span className="figure">14k</span>\n  <Delta value={0.124} />\n  ${mod.markCode(200, 36)}\n</div>`,
     },
-    {
-      label: "In a tab header",
-      code: contextCode(mod, "tab"),
-      preview: (
+    tab: {
+      render: () => (
         <div className="flex flex-wrap gap-1.5">
           {[
             ["Revenue", data],
@@ -111,8 +93,21 @@ export function FourContexts({ slug }: { slug: string }) {
           ))}
         </div>
       ),
+      code: `<button className="tab">\n  Revenue ${mod.markCode(44, 14)}\n</button>`,
     },
-  ];
+  };
+}
+
+/**
+ * The four homes — the same chart doing its job in a sentence, a table cell, a
+ * KPI card, and a tab. Bodies + code come from the chart's authored `contexts`,
+ * so the copy is true to what THIS chart measures — never a shared template.
+ */
+export function FourContexts({ slug }: { slug: string }) {
+  const mod = getModule(slug);
+  const [tab, setTab] = useState<"preview" | "code">("preview");
+  if (!mod) return null;
+  const ctx = mod.contexts ?? genericContexts(mod);
 
   return (
     <div className="not-prose my-6">
@@ -137,22 +132,25 @@ export function FourContexts({ slug }: { slug: string }) {
       {/* One card shell for both modes — identical header bar so the title never
           moves on toggle; only the body below it swaps. */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {contexts.map((c) => (
-          <div key={c.label} className="panel flex flex-col overflow-hidden">
-            <div className="border-b border-hairline px-4 py-2">
-              <span className={tag}>{c.label}</span>
-            </div>
-            {tab === "code" ? (
-              /* Fixed-height well + `code-fill` so the code block spans the card
-                 and the horizontal scrollbar lands at the bottom of every card. */
-              <div className="code-inset code-fill h-36 overflow-hidden">
-                <DynamicCodeBlock lang="tsx" code={c.code} />
+        {HOMES.map(({ key, label }) => {
+          const home = ctx[key];
+          return (
+            <div key={key} className="panel flex flex-col overflow-hidden">
+              <div className="border-b border-hairline px-4 py-2">
+                <span className="mono-label">{label}</span>
               </div>
-            ) : (
-              <div className={previewBody}>{c.preview}</div>
-            )}
-          </div>
-        ))}
+              {tab === "code" ? (
+                <div className="code-inset code-fill h-36 overflow-hidden">
+                  <DynamicCodeBlock lang="tsx" code={home.code} />
+                </div>
+              ) : (
+                <div className="flex min-h-36 flex-1 flex-col justify-center gap-2 p-4">
+                  {home.render() as ReactNode}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -1,49 +1,88 @@
 ---
 title: Performance
-description: microcharts is zero-dependency and budget-gated — 1–3 kB gzip per static chart (median 2.3 kB), ~6 SVG nodes typical, and 500 charts server-rendered in about 5 milliseconds. Every number is reproducible.
+description: Zero dependencies, budget-gated sizes, and server rendering with no client JavaScript — 106 chart types measured at 0.9–3.6 kB gzip (median 2.3) and rendered to SVG at about 0.01 ms each. Every number here is reproducible from one command.
 ---
 
-Performance is a promise, not a marketing line. Every figure below is produced by a command
-you can run yourself.
+Performance isn't a marketing line here — it's a build gate. Every figure on this page
+is produced by a command you can run yourself, checked against the shipped `dist` in CI,
+and regenerated on every release so it can never drift from reality.
+
+<ThroughputSummary />
 
 ## Size
 
-Each chart is imported from its own subpath, so you ship only what you use. Sizes are gzip,
-measured in CI by `pnpm size` and gated — a chart that grows past budget fails the build.
+Each chart is imported from its own subpath, so a bundle ships only the charts it uses —
+importing `Sparkline` never pulls in the other 105. Sizes are gzip, measured by `pnpm size`
+and gated: a chart that grows past its budget fails the build.
 
-| Chart        | Static  | Interactive |
-| ------------ | ------- | ----------- |
-| Sparkline    | 3.62 kB | 4.61 kB     |
-| SparkBar     | 2.78 kB | 3.69 kB     |
-| Delta        | 0.92 kB | 1.17 kB     |
-| Bullet       | 1.66 kB | 2.02 kB     |
-| ActivityGrid | 2.08 kB | 3.25 kB     |
+<SizeDistribution />
 
-Across all 98 charts the static entries span 0.9–3.6 kB with a median of 2.3 kB; every
-chart page shows its own measured number in the hero demo's header.
+The whole catalog lands between **0.92 kB and 3.62 kB** gzip, with a **median of 2.28 kB** —
+and that's the _static_ entry. Interactivity is opt-in from a separate `/interactive` subpath
+and adds roughly a kilobyte (median 3.17 kB), so a page pays for hover and keyboard only where
+it actually uses them.
 
-The whole library carries **zero runtime dependencies** — no chart engine, no D3. That
-constraint is enforced by CI, permanently.
+<SizeTable />
+
+Two charts sit just above the 3 kB reference line — Sparkline, because it's the most
+configurable primitive in the set, and Station Glyph, which packs the most geometry per mark.
+Both are still smaller than a single icon font, and neither is on a hot import path by
+accident: you reach for them deliberately.
 
 ## Server rendering
 
-Static charts are hook-free and listener-free, so they render on the server to plain SVG
-with no client JavaScript. Throughput, measured by `pnpm bench`:
+Static charts are hook-free and listener-free, so a React Server Component renders them to
+plain SVG on the server — **zero client JavaScript** reaches the browser. Throughput, measured
+by `pnpm bench` rendering _N_ sparklines to an SVG string:
 
-| Charts | Time    | Per chart | Payload |
-| ------ | ------- | --------- | ------- |
-| 100    | 1.0 ms  | 0.010 ms  | ~550 B  |
-| 500    | 5.4 ms  | 0.011 ms  | ~550 B  |
-| 1000   | 10.8 ms | 0.011 ms  | ~550 B  |
+<ScalingTable />
 
-A table with 500 sparklines becomes HTML in about five milliseconds, and none of it ships
-JavaScript to the browser.
+A table of **500 sparklines becomes HTML in under six milliseconds**, streams as part of the
+document, and ships nothing to hydrate. Across all 106 chart types the median render is about
+**0.035 ms per chart** — the heavier expressive and frontier instruments cost more geometry,
+the simple strips cost almost nothing.
+
+The core summary kernel is just as cheap: `describeSeries`, which writes every chart's
+accessible sentence, runs at roughly **960,000 calls per second**, so accessibility is never
+the thing that slows a render down.
+
+## Why it's fast
+
+The speed isn't a trick — it's the absence of one.
+
+- **No chart engine.** No D3, no layout runtime, no virtual DOM diff for a static chart. Scales,
+  paths, and stats are a few hundred lines of pure functions, and the output is a handful of SVG
+  nodes — typically six or fewer per chart.
+- **Zero runtime dependencies.** `dependencies: {}`, enforced by CI, forever. Nothing to
+  resolve, nothing to audit, nothing to bloat a lockfile.
+- **Integer geometry, crisp marks.** Coordinates are rounded at generation and rectilinear
+  marks use `shape-rendering: crispEdges`, so the browser does less work rasterising them.
+- **One stylesheet, one cascade layer.** Theming is CSS custom properties in a low-specificity
+  `@layer`, not inline styles recomputed per instance.
+
+## Honest caveats
+
+- **Two charts are marginally under their SSR floor.** Ensemble Ghosts and Win-Probability
+  Worm draw the most paths per render and land just below their per-chart throughput target.
+  They're flagged in the bench output, not hidden — `pnpm bench` exits non-zero and names them.
+- **Interactive entries do ship JavaScript.** The `/interactive` subpath adds a client
+  component and a pointer listener. It's still tiny, but it isn't zero — reach for the static
+  entry unless a chart genuinely needs hover, keyboard, or live announcements.
+- **These numbers are one machine, one Node.** They measure _relative_ cost honestly and
+  reproduce on your hardware; treat them as a floor to reproduce, not an absolute to quote.
 
 ## Reproduce it
+
+Every figure above regenerates from the repo. Nothing is hand-keyed — the docs read the
+measured output directly.
 
 ```bash
 git clone https://github.com/ganapativs/microcharts
 pnpm install
-pnpm bench   # SSR throughput → bench/results.json
-pnpm size    # gzip budgets → measured actuals
+pnpm build                          # build dist the numbers are measured against
+pnpm bench && node scripts/sync-bench.mjs   # SSR throughput → bench-summary.json
+node scripts/sync-sizes.mjs         # gzip budgets → chart-sizes.json
 ```
+
+CI runs `--check` on both synced files, so a stale number fails the build the same way a
+failing test does.

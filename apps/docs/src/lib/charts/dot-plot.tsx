@@ -1,6 +1,6 @@
 import { DotPlot } from "@microcharts/react/dot-plot";
 import { InteractiveDemo } from "./dot-plot.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
@@ -11,6 +11,11 @@ const TEAM = [
   { label: "Sam", value: 88 },
   { label: "Noor", value: 73 },
   { label: "Lee", value: 60 },
+];
+const DESIGN = [
+  { label: "Mira", value: 84 },
+  { label: "Theo", value: 62 },
+  { label: "Zoe", value: 77 },
 ];
 
 export const entry: ChartEntry = {
@@ -52,6 +57,18 @@ export const entry: ChartEntry = {
     title: "Team leaderboard",
     code: `import { DotPlot } from "${PKG}/dot-plot";\n\n<DotPlot data={team} title="Review scores" />`,
   },
+  sampleData: [
+    {
+      name: "team",
+      code: `const team = [
+  { label: "Ada", value: 96 },
+  { label: "Kim", value: 41 },
+  { label: "Sam", value: 88 },
+  { label: "Noor", value: 73 },
+  { label: "Lee", value: 60 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -108,6 +125,102 @@ export const recipes: Recipe[] = [
   },
 ];
 
+/* The four homes — DotPlot always answering "how do a few named values compare
+   on one scale", never a generic "signups held steady" template. Every host
+   is a real leaderboard surface: a review-cycle sentence, a per-pod table,
+   a spread KPI, a pod switcher. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        This cycle's review scores{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <DotPlot data={TEAM} summary={false} width={76} height={34} />
+        </span>{" "}
+        spread from Kim's 41 to Ada's 96 — a 55-point range.
+      </p>
+    ),
+    code: `<p>\n  This cycle's review scores{" "}\n  <DotPlot data={team} width={76} height={34} /> spread from Kim's 41\n  to Ada's 96 — a 55-point range.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <thead>
+          <tr className="text-fd-muted-foreground text-xs">
+            <th className="pb-1.5 pr-3 text-left font-normal">Pod</th>
+            <th className="pb-1.5 text-left font-normal">Scores</th>
+            <th className="pb-1.5 pl-3 text-right font-normal">Range</th>
+          </tr>
+        </thead>
+        <tbody>
+          {(
+            [
+              ["Engineering", TEAM, "41–96"],
+              ["Design", DESIGN, "62–84"],
+            ] as const
+          ).map(([name, rows, range]) => (
+            <tr key={name} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{name}</td>
+              <td className="py-1.5">
+                <DotPlot data={rows} summary={false} width={70} height={24} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{range}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <DotPlot data={pod.scores} width={70} height={24} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Review-cycle high</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">96</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">Ada, of 5 reviewed</span>
+          </div>
+        </div>
+        <DotPlot
+          data={TEAM}
+          label="value"
+          highlight="Ada"
+          summary={false}
+          width={110}
+          height={46}
+        />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">96</span>\n  <span className="unit">Ada, of 5 reviewed</span>\n  <DotPlot data={team} label="value" highlight="Ada" width={110} height={46} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {(
+          [
+            ["Engineering", TEAM],
+            ["Design", DESIGN],
+          ] as const
+        ).map(([name, rows], i) => (
+          <span
+            key={name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {name}
+            <DotPlot data={rows} summary={false} width={40} height={16} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Engineering <DotPlot data={pod.scores} width={40} height={16} />\n</button>`,
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <DotPlot
@@ -130,6 +243,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

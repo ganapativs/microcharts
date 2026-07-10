@@ -1,11 +1,22 @@
 import { TrendArrow } from "@microcharts/react/trend-arrow";
 import { InteractiveDemo } from "./trend-arrow.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const PCT = { style: "percent", maximumFractionDigits: 0 } as const;
+
+const METRICS: { label: string; value: number; positive: "up" | "down" }[] = [
+  { label: "P95 latency", value: 0.09, positive: "down" },
+  { label: "Error rate", value: -0.22, positive: "down" },
+  { label: "Signups", value: 0.06, positive: "up" },
+];
+const SERVICES = [
+  { label: "API", value: -0.08 },
+  { label: "Web", value: 0.03 },
+  { label: "Worker", value: 0.15 },
+];
 
 export const entry: ChartEntry = {
   name: "TrendArrow",
@@ -149,6 +160,105 @@ export const recipes: Recipe[] = [
   },
 ];
 
+/* The four homes — TrendArrow always doing the one thing it's for: reading a
+   direction before any number. Every host is an ops/metrics surface (its
+   bestFor), never a generic "signups held steady" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        P95 latency{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <TrendArrow
+            value={0.09}
+            positive="down"
+            format={PCT}
+            summary={false}
+            style={{ width: 16, height: 16 }}
+          />
+        </span>{" "}
+        is up 9% since the deploy — worth a look before it trips the SLO.
+      </p>
+    ),
+    code: `<p>\n  P95 latency{" "}\n  <TrendArrow value={0.09} positive="down" format={{ style: "percent" }} />{" "}\n  is up 9% since the deploy.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {METRICS.map((m) => (
+            <tr key={m.label} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{m.label}</td>
+              <td className="py-1.5">
+                <TrendArrow
+                  value={m.value}
+                  positive={m.positive}
+                  format={PCT}
+                  summary={false}
+                  style={{ width: 16, height: 16 }}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                {m.value > 0 ? "+" : ""}
+                {Math.round(m.value * 100)}%
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <TrendArrow value={-0.22} positive="down" format={{ style: "percent" }} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Error rate, 7d</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">0.6%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">of requests</span>
+          </div>
+        </div>
+        <TrendArrow
+          value={-0.22}
+          positive="down"
+          showValue
+          format={PCT}
+          summary={false}
+          style={{ height: 30 }}
+        />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">0.6%</span>\n  <span className="unit">of requests</span>\n  <TrendArrow value={-0.22} positive="down" showValue format={{ style: "percent" }} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {SERVICES.map((s, i) => (
+          <span
+            key={s.label}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {s.label}
+            <TrendArrow
+              value={s.value}
+              positive="down"
+              glyph="chevron"
+              summary={false}
+              style={{ width: 12, height: 12 }}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  API <TrendArrow value={-0.08} positive="down" glyph="chevron" />\n</button>`,
+  },
+};
+
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
   return <TrendArrow value={0.12} summary={false} />;
 }
@@ -164,6 +274,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

@@ -1,12 +1,19 @@
 import { DualSparkline } from "@microcharts/react/dual-sparkline";
 import { InteractiveDemo } from "./dual-sparkline.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const US = [12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21];
 const BENCH = [12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16];
+/** Same two series, roles swapped or matched — zero invented numbers, three real
+ *  reads: leading, trailing, and identical ("Matching benchmark."). */
+const ROWS: { label: string; data: number[]; compare: number[]; read: string }[] = [
+  { label: "Checkout", data: US, compare: BENCH, read: "leading" },
+  { label: "Search", data: BENCH, compare: US, read: "trailing" },
+  { label: "Onboarding", data: BENCH, compare: BENCH, read: "matching" },
+];
 
 export const entry: ChartEntry = {
   name: "DualSparkline",
@@ -55,6 +62,16 @@ export const entry: ChartEntry = {
     title: "Conversion vs market",
     code: `import { DualSparkline } from "${PKG}/dual-sparkline";\n\n<DualSparkline data={ours} compare={market} title="Conversion vs market" />`,
   },
+  sampleData: [
+    {
+      name: "ours",
+      code: `const ours = [12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21];`,
+    },
+    {
+      name: "market",
+      code: `const market = [12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -69,6 +86,9 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
+  // data/compare are the dataset, not knobs. compareLabel/curve/domain/color/format/
+  // locale/strings/seriesStrings are styling/formatting/i18n overrides, not interactive
+  // read decisions — every remaining documented prop (band, label) has a control below.
   knobs: [
     {
       kind: "segmented",
@@ -110,12 +130,12 @@ export const recipes: Recipe[] = [
     node: <DualSparkline data={US} compare={BENCH} summary={false} width={160} height={16} />,
   },
   {
-    label: "actual vs plan with endpoint",
-    code: `<DualSparkline data={actual} compare={plan} label="last" />`,
+    label: "flip the primary — benchmark as the judged line",
+    code: `<DualSparkline data={market} compare={ours} label="last" />`,
     node: (
       <DualSparkline
-        data={US}
-        compare={BENCH}
+        data={BENCH}
+        compare={US}
         label="last"
         summary={false}
         width={160}
@@ -124,6 +144,96 @@ export const recipes: Recipe[] = [
     ),
   },
 ];
+
+/* The four homes — DualSparkline always doing the one thing it's for: reading a
+   metric against its benchmark on one shared scale. Every host is a conversion
+   funnel tracked against market/plan, never a generic "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Checkout conversion is outrunning the market{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <DualSparkline data={US} compare={BENCH} summary={false} width={70} height={18} />
+        </span>{" "}
+        — up 75% this quarter against the market&apos;s 33% gain.
+      </p>
+    ),
+    code: `<p>\n  Checkout conversion is outrunning the market{" "}\n  <DualSparkline data={ours} compare={market} width={70} height={18} /> — up 75% vs the market's 33%.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {ROWS.map((r) => (
+            <tr key={r.label} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{r.label}</td>
+              <td className="py-1.5">
+                <DualSparkline
+                  data={r.data}
+                  compare={r.compare}
+                  summary={false}
+                  width={70}
+                  height={18}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{r.read}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <DualSparkline data={ours} compare={market} width={70} height={18} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Conversion vs plan</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">21%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">plan 16% · +75% vs +33%</span>
+          </div>
+        </div>
+        <DualSparkline
+          data={US}
+          compare={BENCH}
+          label="last"
+          summary={false}
+          width={130}
+          height={40}
+        />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">21%</span>\n  <span className="unit">plan 16% · +75% vs +33%</span>\n  <DualSparkline data={ours} compare={market} label="last" width={130} height={40} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {ROWS.slice(0, 2).map((r, i) => (
+          <span
+            key={r.label}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {r.label}
+            <DualSparkline
+              data={r.data}
+              compare={r.compare}
+              summary={false}
+              width={50}
+              height={14}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Checkout <DualSparkline data={ours} compare={market} width={50} height={14} />\n</button>`,
+  },
+};
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
@@ -148,6 +258,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

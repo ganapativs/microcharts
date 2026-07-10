@@ -2,7 +2,7 @@ import { Sparkline } from "@microcharts/react/sparkline";
 import { Sparkline as SparklineInteractive } from "@microcharts/react/sparkline/interactive";
 import { DemoPanel } from "@/components/charts/demo-panel";
 import { wave } from "./demo-data";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -121,7 +121,10 @@ export const playground: PlaygroundSpec = {
     { kind: "segmented", key: "dots", options: ["auto", "minmax", "none"], init: "minmax" },
     { kind: "toggle", key: "fill", init: false },
     { kind: "toggle", key: "band", init: false },
-    { kind: "toggle", key: "label", init: true },
+    { kind: "segmented", key: "label", options: ["none", "last", "minmax"], init: "last" },
+    // maxPoints, title, and summary are documented but not knobbed: maxPoints only
+    // matters past 200 points (shown live in the "2,000 points" edge case below),
+    // and title/summary are naming props, not a visual read the knobs above change.
   ],
   data: wave(0),
   shuffle: wave,
@@ -134,7 +137,7 @@ export const playground: PlaygroundSpec = {
       dots={s.dots as "auto" | "minmax" | "none"}
       fill={s.fill as boolean}
       band={s.band ? [10, 26] : undefined}
-      label={s.label ? "last" : "none"}
+      label={s.label as "none" | "last" | "minmax"}
       className="w-full max-w-md"
       title="Playground"
     />
@@ -147,7 +150,7 @@ export const playground: PlaygroundSpec = {
       `  dots="${s.dots}"`,
       s.fill && "  fill",
       s.band && "  band={[10, 26]}",
-      s.label && '  label="last"',
+      s.label !== "none" && `  label="${s.label}"`,
       "/>",
     ]
       .filter(Boolean)
@@ -179,6 +182,90 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const LATENCY = [48, 45, 44, 40, 38, 36, 33, 31]; // p95 latency, ms — trending down
+const SERVICES: { name: string; data: number[]; current: string }[] = [
+  { name: "checkout-api", data: LATENCY, current: "31 ms" },
+  { name: "auth-api", data: [12, 13, 12, 14, 13, 15, 14, 16], current: "16 ms" },
+  { name: "search-api", data: [80, 78, 82, 79, 81, 80, 79, 78], current: "78 ms" },
+];
+const CONNECTIONS = [1240, 1310, 1290, 1420, 1380, 1510, 1470, 1600]; // concurrent, now 1,600
+const METRICS: { name: string; data: number[] }[] = [
+  { name: "CPU", data: [62, 65, 61, 68, 70, 66, 72, 75] },
+  { name: "Memory", data: [48, 47, 49, 46, 45, 44, 43, 42] },
+  { name: "Network", data: [120, 118, 122, 119, 121, 120, 119, 118] },
+];
+
+/* The four homes — Sparkline always doing the one thing it's for: a trend read
+   at a glance. Every host is a monitoring/ops surface (latency, connections,
+   resource load), distinct from the revenue example above the fold. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        p95 latency this week{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <Sparkline data={LATENCY} summary={false} width={64} height={16} dots="none" />
+        </span>{" "}
+        — trending down.
+      </p>
+    ),
+    code: `<p>\n  p95 latency this week{" "}\n  <Sparkline data={[48, 45, 44, 40, 38, 36, 33, 31]} width={64} height={16} dots="none" /> — trending down.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {SERVICES.map((s) => (
+            <tr key={s.name} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{s.name}</td>
+              <td className="py-1.5">
+                <Sparkline data={s.data} summary={false} width={64} height={18} dots="none" />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{s.current}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<tr>\n  <td>checkout-api</td>\n  <td>\n    <Sparkline data={[48, 45, 44, 40, 38, 36, 33, 31]} width={64} height={18} dots="none" />\n  </td>\n  <td>31 ms</td>\n</tr>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Active connections</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">1,600</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">concurrent, now</span>
+          </div>
+        </div>
+        <Sparkline data={CONNECTIONS} summary={false} width={90} height={28} fill />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">1,600</span>\n  <span className="unit">concurrent, now</span>\n  <Sparkline data={[1240, 1310, 1290, 1420, 1380, 1510, 1470, 1600]} width={90} height={28} fill />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {METRICS.map((m, i) => (
+          <span
+            key={m.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {m.name}
+            <Sparkline data={m.data} summary={false} width={40} height={14} dots="none" />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  CPU <Sparkline data={[62, 65, 61, 68, 70, 66, 72, 75]} width={40} height={14} dots="none" />\n</button>`,
+  },
+};
+
 export function Mark({ data, width, height }: { data: number[]; width?: number; height?: number }) {
   return <Sparkline data={data} width={width ?? 64} height={height ?? 18} summary={false} />;
 }
@@ -195,6 +282,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

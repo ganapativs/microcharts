@@ -1,7 +1,7 @@
 import { ActivityGrid } from "@microcharts/react/activity-grid";
 import { ActivityGrid as ActivityGridInteractive } from "@microcharts/react/activity-grid/interactive";
 import { DemoPanel } from "@/components/charts/demo-panel";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -18,6 +18,13 @@ const showcaseGrid = [
 function gridWave(seed: number): number[] {
   return Array.from({ length: 35 }, (_, i) => Math.round(Math.abs(Math.sin(i * 1.3 + seed)) * 4));
 }
+
+/** Thursday 1970-01-01 — same fixed alignment day used in the docs page's
+ *  "calendar-aligned" example, so the playground's `start` knob is deterministic. */
+const ALIGN_DATE = "1970-01-01";
+/** Widened bucket range for the `domain` knob — compresses every level below
+ *  the wave's natural max (4) so the dimming is visible. */
+const DOMAIN: readonly [number, number] = [0, 6];
 
 export const entry: ChartEntry = {
   name: "ActivityGrid",
@@ -96,12 +103,21 @@ export const entry: ChartEntry = {
     title: "Commits this month",
     code: `import { ActivityGrid } from "${PKG}/activity-grid";
 
-const commitCounts = [
+const commits = [
   0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3,
 ];
 
-<ActivityGrid data={commitCounts} title="Commits" />`,
+<ActivityGrid data={commits} title="Commits" />`,
   },
+  sampleData: [
+    {
+      name: "commits",
+      code: `const commits = [
+  0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3, 0, 2, 3, 4, 1, 2, 0, 1, 2, 3, 4, 2,
+  1, 0,
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -122,10 +138,21 @@ export function InteractiveDemo() {
 }
 
 export const playground: PlaygroundSpec = {
+  // `data` isn't a knob — the wave is the fixture; shuffle regenerates it.
+  // `title`/`summary` drive the accessible name, not a visual toggle — title
+  // stays fixed to "Playground" below.
   knobs: [
     { kind: "segmented", key: "layout", options: ["grid", "strip"], init: "grid" },
     { kind: "segmented", key: "shape", options: ["square", "round", "dot"], init: "square" },
     { kind: "segmented", key: "cell", options: ["9", "12", "15"], init: "12" },
+    {
+      kind: "segmented",
+      key: "align",
+      label: "calendar align",
+      options: ["none", "monday", "sunday"],
+      init: "none",
+    },
+    { kind: "toggle", key: "domain", label: "fixed domain [0, 6]", init: false },
   ],
   data: gridWave(0),
   shuffle: gridWave,
@@ -135,6 +162,9 @@ export const playground: PlaygroundSpec = {
       layout={s.layout as "grid" | "strip"}
       shape={s.shape as "square" | "round" | "dot"}
       cell={Number(s.cell)}
+      start={s.align !== "none" ? ALIGN_DATE : undefined}
+      weekStart={s.align === "sunday" ? 0 : 1}
+      domain={s.domain ? DOMAIN : undefined}
       title="Playground"
     />
   ),
@@ -145,6 +175,9 @@ export const playground: PlaygroundSpec = {
       `  layout="${s.layout}"`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       `  cell={${s.cell}}`,
+      s.align !== "none" && `  start="${ALIGN_DATE}"`,
+      s.align === "sunday" && "  weekStart={0}",
+      s.domain && "  domain={[0, 6]}",
       "/>",
     ]
       .filter(Boolean)
@@ -154,7 +187,7 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "default cells",
-    code: `// ActivityGrid sizes from cell edge length (default 10)\n<ActivityGrid data={data} />`,
+    code: `// ActivityGrid sizes from cell edge length (default 10)\n<ActivityGrid data={commits} />`,
     node: (
       <ActivityGrid
         data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]}
@@ -164,7 +197,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "larger cells",
-    code: `// bump every cell — the whole grid scales with it\n<ActivityGrid data={data} cell={14} />`,
+    code: `// bump every cell — the whole grid scales with it\n<ActivityGrid data={commits} cell={14} />`,
     node: (
       <ActivityGrid
         data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]}
@@ -175,7 +208,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "responsive",
-    code: `// let CSS drive the width — the viewBox keeps the grid's ratio\n<div style={{ width: "100%", maxWidth: 320 }}>\n  <ActivityGrid data={data} style={{ width: "100%", height: "auto" }} />\n</div>`,
+    code: `// let CSS drive the width — the viewBox keeps the grid's ratio\n<div style={{ width: "100%", maxWidth: 320 }}>\n  <ActivityGrid data={commits} style={{ width: "100%", height: "auto" }} />\n</div>`,
     fluid: true,
     node: (
       /* a full quarter (13 weeks) so the fluid grid reads landscape at
@@ -189,6 +222,91 @@ export const recipes: Recipe[] = [
     ),
   },
 ];
+
+/* The four homes — ActivityGrid always doing the one thing it's for: cadence
+   at a glance, never a single cell's exact value. Every host is a commit/deploy
+   surface (this chart's own bestFor), never a generic "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Commit cadence for the last two weeks{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <ActivityGrid data={demoGrid.slice(0, 14)} layout="strip" cell={7} summary={false} />
+        </span>{" "}
+        — bursts of shipping, punctuated by two dead-quiet days.
+      </p>
+    ),
+    code: `<p>\n  Commit cadence for the last two weeks{" "}\n  <ActivityGrid data={commits.slice(0, 14)} layout="strip" cell={7} /> — bursts of shipping, punctuated by two dead-quiet days.\n</p>`,
+  },
+  cell: {
+    render: () => {
+      const rows: [string, number[], number][] = [
+        ["api", demoGrid.slice(0, 7), 13],
+        ["web", showcaseGrid.slice(0, 7), 15],
+        ["docs", demoGrid.slice(7, 14), 14],
+      ];
+      return (
+        <table className="w-full text-sm tabular-nums">
+          <tbody>
+            {rows.map(([name, series, total]) => (
+              <tr key={name} className="border-t border-fd-border/60 first:border-0">
+                <td className="py-1.5 pr-3 text-fd-muted-foreground">{name}</td>
+                <td className="py-1.5">
+                  <ActivityGrid data={series} layout="strip" cell={8} summary={false} />
+                </td>
+                <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{total}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    },
+    code: `<td>\n  <ActivityGrid data={commits.slice(0, 7)} layout="strip" cell={8} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Commits this sprint</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">67</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">
+              across 35 days, busiest at 4
+            </span>
+          </div>
+        </div>
+        <ActivityGrid data={demoGrid} cell={8} summary={false} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">67</span>\n  <span className="unit">across 35 days, busiest at 4</span>\n  <ActivityGrid data={commits} cell={8} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {(
+          [
+            ["api", demoGrid.slice(-14)],
+            ["web", showcaseGrid.slice(-14)],
+          ] as const
+        ).map(([name, series], i) => (
+          <span
+            key={name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {name}
+            <ActivityGrid data={series} layout="strip" cell={5} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  api <ActivityGrid data={commits.slice(-14)} layout="strip" cell={5} />\n</button>`,
+  },
+};
 
 export function Mark({ data }: { data: number[]; width?: number; height?: number }) {
   return <ActivityGrid data={data} layout="strip" cell={7} summary={false} />;
@@ -205,6 +323,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;
