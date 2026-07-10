@@ -1651,3 +1651,12 @@ listed in STATUS.md await the batch-gate user sign-off.
 ## 2026-07-10 — superaudit COMPLETE (branch `superaudit`)
 
 Full-catalog audit/polish executed post-Batch-4: 5 gated passes over all 98 charts + pages. Provenance + method: audit/ dir on the branch (MISSION/BASELINE/FOUNDATION/AUDIT-TABLE/CHANGELOG/CANDIDATES + 4 inventory reports). Key factual corrections recorded: 9 fabricated/stale docs claims fixed against real output; oxfmt was corrupting MDX template literals (now excluded via .prettierignore); bench floors recalibrated to a single documented method (~75% of quiet-machine measure — original frontier floors under-counted text nodes vs the ~300 elements/ms React SSR ceiling); sparkline budget drift noted (approved exception 3.35/4.35 vs current 3.65/4.65 budget, actual 3.62/4.61 — flag for the Checkpoint-3 ledger).
+
+## 2026-07-10 — proposal round: catalog 98 → 106 (user-approved)
+
+Eight research-verified additions specced in plan/26-proposal-round-charts.md (provenance + rejection ledger:
+audit/PROPOSALS.md; three independent research passes — literature/industry/editorial — each cross-checked against
+the shipped 98, the plan/15 cut ledger, and the plan/05 bans). Approved: CohortTriangle, StreakSpark, GradeProfile,
+WinProbWorm, QueueDepth, SpreadBand, BiasStrip, PercentileTrace. Rejected with reasons (logged to prevent
+re-litigation): Q–Q micro (read-back), DirectionRose (PolarClock variant), mix-shift ribbons (QuipuCord class),
+TransitionGrid (ConfusionGrid recipe), RaceSplitBars, runway (EtaBar), warming stripes/spend-pace/swing needle (covered).

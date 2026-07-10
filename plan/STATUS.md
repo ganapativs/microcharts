@@ -20,6 +20,8 @@
 
 ## Current position
 
+**PROPOSAL ROUND APPROVED (2026-07-10, user):** catalog expands 98 → 106 — specs in plan/26-proposal-round-charts.md, buildout in flight on `superaudit` (one agent per chart + serial wiring + full gate suite). Counts are registry-computed, so public numbers update automatically when the 8 register.
+
 **SUPERAUDIT COMPLETE (2026-07-10, branch `superaudit`)** — full-system audit/polish of all 98 charts + 98 docs pages in 5 gated passes (span reference standard + 4 waves of family agents). Prop contract v1 applied (plan/04 §8, 14 pre-release renames); width/cat ink-role system landed in styles.css; 13 missing visual specs added (98/98 coverage); 12 bench-floor reds fixed (optimization first, floors recalibrated to a documented 75%-of-quiet-measure method); 4 truncated pages authored; Edge-cases + Four homes + de-DE locale demos on the whole catalog; ~60 placeholder snippets literalized; 20+ real bugs fixed (see audit/CHANGELOG.md). ALL hard gates green incl. webkit/firefox smoke (CROSS_BROWSER=1). Near-duplicate/deferred flags in audit/CANDIDATES.md await the Checkpoint-3 review. Remaining CI-only: Argos baseline approval on the PR.
 
 
