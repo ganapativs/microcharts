@@ -12,7 +12,16 @@ line is the question; everything else is the answer.
   sizeOf="likert-strip"
   code={`import { LikertStrip } from "@microcharts/react/likert-strip";
 
-<LikertStrip data={responses} title="Q1 satisfaction" />`}
+<LikertStrip
+  data={[
+    { label: "Strongly disagree", value: 10 },
+    { label: "Disagree", value: 14 },
+    { label: "Neutral", value: 14 },
+    { label: "Agree", value: 34 },
+    { label: "Strongly agree", value: 28 },
+  ]}
+  title="Q1 satisfaction"
+/>`}
 >
   <LikertStrip
     data={[
@@ -53,7 +62,16 @@ line is the question; everything else is the answer.
 <LiveDemo
   label="omit neutral"
   code={`// the known critique of center-split neutral — supported, never silent
-<LikertStrip data={responses} neutral="omit" />`}
+<LikertStrip
+  data={[
+    { label: "Strongly disagree", value: 10 },
+    { label: "Disagree", value: 14 },
+    { label: "Neutral", value: 14 },
+    { label: "Agree", value: 34 },
+    { label: "Strongly agree", value: 28 },
+  ]}
+  neutral="omit"
+/>`}
 >
   <LikertStrip
     data={[
@@ -70,7 +88,19 @@ line is the question; everything else is the answer.
   />
 </LiveDemo>
 
-<LiveDemo label="net score" code={`<LikertStrip data={responses} label="net" />`}>
+<LiveDemo
+  label="net score"
+  code={`<LikertStrip
+  data={[
+    { label: "Strongly disagree", value: 10 },
+    { label: "Disagree", value: 14 },
+    { label: "Neutral", value: 14 },
+    { label: "Agree", value: 34 },
+    { label: "Strongly agree", value: 28 },
+  ]}
+  label="net"
+/>`}
+>
   <LikertStrip
     data={[
       { label: "Strongly disagree", value: 10 },

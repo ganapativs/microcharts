@@ -31,25 +31,25 @@ describe("<DataDiff> (plan/23 #16)", () => {
 
   it("both bars per row + a center hairline (never netted by default)", () => {
     const { container } = draw(<DataDiff data={DIFF} width={80} />);
-    const bars = container.querySelectorAll('rect[data-mc-ink="bar"]');
+    const bars = container.querySelectorAll(
+      'rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]',
+    );
     // 6 rows × 2 bars each = 12
     expect(bars.length).toBe(12);
     expect(container.querySelector("line")).not.toBeNull(); // zero hairline
   });
 
-  it("removed bars use --mc-negative, added use --mc-positive", () => {
+  it("removed bars carry the negative ink role, added carry positive", () => {
     const { container } = draw(<DataDiff data={[{ key: "a", added: 10, removed: 5 }]} />);
-    const bars = [...container.querySelectorAll('rect[data-mc-ink="bar"]')];
-    const styles = bars.map((b) => b.getAttribute("style") || "");
-    expect(styles.some((s) => s.includes("--mc-negative"))).toBe(true);
-    expect(styles.some((s) => s.includes("--mc-positive"))).toBe(true);
+    expect(container.querySelectorAll('rect[data-mc-ink="negative"]').length).toBe(1);
+    expect(container.querySelectorAll('rect[data-mc-ink="positive"]').length).toBe(1);
   });
 
   it("a 0/0 key still renders a placeholder tick", () => {
     const { container } = draw(
       <DataDiff data={[{ key: "same", added: 0, removed: 0 }]} width={80} />,
     );
-    expect(container.querySelector('rect[data-mc-ink="data"]')).not.toBeNull();
+    expect(container.querySelector('rect[data-mc-ink="neutral"]')).not.toBeNull();
   });
 
   it("labels opts in key tags (when rows have room); off by default", () => {
@@ -74,8 +74,8 @@ describe("<DataDiff> (plan/23 #16)", () => {
   it("net opts in a summary tick per row", () => {
     const off = draw(<DataDiff data={DIFF} />).container;
     const on = draw(<DataDiff data={DIFF} net />).container;
-    const offTicks = off.querySelectorAll('rect[data-mc-ink="data"]').length;
-    const onTicks = on.querySelectorAll('rect[data-mc-ink="data"]').length;
+    const offTicks = off.querySelectorAll('rect[data-mc-ink="neutral"]').length;
+    const onTicks = on.querySelectorAll('rect[data-mc-ink="neutral"]').length;
     expect(onTicks).toBeGreaterThan(offTicks);
   });
 

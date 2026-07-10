@@ -16,8 +16,8 @@ export interface PhaseTraceProps {
   data: readonly PhaseTraceDatum[];
   xLabel?: string | undefined;
   yLabel?: string | undefined;
-  xDomain?: [number, number] | undefined;
-  yDomain?: [number, number] | undefined;
+  xDomain?: readonly [number, number] | undefined;
+  yDomain?: readonly [number, number] | undefined;
   /** Fraction of points drawn in accent — the "recent motion" read. */
   tail?: number | undefined;
   /** Anchors the path's origin for full-journey reads. */
@@ -37,7 +37,7 @@ export interface PhaseTraceProps {
   children?: ReactNode | undefined;
 }
 
-function extent(vals: number[]): [number, number] {
+function extent(vals: number[]): readonly [number, number] {
   let lo = Infinity;
   let hi = -Infinity;
   for (const v of vals) {
@@ -122,7 +122,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           fill="none"
           stroke="var(--mc-neutral)"
           strokeOpacity={0.18}
-          strokeWidth={0.5}
+          data-mc-w="hair"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}

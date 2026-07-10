@@ -54,7 +54,13 @@ export const entry: ChartEntry = {
   demo: LOAD,
   example: {
     title: "Cluster load",
-    code: `import { Horizon } from "${PKG}/horizon";\n\n<Horizon data={cpuLoad} title="Cluster load" />`,
+    code: `import { Horizon } from "${PKG}/horizon";
+
+const cpuLoad = [
+  2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
+];
+
+<Horizon data={cpuLoad} title="Cluster load" />`,
   },
 };
 

@@ -99,14 +99,17 @@ export function Hourglass(props: HourglassProps): ReactNode {
           data-mc-ink="neutral"
         />
       ))}
-      {/* running-sand cue — a state mark, only while 0<value<1 */}
+      {/* running-sand cue — a state mark, only while 0<value<1. `stroke` is
+          dynamic (color override), so it stays inline; width is the role
+          (orthogonal to ink), not a literal. */}
       {stream && geo.stream ? (
         <line
           x1={geo.stream.x}
           y1={geo.stream.y1}
           x2={geo.stream.x}
           y2={geo.stream.y2}
-          style={{ stroke: color ?? "var(--mc-moon)", strokeWidth: 1, strokeLinecap: "round" }}
+          data-mc-w="support"
+          style={{ stroke: color ?? "var(--mc-moon)", strokeLinecap: "round" }}
         />
       ) : null}
       {showLabel ? (

@@ -162,7 +162,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
                 stroke="var(--mc-neutral)"
                 strokeOpacity={0.6}
                 strokeDasharray="2 1.5"
-                strokeWidth={0.6}
+                data-mc-w="hair"
                 vectorEffect="non-scaling-stroke"
               />
             ) : null,
@@ -189,9 +189,8 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
             x2={b.x}
             y2={height}
             data-mc-ink="flag"
-            stroke="var(--mc-neutral)"
             strokeOpacity={0.75}
-            strokeWidth={0.7}
+            data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
           <path

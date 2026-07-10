@@ -84,45 +84,45 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
       className={className ? `mc-trace ${className}` : "mc-trace"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {geo.rects.map((r, i) => {
+      {geo.rects.flatMap((r, i) => {
         const active = emphasis === "none" ? true : r.critical;
-        const fill =
-          emphasis === "none"
-            ? "var(--mc-stroke)"
-            : r.critical
-              ? "var(--mc-accent)"
-              : "var(--mc-neutral)";
-        const opacity = emphasis === "none" ? 0.85 : r.critical ? 1 : 0.4;
-        const fits = labels && r.width >= r.label.length * fontSize * 0.6 + 2;
-        return (
-          <g key={`${r.label}-${i}`}>
-            <rect
-              x={r.x}
-              y={r.y}
-              width={r.width}
-              height={r.height}
-              rx={0.5}
-              shapeRendering="crispEdges"
-              data-mc-ink="band"
-              style={{ fill, fillOpacity: opacity }}
-            />
-            {fits ? (
-              <text
-                x={round2(r.x + r.width / 2)}
-                y={round2(r.y + r.height / 2)}
-                dominantBaseline="central"
-                textAnchor="middle"
-                fontSize={fontSize}
-                style={{
-                  fill: active ? "rgba(255,255,255,0.96)" : "var(--mc-surface, Canvas)",
-                  fontWeight: 600,
-                }}
-              >
-                {r.label}
-              </text>
-            ) : null}
-          </g>
-        );
+        // fills/shape via ink roles + .mc-trace rules in styles.css — flat
+        // siblings, minimal attributes: the span list is this chart's SSR hot
+        // path (bench floor 15 charts/ms). fontSize stays an attribute (the
+        // craft gate + containment estimates read it).
+        const ink = emphasis === "none" ? "bar" : r.critical ? "accent" : "neutral";
+        const opacity = emphasis === "none" ? 0.85 : r.critical ? undefined : 0.4;
+        // a label must SEAT: wide enough for the text AND a row tall enough to
+        // hold the floor font without bleeding onto neighbor rows — otherwise
+        // it drops out and the strip reads clean (inline/tab sizes)
+        const fits =
+          labels && r.height >= fontSize + 0.8 && r.width >= r.label.length * fontSize * 0.6 + 2;
+        const nodes = [
+          <rect
+            key={`r${i}`}
+            x={r.x}
+            y={r.y}
+            width={r.width}
+            height={r.height}
+            data-mc-ink={ink}
+            fillOpacity={opacity}
+          />,
+        ];
+        if (fits)
+          nodes.push(
+            <text
+              key={`t${i}`}
+              x={round2(r.x + r.width / 2)}
+              y={round2(r.y + r.height / 2)}
+              dominantBaseline="central"
+              textAnchor="middle"
+              fontSize={fontSize}
+              data-mc-dim={active ? undefined : ""}
+            >
+              {r.label}
+            </text>,
+          );
+        return nodes;
       })}
       {children}
     </Chart>

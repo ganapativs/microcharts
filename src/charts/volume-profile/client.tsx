@@ -17,7 +17,7 @@ export function VolumeProfile(props: VolumeProfileProps): React.ReactNode {
   const {
     data,
     valueArea = 0.7,
-    side = "left",
+    align = "left",
     bins = 12,
     width = 48,
     height = 32,
@@ -30,8 +30,8 @@ export function VolumeProfile(props: VolumeProfileProps): React.ReactNode {
   } = props;
 
   const geo = useMemo(
-    () => volumeProfileGeometry({ data, bins, valueArea, side, width, height, gutter: 0 }),
-    [data, bins, valueArea, side, width, height],
+    () => volumeProfileGeometry({ data, bins, valueArea, align, width, height, gutter: 0 }),
+    [data, bins, valueArea, align, width, height],
   );
   const rows = useMemo(() => binMass(data, bins), [data, bins]);
   const total = useMemo(() => rows.reduce((s, r) => s + r.mass, 0), [rows]);
@@ -104,7 +104,7 @@ export function VolumeProfile(props: VolumeProfileProps): React.ReactNode {
         {...rest}
         data={data}
         valueArea={valueArea}
-        side={side}
+        align={align}
         bins={bins}
         width={width}
         height={height}
@@ -123,7 +123,7 @@ export function VolumeProfile(props: VolumeProfileProps): React.ReactNode {
             fill="none"
             stroke="var(--mc-accent)"
             strokeOpacity={0.6}
-            strokeWidth={0.75}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

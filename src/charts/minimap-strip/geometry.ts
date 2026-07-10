@@ -52,7 +52,7 @@ export function minimapGeometry(opts: {
   window: [number, number];
   marks: readonly number[];
   known: readonly [number, number][];
-  domain: [number, number];
+  domain: readonly [number, number];
   width: number;
   height: number;
 }): {

@@ -70,7 +70,18 @@ export const entry: ChartEntry = {
   demo: DIFF.map((d) => d.added - d.removed),
   example: {
     title: "Schema diff",
-    code: `import { DataDiff } from "${PKG}/data-diff";\n\n<DataDiff data={diff} title="Schema diff" />`,
+    code: `import { DataDiff } from "${PKG}/data-diff";
+
+const diff = [
+  { key: "users", added: 340, removed: 120 },
+  { key: "orders", added: 88, removed: 30 },
+  { key: "items", added: 40, removed: 20 },
+  { key: "tags", added: 24, removed: 8 },
+  { key: "notes", added: 12, removed: 6 },
+  { key: "flags", added: 8, removed: 3 },
+];
+
+<DataDiff data={diff} title="Schema diff" />`,
   },
 };
 

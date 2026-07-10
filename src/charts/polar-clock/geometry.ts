@@ -7,7 +7,7 @@
 // fill opacity carries the value (a radial ActivityGrid for tiny sizes). All
 // coords 2-dp.
 import { annulusSector } from "../../core/arc.js";
-import { round2 } from "../../core/types.js";
+import { round2, type Value } from "../../core/types.js";
 
 const TAU = Math.PI * 2;
 
@@ -37,8 +37,9 @@ export interface PolarClockGeometry {
   accentPath: string | null;
   /** Grouped full-length sectors by opacity level (opacity mode); [] otherwise. */
   levelPaths: { opacity: number; d: string }[];
-  /** Four cardinal tick marks (0, ¼, ½, ¾ of the cycle) for `labels`. */
-  cardinalTicks: { x1: number; y1: number; x2: number; y2: number }[];
+  /** The four cardinal tick marks (0, ¼, ½, ¾ of the cycle) merged into one
+   *  path — the at-rest orientation cue, one node instead of four (`labels`). */
+  cardinalPath: string;
   peakIndex: number;
   minIndex: number;
   /** True when every finite value is equal (flat cycle). */
@@ -48,7 +49,7 @@ export interface PolarClockGeometry {
 }
 
 export function polarClockGeometry(opts: {
-  values: readonly (number | null)[];
+  values: readonly Value[];
   size: number;
   inner: number;
   start: number;
@@ -72,7 +73,7 @@ export function polarClockGeometry(opts: {
     segmentsPath: "",
     accentPath: null,
     levelPaths: [],
-    cardinalTicks: [],
+    cardinalPath: "",
     peakIndex: -1,
     minIndex: -1,
     flat: false,
@@ -175,18 +176,20 @@ export function polarClockGeometry(opts: {
     }
   }
 
-  // Cardinal ticks at 0, ¼, ½, ¾ of the cycle — hairline marks just outside rMax.
-  const cardinalTicks = [0, 0.25, 0.5, 0.75].map((f) => {
-    const a = f * TAU;
-    const inR = rMax + 0.3;
-    const outR = rMax + 1.4;
-    return {
-      x1: round2(cx + inR * Math.sin(a)),
-      y1: round2(cy - inR * Math.cos(a)),
-      x2: round2(cx + outR * Math.sin(a)),
-      y2: round2(cy - outR * Math.cos(a)),
-    };
-  });
+  // Cardinal ticks at 0, ¼, ½, ¾ of the cycle — hairline marks just outside
+  // rMax, merged into one path (the at-rest orientation cue: one node, not four).
+  const cardinalPath = [0, 0.25, 0.5, 0.75]
+    .map((f) => {
+      const a = f * TAU;
+      const inR = rMax + 0.3;
+      const outR = rMax + 1.4;
+      const x1 = round2(cx + inR * Math.sin(a));
+      const y1 = round2(cy - inR * Math.cos(a));
+      const x2 = round2(cx + outR * Math.sin(a));
+      const y2 = round2(cy - outR * Math.cos(a));
+      return `M${x1} ${y1}L${x2} ${y2}`;
+    })
+    .join("");
 
   return {
     guide,
@@ -194,7 +197,7 @@ export function polarClockGeometry(opts: {
     segmentsPath,
     accentPath,
     levelPaths,
-    cardinalTicks,
+    cardinalPath,
     peakIndex,
     minIndex,
     flat,

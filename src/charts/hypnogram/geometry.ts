@@ -36,7 +36,7 @@ export function mergeRuns(data: readonly HypnoEntry[], domainEnd: number): Hypno
 export function hypnogramGeometry(opts: {
   data: readonly HypnoEntry[];
   states: readonly string[];
-  domain: [number, number];
+  domain: readonly [number, number];
   width: number;
   height: number;
   style: "steps" | "lanes";

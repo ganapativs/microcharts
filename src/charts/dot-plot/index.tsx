@@ -108,17 +108,17 @@ export function DotPlot(props: DotPlotProps): ReactNode {
                 x2={row.x}
                 y2={row.y}
                 data-mc-ink="muted"
+                data-mc-w="support"
                 strokeOpacity={0.5}
                 vectorEffect="non-scaling-stroke"
-                style={{ strokeWidth: 1 }}
               />
             ) : null}
             <circle
               cx={row.x}
               cy={row.y}
               r={2}
-              data-mc-ink="point"
-              style={isHl ? { fill: "var(--mc-accent)" } : color ? { fill: color } : undefined}
+              data-mc-ink={isHl ? "accent" : "point"}
+              style={!isHl && color ? { fill: color } : undefined}
             />
             {showCategories ? (
               <text

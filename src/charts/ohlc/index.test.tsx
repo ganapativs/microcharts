@@ -24,7 +24,7 @@ afterEach(() => {
 describe("<Ohlc> (plan/22 #24, structured)", () => {
   it("wick + body per period; hollow up / filled down; summary shape", () => {
     const { container } = draw(<Ohlc data={PERIODS} />);
-    expect(container.querySelectorAll("g").length).toBe(20);
+    expect(container.querySelectorAll("rect").length).toBe(20); // one candle body per period
     const up = container.querySelector('[data-mc-ohlc="positive"]')!;
     expect(up.getAttribute("fill")).toContain("--mc-surface"); // hollow
     const down = container.querySelector('[data-mc-ohlc="negative"]')!;
@@ -44,7 +44,7 @@ describe("<Ohlc> (plan/22 #24, structured)", () => {
   it("corrupt data → dev warning + refused", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { container } = draw(<Ohlc data={[{ open: 10, high: 8, low: 12, close: 9 }]} />);
-    expect(container.querySelectorAll("g").length).toBe(0);
+    expect(container.querySelectorAll("rect").length).toBe(0);
     expect(warn).toHaveBeenCalled();
   });
 
@@ -57,7 +57,7 @@ describe("<Ohlc> (plan/22 #24, structured)", () => {
       close: i + 1,
     }));
     const { container } = draw(<Ohlc data={many} />);
-    expect(container.querySelectorAll("g").length).toBe(20);
+    expect(container.querySelectorAll("rect").length).toBe(20); // one candle body per rendered period
     expect(warn).toHaveBeenCalled();
   });
 

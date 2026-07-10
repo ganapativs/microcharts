@@ -108,6 +108,36 @@ glyph alone is too terse.
   <TrendArrow value={-0.08} positive="down" title="Latency" style={{ width: 20, height: 20 }} />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="zero reads flat, not up" code={`<TrendArrow value={0} showValue />`}>
+  <TrendArrow value={0} showValue title="No change" style={{ height: 20 }} />
+</LiveDemo>
+
+<LiveDemo
+  label="non-finite value reads 'No data.' and renders flat"
+  code={`<TrendArrow value={Number.NaN} showValue />`}
+>
+  <TrendArrow value={Number.NaN} showValue title="Invalid" style={{ height: 20 }} />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<TrendArrow value={12483} showValue format={{ maximumFractionDigits: 0 }} locale="de-DE" />`}
+>
+  <TrendArrow
+    value={12483}
+    showValue
+    format={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="Signups"
+    style={{ height: 22 }}
+  />
+</LiveDemo>
+
+`format`/`locale` reach `showValue`'s number and the accessible summary's magnitude together —
+"12,483" becomes "12.483" in German grouping.
+
 ## Four homes
 
 <FourContexts slug="trend-arrow" />

@@ -59,8 +59,19 @@ export const entry: ChartEntry = {
   ],
   demo: PERIODS.map((p) => p.close),
   example: {
-    title: "ACME 20 sessions",
-    code: `import { Ohlc } from "${PKG}/ohlc";\n\n<Ohlc data={sessions} title="ACME 20 sessions" />`,
+    title: "ACME sessions",
+    code: `import { Ohlc } from "${PKG}/ohlc";
+
+const sessions = [
+  { open: 140.1, high: 143.4, low: 137.2, close: 142.3 },
+  { open: 142.6, high: 146.8, low: 141.0, close: 144.9 },
+  { open: 144.5, high: 145.2, low: 140.1, close: 141.4 },
+  { open: 141.1, high: 144.7, low: 139.5, close: 143.8 },
+  { open: 143.9, high: 148.2, low: 142.8, close: 147.5 },
+  { open: 147.2, high: 149.9, low: 144.6, close: 145.9 },
+];
+
+<Ohlc data={sessions} title="ACME sessions" />`,
   },
 };
 

@@ -59,7 +59,21 @@ export const entry: ChartEntry = {
   demo: [82],
   example: {
     title: "Typical day",
-    code: `import { FoldedDayBand } from "${PKG}/folded-day-band";\n\n<FoldedDayBand data={observations} today={today} title="Typical day" />`,
+    code: `import { FoldedDayBand } from "${PKG}/folded-day-band";
+
+const curve = (h: number) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
+const observations = Array.from({ length: 14 }, (_d, d) =>
+  Array.from({ length: 24 }, (_h, h) => ({
+    t: d * 24 + h,
+    value: Math.round(curve(h) + Math.sin(d + h) * 8),
+  })),
+).flat();
+const today = Array.from({ length: 24 }, (_h, h) => ({
+  t: h,
+  value: Math.round(curve(h) + 14),
+}));
+
+<FoldedDayBand data={observations} today={today} title="Typical day" />`,
   },
 };
 

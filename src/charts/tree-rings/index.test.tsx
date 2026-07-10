@@ -15,13 +15,16 @@ describe("<TreeRings> (plan/24 #13)", () => {
     );
   });
 
-  it("renders one boundary ring per period + the centre dot", () => {
+  it("renders one boundary ring per period + the centre dot, merged into one path", () => {
     const { container } = draw(<TreeRings data={YEARS} />);
-    // 8 boundary circles + 1 centre dot
-    expect(container.querySelectorAll("circle").length).toBe(9);
+    // 7 non-highlighted boundaries merge into one muted path (SSR hot path)...
+    const rings = container.querySelector('path[data-mc-ink="muted"]')!;
+    expect((rings.getAttribute("d")!.match(/M/g) ?? []).length).toBe(7);
+    // ...leaving 2 circles: the highlighted (last) ring + the centre dot.
+    expect(container.querySelectorAll("circle").length).toBe(2);
   });
 
-  it("accent='last' emphasizes the outermost ring (weight, not color-alone)", () => {
+  it("highlight='last' emphasizes the outermost ring (weight, not color-alone)", () => {
     const { container } = draw(<TreeRings data={YEARS} />);
     const accent = [...container.querySelectorAll("circle")].find((c) =>
       (c.getAttribute("style") ?? "").includes("1.5"),

@@ -111,23 +111,23 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
       className={cls}
       style={style}
     >
-      {/* control band — the in-control zone; dashed when limits are provisional */}
+      {/* control band — the in-control zone */}
       {geo.degenerate ? null : (
+        <rect x={0} y={geo.band.y} width={width} height={geo.band.height} data-mc-ink="band" />
+      )}
+      {/* provisional limits (n < 10) get a dashed outline — a separate muted
+          rect: the band role's `stroke: none` would override stroke attributes */}
+      {geo.degenerate || geo.reliable ? null : (
         <rect
           x={0}
           y={geo.band.y}
           width={width}
           height={geo.band.height}
-          data-mc-ink="band"
-          {...(geo.reliable
-            ? {}
-            : {
-                stroke: "var(--mc-neutral)",
-                strokeOpacity: 0.5,
-                strokeDasharray: "2 2",
-                strokeWidth: 0.5,
-                vectorEffect: "non-scaling-stroke" as const,
-              })}
+          data-mc-ink="muted"
+          data-mc-w="hair"
+          strokeOpacity={0.5}
+          strokeDasharray="2 2"
+          vectorEffect="non-scaling-stroke"
         />
       )}
       {/* center hairline */}
@@ -136,9 +136,9 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
         y1={geo.center.y}
         x2={width}
         y2={geo.center.y}
-        stroke="var(--mc-neutral)"
+        data-mc-ink="muted"
+        data-mc-w="hair"
         strokeOpacity={0.55}
-        strokeWidth={0.6}
         vectorEffect="non-scaling-stroke"
       />
       {/* faint connecting line — points carry the story, not the path */}
@@ -150,7 +150,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
         vectorEffect="non-scaling-stroke"
         style={color ? { stroke: color } : undefined}
       />
-      {/* secondary run-rule (WE-2/4) markers — hollow, distinct from the ✕/ring */}
+      {/* secondary run-rule (WE-2/4) markers — hollow, distinct from the ring */}
       {geo.points.map((p, i) =>
         flagIdx.has(i) ? (
           <circle
@@ -158,38 +158,46 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
             cx={p.x}
             cy={p.y}
             r={2.4}
-            fill="none"
-            stroke="var(--mc-neutral)"
-            strokeWidth={0.8}
+            data-mc-ink="muted"
+            data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
         ) : null,
       )}
-      {/* out-of-control points — ringed negative dot (ring = shape cue) */}
-      {geo.points.map((p) =>
-        p.out ? (
-          <g key={`o${p.x}`}>
-            <circle
-              cx={p.x}
-              cy={p.y}
-              r={3}
-              fill="none"
-              stroke="var(--mc-negative)"
-              strokeOpacity={0.5}
-              strokeWidth={0.8}
-              vectorEffect="non-scaling-stroke"
-            />
-            <circle cx={p.x} cy={p.y} r={1.6} fill="var(--mc-negative)" />
-          </g>
-        ) : dots === "all" ? (
-          <circle
-            key={`a${p.x}`}
-            cx={p.x}
-            cy={p.y}
-            r={1}
-            style={{ fill: color ?? "var(--mc-stroke)" }}
-          />
-        ) : null,
+      {/* out-of-control points — ringed negative dot (ring = shape cue), flat
+          siblings (no per-point <g>). The ring is a hollow NEGATIVE stroke —
+          no ink role expresses that (the negative role fills), so it stays a
+          literal stroke; width still comes from the shared role. */}
+      {geo.points.flatMap((p) =>
+        p.out
+          ? [
+              <circle
+                key={`o${p.x}`}
+                cx={p.x}
+                cy={p.y}
+                r={3}
+                fill="none"
+                stroke="var(--mc-negative)"
+                strokeOpacity={0.5}
+                data-mc-w="tick"
+                vectorEffect="non-scaling-stroke"
+              />,
+              <circle key={`d${p.x}`} cx={p.x} cy={p.y} r={1.6} data-mc-ink="negative" />,
+            ]
+          : dots === "all"
+            ? [
+                // custom `color` can't come from the static "point" role rule,
+                // so it falls back to a plain fill attribute (no role → no CSS)
+                <circle
+                  key={`a${p.x}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r={1}
+                  data-mc-ink={color ? undefined : "point"}
+                  fill={color}
+                />,
+              ]
+            : [],
       )}
       {children}
     </Chart>

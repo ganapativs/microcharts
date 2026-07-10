@@ -20,11 +20,11 @@ export interface InteractiveHeartbeatBlipProps extends HeartbeatBlipProps {
 
 const TICK_MS = 250; // drift cadence — coarse, so it's a readable sweep not a jitter
 
-function latest(data: readonly number[], now?: number): number {
+function latest(events: readonly number[], now?: number): number {
   if (typeof now === "number" && Number.isFinite(now)) return now;
   let max = 0;
   let seen = false;
-  for (const t of data)
+  for (const t of events)
     if (Number.isFinite(t) && (!seen || t > max)) {
       max = t;
       seen = true;
@@ -34,7 +34,7 @@ function latest(data: readonly number[], now?: number): number {
 
 export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.ReactNode {
   const {
-    data,
+    events,
     window: win = 60_000,
     now,
     strings = EN_HEARTBEAT,
@@ -45,12 +45,12 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
 
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();
-  const baseNow = useMemo(() => latest(data, now), [data, now]);
+  const baseNow = useMemo(() => latest(events, now), [events, now]);
   // The live clock: starts at the latest event, advances while motion is active,
   // and resets to the latest whenever the data changes (new events anchor at now).
   const [liveNow, setLiveNow] = useState(baseNow);
   const [announced, setAnnounced] = useState("");
-  const prevLen = useRef(data.length);
+  const prevLen = useRef(events.length);
   const mounted = useRef(false);
 
   useEffect(() => {
@@ -69,33 +69,34 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
       ? undefined
       : typeof summary === "string"
         ? summary
-        : heartbeatSummary(data, { window: win, now, strings });
+        : heartbeatSummary(events, { window: win, now, strings });
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Announce on data change (not per tick); pulse the endpoint on a new event.
   useEffect(() => {
     if (!mounted.current) {
       mounted.current = true;
-      prevLen.current = data.length;
+      prevLen.current = events.length;
       return;
     }
-    if (data.length !== prevLen.current) {
-      const grew = data.length > prevLen.current;
-      prevLen.current = data.length;
-      setAnnounced(heartbeatSummary(data, { window: win, now, strings }));
+    if (events.length !== prevLen.current) {
+      const grew = events.length > prevLen.current;
+      prevLen.current = events.length;
+      setAnnounced(heartbeatSummary(events, { window: win, now, strings }));
       if (grew && !reduced && inView) {
         const dot = wrapRef.current?.querySelector<SVGCircleElement>(".mc-heartbeat-now");
         if (dot) {
           dot.style.transformBox = "fill-box";
           dot.style.transformOrigin = "center";
+          // ≤200ms, canonical strong ease-out (Emil ruling — motion-typed chart).
           dot.animate(
             [{ transform: "scale(1)" }, { transform: "scale(2.6)" }, { transform: "scale(1)" }],
-            { duration: 450, easing: "ease-out" },
+            { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
           );
         }
       }
     }
-  }, [data, win, now, strings, reduced, inView, wrapRef]);
+  }, [events, win, now, strings, reduced, inView, wrapRef]);
 
   return (
     <span
@@ -108,7 +109,7 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     >
       <StaticHeartbeatBlip
         {...rest}
-        data={data}
+        events={events}
         window={win}
         now={liveNow}
         strings={strings}

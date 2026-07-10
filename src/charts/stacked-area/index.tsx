@@ -64,6 +64,7 @@ export interface StackedAreaProps {
 }
 
 const CAT_TOKENS = ["--mc-cat-1", "--mc-cat-2", "--mc-cat-3"];
+const CAT_N = CAT_TOKENS.length;
 
 export function StackedArea(props: StackedAreaProps): ReactNode {
   const {
@@ -141,22 +142,25 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
           {layer.dArea ? (
             <path
               d={layer.dArea}
-              style={{
-                fill: `var(${CAT_TOKENS[layer.index % CAT_TOKENS.length]})`,
-                fillOpacity: variant === "ridge" ? 1 : 0.8,
-              }}
+              data-mc-cat={(layer.index % CAT_N) + 1}
+              style={{ fillOpacity: variant === "ridge" ? 1 : 0.8 }}
             />
           ) : null}
           {layer.dTop ? (
             <path
               d={layer.dTop}
               fill="none"
+              // top-edge hairline: no data-mc-cat stroke variant exists yet
+              // (styles.css only element-splits accent/positive/negative/ghost
+              // for stroked marks — cat roles are fill-only), so this stays a
+              // literal var() reference; ridge trades it for a fixed surface
+              // "crest light" instead of the category color.
               stroke={
                 variant === "ridge"
                   ? "var(--mc-surface, Canvas)"
-                  : `var(${CAT_TOKENS[layer.index % CAT_TOKENS.length]})`
+                  : `var(${CAT_TOKENS[layer.index % CAT_N]})`
               }
-              strokeWidth={variant === "ridge" ? 1 : 0.75}
+              data-mc-w={variant === "ridge" ? "support" : "tick"}
               vectorEffect="non-scaling-stroke"
             />
           ) : null}

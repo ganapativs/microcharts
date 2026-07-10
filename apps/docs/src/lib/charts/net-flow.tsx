@@ -77,7 +77,15 @@ export const entry: ChartEntry = {
   demo: DEMO.map((d) => d.in - d.out),
   example: {
     title: "Monthly cash flow",
-    code: `import { NetFlow } from "${PKG}/net-flow";\n\n<NetFlow data={months} title="Monthly cash flow" />`,
+    code: `import { NetFlow } from "${PKG}/net-flow";
+
+const months = [
+  { in: 42, out: 31 }, { in: 38, out: 35 }, { in: 45, out: 29 }, { in: 40, out: 44 },
+  { in: 52, out: 38 }, { in: 48, out: 41 }, { in: 55, out: 36 }, { in: 50, out: 47 },
+  { in: 58, out: 39 }, { in: 44, out: 52 }, { in: 60, out: 41 }, { in: 57, out: 43 },
+];
+
+<NetFlow data={months} title="Monthly cash flow" />`,
   },
 };
 
@@ -126,12 +134,26 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "mirrored bars for few months",
-    code: `<NetFlow data={months} mode="bars" />`,
+    code: `<NetFlow
+  data={[
+    { in: 42, out: 31 }, { in: 38, out: 35 }, { in: 45, out: 29 }, { in: 40, out: 44 },
+    { in: 52, out: 38 }, { in: 48, out: 41 }, { in: 55, out: 36 }, { in: 50, out: 47 },
+    { in: 58, out: 39 }, { in: 44, out: 52 }, { in: 60, out: 41 }, { in: 57, out: 43 },
+  ]}
+  mode="bars"
+/>`,
     node: <NetFlow data={DEMO} format={KFMT} mode="bars" summary={false} width={170} height={26} />,
   },
   {
     label: "debt paydown (outflow is the goal)",
-    code: `<NetFlow data={months} positive="down" />`,
+    code: `<NetFlow
+  data={[
+    { in: 42, out: 31 }, { in: 38, out: 35 }, { in: 45, out: 29 }, { in: 40, out: 44 },
+    { in: 52, out: 38 }, { in: 48, out: 41 }, { in: 55, out: 36 }, { in: 50, out: 47 },
+    { in: 58, out: 39 }, { in: 44, out: 52 }, { in: 60, out: 41 }, { in: 57, out: 43 },
+  ]}
+  positive="down"
+/>`,
     node: (
       <NetFlow data={DEMO} format={KFMT} positive="down" summary={false} width={170} height={26} />
     ),

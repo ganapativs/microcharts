@@ -15,6 +15,13 @@ fails to widen is flagged, never quietly inflated.
   sizeOf="forecast-cone"
   code={`import { ForecastCone } from "@microcharts/react/forecast-cone";
 
+const history = [30, 32, 31, 34, 36, 35, 38];
+const forecast = {
+mid: [39, 40, 41, 42],
+p80: [[36, 42], [35, 45], [34, 50], [33, 55]],
+p50: [[37, 41], [37, 43], [36, 46], [35, 49]],
+};
+
 <ForecastCone data={history} forecast={forecast} target={45} title="Q4 revenue" />`}
 >
   <ForecastCone
@@ -56,7 +63,13 @@ fails to widen is flagged, never quietly inflated.
 
 <LiveDemo
   label="single band + no target"
-  code={`<ForecastCone data={history} forecast={{ mid, p80 }} />`}
+  code={`const history = [30, 32, 31, 34, 36, 35, 38];
+const forecast = {
+  mid: [39, 40, 41, 42],
+  p80: [[36, 42], [35, 45], [34, 50], [33, 55]],
+};
+
+<ForecastCone data={history} forecast={forecast} />`}
 >
   <span className="inline-flex flex-col gap-1.5">
     <ForecastCone
@@ -98,6 +111,99 @@ fails to widen is flagged, never quietly inflated.
     />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<ForecastCone
+  data={[3000, 3200, 3100, 3400, 3600, 3500, 3800]}
+  forecast={{
+    mid: [3900, 4000, 4100, 4200],
+    p80: [[3600, 4200], [3500, 4500], [3400, 5000], [3300, 5500]],
+  }}
+  format={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <ForecastCone
+    data={[3000, 3200, 3100, 3400, 3600, 3500, 3800]}
+    forecast={{
+      mid: [3900, 4000, 4100, 4200],
+      p80: [
+        [3600, 4200],
+        [3500, 4500],
+        [3400, 5000],
+        [3300, 5500],
+      ],
+    }}
+    format={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="Localized forecast"
+    width={220}
+    height={26}
+  />
+</LiveDemo>
+
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's
+median, interval, and target numbers follow that locale's own grouping and currency placement
+("4.200 €" in German, not "€4,200"). The in-chart landing label stays the plain formatted
+number either way; only the announced numbers change shape.
+
+## Edge cases
+
+<LiveDemo
+  label="no history yet"
+  code={`<ForecastCone
+  data={[]}
+  forecast={{ mid: [10, 12, 14], p80: [[8, 12], [8, 15], [7, 19]] }}
+  title="No history"
+/>`}
+>
+  <ForecastCone
+    data={[]}
+    forecast={{
+      mid: [10, 12, 14],
+      p80: [
+        [8, 12],
+        [8, 15],
+        [7, 19],
+      ],
+    }}
+    title="No history"
+    width={160}
+    height={26}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="a cone that fails to widen"
+  code={`// bands that narrow instead of widen render exactly as given — the
+// component flags this in dev, it never inflates the shape to look honest
+<ForecastCone
+  data={[10, 11]}
+  forecast={{ mid: [12, 13, 14], p80: [[9, 15], [10, 14], [11, 13]] }}
+/>`}
+>
+  <ForecastCone
+    data={[10, 11]}
+    forecast={{
+      mid: [12, 13, 14],
+      p80: [
+        [9, 15],
+        [10, 14],
+        [11, 13],
+      ],
+    }}
+    title="Narrowing input"
+    width={160}
+    height={26}
+  />
+</LiveDemo>
+
+With no history the cone still draws from the first forecast point, and the accessible summary
+quietly drops its "from N today" clause instead of naming a value that doesn't exist. A cone
+whose bands narrow instead of widen is an input-honesty failure — it renders exactly as supplied
+(never auto-inflated to look right) and logs a one-time dev warning so the mistake surfaces in
+development rather than silently misleading a reader.
 
 ## Four homes
 

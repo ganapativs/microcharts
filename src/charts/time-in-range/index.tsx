@@ -5,29 +5,33 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
+import { ON_FILL_INK } from "../../core/color.js";
 import { EN_TIME_IN_RANGE, type TimeInRangeStrings } from "../../core/strings-time-in-range.js";
 import {
   timeInRangeGeometry,
   zonePercents,
   ZONE_ORDER,
+  type Orientation,
   type TimeInRangeDatum,
   type ZoneKey,
 } from "./geometry.js";
 
-/** Fill + opacity per zone: position carries the reading, hue confirms it.
- *  Severity is encoded by ink weight (opacity), never by hue alone. */
-const ZONE_FILL: Record<ZoneKey, { fill: string; opacity: number }> = {
-  severeBelow: { fill: "var(--mc-negative)", opacity: 1 },
-  below: { fill: "var(--mc-negative)", opacity: 0.5 },
-  in: { fill: "var(--mc-positive)", opacity: 1 },
-  above: { fill: "var(--mc-cat-1)", opacity: 0.72 },
-  severeAbove: { fill: "var(--mc-cat-1)", opacity: 1 },
+/** Ink role + opacity per zone: position carries the reading, hue confirms it.
+ *  Severity is encoded by ink weight (opacity), never by hue alone. `above`/
+ *  `severeAbove` have no dedicated ink role, so they borrow the shared
+ *  categorical amber (--mc-cat-1), matching TapeGauge's warn-zone convention. */
+const ZONE_INK: Record<ZoneKey, { ink: Record<string, string | number>; opacity: number }> = {
+  severeBelow: { ink: { "data-mc-ink": "negative" }, opacity: 1 },
+  below: { ink: { "data-mc-ink": "negative" }, opacity: 0.5 },
+  in: { ink: { "data-mc-ink": "positive" }, opacity: 1 },
+  above: { ink: { "data-mc-cat": 1 }, opacity: 0.72 },
+  severeAbove: { ink: { "data-mc-cat": 1 }, opacity: 1 },
 };
 
 export interface TimeInRangeProps {
   data: TimeInRangeDatum;
   /** Vertical matches the clinical-column convention and fits KPI cards. */
-  orientation?: "horizontal" | "vertical" | undefined;
+  orientation?: Orientation | undefined;
   /** `"in"` = the headline read; `"all"` = per-zone audit; `"none"` = clean. */
   label?: "in" | "all" | "none" | undefined;
   width?: number | undefined;
@@ -104,39 +108,46 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
       className={className ? `mc-tir ${className}` : "mc-tir"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {geo.zones.map((z) => {
-        const paint = ZONE_FILL[z.key];
+      {geo.zones.flatMap((z) => {
+        const paint = ZONE_INK[z.key];
         const showLabel =
           label === "all" || (label === "in" && z.key === "in") ? pct[z.key] : undefined;
         const span = horizontal ? z.width : z.height;
         const text = showLabel !== undefined ? `${showLabel}%` : undefined;
         const fits = text !== undefined && span >= Math.max(14, text.length * fontSize * 0.62 + 2);
-        return (
-          <g key={z.key}>
-            <rect
-              x={z.x}
-              y={z.y}
-              width={z.width}
-              height={z.height}
-              rx={0.5}
-              shapeRendering="crispEdges"
-              data-mc-ink="band"
-              style={{ fill: paint.fill, fillOpacity: paint.opacity }}
-            />
-            {fits ? (
-              <text
-                x={round2(z.x + z.width / 2)}
-                y={round2(z.y + z.height / 2)}
-                dominantBaseline="central"
-                textAnchor="middle"
-                fontSize={fontSize}
-                style={{ fill: "rgba(255,255,255,0.96)", fontWeight: 600 }}
-              >
-                {text}
-              </text>
-            ) : null}
-          </g>
-        );
+        // flat siblings (no per-zone <g>) — the zone list is this chart's SSR
+        // hot path; ink comes from an exact role (positive/negative/cat), never
+        // "band" (that role would exempt the rect from the craft text-collision
+        // check, hiding a real label-on-fill risk).
+        const nodes = [
+          <rect
+            key={`r-${z.key}`}
+            x={z.x}
+            y={z.y}
+            width={z.width}
+            height={z.height}
+            rx={0.5}
+            shapeRendering="crispEdges"
+            fillOpacity={paint.opacity}
+            {...paint.ink}
+          />,
+        ];
+        if (fits)
+          nodes.push(
+            <text
+              key={`t-${z.key}`}
+              x={round2(z.x + z.width / 2)}
+              y={round2(z.y + z.height / 2)}
+              dominantBaseline="central"
+              textAnchor="middle"
+              fontSize={fontSize}
+              fontWeight={600}
+              fill={ON_FILL_INK}
+            >
+              {text}
+            </text>,
+          );
+        return nodes;
       })}
       {children}
     </Chart>

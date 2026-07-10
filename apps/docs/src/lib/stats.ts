@@ -9,8 +9,8 @@ import chartSizes from "./chart-sizes.json";
  */
 export const STATS = {
   deps: 0,
-  ssr: { rows: 500, ms: 5.8 }, // 500 charts → SVG on the server
-  ssr1000: { rows: 1000, ms: 11.6 },
+  ssr: { rows: 500, ms: 5.4 }, // 500 charts → SVG on the server
+  ssr1000: { rows: 1000, ms: 10.8 },
   avgBytes: 550, // average server-rendered chart payload
 } as const;
 

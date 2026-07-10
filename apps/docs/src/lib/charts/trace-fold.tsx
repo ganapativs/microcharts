@@ -57,7 +57,21 @@ export const entry: ChartEntry = {
   demo: [214, 86],
   example: {
     title: "Request trace",
-    code: `import { TraceFold } from "${PKG}/trace-fold";\n\n<TraceFold data={spans} title="Request trace" />`,
+    code: `import { TraceFold } from "${PKG}/trace-fold";
+
+const spans = [
+  { label: "request", start: 0, duration: 214, depth: 0 },
+  { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
+  { label: "auth", start: 0, duration: 8, depth: 1, parent: 0 },
+  { label: "render", start: 96, duration: 60, depth: 1, parent: 0 },
+  { label: "serialize", start: 156, duration: 40, depth: 1, parent: 0 },
+  { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 },
+  { label: "decode", start: 82, duration: 12, depth: 2, parent: 1 },
+  { label: "log", start: 200, duration: 14, depth: 1, parent: 0 },
+  { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 },
+];
+
+<TraceFold data={spans} title="Request trace" />`,
   },
 };
 

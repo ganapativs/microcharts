@@ -27,10 +27,10 @@ describe("<RugStrip> (plan/22 #5, S1 distribution)", () => {
     expect(container.querySelectorAll("svg *").length).toBeLessThanOrEqual(4);
   });
 
-  it("highlight renders a full-height accent tick", () => {
-    const { container } = draw(<RugStrip data={[1, 5, 9]} highlight={5} />);
+  it("markValue renders a full-height accent tick", () => {
+    const { container } = draw(<RugStrip data={[1, 5, 9]} markValue={5} />);
     const hl = container.querySelector("line")!;
-    expect(hl.getAttribute("stroke")).toBe("var(--mc-accent)");
+    expect(hl.getAttribute("data-mc-ink")).toBe("accent");
     expect(Number(hl.getAttribute("y1"))).toBe(0);
     expect(Number(hl.getAttribute("y2"))).toBe(10);
   });
@@ -52,4 +52,4 @@ describe("<RugStrip> (plan/22 #5, S1 distribution)", () => {
   });
 });
 
-seriesEdgeSuite("RugStrip", (data) => <RugStrip data={data} title="Edge" highlight={5} />);
+seriesEdgeSuite("RugStrip", (data) => <RugStrip data={data} title="Edge" markValue={5} />);

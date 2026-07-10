@@ -58,7 +58,17 @@ export const entry: ChartEntry = {
   demo: PL.map((d) => d.value),
   example: {
     title: "Net income bridge",
-    code: `import { Waterfall } from "${PKG}/waterfall";\n\n<Waterfall data={steps} start={60} title="Net income bridge" />`,
+    code: `import { Waterfall } from "${PKG}/waterfall";
+
+const steps = [
+  { label: "Product", value: 42 },
+  { label: "Services", value: 18 },
+  { label: "Refunds", value: -12 },
+  { label: "Opex", value: -26 },
+  { label: "FX", value: 5 },
+];
+
+<Waterfall data={steps} start={60} title="Net income bridge" />`,
   },
 };
 

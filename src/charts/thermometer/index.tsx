@@ -125,13 +125,15 @@ export function Thermometer(props: ThermometerProps): ReactNode {
       className={className ? `mc-thermo ${className}` : "mc-thermo"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* bulb reservoir — always full; dynamic color → inline */}
+      {/* bulb reservoir — always full; dynamic fill → inline; width is the
+          role (orthogonal to ink), not a literal */}
       {geo.bulb ? (
         <circle
           cx={geo.bulb.cx}
           cy={geo.bulb.cy}
           r={geo.bulb.r}
-          style={{ fill: paint, stroke: "var(--mc-neutral)", strokeWidth: 0.5 }}
+          data-mc-w="hair"
+          style={{ fill: paint, stroke: "var(--mc-neutral)" }}
         />
       ) : null}
       {/* tube capsule — the empty channel (rounded, reads closed) */}
@@ -172,7 +174,10 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           style={{ strokeOpacity: 0.7 }}
         />
       ) : null}
-      {/* target line — across the tube (distinct shape), accent via the flag role */}
+      {/* target line — across the tube (distinct shape), accent via the flag
+          role. Literal width (justified): sits between the tube outline and
+          full data ink so it reads as a goal marker, not the primary fill —
+          no support/tick/hair ratio lands there. */}
       {geo.targetTick ? (
         <line
           x1={geo.targetTick.x1}

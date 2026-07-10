@@ -1,0 +1,181 @@
+---
+title: StreakSpark
+description: A run-length streak strip for React — pass/fail outcomes collapse into runs sized by length, with the current run accented against the record so "how are we doing, versus our best" reads at a glance.
+---
+
+StreakSpark answers "how long is the current run, and how does it compare to the record?". A
+sequence of pass/fail outcomes collapses into **runs** — each run a bar whose width is its length on
+one shared scale. Streak runs sit low and translucent, breaks sit thin and saturated, and the
+**current** run is the loud accent bar at the right. The record streak wears a small triangle tick,
+so "are we near our best" reads without counting.
+
+<LiveDemo
+  label="StreakSpark"
+  sizeOf="streak-spark"
+  code={`import { StreakSpark } from "@microcharts/react/streak-spark";
+
+// 1 = passing build, 0 = failing build
+<StreakSpark
+  data={[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1]}
+  label="both"
+  title="Deploy streak"
+/>`}
+>
+  <StreakSpark
+    data={[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1]}
+    label="both"
+    title="Deploy streak"
+    width={300}
+    height={48}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="streak-spark" />
+
+## Try it
+
+<Playground chart="streak-spark" />
+
+## Interactive
+
+<InteractiveDemo slug="streak-spark" />
+
+## When to use it
+
+- **Good for** — pass/fail run histories, uptime and incident-free streaks, the current run against a record.
+- **Avoid for** — a continuous magnitude (SparkBar) or a single completion ratio (Progress).
+
+## Sizing
+
+<Sizing chart="streak-spark" />
+
+## Variants
+
+`data` accepts booleans, `0`/`1`, or any numbers (they pass on `> 0`, or on `>= threshold`). A
+`null` is a gap: it breaks the run and starts a fresh one. Everything else is a prop.
+
+<LiveDemo
+  label="both labels"
+  code={`// label="both" prints the current run's length AND the record's
+<StreakSpark
+  data={[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1]}
+  label="both"
+/>`}
+>
+  <StreakSpark
+    data={[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1]}
+    label="both"
+    title="Current and record"
+    width={300}
+    height={48}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="positive down"
+  code={`// the STREAK is now the failing outcome — e.g. incident-free days
+// (0 = quiet day, 1 = incident): the calm runs become the ok streak
+<StreakSpark
+  data={[0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]}
+  positive="down"
+  label="both"
+/>`}
+>
+  <StreakSpark
+    data={[0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]}
+    positive="down"
+    label="both"
+    title="Incident-free streak"
+    width={300}
+    height={48}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="numeric + threshold"
+  code={`// numbers pass on >= threshold — e.g. daily uptime %, target 99.5
+<StreakSpark
+  data={[99.9, 99.8, 99.6, 98.2, 99.7, 99.9, 99.6, 97.0, 99.8, 99.9]}
+  threshold={99.5}
+  label="both"
+/>`}
+>
+  <StreakSpark
+    data={[99.9, 99.8, 99.6, 98.2, 99.7, 99.9, 99.6, 97.0, 99.8, 99.9]}
+    threshold={99.5}
+    label="both"
+    title="Uptime streak"
+    width={300}
+    height={48}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<StreakSpark
+  data={Array.from({ length: 1204 }, () => 1)}
+  format={{ useGrouping: true }}
+  locale="de-DE"
+/>`}
+>
+  <StreakSpark
+    data={Array.from({ length: 1204 }, () => 1)}
+    format={{ useGrouping: true }}
+    locale="de-DE"
+    label="current"
+    title="Localized run length"
+    width={220}
+    height={48}
+  />
+</LiveDemo>
+
+With a `locale`, the count label and the accessible summary follow that locale's own grouping — a
+1,204-build streak reads **"1.204"** in German. The outcome words come from `strings`, so the whole
+summary localizes together.
+
+## Edge cases
+
+<LiveDemo
+  label="single outcome"
+  code={`<StreakSpark data={[1]} title="One build" />`}
+>
+  <StreakSpark data={[1]} title="One build" width={160} height={24} />
+</LiveDemo>
+
+A lone outcome is one current run of length 1, and it is trivially its own record — the summary reads
+**"Current run 1 passing, unbroken."**
+
+<LiveDemo
+  label="all failing"
+  code={`<StreakSpark data={[0, 0, 0, 0, 0]} title="Rough week" />`}
+>
+  <StreakSpark data={[0, 0, 0, 0, 0]} title="Rough week" width={200} height={24} />
+</LiveDemo>
+
+When nothing passes there is no completed streak: the strip is one saturated break run, no triangle
+tick, and the summary reads **"Current run 5 failing; no completed streak."**
+
+## Four homes
+
+<FourContexts slug="streak-spark" />
+
+## Why this default
+
+Runs, not per-outcome ticks, because the decision is about *length* — "how long have we held" and
+"how does that compare to our best". Width encodes run length on one shared scale, so a wide bar is a
+genuinely long run and the eye compares them honestly. Height and opacity encode run *type* (streak,
+break, current) — never magnitude — so the ribbon never implies a size it doesn't have. The record
+tick and the accented current bar answer the two questions the raw list can't, at a glance.
+
+## Accessibility
+
+The accessible name states the current run, the record, and how often the streak broke — **"Current
+run 3 passing; record 9; broke 2 times."** The interactive entry roves runs with ← →, announcing
+each run's length, outcome, and whether it is the record (**"Run 3 of 5: 4 passing."**). Direction is
+carried by height, opacity, and color together, never color alone.
+
+## Props
+
+<PropTable slug="streak-spark" />

@@ -27,7 +27,7 @@ const MIN_THICK = 2;
 
 export function rubricStripGeometry(opts: {
   data: readonly RubricInput[];
-  domain: [number, number];
+  domain: readonly [number, number];
   width: number;
   height: number;
   gutter: number;

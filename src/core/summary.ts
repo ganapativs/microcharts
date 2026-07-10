@@ -148,6 +148,8 @@ export interface SummaryStrings {
   heartbeatWindow: (ms: number) => string;
   /** Elapsed ms → compact label, e.g. 3000 → "3s" (heartbeat-blip). */
   heartbeatAgo: (ms: number) => string;
+  /** Static empty-state in-chart label (heartbeat-blip). */
+  heartbeatEmpty: string;
   /** S1 rolling window, e.g. "Now 87, rising over the last 12 updates." */
   cometTrail: (last: string, trendWord: string, n: number) => string;
   /** Single point, e.g. "Now 87." (comet-trail). */
@@ -237,6 +239,8 @@ export interface SummaryStrings {
   likert: (agreePct: string, disagreePct: string, neutralPct: string | null) => string;
   /** Lean clause, e.g. "Leans positive." */
   likertLean: (direction: "positive" | "negative" | "balanced") => string;
+  /** Interactive level announcement, e.g. "Agree: 34%, level 4 of 5." */
+  likertAt: (label: string, pct: string, level: number, total: number) => string;
   /** All-neutral / empty likert rows. */
   allNeutral: string;
   noResponses: string;
@@ -751,6 +755,132 @@ export interface SummaryStrings {
   stationWind: (octantName: string, magnitude: string) => string;
   /** Calm-wind clause, e.g. ", wind calm" (station-glyph). */
   stationCalm: string;
+  /** Interactive field-by-field readouts (station-glyph roving keyboard). */
+  stationFieldWindCalm: string;
+  stationFieldWind: (octantName: string, magnitude: string) => string;
+  stationFieldSky: (sky: string) => string;
+  stationFieldTemp: (v: string) => string;
+  stationFieldDew: (v: string) => string;
+  stationFieldPressure: (v: string) => string;
+  /** CohortTriangle summary, e.g.
+   *  "5 cohorts; at month 1, Mar retains worst (47%); newest May starts at 100%." */
+  cohortTriangle: (
+    n: number,
+    unit: string,
+    worstLabel: string,
+    age: number,
+    worstValue: string,
+    newestLabel: string,
+    newestFirst: string,
+  ) => string;
+  /** Single-cohort / no-comparison form, e.g. "1 cohort; Jan starts at 100%." */
+  cohortTriangleShort: (n: number, newestLabel: string, newestFirst: string) => string;
+  /** Interactive cell announce, e.g. "Feb cohort, month 1: 50%." */
+  cohortTriangleAt: (cohortLabel: string, unit: string, age: number, value: string) => string;
+  /** Interactive gap announce, e.g. "Feb cohort, month 2: no data." */
+  cohortTriangleEmpty: (cohortLabel: string, unit: string, age: number) => string;
+  /** StreakSpark overview, e.g. "Current run 2 failing; record 9; broke 3 times." */
+  streakSpark: (current: string, word: string, record: string, breaks: number) => string;
+  /** Unbroken streak, e.g. "Current run 6 passing, unbroken." (streak-spark). */
+  streakSparkUnbroken: (current: string, word: string) => string;
+  /** No completed streak, e.g. "Current run 5 failing; no completed streak." (streak-spark). */
+  streakSparkAllBreak: (current: string, word: string) => string;
+  /** Interactive run announce, e.g. "Run 4 of 12: 9 passing, record." (streak-spark). */
+  streakAt: (pos: number, total: number, len: string, word: string, recordClause: string) => string;
+  /** Record-run clause appended to a run announce, e.g. ", record". (streak-spark). */
+  streakRecord: string;
+  /** Run outcome words, indexed streak (ok) then break (fail). (streak-spark). */
+  streakWords: readonly [string, string];
+  /** GradeProfile overview, e.g. "900 m, 67 m gain; steepest 16% at 800 m." */
+  gradeProfile: (distance: string, gain: string, grade: string, at: string) => string;
+  /** GradeProfile with no real climb (flat / descent-only), e.g. "600 m, no real climb." */
+  gradeProfileFlat: (distance: string) => string;
+  /** GradeProfile pitch announce, e.g. "km 18: 9.5%, 620 m gained." */
+  gradeProfileAt: (at: string, grade: string, gain: string) => string;
+  /** GradeProfile summit callout, e.g. "12% max". */
+  gradeMax: (grade: string) => string;
+  /** WinProbWorm summary, e.g. "Per the supplied model, home leads at 98%; 3 lead changes, biggest swing +17 at point 8." */
+  winProbWorm: (
+    leader: string,
+    prob: string,
+    flips: number,
+    swingAt: number,
+    swingDelta: string,
+  ) => string;
+  /** Constant lead, e.g. "Per the supplied model, home holds 64% throughout." */
+  winProbWormFlat: (leader: string, prob: string) => string;
+  /** Constant 50, e.g. "Per the supplied model, even at 50% throughout." */
+  winProbWormTied: (prob: string) => string;
+  /** Point announcement, e.g. "Point 15: home 98%." */
+  winProbWormAt: (pos: number, leader: string, prob: string) => string;
+  /** QueueDepth summary, e.g. "214 queued, 2.1× capacity, growing over the last quarter." */
+  queueDepth: (depth: string, capacityClause: string, trend: string) => string;
+  /** Breach clause, e.g. ", 2.1× capacity" (queue-depth). */
+  queueOver: (ratio: string) => string;
+  /** Under-capacity clause, e.g. ", within capacity" (queue-depth). */
+  queueUnder: string;
+  /** Trend words (queue-depth): growing / draining / holding steady. */
+  queueGrow: string;
+  queueDrain: string;
+  queueFlat: string;
+  /** QueueDepth period announcement, e.g. "t8: 214 queued, above capacity." */
+  queueAt: (period: number, value: string, breachClause: string) => string;
+  /** Above-capacity clause appended to a period announce (queue-depth). */
+  queueAbove: string;
+  /** SpreadBand lead summary, e.g. "Organic leads Paid by 8; last crossed at point 5." */
+  spreadBand: (leader: string, other: string, gap: string, sinceClause: string) => string;
+  /** Flip clause appended to a spread-band summary, e.g. "; last crossed at point 5". */
+  spreadBandFlip: (position: number) => string;
+  /** Never-crossed clause appended to a spread-band summary. */
+  spreadBandNever: string;
+  /** SpreadBand level/degenerate — identical or endpoint-tied series. */
+  spreadBandTie: string;
+  /** SpreadBand point announce, e.g. "Point 12 of 12: Organic +8 over Paid." */
+  spreadBandAt: (
+    position: number,
+    total: number,
+    leader: string,
+    gap: string,
+    other: string,
+  ) => string;
+  /** SpreadBand tie announce, e.g. "Point 6 of 12: level." */
+  spreadBandAtTie: (position: number, total: number) => string;
+  /** SpreadBand empty-point announce, e.g. "Point 3 of 12: no data." */
+  spreadBandAtEmpty: (position: number, total: number) => string;
+  /** BiasStrip agreement summary, e.g. "Bias +2.21 across 20 pairs; 90% within the limits of agreement." */
+  biasStrip: (bias: string, n: number, withinPct: string) => string;
+  /** BiasStrip small-sample summary (n < 5, no band), e.g. "Bias +2 across 4 pairs." */
+  biasStripShort: (bias: string, n: number) => string;
+  /** BiasStrip pair announcement, e.g. "Pair 12 of 20: mean 41.2, diff +3.1 — outside the limits." */
+  biasStripAt: (
+    pos: number,
+    total: number,
+    mean: string,
+    diff: string,
+    statusClause: string,
+  ) => string;
+  /** Outside-limits clause appended to a BiasStrip pair announce. */
+  biasOutside: string;
+  /** PercentileTrace value notation, e.g. "p81". (percentile-trace). */
+  percentileValue: (n: string) => string;
+  /** PercentileTrace summary, e.g. "p81 now, up 41 points from the first reading; moved above the middle half." */
+  percentileTrace: (current: string, delta: string, band: string) => string;
+  /** PercentileTrace change clause, e.g. "up 41 points from the first reading". */
+  percentileDelta: (direction: "up" | "down", amount: string) => string;
+  /** PercentileTrace no-change clause, e.g. "unchanged from the first reading". */
+  percentileFlat: string;
+  /** PercentileTrace band-movement clause, e.g. "moved above the middle half". */
+  percentileBand: (
+    movement:
+      | "roseAbove"
+      | "fellBelow"
+      | "enteredMiddle"
+      | "heldAbove"
+      | "heldMiddle"
+      | "heldBelow",
+  ) => string;
+  /** PercentileTrace reading announcement, e.g. "week 6: p68". (percentile-trace). */
+  percentileTraceAt: (unit: string, index: number, value: string) => string;
 }
 
 /** The S1 series subset — what `describeSeries` and series-chart interactive

@@ -132,7 +132,7 @@ export function Hypnogram(props: HypnogramProps): React.ReactNode {
             height={height - 1}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

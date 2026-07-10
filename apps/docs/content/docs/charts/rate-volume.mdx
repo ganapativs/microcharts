@@ -13,6 +13,12 @@ remove the bars: a rate without its denominator is the lie this type exists to p
   sizeOf="rate-volume"
   code={`import { RateVolume } from "@microcharts/react/rate-volume";
 
+const periods = [
+{ rate: 0.023, volume: 220 }, { rate: 0.025, volume: 190 }, { rate: 0.028, volume: 160 },
+{ rate: 0.029, volume: 130 }, { rate: 0.031, volume: 110 }, { rate: 0.034, volume: 90 },
+{ rate: 0.036, volume: 66 }, { rate: 0.041, volume: 38 },
+];
+
 <RateVolume data={periods} minVolume={50} title="Conversion rate" />`}
 >
   <RateVolume
@@ -54,7 +60,15 @@ remove the bars: a rate without its denominator is the lie this type exists to p
 
 <LiveDemo
   label="low-volume flag + step"
-  code={`<RateVolume data={periods} minVolume={50} />
+  code={`const periods = [
+  { rate: 0.023, volume: 220 },
+  { rate: 0.028, volume: 160 },
+  { rate: 0.031, volume: 110 },
+  { rate: 0.036, volume: 66 },
+  { rate: 0.041, volume: 38 },
+];
+
+<RateVolume data={periods} minVolume={50} />
 <RateVolume data={periods} curve="step" />`}
 >
   <span className="inline-flex flex-col gap-1.5">
@@ -88,6 +102,70 @@ remove the bars: a rate without its denominator is the lie this type exists to p
     />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<RateVolume
+  data={[
+    { rate: 0.023, volume: 220 },
+    { rate: 0.041, volume: 38 },
+  ]}
+  format={{ style: "percent", maximumFractionDigits: 1 }}
+  volumeFormat={{ maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <RateVolume
+    data={[
+      { rate: 0.023, volume: 220 },
+      { rate: 0.041, volume: 38 },
+    ]}
+    format={{ style: "percent", maximumFractionDigits: 1 }}
+    volumeFormat={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="Localized rate"
+    width={180}
+    height={26}
+  />
+</LiveDemo>
+
+`format` and `volumeFormat` both take `Intl.NumberFormatOptions` and share the same `locale` —
+the rate label reads "4,1 %" and volumes group with a period ("3.800") under `de-DE`, matching
+that locale's own conventions rather than a hardcoded English format.
+
+## Edge cases
+
+<LiveDemo
+  label="a zero-volume period breaks the line"
+  code={`// no denominator, no rate — the line gaps rather than interpolating
+// across a period nothing was measured on
+<RateVolume data={[
+  { rate: 0.02, volume: 200 },
+  { rate: NaN, volume: 0 },
+  { rate: 0.03, volume: 180 },
+]} />`}
+>
+  <RateVolume
+    data={[
+      { rate: 0.02, volume: 200 },
+      { rate: Number.NaN, volume: 0 },
+      { rate: 0.03, volume: 180 },
+    ]}
+    format={{ style: "percent", maximumFractionDigits: 0 }}
+    title="Gap on zero volume"
+    width={140}
+    height={26}
+  />
+</LiveDemo>
+
+<LiveDemo label="empty data" code={`<RateVolume data={[]} title="No periods yet" />`}>
+  <RateVolume data={[]} title="No periods yet" width={140} height={26} />
+</LiveDemo>
+
+A period with zero (or non-finite) volume renders no bar and no rate mark, and the line
+gaps across it instead of interpolating through a period nothing was measured on — the
+interactive entry announces that period as **"no events"** rather than a rate. With no data
+at all, the chart renders an empty root and the accessible name says **"No data."**
 
 ## Four homes
 

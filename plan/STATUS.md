@@ -20,6 +20,11 @@
 
 ## Current position
 
+**PROPOSAL ROUND APPROVED (2026-07-10, user):** catalog expands 98 → 106 — specs in plan/26-proposal-round-charts.md, buildout in flight on `superaudit` (one agent per chart + serial wiring + full gate suite). Counts are registry-computed, so public numbers update automatically when the 8 register.
+
+**SUPERAUDIT COMPLETE (2026-07-10, branch `superaudit`)** — full-system audit/polish of all 98 charts + 98 docs pages in 5 gated passes (span reference standard + 4 waves of family agents). Prop contract v1 applied (plan/04 §8, 14 pre-release renames); width/cat ink-role system landed in styles.css; 13 missing visual specs added (98/98 coverage); 12 bench-floor reds fixed (optimization first, floors recalibrated to a documented 75%-of-quiet-measure method); 4 truncated pages authored; Edge-cases + Four homes + de-DE locale demos on the whole catalog; ~60 placeholder snippets literalized; 20+ real bugs fixed (see audit/CHANGELOG.md). ALL hard gates green incl. webkit/firefox smoke (CROSS_BROWSER=1). Near-duplicate/deferred flags in audit/CANDIDATES.md await the Checkpoint-3 review. Remaining CI-only: Argos baseline approval on the PR.
+
+
 **Phases 0 + 1 COMPLETE.** Checkpoint 0 + Checkpoint 1 passed.
 
 **Phases 0 + 1 + 2 COMPLETE.** Checkpoints 0, 1, 2 all passed. Phase 2 shipped the five charts each with static + `/interactive` entries, SparkGroup shared scale, and the bench harness — 167 tests, `pnpm check`/size/publint/attw/visual/RSC all green.
@@ -34,7 +39,7 @@
 
 **SCOPE DECISION 2026-07-08 (user):** the release-scope fork is resolved — **all 100 catalog types ship in `@microcharts/react` (single package, `@microcharts/expressive` cancelled) BEFORE launch** (96 planned + 4 research-verified additions 2026-07-08: MicroScatter #35, LikertStrip #36, IconArray Q21, ConfusionGrid F21 — plan/12 audit). Master plan [21-full-catalog-buildout.md](21-full-catalog-buildout.md); batch briefs plan/22–25; Checkpoint 3 + Phase 4 launch move after the buildout (Phase 3.75). Next execution front = **Batch 0** (plan/21 §6): docs registry refactor → size/stats generators → kernel additions → shipped-five hardening/variant pass.
 
-Pending one-time account setup (unblocks release/visual workflows): npmjs Trusted Publisher for `@microcharts/react`, `ARGOS_TOKEN` secret.
+Account setup: npmjs Trusted Publisher **CONFIGURED + WORKING** (0.1.0 published via OIDC 2026-07-09, run 29033491214). Still pending: `ARGOS_TOKEN` secret (visual.yml uploads).
 
 **RESOLVED (2026-07-08, user):** sparkline **3.35/4.35 kB approved as a documented flagship exception** to the 3/4 kB hard caps (long-series guard + `label="minmax"` on the densest chart; trim ledger in plan/12). Recorded in `scripts/size-budgets.json` `$exception` + plan/21 §1. Standard caps stay law for every other chart.
 

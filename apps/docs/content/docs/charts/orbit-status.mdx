@@ -79,6 +79,49 @@ say plainly not to read the angle.
   </span>
 </LiveDemo>
 
+<LiveDemo
+  label="locale — the ms gutter numeral and the summary both follow it"
+  code={`<OrbitStatus
+  latency={1240}
+  rate={12}
+  latencyDomain={[0, 2000]}
+  rateDomain={[0, 20]}
+  label="latency"
+  locale="de-DE"
+/>`}
+>
+  <OrbitStatus
+    latency={1240}
+    rate={12}
+    latencyDomain={[0, 2000]}
+    rateDomain={[0, 20]}
+    label="latency"
+    locale="de-DE"
+    title="Localized latency"
+    size={40}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="unknown latency — gray, no satellite, no spin"
+  code={`<OrbitStatus latency={NaN} rate={5} title="Unreachable" />`}
+>
+  <OrbitStatus latency={NaN} rate={5} title="Unreachable" size={40} />
+</LiveDemo>
+
+<LiveDemo
+  label="idle service — zero rate draws a solid, dash-free orbit"
+  code={`<OrbitStatus latency={90} rate={0} latencyDomain={[0, 500]} rateDomain={[0, 20]} />`}
+>
+  <OrbitStatus latency={90} rate={0} latencyDomain={[0, 500]} rateDomain={[0, 20]} size={40} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="orbit-status" />
+
 ## Why this default
 
 The dash-density static encoding exists because a paused satellite says nothing — the still frame had to

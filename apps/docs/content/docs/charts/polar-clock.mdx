@@ -13,7 +13,11 @@ rhythm of a metric across the cycle is immediately legible.
   sizeOf="polar-clock"
   code={`import { PolarClock } from "@microcharts/react/polar-clock";
 
-const byHour = [/* 24 values, midnight → 23:00 */];
+// 24 hourly values, midnight → 23:00
+const byHour = [
+80, 81, 82, 83, 20, 85, 86, 87, 88, 89, 90, 91, 92, 93, 312, 95, 96, 97, 98, 99, 100, 101, 102,
+103,
+];
 
 <PolarClock data={byHour} now={14} title="Traffic by hour" />`}
 >
@@ -44,20 +48,51 @@ const byHour = [/* 24 values, midnight → 23:00 */];
 ## Variants
 
 <LiveDemo
-  label="cardinal ticks, or opacity mode for tiny sizes"
-  code={`<PolarClock data={byHour} labels label="max" />
+  label="the peak numeral, or opacity mode for tiny sizes"
+  code={`const byHour = Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h));
+const week = [120, 200, 180, 210, 260, 90, 60];
+
+<PolarClock data={byHour} label="max" />
 <PolarClock data={week} mode="opacity" />`}
 >
   <span className="inline-flex gap-6 items-center">
     <PolarClock
       data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h))}
-      labels
       label="max"
       size={64}
       summary={false}
     />
     <PolarClock data={[120, 200, 180, 210, 260, 90, 60]} mode="opacity" size={56} summary={false} />
   </span>
+</LiveDemo>
+
+<LiveDemo
+  label="ticks off — pattern-only reads where the axis doesn't matter"
+  code={`const byHour = Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h));
+
+<PolarClock data={byHour} labels={false} />`}
+>
+  <PolarClock
+    data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h))}
+    labels={false}
+    size={64}
+    summary={false}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale — the peak numeral and the summary both follow it"
+  code={`const byHour = Array.from({ length: 24 }, (_, h) => (h === 14 ? 1240 : h === 4 ? 20 : 80 + h));
+
+<PolarClock data={byHour} label="max" locale="de-DE" />`}
+>
+  <PolarClock
+    data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 1240 : h === 4 ? 20 : 80 + h))}
+    label="max"
+    locale="de-DE"
+    title="Localized peak"
+    size={64}
+  />
 </LiveDemo>
 
 ## Why this default
@@ -69,6 +104,32 @@ wedges. Bars are always zero-anchored at that baseline. For very small sizes whe
 judge, `mode="opacity"` switches the channel to a five-step fill — a radial `ActivityGrid` — which is a
 deliberate, named change of encoding, not a cosmetic one. A `null` segment leaves a gap (the baseline
 ring shows the hole) because missing is not the same as zero.
+
+The four cardinal ticks default **on** because a bare ring of bars is rotationally ambiguous — without
+a mark for "12 o'clock" there is no way to tell where the cycle starts, so "when is it busy" can't be
+answered from the static frame alone. The four ticks are merged into one path (a single node), so the
+orientation cue is free of the usual label-drop-out tradeoff — set `labels={false}` only when the shape
+itself is the whole story and the axis genuinely doesn't matter.
+
+## Edge cases
+
+<LiveDemo
+  label="all-null cycle"
+  code={`<PolarClock data={Array(24).fill(null)} title="No data yet" />`}
+>
+  <PolarClock data={Array(24).fill(null)} title="No data yet" size={56} />
+</LiveDemo>
+
+<LiveDemo
+  label="flat cycle — every hour equal"
+  code={`<PolarClock data={Array(24).fill(50)} title="Steady" />`}
+>
+  <PolarClock data={Array(24).fill(50)} title="Steady" size={56} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="polar-clock" />
 
 ## Accessibility
 

@@ -73,6 +73,29 @@ component refuses to tell.
   <PictogramRow value={3} total={5} shape="square" title="Squares" width={90} height={18} />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="zero total" code={`<PictogramRow value={3} total={0} title="No capacity" />`}>
+  <PictogramRow value={3} total={0} title="No capacity" width={90} height={18} />
+</LiveDemo>
+
+<LiveDemo label="negative value" code={`<PictogramRow value={-2} total={4} title="Deficit" />`}>
+  <PictogramRow value={-2} total={4} title="Deficit" width={90} height={18} />
+</LiveDemo>
+
+<LiveDemo
+  label="overflow — value past the total"
+  code={`<PictogramRow value={9} total={8} title="Over capacity" />`}
+>
+  <PictogramRow value={9} total={8} title="Over capacity" width={90} height={18} />
+</LiveDemo>
+
+A `total` of 0 (or non-finite) draws nothing and the summary is "No data." — there is no
+meaningful row to count. A negative value renders every unit hollow, and the summary
+still states the true number ("-2 of 4.") rather than clamping to 0. A value past the
+total fills every unit — never more than `total` units drawn — but the summary keeps the
+honest count ("9 of 8.") with a dev-time warning, so the overflow is never hidden.
+
 ## Four homes
 
 <FourContexts slug="pictogram-row" />

@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
+import type { EmptyCellStyle } from "../../core/types.js";
 import { honeycombGeometry } from "./geometry.js";
 
 export interface HoneycombProps {
@@ -17,11 +18,13 @@ export interface HoneycombProps {
   total?: number | undefined;
   /** Rows: a number, or `auto` (near-square). `1` = a strip. */
   rows?: number | "auto" | undefined;
-  /** Empty cells: `outline` (default) or `dim` (filled, for dark surfaces). */
-  empty?: "outline" | "dim" | undefined;
+  /** Empty cells: `"outline"` (default hairline ring) or `"blank"` (nothing
+   *  drawn — GardenGrid's pattern). Shared `EmptyCellStyle` (plan/04 §8). */
+  empty?: EmptyCellStyle | undefined;
   /** Noun for the summary (e.g. "seats"). */
   unit?: string | undefined;
-  cellR?: number | undefined;
+  /** Hex outer radius (circumradius) in viewBox units. Default 4. */
+  cell?: number | undefined;
   color?: string | undefined;
   format?: Format | undefined;
   locale?: string | string[] | undefined;
@@ -59,7 +62,7 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
     rows = "auto",
     empty = "outline",
     unit = "",
-    cellR = 4,
+    cell = 4,
     color,
     format,
     locale,
@@ -74,7 +77,7 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
 
   if (total > 60) devWarn("<Honeycomb> over 60 cells stops being countable — use Progress.");
 
-  const geo = honeycombGeometry({ total, value, rows, cellR, pad: PAD });
+  const geo = honeycombGeometry({ total, value, rows, cellR: cell, pad: PAD });
   const accName =
     summary === false
       ? false
@@ -91,17 +94,10 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
       className={className ? `mc-honeycomb ${className}` : "mc-honeycomb"}
       style={style}
     >
-      {/* empty cells */}
-      {geo.emptyPath ? (
-        empty === "dim" ? (
-          <path d={geo.emptyPath} data-mc-ink="fill" />
-        ) : (
-          <path
-            d={geo.emptyPath}
-            data-mc-ink="muted"
-            style={{ fill: "none", strokeOpacity: 0.75 }}
-          />
-        )
+      {/* empty cells — "blank" draws nothing (GardenGrid's pattern); "outline"
+          is a quiet hairline ring, fill:none already comes from the role */}
+      {geo.emptyPath && empty !== "blank" ? (
+        <path d={geo.emptyPath} data-mc-ink="muted" strokeOpacity={0.75} />
       ) : null}
       {/* filled cells */}
       {geo.filledPath ? <path d={geo.filledPath} style={{ fill }} /> : null}

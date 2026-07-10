@@ -163,7 +163,7 @@ export function EventRaster(props: EventRasterProps): React.ReactNode {
             fill="none"
             stroke="var(--mc-accent)"
             strokeOpacity={0.5}
-            strokeWidth={0.75}
+            data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
@@ -174,7 +174,7 @@ export function EventRaster(props: EventRasterProps): React.ReactNode {
             y1={0.5}
             y2={height - 0.5}
             data-mc-ink="muted"
-            strokeWidth={0.75}
+            data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

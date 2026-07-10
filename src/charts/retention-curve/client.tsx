@@ -142,7 +142,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
               x2={p.x}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
-              strokeWidth={1}
+              data-mc-w="support"
               strokeDasharray="1.5 2"
               vectorEffect="non-scaling-stroke"
             />
@@ -152,7 +152,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
               r={2.4}
               fill="none"
               stroke="var(--mc-accent)"
-              strokeWidth={1}
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
             {p.benchY !== null ? (
@@ -163,7 +163,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
                 r={1.5}
                 fill="none"
                 stroke="var(--mc-neutral)"
-                strokeWidth={0.8}
+                data-mc-w="tick"
                 vectorEffect="non-scaling-stroke"
               />
             ) : null}

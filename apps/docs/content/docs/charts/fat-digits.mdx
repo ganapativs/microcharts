@@ -57,6 +57,49 @@ never the primary read: it is ordinal and coarse, and the number is right there.
   </span>
 </LiveDemo>
 
+`format` also takes `Intl.NumberFormatOptions` — the numeral itself follows the locale's own
+grouping and decimal marks.
+
+<LiveDemo
+  label="locale"
+  code={`<FatDigits
+  value={12040}
+  domain={[0, 20000]}
+  format={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <FatDigits
+    value={12040}
+    domain={[0, 20000]}
+    format={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
+    locale="de-DE"
+    fontSize={18}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="no domain — middle tier"
+  code={`// without a domain a lone number has no tier to sit in, so it
+// renders at the middle weight rather than implying a magnitude it can't know
+<FatDigits value={1204} />`}
+>
+  <FatDigits value={1204} fontSize={18} />
+</LiveDemo>
+
+<LiveDemo label="non-finite value" code={`<FatDigits value={Number.NaN} domain={[0, 2100]} />`}>
+  <FatDigits value={Number.NaN} domain={[0, 2100]} fontSize={18} title="Missing" />
+</LiveDemo>
+
+A non-finite value renders nothing (no numeral, no weight) and reports **"No data."** rather than
+guessing a tier.
+
+## Four homes
+
+<FourContexts slug="fat-digits" />
+
 ## Why this default
 
 Value mode with five tiers is the default because scanning a column is the use case, and five is the
@@ -71,7 +114,7 @@ about two effective tiers.
 
 ## Accessibility
 
-The accessible name is the exact value and its tier — **"1,204 — tier 4 of 5."** — and in digit mode
+The accessible name is the exact value and its tier — **"1,204 — tier 3 of 5."** — and in digit mode
 just the number, since each digit carries its own weight. The interactive entry eases the weight to
 its new tier on variable fonts (it snaps otherwise) with no layout shift, and announces the value and
 tier through a polite live region.

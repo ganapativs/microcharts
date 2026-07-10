@@ -14,6 +14,8 @@ area (the ring illusion), so read the thicknesses, not the wedges; exact per-per
   sizeOf="tree-rings"
   code={`import { TreeRings } from "@microcharts/react/tree-rings";
 
+const years = [8, 12, 10, 18, 22, 15, 20, 14];
+
 <TreeRings data={years} unit="years" periodWord="year" title="Account age" />`}
 >
   <TreeRings data={[8, 12, 10, 18, 22, 15, 20, 14]} label="last" unit="years" periodWord="year" title="Account age" size={40} />
@@ -44,7 +46,9 @@ area (the ring illusion), so read the thicknesses, not the wedges; exact per-per
 
 <LiveDemo
   label="filled annuli + cohort age (total)"
-  code={`<TreeRings data={years} rings="fill" />
+  code={`const years = [8, 12, 10, 18, 22, 15, 20, 14];
+
+<TreeRings data={years} rings="fill" />
 <TreeRings data={years} total={200} />`}
 >
   <span className="inline-flex gap-6 items-center">
@@ -52,6 +56,36 @@ area (the ring illusion), so read the thicknesses, not the wedges; exact per-per
     <TreeRings data={[8, 12, 10, 18, 22, 15, 20, 14]} total={200} size={44} />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="locale — the last-value label and the summary both follow it"
+  code={`<TreeRings data={[820, 1240, 990, 1810]} label="last" locale="de-DE" />`}
+>
+  <TreeRings
+    data={[820, 1240, 990, 1810]}
+    label="last"
+    locale="de-DE"
+    title="Localized growth"
+    size={44}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="a zero-value period collapses cleanly, it isn't padded to a minimum ring"
+  code={`<TreeRings data={[8, 12, 0, 18, 22]} title="A flat quarter" />`}
+>
+  <TreeRings data={[8, 12, 0, 18, 22]} title="A flat quarter" size={44} />
+</LiveDemo>
+
+<LiveDemo label="no data yet" code={`<TreeRings data={[]} title="New account" />`}>
+  <TreeRings data={[]} title="New account" size={44} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="tree-rings" />
 
 ## Why this default
 

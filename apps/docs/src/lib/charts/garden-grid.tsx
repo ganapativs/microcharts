@@ -46,15 +46,19 @@ export const entry: ChartEntry = {
     },
     {
       name: "empty",
-      type: '"ring" | "blank"',
+      type: '"outline" | "blank"',
       required: false,
-      description: "How zero cells render (default ring).",
+      description: "How zero cells render (default outline).",
     },
   ],
   demo: WEEKS,
   example: {
     title: "Activity",
-    code: `import { GardenGrid } from "${PKG}/garden-grid";\n\n<GardenGrid data={weeks} title="Activity" unit="weeks" />`,
+    code: `import { GardenGrid } from "${PKG}/garden-grid";
+
+const weeks = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26];
+
+<GardenGrid data={weeks} title="Activity" unit="weeks" />`,
   },
 };
 
@@ -71,7 +75,13 @@ export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "rows", label: "rows", min: 1, max: 7, step: 1, init: 7 },
     { kind: "segmented", key: "steps", label: "steps", options: ["5", "3"], init: "5" },
-    { kind: "segmented", key: "empty", label: "empty", options: ["ring", "blank"], init: "ring" },
+    {
+      kind: "segmented",
+      key: "empty",
+      label: "empty",
+      options: ["outline", "blank"],
+      init: "outline",
+    },
   ],
   data: WEEKS,
   render: (_s, data) => (
@@ -79,7 +89,7 @@ export const playground: PlaygroundSpec = {
       data={data}
       rows={_s.rows as number}
       steps={Number(_s.steps) as 3 | 5}
-      empty={_s.empty as "ring" | "blank"}
+      empty={_s.empty as "outline" | "blank"}
       summary={false}
       cell={12}
     />
@@ -90,7 +100,7 @@ export const playground: PlaygroundSpec = {
       "  data={weeks}",
       s.rows !== 7 && `  rows={${s.rows}}`,
       s.steps !== "5" && `  steps={${s.steps}}`,
-      s.empty !== "ring" && `  empty="${s.empty}"`,
+      s.empty !== "outline" && `  empty="${s.empty}"`,
       "/>",
     ]
       .filter(Boolean)
@@ -100,12 +110,16 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "strip mode for a table cell",
-    code: `<GardenGrid data={weeks} rows={1} />`,
+    code: `const weeks = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9];
+
+<GardenGrid data={weeks} rows={1} />`,
     node: <GardenGrid data={WEEKS.slice(0, 12)} rows={1} summary={false} cell={9} />,
   },
   {
     label: "empty='blank' for sparse data",
-    code: `<GardenGrid data={weeks} empty="blank" />`,
+    code: `const weeks = ${JSON.stringify(WEEKS)};
+
+<GardenGrid data={weeks} empty="blank" />`,
     node: <GardenGrid data={WEEKS} empty="blank" summary={false} cell={9} />,
   },
 ];

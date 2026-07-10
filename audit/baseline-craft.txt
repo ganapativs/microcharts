@@ -1,0 +1,3 @@
+$ node tests/craft/matrix.mjs
+611 configs, 0 with issues
+

@@ -31,8 +31,8 @@ describe("<TapeGauge> (plan/25 §19, plan/17 F1)", () => {
     const { container } = draw(
       <TapeGauge value={142} rate={2} zones={ZONES} span={25} height={64} />,
     );
-    // chevron path uses accent stroke
-    expect(container.querySelector('path[stroke="var(--mc-accent)"]')).not.toBeNull();
+    // chevron path uses the accent ink role (element-split: strokes on path)
+    expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
   });
 
   it("no rate → no rate clause", () => {

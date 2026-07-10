@@ -83,9 +83,52 @@ aspect ratio.
   />
 </LiveDemo>
 
+<LiveDemo
+  label="locale"
+  code={`<SparkBar data={[4200, 6100, 2800, 8600]} label="last" locale="de-DE" />`}
+>
+  <SparkBar
+    data={[4200, 6100, 2800, 8600]}
+    width={130}
+    height={32}
+    label="last"
+    locale="de-DE"
+    title="Localized"
+  />
+</LiveDemo>
+
+The endpoint label and accessible summary both follow `format`/`locale` — 8600 reads "8.600"
+under `de-DE` rather than the English "8,600".
+
+## Edge cases
+
+<LiveDemo label="empty data" code={`<SparkBar data={[]} title="No deploys yet" />`}>
+  <SparkBar data={[]} title="No deploys yet" width={100} height={32} />
+</LiveDemo>
+
+<LiveDemo label="single bar" code={`<SparkBar data={[6]} title="One deploy" />`}>
+  <SparkBar data={[6]} title="One deploy" width={40} height={32} />
+</LiveDemo>
+
+An empty series renders no bars and an accessible name that says so, rather than a flat or
+invented baseline. A single value still renders as one zero-anchored bar — `winloss` mode
+treats it the same way a longer streak would: a lone win, loss, or tie.
+
 ## Four homes
 
 <FourContexts slug="sparkbar" />
+
+## Why this default
+
+Bars, not a line, because SparkBar's job is discrete magnitudes — deploy counts, daily
+totals — where each period is its own thing, not a sampled point on a continuous curve.
+Zero-anchored always: a bar whose length doesn't start at zero misstates its magnitude.
+`winloss` mode goes further and discards magnitude entirely on purpose, collapsing each
+value to a three-state streak (win above the mid-line, loss below, tie a thin dash on it)
+because for a streak, sign is the whole story and a magnitude axis would just be noise.
+Sign is doubled by position AND color everywhere signed data appears, so direction survives
+forced-colors and never depends on color alone. The endpoint bar gets accent emphasis by
+default — "how did the run end" is usually the first question a streak answers.
 
 ## Accessibility
 

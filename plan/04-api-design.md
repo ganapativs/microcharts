@@ -90,3 +90,18 @@ Interactive adds (same grammar extension on every chart): `onPointFocus`, `hover
 - No `<ResponsiveContainer>` wrappers, no `<ChartProvider>` requirement, no context needed for the base case.
 - No axis/legend/tooltip subcomponents to assemble — direct labels replace all three at micro scale.
 - No prop that exists only to undo a bad default.
+
+## 8. Amendment — prop contract v1 rulings (2026-07-10, superaudit checkpoint 1)
+
+User-approved (audit/FOUNDATION.md on branch `superaudit`; full audit in audit/reports/prop-contract.md). Library is unreleased, so these renames land now; post-release they would be breaking.
+
+1. **`animate` is not a prop.** §1's sketch predates the static-first split: motion ships only in `…/interactive` client entries + CSS (reduced-motion-gated), server output is static. The grammar's motion family is the *entry choice*, not a boolean.
+2. **`highlight` addresses a datum by index/label everywhere.** Charts that emphasized a raw domain *value* (histogram-strip, rug-strip) rename that prop to `markValue`.
+3. **`emphasis` is reserved for structural units** (a lane/state/boundary: event-raster, hypnogram, partition-strip, trace-fold, ensemble-ghosts). `accent` props fold into `highlight` (datum) or `emphasis` (structure) — no third name.
+4. **Denominators:** `total` for discrete counts (icon-array `of`→`total`, tally-marks `max`→`total`); `max` survives only on Progress (continuous goal).
+5. **Enum-over-boolean for shared names:** wind-barb `label` and percentile-ladder/star-spoke `dots` become string enums matching the family vocabulary.
+6. **Name collisions resolved:** volume-profile `side`→`align`; depth-wedge `range`→`levels`.
+7. **Empty-cell vocabulary:** one shared `EmptyCellStyle = "outline" | "blank"` (garden-grid, honeycomb).
+8. **Grid sizing:** cell-grid charts share `cell`/`gap` (calendar-strip gains them; honeycomb `cellR`→`cell`, documented as the hex outer radius).
+9. **Domains are `readonly [number, number]` everywhere**; shared `Orientation` type in core; single-series charts take gap-aware `Value[]` unless nulls are semantically impossible (justified in the chart's geometry header). heartbeat-blip's timestamp array renames `data`→`events`.
+10. **Stroke width roles:** marks carry `data-mc-w="support" | "tick" | "hair"` (⅔ / ½ / ⅓ of `--mc-stroke-width`) instead of literal secondary widths, so presets and `prefers-contrast` scale whole charts. Literal widths remain only for justified geometric strokes.

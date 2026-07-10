@@ -13,6 +13,19 @@ little data render open and faded, so a confident-looking dot is never backed by
   sizeOf="calibration-strip"
   code={`import { CalibrationStrip } from "@microcharts/react/calibration-strip";
 
+const reliability = [
+{ predicted: 0.05, observed: 0.05, count: 100 },
+{ predicted: 0.15, observed: 0.16, count: 90 },
+{ predicted: 0.25, observed: 0.24, count: 80 },
+{ predicted: 0.35, observed: 0.36, count: 70 },
+{ predicted: 0.45, observed: 0.44, count: 60 },
+{ predicted: 0.55, observed: 0.56, count: 50 },
+{ predicted: 0.65, observed: 0.63, count: 40 },
+{ predicted: 0.7, observed: 0.52, count: 30 },
+{ predicted: 0.85, observed: 0.83, count: 8 },
+{ predicted: 0.95, observed: 0.9, count: 5 },
+];
+
 <CalibrationStrip data={reliability} title="Model calibration" />`}
 >
   <CalibrationStrip
@@ -57,7 +70,19 @@ little data render open and faded, so a confident-looking dot is never backed by
 
 ## Variants
 
-<LiveDemo label="deviation bars" code={`<CalibrationStrip data={reliability} variant="bars" />`}>
+<LiveDemo
+  label="deviation bars"
+  code={`<CalibrationStrip
+  data={[
+    { predicted: 0.1, observed: 0.08, count: 90 },
+    { predicted: 0.3, observed: 0.36, count: 70 },
+    { predicted: 0.5, observed: 0.44, count: 55 },
+    { predicted: 0.7, observed: 0.52, count: 30 },
+    { predicted: 0.9, observed: 0.85, count: 8 },
+  ]}
+  variant="bars"
+/>`}
+>
   <CalibrationStrip
     data={[
       { predicted: 0.1, observed: 0.08, count: 90 },
@@ -72,6 +97,87 @@ little data render open and faded, so a confident-looking dot is never backed by
     height={40}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<CalibrationStrip
+  data={[
+    { predicted: 0.2, observed: 0.21, count: 40 },
+    { predicted: 0.5, observed: 0.44, count: 30 },
+    { predicted: 0.7, observed: 0.52, count: 30 },
+  ]}
+  locale="de-DE"
+/>`}
+>
+  <CalibrationStrip
+    data={[
+      { predicted: 0.2, observed: 0.21, count: 40 },
+      { predicted: 0.5, observed: 0.44, count: 30 },
+      { predicted: 0.7, observed: 0.52, count: 30 },
+    ]}
+    locale="de-DE"
+    title="Localized probabilities"
+    width={200}
+    height={36}
+  />
+</LiveDemo>
+
+Nothing visible changes with `locale` — this chart draws no numerals. It localizes the announced
+numbers: with `locale="de-DE"` the accessible name above reads "3 bins; largest gap at 0,7
+predicted (observed 0,52); 0 low-support bins." — the locale's own decimal mark, not "0.7".
+
+## Edge cases
+
+<LiveDemo
+  label="well calibrated"
+  code={`<CalibrationStrip
+  data={[
+    { predicted: 0.2, observed: 0.21, count: 25 },
+    { predicted: 0.4, observed: 0.39, count: 25 },
+    { predicted: 0.6, observed: 0.63, count: 25 },
+    { predicted: 0.8, observed: 0.79, count: 25 },
+  ]}
+/>`}
+>
+  <CalibrationStrip
+    data={[
+      { predicted: 0.2, observed: 0.21, count: 25 },
+      { predicted: 0.4, observed: 0.39, count: 25 },
+      { predicted: 0.6, observed: 0.63, count: 25 },
+      { predicted: 0.8, observed: 0.79, count: 25 },
+    ]}
+    title="Well calibrated"
+    width={200}
+    height={36}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="every bin low-support"
+  code={`// each bin's count sits under the default minSupport (max(10, 2% of total))
+<CalibrationStrip
+  data={[
+    { predicted: 0.3, observed: 0.2, count: 3 },
+    { predicted: 0.6, observed: 0.7, count: 4 },
+    { predicted: 0.9, observed: 0.6, count: 3 },
+  ]}
+/>`}
+>
+  <CalibrationStrip
+    data={[
+      { predicted: 0.3, observed: 0.2, count: 3 },
+      { predicted: 0.6, observed: 0.7, count: 4 },
+      { predicted: 0.9, observed: 0.6, count: 3 },
+    ]}
+    title="Sparse bins"
+    width={200}
+    height={36}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="calibration-strip" />
 
 ## Why this default
 

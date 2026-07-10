@@ -38,7 +38,7 @@ describe("<EventRaster> (plan/25 §5, plan/17 F18)", () => {
 
   it("emphasis accents one lane", () => {
     const { container } = draw(<EventRaster data={RASTER} emphasis="db" width={160} height={24} />);
-    expect(container.querySelector('path[stroke="var(--mc-accent)"]')).not.toBeNull();
+    expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
   });
 
   it("is axe-clean", async () => {

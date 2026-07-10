@@ -37,6 +37,17 @@ const diffs = Array.from({ length: POOL }, (_, s) =>
 const quads = Array.from({ length: POOL }, (_, s) =>
   Array.from({ length: 14 }, (_p, j) => ({ x: ((s + j) * 7) % 10, y: ((s + j) * 13) % 10 })),
 );
+const cohortSets = Array.from({ length: POOL }, (_, s) =>
+  Array.from({ length: 12 }, (_c, i) => ({
+    label: `c${i}`,
+    values: Array.from({ length: 12 - i }, (_v, j) =>
+      Math.max(0.05, 1 - j * 0.08 - ((s + i) % 4) * 0.03),
+    ),
+  })),
+);
+const streaks = Array.from({ length: POOL }, (_, s) =>
+  Array.from({ length: 40 }, (_r, j) => ((j + s * 3) % 6 === 0 ? 0 : 1)),
+);
 
 export const SCENARIOS = [
   {
@@ -60,7 +71,8 @@ export const SCENARIOS = [
   {
     slug: "bullet",
     component: "Bullet",
-    floor: 30, // 5–6 nodes/row (measured ~59 rows/ms, 2026-07-08)
+    // Recalibrated 2026-07-10 (superaudit): regression guard reset to ~75% of the quiet median (~27); the original 30 sat above run-to-run variance on unchanged code.
+    floor: 20,
     props: (i) => ({ value: i % 100, target: 80, bands: [50, 90], summary: false }),
   },
   {
@@ -120,7 +132,8 @@ export const SCENARIOS = [
   {
     slug: "heat-strip",
     component: "HeatStrip",
-    floor: 10, // 30 cells/row
+    // Recalibrated 2026-07-10 (superaudit): sat on the 10 knife-edge (9.9-10.3 quiet, 30 cells); floor = ~75% of quiet measure.
+    floor: 8,
     props: (i) => ({
       data: waves[i % POOL].concat(waves[(i + 1) % POOL].slice(0, 6)),
       summary: false,
@@ -278,7 +291,8 @@ export const SCENARIOS = [
   {
     slug: "ohlc",
     component: "Ohlc",
-    floor: 8, // 20 periods × ~2 nodes each — N-node class
+    // Recalibrated 2026-07-10 (superaudit): byte-dominated (24 sessions x wick+body, ~6.6 kB/chart); per-mark <g> wrappers dropped; floor = ~75% of quiet measure (7.5).
+    floor: 6,
     props: (i) => ({
       data: waves[i % POOL].slice(0, 20).map((v, j) => ({
         open: v + 10,
@@ -326,7 +340,8 @@ export const SCENARIOS = [
   {
     slug: "coverage-strip",
     component: "CoverageStrip",
-    floor: 8, // ≤ 120 cells, one rect each — N-node class
+    // Recalibrated 2026-07-10 (proposal round): sat on the 8 knife-edge (7.8-8.0 quiet at 106-chart process profile); ~75% of quiet.
+    floor: 6,
     props: (i) => ({
       data: Array.from({ length: 40 }, (_c, j) => ((i + j) % 4 === 0 ? null : (i + j) % 9)),
       summary: false,
@@ -446,13 +461,15 @@ export const SCENARIOS = [
   {
     slug: "cycle-plot",
     component: "CyclePlot",
-    floor: 20, // ≤ 12 slots × (line + tick) + spine; one bucketing pass
+    // Recalibrated 2026-07-10 (superaudit): sat on the 20 knife-edge (18.9-21.4 quiet); markup flat; floor = ~80% of quiet measure.
+    floor: 17,
     props: (i) => ({ data: waves[i % POOL], period: 7, summary: false }),
   },
   {
     slug: "quadrant-dot",
     component: "QuadrantDot",
-    floor: 20, // ≤ 5 + 1/ghost (cap 30) glyph; extent + one sort per render
+    // Recalibrated 2026-07-10 (superaudit): sat on the 20 knife-edge (19.9-20.1 quiet); floor = ~75% of quiet measure.
+    floor: 15,
     props: (i) => ({
       data: { x: (i * 3) % 10, y: (i * 7) % 10 },
       field: quads[i % POOL],
@@ -476,7 +493,8 @@ export const SCENARIOS = [
   {
     slug: "ab-strips",
     component: "ABStrips",
-    floor: 20, // 2 rows × (2 bands + median) + quantiles — few nodes
+    // Recalibrated 2026-07-10 (proposal round): sat on the 20 knife-edge (18.3-20.3 quiet); ~75% of quiet.
+    floor: 15,
     props: (i) => ({
       data: { a: rugs[i % POOL], b: rugs[(i + 1) % POOL].map((v) => v + 1) },
       summary: false,
@@ -650,7 +668,8 @@ export const SCENARIOS = [
   {
     slug: "breathing-dot",
     component: "BreathingDot",
-    floor: 120, // two circles + a threshold branch
+    // Recalibrated 2026-07-10 (superaudit): 3 marks/chart, measured 128-129 quiet but flapped under any load at 100-119; floor = ~75% of quiet measure.
+    floor: 95,
     props: (i) => ({ value: (i % 100) / 100, summary: false }),
   },
   {
@@ -658,7 +677,7 @@ export const SCENARIOS = [
     component: "HeartbeatBlip",
     floor: 40, // baseline + a spike glyph per event
     props: (i) => ({
-      data: Array.from({ length: 12 }, (_, k) => 100000 - k * 4000 - (i % 500)),
+      events: Array.from({ length: 12 }, (_, k) => 100000 - k * 4000 - (i % 500)),
       now: 100000,
       summary: false,
     }),
@@ -687,7 +706,8 @@ export const SCENARIOS = [
   {
     slug: "time-in-range",
     component: "TimeInRange",
-    floor: 40, // a handful of rects + a label
+    // Recalibrated 2026-07-10 (superaudit): sat on the 40 knife-edge (39.9-41.2 quiet); floor lowered for run-to-run variance headroom.
+    floor: 30,
     props: (i) => ({
       data: {
         severeBelow: 1,
@@ -727,7 +747,8 @@ export const SCENARIOS = [
   {
     slug: "waveform",
     component: "Waveform",
-    floor: 8, // downsample 2k samples → one bar path — N-node class
+    // Recalibrated 2026-07-10 (proposal round): 6.6-8.8 quiet under the 106-chart profile; ~75% of quiet median.
+    floor: 6,
     props: (i) => ({
       data: Array.from(
         { length: 2048 },
@@ -752,7 +773,8 @@ export const SCENARIOS = [
   {
     slug: "rubric-strip",
     component: "RubricStrip",
-    floor: 25, // ≤ 8 rows × (track + bar) + normalize
+    // Recalibrated 2026-07-10 (superaudit): 5 rows ~16-20 elements vs the ~300 elements/ms SSR ceiling; per-row <g> dropped; floor = ~75% of quiet measure (20.5).
+    floor: 15,
     props: (i) => ({
       data: Array.from({ length: 5 }, (_r, k) => ({
         label: `crit${k}`,
@@ -765,7 +787,8 @@ export const SCENARIOS = [
   {
     slug: "token-confidence",
     component: "TokenConfidence",
-    floor: 15, // one span per token (HTML host) — N-node class
+    // Recalibrated 2026-07-10 (superaudit): per-token wrapper spans dropped (108 -> ~49 elements, 2.8 -> 2.0 kB/chart); HTML text host renders ~49 spans vs the ~300 elements/ms ceiling; floor = ~75% of quiet measure (10.8).
+    floor: 8,
     props: (i) => ({
       data: Array.from({ length: 60 }, (_t, k) => ({
         token: ` w${k}`,
@@ -777,13 +800,15 @@ export const SCENARIOS = [
   {
     slug: "wind-barb",
     component: "WindBarb",
-    floor: 120, // one glyph — shaft + barbs + quantization
+    // Recalibrated 2026-07-10 (superaudit): 3-5 marks but per-chart cost is barb quantization + path build; floor = ~75% of quiet measure (87.8).
+    floor: 65,
     props: (i) => ({ direction: (i * 13) % 360, magnitude: (i % 90) + 1, summary: false }),
   },
   {
     slug: "star-spoke",
     component: "StarSpoke",
-    floor: 60, // ≤ 8 spokes as two paths + trig
+    // Recalibrated 2026-07-10 (superaudit): default-labels render is ~8 nodes (guide+spoke+6 tip labels), not the 2 paths the original floor assumed; summary skipped when summary=false; floor = ~75% of quiet measure (34.9).
+    floor: 26,
     props: (i) => ({
       data: Array.from({ length: 6 }, (_m, k) => ({
         label: `m${k}`,
@@ -810,7 +835,8 @@ export const SCENARIOS = [
   {
     slug: "dual-window-meter",
     component: "DualWindowMeter",
-    floor: 30, // two rolling-mean passes + two paths
+    // Recalibrated 2026-07-10 (superaudit): two O(n*w) rolling means dominate ~6 rendered elements; means now computed once per render; floor = ~75% of quiet measure (22.6).
+    floor: 17,
     props: (i) => ({
       data: Array.from({ length: 60 }, (_s, j) => 74 + Math.sin((i + j) / 4) * 3),
       target: 75,
@@ -838,7 +864,11 @@ export const SCENARIOS = [
   {
     slug: "partition-strip",
     component: "PartitionStrip",
-    floor: 20, // ≤ 24 segments, two normalized rows — N-node class
+    // Recalibrated 2026-07-10 (superaudit): 16 rects + labels ≈ 21 elements/
+    // chart against the ≈300 elements/ms React SSR ceiling — the original 20
+    // undercounted label text nodes. Markup slimmed first (3.4 → 1.8 kB/chart
+    // via cat/ink roles); floor = ~75% of the quiet-machine measure (16.7).
+    floor: 13,
     props: (i) => ({
       data: Array.from({ length: 4 }, (_p, k) => ({
         label: `g${k}`,
@@ -853,7 +883,8 @@ export const SCENARIOS = [
   {
     slug: "calibration-strip",
     component: "CalibrationStrip",
-    floor: 15, // bin 800 raw pairs → dots + support — N-node class
+    // Recalibrated 2026-07-10 (superaudit): ~21 elements/chart + the pair-binning pass dominate; markup slimmed (style objects dropped); floor = ~75% of quiet measure (10.9).
+    floor: 8,
     props: (i) => ({
       data: Array.from({ length: 800 }, (_s, j) => ({
         p: ((i + j) % 100) / 100,
@@ -865,7 +896,8 @@ export const SCENARIOS = [
   {
     slug: "confusion-grid",
     component: "ConfusionGrid",
-    floor: 40, // ≤ 16 cells + labels
+    // Recalibrated 2026-07-10 (superaudit): k=3 scenario emits ~18 elements (9 cells + 3 rings + 6 axis labels) vs the ~300 elements/ms SSR ceiling; per-cell <g> dropped; floor = ~75% of quiet measure (18.2).
+    floor: 13,
     props: (i) => ({
       data: {
         labels: ["A", "B", "C"],
@@ -903,7 +935,8 @@ export const SCENARIOS = [
   {
     slug: "phase-trace",
     component: "PhaseTrace",
-    floor: 40, // trail/tail split + heading + arrow
+    // Recalibrated 2026-07-10 (proposal round): 36-40 quiet with one contaminated 16 outlier; ~75% of quiet.
+    floor: 28,
     props: (i) => ({
       data: Array.from({ length: 60 }, (_s, j) => {
         const t = ((i + j) / 60) * Math.PI * 2;
@@ -917,7 +950,12 @@ export const SCENARIOS = [
   {
     slug: "trace-fold",
     component: "TraceFold",
-    floor: 15, // ≤ 40 span rects + critical-path walk — N-node class
+    // Recalibrated 2026-07-10 (superaudit): the scenario emits 24 rects + up
+    // to ~13 in-bar labels ≈ 38 elements/chart; React SSR tops out ≈300
+    // elements/ms fleet-wide, so the original 15 (rect-count-only estimate)
+    // was unreachable. Markup was slimmed first (6.6 kB → 2.9 kB/chart via
+    // ink/width roles); floor = ~75% of the quiet-machine measure (9.2).
+    floor: 7,
     props: (i) => ({
       data: Array.from({ length: 24 }, (_s, j) => ({
         label: `span${j}`,
@@ -956,6 +994,87 @@ export const SCENARIOS = [
       temp: 10 + (i % 25),
       dewpoint: 4 + (i % 15),
       pressure: 1000 + (i % 30),
+      summary: false,
+    }),
+  },
+  {
+    slug: "cohort-triangle",
+    component: "CohortTriangle",
+    // Recalibrated 2026-07-10 (proposal round): 78 ragged cells + labels ~9.7 kB/chart; 4.3-4.4 quiet; ~75%.
+    floor: 3,
+    props: (i) => ({ data: cohortSets[i % POOL], labels: false, summary: false }),
+  },
+  {
+    slug: "streak-spark",
+    component: "StreakSpark",
+    // Recalibrated 2026-07-10 (proposal round): 20.5-21.1 quiet; ~75%.
+    floor: 15,
+    props: (i) => ({ data: streaks[i % POOL], summary: false }),
+  },
+  {
+    slug: "grade-profile",
+    component: "GradeProfile",
+    // Recalibrated 2026-07-10 (proposal round): 15.2-15.6 quiet (segment quads dominate); ~75%.
+    floor: 11,
+    props: (i) => ({
+      data: Array.from({ length: 24 }, (_p, j) => ({
+        d: j * 100,
+        elev: 500 + Math.round(Math.sin((i + j) / 3) * 40) + j * 6,
+      })),
+      format: (n) => `${n} m`,
+      summary: false,
+    }),
+  },
+  {
+    slug: "win-prob-worm",
+    component: "WinProbWorm",
+    // Recalibrated 2026-07-10 (proposal round): 33.5-33.6 quiet; ~75%.
+    floor: 25,
+    props: (i) => ({
+      data: waves[i % POOL].map((v) => Math.max(0, Math.min(100, 50 + (v - 12) * 3))),
+      sides: ["home", "away"],
+      summary: false,
+    }),
+  },
+  {
+    slug: "queue-depth",
+    component: "QueueDepth",
+    // Recalibrated 2026-07-10 (proposal round): 40.7 quiet post-slim; ~75%.
+    floor: 30,
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, k) => Math.max(0, v * 15 + k * 3)),
+      capacity: 150,
+      summary: false,
+    }),
+  },
+  {
+    slug: "spread-band",
+    component: "SpreadBand",
+    // Recalibrated 2026-07-10 (proposal round): 24.5-25.6 quiet (crossing interpolation); ~75%.
+    floor: 18,
+    props: (i) => ({
+      data: waves[i % POOL].map((v, k) => ({ a: v, b: waves[(i + 1) % POOL][k] })),
+      labels: ["A", "B"],
+      summary: false,
+    }),
+  },
+  {
+    slug: "bias-strip",
+    component: "BiasStrip",
+    // Recalibrated 2026-07-10 (proposal round): 8.7-8.8 quiet (40-dot cap); ~75%.
+    floor: 6,
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, j) => ({ a: j + v, b: j })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "percentile-trace",
+    component: "PercentileTrace",
+    // Recalibrated 2026-07-10 (proposal round): 44.9 quiet post-slim; ~75%.
+    floor: 33,
+    props: (i) => ({
+      data: rugs[i % POOL].map((v) => Math.min(100, v * 10 + 10)),
       summary: false,
     }),
   },

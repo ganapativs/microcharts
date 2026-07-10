@@ -9,7 +9,7 @@ export function InteractiveDemo() {
     <DemoPanel hint="Hover for the nearest observation; arrow keys walk them in sorted order with rank readouts.">
       <RugStripInteractive
         data={FIELD}
-        highlight={62}
+        markValue={62}
         title="Response times"
         width={260}
         height={24}

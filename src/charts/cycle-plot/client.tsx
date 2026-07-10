@@ -168,7 +168,7 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
             fill="var(--mc-accent)"
             fillOpacity={0.08}
             stroke="var(--mc-accent)"
-            strokeWidth={0.6}
+            data-mc-w="hair"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

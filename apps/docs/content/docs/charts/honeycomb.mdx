@@ -15,7 +15,7 @@ is exactly two SVG paths (filled and empty) no matter how large the total.
 
 <Honeycomb value={34} total={40} unit="seats" title="Occupancy" />`}
 >
-  <Honeycomb value={34} total={40} unit="seats" title="Occupancy" cellR={6} />
+  <Honeycomb value={34} total={40} unit="seats" title="Occupancy" cell={6} />
 </LiveDemo>
 
 ## Install
@@ -42,25 +42,47 @@ is exactly two SVG paths (filled and empty) no matter how large the total.
 ## Variants
 
 <LiveDemo
-  label="strip mode + dim empties"
+  label="strip mode + blank empties"
   code={`<Honeycomb value={7} total={10} rows={1} />
-<Honeycomb value={28} total={40} empty="dim" />`}
+<Honeycomb value={28} total={40} empty="blank" />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <Honeycomb value={7} total={10} rows={1} cellR={6} />
-    <Honeycomb value={28} total={40} empty="dim" cellR={5} />
+    <Honeycomb value={7} total={10} rows={1} cell={6} />
+    <Honeycomb value={28} total={40} empty="blank" cell={5} />
   </span>
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="value = 0" code={`<Honeycomb value={0} total={12} unit="seats" />`}>
+  <Honeycomb value={0} total={12} unit="seats" title="Empty" cell={6} />
+</LiveDemo>
+
+<LiveDemo
+  label="value past total — fills every cell, the name keeps the true count"
+  code={`<Honeycomb value={45} total={40} unit="seats" />`}
+>
+  <Honeycomb value={45} total={40} unit="seats" title="Overbooked" cell={6} />
+</LiveDemo>
+
+<LiveDemo label="total = 0 — 'No data.'" code={`<Honeycomb value={0} total={0} />`}>
+  <Honeycomb value={0} total={0} title="No capacity" cell={6} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="honeycomb" />
 
 ## Why this default
 
 Outline empties are the default because takenness must survive grayscale — a filled cell versus an
-outlined cell reads without color. Auto packing is the default because a near-square honeycomb is the
-recognizable form. The unit is the cell, and its size never changes with value — the count varies, the
-geometry doesn't — which is what keeps this honest area-filling _occupancy_, distinct from a
-`PictogramRow` counting unlike things. Above sixty cells, unit counting stops being countable, so the
-chart refuses and the docs steer to `Progress`: refusing is the feature. A value past the total fills
-every cell, but the accessible name still states the true number — occupancy is never silently
+outlined cell reads without color. `empty="blank"` drops the empty cells entirely instead of dimming
+them, for surfaces where the outline reads as noise. Auto packing is the default because a near-square
+honeycomb is the recognizable form. The unit is the cell, and its size never changes with value — the
+count varies, the geometry doesn't — which is what keeps this honest area-filling _occupancy_, distinct
+from a `PictogramRow` counting unlike things. Above sixty cells, unit counting stops being countable, so
+the chart refuses and the docs steer to `Progress`: refusing is the feature. A value past the total
+fills every cell, but the accessible name still states the true number — occupancy is never silently
 clipped.
 
 ## Accessibility

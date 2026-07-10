@@ -25,7 +25,7 @@ export const entry: ChartEntry = {
   props: [
     { name: "value", type: "number", required: true, description: "The rate, 0–1." },
     {
-      name: "of",
+      name: "total",
       type: "10 | 20 | 100",
       required: false,
       description: "Denominator / grid size (default 20).",
@@ -46,23 +46,23 @@ export const entry: ChartEntry = {
   demo: [3],
   example: {
     title: "Adverse events",
-    code: `import { IconArray } from "${PKG}/icon-array";\n\n<IconArray value={0.15} of={20} title="Adverse events" />`,
+    code: `import { IconArray } from "${PKG}/icon-array";\n\n<IconArray value={0.15} total={20} title="Adverse events" />`,
   },
 };
 
 export function Preview() {
-  return <IconArray value={0.15} of={20} summary={false} width={110} height={26} />;
+  return <IconArray value={0.15} total={20} summary={false} width={110} height={26} />;
 }
 
 export const showcase = {
   hint: "countable rate",
-  Node: () => <IconArray value={0.15} of={20} title="Adverse events" width={120} height={28} />,
+  Node: () => <IconArray value={0.15} total={20} title="Adverse events" width={120} height={28} />,
 };
 
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "pct", label: "rate %", min: 0, max: 100, step: 1, init: 15 },
-    { kind: "segmented", key: "of", label: "of", options: ["10", "20", "100"], init: "20" },
+    { kind: "segmented", key: "total", label: "total", options: ["10", "20", "100"], init: "20" },
     {
       kind: "segmented",
       key: "label",
@@ -79,12 +79,12 @@ export const playground: PlaygroundSpec = {
     },
   ],
   render: (s) => {
-    const of = Number(s.of) as 10 | 20 | 100;
-    const tall = of === 100;
+    const total = Number(s.total) as 10 | 20 | 100;
+    const tall = total === 100;
     return (
       <IconArray
         value={(s.pct as number) / 100}
-        of={of}
+        total={total}
         label={s.label as "ratio" | "percent" | "none"}
         shape={s.shape as "square" | "round" | "dot"}
         summary={false}
@@ -97,7 +97,7 @@ export const playground: PlaygroundSpec = {
     [
       "<IconArray",
       `  value={${((s.pct as number) / 100).toFixed(2)}}`,
-      s.of !== "20" && `  of={${s.of}}`,
+      s.total !== "20" && `  total={${s.total}}`,
       s.label !== "ratio" && `  label="${s.label}"`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       "/>",
@@ -109,14 +109,14 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "1 in 10 framing",
-    code: `<IconArray value={0.1} of={10} />`,
-    node: <IconArray value={0.1} of={10} summary={false} width={110} height={26} />,
+    code: `<IconArray value={0.1} total={10} />`,
+    node: <IconArray value={0.1} total={10} summary={false} width={110} height={26} />,
   },
   {
     label: "risk polarity",
-    code: `// fewer is better → filled units read as the risk\n<IconArray value={0.15} of={20} positive="down" />`,
+    code: `// fewer is better → filled units read as the risk\n<IconArray value={0.15} total={20} positive="down" />`,
     node: (
-      <IconArray value={0.15} of={20} positive="down" summary={false} width={110} height={26} />
+      <IconArray value={0.15} total={20} positive="down" summary={false} width={110} height={26} />
     ),
   },
 ];
@@ -125,7 +125,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
   return (
     <IconArray
       value={(props.data[0] ?? 3) / 20}
-      of={20}
+      total={20}
       summary={false}
       width={props.width ?? 100}
       height={props.height ?? 24}
@@ -134,7 +134,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 }
 
 export function markCode(): string {
-  return `<IconArray value={0.15} of={20} />`;
+  return `<IconArray value={0.15} total={20} />`;
 }
 
 export default {

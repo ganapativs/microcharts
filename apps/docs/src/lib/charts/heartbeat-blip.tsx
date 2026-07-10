@@ -32,7 +32,7 @@ export const entry: ChartEntry = {
   ],
   props: [
     {
-      name: "data",
+      name: "events",
       type: "number[]",
       required: true,
       description: "Event timestamps (ms).",
@@ -59,17 +59,17 @@ export const entry: ChartEntry = {
   demo: BUSY,
   example: {
     title: "Liveness",
-    code: `import { HeartbeatBlip } from "${PKG}/heartbeat-blip";\n\n// pass 'now' from your data layer — never Date.now() in a server render\n<HeartbeatBlip data={eventTimestamps} now={serverNow} title="Requests" />`,
+    code: `import { HeartbeatBlip } from "${PKG}/heartbeat-blip";\n\n// pass 'now' from your data layer — never Date.now() in a server render\n<HeartbeatBlip events={eventTimestamps} now={serverNow} title="Requests" />`,
   },
 };
 
 export function Preview() {
-  return <HeartbeatBlip data={BUSY} now={NOW} summary={false} width={80} />;
+  return <HeartbeatBlip events={BUSY} now={NOW} summary={false} width={80} />;
 }
 
 export const showcase = {
   hint: "alive?",
-  Node: () => <HeartbeatBlip data={BUSY} now={NOW} title="Requests" width={90} />,
+  Node: () => <HeartbeatBlip events={BUSY} now={NOW} title="Requests" width={90} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -79,7 +79,7 @@ export const playground: PlaygroundSpec = {
   ],
   render: (s) => (
     <HeartbeatBlip
-      data={Array.from({ length: s.count as number }, (_, k) => NOW - k * 4200 - 2000)}
+      events={Array.from({ length: s.count as number }, (_, k) => NOW - k * 4200 - 2000)}
       now={NOW}
       label={s.label as "none" | "count"}
       summary={false}
@@ -89,7 +89,7 @@ export const playground: PlaygroundSpec = {
   code: (s) =>
     [
       "<HeartbeatBlip",
-      "  data={eventTimestamps}",
+      "  events={eventTimestamps}",
       "  now={serverNow}",
       s.label !== "none" && `  label="${s.label}"`,
       "/>",
@@ -101,13 +101,13 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "a 5-minute window",
-    code: `<HeartbeatBlip data={events} window={5 * 60_000} now={serverNow} />`,
-    node: <HeartbeatBlip data={BUSY} window={300_000} now={NOW} summary={false} width={100} />,
+    code: `<HeartbeatBlip events={events} window={5 * 60_000} now={serverNow} />`,
+    node: <HeartbeatBlip events={BUSY} window={300_000} now={NOW} summary={false} width={100} />,
   },
   {
     label: "flatline is the down signal (never a fake pulse)",
-    code: `<HeartbeatBlip data={[]} now={serverNow} />`,
-    node: <HeartbeatBlip data={[]} now={NOW} summary={false} width={100} />,
+    code: `<HeartbeatBlip events={[]} now={serverNow} />`,
+    node: <HeartbeatBlip events={[]} now={NOW} summary={false} width={100} />,
   },
 ];
 
@@ -115,7 +115,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
   const n = props.data.length ? (Math.abs(Math.round(props.data[0]!)) % 8) + 1 : 6;
   return (
     <HeartbeatBlip
-      data={Array.from({ length: n }, (_, k) => NOW - k * 5000 - 2000)}
+      events={Array.from({ length: n }, (_, k) => NOW - k * 5000 - 2000)}
       now={NOW}
       summary={false}
       width={props.width ?? 60}
@@ -125,7 +125,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 }
 
 export function markCode(): string {
-  return `<HeartbeatBlip data={events} now={serverNow} />`;
+  return `<HeartbeatBlip events={events} now={serverNow} />`;
 }
 
 export default {

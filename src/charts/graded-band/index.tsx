@@ -152,24 +152,28 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           style={{ fill: color ?? "var(--mc-accent)", fillOpacity: OPACITY(b.step, k) }}
         />
       ))}
+      {/* median tick — the "data" ink role IS this mark exactly: no fill,
+          data-ink stroke at the full primary width */}
       <line
         x1={geo.median.x}
         y1={geo.bandY - 0.5}
         x2={geo.median.x}
         y2={geo.bandY + geo.bandH + 0.5}
-        stroke="var(--mc-stroke)"
+        data-mc-ink="data"
         vectorEffect="non-scaling-stroke"
-        style={{ strokeWidth: "var(--mc-stroke-width)" }}
       />
       {geo.dot ? (
-        // the observed value is a distinct hollow ring, never confused with the tick
+        // the observed value is a distinct hollow ring, never confused with the
+        // tick — fill stays the literal surface token (punches through the
+        // band beneath it, so the "data" ink role's forced fill:none doesn't
+        // fit); width alone moves to a role
         <circle
           cx={geo.dot.x}
           cy={round2(height / 2)}
           r={1.8}
           fill="var(--mc-surface)"
           stroke="var(--mc-stroke)"
-          strokeWidth={1}
+          data-mc-w="support"
         />
       ) : null}
       {showLabel ? (

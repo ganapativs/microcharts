@@ -134,9 +134,9 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
         <path
           d={geo.ghost.d}
           data-mc-ink="muted"
+          data-mc-w="support"
           fill="none"
           strokeDasharray="2.5 2"
-          strokeWidth={1}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -150,7 +150,7 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
           stroke="var(--mc-neutral)"
           strokeOpacity={0.5}
           strokeDasharray="1 1.5"
-          strokeWidth={0.6}
+          data-mc-w="hair"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}

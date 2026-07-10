@@ -70,6 +70,47 @@ lying by occlusion, and duplicates are never jittered: position is the encoding.
   />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="empty" code={`<MicroScatter data={[]} title="No pairs" />`}>
+  <MicroScatter data={[]} title="No pairs" style={{ width: 100, height: 60 }} />
+</LiveDemo>
+
+<LiveDemo
+  label="fewer than 3 points — no relationship claim"
+  code={`<MicroScatter data={[{ x: 1, y: 2 }, { x: 2, y: 3 }]} title="Two points" />`}
+>
+  <MicroScatter
+    data={[
+      { x: 1, y: 2 },
+      { x: 2, y: 3 },
+    ]}
+    title="Two points"
+    style={{ width: 100, height: 60 }}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="a coincident pair"
+  code={`<MicroScatter data={[{ x: 5, y: 5 }, { x: 5, y: 5 }, { x: 1, y: 8 }]} />`}
+>
+  <MicroScatter
+    data={[
+      { x: 5, y: 5 },
+      { x: 5, y: 5 },
+      { x: 1, y: 8 },
+    ]}
+    title="Overlapping pair"
+    style={{ width: 100, height: 60 }}
+  />
+</LiveDemo>
+
+Empty data draws just the frame with "No data." as the summary. Under 3 points (or a
+zero-variance cloud) states the count and stops — no correlation claim without enough
+evidence to back it. Coincident points are never jittered apart: they overlap exactly,
+and at 75% dot opacity the overlap itself reads as extra density rather than hiding a
+point.
+
 ## Four homes
 
 <FourContexts slug="micro-scatter" />
@@ -85,7 +126,7 @@ points, or a zero-variance cloud, makes no claim at all.
 ## Accessibility
 
 The accessible name is the count plus the evidence-backed relationship — **"24 points.
-Strong positive relationship (r 0.9)."** — or just **"2 points."** when no claim is
+Strong positive relationship (r 0.93)."** — or just **"2 points."** when no claim is
 honest. The interactive entry steps points ordered by x and announces each formatted
 pair.
 

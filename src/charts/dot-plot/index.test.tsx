@@ -49,7 +49,7 @@ describe("<DotPlot> (plan/22 #10, S2)", () => {
   it("highlight accents one category's dot", () => {
     const { container } = draw(<DotPlot data={DATA} highlight="Sam" />);
     const dots = [...container.querySelectorAll("circle")];
-    expect((dots[2] as SVGElement).style.fill).toBe("var(--mc-accent)");
+    expect((dots[2] as SVGElement).getAttribute("data-mc-ink")).toBe("accent");
   });
 
   it("labels drop deterministically with density (values < 8-unit rows, categories < 7.5)", () => {

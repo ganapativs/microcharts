@@ -173,7 +173,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
             x2={px}
             y2={height}
             stroke="var(--mc-accent)"
-            strokeWidth={0.8}
+            data-mc-w="tick"
             strokeDasharray="1.5 1.5"
             vectorEffect="non-scaling-stroke"
           />

@@ -13,10 +13,21 @@ to min–max so tail quantiles are never fiction.
   sizeOf="benchmark-strip"
   code={`import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
 
+// 42 peer latencies (ms)
+const peerLatencies = [
+180, 201, 237, 286, 341, 396, 443, 394, 412, 413, 398, 372, 340, 310, 205,
+196, 205, 230, 271, 322, 378, 347, 391, 421, 434, 430, 412, 383, 268, 239,
+221, 218, 231, 261, 306, 275, 331, 382, 422, 447, 455, 447,
+];
+
 <BenchmarkStrip data={peerLatencies} value={312} title="Latency vs peers" />`}
 >
   <BenchmarkStrip
-    data={Array.from({ length: 42 }, (_, i) => 180 + Math.round(220 * Math.sin(i / 5) ** 2) + (i % 7) * 12)}
+    data={[
+      180, 201, 237, 286, 341, 396, 443, 394, 412, 413, 398, 372, 340, 310, 205, 196, 205, 230,
+      271, 322, 378, 347, 391, 421, 434, 430, 412, 383, 268, 239, 221, 218, 231, 261, 306, 275,
+      331, 382, 422, 447, 455, 447,
+    ]}
     value={312}
     title="Latency vs peers"
     width={240} height={16}
@@ -48,8 +59,16 @@ to min–max so tail quantiles are never fiction.
 
 <LiveDemo
   label="range + label"
-  code={`<BenchmarkStrip data={peers} value={300} range="minmax" />
-<BenchmarkStrip data={peers} value={312} label="value" />`}
+  code={`<BenchmarkStrip data={[210, 260, 300, 340, 410]} value={300} range="minmax" />
+
+// 42 peer latencies (ms)
+const peerLatencies = [
+180, 201, 237, 286, 341, 396, 443, 394, 412, 413, 398, 372, 340, 310, 205,
+196, 205, 230, 271, 322, 378, 347, 391, 421, 434, 430, 412, 383, 268, 239,
+221, 218, 231, 261, 306, 275, 331, 382, 422, 447, 455, 447,
+];
+
+<BenchmarkStrip data={peerLatencies} value={312} label="value" />`}
 >
   <span className="inline-flex flex-col gap-1.5">
     <BenchmarkStrip
@@ -61,10 +80,11 @@ to min–max so tail quantiles are never fiction.
       height={14}
     />
     <BenchmarkStrip
-      data={Array.from(
-        { length: 42 },
-        (_, i) => 180 + Math.round(220 * Math.sin(i / 5) ** 2) + (i % 7) * 12,
-      )}
+      data={[
+        180, 201, 237, 286, 341, 396, 443, 394, 412, 413, 398, 372, 340, 310, 205, 196, 205, 230,
+        271, 322, 378, 347, 391, 421, 434, 430, 412, 383, 268, 239, 221, 218, 231, 261, 306, 275,
+        331, 382, 422, 447, 455, 447,
+      ]}
       value={312}
       label="value"
       title="Value label"
@@ -73,3 +93,104 @@ to min–max so tail quantiles are never fiction.
     />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<BenchmarkStrip
+  data={[1080, 1180, 1220, 1360, 1440]}
+  value={1240}
+  label="value"
+  format={{ maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <BenchmarkStrip
+    data={[1080, 1180, 1220, 1360, 1440]}
+    value={1240}
+    label="value"
+    format={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="Localized value"
+    width={200}
+    height={16}
+  />
+</LiveDemo>
+
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, both the right-gutter label and
+the accessible summary's numbers follow that locale's own grouping and decimal marks: the value
+above reads "1.240" in German, not "1,240".
+
+## Edge cases
+
+<LiveDemo
+  label="n < 8 auto-falls back to min–max"
+  code={`// tail quantiles (p5/p95) would be fiction below 8 points — the strip
+// switches to min–max automatically, even with the default range prop
+<BenchmarkStrip data={[210, 260, 300, 340, 410]} value={300} />`}
+>
+  <BenchmarkStrip
+    data={[210, 260, 300, 340, 410]}
+    value={300}
+    title="5 peers"
+    width={200}
+    height={16}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="all peers equal"
+  code={`<BenchmarkStrip data={[50, 50, 50, 50, 50, 50, 50, 50]} value={52} />`}
+>
+  <BenchmarkStrip
+    data={[50, 50, 50, 50, 50, 50, 50, 50]}
+    value={52}
+    title="Flat cohort"
+    width={200}
+    height={16}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="value outside a fixed domain"
+  code={`// with an explicit domain, a value beyond it clamps to the edge and draws
+// a small directional wedge instead of running off the strip
+<BenchmarkStrip
+  data={[180, 250, 300, 350, 420]}
+  value={520}
+  domain={[150, 400]}
+/>`}
+>
+  <BenchmarkStrip
+    data={[180, 250, 300, 350, 420]}
+    value={520}
+    domain={[150, 400]}
+    title="Clamped"
+    width={200}
+    height={16}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="benchmark-strip" />
+
+## Why this default
+
+Bands come from the peers' own empirical quantiles, never a fitted distribution — the strip
+never implies a normal curve that the data doesn't back up. There is no axis: the band itself
+is the reference frame, so the focal dot's position against it is the whole read. Below 8 peers,
+tail quantiles (p5/p95) are statistically unreliable, so the outer band falls back to the
+observed min–max automatically — a deliberate honesty trade the `range` prop can also force at
+any sample size. A value that falls outside the plotted domain clamps to the edge and draws a
+small wedge rather than silently disappearing.
+
+## Accessibility
+
+The accessible name states the value, its percentile, the peer count, and the middle-half
+interval — **"312 — 43rd percentile of 42 peers (middle half 244.5–408.5)."** A flat cohort
+states it plainly instead: "52 — all 8 peers at 50." The interactive entry roves the five
+quantile edges with ←/→, announcing each edge's name and value (e.g. "p75: 408.5.").
+
+## Props
+
+<PropTable slug="benchmark-strip" />

@@ -7,15 +7,16 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_GARDEN, type GardenStrings } from "../../core/strings-garden.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
-import { isFiniteValue, type Value } from "../../core/types.js";
+import { isFiniteValue, type EmptyCellStyle, type Value } from "../../core/types.js";
 import { gardenGridGeometry } from "./geometry.js";
 
 export interface GardenGridProps {
   data: readonly Value[];
   rows?: number | undefined;
   steps?: 3 | 5 | undefined;
-  /** How zero-value cells render (default ring). */
-  empty?: "ring" | "blank" | undefined;
+  /** How zero-value cells render (default `"outline"` — a quiet hairline ring;
+   *  shared `EmptyCellStyle` (plan/04 §8), same vocabulary as Honeycomb. */
+  empty?: EmptyCellStyle | undefined;
   domain?: readonly [number, number] | undefined;
   /** Noun for the summary count (default "periods"). */
   unit?: string | undefined;
@@ -57,7 +58,7 @@ export function GardenGrid(props: GardenGridProps): ReactNode {
     data,
     rows = 7,
     steps = 5,
-    empty = "ring",
+    empty = "outline",
     domain,
     unit = "periods",
     cell = 10,
@@ -104,7 +105,7 @@ export function GardenGrid(props: GardenGridProps): ReactNode {
               cy={c.cy}
               r={geo.rMax * 0.6}
               data-mc-ink="muted"
-              style={{ fill: "none", strokeOpacity: 0.55 }}
+              strokeOpacity={0.55}
             />
           );
         }

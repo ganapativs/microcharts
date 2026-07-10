@@ -151,9 +151,9 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           y1={0}
           x2={geo.cross.x}
           y2={height}
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
+          data-mc-w="hair"
           strokeOpacity={0.5}
-          strokeWidth={0.6}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -163,9 +163,9 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           y1={geo.cross.y}
           x2={width}
           y2={geo.cross.y}
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
+          data-mc-w="hair"
           strokeOpacity={0.5}
-          strokeWidth={0.6}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -178,7 +178,7 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           cy={g.y}
           r={ghostR}
           data-mc-ink="ghost"
-          style={{ fillOpacity: 0.42 }}
+          fillOpacity={0.42}
         />
       ))}
       {/* the focal item — accent, larger, on top, over a soft accent glow (a

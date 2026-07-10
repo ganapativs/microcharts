@@ -33,7 +33,7 @@ export interface MicroDonutProps {
   children?: ReactNode | undefined;
 }
 
-const CAT_TOKENS = ["--mc-cat-1", "--mc-cat-2", "--mc-cat-3", "--mc-cat-4"];
+const CAT_N = 4; // --mc-cat-1 … --mc-cat-4 via data-mc-cat roles
 
 export function MicroDonut(props: MicroDonutProps): ReactNode {
   const {
@@ -76,15 +76,10 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
     >
       {geo.wedges.map((w, i) => {
         const d = rolled[w.index]!;
-        return (
-          <path
-            key={w.index}
-            d={w.d}
-            style={{
-              fill:
-                d.members > 1 ? "var(--mc-neutral)" : `var(${CAT_TOKENS[i % CAT_TOKENS.length]})`,
-            }}
-          />
+        return d.members > 1 ? (
+          <path key={w.index} d={w.d} data-mc-ink="neutral" />
+        ) : (
+          <path key={w.index} d={w.d} data-mc-cat={(i % CAT_N) + 1} />
         );
       })}
       {children}

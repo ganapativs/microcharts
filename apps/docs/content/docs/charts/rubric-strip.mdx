@@ -13,7 +13,16 @@ bar, and none may be added — the type exists to resist collapsing quality into
   sizeOf="rubric-strip"
   code={`import { RubricStrip } from "@microcharts/react/rubric-strip";
 
-<RubricStrip data={criteria} target={0.7} title="Model eval" />`}
+<RubricStrip
+  data={[
+    { label: "Correctness", score: 0.92, weight: 3 },
+    { label: "Coverage", score: 0.78, weight: 2 },
+    { label: "Clarity", score: 0.65, weight: 1 },
+    { label: "Style", score: 0.41, weight: 1 },
+  ]}
+  target={0.7}
+  title="Model eval"
+/>`}
 >
   <RubricStrip
     data={[
@@ -52,7 +61,17 @@ bar, and none may be added — the type exists to resist collapsing quality into
 
 ## Variants
 
-<LiveDemo label="unweighted" code={`<RubricStrip data={checks} />`}>
+<LiveDemo
+  label="unweighted"
+  code={`<RubricStrip
+  data={[
+    { label: "Lint", score: 1 },
+    { label: "Types", score: 1 },
+    { label: "Tests", score: 0.8 },
+    { label: "Docs", score: 0.5 },
+  ]}
+/>`}
+>
   <RubricStrip
     data={[
       { label: "Lint", score: 1 },
@@ -66,6 +85,38 @@ bar, and none may be added — the type exists to resist collapsing quality into
   />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="score outside the domain clamps"
+  code={`// a score of 2 on a [0, 1] domain draws a full-length bar instead of
+// overflowing the track
+<RubricStrip data={[{ label: "Bonus", score: 2, weight: 1 }]} />`}
+>
+  <RubricStrip
+    data={[{ label: "Bonus", score: 2, weight: 1 }]}
+    title="Clamped"
+    width={200}
+    height={16}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="one criterion"
+  code={`<RubricStrip data={[{ label: "Overall fit", score: 0.83 }]} />`}
+>
+  <RubricStrip
+    data={[{ label: "Overall fit", score: 0.83 }]}
+    title="Single criterion"
+    width={200}
+    height={16}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="rubric-strip" />
+
 ## Why this default
 
 Weight-as-thickness keeps "importance" visible where a table hides it — a light criterion that
@@ -77,7 +128,7 @@ A `target` draws one honest pass line across every row instead.
 
 The accessible name names the extremes — **"4 criteria; highest Correctness (0.92), lowest Style
 (0.41)."** The interactive entry roves the criteria, announcing each one's score and its weight
-share of the total (**"Coverage: 0.78, weight 33% of total."**).
+share of the total (**"Coverage: 0.78, weight 29% of total."**).
 
 ## Props
 

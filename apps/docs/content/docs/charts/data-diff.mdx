@@ -13,7 +13,17 @@ must never look alike.
   sizeOf="data-diff"
   code={`import { DataDiff } from "@microcharts/react/data-diff";
 
-<DataDiff data={diff} title="Schema diff" />`}
+<DataDiff
+  data={[
+    { key: "users", added: 340, removed: 120 },
+    { key: "orders", added: 88, removed: 30 },
+    { key: "items", added: 40, removed: 20 },
+    { key: "tags", added: 24, removed: 8 },
+    { key: "notes", added: 12, removed: 6 },
+    { key: "flags", added: 8, removed: 3 },
+  ]}
+  title="Schema diff"
+/>`}
 >
   <DataDiff
     data={[
@@ -56,8 +66,23 @@ must never look alike.
 
 <LiveDemo
   label="key tags + net + totals"
-  code={`<DataDiff data={diff} labels />
-<DataDiff data={diff} net label="totals" />`}
+  code={`<DataDiff
+  data={[
+    { key: "users", added: 340, removed: 120 },
+    { key: "orders", added: 88, removed: 30 },
+    { key: "items", added: 40, removed: 20 },
+  ]}
+  labels
+/>
+<DataDiff
+  data={[
+    { key: "users", added: 340, removed: 120 },
+    { key: "orders", added: 88, removed: 30 },
+    { key: "items", added: 40, removed: 20 },
+  ]}
+  net
+  label="totals"
+/>`}
 >
   <span className="inline-flex gap-4">
     <DataDiff
@@ -83,6 +108,31 @@ must never look alike.
     />
   </span>
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="empty diff" code={`<DataDiff data={[]} />`}>
+  <DataDiff data={[]} title="No keys" width={100} height={24} />
+</LiveDemo>
+
+<LiveDemo
+  label="no changes anywhere"
+  code={`<DataDiff data={[{ key: "a", added: 0, removed: 0 }, { key: "b", added: 0, removed: 0 }]} />`}
+>
+  <DataDiff
+    data={[
+      { key: "a", added: 0, removed: 0 },
+      { key: "b", added: 0, removed: 0 },
+    ]}
+    title="No changes"
+    width={100}
+    height={24}
+  />
+</LiveDemo>
+
+An empty `data` array renders an empty chart and reports **"No data."** A non-empty diff where
+every key is 0/0 still draws its hairline placeholder ticks and reports **"No changes across 2
+keys."** — the keys are named even when nothing about them changed.
 
 ## Four homes
 

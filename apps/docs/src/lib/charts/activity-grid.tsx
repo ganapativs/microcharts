@@ -94,7 +94,13 @@ export const entry: ChartEntry = {
   demo: [0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3],
   example: {
     title: "Commits this month",
-    code: `import { ActivityGrid } from "${PKG}/activity-grid";\n\n<ActivityGrid data={commitCounts} title="Commits" />`,
+    code: `import { ActivityGrid } from "${PKG}/activity-grid";
+
+const commitCounts = [
+  0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3,
+];
+
+<ActivityGrid data={commitCounts} title="Commits" />`,
   },
 };
 

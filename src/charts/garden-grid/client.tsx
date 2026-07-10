@@ -104,7 +104,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
   const announced = !c
     ? ""
     : c.value === null
-      ? `${c.index + 1} of ${geo.cells.length}: no data.`
+      ? strings.gardenCellEmpty(c.index + 1, geo.cells.length)
       : strings.gardenCell(c.index + 1, geo.cells.length, fmt(c.value), c.step, steps);
 
   return (

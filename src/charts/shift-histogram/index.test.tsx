@@ -47,7 +47,8 @@ describe("<ShiftHistogram> (plan/23 #14)", () => {
     const { container } = draw(
       <ShiftHistogram data={{ before: BEFORE, after: AFTER }} width={160} />,
     );
-    expect(container.querySelectorAll('rect[data-mc-ink="bar"]').length).toBeGreaterThan(2);
+    expect(container.querySelectorAll('rect[data-mc-ink="neutral"]').length).toBeGreaterThan(2); // before
+    expect(container.querySelectorAll('rect[data-mc-ink="bar"]').length).toBeGreaterThan(2); // after
     expect(container.querySelector("line")).not.toBeNull(); // center + medians
   });
 

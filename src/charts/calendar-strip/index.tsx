@@ -65,6 +65,10 @@ export interface CalendarStripProps {
   shape?: CellShape | undefined;
   /** Explicit `[min, max]` for step bucketing; auto-fit when omitted. */
   domain?: readonly [number, number] | undefined;
+  /** Cell edge length in viewBox units (default 7 — grid-sibling parity with
+   *  ActivityGrid/GardenGrid; plan/04 §8). */
+  cell?: number | undefined;
+  gap?: number | undefined;
   color?: string | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
   locale?: string | string[] | undefined;
@@ -89,6 +93,8 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
     steps = 5,
     shape = "square",
     domain,
+    cell = CALENDAR_CELL,
+    gap = CALENDAR_GAP,
     color,
     strings = EN_CALENDAR,
     title,
@@ -108,14 +114,14 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
     entries: calendarEntries(data),
     domain,
     steps,
-    cell: CALENDAR_CELL,
-    gap: CALENDAR_GAP,
+    cell,
+    gap,
   });
   if (!geo) {
     devWarn("<CalendarStrip> unparseable `end` date.");
     return null;
   }
-  const mark = cellMetrics(CALENDAR_CELL, shape);
+  const mark = cellMetrics(cell, shape);
   const accName =
     summary === false
       ? false
@@ -131,8 +137,27 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
       className={className ? `mc-calendar ${className}` : "mc-calendar"}
       style={style}
     >
-      {geo.cells.map((c) =>
-        c.state === "future" ? null : (
+      {geo.cells.map((c) => {
+        if (c.state === "future") return null;
+        if (c.state === "empty")
+          // no-data: a visible hollow outline — never the invisible 8% band
+          // ("band" is reserved for true background bands); "muted" is the
+          // fill:none + neutral-stroke role this shape actually wants
+          return (
+            <rect
+              key={c.date}
+              x={c.x + mark.inset}
+              y={c.y + mark.inset}
+              width={c.size - mark.inset * 2}
+              height={c.size - mark.inset * 2}
+              rx={mark.rx}
+              shapeRendering={mark.crisp ? "crispEdges" : undefined}
+              data-mc-ink="muted"
+              data-mc-w="hair"
+              strokeOpacity={0.45}
+            />
+          );
+        return (
           <rect
             key={c.date}
             x={c.x + mark.inset}
@@ -141,26 +166,14 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
             height={c.size - mark.inset * 2}
             rx={mark.rx}
             shapeRendering={mark.crisp ? "crispEdges" : undefined}
-            data-mc-ink={c.state === "empty" ? "band" : "cell"}
-            style={
-              c.state === "empty"
-                ? // no-data: a visible hollow outline — never the invisible 8% band
-                  {
-                    fill: "none",
-                    stroke: "var(--mc-neutral)",
-                    strokeOpacity: 0.45,
-                    strokeWidth: 0.6,
-                  }
-                : {
-                    // a real zero must read as present-but-lowest, not vanish into
-                    // the 0.06 empty-track look (keeps "empty ≠ zero" legible)
-                    fillOpacity: c.state === "zero" ? 0.14 : stepOpacity(c.step ?? 0, steps),
-                    ...(color && c.state === "value" ? { fill: color } : null),
-                  }
-            }
+            data-mc-ink="cell"
+            // a real zero must read as present-but-lowest, not vanish into
+            // the 0.06 empty-track look (keeps "empty ≠ zero" legible)
+            fillOpacity={c.state === "zero" ? 0.14 : stepOpacity(c.step ?? 0, steps)}
+            style={color && c.state === "value" ? { fill: color } : undefined}
           />
-        ),
-      )}
+        );
+      })}
       {children}
     </Chart>
   );

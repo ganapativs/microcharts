@@ -49,11 +49,29 @@ export const entry: ChartEntry = {
       required: false,
       description: "A compliance corridor instead of one line.",
     },
+    {
+      name: "domain",
+      type: "[number, number]",
+      required: false,
+      description: "Fix the vertical scale instead of auto-fitting both traces.",
+    },
   ],
   demo: [-22],
   example: {
     title: "Loudness",
-    code: `import { DualWindowMeter } from "${PKG}/dual-window-meter";\n\n<DualWindowMeter data={samples} target={-23} format={{ maximumFractionDigits: 1 }} title="Loudness" />`,
+    code: `import { DualWindowMeter } from "${PKG}/dual-window-meter";
+
+const samples = Array.from(
+  { length: 60 },
+  (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0),
+);
+
+<DualWindowMeter
+  data={samples}
+  target={-23}
+  format={{ maximumFractionDigits: 1 }}
+  title="Loudness"
+/>`,
   },
 };
 

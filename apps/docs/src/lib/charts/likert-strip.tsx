@@ -58,7 +58,18 @@ export const entry: ChartEntry = {
   demo: SURVEY.map((d) => d.value),
   example: {
     title: "Q1 satisfaction",
-    code: `import { LikertStrip } from "${PKG}/likert-strip";\n\n<LikertStrip data={responses} title="Q1 satisfaction" />`,
+    code: `import { LikertStrip } from "${PKG}/likert-strip";
+
+<LikertStrip
+  data={[
+    { label: "Strongly disagree", value: 10 },
+    { label: "Disagree", value: 14 },
+    { label: "Neutral", value: 14 },
+    { label: "Agree", value: 34 },
+    { label: "Strongly agree", value: 28 },
+  ]}
+  title="Q1 satisfaction"
+/>`,
   },
 };
 

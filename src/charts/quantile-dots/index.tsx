@@ -138,9 +138,9 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
           y1={1}
           x2={geo.threshold.x}
           y2={height - 1}
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
+          data-mc-w="tick"
           strokeOpacity={0.6}
-          strokeWidth={0.7}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -154,7 +154,7 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
             r={d.r}
             data-mc-ink="flag"
             stroke="var(--mc-stroke)"
-            strokeWidth={0.5}
+            data-mc-w="hair"
             vectorEffect="non-scaling-stroke"
             style={color ? { fill: color } : undefined}
           />

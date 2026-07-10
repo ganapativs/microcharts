@@ -43,7 +43,7 @@ ways rings inflate progress, both removed. It is never a gauge: no needle, no re
 <LiveDemo
   label="sweep (countdown)"
   code={`// the REMAINING wedge shrinks — cooldown semantics
-<ProgressRing value={elapsed / total} sweep />`}
+<ProgressRing value={0.68} sweep />`}
 >
   <ProgressRing value={0.68} sweep size={40} title="Cooldown" style={{ width: 56, height: 56 }} />
 </LiveDemo>
@@ -54,6 +54,45 @@ ways rings inflate progress, both removed. It is never a gauge: no needle, no re
     weight={6}
     size={40}
     title="Thick ring"
+    style={{ width: 56, height: 56 }}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale — German percent spacing ('68 %', not '68%')"
+  code={`<ProgressRing value={0.68} label="percent" locale="de-DE" />`}
+>
+  <ProgressRing
+    value={0.68}
+    label="percent"
+    locale="de-DE"
+    title="Localized percent"
+    size={40}
+    style={{ width: 56, height: 56 }}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="past 100% — the ring clamps full, the label carries the true percent"
+  code={`<ProgressRing value={1.4} label="percent" title="Over budget" />`}
+>
+  <ProgressRing
+    value={1.4}
+    label="percent"
+    title="Over budget"
+    size={40}
+    style={{ width: 56, height: 56 }}
+  />
+</LiveDemo>
+
+<LiveDemo label="no data" code={`<ProgressRing value={NaN} label="percent" title="Unknown" />`}>
+  <ProgressRing
+    value={Number.NaN}
+    label="percent"
+    title="Unknown"
+    size={40}
     style={{ width: 56, height: 56 }}
   />
 </LiveDemo>

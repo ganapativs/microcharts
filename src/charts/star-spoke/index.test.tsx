@@ -36,8 +36,26 @@ describe("<StarSpoke> (plan/25 §9, plan/17 F11)", () => {
     expect(paths.every((d) => !d.includes("Z"))).toBe(true);
   });
 
+  it("a label that doesn't seat drops out cleanly instead of clamping into overlap", () => {
+    const { container } = draw(
+      <StarSpoke
+        data={[
+          { label: "Reliability", value: 0.9 },
+          { label: "Throughput", value: 0.6 },
+          { label: "Cost efficiency", value: 0.5 },
+        ]}
+        size={48}
+      />,
+    );
+    const labels = [...container.querySelectorAll('text[data-mc-ink="label"]')].map(
+      (t) => t.textContent,
+    );
+    // long labels at a small size don't all seat — none render squeezed/overlapping
+    expect(labels.length).toBeLessThan(3);
+  });
+
   it("dots render endpoint markers", () => {
-    const { container } = draw(<StarSpoke data={PROFILE} dots size={64} />);
+    const { container } = draw(<StarSpoke data={PROFILE} dots="tips" size={64} />);
     expect(container.querySelector('path[style*="--mc-accent"]')).not.toBeNull();
   });
 

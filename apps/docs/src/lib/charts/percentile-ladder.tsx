@@ -15,6 +15,17 @@ const LATENCY = Array.from({ length: 200 }, (_, i) =>
         ? 480 + ((i * 11) % 900)
         : 1500 + ((i * 13) % 800),
 );
+// literal (no undefined identifiers) source for the printed example snippet —
+// matches LATENCY's generator exactly
+const LATENCY_LITERAL = `Array.from({ length: 200 }, (_, i) =>
+    i < 130
+      ? 90 + (i % 50)
+      : i < 180
+        ? 150 + ((i * 7) % 320)
+        : i < 196
+          ? 480 + ((i * 11) % 900)
+          : 1500 + ((i * 13) % 800),
+  )`;
 
 export const entry: ChartEntry = {
   name: "PercentileLadder",
@@ -57,11 +68,23 @@ export const entry: ChartEntry = {
       required: false,
       description: "What the tick labels state.",
     },
+    {
+      name: "marks",
+      type: '"tick" | "dot"',
+      required: false,
+      description: "Tick marks (default) or dot marks — dots read calmer over dense text.",
+    },
   ],
   demo: [90, 120, 480, 2100],
   example: {
     title: "Request latency",
-    code: `import { PercentileLadder } from "${PKG}/percentile-ladder";\n\n<PercentileLadder data={latencies} format={{ style: "unit", unit: "millisecond" }} title="Request latency" />`,
+    code: `import { PercentileLadder } from "${PKG}/percentile-ladder";
+
+<PercentileLadder
+  data={${LATENCY_LITERAL}}
+  format={{ style: "unit", unit: "millisecond" }}
+  title="Request latency"
+/>`,
   },
 };
 
@@ -84,7 +107,7 @@ export const playground: PlaygroundSpec = {
       options: ["ps", "values", "both", "none"],
       init: "ps",
     },
-    { kind: "toggle", key: "dots", label: "dots", init: false },
+    { kind: "segmented", key: "marks", label: "marks", options: ["tick", "dot"], init: "tick" },
   ],
   data: LATENCY,
   render: (s, data) => (
@@ -92,7 +115,7 @@ export const playground: PlaygroundSpec = {
       data={data}
       scale={s.scale as "linear" | "log"}
       label={s.label as "ps" | "values" | "both" | "none"}
-      dots={s.dots as boolean}
+      marks={s.marks as "tick" | "dot"}
       summary={false}
       width={280}
       height={18}
@@ -104,7 +127,7 @@ export const playground: PlaygroundSpec = {
       "  data={latencies}",
       s.scale !== "linear" && `  scale="${s.scale}"`,
       s.label !== "ps" && `  label="${s.label}"`,
-      s.dots && "  dots",
+      s.marks !== "tick" && `  marks="${s.marks}"`,
       "/>",
     ]
       .filter(Boolean)

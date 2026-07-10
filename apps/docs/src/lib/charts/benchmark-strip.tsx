@@ -42,11 +42,23 @@ export const entry: ChartEntry = {
       required: false,
       description: "What the right gutter states (default percentile).",
     },
+    {
+      name: "positive",
+      type: '"up" | "down"',
+      required: false,
+      description: "Which side of the band is good (colors the focal dot).",
+    },
+    {
+      name: "median",
+      type: "boolean",
+      required: false,
+      description: "Center tick (default true).",
+    },
   ],
   demo: PEERS,
   example: {
     title: "Latency vs peers",
-    code: `import { BenchmarkStrip } from "${PKG}/benchmark-strip";\n\n<BenchmarkStrip data={peerLatencies} value={312} format={{ style: "unit", unit: "millisecond" }} title="Latency vs peers" />`,
+    code: `import { BenchmarkStrip } from "${PKG}/benchmark-strip";\n\n// 42 peer latencies (ms)\nconst peerLatencies = [${PEERS.join(", ")}];\n\n<BenchmarkStrip data={peerLatencies} value={312} format={{ style: "unit", unit: "millisecond" }} title="Latency vs peers" />`,
   },
 };
 

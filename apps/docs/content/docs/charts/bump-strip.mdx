@@ -12,7 +12,7 @@ values: Sparkline would lie about the distance between #2 and #3.
   sizeOf="bump-strip"
   code={`import { BumpStrip } from "@microcharts/react/bump-strip";
 
-<BumpStrip data={weeklyRanks} title="Category rank" />`}
+<BumpStrip data={[5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1]} title="Category rank" />`}
 >
   <BumpStrip
     data={[5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1]}
@@ -61,6 +61,34 @@ values: Sparkline would lie about the distance between #2 and #3.
     height={26}
   />
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="single ranked period" code={`<BumpStrip data={[3]} maxRank={5} />`}>
+  <BumpStrip data={[3]} maxRank={5} title="One period" width={140} height={26} />
+</LiveDemo>
+
+<LiveDemo
+  label="all unranked"
+  code={`// every period null — no line, no dots; the summary says so plainly
+<BumpStrip data={[null, null, null]} />`}
+>
+  <BumpStrip data={[null, null, null]} title="No ranked periods" width={140} height={26} />
+</LiveDemo>
+
+<LiveDemo
+  label="flat run"
+  code={`// rank never moves — no change dots, a level line
+<BumpStrip data={[3, 3, 3, 3, 3]} />`}
+>
+  <BumpStrip data={[3, 3, 3, 3, 3]} title="Steady at #3" width={140} height={26} />
+</LiveDemo>
+
+A single ranked period draws its two end labels with no visible line — there is no
+trajectory to show yet. An all-`null` series renders the frame with neither line nor
+labels; the accessible name reports it directly rather than describing a blank chart.
+A flat run (rank never changes) draws a level line with zero change dots, since
+`dots="changes"` only marks the periods where rank actually moved.
 
 ## Four homes
 

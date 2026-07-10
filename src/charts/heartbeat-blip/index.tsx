@@ -13,8 +13,8 @@ import { labelFont } from "../../core/labels.js";
 import { heartbeatGeometry } from "./geometry.js";
 
 export interface HeartbeatBlipProps {
-  /** Event timestamps (ms). */
-  data: readonly number[];
+  /** Event timestamps (ms). Not a value series (plan/04 §8 — renamed from `data`). */
+  events: readonly number[];
   /** The visible recent window (ms). Default 60000. */
   window?: number | undefined;
   /** Explicit clock (ms) — defaults to the latest event. Pass from the data layer. */
@@ -38,11 +38,11 @@ export interface HeartbeatBlipProps {
 
 const PAD = 1;
 
-function resolveNow(data: readonly number[], now?: number): number {
+function resolveNow(events: readonly number[], now?: number): number {
   if (typeof now === "number" && Number.isFinite(now)) return now;
   let max = 0;
   let seen = false;
-  for (const t of data)
+  for (const t of events)
     if (Number.isFinite(t) && (!seen || t > max)) {
       max = t;
       seen = true;
@@ -51,7 +51,7 @@ function resolveNow(data: readonly number[], now?: number): number {
 }
 
 export function heartbeatSummary(
-  data: readonly number[],
+  events: readonly number[],
   opts: {
     window?: number | undefined;
     now?: number | undefined;
@@ -61,9 +61,9 @@ export function heartbeatSummary(
   } = {},
 ): string {
   const { window: win = 60_000, strings = EN_HEARTBEAT } = opts;
-  const now = resolveNow(data, opts.now);
+  const now = resolveNow(events, opts.now);
   const geo = heartbeatGeometry({
-    events: data,
+    events,
     window: win,
     now,
     width: 60,
@@ -77,7 +77,7 @@ export function heartbeatSummary(
 
 export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
   const {
-    data,
+    events,
     window: win = 60_000,
     now,
     label = "none",
@@ -96,10 +96,10 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
   } = props;
   const fontSize = props.fontSize ?? labelFont(height);
 
-  const resolvedNow = resolveNow(data, now);
+  const resolvedNow = resolveNow(events, now);
   const labelBand = label === "count" ? fontSize * 2 : 0;
   const geo = heartbeatGeometry({
-    events: data,
+    events,
     window: win,
     now: resolvedNow,
     width: width - labelBand,
@@ -109,7 +109,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
   const accName =
     summary === false
       ? false
-      : (summary ?? heartbeatSummary(data, { window: win, now, strings, format, locale }));
+      : (summary ?? heartbeatSummary(events, { window: win, now, strings, format, locale }));
   const spikeColor = color ?? "var(--mc-accent)";
   const fmt = makeFormatter(format, locale);
 
@@ -123,16 +123,19 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
       className={className ? `mc-heartbeat ${className}` : "mc-heartbeat"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* baseline — hairline context */}
+      {/* baseline — hairline context (role: ⅓ of --mc-stroke-width) */}
       <line
         x1={geo.baseline.x1}
         y1={geo.baseline.y}
         x2={geo.baseline.x2}
         y2={geo.baseline.y}
         data-mc-ink="muted"
-        style={{ strokeWidth: 0.5, strokeOpacity: 0.55 }}
+        data-mc-w="hair"
+        style={{ strokeOpacity: 0.55 }}
       />
-      {/* spikes — one clean glyph per real event, rounded like a monitor trace */}
+      {/* spikes — one clean glyph per real event, rounded like a monitor trace.
+          `stroke` is dynamic (color override), so this stays inline; width is
+          the primary-ink token, not a literal, so presets still retune it. */}
       {geo.spikesPath ? (
         <path
           className="mc-heartbeat-spikes"
@@ -140,7 +143,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
           style={{
             fill: "none",
             stroke: spikeColor,
-            strokeWidth: 1.4,
+            strokeWidth: "var(--mc-stroke-width)",
             strokeLinejoin: "round",
             strokeLinecap: "round",
           }}
@@ -155,7 +158,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
           data-mc-ink="label"
           style={{ fillOpacity: 0.7 }}
         >
-          no events
+          {strings.heartbeatEmpty}
         </text>
       )}
       {/* now endpoint — the live accent cursor */}

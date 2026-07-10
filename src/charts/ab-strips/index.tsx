@@ -132,18 +132,11 @@ export function ABStrips(props: ABStripsProps): ReactNode {
   }
 
   const accName = summary === false ? false : (summary ?? abSummary(geo, fmt, labels, strings));
-  // B always uses accent; A stays neutral (the baseline) even if `color` is set
-  const rowInk = ["var(--mc-neutral)", color ?? "var(--mc-accent)"] as const;
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
-  // delta valence: which direction is good (sign is also in the text)
+  // delta valence: which direction is good (sign is also in the text) — B always
+  // uses accent ink (or `color` if set); A stays neutral, the baseline row
   const goodUp = positive !== "down";
-  const deltaColor =
-    geo.deltaMedian === 0
-      ? "var(--mc-neutral)"
-      : geo.deltaMedian > 0 === goodUp
-        ? "var(--mc-positive)"
-        : "var(--mc-negative)";
 
   // the contested zone = the x-overlap of the two middle halves (p25–75)
   const [rA, rB] = geo.rows;
@@ -172,13 +165,17 @@ export function ABStrips(props: ABStripsProps): ReactNode {
           width={round2(ovX1 - ovX0)}
           height={round2(ovBot - ovTop)}
           rx={1}
-          data-mc-ink="region"
-          style={{ fill: "var(--mc-neutral)", fillOpacity: 0.14 }}
+          data-mc-ink="neutral"
+          fillOpacity={0.14}
         />
       ) : null}
-      {/* the two strips: faint p5–95 outer, stronger p25–75 middle half */}
+      {/* the two strips: faint p5–95 outer, stronger p25–75 middle half. Row A is
+          always neutral (the baseline ink role); row B is accent unless `color`
+          overrides it, in which case the fill can't come from a static role. */}
       {geo.rows.map((r, i) => {
-        const ink = rowInk[i]!;
+        const isB = i === 1;
+        const custom = isB && color ? color : undefined;
+        const ink = custom ? undefined : isB ? "accent" : "neutral";
         return (
           <g key={`band-${labels[i]}`}>
             <rect
@@ -187,8 +184,9 @@ export function ABStrips(props: ABStripsProps): ReactNode {
               width={r.outer.width}
               height={1.8}
               rx={0.9}
-              data-mc-ink="band"
-              style={{ fill: ink, fillOpacity: i === 0 ? 0.26 : 0.2 }}
+              data-mc-ink={ink}
+              fill={custom}
+              fillOpacity={i === 0 ? 0.26 : 0.2}
             />
             <rect
               x={r.inner.x}
@@ -196,8 +194,9 @@ export function ABStrips(props: ABStripsProps): ReactNode {
               width={r.inner.width}
               height={4}
               rx={1.5}
-              data-mc-ink="band"
-              style={{ fill: ink, fillOpacity: i === 0 ? 0.42 : 0.38 }}
+              data-mc-ink={ink}
+              fill={custom}
+              fillOpacity={i === 0 ? 0.42 : 0.38}
             />
           </g>
         );
@@ -209,29 +208,33 @@ export function ABStrips(props: ABStripsProps): ReactNode {
         y1={geo.rows[0].y}
         x2={geo.rows[1].median.x}
         y2={geo.rows[1].y}
-        stroke="var(--mc-neutral)"
+        data-mc-ink="muted"
         strokeOpacity={0.6}
-        strokeWidth={0.7}
+        data-mc-w="tick"
         strokeDasharray="1.6 1.4"
         vectorEffect="non-scaling-stroke"
       />
       {/* median dots + row tags, on top */}
-      {geo.rows.map((r, i) => (
-        <g key={`mark-${labels[i]}`}>
-          <circle cx={r.median.x} cy={r.y} r={1.7} style={{ fill: rowInk[i]! }} />
-          <text
-            x={round2(2)}
-            y={r.y}
-            textAnchor="start"
-            dominantBaseline="central"
-            data-mc-ink="label"
-            fontSize={FONT}
-            style={{ fontVariantNumeric: "tabular-nums" }}
-          >
-            {labels[i]}
-          </text>
-        </g>
-      ))}
+      {geo.rows.map((r, i) => {
+        const isB = i === 1;
+        const custom = isB && color ? color : undefined;
+        const ink = custom ? undefined : isB ? "accent" : "neutral";
+        return (
+          <g key={`mark-${labels[i]}`}>
+            <circle cx={r.median.x} cy={r.y} r={1.7} data-mc-ink={ink} fill={custom} />
+            <text
+              x={round2(2)}
+              y={r.y}
+              textAnchor="start"
+              dominantBaseline="central"
+              data-mc-ink="label"
+              fontSize={FONT}
+            >
+              {labels[i]}
+            </text>
+          </g>
+        );
+      })}
       {showLabel ? (
         <text
           x={geo.labelX}
@@ -239,7 +242,13 @@ export function ABStrips(props: ABStripsProps): ReactNode {
           textAnchor="start"
           dominantBaseline="central"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums", fill: deltaColor }}
+          data-mc-ink={
+            geo.deltaMedian === 0
+              ? "neutral"
+              : geo.deltaMedian > 0 === goodUp
+                ? "positive"
+                : "negative"
+          }
         >
           {labelText}
         </text>

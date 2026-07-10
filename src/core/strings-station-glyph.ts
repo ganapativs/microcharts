@@ -5,7 +5,18 @@ import type { SummaryStrings } from "./summary.js";
 
 export type StationGlyphStrings = Pick<
   SummaryStrings,
-  "noData" | "compass8" | "stationGlyph" | "stationSky" | "stationWind" | "stationCalm"
+  | "noData"
+  | "compass8"
+  | "stationGlyph"
+  | "stationSky"
+  | "stationWind"
+  | "stationCalm"
+  | "stationFieldWindCalm"
+  | "stationFieldWind"
+  | "stationFieldSky"
+  | "stationFieldTemp"
+  | "stationFieldDew"
+  | "stationFieldPressure"
 >;
 
 export const EN_STATION_GLYPH: StationGlyphStrings = {
@@ -16,4 +27,10 @@ export const EN_STATION_GLYPH: StationGlyphStrings = {
   stationWind: (octantName, magnitude) => `, wind ${octantName} ${magnitude}`,
   stationGlyph: (station, windClause, sky, fieldsClause) =>
     `${station}${windClause}; sky ${sky}${fieldsClause}.`,
+  stationFieldWindCalm: "wind calm",
+  stationFieldWind: (octantName, magnitude) => `wind ${octantName} ${magnitude}`,
+  stationFieldSky: (sky) => `sky ${sky}`,
+  stationFieldTemp: (v) => `temp ${v}°`,
+  stationFieldDew: (v) => `dew point ${v}°`,
+  stationFieldPressure: (v) => `pressure ${v}`,
 };

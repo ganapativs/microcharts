@@ -66,18 +66,44 @@ export const entry: ChartEntry = {
   demo: [142],
   example: {
     title: "Airspeed",
-    code: `import { TapeGauge } from "${PKG}/tape-gauge";\n\n<TapeGauge value={142} rate={1} zones={zones} title="Airspeed" />`,
+    code: `import { TapeGauge } from "${PKG}/tape-gauge";
+
+const zones = [
+  { from: 100, to: 130, tone: "pos" },
+  { from: 130, to: 150, tone: "warn" },
+  { from: 150, to: 200, tone: "neg" },
+];
+
+<TapeGauge value={142} rate={1} zones={zones} span={60} title="Airspeed" />`,
   },
 };
 
 export function Preview() {
-  return <TapeGauge value={142} rate={1} zones={ZONES} summary={false} width={46} height={60} />;
+  return (
+    <TapeGauge
+      value={142}
+      rate={1}
+      zones={ZONES}
+      span={60}
+      summary={false}
+      width={46}
+      height={60}
+    />
+  );
 }
 
 export const showcase = {
   hint: "rising into caution",
   Node: () => (
-    <TapeGauge value={142} rate={1} zones={ZONES} title="Airspeed" width={46} height={60} />
+    <TapeGauge
+      value={142}
+      rate={1}
+      zones={ZONES}
+      span={60}
+      title="Airspeed"
+      width={46}
+      height={60}
+    />
   ),
 };
 
@@ -124,17 +150,28 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "KPI card",
-    code: `<TapeGauge value={142} rate={1} zones={zones} title="Airspeed" />`,
-    node: <TapeGauge value={142} rate={1} zones={ZONES} summary={false} width={46} height={68} />,
+    code: `<TapeGauge value={142} rate={1} zones={zones} span={60} title="Airspeed" />`,
+    node: (
+      <TapeGauge
+        value={142}
+        rate={1}
+        zones={ZONES}
+        span={60}
+        summary={false}
+        width={46}
+        height={68}
+      />
+    ),
   },
   {
     label: "horizontal cell",
-    code: `<TapeGauge value={142} rate={-1} zones={zones} orientation="horizontal" />`,
+    code: `<TapeGauge value={142} rate={-1} zones={zones} span={60} orientation="horizontal" />`,
     node: (
       <TapeGauge
         value={142}
         rate={-1}
         zones={ZONES}
+        span={60}
         orientation="horizontal"
         summary={false}
         width={140}
@@ -150,6 +187,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
       value={props.data[0] ?? 142}
       rate={1}
       zones={ZONES}
+      span={60}
       summary={false}
       width={props.width ?? 28}
       height={props.height ?? 48}
@@ -158,7 +196,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 }
 
 export function markCode(): string {
-  return `<TapeGauge value={142} rate={1} zones={zones} />`;
+  return `<TapeGauge value={142} rate={1} zones={zones} span={60} />`;
 }
 
 export default {

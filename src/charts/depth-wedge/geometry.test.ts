@@ -18,7 +18,7 @@ describe("depthWedgeGeometry (plan/25 §12, plan/17 F5)", () => {
   it("builds two wedges, the spread, and the lead ratio", () => {
     const geo = depthWedgeGeometry({
       ...BOOK,
-      range: null,
+      levels: null,
       normalize: false,
       width: 100,
       height: 24,
@@ -33,7 +33,7 @@ describe("depthWedgeGeometry (plan/25 §12, plan/17 F5)", () => {
   it("normalize plots shares per side", () => {
     const geo = depthWedgeGeometry({
       ...BOOK,
-      range: null,
+      levels: null,
       normalize: true,
       width: 100,
       height: 24,
@@ -47,7 +47,7 @@ describe("depthWedgeGeometry (plan/25 §12, plan/17 F5)", () => {
     const geo = depthWedgeGeometry({
       demand: BOOK.demand,
       supply: [],
-      range: null,
+      levels: null,
       normalize: false,
       width: 100,
       height: 24,
@@ -75,7 +75,7 @@ describe("depthWedgeGeometry (plan/25 §12, plan/17 F5)", () => {
     const geo = depthWedgeGeometry({
       demand,
       supply,
-      range: null,
+      levels: null,
       normalize: false,
       width: 100,
       height: 24,

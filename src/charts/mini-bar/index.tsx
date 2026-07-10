@@ -128,9 +128,12 @@ export function MiniBar(props: MiniBarProps): ReactNode {
         if (b.empty || (b.w === 0 && b.h === 0)) return null;
         const d = sorted[i]!;
         const isHl = highlight !== undefined && (highlight === d.label || highlight === b.index);
-        // signed data + declared polarity → valence tokens; otherwise single ink
-        const ink =
-          positive !== undefined && hasNegative && b.sign !== 0
+        // signed data + declared polarity → valence tokens; otherwise single ink.
+        // A highlighted bar always reads as accent — it draws the eye regardless
+        // of sign, so it overrides the valence token rather than combining with it.
+        const ink = isHl
+          ? "accent"
+          : positive !== undefined && hasNegative && b.sign !== 0
             ? b.sign === goodSign
               ? "positive"
               : "negative"
@@ -144,7 +147,7 @@ export function MiniBar(props: MiniBarProps): ReactNode {
             height={b.h}
             shapeRendering="crispEdges"
             data-mc-ink={ink}
-            style={isHl ? { fill: "var(--mc-accent)" } : color ? { fill: color } : undefined}
+            style={!isHl && color ? { fill: color } : undefined}
           />
         );
       })}

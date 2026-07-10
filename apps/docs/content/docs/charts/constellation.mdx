@@ -86,6 +86,41 @@ const month = (x) => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"][x];
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="empty" code={`<Constellation data={[]} title="No incidents" />`}>
+  <Constellation data={[]} title="No incidents" width={110} height={28} />
+</LiveDemo>
+
+<LiveDemo
+  label="single event"
+  code={`<Constellation data={[{ x: 3, y: 40 }]} title="One incident" />`}
+>
+  <Constellation data={[{ x: 3, y: 40 }]} title="One incident" width={110} height={28} />
+</LiveDemo>
+
+<LiveDemo
+  label="no values — jittered layout encodes nothing"
+  code={`<Constellation data={[{ x: 0 }, { x: 2 }, { x: 5 }, { x: 8 }]} title="Undated magnitudes" />`}
+>
+  <Constellation
+    data={[{ x: 0 }, { x: 2 }, { x: 5 }, { x: 8 }]}
+    title="Undated magnitudes"
+    width={110}
+    height={28}
+  />
+</LiveDemo>
+
+Empty data draws just the frame with "No data." as the summary. A single event has no
+line to draw — just one dot, and the summary says "1 event at …" rather than forcing a
+range. When every point omits `y`, the vertical spread is deterministic jitter for
+legibility only — the summary and the interactive readout never mention it, and the
+connector's slope carries no meaning in that mode.
+
+## Four homes
+
+<FourContexts slug="constellation" />
+
 ## Why this default
 
 The chronology line is on by default because the sequence is usually the story of rare events — you

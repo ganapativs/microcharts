@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "annotations",
+    "---Core---",
     "sparkline",
     "sparkbar",
     "delta",
@@ -37,6 +38,7 @@
     "horizon",
     "calendar-strip",
     "event-timeline",
+    "---Decision---",
     "coverage-strip",
     "benchmark-strip",
     "percentile-ladder",
@@ -58,6 +60,12 @@
     "cycle-plot",
     "change-point",
     "ensemble-ghosts",
+    "cohort-triangle",
+    "streak-spark",
+    "queue-depth",
+    "spread-band",
+    "percentile-trace",
+    "---Expressive---",
     "tally-marks",
     "dice-pips",
     "fill-word",
@@ -80,6 +88,8 @@
     "heartbeat-blip",
     "comet-trail",
     "orbit-status",
+    "grade-profile",
+    "---Frontier---",
     "time-in-range",
     "hypnogram",
     "eta-bar",
@@ -100,6 +110,8 @@
     "phase-trace",
     "trace-fold",
     "tape-gauge",
-    "station-glyph"
+    "station-glyph",
+    "win-prob-worm",
+    "bias-strip"
   ]
 }

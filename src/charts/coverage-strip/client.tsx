@@ -15,8 +15,6 @@ export interface InteractiveCoverageStripProps extends CoverageStripProps {
   strings?: CoverageStrings;
 }
 
-const FONT = 6;
-
 export function CoverageStrip(props: InteractiveCoverageStripProps): React.ReactNode {
   const {
     data,
@@ -36,6 +34,9 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
     ...rest
   } = props;
 
+  // must match the static entry's font formula — the label gutter widens
+  // totalWidth, and a mismatched fontSize would drift the readout off-cell
+  const font = Math.min(11, Math.max(7, Math.round(height * 0.62)));
   const geo = useMemo(
     () =>
       coverageGeometry({
@@ -48,9 +49,9 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         domain,
         shape,
         gutterCh: label === "percent" ? 4 : 0,
-        fontSize: FONT,
+        fontSize: font,
       }),
-    [width, height, data, expected, mode, steps, domain, shape, label],
+    [width, height, data, expected, mode, steps, domain, shape, label, font],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(
@@ -156,7 +157,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
             rx={cell.rx + 0.75}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
@@ -170,7 +171,9 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
             transform: "translateX(-50%)",
           }}
         >
-          {!cell.present ? "no data" : cell.value === null ? "measured" : fmt(cell.value)}
+          {/* no hardcoded English in the chip (i18n canon): non-values show a
+              dash; the live region carries the localized full sentence */}
+          {cell.present && cell.value !== null ? fmt(cell.value) : "—"}
         </span>
       ) : null}
       <span

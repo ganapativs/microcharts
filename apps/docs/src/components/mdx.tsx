@@ -99,6 +99,14 @@ import { BreathingDot } from "@microcharts/react/breathing-dot";
 import { HeartbeatBlip } from "@microcharts/react/heartbeat-blip";
 import { CometTrail } from "@microcharts/react/comet-trail";
 import { OrbitStatus } from "@microcharts/react/orbit-status";
+import { CohortTriangle } from "@microcharts/react/cohort-triangle";
+import { StreakSpark } from "@microcharts/react/streak-spark";
+import { GradeProfile } from "@microcharts/react/grade-profile";
+import { WinProbWorm } from "@microcharts/react/win-prob-worm";
+import { QueueDepth } from "@microcharts/react/queue-depth";
+import { SpreadBand } from "@microcharts/react/spread-band";
+import { BiasStrip } from "@microcharts/react/bias-strip";
+import { PercentileTrace } from "@microcharts/react/percentile-trace";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
@@ -160,6 +168,14 @@ export function getMDXComponents(components?: MDXComponents) {
     TraceFold,
     TapeGauge,
     StationGlyph,
+    CohortTriangle,
+    StreakSpark,
+    GradeProfile,
+    WinProbWorm,
+    QueueDepth,
+    SpreadBand,
+    BiasStrip,
+    PercentileTrace,
     HistogramStrip,
     MicroBox,
     ProgressRing,

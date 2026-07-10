@@ -65,6 +65,55 @@ mode for aliasing lanes.
   />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="empty lane (silence is signal)"
+  code={`<EventRaster data={[{ label: "api", events: [2, 5, 6, 14, 20, 33, 40, 48] }, { label: "db", events: [] }]} />`}
+>
+  <EventRaster
+    data={[
+      { label: "api", events: [2, 5, 6, 14, 20, 33, 40, 48] },
+      { label: "db", events: [] },
+    ]}
+    title="One quiet lane"
+    width={220}
+    height={32}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="an aliasing lane switches to binned counts (disclosed)"
+  code={`<EventRaster
+  data={[{ label: "requests", events: Array.from({ length: 200 }, (_, i) => i * 0.3) }]}
+  overflow="bin"
+/>`}
+>
+  <EventRaster
+    data={[{ label: "requests", events: Array.from({ length: 200 }, (_, i) => i * 0.3) }]}
+    overflow="bin"
+    title="High-rate lane"
+    width={220}
+    height={20}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="single lane, single event"
+  code={`<EventRaster data={[{ label: "boot", events: [0] }]} />`}
+>
+  <EventRaster
+    data={[{ label: "boot", events: [0] }]}
+    title="Single event"
+    width={160}
+    height={16}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="event-raster" />
+
 ## Why this default
 
 Lanes stay aligned to a shared time domain because vertical banding — several sources firing at the

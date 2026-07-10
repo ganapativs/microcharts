@@ -69,6 +69,9 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
       className={className ? `mc-heat-strip ${className}` : "mc-heat-strip"}
       style={style}
     >
+      {/* flat siblings, plain attributes — the cell list is this chart's SSR
+          hot path (≤ 60 cells); fill stays inline STYLE only when a `color`
+          override must beat the cell ink-role CSS */}
       {geo.cells.map((c) =>
         c.step === null ? (
           <rect
@@ -79,9 +82,9 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
             height={c.h}
             rx={c.rx}
             fill="none"
-            stroke="var(--mc-neutral)"
+            data-mc-ink="muted"
+            data-mc-w="hair"
             strokeOpacity={0.4}
-            strokeWidth={0.6}
           />
         ) : (
           <rect
@@ -93,10 +96,8 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
             rx={c.rx}
             shapeRendering={geo.crisp ? "crispEdges" : undefined}
             data-mc-ink="cell"
-            style={{
-              fillOpacity: valueStepOpacity(c.step, steps),
-              ...(color ? { fill: color } : null),
-            }}
+            fillOpacity={valueStepOpacity(c.step, steps)}
+            style={color ? { fill: color } : undefined}
           />
         ),
       )}

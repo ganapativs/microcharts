@@ -19,7 +19,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
   const {
     data,
     bins,
-    highlight,
+    markValue,
     domain,
     width = 60,
     height = 16,
@@ -32,8 +32,8 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
   } = props;
 
   const geo = useMemo(
-    () => histogramGeometry({ width, height, values: data, domain, bins, highlight }),
-    [width, height, data, domain, bins, highlight],
+    () => histogramGeometry({ width, height, values: data, domain, bins, markValue }),
+    [width, height, data, domain, bins, markValue],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [active, setActive] = useState<number | null>(null);
@@ -108,7 +108,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
         {...rest}
         data={data}
         bins={bins}
-        highlight={highlight}
+        markValue={markValue}
         domain={domain}
         width={width}
         height={height}
@@ -125,7 +125,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
             height={height + 1}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

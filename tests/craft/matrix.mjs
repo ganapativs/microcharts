@@ -1084,10 +1084,10 @@ add(
   "heartbeat-blip",
   "HeartbeatBlip",
   [
-    { data: HB, now: 100000 },
-    { data: HB, now: 100000, label: "count" },
-    { data: [], now: 100000 },
-    { data: [99000], now: 100000 },
+    { events: HB, now: 100000 },
+    { events: HB, now: 100000, label: "count" },
+    { events: [], now: 100000 },
+    { events: [99000], now: 100000 },
   ],
   [[999, 999]],
 );
@@ -1533,11 +1533,162 @@ add(
   ],
   [[999, 0]],
 );
+const COHORTS_CRAFT = [
+  { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
+  { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
+  { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
+  { label: "Apr", values: [1, 0.55, 0.42] },
+  { label: "May", values: [1, 0.52] },
+];
+add(
+  "cohort-triangle",
+  "CohortTriangle",
+  [
+    { data: COHORTS_CRAFT, unit: "month" },
+    { data: COHORTS_CRAFT, labels: false },
+    { data: COHORTS_CRAFT, highlight: "Mar" },
+  ],
+  [[999, 999]],
+);
+add(
+  "streak-spark",
+  "StreakSpark",
+  [
+    { data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1], label: "both" },
+    { data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1], label: "none" },
+    { data: [0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0], positive: "down" },
+  ],
+  [
+    [96, 20],
+    [220, 48],
+  ],
+);
+add(
+  "grade-profile",
+  "GradeProfile",
+  [
+    {
+      data: [
+        { d: 0, elev: 800 },
+        { d: 100, elev: 809 },
+        { d: 250, elev: 812 },
+        { d: 350, elev: 817 },
+        { d: 500, elev: 835 },
+        { d: 700, elev: 833 },
+        { d: 900, elev: 865 },
+      ],
+      format: (n) => `${n} m`,
+    },
+  ],
+  [
+    [80, 24],
+    [240, 44],
+  ],
+);
+const WPWGAME = [50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98];
+const WPWTIGHT = [50, 53, 49, 52, 48, 51, 47, 50, 46, 49, 45, 48, 52];
+add(
+  "win-prob-worm",
+  "WinProbWorm",
+  [
+    { data: WPWGAME, sides: ["home", "away"] },
+    { data: WPWTIGHT, sides: ["home", "away"] },
+    { data: WPWGAME, sides: ["home", "away"], label: "none" },
+    { data: WPWGAME, sides: ["home", "away"], markSwing: false },
+  ],
+  [
+    [80, 16],
+    [160, 24],
+    [240, 32],
+  ],
+);
+add(
+  "queue-depth",
+  "QueueDepth",
+  [
+    { data: [42, 55, 70, 88, 96, 120, 150, 182, 214], capacity: 100 },
+    { data: [214, 190, 150, 120, 96, 70, 48], capacity: 100 },
+    { data: [42, 55, 70, 88, 96, 120, 150, 182, 214] },
+    { data: [42, 55, 70, 88, 96, 120, 150, 182, 214], capacity: 100, label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "spread-band",
+  "SpreadBand",
+  [
+    { data: WAVE.map((v, k) => ({ a: v, b: WAVE[k] * 0.9 + 1 })), labels: ["Organic", "Paid"] },
+    {
+      data: WAVE.map((v, k) => ({ a: v, b: WAVE[k] * 0.9 + 1 })),
+      labels: ["Organic", "Paid"],
+      label: "none",
+    },
+    {
+      data: WAVE.map((v, k) => ({ a: v, b: WAVE[k] * 0.9 + 1 })),
+      labels: ["A", "B"],
+      positive: "down",
+    },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
+add(
+  "bias-strip",
+  "BiasStrip",
+  [
+    {
+      data: Array.from({ length: 20 }, (_, i) => ({
+        a:
+          i +
+          [
+            1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5,
+            1.6, 2.7, 2.0,
+          ][i],
+        b: i,
+      })),
+      limits: 1.96,
+    },
+  ],
+  [
+    [56, 30],
+    [220, 120],
+  ],
+);
+add(
+  "percentile-trace",
+  "PercentileTrace",
+  [
+    { data: [40, 46, 52, 58, 63, 68, 72, 76, 79, 81], unit: "week" },
+    { data: [40, 46, 52, 58, 63, 68, 72, 76, 79, 81], bands: false },
+    { data: [78, 72, 64, 55, 47, 40, 34, 29, 26, 24], positive: "down" },
+    { data: [40, 46, 52, 58, 63, 68, 72, 76, 79, 81], label: "none" },
+  ],
+  [
+    [80, 20],
+    [160, 28],
+    [240, 32],
+  ],
+);
 
 // BY-DESIGN exemptions: EventTimeline span labels render CENTERED INSIDE their
 // span rects (plan/22 #27 — the rect is the label's home, at 0.7 fill opacity).
 const ALLOWED = (line) =>
   /^event-timeline .*TEXT-ON-MARK "(Freeze|Healthy|[^"]*)" over rect/.test(line) ||
+  // TraceFold spans + PartitionStrip segments label INSIDE their rects with
+  // on-fill ink (plan/25 §13/§18) — the rect is the label's home. (Previously
+  // invisible to the gate via a data-mc-ink="band" attr the superaudit removed
+  // as a role misuse.)
+  /^(trace-fold|partition-strip) .*TEXT-ON-MARK "[^"]*" over rect/.test(line) ||
+  // TimeInRange zone percents render CENTERED INSIDE their zone rects with
+  // on-fill ink (plan/25 §1) — the rect is the label's home.
+  /^time-in-range .*TEXT-ON-MARK "\d+%" over rect/.test(line) ||
   // FillWord stacks an accent copy of the word ON the muted base — that exact
   // same-word overlap IS the "label is the bar" encoding, not a collision.
   /^fill-word .*TEXT-TEXT "([^"]+)" × "\1"$/.test(line) ||

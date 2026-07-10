@@ -74,7 +74,7 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     if (dx === 0 && dy === 0) return;
     head.animate(
       [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "translate(0px, 0px)" }],
-      { duration: 220, easing: "ease-out" },
+      { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
     );
   }, [geo, reduced, inView, wrapRef]);
 
@@ -145,7 +145,7 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
             r={activeMark.r + 1.5}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

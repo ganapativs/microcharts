@@ -3,6 +3,13 @@
 // bars extend horizontally by activity mass at that level. The modal bin (POC)
 // is accented and the value area (smallest contiguous span holding `valueArea`
 // of mass around the POC) is shaded. 2-dp.
+//
+// Split into `binProfile` (bin + POC + value-area walk — O(data.length), the
+// expensive pass) and `layoutProfile` (bar positions — O(bins), cheap). The
+// static component needs the POC level before it knows the label gutter width,
+// so it binned once and re-laid-out for the gutter; binning twice was the
+// bench-floor regression (superaudit). `volumeProfileGeometry` composes both
+// for callers that only need one shot (tests, the interactive entry).
 import { uniformBins } from "../../core/bin.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 
@@ -25,6 +32,15 @@ export interface Rect {
   y: number;
   width: number;
   height: number;
+}
+
+export interface BinnedProfile {
+  rows: { level: number; mass: number }[];
+  total: number;
+  pocIdx: number;
+  even: boolean;
+  loI: number;
+  hiI: number;
 }
 
 /** Aggregate weight per uniform level bin (raw levels → counts). Robust to null
@@ -56,34 +72,19 @@ export function binMass(
   return ub.bins.map((b, i) => ({ level: (b.x0 + b.x1) / 2, mass: mass[i]! }));
 }
 
-export function volumeProfileGeometry(opts: {
-  data: readonly (LevelRow | number)[];
-  bins: number;
-  valueArea: number;
-  side: "left" | "right";
-  width: number;
-  height: number;
-  gutter: number;
-}): {
-  bars: ProfileBar[];
-  valueAreaRect: Rect | null;
-  poc: { level: number; share: number } | null;
-  even: boolean;
-  vaLo: number;
-  vaHi: number;
-} {
-  const { data, bins, valueArea, side, width, height, gutter } = opts;
+/** Bin the raw data + locate the POC + walk the value area outward from it —
+ *  the O(data.length) pass, independent of pixel geometry. */
+export function binProfile(
+  data: readonly (LevelRow | number)[],
+  bins: number,
+  valueArea: number,
+): BinnedProfile {
   const rows = binMass(data, bins);
   const n = rows.length;
   const total = rows.reduce((s, r) => s + r.mass, 0);
   if (n === 0 || total === 0) {
-    return { bars: [], valueAreaRect: null, poc: null, even: false, vaLo: 0, vaHi: 0 };
+    return { rows: [], total: 0, pocIdx: -1, even: false, loI: 0, hiI: 0 };
   }
-
-  const pad = 1;
-  const plotW = width - gutter - pad;
-  const rowH = (height - pad * 2) / n;
-  const maxMass = rows.reduce((m, r) => Math.max(m, r.mass), 0) || 1;
 
   // POC = modal bin (lowest level wins ties, deterministic)
   let pocIdx = 0;
@@ -109,10 +110,38 @@ export function volumeProfileGeometry(opts: {
     }
   }
 
+  return { rows, total, pocIdx, even, loI, hiI };
+}
+
+/** Lay out bars + the value-area band from an already-binned profile — the
+ *  O(bins) pass, safe to re-run once the POC-label gutter is known. */
+export function layoutProfile(
+  binned: BinnedProfile,
+  opts: { align: "left" | "right"; width: number; height: number; gutter: number },
+): {
+  bars: ProfileBar[];
+  valueAreaRect: Rect | null;
+  poc: { level: number; share: number } | null;
+  even: boolean;
+  vaLo: number;
+  vaHi: number;
+} {
+  const { rows, total, pocIdx, even, loI, hiI } = binned;
+  const n = rows.length;
+  if (n === 0 || total === 0 || pocIdx < 0) {
+    return { bars: [], valueAreaRect: null, poc: null, even: false, vaLo: 0, vaHi: 0 };
+  }
+
+  const { align, width, height, gutter } = opts;
+  const pad = 1;
+  const plotW = width - gutter - pad;
+  const rowH = (height - pad * 2) / n;
+  const maxMass = rows.reduce((m, r) => Math.max(m, r.mass), 0) || 1;
+
   // bin i at y (bottom-up: lowest level at the bottom)
   const yOf = (i: number): number => round2(pad + (n - 1 - i) * rowH);
   const barLen = (mass: number): number => round2((mass / maxMass) * plotW);
-  const anchorLeft = side === "left";
+  const anchorLeft = align === "left";
 
   const bars: ProfileBar[] = rows.map((r, i) => {
     const len = barLen(r.mass);
@@ -142,4 +171,29 @@ export function volumeProfileGeometry(opts: {
     vaLo: round2(rows[loI]!.level),
     vaHi: round2(rows[hiI]!.level),
   };
+}
+
+export function volumeProfileGeometry(opts: {
+  data: readonly (LevelRow | number)[];
+  bins: number;
+  valueArea: number;
+  align: "left" | "right";
+  width: number;
+  height: number;
+  gutter: number;
+}): {
+  bars: ProfileBar[];
+  valueAreaRect: Rect | null;
+  poc: { level: number; share: number } | null;
+  even: boolean;
+  vaLo: number;
+  vaHi: number;
+} {
+  const binned = binProfile(opts.data, opts.bins, opts.valueArea);
+  return layoutProfile(binned, {
+    align: opts.align,
+    width: opts.width,
+    height: opts.height,
+    gutter: opts.gutter,
+  });
 }

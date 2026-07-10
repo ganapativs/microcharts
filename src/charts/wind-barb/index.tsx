@@ -18,8 +18,9 @@ export interface WindBarbProps {
   magnitude: number;
   /** Full-barb quantum; sets the read-back key ("each barb = 10"). */
   step?: number | undefined;
-  /** Numeric magnitude beside the glyph (anchored, tabular). */
-  label?: boolean | undefined;
+  /** Numeric magnitude beside the glyph, anchored + tabular (plan/04 §8 —
+   *  the one label-boolean-to-enum break, matching the family vocabulary). */
+  label?: "value" | "none" | undefined;
   /** `"arrow"` = plain direction arrow + label when quantized barbs don't fit. */
   variant?: "barb" | "arrow" | undefined;
   /** Square glyph edge in viewBox units. */
@@ -55,7 +56,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
     direction,
     magnitude,
     step = 10,
-    label = false,
+    label = "none",
     variant = "barb",
     size = 32,
     format,
@@ -76,7 +77,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const fontSize = labelFont(size, 0.26);
-  const labelText = label || variant === "arrow" ? fmt(mag) : undefined;
+  const labelText = label === "value" || variant === "arrow" ? fmt(mag) : undefined;
   const gutter = labelText ? labelText.length * fontSize * 0.62 + 3 : 0;
   const totalW = size + gutter;
 
@@ -114,7 +115,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
           r={Math.max(2, size * 0.12)}
           fill="none"
           data-mc-ink="muted"
-          strokeWidth={1}
+          data-mc-w="support"
           vectorEffect="non-scaling-stroke"
         />
       ) : (
@@ -148,7 +149,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
                 />
               ) : null}
               {geo.pennants.map((p, i) => (
-                <path key={i} d={p} style={{ fill: "var(--mc-stroke)" }} />
+                <path key={i} d={p} data-mc-ink="point" />
               ))}
             </>
           )}

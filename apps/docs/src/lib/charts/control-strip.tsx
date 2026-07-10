@@ -66,7 +66,7 @@ export const entry: ChartEntry = {
   demo: DEMO,
   example: {
     title: "Line 3 fill weight",
-    code: `import { ControlStrip } from "${PKG}/control-strip";\n\n<ControlStrip data={weights} title="Line 3 fill weight" />`,
+    code: `import { ControlStrip } from "${PKG}/control-strip";\n\n// 30 fill-weight readings (g); mostly in control, two excursions\nconst weights = [${DEMO.join(", ")}];\n\n<ControlStrip data={weights} title="Line 3 fill weight" />`,
   },
 };
 

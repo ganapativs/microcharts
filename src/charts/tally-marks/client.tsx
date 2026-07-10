@@ -35,7 +35,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
     path.style.strokeDasharray = String(len);
     const anim = path.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], {
       duration: 200,
-      easing: "ease-out",
+      easing: "cubic-bezier(0.23, 1, 0.32, 1)",
     });
     // drop the dash after the sweep so later static renders are clean
     anim.onfinish = () => {

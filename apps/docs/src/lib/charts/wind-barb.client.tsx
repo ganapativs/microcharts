@@ -38,7 +38,7 @@ export function InteractiveDemo() {
               key={m}
               direction={90}
               magnitude={m}
-              label
+              label="value"
               title={`${m}`}
               size={44}
               summary={false}

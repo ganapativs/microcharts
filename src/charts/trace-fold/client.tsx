@@ -148,7 +148,7 @@ export function TraceFold(props: TraceFoldProps): React.ReactNode {
             height={span.height + 0.8}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

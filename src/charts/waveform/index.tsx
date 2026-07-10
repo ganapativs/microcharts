@@ -18,7 +18,7 @@ export interface WaveformProps {
   /** Mirror around the center (default); `false` for magnitude-only series. */
   mirror?: boolean | undefined;
   /** Explicit symmetric domain for HONEST loudness comparison across rows. */
-  domain?: [number, number] | undefined;
+  domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
@@ -103,7 +103,7 @@ export function Waveform(props: WaveformProps): ReactNode {
           y2={cy}
           stroke="var(--mc-neutral)"
           strokeOpacity={0.3}
-          strokeWidth={0.5}
+          data-mc-w="hair"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}

@@ -143,7 +143,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
             x2={geo.statX[active]}
             y2={height - 0.5}
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

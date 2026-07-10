@@ -97,7 +97,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
             r={7}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={0.75}
+            data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

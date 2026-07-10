@@ -138,9 +138,9 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
             x2={geo.centerX}
             y2={height - 0.5}
             data-mc-ink="muted"
+            data-mc-w="support"
             strokeOpacity={0.6}
             vectorEffect="non-scaling-stroke"
-            style={{ strokeWidth: 1 }}
           />
           {geo.segments.map((s) =>
             s.width > 0 ? (
@@ -152,14 +152,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
                 height={barH}
                 shapeRendering="crispEdges"
                 fillOpacity={s.opacity}
-                style={{
-                  fill:
-                    s.side < 0
-                      ? "var(--mc-negative)"
-                      : s.side > 0
-                        ? "var(--mc-positive)"
-                        : "var(--mc-neutral)",
-                }}
+                data-mc-ink={s.side < 0 ? "negative" : s.side > 0 ? "positive" : "neutral"}
               />
             ) : null,
           )}

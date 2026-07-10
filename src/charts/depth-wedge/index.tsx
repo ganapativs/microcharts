@@ -17,7 +17,7 @@ export interface DepthWedgeDatum {
 export interface DepthWedgeProps {
   data: DepthWedgeDatum;
   /** ± level distance from mid to include; the wedge shape depends on it. */
-  range?: number | undefined;
+  levels?: number | undefined;
   /** The gap is the headline number. */
   label?: "spread" | "none" | undefined;
   /** Plot cumulative shares per side instead of absolute amounts. */
@@ -55,7 +55,7 @@ export function depthWedgeSummary(
 export function DepthWedge(props: DepthWedgeProps): ReactNode {
   const {
     data,
-    range,
+    levels,
     label = "spread",
     normalize = false,
     width = 100,
@@ -76,7 +76,7 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
   const geo = depthWedgeGeometry({
     demand: data.demand,
     supply: data.supply,
-    range: range ?? null,
+    levels: levels ?? null,
     normalize,
     width,
     height,
@@ -97,14 +97,16 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
       {geo.demandPath ? (
         <path
           d={geo.demandPath}
-          style={{ fill: "var(--mc-positive)", fillOpacity: 0.5 }}
+          data-mc-ink="positive"
+          fillOpacity={0.5}
           shapeRendering="crispEdges"
         />
       ) : null}
       {geo.supplyPath ? (
         <path
           d={geo.supplyPath}
-          style={{ fill: "var(--mc-negative)", fillOpacity: 0.5 }}
+          data-mc-ink="negative"
+          fillOpacity={0.5}
           shapeRendering="crispEdges"
         />
       ) : null}
@@ -114,8 +116,8 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
         x2={geo.midX}
         y1={showSpread ? fontSize + 1 : 0.5}
         y2={height - 0.5}
-        stroke="var(--mc-neutral)"
-        strokeWidth={0.75}
+        data-mc-ink="muted"
+        data-mc-w="support"
         strokeDasharray="1.5 1.5"
         vectorEffect="non-scaling-stroke"
       />

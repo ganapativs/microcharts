@@ -1,0 +1,169 @@
+---
+title: PercentileTrace
+description: A percentile-rank chart for React — one entity's standing traced on a locked 0–100 scale, over fixed p25–75 and p5–95 population bands.
+---
+
+PercentileTrace answers "is this entity's standing rising or slipping inside the pack?". It
+traces one **percentile rank** over time on a scale **locked to 0–100**. Because the axis *is*
+rank, the population is constant by definition — the middle-half (**p25–75**) and near-full
+(**p5–95**) bands are fixed fields, not estimates — so the only line on the chart is the entity
+itself, drifting through a known landscape.
+
+<LiveDemo
+  label="PercentileTrace"
+  sizeOf="percentile-trace"
+  code={`import { PercentileTrace } from "@microcharts/react/percentile-trace";
+
+<PercentileTrace
+  data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]}
+  unit="week"
+  title="Standing"
+/>`}
+>
+  <PercentileTrace
+    data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]}
+    unit="week"
+    label="last"
+    title="Standing"
+    width={260} height={30}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="percentile-trace" />
+
+## Try it
+
+<Playground chart="percentile-trace" />
+
+## Interactive
+
+<InteractiveDemo slug="percentile-trace" />
+
+## When to use it
+
+- **Good for** — one player's or product's rank drifting over time, whether a standing has crossed into the top or bottom of the pack, a percentile KPI where the population context matters.
+- **Avoid for** — a raw value over time (Sparkline) or one absolute number vs a target (Bullet / Delta).
+
+## Sizing
+
+<Sizing chart="percentile-trace" />
+
+## Variants
+
+<LiveDemo
+  label="bands, and no bands"
+  code={`<PercentileTrace data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]} />
+<PercentileTrace data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]} bands={false} />`}
+>
+  <span className="inline-flex flex-col gap-1.5">
+    <PercentileTrace
+      data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]}
+      unit="week"
+      title="with bands"
+      width={220}
+      height={28}
+    />
+    <PercentileTrace
+      data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]}
+      bands={false}
+      unit="week"
+      title="no bands"
+      width={220}
+      height={28}
+    />
+  </span>
+</LiveDemo>
+
+The endpoint dot carries **valence**: by default a rising standing is good, so it turns
+positive; set `positive="down"` when slipping *down* the pack is the win (a support ticket's
+backlog rank, say). The line already encodes the direction, so the color is only a redundant
+cue — never the sole signal.
+
+<LiveDemo
+  label="positive='down'"
+  code={`<PercentileTrace
+  data={[78, 72, 64, 55, 47, 40, 34, 29, 26, 24]}
+  positive="down"
+/>`}
+>
+  <PercentileTrace
+    data={[78, 72, 64, 55, 47, 40, 34, 29, 26, 24]}
+    positive="down"
+    unit="week"
+    title="down is good"
+    width={220}
+    height={28}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="one reading" code={`<PercentileTrace data={[63]} unit="week" />`}>
+  <PercentileTrace data={[63]} unit="week" title="Single reading" width={140} height={26} />
+</LiveDemo>
+
+<LiveDemo
+  label="out-of-range clamp"
+  code={`// ranks are 0–100 — values outside are clamped (and dev-warn once)
+<PercentileTrace data={[102, 88, 96]} unit="week" />`}
+>
+  <PercentileTrace
+    data={[102, 88, 96]}
+    unit="week"
+    title="Clamped ranks"
+    width={180}
+    height={26}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<PercentileTrace
+  data={[40, 55, 68, 81.5]}
+  format={{ maximumFractionDigits: 1 }}
+  locale="de-DE"
+  label="last"
+/>`}
+>
+  <PercentileTrace
+    data={[40, 55, 68, 81.5]}
+    format={{ maximumFractionDigits: 1 }}
+    locale="de-DE"
+    label="last"
+    unit="week"
+    title="Localized percentile"
+    width={180}
+    height={26}
+  />
+</LiveDemo>
+
+A single reading is a lone endpoint with no line to draw — it still reports its standing and
+holds the accessible-name contract. Ranks outside 0–100 are clamped to the axis (a value of
+`102` reads as `p100`) and warn once in development. With a `locale`, the percentile label and
+every announced number follow that locale's own formatting — `de-DE` renders `p81,5` with a
+comma.
+
+## Four homes
+
+<FourContexts slug="percentile-trace" />
+
+## Why this default
+
+The full 0–100 axis with fixed bands, because a percentile is a standing *within a population*
+— truncating the axis would hide how much headroom or floor is left, and re-estimating the
+bands from the single traced series would be a fiction. The middle-half and near-full fields
+are exact by construction, so the chart shows one honest line over a landscape you can trust,
+never a thicket of competing series.
+
+## Accessibility
+
+The accessible name states the current percentile, the change from the first reading, and how
+the standing moved relative to the middle half — **"p81 now, up 41 points from the first
+reading; moved above the middle half."**. The interactive entry steps the readings and
+announces each one's percentile.
+
+## Props
+
+<PropTable slug="percentile-trace" />

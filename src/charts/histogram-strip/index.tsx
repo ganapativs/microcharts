@@ -26,7 +26,7 @@ export interface HistogramStripProps {
   /** Bin count; auto = min(12, ⌈√n⌉). */
   bins?: number | undefined;
   /** A VALUE whose bin gets accent — "where you fall in the distribution". */
-  highlight?: number | undefined;
+  markValue?: number | undefined;
   /** Fixed bin edges across small multiples (calibration). */
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
@@ -47,7 +47,7 @@ export function HistogramStrip(props: HistogramStripProps): ReactNode {
   const {
     data,
     bins,
-    highlight,
+    markValue,
     domain,
     width = 60,
     height = 16,
@@ -63,12 +63,12 @@ export function HistogramStrip(props: HistogramStripProps): ReactNode {
     children,
   } = props;
 
-  const geo = histogramGeometry({ width, height, values: data, domain, bins, highlight });
+  const geo = histogramGeometry({ width, height, values: data, domain, bins, markValue });
   const fmt = makeFormatter(format, locale);
   const modal = geo.modalBin >= 0 ? geo.bars[geo.modalBin] : undefined;
   const accName =
     summary === false ? false : (summary ?? histogramSummary(geo.total, modal, fmt, strings));
-  const hasHighlight = geo.highlightBin >= 0;
+  const hasMark = geo.markBin >= 0;
 
   return (
     <Chart
@@ -91,8 +91,8 @@ export function HistogramStrip(props: HistogramStripProps): ReactNode {
             shapeRendering="crispEdges"
             data-mc-ink="bar"
             style={
-              hasHighlight
-                ? b.index === geo.highlightBin
+              hasMark
+                ? b.index === geo.markBin
                   ? { fill: "var(--mc-accent)" }
                   : { fillOpacity: 0.55, ...(color ? { fill: color } : null) }
                 : color

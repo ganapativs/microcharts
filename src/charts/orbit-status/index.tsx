@@ -96,7 +96,6 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
   // Reserve the gutter from the real text extent so the ms numeral never spills
   // (0.7·em/char over-estimate — the "ms" glyphs run wider than digits).
   const labelBand = labelText ? Math.ceil(labelText.length * 0.7 * fontSize + 2) : 0;
-  const satFill = geo.satellite.alerted ? "var(--mc-negative)" : (color ?? "var(--mc-accent)");
 
   return (
     <Chart
@@ -114,9 +113,9 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
         cy={geo.orbit.cy}
         r={geo.orbit.r}
         data-mc-ink="muted"
+        data-mc-w="hair"
         style={{
           fill: "none",
-          strokeWidth: 0.6,
           strokeOpacity: geo.unknown ? 0.4 : 0.8,
           ...(geo.orbit.dash[0] > 0
             ? { strokeDasharray: `${geo.orbit.dash[0]} ${geo.orbit.dash[1]}` }
@@ -128,10 +127,8 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
         cx={geo.center.cx}
         cy={geo.center.cy}
         r={geo.center.r}
-        style={{
-          fill: geo.unknown ? "var(--mc-neutral)" : "var(--mc-stroke)",
-          fillOpacity: geo.unknown ? 0.5 : 1,
-        }}
+        data-mc-ink={geo.unknown ? "neutral" : "bar"}
+        style={geo.unknown ? { fillOpacity: 0.5 } : undefined}
       />
       {/* the dependency */}
       {!geo.unknown ? (
@@ -140,7 +137,8 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
           cx={geo.satellite.cx}
           cy={geo.satellite.cy}
           r={geo.satellite.r}
-          style={{ fill: satFill }}
+          data-mc-ink={geo.satellite.alerted ? "negative" : "accent"}
+          style={color ? { fill: color } : undefined}
         />
       ) : null}
       {labelText !== null ? (

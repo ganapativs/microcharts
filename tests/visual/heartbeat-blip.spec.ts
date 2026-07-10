@@ -14,26 +14,26 @@ const BUSY = [97_000, 92_000, 85_000, 70_000, 55_000, 48_000];
 const QUIET = [90_000, 60_000];
 
 function gallery(): string {
-  const sentence = `The service is ${svg({ data: BUSY, now: 100_000, width: 70, summary: false })} alive.`;
+  const sentence = `The service is ${svg({ events: BUSY, now: 100_000, width: 70, summary: false })} alive.`;
 
   const cell = `<table><tbody>
-    <tr><td>web</td><td>${svg({ data: BUSY, now: 100_000, width: 64, summary: false })}</td></tr>
-    <tr><td>api</td><td>${svg({ data: QUIET, now: 100_000, width: 64, summary: false })}</td></tr>
-    <tr><td>db</td><td>${svg({ data: [], now: 100_000, width: 64, summary: false })}</td></tr>
+    <tr><td>web</td><td>${svg({ events: BUSY, now: 100_000, width: 64, summary: false })}</td></tr>
+    <tr><td>api</td><td>${svg({ events: QUIET, now: 100_000, width: 64, summary: false })}</td></tr>
+    <tr><td>db</td><td>${svg({ events: [], now: 100_000, width: 64, summary: false })}</td></tr>
   </tbody></table>`;
 
   const kpi = `<div class="card">
     <div class="label">Requests</div>
-    <div class="value">${svg({ data: BUSY, now: 100_000, label: "count", width: 90, summary: false })}</div>
+    <div class="value">${svg({ events: BUSY, now: 100_000, label: "count", width: 90, summary: false })}</div>
   </div>`;
 
-  const tab = `<div class="tab">${svg({ data: BUSY, now: 100_000, width: 56, summary: false })} <span>Live</span></div>`;
+  const tab = `<div class="tab">${svg({ events: BUSY, now: 100_000, width: 56, summary: false })} <span>Live</span></div>`;
 
   const variants = [
-    svg({ data: BUSY, now: 100_000, title: "busy", width: 90 }),
-    svg({ data: QUIET, now: 100_000, title: "quiet", width: 90 }),
-    svg({ data: BUSY, now: 100_000, label: "count", title: "count", width: 90 }),
-    svg({ data: [], now: 100_000, title: "flatline", width: 90 }),
+    svg({ events: BUSY, now: 100_000, title: "busy", width: 90 }),
+    svg({ events: QUIET, now: 100_000, title: "quiet", width: 90 }),
+    svg({ events: BUSY, now: 100_000, label: "count", title: "count", width: 90 }),
+    svg({ events: [], now: 100_000, title: "flatline", width: 90 }),
   ]
     .map((s) => `<div>${s}</div>`)
     .join("");
@@ -41,7 +41,7 @@ function gallery(): string {
   const presets = ["editorial", "mono", "vivid"]
     .map(
       (p) =>
-        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ data: BUSY, now: 100_000, width: 70, summary: false })}</span>`,
+        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ events: BUSY, now: 100_000, width: 70, summary: false })}</span>`,
     )
     .join(" ");
 

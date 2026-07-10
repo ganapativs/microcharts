@@ -13,7 +13,7 @@ export function InteractiveDemo() {
         style={{ background: "none", border: "none", padding: 0, cursor: "pointer", lineHeight: 0 }}
         aria-label="Take a seat"
       >
-        <HoneycombInteractive value={value} total={40} unit="seats" title="Occupancy" cellR={8} />
+        <HoneycombInteractive value={value} total={40} unit="seats" title="Occupancy" cell={8} />
       </button>
     </DemoPanel>
   );

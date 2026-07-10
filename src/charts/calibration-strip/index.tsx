@@ -99,7 +99,8 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
       className={className ? `mc-calib ${className}` : "mc-calib"}
       style={style}
     >
-      {/* support lane */}
+      {/* support lane — flat siblings, plain attributes (up to `bins` bars +
+          `bins` points can clear the 10-element SSR hot-path threshold) */}
       {geo.supportBars.map((b, i) => (
         <rect
           key={i}
@@ -108,15 +109,15 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
           width={b.width}
           height={b.height}
           shapeRendering="crispEdges"
-          style={{ fill: "var(--mc-neutral)", fillOpacity: 0.35 }}
+          data-mc-ink="neutral"
+          fillOpacity={0.35}
         />
       ))}
       {/* identity diagonal — a reference axis (a path, not a connector line) */}
       <path
         d={`M${geo.diagonal.x1} ${geo.diagonal.y1}L${geo.diagonal.x2} ${geo.diagonal.y2}`}
-        fill="none"
-        stroke="var(--mc-neutral)"
-        strokeWidth={0.75}
+        data-mc-ink="muted"
+        data-mc-w="tick"
         strokeDasharray="2 1.5"
         vectorEffect="non-scaling-stroke"
       />
@@ -125,15 +126,18 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
         ? geo.points.map((p, i) => {
             const dy = diagY(p.predicted);
             return (
+              // primary bar-mode mark (the only per-point mark in this variant) —
+              // inherits full --mc-stroke-width rather than a width role, which
+              // is reserved for secondary/decorative strokes
               <line
                 key={i}
                 x1={p.x}
                 x2={p.x}
                 y1={round2(dy)}
                 y2={p.y}
-                stroke="var(--mc-accent)"
+                data-mc-ink="accent"
                 strokeOpacity={p.lowSupport ? 0.4 : 1}
-                strokeWidth={1.4}
+                style={{ strokeWidth: "var(--mc-stroke-width)" }}
                 vectorEffect="non-scaling-stroke"
               />
             );
@@ -148,11 +152,11 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                 fill="none"
                 stroke="var(--mc-accent)"
                 strokeOpacity={0.5}
-                strokeWidth={0.9}
+                data-mc-w="support"
                 vectorEffect="non-scaling-stroke"
               />
             ) : (
-              <circle key={i} cx={p.x} cy={p.y} r={1.6} fill="var(--mc-accent)" />
+              <circle key={i} cx={p.x} cy={p.y} r={1.6} data-mc-ink="accent" />
             ),
           )}
       {children}

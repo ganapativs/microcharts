@@ -1,8 +1,8 @@
 // DepthWedge geometry — pure, React-free (plan/25 §12, plan/17 F5). Two filled
 // cumulative step-wedges meeting at the spread: demand accumulates leftward from
 // the gap, supply rightward. The y-scale is LINEAR, full stop — no `scale` prop,
-// no silent log (documented steer to full-size tools). The visible `range` is
-// part of the claim. 2-dp.
+// no silent log (documented steer to full-size tools). The visible `levels`
+// span is part of the claim. 2-dp.
 import { round2 } from "../../core/types.js";
 
 export interface Level {
@@ -38,7 +38,7 @@ const clean = (rows: readonly Level[]): Level[] =>
 export function depthWedgeGeometry(opts: {
   demand: readonly Level[];
   supply: readonly Level[];
-  range: number | null;
+  levels: number | null;
   normalize: boolean;
   width: number;
   height: number;
@@ -62,15 +62,15 @@ export function depthWedgeGeometry(opts: {
         : lowestAsk;
   const spread = demand.length > 0 && supply.length > 0 ? Math.max(0, lowestAsk - highestBid) : 0;
 
-  // range = ± level distance from mid to include
+  // levels = ± level distance from mid to include
   const extents: number[] = [];
   for (const d of demand) extents.push(mid - d.level);
   for (const s of supply) extents.push(s.level - mid);
-  const autoRange = extents.length > 0 ? Math.max(...extents) : 1;
-  const range = opts.range != null && opts.range > 0 ? opts.range : autoRange || 1;
+  const autoLevels = extents.length > 0 ? Math.max(...extents) : 1;
+  const levels = opts.levels != null && opts.levels > 0 ? opts.levels : autoLevels || 1;
 
   const halfW = width / 2 - pad;
-  const xOf = (level: number): number => round2(midX + ((level - mid) / range) * halfW);
+  const xOf = (level: number): number => round2(midX + ((level - mid) / levels) * halfW);
 
   const demandTotal = demand.reduce((s, d) => s + d.amount, 0);
   const supplyTotal = supply.reduce((s, d) => s + d.amount, 0);

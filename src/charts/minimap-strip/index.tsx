@@ -16,7 +16,7 @@ export interface MinimapStripProps {
   variant?: "bars" | "heat" | undefined;
   /** Dedicated tick lane vs overlaying ticks on content. */
   markLane?: boolean | undefined;
-  domain?: [number, number] | undefined;
+  domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
@@ -33,7 +33,7 @@ export interface MinimapStripProps {
 /** Shared summary — position in the whole, mark count, unknown share. */
 export function minimapSummary(
   data: MinimapStripDatum,
-  domain: [number, number],
+  domain: readonly [number, number],
   unknownShare: number,
   strings: MinimapStrings,
   fmt: (n: number) => string,
@@ -100,27 +100,30 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
       className={className ? `mc-minimap ${className}` : "mc-minimap"}
       style={style}
     >
-      {/* fog-of-war over unknown regions */}
-      {geo.fogRects.map((f, i) => (
-        <g key={i}>
-          <rect
-            x={f.x}
-            y={f.y}
-            width={f.width}
-            height={f.height}
-            style={{ fill: "var(--mc-neutral)", fillOpacity: 0.1 }}
-          />
-          <path
-            d={hatchPath(f)}
-            stroke="var(--mc-neutral)"
-            strokeOpacity={0.4}
-            strokeWidth={0.5}
-            vectorEffect="non-scaling-stroke"
-          />
-        </g>
-      ))}
+      {/* fog-of-war over unknown regions — flat siblings, ink roles: the fog
+          rects + hatch scale with `known`/domain gaps, so no per-item <g> */}
+      {geo.fogRects.flatMap((f, i) => [
+        <rect
+          key={`fog${i}`}
+          x={f.x}
+          y={f.y}
+          width={f.width}
+          height={f.height}
+          fillOpacity={0.1}
+          data-mc-ink="neutral"
+        />,
+        <path
+          key={`hatch${i}`}
+          d={hatchPath(f)}
+          strokeOpacity={0.4}
+          data-mc-ink="muted"
+          data-mc-w="hair"
+          vectorEffect="non-scaling-stroke"
+        />,
+      ])}
 
-      {/* content thumbnail */}
+      {/* content thumbnail — flat siblings, ink role: up to ~60 buckets is
+          this chart's SSR hot path (bench floor 8 charts/ms) */}
       {variant === "heat" ? (
         geo.buckets.map((b, i) => (
           <rect
@@ -129,7 +132,8 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
             y={3}
             width={b.width}
             height={contentBottom - 3}
-            style={{ fill: "var(--mc-stroke)", fillOpacity: b.norm * 0.7 }}
+            fillOpacity={b.norm * 0.7}
+            data-mc-ink="bar"
           />
         ))
       ) : geo.buckets.length > 0 ? (
@@ -148,13 +152,14 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
       {geo.markX.length > 0 ? (
         <path
           d={geo.markX.map((x) => `M${round2(x)} 0.5V${markLane ? 3 : height - 1}`).join("")}
-          stroke="var(--mc-accent)"
-          strokeWidth={1}
+          data-mc-ink="accent"
+          data-mc-w="support"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
 
-      {/* viewport window */}
+      {/* viewport window — fill+stroke combo, so a literal accent var() ref
+          stays (the "accent" ink role zeroes the stroke on rects) */}
       <rect
         x={geo.windowRect.x}
         y={geo.windowRect.y}
@@ -164,7 +169,7 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
         fill="var(--mc-accent)"
         fillOpacity={0.12}
         stroke="var(--mc-accent)"
-        strokeWidth={1}
+        data-mc-w="support"
         vectorEffect="non-scaling-stroke"
       />
       {children}

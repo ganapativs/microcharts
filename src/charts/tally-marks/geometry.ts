@@ -27,15 +27,15 @@ export interface TallyGeometry {
   d: string;
   /** Integer viewBox width the strokes + numeral gutter need. */
   width: number;
-  /** Marks actually drawn (≤ max). */
+  /** Marks actually drawn (≤ total). */
   drawn: number;
-  /** Count beyond `max` not drawn as marks (numeral carries it). */
+  /** Count beyond `total` not drawn as marks (numeral carries it). */
   overflow: number;
   /** x for the `+N` numeral (text-anchor start), or null when none. */
   numeralX: number | null;
 }
 
-// Saturate drawn marks at a legible bound. `max` is a caller prop; a
+// Saturate drawn marks at a legible bound. `total` is a caller prop; a
 // non-physical value (e.g. 1e15, with a matching value) would otherwise loop
 // unbounded — trillions of stroke segments (OOM) running off the growing
 // viewBox. The overflow numeral carries the remainder, so the summary stays
@@ -49,7 +49,8 @@ const OVERHANG = 1; // how far the strike pokes past the outer verticals
 
 export function tallyGeometry(opts: {
   value: number;
-  max: number;
+  /** Discrete-count denominator (plan/04 §8 — renamed from `max`). */
+  total: number;
   height: number;
   pad: number;
   pen: TallyPen;
@@ -57,10 +58,10 @@ export function tallyGeometry(opts: {
   /** viewBox font size of the overflow numeral (gutter reservation). */
   fontSize: number;
 }): TallyGeometry {
-  const { value, max, height, pad, pen, overflow, fontSize } = opts;
+  const { value, total, height, pad, pen, overflow, fontSize } = opts;
   // count is floored + never negative; the summary always carries the truth.
   const count = Math.max(0, Math.floor(isFinite(value) ? value : 0));
-  const cap = Math.min(Math.max(0, Math.floor(max)), TALLY_MAX_MARKS);
+  const cap = Math.min(Math.max(0, Math.floor(total)), TALLY_MAX_MARKS);
   const drawn = Math.min(count, cap);
   const overflowCount = count - drawn;
 

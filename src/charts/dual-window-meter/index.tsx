@@ -10,7 +10,7 @@ import { makeFormatter } from "../../core/format.js";
 import { EN_DUAL_WINDOW, type DualWindowStrings } from "../../core/strings-dual-window.js";
 import { clamp } from "../../core/scale.js";
 import { round2, type Value } from "../../core/types.js";
-import { dualWindowGeometry } from "./geometry.js";
+import { dualWindowGeometry, rollingMean } from "./geometry.js";
 
 export interface DualWindowMeterProps {
   data: readonly Value[];
@@ -19,12 +19,12 @@ export interface DualWindowMeterProps {
   /** Fast/slow integration windows (samples) — stated, never silent. */
   windows?: [number, number] | undefined;
   /** Compliance corridor instead of a single target (a muted zone). */
-  band?: [number, number] | undefined;
+  band?: readonly [number, number] | undefined;
   /** Ballistics for the live entry only (α on the displayed motion). */
   damping?: number | undefined;
   /** Right-edge current readings. */
   label?: "last" | "none" | undefined;
-  domain?: [number, number] | undefined;
+  domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
@@ -83,6 +83,10 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const fontSize = labelFont(height, 0.32);
+  // the two O(n·window) rolling means are computed ONCE and reused for both
+  // the preliminary (gutter-sizing) pass and the final layout pass below —
+  // each pass used to recompute both means, quietly doubling the real cost
+  const means = { fast: rollingMean(data, wf), slow: rollingMean(data, ws) };
   // preliminary pass to size the gutter from the last readings
   const pre = dualWindowGeometry({
     data,
@@ -93,6 +97,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
     width,
     height,
     gutter: 0,
+    means,
   });
   const labelStr = (v: number | null) => (v == null ? "" : fmt(v));
   const gutter =
@@ -115,6 +120,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
     width,
     height,
     gutter,
+    means,
   });
   const accName =
     summary === false
@@ -152,6 +158,9 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {geo.bandRect ? (
+        // fill via inline STYLE (see graded-band/benchmark-strip): the band
+        // ink-role CSS would set --mc-band, overriding it here to a flatter
+        // neutral corridor tint (plan/12)
         <rect
           x={geo.bandRect.x}
           y={geo.bandRect.y}
@@ -166,11 +175,14 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
         x2={width - gutter - 1}
         y1={geo.targetY}
         y2={geo.targetY}
-        stroke="var(--mc-neutral)"
-        strokeWidth={0.75}
+        data-mc-ink="muted"
+        data-mc-w="tick"
         strokeDasharray="2 1.5"
         vectorEffect="non-scaling-stroke"
       />
+      {/* the ×1.3 / ×0.7 width pair IS the encoding (slow sustained = thick,
+          fast reactive = thin) — justified literal multipliers on the primary
+          token, not width roles (those are for secondary strokes) */}
       <path
         d={geo.slowPath}
         data-mc-ink="data"
@@ -181,8 +193,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
       />
       <path
         d={geo.fastPath}
-        fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-ink="accent"
         strokeLinejoin="round"
         strokeLinecap="round"
         style={{ strokeWidth: "calc(var(--mc-stroke-width) * 0.7)" }}
@@ -206,7 +217,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
           dominantBaseline="central"
           textAnchor="end"
           fontSize={fontSize}
-          style={{ fill: "var(--mc-accent)" }}
+          data-mc-ink="accent"
         >
           {fmt(geo.fastLast)}
         </text>

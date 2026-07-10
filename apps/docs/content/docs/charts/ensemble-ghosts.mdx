@@ -13,7 +13,19 @@ quantiles), so the same input renders identically every time.
   sizeOf="ensemble-ghosts"
   code={`import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
 
-<EnsembleGhosts data={futures} title="Simulated futures" />`}
+<EnsembleGhosts
+  data={[
+    [40, 41, 43, 45, 47, 50],
+    [40, 39, 38, 36, 35, 33],
+    [40, 42, 44, 47, 49, 52],
+    [40, 40, 41, 41, 42, 43],
+    [40, 43, 47, 52, 56, 61],
+    [40, 38, 35, 32, 30, 28],
+    [40, 41, 42, 44, 45, 46],
+    [40, 39, 40, 41, 42, 44],
+  ]}
+  title="Simulated futures"
+/>`}
 >
   <EnsembleGhosts
     data={[[40, 41, 43, 45, 47, 50], [40, 39, 38, 36, 35, 33], [40, 42, 44, 47, 49, 52], [40, 40, 41, 41, 42, 43], [40, 43, 47, 52, 56, 61], [40, 38, 35, 32, 30, 28], [40, 41, 42, 44, 45, 46], [40, 39, 40, 41, 42, 44]]}
@@ -49,8 +61,26 @@ quantiles), so the same input renders identically every time.
 
 <LiveDemo
   label="endpoint dots + synthetic median"
-  code={`<EnsembleGhosts data={futures} endpoints />
-<EnsembleGhosts data={futures} emphasis="median" />`}
+  code={`<EnsembleGhosts
+  data={[
+    [40, 41, 43, 45, 47, 50],
+    [40, 39, 38, 36, 35, 33],
+    [40, 42, 44, 47, 49, 52],
+    [40, 43, 47, 52, 56, 61],
+    [40, 38, 35, 32, 30, 28],
+  ]}
+  endpoints
+/>
+<EnsembleGhosts
+  data={[
+    [40, 41, 43, 45, 47, 50],
+    [40, 39, 38, 36, 35, 33],
+    [40, 42, 44, 47, 49, 52],
+    [40, 43, 47, 52, 56, 61],
+    [40, 38, 35, 32, 30, 28],
+  ]}
+  emphasis="median"
+/>`}
 >
   <span className="inline-flex gap-4 items-center">
     <EnsembleGhosts
@@ -79,6 +109,47 @@ quantiles), so the same input renders identically every time.
     />
   </span>
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="single member" code={`<EnsembleGhosts data={[[40, 43, 47, 52, 56, 61]]} />`}>
+  <EnsembleGhosts
+    data={[[40, 43, 47, 52, 56, 61]]}
+    title="One simulated path"
+    width={160}
+    height={40}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<EnsembleGhosts
+  data={[
+    [4000, 4100, 4300, 4500, 4700, 5000],
+    [4000, 3900, 3800, 3600, 3500, 3300],
+    [4000, 4200, 4400, 4700, 4900, 5200],
+  ]}
+  locale="de-DE"
+/>`}
+>
+  <EnsembleGhosts
+    data={[
+      [4000, 4100, 4300, 4500, 4700, 5000],
+      [4000, 3900, 3800, 3600, 3500, 3300],
+      [4000, 4200, 4400, 4700, 4900, 5200],
+    ]}
+    locale="de-DE"
+    title="Localized endpoints"
+    width={160}
+    height={40}
+  />
+</LiveDemo>
+
+With one member, there is no bundle to show — the chart draws that single path as the
+representative, and the summary states its ending value rather than a spread. A member that
+contains a non-finite value (`NaN`, `Infinity`) is excluded entirely from ghost selection and
+the median, not gapped mid-path — a dev-only console warning flags it, since a partially
+invalid future usually means bad simulation output.
 
 ## Four homes
 

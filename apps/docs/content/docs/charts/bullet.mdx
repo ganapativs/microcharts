@@ -57,9 +57,43 @@ card column; the viewBox keeps the aspect ratio.
   <Bullet value={38} target={80} width={220} height={22} title="Measure and target only" />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="value beyond the domain"
+  code={`// the measure clamps at the track end; the summary keeps the real number
+<Bullet value={120} target={80} domain={[0, 100]} />`}
+>
+  <Bullet
+    value={120}
+    target={80}
+    domain={[0, 100]}
+    width={220}
+    height={22}
+    title="Over the domain"
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="no data"
+  code={`// a non-finite value renders a zero-width measure and announces "No data." —
+// the bands and target tick stay as context
+<Bullet value={NaN} target={80} bands={[50, 90]} />`}
+>
+  <Bullet value={NaN} target={80} bands={[50, 90]} width={220} height={22} title="No data" />
+</LiveDemo>
+
 ## Four homes
 
 <FourContexts slug="bullet" />
+
+## Why this default
+
+The qualitative bands sit lowest and graduate in shade by step, because they are context, not the
+answer — the measure bar has to read as the loudest mark on the row. The target is a tick, not a
+second bar: a distinct shape at a distinct position so "value vs target" survives grayscale print
+and never depends on the two colors staying apart. The measure bar itself is a thin band centered in
+the track (Few's proportion, not a full-height fill) so the bands stay legible on both sides of it.
 
 ## Accessibility
 

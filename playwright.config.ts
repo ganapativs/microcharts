@@ -28,5 +28,17 @@ export default defineConfig({
   projects: [
     { name: "light", use: { colorScheme: "light" } },
     { name: "dark", use: { colorScheme: "dark" } },
+    // Cross-browser smoke (render + console-error sweep, no Argos baselines):
+    // opt-in via CROSS_BROWSER=1 — Safari's SVG/currentColor/sub-pixel quirks
+    // and Firefox's are the targets; Argos pixel review stays Chromium-only.
+    ...(process.env.CROSS_BROWSER
+      ? [
+          { name: "webkit", use: { ...devices["Desktop Safari"], colorScheme: "light" as const } },
+          {
+            name: "firefox",
+            use: { ...devices["Desktop Firefox"], colorScheme: "light" as const },
+          },
+        ]
+      : []),
   ],
 });

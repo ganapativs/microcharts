@@ -29,8 +29,6 @@
 
     /* geometry + type */
     --mc-stroke-width: 1.5;
-    --mc-dot-size: 2;
-    --mc-radius: 1px;
     --mc-gap: 0.25em;
     --mc-font: inherit;
     --mc-label-size: 0.75em;
@@ -73,22 +71,26 @@
      Ink is left to the active theme (never pinned to a light value) so the
      preset stays legible on dark surfaces too — its identity is the weight and
      the accent, not a fixed grey. */
-  :where([data-mc-theme="editorial"]) {
+  /* Each preset also answers to [data-mc-preset] — the page-global form (a docs
+     or app shell sets it on <html>) — so preset bundles have ONE source here and
+     hosts never re-declare them. Per-instance [data-mc-theme] wins by proximity. */
+  :where([data-mc-theme="editorial"], [data-mc-preset="editorial"]) {
     --mc-accent: #b8112a;
     --mc-stroke-width: 1;
-    --mc-radius: 0;
   }
-  :where([data-mc-theme="mono"]) {
+  :where([data-mc-theme="mono"], [data-mc-preset="mono"]) {
     --mc-positive: var(--mc-stroke);
     --mc-negative: var(--mc-stroke);
     --mc-accent: var(--mc-stroke);
     --mc-neutral: var(--mc-stroke);
     --mc-moon: var(--mc-stroke);
   }
-  :where([data-mc-theme="vivid"]) {
+  /* vivid never claims --mc-accent: the accent is the consumer's brand voice;
+     the preset only turns up weight + valence. (editorial's red IS its identity,
+     so that one keeps its pin.) */
+  :where([data-mc-theme="vivid"], [data-mc-preset="vivid"]) {
     --mc-positive: #00c896;
     --mc-negative: #ff5630;
-    --mc-accent: #2f6bff;
     --mc-stroke-width: 2;
   }
 }
@@ -223,6 +225,38 @@
     fill: var(--mc-accent);
     stroke: none;
   }
+  /* accent on stroked marks (now-line, focus guides) — element-split like ghost:
+     an open polyline with a plain accent FILL would paint a wedge and lose its
+     stroke, so line-shaped accents stroke instead. */
+  :where(.mc-root :is(path, line, polyline)[data-mc-ink="accent"]) {
+    fill: none;
+    stroke: var(--mc-accent);
+  }
+  /* valence on stroked marks (seismogram spikes) — same element-split */
+  :where(.mc-root :is(path, line, polyline)[data-mc-ink="positive"]) {
+    fill: none;
+    stroke: var(--mc-positive);
+  }
+  :where(.mc-root :is(path, line, polyline)[data-mc-ink="negative"]) {
+    fill: none;
+    stroke: var(--mc-negative);
+  }
+  /* width roles — orthogonal to ink (color) roles, composable on any stroked
+     mark. Ratios of the primary width so presets and prefers-contrast retune
+     every stroke in a chart, not just the data line. At the default 1.5 these
+     resolve to 1 / 0.75 / 0.5 — the weights the charts were hand-tuned to. */
+  :where(.mc-root [data-mc-w="full"]) {
+    stroke-width: var(--mc-stroke-width);
+  }
+  :where(.mc-root [data-mc-w="support"]) {
+    stroke-width: calc(var(--mc-stroke-width) * 2 / 3);
+  }
+  :where(.mc-root [data-mc-w="tick"]) {
+    stroke-width: calc(var(--mc-stroke-width) / 2);
+  }
+  :where(.mc-root [data-mc-w="hair"]) {
+    stroke-width: calc(var(--mc-stroke-width) / 3);
+  }
   :where(.mc-root [data-mc-ink="muted"]) {
     fill: none;
     stroke: var(--mc-neutral);
@@ -281,13 +315,13 @@
     fill: var(--mc-band);
     stroke: var(--mc-neutral);
     stroke-opacity: 0.4;
-    stroke-width: 0.5;
+    stroke-width: calc(var(--mc-stroke-width) / 3);
   }
   :where(.mc-root [data-mc-ink="gap"]) {
     fill: var(--mc-band);
     stroke: var(--mc-neutral);
     stroke-opacity: 0.35;
-    stroke-width: 0.5;
+    stroke-width: calc(var(--mc-stroke-width) / 3);
   }
   /* Ghost = low-precision context behind the primary mark (RateVolume volume
      bars, QuadrantDot peer dots, CyclePlot slot lines, ChangePoint regime means,
@@ -320,6 +354,52 @@
   }
   :where(.mc-root circle[data-mc-ink="flag"]) {
     fill: var(--mc-accent);
+  }
+
+  /* categorical fill roles — the --mc-cat-N palette as roles, so segment charts
+     emit one short attribute instead of an inline var() string per mark. */
+  :where(.mc-root [data-mc-cat="1"]) {
+    fill: var(--mc-cat-1);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="2"]) {
+    fill: var(--mc-cat-2);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="3"]) {
+    fill: var(--mc-cat-3);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="4"]) {
+    fill: var(--mc-cat-4);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="5"]) {
+    fill: var(--mc-cat-5);
+    stroke: none;
+  }
+  :where(.mc-root [data-mc-cat="6"]) {
+    fill: var(--mc-cat-6);
+    stroke: none;
+  }
+
+  /* TraceFold + PartitionStrip — dense span/segment strips. Shared presentation
+     lives here (not per-mark attributes): these charts render 20–40 rects and
+     the attribute count is their SSR hot path. Label ink over saturated fills
+     = ON_FILL_INK (core/color.ts) — the one sanctioned on-fill literal. */
+  :where(.mc-trace, .mc-partition) :where(rect) {
+    shape-rendering: crispEdges;
+    rx: 0.5;
+  }
+  /* anchor/baseline stay SVG attributes on the marks — the craft gate computes
+     text extents from raw attributes; only paint moves here */
+  :where(.mc-trace, .mc-partition) :where(text) {
+    font-weight: 600;
+    fill: rgba(255, 255, 255, 0.96);
+  }
+  /* a label on a muted (non-critical) span recedes to the page surface */
+  :where(.mc-trace) :where(text[data-mc-dim]) {
+    fill: var(--mc-surface, Canvas);
   }
 
   /* Interactive sparkline crosshair — a dashed guide reads as "measuring" the
@@ -393,6 +473,24 @@
 }
 
 @layer microcharts.motion {
+  /* Readout chip enter — 140ms strong ease-out rise (opacity + independent
+     translate/scale, composing with the chip's inline centering transform).
+     @starting-style is progressive: older engines show the chip instantly.
+     Exit is unmount (instant) — deliberate enter/exit asymmetry. */
+  :where(.mc-spark-readout) {
+    translate: 0 0;
+    scale: 1;
+    transition:
+      opacity 140ms cubic-bezier(0.23, 1, 0.32, 1),
+      translate 140ms cubic-bezier(0.23, 1, 0.32, 1),
+      scale 140ms cubic-bezier(0.23, 1, 0.32, 1);
+    @starting-style {
+      opacity: 0;
+      translate: 0 2px;
+      scale: 0.97;
+    }
+  }
+
   @keyframes mc-pulse {
     0% {
       transform: scale(1);
@@ -461,7 +559,8 @@
   @media (prefers-reduced-motion: reduce) {
     :where(.mc-root *),
     :where(.mc-root),
-    :where(.mc-delta-live .mc-delta-num) {
+    :where(.mc-delta-live .mc-delta-num),
+    :where(.mc-spark-readout) {
       animation: none !important;
       transition: none !important;
     }

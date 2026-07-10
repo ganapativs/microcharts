@@ -123,7 +123,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
           x2={geo.ground.x2}
           y2={geo.ground.y}
           data-mc-ink="muted"
-          style={{ strokeOpacity: 0.6 }}
+          strokeOpacity={0.6}
         />
       ) : null}
       {geo.buildings.map((b) =>

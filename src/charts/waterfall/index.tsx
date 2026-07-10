@@ -110,9 +110,9 @@ export function Waterfall(props: WaterfallProps): ReactNode {
           x2={c.x1}
           y2={c.y}
           data-mc-ink="muted"
+          data-mc-w="support"
           strokeOpacity={0.4}
           vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: 0.75 }}
         />
       ))}
       {geo.bars.map((b) => (

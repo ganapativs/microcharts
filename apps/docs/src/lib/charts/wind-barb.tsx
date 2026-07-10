@@ -39,7 +39,7 @@ export const entry: ChartEntry = {
     },
     {
       name: "label",
-      type: "boolean",
+      type: '"value" | "none"',
       required: false,
       description: "Numeric magnitude beside the glyph.",
     },
@@ -57,7 +57,7 @@ export function Preview() {
 
 export const showcase = {
   hint: "flow",
-  Node: () => <WindBarb direction={225} magnitude={32} label title="Wind" size={32} />,
+  Node: () => <WindBarb direction={225} magnitude={32} label="value" title="Wind" size={32} />,
 };
 
 export const playground: PlaygroundSpec = {
@@ -73,14 +73,14 @@ export const playground: PlaygroundSpec = {
     },
     { kind: "range", key: "magnitude", label: "magnitude", min: 0, max: 90, init: 32 },
     { kind: "range", key: "step", label: "each barb =", min: 5, max: 20, step: 5, init: 10 },
-    { kind: "toggle", key: "label", label: "label", init: false },
+    { kind: "segmented", key: "label", label: "label", options: ["none", "value"], init: "none" },
   ],
   render: (s) => (
     <WindBarb
       direction={s.direction as number}
       magnitude={s.magnitude as number}
       step={s.step as number}
-      label={s.label as boolean}
+      label={s.label as "none" | "value"}
       summary={false}
       size={64}
     />
@@ -91,7 +91,7 @@ export const playground: PlaygroundSpec = {
       `  direction={${s.direction}}`,
       `  magnitude={${s.magnitude}}`,
       s.step !== 10 && `  step={${s.step}}`,
-      s.label === true && "  label",
+      s.label === "value" && '  label="value"',
       "/>",
     ]
       .filter(Boolean)
@@ -106,8 +106,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "with label",
-    code: `<WindBarb direction={45} magnitude={25} label />`,
-    node: <WindBarb direction={45} magnitude={25} label summary={false} size={32} />,
+    code: `<WindBarb direction={45} magnitude={25} label="value" />`,
+    node: <WindBarb direction={45} magnitude={25} label="value" summary={false} size={32} />,
   },
 ];
 

@@ -13,7 +13,18 @@ fact that holds until the next one, not a sample of a continuum a line chart can
   code={`import { Hypnogram } from "@microcharts/react/hypnogram";
 
 <Hypnogram
-  data={sleep}
+  data={[
+    { t: 0, state: "Awake" },
+    { t: 8, state: "Light" },
+    { t: 22, state: "Deep" },
+    { t: 38, state: "Light" },
+    { t: 50, state: "REM" },
+    { t: 62, state: "Light" },
+    { t: 74, state: "Deep" },
+    { t: 86, state: "Light" },
+    { t: 98, state: "REM" },
+    { t: 110, state: "Awake" },
+  ]}
   states={["Awake", "REM", "Light", "Deep"]}
   title="Sleep stages"
 />`}
@@ -62,7 +73,18 @@ fact that holds until the next one, not a sample of a continuum a line chart can
 
 ## Variants
 
-<LiveDemo label="lanes (nominal)" code={`<Hypnogram data={deploys} variant="lanes" />`}>
+<LiveDemo
+  label="lanes (nominal)"
+  code={`<Hypnogram
+  data={[
+    { t: 0, state: "Awake" },
+    { t: 30, state: "REM" },
+    { t: 60, state: "Deep" },
+    { t: 90, state: "Light" },
+  ]}
+  variant="lanes"
+/>`}
+>
   <Hypnogram
     data={[
       { t: 0, state: "Awake" },
@@ -79,7 +101,20 @@ fact that holds until the next one, not a sample of a continuum a line chart can
   />
 </LiveDemo>
 
-<LiveDemo label="emphasis" code={`<Hypnogram data={sleep} emphasis="Deep" />`}>
+<LiveDemo
+  label="emphasis"
+  code={`<Hypnogram
+  data={[
+    { t: 0, state: "Awake" },
+    { t: 8, state: "Light" },
+    { t: 22, state: "Deep" },
+    { t: 38, state: "Light" },
+    { t: 74, state: "Deep" },
+    { t: 110, state: "Awake" },
+  ]}
+  emphasis="Deep"
+/>`}
+>
   <Hypnogram
     data={[
       { t: 0, state: "Awake" },
@@ -97,6 +132,52 @@ fact that holds until the next one, not a sample of a continuum a line chart can
     height={64}
   />
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="one state, whole domain"
+  code={`<Hypnogram data={[{ t: 0, state: "Deep" }]} domain={[0, 120]} />`}
+>
+  <Hypnogram
+    data={[{ t: 0, state: "Deep" }]}
+    domain={[0, 120]}
+    title="Deep sleep throughout"
+    width={220}
+    height={40}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="a state outside the explicit order"
+  code={`// "Groggy" isn't in \`states\` — it's appended as its own row, not dropped
+<Hypnogram
+  data={[
+    { t: 0, state: "Awake" },
+    { t: 20, state: "Groggy" },
+    { t: 40, state: "Light" },
+  ]}
+  states={["Awake", "Light", "Deep"]}
+/>`}
+>
+  <Hypnogram
+    data={[
+      { t: 0, state: "Awake" },
+      { t: 20, state: "Groggy" },
+      { t: 40, state: "Light" },
+    ]}
+    states={["Awake", "Light", "Deep"]}
+    title="Unlisted state appended"
+    width={220}
+    height={52}
+  />
+</LiveDemo>
+
+A single entry holds its state across the whole domain — one flat run, and the summary
+names it directly — **"1 state, no transitions; Deep throughout."** — rather than describing
+a one-point chart. A state present in the data but missing from an explicit `states` order
+is never dropped: it's appended as its own row (with a dev-only console warning), so the
+strip always accounts for every state it's given.
 
 ## Four homes
 

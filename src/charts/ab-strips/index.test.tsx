@@ -36,7 +36,10 @@ describe("<ABStrips> (plan/23 #13)", () => {
 
   it("two rows: outer + inner band + median dot each, plus A/B tags", () => {
     const { container } = draw(<ABStrips data={{ a: A, b: B }} />);
-    expect(container.querySelectorAll('[data-mc-ink="band"]').length).toBe(4); // 2 rows × (outer+inner)
+    // row A is neutral ink, row B is accent ink (no custom `color` here) — each
+    // row's outer+inner rects live inside a `<g>`, unlike the contested-zone rect
+    expect(container.querySelectorAll('g > rect[data-mc-ink="neutral"]').length).toBe(2); // A
+    expect(container.querySelectorAll('g > rect[data-mc-ink="accent"]').length).toBe(2); // B
     expect(container.querySelectorAll("circle").length).toBe(2); // medians
     const tags = [...container.querySelectorAll("text")].map((t) => t.textContent);
     expect(tags).toContain("A");

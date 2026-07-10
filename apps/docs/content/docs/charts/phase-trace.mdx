@@ -13,7 +13,15 @@ arrowhead, so "now, and how it got here" reads at a glance.
   sizeOf="phase-trace"
   code={`import { PhaseTrace } from "@microcharts/react/phase-trace";
 
-<PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" title="Phase portrait" />`}
+<PhaseTrace
+  data={Array.from({ length: 40 }, (_, i) => {
+    const t = (i / 40) * Math.PI * 2;
+    return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+  })}
+  xLabel="CPU"
+  yLabel="Latency"
+  title="Phase portrait"
+/>`}
 >
   <PhaseTrace
     data={Array.from({ length: 40 }, (_, i) => { const t = (i / 40) * Math.PI * 2; return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 }; })}
@@ -49,7 +57,17 @@ arrowhead, so "now, and how it got here" reads at a glance.
 
 ## Variants
 
-<LiveDemo label="longer tail" code={`<PhaseTrace data={traj} tail={0.4} startDot />`}>
+<LiveDemo
+  label="longer tail"
+  code={`<PhaseTrace
+  data={Array.from({ length: 40 }, (_, i) => {
+    const t = (i / 40) * Math.PI * 2;
+    return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+  })}
+  tail={0.4}
+  startDot
+/>`}
+>
   <PhaseTrace
     data={Array.from({ length: 40 }, (_, i) => {
       const t = (i / 40) * Math.PI * 2;
@@ -65,6 +83,83 @@ arrowhead, so "now, and how it got here" reads at a glance.
   />
 </LiveDemo>
 
+<LiveDemo
+  label="locale"
+  code={`<PhaseTrace
+  data={[
+    { x: 1200, y: 4500 },
+    { x: 1450, y: 4100 },
+    { x: 1800, y: 3600 },
+  ]}
+  xLabel="Requests"
+  yLabel="Errors"
+  locale="de-DE"
+/>`}
+>
+  <PhaseTrace
+    data={[
+      { x: 1200, y: 4500 },
+      { x: 1450, y: 4100 },
+      { x: 1800, y: 3600 },
+    ]}
+    xLabel="Requests"
+    yLabel="Errors"
+    locale="de-DE"
+    title="Localized coordinates"
+    width={90}
+    height={80}
+  />
+</LiveDemo>
+
+With a `locale`, the accessible summary's coordinates follow that locale's own grouping —
+"1.800" in German, not "1,800". In-chart marks carry no text, so only the announced numbers
+change.
+
+## Edge cases
+
+<LiveDemo
+  label="single observation"
+  code={`// one point: no trail, no tail, no arrowhead — just the current position
+<PhaseTrace data={[{ x: 55, y: 62 }]} xLabel="CPU" yLabel="Latency" />`}
+>
+  <PhaseTrace
+    data={[{ x: 55, y: 62 }]}
+    xLabel="CPU"
+    yLabel="Latency"
+    title="One observation"
+    width={80}
+    height={72}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="steady (no motion)"
+  code={`// every point identical — heading resolves to "steady", not a division by zero
+<PhaseTrace
+  data={Array.from({ length: 8 }, () => ({ x: 40, y: 40 }))}
+  xLabel="CPU"
+  yLabel="Latency"
+/>`}
+>
+  <PhaseTrace
+    data={Array.from({ length: 8 }, () => ({ x: 40, y: 40 }))}
+    xLabel="CPU"
+    yLabel="Latency"
+    title="No motion"
+    width={80}
+    height={72}
+  />
+</LiveDemo>
+
+A single observation draws only the accent endpoint dot — there's no history to trail and no
+motion for an arrowhead to point along. When every point in the tail window is coincident
+(or nearly so, within 0.5% of the combined axis span), the heading resolves to the fifth,
+explicit "steady" state rather than a jittery direction from noise.
+
+## Four homes
+
+<FourContexts slug="phase-trace" />
+
 ## Why this default
 
 A muted trail with an accent tail because "now, and how it got here" is the question — the eye lands
@@ -75,9 +170,10 @@ direction is what separates a phase trace from a scatter.
 
 ## Accessibility
 
-The accessible name states the current point and heading — **"Latency vs CPU: now 62, 130; heading
-up-right."** The interactive entry steps through the trajectory in time order with ←/→, announcing
-each point's index and its value on both named axes.
+The accessible name states the current point and heading, with the y-axis named first — for the
+hero example above, **"Latency vs CPU: now 76.729, 75.163; heading down-right."** The interactive
+entry steps through the trajectory in time order with ←/→, announcing each point's index and its
+value on both named axes.
 
 ## Props
 

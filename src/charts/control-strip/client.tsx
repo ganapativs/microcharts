@@ -146,18 +146,20 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
               y1={0.5}
               x2={p.x}
               y2={height - 0.5}
-              stroke="var(--mc-neutral)"
-              strokeWidth={1}
+              data-mc-ink="muted"
+              data-mc-w="support"
               strokeDasharray="1.5 2"
               vectorEffect="non-scaling-stroke"
             />
+            {/* focus ring stroke is state-dependent (negative when out), so it
+                stays an attribute — a role can't switch color per point */}
             <circle
               cx={p.x}
               cy={p.y}
               r={2.4}
               fill="none"
               stroke={p.out ? "var(--mc-negative)" : "var(--mc-accent)"}
-              strokeWidth={1}
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
           </>

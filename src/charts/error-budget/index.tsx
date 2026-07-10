@@ -143,7 +143,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
           fill="none"
           strokeOpacity={0.28}
           strokeDasharray="1 2"
-          strokeWidth={0.6}
+          data-mc-w="hair"
           vectorEffect="non-scaling-stroke"
         />
       ))}
@@ -156,7 +156,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
         data-mc-ink="muted"
         strokeOpacity={0.6}
         strokeDasharray="2.5 2.5"
-        strokeWidth={0.8}
+        data-mc-w="support"
         vectorEffect="non-scaling-stroke"
       />
       {/* actual remaining line */}
@@ -176,7 +176,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
             x2={geo.exhausted.x + 1.6}
             y2={height - 2 + 1.6}
             stroke="var(--mc-negative)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
           <line
@@ -185,7 +185,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
             x2={geo.exhausted.x + 1.6}
             y2={height - 2 - 1.6}
             stroke="var(--mc-negative)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         </>

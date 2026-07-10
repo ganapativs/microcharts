@@ -13,6 +13,11 @@ maps to probability level and nothing else.
   sizeOf="graded-band"
   code={`import { GradedBand } from "@microcharts/react/graded-band";
 
+const posterior = Array.from(
+{ length: 160 },
+(_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
+);
+
 <GradedBand data={posterior} label="median" title="Forecast estimate" />`}
 >
   <GradedBand
@@ -48,7 +53,12 @@ maps to probability level and nothing else.
 
 <LiveDemo
   label="value + soft edge"
-  code={`<GradedBand data={posterior} value={28} />
+  code={`const posterior = Array.from(
+  { length: 160 },
+  (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
+);
+
+<GradedBand data={posterior} value={28} />
 <GradedBand data={posterior} softEdge />`}
 >
   <span className="inline-flex flex-col gap-1.5">
@@ -73,6 +83,63 @@ maps to probability level and nothing else.
       height={14}
     />
   </span>
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`const drift = Array.from(
+  { length: 160 },
+  (_, i) => (21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3))) / 10,
+);
+
+<GradedBand data={drift} label="median" locale="de-DE" />`}
+>
+  <GradedBand
+    data={Array.from(
+      { length: 160 },
+      (_, i) => (21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3))) / 10,
+    )}
+    label="median"
+    locale="de-DE"
+    title="Localized median"
+    width={200}
+    height={14}
+  />
+</LiveDemo>
+
+With a `locale`, the median label and the accessible summary follow that locale's decimal mark —
+the label above renders "2,2", not "2.2".
+
+## Edge cases
+
+<LiveDemo
+  label="all draws equal"
+  code={`// no spread → no interval to grade: only the median tick renders,
+// and the summary says so instead of faking a band
+<GradedBand data={[42, 42, 42, 42, 42, 42]} />`}
+>
+  <GradedBand data={[42, 42, 42, 42, 42, 42]} title="No spread" width={200} height={14} />
+</LiveDemo>
+
+The accessible name for that strip is **"Point value 42, no interval."** — a degenerate sample is
+announced as a point estimate, never dressed up as certainty about a range.
+
+<LiveDemo
+  label="actual far outside the forecast"
+  code={`// the observed dot always stays on-scale: the domain stretches to
+// include it, compressing the band instead of clipping the miss
+<GradedBand
+  data={[19, 20, 21, 21, 22, 22, 23, 23, 24, 26]}
+  value={48}
+/>`}
+>
+  <GradedBand
+    data={[19, 20, 21, 21, 22, 22, 23, 23, 24, 26]}
+    value={48}
+    title="Forecast miss"
+    width={200}
+    height={14}
+  />
 </LiveDemo>
 
 ## Four homes

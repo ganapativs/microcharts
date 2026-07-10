@@ -14,7 +14,16 @@ the same data — so they never share a mark.
   sizeOf="cycle-plot"
   code={`import { CyclePlot } from "@microcharts/react/cycle-plot";
 
-<CyclePlot data={daily} period={7} slots={weekdays} cycleUnit="weeks" title="Weekly shape" />`}
+<CyclePlot
+  data={[
+    38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44, 38, 46, 45,
+    48, 52, 61, 44, 38, 48, 45, 48, 52, 61, 44, 38, 50, 45, 48, 52, 61, 44,
+  ]}
+  period={7}
+  slots={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
+  cycleUnit="weeks"
+  title="Weekly shape"
+/>`}
 >
   <CyclePlot
     data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44, 38, 46, 45, 48, 52, 61, 44, 38, 48, 45, 48, 52, 61, 44, 38, 50, 45, 48, 52, 61, 44]}
@@ -52,8 +61,16 @@ the same data — so they never share a mark.
 
 <LiveDemo
   label="median center + spine only"
-  code={`<CyclePlot data={daily} period={7} center="median" />
-<CyclePlot data={daily} period={7} trend="none" />`}
+  code={`<CyclePlot
+  data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]}
+  period={7}
+  center="median"
+/>
+<CyclePlot
+  data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]}
+  period={7}
+  trend="none"
+/>`}
 >
   <span className="inline-flex gap-4 items-center">
     <CyclePlot
@@ -72,6 +89,64 @@ the same data — so they never share a mark.
     />
   </span>
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="one slot always missing"
+  code={`// Sunday is null every week — that slot skips both its mean tick and
+// the spine, which breaks cleanly around the gap instead of interpolating
+<CyclePlot
+  data={[null, 40, 45, 48, 52, 61, null, 42, 45, 48, 52, 61, null, 44, 45, 48, 52, 61]}
+  period={6}
+/>`}
+>
+  <CyclePlot
+    data={[null, 40, 45, 48, 52, 61, null, 42, 45, 48, 52, 61, null, 44, 45, 48, 52, 61]}
+    period={6}
+    title="One slot always missing"
+    width={160}
+    height={32}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="single cycle"
+  code={`// exactly one pass through the slots — every slot has one point, so no
+// within-slot line can draw (it needs ≥ 2); only the spine and dots show
+<CyclePlot data={[38, 45, 52, 44, 40, 48, 61]} period={7} />`}
+>
+  <CyclePlot
+    data={[38, 45, 52, 44, 40, 48, 61]}
+    period={7}
+    title="One cycle"
+    width={160}
+    height={32}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<CyclePlot
+  data={[3800, 4000, 4500, 4800, 5200, 6100, 4400, 3800, 4200, 4500, 4800, 5200, 6100, 4400]}
+  period={7}
+  locale="de-DE"
+/>`}
+>
+  <CyclePlot
+    data={[3800, 4000, 4500, 4800, 5200, 6100, 4400, 3800, 4200, 4500, 4800, 5200, 6100, 4400]}
+    period={7}
+    locale="de-DE"
+    title="Localized visits"
+    width={200}
+    height={36}
+  />
+</LiveDemo>
+
+A slot with no finite values in it draws no mean tick and no within-slot line; the spine
+connects only the non-empty slots, so it breaks cleanly around the gap rather than
+interpolating across it. A single cycle (one value per slot) draws the spine and dots as
+usual, but no within-slot polylines — a line needs at least two observations in a slot.
 
 ## Four homes
 

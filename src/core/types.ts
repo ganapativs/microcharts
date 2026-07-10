@@ -9,6 +9,13 @@ export type XY = readonly [number, number];
 /** Polarity: which direction counts as "good" (plan/04 rule 6). */
 export type Polarity = "up" | "down";
 
+/** Layout direction for gauge-like charts (Thermometer, TapeGauge). */
+export type Orientation = "vertical" | "horizontal";
+
+/** How a chart renders an empty (no-data) cell/unit: outlined slot or blank
+ *  (plan/04 §8 ruling 7 — shared by GardenGrid, Honeycomb). */
+export type EmptyCellStyle = "outline" | "blank";
+
 /** Rounds to 2 decimals — path coords are emitted at this precision so SVG
  *  output is small and attribute assertions are stable (plan/07, plan/09). */
 export function round2(n: number): number {

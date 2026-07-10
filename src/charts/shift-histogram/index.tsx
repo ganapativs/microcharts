@@ -150,7 +150,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         y2={geo.centerY}
         stroke="var(--mc-neutral)"
         strokeOpacity={0.4}
-        strokeWidth={0.6}
+        data-mc-w="hair"
         vectorEffect="non-scaling-stroke"
       />
       {/* before bins — upward, muted */}
@@ -162,9 +162,9 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
             y={round2(geo.centerY - b.up)}
             width={b.width}
             height={b.up}
-            data-mc-ink="bar"
+            data-mc-ink="neutral"
             shapeRendering="crispEdges"
-            style={{ fill: "var(--mc-neutral)", fillOpacity: 0.55 }}
+            fillOpacity={0.55}
           />
         ) : null,
       )}
@@ -180,7 +180,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
               height={b.down}
               fill="none"
               stroke={afterFill}
-              strokeWidth={0.8}
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
           ) : (
@@ -205,7 +205,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
           x2={geo.medians.before.x}
           y2={geo.centerY}
           stroke="var(--mc-stroke)"
-          strokeWidth={0.8}
+          data-mc-w="support"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -216,7 +216,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
           x2={geo.medians.after.x}
           y2={round2(geo.centerY + (height / 2 - 2))}
           stroke={afterFill}
-          strokeWidth={0.8}
+          data-mc-w="support"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}

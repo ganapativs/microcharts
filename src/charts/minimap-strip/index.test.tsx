@@ -30,7 +30,7 @@ describe("<MinimapStrip> (plan/25 §10, plan/17 F10)", () => {
 
   it("fog renders for unknown regions", () => {
     const { container } = draw(<MinimapStrip data={DATA} />);
-    expect(container.querySelector("path[stroke='var(--mc-neutral)']")).not.toBeNull();
+    expect(container.querySelector('path[data-mc-ink="muted"]')).not.toBeNull();
   });
 
   it("heat variant renders content as opacity, no bar path", () => {

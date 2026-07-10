@@ -19,6 +19,25 @@ type Density = "comfortable" | "compact";
 const DENSITY_KEY = "mc-gallery2-density";
 const TILT_MAX = 3; // degrees
 
+/**
+ * Initial control state, read once from the URL so a filtered view is
+ * shareable + survives reload/back. Precedence: URL param > localStorage
+ * (density only) > default. SSR-safe (returns defaults with no window).
+ */
+function initialState(): { q: string; col: string; density: Density } {
+  if (typeof window === "undefined") return { q: "", col: "all", density: "comfortable" };
+  const p = new URLSearchParams(window.location.search);
+  const d = p.get("density");
+  const stored = localStorage.getItem(DENSITY_KEY);
+  const density: Density =
+    d === "compact" || d === "comfortable"
+      ? d
+      : stored === "compact" || stored === "comfortable"
+        ? stored
+        : "comfortable";
+  return { q: p.get("q") ?? "", col: p.get("collection") ?? "all", density };
+}
+
 export function GalleryDock({
   counts,
   collections,
@@ -26,9 +45,9 @@ export function GalleryDock({
   counts: Record<string, number>;
   collections: { key: ChartCollection; label: string }[];
 }) {
-  const [q, setQ] = useState("");
-  const [col, setCol] = useState<string>("all");
-  const [density, setDensity] = useState<Density>("comfortable");
+  const [q, setQ] = useState(() => initialState().q);
+  const [col, setCol] = useState<string>(() => initialState().col);
+  const [density, setDensity] = useState<Density>(() => initialState().density);
   const [shown, setShown] = useState<number | null>(null);
   const [atTop, setAtTop] = useState(true);
   const [dockHidden, setDockHidden] = useState(false);
@@ -38,6 +57,7 @@ export function GalleryDock({
   const [mounted, setMounted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const firstFilter = useRef(true);
+  const syncDock = useRef<() => void>(() => {});
   // Server-rendered rows never change, so query the DOM once and reuse it.
   const domRef = useRef<{
     cards: HTMLElement[];
@@ -59,11 +79,25 @@ export function GalleryDock({
     };
   }, []);
 
-  // Restore density before the first filter pass.
+  // Keep the URL in sync with the controls so the view is shareable + survives
+  // reload/back. Only non-default params are written (clean URLs). replaceState
+  // (not push) — per-keystroke history entries would be noise. Read back by
+  // initialState() on load.
   useEffect(() => {
-    const saved = localStorage.getItem(DENSITY_KEY);
-    if (saved === "comfortable" || saved === "compact") setDensity(saved);
-  }, []);
+    const p = new URLSearchParams(window.location.search);
+    if (q) p.set("q", q);
+    else p.delete("q");
+    if (col !== "all") p.set("collection", col);
+    else p.delete("collection");
+    if (density !== "comfortable") p.set("density", density);
+    else p.delete("density");
+    const qs = p.toString();
+    window.history.replaceState(
+      null,
+      "",
+      window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash,
+    );
+  }, [q, col, density]);
 
   // Let the entrance ripple play once, then freeze it so filtering never replays.
   useEffect(() => {
@@ -95,6 +129,7 @@ export function GalleryDock({
       if (y > 140 && y > lastY + 4) html.dataset.g2Nav = "hidden";
       else if (y < lastY - 4 || y < 140) delete html.dataset.g2Nav;
       setAtTop(y < 600);
+      syncDock.current();
       lastY = y;
     };
     const onScroll = () => {
@@ -108,14 +143,22 @@ export function GalleryDock({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Slip the dock away once the footer scrolls into view — it's fixed to the
-  // viewport, so without this it would float over the footer at the page bottom.
+  // Slip the dock away only when the footer is actually REACHED by scrolling — a
+  // scrollable page whose footer has risen into the dock's zone. When a filter
+  // leaves few results the page isn't scrollable, so the (always-visible) footer
+  // must NOT hide the dock. Re-checked on scroll, resize, and after every filter.
   useEffect(() => {
     const footer = document.querySelector("footer");
-    if (!footer) return;
-    const io = new IntersectionObserver(([e]) => setDockHidden(e.isIntersecting));
-    io.observe(footer);
-    return () => io.disconnect();
+    syncDock.current = () => {
+      const doc = document.documentElement;
+      const scrollable = doc.scrollHeight - window.innerHeight > 80;
+      const reached = footer ? footer.getBoundingClientRect().top < window.innerHeight - 56 : false;
+      setDockHidden(scrollable && reached);
+    };
+    syncDock.current();
+    const onResize = () => syncDock.current();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   // ── The single delegated tilt + spotlight handler ────────────────────────
@@ -201,6 +244,9 @@ export function GalleryDock({
       dom.emptyQ.textContent = trimmed ? `“${trimmed}”` : label ? `${label} charts` : "that";
     }
     setShown(count);
+    // result count changed the page height — re-decide dock visibility after
+    // layout so a small filtered set (short, non-scrollable page) keeps the dock.
+    requestAnimationFrame(() => syncDock.current());
   }, [q, col, collections]);
 
   // Arrow-key roving across the visible plates — Left/Right step one, Up/Down
@@ -249,13 +295,8 @@ export function GalleryDock({
     }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const grid = document.querySelector<HTMLElement>(".g2-grid");
-    grid?.animate?.(
-      [
-        { opacity: 0.55, transform: "translateY(5px)" },
-        { opacity: 1, transform: "none" },
-      ],
-      { duration: 280, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
-    );
+    // opacity-only — a calm cross-fade of the new set, nothing moves.
+    grid?.animate?.([{ opacity: 0.5 }, { opacity: 1 }], { duration: 260, easing: "ease-out" });
   }, [col]);
 
   // "/" or ⌘K focuses search, Esc clears.

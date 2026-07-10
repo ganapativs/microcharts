@@ -1,5 +1,5 @@
 // HistogramStrip geometry — pure, React-free (plan/22 #15, S1 distribution).
-// Uniform bins, counts zero-anchored, never density-smoothed. `highlight` is a
+// Uniform bins, counts zero-anchored, never density-smoothed. `markValue` is a
 // VALUE whose bin gets accent — it marks the bin, never re-bins around the
 // value. 2-dp.
 import { uniformBins } from "../../core/bin.js";
@@ -18,8 +18,8 @@ interface HistogramBar {
 
 export interface HistogramGeometry {
   bars: HistogramBar[];
-  /** Bin index for a highlight value (−1 = none). */
-  highlightBin: number;
+  /** Bin index for a marked value (−1 = none). */
+  markBin: number;
   /** Modal bin (largest count), or −1. */
   modalBin: number;
   total: number;
@@ -34,9 +34,9 @@ export function histogramGeometry(opts: {
   domain?: readonly [number, number] | undefined;
   bins?: number | undefined;
   gap?: number | undefined;
-  highlight?: number | undefined;
+  markValue?: number | undefined;
 }): HistogramGeometry {
-  const { width, height, values, gap = 0.5, highlight } = opts;
+  const { width, height, values, gap = 0.5, markValue } = opts;
   // explicit bin counts collapse to the observation count (no empty-comb)
   let finiteCount = 0;
   for (const v of values) if (typeof v === "number" && Number.isFinite(v)) finiteCount++;
@@ -45,7 +45,7 @@ export function histogramGeometry(opts: {
     ...(opts.domain ? { domain: opts.domain } : null),
   });
   if (!binned || binned.bins.length === 0) {
-    return { bars: [], highlightBin: -1, modalBin: -1, total: 0, pitch: 0 };
+    return { bars: [], markBin: -1, modalBin: -1, total: 0, pitch: 0 };
   }
 
   const n = binned.bins.length;
@@ -72,8 +72,7 @@ export function histogramGeometry(opts: {
 
   return {
     bars,
-    highlightBin:
-      highlight !== undefined && Number.isFinite(highlight) ? binned.binOf(highlight) : -1,
+    markBin: markValue !== undefined && Number.isFinite(markValue) ? binned.binOf(markValue) : -1,
     modalBin,
     total: binned.total,
     pitch,

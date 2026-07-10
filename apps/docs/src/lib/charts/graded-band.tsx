@@ -60,7 +60,14 @@ export const entry: ChartEntry = {
   demo: [12, 17, 21, 21, 26, 38],
   example: {
     title: "Forecast estimate",
-    code: `import { GradedBand } from "${PKG}/graded-band";\n\n<GradedBand data={posterior} label="median" title="Forecast estimate" />`,
+    code: `import { GradedBand } from "${PKG}/graded-band";
+
+const posterior = Array.from(
+  { length: 160 },
+  (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
+);
+
+<GradedBand data={posterior} label="median" title="Forecast estimate" />`,
   },
 };
 

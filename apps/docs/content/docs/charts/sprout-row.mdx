@@ -73,6 +73,51 @@ The key, shown once: **seed → sprout → leaf → bloom**.
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="empty" code={`<SproutRow data={[]} title="No accounts" />`}>
+  <SproutRow data={[]} title="No accounts" height={20} step={20} />
+</LiveDemo>
+
+<LiveDemo
+  label="a missing item — soil tick only"
+  code={`<SproutRow data={[{ label: "A", value: 2 }, { label: "B", value: null }]} />`}
+>
+  <SproutRow
+    data={[
+      { label: "A", value: 2 },
+      { label: "B", value: null },
+    ]}
+    title="One account missing"
+    height={20}
+    step={20}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="out-of-range values clamp to seed or bloom"
+  code={`<SproutRow data={[{ label: "A", value: -3 }, { label: "B", value: 12 }]} />`}
+>
+  <SproutRow
+    data={[
+      { label: "A", value: -3 },
+      { label: "B", value: 12 },
+    ]}
+    title="Clamped stages"
+    height={20}
+    step={20}
+  />
+</LiveDemo>
+
+Empty data draws just the frame. A `null` value renders only the soil tick — visibly
+distinct from a seed, which is stage 0 and gets its own glyph. Values outside `[0, 3]`
+round and clamp to the nearest real stage (seed or bloom) rather than drawing an
+out-of-bounds or fractional glyph.
+
+## Four homes
+
+<FourContexts slug="sprout-row" />
+
 ## Why this default
 
 Labels are off by default because the row usually sits beside its own row label, and at micro scale
@@ -83,7 +128,7 @@ glyphs but never reshape a stage; the four stages are fixed and never interpolat
 
 ## Accessibility
 
-The accessible name summarizes the row — **"6 accounts; 2 at bloom, 1 at seed."** The interactive
+The accessible name summarizes the row — **"6 items; 2 at bloom, 1 at seed."** The interactive
 entry roves the items with ←/→ (or hover), announcing each as **"Acme: bloom, stage 4 of 4."** — the
 stage name plus a 1-of-4 index — and reads "…: no data." for a missing item. A ring lifts the focused
 glyph.

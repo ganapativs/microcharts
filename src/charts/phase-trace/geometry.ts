@@ -33,8 +33,8 @@ export interface PhaseTraceResult {
 
 export function phaseTraceGeometry(opts: {
   data: readonly Pt[];
-  xDomain: [number, number];
-  yDomain: [number, number];
+  xDomain: readonly [number, number];
+  yDomain: readonly [number, number];
   tail: number;
   width: number;
   height: number;

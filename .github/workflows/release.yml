@@ -29,8 +29,13 @@ jobs:
           node-version: 22
           cache: pnpm
           registry-url: https://registry.npmjs.org
+      # Pinned to the npm 11 line: OIDC trusted publishing needs npm >= 11.5,
+      # but `npm@latest` broke @changesets/cli's publish-error parsing (it
+      # crashes in isAlreadyPublishedError with a TypeError and masks the real
+      # npm error — seen 2026-07-10, run 29073720208). Bump the pin only after
+      # verifying changesets parses that npm major's error output.
       - name: Ensure npm supports OIDC trusted publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
       - run: pnpm install --frozen-lockfile
       - name: Create release PR or publish
         uses: changesets/action@v1

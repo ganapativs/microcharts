@@ -79,7 +79,10 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
   const fmt = makeFormatter(format, locale);
   const accName =
     summary === false ? false : (summary ?? pictogramSummary(value, total, fmt, strings));
-  const fillColor = color ?? "var(--mc-accent)";
+  // no custom color: the fill IS the accent ink role (bound in styles.css,
+  // retunes with presets); a custom color has no token and stays inline
+  const fillRole = color ? undefined : "accent";
+  const fillStyle = color ? { fill: color } : undefined;
 
   return (
     <Chart
@@ -93,6 +96,8 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
     >
       {geo.units.map((u) => {
         if (renderPoint) return renderPoint(u);
+        // ring only ever renders below the fill>=1 early return, so the fill
+        // guard is always true here — kept for defensive clarity, not dropped
         const ring =
           shape === "dot" ? (
             <circle
@@ -101,8 +106,9 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
               cy={u.cy}
               r={u.r - 0.3}
               fill="none"
-              stroke={u.fill >= 1 ? "none" : "var(--mc-neutral)"}
-              strokeWidth={0.6}
+              data-mc-ink={u.fill >= 1 ? undefined : "muted"}
+              data-mc-w={u.fill >= 1 ? undefined : "hair"}
+              stroke={u.fill >= 1 ? "none" : undefined}
             />
           ) : (
             <rect
@@ -112,13 +118,21 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
               width={(u.r - 0.3) * 2}
               height={(u.r - 0.3) * 2}
               fill="none"
-              stroke={u.fill >= 1 ? "none" : "var(--mc-neutral)"}
-              strokeWidth={0.6}
+              data-mc-ink={u.fill >= 1 ? undefined : "muted"}
+              data-mc-w={u.fill >= 1 ? undefined : "hair"}
+              stroke={u.fill >= 1 ? "none" : undefined}
             />
           );
         if (u.fill >= 1) {
           return shape === "dot" ? (
-            <circle key={u.index} cx={u.cx} cy={u.cy} r={u.r} style={{ fill: fillColor }} />
+            <circle
+              key={u.index}
+              cx={u.cx}
+              cy={u.cy}
+              r={u.r}
+              data-mc-ink={fillRole}
+              style={fillStyle}
+            />
           ) : (
             <rect
               key={u.index}
@@ -127,7 +141,8 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
               width={u.r * 2}
               height={u.r * 2}
               shapeRendering="crispEdges"
-              style={{ fill: fillColor }}
+              data-mc-ink={fillRole}
+              style={fillStyle}
             />
           );
         }
@@ -135,7 +150,7 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
           return (
             <g key={u.index}>
               {ring}
-              <path d={u.partial} style={{ fill: fillColor }} />
+              <path d={u.partial} data-mc-ink={fillRole} style={fillStyle} />
             </g>
           );
         }

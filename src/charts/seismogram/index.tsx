@@ -105,9 +105,9 @@ export function Seismogram(props: SeismogramProps): ReactNode {
           x2={width}
           y2={geo.baselineY}
           data-mc-ink="muted"
+          data-mc-w="tick"
           strokeOpacity={0.4}
           vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: 0.75 }}
         />
       ) : null}
       {/* tick width inherits --mc-stroke-width (theme-tunable, matches peers) */}

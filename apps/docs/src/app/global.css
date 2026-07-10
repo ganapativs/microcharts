@@ -256,31 +256,31 @@
   color-scheme: dark;
 }
 
-/* ---- Chart presets — the picker sets [data-mc-preset] on <html]. These are
-   the library's preset bundles, re-declared at docs specificity so they win
-   over the base --mc-* binding above and COMPOSE with the accent picker (only
-   Mono deliberately claims the accent, to go fully monochrome). Geometry +
-   colour relationships are theme-independent, so one block serves light+dark;
-   colour values that must adapt are expressed through var(--mc-stroke). ------ */
+/* ---- Chart presets — the picker sets [data-mc-preset] on <html>. These
+   MIRROR the library's preset bundles in styles.css exactly (parity is
+   test-enforced: preset-parity.test.ts) — re-declared only because the base
+   --mc-* binding above is unlayered and would beat the library's layered
+   :where() rules. Editorial's red accent is that preset's identity and
+   deliberately overrides the accent picker while active; vivid and mono
+   follow the library too. ------------------------------------------------ */
 :root[data-mc-preset="editorial"] {
-  /* hairline ink, sharp corners — a printed-page restraint */
+  /* hairline ink, signature red endpoint — a printed-page restraint */
+  --mc-accent: #b8112a;
   --mc-stroke-width: 1;
-  --mc-radius: 0;
-  --mc-dot-size: 1.6;
 }
 :root[data-mc-preset="mono"] {
   /* one ink — direction still carries by shape, never colour alone */
   --mc-positive: var(--mc-stroke);
   --mc-negative: var(--mc-stroke);
   --mc-accent: var(--mc-stroke);
-  --mc-neutral: color-mix(in oklab, var(--mc-stroke) 55%, transparent);
+  --mc-neutral: var(--mc-stroke);
+  --mc-moon: var(--mc-stroke);
 }
 :root[data-mc-preset="vivid"] {
   /* bolder ink + punchier valence; accent stays user-chosen */
-  --mc-stroke-width: 2.25;
-  --mc-dot-size: 2.4;
-  --mc-positive: #10b981;
-  --mc-negative: #f43f5e;
+  --mc-positive: #00c896;
+  --mc-negative: #ff5630;
+  --mc-stroke-width: 2;
 }
 
 /* ---- Accent presets — the global picker sets [data-accent] on <html>.
@@ -708,6 +708,22 @@ body {
   .g2-grid[data-density="compact"] .g2-stage {
     --g2-stage-h: 6rem;
   }
+  /* Compact is a dense scan — the chart + name carry it; the description is
+     noise at this size (and its reserved height is dead weight). Drop it and
+     tighten the shelf. The card's aria-label still carries the tagline. */
+  .g2-grid[data-density="compact"] .g2-tag {
+    display: none;
+  }
+  .g2-grid[data-density="compact"] .g2-meta {
+    padding-block: 0.6rem 0.7rem;
+  }
+  /* compact: the tag-label sits under the name, small + left-aligned + quiet */
+  .g2-grid[data-density="compact"] .g2-coll {
+    margin-left: 0;
+    margin-top: 0.1rem;
+    font-size: 0.55rem;
+    opacity: 0.5;
+  }
   .g2-stage svg {
     height: auto;
     max-width: 100%;
@@ -724,12 +740,8 @@ body {
     border-top: 1px solid var(--hairline);
     transform: translateZ(8px);
   }
-  .g2-meta-head {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
   .g2-name {
+    display: block;
     min-width: 0;
     font-family: var(--font-display);
     font-size: 1.05rem;
@@ -740,11 +752,19 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* tagline + collection tag share the second line: tag flows, tag-label sits
+     top-right so the title above stays full-width and never truncates. */
+  .g2-subrow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
   .g2-cell:focus-within .g2-name {
     color: var(--accent);
   }
   .g2-coll {
     margin-left: auto;
+    margin-top: 0.14rem; /* optically align its cap with the tagline's first line */
     flex: none;
     font-family: var(--font-mono);
     font-size: 0.6rem;
@@ -756,6 +776,8 @@ body {
   /* Its two-line space is ALWAYS reserved (fixed height) so hover never grows
      the plate or shifts a neighbour — only the text fades in. */
   .g2-tag {
+    flex: 1;
+    min-width: 0;
     font-size: 0.8rem;
     line-height: 1.35;
     height: 2.16rem; /* 2 lines × 1.35 × 0.8rem */
@@ -819,21 +841,25 @@ body {
     }
   }
 
-  /* one-time staggered entrance — a ripple down the plane on first paint */
+  /* One-time entrance, deliberately CALM: a plain opacity fade, nothing moves.
+     Two elements only — the masthead fades in, then the whole grid fades in a
+     beat later (as one plane, not a per-card wave — no stagger to twitch the
+     eye). Opacity is GPU-cheap and reads as "settling in", not "performing".
+     Gated to no-preference; reduced-motion gets the static end state. */
   @media (prefers-reduced-motion: no-preference) {
-    .g2:not([data-entered]) .g2-cell {
-      animation: g2-rise 0.55s var(--ease-out-expo) backwards;
-      animation-delay: min(calc(var(--i, 0) * 22ms), 420ms);
+    .g2:not([data-entered]) .g2-head {
+      animation: g2-fade 0.55s ease-out backwards;
+    }
+    .g2:not([data-entered]) .g2-grid {
+      animation: g2-fade 0.7s ease-out 0.18s backwards;
     }
   }
-  @keyframes g2-rise {
+  @keyframes g2-fade {
     from {
       opacity: 0;
-      transform: translateY(14px) scale(0.985);
     }
     to {
       opacity: 1;
-      transform: none;
     }
   }
 
@@ -1035,6 +1061,47 @@ body {
     .g2-dock,
     .g2:not([data-entered]) .g2-cell {
       animation: none;
+    }
+  }
+
+  /* Forced colors (Windows High Contrast): the glass tints, spotlight, shadows,
+     and graph-paper all drop out — so pin the reads that MUST survive to system
+     colors: a visible plate border, a system focus/hover highlight, a legible
+     dock, and a real active-filter indication (color-mix backgrounds vanish). */
+  @media (forced-colors: active) {
+    .g2-card {
+      border: 1px solid CanvasText;
+    }
+    .g2-card:hover,
+    .g2-cell:focus-within .g2-card {
+      border-color: Highlight;
+    }
+    .g2-card:focus-visible {
+      outline-color: Highlight;
+    }
+    .g2-card .g2-name {
+      color: LinkText;
+    }
+    .g2-spot {
+      display: none;
+    }
+    .g2-dock-bar {
+      background: Canvas;
+      border: 1px solid CanvasText;
+    }
+    .g2-seg,
+    .g2-dock-search input {
+      border-color: CanvasText;
+    }
+    .g2-pill[aria-pressed="true"],
+    .g2-icon-btn[aria-pressed="true"] {
+      background: Highlight;
+      color: HighlightText;
+    }
+    .g2-pill:focus-visible,
+    .g2-icon-btn:focus-visible,
+    .g2-dock-search input:focus-visible {
+      outline-color: Highlight;
     }
   }
 

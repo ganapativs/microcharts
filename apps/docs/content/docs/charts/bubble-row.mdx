@@ -57,8 +57,47 @@ value numerals are on by default, because a low-precision channel owes the reade
       align="baseline"
       height={36}
     />
+    <BubbleRow
+      data={[
+        { label: "EMEA", value: 1240 },
+        { label: "AMER", value: 890 },
+        { label: "APAC", value: 560 },
+        { label: "LATAM", value: 210 },
+      ]}
+      label="both"
+      height={36}
+    />
   </span>
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="empty" code={`<BubbleRow data={[]} title="No regions" />`}>
+  <BubbleRow data={[]} title="No regions" height={30} />
+</LiveDemo>
+
+<LiveDemo
+  label="a null value"
+  code={`<BubbleRow data={[{ label: "EMEA", value: 1240 }, { label: "AMER", value: null }]} />`}
+>
+  <BubbleRow
+    data={[
+      { label: "EMEA", value: 1240 },
+      { label: "AMER", value: null },
+    ]}
+    title="Missing AMER figure"
+    height={30}
+  />
+</LiveDemo>
+
+Empty data draws just the frame with "No data." as the summary. A `null` value still
+holds its place with a small presence ring (never a zero-radius void, and never
+skipped from the row) but drops its numeral — a missing figure is visibly present yet
+explicitly unlabeled, never faked as a zero.
+
+## Four homes
+
+<FourContexts slug="bubble-row" />
 
 ## Why this default
 
@@ -72,7 +111,7 @@ low-precision admission.
 
 ## Accessibility
 
-The accessible name names the extremes — **"4 regions; largest EMEA at 1,240, smallest LATAM at
+The accessible name names the extremes — **"4 items; largest EMEA at 1,240, smallest LATAM at
 210."** The interactive entry roves the bubbles with ←/→ (or hover), announcing each one's exact
 value — **"EMEA: 1,240."** — the number the area itself can't carry.
 

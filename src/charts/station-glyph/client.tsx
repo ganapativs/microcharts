@@ -47,11 +47,13 @@ export function StationGlyph(props: StationGlyphProps): React.ReactNode {
     const out: string[] = [];
     if (station) out.push(station);
     if (wind && Number.isFinite(wind.magnitude)) {
-      if (Math.abs(wind.magnitude) < step / 4) out.push("wind calm");
+      if (Math.abs(wind.magnitude) < step / 4) out.push(strings.stationFieldWindCalm);
       else {
         const dir = wind.magnitude < 0 ? wind.direction + 180 : wind.direction;
         const deg = Math.round(((dir % 360) + 360) % 360);
-        out.push(`wind ${strings.compass8[octant(deg)]!} ${fmt(Math.abs(wind.magnitude))}`);
+        out.push(
+          strings.stationFieldWind(strings.compass8[octant(deg)]!, fmt(Math.abs(wind.magnitude))),
+        );
       }
     }
     const okta = stationGlyphGeometry({
@@ -63,10 +65,13 @@ export function StationGlyph(props: StationGlyphProps): React.ReactNode {
       coreR: 1,
       barbBox: 30,
     }).oktaIndex;
-    if (cloud != null && Number.isFinite(cloud)) out.push(`sky ${strings.stationSky[okta]!}`);
-    if (temp != null && Number.isFinite(temp)) out.push(`temp ${fmt(temp)}°`);
-    if (dewpoint != null && Number.isFinite(dewpoint)) out.push(`dew point ${fmt(dewpoint)}°`);
-    if (pressure != null && Number.isFinite(pressure)) out.push(`pressure ${fmt(pressure)}`);
+    if (cloud != null && Number.isFinite(cloud))
+      out.push(strings.stationFieldSky(strings.stationSky[okta]!));
+    if (temp != null && Number.isFinite(temp)) out.push(strings.stationFieldTemp(fmt(temp)));
+    if (dewpoint != null && Number.isFinite(dewpoint))
+      out.push(strings.stationFieldDew(fmt(dewpoint)));
+    if (pressure != null && Number.isFinite(pressure))
+      out.push(strings.stationFieldPressure(fmt(pressure)));
     return out;
   }, [station, wind, step, cloud, temp, dewpoint, pressure, strings, fmt]);
 

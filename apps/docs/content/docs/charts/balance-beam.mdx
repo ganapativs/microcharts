@@ -44,7 +44,11 @@ area, not their width, is proportional to value). For a precise comparison, reac
 
 <LiveDemo
   label="round weights + balanced"
-  code={`<BalanceBeam data={pair} shape="round" label="values" />
+  code={`<BalanceBeam
+  data={[{ label: "Inflow", value: 620 }, { label: "Outflow", value: 480 }]}
+  shape="round"
+  label="values"
+/>
 <BalanceBeam data={[{ label: "A", value: 500 }, { label: "B", value: 500 }]} />`}
 >
   <span className="inline-flex gap-6 items-center">
@@ -69,6 +73,69 @@ area, not their width, is proportional to value). For a precise comparison, reac
   </span>
 </LiveDemo>
 
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, both the announced values and
+the in-chart numerals (`label="values"`) follow that locale's own grouping and decimal marks.
+
+<LiveDemo
+  label="locale"
+  code={`<BalanceBeam
+  data={[{ label: "Inflow", value: 62000 }, { label: "Outflow", value: 48000 }]}
+  label="values"
+  format={{ maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <BalanceBeam
+    data={[
+      { label: "Inflow", value: 62000 },
+      { label: "Outflow", value: 48000 },
+    ]}
+    label="values"
+    format={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    width={90}
+    height={34}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="balanced — level beam"
+  code={`<BalanceBeam data={[{ label: "A", value: 500 }, { label: "B", value: 500 }]} />`}
+>
+  <BalanceBeam
+    data={[
+      { label: "A", value: 500 },
+      { label: "B", value: 500 },
+    ]}
+    width={70}
+    height={28}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="both zero — level beam, no weights to see"
+  code={`<BalanceBeam data={[{ label: "A", value: 0 }, { label: "B", value: 0 }]} />`}
+>
+  <BalanceBeam
+    data={[
+      { label: "A", value: 0 },
+      { label: "B", value: 0 },
+    ]}
+    width={70}
+    height={28}
+  />
+</LiveDemo>
+
+Equal values level the beam and report **"balanced"** rather than picking an arbitrary heavier
+side. Two zeros are the same case — the beam stays level and both weights shrink to nothing, which
+is honest: there is nothing to weigh.
+
+## Four homes
+
+<FourContexts slug="balance-beam" />
+
 ## Why this default
 
 Ratio mode is the default because most two-sided comparisons are share-of-whole questions, and square
@@ -80,7 +147,7 @@ rows that should tilt comparably, `mode="difference"` scales the imbalance by a 
 
 ## Accessibility
 
-The accessible name states both sides and the winner — **"Inflow 620 vs outflow 480; Inflow
+The accessible name states both sides and the winner — **"Inflow 620 vs Outflow 480; Inflow
 heavier."** — or "…; balanced." when they match. The interactive entry eases the beam to its new tilt,
 reveals a side's value on hover or ←/→, and announces when the heavier side flips.
 

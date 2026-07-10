@@ -27,7 +27,10 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     prev.current = value;
     if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       const lit = wrap.current?.querySelector<SVGPathElement>("path");
-      lit?.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "ease-out" });
+      lit?.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: 200,
+        easing: "cubic-bezier(0.23, 1, 0.32, 1)",
+      });
     }
     if (!live) return;
     const emit = () => {

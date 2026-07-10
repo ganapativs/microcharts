@@ -1,0 +1,223 @@
+---
+title: GradeProfile
+description: A word-sized route profile for React — elevation ridge with pitches coloured by grade, so the hard climbs read at a glance.
+---
+
+GradeProfile answers "how hard is this route, and where does it bite?" Each segment between two
+points is filled from the baseline and coloured by its grade — gentle to brutal — with the
+elevation ridge riding on top. The steepest pitch is called out, so the wall in the route is the
+first thing you see.
+
+**How to read it** — colour is a _quantized_ grade bin, never a smooth ramp: flats and every
+descent take the faint band, then a mid tone, the negative colour, and the darkest fill for the
+brutal pitches. Height is the elevation ridge for shape; the encoded channel is the colour, and
+the interactive readout gives the exact grade.
+
+<LiveDemo
+  label="GradeProfile"
+  sizeOf="grade-profile"
+  code={`import { GradeProfile } from "@microcharts/react/grade-profile";
+
+const trail = [
+{ d: 0, elev: 800 }, { d: 100, elev: 809 }, { d: 250, elev: 812 },
+{ d: 350, elev: 817 }, { d: 500, elev: 835 }, { d: 700, elev: 833 },
+{ d: 900, elev: 865 },
+];
+
+<GradeProfile data={trail} format={(n) => \`\${n} m\`} title="Queen stage" />`}
+>
+  <GradeProfile
+    data={[
+      { d: 0, elev: 800 },
+      { d: 100, elev: 809 },
+      { d: 250, elev: 812 },
+      { d: 350, elev: 817 },
+      { d: 500, elev: 835 },
+      { d: 700, elev: 833 },
+      { d: 900, elev: 865 },
+    ]}
+    format={(n) => `${n} m`}
+    title="Queen stage"
+    width={240}
+    height={48}
+  />
+</LiveDemo>
+
+`d` and `elev` must share a unit (both metres, say) so that grade — rise ÷ run — is a true
+percent. Distance need only be monotonic; the values themselves can be any scale.
+
+## Install
+
+<Usage chart="grade-profile" />
+
+## Try it
+
+<Playground chart="grade-profile" />
+
+## Interactive
+
+<InteractiveDemo slug="grade-profile" />
+
+## When to use it
+
+- **Good for** — route and climb profiles (cycling, running, hiking); showing _where_ the hard pitches fall.
+- **Avoid for** — a single elevation series (Sparkline), or an unordered track (distance must be monotonic).
+
+## Sizing
+
+<Sizing chart="grade-profile" />
+
+## Variants
+
+<LiveDemo
+  label="no summit label"
+  code={`const trail = [
+  { d: 0, elev: 800 }, { d: 250, elev: 812 }, { d: 500, elev: 835 },
+  { d: 700, elev: 833 }, { d: 900, elev: 865 },
+];
+
+<GradeProfile data={trail} label="none" />`}
+>
+  <GradeProfile
+    data={[
+      { d: 0, elev: 800 },
+      { d: 250, elev: 812 },
+      { d: 500, elev: 835 },
+      { d: 700, elev: 833 },
+      { d: 900, elev: 865 },
+    ]}
+    label="none"
+    title="No label"
+    width={240}
+    height={44}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="custom bins"
+  code={`// classify the difficulty differently: brutal starts at 12%
+const trail = [
+  { d: 0, elev: 800 }, { d: 100, elev: 809 }, { d: 350, elev: 817 },
+  { d: 500, elev: 835 }, { d: 900, elev: 865 },
+];
+
+<GradeProfile data={trail} bins={[5, 8, 12]} />`}
+>
+  <GradeProfile
+    data={[
+      { d: 0, elev: 800 },
+      { d: 100, elev: 809 },
+      { d: 350, elev: 817 },
+      { d: 500, elev: 835 },
+      { d: 900, elev: 865 },
+    ]}
+    bins={[5, 8, 12]}
+    format={(n) => `${n} m`}
+    title="Custom bins"
+    width={240}
+    height={44}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`const alps = [
+  { d: 0, elev: 600 }, { d: 2000, elev: 780 }, { d: 5000, elev: 1150 },
+  { d: 8000, elev: 1400 }, { d: 12000, elev: 1850 },
+];
+
+<GradeProfile data={alps} format={{ maximumFractionDigits: 0 }} locale="de-DE" />`}
+>
+  <GradeProfile
+    data={[
+      { d: 0, elev: 600 },
+      { d: 2000, elev: 780 },
+      { d: 5000, elev: 1150 },
+      { d: 8000, elev: 1400 },
+      { d: 12000, elev: 1850 },
+    ]}
+    format={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="Alpine stage"
+    width={240}
+    height={48}
+  />
+</LiveDemo>
+
+`format` accepts `Intl.NumberFormatOptions` (with a `locale`) or a formatting function, and
+applies to the distance and elevation numbers in the summary and readout. Grades carry their own
+percent formatting, so the locale still decides the decimal mark: the alpine profile above reads
+**"12.000, 1.250 gain; steepest 12,3% at 3.500."** in German.
+
+## Edge cases
+
+<LiveDemo
+  label="descent-only — no climb to grade"
+  code={`const drop = [{ d: 0, elev: 900 }, { d: 300, elev: 840 }, { d: 600, elev: 780 }];
+
+<GradeProfile data={drop} format={(n) => \`\${n} m\`} title="Descent" />`}
+>
+  <GradeProfile
+    data={[
+      { d: 0, elev: 900 },
+      { d: 300, elev: 840 },
+      { d: 600, elev: 780 },
+    ]}
+    format={(n) => `${n} m`}
+    title="Descent"
+    width={200}
+    height={44}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="a gap in the elevation track"
+  code={`const gappy = [
+  { d: 0, elev: 100 }, { d: 100, elev: 120 },
+  { d: 200, elev: NaN }, { d: 300, elev: 160 },
+];
+
+<GradeProfile data={gappy} title="Partial track" />`}
+>
+  <GradeProfile
+    data={[
+      { d: 0, elev: 100 },
+      { d: 100, elev: 120 },
+      { d: 200, elev: NaN },
+      { d: 300, elev: 160 },
+    ]}
+    title="Partial track"
+    width={200}
+    height={44}
+  />
+</LiveDemo>
+
+A descent-only route has no climb to grade, so no pitch is emphasised and the summary reports
+**"600 m, no real climb."** — climbing difficulty is the whole story, so descents always take the
+gentlest colour rather than borrowing a climb's. A non-finite elevation breaks the profile into a
+gap: the segments touching it drop out and the ridge splits, so a missing reading never invents a
+grade. Flat routes and single points behave the same honest way.
+
+## Four homes
+
+<FourContexts slug="grade-profile" />
+
+## Why this default
+
+Two decisions carry the chart. Grade is **quantized** into bins, not drawn as a continuous colour
+ramp — a route reads as "gentle / rolling / steep / wall", categories a rider can act on, instead
+of a gradient nobody can decode at a glance. And the default `bins` of `[3, 6, 10]` percent match
+how climbs are actually described, with the steepest pitch labelled so the hardest moment is never
+buried. Below 72 pixels wide the four bins collapse to a simple flat-versus-climb read, because
+the finer classes stop being separable there.
+
+## Accessibility
+
+The accessible name states the route's shape in words — **"900 m, 67 m gain; steepest 16% at 800
+m."** — distance, total climb, and where the hardest pitch falls, none of it dependent on colour.
+The interactive entry announces each pitch as you rove it (`←`/`→`), giving the true grade and the
+cumulative climb, so the encoding never has to be learned to be used.
+
+## Props
+
+<PropTable slug="grade-profile" />

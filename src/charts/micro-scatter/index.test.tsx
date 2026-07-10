@@ -34,7 +34,7 @@ describe("<MicroScatter> (plan/22 #29, S1-XY)", () => {
   it("trend renders a muted least-squares line under the dots", () => {
     const { container } = draw(<MicroScatter data={CLOUD} trend />);
     const line = container.querySelector("line")!;
-    expect(line.getAttribute("stroke")).toBe("var(--mc-neutral)");
+    expect(line.getAttribute("data-mc-ink")).toBe("muted");
     expect(container.querySelector("svg")!.firstElementChild!.tagName).not.toBe("circle");
   });
 
@@ -43,7 +43,7 @@ describe("<MicroScatter> (plan/22 #29, S1-XY)", () => {
     const focal = [...container.querySelectorAll("circle")].find(
       (c) => c.getAttribute("fill-opacity") === "1",
     )!;
-    expect((focal as SVGElement).style.fill).toBe("var(--mc-accent)");
+    expect(focal.getAttribute("data-mc-ink")).toBe("accent");
   });
 
   it("> 60 points → dev warning (overplot cap)", () => {

@@ -112,7 +112,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
         x2={geo.soil.x2}
         y2={geo.soil.y2}
         data-mc-ink="muted"
-        style={{ strokeOpacity: 0.6 }}
+        strokeOpacity={0.6}
       />
       {geo.slots.map((s) =>
         s.stage === null ? null : (

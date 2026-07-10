@@ -12,6 +12,10 @@ counts are not supported; that's SparkBar's contract.
   sizeOf="histogram-strip"
   code={`import { HistogramStrip } from "@microcharts/react/histogram-strip";
 
+const responseTimes = Array.from({ length: 120 }, (_, i) =>
+i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
+);
+
 <HistogramStrip data={responseTimes} title="Response times" />`}
 >
   <HistogramStrip
@@ -46,16 +50,59 @@ counts are not supported; that's SparkBar's contract.
 
 ## Variants
 
-<LiveDemo label="where you fall" code={`<HistogramStrip data={salaries} highlight={72} />`}>
+<LiveDemo
+  label="where you fall"
+  code={`const responseTimes = Array.from({ length: 120 }, (_, i) =>
+  i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
+);
+
+<HistogramStrip data={responseTimes} markValue={45} title="You are here" />`}
+>
   <HistogramStrip
     data={Array.from({ length: 120 }, (_, i) =>
       i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
     )}
-    highlight={45}
+    markValue={45}
     title="You are here"
     style={{ width: 220, height: 56 }}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<HistogramStrip
+  data={[12000, 18000, 24000, 30000, 36000, 42000, 18000, 24000, 30000]}
+  locale="de-DE"
+/>`}
+>
+  <HistogramStrip
+    data={[12000, 18000, 24000, 30000, 36000, 42000, 18000, 24000, 30000]}
+    locale="de-DE"
+    title="Localized bin edges"
+    style={{ width: 220, height: 56 }}
+  />
+</LiveDemo>
+
+The accessible summary states the modal bin's edges through `format`/`locale` — under `de-DE`
+a value like 24000 reads "24.000" (period as the thousands separator) instead of the English
+"24,000".
+
+## Edge cases
+
+<LiveDemo label="empty data" code={`<HistogramStrip data={[]} title="No observations yet" />`}>
+  <HistogramStrip data={[]} title="No observations yet" style={{ width: 160, height: 40 }} />
+</LiveDemo>
+
+<LiveDemo
+  label="all values equal"
+  code={`<HistogramStrip data={[4, 4, 4, 4, 4]} title="Constant" />`}
+>
+  <HistogramStrip data={[4, 4, 4, 4, 4]} title="Constant" style={{ width: 160, height: 40 }} />
+</LiveDemo>
+
+An empty series renders zero bars — an empty accessible name ("No data.") rather than a
+misleading flat line. A constant series collapses to ONE full-height bin instead of the
+usual up-to-12 slivers a naive equal-width binner would draw for a zero-span domain.
 
 ## Four homes
 
@@ -65,7 +112,7 @@ counts are not supported; that's SparkBar's contract.
 
 Auto bin count is √n capped at 12 — enough shape to see skew, few enough bars to survive
 60 px. All values identical collapse to ONE bin (never twelve slivers); explicit bin
-counts collapse to the observation count. `highlight` marks the bin of a value and never
+counts collapse to the observation count. `markValue` marks the bin of a value and never
 re-bins around it.
 
 ## Accessibility

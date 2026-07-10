@@ -106,13 +106,17 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
 
   const accName = summary === false ? false : (summary ?? benchmarkSummary(geo, fmt, strings));
 
-  // dot color: default accent; with polarity, the "good" side reads positive
+  // dot color: default accent; with polarity, the "good" side reads positive.
+  // The label <text> takes the same color as an ink ROLE (the base `.mc-root
+  // text` rule would override a fill attribute); a custom `color` can't come
+  // from a static role, so it falls back to an inline fill.
   const good =
     positive === undefined
       ? undefined
       : positive === "up"
         ? geo.dot.value >= geo.median.value
         : geo.dot.value <= geo.median.value;
+  const dotInk = color ? undefined : good === undefined ? "accent" : good ? "positive" : "negative";
   const dotFill =
     color ??
     (good === undefined ? "var(--mc-accent)" : good ? "var(--mc-positive)" : "var(--mc-negative)");
@@ -135,17 +139,17 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* fill via inline STYLE, not attribute: the data-mc-ink="band" CSS rule
-          (kept for the craft/overlap + forced-colors exemption) would otherwise
-          override a fill attribute to the faint --mc-band token. plan/12. */}
+      {/* peer quantile bands — DATA (the cohort's spread), not a background
+          band, so they take neutral ink like ABStrips' rows; opacity grades
+          outer (p5–95) vs the middle half. */}
       <rect
         x={geo.outer.x}
         y={geo.bandY}
         width={geo.outer.width}
         height={geo.bandH}
         rx={1.5}
-        data-mc-ink="band"
-        style={{ fill: "var(--mc-neutral)", fillOpacity: 0.16 }}
+        data-mc-ink="neutral"
+        fillOpacity={0.16}
       />
       <rect
         x={geo.inner.x}
@@ -153,8 +157,8 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
         width={geo.inner.width}
         height={geo.bandH}
         rx={1.5}
-        data-mc-ink="band"
-        style={{ fill: "var(--mc-neutral)", fillOpacity: 0.34 }}
+        data-mc-ink="neutral"
+        fillOpacity={0.34}
       />
       {median ? (
         <line
@@ -162,29 +166,32 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
           y1={geo.bandY - 0.5}
           x2={geo.median.x}
           y2={geo.bandY + geo.bandH + 0.5}
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
+          data-mc-w="support"
           vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: 1 }}
         />
       ) : null}
       {geo.dot.clamped !== 0 ? (
+        // dynamic valence FILL stays an attribute: accent ink on a <path> would
+        // stroke it (element-split rule) and lose the solid arrowhead
         <path
           d={
             geo.dot.clamped < 0
               ? `M${geo.dot.x - 3} ${midY} l2.4 -1.8 v3.6 Z`
               : `M${geo.dot.x + 3} ${midY} l-2.4 -1.8 v3.6 Z`
           }
-          style={{ fill: dotFill }}
+          fill={dotFill}
         />
       ) : null}
-      {/* accent dot with a surface halo so it reads on top of the band */}
+      {/* focal dot; the surface-colored halo is a knockout against the band,
+          not an ink role — an ink role here would set stroke: none and kill it */}
       <circle
         cx={geo.dot.x}
         cy={midY}
         r={2.4}
         fill={dotFill}
         stroke="var(--mc-surface)"
-        strokeWidth={0.9}
+        data-mc-w="support"
       />
       {showLabel ? (
         <text
@@ -193,7 +200,8 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
           textAnchor="end"
           dominantBaseline="central"
           fontSize={FONT}
-          style={{ fill: dotFill, fontVariantNumeric: "tabular-nums" }}
+          data-mc-ink={dotInk}
+          style={color ? { fill: color } : undefined}
         >
           {labelText}
         </text>

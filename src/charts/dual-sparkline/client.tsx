@@ -165,8 +165,8 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
               x2={crossX}
               y2={height}
               data-mc-ink="muted"
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
-              style={{ strokeWidth: 1 }}
             />
             {geo.primaryPoints[active!] ? (
               <circle

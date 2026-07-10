@@ -9,10 +9,11 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
+import type { Value } from "../../core/types.js";
 import { polarClockGeometry } from "./geometry.js";
 
 export interface PolarClockProps {
-  data: readonly (number | null)[];
+  data: readonly Value[];
   /** Index of the current segment to accent (position + color, never color alone). */
   now?: number | undefined;
   /** Inner radius fraction r0 (the zero baseline all bars grow from). Default 0.35. */
@@ -21,7 +22,8 @@ export interface PolarClockProps {
   start?: number | undefined;
   /** `length` (radial bars, default) or `opacity` (fixed-length, 5-step fill). */
   mode?: "length" | "opacity" | undefined;
-  /** Hairline cardinal ticks at 0/¼/½/¾ of the cycle. */
+  /** Hairline cardinal ticks at 0/¼/½/¾ of the cycle — the at-rest orientation
+   *  cue ("where is 12 o'clock"). One merged path node; default true. */
   labels?: boolean | undefined;
   /** Numeral of the peak value in a bottom gutter (`max`), or none (default). */
   label?: "max" | "none" | undefined;
@@ -52,7 +54,7 @@ function defaultSegmentLabel(strings: PolarClockStrings) {
 }
 
 export function polarClockSummary(
-  data: readonly (number | null)[],
+  data: readonly Value[],
   opts: {
     formatSegment?: ((index: number, n: number) => string) | undefined;
     strings?: PolarClockStrings | undefined;
@@ -88,7 +90,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
     inner = 0.35,
     start = 0,
     mode = "length",
-    labels = false,
+    labels = true,
     label = "none",
     formatSegment,
     size = 24,
@@ -110,7 +112,6 @@ export function PolarClock(props: PolarClockProps): ReactNode {
     summary === false
       ? false
       : (summary ?? polarClockSummary(data, { formatSegment, strings, format, locale }));
-  const fill = color ?? "var(--mc-stroke)";
   const fmt = makeFormatter(format, locale);
 
   const labelBand = label === "max" ? Math.ceil(fontSize * 1.35) : 0;
@@ -135,21 +136,17 @@ export function PolarClock(props: PolarClockProps): ReactNode {
         cy={geo.guide.cy}
         r={geo.guide.r}
         data-mc-ink="muted"
-        style={{ fill: "none", strokeOpacity: 0.5, strokeWidth: 0.5 }}
+        data-mc-w="hair"
+        style={{ fill: "none", strokeOpacity: 0.5 }}
       />
-      {labels
-        ? geo.cardinalTicks.map((t) => (
-            <line
-              key={`c${t.x1}-${t.y1}`}
-              x1={t.x1}
-              y1={t.y1}
-              x2={t.x2}
-              y2={t.y2}
-              data-mc-ink="muted"
-              style={{ strokeWidth: 0.5, strokeOpacity: 0.6 }}
-            />
-          ))
-        : null}
+      {labels && geo.cardinalPath ? (
+        <path
+          d={geo.cardinalPath}
+          data-mc-ink="muted"
+          data-mc-w="hair"
+          style={{ strokeOpacity: 0.6 }}
+        />
+      ) : null}
       {mode === "opacity" ? (
         geo.levelPaths.map((lp) => (
           <path
@@ -160,7 +157,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
           />
         ))
       ) : geo.segmentsPath ? (
-        <path d={geo.segmentsPath} style={{ fill }} />
+        <path d={geo.segmentsPath} data-mc-ink="bar" style={color ? { fill: color } : undefined} />
       ) : null}
       {geo.accentPath ? <path d={geo.accentPath} data-mc-ink="accent" /> : null}
       {peakText !== null ? (

@@ -6,7 +6,7 @@
 // so the node count is O(steps), not O(days). All coords 2-dp.
 import { arcPath, polarPoint } from "../../core/arc.js";
 import { monthStartDays } from "../../core/calendar-grid.js";
-import { round2 } from "../../core/types.js";
+import { round2, type Value } from "../../core/types.js";
 
 const TAU = Math.PI * 2;
 
@@ -16,7 +16,9 @@ export interface SpiralYearGeometry {
   stepPaths: string[];
   /** `dot` (filled circles) or `arc` (short stroked segments). */
   mark: "dot" | "arc";
-  monthTicks: { x1: number; y1: number; x2: number; y2: number }[];
+  /** The 12 month-boundary ticks merged into one path — the at-rest calendar
+   *  orientation cue, one node instead of twelve. */
+  monthTicksPath: string;
   peakIndex: number;
   minIndex: number;
   turns: number;
@@ -30,7 +32,7 @@ function circleSub(cx: number, cy: number, r: number): string {
 }
 
 export function spiralYearGeometry(opts: {
-  values: readonly (number | null)[];
+  values: readonly Value[];
   size: number;
   steps: 3 | 5;
   cadence: "day" | "week";
@@ -54,7 +56,7 @@ export function spiralYearGeometry(opts: {
     marks: [],
     stepPaths: [],
     mark,
-    monthTicks: [],
+    monthTicksPath: "",
     peakIndex: -1,
     minIndex: -1,
     turns: 0,
@@ -119,37 +121,28 @@ export function spiralYearGeometry(opts: {
   const stepPaths = buckets;
 
   // Month ticks — 12 hairline radial ticks at month boundaries (non-leap ref),
-  // spanning just outside the outermost turn.
-  const monthTicks =
+  // spanning just outside the outermost turn, merged into one path (one node).
+  const monthAngles =
     cadence === "day"
-      ? monthStartDays(2001).map((d) => {
-          const a = (d / 365) * TAU;
-          const inR = rMax - 1.2;
-          const outR = rMax + 0.4;
-          return {
-            x1: round2(cx + inR * Math.sin(a)),
-            y1: round2(cy - inR * Math.cos(a)),
-            x2: round2(cx + outR * Math.sin(a)),
-            y2: round2(cy - outR * Math.cos(a)),
-          };
-        })
-      : Array.from({ length: 12 }, (_, mo) => {
-          const a = (mo / 12) * TAU;
-          const inR = rMax - 1.2;
-          const outR = rMax + 0.4;
-          return {
-            x1: round2(cx + inR * Math.sin(a)),
-            y1: round2(cy - inR * Math.cos(a)),
-            x2: round2(cx + outR * Math.sin(a)),
-            y2: round2(cy - outR * Math.cos(a)),
-          };
-        });
+      ? monthStartDays(2001).map((d) => (d / 365) * TAU)
+      : Array.from({ length: 12 }, (_, mo) => (mo / 12) * TAU);
+  const monthTicksPath = monthAngles
+    .map((a) => {
+      const inR = rMax - 1.2;
+      const outR = rMax + 0.4;
+      const x1 = round2(cx + inR * Math.sin(a));
+      const y1 = round2(cy - inR * Math.cos(a));
+      const x2 = round2(cx + outR * Math.sin(a));
+      const y2 = round2(cy - outR * Math.cos(a));
+      return `M${x1} ${y1}L${x2} ${y2}`;
+    })
+    .join("");
 
   return {
     marks,
     stepPaths,
     mark,
-    monthTicks,
+    monthTicksPath,
     peakIndex,
     minIndex,
     turns,

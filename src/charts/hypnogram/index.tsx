@@ -26,7 +26,7 @@ export interface HypnogramProps {
    *  (plan/21 §3 names this `style`; React reserves that for CSS — logged.) */
   variant?: "steps" | "lanes" | undefined;
   /** Time extent; the last state holds to `domain[1]`. */
-  domain?: [number, number] | undefined;
+  domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
   strings?: HypnogramStrings | undefined;
@@ -38,17 +38,10 @@ export interface HypnogramProps {
   children?: ReactNode | undefined;
 }
 
-const CAT_TOKENS = [
-  "--mc-cat-1",
-  "--mc-cat-2",
-  "--mc-cat-3",
-  "--mc-cat-4",
-  "--mc-cat-5",
-  "--mc-cat-6",
-];
+const CAT_N = 6; // --mc-cat-1 … --mc-cat-6 via data-mc-cat roles
 
 /** Default domain: [firstT, lastT + one median step] so the last state shows. */
-export function resolveDomain(data: readonly HypnogramDatum[]): [number, number] {
+export function resolveDomain(data: readonly HypnogramDatum[]): readonly [number, number] {
   const ts = data
     .map((d) => d.t)
     .filter((t) => Number.isFinite(t))
@@ -66,7 +59,7 @@ export function resolveDomain(data: readonly HypnogramDatum[]): [number, number]
 export function hypnogramSummary(
   data: readonly HypnogramDatum[],
   states: readonly string[],
-  domain: [number, number],
+  domain: readonly [number, number],
   strings: HypnogramStrings,
 ): string {
   const merged = mergeRuns(data, domain[1]);
@@ -161,7 +154,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
               y2={y}
               stroke="var(--mc-neutral)"
               strokeOpacity={0.16}
-              strokeWidth={0.5}
+              data-mc-w="hair"
               vectorEffect="non-scaling-stroke"
             />
             {labels ? (
@@ -183,11 +176,6 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
       {variant === "lanes" ? (
         geo.runs.map((r, i) => {
           const active = emphasis ? r.state === emphasis : true;
-          const fill = emphasis
-            ? active
-              ? "var(--mc-accent)"
-              : "var(--mc-neutral)"
-            : `var(${CAT_TOKENS[r.row % CAT_TOKENS.length]})`;
           return (
             <rect
               key={i}
@@ -197,7 +185,9 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
               height={Math.max(0.5, geo.rowHeight - 0.8)}
               rx={0.5}
               shapeRendering="crispEdges"
-              style={{ fill, fillOpacity: emphasis && !active ? 0.35 : 0.9 }}
+              data-mc-ink={emphasis ? (active ? "accent" : "neutral") : undefined}
+              data-mc-cat={emphasis ? undefined : (r.row % CAT_N) + 1}
+              style={{ fillOpacity: emphasis && !active ? 0.35 : 0.9 }}
             />
           );
         })
@@ -209,7 +199,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
               fill="none"
               stroke="var(--mc-neutral)"
               strokeOpacity={0.5}
-              strokeWidth={0.75}
+              data-mc-w="tick"
               vectorEffect="non-scaling-stroke"
             />
           ) : null}

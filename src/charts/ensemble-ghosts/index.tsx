@@ -118,7 +118,7 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
           fill="none"
           stroke="var(--mc-neutral)"
           strokeOpacity={0.34}
-          strokeWidth={0.6}
+          data-mc-w="hair"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
         />

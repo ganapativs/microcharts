@@ -136,12 +136,13 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
       {geo.rows.map((row) => {
         const d = data[row.index]!;
         const isHl = highlight !== undefined && (highlight === d.label || highlight === row.index);
-        const connectorStroke =
+        // valence ink role by direction; a plain range (no `positive`) stays muted
+        const connectorInk =
           positive !== undefined && row.dir !== 0
             ? row.dir === goodDir
-              ? "var(--mc-positive)"
-              : "var(--mc-negative)"
-            : undefined;
+              ? "positive"
+              : "negative"
+            : "muted";
         // from === to → single dot, connector omitted (honest degenerate)
         const single = row.x0 !== null && row.x0 === row.x1;
         // connector stops at each dot's EDGE, not its center — otherwise it
@@ -189,22 +190,24 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
                 y1={row.y}
                 x2={connector.x1}
                 y2={row.y}
-                data-mc-ink="muted"
+                data-mc-ink={connectorInk}
                 vectorEffect="non-scaling-stroke"
-                style={{
-                  strokeWidth: 1.25,
-                  ...(connectorStroke ? { stroke: connectorStroke } : null),
-                }}
+                // 1.25 sits in the "1.2–1.8 secondary mark" justified-literal
+                // band (FOUNDATION.md §1.2) — a touch thinner than full data ink.
+                strokeWidth={1.25}
               />
             ) : null}
             {row.x0 !== null && !single ? (
+              // hollow ring: circles can't take the fill-based accent ink role,
+              // so the color stays a justified literal (same pattern as
+              // calibration-strip's low-support marks); width still uses the role.
               <circle
                 cx={row.x0}
                 cy={row.y}
                 r={1.7}
                 fill="none"
                 stroke={isHl ? "var(--mc-accent)" : (color ?? "var(--mc-stroke)")}
-                strokeWidth={0.8}
+                data-mc-w="support"
               />
             ) : null}
             {row.x1 !== null ? (
@@ -212,8 +215,8 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
                 cx={row.x1}
                 cy={row.y}
                 r={2}
-                data-mc-ink="point"
-                style={isHl ? { fill: "var(--mc-accent)" } : color ? { fill: color } : undefined}
+                data-mc-ink={isHl ? "accent" : "point"}
+                style={!isHl && color ? { fill: color } : undefined}
               />
             ) : null}
             {showValues && leftX !== null && rightX !== null ? (

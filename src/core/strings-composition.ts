@@ -16,6 +16,7 @@ export type CompositionStrings = Pick<
   | "stageAt"
   | "likert"
   | "likertLean"
+  | "likertAt"
   | "allNeutral"
   | "noResponses"
 >;
@@ -29,7 +30,7 @@ export const EN_COMPOSITION: CompositionStrings = {
     `${label}: ${pct}, ${members} ${members === 1 ? "category" : "categories"}.`,
   otherLabel: "Other",
   funnel: (stages, first, last, overallPct) =>
-    `${stages} stages, ${first} to ${last} — overall ${overallPct}.`,
+    `${stages} ${stages === 1 ? "stage" : "stages"}, ${first} to ${last} — overall ${overallPct}.`,
   funnelInversion: (stage, prev) => `Stage ${stage} exceeds stage ${prev}.`,
   stageAt: (label, value, retainedPct, firstLabel) =>
     `${label}: ${value} — ${retainedPct} of ${firstLabel}.`,
@@ -38,6 +39,7 @@ export const EN_COMPOSITION: CompositionStrings = {
       ? `${agree} agree, ${disagree} disagree.`
       : `${agree} agree, ${disagree} disagree, ${neutral} neutral.`,
   likertLean: (dir) => (dir === "balanced" ? "Balanced." : `Leans ${dir}.`),
+  likertAt: (label, pct, level, total) => `${label}: ${pct}, level ${level} of ${total}.`,
   allNeutral: "All responses neutral.",
   noResponses: "No responses.",
 };

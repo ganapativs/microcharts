@@ -49,7 +49,7 @@ aspect ratio.
 Shape, fill, a normal-range band, and dots are all props — same data, different read.
 Flip any of them to the Code tab.
 
-<LiveDemo label="curve" code={`<Sparkline data={data} curve="smooth" />`}>
+<LiveDemo label="curve" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} curve="smooth" />`}>
   <Sparkline
     data={[3, 5, 4, 8, 6, 9]}
     width={120}
@@ -59,11 +59,11 @@ Flip any of them to the Code tab.
   />
 </LiveDemo>
 
-<LiveDemo label="fill" code={`<Sparkline data={data} fill />`}>
+<LiveDemo label="fill" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} fill />`}>
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} fill title="Filled area" />
 </LiveDemo>
 
-<LiveDemo label="band" code={`<Sparkline data={data} band={[4, 8]} />`}>
+<LiveDemo label="band" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} band={[4, 8]} />`}>
   <Sparkline
     data={[3, 5, 4, 8, 6, 9]}
     width={120}
@@ -73,7 +73,10 @@ Flip any of them to the Code tab.
   />
 </LiveDemo>
 
-<LiveDemo label="dots + label" code={`<Sparkline data={data} dots="minmax" label="last" />`}>
+<LiveDemo
+  label="dots + label"
+  code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} dots="minmax" label="last" />`}
+>
   <Sparkline
     data={[3, 5, 4, 8, 6, 9]}
     width={130}
@@ -87,7 +90,7 @@ Flip any of them to the Code tab.
 <LiveDemo
   label="minmax labels"
   code={`// the extremes, labelled directly — no axis needed
-<Sparkline data={data} dots="minmax" label="minmax" />`}
+<Sparkline data={[3, 5, 4, 8, 6, 9, 2, 7]} dots="minmax" label="minmax" />`}
 >
   <Sparkline
     data={[3, 5, 4, 8, 6, 9, 2, 7]}
@@ -99,7 +102,34 @@ Flip any of them to the Code tab.
   />
 </LiveDemo>
 
-## Long series
+## Edge cases
+
+<LiveDemo
+  label="null gaps"
+  code={`// null = "no measurement here" — the line breaks, never interpolates
+<Sparkline data={[3, 5, null, null, 6, 9, 4, 7]} />`}
+>
+  <Sparkline
+    data={[3, 5, null, null, 6, 9, 4, 7]}
+    width={130}
+    height={32}
+    title="Series with gaps"
+  />
+</LiveDemo>
+
+<LiveDemo label="single point" code={`<Sparkline data={[7]} />`}>
+  <Sparkline data={[7]} width={80} height={32} title="One value" />
+</LiveDemo>
+
+<LiveDemo label="all equal" code={`<Sparkline data={[5, 5, 5, 5, 5, 5]} />`}>
+  <Sparkline data={[5, 5, 5, 5, 5, 5]} width={130} height={32} title="Flat series" />
+</LiveDemo>
+
+A `null` means "no measurement here" — the line breaks at the gap and never interpolates
+across it, so an outage can't masquerade as a smooth trend. A single point has no line to
+draw; it sits centered in the plot, visible as the default endpoint dot. An all-equal
+series renders on the vertical mid-line — a zero-span domain maps to the middle of the
+range, so flat data reads as level, not as bottomed-out.
 
 Past `maxPoints` (default 200) the drawn line decimates to a min/max-preserving
 envelope: every spike keeps its true position and height, gaps stay gaps, and the
@@ -109,7 +139,11 @@ lighter. Pass `maxPoints={Infinity}` to opt out.
 <LiveDemo
   label="2,000 points"
   code={`// renders ≤ 200 line points; the spike at i=1500 survives
-<Sparkline data={twoThousandPoints} />`}
+<Sparkline
+  data={Array.from({ length: 2000 }, (_, i) =>
+    i === 1500 ? 98 : 50 + Math.sin(i / 40) * 24 + ((i * 13) % 7),
+  )}
+/>`}
 >
   <Sparkline
     data={Array.from({ length: 2000 }, (_, i) =>
@@ -126,6 +160,16 @@ lighter. Pass `maxPoints={Infinity}` to opt out.
 The same chart, sized for four real contexts.
 
 <FourContexts slug="sparkline" />
+
+## Why this default
+
+A bare line, no dots, no fill, no band — the shape of the series is the whole story until you
+ask for more. Dots and fill are opt-in because at word size they compete with the line for the
+same few pixels; adding them by default would make every sparkline noisier for the common case
+that only needs direction and range. Long series decimate to a min/max-preserving envelope
+rather than a naive stride sample, so a single spike at point 1,500 of 2,000 still shows up —
+silently dropping it would be the more common bug in a naive implementation, and a chart that
+hides its own spikes is dishonest by construction.
 
 ## Accessibility
 

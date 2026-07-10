@@ -13,7 +13,17 @@ against a target line. It is the general form of any noisy metric with a complia
   sizeOf="dual-window-meter"
   code={`import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
 
-<DualWindowMeter data={samples} target={-23} title="Loudness" />`}
+const samples = Array.from(
+{ length: 60 },
+(_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0),
+);
+
+<DualWindowMeter
+  data={samples}
+  target={-23}
+  format={{ maximumFractionDigits: 1 }}
+  title="Loudness"
+/>`}
 >
   <DualWindowMeter
     data={Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0))}
@@ -48,7 +58,15 @@ against a target line. It is the general form of any noisy metric with a complia
 
 ## Variants
 
-<LiveDemo label="corridor" code={`<DualWindowMeter data={cpu} target={70} band={[60, 80]} />`}>
+<LiveDemo
+  label="corridor"
+  code={`const samples = Array.from(
+  { length: 60 },
+  (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2,
+);
+
+<DualWindowMeter data={samples} target={-23} band={[-25, -21]} />`}
+>
   <DualWindowMeter
     data={Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2)}
     target={-23}
@@ -58,6 +76,81 @@ against a target line. It is the general form of any noisy metric with a complia
     height={28}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="custom windows"
+  code={`const samples = Array.from(
+  { length: 60 },
+  (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2,
+);
+
+// both window sizes are part of the reading — state them, never hide them
+
+<DualWindowMeter data={samples} target={-23} windows={[5, 20]} />`}
+>
+  <DualWindowMeter
+    data={Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2)}
+    target={-23}
+    windows={[5, 20]}
+    title="Custom windows"
+    width={300}
+    height={28}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`const samples = Array.from(
+  { length: 60 },
+  (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0),
+);
+
+<DualWindowMeter
+  data={samples}
+  target={-23}
+  format={{ maximumFractionDigits: 1 }}
+  locale="de-DE"
+/>`}
+>
+  <DualWindowMeter
+    data={Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0))}
+    target={-23}
+    format={{ maximumFractionDigits: 1 }}
+    locale="de-DE"
+    title="Localized readings"
+    width={300}
+    height={28}
+  />
+</LiveDemo>
+
+With a `locale`, the right-edge readings and the accessible summary follow that locale's decimal
+mark — the fast reading above renders "-23,9", not "-23.9", and the accessible name reads "Slow
+window -25 vs target -23; fast -23,9."
+
+## Edge cases
+
+<LiveDemo
+  label="short series — slow window still filling"
+  code={`// 10 samples with the default windows=[3, 30]: the fast trace fills at
+// sample 3, the slow trace never fills — it stays absent rather than
+// faking a partial-window value, and its readout shows "—"
+<DualWindowMeter
+  data={[48, 48.3, 48.6, 48.9, 49.2, 49.5, 49.8, 50.1, 50.4, 50.7]}
+  target={50}
+/>`}
+>
+  <DualWindowMeter
+    data={[48, 48.3, 48.6, 48.9, 49.2, 49.5, 49.8, 50.1, 50.4, 50.7]}
+    target={50}
+    title="Filling"
+    width={200}
+    height={28}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="dual-window-meter" />
 
 ## Why this default
 

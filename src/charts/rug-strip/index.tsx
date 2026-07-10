@@ -1,7 +1,7 @@
 // <RugStrip> — where the raw observations actually sit (plan/22 #5, S1
 // distribution). Static, hook-free, RSC-safe. Every tick is one observation;
 // density comes from ink accumulation only (tiered opacity, see geometry).
-// The strongest single story is `highlight`: one value against the field.
+// The strongest single story is `markValue`: one raw value against the field.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
@@ -33,8 +33,8 @@ export function rugSummary(
 export interface RugStripProps {
   /** Raw observations — x-position = value. */
   data: readonly Value[];
-  /** One value emphasized against the field ("your salary vs the band"). */
-  highlight?: number | undefined;
+  /** One raw domain value emphasized against the field ("your salary vs the band"). */
+  markValue?: number | undefined;
   orientation?: "horizontal" | "vertical" | undefined;
   /** Explicit domain for cross-row comparability. */
   domain?: readonly [number, number] | undefined;
@@ -55,7 +55,7 @@ export interface RugStripProps {
 export function RugStrip(props: RugStripProps): ReactNode {
   const {
     data,
-    highlight,
+    markValue,
     orientation = "horizontal",
     domain,
     color,
@@ -83,7 +83,7 @@ export function RugStrip(props: RugStripProps): ReactNode {
     thickness: orientation === "horizontal" ? height : width,
     values: data,
     domain,
-    highlight,
+    markValue,
     orientation,
   });
   const fmt = makeFormatter(format, locale);
@@ -114,9 +114,9 @@ export function RugStrip(props: RugStripProps): ReactNode {
           y1={orientation === "horizontal" ? height / 2 : 0}
           x2={orientation === "horizontal" ? width : width / 2}
           y2={orientation === "horizontal" ? height / 2 : height}
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
+          data-mc-w="support"
           strokeOpacity={0.4}
-          strokeWidth={1}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -128,18 +128,12 @@ export function RugStrip(props: RugStripProps): ReactNode {
           vectorEffect="non-scaling-stroke"
           style={{
             strokeOpacity: tier.opacity,
-            strokeWidth: 1,
             ...(color ? { stroke: color } : null),
           }}
         />
       ))}
       {hl ? (
-        <line
-          {...hl}
-          stroke="var(--mc-accent)"
-          strokeWidth={1.75}
-          vectorEffect="non-scaling-stroke"
-        />
+        <line {...hl} data-mc-ink="accent" data-mc-w="full" vectorEffect="non-scaling-stroke" />
       ) : null}
       {children}
     </Chart>

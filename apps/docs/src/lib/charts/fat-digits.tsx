@@ -34,7 +34,7 @@ export const entry: ChartEntry = {
     },
     {
       name: "domain",
-      type: "[number, number]",
+      type: "readonly [number, number]",
       required: false,
       description: "Maps value to a weight tier — always pass one.",
     },

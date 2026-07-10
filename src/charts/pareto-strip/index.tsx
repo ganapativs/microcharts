@@ -111,7 +111,9 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* bars — vital few accent, the rest muted (where to stop reading) */}
+      {/* bars — vital few accent, the rest muted (where to stop reading); a
+          custom `color` prop still needs an inline override, so the ink role
+          only drives the default accent/neutral pair */}
       {geo.bars.map((b) =>
         b.height > 0 ? (
           <rect
@@ -120,9 +122,10 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
             y={b.y}
             width={b.width}
             height={b.height}
-            data-mc-ink="bar"
+            data-mc-ink={color ? "bar" : b.vital ? "accent" : "neutral"}
+            fillOpacity={b.vital ? 1 : 0.5}
             shapeRendering="crispEdges"
-            style={{ fill: b.vital ? accent : "var(--mc-neutral)", fillOpacity: b.vital ? 1 : 0.5 }}
+            style={color ? { fill: b.vital ? accent : "var(--mc-neutral)" } : undefined}
           />
         ) : null,
       )}
@@ -131,8 +134,8 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
         <path
           d={geo.line.d}
           data-mc-ink="muted"
+          data-mc-w="support"
           fill="none"
-          strokeWidth={1}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -143,15 +146,21 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
           y1={geo.thresholdY}
           x2={width}
           y2={geo.thresholdY}
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
+          data-mc-w="hair"
           strokeOpacity={0.55}
           strokeDasharray="2 2"
-          strokeWidth={0.6}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.crossing !== null && geo.thresholdY !== null ? (
-        <circle cx={geo.crossing.x} cy={geo.thresholdY} r={1.6} style={{ fill: accent }} />
+        <circle
+          cx={geo.crossing.x}
+          cy={geo.thresholdY}
+          r={1.6}
+          data-mc-ink={color ? undefined : "accent"}
+          style={color ? { fill: accent } : undefined}
+        />
       ) : null}
       {showLabel ? (
         <text
@@ -161,7 +170,6 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

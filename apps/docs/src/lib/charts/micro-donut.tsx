@@ -55,7 +55,17 @@ export const entry: ChartEntry = {
   demo: MIX.map((d) => d.value),
   example: {
     title: "Traffic mix",
-    code: `import { MicroDonut } from "${PKG}/micro-donut";\n\n<MicroDonut data={mix} title="Traffic mix" />`,
+    code: `import { MicroDonut } from "${PKG}/micro-donut";
+
+const mix = [
+  { label: "Chrome", value: 620 },
+  { label: "Safari", value: 240 },
+  { label: "Firefox", value: 90 },
+  { label: "Edge", value: 30 },
+  { label: "Arc", value: 20 },
+];
+
+<MicroDonut data={mix} title="Traffic mix" />`,
   },
 };
 

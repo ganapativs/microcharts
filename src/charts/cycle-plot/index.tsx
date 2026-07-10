@@ -9,6 +9,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_CYCLE, type CycleStrings } from "../../core/strings-cycle.js";
+import type { Value } from "../../core/types.js";
 import { cycleGeometry, type CycleGeometry } from "./geometry.js";
 
 const slotName = (slots: readonly string[] | undefined, i: number): string =>
@@ -54,7 +55,7 @@ export function cycleSummary(
 
 export interface CyclePlotProps {
   /** A flat series, reshaped row-major into `period` slots. */
-  data: readonly (number | null)[];
+  data: readonly Value[];
   /** Slots per cycle (4–12) — e.g. 7 for weekdays. Required. */
   period: number;
   /** Slot names for summaries, e.g. ["Sun", "Mon", …]. */
@@ -154,7 +155,7 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
                 fill="none"
                 stroke="var(--mc-neutral)"
                 strokeOpacity={0.55}
-                strokeWidth={0.6}
+                data-mc-w="hair"
                 vectorEffect="non-scaling-stroke"
               />
             ) : null,

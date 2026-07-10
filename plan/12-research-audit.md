@@ -1640,3 +1640,23 @@ IntersectionObserver) underpins all four motion charts; every motion chart's red
 static frame (not a paused pose), and the browser suite asserts `getAnimations()` starts/stops per the
 gate. Accumulated budget spec-vs-measured divergences (all < the 3/4 hard caps) + motion deviations
 listed in STATUS.md await the batch-gate user sign-off.
+
+## 2026-07-10 — superaudit foundation (branch `superaudit`, checkpoint 1 approved)
+
+- **Prop contract v1** rulings recorded in plan/04 §8 (renames + `data-mc-w` width roles). Provenance: exhaustive Props-type audit of all 98 charts (audit/reports/prop-contract.md), user-approved 2026-07-10.
+- **Tokens**: `--mc-dot-size` + `--mc-radius` removed (zero consumers, verified by grep of styles.css + src). `vivid` preset no longer pins `--mc-accent` (accent = consumer's brand; editorial's red pin stays as its identity). Preset bundles now answer to `[data-mc-theme]` AND `[data-mc-preset]` — docs mirrors are parity-tested (`apps/docs/src/lib/preset-parity.test.ts`), killing the observed lib↔docs vivid/mono drift.
+- **Counts**: 98 components = 98 pages = registry (plan's "100 types" counts band-sparkline + win-loss variants). Dead `CATALOG_TARGET` export removed; public counts computed from `STABLE_CHARTS.length`.
+- Baseline (main 431f6b3): tests 2298 green, craft 611/0, size green, **12 frontier charts below SSR bench floor**, 21 frontier charts missing visual specs, 4 truncated docs pages — remediation tracked in audit/ on the branch.
+
+## 2026-07-10 — superaudit COMPLETE (branch `superaudit`)
+
+Full-catalog audit/polish executed post-Batch-4: 5 gated passes over all 98 charts + pages. Provenance + method: audit/ dir on the branch (MISSION/BASELINE/FOUNDATION/AUDIT-TABLE/CHANGELOG/CANDIDATES + 4 inventory reports). Key factual corrections recorded: 9 fabricated/stale docs claims fixed against real output; oxfmt was corrupting MDX template literals (now excluded via .prettierignore); bench floors recalibrated to a single documented method (~75% of quiet-machine measure — original frontier floors under-counted text nodes vs the ~300 elements/ms React SSR ceiling); sparkline budget drift noted (approved exception 3.35/4.35 vs current 3.65/4.65 budget, actual 3.62/4.61 — flag for the Checkpoint-3 ledger).
+
+## 2026-07-10 — proposal round: catalog 98 → 106 (user-approved)
+
+Eight research-verified additions specced in plan/26-proposal-round-charts.md (provenance + rejection ledger:
+audit/PROPOSALS.md; three independent research passes — literature/industry/editorial — each cross-checked against
+the shipped 98, the plan/15 cut ledger, and the plan/05 bans). Approved: CohortTriangle, StreakSpark, GradeProfile,
+WinProbWorm, QueueDepth, SpreadBand, BiasStrip, PercentileTrace. Rejected with reasons (logged to prevent
+re-litigation): Q–Q micro (read-back), DirectionRose (PolarClock variant), mix-shift ribbons (QuipuCord class),
+TransitionGrid (ConfusionGrid recipe), RaceSplitBars, runway (EtaBar), warming stripes/spend-pace/swing needle (covered).

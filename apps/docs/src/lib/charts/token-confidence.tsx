@@ -52,7 +52,7 @@ export const entry: ChartEntry = {
     },
     {
       name: "tiers",
-      type: "[number, number]",
+      type: "readonly [number, number]",
       required: false,
       description: "lo/hi thresholds — the only tuning.",
     },
@@ -72,7 +72,20 @@ export const entry: ChartEntry = {
   demo: [98, 71, 44, 63],
   example: {
     title: "Model answer",
-    code: `import { TokenConfidence } from "${PKG}/token-confidence";\n\n<TokenConfidence data={tokens} title="Model answer" />`,
+    code: `import { TokenConfidence } from "${PKG}/token-confidence";
+
+const tokens = [
+  { token: "The", confidence: 0.98 },
+  { token: " Treaty", confidence: 0.93 },
+  { token: " of", confidence: 0.99 },
+  { token: " Westphalia", confidence: 0.71 },
+  { token: " was", confidence: 0.96 },
+  { token: " signed", confidence: 0.9 },
+  { token: " in", confidence: 0.97 },
+  { token: " 1648", confidence: 0.44 },
+];
+
+<TokenConfidence data={tokens} title="Model answer" />`,
   },
 };
 

@@ -28,7 +28,7 @@ function nearestTick(ticks: readonly { pos: number }[], pos: number): number {
 export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
   const {
     data,
-    highlight,
+    markValue,
     orientation = "horizontal",
     domain,
     format,
@@ -49,10 +49,10 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
         thickness: orientation === "horizontal" ? height : width,
         values: data,
         domain,
-        highlight,
+        markValue,
         orientation,
       }),
-    [length, width, height, data, domain, highlight, orientation],
+    [length, width, height, data, domain, markValue, orientation],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [active, setActive] = useState<number | null>(null);
@@ -127,7 +127,7 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
       <StaticRugStrip
         {...rest}
         data={data}
-        highlight={highlight}
+        markValue={markValue}
         orientation={orientation}
         domain={domain}
         format={format}
@@ -144,8 +144,8 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
               y1={0}
               x2={activeTick.pos}
               y2={height}
-              stroke="var(--mc-accent)"
-              strokeWidth={1.75}
+              data-mc-ink="accent"
+              data-mc-w="full"
               vectorEffect="non-scaling-stroke"
             />
           ) : (
@@ -154,8 +154,8 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
               y1={activeTick.pos}
               x2={width}
               y2={activeTick.pos}
-              stroke="var(--mc-accent)"
-              strokeWidth={1.75}
+              data-mc-ink="accent"
+              data-mc-w="full"
               vectorEffect="non-scaling-stroke"
             />
           )

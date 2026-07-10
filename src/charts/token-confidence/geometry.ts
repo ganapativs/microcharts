@@ -19,7 +19,7 @@ export interface TieredToken {
  *  Non-finite confidence → guessing (the safe, flag-it default). */
 export function tokenTiers(opts: {
   data: readonly TokenDatum[];
-  tiers: [number, number];
+  tiers: readonly [number, number];
 }): TieredToken[] {
   const [lo, hi] = opts.tiers;
   return opts.data.map((d) => {

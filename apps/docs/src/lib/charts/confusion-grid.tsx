@@ -63,7 +63,17 @@ export const entry: ChartEntry = {
   demo: [87, 12],
   example: {
     title: "Classifier",
-    code: `import { ConfusionGrid } from "${PKG}/confusion-grid";\n\n<ConfusionGrid data={{ labels: ["cat", "dog"], counts }} title="Classifier" />`,
+    code: `import { ConfusionGrid } from "${PKG}/confusion-grid";
+
+const counts = {
+  labels: ["cat", "dog"],
+  counts: [
+    [88, 12],
+    [10, 59],
+  ],
+};
+
+<ConfusionGrid data={counts} title="Classifier" />`,
   },
 };
 

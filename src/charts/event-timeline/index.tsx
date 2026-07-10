@@ -184,9 +184,10 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
         y1={geo.track.y}
         x2={geo.track.x1}
         y2={geo.track.y}
-        data-mc-ink="band"
+        data-mc-ink="muted"
+        data-mc-w="support"
+        strokeOpacity={0.35}
         vectorEffect="non-scaling-stroke"
-        style={{ stroke: "var(--mc-neutral)", strokeOpacity: 0.35, strokeWidth: 1 }}
       />
       {geo.spans.map((s) => {
         const it = items[s.i]!;
@@ -238,8 +239,8 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
           x2={geo.nowX}
           y2={height}
           data-mc-ink="accent"
+          data-mc-w="support"
           vectorEffect="non-scaling-stroke"
-          style={{ stroke: "var(--mc-accent)", strokeWidth: 1 }}
         />
       ) : null}
       {children}

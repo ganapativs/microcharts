@@ -43,7 +43,7 @@ export const entry: ChartEntry = {
       description: "Level/amount rows per side.",
     },
     {
-      name: "range",
+      name: "levels",
       type: "number",
       required: false,
       description: "± level distance from mid to include.",
@@ -64,7 +64,23 @@ export const entry: ChartEntry = {
   demo: [18],
   example: {
     title: "Order book",
-    code: `import { DepthWedge } from "${PKG}/depth-wedge";\n\n<DepthWedge data={{ demand, supply }} title="Order book" />`,
+    code: `import { DepthWedge } from "${PKG}/depth-wedge";
+
+const demand = [
+  { level: 99.75, amount: 420 },
+  { level: 99.5, amount: 360 },
+  { level: 99.25, amount: 280 },
+  { level: 99, amount: 200 },
+  { level: 98.5, amount: 120 },
+];
+const supply = [
+  { level: 100.25, amount: 300 },
+  { level: 100.5, amount: 240 },
+  { level: 100.75, amount: 160 },
+  { level: 101, amount: 90 },
+];
+
+<DepthWedge data={{ demand, supply }} title="Order book" />`,
   },
 };
 
@@ -87,14 +103,14 @@ export const playground: PlaygroundSpec = {
       options: ["spread", "none"],
       init: "spread",
     },
-    { kind: "range", key: "range", label: "range ±", min: 1, max: 4, step: 0.5, init: 2 },
+    { kind: "range", key: "levels", label: "levels ±", min: 1, max: 4, step: 0.5, init: 2 },
   ],
   render: (s) => (
     <DepthWedge
       data={BOOK}
       normalize={s.normalize as boolean}
       label={s.label as "spread" | "none"}
-      range={s.range as number}
+      levels={s.levels as number}
       summary={false}
       width={320}
       height={30}
@@ -106,7 +122,7 @@ export const playground: PlaygroundSpec = {
       "  data={{ demand, supply }}",
       s.normalize === true && "  normalize",
       s.label !== "spread" && `  label="${s.label}"`,
-      s.range !== 2 && `  range={${s.range}}`,
+      s.levels !== 2 && `  levels={${s.levels}}`,
       "/>",
     ]
       .filter(Boolean)

@@ -13,7 +13,17 @@ wouldn't.
   sizeOf="event-timeline"
   code={`import { EventTimeline } from "@microcharts/react/event-timeline";
 
-<EventTimeline data={windows} domain={today} title="API uptime" />`}
+<EventTimeline
+  data={[
+    { start: Date.UTC(2026, 5, 3, 1), end: Date.UTC(2026, 5, 3, 5), label: "Freeze", kind: "accent" },
+    { start: Date.UTC(2026, 5, 3, 6), end: Date.UTC(2026, 5, 3, 15), label: "Healthy", kind: "positive" },
+    { start: Date.UTC(2026, 5, 3, 11), label: "Incident", kind: "negative" },
+    { start: Date.UTC(2026, 5, 3, 16), end: Date.UTC(2026, 5, 3, 18), kind: "negative" },
+    { start: Date.UTC(2026, 5, 3, 20), label: "Release" },
+  ]}
+  domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)]}
+  title="API uptime"
+/>`}
 >
   <EventTimeline
     data={[
@@ -55,7 +65,14 @@ wouldn't.
 <LiveDemo
   label="now tick"
   code={`// authored, never implicit — determinism
-<EventTimeline data={windows} domain={today} now={Date.now()} />`}
+<EventTimeline
+  data={[
+    { start: Date.UTC(2026, 5, 3, 6), end: Date.UTC(2026, 5, 3, 15), label: "Healthy", kind: "positive" },
+    { start: Date.UTC(2026, 5, 3, 11), label: "Incident", kind: "negative" },
+  ]}
+  domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)]}
+  now={Date.UTC(2026, 5, 3, 21)}
+/>`}
 >
   <EventTimeline
     data={[
@@ -77,7 +94,14 @@ wouldn't.
 
 <LiveDemo
   label="span labels"
-  code={`<EventTimeline data={windows} domain={today} label="spans" width={160} height={14} />`}
+  code={`<EventTimeline
+  data={[
+    { start: Date.UTC(2026, 5, 3, 6), end: Date.UTC(2026, 5, 3, 15), label: "Healthy", kind: "positive" },
+    { start: Date.UTC(2026, 5, 3, 16), end: Date.UTC(2026, 5, 3, 18), label: "Deploy", kind: "accent" },
+  ]}
+  domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)]}
+  label="spans"
+/>`}
 >
   <EventTimeline
     data={[
@@ -99,6 +123,57 @@ wouldn't.
     width={280}
     height={26}
     title="Labeled spans"
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="instants only"
+  code={`// no item has an end — every mark renders as a diamond, no span fill
+<EventTimeline
+  data={[
+    { start: Date.UTC(2026, 5, 3, 9), label: "Deploy" },
+    { start: Date.UTC(2026, 5, 3, 14), label: "Alert", kind: "negative" },
+    { start: Date.UTC(2026, 5, 3, 18), label: "Resolved", kind: "positive" },
+  ]}
+  domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)]}
+  title="Today's events"
+/>`}
+>
+  <EventTimeline
+    data={[
+      { start: Date.UTC(2026, 5, 3, 9), label: "Deploy" },
+      { start: Date.UTC(2026, 5, 3, 14), label: "Alert", kind: "negative" },
+      { start: Date.UTC(2026, 5, 3, 18), label: "Resolved", kind: "positive" },
+    ]}
+    domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)]}
+    title="Today's events"
+    width={220}
+    height={16}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="clipped by the window"
+  code={`// the span starts before the window and ends after it — both edges cut
+// flat at the domain boundary, never rescaled to fit
+<EventTimeline
+  data={[
+    { start: Date.UTC(2026, 5, 2, 20), end: Date.UTC(2026, 5, 3, 10), label: "Maintenance" },
+  ]}
+  domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 3, 6)]}
+  title="Clipped window"
+/>`}
+>
+  <EventTimeline
+    data={[
+      { start: Date.UTC(2026, 5, 2, 20), end: Date.UTC(2026, 5, 3, 10), label: "Maintenance" },
+    ]}
+    domain={[Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 3, 6)]}
+    title="Clipped window"
+    width={220}
+    height={16}
   />
 </LiveDemo>
 

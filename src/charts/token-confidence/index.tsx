@@ -16,7 +16,7 @@ export type TokenConfidenceDatum = TokenDatum;
 export interface TokenConfidenceProps {
   data: readonly TokenConfidenceDatum[];
   /** The lo/hi thresholds — the ONLY tuning. A gradient prop will never exist. */
-  tiers?: [number, number] | undefined;
+  tiers?: readonly [number, number] | undefined;
   /** `"all"` also marks confident tokens (hairline) for audit UIs. */
   show?: "flagged" | "all" | undefined;
   /** Appends the 1-line inline key ("― unsure · ⋯ guessing"). */
@@ -79,25 +79,26 @@ export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
 
   return (
     <span className={rootClass} style={style} id={id} {...aria}>
-      {tokens.map((t, i) => {
+      {/* SSR hot path (bench floor): no per-token wrapper span — confident
+          tokens (the majority) render as bare text nodes, and flagged tokens
+          get exactly one underline span instead of an outer+inner pair. */}
+      {tokens.flatMap((t, i) => {
         const cls = CLASS[t.tier] ?? (show === "all" ? "mc-tc-seen" : undefined);
-        if (!cls)
-          // eslint-disable-next-line react/no-array-index-key -- tokens repeat; index is the only stable key
-          return <span key={i}>{t.token}</span>;
+        if (!cls) return [t.token];
         // underline the WORD only — keep leading/trailing whitespace outside the
         // marked span so the mark never bleeds under the space between tokens.
-        const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(t.token);
-        const lead = m?.[1] ?? "";
-        const core = m?.[2] ?? t.token;
-        const trail = m?.[3] ?? "";
-        return (
+        const trimmed = t.token.trimStart();
+        const lead = t.token.slice(0, t.token.length - trimmed.length);
+        const core = trimmed.trimEnd();
+        const trail = trimmed.slice(core.length);
+        return [
+          lead,
           // eslint-disable-next-line react/no-array-index-key -- tokens repeat; index is the only stable key
-          <span key={i}>
-            {lead}
-            <span className={cls}>{core}</span>
-            {trail}
-          </span>
-        );
+          <span key={i} className={cls}>
+            {core}
+          </span>,
+          trail,
+        ];
       })}
       {legend ? (
         <span className="mc-tc-legend" aria-hidden="true">

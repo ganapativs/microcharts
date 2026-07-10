@@ -14,7 +14,7 @@ values steer to `Sparkline` with a label.
   sizeOf="music-staff"
   code={`import { MusicStaff } from "@microcharts/react/music-staff";
 
-<MusicStaff data={weeks} title="Sprint melody" />`}
+<MusicStaff data={[3, 5, 4, 8, 6, 9, 7, 11]} label="last" title="Sprint melody" />`}
 >
   <MusicStaff data={[3, 5, 4, 8, 6, 9, 7, 11]} label="last" title="Sprint melody" width={120} height={26} />
 </LiveDemo>
@@ -44,7 +44,7 @@ values steer to `Sparkline` with a label.
 
 <LiveDemo
   label="staff range + a rest"
-  code={`<MusicStaff data={weeks} range="staff" />
+  code={`<MusicStaff data={[3, 5, 4, 8, 6, 9]} range="staff" />
 <MusicStaff data={[3, 5, null, 8, 6]} />`}
 >
   <span className="inline-flex gap-6 items-center">
@@ -53,14 +53,52 @@ values steer to `Sparkline` with a label.
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="a single note" code={`<MusicStaff data={[7]} />`}>
+  <MusicStaff data={[7]} title="One value" width={60} height={24} />
+</LiveDemo>
+
+<LiveDemo
+  label="all rests"
+  code={`// every value null — no notes, no contour line, just the staff
+<MusicStaff data={[null, null, null]} />`}
+>
+  <MusicStaff data={[null, null, null]} title="No notes" width={80} height={24} />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<MusicStaff data={[3000, 5200, 4100, 8300, 6400]} label="last" locale="de-DE" />`}
+>
+  <MusicStaff
+    data={[3000, 5200, 4100, 8300, 6400]}
+    label="last"
+    locale="de-DE"
+    title="Localized last value"
+    width={110}
+    height={24}
+  />
+</LiveDemo>
+
+A single value draws one note and no contour line — a melody needs at least two notes to
+have a shape. An all-`null` series draws the bare staff with no notes at all; the accessible
+name falls back to `describeSeries`'s own no-data phrasing. With a `locale`, the trailing
+`label="last"` value follows that locale's own grouping and decimal marks.
+
+## Four homes
+
+<FourContexts slug="music-staff" />
+
 ## Why this default
 
 The ledger range is the default because clipping pitch silently is worse than two extra hairline
 ledger ticks — a note above or below the staff still reads truly. `range="staff"` exists for dense
 cells where ledger lines would collide with a neighbour; there, out-of-range pitches clamp to the
-staff and the clamp is stated in the cell's accessible name. Two adjacent equal values are spaced by
-the time axis, never dodged vertically, because moving a note vertically would change its pitch — and
-pitch is the data.
+nearest staff line or space instead, trading visual precision for a collision-free cell — the
+accessible summary is unaffected either way, since it describes the raw values, not the clamped
+pixel positions. Two adjacent equal values are spaced by the time axis, never dodged vertically,
+because moving a note vertically would change its pitch — and pitch is the data.
 
 ## Accessibility
 

@@ -124,7 +124,6 @@ export function Constellation(props: ConstellationProps): ReactNode {
     summary === false
       ? false
       : (summary ?? constellationSummary(data, { xFormat, strings, format, locale }));
-  const fill = color ?? "var(--mc-stroke)";
   const fmt = makeFormatter(format, locale);
 
   const largest = geo.stars.find((s) => s.index === geo.largestIndex);
@@ -162,7 +161,7 @@ export function Constellation(props: ConstellationProps): ReactNode {
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
       {geo.connectorPath ? (
-        <path d={geo.connectorPath} data-mc-ink="ghost" style={{ strokeWidth: 0.75 }} />
+        <path d={geo.connectorPath} data-mc-ink="ghost" data-mc-w="tick" />
       ) : null}
       {/* faint halo behind the brightest event — a star that stands out */}
       {largest ? (
@@ -172,26 +171,30 @@ export function Constellation(props: ConstellationProps): ReactNode {
           r={largest.r + 1.6}
           fill="none"
           stroke="var(--mc-accent)"
-          strokeWidth={0.75}
+          data-mc-w="tick"
           strokeOpacity={0.4}
         />
       ) : null}
-      {geo.stars.map((s) => (
-        <circle
-          key={`s${s.index}`}
-          cx={s.cx}
-          cy={s.cy}
-          r={s.r}
-          style={{ fill: s.index === geo.largestIndex ? "var(--mc-accent)" : fill }}
-        />
-      ))}
+      {geo.stars.map((s) => {
+        const isLargest = s.index === geo.largestIndex;
+        return (
+          <circle
+            key={`s${s.index}`}
+            cx={s.cx}
+            cy={s.cy}
+            r={s.r}
+            data-mc-ink={isLargest ? "accent" : color ? undefined : "point"}
+            style={!isLargest && color ? { fill: color } : undefined}
+          />
+        );
+      })}
       {maxLabel ? (
         <text
           x={maxLabel.x}
           y={maxLabel.y}
           fontSize={fontSize}
           textAnchor={maxLabel.anchor}
-          style={{ fill: "var(--mc-accent)" }}
+          data-mc-ink="accent"
         >
           {maxLabel.text}
         </text>

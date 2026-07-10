@@ -59,6 +59,20 @@ inventing a seven-pip layout. The face never pretends.
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="zero — a real empty face, not missing data" code={`<DicePips value={0} />`}>
+  <DicePips value={0} size={22} />
+</LiveDemo>
+
+<LiveDemo label="a negative or invalid value reads 'No data.'" code={`<DicePips value={-2} />`}>
+  <DicePips value={-2} size={22} />
+</LiveDemo>
+
+<LiveDemo label="non-integers round to the nearest face" code={`<DicePips value={3.6} />`}>
+  <DicePips value={3.6} size={22} />
+</LiveDemo>
+
 ## Four homes
 
 <FourContexts slug="dice-pips" />

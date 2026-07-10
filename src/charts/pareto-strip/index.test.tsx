@@ -43,7 +43,7 @@ describe("<ParetoStrip> (plan/23 #15)", () => {
 
   it("descending bars + a cumulative line + threshold hairline", () => {
     const { container } = draw(<ParetoStrip data={CAUSES} width={160} />);
-    const bars = container.querySelectorAll('rect[data-mc-ink="bar"]');
+    const bars = container.querySelectorAll("rect");
     expect(bars.length).toBeGreaterThan(2);
     expect(container.querySelector('path[data-mc-ink="muted"]')).not.toBeNull(); // cum line
     expect(container.querySelectorAll("line").length).toBe(1); // threshold
@@ -51,8 +51,8 @@ describe("<ParetoStrip> (plan/23 #15)", () => {
 
   it("vital bars (accent) stop at the crossing; the rest are muted", () => {
     const { container } = draw(<ParetoStrip data={CAUSES} threshold={80} width={200} />);
-    const bars = [...container.querySelectorAll('rect[data-mc-ink="bar"]')];
-    const accent = bars.filter((b) => (b.getAttribute("style") || "").includes("--mc-accent"));
+    const bars = [...container.querySelectorAll("rect")];
+    const accent = bars.filter((b) => b.getAttribute("data-mc-ink") === "accent");
     // top few are accent, and they are the leftmost (a prefix)
     expect(accent.length).toBeGreaterThan(0);
     expect(accent.length).toBeLessThan(bars.length);
@@ -61,7 +61,7 @@ describe("<ParetoStrip> (plan/23 #15)", () => {
   it("max rolls the tail into Other (rendered, last)", () => {
     const { container } = draw(<ParetoStrip data={CAUSES} max={3} width={160} />);
     // 3 head bars + Other = 4 bars
-    expect(container.querySelectorAll('rect[data-mc-ink="bar"]').length).toBe(4);
+    expect(container.querySelectorAll("rect").length).toBe(4);
   });
 
   it("label='count' states 'K of N → cum%'; 'none' hides it", () => {
