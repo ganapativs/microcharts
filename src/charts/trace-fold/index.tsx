@@ -5,6 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
+import { ON_FILL_INK } from "../../core/color.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_TRACE_FOLD, type TraceFoldStrings } from "../../core/strings-trace-fold.js";
 import { traceFoldGeometry, type Span } from "./geometry.js";
@@ -114,7 +115,7 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
                 textAnchor="middle"
                 fontSize={fontSize}
                 style={{
-                  fill: active ? "rgba(255,255,255,0.96)" : "var(--mc-surface, Canvas)",
+                  fill: active ? ON_FILL_INK : "var(--mc-surface, Canvas)",
                   fontWeight: 600,
                 }}
               >

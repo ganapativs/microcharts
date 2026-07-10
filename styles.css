@@ -29,8 +29,6 @@
 
     /* geometry + type */
     --mc-stroke-width: 1.5;
-    --mc-dot-size: 2;
-    --mc-radius: 1px;
     --mc-gap: 0.25em;
     --mc-font: inherit;
     --mc-label-size: 0.75em;
@@ -73,22 +71,26 @@
      Ink is left to the active theme (never pinned to a light value) so the
      preset stays legible on dark surfaces too — its identity is the weight and
      the accent, not a fixed grey. */
-  :where([data-mc-theme="editorial"]) {
+  /* Each preset also answers to [data-mc-preset] — the page-global form (a docs
+     or app shell sets it on <html>) — so preset bundles have ONE source here and
+     hosts never re-declare them. Per-instance [data-mc-theme] wins by proximity. */
+  :where([data-mc-theme="editorial"], [data-mc-preset="editorial"]) {
     --mc-accent: #b8112a;
     --mc-stroke-width: 1;
-    --mc-radius: 0;
   }
-  :where([data-mc-theme="mono"]) {
+  :where([data-mc-theme="mono"], [data-mc-preset="mono"]) {
     --mc-positive: var(--mc-stroke);
     --mc-negative: var(--mc-stroke);
     --mc-accent: var(--mc-stroke);
     --mc-neutral: var(--mc-stroke);
     --mc-moon: var(--mc-stroke);
   }
-  :where([data-mc-theme="vivid"]) {
+  /* vivid never claims --mc-accent: the accent is the consumer's brand voice;
+     the preset only turns up weight + valence. (editorial's red IS its identity,
+     so that one keeps its pin.) */
+  :where([data-mc-theme="vivid"], [data-mc-preset="vivid"]) {
     --mc-positive: #00c896;
     --mc-negative: #ff5630;
-    --mc-accent: #2f6bff;
     --mc-stroke-width: 2;
   }
 }
@@ -223,6 +225,19 @@
     fill: var(--mc-accent);
     stroke: none;
   }
+  /* width roles — orthogonal to ink (color) roles, composable on any stroked
+     mark. Ratios of the primary width so presets and prefers-contrast retune
+     every stroke in a chart, not just the data line. At the default 1.5 these
+     resolve to 1 / 0.75 / 0.5 — the weights the charts were hand-tuned to. */
+  :where(.mc-root [data-mc-w="support"]) {
+    stroke-width: calc(var(--mc-stroke-width) * 2 / 3);
+  }
+  :where(.mc-root [data-mc-w="tick"]) {
+    stroke-width: calc(var(--mc-stroke-width) / 2);
+  }
+  :where(.mc-root [data-mc-w="hair"]) {
+    stroke-width: calc(var(--mc-stroke-width) / 3);
+  }
   :where(.mc-root [data-mc-ink="muted"]) {
     fill: none;
     stroke: var(--mc-neutral);
@@ -281,13 +296,13 @@
     fill: var(--mc-band);
     stroke: var(--mc-neutral);
     stroke-opacity: 0.4;
-    stroke-width: 0.5;
+    stroke-width: calc(var(--mc-stroke-width) / 3);
   }
   :where(.mc-root [data-mc-ink="gap"]) {
     fill: var(--mc-band);
     stroke: var(--mc-neutral);
     stroke-opacity: 0.35;
-    stroke-width: 0.5;
+    stroke-width: calc(var(--mc-stroke-width) / 3);
   }
   /* Ghost = low-precision context behind the primary mark (RateVolume volume
      bars, QuadrantDot peer dots, CyclePlot slot lines, ChangePoint regime means,

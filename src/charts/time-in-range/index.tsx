@@ -5,6 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
+import { ON_FILL_INK } from "../../core/color.js";
 import { EN_TIME_IN_RANGE, type TimeInRangeStrings } from "../../core/strings-time-in-range.js";
 import {
   timeInRangeGeometry,
@@ -130,7 +131,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
                 dominantBaseline="central"
                 textAnchor="middle"
                 fontSize={fontSize}
-                style={{ fill: "rgba(255,255,255,0.96)", fontWeight: 600 }}
+                style={{ fill: ON_FILL_INK, fontWeight: 600 }}
               >
                 {text}
               </text>

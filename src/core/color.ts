@@ -34,6 +34,11 @@ export const CATEGORICAL = [
   OKABE_ITO.reddishPurple,
 ] as const;
 
+/** Label ink for text sitting ON a saturated data fill (dense cells, wedges).
+ *  Near-white with a hair of translucency so it reads on any --mc-cat-* fill
+ *  in light and dark; the one sanctioned literal for this job. */
+export const ON_FILL_INK = "rgba(255,255,255,0.96)";
+
 /** The `--mc-cat-N` CSS variable for a series index (1-based, cycles). */
 export function categoricalToken(index: number): string {
   const n = (((index % CATEGORICAL.length) + CATEGORICAL.length) % CATEGORICAL.length) + 1;

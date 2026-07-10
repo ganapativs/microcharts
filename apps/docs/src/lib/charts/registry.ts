@@ -225,6 +225,3 @@ export function getModule(slug: string): ChartModule | undefined {
 }
 
 export const STABLE_CHARTS = CHARTS.filter((c) => c.status === "stable");
-
-/** The full catalog size (plan/21 §0 — every type ships before launch). */
-export const CATALOG_TARGET = 100;

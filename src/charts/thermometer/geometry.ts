@@ -5,8 +5,9 @@
 // clipPath/id is needed. Works vertical (default) or horizontal. All coords 2-dp.
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
+import type { Orientation } from "../../core/types.js";
 
-export type Orientation = "vertical" | "horizontal";
+export type { Orientation } from "../../core/types.js";
 
 export interface ThermometerGeometry {
   /** Tube + fill are rounded-rect capsules (rx = r) so the ends read closed. */

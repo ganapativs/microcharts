@@ -6,9 +6,11 @@
 // Ticks/labels are generated only within the window, so containment is by
 // construction — no clipPath. 2-dp.
 import { round2 } from "../../core/types.js";
+import type { Orientation } from "../../core/types.js";
+
+export type { Orientation } from "../../core/types.js";
 
 export type Tone = "pos" | "neg" | "warn" | "neutral";
-export type Orientation = "vertical" | "horizontal";
 
 export interface Zone {
   from: number;

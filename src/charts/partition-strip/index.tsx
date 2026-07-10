@@ -5,6 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
+import { ON_FILL_INK } from "../../core/color.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_PARTITION, type PartitionStrings } from "../../core/strings-partition.js";
 import { partitionStripGeometry, parentValue, type PartitionNode } from "./geometry.js";
@@ -143,7 +144,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
                 dominantBaseline="central"
                 textAnchor="middle"
                 fontSize={fontSize}
-                style={{ fill: "rgba(255,255,255,0.96)", fontWeight: 600 }}
+                style={{ fill: ON_FILL_INK, fontWeight: 600 }}
               >
                 {seg.label}
               </text>

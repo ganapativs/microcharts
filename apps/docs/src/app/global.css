@@ -256,31 +256,31 @@
   color-scheme: dark;
 }
 
-/* ---- Chart presets — the picker sets [data-mc-preset] on <html]. These are
-   the library's preset bundles, re-declared at docs specificity so they win
-   over the base --mc-* binding above and COMPOSE with the accent picker (only
-   Mono deliberately claims the accent, to go fully monochrome). Geometry +
-   colour relationships are theme-independent, so one block serves light+dark;
-   colour values that must adapt are expressed through var(--mc-stroke). ------ */
+/* ---- Chart presets — the picker sets [data-mc-preset] on <html>. These
+   MIRROR the library's preset bundles in styles.css exactly (parity is
+   test-enforced: preset-parity.test.ts) — re-declared only because the base
+   --mc-* binding above is unlayered and would beat the library's layered
+   :where() rules. Editorial's red accent is that preset's identity and
+   deliberately overrides the accent picker while active; vivid and mono
+   follow the library too. ------------------------------------------------ */
 :root[data-mc-preset="editorial"] {
-  /* hairline ink, sharp corners — a printed-page restraint */
+  /* hairline ink, signature red endpoint — a printed-page restraint */
+  --mc-accent: #b8112a;
   --mc-stroke-width: 1;
-  --mc-radius: 0;
-  --mc-dot-size: 1.6;
 }
 :root[data-mc-preset="mono"] {
   /* one ink — direction still carries by shape, never colour alone */
   --mc-positive: var(--mc-stroke);
   --mc-negative: var(--mc-stroke);
   --mc-accent: var(--mc-stroke);
-  --mc-neutral: color-mix(in oklab, var(--mc-stroke) 55%, transparent);
+  --mc-neutral: var(--mc-stroke);
+  --mc-moon: var(--mc-stroke);
 }
 :root[data-mc-preset="vivid"] {
   /* bolder ink + punchier valence; accent stays user-chosen */
-  --mc-stroke-width: 2.25;
-  --mc-dot-size: 2.4;
-  --mc-positive: #10b981;
-  --mc-negative: #f43f5e;
+  --mc-positive: #00c896;
+  --mc-negative: #ff5630;
+  --mc-stroke-width: 2;
 }
 
 /* ---- Accent presets — the global picker sets [data-accent] on <html>.

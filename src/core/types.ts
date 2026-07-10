@@ -9,6 +9,9 @@ export type XY = readonly [number, number];
 /** Polarity: which direction counts as "good" (plan/04 rule 6). */
 export type Polarity = "up" | "down";
 
+/** Layout direction for gauge-like charts (Thermometer, TapeGauge). */
+export type Orientation = "vertical" | "horizontal";
+
 /** Rounds to 2 decimals — path coords are emitted at this precision so SVG
  *  output is small and attribute assertions are stable (plan/07, plan/09). */
 export function round2(n: number): number {

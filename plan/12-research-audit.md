@@ -1640,3 +1640,10 @@ IntersectionObserver) underpins all four motion charts; every motion chart's red
 static frame (not a paused pose), and the browser suite asserts `getAnimations()` starts/stops per the
 gate. Accumulated budget spec-vs-measured divergences (all < the 3/4 hard caps) + motion deviations
 listed in STATUS.md await the batch-gate user sign-off.
+
+## 2026-07-10 — superaudit foundation (branch `superaudit`, checkpoint 1 approved)
+
+- **Prop contract v1** rulings recorded in plan/04 §8 (renames + `data-mc-w` width roles). Provenance: exhaustive Props-type audit of all 98 charts (audit/reports/prop-contract.md), user-approved 2026-07-10.
+- **Tokens**: `--mc-dot-size` + `--mc-radius` removed (zero consumers, verified by grep of styles.css + src). `vivid` preset no longer pins `--mc-accent` (accent = consumer's brand; editorial's red pin stays as its identity). Preset bundles now answer to `[data-mc-theme]` AND `[data-mc-preset]` — docs mirrors are parity-tested (`apps/docs/src/lib/preset-parity.test.ts`), killing the observed lib↔docs vivid/mono drift.
+- **Counts**: 98 components = 98 pages = registry (plan's "100 types" counts band-sparkline + win-loss variants). Dead `CATALOG_TARGET` export removed; public counts computed from `STABLE_CHARTS.length`.
+- Baseline (main 431f6b3): tests 2298 green, craft 611/0, size green, **12 frontier charts below SSR bench floor**, 21 frontier charts missing visual specs, 4 truncated docs pages — remediation tracked in audit/ on the branch.
