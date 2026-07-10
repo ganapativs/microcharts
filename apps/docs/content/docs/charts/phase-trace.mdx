@@ -3,7 +3,7 @@ title: PhaseTrace
 description: A phase portrait for React — two synchronized signals plotted as one x×y trajectory where path order is time, so loops expose lag and clusters expose regimes.
 ---
 
-PhaseTrace answers "how do two coupled signals move *together*?". Plotting one against the other as a
+PhaseTrace answers "how do two coupled signals move _together_?". Plotting one against the other as a
 single trajectory turns lag into loops and regimes into clusters — structure that two separate
 sparklines hide. Path order carries time, and the current state is a directed endpoint with an
 arrowhead, so "now, and how it got here" reads at a glance.
@@ -51,7 +51,10 @@ arrowhead, so "now, and how it got here" reads at a glance.
 
 <LiveDemo label="longer tail" code={`<PhaseTrace data={traj} tail={0.4} startDot />`}>
   <PhaseTrace
-    data={Array.from({ length: 40 }, (_, i) => { const t = (i / 40) * Math.PI * 2; return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 }; })}
+    data={Array.from({ length: 40 }, (_, i) => {
+      const t = (i / 40) * Math.PI * 2;
+      return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+    })}
     xLabel="CPU"
     yLabel="Latency"
     tail={0.4}

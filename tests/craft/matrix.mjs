@@ -292,7 +292,10 @@ add(
       format: (n) => `${Math.round(n)} ms`,
     },
   ],
-  [[80, 24], [320, 40]],
+  [
+    [80, 24],
+    [320, 40],
+  ],
 );
 add(
   "phase-trace",
@@ -308,7 +311,10 @@ add(
       grid: true,
     },
   ],
-  [[40, 32], [110, 100]],
+  [
+    [40, 32],
+    [110, 100],
+  ],
 );
 add(
   "volume-profile",
@@ -324,7 +330,10 @@ add(
       ],
     },
   ],
-  [[48, 32], [120, 80]],
+  [
+    [48, 32],
+    [120, 80],
+  ],
 );
 add(
   "folded-day-band",
@@ -332,21 +341,51 @@ add(
   [
     {
       data: Array.from({ length: 14 }, (_d, d) =>
-        Array.from({ length: 24 }, (_h, h) => ({ t: d * 24 + h, value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + Math.sin(d + h) * 8) })),
+        Array.from({ length: 24 }, (_h, h) => ({
+          t: d * 24 + h,
+          value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + Math.sin(d + h) * 8),
+        })),
       ).flat(),
-      today: Array.from({ length: 24 }, (_h, h) => ({ t: h, value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + 14) })),
+      today: Array.from({ length: 24 }, (_h, h) => ({
+        t: h,
+        value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + 14),
+      })),
     },
   ],
-  [[80, 20], [320, 40]],
+  [
+    [80, 20],
+    [320, 40],
+  ],
 );
 add(
   "confusion-grid",
   "ConfusionGrid",
   [
-    { data: { labels: ["cat", "dog"], counts: [[88, 12], [10, 59]] } },
-    { data: { labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 62, 12], [3, 9, 58]] }, label: "accuracy" },
+    {
+      data: {
+        labels: ["cat", "dog"],
+        counts: [
+          [88, 12],
+          [10, 59],
+        ],
+      },
+    },
+    {
+      data: {
+        labels: ["A", "B", "C"],
+        counts: [
+          [70, 8, 2],
+          [6, 62, 12],
+          [3, 9, 58],
+        ],
+      },
+      label: "accuracy",
+    },
   ],
-  [[44, 44], [120, 120]],
+  [
+    [44, 44],
+    [120, 120],
+  ],
 );
 add(
   "calibration-strip",
@@ -362,7 +401,10 @@ add(
       ],
     },
   ],
-  [[80, 24], [300, 44]],
+  [
+    [80, 24],
+    [300, 44],
+  ],
 );
 add(
   "partition-strip",
@@ -370,13 +412,28 @@ add(
   [
     {
       data: [
-        { label: "JS", children: [{ label: "react", value: 28 }, { label: "vendor", value: 12 }] },
-        { label: "CSS", children: [{ label: "tw", value: 16 }, { label: "custom", value: 8 }] },
+        {
+          label: "JS",
+          children: [
+            { label: "react", value: 28 },
+            { label: "vendor", value: 12 },
+          ],
+        },
+        {
+          label: "CSS",
+          children: [
+            { label: "tw", value: 16 },
+            { label: "custom", value: 8 },
+          ],
+        },
         { label: "img", value: 18 },
       ],
     },
   ],
-  [[80, 16], [320, 30]],
+  [
+    [80, 16],
+    [320, 30],
+  ],
 );
 add(
   "depth-wedge",
@@ -396,16 +453,29 @@ add(
       },
     },
   ],
-  [[60, 16], [320, 30]],
+  [
+    [60, 16],
+    [320, 30],
+  ],
 );
 add(
   "dual-window-meter",
   "DualWindowMeter",
   [
-    { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 - (i > 40 ? 2 : 0)), target: -23 },
-    { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4), target: -23, band: [-25, -21] },
+    {
+      data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 - (i > 40 ? 2 : 0)),
+      target: -23,
+    },
+    {
+      data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4),
+      target: -23,
+      band: [-25, -21],
+    },
   ],
-  [[80, 16], [320, 28]],
+  [
+    [80, 16],
+    [320, 28],
+  ],
 );
 add(
   "minimap-strip",
@@ -421,7 +491,10 @@ add(
       domain: [0, 600],
     },
   ],
-  [[80, 12], [300, 18]],
+  [
+    [80, 12],
+    [300, 18],
+  ],
 );
 add(
   "star-spoke",
@@ -438,7 +511,10 @@ add(
       dots: true,
     },
   ],
-  [[32, 32], [110, 110]],
+  [
+    [32, 32],
+    [110, 110],
+  ],
 );
 add(
   "wind-barb",
@@ -448,7 +524,10 @@ add(
     { direction: 45, magnitude: 65, label: true },
     { direction: 0, magnitude: 1 },
   ],
-  [[24, 24], [64, 64]],
+  [
+    [24, 24],
+    [64, 64],
+  ],
 );
 add(
   "event-raster",

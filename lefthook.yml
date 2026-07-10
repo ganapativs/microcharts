@@ -3,7 +3,8 @@ pre-commit:
   parallel: true
   commands:
     format:
-      glob: "*.{ts,tsx,js,jsx,json,css}"
+      # match what CI's `oxfmt --check` covers (incl. .mjs/.cjs/.mts + .mdx docs)
+      glob: "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,json,css,mdx}"
       run: pnpm oxfmt --check {staged_files}
     lint:
       glob: "*.{ts,tsx}"

@@ -57,7 +57,10 @@ same as zero. The unknown share travels with the accessible name.
 <LiveDemo label="heat" code={`<MinimapStrip data={data} variant="heat" />`}>
   <MinimapStrip
     data={{
-      content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6),
+      content: Array.from(
+        { length: 1200 },
+        (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6,
+      ),
       window: [300, 440],
       marks: [600, 1000],
     }}

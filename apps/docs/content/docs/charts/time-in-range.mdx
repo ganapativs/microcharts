@@ -45,7 +45,10 @@ is read by position first and color second. The in-range percent is the one numb
 
 ## Variants
 
-<LiveDemo label="clinical column" code={`<TimeInRange data={tir} orientation="vertical" label="all" />`}>
+<LiveDemo
+  label="clinical column"
+  code={`<TimeInRange data={tir} orientation="vertical" label="all" />`}
+>
   <TimeInRange
     data={{ severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }}
     orientation="vertical"
@@ -56,7 +59,10 @@ is read by position first and color second. The in-range percent is the one numb
   />
 </LiveDemo>
 
-<LiveDemo label="five zones" code={`<TimeInRange data={{ severeBelow, below, in, above, severeAbove }} />`}>
+<LiveDemo
+  label="five zones"
+  code={`<TimeInRange data={{ severeBelow, below, in, above, severeAbove }} />`}
+>
   <TimeInRange
     data={{ severeBelow: 3, below: 8, in: 64, above: 18, severeAbove: 7 }}
     title="Severity tiers"

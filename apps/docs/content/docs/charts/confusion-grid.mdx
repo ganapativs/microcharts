@@ -49,7 +49,14 @@ columns predicted — belongs next to every example.
 
 <LiveDemo label="worst-confusion accent" code={`<ConfusionGrid data={cm} accent="errors" />`}>
   <ConfusionGrid
-    data={{ labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 40, 34], [3, 9, 58]] }}
+    data={{
+      labels: ["A", "B", "C"],
+      counts: [
+        [70, 8, 2],
+        [6, 40, 34],
+        [3, 9, 58],
+      ],
+    }}
     accent="errors"
     title="Worst confusion"
     size={110}

@@ -55,8 +55,21 @@ become unreadable texture at this size.
 <LiveDemo label="emphasis" code={`<PartitionStrip data={bundle} emphasis="react" />`}>
   <PartitionStrip
     data={[
-      { label: "JS", children: [{ label: "react", value: 28 }, { label: "vendor", value: 12 }, { label: "app", value: 8 }] },
-      { label: "CSS", children: [{ label: "tailwind", value: 16 }, { label: "custom", value: 8 }] },
+      {
+        label: "JS",
+        children: [
+          { label: "react", value: 28 },
+          { label: "vendor", value: 12 },
+          { label: "app", value: 8 },
+        ],
+      },
+      {
+        label: "CSS",
+        children: [
+          { label: "tailwind", value: 16 },
+          { label: "custom", value: 8 },
+        ],
+      },
       { label: "img", value: 18 },
     ]}
     emphasis="react"

@@ -729,7 +729,10 @@ export const SCENARIOS = [
     component: "Waveform",
     floor: 8, // downsample 2k samples → one bar path — N-node class
     props: (i) => ({
-      data: Array.from({ length: 2048 }, (_s, j) => Math.sin((i + j) / 7) * (1 - Math.abs(j - 1024) / 2200)),
+      data: Array.from(
+        { length: 2048 },
+        (_s, j) => Math.sin((i + j) / 7) * (1 - Math.abs(j - 1024) / 2200),
+      ),
       summary: false,
     }),
   },
@@ -820,8 +823,14 @@ export const SCENARIOS = [
     floor: 40, // two cumulative step wedges
     props: (i) => ({
       data: {
-        demand: Array.from({ length: 8 }, (_l, k) => ({ level: 99.9 - k * 0.2, amount: ((i + k) % 9) * 40 + 40 })),
-        supply: Array.from({ length: 8 }, (_l, k) => ({ level: 100.1 + k * 0.2, amount: ((i + k + 3) % 9) * 40 + 40 })),
+        demand: Array.from({ length: 8 }, (_l, k) => ({
+          level: 99.9 - k * 0.2,
+          amount: ((i + k) % 9) * 40 + 40,
+        })),
+        supply: Array.from({ length: 8 }, (_l, k) => ({
+          level: 100.1 + k * 0.2,
+          amount: ((i + k + 3) % 9) * 40 + 40,
+        })),
       },
       summary: false,
     }),
@@ -833,7 +842,10 @@ export const SCENARIOS = [
     props: (i) => ({
       data: Array.from({ length: 4 }, (_p, k) => ({
         label: `g${k}`,
-        children: Array.from({ length: 3 }, (_c, j) => ({ label: `c${k}${j}`, value: ((i + k + j) % 9) * 10 + 10 })),
+        children: Array.from({ length: 3 }, (_c, j) => ({
+          label: `c${k}${j}`,
+          value: ((i + k + j) % 9) * 10 + 10,
+        })),
       })),
       summary: false,
     }),
@@ -843,7 +855,10 @@ export const SCENARIOS = [
     component: "CalibrationStrip",
     floor: 15, // bin 800 raw pairs → dots + support — N-node class
     props: (i) => ({
-      data: Array.from({ length: 800 }, (_s, j) => ({ p: ((i + j) % 100) / 100, outcome: (i + j) % 3 === 0 ? 1 : 0 })),
+      data: Array.from({ length: 800 }, (_s, j) => ({
+        p: ((i + j) % 100) / 100,
+        outcome: (i + j) % 3 === 0 ? 1 : 0,
+      })),
       summary: false,
     }),
   },
@@ -868,7 +883,10 @@ export const SCENARIOS = [
     component: "FoldedDayBand",
     floor: 6, // fold ~336 obs → per-bin quantiles — N-node class
     props: (i) => ({
-      data: Array.from({ length: 336 }, (_s, j) => ({ t: j, value: 40 + Math.sin((i + j) / 4) * 20 })),
+      data: Array.from({ length: 336 }, (_s, j) => ({
+        t: j,
+        value: 40 + Math.sin((i + j) / 4) * 20,
+      })),
       period: 24,
       summary: false,
     }),

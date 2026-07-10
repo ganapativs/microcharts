@@ -76,14 +76,49 @@ const { VolumeProfile } = await D("volume-profile");
 const { PhaseTrace } = await D("phase-trace");
 const { TraceFold } = await D("trace-fold");
 const { TapeGauge } = await D("tape-gauge");
-const tapeZones = [{ from: 100, to: 130, tone: "pos" }, { from: 130, to: 150, tone: "warn" }, { from: 150, to: 200, tone: "neg" }];
+const tapeZones = [
+  { from: 100, to: 130, tone: "pos" },
+  { from: 130, to: 150, tone: "warn" },
+  { from: 150, to: 200, tone: "neg" },
+];
 const { StationGlyph } = await D("station-glyph");
-const traceSpans = [{ label: "request", start: 0, duration: 214, depth: 0 }, { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 }, { label: "auth", start: 0, duration: 8, depth: 1, parent: 0 }, { label: "render", start: 96, duration: 60, depth: 1, parent: 0 }, { label: "serialize", start: 156, duration: 40, depth: 1, parent: 0 }, { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 }, { label: "decode", start: 82, duration: 12, depth: 2, parent: 1 }, { label: "log", start: 200, duration: 14, depth: 1, parent: 0 }, { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 }];
-const phaseTraj = Array.from({ length: 40 }, (_, i) => { const t = (i / 40) * Math.PI * 2; return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 }; });
-const volProfile = [{ level: 134, weight: 3 }, { level: 136, weight: 6 }, { level: 138, weight: 11 }, { level: 140, weight: 18 }, { level: 142, weight: 26 }, { level: 144, weight: 20 }, { level: 146, weight: 12 }, { level: 148, weight: 7 }, { level: 150, weight: 4 }];
+const traceSpans = [
+  { label: "request", start: 0, duration: 214, depth: 0 },
+  { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
+  { label: "auth", start: 0, duration: 8, depth: 1, parent: 0 },
+  { label: "render", start: 96, duration: 60, depth: 1, parent: 0 },
+  { label: "serialize", start: 156, duration: 40, depth: 1, parent: 0 },
+  { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 },
+  { label: "decode", start: 82, duration: 12, depth: 2, parent: 1 },
+  { label: "log", start: 200, duration: 14, depth: 1, parent: 0 },
+  { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 },
+];
+const phaseTraj = Array.from({ length: 40 }, (_, i) => {
+  const t = (i / 40) * Math.PI * 2;
+  return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+});
+const volProfile = [
+  { level: 134, weight: 3 },
+  { level: 136, weight: 6 },
+  { level: 138, weight: 11 },
+  { level: 140, weight: 18 },
+  { level: 142, weight: 26 },
+  { level: 144, weight: 20 },
+  { level: 146, weight: 12 },
+  { level: 148, weight: 7 },
+  { level: 150, weight: 4 },
+];
 const foldCurve = (h) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
-const foldData = Array.from({ length: 14 }, (_d, d) => Array.from({ length: 24 }, (_h, h) => ({ t: d * 24 + h, value: Math.round(foldCurve(h) + Math.sin(d + h) * 8) }))).flat();
-const foldToday = Array.from({ length: 24 }, (_h, h) => ({ t: h, value: Math.round(foldCurve(h) + 14) }));
+const foldData = Array.from({ length: 14 }, (_d, d) =>
+  Array.from({ length: 24 }, (_h, h) => ({
+    t: d * 24 + h,
+    value: Math.round(foldCurve(h) + Math.sin(d + h) * 8),
+  })),
+).flat();
+const foldToday = Array.from({ length: 24 }, (_h, h) => ({
+  t: h,
+  value: Math.round(foldCurve(h) + 14),
+}));
 
 const svg = (C, props) => renderToStaticMarkup(h(C, props));
 
@@ -1006,111 +1041,748 @@ const body = [
   row("unknown", svg(OrbitStatus, { latency: NaN, rate: 5, size: 56 })),
 
   `<h2>TimeInRange</h2>`,
-  row("in-range label", svg(TimeInRange, { data: { below: 9, in: 72, above: 19 }, width: 240, height: 22 })),
-  row("five zones, all", svg(TimeInRange, { data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }, label: "all", width: 240, height: 22 })),
-  row("vertical column", svg(TimeInRange, { data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }, orientation: "vertical", label: "all", width: 28, height: 130 })),
+  row(
+    "in-range label",
+    svg(TimeInRange, { data: { below: 9, in: 72, above: 19 }, width: 240, height: 22 }),
+  ),
+  row(
+    "five zones, all",
+    svg(TimeInRange, {
+      data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 },
+      label: "all",
+      width: 240,
+      height: 22,
+    }),
+  ),
+  row(
+    "vertical column",
+    svg(TimeInRange, {
+      data: { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 },
+      orientation: "vertical",
+      label: "all",
+      width: 28,
+      height: 130,
+    }),
+  ),
   row("cell", svg(TimeInRange, { data: { below: 9, in: 72, above: 19 }, width: 60, height: 10 })),
 
   `<h2>Hypnogram</h2>`,
-  row("sleep stages", svg(Hypnogram, { data: [{ t: 0, state: "Awake" }, { t: 8, state: "Light" }, { t: 22, state: "Deep" }, { t: 38, state: "Light" }, { t: 50, state: "REM" }, { t: 62, state: "Light" }, { t: 74, state: "Deep" }, { t: 110, state: "Awake" }], states: ["Awake", "REM", "Light", "Deep"], domain: [0, 120], width: 300, height: 30 })),
-  row("emphasis Deep", svg(Hypnogram, { data: [{ t: 0, state: "Awake" }, { t: 8, state: "Light" }, { t: 22, state: "Deep" }, { t: 74, state: "Deep" }, { t: 110, state: "Awake" }], states: ["Awake", "REM", "Light", "Deep"], domain: [0, 120], emphasis: "Deep", width: 300, height: 30 })),
-  row("lanes", svg(Hypnogram, { data: [{ t: 0, state: "Awake" }, { t: 30, state: "REM" }, { t: 60, state: "Deep" }, { t: 90, state: "Light" }], states: ["Awake", "REM", "Light", "Deep"], domain: [0, 120], variant: "lanes", width: 260, height: 30 })),
+  row(
+    "sleep stages",
+    svg(Hypnogram, {
+      data: [
+        { t: 0, state: "Awake" },
+        { t: 8, state: "Light" },
+        { t: 22, state: "Deep" },
+        { t: 38, state: "Light" },
+        { t: 50, state: "REM" },
+        { t: 62, state: "Light" },
+        { t: 74, state: "Deep" },
+        { t: 110, state: "Awake" },
+      ],
+      states: ["Awake", "REM", "Light", "Deep"],
+      domain: [0, 120],
+      width: 300,
+      height: 30,
+    }),
+  ),
+  row(
+    "emphasis Deep",
+    svg(Hypnogram, {
+      data: [
+        { t: 0, state: "Awake" },
+        { t: 8, state: "Light" },
+        { t: 22, state: "Deep" },
+        { t: 74, state: "Deep" },
+        { t: 110, state: "Awake" },
+      ],
+      states: ["Awake", "REM", "Light", "Deep"],
+      domain: [0, 120],
+      emphasis: "Deep",
+      width: 300,
+      height: 30,
+    }),
+  ),
+  row(
+    "lanes",
+    svg(Hypnogram, {
+      data: [
+        { t: 0, state: "Awake" },
+        { t: 30, state: "REM" },
+        { t: 60, state: "Deep" },
+        { t: 90, state: "Light" },
+      ],
+      states: ["Awake", "REM", "Light", "Deep"],
+      domain: [0, 120],
+      variant: "lanes",
+      width: 260,
+      height: 30,
+    }),
+  ),
 
   `<h2>EtaBar</h2>`,
-  row("64% + eta", svg(EtaBar, { progress: 0.64, elapsed: 3.6, rate: 0.18, formatEta: (t) => `${Math.round(t)} min`, width: 300, height: 16 })),
+  row(
+    "64% + eta",
+    svg(EtaBar, {
+      progress: 0.64,
+      elapsed: 3.6,
+      rate: 0.18,
+      formatEta: (t) => `${Math.round(t)} min`,
+      width: 300,
+      height: 16,
+    }),
+  ),
   row("stalled", svg(EtaBar, { progress: 0.3, elapsed: 40, rate: 0, width: 300, height: 16 })),
-  row("percent", svg(EtaBar, { progress: 0.42, elapsed: 10, rate: 0.05, label: "percent", width: 300, height: 16 })),
+  row(
+    "percent",
+    svg(EtaBar, {
+      progress: 0.42,
+      elapsed: 10,
+      rate: 0.05,
+      label: "percent",
+      width: 300,
+      height: 16,
+    }),
+  ),
   row("cell", svg(EtaBar, { progress: 0.64, elapsed: 128, rate: 0.5, width: 60, height: 8 })),
 
   `<h2>Waveform</h2>`,
-  row("bars + peak", svg(Waveform, { data: Array.from({ length: 200 }, (_, i) => (i === 126 ? 0.82 : Math.sin(i / 3) * 0.15 + Math.sin(i / 11) * 0.35) * (1 - Math.abs(i - 100) / 260)), width: 300, height: 30 })),
-  row("progress 63%", svg(Waveform, { data: Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220)), progress: 0.63, width: 300, height: 30 })),
-  row("envelope", svg(Waveform, { data: Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220)), variant: "envelope", width: 300, height: 30 })),
+  row(
+    "bars + peak",
+    svg(Waveform, {
+      data: Array.from(
+        { length: 200 },
+        (_, i) =>
+          (i === 126 ? 0.82 : Math.sin(i / 3) * 0.15 + Math.sin(i / 11) * 0.35) *
+          (1 - Math.abs(i - 100) / 260),
+      ),
+      width: 300,
+      height: 30,
+    }),
+  ),
+  row(
+    "progress 63%",
+    svg(Waveform, {
+      data: Array.from(
+        { length: 200 },
+        (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220),
+      ),
+      progress: 0.63,
+      width: 300,
+      height: 30,
+    }),
+  ),
+  row(
+    "envelope",
+    svg(Waveform, {
+      data: Array.from(
+        { length: 200 },
+        (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220),
+      ),
+      variant: "envelope",
+      width: 300,
+      height: 30,
+    }),
+  ),
   row("silent", svg(Waveform, { data: [0, 0, 0, 0, 0], width: 120, height: 24 })),
 
   `<h2>EventRaster</h2>`,
-  row("services", svg(EventRaster, { data: [{ label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40, 41, 48, 55] }, { label: "db", events: [3, 6, 15, 21, 34, 41, 55] }, { label: "cache", events: [6, 21, 41, 55] }, { label: "queue", events: [10, 30, 50] }], width: 300, height: 36 })),
-  row("emphasis api", svg(EventRaster, { data: [{ label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40] }, { label: "db", events: [3, 6, 15, 21, 34] }, { label: "cache", events: [6, 21, 41] }], emphasis: "api", width: 300, height: 30 })),
-  row("dense → binned", svg(EventRaster, { data: [{ label: "spam", events: Array.from({ length: 300 }, (_, i) => i) }, { label: "rare", events: [10, 150, 280] }], domain: [0, 299], width: 300, height: 20 })),
+  row(
+    "services",
+    svg(EventRaster, {
+      data: [
+        { label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40, 41, 48, 55] },
+        { label: "db", events: [3, 6, 15, 21, 34, 41, 55] },
+        { label: "cache", events: [6, 21, 41, 55] },
+        { label: "queue", events: [10, 30, 50] },
+      ],
+      width: 300,
+      height: 36,
+    }),
+  ),
+  row(
+    "emphasis api",
+    svg(EventRaster, {
+      data: [
+        { label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40] },
+        { label: "db", events: [3, 6, 15, 21, 34] },
+        { label: "cache", events: [6, 21, 41] },
+      ],
+      emphasis: "api",
+      width: 300,
+      height: 30,
+    }),
+  ),
+  row(
+    "dense → binned",
+    svg(EventRaster, {
+      data: [
+        { label: "spam", events: Array.from({ length: 300 }, (_, i) => i) },
+        { label: "rare", events: [10, 150, 280] },
+      ],
+      domain: [0, 299],
+      width: 300,
+      height: 20,
+    }),
+  ),
 
   `<h2>RubricStrip</h2>`,
-  row("weighted + target", svg(RubricStrip, { data: [{ label: "Correctness", score: 0.92, weight: 3 }, { label: "Coverage", score: 0.78, weight: 2 }, { label: "Clarity", score: 0.65, weight: 1 }, { label: "Style", score: 0.41, weight: 1 }], target: 0.7, width: 260, height: 44 })),
-  row("unweighted", svg(RubricStrip, { data: [{ label: "Lint", score: 1 }, { label: "Types", score: 1 }, { label: "Tests", score: 0.8 }, { label: "Docs", score: 0.5 }], width: 260, height: 44 })),
-  row("cell", svg(RubricStrip, { data: [{ label: "a", score: 0.9, weight: 3 }, { label: "b", score: 0.5, weight: 1 }], labels: false, width: 60, height: 24 })),
+  row(
+    "weighted + target",
+    svg(RubricStrip, {
+      data: [
+        { label: "Correctness", score: 0.92, weight: 3 },
+        { label: "Coverage", score: 0.78, weight: 2 },
+        { label: "Clarity", score: 0.65, weight: 1 },
+        { label: "Style", score: 0.41, weight: 1 },
+      ],
+      target: 0.7,
+      width: 260,
+      height: 44,
+    }),
+  ),
+  row(
+    "unweighted",
+    svg(RubricStrip, {
+      data: [
+        { label: "Lint", score: 1 },
+        { label: "Types", score: 1 },
+        { label: "Tests", score: 0.8 },
+        { label: "Docs", score: 0.5 },
+      ],
+      width: 260,
+      height: 44,
+    }),
+  ),
+  row(
+    "cell",
+    svg(RubricStrip, {
+      data: [
+        { label: "a", score: 0.9, weight: 3 },
+        { label: "b", score: 0.5, weight: 1 },
+      ],
+      labels: false,
+      width: 60,
+      height: 24,
+    }),
+  ),
 
   `<h2>TokenConfidence (HTML host)</h2>`,
-  row("flagged", svg(TokenConfidence, { data: [{ token: "The", confidence: 0.98 }, { token: " Treaty", confidence: 0.93 }, { token: " of", confidence: 0.99 }, { token: " Westphalia", confidence: 0.71 }, { token: " was signed in", confidence: 0.9 }, { token: " 1648", confidence: 0.44 }, { token: ", ending the", confidence: 0.9 }, { token: " Thirty", confidence: 0.63 }, { token: " Years' War over", confidence: 0.85 }, { token: " a decade", confidence: 0.31 }, { token: ".", confidence: 0.99 }], style: { fontSize: "15px" } })),
-  row("legend", svg(TokenConfidence, { data: [{ token: "Likely", confidence: 0.92 }, { token: " Paris", confidence: 0.62 }, { token: ", maybe", confidence: 0.3 }], legend: true, style: { fontSize: "15px" } })),
+  row(
+    "flagged",
+    svg(TokenConfidence, {
+      data: [
+        { token: "The", confidence: 0.98 },
+        { token: " Treaty", confidence: 0.93 },
+        { token: " of", confidence: 0.99 },
+        { token: " Westphalia", confidence: 0.71 },
+        { token: " was signed in", confidence: 0.9 },
+        { token: " 1648", confidence: 0.44 },
+        { token: ", ending the", confidence: 0.9 },
+        { token: " Thirty", confidence: 0.63 },
+        { token: " Years' War over", confidence: 0.85 },
+        { token: " a decade", confidence: 0.31 },
+        { token: ".", confidence: 0.99 },
+      ],
+      style: { fontSize: "15px" },
+    }),
+  ),
+  row(
+    "legend",
+    svg(TokenConfidence, {
+      data: [
+        { token: "Likely", confidence: 0.92 },
+        { token: " Paris", confidence: 0.62 },
+        { token: ", maybe", confidence: 0.3 },
+      ],
+      legend: true,
+      style: { fontSize: "15px" },
+    }),
+  ),
 
   `<h2>WindBarb</h2>`,
-  row("compass 8", [0, 45, 90, 135, 180, 225, 270, 315].map((d) => svg(WindBarb, { direction: d, magnitude: 35, size: 44 })).join("")),
-  row("magnitudes", [5, 15, 32, 55, 80].map((m) => svg(WindBarb, { direction: 90, magnitude: m, label: true, size: 48 })).join("")),
-  row("calm / arrow", svg(WindBarb, { direction: 0, magnitude: 1, size: 44 }) + svg(WindBarb, { direction: 45, magnitude: 25, variant: "arrow", size: 44 })),
+  row(
+    "compass 8",
+    [0, 45, 90, 135, 180, 225, 270, 315]
+      .map((d) => svg(WindBarb, { direction: d, magnitude: 35, size: 44 }))
+      .join(""),
+  ),
+  row(
+    "magnitudes",
+    [5, 15, 32, 55, 80]
+      .map((m) => svg(WindBarb, { direction: 90, magnitude: m, label: true, size: 48 }))
+      .join(""),
+  ),
+  row(
+    "calm / arrow",
+    svg(WindBarb, { direction: 0, magnitude: 1, size: 44 }) +
+      svg(WindBarb, { direction: 45, magnitude: 25, variant: "arrow", size: 44 }),
+  ),
 
   `<h2>StarSpoke</h2>`,
-  row("profile + dots", svg(StarSpoke, { data: [{ label: "Speed", value: 0.9 }, { label: "Power", value: 0.6 }, { label: "Range", value: 0.5 }, { label: "Cost", value: 0.3 }, { label: "Ease", value: 0.7 }], dots: true, size: 110 })),
-  row("vs baseline", svg(StarSpoke, { data: [{ label: "a", value: 0.9 }, { label: "b", value: 0.4 }, { label: "c", value: 0.7 }, { label: "d", value: 0.5 }], compare: [0.5, 0.5, 0.5, 0.5], dots: true, size: 110 })),
-  row("labels", svg(StarSpoke, { data: [{ label: "Speed", value: 0.9 }, { label: "Power", value: 0.6 }, { label: "Range", value: 0.5 }, { label: "Cost", value: 0.3 }], labels: true, size: 96 })),
+  row(
+    "profile + dots",
+    svg(StarSpoke, {
+      data: [
+        { label: "Speed", value: 0.9 },
+        { label: "Power", value: 0.6 },
+        { label: "Range", value: 0.5 },
+        { label: "Cost", value: 0.3 },
+        { label: "Ease", value: 0.7 },
+      ],
+      dots: true,
+      size: 110,
+    }),
+  ),
+  row(
+    "vs baseline",
+    svg(StarSpoke, {
+      data: [
+        { label: "a", value: 0.9 },
+        { label: "b", value: 0.4 },
+        { label: "c", value: 0.7 },
+        { label: "d", value: 0.5 },
+      ],
+      compare: [0.5, 0.5, 0.5, 0.5],
+      dots: true,
+      size: 110,
+    }),
+  ),
+  row(
+    "labels",
+    svg(StarSpoke, {
+      data: [
+        { label: "Speed", value: 0.9 },
+        { label: "Power", value: 0.6 },
+        { label: "Range", value: 0.5 },
+        { label: "Cost", value: 0.3 },
+      ],
+      labels: true,
+      size: 96,
+    }),
+  ),
 
   `<h2>MinimapStrip</h2>`,
-  row("bars + fog", svg(MinimapStrip, { data: { content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6), window: [520, 660], marks: [100, 600, 1100], known: [[0, 1104]] }, domain: [0, 1200], width: 320, height: 18 })),
-  row("heat", svg(MinimapStrip, { data: { content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + 0.4), window: [300, 440], marks: [600, 1000] }, domain: [0, 1200], variant: "heat", width: 320, height: 18 })),
-  row("cell", svg(MinimapStrip, { data: { content: Array.from({ length: 400 }, (_, i) => Math.abs(Math.sin(i / 20)) + 0.3), window: [120, 200] }, domain: [0, 400], width: 80, height: 12 })),
+  row(
+    "bars + fog",
+    svg(MinimapStrip, {
+      data: {
+        content: Array.from(
+          { length: 1200 },
+          (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6,
+        ),
+        window: [520, 660],
+        marks: [100, 600, 1100],
+        known: [[0, 1104]],
+      },
+      domain: [0, 1200],
+      width: 320,
+      height: 18,
+    }),
+  ),
+  row(
+    "heat",
+    svg(MinimapStrip, {
+      data: {
+        content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + 0.4),
+        window: [300, 440],
+        marks: [600, 1000],
+      },
+      domain: [0, 1200],
+      variant: "heat",
+      width: 320,
+      height: 18,
+    }),
+  ),
+  row(
+    "cell",
+    svg(MinimapStrip, {
+      data: {
+        content: Array.from({ length: 400 }, (_, i) => Math.abs(Math.sin(i / 20)) + 0.3),
+        window: [120, 200],
+      },
+      domain: [0, 400],
+      width: 80,
+      height: 12,
+    }),
+  ),
 
   `<h2>DualWindowMeter</h2>`,
-  row("loudness", svg(DualWindowMeter, { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0)), target: -23, width: 320, height: 28 })),
-  row("corridor", svg(DualWindowMeter, { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4), target: -23, band: [-25, -21], width: 320, height: 28 })),
-  row("cell", svg(DualWindowMeter, { data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4), target: -23, label: "none", width: 80, height: 16 })),
+  row(
+    "loudness",
+    svg(DualWindowMeter, {
+      data: Array.from(
+        { length: 60 },
+        (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0),
+      ),
+      target: -23,
+      width: 320,
+      height: 28,
+    }),
+  ),
+  row(
+    "corridor",
+    svg(DualWindowMeter, {
+      data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4),
+      target: -23,
+      band: [-25, -21],
+      width: 320,
+      height: 28,
+    }),
+  ),
+  row(
+    "cell",
+    svg(DualWindowMeter, {
+      data: Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4),
+      target: -23,
+      label: "none",
+      width: 80,
+      height: 16,
+    }),
+  ),
 
   `<h2>DepthWedge</h2>`,
-  row("order book", svg(DepthWedge, { data: { demand: [{ level: 99.75, amount: 420 }, { level: 99.5, amount: 360 }, { level: 99.25, amount: 280 }, { level: 99, amount: 200 }, { level: 98.5, amount: 120 }], supply: [{ level: 100.25, amount: 300 }, { level: 100.5, amount: 240 }, { level: 100.75, amount: 160 }, { level: 101, amount: 90 }] }, width: 320, height: 30 })),
-  row("normalized", svg(DepthWedge, { data: { demand: [{ level: 99.5, amount: 420 }, { level: 99, amount: 260 }], supply: [{ level: 100.5, amount: 300 }, { level: 101, amount: 180 }] }, normalize: true, width: 320, height: 30 })),
-  row("cell", svg(DepthWedge, { data: { demand: [{ level: 99.5, amount: 400 }], supply: [{ level: 100.5, amount: 200 }] }, label: "none", width: 60, height: 16 })),
+  row(
+    "order book",
+    svg(DepthWedge, {
+      data: {
+        demand: [
+          { level: 99.75, amount: 420 },
+          { level: 99.5, amount: 360 },
+          { level: 99.25, amount: 280 },
+          { level: 99, amount: 200 },
+          { level: 98.5, amount: 120 },
+        ],
+        supply: [
+          { level: 100.25, amount: 300 },
+          { level: 100.5, amount: 240 },
+          { level: 100.75, amount: 160 },
+          { level: 101, amount: 90 },
+        ],
+      },
+      width: 320,
+      height: 30,
+    }),
+  ),
+  row(
+    "normalized",
+    svg(DepthWedge, {
+      data: {
+        demand: [
+          { level: 99.5, amount: 420 },
+          { level: 99, amount: 260 },
+        ],
+        supply: [
+          { level: 100.5, amount: 300 },
+          { level: 101, amount: 180 },
+        ],
+      },
+      normalize: true,
+      width: 320,
+      height: 30,
+    }),
+  ),
+  row(
+    "cell",
+    svg(DepthWedge, {
+      data: { demand: [{ level: 99.5, amount: 400 }], supply: [{ level: 100.5, amount: 200 }] },
+      label: "none",
+      width: 60,
+      height: 16,
+    }),
+  ),
 
   `<h2>PartitionStrip</h2>`,
-  row("bundle", svg(PartitionStrip, { data: [{ label: "JS", children: [{ label: "react", value: 28 }, { label: "vendor", value: 12 }, { label: "app", value: 8 }] }, { label: "CSS", children: [{ label: "tailwind", value: 16 }, { label: "custom", value: 8 }] }, { label: "img", value: 18 }, { label: "font", value: 10 }], width: 320, height: 30 })),
-  row("emphasis react", svg(PartitionStrip, { data: [{ label: "JS", children: [{ label: "react", value: 28 }, { label: "vendor", value: 12 }] }, { label: "CSS", children: [{ label: "tailwind", value: 16 }, { label: "custom", value: 8 }] }, { label: "img", value: 18 }], emphasis: "react", width: 320, height: 30 })),
-  row("cell", svg(PartitionStrip, { data: [{ label: "A", children: [{ label: "a1", value: 3 }, { label: "a2", value: 2 }] }, { label: "B", value: 4 }], labels: false, width: 80, height: 16 })),
+  row(
+    "bundle",
+    svg(PartitionStrip, {
+      data: [
+        {
+          label: "JS",
+          children: [
+            { label: "react", value: 28 },
+            { label: "vendor", value: 12 },
+            { label: "app", value: 8 },
+          ],
+        },
+        {
+          label: "CSS",
+          children: [
+            { label: "tailwind", value: 16 },
+            { label: "custom", value: 8 },
+          ],
+        },
+        { label: "img", value: 18 },
+        { label: "font", value: 10 },
+      ],
+      width: 320,
+      height: 30,
+    }),
+  ),
+  row(
+    "emphasis react",
+    svg(PartitionStrip, {
+      data: [
+        {
+          label: "JS",
+          children: [
+            { label: "react", value: 28 },
+            { label: "vendor", value: 12 },
+          ],
+        },
+        {
+          label: "CSS",
+          children: [
+            { label: "tailwind", value: 16 },
+            { label: "custom", value: 8 },
+          ],
+        },
+        { label: "img", value: 18 },
+      ],
+      emphasis: "react",
+      width: 320,
+      height: 30,
+    }),
+  ),
+  row(
+    "cell",
+    svg(PartitionStrip, {
+      data: [
+        {
+          label: "A",
+          children: [
+            { label: "a1", value: 3 },
+            { label: "a2", value: 2 },
+          ],
+        },
+        { label: "B", value: 4 },
+      ],
+      labels: false,
+      width: 80,
+      height: 16,
+    }),
+  ),
 
   `<h2>CalibrationStrip</h2>`,
-  row("dots + support", svg(CalibrationStrip, { data: [{ predicted: 0.05, observed: 0.05, count: 100 }, { predicted: 0.25, observed: 0.24, count: 80 }, { predicted: 0.45, observed: 0.44, count: 60 }, { predicted: 0.65, observed: 0.63, count: 40 }, { predicted: 0.7, observed: 0.52, count: 30 }, { predicted: 0.85, observed: 0.83, count: 8 }, { predicted: 0.95, observed: 0.9, count: 5 }], width: 300, height: 44 })),
-  row("bars", svg(CalibrationStrip, { data: [{ predicted: 0.1, observed: 0.08, count: 90 }, { predicted: 0.3, observed: 0.36, count: 70 }, { predicted: 0.5, observed: 0.44, count: 55 }, { predicted: 0.7, observed: 0.52, count: 30 }, { predicted: 0.9, observed: 0.85, count: 8 }], variant: "bars", width: 300, height: 40 })),
+  row(
+    "dots + support",
+    svg(CalibrationStrip, {
+      data: [
+        { predicted: 0.05, observed: 0.05, count: 100 },
+        { predicted: 0.25, observed: 0.24, count: 80 },
+        { predicted: 0.45, observed: 0.44, count: 60 },
+        { predicted: 0.65, observed: 0.63, count: 40 },
+        { predicted: 0.7, observed: 0.52, count: 30 },
+        { predicted: 0.85, observed: 0.83, count: 8 },
+        { predicted: 0.95, observed: 0.9, count: 5 },
+      ],
+      width: 300,
+      height: 44,
+    }),
+  ),
+  row(
+    "bars",
+    svg(CalibrationStrip, {
+      data: [
+        { predicted: 0.1, observed: 0.08, count: 90 },
+        { predicted: 0.3, observed: 0.36, count: 70 },
+        { predicted: 0.5, observed: 0.44, count: 55 },
+        { predicted: 0.7, observed: 0.52, count: 30 },
+        { predicted: 0.9, observed: 0.85, count: 8 },
+      ],
+      variant: "bars",
+      width: 300,
+      height: 40,
+    }),
+  ),
 
   `<h2>ConfusionGrid</h2>`,
-  row("2×2 + accuracy", svg(ConfusionGrid, { data: { labels: ["cat", "dog"], counts: [[88, 12], [10, 59]] }, label: "accuracy", size: 90 })),
-  row("3×3", svg(ConfusionGrid, { data: { labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 62, 12], [3, 9, 58]] }, size: 110 })),
-  row("errors accent + round", svg(ConfusionGrid, { data: { labels: ["A", "B", "C"], counts: [[70, 8, 2], [6, 40, 34], [3, 9, 58]] }, accent: "errors", shape: "round", size: 110 })),
-  row("empty row", svg(ConfusionGrid, { data: { labels: ["cat", "dog"], counts: [[40, 10], [0, 0]] }, size: 90 })),
+  row(
+    "2×2 + accuracy",
+    svg(ConfusionGrid, {
+      data: {
+        labels: ["cat", "dog"],
+        counts: [
+          [88, 12],
+          [10, 59],
+        ],
+      },
+      label: "accuracy",
+      size: 90,
+    }),
+  ),
+  row(
+    "3×3",
+    svg(ConfusionGrid, {
+      data: {
+        labels: ["A", "B", "C"],
+        counts: [
+          [70, 8, 2],
+          [6, 62, 12],
+          [3, 9, 58],
+        ],
+      },
+      size: 110,
+    }),
+  ),
+  row(
+    "errors accent + round",
+    svg(ConfusionGrid, {
+      data: {
+        labels: ["A", "B", "C"],
+        counts: [
+          [70, 8, 2],
+          [6, 40, 34],
+          [3, 9, 58],
+        ],
+      },
+      accent: "errors",
+      shape: "round",
+      size: 110,
+    }),
+  ),
+  row(
+    "empty row",
+    svg(ConfusionGrid, {
+      data: {
+        labels: ["cat", "dog"],
+        counts: [
+          [40, 10],
+          [0, 0],
+        ],
+      },
+      size: 90,
+    }),
+  ),
 
   `<h2>FoldedDayBand</h2>`,
-  row("today vs typical", svg(FoldedDayBand, { data: foldData, today: foldToday, width: 320, height: 40 })),
-  row("one band", svg(FoldedDayBand, { data: foldData, bands: [[25, 75]], width: 320, height: 40 })),
+  row(
+    "today vs typical",
+    svg(FoldedDayBand, { data: foldData, today: foldToday, width: 320, height: 40 }),
+  ),
+  row(
+    "one band",
+    svg(FoldedDayBand, { data: foldData, bands: [[25, 75]], width: 320, height: 40 }),
+  ),
   row("cell", svg(FoldedDayBand, { data: foldData, width: 80, height: 20 })),
 
   `<h2>VolumeProfile</h2>`,
   row("left + POC", svg(VolumeProfile, { data: volProfile, width: 120, height: 90 })),
-  row("right side", svg(VolumeProfile, { data: volProfile, side: "right", width: 120, height: 90 })),
+  row(
+    "right side",
+    svg(VolumeProfile, { data: volProfile, side: "right", width: 120, height: 90 }),
+  ),
   row("cell", svg(VolumeProfile, { data: volProfile, label: "none", width: 32, height: 32 })),
 
   `<h2>PhaseTrace</h2>`,
-  row("trajectory + grid", svg(PhaseTrace, { data: phaseTraj, xLabel: "CPU", yLabel: "Latency", grid: true, width: 110, height: 100 })),
-  row("longer tail + start", svg(PhaseTrace, { data: phaseTraj, xLabel: "CPU", yLabel: "Latency", tail: 0.4, startDot: true, width: 110, height: 100 })),
-  row("cell", svg(PhaseTrace, { data: phaseTraj, xLabel: "x", yLabel: "y", width: 32, height: 28 })),
+  row(
+    "trajectory + grid",
+    svg(PhaseTrace, {
+      data: phaseTraj,
+      xLabel: "CPU",
+      yLabel: "Latency",
+      grid: true,
+      width: 110,
+      height: 100,
+    }),
+  ),
+  row(
+    "longer tail + start",
+    svg(PhaseTrace, {
+      data: phaseTraj,
+      xLabel: "CPU",
+      yLabel: "Latency",
+      tail: 0.4,
+      startDot: true,
+      width: 110,
+      height: 100,
+    }),
+  ),
+  row(
+    "cell",
+    svg(PhaseTrace, { data: phaseTraj, xLabel: "x", yLabel: "y", width: 32, height: 28 }),
+  ),
 
   `<h2>TraceFold</h2>`,
-  row("critical path", svg(TraceFold, { data: traceSpans, format: (n) => `${Math.round(n)} ms`, width: 320, height: 40 })),
-  row("structure (none)", svg(TraceFold, { data: traceSpans, emphasis: "none", format: (n) => `${Math.round(n)} ms`, width: 320, height: 40 })),
+  row(
+    "critical path",
+    svg(TraceFold, {
+      data: traceSpans,
+      format: (n) => `${Math.round(n)} ms`,
+      width: 320,
+      height: 40,
+    }),
+  ),
+  row(
+    "structure (none)",
+    svg(TraceFold, {
+      data: traceSpans,
+      emphasis: "none",
+      format: (n) => `${Math.round(n)} ms`,
+      width: 320,
+      height: 40,
+    }),
+  ),
   row("cell", svg(TraceFold, { data: traceSpans, labels: false, width: 80, height: 24 })),
 
   `<h2>TapeGauge</h2>`,
-  row("rising / caution", svg(TapeGauge, { value: 142, rate: 1, zones: tapeZones, span: 60, width: 28, height: 72 })),
-  row("falling fast", svg(TapeGauge, { value: 118, rate: -3, zones: tapeZones, span: 60, width: 28, height: 72 })),
-  row("horizontal", svg(TapeGauge, { value: 142, rate: -1, zones: tapeZones, span: 60, orientation: "horizontal", width: 160, height: 30 })),
+  row(
+    "rising / caution",
+    svg(TapeGauge, { value: 142, rate: 1, zones: tapeZones, span: 60, width: 28, height: 72 }),
+  ),
+  row(
+    "falling fast",
+    svg(TapeGauge, { value: 118, rate: -3, zones: tapeZones, span: 60, width: 28, height: 72 }),
+  ),
+  row(
+    "horizontal",
+    svg(TapeGauge, {
+      value: 142,
+      rate: -1,
+      zones: tapeZones,
+      span: 60,
+      orientation: "horizontal",
+      width: 160,
+      height: 30,
+    }),
+  ),
 
   `<h2>StationGlyph</h2>`,
-  row("KSFO obs", svg(StationGlyph, { station: "KSFO", cloud: 0.75, wind: { direction: 225, magnitude: 15 }, temp: 16, dewpoint: 9, pressure: 1013, size: 40 })),
-  row("clear + calm", svg(StationGlyph, { station: "STN", cloud: 0, wind: { direction: 0, magnitude: 0 }, temp: 22, dewpoint: 8, size: 40 })),
-  row("overcast + gale", svg(StationGlyph, { station: "KJFK", cloud: 1, wind: { direction: 300, magnitude: 45 }, temp: 4, dewpoint: 2, pressure: 988, size: 40 })),
+  row(
+    "KSFO obs",
+    svg(StationGlyph, {
+      station: "KSFO",
+      cloud: 0.75,
+      wind: { direction: 225, magnitude: 15 },
+      temp: 16,
+      dewpoint: 9,
+      pressure: 1013,
+      size: 40,
+    }),
+  ),
+  row(
+    "clear + calm",
+    svg(StationGlyph, {
+      station: "STN",
+      cloud: 0,
+      wind: { direction: 0, magnitude: 0 },
+      temp: 22,
+      dewpoint: 8,
+      size: 40,
+    }),
+  ),
+  row(
+    "overcast + gale",
+    svg(StationGlyph, {
+      station: "KJFK",
+      cloud: 1,
+      wind: { direction: 300, magnitude: 45 },
+      temp: 4,
+      dewpoint: 2,
+      pressure: 988,
+      size: 40,
+    }),
+  ),
 ].join("\n");
 
 const html = `<!doctype html><html><head><meta charset="utf8"><style>${styles}
