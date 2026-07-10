@@ -820,6 +820,70 @@
       "types": "./dist/charts/station-glyph/client.d.ts",
       "import": "./dist/charts/station-glyph/client.js"
     },
+    "./cohort-triangle": {
+      "types": "./dist/charts/cohort-triangle/index.d.ts",
+      "import": "./dist/charts/cohort-triangle/index.js"
+    },
+    "./cohort-triangle/interactive": {
+      "types": "./dist/charts/cohort-triangle/client.d.ts",
+      "import": "./dist/charts/cohort-triangle/client.js"
+    },
+    "./streak-spark": {
+      "types": "./dist/charts/streak-spark/index.d.ts",
+      "import": "./dist/charts/streak-spark/index.js"
+    },
+    "./streak-spark/interactive": {
+      "types": "./dist/charts/streak-spark/client.d.ts",
+      "import": "./dist/charts/streak-spark/client.js"
+    },
+    "./grade-profile": {
+      "types": "./dist/charts/grade-profile/index.d.ts",
+      "import": "./dist/charts/grade-profile/index.js"
+    },
+    "./grade-profile/interactive": {
+      "types": "./dist/charts/grade-profile/client.d.ts",
+      "import": "./dist/charts/grade-profile/client.js"
+    },
+    "./win-prob-worm": {
+      "types": "./dist/charts/win-prob-worm/index.d.ts",
+      "import": "./dist/charts/win-prob-worm/index.js"
+    },
+    "./win-prob-worm/interactive": {
+      "types": "./dist/charts/win-prob-worm/client.d.ts",
+      "import": "./dist/charts/win-prob-worm/client.js"
+    },
+    "./queue-depth": {
+      "types": "./dist/charts/queue-depth/index.d.ts",
+      "import": "./dist/charts/queue-depth/index.js"
+    },
+    "./queue-depth/interactive": {
+      "types": "./dist/charts/queue-depth/client.d.ts",
+      "import": "./dist/charts/queue-depth/client.js"
+    },
+    "./spread-band": {
+      "types": "./dist/charts/spread-band/index.d.ts",
+      "import": "./dist/charts/spread-band/index.js"
+    },
+    "./spread-band/interactive": {
+      "types": "./dist/charts/spread-band/client.d.ts",
+      "import": "./dist/charts/spread-band/client.js"
+    },
+    "./bias-strip": {
+      "types": "./dist/charts/bias-strip/index.d.ts",
+      "import": "./dist/charts/bias-strip/index.js"
+    },
+    "./bias-strip/interactive": {
+      "types": "./dist/charts/bias-strip/client.d.ts",
+      "import": "./dist/charts/bias-strip/client.js"
+    },
+    "./percentile-trace": {
+      "types": "./dist/charts/percentile-trace/index.d.ts",
+      "import": "./dist/charts/percentile-trace/index.js"
+    },
+    "./percentile-trace/interactive": {
+      "types": "./dist/charts/percentile-trace/client.d.ts",
+      "import": "./dist/charts/percentile-trace/client.js"
+    },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"

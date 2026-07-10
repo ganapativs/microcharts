@@ -88,11 +88,13 @@ export default function GalleryPage() {
                     </span>
                   </div>
                   <div className="g2-meta">
-                    <div className="g2-meta-head">
-                      <span className="g2-name">{c.name}</span>
+                    {/* name owns its own full-width line so it never truncates
+                        against the collection tag */}
+                    <span className="g2-name">{c.name}</span>
+                    <div className="g2-subrow">
+                      <p className="g2-tag">{c.tagline}</p>
                       <span className="g2-coll">{c.collection}</span>
                     </div>
-                    <p className="g2-tag">{c.tagline}</p>
                   </div>
                 </Link>
               </article>

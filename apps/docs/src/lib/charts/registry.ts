@@ -108,6 +108,14 @@ import phaseTrace from "./phase-trace";
 import traceFold from "./trace-fold";
 import tapeGauge from "./tape-gauge";
 import stationGlyph from "./station-glyph";
+import cohortTriangle from "./cohort-triangle";
+import streakSpark from "./streak-spark";
+import gradeProfile from "./grade-profile";
+import winProbWorm from "./win-prob-worm";
+import queueDepth from "./queue-depth";
+import spreadBand from "./spread-band";
+import biasStrip from "./bias-strip";
+import percentileTrace from "./percentile-trace";
 
 const MODULES: ChartModule[] = [
   sparkline,
@@ -208,6 +216,14 @@ const MODULES: ChartModule[] = [
   traceFold,
   tapeGauge,
   stationGlyph,
+  cohortTriangle,
+  streakSpark,
+  gradeProfile,
+  winProbWorm,
+  queueDepth,
+  spreadBand,
+  biasStrip,
+  percentileTrace,
 ];
 
 export const CHART_MODULES: Record<string, ChartModule> = Object.fromEntries(

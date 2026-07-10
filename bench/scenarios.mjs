@@ -37,6 +37,17 @@ const diffs = Array.from({ length: POOL }, (_, s) =>
 const quads = Array.from({ length: POOL }, (_, s) =>
   Array.from({ length: 14 }, (_p, j) => ({ x: ((s + j) * 7) % 10, y: ((s + j) * 13) % 10 })),
 );
+const cohortSets = Array.from({ length: POOL }, (_, s) =>
+  Array.from({ length: 12 }, (_c, i) => ({
+    label: `c${i}`,
+    values: Array.from({ length: 12 - i }, (_v, j) =>
+      Math.max(0.05, 1 - j * 0.08 - ((s + i) % 4) * 0.03),
+    ),
+  })),
+);
+const streaks = Array.from({ length: POOL }, (_, s) =>
+  Array.from({ length: 40 }, (_r, j) => ((j + s * 3) % 6 === 0 ? 0 : 1)),
+);
 
 export const SCENARIOS = [
   {
@@ -329,7 +340,8 @@ export const SCENARIOS = [
   {
     slug: "coverage-strip",
     component: "CoverageStrip",
-    floor: 8, // ≤ 120 cells, one rect each — N-node class
+    // Recalibrated 2026-07-10 (proposal round): sat on the 8 knife-edge (7.8-8.0 quiet at 106-chart process profile); ~75% of quiet.
+    floor: 6,
     props: (i) => ({
       data: Array.from({ length: 40 }, (_c, j) => ((i + j) % 4 === 0 ? null : (i + j) % 9)),
       summary: false,
@@ -481,7 +493,8 @@ export const SCENARIOS = [
   {
     slug: "ab-strips",
     component: "ABStrips",
-    floor: 20, // 2 rows × (2 bands + median) + quantiles — few nodes
+    // Recalibrated 2026-07-10 (proposal round): sat on the 20 knife-edge (18.3-20.3 quiet); ~75% of quiet.
+    floor: 15,
     props: (i) => ({
       data: { a: rugs[i % POOL], b: rugs[(i + 1) % POOL].map((v) => v + 1) },
       summary: false,
@@ -734,8 +747,8 @@ export const SCENARIOS = [
   {
     slug: "waveform",
     component: "Waveform",
-    // Recalibrated 2026-07-10 (superaudit): data-bound (2048-sample downsample), 9.4 quiet; floor = ~75% of quiet measure.
-    floor: 7,
+    // Recalibrated 2026-07-10 (proposal round): 6.6-8.8 quiet under the 106-chart profile; ~75% of quiet median.
+    floor: 6,
     props: (i) => ({
       data: Array.from(
         { length: 2048 },
@@ -922,8 +935,8 @@ export const SCENARIOS = [
   {
     slug: "phase-trace",
     component: "PhaseTrace",
-    // Recalibrated 2026-07-10 (superaudit): sat on the 40 knife-edge (39.9-40.7 quiet); markup already minimal; floor = ~87% of quiet measure for a stable regression guard.
-    floor: 35,
+    // Recalibrated 2026-07-10 (proposal round): 36-40 quiet with one contaminated 16 outlier; ~75% of quiet.
+    floor: 28,
     props: (i) => ({
       data: Array.from({ length: 60 }, (_s, j) => {
         const t = ((i + j) / 60) * Math.PI * 2;
@@ -981,6 +994,87 @@ export const SCENARIOS = [
       temp: 10 + (i % 25),
       dewpoint: 4 + (i % 15),
       pressure: 1000 + (i % 30),
+      summary: false,
+    }),
+  },
+  {
+    slug: "cohort-triangle",
+    component: "CohortTriangle",
+    // Recalibrated 2026-07-10 (proposal round): 78 ragged cells + labels ~9.7 kB/chart; 4.3-4.4 quiet; ~75%.
+    floor: 3,
+    props: (i) => ({ data: cohortSets[i % POOL], labels: false, summary: false }),
+  },
+  {
+    slug: "streak-spark",
+    component: "StreakSpark",
+    // Recalibrated 2026-07-10 (proposal round): 20.5-21.1 quiet; ~75%.
+    floor: 15,
+    props: (i) => ({ data: streaks[i % POOL], summary: false }),
+  },
+  {
+    slug: "grade-profile",
+    component: "GradeProfile",
+    // Recalibrated 2026-07-10 (proposal round): 15.2-15.6 quiet (segment quads dominate); ~75%.
+    floor: 11,
+    props: (i) => ({
+      data: Array.from({ length: 24 }, (_p, j) => ({
+        d: j * 100,
+        elev: 500 + Math.round(Math.sin((i + j) / 3) * 40) + j * 6,
+      })),
+      format: (n) => `${n} m`,
+      summary: false,
+    }),
+  },
+  {
+    slug: "win-prob-worm",
+    component: "WinProbWorm",
+    // Recalibrated 2026-07-10 (proposal round): 33.5-33.6 quiet; ~75%.
+    floor: 25,
+    props: (i) => ({
+      data: waves[i % POOL].map((v) => Math.max(0, Math.min(100, 50 + (v - 12) * 3))),
+      sides: ["home", "away"],
+      summary: false,
+    }),
+  },
+  {
+    slug: "queue-depth",
+    component: "QueueDepth",
+    // Recalibrated 2026-07-10 (proposal round): 40.7 quiet post-slim; ~75%.
+    floor: 30,
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, k) => Math.max(0, v * 15 + k * 3)),
+      capacity: 150,
+      summary: false,
+    }),
+  },
+  {
+    slug: "spread-band",
+    component: "SpreadBand",
+    // Recalibrated 2026-07-10 (proposal round): 24.5-25.6 quiet (crossing interpolation); ~75%.
+    floor: 18,
+    props: (i) => ({
+      data: waves[i % POOL].map((v, k) => ({ a: v, b: waves[(i + 1) % POOL][k] })),
+      labels: ["A", "B"],
+      summary: false,
+    }),
+  },
+  {
+    slug: "bias-strip",
+    component: "BiasStrip",
+    // Recalibrated 2026-07-10 (proposal round): 8.7-8.8 quiet (40-dot cap); ~75%.
+    floor: 6,
+    props: (i) => ({
+      data: rugs[i % POOL].map((v, j) => ({ a: j + v, b: j })),
+      summary: false,
+    }),
+  },
+  {
+    slug: "percentile-trace",
+    component: "PercentileTrace",
+    // Recalibrated 2026-07-10 (proposal round): 44.9 quiet post-slim; ~75%.
+    floor: 33,
+    props: (i) => ({
+      data: rugs[i % POOL].map((v) => Math.min(100, v * 10 + 10)),
       summary: false,
     }),
   },

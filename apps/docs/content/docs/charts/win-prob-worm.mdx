@@ -1,0 +1,163 @@
+---
+title: WinProbWorm
+description: A win-probability worm for React — a single 0–100 probability on a fixed, never-truncated axis, split at the 50% line so leading stretches read accent and trailing stretches read neutral, with a dot at every lead change.
+---
+
+WinProbWorm answers "who's winning, and when did the lead flip?". It plots one win-probability series
+on a **fixed 0–100 axis that is never truncated** — the honesty rule for a probability — and splits the
+worm at the 50% line: while your side leads the line reads accent, when it trails it reads neutral, and a
+dot marks each lead change. Because a win-probability curve is a modelled read, the summary always says
+so, "per the supplied model".
+
+<LiveDemo
+  label="WinProbWorm"
+  sizeOf="win-prob-worm"
+  code={`import { WinProbWorm } from "@microcharts/react/win-prob-worm";
+
+<WinProbWorm
+  data={[50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98]}
+  sides={["home", "away"]}
+  title="Win probability"
+/>`}
+>
+  <WinProbWorm
+    data={[50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98]}
+    sides={["home", "away"]}
+    title="Win probability"
+    width={220}
+    height={28}
+  />
+</LiveDemo>
+
+## Install
+
+<Usage chart="win-prob-worm" />
+
+## Try it
+
+<Playground chart="win-prob-worm" />
+
+## Interactive
+
+<InteractiveDemo slug="win-prob-worm" />
+
+## When to use it
+
+- **Good for** — live win or election probability where the lead flips, a modelled forecast whose crossings are the story, and any 0–100 probability you must not truncate.
+- **Avoid for** — a raw score or margin (Sparkline), or a value that isn't a bounded 0–100 probability.
+
+## Sizing
+
+<Sizing chart="win-prob-worm" />
+
+## Variants
+
+<LiveDemo
+  label="wire-to-wire vs nailbiter"
+  code={`<WinProbWorm data={[50, 58, 66, 74, 80, 86, 90, 93, 96, 98, 99]} sides={["home", "away"]} />
+<WinProbWorm data={[50, 53, 49, 52, 48, 51, 47, 50, 46, 49, 45, 48, 52]} sides={["home", "away"]} />`}
+>
+  <span className="inline-flex gap-4 items-center">
+    <WinProbWorm
+      data={[50, 58, 66, 74, 80, 86, 90, 93, 96, 98, 99]}
+      sides={["home", "away"]}
+      width={160}
+      height={24}
+    />
+    <WinProbWorm
+      data={[50, 53, 49, 52, 48, 51, 47, 50, 46, 49, 45, 48, 52]}
+      sides={["home", "away"]}
+      width={160}
+      height={24}
+    />
+  </span>
+</LiveDemo>
+
+At a taller size the biggest single momentum swing gets a hair connector and a signed delta; drop it with
+`markSwing={false}`, and drop the endpoint probability with `label="none"`.
+
+<LiveDemo
+  label="markSwing and label"
+  code={`<WinProbWorm
+  data={[50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98]}
+  sides={["home", "away"]}
+  markSwing={false}
+  label="none"
+/>`}
+>
+  <WinProbWorm
+    data={[50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98]}
+    sides={["home", "away"]}
+    markSwing={false}
+    label="none"
+    width={220}
+    height={28}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="locale"
+  code={`<WinProbWorm
+  data={[50, 55.5, 61.2, 58.4, 63.5]}
+  sides={["Ja", "Nein"]}
+  format={{ minimumFractionDigits: 1 }}
+  locale="de-DE"
+/>`}
+>
+  <WinProbWorm
+    data={[50, 55.5, 61.2, 58.4, 63.5]}
+    sides={["Ja", "Nein"]}
+    format={{ minimumFractionDigits: 1 }}
+    locale="de-DE"
+    title="Modelled probability"
+    width={180}
+    height={26}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="a dead heat"
+  code={`// a constant 50 reads as tied — the worm sits on the midline
+<WinProbWorm data={[50, 50, 50, 50, 50]} sides={["home", "away"]} />`}
+>
+  <WinProbWorm data={[50, 50, 50, 50, 50]} sides={["home", "away"]} title="Tied" width={160} height={24} />
+</LiveDemo>
+
+<LiveDemo label="single point" code={`<WinProbWorm data={[72]} sides={["home", "away"]} />`}>
+  <WinProbWorm data={[72]} sides={["home", "away"]} title="One reading" width={110} height={24} />
+</LiveDemo>
+
+With a `format` and `locale`, the endpoint label and the summary format their numbers in that locale's own
+decimal mark — `[50, 55.5, 61.2, 58.4, 63.5]` in `de-DE` ends at **"63,5%"**. Values outside 0–100 are
+clamped to the axis and dev-warn — a probability cannot exceed 100. A constant series has no crossing and
+no swing: an all-50 series reads "even… throughout", any other constant reads "…holds X% throughout". A
+`null` breaks the worm into disconnected runs the way a gap should; a single point has no line to draw, so
+it renders just the endpoint dot and its label; `data={[]}` renders the frame with the "no data" summary.
+
+## Four homes
+
+<FourContexts slug="win-prob-worm" />
+
+## Why this default
+
+The fixed 0–100 axis is the whole point: a win probability that truncated its own scale would exaggerate a
+lead, so the axis never moves and a 2-point edge always looks like a 2-point edge (lie factor 1). The 50%
+split does the reasoning for the reader — accent while your side leads, neutral while it trails, a dot at
+each flip — so "who's ahead, and did it ever change?" is answered before the second glance. The endpoint
+carries the current number, and the biggest momentum swing is marked only when there's room for it. The
+worm is a modelled read, never a fact, so its accessible name is framed "per the supplied model" and the
+chart never editorializes the forecast.
+
+## Accessibility
+
+The accessible name states the current leader, their probability, the number of lead changes, and the
+biggest momentum swing — **"Per the supplied model, home leads at 98%; 3 lead changes, biggest swing +17
+at point 8."** — or, for a constant series, "Per the supplied model, even at 50% throughout." The
+interactive entry roves the points with ←/→ (Home/End jump to the ends), each announcing the leader and
+probability at that point, with a live readout chip.
+
+## Props
+
+<PropTable slug="win-prob-worm" />

@@ -1,0 +1,146 @@
+// <GradeProfile> — how hard is the route, and where (plan/26 §3). Static,
+// hook-free, RSC-safe. One baseline-anchored quad per segment, coloured by a
+// QUANTIZED grade bin (gentle → brutal); the elevation ridge rides on top and a
+// seat-gated summit tick calls out the steepest pitch. Descents are always the
+// gentlest bin — climbing difficulty is the decision.
+import type { CSSProperties, ReactNode } from "react";
+import { Chart } from "../../shared/Chart.js";
+import { clamp } from "../../core/scale.js";
+import { makeFormatter } from "../../core/format.js";
+import { round2 } from "../../core/types.js";
+import { EN_GRADE_PROFILE, type GradeProfileStrings } from "../../core/strings-grade-profile.js";
+import { gradeLayout, gradeProfileGeometry, type GradePoint } from "./geometry.js";
+
+export type { GradePoint } from "./geometry.js";
+
+export interface GradeProfileProps {
+  data: readonly GradePoint[];
+  /** Grade % thresholds (ascending) that quantize the four bins. */
+  bins?: readonly [number, number, number] | undefined;
+  /** `"max"` marks the steepest pitch; `"none"` renders the profile alone. */
+  label?: "max" | "none" | undefined;
+  width?: number | undefined;
+  height?: number | undefined;
+  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  locale?: string | string[] | undefined;
+  strings?: GradeProfileStrings | undefined;
+  title?: string | undefined;
+  summary?: string | false | undefined;
+  id?: string | undefined;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
+  children?: ReactNode | undefined;
+}
+
+const DEFAULT_BINS = [3, 6, 10] as const;
+
+/** Percent formatter for grades — intrinsic units, so it ignores `format`. */
+export function gradePercent(locale: string | string[] | undefined): (n: number) => string {
+  const nf = makeFormatter(undefined, locale, { maximumFractionDigits: 1 });
+  return (n) => `${nf(n)}%`;
+}
+
+/** Shared summary — total distance, climb gain, and the steepest pitch + where. */
+export function gradeProfileSummary(
+  geo: ReturnType<typeof gradeProfileGeometry>,
+  strings: GradeProfileStrings,
+  fmt: (n: number) => string,
+  pct: (n: number) => string,
+): string {
+  if (geo.segments.length === 0) return strings.noData;
+  if (geo.maxGrade <= 0) return strings.gradeProfileFlat(fmt(geo.totalDistance));
+  return strings.gradeProfile(
+    fmt(geo.totalDistance),
+    fmt(geo.totalGain),
+    pct(geo.maxGrade),
+    fmt(geo.maxGradeAt),
+  );
+}
+
+// bin → static ink/cat role: gentle band, then a categorical mid, the negative
+// token, and the darkest bar for the brutal pitch. Quantized, never a ramp.
+const BIN_INK: Record<0 | 1 | 2 | 3, string | undefined> = {
+  0: "band",
+  1: undefined,
+  2: "negative",
+  3: "bar",
+};
+
+export function GradeProfile(props: GradeProfileProps): ReactNode {
+  const {
+    data,
+    bins = DEFAULT_BINS,
+    label = "max",
+    width = 120,
+    height = 40,
+    format,
+    locale,
+    strings = EN_GRADE_PROFILE,
+    title,
+    summary,
+    id,
+    className,
+    style,
+    children,
+  } = props;
+
+  const { fontSize, topPad } = gradeLayout(height, label);
+  const geo = gradeProfileGeometry({ data, width, height, bins, topPad });
+  const fmt = makeFormatter(format, locale);
+  const pct = gradePercent(locale);
+  const accName =
+    summary === false ? false : (summary ?? gradeProfileSummary(geo, strings, fmt, pct));
+
+  // seat the summit label: enabled, a real climb, room in the top gutter, and
+  // width to hold the text — otherwise it drops out and the profile reads clean.
+  const labelText = geo.maxGrade > 0 ? strings.gradeMax(pct(geo.maxGrade)) : "";
+  const labelW = labelText.length * fontSize * 0.6 + 2;
+  const showLabel =
+    label === "max" && geo.maxGrade > 0 && topPad >= fontSize + 0.8 && labelW <= width;
+  const labelX = showLabel ? round2(clamp(geo.summitX, labelW / 2, width - labelW / 2)) : 0;
+
+  return (
+    <Chart
+      width={width}
+      height={height}
+      title={title}
+      summary={accName}
+      id={id}
+      className={className ? `mc-grade ${className}` : "mc-grade"}
+      style={style}
+    >
+      {geo.segments.map((seg, i) => (
+        <path
+          key={`q${i}`}
+          d={seg.path}
+          data-mc-ink={BIN_INK[seg.bin]}
+          data-mc-cat={seg.bin === 1 ? 1 : undefined}
+        />
+      ))}
+      <path d={geo.ridge} data-mc-ink="data" data-mc-w="full" vectorEffect="non-scaling-stroke" />
+      {showLabel ? (
+        <>
+          <line
+            x1={geo.summitX}
+            y1={round2(topPad)}
+            x2={geo.summitX}
+            y2={geo.summitY}
+            data-mc-ink="muted"
+            data-mc-w="hair"
+            vectorEffect="non-scaling-stroke"
+          />
+          <text
+            x={labelX}
+            y={round2(fontSize)}
+            textAnchor="middle"
+            fontSize={fontSize}
+            data-mc-ink="label"
+          >
+            {labelText}
+          </text>
+        </>
+      ) : null}
+      {children}
+    </Chart>
+  );
+}

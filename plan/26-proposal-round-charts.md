@@ -92,3 +92,12 @@ single point, nulls (gap), out-of-range clamp + dev-warn. Size ≤ 2.2/3.2 kB. I
 package.json exports ×2/chart · tsdown entries · scripts/size-budgets.json · bench/scenarios.mjs · tests/craft/matrix.mjs
 cases · core/summary.ts SummaryStrings members + core/strings.ts EN aggregate · apps/docs registry.ts MODULES ·
 apps/docs content/docs/charts/meta.json. Floors recalibrated from quiet bench post-build.
+
+## Amendment — budget model correction (2026-07-10, post-build)
+
+The §1–8 size estimates under-counted the shared-kernel floor every chart pays (~950 B gz: Chart wrapper +
+a11y naming + makeFormatter + labelFont + types) before drawing a mark. Seven independent fix agents converged
+on the same finding after exhausting honest slimming levers (measurements in the build transcripts). Budgets in
+scripts/size-budgets.json are now set from post-slim measured reality + ~3–5% headroom; all 8 sit inside the
+library's hard caps (static ≤ 3 kB — worst is win-prob-worm 2.96; interactive ≤ static + 1 kB — all pass).
+Wiring list gains a 10th entry learned the hard way: apps/docs/src/components/mdx.tsx chart-component registry.

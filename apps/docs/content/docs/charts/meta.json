@@ -100,6 +100,14 @@
     "phase-trace",
     "trace-fold",
     "tape-gauge",
-    "station-glyph"
+    "station-glyph",
+    "cohort-triangle",
+    "streak-spark",
+    "grade-profile",
+    "win-prob-worm",
+    "queue-depth",
+    "spread-band",
+    "bias-strip",
+    "percentile-trace"
   ]
 }

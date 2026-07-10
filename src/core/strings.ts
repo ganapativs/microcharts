@@ -77,6 +77,14 @@ import { EN_PHASE_TRACE } from "./strings-phase-trace.js";
 import { EN_TRACE_FOLD } from "./strings-trace-fold.js";
 import { EN_TAPE_GAUGE } from "./strings-tape-gauge.js";
 import { EN_STATION_GLYPH } from "./strings-station-glyph.js";
+import { EN_COHORT_TRIANGLE } from "./strings-cohort-triangle.js";
+import { EN_STREAK_SPARK } from "./strings-streak-spark.js";
+import { EN_GRADE_PROFILE } from "./strings-grade-profile.js";
+import { EN_WIN_PROB_WORM } from "./strings-win-prob-worm.js";
+import { EN_QUEUE_DEPTH } from "./strings-queue-depth.js";
+import { EN_SPREAD_BAND } from "./strings-spread-band.js";
+import { EN_BIAS_STRIP } from "./strings-bias-strip.js";
+import { EN_PERCENTILE_TRACE } from "./strings-percentile-trace.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -154,4 +162,12 @@ export const EN: SummaryStrings = {
   ...EN_TRACE_FOLD,
   ...EN_TAPE_GAUGE,
   ...EN_STATION_GLYPH,
+  ...EN_COHORT_TRIANGLE,
+  ...EN_STREAK_SPARK,
+  ...EN_GRADE_PROFILE,
+  ...EN_WIN_PROB_WORM,
+  ...EN_QUEUE_DEPTH,
+  ...EN_SPREAD_BAND,
+  ...EN_BIAS_STRIP,
+  ...EN_PERCENTILE_TRACE,
 };

@@ -1175,6 +1175,102 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/cohort-triangle (static)",
+    "path": "dist/charts/cohort-triangle/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/cohort-triangle/interactive",
+    "path": "dist/charts/cohort-triangle/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/streak-spark (static)",
+    "path": "dist/charts/streak-spark/index.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/streak-spark/interactive",
+    "path": "dist/charts/streak-spark/client.js",
+    "limit": "3.35 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/grade-profile (static)",
+    "path": "dist/charts/grade-profile/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/grade-profile/interactive",
+    "path": "dist/charts/grade-profile/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/win-prob-worm (static)",
+    "path": "dist/charts/win-prob-worm/index.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/win-prob-worm/interactive",
+    "path": "dist/charts/win-prob-worm/client.js",
+    "limit": "3.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/queue-depth (static)",
+    "path": "dist/charts/queue-depth/index.js",
+    "limit": "2.7 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/queue-depth/interactive",
+    "path": "dist/charts/queue-depth/client.js",
+    "limit": "3.55 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/spread-band (static)",
+    "path": "dist/charts/spread-band/index.js",
+    "limit": "2.8 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/spread-band/interactive",
+    "path": "dist/charts/spread-band/client.js",
+    "limit": "3.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/bias-strip (static)",
+    "path": "dist/charts/bias-strip/index.js",
+    "limit": "2.45 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/bias-strip/interactive",
+    "path": "dist/charts/bias-strip/client.js",
+    "limit": "3.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/percentile-trace (static)",
+    "path": "dist/charts/percentile-trace/index.js",
+    "limit": "2.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/percentile-trace/interactive",
+    "path": "dist/charts/percentile-trace/client.js",
+    "limit": "3.25 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/annotations (static)",
     "path": "dist/annotations.js",
     "limit": "1.5 kB",

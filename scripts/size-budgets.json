@@ -396,6 +396,38 @@
     "station-glyph": {
       "static": "3.05 kB",
       "interactive": "3.6 kB"
+    },
+    "cohort-triangle": {
+      "static": "2.5 kB",
+      "interactive": "3.4 kB"
+    },
+    "streak-spark": {
+      "static": "2.5 kB",
+      "interactive": "3.35 kB"
+    },
+    "grade-profile": {
+      "static": "2.4 kB",
+      "interactive": "3.4 kB"
+    },
+    "win-prob-worm": {
+      "static": "3 kB",
+      "interactive": "3.9 kB"
+    },
+    "queue-depth": {
+      "static": "2.7 kB",
+      "interactive": "3.55 kB"
+    },
+    "spread-band": {
+      "static": "2.8 kB",
+      "interactive": "3.75 kB"
+    },
+    "bias-strip": {
+      "static": "2.45 kB",
+      "interactive": "3.4 kB"
+    },
+    "percentile-trace": {
+      "static": "2.4 kB",
+      "interactive": "3.25 kB"
     }
   }
 }

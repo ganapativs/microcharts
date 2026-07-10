@@ -390,6 +390,38 @@
     "static": 3.01,
     "interactive": 3.57
   },
+  "cohort-triangle": {
+    "static": 2.41,
+    "interactive": 3.33
+  },
+  "streak-spark": {
+    "static": 2.43,
+    "interactive": 3.27
+  },
+  "grade-profile": {
+    "static": 2.27,
+    "interactive": 3.08
+  },
+  "win-prob-worm": {
+    "static": 2.96,
+    "interactive": 3.8
+  },
+  "queue-depth": {
+    "static": 2.64,
+    "interactive": 3.46
+  },
+  "spread-band": {
+    "static": 2.72,
+    "interactive": 3.66
+  },
+  "bias-strip": {
+    "static": 2.38,
+    "interactive": 3.32
+  },
+  "percentile-trace": {
+    "static": 2.33,
+    "interactive": 3.18
+  },
   "annotations": {
     "static": 1.46
   }
