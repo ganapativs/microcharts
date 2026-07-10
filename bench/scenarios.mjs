@@ -121,7 +121,8 @@ export const SCENARIOS = [
   {
     slug: "heat-strip",
     component: "HeatStrip",
-    floor: 10, // 30 cells/row
+    // Recalibrated 2026-07-10 (superaudit): sat on the 10 knife-edge (9.9-10.3 quiet, 30 cells); floor = ~75% of quiet measure.
+    floor: 8,
     props: (i) => ({
       data: waves[i % POOL].concat(waves[(i + 1) % POOL].slice(0, 6)),
       summary: false,
@@ -773,7 +774,8 @@ export const SCENARIOS = [
   {
     slug: "token-confidence",
     component: "TokenConfidence",
-    floor: 15, // one span per token (HTML host) — N-node class
+    // Recalibrated 2026-07-10 (superaudit): per-token wrapper spans dropped (108 -> ~49 elements, 2.8 -> 2.0 kB/chart); HTML text host renders ~49 spans vs the ~300 elements/ms ceiling; floor = ~75% of quiet measure (10.8).
+    floor: 8,
     props: (i) => ({
       data: Array.from({ length: 60 }, (_t, k) => ({
         token: ` w${k}`,

@@ -61,7 +61,7 @@
   },
   "dumbbell": {
     "static": 2.65,
-    "interactive": 3.56
+    "interactive": 3.55
   },
   "paired-bars": {
     "static": 2.24,
@@ -192,8 +192,8 @@
     "interactive": 3.08
   },
   "data-diff": {
-    "static": 2.5,
-    "interactive": 3.33
+    "static": 2.48,
+    "interactive": 3.31
   },
   "quadrant-dot": {
     "static": 2.18,
@@ -332,7 +332,7 @@
     "interactive": 3.02
   },
   "token-confidence": {
-    "static": 0.98,
+    "static": 0.97,
     "interactive": 1.58
   },
   "wind-barb": {

@@ -41,7 +41,16 @@ With `positive` the connector takes the valence token by direction.
 
 ## Variants
 
-<LiveDemo label="valence" code={`<Dumbbell data={moves} positive="up" />`}>
+<LiveDemo
+  label="valence"
+  code={`<Dumbbell
+  data={[
+    { label: "Paris", from: 52, to: 61 },
+    { label: "Oslo", from: 66, to: 60 },
+  ]}
+  positive="up"
+/>`}
+>
   <Dumbbell
     data={[
       { label: "Paris", from: 52, to: 61 },
@@ -51,14 +60,6 @@ With `positive` the connector takes the valence token by direction.
     title="Moves"
     style={{ width: 200, height: 44 }}
   />
-</LiveDemo>
-
-<LiveDemo
-  label="no change"
-  code={`// from === to → a single dot, honestly
-<Dumbbell data={[{ from: 55, to: 55 }]} />`}
->
-  <Dumbbell data={[{ from: 55, to: 55 }]} title="Flat" style={{ width: 200, height: 24 }} />
 </LiveDemo>
 
 <LiveDemo
@@ -73,6 +74,20 @@ With `positive` the connector takes the valence token by direction.
     style={{ width: 240, height: 26 }}
   />
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="from === to — a single dot, honestly"
+  code={`// from === to → a single dot, no connector
+<Dumbbell data={[{ from: 55, to: 55 }]} />`}
+>
+  <Dumbbell data={[{ from: 55, to: 55 }]} title="Flat" style={{ width: 200, height: 24 }} />
+</LiveDemo>
+
+When a row's `from` equals its `to`, the connector is dropped and only one filled dot is drawn —
+never a hollow-and-filled pair sitting on top of each other pretending to be two points. The
+summary says **"No change at 55."** for a single row.
 
 ## Four homes
 

@@ -22,11 +22,12 @@ const SENT = [
 ];
 
 describe("<TokenConfidence> (plan/25 §7, plan/17 F12)", () => {
-  it("renders one span per token; docs-as-tests summary", () => {
+  it("renders one span per flagged token; confident tokens are bare text; docs-as-tests summary", () => {
     const { container } = draw(<TokenConfidence data={SENT} />);
     const host = container.querySelector(".mc-token-confidence")!;
-    // one outer span per token (flagged tokens nest an inner underline span)
-    expect(host.querySelectorAll(":scope > span").length).toBe(10);
+    // SSR hot path: no per-token wrapper — only the 4 flagged (unsure/guessing)
+    // tokens get a span; the 6 confident tokens render as bare text nodes.
+    expect(host.querySelectorAll(":scope > span").length).toBe(4);
     expect(
       tokenConfidenceSummary(tokenTiers({ data: SENT, tiers: [0.5, 0.8] }), EN_TOKEN_CONFIDENCE),
     ).toBe("10 tokens: 6 confident, 2 unsure, 2 guessing.");

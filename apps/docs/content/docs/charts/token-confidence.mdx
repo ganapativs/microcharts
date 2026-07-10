@@ -13,7 +13,24 @@ uncertain words draw the eye.
   sizeOf="token-confidence"
   code={`import { TokenConfidence } from "@microcharts/react/token-confidence";
 
-<TokenConfidence data={tokens} title="Model answer" />`}
+<TokenConfidence
+  data={[
+    { token: "The", confidence: 0.98 },
+    { token: " Treaty", confidence: 0.93 },
+    { token: " of", confidence: 0.99 },
+    { token: " Westphalia", confidence: 0.71 },
+    { token: " was", confidence: 0.96 },
+    { token: " signed", confidence: 0.9 },
+    { token: " in", confidence: 0.97 },
+    { token: " 1648", confidence: 0.44 },
+    { token: ", ending the Thirty", confidence: 0.63 },
+    { token: " Years' War", confidence: 0.85 },
+    { token: " over", confidence: 0.31 },
+    { token: " a decade", confidence: 0.38 },
+    { token: ".", confidence: 0.99 },
+  ]}
+  title="Model answer"
+/>`}
 >
   <TokenConfidence
     data={[
@@ -60,7 +77,18 @@ The text is the chart, so it inherits the surrounding font size — there is no 
 
 ## Variants
 
-<LiveDemo label="with legend" code={`<TokenConfidence data={tokens} legend />`}>
+<LiveDemo
+  label="with legend"
+  code={`<TokenConfidence
+  data={[
+    { token: "Likely", confidence: 0.92 },
+    { token: " Paris", confidence: 0.62 },
+    { token: ", maybe", confidence: 0.3 },
+    { token: " Lyon", confidence: 0.28 },
+  ]}
+  legend
+/>`}
+>
   <TokenConfidence
     data={[
       { token: "Likely", confidence: 0.92 },
@@ -73,6 +101,44 @@ The text is the chart, so it inherits the surrounding font size — there is no 
   />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="all confident — no marks at all"
+  code={`<TokenConfidence
+  data={[
+    { token: "The", confidence: 0.95 },
+    { token: " answer", confidence: 0.99 },
+    { token: " is", confidence: 0.97 },
+    { token: " Paris", confidence: 0.9 },
+  ]}
+/>`}
+>
+  <TokenConfidence
+    data={[
+      { token: "The", confidence: 0.95 },
+      { token: " answer", confidence: 0.99 },
+      { token: " is", confidence: 0.97 },
+      { token: " Paris", confidence: 0.9 },
+    ]}
+    style={{ fontSize: "1.05rem" }}
+  />
+</LiveDemo>
+
+Every token clears the `hi` threshold, so nothing is flagged — the sentence renders as
+plain, unmarked text. That absence of marks is the finding: nothing here needs a second
+look.
+
+<LiveDemo label="empty data" code={`<TokenConfidence data={[]} />`}>
+  <TokenConfidence data={[]} style={{ fontSize: "1.05rem" }} />
+</LiveDemo>
+
+An empty `data` array renders nothing and reports **"No tokens."** to assistive tech.
+
+## Four homes
+
+<FourContexts slug="token-confidence" />
+
 ## Why this default
 
 The tiers are discrete — confident, unsure, guessing — never a continuous gradient, because people
@@ -83,7 +149,7 @@ auditing exact probabilities, reach for [CalibrationStrip](/docs/charts/calibrat
 
 ## Accessibility
 
-The accessible name is the tier tally — **"19 tokens: 14 confident, 2 unsure, 3 guessing."** The
+The accessible name is the tier tally — **"13 tokens: 8 confident, 2 unsure, 3 guessing."** The
 interactive entry gives each flagged token a roving tab stop; ←/→ move between them (skipping
 confident tokens), announcing each one's tier and confidence.
 

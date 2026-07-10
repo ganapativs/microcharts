@@ -149,9 +149,9 @@ export function DataDiff(props: DataDiffProps): ReactNode {
         y1={0}
         x2={geo.centerX}
         y2={height}
-        stroke="var(--mc-neutral)"
+        data-mc-ink="muted"
+        data-mc-w="hair"
         strokeOpacity={0.45}
-        strokeWidth={0.6}
         vectorEffect="non-scaling-stroke"
       />
       {geo.rows.map((r) => (
@@ -163,9 +163,8 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               y={r.y}
               width={r.removed.width}
               height={r.height}
-              data-mc-ink="bar"
+              data-mc-ink="negative"
               shapeRendering="crispEdges"
-              style={{ fill: "var(--mc-negative)" }}
             />
           ) : null}
           {/* added rightward */}
@@ -175,9 +174,8 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               y={r.y}
               width={r.added.width}
               height={r.height}
-              data-mc-ink="bar"
+              data-mc-ink="positive"
               shapeRendering="crispEdges"
-              style={{ fill: "var(--mc-positive)" }}
             />
           ) : null}
           {/* 0/0 key — a hairline tick so the key's presence survives */}
@@ -187,8 +185,8 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               y={r.y}
               width={1}
               height={r.height}
-              data-mc-ink="data"
-              style={{ fill: "var(--mc-neutral)", fillOpacity: 0.5 }}
+              data-mc-ink="neutral"
+              style={{ fillOpacity: 0.5 }}
             />
           ) : null}
           {/* net summary tick — opt-in, never a stand-in for the bars */}
@@ -198,8 +196,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               y={round2(r.y - 0.8)}
               width={1}
               height={round2(r.height + 1.6)}
-              data-mc-ink="data"
-              style={{ fill: "var(--mc-neutral)" }}
+              data-mc-ink="neutral"
             />
           ) : null}
           {showTags ? (

@@ -58,9 +58,9 @@ describe("<Dumbbell> (plan/22 #11, S2-paired)", () => {
 
   it("positive colors the connector by direction; without it stays neutral", () => {
     const up = draw(<Dumbbell data={[{ from: 10, to: 20 }]} positive="up" />).container;
-    expect((up.querySelector("line") as SVGElement).style.stroke).toBe("var(--mc-positive)");
+    expect(up.querySelector("line")!.getAttribute("data-mc-ink")).toBe("positive");
     const range = draw(<Dumbbell data={[{ from: 10, to: 20 }]} />).container;
-    expect((range.querySelector("line") as SVGElement).style.stroke).toBe("");
+    expect(range.querySelector("line")!.getAttribute("data-mc-ink")).toBe("muted");
   });
 
   it("label='value' renders from/to outside the dots when they fit", () => {

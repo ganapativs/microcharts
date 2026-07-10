@@ -121,11 +121,14 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
 
   // The heavier pan is accented — the "which side wins" read is instant, and it
   // only reinforces the tilt (never the sole cue), so direction stays legible
-  // without colour. An explicit `color` overrides both pans (user intent wins).
+  // without colour. An explicit `color` overrides both pans (user intent wins);
+  // otherwise the fill comes from the accent/point ink roles (plan/24 #8).
   const weightMark = (w: { cx: number; cy: number; half: number }, key: string, heavy: boolean) => {
-    const f = color ?? (heavy ? "var(--mc-accent)" : "var(--mc-stroke)");
+    const inkProps = color
+      ? { style: { fill: color } }
+      : { "data-mc-ink": heavy ? "accent" : "point" };
     return shape === "round" ? (
-      <circle key={key} cx={w.cx} cy={w.cy} r={w.half} style={{ fill: f }} />
+      <circle key={key} cx={w.cx} cy={w.cy} r={w.half} {...inkProps} />
     ) : (
       <rect
         key={key}
@@ -133,7 +136,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
         y={w.cy - w.half}
         width={w.half * 2}
         height={w.half * 2}
-        style={{ fill: f }}
+        {...inkProps}
       />
     );
   };

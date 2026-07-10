@@ -71,9 +71,60 @@ down is good (latency, churn, cost).
   </span>
 </LiveDemo>
 
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the sign and magnitude follow
+that locale's own grouping and decimal marks (a German reader sees a comma decimal and a space
+before the `%`, not a period).
+
+<LiveDemo
+  label="locale"
+  code={`<Delta value={0.124} format={{ style: "percent", maximumFractionDigits: 1 }} locale="de-DE" />`}
+>
+  <span className="text-lg">
+    <Delta
+      value={0.124}
+      format={{ style: "percent", maximumFractionDigits: 1 }}
+      locale="de-DE"
+      title="Localized change"
+    />
+  </span>
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo label="zero — no change" code={`<Delta value={0} />`}>
+  <span className="text-lg">
+    <Delta value={0} title="Flat" />
+  </span>
+</LiveDemo>
+
+<LiveDemo
+  label="non-finite input — em dash, never NaN%"
+  code={`<Delta value={Number.NaN} />
+<Delta value={Infinity} />`}
+>
+  <span className="inline-flex gap-4 text-lg">
+    <Delta value={Number.NaN} title="Not a number" />
+    <Delta value={Number.POSITIVE_INFINITY} title="Infinite" />
+  </span>
+</LiveDemo>
+
+A zero delta shows the flat glyph and **"No change."** — never a `+0%`/`−0%` that implies a
+direction with nothing behind it. `NaN` and `±Infinity` degrade the same way: the flat glyph, an
+em dash instead of a number, and **"No change."** rather than a misleading `NaN%`.
+
 ## Four homes
 
 <FourContexts slug="delta" />
+
+## Why this default
+
+Direction is always double-encoded — the triangle's shape carries it as much as the color does —
+because a red/green-only read fails for color-blind viewers and under `forced-colors`. `positive`
+flips only which color means "good"; it never changes which way the glyph points, so a metric where
+down is good (latency, churn, cost) still shows an honest down-pointing triangle, just in the "good"
+color. Percent is the default format because most deltas are relative change, not raw magnitude —
+pass `format` for currency, counts, or any other unit. Non-finite input renders as an em dash rather
+than `NaN%`, because a broken number should read as "nothing to report," not as a fabricated value.
 
 ## Accessibility
 

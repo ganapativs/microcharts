@@ -52,6 +52,32 @@ a hidden wider track. It trades some precision for a read that needs no separate
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="0% and 100%"
+  code={`<FillWord word="uploading" value={0} />
+<FillWord word="uploading" value={1} />`}
+>
+  <span className="inline-flex gap-5 items-center">
+    <FillWord word="uploading" value={0} fontSize={16} title="0%" />
+    <FillWord word="uploading" value={1} fontSize={16} title="100%" />
+  </span>
+</LiveDemo>
+
+At 0% the word is entirely the muted track; at 100% it is entirely accent ink — both ends are
+honest limits of the same clip, not a special case.
+
+<LiveDemo label="empty word" code={`<FillWord word="" value={0.5} />`}>
+  <FillWord word="" value={0.5} fontSize={16} title="Empty" />
+</LiveDemo>
+
+An empty `word` renders nothing and reports **"No data."** — there is no label to be the bar.
+
+## Four homes
+
+<FourContexts slug="fill-word" />
+
 ## Why this default
 
 Fill (not drain) is the default because progress is the ninety-percent case — a word filling as a
