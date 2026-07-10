@@ -36,12 +36,8 @@ export interface LikertStripProps {
   data: readonly LikertDatum[];
   /** Neutral placement: `"split"` (half each side) or `"omit"` (labeled only). */
   neutral?: "split" | "omit" | undefined;
-  /** `"share"` normalizes to %; `"count"` renders raw counts on a fixed max. */
-  mode?: "share" | "count" | undefined;
   /** `"ends"` = agree/disagree %; `"net"` = one signed score; `"none"`. */
   label?: "ends" | "net" | "none" | undefined;
-  /** Fixed max for `mode="count"` rows. */
-  max?: number | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;

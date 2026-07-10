@@ -40,6 +40,48 @@ describe("<Waterfall> (plan/22 #20, S2-signed)", () => {
     expect(container.querySelectorAll("rect").length).toBe(4);
   });
 
+  it('label="delta" draws signed value labels below the plot', () => {
+    const { container } = draw(<Waterfall data={PL} start={1200} label="delta" width={260} />);
+    const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(texts.length).toBeGreaterThan(0);
+    expect(texts).toContain("+300");
+    expect(texts).toContain("−140"); // U+2212 minus, never a hyphen
+    // labels sit in a band below the plot → viewBox grows in height only
+    const vb = container.querySelector("svg")!.getAttribute("viewBox")!.split(" ").map(Number);
+    expect(vb[2]).toBe(260); // width unchanged
+    expect(vb[3]).toBeGreaterThan(18); // height reserved a label band
+    // containment: every label anchor stays inside the (grown) viewBox
+    for (const t of container.querySelectorAll("text")) {
+      expect(Number(t.getAttribute("x"))).toBeGreaterThanOrEqual(0);
+      expect(Number(t.getAttribute("x"))).toBeLessThanOrEqual(vb[2]!);
+      expect(Number(t.getAttribute("y"))).toBeLessThanOrEqual(vb[3]!);
+    }
+  });
+
+  it('label defaults to "none" — no text, viewBox unchanged', () => {
+    const { container } = draw(<Waterfall data={PL} width={260} height={18} />);
+    expect(container.querySelectorAll("text").length).toBe(0);
+    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 260 18");
+  });
+
+  it("zero deltas carry no label (they are the 1-unit tick, not a move)", () => {
+    const { container } = draw(
+      <Waterfall
+        data={[
+          { label: "a", value: 100 },
+          { label: "b", value: 0 },
+        ]}
+        label="delta"
+        width={260}
+        total={false}
+      />,
+    );
+    const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(texts).toContain("+100");
+    expect(texts).not.toContain("+0");
+    expect(texts).not.toContain("0");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<Waterfall data={PL} start={1200} title="Monthly P&L" />);
     await expectNoA11yViolations(container);
