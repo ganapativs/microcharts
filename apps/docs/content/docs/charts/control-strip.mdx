@@ -15,6 +15,12 @@ boring.
   sizeOf="control-strip"
   code={`import { ControlStrip } from "@microcharts/react/control-strip";
 
+// 30 fill-weight readings (g); mostly in control, two excursions
+const weights = [
+74, 73, 75, 74, 76, 73, 74, 75, 74, 73, 82, 74, 75, 73, 74, 76, 74, 73, 75, 74, 66, 74, 75, 74,
+73, 76, 74, 75, 74, 73,
+];
+
 <ControlStrip data={weights} title="Line 3 fill weight" />`}
 >
   <ControlStrip
@@ -49,7 +55,12 @@ boring.
 
 <LiveDemo
   label="Western Electric rules + all dots"
-  code={`<ControlStrip data={weights} rules="we" />
+  code={`const weights = [
+  74, 73, 75, 74, 76, 73, 74, 75, 74, 73, 82, 74, 75, 73, 74, 76, 74, 73, 75, 74, 66, 74, 75, 74,
+  73, 76, 74, 75, 74, 73,
+];
+
+<ControlStrip data={weights} rules="we" />
 <ControlStrip data={weights} dots="all" />`}
 >
   <span className="inline-flex flex-col gap-1.5">
@@ -71,6 +82,48 @@ boring.
       height={24}
     />
   </span>
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<ControlStrip
+  data={[2.4, 2.5, 2.45, 2.55, 2.5, 2.6, 2.4, 2.5, 2.45, 2.9, 2.5, 2.55]}
+  format={{ maximumFractionDigits: 1 }}
+  locale="de-DE"
+/>`}
+>
+  <ControlStrip
+    data={[2.4, 2.5, 2.45, 2.55, 2.5, 2.6, 2.4, 2.5, 2.45, 2.9, 2.5, 2.55]}
+    format={{ maximumFractionDigits: 1 }}
+    locale="de-DE"
+    title="Localized limits"
+    width={220}
+    height={24}
+  />
+</LiveDemo>
+
+The chart draws no in-chart numbers, so `format`/`locale` shape the accessible summary and the
+interactive announcements — the strip above reads "All 12 points within control limits (center
+2,5, limits 2,1–2,9)." with German decimal commas.
+
+## Edge cases
+
+<LiveDemo
+  label="fewer than 10 points — limits provisional"
+  code={`// the band gets a dashed outline and the summary appends
+// "Limits provisional (n=6)"
+<ControlStrip data={[10, 11, 9, 10, 12, 8]} />`}
+>
+  <ControlStrip data={[10, 11, 9, 10, 12, 8]} title="Provisional" width={160} height={22} />
+</LiveDemo>
+
+<LiveDemo
+  label="a constant series has no spread"
+  code={`// MR̄ = 0 → σ̂ = 0: the band collapses into the center hairline
+// instead of painting a fake zero-height zone
+<ControlStrip data={[5, 5, 5, 5]} />`}
+>
+  <ControlStrip data={[5, 5, 5, 5]} title="Constant" width={160} height={22} />
 </LiveDemo>
 
 ## Four homes

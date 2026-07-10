@@ -102,6 +102,9 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
   // pin the label size to viewBox units (the shared 0.75em default is ambient —
   // it would render labels ~2× and break the reserved gutter). plan/12.
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  // a custom `color` must be inline STYLE: the "cell" role rule would override
+  // a fill attribute. ONE shared object — never allocated per cell (SSR path).
+  const customFill = color ? { fill: color } : undefined;
 
   return (
     <Chart
@@ -124,11 +127,10 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
             rx={c.rx}
             shapeRendering={geo.crisp ? "crispEdges" : undefined}
             data-mc-ink="cell"
-            style={{
-              fillOpacity:
-                mode === "intensity" && c.step !== null ? valueStepOpacity(c.step, steps) : 1,
-              ...(color ? { fill: color } : null),
-            }}
+            fillOpacity={
+              mode === "intensity" && c.step !== null ? valueStepOpacity(c.step, steps) : 1
+            }
+            style={customFill}
           />
         ) : (
           // an EMPTY slot, not a void: a faint track fill + a hairline outline
@@ -153,7 +155,6 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {pctFmt(geo.coverage)}
         </text>

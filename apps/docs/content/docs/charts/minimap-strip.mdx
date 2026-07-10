@@ -14,7 +14,15 @@ same as zero. The unknown share travels with the accessible name.
   code={`import { MinimapStrip } from "@microcharts/react/minimap-strip";
 
 <MinimapStrip
-  data={{ content, window: [520, 660], marks, known }}
+  data={{
+    content: Array.from(
+      { length: 1200 },
+      (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6,
+    ),
+    window: [520, 660],
+    marks: [100, 600, 1100],
+    known: [[0, 1104]],
+  }}
   title="Document position"
 />`}
 >
@@ -54,7 +62,20 @@ same as zero. The unknown share travels with the accessible name.
 
 ## Variants
 
-<LiveDemo label="heat" code={`<MinimapStrip data={data} variant="heat" />`}>
+<LiveDemo
+  label="heat"
+  code={`<MinimapStrip
+  data={{
+    content: Array.from(
+      { length: 1200 },
+      (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6,
+    ),
+    window: [300, 440],
+    marks: [600, 1000],
+  }}
+  variant="heat"
+/>`}
+>
   <MinimapStrip
     data={{
       content: Array.from(
@@ -70,6 +91,35 @@ same as zero. The unknown share travels with the accessible name.
     height={18}
   />
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="fully known — no fog"
+  code={`// \`known\` covers the whole domain, so no hatched fog renders
+<MinimapStrip
+  data={{
+    content: Array.from({ length: 200 }, (_, i) => Math.abs(Math.sin(i / 20))),
+    window: [40, 90],
+    known: [[0, 200]],
+  }}
+/>`}
+>
+  <MinimapStrip
+    data={{
+      content: Array.from({ length: 200 }, (_, i) => Math.abs(Math.sin(i / 20))),
+      window: [40, 90],
+      known: [[0, 200]],
+    }}
+    title="Fully known"
+    width={220}
+    height={16}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="minimap-strip" />
 
 ## Why this default
 

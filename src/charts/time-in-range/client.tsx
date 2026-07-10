@@ -143,7 +143,7 @@ export function TimeInRange(props: TimeInRangeProps): React.ReactNode {
             height={zone.height + 1}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

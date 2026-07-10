@@ -13,6 +13,8 @@ different from a low value.
   sizeOf="heat-strip"
   code={`import { HeatStrip } from "@microcharts/react/heat-strip";
 
+const hourlyLoad = [12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35];
+
 <HeatStrip data={hourlyLoad} domain={[0, 100]} title="Load per hour" />`}
 >
   <HeatStrip
@@ -48,8 +50,10 @@ different from a low value.
 
 <LiveDemo
   label="shapes"
-  code={`<HeatStrip data={load} shape="round" />
-<HeatStrip data={load} shape="dot" />`}
+  code={`const load = [12, 38, 66, 88, 84, 55, 28, 62, 85, 58];
+
+<HeatStrip data={load} domain={[0, 100]} shape="round" />
+<HeatStrip data={load} domain={[0, 100]} shape="dot" />`}
 >
   <span className="inline-flex flex-col gap-1.5">
     <HeatStrip
@@ -70,6 +74,8 @@ different from a low value.
     />
   </span>
 </LiveDemo>
+
+## Edge cases
 
 <LiveDemo label="nulls hold their slot" code={`<HeatStrip data={[3, null, 8, null, 5]} />`}>
   <HeatStrip data={[3, null, 8, null, 5]} title="Gaps" width={100} height={16} />

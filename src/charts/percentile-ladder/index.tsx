@@ -34,8 +34,8 @@ export interface PercentileLadderProps {
   scale?: "linear" | "log" | undefined;
   /** What the tick labels state (default `"ps"`). */
   label?: "values" | "ps" | "both" | "none" | undefined;
-  /** Dot marks instead of ticks (over text). */
-  dots?: boolean | undefined;
+  /** Tick marks (default) or dot marks — dots read calmer over dense text. */
+  marks?: "tick" | "dot" | undefined;
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
@@ -93,7 +93,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
     ps,
     scale = "linear",
     label = "ps",
-    dots = false,
+    marks = "tick",
     domain,
     width = 80,
     height = 12,
@@ -167,8 +167,8 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
         x2={geo.track.x1}
         y2={geo.track.y}
         data-mc-ink="muted"
+        data-mc-w="support"
         vectorEffect="non-scaling-stroke"
-        style={{ strokeWidth: 1 }}
       />
       {rendered.map((t) => {
         const tail = t.emphasis === k - 1;
@@ -176,7 +176,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
         // the tail's default accent now lives in the "flag" ink-role rule
         // (styles.css) so forced-colors can remap it; `color` still overrides.
         const stroke = color;
-        return dots ? (
+        return marks === "dot" ? (
           <circle
             key={t.p}
             cx={t.x}
@@ -215,7 +215,6 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
                 textAnchor="middle"
                 data-mc-ink="label"
                 fontSize={FONT}
-                style={{ fontVariantNumeric: "tabular-nums" }}
               >
                 {texts[i]}
               </text>

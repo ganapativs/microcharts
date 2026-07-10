@@ -97,7 +97,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
   const datum = seg ? data[seg.level] : undefined;
   const announced =
     seg && datum
-      ? `${datum.label}: ${pctFmt(seg.share)}, level ${seg.level + 1} of ${data.length}.`
+      ? strings.likertAt(datum.label, pctFmt(seg.share), seg.level + 1, data.length)
       : "";
 
   return (
@@ -132,7 +132,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
             height={height - 2}
             fill="none"
             stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

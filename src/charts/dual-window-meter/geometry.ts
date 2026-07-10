@@ -64,11 +64,15 @@ export function dualWindowGeometry(opts: {
   data: readonly Value[];
   windows: [number, number];
   target: number;
-  band: [number, number] | null;
-  domain: [number, number] | null;
+  band: readonly [number, number] | null;
+  domain: readonly [number, number] | null;
   width: number;
   height: number;
   gutter: number;
+  /** Precomputed rolling means — callers that need this geometry twice (once
+   *  to size a label gutter, once for the final layout) pass the same means
+   *  in both calls instead of recomputing two O(n·window) passes each time. */
+  means?: { fast: readonly (number | null)[]; slow: readonly (number | null)[] } | undefined;
 }): {
   fastPath: string;
   slowPath: string;
@@ -82,8 +86,8 @@ export function dualWindowGeometry(opts: {
 } {
   const { data, windows, target, band, domain, width, height, gutter } = opts;
   const [wf, ws] = windows;
-  const fast = rollingMean(data, wf);
-  const slow = rollingMean(data, ws);
+  const fast = opts.means ? opts.means.fast : rollingMean(data, wf);
+  const slow = opts.means ? opts.means.slow : rollingMean(data, ws);
 
   let lo = Infinity;
   let hi = -Infinity;

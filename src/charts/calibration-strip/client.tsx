@@ -135,7 +135,7 @@ export function CalibrationStrip(props: CalibrationStripProps): React.ReactNode 
               y1={0.5}
               y2={height - 0.5}
               data-mc-ink="muted"
-              strokeWidth={0.75}
+              data-mc-w="tick"
               vectorEffect="non-scaling-stroke"
             />
             <circle
@@ -144,7 +144,7 @@ export function CalibrationStrip(props: CalibrationStripProps): React.ReactNode 
               r={2.4}
               fill="none"
               stroke="var(--mc-accent)"
-              strokeWidth={0.9}
+              data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
           </>

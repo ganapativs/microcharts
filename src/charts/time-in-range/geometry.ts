@@ -4,6 +4,9 @@
 // Counts or fractions in, normalized shares out. 2-dp. Uses core/stack shares.
 import { normalizeShares } from "../../core/stack.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
+import type { Orientation } from "../../core/types.js";
+
+export type { Orientation } from "../../core/types.js";
 
 export type ZoneKey = "severeBelow" | "below" | "in" | "above" | "severeAbove";
 
@@ -38,7 +41,7 @@ export function timeInRangeGeometry(opts: {
   data: TimeInRangeDatum;
   width: number;
   height: number;
-  orientation: "horizontal" | "vertical";
+  orientation: Orientation;
   gap?: number | undefined;
 }): { zones: TirZone[] } {
   const { data, width, height, orientation, gap = 0.5 } = opts;

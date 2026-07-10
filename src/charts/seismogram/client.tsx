@@ -4,7 +4,7 @@
 // (not slot — quiet slots are skippable context). Announces via the shared
 // point template; quiet slots use the pointEmpty wording (ActivityGrid
 // parity). Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -24,6 +24,10 @@ export interface InteractiveSeismogramProps extends SeismogramProps {
 }
 
 const DEFAULT_SERIES_STRINGS = { ...EN_SERIES, ...EN_SLOTS };
+
+// the inner SVG must fill the wrapper, or the %-positioned readout chip and
+// pointer math drift off-cursor when context CSS resizes the chart
+const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
   const {
@@ -142,6 +146,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
+        style={FILL}
       >
         {active !== null ? (
           <line
@@ -150,8 +155,8 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
             x2={slotW * (active + 0.5)}
             y2={height}
             data-mc-ink="muted"
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
-            style={{ strokeWidth: 1 }}
           />
         ) : null}
         {rest.children}

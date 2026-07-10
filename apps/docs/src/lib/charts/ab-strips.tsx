@@ -59,7 +59,7 @@ export const entry: ChartEntry = {
   demo: B,
   example: {
     title: "Latency A/B",
-    code: `import { ABStrips } from "${PKG}/ab-strips";\n\n<ABStrips data={{ a: control, b: test }} positive="down" title="Latency A/B" />`,
+    code: `import { ABStrips } from "${PKG}/ab-strips";\n\nconst control = Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22);\nconst test = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);\n\n<ABStrips data={{ a: control, b: test }} positive="down" title="Latency A/B" />`,
   },
 };
 

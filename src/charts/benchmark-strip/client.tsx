@@ -146,8 +146,8 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
             y1={0.5}
             x2={edge.x}
             y2={height - 0.5}
-            stroke="var(--mc-accent)"
-            strokeWidth={1}
+            data-mc-ink="accent"
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

@@ -14,7 +14,17 @@ is the aviation primary-flight-display tape, shrunk to a word.
   sizeOf="tape-gauge"
   code={`import { TapeGauge } from "@microcharts/react/tape-gauge";
 
-<TapeGauge value={142} rate={1} zones={zones} title="Airspeed" />`}
+<TapeGauge
+  value={142}
+  rate={1}
+  zones={[
+    { from: 100, to: 130, tone: "pos" },
+    { from: 130, to: 150, tone: "warn" },
+    { from: 150, to: 200, tone: "neg" },
+  ]}
+  span={60}
+  title="Airspeed"
+/>`}
 >
   <TapeGauge
     value={142}
@@ -24,6 +34,7 @@ is the aviation primary-flight-display tape, shrunk to a word.
       { from: 130, to: 150, tone: "warn" },
       { from: 150, to: 200, tone: "neg" },
     ]}
+    span={60}
     title="Airspeed"
     width={46}
     height={72}
@@ -55,7 +66,17 @@ is the aviation primary-flight-display tape, shrunk to a word.
 
 <LiveDemo
   label="horizontal"
-  code={`<TapeGauge value={142} rate={-1} zones={zones} orientation="horizontal" />`}
+  code={`<TapeGauge
+  value={142}
+  rate={-1}
+  zones={[
+    { from: 100, to: 130, tone: "pos" },
+    { from: 130, to: 150, tone: "warn" },
+    { from: 150, to: 200, tone: "neg" },
+  ]}
+  span={60}
+  orientation="horizontal"
+/>`}
 >
   <TapeGauge
     value={142}
@@ -65,12 +86,88 @@ is the aviation primary-flight-display tape, shrunk to a word.
       { from: 130, to: 150, tone: "warn" },
       { from: 150, to: 200, tone: "neg" },
     ]}
+    span={60}
     orientation="horizontal"
     title="Airspeed"
     width={160}
     height={30}
   />
 </LiveDemo>
+
+<LiveDemo
+  label="pointer-only"
+  code={`// label="none" drops the in-chart readout for an external number
+<TapeGauge
+  value={142}
+  rate={1}
+  zones={[
+    { from: 100, to: 130, tone: "pos" },
+    { from: 130, to: 150, tone: "warn" },
+    { from: 150, to: 200, tone: "neg" },
+  ]}
+  span={60}
+  label="none"
+/>`}
+>
+  <TapeGauge
+    value={142}
+    rate={1}
+    zones={[
+      { from: 100, to: 130, tone: "pos" },
+      { from: 130, to: 150, tone: "warn" },
+      { from: 150, to: 200, tone: "neg" },
+    ]}
+    span={60}
+    label="none"
+    title="Airspeed"
+    width={30}
+    height={44}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<TapeGauge
+  value={14200}
+  format={{ maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <TapeGauge
+    value={14200}
+    format={{ maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="Localized reading"
+    width={46}
+    height={68}
+  />
+</LiveDemo>
+
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, both the in-gauge readout
+and the accessible summary follow that locale's own grouping ("14.200" in German, not
+"14,200").
+
+## Edge cases
+
+<LiveDemo
+  label="no data"
+  code={`// a non-finite value renders an empty gauge — no pointer, no readout
+<TapeGauge value={NaN} title="Sensor offline" />`}
+>
+  <TapeGauge value={NaN} title="Sensor offline" width={46} height={68} />
+</LiveDemo>
+
+<LiveDemo
+  label="no zones"
+  code={`// zones are optional — the gauge still tracks level and rate without bands
+<TapeGauge value={142} rate={1} span={40} />`}
+>
+  <TapeGauge value={142} rate={1} span={40} title="Airspeed, unzoned" width={46} height={68} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="tape-gauge" />
 
 ## Why this default
 

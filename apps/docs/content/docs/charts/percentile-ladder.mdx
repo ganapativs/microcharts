@@ -14,7 +14,18 @@ renders when it applies.
   sizeOf="percentile-ladder"
   code={`import { PercentileLadder } from "@microcharts/react/percentile-ladder";
 
-<PercentileLadder data={latencies} title="Request latency" />`}
+<PercentileLadder
+  data={Array.from({ length: 200 }, (_, i) =>
+    i < 130
+      ? 90 + (i % 50)
+      : i < 180
+        ? 150 + ((i * 7) % 320)
+        : i < 196
+          ? 480 + ((i * 11) % 900)
+          : 1500 + ((i * 13) % 800),
+  )}
+  title="Request latency"
+/>`}
 >
   <PercentileLadder
     data={Array.from({ length: 200 }, (_, i) => (i < 130 ? 90 + (i % 50) : i < 180 ? 150 + ((i * 7) % 320) : i < 196 ? 480 + ((i * 11) % 900) : 1500 + ((i * 13) % 800)))}
@@ -48,8 +59,19 @@ renders when it applies.
 
 <LiveDemo
   label="scale + percentiles"
-  code={`<PercentileLadder data={latencies} scale="log" />
-<PercentileLadder data={latencies} ps={[50, 95, 99.9]} label="values" />`}
+  code={`const latencies = Array.from({ length: 200 }, (_, i) =>
+  i < 130
+    ? 90 + (i % 50)
+    : i < 180
+      ? 150 + ((i * 7) % 320)
+      : i < 196
+        ? 480 + ((i * 11) % 900)
+        : 1500 + ((i * 13) % 800),
+);
+
+<PercentileLadder data={latencies} scale="log" />
+<PercentileLadder data={latencies} ps={[50, 95, 99.9]} label="values" />
+<PercentileLadder data={latencies} marks="dot" />`}
 >
   <span className="inline-flex flex-col gap-2">
     <PercentileLadder
@@ -83,5 +105,124 @@ renders when it applies.
       width={220}
       height={20}
     />
+    <PercentileLadder
+      data={Array.from({ length: 200 }, (_, i) =>
+        i < 130
+          ? 90 + (i % 50)
+          : i < 180
+            ? 150 + ((i * 7) % 320)
+            : i < 196
+              ? 480 + ((i * 11) % 900)
+              : 1500 + ((i * 13) % 800),
+      )}
+      marks="dot"
+      title="Dot marks"
+      width={220}
+      height={18}
+    />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="de-DE locale"
+  code={`// value labels and the summary format through Intl — "1.661 ms", not "1,661 ms"
+<PercentileLadder
+  data={Array.from({ length: 200 }, (_, i) =>
+    i < 130
+      ? 90 + (i % 50)
+      : i < 180
+        ? 150 + ((i * 7) % 320)
+        : i < 196
+          ? 480 + ((i * 11) % 900)
+          : 1500 + ((i * 13) % 800),
+  )}
+  label="values"
+  format={{ style: "unit", unit: "millisecond", maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
+>
+  <PercentileLadder
+    data={Array.from({ length: 200 }, (_, i) =>
+      i < 130
+        ? 90 + (i % 50)
+        : i < 180
+          ? 150 + ((i * 7) % 320)
+          : i < 196
+            ? 480 + ((i * 11) % 900)
+            : 1500 + ((i * 13) % 800),
+    )}
+    label="values"
+    format={{ style: "unit", unit: "millisecond", maximumFractionDigits: 0 }}
+    locale="de-DE"
+    title="de-DE locale"
+    width={260}
+    height={18}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="all values equal — collapses to one tick"
+  code={`// every percentile lands on the same value, so the ladder renders one
+// tick instead of three overlapping ones
+<PercentileLadder data={[7, 7, 7, 7]} />`}
+>
+  <PercentileLadder data={[7, 7, 7, 7]} title="All equal" width={120} height={14} />
+</LiveDemo>
+
+<LiveDemo
+  label="log falls back silently on any value ≤ 0"
+  code={`// a single ≤ 0 sample would make a log axis a lie, so scale="log" falls
+// back to linear — no in-chart "log" tag renders, because the transform
+// wasn't actually applied
+<PercentileLadder data={[0, 10, 100, 1000]} scale="log" />`}
+>
+  <PercentileLadder
+    data={[0, 10, 100, 1000]}
+    scale="log"
+    title="Falls back"
+    width={120}
+    height={14}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="labels drop below 56 px wide"
+  code={`// under the documented minimum width, tick labels drop out cleanly
+// rather than overlapping
+<PercentileLadder
+  data={[10, 20, 30, 90, 900]}
+  width={40}
+/>`}
+>
+  <PercentileLadder
+    data={[10, 20, 30, 90, 900]}
+    title="Too narrow for labels"
+    width={40}
+    height={14}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="percentile-ladder" />
+
+## Why this default
+
+The track is always zero-anchored — tick **distances** carry the story, so cropping the origin
+would distort every gap between percentiles. Height and accent grow toward the tail because the
+tail, not the median, is usually the SLO question. A log transform for long tails is never
+silent: it only applies when every sample is strictly positive, and an in-chart `log` tag renders
+whenever it does, so the axis is never misread as linear.
+
+## Accessibility
+
+The accessible name states every marked percentile and the tail's multiple of the median —
+**"p50 50, p90 90, p99 99 — the slowest 1% take 2× the median."** The interactive entry roves
+ticks with ←/→ (Home/End jump to the ends), announcing each tick's value and its multiple of the
+median (**"p99: 2.1 s — 17× the median."**).
+
+## Props
+
+<PropTable slug="percentile-ladder" />

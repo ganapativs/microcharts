@@ -49,7 +49,17 @@ export const entry: ChartEntry = {
   demo: [92, 78, 65, 41],
   example: {
     title: "Model eval",
-    code: `import { RubricStrip } from "${PKG}/rubric-strip";\n\n<RubricStrip data={criteria} title="Model eval" />`,
+    code: `import { RubricStrip } from "${PKG}/rubric-strip";
+
+<RubricStrip
+  data={[
+    { label: "Correctness", score: 0.92, weight: 3 },
+    { label: "Coverage", score: 0.78, weight: 2 },
+    { label: "Clarity", score: 0.65, weight: 1 },
+    { label: "Style", score: 0.41, weight: 1 },
+  ]}
+  title="Model eval"
+/>`,
   },
 };
 

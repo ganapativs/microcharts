@@ -40,11 +40,14 @@ export interface TapeGaugeProps {
   children?: ReactNode | undefined;
 }
 
-const TONE_FILL: Record<Tone, string> = {
-  pos: "var(--mc-positive)",
-  neg: "var(--mc-negative)",
-  warn: "var(--mc-cat-1)",
-  neutral: "var(--mc-neutral)",
+// zone stripe ink per tone — pos/neg/neutral map to exact ink roles; warn has
+// no dedicated role, so it borrows the shared categorical amber (--mc-cat-1),
+// matching the same tone→cat-1 convention used for TapeGauge's own warn zones.
+const TONE_INK: Record<Tone, Record<string, string | number>> = {
+  pos: { "data-mc-ink": "positive" },
+  neg: { "data-mc-ink": "negative" },
+  warn: { "data-mc-cat": 1 },
+  neutral: { "data-mc-ink": "neutral" },
 };
 
 /** Auto span: zones extent, else a rate-scaled window, else 10% of |value|. */
@@ -86,6 +89,9 @@ export function tapeGaugeSummary(
   return strings.tapeGauge(fmt(value), rateClause, zoneClause);
 }
 
+/** Text width over-estimate (plan/18): 0.62 em/char at font size `f`. */
+const est = (chars: number, f: number): number => 0.62 * f * chars;
+
 export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const {
     value,
@@ -124,7 +130,6 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const valueText = finite ? fmt(value) : "";
 
   // the readout is the hero number — sized large, then clamped to fit its gutter
-  const est = (chars: number, f: number): number => 0.62 * f * chars;
   const readoutAvail = (vertical ? geo.readout.gutter : width) - 1.6;
   const readoutBase = Math.min(13, Math.max(10, Math.round(Math.min(width, height) * 0.25)));
   // containment wins over a floor at extreme narrow widths (default 46 renders ~11)
@@ -133,8 +138,9 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     Math.min(readoutBase, readoutAvail / est(valueText.length || 1, 1)),
   );
 
-  // thin tick labels to those that fit their column and don't collide
-  const shownLabels: typeof geo.tickLabels = [];
+  // thin tick labels to those that fit their column and don't collide; the
+  // formatted string is cached here so render never re-runs Intl per label
+  const shownLabels: ((typeof geo.tickLabels)[number] & { s: string })[] = [];
   let lastEnd = -Infinity;
   for (const t of geo.tickLabels) {
     const s = fmt(t.text);
@@ -148,7 +154,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
       if (t.x - w / 2 < lastEnd) continue; // horizontal crowding
       lastEnd = t.x + w / 2 + 1;
     }
-    shownLabels.push(t);
+    shownLabels.push({ ...t, s });
   }
 
   // chevron marks stacked from the pointer in the rate's direction
@@ -198,13 +204,14 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               width={z.width}
               height={z.height}
               shapeRendering="crispEdges"
-              style={{ fill: TONE_FILL[z.tone], fillOpacity: 0.85 }}
+              fillOpacity={0.85}
+              {...TONE_INK[z.tone]}
             />
           ))}
           <path
             d={geo.tickPath}
             data-mc-ink="muted"
-            strokeWidth={0.6}
+            data-mc-w="hair"
             vectorEffect="non-scaling-stroke"
           />
           {shownLabels.map((t, i) => (
@@ -217,7 +224,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               fontSize={tickFont}
               data-mc-ink="label"
             >
-              {fmt(t.text)}
+              {t.s}
             </text>
           ))}
           {/* fixed center pointer + readout */}
@@ -229,7 +236,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               dominantBaseline="central"
               textAnchor="middle"
               fontSize={readoutFont}
-              style={{ fontWeight: 700, fill: "var(--mc-stroke)" }}
+              fontWeight={700}
             >
               {valueText}
             </text>
@@ -237,9 +244,8 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
           {chevrons.length > 0 ? (
             <path
               d={chevrons.join("")}
-              fill="none"
-              stroke="var(--mc-accent)"
-              strokeWidth={0.9}
+              data-mc-ink="accent"
+              data-mc-w="support"
               strokeLinecap="round"
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"

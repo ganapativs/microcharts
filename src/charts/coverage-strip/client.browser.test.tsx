@@ -17,8 +17,9 @@ describe("interactive <CoverageStrip> (plan/23 #1)", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     await expect.poll(() => live.textContent).toBe("Slot 3: no measurement.");
-    // the chip distinguishes a gap from a measured zero
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("no data");
+    // the chip shows a locale-neutral dash for a gap (no hardcoded English);
+    // the live region above carries the localized "no measurement" sentence
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("—");
     // focus ring overlay present (4 cells + ring)
     expect(wrap.querySelectorAll("svg rect").length).toBe(5);
   });

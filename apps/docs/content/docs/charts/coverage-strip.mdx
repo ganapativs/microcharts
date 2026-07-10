@@ -14,7 +14,10 @@ across a gap.
   sizeOf="coverage-strip"
   code={`import { CoverageStrip } from "@microcharts/react/coverage-strip";
 
-<CoverageStrip data={readings} expected={24} label="percent" title="Sensor uptime" />`}
+// null = no measurement, 0 = a measured zero
+const readings = [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10];
+
+<CoverageStrip data={readings} expected={18} label="percent" title="Sensor uptime" />`}
 >
   <CoverageStrip
     data={[3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10]}
@@ -50,7 +53,9 @@ across a gap.
 
 <LiveDemo
   label="intensity + shape"
-  code={`<CoverageStrip data={readings} mode="intensity" domain={[0, 12]} />
+  code={`const readings = [3, 4, null, 5, 0, null, 6, 8, 7, null, 9, 11];
+
+<CoverageStrip data={readings} mode="intensity" domain={[0, 12]} />
 <CoverageStrip data={readings} shape="round" />`}
 >
   <span className="inline-flex flex-col gap-1.5">
@@ -71,3 +76,77 @@ across a gap.
     />
   </span>
 </LiveDemo>
+
+<LiveDemo
+  label="locale"
+  code={`<CoverageStrip
+  data={[3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10]}
+  expected={18}
+  label="percent"
+  locale="de-DE"
+/>`}
+>
+  <CoverageStrip
+    data={[3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10]}
+    expected={18}
+    label="percent"
+    locale="de-DE"
+    title="Localized coverage"
+    width={200}
+    height={14}
+  />
+</LiveDemo>
+
+`locale` formats the coverage percentage in the gutter and the accessible summary — the strip
+above reads "56 %" (German percent spacing) instead of "56%". `format` shapes the measured
+values the interactive entry announces.
+
+## Edge cases
+
+<LiveDemo
+  label="a trailing shortfall counts as gaps"
+  code={`// an array that simply stops is the worst gap of all — expected beyond
+// data.length pads the tail with hollow "no measurement" slots
+<CoverageStrip data={[1, 1, 1]} expected={8} label="percent" />`}
+>
+  <CoverageStrip
+    data={[1, 1, 1]}
+    expected={8}
+    label="percent"
+    title="Trailing gap"
+    width={180}
+    height={16}
+  />
+</LiveDemo>
+
+<LiveDemo label="a measured zero is not a gap" code={`<CoverageStrip data={[3, 0, null, 5]} />`}>
+  <CoverageStrip data={[3, 0, null, 5]} title="Zero vs missing" width={100} height={16} />
+</LiveDemo>
+
+<LiveDemo label="no data" code={`<CoverageStrip data={[]} />`}>
+  <CoverageStrip data={[]} title="Empty" width={80} height={16} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="coverage-strip" />
+
+## Why this default
+
+Shape carries the presence/absence distinction, not just color, so it survives forced-colors
+and print. A measured `0` is a filled cell like any other value; only `null` (no record) is
+hollow — the two never look the same. `expected` lets a trailing shortfall count as coverage
+loss: a feed that simply stops reporting is the worst gap of all, so it isn't silently dropped
+from the denominator. Nothing is ever interpolated across a gap — a missing slot stays visibly
+empty rather than being smoothed into its neighbors.
+
+## Accessibility
+
+The accessible name states how many slots were measured, the coverage percentage, and the
+longest gap — **"10 of 18 slots measured (56%); longest gap 4 slots."** An empty series states
+"No data." instead. The interactive entry roves slots with ←/→, announcing each one as a
+measured value or "no measurement".
+
+## Props
+
+<PropTable slug="coverage-strip" />

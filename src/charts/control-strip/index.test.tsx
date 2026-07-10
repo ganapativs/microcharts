@@ -50,8 +50,11 @@ describe("<ControlStrip> (plan/23 #10)", () => {
 
   it("provisional limits render a dashed band border", () => {
     const { container } = draw(<ControlStrip data={[10, 11, 9, 10, 12, 8]} />);
-    const band = container.querySelector('[data-mc-ink="band"]')!;
-    expect(band.getAttribute("stroke-dasharray")).toBe("2 2");
+    // a separate muted outline rect — the band role's `stroke: none` CSS rule
+    // would override stroke attributes set on the band rect itself
+    const outline = container.querySelector('rect[data-mc-ink="muted"]')!;
+    expect(outline.getAttribute("stroke-dasharray")).toBe("2 2");
+    expect(outline.getAttribute("data-mc-w")).toBe("hair");
   });
 
   it("is axe-clean", async () => {

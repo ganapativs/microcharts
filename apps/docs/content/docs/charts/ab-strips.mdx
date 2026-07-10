@@ -14,6 +14,9 @@ without its spread is how A/B results lie.
   sizeOf="ab-strips"
   code={`import { ABStrips } from "@microcharts/react/ab-strips";
 
+const control = Array.from({ length: 80 }, (_, i) => 130 + ((i \* 13) % 44) - 22);
+const test = Array.from({ length: 80 }, (_, i) => 116 + ((i \* 13) % 44) - 22);
+
 <ABStrips data={{ a: control, b: test }} positive="down" title="Latency A/B" />`}
 >
   <ABStrips
@@ -53,7 +56,10 @@ without its spread is how A/B results lie.
 
 <LiveDemo
   label="labelled arms + clearly separated"
-  code={`<ABStrips data={{ a: control, b: test }} labels={["Control", "Test"]} />`}
+  code={`const control = Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22);
+const test = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
+
+<ABStrips data={{ a: control, b: test }} labels={["Control", "Test"]} />`}
 >
   <span className="inline-flex flex-col gap-2">
     <ABStrips

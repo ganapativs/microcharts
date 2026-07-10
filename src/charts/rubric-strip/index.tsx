@@ -22,7 +22,7 @@ export interface RubricStripProps {
   target?: number | undefined;
   /** Criterion names in the left gutter; off for cell embedding. */
   labels?: boolean | undefined;
-  domain?: [number, number] | undefined;
+  domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
@@ -109,48 +109,51 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
       className={className ? `mc-rubric ${className}` : "mc-rubric"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {geo.rows.map((row) => {
+      {/* flat siblings, ink roles: rows × (track + bar [+ label]) is this
+          chart's SSR hot path (bench floor 25 charts/ms) — no per-row <g> */}
+      {geo.rows.flatMap((row) => {
         const cy = round2(row.y + row.height / 2);
         // keep the row label inside the viewBox even when rows are shorter than the font
         const ty = round2(Math.max(fontSize * 0.5, Math.min(height - fontSize * 0.5, cy)));
         const pass = target != null ? row.score >= target : null;
-        const fill =
-          pass == null ? "var(--mc-accent)" : pass ? "var(--mc-positive)" : "var(--mc-negative)";
-        return (
-          <g key={row.label}>
-            {/* track */}
-            <rect
-              x={gutter}
-              y={row.y}
-              width={row.trackWidth}
-              height={row.height}
-              rx={Math.min(1, row.height / 2)}
-              style={{ fill: "var(--mc-neutral)", fillOpacity: 0.12 }}
-            />
-            {/* score bar */}
-            <rect
-              x={gutter}
-              y={row.y}
-              width={row.barWidth}
-              height={row.height}
-              rx={Math.min(1, row.height / 2)}
-              shapeRendering="crispEdges"
-              style={{ fill }}
-            />
-            {labels && labelsFit ? (
-              <text
-                x={round2(gutter - 2)}
-                y={ty}
-                dominantBaseline="central"
-                textAnchor="end"
-                fontSize={fontSize}
-                data-mc-ink="label"
-              >
-                {row.label}
-              </text>
-            ) : null}
-          </g>
-        );
+        const ink = pass == null ? "accent" : pass ? "positive" : "negative";
+        const nodes = [
+          <rect
+            key={`track-${row.label}`}
+            x={gutter}
+            y={row.y}
+            width={row.trackWidth}
+            height={row.height}
+            rx={Math.min(1, row.height / 2)}
+            fillOpacity={0.12}
+            data-mc-ink="neutral"
+          />,
+          <rect
+            key={`bar-${row.label}`}
+            x={gutter}
+            y={row.y}
+            width={row.barWidth}
+            height={row.height}
+            rx={Math.min(1, row.height / 2)}
+            shapeRendering="crispEdges"
+            data-mc-ink={ink}
+          />,
+        ];
+        if (labels && labelsFit)
+          nodes.push(
+            <text
+              key={`label-${row.label}`}
+              x={round2(gutter - 2)}
+              y={ty}
+              dominantBaseline="central"
+              textAnchor="end"
+              fontSize={fontSize}
+              data-mc-ink="label"
+            >
+              {row.label}
+            </text>,
+          );
+        return nodes;
       })}
       {target != null ? (
         <line
@@ -158,8 +161,8 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
           x2={geo.targetX(target)}
           y1={0.5}
           y2={height - 0.5}
-          stroke="var(--mc-stroke)"
-          strokeWidth={0.75}
+          data-mc-ink="data"
+          data-mc-w="tick"
           strokeDasharray="1.5 1.5"
           vectorEffect="non-scaling-stroke"
         />

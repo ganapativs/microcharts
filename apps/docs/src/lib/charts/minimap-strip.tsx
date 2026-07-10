@@ -52,7 +52,20 @@ export const entry: ChartEntry = {
   demo: [12],
   example: {
     title: "Document position",
-    code: `import { MinimapStrip } from "${PKG}/minimap-strip";\n\n<MinimapStrip data={{ content, window: [520, 660], marks, known }} title="Document position" />`,
+    code: `import { MinimapStrip } from "${PKG}/minimap-strip";
+
+<MinimapStrip
+  data={{
+    content: Array.from(
+      { length: 1200 },
+      (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6,
+    ),
+    window: [520, 660],
+    marks: [100, 600, 1100],
+    known: [[0, 1104]],
+  }}
+  title="Document position"
+/>`,
   },
 };
 
