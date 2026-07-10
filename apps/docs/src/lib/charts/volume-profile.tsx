@@ -47,7 +47,7 @@ export const entry: ChartEntry = {
       description: "Mass fraction of the shaded value area (0.7).",
     },
     {
-      name: "side",
+      name: "align",
       type: '"left" | "right"',
       required: false,
       description: "Which way bars grow.",
@@ -62,7 +62,21 @@ export const entry: ChartEntry = {
   demo: [142],
   example: {
     title: "Volume by price",
-    code: `import { VolumeProfile } from "${PKG}/volume-profile";\n\n<VolumeProfile data={profile} title="Volume by price" />`,
+    code: `import { VolumeProfile } from "${PKG}/volume-profile";
+
+const profile = [
+  { level: 134, weight: 3 },
+  { level: 136, weight: 6 },
+  { level: 138, weight: 11 },
+  { level: 140, weight: 18 },
+  { level: 142, weight: 26 },
+  { level: 144, weight: 20 },
+  { level: 146, weight: 12 },
+  { level: 148, weight: 7 },
+  { level: 150, weight: 4 },
+];
+
+<VolumeProfile data={profile} title="Volume by price" />`,
   },
 };
 
@@ -77,14 +91,14 @@ export const showcase = {
 
 export const playground: PlaygroundSpec = {
   knobs: [
-    { kind: "segmented", key: "side", label: "side", options: ["left", "right"], init: "left" },
+    { kind: "segmented", key: "align", label: "align", options: ["left", "right"], init: "left" },
     { kind: "segmented", key: "label", label: "label", options: ["poc", "none"], init: "poc" },
     { kind: "range", key: "valueArea", label: "value area %", min: 50, max: 90, step: 5, init: 70 },
   ],
   render: (s) => (
     <VolumeProfile
       data={PROFILE}
-      side={s.side as "left" | "right"}
+      align={s.align as "left" | "right"}
       label={s.label as "poc" | "none"}
       valueArea={(s.valueArea as number) / 100}
       summary={false}
@@ -96,7 +110,7 @@ export const playground: PlaygroundSpec = {
     [
       "<VolumeProfile",
       "  data={profile}",
-      s.side !== "left" && `  side="${s.side}"`,
+      s.align !== "left" && `  align="${s.align}"`,
       s.label !== "poc" && `  label="${s.label}"`,
       s.valueArea !== 70 && `  valueArea={${((s.valueArea as number) / 100).toFixed(2)}}`,
       "/>",
@@ -113,8 +127,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "right side (pair with trend)",
-    code: `<VolumeProfile data={profile} side="right" />`,
-    node: <VolumeProfile data={PROFILE} side="right" summary={false} width={80} height={56} />,
+    code: `<VolumeProfile data={profile} align="right" />`,
+    node: <VolumeProfile data={PROFILE} align="right" summary={false} width={80} height={56} />,
   },
 ];
 

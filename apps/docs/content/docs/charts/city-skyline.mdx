@@ -70,6 +70,59 @@ dark", not a number. Omit `lit` everywhere and it's a plain, honest bar row.
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="flat skyline"
+  code={`// all-equal values read as a flat roofline — no artificial variation is added
+<CitySkyline
+  data={[
+    { label: "A", value: 30, lit: 0.8 },
+    { label: "B", value: 30, lit: 0.4 },
+    { label: "C", value: 30, lit: 0 },
+  ]}
+/>`}
+>
+  <CitySkyline
+    data={[
+      { label: "A", value: 30, lit: 0.8 },
+      { label: "B", value: 30, lit: 0.4 },
+      { label: "C", value: 30, lit: 0 },
+    ]}
+    title="Flat skyline"
+    bw={16}
+    gap={6}
+    height={36}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="too short for windows"
+  code={`// a building under one window row renders as a solid tower — its lit
+// fraction still reads in the summary and on hover
+<CitySkyline
+  data={[
+    { label: "big", value: 40, lit: 0.8 },
+    { label: "tiny", value: 2, lit: 0.9 },
+  ]}
+/>`}
+>
+  <CitySkyline
+    data={[
+      { label: "big", value: 40, lit: 0.8 },
+      { label: "tiny", value: 2, lit: 0.9 },
+    ]}
+    title="Secondary channel drops out first"
+    bw={16}
+    gap={6}
+    height={36}
+  />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="city-skyline" />
+
 ## Why this default
 
 Windows come on when `lit` is present, because the two-variable read is exactly why this beats a

@@ -47,7 +47,7 @@ describe("<Funnel> (plan/22 #19, S3-sequential)", () => {
   it("highlight accents the leak stage", () => {
     const { container } = draw(<Funnel data={PIPE} highlight="Activated" />);
     const accent = [...container.querySelectorAll("rect")].filter(
-      (r) => (r as SVGElement).style.fill === "var(--mc-accent)",
+      (r) => r.getAttribute("data-mc-ink") === "accent",
     );
     expect(accent.length).toBe(1);
   });

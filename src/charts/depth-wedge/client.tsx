@@ -17,7 +17,7 @@ const FILL: CSSProperties = { width: "100%", height: "auto" };
 export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
   const {
     data,
-    range,
+    levels,
     normalize = false,
     width = 100,
     height = 24,
@@ -34,12 +34,12 @@ export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
       depthWedgeGeometry({
         demand: data.demand,
         supply: data.supply,
-        range: range ?? null,
+        levels: levels ?? null,
         normalize,
         width,
         height,
       }),
-    [data, range, normalize, width, height],
+    [data, levels, normalize, width, height],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const combined = useMemo(
@@ -119,7 +119,7 @@ export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
       <StaticDepthWedge
         {...rest}
         data={data}
-        range={range}
+        levels={levels}
         normalize={normalize}
         width={width}
         height={height}
@@ -136,7 +136,7 @@ export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
             y1={0.5}
             y2={height - 0.5}
             data-mc-ink="muted"
-            strokeWidth={0.75}
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "../../core/strings-volume-profile.js";
-import { volumeProfileGeometry, type LevelRow } from "./geometry.js";
+import { binProfile, layoutProfile, volumeProfileGeometry, type LevelRow } from "./geometry.js";
 
 export type VolumeProfileDatum = LevelRow | number;
 
@@ -17,7 +17,7 @@ export interface VolumeProfileProps {
   /** Mass fraction defining the shaded value-area span. */
   valueArea?: number | undefined;
   /** Which way bars grow — pairs with a trend chart on the opposite side. */
-  side?: "left" | "right" | undefined;
+  align?: "left" | "right" | undefined;
   /** The POC level, anchored beside the accent bar. */
   label?: "poc" | "none" | undefined;
   bins?: number | undefined;
@@ -55,7 +55,7 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
   const {
     data,
     valueArea = 0.7,
-    side = "left",
+    align = "left",
     label = "poc",
     bins = 12,
     width = 48,
@@ -73,18 +73,21 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const fontSize = labelFont(height, 0.11);
-  // preliminary pass to size the POC-label gutter
-  const pre = volumeProfileGeometry({ data, bins, valueArea, side, width, height, gutter: 0 });
+  // bin once (the O(data.length) pass) — the POC-label gutter needs the POC
+  // level before layout can run, so layout (O(bins), cheap) runs twice instead
+  // of the whole bin+value-area walk (was the bench-floor regression)
+  const binned = binProfile(data, bins, valueArea);
+  const pre = layoutProfile(binned, { align, width, height, gutter: 0 });
   const pocText = label === "poc" && pre.poc ? fmt(pre.poc.level) : undefined;
   const gutter = pocText ? pocText.length * fontSize * 0.6 + 2 : 0;
 
-  const geo = volumeProfileGeometry({ data, bins, valueArea, side, width, height, gutter });
+  const geo = layoutProfile(binned, { align, width, height, gutter });
   const accName =
     summary === false ? false : (summary ?? volumeProfileSummary(geo, valueArea, strings, fmt));
 
   const normal = geo.bars.filter((b) => !b.poc);
   const pocBar = geo.bars.find((b) => b.poc);
-  const anchorLeft = side === "left";
+  const anchorLeft = align === "left";
 
   return (
     <Chart
@@ -96,7 +99,10 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
       className={className ? `mc-volprofile ${className}` : "mc-volprofile"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* value area band */}
+      {/* value area band — a true background band (real data extent, kept for
+          the craft/overlap + forced-colors exemption); fill via inline STYLE,
+          not the token, so the accent tint stays distinct from a plain neutral
+          band (plan/12 benchmark-strip precedent). */}
       {geo.valueAreaRect ? (
         <rect
           x={geo.valueAreaRect.x}
@@ -118,7 +124,7 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
       {pocBar ? (
         <path
           d={`M${pocBar.x} ${pocBar.y}h${pocBar.width}v${pocBar.height}h${-pocBar.width}z`}
-          style={{ fill: "var(--mc-accent)" }}
+          data-mc-ink="accent"
         />
       ) : null}
       {pocText && pocBar ? (

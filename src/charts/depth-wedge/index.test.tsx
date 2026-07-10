@@ -30,7 +30,7 @@ describe("<DepthWedge> (plan/25 §12, plan/17 F5)", () => {
     expect(container.querySelectorAll("path").length).toBe(2);
     const geo = depthWedgeGeometry({
       ...BOOK,
-      range: null,
+      levels: null,
       normalize: false,
       width: 100,
       height: 24,
@@ -44,7 +44,7 @@ describe("<DepthWedge> (plan/25 §12, plan/17 F5)", () => {
     const geo = depthWedgeGeometry({
       demand: [{ level: 99, amount: 100 }],
       supply: [{ level: 101, amount: 500 }],
-      range: null,
+      levels: null,
       normalize: false,
       width: 100,
       height: 24,

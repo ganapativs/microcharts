@@ -126,7 +126,9 @@ export function Ohlc(props: OhlcProps): ReactNode {
       className={className ? `mc-ohlc ${className}` : "mc-ohlc"}
       style={style}
     >
-      {geo.marks.map((m) => {
+      {/* flat siblings, no per-mark <g> wrapper: up to maxPeriods (20) marks is
+          this chart's SSR hot path. */}
+      {geo.marks.flatMap((m) => {
         const ink = m.doji ? "neutral" : m.up ? "positive" : "negative";
         const stroke = m.doji
           ? "var(--mc-neutral)"
@@ -135,54 +137,60 @@ export function Ohlc(props: OhlcProps): ReactNode {
             : "var(--mc-negative)";
         const bodyTop = Math.min(m.yO, m.yC);
         const bodyH = Math.max(Math.abs(m.yO - m.yC), 1);
-        return (
-          <g key={m.index}>
-            <line
-              x1={m.x}
-              y1={m.yH}
-              x2={m.x}
-              y2={m.yL}
-              stroke={stroke}
-              vectorEffect="non-scaling-stroke"
-              style={{ strokeWidth: 1 }}
-            />
-            {variant === "candle" ? (
-              /* hollow up / filled down — the shape code */
-              <rect
-                x={round2(m.x - m.bodyW / 2)}
-                y={bodyTop}
-                width={m.bodyW}
-                height={round2(bodyH)}
-                shapeRendering="crispEdges"
-                fill={m.up ? "var(--mc-surface, Canvas)" : stroke}
-                stroke={stroke}
-                strokeWidth={m.up ? 0.75 : 0}
-                data-mc-ohlc={ink}
-              />
-            ) : (
-              <>
-                <line
-                  x1={round2(m.x - m.bodyW / 2)}
-                  y1={m.yO}
-                  x2={m.x}
-                  y2={m.yO}
-                  stroke={stroke}
-                  vectorEffect="non-scaling-stroke"
-                  style={{ strokeWidth: 1 }}
-                />
-                <line
-                  x1={m.x}
-                  y1={m.yC}
-                  x2={round2(m.x + m.bodyW / 2)}
-                  y2={m.yC}
-                  stroke={stroke}
-                  vectorEffect="non-scaling-stroke"
-                  style={{ strokeWidth: 1 }}
-                />
-              </>
-            )}
-          </g>
+        const wick = (
+          <line
+            key={`w${m.index}`}
+            x1={m.x}
+            y1={m.yH}
+            x2={m.x}
+            y2={m.yL}
+            stroke={stroke}
+            data-mc-w="support"
+            vectorEffect="non-scaling-stroke"
+          />
         );
+        if (variant === "candle") {
+          return [
+            wick,
+            /* hollow up / filled down — the shape code */
+            <rect
+              key={`b${m.index}`}
+              x={round2(m.x - m.bodyW / 2)}
+              y={bodyTop}
+              width={m.bodyW}
+              height={round2(bodyH)}
+              shapeRendering="crispEdges"
+              fill={m.up ? "var(--mc-surface, Canvas)" : stroke}
+              stroke={stroke}
+              data-mc-w={m.up ? "support" : undefined}
+              strokeWidth={m.up ? undefined : 0}
+              data-mc-ohlc={ink}
+            />,
+          ];
+        }
+        return [
+          wick,
+          <line
+            key={`o${m.index}`}
+            x1={round2(m.x - m.bodyW / 2)}
+            y1={m.yO}
+            x2={m.x}
+            y2={m.yO}
+            stroke={stroke}
+            data-mc-w="support"
+            vectorEffect="non-scaling-stroke"
+          />,
+          <line
+            key={`c${m.index}`}
+            x1={m.x}
+            y1={m.yC}
+            x2={round2(m.x + m.bodyW / 2)}
+            y2={m.yC}
+            stroke={stroke}
+            data-mc-w="support"
+            vectorEffect="non-scaling-stroke"
+          />,
+        ];
       })}
       {label === "last" && lastMark && Number.isFinite(lastClose) ? (
         <text

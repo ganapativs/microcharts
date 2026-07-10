@@ -44,7 +44,12 @@ most product data doesn't meet); `tukey` mode exposes fence-breakers as dots.
 
 ## Variants
 
-<LiveDemo label="tukey outliers" code={`<MicroBox data={values} whiskers="tukey" />`}>
+<LiveDemo
+  label="tukey outliers"
+  code={`const values = [...Array.from({ length: 20 }, (_, i) => 40 + i), 400, 500];
+
+<MicroBox data={values} whiskers="tukey" />`}
+>
   <MicroBox
     data={[...Array.from({ length: 20 }, (_, i) => 40 + i), 400, 500]}
     whiskers="tukey"
@@ -53,12 +58,23 @@ most product data doesn't meet); `tukey` mode exposes fence-breakers as dots.
   />
 </LiveDemo>
 
+## Edge cases
+
 <LiveDemo
   label="too few observations"
   code={`// < 5 values → dots, never a fake box
 <MicroBox data={[3, 7, 9]} />`}
 >
   <MicroBox data={[3, 7, 9]} title="Only three" width={220} height={32} />
+</LiveDemo>
+
+<LiveDemo
+  label="all-equal values"
+  code={`// a degenerate IQR collapses the box to a 1-unit tick; the domain pads
+// ±1 around the value so the mark stays centered and visible
+<MicroBox data={[7, 7, 7, 7, 7, 7]} />`}
+>
+  <MicroBox data={[7, 7, 7, 7, 7, 7]} title="All equal" width={220} height={32} />
 </LiveDemo>
 
 ## Four homes

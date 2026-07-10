@@ -150,8 +150,8 @@ export function MicroBox(props: MicroBoxProps): ReactNode {
         x2={geo.whisker.x1}
         y2={geo.whisker.y}
         data-mc-ink="muted"
+        data-mc-w="support"
         vectorEffect="non-scaling-stroke"
-        style={{ strokeWidth: 1 }}
       />
       <rect
         x={geo.box.x}
@@ -160,7 +160,7 @@ export function MicroBox(props: MicroBoxProps): ReactNode {
         height={geo.box.h}
         data-mc-ink="band"
         stroke="var(--mc-neutral)"
-        strokeWidth={0.5}
+        data-mc-w="hair"
       />
       <line
         x1={geo.medianX}

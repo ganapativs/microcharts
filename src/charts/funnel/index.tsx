@@ -130,8 +130,8 @@ export function Funnel(props: FunnelProps): ReactNode {
                 width={st.w}
                 height={st.h}
                 shapeRendering="crispEdges"
-                data-mc-ink="bar"
-                style={isHl ? { fill: "var(--mc-accent)" } : color ? { fill: color } : undefined}
+                data-mc-ink={isHl ? "accent" : "bar"}
+                style={!isHl && color ? { fill: color } : undefined}
               />
             ) : null}
             {text !== undefined && geo.labelsFit(text.length) ? (

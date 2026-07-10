@@ -14,6 +14,18 @@ is a working reference, not a law, and `Other` never re-enters the ranking.
   sizeOf="pareto-strip"
   code={`import { ParetoStrip } from "@microcharts/react/pareto-strip";
 
+const causes = [
+{ label: "Timeouts", value: 38 },
+{ label: "OOM", value: 24 },
+{ label: "Deploy", value: 15 },
+{ label: "Config", value: 9 },
+{ label: "Network", value: 7 },
+{ label: "Auth", value: 4 },
+{ label: "Disk", value: 3 },
+{ label: "DNS", value: 3 },
+{ label: "Other bug", value: 2 },
+];
+
 <ParetoStrip data={causes} unit="causes" metric="incidents" title="Incident causes" />`}
 >
   <ParetoStrip
@@ -54,7 +66,16 @@ is a working reference, not a law, and `Other` never re-enters the ranking.
 
 <LiveDemo
   label="rollup + no threshold"
-  code={`<ParetoStrip data={causes} max={4} />
+  code={`const causes = [
+  { label: "Timeouts", value: 38 },
+  { label: "OOM", value: 24 },
+  { label: "Deploy", value: 15 },
+  { label: "Config", value: 9 },
+  { label: "Network", value: 7 },
+  { label: "Auth", value: 4 },
+];
+
+<ParetoStrip data={causes} max={3} />
 <ParetoStrip data={causes} threshold={false} />`}
 >
   <span className="inline-flex flex-col gap-2">
@@ -87,6 +108,50 @@ is a working reference, not a law, and `Other` never re-enters the ranking.
       height={26}
     />
   </span>
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="one dominant cause"
+  code={`// the first cause alone crosses 80% — one accent bar, the rest muted:
+// "Top 1 of 3 causes account for 90% of incidents."
+<ParetoStrip
+  data={[
+    { label: "Timeouts", value: 90 },
+    { label: "OOM", value: 6 },
+    { label: "Deploy", value: 4 },
+  ]}
+  unit="causes"
+  metric="incidents"
+/>`}
+>
+  <ParetoStrip
+    data={[
+      { label: "Timeouts", value: 90 },
+      { label: "OOM", value: 6 },
+      { label: "Deploy", value: 4 },
+    ]}
+    unit="causes"
+    metric="incidents"
+    title="One dominant cause"
+    width={240}
+    height={26}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="zero total"
+  code={`// all-zero values render no bars and announce "No recorded incidents."
+<ParetoStrip data={[{ label: "a", value: 0 }]} metric="incidents" />`}
+>
+  <ParetoStrip
+    data={[{ label: "a", value: 0 }]}
+    metric="incidents"
+    title="Nothing recorded"
+    width={240}
+    height={26}
+  />
 </LiveDemo>
 
 ## Four homes

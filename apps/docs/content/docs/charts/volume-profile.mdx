@@ -56,7 +56,19 @@ and the value area (the levels holding most of the activity) is shaded.
 
 ## Variants
 
-<LiveDemo label="right side" code={`<VolumeProfile data={profile} side="right" />`}>
+<LiveDemo
+  label="right side"
+  code={`<VolumeProfile
+  data={[
+    { level: 138, weight: 11 },
+    { level: 140, weight: 18 },
+    { level: 142, weight: 26 },
+    { level: 144, weight: 20 },
+    { level: 146, weight: 12 },
+  ]}
+  align="right"
+/>`}
+>
   <VolumeProfile
     data={[
       { level: 138, weight: 11 },
@@ -65,12 +77,35 @@ and the value area (the levels holding most of the activity) is shaded.
       { level: 144, weight: 20 },
       { level: 146, weight: 12 },
     ]}
-    side="right"
+    align="right"
     title="Right side"
     width={120}
     height={70}
   />
 </LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="every observation at one level"
+  code={`// identical levels collapse into a single bin — the summary refuses to
+// claim a concentration and reads "Activity is evenly spread."
+<VolumeProfile data={[142, 142, 142, 142]} />`}
+>
+  <VolumeProfile data={[142, 142, 142, 142]} title="Single level" width={80} height={40} />
+</LiveDemo>
+
+<LiveDemo
+  label="empty"
+  code={`// no data → no marks, and the accessible name is "No data."
+<VolumeProfile data={[]} />`}
+>
+  <VolumeProfile data={[]} title="Empty" width={80} height={40} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="volume-profile" />
 
 ## Why this default
 
@@ -82,9 +117,10 @@ passed to both; cross-axis group binding is a v1 follow-up.
 
 ## Accessibility
 
-The accessible name states where activity concentrates — **"Activity concentrates at 142 (POC); 70%
-within 140.4–143.6."** An even distribution reads **"Activity is evenly spread."** The interactive
-entry roves the levels with ↑/↓, announcing each level's share of activity and flagging the POC.
+The accessible name states where activity concentrates — **"Activity concentrates at 142.67 (POC);
+70% within 140–149.33."** (the hero demo's 9-level profile, default 12 bins). An even distribution
+reads **"Activity is evenly spread."** The interactive entry roves the levels with ↑/↓, announcing
+each level's share of activity and flagging the POC.
 
 ## Props
 

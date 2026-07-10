@@ -12,7 +12,17 @@ never color alone.
   sizeOf="waterfall"
   code={`import { Waterfall } from "@microcharts/react/waterfall";
 
-<Waterfall data={steps} start={60} title="Net income bridge" />`}
+<Waterfall
+  data={[
+    { label: "Product", value: 42 },
+    { label: "Services", value: 18 },
+    { label: "Refunds", value: -12 },
+    { label: "Opex", value: -26 },
+    { label: "FX", value: 5 },
+  ]}
+  start={60}
+  title="Net income bridge"
+/>`}
 >
   <Waterfall
     data={[
@@ -54,7 +64,16 @@ never color alone.
 <LiveDemo
   label="costs: down is good"
   code={`// cost breakdowns invert valence — decreases are wins
-<Waterfall data={costSteps} positive="down" />`}
+<Waterfall
+  data={[
+    { label: "Cloud", value: -8 },
+    { label: "Headcount", value: 14 },
+    { label: "Vendors", value: -5 },
+    { label: "Travel", value: -3 },
+  ]}
+  start={40}
+  positive="down"
+/>`}
 >
   <Waterfall
     data={[
@@ -71,7 +90,20 @@ never color alone.
   />
 </LiveDemo>
 
-<LiveDemo label="no total bar" code={`<Waterfall data={steps} start={60} total={false} />`}>
+<LiveDemo
+  label="no total bar"
+  code={`<Waterfall
+  data={[
+    { label: "Product", value: 42 },
+    { label: "Services", value: 18 },
+    { label: "Refunds", value: -12 },
+    { label: "Opex", value: -26 },
+    { label: "FX", value: 5 },
+  ]}
+  start={60}
+  total={false}
+/>`}
+>
   <Waterfall
     data={[
       { label: "Product", value: 42 },
@@ -84,6 +116,60 @@ never color alone.
     total={false}
     title="Steps only"
     width={220}
+    height={30}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="all losses"
+  code={`// a bridge that only falls — the domain extends below zero and the
+// zero-anchored total bar hangs beneath the baseline
+<Waterfall
+  data={[
+    { label: "Q1", value: -20 },
+    { label: "Q2", value: -35 },
+    { label: "Q3", value: -10 },
+  ]}
+  start={0}
+/>`}
+>
+  <Waterfall
+    data={[
+      { label: "Q1", value: -20 },
+      { label: "Q2", value: -35 },
+      { label: "Q3", value: -10 },
+    ]}
+    start={0}
+    title="All losses"
+    width={180}
+    height={30}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="zero-delta step"
+  code={`// a zero delta renders a visible 1-unit neutral tick at the running level —
+// "no change" is a statement, not a gap
+<Waterfall
+  data={[
+    { label: "Product", value: 30 },
+    { label: "Flat", value: 0 },
+    { label: "Refunds", value: -12 },
+  ]}
+  start={50}
+/>`}
+>
+  <Waterfall
+    data={[
+      { label: "Product", value: 30 },
+      { label: "Flat", value: 0 },
+      { label: "Refunds", value: -12 },
+    ]}
+    start={50}
+    title="Zero step"
+    width={180}
     height={30}
   />
 </LiveDemo>

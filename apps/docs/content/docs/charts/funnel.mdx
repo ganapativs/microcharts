@@ -57,7 +57,14 @@ drop _between_ neighbors is the read.
 <LiveDemo
   label="rate mode"
   code={`// every stage as % of the FIRST stage — cross-funnel comparison
-<Funnel data={stages} mode="rate" />`}
+<Funnel
+  data={[
+    { label: "Visitors", value: 12400 },
+    { label: "Signups", value: 5704 },
+    { label: "Paid", value: 1116 },
+  ]}
+  mode="rate"
+/>`}
 >
   <Funnel
     data={[
@@ -72,7 +79,18 @@ drop _between_ neighbors is the read.
   />
 </LiveDemo>
 
-<LiveDemo label="the leak" code={`<Funnel data={stages} highlight="Activated" />`}>
+<LiveDemo
+  label="the leak"
+  code={`<Funnel
+  data={[
+    { label: "Visitors", value: 12400 },
+    { label: "Signups", value: 5704 },
+    { label: "Activated", value: 2730 },
+    { label: "Paid", value: 1116 },
+  ]}
+  highlight="Activated"
+/>`}
+>
   <Funnel
     data={[
       { label: "Visitors", value: 12400 },
@@ -84,6 +102,45 @@ drop _between_ neighbors is the read.
     title="The leak"
     width={220}
     height={66}
+  />
+</LiveDemo>
+
+## Edge cases
+
+<LiveDemo
+  label="single stage"
+  code={`// one stage — a single full-height column, no connector slats, overall 100%
+<Funnel data={[{ label: "Visitors", value: 8000 }]} />`}
+>
+  <Funnel
+    data={[{ label: "Visitors", value: 8000 }]}
+    title="Single stage"
+    width={120}
+    height={40}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="inversion"
+  code={`// a stage larger than its predecessor renders truthfully — the summary
+// appends "Stage 3 exceeds stage 2."
+<Funnel
+  data={[
+    { label: "Trial", value: 900 },
+    { label: "Churned", value: 420 },
+    { label: "Win-back", value: 610 },
+  ]}
+/>`}
+>
+  <Funnel
+    data={[
+      { label: "Trial", value: 900 },
+      { label: "Churned", value: 420 },
+      { label: "Win-back", value: 610 },
+    ]}
+    title="Re-engagement funnel"
+    width={220}
+    height={56}
   />
 </LiveDemo>
 
