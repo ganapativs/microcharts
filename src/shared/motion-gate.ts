@@ -57,6 +57,12 @@ export interface EntranceOptions {
   order?: "index" | "x" | "y";
   /** Total span (ms) of an ordered sequence (default 520 trail / 400 others). */
   window?: number;
+  /**
+   * Elements to cast into the closing act (they enter as the story lands)
+   * instead of the quiet opening stage — e.g. a cumulative line that must
+   * follow its bars.
+   */
+  defer?: string;
 }
 
 type Engine = (

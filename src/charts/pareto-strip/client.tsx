@@ -41,16 +41,13 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   const hostRef = useRef<HTMLSpanElement>(null);
   // The cumulative line carries "muted" ink, not data/accent, so it's not a
   // bar-rise candidate — it's excluded from the selector below (rects only)
-  // and instead already picked up by the engine's SUPPORT pass (`[data-mc-ink
-  // ="muted"]` is in motion-engine's SUPPORT selector), which fades it in
-  // once the bars have mostly finished. The engine has no two-phase
-  // "bars-then-draw" archetype, so `order: "x"` is the honest one-archetype
-  // improvement: bars cascade left→right and the line arrives late and soft
-  // behind them, instead of both racing on a flat stagger. A future engine
-  // capability could sequence a real `draw` on the line after the bars land.
+  // Three acts: the bars cascade left→right (story) and the cumulative line
+  // is deferred to the closing act — it arrives as the last bar lands, the
+  // conclusion drawn over the evidence.
   useEntrance(hostRef, "rise", animate, {
     selector: 'rect[data-mc-ink="accent"], rect[data-mc-ink="neutral"], rect[data-mc-ink="bar"]',
     order: "x",
+    defer: 'path[data-mc-ink="muted"]',
   });
 
   const geo = useMemo(

@@ -86,12 +86,17 @@ const MARKS: Record<EntranceArchetype, string> = {
 // Dots that ride a drawn line pop exactly as the draw front reaches them.
 const DRAW_DOTS = '[data-mc-ink="point"], circle';
 
-const STAGGER_CAP = 240;
+// Three-act orchestration on one beat grid — every entrance tells the same
+// story shape: the STAGE (context ink: bands, tracks, backdrop channels)
+// settles in quietly first; the STORY (the primary encoding) performs on the
+// beat as the stage lands; the VOICE (labels, values, accents, flags) speaks
+// as the story finishes. Nothing on the chart ever simply appears.
+const BEAT = 120;
+const LEAVES = "path, rect, circle, line, ellipse, polygon, polyline, text";
+const VOICE_INK =
+  '[data-mc-ink="accent"], [data-mc-ink="point"], [data-mc-ink="flag"], [data-mc-ink="label"]';
 
-// Support ink (bands, fills, labels, reference marks) arrives late and soft,
-// after the primary marks have committed — one choreographed entrance.
-const SUPPORT =
-  'text, [data-mc-ink="band"], [data-mc-ink="fill"], [data-mc-ink="muted"], [data-mc-ink="region"], [data-mc-ink="point"], [data-mc-ink="label"]';
+const STAGGER_CAP = 240;
 
 // One observer for every entrance on the page; fires each chart once.
 let io: IntersectionObserver | null = null;
@@ -219,15 +224,38 @@ export function runEntrance(
     }
     const ease = EASE[kind];
     const dur = DUR[kind];
-
-    // The held first frame hands off to a short fade — nothing ever jumps.
-    // Whole-svg archetypes carry their own reveal; a parallel fade would
-    // double-expose and wash the motion out.
+    const wholeSvgFinal =
+      kind === "pop" || kind === "fade" || kind === "wipe" || kind === "spin" || kind === "grow";
+    const storyStart = wholeSvgFinal ? 0 : BEAT;
     svg.style.opacity = "";
-    if (kind !== "wipe" && kind !== "pop" && kind !== "spin" && kind !== "grow") {
-      anims.push(svg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: ease }));
+
+    // ── casting: every visible element belongs to an act ──────────────────
+    const storySet = new Set<Element>(marks);
+    const stageEls: SVGGraphicsElement[] = [];
+    const voiceEls: SVGGraphicsElement[] = [];
+    for (const el of svg.querySelectorAll<SVGGraphicsElement>(LEAVES)) {
+      if (storySet.has(el)) continue;
+      if (
+        el.tagName === "text" ||
+        el.matches(VOICE_INK) ||
+        (options.defer && el.matches(options.defer))
+      )
+        voiceEls.push(el);
+      else if (!wholeSvgFinal) stageEls.push(el);
     }
 
+    // ACT 1 — the stage settles in quietly (context before content).
+    for (const el of stageEls) {
+      anims.push(
+        el.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 2 * BEAT,
+          easing: EASE_EVEN,
+          fill: "backwards",
+        }),
+      );
+    }
+
+    // ACT 2 — the story performs, entering on the beat as the stage lands.
     const n = marks.length;
     // Sequential choreography: an explicit order (or the trail archetype)
     // spreads the marks across a window along the chart's own geometry.
@@ -235,7 +263,7 @@ export function runEntrance(
     const norms =
       options.order || kind === "trail" ? orderNorm(marks, options.order ?? "index") : null;
     marks.forEach((el, i) => {
-      const delay = norms ? norms[i]! * win : stagger(i, n, step);
+      const delay = storyStart + (norms ? norms[i]! * win : stagger(i, n, step));
       const timing = { duration: dur, delay, easing: ease, fill: "backwards" as const };
       switch (kind) {
         case "draw": {
@@ -305,16 +333,33 @@ export function runEntrance(
       }
     });
 
-    // Dots that ride a drawn line pop out of it exactly as the draw front
-    // reaches them (delay follows each dot's x position).
-    const markSet = new Set<Element>(marks);
+    // When the story finishes — the voice waits for it.
+    const storySpan = norms ? win + dur : (n > 0 ? stagger(n - 1, n, step) : 0) + dur;
+    const storyEnd = wholeSvgFinal ? dur : storyStart + storySpan;
+
+    // ACT 3 (positional) — dots that ride a drawn line pop out of it exactly
+    // as the draw front reaches them (delay follows each dot's x position).
+    const spoken = new Set<Element>(marks);
     if (kind === "draw" && marks.length > 0) {
       const dots = Array.from(svg.querySelectorAll<SVGGraphicsElement>(DRAW_DOTS)).filter(
-        (el) => !markSet.has(el),
+        (el) => !spoken.has(el),
       );
-      const dotNorms = orderNorm(dots, "x");
+      // A lone dot still syncs to its real position along the line — an
+      // endpoint dot pops when the front ARRIVES, not at the start.
+      const vbWidth = svg.viewBox?.baseVal?.width || 0;
+      const dotNorms =
+        dots.length === 1 && vbWidth > 0
+          ? dots.map((el) => {
+              try {
+                const b = el.getBBox();
+                return Math.min(1, Math.max(0, (b.x + b.width / 2) / vbWidth));
+              } catch {
+                return 1;
+              }
+            })
+          : orderNorm(dots, "x");
       dots.forEach((el, i) => {
-        markSet.add(el);
+        spoken.add(el);
         el.style.transformBox = "fill-box";
         el.style.transformOrigin = "center";
         cleanups.push(() => {
@@ -329,7 +374,7 @@ export function runEntrance(
             ],
             {
               duration: 180,
-              delay: dotNorms[i]! * dur * 0.92,
+              delay: storyStart + dotNorms[i]! * dur * 0.92,
               easing: MC_EASE_ENTER,
               fill: "backwards",
             },
@@ -338,23 +383,8 @@ export function runEntrance(
       });
     }
 
-    // Whole-chart archetypes (and the coherent backdrop for mark archetypes).
-    if (marks.length > 0) {
-      for (const el of svg.querySelectorAll<SVGGraphicsElement>(SUPPORT)) {
-        if (markSet.has(el)) continue;
-        anims.push(
-          el.animate([{ opacity: 0 }, { opacity: 1 }], {
-            duration: 200,
-            delay: Math.min(dur * 0.7, 320),
-            easing: ease,
-            fill: "backwards",
-          }),
-        );
-      }
-    }
-
+    // Whole-chart stories (radial unwind, clip reveal, glyph pop).
     if (kind === "spin" || kind === "grow") {
-      // Radial charts unwind / concentric charts grow from their center.
       svg.style.transformOrigin = "50% 50%";
       cleanups.push(() => {
         svg.style.transformOrigin = "";
@@ -388,6 +418,39 @@ export function runEntrance(
           { duration: dur, easing: ease },
         ),
       );
+    }
+
+    // ACT 3 — the voice speaks as the story lands: values and accents pop,
+    // labels fade, all on the same final beat.
+    const voiceDelay = Math.max(storyEnd - BEAT / 2, storyStart + BEAT);
+    for (const el of voiceEls) {
+      if (spoken.has(el)) continue;
+      if (el.tagName === "text") {
+        anims.push(
+          el.animate([{ opacity: 0 }, { opacity: 1 }], {
+            duration: 1.5 * BEAT,
+            delay: voiceDelay,
+            easing: EASE_EVEN,
+            fill: "backwards",
+          }),
+        );
+      } else {
+        el.style.transformBox = "fill-box";
+        el.style.transformOrigin = "center";
+        cleanups.push(() => {
+          el.style.transformBox = "";
+          el.style.transformOrigin = "";
+        });
+        anims.push(
+          el.animate(
+            [
+              { opacity: 0, transform: "scale(0.85)" },
+              { opacity: 1, transform: "scale(1)" },
+            ],
+            { duration: 1.5 * BEAT, delay: voiceDelay, easing: MC_EASE_ENTER, fill: "backwards" },
+          ),
+        );
+      }
     }
 
     if (anims.length > 0) {
