@@ -63,10 +63,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
   // markers or value bars, so reveal (fade-only, staggered) matches
   // ActivityGrid's cell-grid archetype better than settle's scale, which
   // would distort the variable-width rects.
-  useEntrance(hostRef, "reveal", animate, {
-    selector:
-      '[data-mc-ink="accent"], [data-mc-ink="positive"], [data-mc-ink="negative"], [data-mc-ink="point"]',
-  });
+  useEntrance(hostRef, "wipe", animate);
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const geo = useMemo(

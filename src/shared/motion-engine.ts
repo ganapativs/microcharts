@@ -42,6 +42,22 @@ const DUR: Record<EntranceArchetype, number> = {
   fade: 250,
 };
 
+// Progress-class reveals (a line drawing, a clip sweeping) are constant-rate
+// motion: a strong ease-out tail makes them sprint then crawl — the "stuck
+// mid-line" feel. They get an even easeOutCubic; pops/rises keep the punchy
+// curve.
+const EASE_EVEN = "cubic-bezier(0.33, 1, 0.68, 1)";
+const EASE: Record<EntranceArchetype, string> = {
+  draw: EASE_EVEN,
+  wipe: EASE_EVEN,
+  sweep: EASE_EVEN,
+  rise: MC_EASE_ENTER,
+  reveal: MC_EASE_ENTER,
+  settle: MC_EASE_ENTER,
+  pop: MC_EASE_ENTER,
+  fade: MC_EASE_ENTER,
+};
+
 /** Primary marks per archetype — selected by the ink roles charts already emit. */
 const MARKS: Record<EntranceArchetype, string> = {
   draw: 'path[data-mc-ink="data"], path[data-mc-ink="accent"]',
@@ -115,8 +131,6 @@ export function runEntrance(
   const anims: Animation[] = [];
   const cleanups: (() => void)[] = [];
   const step = options.stagger ?? 30;
-  const ease = MC_EASE_ENTER;
-  const dur = DUR[archetype];
 
   const finishAll = (): void => {
     for (const a of anims) {
@@ -143,22 +157,41 @@ export function runEntrance(
 
   const start = (): void => {
     active.add(run);
-    let marks = MARKS[archetype]
-      ? Array.from(svg.querySelectorAll<SVGGraphicsElement>(options.selector ?? MARKS[archetype]))
+    let kind = archetype;
+    let marks = MARKS[kind]
+      ? Array.from(svg.querySelectorAll<SVGGraphicsElement>(options.selector ?? MARKS[kind]))
       : [];
-    // Dense grids (a year of cells) don't need 365 tracks — the coherent
-    // whole-chart fade carries the entrance; per-mark work stays bounded.
-    if (marks.length > 80) marks = [];
+    // A bare fade is not an entrance. Dense grids (a year of cells) don't get
+    // 365 tracks, and a selector that matches nothing must not degrade to
+    // nothing — both fall back to the O(1) clip reveal, which still MOVES.
+    if (marks.length > 80 || (marks.length === 0 && kind !== "pop" && kind !== "fade")) {
+      if (
+        marks.length === 0 &&
+        (typeof process === "undefined" || process.env.NODE_ENV !== "production")
+      ) {
+        console.warn(
+          `[microcharts] entrance "${kind}" matched no marks in .${svg.getAttribute("class") ?? "svg"} — falling back to wipe. Check the selector.`,
+        );
+      }
+      kind = "wipe";
+      marks = [];
+    }
+    const ease = EASE[kind];
+    const dur = DUR[kind];
 
     // The held first frame hands off to a short fade — nothing ever jumps.
+    // Whole-svg archetypes carry their own reveal; a parallel fade would
+    // double-expose and wash the motion out.
     svg.style.opacity = "";
-    anims.push(svg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: ease }));
+    if (kind !== "wipe" && kind !== "pop") {
+      anims.push(svg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: ease }));
+    }
 
     const n = marks.length;
     marks.forEach((el, i) => {
       const delay = stagger(i, n, step);
       const timing = { duration: dur, delay, easing: ease, fill: "backwards" as const };
-      switch (archetype) {
+      switch (kind) {
         case "draw": {
           let len = 0;
           try {
@@ -180,13 +213,13 @@ export function runEntrance(
         }
         case "rise":
         case "sweep": {
-          const axis = archetype === "rise" ? "scaleY" : "scaleX";
-          let origin = options.origin ?? (archetype === "rise" ? "bottom" : "left");
+          const axis = kind === "rise" ? "scaleY" : "scaleX";
+          let origin = options.origin ?? (kind === "rise" ? "bottom" : "left");
           // Bars extend AWAY from the zero line — negative marks grow toward
           // their own side of it (down for columns, left for horizontal bars).
           if (origin === "signed") {
             const neg = el.matches('[data-mc-ink="negative"]');
-            origin = archetype === "rise" ? (neg ? "top" : "bottom") : neg ? "right" : "left";
+            origin = kind === "rise" ? (neg ? "top" : "bottom") : neg ? "right" : "left";
           }
           el.style.transformBox = "fill-box";
           el.style.transformOrigin = origin;
@@ -232,8 +265,8 @@ export function runEntrance(
         if (markSet.has(el)) continue;
         anims.push(
           el.animate([{ opacity: 0 }, { opacity: 1 }], {
-            duration: 250,
-            delay: Math.min(dur * 0.45, 220),
+            duration: 200,
+            delay: Math.min(dur * 0.7, 320),
             easing: ease,
             fill: "backwards",
           }),
@@ -241,14 +274,14 @@ export function runEntrance(
       }
     }
 
-    if (archetype === "wipe") {
+    if (kind === "wipe") {
       anims.push(
         svg.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0 0 0)" }], {
           duration: dur,
           easing: ease,
         }),
       );
-    } else if (archetype === "pop") {
+    } else if (kind === "pop") {
       anims.push(
         svg.animate(
           [

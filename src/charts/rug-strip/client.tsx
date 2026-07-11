@@ -54,7 +54,7 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
   // Ticks are merged per-opacity-tier paths, not discrete per-observation
   // elements — settle's scale would shift tick x-positions non-uniformly
   // within a tier, so reveal (fade-only) is used instead.
-  useEntrance(hostRef, "reveal", animate, { selector: 'path[data-mc-ink="data"]' });
+  useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(
     () =>

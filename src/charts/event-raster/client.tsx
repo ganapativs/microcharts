@@ -54,10 +54,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
   // settle's per-mark scale would shift tick x-positions non-uniformly
   // within a lane, so reveal (fade-only, staggered per lane) is used
   // instead, matching the lane-by-lane scan order.
-  useEntrance(hostRef, "reveal", animate, {
-    selector:
-      'path, rect[data-mc-ink="bar"], rect[data-mc-ink="accent"], rect[data-mc-ink="neutral"]',
-  });
+  useEntrance(hostRef, "wipe", animate);
 
   const lanes = useMemo(() => data.slice(0, LANE_CAP), [data]);
   const n = Math.max(1, lanes.length);
