@@ -5,7 +5,7 @@
   "charts": {
     "sparkline": {
       "static": "3.65 kB",
-      "interactive": "4.65 kB"
+      "interactive": "5 kB"
     },
     "sparkbar": {
       "static": "3 kB",
@@ -80,6 +80,9 @@
       "interactive": "3.5 kB"
     },
     "annotations": {
+      "static": "1.5 kB"
+    },
+    "motion": {
       "static": "1.5 kB"
     },
     "segmented-bar": {

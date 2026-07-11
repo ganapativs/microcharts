@@ -9,6 +9,10 @@ export default defineConfig({
   entry: [
     "src/index.ts",
     "src/annotations.ts",
+    // Entrance-motion engine: dynamically imported by motion-gate when a
+    // consumer passes `animate` — its own chunk so charts that never animate
+    // never load it (plan/04 §8.1, plan/06 §5).
+    "src/shared/motion-engine.ts",
     "src/charts/sparkline/index.tsx",
     "src/charts/sparkline/client.tsx",
     "src/charts/sparkbar/index.tsx",

@@ -32,7 +32,8 @@
   ],
   "type": "module",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./dist/shared/motion-engine.js"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -887,6 +888,10 @@
     "./annotations": {
       "types": "./dist/annotations.d.ts",
       "import": "./dist/annotations.js"
+    },
+    "./motion": {
+      "types": "./dist/shared/motion-engine.d.ts",
+      "import": "./dist/shared/motion-engine.js"
     },
     "./styles.css": "./styles.css"
   },
