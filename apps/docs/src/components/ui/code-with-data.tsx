@@ -24,20 +24,25 @@ export function CodeWithData({
   lang?: string;
   className?: string;
 }) {
-  // Only surface the definitions this snippet actually references — a demo that
-  // inlines its own data (declares the variable itself) shows no disclosure at
-  // all; repeating the literal below the snippet would be pure duplication.
+  // Standard: raw data literals live ONLY in the "Sample data" disclosure —
+  // snippets reference the variable and carry a one-line pointer comment
+  // (added here so all pages stay consistent and it can never drift). A demo
+  // that declares the variable itself gets no disclosure (no duplication).
   const used = (sampleData ?? []).filter(
     (s) =>
       new RegExp(`\\b${s.name}\\b`).test(code) &&
       !new RegExp(`\\b(?:const|let|var)\\s+${s.name}\\b`).test(code),
   );
   const defs = used.length ? used.map((s) => s.code).join("\n\n") : "";
+  const pointer = used.length
+    ? `// ${used.map((s) => s.name).join(", ")} — real values under “Sample data” below\n`
+    : "";
+  const shown = pointer && !code.includes("Sample data") ? pointer + code : code;
   const runnable = defs ? `${defs}\n\n${code}` : code;
 
   return (
     <div className={cn("code-inset", className)}>
-      <DynamicCodeBlock lang={lang} code={code} />
+      <DynamicCodeBlock lang={lang} code={shown} />
       {defs ? (
         <details className="sample-data group/sd">
           <summary className="sample-data-summary">

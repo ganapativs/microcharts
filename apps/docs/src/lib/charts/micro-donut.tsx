@@ -71,14 +71,6 @@ export const entry: ChartEntry = {
     title: "Traffic mix",
     code: `import { MicroDonut } from "${PKG}/micro-donut";
 
-const mix = [
-  { label: "Chrome", value: 620 },
-  { label: "Safari", value: 240 },
-  { label: "Firefox", value: 90 },
-  { label: "Edge", value: 30 },
-  { label: "Arc", value: 20 },
-];
-
 <MicroDonut data={mix} title="Traffic mix" />`,
   },
   sampleData: [
