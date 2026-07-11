@@ -1,4 +1,4 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": ["screenshots/", "tests/visual/__screenshots__/"]
+  "ignorePatterns": ["screenshots/", "tests/visual/__screenshots__/", "bench/results.json"]
 }

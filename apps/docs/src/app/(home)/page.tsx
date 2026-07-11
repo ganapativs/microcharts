@@ -57,8 +57,8 @@ export default function HomePage() {
           <Reveal delay={120}>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
               A tiny, handcrafted chart set for dense interfaces — sentences, table cells, KPI
-              cards. Server-rendered and nearly weightless, and legible to the people and the models
-              that read them.
+              cards, chat streams. Simple enough for a model to write mid-reply, honest enough for a
+              person to trust. Server-rendered and nearly weightless.
             </p>
           </Reveal>
 
@@ -71,6 +71,13 @@ export default function HomePage() {
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <InstallCommand />
+            <Link
+              href="/docs/ai"
+              className="group inline-flex items-center gap-1.5 text-sm font-medium text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+            >
+              Watch a model draw one
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </Reveal>
 
           <Reveal delay={260} className="mt-16">

@@ -7,8 +7,8 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
-import { isFiniteValue } from "../../core/types.js";
-import { waterfallGeometry } from "./geometry.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
+import { waterfallGeometry, placeWaterfallLabels } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
 
 export type WaterfallDatum = MiniBarDatum;
@@ -64,6 +64,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
     data,
     start = 0,
     total = true,
+    label = "none",
     positive = "up",
     domain,
     width = 70,
@@ -92,10 +93,35 @@ export function Waterfall(props: WaterfallProps): ReactNode {
     summary === false ? false : (summary ?? waterfallSummary(data, start, fmt, strings));
   const goodSign = positive === "down" ? -1 : 1;
 
+  // Direct value labels sit in a reserved band BELOW the plot (like the endpoint
+  // gutter idiom): the viewBox grows downward, so the plot — and every
+  // interactive overlay drawn over it — keeps its y∈[0,height] coordinates.
+  const FONT = Math.min(9, Math.max(6, Math.round(height * 0.5)));
+  const labelText = (v: number): string => `${v < 0 ? "−" : "+"}${fmt(Math.abs(v))}`;
+  const labels =
+    label === "delta"
+      ? placeWaterfallLabels(
+          geo.bars
+            .map((b, i) => ({ b, v: data[i]!.value }))
+            .filter(({ v }) => isFiniteValue(v) && v !== 0)
+            .map(({ b, v }) => ({
+              index: b.index,
+              cx: b.x + b.w / 2,
+              // 0.62·em/char over-estimate + the sign glyph and a little air
+              w: Math.ceil(labelText(v as number).length * FONT * 0.62) + 2,
+              priority: Math.abs(v as number),
+            })),
+          width,
+        )
+      : [];
+  const band = labels.length > 0 ? FONT + 4 : 0;
+  const viewH = height + band;
+  const labelY = round2(height + FONT);
+
   return (
     <Chart
       width={width}
-      height={height}
+      height={viewH}
       title={title}
       summary={accName}
       id={id}
@@ -136,6 +162,19 @@ export function Waterfall(props: WaterfallProps): ReactNode {
           data-mc-ink="bar"
         />
       ) : null}
+      {labels.map((l) => (
+        <text
+          key={`l${l.index}`}
+          x={l.x}
+          y={labelY}
+          textAnchor="middle"
+          data-mc-ink="label"
+          fontSize={FONT}
+          style={{ fontVariantNumeric: "tabular-nums" }}
+        >
+          {labelText(data[l.index]!.value as number)}
+        </text>
+      ))}
       {children}
     </Chart>
   );

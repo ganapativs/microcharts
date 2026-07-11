@@ -1,5 +1,6 @@
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
+import type { ComponentProps } from "react";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SparkBar } from "@microcharts/react/sparkbar";
 import { Delta } from "@microcharts/react/delta";
@@ -19,7 +20,13 @@ import { Dumbbell } from "@microcharts/react/dumbbell";
 import { PairedBars } from "@microcharts/react/paired-bars";
 import { Slope } from "@microcharts/react/slope";
 import { MicroScatter } from "@microcharts/react/micro-scatter";
-import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annotations";
+import {
+  Threshold,
+  TargetZone,
+  Marker,
+  Callout as ChartCallout,
+} from "@microcharts/react/annotations";
+import { Callout as DocCallout } from "fumadocs-ui/components/callout";
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { TimeInRange } from "@microcharts/react/time-in-range";
 import { Hypnogram } from "@microcharts/react/hypnogram";
@@ -117,7 +124,40 @@ import { Playground } from "@/components/charts/playground";
 import { Usage } from "@/components/charts/usage";
 import { InteractiveDemo } from "@/components/charts/interactive";
 import { PropTable } from "@/components/charts/prop-table";
+import { ChartChooser } from "@/components/charts/chooser";
 import { PackageTabs } from "@/components/ui/package-tabs";
+import { StreamDemo } from "@/components/charts/stream-demo";
+import { GrammarExplorer, AgentCheatSheet } from "@/components/charts/ai-guide";
+import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
+import { CatalogStrip } from "@/components/charts/catalog-strip";
+import { Snippet } from "@/components/ui/snippet";
+import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
+import { Accordions, Accordion } from "fumadocs-ui/components/accordion";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import {
+  SizeDistribution,
+  SizeTable,
+  ScalingTable,
+  ThroughputSummary,
+  CatalogFacts,
+} from "@/components/ui/perf";
+
+// `<Callout>` is overloaded: the microcharts chart annotation (`x`/`y`/`label`,
+// nested inside a chart) and the Fumadocs doc callout (`type` + text). Dispatch
+// on props so both work under one tag — the annotations page keeps the real API,
+// and guide pages get proper doc callouts.
+function Callout({
+  x,
+  y,
+  ...props
+}: ComponentProps<typeof DocCallout> & { x?: number; y?: number }) {
+  // Chart annotation carries numeric x/y; the doc callout does not.
+  if (typeof x === "number" || typeof y === "number") {
+    return <ChartCallout {...({ x, y, ...props } as ComponentProps<typeof ChartCallout>)} />;
+  }
+  return <DocCallout {...props} />;
+}
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -244,7 +284,27 @@ export function getMDXComponents(components?: MDXComponents) {
     Usage,
     InteractiveDemo,
     PropTable,
+    ChartChooser,
     PackageTabs,
+    StreamDemo,
+    GrammarExplorer,
+    AgentCheatSheet,
+    CatalogStrip,
+    ProviderWall,
+    SurfaceCards,
+    Snippet,
+    DynamicCodeBlock,
+    Accordions,
+    Accordion,
+    Tab,
+    Tabs,
+    Step,
+    Steps,
+    SizeDistribution,
+    SizeTable,
+    ScalingTable,
+    ThroughputSummary,
+    CatalogFacts,
     ...components,
   } satisfies MDXComponents;
 }

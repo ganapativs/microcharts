@@ -166,26 +166,26 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
             const dy = Math.sin(s.angle);
             const anchor = dx > 0.3 ? "start" : dx < -0.3 ? "end" : "middle";
             const est = 0.62 * fontSize * label.length;
-            const naturalX = s.tx + dx * (fontSize * 0.5);
-            // seat gate: a label must fit its anchor side without heavy
-            // clamping (many spokes / long labels), or it drops out cleanly —
-            // self-legibility: identity comes from the fixed clock order +
-            // guides even where a long label doesn't seat.
-            const roomRight = size - naturalX;
-            const roomLeft = naturalX;
-            const fits =
+            // Seat at the RIM (fixed radius), not the value tip — otherwise a
+            // low-value spoke pulls its label into the hub and labels collide.
+            const naturalX = s.rx + dx * (fontSize * 0.5);
+            // Drop only a label too wide for the whole chart; otherwise CLAMP it
+            // into the reserved ring. Rim labels sit at distinct angles, so
+            // clamping toward an edge keeps them apart rather than dropping them —
+            // identity still comes from the fixed clock order + guides.
+            if (est > size - 2) return [];
+            // Keep the text box inside the viewBox for its anchor side.
+            const minX = anchor === "start" ? 0.5 : anchor === "end" ? est + 0.5 : est / 2 + 0.5;
+            const maxX =
               anchor === "start"
-                ? est <= roomRight - 0.5
+                ? size - est - 0.5
                 : anchor === "end"
-                  ? est <= roomLeft - 0.5
-                  : est / 2 <= Math.min(roomLeft, roomRight) - 0.5;
-            if (!fits) return [];
-            const half = anchor === "middle" ? est / 2 : anchor === "start" ? est : 0;
-            const rightRoom = anchor === "start" ? est : anchor === "middle" ? est / 2 : 0;
-            const x = Math.max(half + 0.5, Math.min(size - rightRoom - 0.5, naturalX));
+                  ? size - 0.5
+                  : size - est / 2 - 0.5;
+            const x = Math.max(minX, Math.min(maxX, naturalX));
             const y = Math.max(
               fontSize * 0.6,
-              Math.min(size - fontSize * 0.4, s.ty + dy * (fontSize * 0.5)),
+              Math.min(size - fontSize * 0.4, s.ry + dy * (fontSize * 0.5)),
             );
             return [
               <text

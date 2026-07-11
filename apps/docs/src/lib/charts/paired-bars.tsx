@@ -1,11 +1,12 @@
 import { PairedBars } from "@microcharts/react/paired-bars";
 import { InteractiveDemo } from "./paired-bars.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
-const BUDGET = [
+type PairRow = { label: string; value: number | null; ref: number | null }[];
+const BUDGET: PairRow = [
   { label: "East", value: 940, ref: 1200 },
   { label: "West", value: 410, ref: 400 },
   { label: "South", value: 620, ref: 600 },
@@ -50,8 +51,14 @@ export const entry: ChartEntry = {
       required: false,
       description: "Rows for wide cells.",
     },
+    {
+      name: "locale",
+      type: "string | string[]",
+      required: false,
+      description: 'BCP 47 locale(s) for the gap named in the summary, e.g. "de-DE".',
+    },
   ],
-  demo: BUDGET.map((d) => d.value),
+  demo: BUDGET.map((d) => d.value ?? 0),
   example: {
     title: "Budget vs actual",
     code: `import { PairedBars } from "${PKG}/paired-bars";
@@ -65,6 +72,25 @@ const regions = [
 
 <PairedBars data={regions} title="Actual vs plan" />`,
   },
+  sampleData: [
+    {
+      name: "regions",
+      code: `const regions = [
+  { label: "East", value: 940, ref: 1200 },
+  { label: "West", value: 410, ref: 400 },
+  { label: "South", value: 620, ref: 600 },
+  { label: "North", value: 120, ref: 300 },
+];`,
+    },
+    {
+      name: "marketing",
+      code: `const marketing = [
+  { label: "Ads", value: 82, ref: 65 },
+  { label: "Content", value: 38, ref: 50 },
+  { label: "Events", value: 21, ref: 20 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -93,6 +119,17 @@ export const playground: PlaygroundSpec = {
       options: ["vertical", "horizontal"],
       init: "vertical",
     },
+    {
+      kind: "segmented",
+      key: "locale",
+      label: "locale",
+      options: ["en-US", "de-DE"],
+      init: "en-US",
+    },
+    // `data` is the fixed demo series — edge cases (missing ref, single pair) get
+    // their own LiveDemos below. `domain`/`color`/`format`/`strings`/`id`/
+    // `className`/`style`/`children` are styling or integration hooks, not knobs
+    // a reader twiddles.
   ],
   render: (s) => (
     <PairedBars
@@ -100,6 +137,7 @@ export const playground: PlaygroundSpec = {
       mode={s.mode as "grouped" | "overlay"}
       positive={(s.positive as boolean) ? "up" : undefined}
       orientation={s.orientation as "horizontal" | "vertical"}
+      locale={s.locale as string}
       summary={false}
       style={
         s.orientation === "horizontal" ? { width: 200, height: 110 } : { width: 220, height: 72 }
@@ -113,6 +151,7 @@ export const playground: PlaygroundSpec = {
       s.mode !== "grouped" && `  mode="${s.mode}"`,
       (s.positive as boolean) && '  positive="up"',
       s.orientation === "horizontal" && '  orientation="horizontal"',
+      s.locale !== "en-US" && `  locale="${s.locale}"`,
       "/>",
     ]
       .filter(Boolean)
@@ -131,6 +170,98 @@ export const recipes: Recipe[] = [
     node: <PairedBars data={BUDGET} mode="overlay" summary={false} width={60} height={20} />,
   },
 ];
+
+const MARKETING: PairRow = [
+  { label: "Ads", value: 82, ref: 65 },
+  { label: "Content", value: 38, ref: 50 },
+  { label: "Events", value: 21, ref: 20 },
+];
+
+/* The four homes — PairedBars always doing the one thing it's for: actual vs
+   plan on one shared scale. Every host is a real budget surface (a regional
+   spend line, a finance table, a budget KPI, a category tab), never a generic
+   "signups" template. Lower-than-plan is the good direction throughout —
+   positive="down" — because these are expense rows, not revenue. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Regional spend vs plan this quarter{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <PairedBars data={BUDGET} summary={false} width={100} height={18} />
+        </span>{" "}
+        — East is furthest off target, 940 spent against a 1,200 budget.
+      </p>
+    ),
+    code: `<p>\n  Regional spend vs plan this quarter{" "}\n  <PairedBars data={regions} width={100} height={18} /> — East is furthest off target, 940 spent against a 1,200 budget.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {BUDGET.slice(0, 3).map((r) => {
+            const value = r.value ?? 0;
+            const ref = r.ref ?? 0;
+            const over = value >= ref;
+            const gap = Math.abs(value - ref);
+            return (
+              <tr key={r.label} className="border-t border-fd-border/60 first:border-0">
+                <td className="py-1.5 pr-3 text-fd-muted-foreground">{r.label}</td>
+                <td className="py-1.5">
+                  <PairedBars data={[r]} positive="down" summary={false} width={50} height={16} />
+                </td>
+                <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                  {gap} {over ? "over" : "under"}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <PairedBars data={[{ label: "East", value: 940, ref: 1200 }]} positive="down" />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Regions under budget</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">2 / 4</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">this quarter</span>
+          </div>
+        </div>
+        <PairedBars data={BUDGET} positive="down" summary={false} width={110} height={30} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">2 / 4</span>\n  <span className="unit">regions under budget, this quarter</span>\n  <PairedBars data={regions} positive="down" width={110} height={30} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {(
+          [
+            ["Regional", BUDGET],
+            ["Marketing", MARKETING],
+          ] as const
+        ).map(([name, rows], i) => (
+          <span
+            key={name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {name}
+            <PairedBars data={rows} positive="down" summary={false} width={40} height={14} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Regional <PairedBars data={regions} positive="down" width={40} height={14} />\n</button>\n<button className="tab">\n  Marketing <PairedBars data={marketing} positive="down" width={40} height={14} />\n</button>`,
+  },
+};
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
@@ -154,6 +285,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

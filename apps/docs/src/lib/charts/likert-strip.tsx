@@ -1,6 +1,6 @@
 import { LikertStrip } from "@microcharts/react/likert-strip";
 import { InteractiveDemo } from "./likert-strip.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
@@ -48,12 +48,6 @@ export const entry: ChartEntry = {
       required: false,
       description: "Agree/disagree % or one signed score.",
     },
-    {
-      name: "mode",
-      type: '"share" | "count"',
-      required: false,
-      description: "Percent normalization or raw counts on a fixed max.",
-    },
   ],
   demo: SURVEY.map((d) => d.value),
   example: {
@@ -71,6 +65,18 @@ export const entry: ChartEntry = {
   title="Q1 satisfaction"
 />`,
   },
+  sampleData: [
+    {
+      name: "responses",
+      code: `const responses = [
+  { label: "Strongly disagree", value: 10 },
+  { label: "Disagree", value: 14 },
+  { label: "Neutral", value: 14 },
+  { label: "Agree", value: 34 },
+  { label: "Strongly agree", value: 28 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -134,6 +140,113 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const QUESTIONS = [
+  { q: "Checkout was easy", data: SURVEY },
+  {
+    q: "Support response time",
+    data: [
+      { label: "Strongly disagree", value: 18 },
+      { label: "Disagree", value: 22 },
+      { label: "Neutral", value: 20 },
+      { label: "Agree", value: 26 },
+      { label: "Strongly agree", value: 14 },
+    ],
+  },
+  {
+    q: "Pricing feels fair",
+    data: [
+      { label: "Strongly disagree", value: 8 },
+      { label: "Disagree", value: 12 },
+      { label: "Neutral", value: 10 },
+      { label: "Agree", value: 40 },
+      { label: "Strongly agree", value: 30 },
+    ],
+  },
+];
+
+const RETURNING = [
+  { label: "Strongly disagree", value: 4 },
+  { label: "Disagree", value: 6 },
+  { label: "Neutral", value: 10 },
+  { label: "Agree", value: 38 },
+  { label: "Strongly agree", value: 42 },
+];
+
+/* The four homes — LikertStrip always answering "does the response lean agree
+   or disagree, and how hard" for a real survey/sentiment surface, never a
+   generic "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Checkout satisfaction, Q1{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <LikertStrip data={SURVEY} summary={false} label="none" width={90} height={16} />
+        </span>{" "}
+        — 62% agree, 24% disagree. Leans positive.
+      </p>
+    ),
+    code: `<p>\n  Checkout satisfaction, Q1{" "}\n  <LikertStrip data={responses} label="none" height={16} /> — 62% agree, 24% disagree. Leans positive.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {QUESTIONS.map((row) => (
+            <tr key={row.q} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{row.q}</td>
+              <td className="py-1.5">
+                <LikertStrip data={row.data} summary={false} label="net" width={120} height={16} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <LikertStrip data={q.responses} label="net" />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Checkout satisfaction</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">62%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">agree, 24% disagree</span>
+          </div>
+        </div>
+        <LikertStrip data={SURVEY} summary={false} label="none" width={160} height={18} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">62%</span>\n  <span className="unit">agree, 24% disagree</span>\n  <LikertStrip data={responses} label="none" width={160} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {(
+          [
+            ["New users", SURVEY],
+            ["Returning users", RETURNING],
+          ] as const
+        ).map(([name, rows], i) => (
+          <span
+            key={name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {name}
+            <LikertStrip data={rows} summary={false} label="none" width={64} height={12} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  New users <LikertStrip data={responses} label="none" width={64} />\n</button>`,
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <LikertStrip
@@ -157,6 +270,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

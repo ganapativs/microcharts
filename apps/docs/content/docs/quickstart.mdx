@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Install @microcharts/react, import the stylesheet, and render your first accessible chart — static in a Server Component, or interactive on the client.
+description: Install @microcharts/react, import the stylesheet once, and render your first accessible chart — static in a Server Component, or interactive on the client.
 ---
 
 ## Install
@@ -9,9 +9,9 @@ description: Install @microcharts/react, import the stylesheet, and render your 
 
 ## Import the stylesheet once
 
-microcharts ships a single stylesheet — import it once at the root of your app. It carries
-all theming tokens and chart styles in a low-specificity cascade layer, so your own styles
-always win.
+microcharts ships a single stylesheet — import it once at the root of your app. It carries all
+theming tokens and chart styles in a low-specificity cascade layer, so your own styles always
+win.
 
 ```tsx title="app/layout.tsx"
 import "@microcharts/react/styles.css";
@@ -19,11 +19,12 @@ import "@microcharts/react/styles.css";
 
 ## Your first chart
 
-Every chart renders from `data` alone. This works in a React Server Component with **zero
-client JavaScript** — it's pure SVG.
+Every chart renders from `data` alone. This works in a React Server Component with **zero client
+JavaScript** — it's pure SVG, and its accessible name is generated from the data.
 
 <LiveDemo
   label="Static · RSC-safe"
+  sizeOf="sparkline"
   code={`import { Sparkline } from "@microcharts/react/sparkline";
 
 export default function Page() {
@@ -36,7 +37,8 @@ export default function Page() {
 ## Add interactivity
 
 Need hover, keyboard navigation, or live announcements? Import the same chart from its
-`/interactive` entry. Everything else — props, output, accessibility — is identical.
+`/interactive` entry. Everything else — props, output, accessibility — is identical; you just
+opt into the client component where it matters.
 
 ```tsx
 import { Sparkline } from "@microcharts/react/sparkline/interactive";
@@ -46,7 +48,8 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 
 ## Import paths
 
-Import each chart from its own subpath so you only ship what you use.
+Import each chart from its own subpath so you only ship what you use. Every chart in the catalog
+follows the same two-entry pattern — a static default and an `/interactive` twin:
 
 | Chart        | Static                             | Interactive                                    |
 | ------------ | ---------------------------------- | ---------------------------------------------- |
@@ -55,3 +58,13 @@ Import each chart from its own subpath so you only ship what you use.
 | Delta        | `@microcharts/react/delta`         | `@microcharts/react/delta/interactive`         |
 | Bullet       | `@microcharts/react/bullet`        | `@microcharts/react/bullet/interactive`        |
 | ActivityGrid | `@microcharts/react/activity-grid` | `@microcharts/react/activity-grid/interactive` |
+
+Every other chart uses the same shape — see [All charts](/docs/charts) for the full catalog,
+each page listing its own import path and props.
+
+## Next steps
+
+- **[All charts](/docs/charts)** — the full catalog, filed by the question each chart answers.
+- **[AI-native](/docs/ai)** — render charts straight from a model stream, agent, or tool call.
+- **[Theming](/docs/theming)** — rebind one CSS variable and every chart follows your brand.
+- **[Accessibility](/docs/accessibility)** — how the generated summaries and keyboard support work.

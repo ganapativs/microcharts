@@ -1,10 +1,31 @@
 import { StatusDot } from "@microcharts/react/status-dot";
 import { InteractiveDemo } from "./status-dot.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
+
+type Service = { name: string; status: string };
+/** Ordered so the cell home's first three rows show real variety. */
+const SERVICES: Service[] = [
+  { name: "API", status: "ok" },
+  { name: "Billing", status: "warn" },
+  { name: "Search", status: "error" },
+  { name: "Auth", status: "ok" },
+  { name: "CDN", status: "off" },
+];
+const SERVICE_COPY: Record<string, string> = {
+  ok: "operational",
+  warn: "degraded",
+  error: "down",
+  off: "disabled",
+  busy: "deploying",
+};
+const ENVIRONMENTS: Service[] = [
+  { name: "Production", status: "ok" },
+  { name: "Staging", status: "busy" },
+];
 
 export const entry: ChartEntry = {
   name: "StatusDot",
@@ -67,6 +88,10 @@ export const showcase = {
   Node: () => <StatusDot status="busy" pulse title="Pipeline" style={{ width: 18, height: 18 }} />,
 };
 
+// states/color: vocabulary/styling escape hatches, not chart-shape knobs — no
+// interactive control (consistent with every other chart's playground; the
+// "custom vocabulary" recipe below already demonstrates `states`). Every
+// remaining documented prop (status, pulse) has a knob below.
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -118,6 +143,93 @@ export const recipes: Recipe[] = [
   },
 ];
 
+/* The four homes — StatusDot always doing the one thing it's for: naming a
+   state at a glance, shape+color paired. Every host is a service/ops surface,
+   never a generic "signups"/"weekly active" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Checkout is{" "}
+        <StatusDot status="ok" summary={false} style={{ width: "0.7em", height: "0.7em" }} />{" "}
+        operational; Billing is{" "}
+        <StatusDot status="warn" summary={false} style={{ width: "0.7em", height: "0.7em" }} />{" "}
+        degraded.
+      </p>
+    ),
+    code: `<p>\n  Checkout is <StatusDot status="ok" style={{ width: "0.7em", height: "0.7em" }} />{" "}\n  operational; Billing is <StatusDot status="warn" style={{ width: "0.7em", height: "0.7em" }} />{" "}\n  degraded.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {SERVICES.slice(0, 3).map((svc) => (
+            <tr key={svc.name} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{svc.name}</td>
+              <td className="py-1.5">
+                <StatusDot status={svc.status} summary={false} style={{ width: 14, height: 14 }} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                {SERVICE_COPY[svc.status]}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <StatusDot status="warn" />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Service health</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">2 / 5</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">fully healthy</span>
+          </div>
+        </div>
+        <span className="inline-flex items-center gap-1.5">
+          {SERVICES.map((svc) => (
+            <StatusDot
+              key={svc.name}
+              status={svc.status}
+              summary={false}
+              style={{ width: 12, height: 12 }}
+            />
+          ))}
+        </span>
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">2 / 5</span>\n  <span className="unit">fully healthy</span>\n  <StatusDot status="ok" />\n  <StatusDot status="warn" />\n  <StatusDot status="error" />\n  <StatusDot status="ok" />\n  <StatusDot status="off" />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {ENVIRONMENTS.map((env, i) => (
+          <span
+            key={env.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {env.name}
+            <StatusDot
+              status={env.status}
+              pulse={env.status === "busy"}
+              summary={false}
+              style={{ width: 10, height: 10 }}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Staging <StatusDot status="busy" pulse />\n</button>`,
+  },
+};
+
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
   return <StatusDot status="ok" summary={false} style={{ width: 10, height: 10 }} />;
 }
@@ -133,6 +245,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

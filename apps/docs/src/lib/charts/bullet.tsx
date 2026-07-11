@@ -1,7 +1,7 @@
 import { Bullet } from "@microcharts/react/bullet";
 import { Bullet as BulletInteractive } from "@microcharts/react/bullet/interactive";
 import { DemoPanel } from "@/components/charts/demo-panel";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -92,17 +92,23 @@ export function InteractiveDemo() {
   );
 }
 
+// color, format, locale, id, className, style, children: styling/formatting
+// escape hatches, not chart-shape knobs — no interactive control (consistent
+// with every other chart's playground). title/summary are accessible-name
+// overrides fixed to "Playground" here for a stable live-region readout.
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", min: 0, max: 100, init: 72 },
     { kind: "range", key: "target", min: 0, max: 100, init: 80 },
     { kind: "toggle", key: "bands", init: true },
+    { kind: "toggle", key: "domain", label: "narrow domain (0–60)", init: false },
   ],
   render: (s) => (
     <Bullet
       value={s.value as number}
       target={s.target as number}
       bands={s.bands ? [50, 90] : undefined}
+      domain={s.domain ? [0, 60] : undefined}
       width={300}
       height={28}
       className="w-full max-w-md"
@@ -115,6 +121,7 @@ export const playground: PlaygroundSpec = {
       `  value={${s.value}}`,
       `  target={${s.target}}`,
       s.bands && "  bands={[50, 90]}",
+      s.domain && "  domain={[0, 60]}",
       "/>",
     ]
       .filter(Boolean)
@@ -150,6 +157,104 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const REPS: { name: string; value: number; target: number }[] = [
+  { name: "Priya", value: 92, target: 80 },
+  { name: "Marcus", value: 61, target: 80 },
+  { name: "Jade", value: 78, target: 80 },
+];
+
+const TEAMS: { name: string; value: number; target: number }[] = [
+  { name: "North", value: 72, target: 80 },
+  { name: "South", value: 54, target: 80 },
+];
+
+/* The four homes — Bullet always doing the one thing it's for: a measure read
+   against a target and qualitative bands. Every host is a progress/compliance
+   surface (quota, budget, SLA), never a generic "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Q3 quota attainment sits at{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <Bullet value={72} target={80} bands={[50, 90]} summary={false} width={90} height={14} />
+        </span>{" "}
+        — inside the good band, short of target.
+      </p>
+    ),
+    code: `<p>\n  Q3 quota attainment sits at{" "}\n  <Bullet value={72} target={80} bands={[50, 90]} height={14} /> — inside the good band, short of target.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {REPS.map((r) => (
+            <tr key={r.name} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{r.name}</td>
+              <td className="py-1.5">
+                <Bullet
+                  value={r.value}
+                  target={r.target}
+                  bands={[50, 90]}
+                  summary={false}
+                  width={70}
+                  height={14}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                {r.value >= r.target ? "hit" : "short"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <Bullet value={92} target={80} bands={[50, 90]} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Storage budget</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">72 GB</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">of an 80 GB volume</span>
+          </div>
+        </div>
+        <Bullet value={72} target={80} bands={[50, 90]} summary={false} width={200} height={20} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">72 GB</span>\n  <span className="unit">of an 80 GB volume</span>\n  <Bullet value={72} target={80} bands={[50, 90]} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {TEAMS.map((t, i) => (
+          <span
+            key={t.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {t.name}
+            <Bullet
+              value={t.value}
+              target={t.target}
+              bands={[50, 90]}
+              summary={false}
+              width={54}
+              height={12}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  North <Bullet value={72} target={80} bands={[50, 90]} />\n</button>`,
+  },
+};
+
 export function Mark({ width, height }: { data: number[]; width?: number; height?: number }) {
   return (
     <Bullet
@@ -175,6 +280,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

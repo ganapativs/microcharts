@@ -1,6 +1,6 @@
 import { EventTimeline } from "@microcharts/react/event-timeline";
 import { InteractiveDemo } from "./event-timeline.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
@@ -15,6 +15,8 @@ const DATA = [
   { start: T0 + 20 * H, label: "Release" },
 ];
 const WINDOW: [number, number] = [T0, T0 + 24 * H];
+/** A second service with a clean window — contrast for the cell/tab homes. */
+const AUTH = [{ start: T0, end: T0 + 24 * H, label: "Healthy", kind: "positive" as const }];
 
 export const entry: ChartEntry = {
   name: "EventTimeline",
@@ -63,6 +65,18 @@ export const entry: ChartEntry = {
     title: "API uptime",
     code: `import { EventTimeline } from "${PKG}/event-timeline";\n\n<EventTimeline data={windows} domain={today} title="API uptime" />`,
   },
+  sampleData: [
+    {
+      name: "windows",
+      code: `const windows = [
+  { start: Date.UTC(2026, 5, 3, 1), end: Date.UTC(2026, 5, 3, 5), label: "Freeze", kind: "accent" },
+  { start: Date.UTC(2026, 5, 3, 6), end: Date.UTC(2026, 5, 3, 15), label: "Healthy", kind: "positive" },
+  { start: Date.UTC(2026, 5, 3, 11), label: "Incident", kind: "negative" },
+  { start: Date.UTC(2026, 5, 3, 16), end: Date.UTC(2026, 5, 3, 18), kind: "negative" },
+  { start: Date.UTC(2026, 5, 3, 20), label: "Release" },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -77,6 +91,8 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
+  // data and domain aren't knobbed — they're the fixture + shared window, not
+  // interactive toggles (same convention as every other domain-taking chart).
   knobs: [
     { kind: "toggle", key: "now", label: "now tick", init: false },
     {
@@ -133,6 +149,89 @@ export const recipes: Recipe[] = [
   },
 ];
 
+/* The four homes — EventTimeline always answering "what happened when, and for
+   how long": a coverage read, per-service rows, an SLA-style KPI, status tabs.
+   Every host is an uptime/on-call surface, never a generic "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        API status today{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <EventTimeline data={DATA} domain={WINDOW} summary={false} width={90} height={14} />
+        </span>{" "}
+        — 3 spans covering 63% of the window, one incident logged.
+      </p>
+    ),
+    code: `<p>\n  API status today{" "}\n  <EventTimeline data={windows} domain={today} width={90} height={14} />{" "}\n  — 3 spans covering 63% of the window.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {(
+            [
+              ["API", DATA, 1],
+              ["Auth", AUTH, 0],
+            ] as const
+          ).map(([name, rows, incidents]) => (
+            <tr key={name} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{name}</td>
+              <td className="py-1.5">
+                <EventTimeline data={rows} domain={WINDOW} summary={false} width={90} height={14} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                {incidents} incident{incidents === 1 ? "" : "s"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <EventTimeline data={windows} domain={today} width={90} height={14} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Window coverage</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">63%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">3 spans, 1 incident</span>
+          </div>
+        </div>
+        <EventTimeline data={DATA} domain={WINDOW} summary={false} width={200} height={30} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">63%</span>\n  <span className="unit">3 spans, 1 incident</span>\n  <EventTimeline data={windows} domain={today} width={200} height={30} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {(
+          [
+            ["API", DATA],
+            ["Auth", AUTH],
+          ] as const
+        ).map(([name, rows], i) => (
+          <span
+            key={name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {name}
+            <EventTimeline data={rows} domain={WINDOW} summary={false} width={54} height={14} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  API <EventTimeline data={windows} domain={today} width={54} height={14} />\n</button>`,
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <EventTimeline
@@ -159,6 +258,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

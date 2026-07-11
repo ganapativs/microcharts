@@ -11,9 +11,13 @@ export interface Spoke {
   y1: number;
   x2: number;
   y2: number;
-  /** Tip (for dots/labels/interactive focus). */
+  /** Tip (for dots + interactive focus) — sits at the value along the spoke. */
   tx: number;
   ty: number;
+  /** Rim anchor (for labels) — fixed at full radius on the axis, so a label
+   *  annotates its direction and never collapses toward the hub on low values. */
+  rx: number;
+  ry: number;
   angle: number;
 }
 
@@ -45,6 +49,8 @@ export function starSpokeGeometry(opts: {
       y2: round2(cy + dy * len),
       tx: round2(cx + dx * len),
       ty: round2(cy + dy * len),
+      rx: round2(cx + dx * R),
+      ry: round2(cy + dy * R),
       angle,
     };
   });

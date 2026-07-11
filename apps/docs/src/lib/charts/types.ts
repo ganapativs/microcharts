@@ -40,6 +40,13 @@ export interface ChartEntry {
   /** A representative series/values used for live demos + OG + summary quoting. */
   demo: number[];
   example: { title: string; code: string };
+  /**
+   * Named literals backing every snippet variable across the page's snippets
+   * (`data={accounts}` → the `accounts` definition). Powers the sample-data
+   * disclosure so copy-paste always runs — no phantom variables. Optional during
+   * the per-chart migration; a gate flips it to required once all charts declare it.
+   */
+  sampleData?: SampleData[];
 }
 
 /* ── playground (declarative — the shared engine renders knobs + shell) ──── */
@@ -69,6 +76,41 @@ export interface PlaygroundSpec {
   code: (state: Record<string, KnobValue>, data: number[]) => string;
 }
 
+/* ── copy-complete snippets ──────────────────────────────────────────────── */
+
+/**
+ * A named sample-data literal that a chart's snippets reference (`data={accounts}`).
+ * Surfaced once per page in a collapsible "sample data" disclosure so every
+ * copy-pasted snippet actually runs — no phantom variables (plan/20 docs-as-tests).
+ */
+export interface SampleData {
+  /** The variable a snippet binds to, e.g. `"accounts"`. */
+  name: string;
+  /** Its full definition, e.g. `const accounts = [\n  { label: "Acme", value: 3 },\n];`. */
+  code: string;
+}
+
+/* ── four homes (chart-true placements) ──────────────────────────────────── */
+
+/**
+ * One placement home. The host copy is written for THIS chart's job — a StatusDot
+ * sits in "the API is ● operational", a SproutRow in an account-health column —
+ * never a generic "signups held steady" template.
+ */
+export interface ContextHome {
+  /** Realistic host with the live mark embedded (sentence, row, card, tab). */
+  render: () => ReactNode;
+  /** Copy-complete JSX for the placement; vars resolve via `sampleData`. */
+  code: string;
+}
+
+export interface ChartContexts {
+  sentence: ContextHome;
+  cell: ContextHome;
+  kpi: ContextHome;
+  tab: ContextHome;
+}
+
 /* ── sizing recipes ──────────────────────────────────────────────────────── */
 
 export interface Recipe {
@@ -95,4 +137,9 @@ export interface ChartModule {
   Mark: ComponentType<{ data: number[]; width?: number; height?: number }>;
   /** JSX string mirroring `Mark` at a given size (docs-as-tests). */
   markCode: (width?: number, height?: number) => string;
+  /**
+   * The four placement homes, authored for this chart. When present the shared
+   * grid renders these; absent, it falls back to a generic template (migration only).
+   */
+  contexts?: ChartContexts;
 }

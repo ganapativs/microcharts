@@ -2,9 +2,17 @@ import { SparkBar } from "@microcharts/react/sparkbar";
 import { SparkBar as SparkBarInteractive } from "@microcharts/react/sparkbar/interactive";
 import { DemoPanel } from "@/components/charts/demo-panel";
 import { wave } from "./demo-data";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
+const DEPLOYS = [4, 6, 2, 8, 5, 9, 3, 7];
+const CI_RUNS = [1, 1, -1, 1, 1, 1, -1]; // 1 = win, -1 = loss
+const RELEASE_RUNS = [1, -1, -1, 1, -1, 1, 1];
+const SERVICES = [
+  { name: "checkout", deploys: [2, 1, 3, 0, 2, 4, 1] },
+  { name: "search", deploys: [1, 0, 1, 2, 1, 3, 2] },
+  { name: "billing", deploys: [0, 0, 1, 0, 0, 1, 0] },
+];
 
 export const entry: ChartEntry = {
   name: "SparkBar",
@@ -56,12 +64,23 @@ export const entry: ChartEntry = {
       required: false,
       description: "Override or disable the auto summary.",
     },
+    {
+      name: "locale",
+      type: "string | string[]",
+      required: false,
+      description: "BCP 47 locale(s) for the endpoint label and summary.",
+    },
   ],
   demo: [4, 6, 2, 8, 5, 9, 3, 7],
   example: {
     title: "Deploys per day",
     code: `import { SparkBar } from "${PKG}/sparkbar";\n\n<SparkBar data={[4, 6, 2, 8, 5, 9]} title="Deploys per day" />`,
   },
+  sampleData: [
+    { name: "deploys", code: `const deploys = [4, 6, 2, 8, 5, 9, 3, 7]; // per day, Mon–Mon` },
+    { name: "ciRuns", code: `const ciRuns = [1, 1, -1, 1, 1, 1, -1]; // 1 = pass, -1 = fail` },
+    { name: "releaseRuns", code: `const releaseRuns = [1, -1, -1, 1, -1, 1, 1];` },
+  ],
 };
 
 export function Preview() {
@@ -99,18 +118,31 @@ export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "mode", options: ["bar", "winloss"], init: "bar" },
     { kind: "toggle", key: "label", init: false },
+    { kind: "range", key: "gap", label: "gap", min: 0, max: 0.6, step: 0.05, init: 0.25 },
+    {
+      kind: "segmented",
+      key: "locale",
+      label: "locale",
+      options: ["en-US", "de-DE"],
+      init: "en-US",
+    },
+    // `title`/`summary`/`domain`/`color` aren't playground controls — accessible-name
+    // text and styling overrides, not visual states to twiddle; shown as-is elsewhere.
   ],
   data: [4, 6, 2, 8, 5, 9, 3, 7, 6, 10],
   shuffle: wave,
   render: (s, data) => {
     const shown = s.mode === "winloss" ? data.map((n) => (n % 2 === 0 ? 1 : -1)) : data;
+    const gap = Number((s.gap as number).toFixed(2));
     return (
       <SparkBar
         data={shown}
         width={340}
         height={92}
         mode={s.mode as "bar" | "winloss"}
+        gap={gap}
         label={s.label ? "last" : "none"}
+        locale={s.locale as string}
         className="w-full max-w-md"
         title="Playground"
       />
@@ -118,11 +150,14 @@ export const playground: PlaygroundSpec = {
   },
   code: (s, data) => {
     const shown = s.mode === "winloss" ? data.map((n) => (n % 2 === 0 ? 1 : -1)) : data;
+    const gap = Number((s.gap as number).toFixed(2));
     return [
       "<SparkBar",
       `  data={[${shown.join(", ")}]}`,
       `  mode="${s.mode}"`,
+      gap !== 0.25 && `  gap={${gap}}`,
       s.label && '  label="last"',
+      s.locale !== "en-US" && `  locale="${s.locale}"`,
       "/>",
     ]
       .filter(Boolean)
@@ -155,6 +190,84 @@ export const recipes: Recipe[] = [
   },
 ];
 
+/* The four homes — SparkBar always doing one of its two jobs: a magnitude count
+   or a win/loss/tie streak. Every host is a deploy/CI surface, never a generic
+   "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Deploys peaked at nine mid-week{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <SparkBar data={DEPLOYS} summary={false} width={70} height={16} />
+        </span>{" "}
+        — quieter since.
+      </p>
+    ),
+    code: `<p>\n  Deploys peaked at nine mid-week{" "}\n  <SparkBar data={deploys} width={70} height={16} /> — quieter since.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {SERVICES.map((s) => (
+            <tr key={s.name} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{s.name}</td>
+              <td className="py-1.5">
+                <SparkBar data={s.deploys} summary={false} width={56} height={16} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                {s.deploys.reduce((a, b) => a + b, 0)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <SparkBar data={services[0].deploys} width={56} height={16} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">CI pass rate</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">5 / 7</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">last 7 runs</span>
+          </div>
+        </div>
+        <SparkBar data={CI_RUNS} mode="winloss" summary={false} width={80} height={26} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">5 / 7</span>\n  <span className="unit">last 7 runs</span>\n  <SparkBar data={ciRuns} mode="winloss" width={80} height={26} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {(
+          [
+            ["CI", CI_RUNS],
+            ["Release", RELEASE_RUNS],
+          ] as const
+        ).map(([name, runs], i) => (
+          <span
+            key={name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {name}
+            <SparkBar data={runs} mode="winloss" summary={false} width={44} height={14} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  CI <SparkBar data={ciRuns} mode="winloss" width={44} height={14} />\n</button>\n<button className="tab">\n  Release <SparkBar data={releaseRuns} mode="winloss" width={44} height={14} />\n</button>`,
+  },
+};
+
 export function Mark({ data, width, height }: { data: number[]; width?: number; height?: number }) {
   return <SparkBar data={data} width={width ?? 64} height={height ?? 18} summary={false} />;
 }
@@ -171,6 +284,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

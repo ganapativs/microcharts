@@ -1,6 +1,6 @@
 import { Funnel } from "@microcharts/react/funnel";
 import { InteractiveDemo } from "./funnel.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
@@ -10,6 +10,12 @@ const PIPE = [
   { label: "Signups", value: 5704 },
   { label: "Activated", value: 2730 },
   { label: "Paid", value: 1116 },
+];
+const REFERRAL = [
+  { label: "Visitors", value: 3200 },
+  { label: "Signups", value: 2100 },
+  { label: "Activated", value: 1400 },
+  { label: "Paid", value: 690 },
 ];
 
 export const entry: ChartEntry = {
@@ -69,6 +75,17 @@ const stages = [
 
 <Funnel data={stages} title="Signup funnel" />`,
   },
+  sampleData: [
+    {
+      name: "stages",
+      code: `const stages = [
+  { label: "Visitors", value: 12400 },
+  { label: "Signups", value: 5704 },
+  { label: "Activated", value: 2730 },
+  { label: "Paid", value: 1116 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -81,6 +98,7 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
+  // `data` isn't a knob — the pipeline shape is the fixture, not a toggle.
   knobs: [
     {
       kind: "segmented",
@@ -97,6 +115,7 @@ export const playground: PlaygroundSpec = {
       options: ["none", "percent", "value"],
       init: "none",
     },
+    { kind: "toggle", key: "highlight", label: "highlight Activated", init: false },
   ],
   render: (s) => (
     <Funnel
@@ -104,6 +123,7 @@ export const playground: PlaygroundSpec = {
       mode={s.mode as "absolute" | "rate"}
       connectors={s.connectors as boolean}
       label={s.label as "none" | "percent" | "value"}
+      highlight={(s.highlight as boolean) ? "Activated" : undefined}
       summary={false}
       width={260}
       height={78}
@@ -116,6 +136,7 @@ export const playground: PlaygroundSpec = {
       s.mode !== "absolute" && `  mode="${s.mode}"`,
       !(s.connectors as boolean) && "  connectors={false}",
       s.label !== "none" && `  label="${s.label}"`,
+      (s.highlight as boolean) && '  highlight="Activated"',
       "/>",
     ]
       .filter(Boolean)
@@ -134,6 +155,95 @@ export const recipes: Recipe[] = [
     node: <Funnel data={PIPE} highlight="Activated" summary={false} width={90} height={26} />,
   },
 ];
+
+/* The four homes — Funnel always answering "where does the pipeline leak",
+   never a generic "signups held steady" template. Every host is a real
+   conversion surface: a growth-report sentence, a per-campaign table, a
+   conversion KPI, a campaign switcher. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        This week's signup funnel{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <Funnel data={PIPE} summary={false} width={64} height={20} />
+        </span>{" "}
+        converted 12,400 visitors to 1,116 paid — a 9% overall rate.
+      </p>
+    ),
+    code: `<p>\n  This week's signup funnel{" "}\n  <Funnel data={stages} width={64} height={20} /> converted 12,400\n  visitors to 1,116 paid — a 9% overall rate.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <thead>
+          <tr className="text-fd-muted-foreground text-xs">
+            <th className="pb-1.5 pr-3 text-left font-normal">Campaign</th>
+            <th className="pb-1.5 text-left font-normal">Funnel</th>
+            <th className="pb-1.5 pl-3 text-right font-normal">Overall</th>
+          </tr>
+        </thead>
+        <tbody>
+          {(
+            [
+              ["Organic", PIPE, "9%"],
+              ["Referral", REFERRAL, "22%"],
+            ] as const
+          ).map(([name, stages, rate]) => (
+            <tr key={name} className="border-t border-fd-border/60 first:border-0">
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{name}</td>
+              <td className="py-1.5">
+                <Funnel data={stages} summary={false} width={60} height={18} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{rate}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <Funnel data={campaign.stages} width={60} height={18} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Signup → paid</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">9%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">12,400 → 1,116</span>
+          </div>
+        </div>
+        <Funnel data={PIPE} highlight="Activated" summary={false} width={90} height={28} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">9%</span>\n  <span className="unit">12,400 → 1,116</span>\n  <Funnel data={stages} highlight="Activated" width={90} height={28} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {(
+          [
+            ["Organic", PIPE],
+            ["Referral", REFERRAL],
+          ] as const
+        ).map(([name, stages], i) => (
+          <span
+            key={name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {name}
+            <Funnel data={stages} summary={false} width={40} height={14} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Organic <Funnel data={stages} width={40} height={14} />\n</button>`,
+  },
+};
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
@@ -157,6 +267,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SITE } from "@/lib/site";
 import { STABLE_CHARTS } from "@/lib/catalog";
+import { FooterMark } from "@/components/footer-mark";
 
 function XMark() {
   return (
@@ -48,8 +49,8 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-hairline">
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+      <div className="mx-auto max-w-6xl px-4 pb-4 pt-14 sm:px-6">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           <div className="col-span-2 sm:col-span-1">
             <div className="text-[0.95rem] font-semibold tracking-tight">microcharts</div>
             <p className="mt-2 max-w-52 text-sm text-fd-muted-foreground">{SITE.tagline}</p>
@@ -84,7 +85,14 @@ export function SiteFooter() {
             </div>
           ))}
         </div>
-        <div className="mt-12 flex flex-col gap-3 border-t border-hairline pt-6 text-fd-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+      </div>
+
+      {/* The brand moment — the catalog surfaces beneath the wordmark, and the
+          legal bar floats on the same field. */}
+      <FooterMark />
+
+      <div className="relative z-10 mx-auto -mt-9 max-w-6xl px-4 pb-8 sm:px-6 sm:-mt-8">
+        <div className="flex flex-col gap-3 text-fd-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span className="mono-label flex items-center gap-1.5">
             <span>© 2026</span>
             <a

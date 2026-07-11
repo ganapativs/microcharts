@@ -1,6 +1,6 @@
 import { Waterfall } from "@microcharts/react/waterfall";
 import { InteractiveDemo } from "./waterfall.client";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 export { InteractiveDemo };
 
@@ -54,6 +54,13 @@ export const entry: ChartEntry = {
       required: false,
       description: '"down" = decreases are good (cost breakdowns).',
     },
+    {
+      name: "label",
+      type: '"none" | "delta"',
+      required: false,
+      description:
+        '"delta" prints each step\'s signed value in a band below the plot; the biggest movers win when labels would collide.',
+    },
   ],
   demo: PL.map((d) => d.value),
   example: {
@@ -70,6 +77,18 @@ const steps = [
 
 <Waterfall data={steps} start={60} title="Net income bridge" />`,
   },
+  sampleData: [
+    {
+      name: "steps",
+      code: `const steps = [
+  { label: "Product", value: 42 },
+  { label: "Services", value: 18 },
+  { label: "Refunds", value: -12 },
+  { label: "Opex", value: -26 },
+  { label: "FX", value: 5 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -81,9 +100,14 @@ export const showcase = {
   Node: () => <Waterfall data={PL} start={60} title="Net income bridge" width={130} height={24} />,
 };
 
+// domain, format, locale, id, className, style, children: styling/formatting
+// escape hatches, not chart-shape knobs (consistent with every other chart's
+// playground).
 export const playground: PlaygroundSpec = {
   knobs: [
+    { kind: "range", key: "start", label: "start", min: 0, max: 100, step: 5, init: 60 },
     { kind: "toggle", key: "total", label: "total bar", init: true },
+    { kind: "toggle", key: "delta", label: "delta labels", init: false },
     {
       kind: "segmented",
       key: "positive",
@@ -95,8 +119,9 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <Waterfall
       data={PL}
-      start={60}
+      start={s.start as number}
       total={s.total as boolean}
+      label={s.delta ? "delta" : "none"}
       positive={s.positive as "up" | "down"}
       summary={false}
       width={260}
@@ -107,8 +132,9 @@ export const playground: PlaygroundSpec = {
     [
       "<Waterfall",
       "  data={steps}",
-      "  start={60}",
+      `  start={${s.start}}`,
       s.total === false && "  total={false}",
+      s.delta && '  label="delta"',
       s.positive !== "up" && `  positive="${s.positive}"`,
       "/>",
     ]
@@ -118,13 +144,18 @@ export const playground: PlaygroundSpec = {
 
 export const recipes: Recipe[] = [
   {
+    label: "signed step labels (biggest movers win collisions)",
+    code: `<Waterfall data={steps} start={60} label="delta" />`,
+    node: <Waterfall data={PL} start={60} label="delta" summary={false} width={220} height={26} />,
+  },
+  {
     label: "P&L rows",
     code: `{quarters.map((q) => (\n  <Waterfall key={q.id} data={q.steps} start={q.open} title={q.name} />\n))}`,
     node: <Waterfall data={PL} start={60} summary={false} width={160} height={20} />,
   },
   {
     label: "cost bridge (down is good)",
-    code: `<Waterfall data={costSteps} positive="down" />`,
+    code: `<Waterfall data={steps.map((d) => ({ label: d.label, value: -d.value }))} positive="down" />`,
     node: (
       <Waterfall
         data={PL.map((d) => ({ label: d.label, value: -d.value }))}
@@ -137,6 +168,124 @@ export const recipes: Recipe[] = [
     ),
   },
 ];
+
+type Step = { label: string; value: number | null };
+
+const UNITS: { name: string; start: number; steps: Step[] }[] = [
+  { name: "Core", start: 60, steps: PL },
+  {
+    name: "Labs",
+    start: 22,
+    steps: [
+      { label: "Product", value: 9 },
+      { label: "Opex", value: -14 },
+      { label: "FX", value: 2 },
+    ],
+  },
+  {
+    name: "Field",
+    start: 15,
+    steps: [
+      { label: "Product", value: 4 },
+      { label: "Refunds", value: -6 },
+    ],
+  },
+];
+
+const BRIDGES: { name: string; steps: Step[]; positive: "up" | "down" }[] = [
+  { name: "Revenue", steps: PL, positive: "up" },
+  { name: "Costs", steps: PL.map((d) => ({ label: d.label, value: -d.value })), positive: "down" },
+];
+
+/* The four homes — Waterfall always doing the one thing it's for: how signed
+   deltas compose into a total. Every host is a P&L or bridge surface, never a
+   generic "signups" template. */
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Net income bridged from $60k to $87k this quarter{" "}
+        <span className="mx-1 inline-flex align-middle">
+          <Waterfall data={PL} start={60} summary={false} width={100} height={16} />
+        </span>{" "}
+        — Product and Services carried it past Refunds and Opex.
+      </p>
+    ),
+    code: `<p>\n  Net income bridged from $60k to $87k this quarter{" "}\n  <Waterfall data={steps} start={60} width={100} height={16} /> — Product and\n  Services carried it past Refunds and Opex.\n</p>`,
+  },
+  cell: {
+    render: () => (
+      <table className="w-full text-sm tabular-nums">
+        <tbody>
+          {UNITS.map((u) => {
+            const net = u.steps.reduce((s, d) => s + (d.value ?? 0), 0);
+            return (
+              <tr key={u.name} className="border-t border-fd-border/60 first:border-0">
+                <td className="py-1.5 pr-3 text-fd-muted-foreground">{u.name}</td>
+                <td className="py-1.5">
+                  <Waterfall
+                    data={u.steps}
+                    start={u.start}
+                    summary={false}
+                    width={70}
+                    height={16}
+                  />
+                </td>
+                <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
+                  {net >= 0 ? "+" : "−"}
+                  {Math.abs(net)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    ),
+    code: `<td>\n  <Waterfall data={unit.steps} start={unit.start} />\n</td>`,
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Q2 net income</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">$87k</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">from $60k</span>
+          </div>
+        </div>
+        <Waterfall data={PL} start={60} summary={false} width={200} height={26} />
+      </>
+    ),
+    code: `<div className="kpi">\n  <span className="figure">$87k</span>\n  <span className="unit">from $60k</span>\n  <Waterfall data={steps} start={60} />\n</div>`,
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {BRIDGES.map((b, i) => (
+          <span
+            key={b.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
+              i === 0
+                ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground"
+                : "border-fd-border text-fd-muted-foreground"
+            }`}
+          >
+            {b.name}
+            <Waterfall
+              data={b.steps}
+              start={60}
+              positive={b.positive}
+              summary={false}
+              width={44}
+              height={14}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: `<button className="tab">\n  Revenue <Waterfall data={steps} start={60} />\n</button>`,
+  },
+};
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
@@ -160,6 +309,7 @@ export default {
   InteractiveDemo,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

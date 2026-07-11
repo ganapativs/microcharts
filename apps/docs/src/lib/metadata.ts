@@ -8,6 +8,9 @@ type MetaInput = {
   image?: `/${string}`;
   imageAlt?: string;
   noindex?: boolean;
+  /** Markdown-mirror URL — emitted as `<link rel="alternate" type="text/markdown">`
+   *  so agents can discover the machine-readable copy of the page. */
+  markdown?: `/${string}`;
 };
 
 /**
@@ -21,6 +24,7 @@ export function docsMeta({
   image = "/og/default.png",
   imageAlt = SITE.ogImageAlt,
   noindex = false,
+  markdown,
 }: MetaInput): Metadata {
   const url = abs(path);
   const imageUrl = abs(image);
@@ -31,7 +35,10 @@ export function docsMeta({
     title,
     description,
     metadataBase: new URL(SITE.url),
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      ...(markdown ? { types: { "text/markdown": abs(markdown) } } : {}),
+    },
     robots: noindex ? { index: false, follow: false } : { index: true, follow: true },
     openGraph: {
       type: "website",

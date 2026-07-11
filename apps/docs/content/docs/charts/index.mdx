@@ -1,34 +1,32 @@
 ---
 title: All charts
-description: Browse the full microcharts catalog — every shipped chart at word-size, grouped by the data shape and decision each one answers.
+description: The full microcharts catalog — every shipped chart at word size, grouped by the question its collection answers, each linking to a live page.
 ---
 
-Every chart shares one grammar: `data` alone always renders something correct, and
-the same prop names mean the same thing everywhere. Pick by the shape of your data
-and the decision you need someone to make in a single glance.
+One grammar runs through all of them: `data` alone always renders something correct,
+and a prop name means the same thing on every chart. So you don't pick by chart —
+you pick by the **decision** you need read at a glance. The chooser below is filed
+exactly that way: start from the question, land on the chart.
 
 <Cards>
   <Card
-    title="Open the gallery"
+    title="Browse the gallery"
     href="/gallery"
-    description="The whole catalog, visual — every shipped chart at word-size in a searchable card grid (or a dense specimen sheet). The fastest way to find the right one."
+    description="Every chart at true word-size on one searchable, filterable plane — the fastest way to see them, not just read them."
   />
 </Cards>
 
-The sidebar lists every chart individually. Not sure which you need? Start from the
-[gallery](/gallery) — search by name, data shape, or the question you're answering,
-and filter by collection (core, decision, expressive, frontier).
+## Which chart do I use?
 
-## Two entries per chart
+<ChartChooser />
 
-Each chart ships a **static** entry (hook-free, server-component safe, zero client
-JavaScript) and an **interactive** entry (`/interactive`) that adds hover, keyboard
-navigation, and live announcements. Import whichever the context needs.
+## Static and interactive
+
+Each chart ships two entries. The **static** one is hook-free and server-component
+safe — zero client JavaScript, the default. The **interactive** one adds hover,
+keyboard navigation, and live announcements. Import whichever the context needs.
 
 ```tsx
-import { Sparkline } from "@microcharts/react/sparkline"; // static, RSC-safe
+import { Sparkline } from "@microcharts/react/sparkline"; //             static, RSC-safe
 import { Sparkline } from "@microcharts/react/sparkline/interactive"; // hover + keyboard
 ```
-
-The catalog grows toward 100 planned types — the [gallery](/gallery) shows what's
-shipped and what's still on the way.

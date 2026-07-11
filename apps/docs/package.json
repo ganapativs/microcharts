@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "postinstall": "fumadocs-mdx",
-    "predev": "fumadocs-mdx",
+    "predev": "fumadocs-mdx && node scripts/gen-md.ts",
     "dev": "next dev",
+    "prebuild": "node scripts/gen-md.ts",
     "build": "next build",
     "start": "serve out -l 3001",
     "typecheck": "fumadocs-mdx && next typegen && tsc --noEmit",

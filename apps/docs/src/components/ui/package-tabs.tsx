@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { CopyButton } from "./copy";
+import { CommandLine } from "./command-line";
 
 const managers = {
   pnpm: "pnpm add",
@@ -35,12 +36,7 @@ export function PackageTabs({ pkg = "@microcharts/react" }: { pkg?: string }) {
         </div>
       </div>
       <div className="flex items-center gap-2.5 pb-2.5 pl-4 pr-2 pt-1">
-        <code className="min-w-0 flex-1 truncate font-mono text-sm text-fd-foreground">
-          <span aria-hidden className="mr-2 select-none text-fd-primary">
-            $
-          </span>
-          {command}
-        </code>
+        <CommandLine command={command} className="min-w-0 flex-1 truncate text-sm" />
         <CopyButton text={command} size={7} className="shrink-0" />
       </div>
     </div>

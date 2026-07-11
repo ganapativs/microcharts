@@ -17,9 +17,9 @@ function GithubMark() {
 
 const links = [
   { href: "/docs", label: "Docs" },
-  { href: "/docs/charts/sparkline", label: "Charts" },
+  { href: "/docs/charts", label: "Charts" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/docs/accessibility", label: "A11y" },
+  { href: "/docs/ai", label: "AI" },
   { href: "/brand", label: "Brand" },
 ];
 

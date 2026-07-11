@@ -103,3 +103,42 @@ export function waterfallGeometry(opts: {
 
   return { bars, connectors, totalBar, zeroY, levels, pitch };
 }
+
+/** One label the caller wants placed under its column. `w` is an over-estimate
+ *  (never measures text — unmeasurable server-side); `priority` orders drop-out. */
+export interface WaterfallLabelInput {
+  index: number;
+  /** Column-center x. */
+  cx: number;
+  /** Estimated box width in viewBox units. */
+  w: number;
+  /** Drop-out rank: biggest magnitude survives collisions. */
+  priority: number;
+}
+
+export interface PlacedWaterfallLabel {
+  index: number;
+  /** Clamped center x (text-anchor="middle"). */
+  x: number;
+}
+
+/** Deterministic magnitude-priority drop-out for step labels: place the biggest
+ *  movers first (ties by index), skip any label that would overlap a kept one or
+ *  overrun the box. Pure — same inputs, same survivors, no text measurement. */
+export function placeWaterfallLabels(
+  items: readonly WaterfallLabelInput[],
+  viewWidth: number,
+  gap = 1,
+): PlacedWaterfallLabel[] {
+  const order = [...items].sort((a, b) => b.priority - a.priority || a.index - b.index);
+  const kept: { x: number; half: number }[] = [];
+  const out: PlacedWaterfallLabel[] = [];
+  for (const it of order) {
+    const half = Math.min(it.w / 2, viewWidth / 2);
+    const x = clamp(it.cx, half, viewWidth - half);
+    if (kept.some((k) => Math.abs(k.x - x) < k.half + half + gap)) continue;
+    kept.push({ x, half });
+    out.push({ index: it.index, x: round2(x) });
+  }
+  return out.sort((a, b) => a.index - b.index);
+}

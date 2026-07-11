@@ -1,11 +1,11 @@
 ---
 title: Theming
-description: Theme microcharts with ~20 CSS custom properties and named presets — override a token at any scope, switch presets with a data attribute, and get hand-tuned dark mode for free.
+description: Theme microcharts with ~20 CSS custom properties and named presets — override a token at any scope, switch presets with a data attribute, keep semantic colors meaning what they say, and get hand-tuned dark mode and forced-colors support for free.
 ---
 
-microcharts theming is CSS custom properties, all the way down. There is no theme provider
-to wire up and no Tailwind requirement — set a `--mc-*` variable at any scope and every
-chart inside it retunes with zero re-render.
+microcharts theming is CSS custom properties, all the way down. There's no theme provider to
+wire up and no Tailwind requirement — set a `--mc-*` variable at any scope and every chart
+inside it retunes, with zero re-render and no build step.
 
 ## Override a token
 
@@ -16,8 +16,9 @@ chart inside it retunes with zero re-render.
 }
 ```
 
-Precedence is predictable: a **prop** wins over a **CSS variable scope**, which wins over a
-**preset**, which wins over the built-in default.
+Every chart inside `.brand` now draws with that accent and stroke weight. Precedence is
+predictable: a **prop** wins over a **CSS-variable scope**, which wins over a **preset**, which
+wins over the built-in default.
 
 <LiveDemo
   label="Per-instance color"
@@ -35,6 +36,25 @@ Precedence is predictable: a **prop** wins over a **CSS variable scope**, which 
     title="Token"
   />
 </LiveDemo>
+
+## Scope it anywhere
+
+Because the tokens cascade, the scope is yours to choose — the whole app, one brand section, a
+single card, or one chart. Set a token high and every chart below inherits it; override it
+lower and only that subtree changes.
+
+```tsx
+// app-wide, once
+<html style={{ "--mc-accent": "var(--brand-500)" }}>
+
+// just this card's charts
+<div style={{ "--mc-stroke-width": 2, "--mc-radius": 3 }}>
+  <SparkBar data={weekly} />
+</div>
+```
+
+Bind `--mc-accent` to your existing brand variable and the charts follow your design system
+automatically — no per-chart props, no duplicated color values.
 
 ## Presets
 
@@ -63,15 +83,16 @@ JavaScript. They change how charts _look_, never what the data _means_.
 </LiveDemo>
 
 <Callout type="info">
-  This site's appearance menu (the palette icon in the nav) previews these presets and accents live
-  — every chart on every page retunes as you switch, because it is the same token contract.
+  This site's appearance menu (the palette icon in the nav) previews these presets and accents
+  live — every chart on every page retunes as you switch, because it's the same token contract
+  you'd use in your own app.
 </Callout>
 
 ## The token set
 
-Around twenty custom properties cover the whole surface. Set any of them at any scope and
-every chart inside retunes — no re-render, no build step. Here is the full set with its
-defaults, grouped by what it controls and why it exists:
+Around twenty custom properties cover the whole surface. Set any of them at any scope and every
+chart inside retunes. Here's the full set with its defaults, grouped by what it controls and why
+it exists:
 
 ```css
 :root {
@@ -150,14 +171,33 @@ defaults, grouped by what it controls and why it exists:
 }
 ```
 
-Two rules make this predictable. **Semantic tokens keep their meaning** — swapping `--mc-accent`
-retints the emphasis colour, but `--mc-positive`/`--mc-negative` still mean up and down, so a
-preset can restyle a chart without ever changing what it says. And **every token has a
-hand-tuned dark value** (never auto-inverted — see [Dark mode](#dark-mode)), so overriding one
-light value doesn't quietly break the dark surface.
+## Semantic vs categorical color
 
-## Dark mode
+Two rules make theming predictable and keep it honest.
 
-Dark values are hand-tuned per token — never auto-inverted. microcharts follows
-`prefers-color-scheme` out of the box, and you can force a scope with `data-mc-theme="dark"`.
-Charts never paint their own background, so they always sit cleanly on your surface.
+**Semantic tokens keep their meaning.** Swapping `--mc-accent` retints the one emphasis color,
+but `--mc-positive`/`--mc-negative` still mean up and down — so a preset can restyle a chart
+without ever changing what it says. Color encodes; it never merely decorates.
+
+**Categorical colors are a last resort.** Most microcharts show one series and never touch the
+palette. When a chart genuinely needs several, the six `--mc-cat-*` hues are ordered
+high-contrast-first and chosen to survive color-vision differences _and_ grayscale print — so a
+two-series chart automatically reaches for the most separable pair.
+
+## The readout surface
+
+The only opaque plane in the whole library is the value chip an interactive chart shows on
+hover or focus. Its three `--mc-surface*` tokens default to the system `Canvas`, so it adapts to
+light, dark, and forced-colors with no configuration. Point them at your popover tokens when you
+want the chip to match a themed surface exactly.
+
+## Dark mode and forced colors
+
+Dark values are hand-tuned per token — never auto-inverted, so overriding one light value can't
+quietly break the dark surface. microcharts follows `prefers-color-scheme` out of the box, and
+you can force a scope with `data-mc-theme="dark"`. Charts never paint their own background, so
+they always sit cleanly on your surface.
+
+Under Windows High Contrast (`forced-colors`), the semantic tokens defer to system colors —
+ink to `CanvasText`, accent to `Highlight`, muted marks to `GrayText` — so a chart stays legible
+even when your palette is overridden entirely.

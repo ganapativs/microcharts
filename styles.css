@@ -124,12 +124,17 @@
      currentColor. Direction is double-encoded (triangle shape + color). */
   :where(.mc-delta) {
     display: inline-flex;
-    align-items: center;
+    /* Align to the text BASELINE, not the x-height middle: inline-flex +
+       vertical-align:middle rode the box high beside running text ("Revenue
+       ▲ +12.4%" sat above the line). align-items:baseline lets the number set
+       the box baseline; vertical-align:baseline seats it on the sentence line.
+       Metric-independent — scales with font-size, no magic numbers. */
+    align-items: baseline;
     gap: var(--mc-gap);
     font: var(--mc-font);
     font-variant-numeric: tabular-nums;
     color: var(--mc-neutral);
-    vertical-align: middle;
+    vertical-align: baseline;
     line-height: 1;
   }
   :where(.mc-delta[data-mc-valence="pos"]) {
@@ -141,9 +146,13 @@
   :where(.mc-delta .mc-delta-glyph) {
     fill: currentColor;
     flex: none;
+    /* The NUMBER owns the box baseline (align-items:baseline on the parent); the
+       glyph must not participate or the taller svg drags the baseline up and the
+       whole delta rides high in a sentence. Center it on the number instead. */
+    align-self: center;
     /* optical: the digits' ink centre sits a hair below the line-box centre —
        nudge the mark down to match so glyph + number share one midline. */
-    transform: translateY(0.045em);
+    transform: translateY(0.055em);
   }
   :where(.mc-delta .mc-delta-num) {
     font-weight: 600;
