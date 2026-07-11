@@ -1,4 +1,5 @@
 import { FatDigits } from "@microcharts/react/fat-digits";
+import { FatDigits as FatDigitsInteractive } from "@microcharts/react/fat-digits/interactive";
 import { InteractiveDemo } from "./fat-digits.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -102,6 +103,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <FatDigitsInteractive
+      value={s.value as number}
+      domain={DOMAIN}
+      encode={s.encode as "value" | "digit"}
+      tiers={Number(s.tiers) as 3 | 5}
+      summary={false}
+      animate={ui.animate}
+      fontSize={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<FatDigits",
+      `  value={${s.value}}`,
+      "  domain={[0, 2100]}",
+      s.encode !== "value" && `  encode="${s.encode}"`,
+      s.tiers !== "5" && `  tiers={${s.tiers}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Tap to change the value — the numeral stays exact while its weight eases to the new tier (on variable fonts; it snaps otherwise). The value and tier are announced through a polite live region.",
 };
 
 export const recipes: Recipe[] = [

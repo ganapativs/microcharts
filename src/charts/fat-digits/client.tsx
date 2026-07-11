@@ -4,6 +4,7 @@
 // otherwise), with no layout shift (tabular-nums). Wrapper focus only — the
 // numeral is one value. Composes the static component.
 import { useEffect, useRef, useState } from "react";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";
 import { FatDigits as StaticFatDigits, fatDigitsSummary, type FatDigitsProps } from "./index.js";
 
@@ -11,12 +12,19 @@ export interface InteractiveFatDigitsProps extends FatDigitsProps {
   /** Announce changes through a polite region (default true). */
   live?: boolean;
   strings?: FatStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the numeral fades in when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
   const {
     live = true,
     strings = EN_FAT,
+    animate = false,
     title,
     value,
     domain,
@@ -26,6 +34,8 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
     locale,
     ...rest
   } = props;
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "fade", animate);
   const summary = fatDigitsSummary(value, { encode, tiers, domain, strings, format, locale });
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");
@@ -40,6 +50,7 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-fat-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

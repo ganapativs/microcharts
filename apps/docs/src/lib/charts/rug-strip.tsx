@@ -1,4 +1,5 @@
 import { RugStrip } from "@microcharts/react/rug-strip";
+import { RugStrip as RugStripInteractive } from "@microcharts/react/rug-strip/interactive";
 import { InteractiveDemo } from "./rug-strip.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -110,6 +111,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <RugStripInteractive
+      data={data}
+      markValue={(s.markValue as boolean) ? data[Math.floor(data.length / 2)] : undefined}
+      orientation={s.orientation as "horizontal" | "vertical"}
+      domain={(s.domain as boolean) ? [0, 150] : undefined}
+      summary={false}
+      animate={ui.animate}
+      style={s.orientation === "vertical" ? { width: 20, height: 140 } : { width: 220, height: 22 }}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<RugStrip",
+      "  data={salaries}",
+      (s.markValue as boolean) && "  markValue={you}",
+      s.orientation === "vertical" && '  orientation="vertical"',
+      (s.domain as boolean) && "  domain={[0, 150]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover for the nearest observation; arrow keys walk them in sorted order with rank readouts.",
 };
 
 export const recipes: Recipe[] = [

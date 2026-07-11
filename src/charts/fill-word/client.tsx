@@ -4,6 +4,7 @@
 // through a polite region, throttled to ≥1 s so a streaming value never spams.
 // Wrapper focus only (one value). Composes the static component.
 import { useEffect, useRef, useState } from "react";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_FILL_WORD, type FillWordStrings } from "../../core/strings-fill-word.js";
 import { FillWord as StaticFillWord, fillWordSummary, type FillWordProps } from "./index.js";
 
@@ -11,10 +12,27 @@ export interface InteractiveFillWordProps extends FillWordProps {
   /** Announce changes through a polite region (default true). */
   live?: boolean;
   strings?: FillWordStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the word fades in when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
-  const { live = true, strings = EN_FILL_WORD, title, value, word, mode = "fill", ...rest } = props;
+  const {
+    live = true,
+    strings = EN_FILL_WORD,
+    animate = false,
+    title,
+    value,
+    word,
+    mode = "fill",
+    ...rest
+  } = props;
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "fade", animate);
   const summary = fillWordSummary(value, word, mode, strings);
   const prev = useRef(value);
   const last = useRef(0);
@@ -42,6 +60,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-fillword-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
