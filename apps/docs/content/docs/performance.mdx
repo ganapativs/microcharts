@@ -1,6 +1,6 @@
 ---
 title: Performance
-description: Zero dependencies, budget-gated sizes, and server rendering with no client JavaScript — 106 chart types measured at 0.9–3.6 kB gzip (median 2.3) and rendered to SVG at about 0.01 ms each. Every number here is reproducible from one command.
+description: Zero dependencies, budget-gated sizes, and server rendering with no client JavaScript — 106 chart types measured at 0.9–3.6 kB gzip (median 2.3) and rendered to SVG at about 0.035 ms each. Every number here is reproducible from one command.
 ---
 
 Performance isn't a marketing line here — it's a build gate. Every figure on this page
@@ -43,8 +43,8 @@ document, and ships nothing to hydrate. Across all 106 chart types the median re
 the simple strips cost almost nothing.
 
 The core summary kernel is just as cheap: `describeSeries`, which writes every chart's
-accessible sentence, runs at roughly **960,000 calls per second**, so accessibility is never
-the thing that slows a render down.
+accessible sentence, runs at roughly **966,000 calls per second** (24-point series, measured by
+`pnpm bench`), so accessibility is never the thing that slows a render down.
 
 ## Why it's fast
 

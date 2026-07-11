@@ -46,6 +46,22 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
 ```
 
+## Animate on mount (optional)
+
+Every interactive entry also takes an `animate` prop — the chart draws on instead of appearing
+instantly. It's off by default, and inert on the server and on hydrated server HTML, so it never
+fights SSR or flashes over painted content; a fresh client-side mount is what plays it. Wire the
+engine once, client-side, then opt in per chart:
+
+```tsx
+import "@microcharts/react/motion"; // once, client-side
+
+<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" animate />;
+```
+
+`prefers-reduced-motion` wins unconditionally — a reader who asked for less motion gets the
+finished chart, never the entrance.
+
 ## Import paths
 
 Import each chart from its own subpath so you only ship what you use. Every chart in the catalog
