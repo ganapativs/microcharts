@@ -105,8 +105,8 @@ export const playground: PlaygroundSpec = {
       label={s.label as "poc" | "none"}
       valueArea={(s.valueArea as number) / 100}
       summary={false}
-      width={120}
-      height={80}
+      width={200}
+      height={132}
     />
   ),
   code: (s) =>
@@ -128,8 +128,8 @@ export const playground: PlaygroundSpec = {
       valueArea={(s.valueArea as number) / 100}
       animate={ui.animate}
       summary={false}
-      width={120}
-      height={80}
+      width={200}
+      height={132}
     />
   ),
   codeInteractive: (s, _data, ui) =>
