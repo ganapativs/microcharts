@@ -4,8 +4,16 @@
 // the arrow keys. Follows the CANONICAL INTERACTIVE PATTERN (CLAUDE.md):
 // composes the static component (summary={false}, focus ring as its child),
 // one pointer listener on the wrapper, announcements via SummaryStrings.
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import { activityGridGeometry } from "./geometry.js";
@@ -21,6 +29,12 @@ import {
 export interface InteractiveActivityGridProps extends ActivityGridProps {
   /** Swappable announcement strings (defaults to EN). */
   strings?: SeriesStrings & SlotStrings;
+  /**
+   * Opt-in entrance motion (default `false`): cells fade in on first
+   * client-side mount. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const DEFAULT_STRINGS = { ...EN_SERIES, ...EN_SLOTS };
@@ -40,10 +54,14 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     title,
     summary,
     strings = DEFAULT_STRINGS,
+    animate = false,
     className,
     style,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate);
 
   const rows = layout === "strip" ? 1 : 7;
   const offset = layout === "grid" ? calendarOffset(start, weekStart) : 0;
@@ -141,6 +159,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
 
   return (
     <span
+      ref={hostRef}
       className={className ? `mc-activity-interactive ${className}` : "mc-activity-interactive"}
       style={wrapStyle}
       tabIndex={0}

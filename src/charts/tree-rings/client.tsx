@@ -2,14 +2,23 @@
 // Interactive <TreeRings> (plan/24 #13). Radial pointer lookup (distance from
 // centre → ring index) + ←/→ stepping inner→outer; the focused ring is ringed
 // and its period announced. Composes the static component.
-import { useMemo, useState, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { treeRingsGeometry } from "./geometry.js";
 import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import { TreeRings as StaticTreeRings, treeRingsSummary, type TreeRingsProps } from "./index.js";
 
 export interface InteractiveTreeRingsProps extends TreeRingsProps {
   strings?: TreeStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the ring disc fades and scales
+   * in on first client-side mount — rings are merged into O(1) path nodes for
+   * the SSR hot path, so a per-ring stagger isn't available; a center-out
+   * scale echoes the rings growing outward instead. Inert on the server and
+   * on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
@@ -24,8 +33,12 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     title,
     summary,
     strings = EN_TREE,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "pop", animate);
 
   const geo = useMemo(
     () => treeRingsGeometry({ values: data, size, pad: 1, total }),
@@ -71,6 +84,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-tree-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

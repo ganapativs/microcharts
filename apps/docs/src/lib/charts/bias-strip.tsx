@@ -1,4 +1,5 @@
 import { BiasStrip } from "@microcharts/react/bias-strip";
+import { BiasStrip as BiasStripInteractive } from "@microcharts/react/bias-strip/interactive";
 import { InteractiveDemo } from "./bias-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -86,6 +87,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <BiasStripInteractive
+      data={PAIRS}
+      limits={(s.wide as boolean) ? 2.58 : 1.96}
+      label={(s.caption as boolean) ? "bias" : "none"}
+      r={s.r as number}
+      summary={false}
+      animate={ui.animate}
+      width={220}
+      height={120}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BiasStrip",
+      "  data={pairs}",
+      (s.wide as boolean) && "  limits={2.58}",
+      !(s.caption as boolean) && '  label="none"',
+      s.r !== 1.5 && `  r={${s.r}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover the nearest pair or step by mean with ←/→ — each announces its mean, difference, and whether it clears the limits.",
 };
 
 export const recipes: Recipe[] = [

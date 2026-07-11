@@ -182,6 +182,35 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <ActivityGridInteractive
+      data={data}
+      layout={s.layout as "grid" | "strip"}
+      shape={s.shape as "square" | "round" | "dot"}
+      cell={Number(s.cell)}
+      start={s.align !== "none" ? ALIGN_DATE : undefined}
+      weekStart={s.align === "sunday" ? 0 : 1}
+      domain={s.domain ? DOMAIN : undefined}
+      animate={ui.animate}
+      title="Playground"
+    />
+  ),
+  codeInteractive: (s, data, ui) =>
+    [
+      "<ActivityGrid",
+      `  data={/* ${data.length} values */}`,
+      `  layout="${s.layout}"`,
+      s.shape !== "square" && `  shape="${s.shape}"`,
+      `  cell={${s.cell}}`,
+      s.align !== "none" && `  start="${ALIGN_DATE}"`,
+      s.align === "sunday" && "  weekStart={0}",
+      s.domain && "  domain={[0, 6]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover a cell, or focus and move in 2-D with the arrow keys.",
 };
 
 export const recipes: Recipe[] = [

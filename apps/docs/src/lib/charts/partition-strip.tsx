@@ -1,4 +1,5 @@
 import { PartitionStrip } from "@microcharts/react/partition-strip";
+import { PartitionStrip as PartitionStripInteractive } from "@microcharts/react/partition-strip/interactive";
 import { InteractiveDemo } from "./partition-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -109,6 +110,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PartitionStripInteractive
+      data={TREE}
+      labels={s.labels as boolean}
+      emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
+      summary={false}
+      animate={ui.animate}
+      width={320}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PartitionStrip",
+      "  data={bundle}",
+      s.labels === false && "  labels={false}",
+      s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover, or use ←/→ within a row and ↑/↓ between a parent and its children — each announces its share.",
 };
 
 export const recipes: Recipe[] = [

@@ -2,14 +2,21 @@
 // Interactive <HeatCell> (plan/22 #3). One target — no pointer lookup needed;
 // focus/hover reveals the formatted value + calibrated level with ActivityGrid
 // announcement parity ("42 — level 3 of 5."). Composes the static entry.
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { heatCellGeometry } from "./geometry.js";
 import { HeatCell as StaticHeatCell, heatCellSummary, type HeatCellProps } from "./index.js";
 
 export interface InteractiveHeatCellProps extends HeatCellProps {
   strings?: ScalarStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the cell fades and scales in on
+   * first client-side mount. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
@@ -23,8 +30,12 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
     title,
     summary,
     strings = EN_SCALAR,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "pop", animate);
 
   const [active, setActive] = useState(false);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -36,6 +47,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-heat-cell-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

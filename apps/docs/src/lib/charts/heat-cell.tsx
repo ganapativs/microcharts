@@ -1,4 +1,5 @@
 import { HeatCell } from "@microcharts/react/heat-cell";
+import { HeatCell as HeatCellInteractive } from "@microcharts/react/heat-cell/interactive";
 import { InteractiveDemo } from "./heat-cell.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -122,6 +123,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <HeatCellInteractive
+      value={s.value as number}
+      domain={D}
+      steps={s.steps as number}
+      shape={s.shape as "square" | "round" | "dot"}
+      label={(s.label as boolean) ? "value" : "none"}
+      animate={ui.animate}
+      style={{ width: 48, height: 48 }}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<HeatCell",
+      `  value={${s.value}}`,
+      "  domain={[0, 100]}",
+      s.steps !== 5 && `  steps={${s.steps}}`,
+      s.shape !== "square" && `  shape="${s.shape}"`,
+      (s.label as boolean) && '  label="value"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or focus a cell — it reveals the value and its calibrated level.",
 };
 
 export const recipes: Recipe[] = [

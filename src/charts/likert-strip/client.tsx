@@ -2,14 +2,21 @@
 // Interactive <LikertStrip> (plan/22 #30). One pointer listener; segment by
 // x-band lookup. ←/→ step levels in DATA order ("Agree: 34%, level 4 of 5.").
 // Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { likertStripGeometry } from "./geometry.js";
 import { LikertStrip as StaticLikertStrip, likertSummary, type LikertStripProps } from "./index.js";
 
 export interface InteractiveLikertStripProps extends LikertStripProps {
   strings?: CompositionStrings;
+  /**
+   * Opt-in entrance motion (default `false`): segments fade in from the
+   * center line on first client-side mount. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode {
@@ -24,8 +31,15 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
     strings = EN_COMPOSITION,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate, {
+    selector:
+      'rect[data-mc-ink="negative"], rect[data-mc-ink="positive"], rect[data-mc-ink="neutral"]',
+  });
 
   const fontSize = 5;
   const gutter = label === "none" ? 0 : Math.ceil(4 * fontSize * 0.62) + 2;
@@ -102,6 +116,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className="mc-likert-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

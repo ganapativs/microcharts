@@ -2,7 +2,15 @@
 // Interactive <PartitionStrip> (plan/25 §13). One pointer listener; segment by
 // row (y) + x lookup. ←/→ within a row, ↑/↓ between a parent and its first child
 // (2-D keyboard, ActivityGrid model). Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_PARTITION } from "../../core/strings-partition.js";
 import { partitionStripGeometry, type PartitionSegment } from "./geometry.js";
 import {
@@ -13,7 +21,16 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function PartitionStrip(props: PartitionStripProps): React.ReactNode {
+export interface InteractivePartitionStripProps extends PartitionStripProps {
+  /**
+   * Opt-in entrance motion (default `false`): both rows of segments fade in,
+   * staggered, on first client-side mount. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function PartitionStrip(props: InteractivePartitionStripProps): React.ReactNode {
   const {
     data,
     labels = true,
@@ -22,8 +39,14 @@ export function PartitionStrip(props: PartitionStripProps): React.ReactNode {
     strings = EN_PARTITION,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate, {
+    selector: 'rect[data-mc-cat], rect[data-mc-ink="accent"], rect[data-mc-ink="neutral"]',
+  });
 
   const geo = useMemo(
     () => partitionStripGeometry({ data, width, height, gap: 1 }),
@@ -104,6 +127,7 @@ export function PartitionStrip(props: PartitionStripProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-partition-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

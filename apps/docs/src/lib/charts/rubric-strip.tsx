@@ -1,4 +1,5 @@
 import { RubricStrip } from "@microcharts/react/rubric-strip";
+import { RubricStrip as RubricStripInteractive } from "@microcharts/react/rubric-strip/interactive";
 import { InteractiveDemo } from "./rubric-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -98,6 +99,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <RubricStripInteractive
+      data={RUBRIC}
+      labels={s.labels as boolean}
+      target={s.showTarget ? (s.target as number) / 100 : undefined}
+      summary={false}
+      animate={ui.animate}
+      width={260}
+      height={40}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<RubricStrip",
+      "  data={criteria}",
+      s.labels === false && "  labels={false}",
+      s.showTarget && `  target={${((s.target as number) / 100).toFixed(2)}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use ↑/↓ across the criteria — each announces its score and weight share.",
 };
 
 export const recipes: Recipe[] = [

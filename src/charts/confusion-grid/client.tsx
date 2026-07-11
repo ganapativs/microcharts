@@ -3,7 +3,15 @@
 // lookup. 2-D arrow roving (ActivityGrid model); Home/End jump the diagonal. The
 // live region reuses the FULL row/column labels — this entry is the full-label
 // read-back path. Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_CONFUSION } from "../../core/strings-confusion.js";
 import { confusionGridGeometry } from "./geometry.js";
 import {
@@ -14,7 +22,16 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function ConfusionGrid(props: ConfusionGridProps): React.ReactNode {
+export interface InteractiveConfusionGridProps extends ConfusionGridProps {
+  /**
+   * Opt-in entrance motion (default `false`): cells fade in on first
+   * client-side mount. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function ConfusionGrid(props: InteractiveConfusionGridProps): React.ReactNode {
   const {
     data,
     normalize = "row",
@@ -22,8 +39,12 @@ export function ConfusionGrid(props: ConfusionGridProps): React.ReactNode {
     strings = EN_CONFUSION,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate);
 
   const { labels, counts } = data;
   const k = Math.max(2, Math.min(4, labels.length));
@@ -100,6 +121,7 @@ export function ConfusionGrid(props: ConfusionGridProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-confusion-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

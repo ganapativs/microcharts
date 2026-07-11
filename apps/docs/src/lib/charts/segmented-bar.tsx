@@ -1,4 +1,5 @@
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
+import { SegmentedBar as SegmentedBarInteractive } from "@microcharts/react/segmented-bar/interactive";
 import { InteractiveDemo } from "./segmented-bar.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -152,6 +153,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <SegmentedBarInteractive
+      data={MIX}
+      label={s.label as "none" | "percent" | "value"}
+      order={s.order as "data" | "desc"}
+      maxSegments={s.maxSegments as number}
+      summary={false}
+      animate={ui.animate}
+      width={260}
+      height={22}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<SegmentedBar",
+      "  data={mix}",
+      s.label !== "none" && `  label="${s.label}"`,
+      s.order !== "data" && `  order="${s.order}"`,
+      s.maxSegments !== 5 && `  maxSegments={${s.maxSegments}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow through the segments — Other announces its member count.",
 };
 
 export const recipes: Recipe[] = [

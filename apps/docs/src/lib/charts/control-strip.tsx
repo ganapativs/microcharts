@@ -1,4 +1,5 @@
 import { ControlStrip } from "@microcharts/react/control-strip";
+import { ControlStrip as ControlStripInteractive } from "@microcharts/react/control-strip/interactive";
 import { InteractiveDemo } from "./control-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -113,6 +114,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ControlStripInteractive
+      data={DEMO}
+      limits={s.limits as "sigma" | "percentile"}
+      rules={s.rules ? "we" : "none"}
+      dots={s.dots ? "all" : "out"}
+      summary={false}
+      animate={ui.animate}
+      width={280}
+      height={26}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ControlStrip",
+      "  data={weights}",
+      s.limits !== "sigma" && `  limits="${s.limits}"`,
+      s.rules && '  rules="we"',
+      s.dots && '  dots="all"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the points — out-of-control points announce which limit they crossed.",
 };
 
 export const recipes: Recipe[] = [

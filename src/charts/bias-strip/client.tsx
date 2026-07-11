@@ -4,15 +4,32 @@
 // by mean, announcing the formatted mean, difference, and whether the pair falls
 // outside the limits of agreement. Focus ring on the active dot. Composes the
 // static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_BIAS_STRIP } from "../../core/strings-bias-strip.js";
 import { biasLayout, biasStripGeometry } from "./geometry.js";
 import { BiasStrip as StaticBiasStrip, biasStripSummary, type BiasStripProps } from "./index.js";
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function BiasStrip(props: BiasStripProps): React.ReactNode {
+export interface InteractiveBiasStripProps extends BiasStripProps {
+  /**
+   * Opt-in entrance motion (default `false`): the pair dots settle onto the
+   * plot on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
   const {
     data,
     limits = 1.96,
@@ -23,9 +40,13 @@ export function BiasStrip(props: BiasStripProps): React.ReactNode {
     strings = EN_BIAS_STRIP,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
   const { rad, outlierRad, captionPad } = biasLayout(width, height, props.label ?? "bias", props.r);
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "settle", animate, { selector: "circle" });
 
   const geo = useMemo(
     () => biasStripGeometry({ width, height, data, limits, rad: outlierRad, captionPad }),
@@ -121,6 +142,7 @@ export function BiasStrip(props: BiasStripProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-bias-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

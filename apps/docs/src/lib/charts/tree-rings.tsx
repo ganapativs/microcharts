@@ -1,4 +1,5 @@
 import { TreeRings } from "@microcharts/react/tree-rings";
+import { TreeRings as TreeRingsInteractive } from "@microcharts/react/tree-rings/interactive";
 import { InteractiveDemo } from "./tree-rings.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -120,6 +121,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <TreeRingsInteractive
+      data={YEARS}
+      rings={s.rings as "stroke" | "fill"}
+      highlight={s.highlight as "last" | "none"}
+      label={s.label ? "last" : "none"}
+      unit="years"
+      periodWord="year"
+      summary={false}
+      animate={ui.animate}
+      size={56}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<TreeRings",
+      "  data={years}",
+      s.rings !== "stroke" && `  rings="${s.rings}"`,
+      s.highlight !== "last" && `  highlight="${s.highlight}"`,
+      s.label && '  label="last"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover a ring, or arrow ←/→ from the centre out — each period announces its value. The channel is ring thickness, not area: equal thickness at a larger radius spans more area, so read thicknesses, not wedges.",
 };
 
 export const recipes: Recipe[] = [

@@ -4,8 +4,9 @@
 // trapping it to cycle violations would break keyboard escape; the violations
 // are visible as rings.) Composes the static component (canon); the crosshair +
 // readout chip are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_CONTROL, type ControlStrings } from "../../core/strings-control.js";
 import { controlGeometry } from "./geometry.js";
 import {
@@ -16,6 +17,12 @@ import {
 
 export interface InteractiveControlStripProps extends ControlStripProps {
   strings?: ControlStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the process line draws on first
+   * client-side mount. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function ControlStrip(props: InteractiveControlStripProps): React.ReactNode {
@@ -31,8 +38,12 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
     strings = EN_CONTROL,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
     () => controlGeometry({ width, height, data, limits, baseline, rules, domain: props.domain }),
@@ -116,6 +127,7 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
 
   return (
     <span
+      ref={hostRef}
       className="mc-control-strip-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

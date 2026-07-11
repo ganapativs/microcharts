@@ -1,4 +1,5 @@
 import { LikertStrip } from "@microcharts/react/likert-strip";
+import { LikertStrip as LikertStripInteractive } from "@microcharts/react/likert-strip/interactive";
 import { InteractiveDemo } from "./likert-strip.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -125,6 +126,29 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <LikertStripInteractive
+      data={SURVEY}
+      neutral={s.neutral as "split" | "omit"}
+      label={s.label as "ends" | "net" | "none"}
+      summary={false}
+      animate={ui.animate}
+      width={260}
+      height={26}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<LikertStrip",
+      "  data={responses}",
+      s.neutral !== "split" && `  neutral="${s.neutral}"`,
+      s.label !== "ends" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow through the levels — each announces its share and position.",
 };
 
 export const recipes: Recipe[] = [

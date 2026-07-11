@@ -1,4 +1,5 @@
 import { ABStrips } from "@microcharts/react/ab-strips";
+import { ABStrips as ABStripsInteractive } from "@microcharts/react/ab-strips/interactive";
 import { InteractiveDemo } from "./ab-strips.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -122,6 +123,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ABStripsInteractive
+      data={{ a: A, b: B }}
+      format={MS}
+      positive={s.positive as "up" | "down"}
+      label={s.label as "delta" | "none"}
+      summary={false}
+      animate={ui.animate}
+      width={280}
+      height={26}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ABStrips",
+      "  data={{ a: control, b: test }}",
+      s.positive === "down" && '  positive="down"',
+      s.label !== "delta" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow (↑/↓ rows, ←/→ edges) — the median announces the delta vs the other arm; other edges announce the percentile.",
 };
 
 export const recipes: Recipe[] = [

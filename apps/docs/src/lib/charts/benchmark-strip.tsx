@@ -1,4 +1,5 @@
 import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
+import { BenchmarkStrip as BenchmarkStripInteractive } from "@microcharts/react/benchmark-strip/interactive";
 import { InteractiveDemo } from "./benchmark-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -114,6 +115,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <BenchmarkStripInteractive
+      data={data}
+      value={s.value as number}
+      range={s.range as "p5p95" | "minmax"}
+      label={s.label as "percentile" | "value" | "none"}
+      summary={false}
+      animate={ui.animate}
+      width={280}
+      height={16}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BenchmarkStrip",
+      "  data={peerLatencies}",
+      `  value={${s.value}}`,
+      s.range !== "p5p95" && `  range="${s.range}"`,
+      s.label !== "percentile" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the quantile edges — each names its percentile and value.",
 };
 
 export const recipes: Recipe[] = [

@@ -1,4 +1,5 @@
 import { CalibrationStrip } from "@microcharts/react/calibration-strip";
+import { CalibrationStrip as CalibrationStripInteractive } from "@microcharts/react/calibration-strip/interactive";
 import { InteractiveDemo } from "./calibration-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -120,6 +121,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <CalibrationStripInteractive
+      data={BINS}
+      variant={s.variant as "dots" | "bars"}
+      minSupport={s.minSupport as number}
+      summary={false}
+      animate={ui.animate}
+      width={300}
+      height={44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<CalibrationStrip",
+      "  data={reliability}",
+      s.variant !== "dots" && `  variant="${s.variant}"`,
+      s.minSupport !== 11 && `  minSupport={${s.minSupport}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use ←/→ across the bins — each announces predicted vs observed and its sample support.",
 };
 
 export const recipes: Recipe[] = [

@@ -1,4 +1,5 @@
 import { ConfusionGrid } from "@microcharts/react/confusion-grid";
+import { ConfusionGrid as ConfusionGridInteractive } from "@microcharts/react/confusion-grid/interactive";
 import { InteractiveDemo } from "./confusion-grid.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -128,6 +129,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ConfusionGridInteractive
+      data={THREE}
+      normalize={s.normalize as "row" | "none"}
+      accent={s.accent as "diagonal" | "errors"}
+      label={s.label ? "accuracy" : "none"}
+      shape={s.round ? "round" : "square"}
+      summary={false}
+      animate={ui.animate}
+      size={120}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ConfusionGrid",
+      "  data={{ labels, counts }}",
+      s.normalize !== "row" && `  normalize="${s.normalize}"`,
+      s.accent !== "diagonal" && `  accent="${s.accent}"`,
+      s.label === true && '  label="accuracy"',
+      s.round === true && '  shape="round"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use the arrow keys across the grid — each cell announces actual vs predicted as a share of the actual class.",
 };
 
 export const recipes: Recipe[] = [

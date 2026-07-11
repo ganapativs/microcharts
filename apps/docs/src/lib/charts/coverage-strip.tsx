@@ -1,4 +1,5 @@
 import { CoverageStrip } from "@microcharts/react/coverage-strip";
+import { CoverageStrip as CoverageStripInteractive } from "@microcharts/react/coverage-strip/interactive";
 import { InteractiveDemo } from "./coverage-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -129,6 +130,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <CoverageStripInteractive
+      data={data}
+      expected={18}
+      mode={s.mode as "binary" | "intensity"}
+      shape={s.shape as "square" | "round"}
+      label={s.label as "none" | "percent"}
+      summary={false}
+      animate={ui.animate}
+      width={260}
+      height={16}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<CoverageStrip",
+      "  data={readings}",
+      "  expected={18}",
+      s.mode !== "binary" && `  mode="${s.mode}"`,
+      s.shape !== "square" && `  shape="${s.shape}"`,
+      s.label !== "none" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow through the slots — each says whether it was measured, or missing.",
 };
 
 export const recipes: Recipe[] = [
