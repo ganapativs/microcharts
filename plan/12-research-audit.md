@@ -1660,3 +1660,30 @@ the shipped 98, the plan/15 cut ledger, and the plan/05 bans). Approved: CohortT
 WinProbWorm, QueueDepth, SpreadBand, BiasStrip, PercentileTrace. Rejected with reasons (logged to prevent
 re-litigation): Q–Q micro (read-back), DirectionRose (PolarClock variant), mix-shift ribbons (QuipuCord class),
 TransitionGrid (ConfusionGrid recipe), RaceSplitBars, runway (EtaBar), warming stripes/spend-pace/swing needle (covered).
+
+## 2026-07-11 — unified opt-in entrance motion + CSS split (branch `unified-motion`)
+
+- **`animate` prop on interactive entries** (plan/04 §8.1 amended; static entries untouched). One
+  shared WAAPI engine, 8 archetypes (draw/wipe/rise/reveal/settle/sweep/pop/fade), one vocabulary:
+  entrances `cubic-bezier(0.23,1,0.32,1)`, 200–450 ms by archetype, 30 ms stagger capped at 240 ms
+  total; ≥80-mark grids fall back to the whole-svg fade (bounded work). Provenance: emil-design-eng /
+  apple-design skill standards (easing/duration/interruptibility tables), applied + self-reviewed
+  against the review-animations 10-standard checklist; durations trimmed one notch for word-sized
+  marks after that review.
+- **Engine delivery = import-once subpath `./motion`** (self-registers into the per-chart gate;
+  `sideEffects`-listed). Measured: engine 1.39 kB gz own budget row; gate ≈ +0.32 kB gz per wired
+  interactive subpath → plan/21 §1 "+0.35 kB motion-gate allowance" amendment. Rejected alternative:
+  dynamic `import()` from the gate — size-limit counts the async chunk into every interactive subpath
+  (+1.57 kB measured on sparkline), gutting the `static+1 kB` law for bytes most consumers never fetch.
+- **SSR/hydration contract**: entrances play ONLY on fresh client-side mounts (useSyncExternalStore
+  hydration latch) — server output byte-identical with/without `animate` (renderToString equality
+  test), hydrated paints never replay an entrance (no flash), hidden documents skip entirely
+  (background tabs/print/headless), `prefers-reduced-motion` skips, at-rest DOM proven byte-identical
+  in a real browser (src/shared/motion.browser.test.tsx).
+- **CSS delivery amendment** (plan/19): styles.css audit at 106 charts → ~90 % universal
+  (role system + a11y media blocks can't split); surgical split via `@mc-chart` markers →
+  generated `styles/core.css` + per-chart sheets, aggregate stays default. Entrance motion adds
+  ZERO CSS.
+- **Docs**: unified playground (static ↔ interactive mode, animate toggle, replay, imports-complete
+  snippets) replaces the separate Playground + InteractiveDemo sections on every chart page;
+  `animate` auto-documented in every interactive chart's prop table with reduced-motion/SSR notes.

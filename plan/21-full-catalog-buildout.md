@@ -44,7 +44,7 @@ per subpath.** New gates:
 | Metric | Budget | Gate |
 |---|---|---|
 | Gzip per static chart subpath (tree-shaken, incl. shared core) | **≤ 3 kB** hard · ≤ 2 kB target · simple charts (Delta-class) ≤ 1.5 kB. One documented flagship exception: Sparkline 3.35/4.35 kB (user-approved 2026-07-08, plan/12 — not a precedent) | size-limit per subpath |
-| Gzip per interactive subpath | **≤ static + 1 kB** (≤ 4 kB hard) | size-limit per subpath |
+| Gzip per interactive subpath | **≤ static + 1 kB** (≤ 4 kB hard) · **+ 0.35 kB motion-gate allowance** once the chart wires the opt-in `animate` entrance (2026-07-11 amendment; the entrance *engine* is NOT in this number — it ships as its own `./motion` subpath, import-once like styles.css, with its own budget row) | size-limit per subpath |
 | Shared kernel (`core/` + `shared/`, fully tree-shaken cost of one minimal chart) | **≤ 5 kB** | size-limit on `./sparkline` (proxy) |
 | `styles.css` (whole library, shared) | **≤ 12 kB** | size-limit |
 | Whole barrel (`.`) | **tracked + published honestly, not gated** — README states "one chart ≈ 1–3 kB; all 100 ≈ N kB (still < ½ of one Recharts)" with the measured N | CI report comment |

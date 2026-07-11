@@ -35,3 +35,25 @@ Per-component subpath exports + tree-shaking pull one way; a shared token system
 - Author one `styles.css` with the `@layer` structure above; no CSS-in-JS, no per-component sheets.
 - `size-limit` gets a dedicated CSS entry against the library budget.
 - Docs show the single import in the install snippet and every fixture.
+
+## Amendment 2026-07-11 (unified-motion) — the escape hatch, exercised precisely
+
+Audit result at 106 charts: the sheet is ~90 % genuinely universal (tokens, the
+`data-mc-ink`/`data-mc-w`/`data-mc-cat` role system shared by 40+ charts, and the
+`forced-colors` / `prefers-contrast` / `prefers-reduced-motion` blocks that re-map that
+role system — none of which CAN be split per chart). Only ~2.2 kB raw is single-chart.
+So the split is surgical, not per-chart-everything:
+
+1. `styles.css` stays the single hand-authored source AND the default import —
+   unchanged DX, unchanged budget row. Single-chart blocks inside it are fenced with
+   `/* @mc-chart <slug> */ … /* @mc-chart-end */` markers.
+2. The build (`scripts/gen-style-splits.mjs`) emits `dist/styles/core.css` (everything
+   universal) plus `dist/styles/<slug>.css` per fenced slug, each re-declaring its
+   `@layer` wrappers so the cascade is identical. Exported as `./styles/core.css` and
+   `./styles/*.css` for byte-minimal consumers: one chart = core + that chart's sheet,
+   nothing else. A node test proves core+charts ≡ aggregate.
+3. Entrance-motion CSS cost is **zero**: the `animate` system is WAAPI-in-JS
+   (`./motion` subpath) and adds no rules to any sheet.
+
+Rules that stay shared stay shared — anything used by 2+ charts lives in core; the
+"why not per-chart splitting" section above still governs the 90 %.
