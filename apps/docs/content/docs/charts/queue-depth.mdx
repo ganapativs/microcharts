@@ -41,9 +41,12 @@ change in _shape_ as well as color. The endpoint carries the current value and a
 ## Variants
 
 <LiveDemo
-  label="draining + no capacity"
-  code={`<QueueDepth data={[214, 190, 150, 120, 96, 70, 48]} capacity={100} />
-<QueueDepth data={[42, 55, 70, 88, 96, 120, 150, 182, 214]} />`}
+  label="draining + no capacity + no endpoint label"
+  code={`const backlog = [42, 55, 70, 88, 96, 120, 150, 182, 214];
+
+<QueueDepth data={[214, 190, 150, 120, 96, 70, 48]} capacity={100} />
+<QueueDepth data={backlog} />
+<QueueDepth data={backlog} capacity={100} label="none" />`}
 >
   <span className="inline-flex flex-col gap-1.5">
     <QueueDepth
@@ -59,25 +62,15 @@ change in _shape_ as well as color. The endpoint carries the current value and a
       width={220}
       height={28}
     />
+    <QueueDepth
+      data={[42, 55, 70, 88, 96, 120, 150, 182, 214]}
+      capacity={100}
+      label="none"
+      title="No label"
+      width={220}
+      height={28}
+    />
   </span>
-</LiveDemo>
-
-<LiveDemo
-  label="no endpoint label"
-  code={`<QueueDepth
-  data={[42, 55, 70, 88, 96, 120, 150, 182, 214]}
-  capacity={100}
-  label="none"
-/>`}
->
-  <QueueDepth
-    data={[42, 55, 70, 88, 96, 120, 150, 182, 214]}
-    capacity={100}
-    label="none"
-    title="No label"
-    width={220}
-    height={28}
-  />
 </LiveDemo>
 
 <LiveDemo

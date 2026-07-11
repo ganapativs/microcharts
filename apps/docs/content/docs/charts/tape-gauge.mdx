@@ -48,64 +48,42 @@ is the aviation primary-flight-display tape, shrunk to a word.
 ## Variants
 
 <LiveDemo
-  label="horizontal"
-  code={`<TapeGauge
-  value={142}
-  rate={-1}
-  zones={[
-    { from: 100, to: 130, tone: "pos" },
-    { from: 130, to: 150, tone: "warn" },
-    { from: 150, to: 200, tone: "neg" },
-  ]}
-  span={60}
-  orientation="horizontal"
-/>`}
+  label="horizontal vs pointer-only"
+  dataOf="tape-gauge"
+  code={`<TapeGauge value={142} rate={-1} zones={zones} span={60} orientation="horizontal" />
+// label="none" drops the in-chart readout for an external number
+<TapeGauge value={142} rate={1} zones={zones} span={60} label="none" />`}
 >
-  <TapeGauge
-    value={142}
-    rate={-1}
-    zones={[
-      { from: 100, to: 130, tone: "pos" },
-      { from: 130, to: 150, tone: "warn" },
-      { from: 150, to: 200, tone: "neg" },
-    ]}
-    span={60}
-    orientation="horizontal"
-    title="Airspeed"
-    width={160}
-    height={30}
-  />
-</LiveDemo>
-
-<LiveDemo
-  label="pointer-only"
-  code={`// label="none" drops the in-chart readout for an external number
-<TapeGauge
-  value={142}
-  rate={1}
-  zones={[
-    { from: 100, to: 130, tone: "pos" },
-    { from: 130, to: 150, tone: "warn" },
-    { from: 150, to: 200, tone: "neg" },
-  ]}
-  span={60}
-  label="none"
-/>`}
->
-  <TapeGauge
-    value={142}
-    rate={1}
-    zones={[
-      { from: 100, to: 130, tone: "pos" },
-      { from: 130, to: 150, tone: "warn" },
-      { from: 150, to: 200, tone: "neg" },
-    ]}
-    span={60}
-    label="none"
-    title="Airspeed"
-    width={30}
-    height={44}
-  />
+  <span className="inline-flex items-end gap-6">
+    <TapeGauge
+      value={142}
+      rate={-1}
+      zones={[
+        { from: 100, to: 130, tone: "pos" },
+        { from: 130, to: 150, tone: "warn" },
+        { from: 150, to: 200, tone: "neg" },
+      ]}
+      span={60}
+      orientation="horizontal"
+      title="Airspeed"
+      width={160}
+      height={30}
+    />
+    <TapeGauge
+      value={142}
+      rate={1}
+      zones={[
+        { from: 100, to: 130, tone: "pos" },
+        { from: 130, to: 150, tone: "warn" },
+        { from: 150, to: 200, tone: "neg" },
+      ]}
+      span={60}
+      label="none"
+      title="Airspeed"
+      width={30}
+      height={44}
+    />
+  </span>
 </LiveDemo>
 
 <LiveDemo

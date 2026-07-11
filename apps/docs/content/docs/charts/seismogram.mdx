@@ -81,17 +81,14 @@ values, never the buckets.
 
 <LiveDemo
   label="flag anomalies"
+  dataOf="seismogram"
   code={`// spikes at or above the threshold flare in the alert token
-<Seismogram
-  data={[
-    1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2, 0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1,
-  ]}
-  anomaly={6}
-/>`}
+<Seismogram data={burstsPerMinute} anomaly={6} />`}
 >
   <Seismogram
     data={[
-      1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2, 0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1,
+      1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2, 0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1, 2,
+      1,
     ]}
     anomaly={6}
     title="Error bursts"

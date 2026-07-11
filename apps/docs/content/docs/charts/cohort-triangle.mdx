@@ -56,59 +56,38 @@ Row labels are on by default. Turn them off for a dense, glanceable block, or `h
 vintage to anchor the equal-maturity comparison.
 
 <LiveDemo
-  label="highlight a vintage"
-  code={`<CohortTriangle
-  data={[
-    { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
-    { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
-    { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
-    { label: "Apr", values: [1, 0.55, 0.42] },
-    { label: "May", values: [1, 0.52] },
-  ]}
-  highlight="Mar"
-/>`}
+  label="highlight a vintage vs dense, no labels"
+  dataOf="cohort-triangle"
+  code={`<CohortTriangle data={cohorts} highlight="Mar" />
+<CohortTriangle data={cohorts} labels={false} cell={9} />`}
 >
-  <CohortTriangle
-    data={[
-      { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
-      { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
-      { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
-      { label: "Apr", values: [1, 0.55, 0.42] },
-      { label: "May", values: [1, 0.52] },
-    ]}
-    cell={16}
-    unit="month"
-    highlight="Mar"
-    title="Worst vintage ringed"
-  />
-</LiveDemo>
-
-<LiveDemo
-  label="dense, no labels"
-  code={`<CohortTriangle
-  data={[
-    { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
-    { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
-    { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
-    { label: "Apr", values: [1, 0.55, 0.42] },
-    { label: "May", values: [1, 0.52] },
-  ]}
-  labels={false}
-  cell={9}
-/>`}
->
-  <CohortTriangle
-    data={[
-      { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
-      { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
-      { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
-      { label: "Apr", values: [1, 0.55, 0.42] },
-      { label: "May", values: [1, 0.52] },
-    ]}
-    labels={false}
-    cell={9}
-    title="Dense block"
-  />
+  <span className="inline-flex flex-col gap-3">
+    <CohortTriangle
+      data={[
+        { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
+        { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
+        { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
+        { label: "Apr", values: [1, 0.55, 0.42] },
+        { label: "May", values: [1, 0.52] },
+      ]}
+      cell={16}
+      unit="month"
+      highlight="Mar"
+      title="Worst vintage ringed"
+    />
+    <CohortTriangle
+      data={[
+        { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
+        { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
+        { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
+        { label: "Apr", values: [1, 0.55, 0.42] },
+        { label: "May", values: [1, 0.52] },
+      ]}
+      labels={false}
+      cell={9}
+      title="Dense block"
+    />
+  </span>
 </LiveDemo>
 
 The `unit` prop renames the age columns in the summary and announcements — `"month"`,
