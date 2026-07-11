@@ -1,4 +1,5 @@
 import { NetFlow } from "@microcharts/react/net-flow";
+import { NetFlow as NetFlowInteractive } from "@microcharts/react/net-flow/interactive";
 import { InteractiveDemo } from "./net-flow.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -129,6 +130,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <NetFlowInteractive
+      data={DEMO}
+      format={KFMT}
+      mode={s.mode as "area" | "bars"}
+      net={s.net as boolean}
+      label={s.label as "last" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<NetFlow",
+      "  data={months}",
+      s.mode !== "area" && `  mode="${s.mode}"`,
+      s.net === false && "  net={false}",
+      s.label !== "last" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the months — each announces inflow, outflow, and the signed net.",
 };
 
 export const recipes: Recipe[] = [

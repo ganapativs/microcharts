@@ -1,8 +1,16 @@
 "use client";
 // Interactive <Hypnogram> (plan/25 §2). One pointer listener; run lookup by x.
 // ←/→ rove runs, Home/End jump. Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_HYPNOGRAM } from "../../core/strings-hypnogram.js";
 import { firstAppearance, hypnogramGeometry } from "./geometry.js";
 import {
@@ -14,7 +22,16 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function Hypnogram(props: HypnogramProps): React.ReactNode {
+export interface InteractiveHypnogramProps extends HypnogramProps {
+  /**
+   * Opt-in entrance motion (default `false`): the state trace wipes on when
+   * the chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
   const {
     data,
     states: statesProp,
@@ -27,11 +44,15 @@ export function Hypnogram(props: HypnogramProps): React.ReactNode {
     locale,
     title,
     summary,
+    animate = false,
     ...rest
-  } = props as HypnogramProps & {
+  } = props as InteractiveHypnogramProps & {
     format?: Intl.NumberFormatOptions | ((n: number) => string);
     locale?: string | string[];
   };
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const appearance = useMemo(() => firstAppearance(data), [data]);
   const rowStates = useMemo(() => {
@@ -102,6 +123,7 @@ export function Hypnogram(props: HypnogramProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-hypno-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

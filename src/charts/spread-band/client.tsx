@@ -2,8 +2,16 @@
 // Interactive <SpreadBand> (plan/26 §6). Nearest-x lookup announces the lead at
 // that point ("Point 6 of 12: organic +11 over paid."); the crosshair touches
 // both lines. ←/→ steps x. Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { isFiniteValue } from "../../core/types.js";
 import { EN_SPREAD_BAND } from "../../core/strings-spread-band.js";
 import { gutterFont, lastGap, spreadBandGeometry } from "./geometry.js";
@@ -16,7 +24,16 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function SpreadBand(props: SpreadBandProps): React.ReactNode {
+export interface InteractiveSpreadBandProps extends SpreadBandProps {
+  /**
+   * Opt-in entrance motion (default `false`): the signed gap band wipes on
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
   const {
     data,
     labels = ["A", "B"],
@@ -29,7 +46,12 @@ export function SpreadBand(props: SpreadBandProps): React.ReactNode {
     strings = EN_SPREAD_BAND,
     title,
     summary,
+    animate = false,
+    ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const fontSize = gutterFont(height);
@@ -124,6 +146,7 @@ export function SpreadBand(props: SpreadBandProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-spread-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
@@ -134,7 +157,21 @@ export function SpreadBand(props: SpreadBandProps): React.ReactNode {
       onKeyDown={onKeyDown}
       onBlur={clear}
     >
-      <StaticSpreadBand {...props} summary={false} style={FILL}>
+      <StaticSpreadBand
+        {...rest}
+        data={data}
+        labels={labels}
+        label={label}
+        domain={domain}
+        width={width}
+        height={height}
+        format={format}
+        locale={locale}
+        strings={strings}
+        title={title}
+        summary={false}
+        style={FILL}
+      >
         {crossX !== undefined ? (
           <>
             <line
@@ -164,7 +201,7 @@ export function SpreadBand(props: SpreadBandProps): React.ReactNode {
             ) : null}
           </>
         ) : null}
-        {props.children}
+        {rest.children}
       </StaticSpreadBand>
       <span
         aria-live="polite"

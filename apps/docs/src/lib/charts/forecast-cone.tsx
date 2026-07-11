@@ -1,4 +1,5 @@
 import { ForecastCone } from "@microcharts/react/forecast-cone";
+import { ForecastCone as ForecastConeInteractive } from "@microcharts/react/forecast-cone/interactive";
 import { InteractiveDemo } from "./forecast-cone.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -137,6 +138,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ForecastConeInteractive
+      data={HIST}
+      forecast={s.p50 ? FORE : { mid: FORE.mid, p80: FORE.p80 }}
+      target={s.target ? 45 : undefined}
+      label={s.label as "landing" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ForecastCone",
+      "  data={history}",
+      "  forecast={forecast}",
+      s.target && "  target={45}",
+      s.label !== "landing" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the weeks — history announces a value, the forecast region announces the median and 80% interval.",
 };
 
 export const recipes: Recipe[] = [

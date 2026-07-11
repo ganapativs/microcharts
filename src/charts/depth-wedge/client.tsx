@@ -2,8 +2,16 @@
 // Interactive <DepthWedge> (plan/25 §12). One pointer listener; nearest level by
 // x reveals the cumulative depth on that side. ←/→ walk levels across the book.
 // Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_DEPTH_WEDGE } from "../../core/strings-depth-wedge.js";
 import { depthWedgeGeometry } from "./geometry.js";
 import {
@@ -14,7 +22,16 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
+export interface InteractiveDepthWedgeProps extends DepthWedgeProps {
+  /**
+   * Opt-in entrance motion (default `false`): the two wedges wipe on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
   const {
     data,
     levels,
@@ -26,8 +43,12 @@ export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
     strings = EN_DEPTH_WEDGE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(
     () =>
@@ -106,6 +127,7 @@ export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-depth-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
@@ -140,6 +162,7 @@ export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {rest.children}
       </StaticDepthWedge>
       <span
         aria-live="polite"

@@ -1,4 +1,5 @@
 import { SpreadBand } from "@microcharts/react/spread-band";
+import { SpreadBand as SpreadBandInteractive } from "@microcharts/react/spread-band/interactive";
 import { InteractiveDemo } from "./spread-band.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -111,6 +112,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <SpreadBandInteractive
+      data={PAIRS}
+      labels={LABELS}
+      label={s.label as "gap" | "none"}
+      positive={s.positive as "up" | "down"}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={34}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<SpreadBand",
+      "  data={data}",
+      '  labels={["Organic", "Paid"]}',
+      s.label !== "gap" && `  label="${s.label}"`,
+      s.positive !== "up" && `  positive="${s.positive}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow across — each point announces who leads and by how much.",
 };
 
 export const recipes: Recipe[] = [

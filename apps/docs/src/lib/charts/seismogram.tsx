@@ -1,4 +1,5 @@
 import { Seismogram } from "@microcharts/react/seismogram";
+import { Seismogram as SeismogramInteractive } from "@microcharts/react/seismogram/interactive";
 import { InteractiveDemo } from "./seismogram.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -147,6 +148,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <SeismogramInteractive
+      data={(s.signed as boolean) ? BURSTS.map((v, i) => (i % 2 === 0 ? v : -v)) : BURSTS}
+      mode={s.mode as "intensity" | "barcode"}
+      positive={(s.signed as boolean) ? "up" : undefined}
+      anomaly={(s.flag as boolean) ? 6 : undefined}
+      domain={(s.domain as boolean) ? [0, 20] : undefined}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Seismogram",
+      "  data={burstsPerMinute}",
+      s.mode !== "intensity" && `  mode="${s.mode}"`,
+      (s.signed as boolean) && '  positive="up"',
+      (s.flag as boolean) && "  anomaly={6}",
+      (s.domain as boolean) && "  domain={[0, 20]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow through the slots; Home/End jump to the first/last event.",
 };
 
 export const recipes: Recipe[] = [

@@ -1,4 +1,5 @@
 import { ErrorBudget } from "@microcharts/react/error-budget";
+import { ErrorBudget as ErrorBudgetInteractive } from "@microcharts/react/error-budget/interactive";
 import { InteractiveDemo } from "./error-budget.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -121,6 +122,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ErrorBudgetInteractive
+      data={s.exhausted ? BURNED : DEMO}
+      window={s.exhausted ? 20 : WINDOW}
+      rates={s.wedges ? undefined : [1]}
+      label={s.label as "remaining" | "none"}
+      unit="day"
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ErrorBudget",
+      "  data={remaining}",
+      "  window={30}",
+      s.wedges === false && "  rates={[1]}",
+      s.label !== "remaining" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the days — each announces the budget remaining and the current burn rate.",
 };
 
 export const recipes: Recipe[] = [

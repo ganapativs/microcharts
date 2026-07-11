@@ -1,4 +1,5 @@
 import { TraceFold } from "@microcharts/react/trace-fold";
+import { TraceFold as TraceFoldInteractive } from "@microcharts/react/trace-fold/interactive";
 import { InteractiveDemo } from "./trace-fold.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -116,6 +117,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <TraceFoldInteractive
+      data={TRACE}
+      emphasis={s.emphasis as "critical" | "none"}
+      labels={s.labels as boolean}
+      format={ms}
+      animate={ui.animate}
+      summary={false}
+      width={320}
+      height={48}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<TraceFold",
+      "  data={spans}",
+      s.emphasis !== "critical" && `  emphasis="${s.emphasis}"`,
+      s.labels === false && "  labels={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover, or use ←/→ within a depth and ↑/↓ between depths — each span announces its duration, share, and path status.",
 };
 
 export const recipes: Recipe[] = [

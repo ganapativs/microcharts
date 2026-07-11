@@ -1,4 +1,5 @@
 import { CohortTriangle } from "@microcharts/react/cohort-triangle";
+import { CohortTriangle as CohortTriangleInteractive } from "@microcharts/react/cohort-triangle/interactive";
 import { InteractiveDemo } from "./cohort-triangle.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -140,6 +141,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <CohortTriangleInteractive
+      data={COHORTS}
+      labels={s.labels as boolean}
+      highlight={s.highlight === "none" ? undefined : (s.highlight as string)}
+      cell={Number(s.cell)}
+      unit="month"
+      animate={ui.animate}
+      title="Playground"
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<CohortTriangle",
+      "  data={cohorts}",
+      s.labels === false && "  labels={false}",
+      s.highlight !== "none" && `  highlight="${s.highlight}"`,
+      `  cell={${s.cell}}`,
+      '  unit="month"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover a cell, or focus and move in 2-D with the arrow keys — each cell announces its cohort, age, and retention.",
 };
 
 export const recipes: Recipe[] = [

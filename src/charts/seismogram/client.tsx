@@ -4,9 +4,17 @@
 // (not slot — quiet slots are skippable context). Announces via the shared
 // point template; quiet slots use the pointEmpty wording (ActivityGrid
 // parity). Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
@@ -21,6 +29,12 @@ export interface InteractiveSeismogramProps extends SeismogramProps {
   strings?: DistStrings;
   /** Slot announcement templates (shared point wording). */
   seriesStrings?: SeriesStrings & SlotStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the strip wipes on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const DEFAULT_SERIES_STRINGS = { ...EN_SERIES, ...EN_SLOTS };
@@ -42,8 +56,12 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
     seriesStrings = DEFAULT_SERIES_STRINGS,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   // the rendered series (mirrors the static entry's downsampling)
   const rendered = useMemo(() => {
@@ -125,6 +143,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-seismo-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

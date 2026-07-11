@@ -2,15 +2,32 @@
 // Interactive <TraceFold> (plan/25 §18). One pointer listener; span by row (y) +
 // x lookup. ←/→ within a depth row, ↑/↓ between depths (2-D keyboard). Composes
 // the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_TRACE_FOLD } from "../../core/strings-trace-fold.js";
 import { traceFoldGeometry, type SpanRect } from "./geometry.js";
 import { TraceFold as StaticTraceFold, traceFoldSummary, type TraceFoldProps } from "./index.js";
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function TraceFold(props: TraceFoldProps): React.ReactNode {
+export interface InteractiveTraceFoldProps extends TraceFoldProps {
+  /**
+   * Opt-in entrance motion (default `false`): the span rects wipe on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
   const {
     data,
     width = 120,
@@ -20,8 +37,12 @@ export function TraceFold(props: TraceFoldProps): React.ReactNode {
     strings = EN_TRACE_FOLD,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const depthCount = Math.max(1, new Set(data.slice(0, 40).map((s) => s.depth)).size);
   const height = heightProp ?? Math.min(48, Math.max(16, depthCount * 10));
@@ -119,6 +140,7 @@ export function TraceFold(props: TraceFoldProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-trace-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
@@ -152,6 +174,7 @@ export function TraceFold(props: TraceFoldProps): React.ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {rest.children}
       </StaticTraceFold>
       <span
         aria-live="polite"

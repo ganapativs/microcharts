@@ -2,7 +2,15 @@
 // Interactive <TimeInRange> (plan/25 §1). One pointer listener; zone by x/y
 // lookup. ←/→ (or ↑/↓ vertical) rove zones, each announcing "{zone}: {pct}".
 // Composes the static component (canon) — overlays ride as children.
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_TIME_IN_RANGE } from "../../core/strings-time-in-range.js";
 import { timeInRangeGeometry } from "./geometry.js";
 import {
@@ -14,7 +22,16 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function TimeInRange(props: TimeInRangeProps): React.ReactNode {
+export interface InteractiveTimeInRangeProps extends TimeInRangeProps {
+  /**
+   * Opt-in entrance motion (default `false`): the zone segments reveal on
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode {
   const {
     data,
     orientation = "horizontal",
@@ -23,9 +40,15 @@ export function TimeInRange(props: TimeInRangeProps): React.ReactNode {
     strings = EN_TIME_IN_RANGE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
   const horizontal = orientation !== "vertical";
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate, {
+    selector: "rect[data-mc-ink], rect[data-mc-cat]",
+  });
 
   const geo = useMemo(
     () => timeInRangeGeometry({ data, width, height, orientation }),
@@ -115,6 +138,7 @@ export function TimeInRange(props: TimeInRangeProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-tir-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

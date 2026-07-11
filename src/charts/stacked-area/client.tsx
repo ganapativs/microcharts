@@ -2,9 +2,10 @@
 // Interactive <StackedArea> (plan/22 #23). Nearest-x lookup announces ALL
 // layers ("Point 8 of 12: Mobile 45%, Web 38%, API 17%."); ←/→ steps x, ↑/↓
 // cycles which layer the crosshair dot highlights. Composes the static.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import type { Curve } from "../../core/path.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -18,6 +19,12 @@ import {
 export interface InteractiveStackedAreaProps extends StackedAreaProps {
   strings?: StackStrings;
   seriesStrings?: SeriesStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the layers wipe on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode {
@@ -35,8 +42,12 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     seriesStrings = EN_SERIES,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const series = useMemo(() => {
     let s = data.slice(0, 3);
@@ -143,6 +154,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className="mc-stacked-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

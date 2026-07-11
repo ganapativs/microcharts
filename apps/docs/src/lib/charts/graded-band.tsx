@@ -1,4 +1,5 @@
 import { GradedBand } from "@microcharts/react/graded-band";
+import { GradedBand as GradedBandInteractive } from "@microcharts/react/graded-band/interactive";
 import { InteractiveDemo } from "./graded-band.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -123,6 +124,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <GradedBandInteractive
+      data={data}
+      levels={s.levels === "50/90" ? [50, 90] : [50, 80, 95]}
+      softEdge={s.softEdge as boolean}
+      label={s.label as "none" | "median"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={16}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<GradedBand",
+      "  data={posterior}",
+      s.levels === "50/90" && "  levels={[50, 90]}",
+      s.softEdge && "  softEdge",
+      s.label !== "none" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow outward from the median — each level announces its interval.",
 };
 
 export const recipes: Recipe[] = [

@@ -1,4 +1,5 @@
 import { DualSparkline } from "@microcharts/react/dual-sparkline";
+import { DualSparkline as DualSparklineInteractive } from "@microcharts/react/dual-sparkline/interactive";
 import { InteractiveDemo } from "./dual-sparkline.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -121,6 +122,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <DualSparklineInteractive
+      data={US}
+      compare={BENCH}
+      label={s.label as "last" | "none"}
+      band={s.band ? [13, 16] : undefined}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<DualSparkline",
+      "  data={ours}",
+      "  compare={market}",
+      s.label !== "none" && `  label="${s.label}"`,
+      s.band && "  band={[13, 16]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow across — each point announces both values side by side.",
 };
 
 export const recipes: Recipe[] = [

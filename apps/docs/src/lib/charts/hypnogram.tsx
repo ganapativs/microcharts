@@ -1,4 +1,5 @@
 import { Hypnogram } from "@microcharts/react/hypnogram";
+import { Hypnogram as HypnogramInteractive } from "@microcharts/react/hypnogram/interactive";
 import { InteractiveDemo } from "./hypnogram.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -130,6 +131,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <HypnogramInteractive
+      data={SLEEP}
+      states={STATES}
+      domain={DOM}
+      variant={s.variant as "steps" | "lanes"}
+      emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
+      connectors={s.connectors as boolean}
+      animate={ui.animate}
+      summary={false}
+      width={300}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Hypnogram",
+      "  data={sleep}",
+      `  states={["Awake", "REM", "Light", "Deep"]}`,
+      s.variant !== "steps" && `  variant="${s.variant}"`,
+      s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
+      s.connectors === false && "  connectors={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow across the runs — each announces its state and time span.",
 };
 
 export const recipes: Recipe[] = [

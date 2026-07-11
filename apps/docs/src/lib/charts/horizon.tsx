@@ -1,4 +1,5 @@
 import { Horizon } from "@microcharts/react/horizon";
+import { Horizon as HorizonInteractive } from "@microcharts/react/horizon/interactive";
 import { InteractiveDemo } from "./horizon.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -124,6 +125,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <HorizonInteractive
+      data={LOAD.map((v, i) => v - 20 + (i % 3))}
+      folds={Number(s.folds) as 2 | 3}
+      mode={s.mode as "mirror" | "offset"}
+      baseline={s.baseline as number}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={24}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Horizon",
+      "  data={cpuLoad}",
+      s.folds !== "2" && `  folds={${s.folds}}`,
+      s.mode !== "mirror" && `  mode="${s.mode}"`,
+      s.baseline !== 0 && `  baseline={${s.baseline}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow across — each point announces its unfolded value.",
 };
 
 export const recipes: Recipe[] = [

@@ -1,4 +1,5 @@
 import { DepthWedge } from "@microcharts/react/depth-wedge";
+import { DepthWedge as DepthWedgeInteractive } from "@microcharts/react/depth-wedge/interactive";
 import { InteractiveDemo } from "./depth-wedge.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -127,6 +128,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <DepthWedgeInteractive
+      data={BOOK}
+      normalize={s.normalize as boolean}
+      label={s.label as "spread" | "none"}
+      levels={s.levels as number}
+      animate={ui.animate}
+      summary={false}
+      width={320}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<DepthWedge",
+      "  data={{ demand, supply }}",
+      s.normalize === true && "  normalize",
+      s.label !== "spread" && `  label="${s.label}"`,
+      s.levels !== 2 && `  levels={${s.levels}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use ←/→ to walk the levels — each announces the cumulative depth on its side of the spread.",
 };
 
 export const recipes: Recipe[] = [
