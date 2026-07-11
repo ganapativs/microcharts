@@ -1,4 +1,5 @@
 import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
+import { EnsembleGhosts as EnsembleGhostsInteractive } from "@microcharts/react/ensemble-ghosts/interactive";
 import { InteractiveDemo } from "./ensemble-ghosts.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -106,6 +107,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <EnsembleGhostsInteractive
+      data={FUTURES}
+      ghosts={s.ghosts as number}
+      emphasis={s.emphasis as "nearest-median" | "median"}
+      endpoints={s.endpoints as boolean}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<EnsembleGhosts",
+      "  data={futures}",
+      s.ghosts !== 8 && `  ghosts={${s.ghosts}}`,
+      s.emphasis !== "nearest-median" && `  emphasis="${s.emphasis}"`,
+      s.endpoints && "  endpoints",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover to flip through the futures one at a time (the HOP loop); with reduced motion, arrow keys step them instead — each member is announced.",
 };
 
 export const recipes: Recipe[] = [

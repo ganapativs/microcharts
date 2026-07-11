@@ -1,4 +1,5 @@
 import { TallyMarks } from "@microcharts/react/tally-marks";
+import { TallyMarks as TallyMarksInteractive } from "@microcharts/react/tally-marks/interactive";
 import { InteractiveDemo } from "./tally-marks.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -14,6 +15,10 @@ export const entry: ChartEntry = {
   tagline: "How many — counted the way a human counts.",
   staticImport: `${PKG}/tally-marks`,
   interactiveImport: `${PKG}/tally-marks/interactive`,
+  // Marks already draw in on every value change (one-shot stroke-dashoffset
+  // sweep, client.tsx) — a mount entrance would fight that existing motion,
+  // so this chart has no `animate` prop at all.
+  animates: false,
   dataShape: "{ value: number }",
   encoding: { channel: "mark count in four-and-strike clusters of five", precision: "high" },
   nodeBudget: "2 (strokes + overflow numeral)",
@@ -105,6 +110,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  // No `animate` prop exists on this chart (see entry.animates) — the marks'
+  // own value-transition sweep is the only motion; renderInteractive still
+  // demonstrates the interactive entry itself.
+  renderInteractive: (s) => (
+    <TallyMarksInteractive
+      value={s.value as number}
+      total={s.total as number}
+      pen={s.pen as "ruled" | "drawn"}
+      overflow={s.overflow as "numeral" | "clamp"}
+      title="Count"
+      summary={false}
+      height={28}
+    />
+  ),
+  codeInteractive: (s) =>
+    [
+      "<TallyMarks",
+      `  value={${s.value}}`,
+      s.total !== 25 && `  total={${s.total}}`,
+      s.pen !== "ruled" && `  pen="${s.pen}"`,
+      s.overflow !== "numeral" && `  overflow="${s.overflow}"`,
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Tap to count — each new mark draws in and the total is announced through a polite live region. A count has no sub-parts, so focus reads the summary and there is no cursor to move.",
+  animates: false,
 };
 
 export const recipes: Recipe[] = [

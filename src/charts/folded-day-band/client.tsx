@@ -1,8 +1,16 @@
 "use client";
 // Interactive <FoldedDayBand> (plan/25 §15). One pointer listener; nearest fold
 // bin by x. ←/→ rove bins. Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_FOLDED_BAND } from "../../core/strings-folded-band.js";
 import { foldedBandGeometry } from "./geometry.js";
 import {
@@ -14,7 +22,16 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function FoldedDayBand(props: FoldedDayBandProps): React.ReactNode {
+export interface InteractiveFoldedDayBandProps extends FoldedDayBandProps {
+  /**
+   * Opt-in entrance motion (default `false`): the median line draws on when
+   * the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.ReactNode {
   const {
     data,
     period = 24,
@@ -31,8 +48,12 @@ export function FoldedDayBand(props: FoldedDayBandProps): React.ReactNode {
     strings = EN_FOLDED_BAND,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
     () => foldedBandGeometry({ data, today: today ?? null, period, bins, bands, width, height }),
@@ -110,6 +131,7 @@ export function FoldedDayBand(props: FoldedDayBandProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-folded-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

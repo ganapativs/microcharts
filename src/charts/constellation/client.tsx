@@ -4,8 +4,9 @@
 // Focus ring on the active event; readout names the time, value, and magnitude.
 // Composes the static component (canon). Vertical jitter (value-less data) stays
 // layout-only — the readout never presents it as data.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";
 import { constellationGeometry } from "./geometry.js";
 import {
@@ -16,6 +17,12 @@ import {
 
 export interface InteractiveConstellationProps extends ConstellationProps {
   strings?: ConstellationStrings;
+  /**
+   * Opt-in entrance motion (default `false`): stars fade and scale in on
+   * first client-side mount. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Constellation(props: InteractiveConstellationProps): React.ReactNode {
@@ -33,8 +40,12 @@ export function Constellation(props: InteractiveConstellationProps): React.React
     strings = EN_CONSTELLATION,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "settle", animate, { selector: "circle" });
 
   const geo = useMemo(
     () =>
@@ -135,6 +146,7 @@ export function Constellation(props: InteractiveConstellationProps): React.React
 
   return (
     <span
+      ref={hostRef}
       className="mc-constellation-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

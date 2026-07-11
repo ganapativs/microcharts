@@ -1,4 +1,5 @@
 import { PercentileTrace } from "@microcharts/react/percentile-trace";
+import { PercentileTrace as PercentileTraceInteractive } from "@microcharts/react/percentile-trace/interactive";
 import { InteractiveDemo } from "./percentile-trace.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -101,6 +102,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PercentileTraceInteractive
+      data={DEMO}
+      bands={s.bands as boolean}
+      positive={s.positive as "up" | "down"}
+      unit="week"
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PercentileTrace",
+      "  data={ranks}",
+      s.bands === false && "  bands={false}",
+      s.positive !== "up" && `  positive="${s.positive}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the weeks — each announces the percentile at that reading.",
 };
 
 export const recipes: Recipe[] = [

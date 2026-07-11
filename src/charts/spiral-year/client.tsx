@@ -3,8 +3,9 @@
 // squared 2-D distance over the precomputed spiral marks. ←/→ step chronologically
 // along the spiral; a polite live region announces the focused period. Composes the
 // static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { dayOfYear } from "../../core/calendar-grid.js";
 import { EN_SPIRAL_YEAR, type SpiralYearStrings } from "../../core/strings-spiral-year.js";
 import { spiralYearGeometry } from "./geometry.js";
@@ -17,6 +18,12 @@ import {
 
 export interface InteractiveSpiralYearProps extends SpiralYearProps {
   strings?: SpiralYearStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the rings fade in on first
+   * client-side mount. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 function inferCadence(n: number, explicit?: "day" | "week"): "day" | "week" {
@@ -37,8 +44,14 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
     strings = EN_SPIRAL_YEAR,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate, {
+    selector: 'path[data-mc-ink="data"], path[data-mc-ink="bar"]',
+  });
 
   const cadence = inferCadence(data.length, cadenceProp);
   const startIndex = useMemo(() => {
@@ -125,6 +138,7 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-spiral-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

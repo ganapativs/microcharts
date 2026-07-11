@@ -2,8 +2,16 @@
 // Interactive <MinimapStrip> (plan/25 §10). Drag or click to move the viewport
 // window; ←/→ nudge 5% (Shift 20%). The window maps linearly to the domain — no
 // fisheye. Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_MINIMAP } from "../../core/strings-minimap.js";
 import { minimapDomain } from "./geometry.js";
 import {
@@ -16,6 +24,12 @@ const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveMinimapProps extends MinimapStripProps {
   onWindowChange?: (window: [number, number]) => void;
+  /**
+   * Opt-in entrance motion (default `false`): the strip wipes in left to
+   * right on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
@@ -30,8 +44,12 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
     title,
     summary,
     onWindowChange,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const domain = useMemo(() => domainProp ?? minimapDomain(data), [domainProp, data]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -90,6 +108,7 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-minimap-live"
       style={{
         display: "inline-block",

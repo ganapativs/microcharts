@@ -1,4 +1,5 @@
 import { RetentionCurve } from "@microcharts/react/retention-curve";
+import { RetentionCurve as RetentionCurveInteractive } from "@microcharts/react/retention-curve/interactive";
 import { InteractiveDemo } from "./retention-curve.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -116,6 +117,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <RetentionCurveInteractive
+      data={DEMO}
+      benchmark={s.benchmark ? BENCH : undefined}
+      plateau={s.plateau as boolean}
+      curve={s.curve as "step" | "smooth"}
+      unit="week"
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<RetentionCurve",
+      "  data={cohort}",
+      s.benchmark && "  benchmark={industry}",
+      s.plateau === false && "  plateau={false}",
+      s.curve !== "step" && `  curve="${s.curve}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow across the weeks — each announces retention and the benchmark.",
 };
 
 export const recipes: Recipe[] = [

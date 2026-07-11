@@ -1,4 +1,5 @@
 import { SpiralYear } from "@microcharts/react/spiral-year";
+import { SpiralYear as SpiralYearInteractive } from "@microcharts/react/spiral-year/interactive";
 import { InteractiveDemo } from "./spiral-year.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -111,6 +112,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <SpiralYearInteractive
+      data={YEAR}
+      steps={s.steps === "3" ? 3 : 5}
+      mark={s.mark as "dot" | "arc"}
+      monthTicks={s.monthTicks === "on"}
+      animate={ui.animate}
+      summary={false}
+      size={128}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<SpiralYear",
+      "  data={byWeek}",
+      s.steps !== "5" && `  steps={${s.steps}}`,
+      s.mark !== "dot" && `  mark="${s.mark}"`,
+      s.monthTicks !== "on" && "  monthTicks={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover across the spiral or arrow along it week by week — each mark announces its period and value through a polite live region. Remember the channel is ordinal opacity: for an exact day, reach for ActivityGrid or HeatStrip.",
 };
 
 export const recipes: Recipe[] = [

@@ -3,14 +3,21 @@
 // math across history AND the projection region. ←/→ step days, Home/End jump
 // start/deadline. Composes the static component (canon); the crosshair + marker
 // are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_BURN, type BurnStrings } from "../../core/strings-burn.js";
 import { burnGeometry } from "./geometry.js";
 import { BurnChart as StaticBurnChart, burnSummary, type BurnChartProps } from "./index.js";
 
 export interface InteractiveBurnChartProps extends BurnChartProps {
   strings?: BurnStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the line draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
@@ -27,8 +34,12 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
     strings = EN_BURN,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
     () =>
@@ -131,6 +142,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-burn-chart-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

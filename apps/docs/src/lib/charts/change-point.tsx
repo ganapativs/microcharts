@@ -1,4 +1,5 @@
 import { ChangePoint } from "@microcharts/react/change-point";
+import { ChangePoint as ChangePointInteractive } from "@microcharts/react/change-point/interactive";
 import { InteractiveDemo } from "./change-point.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -113,6 +114,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ChangePointInteractive
+      data={s.preset === "ramp" ? RAMP : ERRORS}
+      max={s.max as number}
+      means={s.means as boolean}
+      label={s.delta ? "delta" : "none"}
+      title="Error rate"
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ChangePoint",
+      "  data={errors}",
+      s.max !== 2 && `  max={${s.max}}`,
+      s.means === false && "  means={false}",
+      s.delta && '  label="delta"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the points — each announces its value and regime; Tab jumps between the breaks, announcing the mean shift.",
 };
 
 export const recipes: Recipe[] = [

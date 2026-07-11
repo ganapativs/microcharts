@@ -4,14 +4,21 @@
 // (announcing individual observations). A pointer picks the slot under the
 // cursor. Composes the static component (canon); the focus band + readout chip
 // are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_CYCLE, type CycleStrings } from "../../core/strings-cycle.js";
 import { cycleGeometry } from "./geometry.js";
 import { CyclePlot as StaticCyclePlot, cycleSummary, type CyclePlotProps } from "./index.js";
 
 export interface InteractiveCyclePlotProps extends CyclePlotProps {
   strings?: CycleStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the spine draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const slotName = (slots: readonly string[] | undefined, i: number): string =>
@@ -35,8 +42,12 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
     strings = EN_CYCLE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
     () => cycleGeometry({ width, height, data, period, center, domain }),
@@ -134,6 +145,7 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-cycle-plot-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -2,8 +2,16 @@
 // Interactive <PhaseTrace> (plan/25 §17). Hover snaps to the nearest DATA point
 // (which carries a definite time index — spatial interpolation would lie at
 // crossings); ←/→ step time. Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_PHASE_TRACE } from "../../core/strings-phase-trace.js";
 import { phaseTraceGeometry } from "./geometry.js";
 import {
@@ -14,6 +22,15 @@ import {
 import { isFiniteValue } from "../../core/types.js";
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
+
+export interface InteractivePhaseTraceProps extends PhaseTraceProps {
+  /**
+   * Opt-in entrance motion (default `false`): the trail draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
 
 function extent(vals: number[]): readonly [number, number] {
   let lo = Infinity;
@@ -27,7 +44,7 @@ function extent(vals: number[]): readonly [number, number] {
   return [lo, hi];
 }
 
-export function PhaseTrace(props: PhaseTraceProps): React.ReactNode {
+export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
   const {
     data,
     xLabel = "x",
@@ -42,8 +59,12 @@ export function PhaseTrace(props: PhaseTraceProps): React.ReactNode {
     strings = EN_PHASE_TRACE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate, { selector: 'path[data-mc-ink="muted"]' });
 
   const finite = useMemo(
     () => data.filter((p) => isFiniteValue(p.x) && isFiniteValue(p.y)),
@@ -114,6 +135,7 @@ export function PhaseTrace(props: PhaseTraceProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-phase-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

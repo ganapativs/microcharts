@@ -1,4 +1,5 @@
 import { StarSpoke } from "@microcharts/react/star-spoke";
+import { StarSpoke as StarSpokeInteractive } from "@microcharts/react/star-spoke/interactive";
 import { InteractiveDemo } from "./star-spoke.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -108,6 +109,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <StarSpokeInteractive
+      data={PROFILE}
+      dots={s.dots ? "tips" : "none"}
+      guides={s.guides as boolean}
+      compare={s.compare ? [0.5, 0.5, 0.5, 0.5, 0.5] : undefined}
+      labels={s.labels as boolean}
+      animate={ui.animate}
+      summary={false}
+      size={110}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<StarSpoke",
+      "  data={metrics}",
+      s.dots === true && '  dots="tips"',
+      s.guides === false && "  guides={false}",
+      s.compare === true && "  compare={baseline}",
+      s.labels === true && "  labels",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use ←/→ to rotate through the spokes — each announces its metric and value.",
 };
 
 export const recipes: Recipe[] = [

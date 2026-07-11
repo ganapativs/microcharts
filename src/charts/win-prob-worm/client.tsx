@@ -4,8 +4,16 @@
 // Composes the static component (canon) — the crosshair + readout chip are
 // overlay children, the worm/midline/dots come from the static so the two
 // entries can never drift.
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { isFiniteValue } from "../../core/types.js";
 import { clamp } from "../../core/scale.js";
 import { labelFont } from "../../core/labels.js";
@@ -19,6 +27,12 @@ const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveWinProbWormProps extends WinProbWormProps {
   strings?: WinProbWormStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the worm draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const pct = (v: number, fmt: (n: number) => string): string => `${fmt(v)}%`;
@@ -35,8 +49,14 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
     strings = EN_WIN_PROB_WORM,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate, {
+    selector: 'path[data-mc-ink="muted"], path[data-mc-ink="accent"]',
+  });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const FONT = labelFont(height);
@@ -117,6 +137,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className="mc-win-prob-worm-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

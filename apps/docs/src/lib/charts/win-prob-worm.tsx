@@ -1,4 +1,5 @@
 import { WinProbWorm } from "@microcharts/react/win-prob-worm";
+import { WinProbWorm as WinProbWormInteractive } from "@microcharts/react/win-prob-worm/interactive";
 import { InteractiveDemo } from "./win-prob-worm.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -110,6 +111,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <WinProbWormInteractive
+      data={s.game === "nailbiter" ? NAILBITER : s.game === "decided" ? DECIDED : GAME}
+      sides={SIDES}
+      markSwing={s.swing as boolean}
+      label={s.label ? "last" : "none"}
+      title="Win probability"
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<WinProbWorm",
+      `  data={${s.game === "nailbiter" ? "nailbiter" : s.game === "decided" ? "decided" : "game"}}`,
+      '  sides={["home", "away"]}',
+      s.swing === false && "  markSwing={false}",
+      s.label === false && '  label="none"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the game — each point announces the current leader and their probability. The worm reads accent while the top side leads, neutral when it trails; dots mark the lead changes.",
 };
 
 export const recipes: Recipe[] = [

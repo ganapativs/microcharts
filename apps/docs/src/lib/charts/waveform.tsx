@@ -1,4 +1,5 @@
 import { Waveform } from "@microcharts/react/waveform";
+import { Waveform as WaveformInteractive } from "@microcharts/react/waveform/interactive";
 import { InteractiveDemo } from "./waveform.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -102,6 +103,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <WaveformInteractive
+      data={WAVE}
+      variant={s.variant as "bars" | "envelope"}
+      mirror={s.mirror as boolean}
+      progress={(s.progress as number) / 100}
+      animate={ui.animate}
+      summary={false}
+      width={320}
+      height={32}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Waveform",
+      "  data={samples}",
+      s.variant !== "bars" && `  variant="${s.variant}"`,
+      s.mirror === false && "  mirror={false}",
+      `  progress={${((s.progress as number) / 100).toFixed(2)}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the buckets — each announces its position and peak amplitude.",
 };
 
 export const recipes: Recipe[] = [

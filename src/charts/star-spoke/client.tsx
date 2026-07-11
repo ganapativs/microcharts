@@ -1,13 +1,23 @@
 "use client";
 // Interactive <StarSpoke> (plan/25 §9). One pointer listener; nearest spoke by
 // angle. ←/→ rotate focus through the spokes. Composes the static component.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_STAR_SPOKE } from "../../core/strings-star-spoke.js";
 import { starSpokeGeometry } from "./geometry.js";
 import { StarSpoke as StaticStarSpoke, starSpokeSummary, type StarSpokeProps } from "./index.js";
 
-export function StarSpoke(props: StarSpokeProps): React.ReactNode {
+export interface InteractiveStarSpokeProps extends StarSpokeProps {
+  /**
+   * Opt-in entrance motion (default `false`): the shape draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
   const {
     data,
     domain = [0, 1],
@@ -18,8 +28,12 @@ export function StarSpoke(props: StarSpokeProps): React.ReactNode {
     strings = EN_STAR_SPOKE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const pad = labels && size >= 48 ? Math.max(10, size * 0.2) : 2;
   const geo = useMemo(
@@ -94,6 +108,7 @@ export function StarSpoke(props: StarSpokeProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-star-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

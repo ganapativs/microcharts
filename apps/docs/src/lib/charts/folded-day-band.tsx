@@ -1,4 +1,5 @@
 import { FoldedDayBand } from "@microcharts/react/folded-day-band";
+import { FoldedDayBand as FoldedDayBandInteractive } from "@microcharts/react/folded-day-band/interactive";
 import { InteractiveDemo } from "./folded-day-band.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -123,6 +124,39 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <FoldedDayBandInteractive
+      data={DATA}
+      today={s.today ? TODAY : undefined}
+      bands={
+        s.single
+          ? [[25, 75]]
+          : [
+              [25, 75],
+              [5, 95],
+            ]
+      }
+      bins={s.bins as number}
+      animate={ui.animate}
+      summary={false}
+      width={320}
+      height={40}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<FoldedDayBand",
+      "  data={observations}",
+      s.today === true && "  today={today}",
+      s.single === true && "  bands={[[25, 75]]}",
+      s.bins !== 24 && `  bins={${s.bins}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use ←/→ across the folded axis — each position announces the median and middle half.",
 };
 
 export const recipes: Recipe[] = [

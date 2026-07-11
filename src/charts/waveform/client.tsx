@@ -2,9 +2,17 @@
 // Interactive <Waveform> (plan/25 §4). One pointer listener; bucket by x lookup.
 // Hover shows the bucket peak + crosshair; ←/→ rove buckets. Composes the static
 // component (canon). onPointFocus supports scrub-to-seek recipes.
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { maxPerBucket } from "../../core/downsample.js";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_WAVEFORM } from "../../core/strings-waveform.js";
 import { bucketCount, waveformGeometry } from "./geometry.js";
 import { Waveform as StaticWaveform, waveformSummary, type WaveformProps } from "./index.js";
@@ -13,6 +21,12 @@ const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveWaveformProps extends WaveformProps {
   onPointFocus?: (index: number, fraction: number) => void;
+  /**
+   * Opt-in entrance motion (default `false`): the bars rise from the center
+   * on first client-side mount. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
@@ -28,8 +42,15 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
     title,
     summary,
     onPointFocus,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "rise", animate, {
+    selector: 'path[data-mc-ink="bar"]',
+    origin: "center",
+  });
 
   const buckets = useMemo(() => bucketCount(width, Math.max(1, data.length)), [width, data.length]);
   const geo = useMemo(
@@ -114,6 +135,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-wave-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

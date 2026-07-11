@@ -1,4 +1,5 @@
 import { PhaseTrace } from "@microcharts/react/phase-trace";
+import { PhaseTrace as PhaseTraceInteractive } from "@microcharts/react/phase-trace/interactive";
 import { InteractiveDemo } from "./phase-trace.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -110,6 +111,36 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PhaseTraceInteractive
+      data={TRAJ}
+      xLabel="CPU"
+      yLabel="Latency"
+      tail={(s.tail as number) / 100}
+      grid={s.grid as boolean}
+      startDot={s.startDot as boolean}
+      animate={ui.animate}
+      summary={false}
+      width={110}
+      height={100}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PhaseTrace",
+      "  data={trajectory}",
+      '  xLabel="CPU"',
+      '  yLabel="Latency"',
+      s.tail !== 25 && `  tail={${((s.tail as number) / 100).toFixed(2)}}`,
+      s.grid === true && "  grid",
+      s.startDot === true && "  startDot",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or step with ←/→ — each point announces its position in time and on both named axes.",
 };
 
 export const recipes: Recipe[] = [

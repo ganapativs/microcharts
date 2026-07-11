@@ -1,4 +1,5 @@
 import { BurnChart } from "@microcharts/react/burn-chart";
+import { BurnChart as BurnChartInteractive } from "@microcharts/react/burn-chart/interactive";
 import { InteractiveDemo } from "./burn-chart.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -108,6 +109,37 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => {
+    const up = s.mode === "up";
+    const plan = up ? PLAN.map((v) => 40 - v) : PLAN;
+    const actual = up ? ACTUAL.map((v) => 40 - v) : ACTUAL;
+    return (
+      <BurnChartInteractive
+        data={{ plan, actual }}
+        mode={s.mode as "down" | "up"}
+        projection={s.projection as boolean}
+        label={s.label as "gap" | "none"}
+        animate={ui.animate}
+        summary={false}
+        width={280}
+        height={30}
+      />
+    );
+  },
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BurnChart",
+      "  data={{ plan, actual }}",
+      s.mode !== "down" && `  mode="${s.mode}"`,
+      s.projection === false && "  projection={false}",
+      s.label !== "gap" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the days — history announces actual vs plan, the dotted region announces the projection.",
 };
 
 export const recipes: Recipe[] = [

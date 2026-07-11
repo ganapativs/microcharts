@@ -1,14 +1,21 @@
 "use client";
 // Interactive <BumpStrip> (plan/22 #21). Nearest-x pointer lookup; ←/→ step
 // periods ("Week 4 of 12: #3."). Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { isFiniteValue } from "../../core/types.js";
 import { bumpGeometry } from "./geometry.js";
 import { BumpStrip as StaticBumpStrip, bumpSummary, type BumpStripProps } from "./index.js";
 
 export interface InteractiveBumpStripProps extends BumpStripProps {
   strings?: FlowStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the line draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
@@ -21,8 +28,12 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
     strings = EN_FLOW,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 7));
   const maxLabelChars =
@@ -109,6 +120,7 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-bump-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

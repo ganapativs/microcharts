@@ -3,8 +3,9 @@
 // (span hit = containment, else nearest edge/point); ←/→ cycle items
 // chronologically; announces "Deploy freeze: Jun 3, 09:00 to 13:30 — 4h 30m."
 // Composes the static component (canon).
-import { useMemo, useState, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
 import { eventTimelineGeometry } from "./geometry.js";
 import {
@@ -19,6 +20,12 @@ export interface InteractiveEventTimelineProps extends EventTimelineProps {
   strings?: TimelineStrings;
   /** Announced instant label (defaults to "Jun 3, 11:12" UTC). */
   dateFormat?: DateFormat;
+  /**
+   * Opt-in entrance motion (default `false`): spans and events fade in on
+   * first client-side mount. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function EventTimeline(props: InteractiveEventTimelineProps): React.ReactNode {
@@ -35,8 +42,12 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
     dateFormat,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate, { selector: "rect, path[data-mc-ink]" });
 
   const items = useMemo(() => normalizeItems(data), [data]);
   const win = useMemo(() => timelineDomain(items, domain), [items, domain]);
@@ -156,6 +167,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
 
   return (
     <span
+      ref={hostRef}
       className="mc-timeline-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -1,4 +1,5 @@
 import { CyclePlot } from "@microcharts/react/cycle-plot";
+import { CyclePlot as CyclePlotInteractive } from "@microcharts/react/cycle-plot/interactive";
 import { InteractiveDemo } from "./cycle-plot.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -124,6 +125,36 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <CyclePlotInteractive
+      data={WEEKS}
+      period={7}
+      slots={DAYS}
+      cycleUnit="weeks"
+      center={s.center as "mean" | "median"}
+      trend={s.trend as "line" | "none"}
+      spine={s.spine as boolean}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={40}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<CyclePlot",
+      "  data={daily}",
+      "  period={7}",
+      s.center !== "mean" && `  center="${s.center}"`,
+      s.trend !== "line" && `  trend="${s.trend}"`,
+      s.spine === false && "  spine={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the slots — each announces its mean, cycle count, and drift; ↑/↓ steps the individual weeks within a slot.",
 };
 
 export const recipes: Recipe[] = [

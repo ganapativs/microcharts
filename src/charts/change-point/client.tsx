@@ -3,8 +3,9 @@
 // Tab cycles the breaks as first-class stops, each announcing the mean shift.
 // A pointer picks the nearest x. Composes the static component (canon); the
 // crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-change-point.js";
 import { changePointGeometry } from "./geometry.js";
 import {
@@ -15,6 +16,12 @@ import {
 
 export interface InteractiveChangePointProps extends ChangePointProps {
   strings?: ChangePointStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the line draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const pct = (frac: number): string =>
@@ -33,8 +40,12 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     strings = EN_CHANGE_POINT,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
     () => changePointGeometry({ width, height, data, breaks, max, domain }),
@@ -143,6 +154,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className="mc-change-point-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
