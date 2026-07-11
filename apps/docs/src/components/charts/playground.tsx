@@ -148,21 +148,6 @@ function Shell({
       <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-2.5">
         <span className="mono-label">Live playground</span>
         <div className="flex items-center gap-2">
-          {mode && onMode && (
-            <div className="seg">
-              {(["static", "interactive"] as const).map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  data-active={mode === m}
-                  onClick={() => onMode(m)}
-                  className="seg-opt"
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
-          )}
           {onReplay && (
             <button
               type="button"
@@ -196,6 +181,37 @@ function Shell({
         <p className="border-t border-hairline px-4 py-2 text-center text-[0.72rem] leading-snug text-fd-muted-foreground">
           {hint}
         </p>
+      )}
+      {mode && onMode && (
+        /* The entry choice IS the product's grammar — give it a real surface,
+           not a header afterthought: two captioned options, full width. */
+        <div
+          role="radiogroup"
+          aria-label="Chart entry"
+          className="grid grid-cols-2 border-t border-hairline"
+        >
+          {(
+            [
+              ["static", "Static", "pure SVG · zero client JS"],
+              ["interactive", "Interactive", "hover · keyboard · live values"],
+            ] as const
+          ).map(([m, label, caption]) => (
+            <button
+              key={m}
+              type="button"
+              role="radio"
+              aria-checked={mode === m}
+              data-active={mode === m}
+              onClick={() => onMode(m)}
+              className="group flex flex-col items-start gap-0.5 px-4 py-2.5 text-left transition-colors first:border-r first:border-hairline hover:bg-fd-muted/60 data-[active=true]:bg-fd-primary/[0.05] data-[active=true]:shadow-[inset_0_2px_0_var(--accent)]"
+            >
+              <span className="text-[0.82rem] font-medium text-fd-muted-foreground transition-colors group-hover:text-fd-foreground group-data-[active=true]:text-fd-foreground">
+                {label}
+              </span>
+              <span className="mono-label text-[0.55rem] opacity-60">{caption}</span>
+            </button>
+          ))}
+        </div>
       )}
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-t border-hairline px-4 py-4">
         {controls}
