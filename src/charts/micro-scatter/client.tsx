@@ -3,8 +3,9 @@
 // point by squared Euclidean distance over the precomputed dots. ←/→ step
 // points ordered by x, announcing the formatted pair. Focus ring on the
 // active dot. Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SCATTER, type ScatterStrings } from "../../core/strings-scatter.js";
 import { microScatterGeometry } from "./geometry.js";
@@ -18,6 +19,12 @@ export interface InteractiveMicroScatterProps extends MicroScatterProps {
   strings?: ScatterStrings;
   /** Point announcement templates (shared point wording). */
   seriesStrings?: SeriesStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the dots settle onto the plot
+   * on first client-side mount. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNode {
@@ -34,9 +41,13 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
     seriesStrings = EN_SERIES,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
   const rad = Math.min(3, Math.max(1, props.r ?? 1.5));
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "settle", animate);
 
   const geo = useMemo(
     () =>
@@ -133,6 +144,7 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
 
   return (
     <span
+      ref={hostRef}
       className="mc-scatter-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

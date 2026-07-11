@@ -2,8 +2,9 @@
 // Interactive <BubbleRow> (plan/24 #11). Nearest-bubble pointer lookup + ←/→
 // roving; announces each bubble's exact value (the number the low-precision area
 // can't carry); the focused bubble gets a thicker ring. Composes the static.
-import { useMemo, useState, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { labelFont } from "../../core/labels.js";
 import { bubbleRowGeometry } from "./geometry.js";
 import { EN_BUBBLE, type BubbleStrings } from "../../core/strings-bubble.js";
@@ -11,6 +12,12 @@ import { BubbleRow as StaticBubbleRow, bubbleRowSummary, type BubbleRowProps } f
 
 export interface InteractiveBubbleRowProps extends BubbleRowProps {
   strings?: BubbleStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the bubbles settle into the
+   * row on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
@@ -25,10 +32,16 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     title,
     summary,
     strings = EN_BUBBLE,
+    animate = false,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.34);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // `circle` (not the default ink selector) so bubbles still settle when a
+  // literal `color` prop drops the data-mc-ink attribute.
+  useEntrance(hostRef, "settle", animate, { selector: "circle" });
 
   const labelBand = label === "none" ? 0 : fontSize + 2;
   // Same numeral-width spread as the static, so the overlay ring aligns exactly.
@@ -98,6 +111,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-bubble-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -1,4 +1,5 @@
 import { MicroScatter } from "@microcharts/react/micro-scatter";
+import { MicroScatter as MicroScatterInteractive } from "@microcharts/react/micro-scatter/interactive";
 import { InteractiveDemo } from "./micro-scatter.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -139,6 +140,35 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <MicroScatterInteractive
+      data={CLOUD}
+      trend={s.trend as boolean}
+      focal={(s.focal as boolean) ? 12 : undefined}
+      r={s.r as number}
+      xDomain={(s.zoom as boolean) ? [0, 12] : undefined}
+      domain={(s.zoom as boolean) ? [0, 60] : undefined}
+      summary={false}
+      animate={ui.animate}
+      width={220}
+      height={132}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<MicroScatter",
+      "  data={pairs}",
+      (s.trend as boolean) && "  trend",
+      (s.focal as boolean) && "  focal={12}",
+      s.r !== 1.5 && `  r={${s.r}}`,
+      (s.zoom as boolean) && "  xDomain={[0, 12]}",
+      (s.zoom as boolean) && "  domain={[0, 60]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover the nearest point or step by x with ←/→ — each announces its pair.",
 };
 
 export const recipes: Recipe[] = [

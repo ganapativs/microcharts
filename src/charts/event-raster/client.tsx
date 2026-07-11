@@ -2,8 +2,16 @@
 // Interactive <EventRaster> (plan/25 §5). One pointer listener; lane from y,
 // nearest event from x. ↑/↓ lanes, ←/→ events within a lane (2-D keyboard,
 // ActivityGrid model). Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_EVENT_RASTER } from "../../core/strings-event-raster.js";
 import { LANE_CAP, rasterDomain } from "./geometry.js";
 import {
@@ -15,7 +23,16 @@ import {
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 const LANE_UNIT = 8;
 
-export function EventRaster(props: EventRasterProps): React.ReactNode {
+export interface InteractiveEventRasterProps extends EventRasterProps {
+  /**
+   * Opt-in entrance motion (default `false`): lanes fade in top-to-bottom on
+   * first client-side mount. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode {
   const {
     data,
     labels: labelsProp,
@@ -27,8 +44,20 @@ export function EventRaster(props: EventRasterProps): React.ReactNode {
     strings = EN_EVENT_RASTER,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Each lane's events are merged into one raster path (or, when binned, a
+  // handful of count rects) rather than discrete per-event elements —
+  // settle's per-mark scale would shift tick x-positions non-uniformly
+  // within a lane, so reveal (fade-only, staggered per lane) is used
+  // instead, matching the lane-by-lane scan order.
+  useEntrance(hostRef, "reveal", animate, {
+    selector:
+      'path, rect[data-mc-ink="bar"], rect[data-mc-ink="accent"], rect[data-mc-ink="neutral"]',
+  });
 
   const lanes = useMemo(() => data.slice(0, LANE_CAP), [data]);
   const n = Math.max(1, lanes.length);
@@ -131,6 +160,7 @@ export function EventRaster(props: EventRasterProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-raster-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

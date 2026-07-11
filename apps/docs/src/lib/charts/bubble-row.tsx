@@ -1,4 +1,5 @@
 import { BubbleRow } from "@microcharts/react/bubble-row";
+import { BubbleRow as BubbleRowInteractive } from "@microcharts/react/bubble-row/interactive";
 import { InteractiveDemo } from "./bubble-row.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -105,6 +106,29 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <BubbleRowInteractive
+      data={REGIONS}
+      align={s.align as "center" | "baseline"}
+      label={s.label as "value" | "both" | "none"}
+      summary={false}
+      animate={ui.animate}
+      height={44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BubbleRow",
+      "  data={regions}",
+      s.align !== "center" && `  align="${s.align}"`,
+      s.label !== "value" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow ←/→ across the bubbles — each announces its exact value, the number the low-precision area can't carry.",
 };
 
 export const recipes: Recipe[] = [

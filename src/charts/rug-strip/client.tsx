@@ -2,14 +2,21 @@
 // Interactive <RugStrip> (plan/22 #5). One pointer listener; nearest tick by
 // binary search over the sorted positions. ←/→ step through the SORTED
 // observations ("5.2 — 19th of 38."). Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import { rugGeometry } from "./geometry.js";
 import { RugStrip as StaticRugStrip, rugSummary, type RugStripProps } from "./index.js";
 
 export interface InteractiveRugStripProps extends RugStripProps {
   strings?: DistStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the tiers of ticks fade onto the
+   * strip on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 /** Index of the tick nearest to `pos` (ticks sorted by value ⇒ by pos). */
@@ -36,11 +43,18 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
     strings = EN_DIST,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
   const width = props.width ?? (orientation === "horizontal" ? 60 : 10);
   const height = props.height ?? (orientation === "horizontal" ? 10 : 60);
   const length = orientation === "horizontal" ? width : height;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Ticks are merged per-opacity-tier paths, not discrete per-observation
+  // elements — settle's scale would shift tick x-positions non-uniformly
+  // within a tier, so reveal (fade-only) is used instead.
+  useEntrance(hostRef, "reveal", animate, { selector: 'path[data-mc-ink="data"]' });
 
   const geo = useMemo(
     () =>
@@ -114,6 +128,7 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-rug-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

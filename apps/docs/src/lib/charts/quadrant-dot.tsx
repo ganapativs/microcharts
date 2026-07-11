@@ -1,4 +1,5 @@
 import { QuadrantDot } from "@microcharts/react/quadrant-dot";
+import { QuadrantDot as QuadrantDotInteractive } from "@microcharts/react/quadrant-dot/interactive";
 import { InteractiveDemo } from "./quadrant-dot.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -140,6 +141,37 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <QuadrantDotInteractive
+      data={FOCAL}
+      field={FIELD}
+      {...AXES}
+      split={[s.splitX as number, s.splitY as number]}
+      region={s.region as boolean}
+      quadrants={s.named ? ["quick win", "big bet", "skip", "time sink"] : undefined}
+      title="Effort vs impact"
+      summary={false}
+      animate={ui.animate}
+      width={120}
+      height={120}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<QuadrantDot",
+      "  data={item}",
+      "  field={backlog}",
+      `  split={[${s.splitX}, ${s.splitY}]}`,
+      s.region === false && "  region={false}",
+      s.named && `  quadrants={["quick win", "big bet", "skip", "time sink"]}`,
+      '  xLabel="effort" yLabel="impact"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the peers — each announces its coords and quadrant, nearest-first from the focal dot.",
 };
 
 export const recipes: Recipe[] = [

@@ -1,4 +1,5 @@
 import { Dumbbell } from "@microcharts/react/dumbbell";
+import { Dumbbell as DumbbellInteractive } from "@microcharts/react/dumbbell/interactive";
 import { InteractiveDemo } from "./dumbbell.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -110,6 +111,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <DumbbellInteractive
+      data={BANDS}
+      positive={(s.positive as boolean) ? "up" : undefined}
+      label={(s.values as boolean) ? "value" : "none"}
+      highlight={(s.highlight as boolean) ? "Berlin" : undefined}
+      summary={false}
+      animate={ui.animate}
+      width={240}
+      height={96}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Dumbbell",
+      "  data={bands}",
+      (s.positive as boolean) && '  positive="up"',
+      (s.values as boolean) && '  label="value"',
+      (s.highlight as boolean) && '  highlight="Berlin"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Rove rows with ↑/↓; ←/→ inspect the from/to ends of the active row.",
 };
 
 export const recipes: Recipe[] = [

@@ -4,8 +4,16 @@
 // entry (component canon): the static renders the run bars, triangle tick and
 // count labels; the client only overlays a focus outline + readout and owns
 // interaction — the SVG is never re-implemented here.
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_STREAK_SPARK } from "../../core/strings-streak-spark.js";
 import { streakSparkGeometry } from "./geometry.js";
 import {
@@ -20,6 +28,12 @@ const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveStreakSparkProps extends StreakSparkProps {
   onRunFocus?: (index: number | null) => void;
+  /**
+   * Opt-in entrance motion (default `false`): the run segments fade onto the
+   * strip on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode {
@@ -39,8 +53,20 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
     onRunFocus,
     className,
     style,
+    animate = false,
     children,
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Runs are fixed-height typed segments tiled like a cell strip (their
+  // height encodes run TYPE, not a baseline-anchored value) — not point
+  // markers or value bars, so reveal (fade-only, staggered) matches
+  // ActivityGrid's cell-grid archetype better than settle's scale, which
+  // would distort the variable-width rects.
+  useEntrance(hostRef, "reveal", animate, {
+    selector:
+      '[data-mc-ink="accent"], [data-mc-ink="positive"], [data-mc-ink="negative"], [data-mc-ink="point"]',
+  });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const geo = useMemo(
@@ -133,6 +159,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className={className ? `mc-streak-interactive ${className}` : "mc-streak-interactive"}
       style={wrapStyle}
       tabIndex={0}

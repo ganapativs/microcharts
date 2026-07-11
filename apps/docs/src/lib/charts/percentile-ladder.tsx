@@ -1,4 +1,5 @@
 import { PercentileLadder } from "@microcharts/react/percentile-ladder";
+import { PercentileLadder as PercentileLadderInteractive } from "@microcharts/react/percentile-ladder/interactive";
 import { InteractiveDemo } from "./percentile-ladder.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -132,6 +133,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <PercentileLadderInteractive
+      data={data}
+      scale={s.scale as "linear" | "log"}
+      label={s.label as "ps" | "values" | "both" | "none"}
+      marks={s.marks as "tick" | "dot"}
+      summary={false}
+      animate={ui.animate}
+      width={280}
+      height={18}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PercentileLadder",
+      "  data={latencies}",
+      s.scale !== "linear" && `  scale="${s.scale}"`,
+      s.label !== "ps" && `  label="${s.label}"`,
+      s.marks !== "tick" && `  marks="${s.marks}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the ticks — each states its value and its multiple of the median.",
 };
 
 export const recipes: Recipe[] = [

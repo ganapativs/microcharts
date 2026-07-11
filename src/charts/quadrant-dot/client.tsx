@@ -4,8 +4,9 @@
 // and quadrant; a pointer picks the nearest dot within a 3-unit hit radius.
 // Composes the static component (canon); the focus ring + readout chip are
 // overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_QUADRANT, type QuadrantStrings } from "../../core/strings-quadrant.js";
 import { quadrantDotGeometry } from "./geometry.js";
 import {
@@ -17,6 +18,12 @@ import {
 
 export interface InteractiveQuadrantDotProps extends QuadrantDotProps {
   strings?: QuadrantStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the focal dot and its peer
+   * field settle into place on first client-side mount. Inert on the server
+   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 // derive the quadrant name from a peer's quadrant index (TL0 TR1 BL2 BR3)
@@ -48,8 +55,17 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
     strings = EN_QUADRANT,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // The soft accent glow behind the focal dot has no data-mc-ink attribute
+  // (a literal fill), so it isn't selected — it still fades in with the base
+  // whole-svg fade.
+  useEntrance(hostRef, "settle", animate, {
+    selector: 'circle[data-mc-ink="data"], circle[data-mc-ink="ghost"]',
+  });
 
   const geo = useMemo(
     () => quadrantDotGeometry({ width, height, data, field, xDomain, domain, split }),
@@ -134,6 +150,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className="mc-quadrant-dot-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -1,4 +1,5 @@
 import { QuantileDots } from "@microcharts/react/quantile-dots";
+import { QuantileDots as QuantileDotsInteractive } from "@microcharts/react/quantile-dots/interactive";
 import { InteractiveDemo } from "./quantile-dots.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -123,6 +124,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <QuantileDotsInteractive
+      data={WAITS}
+      count={Number(s.count)}
+      threshold={s.threshold as number}
+      side={s.side as "above" | "below"}
+      format={MIN_FMT}
+      summary={false}
+      animate={ui.animate}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<QuantileDots",
+      "  data={waits}",
+      `  threshold={${s.threshold}}`,
+      s.count !== "20" && `  count={${s.count}}`,
+      s.side !== "above" && `  side="${s.side}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover to drag the threshold — the count of dots past the line recomputes as you move it.",
 };
 
 export const recipes: Recipe[] = [

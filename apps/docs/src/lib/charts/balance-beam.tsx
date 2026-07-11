@@ -1,4 +1,5 @@
 import { BalanceBeam } from "@microcharts/react/balance-beam";
+import { BalanceBeam as BalanceBeamInteractive } from "@microcharts/react/balance-beam/interactive";
 import { InteractiveDemo } from "./balance-beam.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -119,6 +120,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <BalanceBeamInteractive
+      data={[
+        { label: "Inflow", value: s.left as number },
+        { label: "Outflow", value: s.right as number },
+      ]}
+      shape={s.shape as "square" | "round"}
+      label={s.label ? "values" : "none"}
+      summary={false}
+      animate={ui.animate}
+      width={120}
+      height={44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BalanceBeam",
+      `  data={[{ label: "Inflow", value: ${s.left} }, { label: "Outflow", value: ${s.right} }]}`,
+      s.shape !== "square" && `  shape="${s.shape}"`,
+      s.label && '  label="values"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow Left/Right to read a side's value — a flip of the heavier side is announced.",
 };
 
 export const recipes: Recipe[] = [

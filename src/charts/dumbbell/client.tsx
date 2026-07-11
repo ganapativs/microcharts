@@ -2,8 +2,9 @@
 // Interactive <Dumbbell> (plan/22 #11). One pointer listener; row by y-band.
 // ↑/↓ rove rows; ←/→ within a row toggles the from/to announcement
 // ("From: 62,000." / "To: 84,000."). Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { dumbbellGeometry } from "./geometry.js";
 import {
@@ -15,6 +16,13 @@ import {
 
 export interface InteractiveDumbbellProps extends DumbbellProps {
   strings?: PairedStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the from/to endpoint dots settle
+   * onto each row on first client-side mount (the connectors arrive with the
+   * base fade). Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
@@ -27,9 +35,16 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     strings = EN_PAIRED,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
   const height = props.height ?? data.length * 12;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Covers both endpoints regardless of shape: the "from" hollow ring has no
+  // data-mc-ink attribute, only the "to" dot does — a bare `circle` selector
+  // catches both; the connector arrives via the base whole-svg fade.
+  useEntrance(hostRef, "settle", animate, { selector: "circle" });
 
   const fontSize = 6;
   const hasLabels = data.some((d) => d.label);
@@ -124,6 +139,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-dumbbell-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
