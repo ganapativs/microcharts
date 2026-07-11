@@ -1,4 +1,5 @@
 import { TapeGauge } from "@microcharts/react/tape-gauge";
+import { TapeGauge as TapeGaugeInteractive } from "@microcharts/react/tape-gauge/interactive";
 import { InteractiveDemo } from "./tape-gauge.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -145,6 +146,36 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => {
+    const vertical = s.orientation !== "horizontal";
+    return (
+      <TapeGaugeInteractive
+        value={s.value as number}
+        rate={s.rate as number}
+        zones={ZONES}
+        span={60}
+        orientation={s.orientation as "vertical" | "horizontal"}
+        summary={false}
+        animate={ui.animate}
+        width={vertical ? 28 : 160}
+        height={vertical ? 72 : 32}
+      />
+    );
+  },
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<TapeGauge",
+      `  value={${s.value}}`,
+      s.rate !== 0 && `  rate={${s.rate}}`,
+      "  zones={zones}",
+      s.orientation !== "vertical" && `  orientation="${s.orientation}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "A live reading: the scale scrolls while the value stays parked at the pointer; chevrons show how fast it's moving, and each change is announced politely.",
 };
 
 export const recipes: Recipe[] = [

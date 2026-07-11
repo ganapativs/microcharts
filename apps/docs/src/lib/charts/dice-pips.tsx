@@ -1,4 +1,5 @@
 import { DicePips } from "@microcharts/react/dice-pips";
+import { DicePips as DicePipsInteractive } from "@microcharts/react/dice-pips/interactive";
 import { InteractiveDemo } from "./dice-pips.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -14,6 +15,10 @@ export const entry: ChartEntry = {
   tagline: "A small count or severity, read instantly as a die face.",
   staticImport: `${PKG}/dice-pips`,
   interactiveImport: `${PKG}/dice-pips/interactive`,
+  // Pip changes already cross-fade (one-shot WAAPI value-transition in
+  // client.tsx) — a mount entrance would fight that existing motion, so this
+  // chart has no `animate` prop at all.
+  animates: false,
   dataShape: "{ value: number }",
   encoding: { channel: "canonical pip pattern 1–6 (subitized)", precision: "high" },
   nodeBudget: "≤ 7 (face + 6 pips)",
@@ -71,6 +76,24 @@ export const playground: PlaygroundSpec = {
     ["<DicePips", `  value={${s.value}}`, s.face === false && "  face={false}", "/>"]
       .filter(Boolean)
       .join("\n"),
+  // No `animate` prop exists on this chart (see entry.animates) — the pips'
+  // own value-transition cross-fade is the only motion; renderInteractive
+  // still demonstrates the interactive entry itself.
+  renderInteractive: (s) => (
+    <DicePipsInteractive
+      value={s.value as number}
+      face={s.face as boolean}
+      summary={false}
+      size={44}
+    />
+  ),
+  codeInteractive: (s) =>
+    ["<DicePips", `  value={${s.value}}`, s.face === false && "  face={false}", "/>"]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Tap to roll — the pip set cross-fades to the new face and the value is announced through a polite live region. The pips are one value, so there is no cursor to move.",
+  animates: false,
 };
 
 export const recipes: Recipe[] = [

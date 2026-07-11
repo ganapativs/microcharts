@@ -1,4 +1,5 @@
 import { MicroDonut } from "@microcharts/react/micro-donut";
+import { MicroDonut as MicroDonutInteractive } from "@microcharts/react/micro-donut/interactive";
 import { InteractiveDemo } from "./micro-donut.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -131,6 +132,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <MicroDonutInteractive
+      data={MIX}
+      maxWedges={s.maxWedges as number}
+      weight={s.weight as number}
+      decorative={s.decorative as boolean}
+      size={48}
+      summary={false}
+      animate={ui.animate}
+      style={{ width: 96, height: 96 }}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<MicroDonut",
+      "  data={mix}",
+      s.maxWedges !== 4 && `  maxWedges={${s.maxWedges}}`,
+      s.weight !== 5 && `  weight={${s.weight}}`,
+      (s.decorative as boolean) && "  decorative",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover a wedge (angle lookup) or arrow through them — Other announces its members.",
 };
 
 export const recipes: Recipe[] = [

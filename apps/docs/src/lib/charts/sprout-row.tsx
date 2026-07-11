@@ -1,4 +1,5 @@
 import { SproutRow } from "@microcharts/react/sprout-row";
+import { SproutRow as SproutRowInteractive } from "@microcharts/react/sprout-row/interactive";
 import { InteractiveDemo } from "./sprout-row.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -94,6 +95,29 @@ export const playground: PlaygroundSpec = {
     ["<SproutRow", "  data={accounts}", s.labels && "  labels", s.value && '  label="value"', "/>"]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <SproutRowInteractive
+      data={ACCTS}
+      labels={s.labels as boolean}
+      label={s.value ? "value" : "none"}
+      summary={false}
+      animate={ui.animate}
+      height={s.labels ? 46 : 26}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<SproutRow",
+      "  data={accounts}",
+      s.labels && "  labels",
+      s.value && '  label="value"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow ←/→ across the row — each item announces its stage (seed → sprout → leaf → bloom), and a ring lifts the focused glyph. Taller means further along, so the ordering reads without the key.",
 };
 
 export const recipes: Recipe[] = [

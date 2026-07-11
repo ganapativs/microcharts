@@ -1,4 +1,5 @@
 import { Hourglass } from "@microcharts/react/hourglass";
+import { Hourglass as HourglassInteractive } from "@microcharts/react/hourglass/interactive";
 import { InteractiveDemo } from "./hourglass.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -14,6 +15,10 @@ export const entry: ChartEntry = {
   tagline: "How much time is gone and how much remains — both at once.",
   staticImport: `${PKG}/hourglass`,
   interactiveImport: `${PKG}/hourglass/interactive`,
+  // The sand levels already cross-fade on value change (one-shot WAAPI
+  // value-transition in client.tsx) — a mount entrance would fight that
+  // existing motion, so this chart has no `animate` prop at all.
+  animates: false,
   dataShape: "{ value: number }",
   encoding: { channel: "sand area split top (remaining) / bottom (elapsed)", precision: "medium" },
   nodeBudget: "4",
@@ -96,6 +101,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  // No `animate` prop exists on this chart (see entry.animates) — the sand
+  // levels' own value-transition cross-fade is the only motion.
+  renderInteractive: (s) => (
+    <HourglassInteractive
+      value={(s.value as number) / 100}
+      label={s.label as "none" | "remaining" | "elapsed"}
+      stream={s.stream as boolean}
+      summary={false}
+      height={64}
+    />
+  ),
+  codeInteractive: (s) =>
+    [
+      "<Hourglass",
+      `  value={${((s.value as number) / 100).toFixed(2)}}`,
+      s.label !== "none" && `  label="${s.label}"`,
+      s.stream === false && "  stream={false}",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Tap to let more sand fall — the levels cross-fade (reduced-motion → they swap), and the total is announced only when it crosses a documented threshold (50 / 90 / 100%), never on every tick.",
+  animates: false,
 };
 
 export const recipes: Recipe[] = [

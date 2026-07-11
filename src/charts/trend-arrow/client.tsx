@@ -4,6 +4,7 @@
 // gives the glyph a one-shot pulse (CSS, reduced-motion-gated). Keyboard: the
 // wrapper is focusable, nothing more. Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { TrendArrow as StaticTrendArrow, trendArrowModel, type TrendArrowProps } from "./index.js";
 
@@ -11,13 +12,24 @@ export interface InteractiveTrendArrowProps extends TrendArrowProps {
   /** Announce + pulse when the direction changes (default true). */
   live?: boolean;
   strings?: ScalarStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the glyph fades in when the
+   * chart first mounts client-side. Fade only (no scale/transform) — the
+   * existing direction-change pulse animates `transform` on this same `.mc-root`
+   * svg, so the entrance stays off that property to never collide with it.
+   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
+   */
+  animate?: boolean;
 }
 
 export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
-  const { live = true, strings = EN_SCALAR, title, ...rest } = props;
+  const { live = true, animate = false, strings = EN_SCALAR, title, ...rest } = props;
   const model = trendArrowModel({ ...rest, strings });
   const [pulse, setPulse] = useState(false);
   const prev = useRef(model.direction);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "fade", animate);
 
   useEffect(() => {
     if (prev.current === model.direction) return;
@@ -32,6 +44,7 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-trend-live"
       data-pulse={pulse ? "1" : undefined}
       tabIndex={0}

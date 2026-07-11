@@ -2,8 +2,16 @@
 // Interactive <DualWindowMeter> (plan/25 §11). One pointer listener; nearest
 // sample by x reveals both window values against the target. ←/→ rove points.
 // Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_DUAL_WINDOW } from "../../core/strings-dual-window.js";
 import { rollingMean } from "./geometry.js";
 import {
@@ -14,7 +22,16 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function DualWindowMeter(props: DualWindowMeterProps): React.ReactNode {
+export interface InteractiveDualWindowMeterProps extends DualWindowMeterProps {
+  /**
+   * Opt-in entrance motion (default `false`): the fast and slow lines draw on
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.ReactNode {
   const {
     data,
     target,
@@ -27,8 +44,12 @@ export function DualWindowMeter(props: DualWindowMeterProps): React.ReactNode {
     strings = EN_DUAL_WINDOW,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const [wf, ws] = windows[0] < windows[1] ? windows : [windows[1], windows[0]];
   const fast = useMemo(() => rollingMean(data, wf), [data, wf]);
@@ -102,6 +123,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-dualwin-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

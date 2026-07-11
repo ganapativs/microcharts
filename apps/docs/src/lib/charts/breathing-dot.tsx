@@ -1,4 +1,5 @@
 import { BreathingDot } from "@microcharts/react/breathing-dot";
+import { BreathingDot as BreathingDotInteractive } from "@microcharts/react/breathing-dot/interactive";
 import { InteractiveDemo } from "./breathing-dot.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -14,6 +15,11 @@ export const entry: ChartEntry = {
   tagline: "How loaded the system is, right now — ambiently.",
   staticImport: `${PKG}/breathing-dot`,
   interactiveImport: `${PKG}/breathing-dot/interactive`,
+  // The pulse rate/amplitude IS the encoding (the continuous breathing
+  // animation, reduced-motion-gated to a static ring offset) — a mount
+  // entrance would fight that live motion, so this chart has no `animate`
+  // prop at all.
+  animates: false,
   dataShape: "{ value: number }",
   encoding: { channel: "pulse rate + amplitude (static: ring offset) by level", precision: "low" },
   nodeBudget: "3",
@@ -85,6 +91,28 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  // No `animate` prop exists on this chart (see entry.animates) — the
+  // continuous breathing pulse IS the encoding.
+  renderInteractive: (s) => (
+    <BreathingDotInteractive
+      value={(s.value as number) / 100}
+      label={s.label as "none" | "value"}
+      summary={false}
+      size={64}
+    />
+  ),
+  codeInteractive: (s) =>
+    [
+      "<BreathingDot",
+      `  value={${((s.value as number) / 100).toFixed(2)}}`,
+      s.label !== "none" && `  label="${s.label}"`,
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Drag the load up and down — the dot pulses faster and larger as it moves through the calm, elevated, and strained bands. The motion is the encoding, so a reduced-motion reader gets the static ring offset instead, and the band is announced through a polite live region only when it changes.",
+  animates: false,
 };
 
 export const recipes: Recipe[] = [

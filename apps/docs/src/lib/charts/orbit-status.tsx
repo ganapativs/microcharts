@@ -1,4 +1,5 @@
 import { OrbitStatus } from "@microcharts/react/orbit-status";
+import { OrbitStatus as OrbitStatusInteractive } from "@microcharts/react/orbit-status/interactive";
 import { InteractiveDemo } from "./orbit-status.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -16,6 +17,10 @@ export const entry: ChartEntry = {
   tagline: "How slow and how busy is this dependency right now?",
   staticImport: `${PKG}/orbit-status`,
   interactiveImport: `${PKG}/orbit-status/interactive`,
+  // The satellite's orbital speed IS the encoding (busier services spin
+  // faster) — a mount entrance would fight that live motion, so this chart
+  // has no `animate` prop at all.
+  animates: false,
   dataShape: "{ latency: number; rate: number }",
   encoding: { channel: "orbit radius = latency, dash density / speed = rate", precision: "low" },
   nodeBudget: "3",
@@ -118,6 +123,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  // No `animate` prop exists on this chart (see entry.animates) — the
+  // satellite's own orbital speed IS the encoding.
+  renderInteractive: (s) => (
+    <OrbitStatusInteractive
+      latency={s.latency as number}
+      rate={s.rate as number}
+      latencyDomain={LD}
+      rateDomain={RD}
+      alert={s.alert === "on" ? 300 : undefined}
+      summary={false}
+      size={120}
+    />
+  ),
+  codeInteractive: (s) =>
+    [
+      "<OrbitStatus",
+      `  latency={${s.latency}}`,
+      `  rate={${s.rate}}`,
+      "  latencyDomain={[0, 500]}",
+      "  rateDomain={[0, 20]}",
+      s.alert === "on" && "  alert={300}",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "A live dependency table. Each orbit's radius is its latency, its dash density is its call rate, and the satellite's speed mirrors that rate — busier services spin faster. Cross 300ms and the satellite doubles and the row flags. Reduced-motion readers read the same dash density without the spin.",
+  animates: false,
 };
 
 export const recipes: Recipe[] = [

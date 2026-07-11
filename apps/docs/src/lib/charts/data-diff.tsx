@@ -1,4 +1,5 @@
 import { DataDiff } from "@microcharts/react/data-diff";
+import { DataDiff as DataDiffInteractive } from "@microcharts/react/data-diff/interactive";
 import { InteractiveDemo } from "./data-diff.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -131,6 +132,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <DataDiffInteractive
+      data={DIFF}
+      labels={s.labels as boolean}
+      net={s.net as boolean}
+      sort={s.sort as "none" | "net" | "magnitude"}
+      label={s.label as "totals" | "none"}
+      summary={false}
+      animate={ui.animate}
+      width={220}
+      height={80}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<DataDiff",
+      "  data={diff}",
+      s.labels && "  labels",
+      s.net && "  net",
+      s.sort !== "none" && `  sort="${s.sort}"`,
+      s.label !== "none" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow down the rows — each announces its added, removed, and net change.",
 };
 
 export const recipes: Recipe[] = [

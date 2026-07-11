@@ -4,14 +4,21 @@
 // Each unit announces the running count — genuinely useful for a SR user
 // counting. Composes the static component (canon); the focus ring is an overlay
 // child re-using geometry.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
 import { iconArrayGeometry } from "./geometry.js";
 import { IconArray as StaticIconArray, iconArraySummary, type IconArrayProps } from "./index.js";
 
 export interface InteractiveIconArrayProps extends IconArrayProps {
   strings?: FreqStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the unit grid fades in,
+   * staggered, when the chart first mounts client-side. Inert on the server
+   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
@@ -26,8 +33,16 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     strings = EN_FREQ,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // "reveal" — a fixed-N grid of unit cells is exactly the cell-grid case;
+  // the default selector only matches "unit-off" (empty) cells, so a custom
+  // selector scoped to unit rects (excludes the label text) catches filled
+  // units too.
+  useEntrance(hostRef, "reveal", animate, { selector: "rect[data-mc-ink]" });
 
   const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
   const gutterCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
@@ -112,6 +127,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-icon-array-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -1,4 +1,5 @@
 import { CometTrail } from "@microcharts/react/comet-trail";
+import { CometTrail as CometTrailInteractive } from "@microcharts/react/comet-trail/interactive";
 import { InteractiveDemo } from "./comet-trail.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -16,6 +17,10 @@ export const entry: ChartEntry = {
   tagline: "Where the value is now, and where it has just been.",
   staticImport: `${PKG}/comet-trail`,
   interactiveImport: `${PKG}/comet-trail/interactive`,
+  // The easing head + opacity-fading trail IS the encoding (age is motion) —
+  // a mount entrance would fight that live motion, so this chart has no
+  // `animate` prop at all.
+  animates: false,
   dataShape: "number[]",
   encoding: {
     channel: "head position (now) + opacity-fading positional trail",
@@ -92,6 +97,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  // No `animate` prop exists on this chart (see entry.animates) — the head's
+  // own easing motion + fading trail IS the encoding.
+  renderInteractive: (s) => (
+    <CometTrailInteractive
+      data={RISING}
+      trail={s.trail as number}
+      label={s.label as "last" | "none"}
+      summary={false}
+      width={180}
+    />
+  ),
+  codeInteractive: (s) =>
+    [
+      "<CometTrail",
+      "  data={rollingWindow}",
+      s.trail !== 12 && `  trail={${s.trail}}`,
+      s.label !== "last" && `  label="${s.label}"`,
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "A live rolling value. The bright head is now; the fading trail is where it has just been (opacity is age, never value). Each update eases the head to the new position — a steady stream makes the comet, a stall goes still. Reduced-motion readers get the same decaying dot-sparkline, repositioned instantly.",
+  animates: false,
 };
 
 export const recipes: Recipe[] = [

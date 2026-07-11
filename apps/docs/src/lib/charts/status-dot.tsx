@@ -1,4 +1,5 @@
 import { StatusDot } from "@microcharts/react/status-dot";
+import { StatusDot as StatusDotInteractive } from "@microcharts/react/status-dot/interactive";
 import { InteractiveDemo } from "./status-dot.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -115,6 +116,26 @@ export const playground: PlaygroundSpec = {
     ["<StatusDot", `  status="${s.status}"`, (s.pulse as boolean) && "  pulse", "/>"]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <StatusDotInteractive
+      status={s.status as string}
+      pulse={s.pulse as boolean}
+      summary={false}
+      animate={ui.animate}
+      style={{ width: 40, height: 40 }}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<StatusDot",
+      `  status="${s.status}"`,
+      (s.pulse as boolean) && "  pulse",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Cycle the state — each change is announced politely with its label.",
 };
 
 export const recipes: Recipe[] = [

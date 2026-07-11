@@ -4,6 +4,7 @@
 // mark has nothing to reveal on hover that the summary doesn't already say
 // (documented skip). Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { resolveStatus, StatusDot as StaticStatusDot, type StatusDotProps } from "./index.js";
 
@@ -11,11 +12,22 @@ export interface InteractiveStatusDotProps extends StatusDotProps {
   /** Announce when the status changes (default true). */
   live?: boolean;
   strings?: ScalarStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the dot fades and scales in
+   * when the chart first mounts client-side. Independent of the optional
+   * `pulse` halo (a continuous CSS animation on a child `.mc-status-halo`
+   * circle, not the root svg the entrance drives) — different element, no
+   * property collision. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
-  const { live = true, strings = EN_SCALAR, title, ...rest } = props;
+  const { live = true, animate = false, strings = EN_SCALAR, title, ...rest } = props;
   const state = resolveStatus(rest.status, rest.states);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "pop", animate);
   const summaryText = strings.status(state.label);
   const label = [title, summaryText].filter(Boolean).join(". ");
 
@@ -31,7 +43,7 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
   }, [state.label, label, live]);
 
   return (
-    <span className="mc-status-live" tabIndex={0} role="img" aria-label={label}>
+    <span ref={hostRef} className="mc-status-live" tabIndex={0} role="img" aria-label={label}>
       <StaticStatusDot {...rest} strings={strings} summary={false} />
       {live ? (
         <span

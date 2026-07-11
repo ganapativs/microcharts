@@ -1,4 +1,5 @@
 import { MoonPhase } from "@microcharts/react/moon-phase";
+import { MoonPhase as MoonPhaseInteractive } from "@microcharts/react/moon-phase/interactive";
 import { InteractiveDemo } from "./moon-phase.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -14,6 +15,10 @@ export const entry: ChartEntry = {
   tagline: "How far through a cycle or period — readable across cultures.",
   staticImport: `${PKG}/moon-phase`,
   interactiveImport: `${PKG}/moon-phase/interactive`,
+  // The lit region already cross-fades on value change (one-shot WAAPI
+  // value-transition in client.tsx) — a mount entrance would fight that
+  // existing motion, so this chart has no `animate` prop at all.
+  animates: false,
   dataShape: "{ value: number }",
   encoding: { channel: "illuminated area fraction of the disc", precision: "medium" },
   nodeBudget: "3",
@@ -83,6 +88,28 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  // No `animate` prop exists on this chart (see entry.animates) — the lit
+  // region's own value-transition cross-fade is the only motion.
+  renderInteractive: (s) => (
+    <MoonPhaseInteractive
+      value={(s.value as number) / 100}
+      mode={s.mode as "progress" | "cycle"}
+      summary={false}
+      size={44}
+    />
+  ),
+  codeInteractive: (s) =>
+    [
+      "<MoonPhase",
+      `  value={${((s.value as number) / 100).toFixed(2)}}`,
+      s.mode !== "progress" && `  mode="${s.mode}"`,
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Tap to advance the phase — the lit region cross-fades to its new area (reduced-motion → it swaps), hover reveals the percent, and each change is announced through a polite live region.",
+  animates: false,
 };
 
 export const recipes: Recipe[] = [

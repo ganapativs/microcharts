@@ -1,4 +1,5 @@
 import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
+import { DualWindowMeter as DualWindowMeterInteractive } from "@microcharts/react/dual-window-meter/interactive";
 import { InteractiveDemo } from "./dual-window-meter.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -130,6 +131,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <DualWindowMeterInteractive
+      data={LOUDNESS}
+      target={-23}
+      windows={[s.fast as number, s.slow as number]}
+      band={s.band ? [-25, -21] : undefined}
+      summary={false}
+      animate={ui.animate}
+      width={320}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<DualWindowMeter",
+      "  data={samples}",
+      "  target={-23}",
+      `  windows={[${s.fast}, ${s.slow}]}`,
+      s.band === true && "  band={[-25, -21]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the samples — the thin fast window and thick slow window read against the target.",
 };
 
 export const recipes: Recipe[] = [

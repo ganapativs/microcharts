@@ -3,14 +3,21 @@
 // (pointer y → row). ↑/↓ step rows, Home/End jump. The live region states each
 // row's added / removed / net. Composes the static component (canon); the focus
 // ring + readout chip are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
 import { dataDiffGeometry } from "./geometry.js";
 import { DataDiff as StaticDataDiff, dataDiffSummary, type DataDiffProps } from "./index.js";
 
 export interface InteractiveDataDiffProps extends DataDiffProps {
   strings?: DataDiffStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the chart fades and scales in
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const signed = (n: number, fmt: (v: number) => string): string =>
@@ -29,8 +36,12 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
     strings = EN_DATA_DIFF,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "pop", animate);
 
   const geo = useMemo(
     () => dataDiffGeometry({ width, height, data, sort, domain, max }),
@@ -105,6 +116,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-data-diff-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -4,6 +4,7 @@
 // (single mark). Composes the static component (canon).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { ProgressRing as StaticProgressRing, type ProgressRingProps } from "./index.js";
 
@@ -11,13 +12,21 @@ export interface InteractiveProgressRingProps extends ProgressRingProps {
   /** Announce at quarter-threshold crossings (default true). */
   live?: boolean;
   strings?: ScalarStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the arc draws on when the chart
+   * first mounts client-side. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const THRESHOLDS = [0.25, 0.5, 0.75, 1];
 
 export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNode {
-  const { live = true, strings = EN_SCALAR, title, ...rest } = props;
+  const { live = true, animate = false, strings = EN_SCALAR, title, ...rest } = props;
   const { value, max = 1, sweep = false, format, locale } = rest;
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
   const fraction =
     Number.isFinite(value) && Number.isFinite(max) && max > 0 ? value / max : Number.NaN;
   const pctFmt = useMemo(
@@ -49,6 +58,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
 
   return (
     <span
+      ref={hostRef}
       className="mc-ring-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

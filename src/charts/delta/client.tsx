@@ -4,17 +4,32 @@
 // polite region (for updating KPI cards) and gives a one-shot pulse. Motion is
 // gated on reduced-motion in CSS; the announcement always fires.
 import { useEffect, useRef, useState } from "react";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { Delta as StaticDelta, deltaModel, type DeltaProps } from "./index.js";
 
 export interface InteractiveDeltaProps extends DeltaProps {
   /** Announce + pulse when the value changes (default true). */
   live?: boolean;
+  /**
+   * Opt-in entrance motion (default `false`): the glyph fades and scales in
+   * when the chart first mounts client-side. Independent of the existing
+   * value-change pulse (a separate CSS animation on the number span, not the
+   * glyph svg) — the two never touch the same element. Inert on the server
+   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
-export function Delta({ live = true, ...props }: InteractiveDeltaProps): React.ReactNode {
+export function Delta({
+  live = true,
+  animate = false,
+  ...props
+}: InteractiveDeltaProps): React.ReactNode {
   const [pulse, setPulse] = useState(false);
   const prev = useRef(props.value);
   const { summary } = deltaModel(props);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "pop", animate);
 
   useEffect(() => {
     if (prev.current === props.value) return;
@@ -26,7 +41,7 @@ export function Delta({ live = true, ...props }: InteractiveDeltaProps): React.R
   }, [props.value, live]);
 
   return (
-    <span className="mc-delta-live" data-pulse={pulse ? "1" : undefined}>
+    <span ref={hostRef} className="mc-delta-live" data-pulse={pulse ? "1" : undefined}>
       <StaticDelta {...props} />
       {live ? (
         <span

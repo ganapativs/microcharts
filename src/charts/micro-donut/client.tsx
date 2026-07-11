@@ -2,8 +2,9 @@
 // Interactive <MicroDonut> (plan/22 #18). Pointer → wedge by atan2 angle
 // lookup (pure); ←/→ rove wedges. Disabled entirely when `decorative` — an
 // aria-hidden chart must not be a tab stop. Composes the static component.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { largestRemainderPercents, rollup } from "../segmented-bar/geometry.js";
 import { sharesSummary } from "../segmented-bar/index.js";
@@ -14,6 +15,14 @@ export interface InteractiveMicroDonutProps extends MicroDonutProps {
   strings?: CompositionStrings;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
   locale?: string | string[] | undefined;
+  /**
+   * Opt-in entrance motion (default `false`): the wedges fade in, staggered,
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins. Skipped when
+   * `decorative` (an aria-hidden ornament renders through the static entry
+   * directly, before any hook that could wire it runs).
+   */
+  animate?: boolean;
 }
 
 export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
@@ -28,8 +37,17 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
     strings = EN_COMPOSITION,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Wedges carry either a category role or the rolled-up "other" neutral role
+  // — the default "reveal" selector only matches data-mc-cat, so the neutral
+  // wedge is added explicitly.
+  useEntrance(hostRef, "reveal", animate, {
+    selector: 'path[data-mc-ink="neutral"], path[data-mc-cat]',
+  });
 
   const rolled = useMemo(
     () => rollup(data, maxWedges, strings.otherLabel),
@@ -113,6 +131,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-donut-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

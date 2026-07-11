@@ -1,4 +1,5 @@
 import { Thermometer } from "@microcharts/react/thermometer";
+import { Thermometer as ThermometerInteractive } from "@microcharts/react/thermometer/interactive";
 import { InteractiveDemo } from "./thermometer.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -112,6 +113,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ThermometerInteractive
+      value={s.value as number}
+      target={s.target as number}
+      orientation={s.orientation as "vertical" | "horizontal"}
+      bulb={s.bulb as boolean}
+      summary={false}
+      animate={ui.animate}
+      {...(s.orientation === "horizontal" ? { width: 120 } : { height: 72 })}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Thermometer",
+      `  value={${s.value}}`,
+      `  target={${s.target}}`,
+      s.orientation !== "vertical" && `  orientation="${s.orientation}"`,
+      s.bulb === false && "  bulb={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Tap to raise the level — the fill glides to its new reading (reduced-motion → it jumps), hover reveals the exact value, and each change is announced against the calibrated scale and target.",
 };
 
 export const recipes: Recipe[] = [

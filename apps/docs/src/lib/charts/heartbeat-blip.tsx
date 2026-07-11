@@ -1,4 +1,5 @@
 import { HeartbeatBlip } from "@microcharts/react/heartbeat-blip";
+import { HeartbeatBlip as HeartbeatBlipInteractive } from "@microcharts/react/heartbeat-blip/interactive";
 import { InteractiveDemo } from "./heartbeat-blip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -17,6 +18,10 @@ export const entry: ChartEntry = {
   tagline: "Is it alive, and how busy — instantly.",
   staticImport: `${PKG}/heartbeat-blip`,
   interactiveImport: `${PKG}/heartbeat-blip/interactive`,
+  // The sweep IS the encoding (the trace's own left-sweeping motion carries
+  // the event rate) — a mount entrance would fight that live motion, so this
+  // chart has no `animate` prop at all.
+  animates: false,
   dataShape: "number[]",
   encoding: { channel: "a spike per event across the recent window", precision: "medium" },
   nodeBudget: "3",
@@ -96,6 +101,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  // No `animate` prop exists on this chart (see entry.animates) — the
+  // sweeping trace IS the encoding.
+  renderInteractive: (s) => (
+    <HeartbeatBlipInteractive
+      events={Array.from({ length: s.count as number }, (_, k) => NOW - k * 4200 - 2000)}
+      now={NOW}
+      label={s.label as "none" | "count"}
+      summary={false}
+      width={160}
+    />
+  ),
+  codeInteractive: (s) =>
+    [
+      "<HeartbeatBlip",
+      "  events={eventTimestamps}",
+      "  now={serverNow}",
+      s.label !== "none" && `  label="${s.label}"`,
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "A live event firehose. Each blip is one real event arriving; the trace sweeps left as time passes and the rate you see IS the event rate. Stop the firehose and, after the window empties, the flat baseline is the down signal — never a fake pulse. Reduced-motion readers get the same trace, re-rendered on each event instead of swept.",
+  animates: false,
 };
 
 export const recipes: Recipe[] = [

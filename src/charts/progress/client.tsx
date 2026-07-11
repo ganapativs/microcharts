@@ -4,6 +4,7 @@
 // Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
 // mark). Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { Progress as StaticProgress, progressModel, type ProgressProps } from "./index.js";
 
@@ -11,12 +12,24 @@ export interface InteractiveProgressProps extends ProgressProps {
   /** Announce whole-percent changes (default true). */
   live?: boolean;
   strings?: ScalarStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the fill sweeps in from the left
+   * when the chart first mounts client-side. Independent of the existing CSS
+   * transition on the fill rect's `width` (which eases live value updates, a
+   * different property than the WAAPI `transform` this drives) — the two
+   * never run at once, since the entrance fires once on mount before any
+   * value update. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Progress(props: InteractiveProgressProps): React.ReactNode {
-  const { live = true, strings = EN_SCALAR, title, ...rest } = props;
+  const { live = true, animate = false, strings = EN_SCALAR, title, ...rest } = props;
   const model = progressModel({ ...rest, strings });
   const wholePct = Number.isFinite(model.fraction) ? Math.round(model.fraction * 100) : null;
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "sweep", animate);
 
   const [announced, setAnnounced] = useState("");
   const prev = useRef(wholePct);
@@ -30,6 +43,7 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-progress-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
