@@ -1699,3 +1699,15 @@ live docs (track shapes + ascending delays) and slow-motion frame capture. Two e
 the probes: whole-svg archetypes were being demoted by the selector-miss fallback (spin ran as wipe),
 and a long-running Next dev server serves a STALE compiled engine from node_modules — restart the
 docs dev server after every `pnpm build` before judging motion (turbopack does not watch node_modules).
+
+## 2026-07-11 — motion v3: three-act orchestration (user craft round 3)
+
+User verdict on v2: no story/rhythm — secondary ink either popped in via a disconnected fade or sat
+frozen ("half the chart animating"). Engine rewritten as a three-act scheduler on a 120 ms beat:
+Act 1 STAGE (all non-story, non-voice leaves fade in quietly over 2 beats — bands, tracks, ghost
+channels; nothing on a chart is ever unstaged), Act 2 STORY (the archetype performs, entering at
+beat 1 as the stage lands), Act 3 VOICE (text + accent/point/flag ink lands together at storyEnd −
+½ beat; draw-riding dots stay front-synced, incl. a lone endpoint dot syncing to its real viewBox x).
+New `defer` option casts a co-channel into the closing act (pareto line follows its bars). Verified
+by WAAPI probes on 12+ charts (stage/story/voice track shapes + delays) + full suites. SUPPORT pass
+retired (superseded by casting).
