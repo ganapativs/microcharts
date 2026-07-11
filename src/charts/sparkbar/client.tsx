@@ -61,7 +61,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "rise", animate, { selector: BAR_SELECTOR });
+  useEntrance(hostRef, "rise", animate, { selector: BAR_SELECTOR, origin: "signed" });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 

@@ -38,8 +38,12 @@ export type EntranceArchetype =
 export interface EntranceOptions {
   /** Marks to animate; defaults per archetype (data-mc-ink roles). */
   selector?: string;
-  /** transform-origin for rise/sweep (default "bottom" / "left"). */
-  origin?: "bottom" | "top" | "left" | "right" | "center";
+  /**
+   * transform-origin for rise/sweep (default "bottom" / "left").
+   * "signed": per-mark — `data-mc-ink="negative"` marks grow from the top
+   * (away from the zero line), everything else from the bottom.
+   */
+  origin?: "bottom" | "top" | "left" | "right" | "center" | "signed";
   /** Per-item stagger in ms (default 30, total capped at 240). */
   stagger?: number;
 }

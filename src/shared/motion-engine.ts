@@ -181,7 +181,13 @@ export function runEntrance(
         case "rise":
         case "sweep": {
           const axis = archetype === "rise" ? "scaleY" : "scaleX";
-          const origin = options.origin ?? (archetype === "rise" ? "bottom" : "left");
+          let origin = options.origin ?? (archetype === "rise" ? "bottom" : "left");
+          // Bars extend AWAY from the zero line — negative marks grow toward
+          // their own side of it (down for columns, left for horizontal bars).
+          if (origin === "signed") {
+            const neg = el.matches('[data-mc-ink="negative"]');
+            origin = archetype === "rise" ? (neg ? "top" : "bottom") : neg ? "right" : "left";
+          }
           el.style.transformBox = "fill-box";
           el.style.transformOrigin = origin;
           cleanups.push(() => {

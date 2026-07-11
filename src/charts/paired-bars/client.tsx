@@ -49,6 +49,7 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, orientation === "horizontal" ? "sweep" : "rise", animate, {
+    origin: "signed",
     selector: VALUE_SELECTOR,
   });
 
