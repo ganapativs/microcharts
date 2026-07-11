@@ -43,8 +43,12 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
   // their ink role on the fill mark itself (circle/rect/path), unfilled units
   // carry it on the ring — a custom selector catches every unit regardless of
   // shape or fill state (the default "settle" selector only matches circles).
+  // Index order over a 450ms window gives the row a counting feel (units
+  // settle one at a time, reading order) instead of a uniform staggered fade.
   useEntrance(hostRef, "settle", animate, {
     selector: "circle[data-mc-ink], rect[data-mc-ink], path[data-mc-ink]",
+    order: "index",
+    window: 450,
   });
 
   const [announced, setAnnounced] = useState("");

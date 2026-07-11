@@ -49,7 +49,9 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.3);
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "rise", animate, { selector: SKYLINE_SELECTOR });
+  // ordered by x, spread over a 500ms window — the skyline builds left→right
+  // instead of every building rising in lockstep.
+  useEntrance(hostRef, "rise", animate, { selector: SKYLINE_SELECTOR, order: "x", window: 500 });
 
   const groundY = height - (labels ? fontSize + 2 : 2);
   const geo = useMemo(

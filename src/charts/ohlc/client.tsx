@@ -38,11 +38,12 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // Candle bodies/wicks carry `data-mc-ohlc`, not `data-mc-ink` (and the
-  // "bars" variant is untagged lines), so no ink-based selector reliably
-  // covers both variants — wipe the whole svg left-to-right, matching how
-  // OHLC periods actually read (oldest to newest).
-  useEntrance(hostRef, "wipe", animate);
+  // "trail" ordered by x — periods land oldest→newest, one candle at a time.
+  // Candle bodies carry `data-mc-ohlc` (not `data-mc-ink`); the "bars"
+  // variant's ticks carry neither, so this selector matches only the candle
+  // bodies — the "bars" variant has no marks to select and the engine falls
+  // back to its whole-svg "wipe" reveal automatically (documented fallback).
+  useEntrance(hostRef, "trail", animate, { selector: "rect[data-mc-ohlc]", order: "x" });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(

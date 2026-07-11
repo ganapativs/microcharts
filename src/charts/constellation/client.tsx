@@ -45,7 +45,11 @@ export function Constellation(props: InteractiveConstellationProps): React.React
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "settle", animate, { selector: "circle" });
+  // "draw" — the chronology line draws left→right; the star dots pop out of
+  // it exactly as the draw front reaches them (engine-automatic). The
+  // connector carries ink="ghost" (not "data"/"accent"), so the draw default
+  // selector misses it — pass it explicitly.
+  useEntrance(hostRef, "draw", animate, { selector: 'path[data-mc-ink="ghost"]' });
 
   const geo = useMemo(
     () =>

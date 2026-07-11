@@ -47,7 +47,10 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "reveal", animate, { selector: "rect, path[data-mc-ink]" });
+  // "trail" ordered by x — events appear in chronological (left→right) order
+  // instead of a uniform staggered fade. Same selector as before: spans
+  // (rect) and point events (path[data-mc-ink]).
+  useEntrance(hostRef, "trail", animate, { selector: "rect, path[data-mc-ink]", order: "x" });
 
   const items = useMemo(() => normalizeItems(data), [data]);
   const win = useMemo(() => timelineDomain(items, domain), [items, domain]);

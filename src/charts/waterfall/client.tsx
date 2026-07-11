@@ -40,9 +40,12 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   // Waterfall bars float between running totals rather than sharing a zero
   // baseline, so a per-bar scaleY "rise" points the wrong way for roughly
-  // half the steps; the data is strictly sequential (left-to-right, step by
-  // step to the total), which "wipe" reveals naturally with no per-mark work.
-  useEntrance(hostRef, "wipe", animate);
+  // half the steps. "trail" ordered by x tells the actual waterfall story
+  // instead: each step (and the total, being rightmost) lands in sequence.
+  // `rect[data-mc-ink]` catches every step bar (ink="positive"/"negative"/
+  // "neutral") and the total bar (ink="bar") but not the connector hairlines
+  // (those are <line>, not <rect>).
+  useEntrance(hostRef, "trail", animate, { selector: "rect[data-mc-ink]", order: "x" });
 
   const geo = useMemo(
     () =>

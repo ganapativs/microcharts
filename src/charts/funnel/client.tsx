@@ -41,7 +41,9 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "rise", animate, { selector: STAGE_SELECTOR });
+  // ordered by y, spread over a 450ms window — the funnel squeezes top→down
+  // instead of every stage rising in lockstep.
+  useEntrance(hostRef, "rise", animate, { selector: STAGE_SELECTOR, order: "y", window: 450 });
 
   const geo = useMemo(
     () =>

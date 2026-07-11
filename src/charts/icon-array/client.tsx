@@ -41,8 +41,14 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
   // "reveal" — a fixed-N grid of unit cells is exactly the cell-grid case;
   // the default selector only matches "unit-off" (empty) cells, so a custom
   // selector scoped to unit rects (excludes the label text) catches filled
-  // units too.
-  useEntrance(hostRef, "reveal", animate, { selector: "rect[data-mc-ink]" });
+  // units too. Index order over a 450ms window gives the grid a counting
+  // feel (units light up one at a time, reading order) instead of a uniform
+  // staggered fade.
+  useEntrance(hostRef, "reveal", animate, {
+    selector: "rect[data-mc-ink]",
+    order: "index",
+    window: 450,
+  });
 
   const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
   const gutterCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;

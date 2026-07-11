@@ -44,7 +44,9 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "settle", animate);
+  // "trail" ordered by x — notes land left→right along the staff, echoing a
+  // melody played in time order rather than a generic staggered settle.
+  useEntrance(hostRef, "trail", animate, { order: "x" });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const last = lastFinite(data);

@@ -41,10 +41,11 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   const height = props.height ?? data.length * 12;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // Covers both endpoints regardless of shape: the "from" hollow ring has no
-  // data-mc-ink attribute, only the "to" dot does — a bare `circle` selector
-  // catches both; the connector arrives via the base whole-svg fade.
-  useEntrance(hostRef, "settle", animate, { selector: "circle" });
+  // "trail" ordered by y — rows populate top→down, one at a time. Covers both
+  // endpoints regardless of shape: the "from" hollow ring has no data-mc-ink
+  // attribute, only the "to" dot does — a bare `circle` selector catches
+  // both; the connector arrives via the base whole-svg fade.
+  useEntrance(hostRef, "trail", animate, { selector: "circle", order: "y" });
 
   const fontSize = 6;
   const hasLabels = data.some((d) => d.label);

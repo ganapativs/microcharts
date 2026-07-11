@@ -42,7 +42,10 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "settle", animate, { selector: "circle[data-mc-ink]" });
+  // "trail" (index order) — cells plant in a wave rather than a uniform
+  // staggered settle. Selector covers both empty (ink="muted") and filled
+  // (ink="point") cells; the default trail selector misses "muted".
+  useEntrance(hostRef, "trail", animate, { selector: "circle[data-mc-ink]" });
 
   const geo = useMemo(
     () => gardenGridGeometry({ values: data, rows, cell, gap, steps, domain, pad: 1 }),
