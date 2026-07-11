@@ -1711,3 +1711,13 @@ beat 1 as the stage lands), Act 3 VOICE (text + accent/point/flag ink lands toge
 New `defer` option casts a co-channel into the closing act (pareto line follows its bars). Verified
 by WAAPI probes on 12+ charts (stage/story/voice track shapes + delays) + full suites. SUPPORT pass
 retired (superseded by casting).
+
+## 2026-07-11 — motion v3.1: screen-space dash bug (user-reported, sparkline)
+
+Phantom second fragment animating from mid-line during dash draws at any CSS scale ≠ 1:
+`vector-effect: non-scaling-stroke` computes dash patterns post-transform (screen space) while
+`getTotalLength()` answers in user units, so the pattern repeat leaked into the visible path.
+Engine now scales the dash by the rendered factor (viewBox→client width) for non-scaling-stroke
+paths, +5 % guard (a dash longer than the path preserves the hold-invisible invariant). Affected
+all 20 draw charts; invisible at 1:1 word size — scaled-render checks are now part of the motion
+verification method (slow-mo frame capture at playground scale).
