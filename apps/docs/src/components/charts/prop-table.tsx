@@ -25,6 +25,18 @@ export function PropTable({ slug }: { slug: string }) {
               <td className="text-fd-muted-foreground">{p.description}</td>
             </tr>
           ))}
+          {chart.interactiveImport && (
+            <tr>
+              <td className="whitespace-nowrap font-mono text-fd-foreground">animate</td>
+              <td className="font-mono text-xs text-fd-muted-foreground">boolean</td>
+              <td className="text-fd-muted-foreground">
+                Interactive entry only. Opt-in entrance motion when the chart mounts client-side —
+                add <code className="text-xs">import &quot;@microcharts/react/motion&quot;</code>{" "}
+                once. Inert on the server, on hydrated server HTML, and under{" "}
+                <code className="text-xs">prefers-reduced-motion</code>.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

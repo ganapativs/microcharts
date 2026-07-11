@@ -1,6 +1,9 @@
 "use client";
 import { useState, type ReactNode } from "react";
-import { RotateCw } from "lucide-react";
+import { Play, RotateCw } from "lucide-react";
+// Registers the entrance-motion engine once for every playground on the site —
+// the exact import a consumer adds to enable the `animate` prop.
+import "@microcharts/react/motion";
 import { cn } from "@/lib/cn";
 import { getModule } from "@/lib/charts/registry";
 import { CodeWithData } from "@/components/ui/code-with-data";
@@ -115,14 +118,24 @@ function Range({
 
 function Shell({
   onShuffle,
+  onReplay,
+  mode,
+  onMode,
   preview,
+  hint,
   controls,
   code,
   sampleData,
   morphKey,
 }: {
   onShuffle?: () => void;
+  /** Present ⇒ a replay control re-runs the entrance motion. */
+  onReplay?: () => void;
+  /** Present ⇒ the static ↔ interactive mode switch. */
+  mode?: "static" | "interactive";
+  onMode?: (m: "static" | "interactive") => void;
   preview: ReactNode;
+  hint?: string;
   controls: ReactNode;
   code: string;
   sampleData?: SampleData[];
@@ -134,22 +147,51 @@ function Shell({
     <div className="panel not-prose my-6 overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-2.5">
         <span className="mono-label">Live playground</span>
-        {onShuffle && (
-          <button
-            type="button"
-            onClick={onShuffle}
-            aria-label="Shuffle data"
-            title="Shuffle data"
-            className="ghost-ctrl size-8"
-          >
-            <RotateCw className="size-4" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {mode && onMode && (
+            <div className="seg">
+              {(["static", "interactive"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  data-active={mode === m}
+                  onClick={() => onMode(m)}
+                  className="seg-opt"
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+          )}
+          {onReplay && (
+            <button
+              type="button"
+              onClick={onReplay}
+              aria-label="Replay entrance motion"
+              title="Replay entrance motion"
+              className="ghost-ctrl size-8"
+            >
+              <Play className="size-4" />
+            </button>
+          )}
+          {onShuffle && (
+            <button
+              type="button"
+              onClick={onShuffle}
+              aria-label="Shuffle data"
+              title="Shuffle data"
+              className="ghost-ctrl size-8"
+            >
+              <RotateCw className="size-4" />
+            </button>
+          )}
+        </div>
       </div>
-      <div className="grid-paper flex min-h-32 items-center justify-center px-6 py-10">
+      <div className="grid-paper flex min-h-32 flex-col items-center justify-center gap-3 px-6 py-10">
         <div key={morphKey} className="mc-morph flex w-full items-center justify-center">
           {preview}
         </div>
+        {hint && <p className="mono-label text-center text-[0.58rem] opacity-70">{hint}</p>}
       </div>
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-t border-hairline px-4 py-4">
         {controls}
@@ -197,27 +239,58 @@ function KnobControl({
   }
 }
 
-/** A live prop playground for any chart. `<Playground chart="bullet" />` */
+/**
+ * The unified live playground for any chart: props, static ↔ interactive mode,
+ * opt-in entrance motion with replay, and a copy-complete snippet that tracks
+ * every toggle. `<Playground chart="bullet" />`
+ */
 export function Playground({ chart }: { chart: string }) {
   const mod = getModule(chart);
   const spec = mod?.playground;
+  const entry = mod?.entry;
   const [state, setState] = useState<Record<string, KnobValue>>(() =>
     Object.fromEntries((spec?.knobs ?? []).map((k) => [k.key, k.init])),
   );
   const [data, setData] = useState<number[]>(spec?.data ?? []);
   const [seed, setSeed] = useState(1);
-  if (!spec) return null;
+  const [mode, setMode] = useState<"static" | "interactive">("static");
+  const [animate, setAnimate] = useState(false);
+  const [take, setTake] = useState(0);
+  if (!spec || !entry) return null;
 
-  // remount (and morph) on discrete-knob or data changes — never on slider drags
+  const interactive = mode === "interactive" && !!spec.renderInteractive;
+  const ui = { animate };
+
+  // remount (and morph) on discrete-knob, data, or mode changes — never on
+  // slider drags. Remounting is also exactly what replays the entrance.
   const morphKey = spec.knobs
     .filter((k) => k.kind !== "range")
     .map((k) => String(state[k.key]))
     .concat(spec.shuffle ? [String(seed)] : [])
+    .concat([mode, String(animate), String(take)])
     .join("-");
+
+  // Copy-complete: the snippet always carries its own imports and reflects
+  // the exact playground state (docs-as-tests).
+  const importPath = interactive
+    ? (entry.interactiveImport ?? entry.staticImport)
+    : entry.staticImport;
+  const jsx = interactive
+    ? (spec.codeInteractive?.(state, data, ui) ?? spec.code(state, data))
+    : spec.code(state, data);
+  const code = [
+    `import { ${entry.name} } from "${importPath}";`,
+    ...(interactive && animate ? ['import "@microcharts/react/motion";'] : []),
+    "",
+    jsx,
+  ].join("\n");
 
   return (
     <Shell
       morphKey={morphKey}
+      mode={spec.renderInteractive ? mode : undefined}
+      onMode={spec.renderInteractive ? setMode : undefined}
+      onReplay={interactive && animate ? () => setTake((t) => t + 1) : undefined}
       onShuffle={
         spec.shuffle
           ? () => {
@@ -227,16 +300,22 @@ export function Playground({ chart }: { chart: string }) {
           : undefined
       }
       sampleData={mod?.entry.sampleData}
-      preview={spec.render(state, data)}
-      controls={spec.knobs.map((k) => (
-        <KnobControl
-          key={k.key}
-          knob={k}
-          value={state[k.key]!}
-          onChange={(v) => setState((s) => ({ ...s, [k.key]: v }))}
-        />
-      ))}
-      code={spec.code(state, data)}
+      preview={interactive ? spec.renderInteractive!(state, data, ui) : spec.render(state, data)}
+      hint={interactive ? spec.interactiveHint : undefined}
+      controls={
+        <>
+          {spec.knobs.map((k) => (
+            <KnobControl
+              key={k.key}
+              knob={k}
+              value={state[k.key]!}
+              onChange={(v) => setState((s) => ({ ...s, [k.key]: v }))}
+            />
+          ))}
+          {interactive && <Toggle label="animate" value={animate} onChange={setAnimate} />}
+        </>
+      }
+      code={code}
     />
   );
 }

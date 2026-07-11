@@ -74,6 +74,25 @@ export interface PlaygroundSpec {
   shuffle?: (seed: number) => number[];
   render: (state: Record<string, KnobValue>, data: number[]) => ReactNode;
   code: (state: Record<string, KnobValue>, data: number[]) => string;
+  /**
+   * The same playground state rendered through the `…/interactive` entry —
+   * present ⇒ the shell grows a static ↔ interactive mode switch, an animate
+   * toggle, and a replay control. Keep the props identical to `render` so the
+   * two modes are visibly the same chart.
+   */
+  renderInteractive?: (
+    state: Record<string, KnobValue>,
+    data: number[],
+    ui: { animate: boolean },
+  ) => ReactNode;
+  /** JSX mirroring `renderInteractive` (docs-as-tests; includes `animate` when on). */
+  codeInteractive?: (
+    state: Record<string, KnobValue>,
+    data: number[],
+    ui: { animate: boolean },
+  ) => string;
+  /** One-line affordance hint shown under the interactive preview. */
+  interactiveHint?: string;
 }
 
 /* ── copy-complete snippets ──────────────────────────────────────────────── */

@@ -29,15 +29,17 @@ interface Run {
   finish: () => void;
 }
 
+// Word-sized marks read fast — entrances sit at the top of the UI duration
+// scale only where the motion IS the encoding reveal (a line drawing on).
 const DUR: Record<EntranceArchetype, number> = {
-  draw: 500,
-  wipe: 450,
-  rise: 400,
-  reveal: 350,
-  settle: 350,
-  sweep: 450,
-  pop: 250,
-  fade: 300,
+  draw: 450,
+  wipe: 400,
+  rise: 350,
+  reveal: 300,
+  settle: 300,
+  sweep: 400,
+  pop: 200,
+  fade: 250,
 };
 
 /** Primary marks per archetype — selected by the ink roles charts already emit. */
@@ -106,6 +108,10 @@ export function runEntrance(
   archetype: EntranceArchetype,
   options: EntranceOptions = {},
 ): () => void {
+  // A hidden document can't render frames (background tab, print, headless
+  // capture) — never hold content hostage waiting for one. The chart simply
+  // stays at its static frame.
+  if (document.hidden) return () => {};
   const anims: Animation[] = [];
   const cleanups: (() => void)[] = [];
   const step = options.stagger ?? 30;
@@ -197,7 +203,7 @@ export function runEntrance(
           anims.push(
             el.animate(
               [
-                { opacity: 0, transform: "scale(0.4)" },
+                { opacity: 0, transform: "scale(0.6)" },
                 { opacity: 1, transform: "scale(1)" },
               ],
               timing,
