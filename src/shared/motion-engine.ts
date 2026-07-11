@@ -256,6 +256,14 @@ export function runEntrance(
     }
 
     // ACT 2 — the story performs, entering on the beat as the stage lands.
+    // Dash lengths for `vector-effect: non-scaling-stroke` paths are computed
+    // by the browser in SCREEN space (the effect applies post-transform), but
+    // getTotalLength() answers in user units — at any CSS scale ≠ 1 the dash
+    // pattern's repeat would leak in as a phantom second fragment. Scale by
+    // the rendered factor (+5% guard; a dash longer than the path is safe).
+    const svgRect = svg.getBoundingClientRect();
+    const vb = svg.viewBox?.baseVal;
+    const screenK = vb && vb.width > 0 && svgRect.width > 0 ? svgRect.width / vb.width : 1;
     const n = marks.length;
     // Sequential choreography: an explicit order (or the trail archetype)
     // spreads the marks across a window along the chart's own geometry.
@@ -274,7 +282,12 @@ export function runEntrance(
             /* detached / non-path */
           }
           if (len > 0) {
-            el.style.strokeDasharray = `${len}`;
+            const nonScaling =
+              el.getAttribute("vector-effect") === "non-scaling-stroke" ||
+              getComputedStyle(el).vectorEffect === "non-scaling-stroke";
+            const dash = (nonScaling ? len * screenK : len) * 1.05;
+            len = dash;
+            el.style.strokeDasharray = `${dash}`;
             cleanups.push(() => {
               el.style.strokeDasharray = "";
               el.style.strokeDashoffset = "";
