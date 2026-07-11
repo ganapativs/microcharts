@@ -166,7 +166,8 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
           className="mc-spark-readout"
           style={{ left: `${(b.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {announced}
+          {/* chips are terse — the live region keeps the full sentence */}
+          {announced.replace(/[.。]$/, "")}
         </span>
       ) : null}
     </span>
