@@ -66,6 +66,16 @@ export const entry: ChartEntry = {
     title: "Liveness",
     code: `import { HeartbeatBlip } from "${PKG}/heartbeat-blip";\n\n// pass 'now' from your data layer — never Date.now() in a server render\n<HeartbeatBlip events={eventTimestamps} now={serverNow} title="Requests" />`,
   },
+  sampleData: [
+    {
+      name: "eventTimestamps",
+      code: `const eventTimestamps = [97_000, 92_000, 85_000, 70_000, 55_000, 48_000];`,
+    },
+    {
+      name: "serverNow",
+      code: `const serverNow = 100_000;`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -130,7 +140,7 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "a 5-minute window",
-    code: `<HeartbeatBlip events={events} window={5 * 60_000} now={serverNow} />`,
+    code: `<HeartbeatBlip events={eventTimestamps} window={5 * 60_000} now={serverNow} />`,
     node: <HeartbeatBlip events={BUSY} window={300_000} now={NOW} summary={false} width={100} />,
   },
   {
@@ -154,7 +164,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 }
 
 export function markCode(): string {
-  return `<HeartbeatBlip events={events} now={serverNow} />`;
+  return `<HeartbeatBlip events={eventTimestamps} now={serverNow} />`;
 }
 
 export default {

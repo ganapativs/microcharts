@@ -61,15 +61,18 @@ export const entry: ChartEntry = {
   demo: [12, 17, 21, 21, 26, 38],
   example: {
     title: "Forecast estimate",
-    code: `import { GradedBand } from "${PKG}/graded-band";
-
+    code: `import { GradedBand } from "${PKG}/graded-band";\n\n<GradedBand data={posterior} label="median" title="Forecast estimate" />`,
+  },
+  sampleData: [
+    {
+      name: "posterior",
+      code: `// posterior draws for one estimate (deterministic pseudo-sample)
 const posterior = Array.from(
   { length: 160 },
   (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
-);
-
-<GradedBand data={posterior} label="median" title="Forecast estimate" />`,
-  },
+);`,
+    },
+  ],
 };
 
 export function Preview() {

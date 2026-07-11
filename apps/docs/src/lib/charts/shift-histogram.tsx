@@ -60,13 +60,19 @@ export const entry: ChartEntry = {
   demo: AFTER,
   example: {
     title: "The fix",
-    code: `import { ShiftHistogram } from "${PKG}/shift-histogram";
-
-const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
-const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
-
-<ShiftHistogram data={{ before, after }} title="The fix" />`,
+    code: `import { ShiftHistogram } from "${PKG}/shift-histogram";\n\n<ShiftHistogram data={{ before, after }} title="The fix" />`,
   },
+  sampleData: [
+    {
+      name: "before",
+      code: `// latency (ms) before/after a fix — the whole distribution moved left
+const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);`,
+    },
+    {
+      name: "after",
+      code: `const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);`,
+    },
+  ],
 };
 
 export function Preview() {

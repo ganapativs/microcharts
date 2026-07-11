@@ -66,6 +66,18 @@ export const entry: ChartEntry = {
     title: "Weekly shape",
     code: `import { CyclePlot } from "${PKG}/cycle-plot";\n\n<CyclePlot data={daily} period={7} slots={weekdays} cycleUnit="weeks" title="Weekly shape" />`,
   },
+  sampleData: [
+    {
+      name: "daily",
+      code: `// 6 weeks of daily traffic — the week has a shape; Mondays are drifting up
+const daily: number[] = [];
+for (let w = 0; w < 6; w++) daily.push(38, 40 + w * 2, 45, 48, 52, 61, 44);`,
+    },
+    {
+      name: "weekdays",
+      code: `const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];`,
+    },
+  ],
 };
 
 export function Preview() {

@@ -56,6 +56,16 @@ export const entry: ChartEntry = {
     title: "CPU × latency",
     code: `import { PhaseTrace } from "${PKG}/phase-trace";\n\n<PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" title="Phase portrait" />`,
   },
+  sampleData: [
+    {
+      name: "trajectory",
+      code: `// a coupled CPU×latency trajectory with a lag loop
+const trajectory = Array.from({ length: 40 }, (_, i) => {
+  const t = (i / 40) * Math.PI * 2;
+  return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+});`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -146,7 +156,7 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "service cell",
-    code: `<PhaseTrace data={traj} xLabel="CPU" yLabel="Latency" width={32} height={28} />`,
+    code: `<PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" width={32} height={28} />`,
     node: (
       <PhaseTrace
         data={TRAJ}
@@ -160,7 +170,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "quadrant grid",
-    code: `<PhaseTrace data={traj} grid startDot />`,
+    code: `<PhaseTrace data={trajectory} grid startDot />`,
     node: (
       <PhaseTrace
         data={TRAJ}

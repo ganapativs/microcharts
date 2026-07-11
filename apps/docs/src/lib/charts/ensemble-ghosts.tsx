@@ -62,6 +62,17 @@ export const entry: ChartEntry = {
     title: "Simulated futures",
     code: `import { EnsembleGhosts } from "${PKG}/ensemble-ghosts";\n\n<EnsembleGhosts data={futures} title="Simulated futures" />`,
   },
+  sampleData: [
+    {
+      name: "futures",
+      code: `// 24 simulated futures — a fan of walks with diverse shapes
+const futures = Array.from({ length: 24 }, (_m, i) =>
+  Array.from({ length: 10 }, (_, t) =>
+    Math.round(40 + (i - 12) * 0.55 * t * 0.4 + 3 * Math.sin(i + t) + t * 0.5),
+  ),
+);`,
+    },
+  ],
 };
 
 export function Preview() {

@@ -59,8 +59,14 @@ export const entry: ChartEntry = {
   demo: PEERS,
   example: {
     title: "Latency vs peers",
-    code: `import { BenchmarkStrip } from "${PKG}/benchmark-strip";\n\n// 42 peer latencies (ms)\nconst peerLatencies = [${PEERS.join(", ")}];\n\n<BenchmarkStrip data={peerLatencies} value={312} format={{ style: "unit", unit: "millisecond" }} title="Latency vs peers" />`,
+    code: `import { BenchmarkStrip } from "${PKG}/benchmark-strip";\n\n<BenchmarkStrip data={peerLatencies} value={312} format={{ style: "unit", unit: "millisecond" }} title="Latency vs peers" />`,
   },
+  sampleData: [
+    {
+      name: "peerLatencies",
+      code: `// 42 peer latencies (ms)\nconst peerLatencies = [${PEERS.join(", ")}];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -159,7 +165,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "polarity colors the dot",
-    code: `// latency: lower is better → below the median reads positive\n<BenchmarkStrip data={peers} value={230} positive="down" />`,
+    code: `// latency: lower is better → below the median reads positive\n<BenchmarkStrip data={peerLatencies} value={230} positive="down" />`,
     node: (
       <BenchmarkStrip
         data={PEERS}
@@ -186,7 +192,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 }
 
 export function markCode(): string {
-  return `<BenchmarkStrip data={peers} value={value} />`;
+  return `<BenchmarkStrip data={peerLatencies} value={value} />`;
 }
 
 export default {

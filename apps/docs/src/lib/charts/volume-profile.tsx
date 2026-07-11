@@ -63,9 +63,12 @@ export const entry: ChartEntry = {
   demo: [142],
   example: {
     title: "Volume by price",
-    code: `import { VolumeProfile } from "${PKG}/volume-profile";
-
-const profile = [
+    code: `import { VolumeProfile } from "${PKG}/volume-profile";\n\n<VolumeProfile data={profile} title="Volume by price" />`,
+  },
+  sampleData: [
+    {
+      name: "profile",
+      code: `const profile = [
   { level: 134, weight: 3 },
   { level: 136, weight: 6 },
   { level: 138, weight: 11 },
@@ -75,10 +78,9 @@ const profile = [
   { level: 146, weight: 12 },
   { level: 148, weight: 7 },
   { level: 150, weight: 4 },
-];
-
-<VolumeProfile data={profile} title="Volume by price" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

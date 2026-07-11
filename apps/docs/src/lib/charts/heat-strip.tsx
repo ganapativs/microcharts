@@ -64,11 +64,7 @@ export const entry: ChartEntry = {
   demo: LOAD,
   example: {
     title: "Load per hour",
-    code: `import { HeatStrip } from "${PKG}/heat-strip";
-
-const hourlyLoad = [12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35];
-
-<HeatStrip data={hourlyLoad} domain={[0, 100]} title="Load per hour" />`,
+    code: `import { HeatStrip } from "${PKG}/heat-strip";\n\n<HeatStrip data={hourlyLoad} domain={[0, 100]} title="Load per hour" />`,
   },
   sampleData: [
     {

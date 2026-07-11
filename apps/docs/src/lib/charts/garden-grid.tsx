@@ -55,12 +55,15 @@ export const entry: ChartEntry = {
   demo: WEEKS,
   example: {
     title: "Activity",
-    code: `import { GardenGrid } from "${PKG}/garden-grid";
-
-const weeks = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26];
-
-<GardenGrid data={weeks} title="Activity" unit="weeks" />`,
+    code: `import { GardenGrid } from "${PKG}/garden-grid";\n\n<GardenGrid data={weeks} title="Activity" unit="weeks" />`,
   },
+  sampleData: [
+    {
+      name: "weeks",
+      code: `// 12 weeks of activity, some quiet
+const weeks = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26];`,
+    },
+  ],
 };
 
 export function Preview() {

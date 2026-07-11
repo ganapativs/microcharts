@@ -58,6 +58,17 @@ export const entry: ChartEntry = {
     title: "Service events",
     code: `import { EventRaster } from "${PKG}/event-raster";\n\n<EventRaster data={services} title="Service events" />`,
   },
+  sampleData: [
+    {
+      name: "services",
+      code: `const services = [
+  { label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40, 41, 48, 55] },
+  { label: "db", events: [3, 6, 15, 21, 34, 41, 55] },
+  { label: "cache", events: [6, 21, 41, 55] },
+  { label: "queue", events: [10, 30, 50] },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

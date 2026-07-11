@@ -77,6 +77,10 @@ export const entry: ChartEntry = {
   { start: Date.UTC(2026, 5, 3, 20), label: "Release" },
 ];`,
     },
+    {
+      name: "today",
+      code: `const today: [number, number] = [Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)];`,
+    },
   ],
 };
 

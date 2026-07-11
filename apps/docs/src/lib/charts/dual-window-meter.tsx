@@ -60,20 +60,17 @@ export const entry: ChartEntry = {
   demo: [-22],
   example: {
     title: "Loudness",
-    code: `import { DualWindowMeter } from "${PKG}/dual-window-meter";
-
-const samples = Array.from(
+    code: `import { DualWindowMeter } from "${PKG}/dual-window-meter";\n\n<DualWindowMeter\n  data={samples}\n  target={-23}\n  format={{ maximumFractionDigits: 1 }}\n  title="Loudness"\n/>`,
+  },
+  sampleData: [
+    {
+      name: "samples",
+      code: `const samples = Array.from(
   { length: 60 },
   (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0),
-);
-
-<DualWindowMeter
-  data={samples}
-  target={-23}
-  format={{ maximumFractionDigits: 1 }}
-  title="Loudness"
-/>`,
-  },
+);`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -162,7 +159,7 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "latency SLO cell",
-    code: `<DualWindowMeter data={latency} target={200} width={80} height={16} />`,
+    code: `<DualWindowMeter data={samples} target={200} width={80} height={16} />`,
     node: (
       <DualWindowMeter
         data={LOUDNESS}
@@ -176,7 +173,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "with corridor",
-    code: `<DualWindowMeter data={cpu} target={70} band={[60, 80]} />`,
+    code: `<DualWindowMeter data={samples} target={70} band={[60, 80]} />`,
     node: (
       <DualWindowMeter
         data={LOUDNESS}

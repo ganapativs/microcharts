@@ -101,16 +101,7 @@ export const entry: ChartEntry = {
   demo: MIX.map((d) => d.value),
   example: {
     title: "Regional mix",
-    code: `import { MiniBar } from "${PKG}/mini-bar";
-
-const regions = [
-  { label: "East", value: 940 },
-  { label: "West", value: 410 },
-  { label: "South", value: 620 },
-  { label: "North", value: 120 },
-];
-
-<MiniBar data={regions} title="Sales by region" />`,
+    code: `import { MiniBar } from "${PKG}/mini-bar";\n\n<MiniBar data={regions} title="Sales by region" />`,
   },
   sampleData: [
     {

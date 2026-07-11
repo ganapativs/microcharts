@@ -63,17 +63,19 @@ export const entry: ChartEntry = {
   demo: YEAR,
   example: {
     title: "Seasonality",
-    code: `import { SpiralYear } from "${PKG}/spiral-year";
-
-// 52 weekly values, a summer peak in week 30
+    code: `import { SpiralYear } from "${PKG}/spiral-year";\n\n<SpiralYear data={byWeek} title="Seasonality" />`,
+  },
+  sampleData: [
+    {
+      name: "byWeek",
+      code: `// 52 weekly values, a summer peak in week 30
 const byWeek = [
   85, 95, 107, 120, 135, 150, 166, 183, 200, 217, 234, 250, 265, 280, 293, 305, 315, 324, 331, 336,
   339, 340, 339, 336, 331, 324, 315, 305, 293, 480, 265, 250, 234, 217, 200, 183, 166, 150, 135,
   120, 107, 95, 85, 76, 69, 64, 61, 60, 61, 64, 69, 76,
-];
-
-<SpiralYear data={byWeek} title="Seasonality" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

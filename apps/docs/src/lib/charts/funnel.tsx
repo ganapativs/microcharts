@@ -65,16 +65,7 @@ export const entry: ChartEntry = {
   demo: PIPE.map((d) => d.value),
   example: {
     title: "Signup funnel",
-    code: `import { Funnel } from "${PKG}/funnel";
-
-const stages = [
-  { label: "Visitors", value: 12400 },
-  { label: "Signups", value: 5704 },
-  { label: "Activated", value: 2730 },
-  { label: "Paid", value: 1116 },
-];
-
-<Funnel data={stages} title="Signup funnel" />`,
+    code: `import { Funnel } from "${PKG}/funnel";\n\n<Funnel data={stages} title="Signup funnel" />`,
   },
   sampleData: [
     {

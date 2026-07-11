@@ -58,6 +58,17 @@ export const entry: ChartEntry = {
     title: "Voice memo",
     code: `import { Waveform } from "${PKG}/waveform";\n\n<Waveform data={samples} title="Voice memo" />`,
   },
+  sampleData: [
+    {
+      name: "samples",
+      code: `const samples = Array.from(
+  { length: 200 },
+  (_, i) =>
+    (i === 126 ? 0.82 : Math.sin(i / 3) * 0.15 + Math.sin(i / 11) * 0.35) *
+    (1 - Math.abs(i - 100) / 260),
+);`,
+    },
+  ],
 };
 
 export function Preview() {

@@ -67,16 +67,18 @@ export const entry: ChartEntry = {
   demo: [142],
   example: {
     title: "Airspeed",
-    code: `import { TapeGauge } from "${PKG}/tape-gauge";
-
-const zones = [
+    code: `import { TapeGauge } from "${PKG}/tape-gauge";\n\n<TapeGauge value={142} rate={1} zones={zones} span={60} title="Airspeed" />`,
+  },
+  sampleData: [
+    {
+      name: "zones",
+      code: `const zones = [
   { from: 100, to: 130, tone: "pos" },
   { from: 130, to: 150, tone: "warn" },
   { from: 150, to: 200, tone: "neg" },
-];
-
-<TapeGauge value={142} rate={1} zones={zones} span={60} title="Airspeed" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -157,8 +159,8 @@ export const playground: PlaygroundSpec = {
         orientation={s.orientation as "vertical" | "horizontal"}
         summary={false}
         animate={ui.animate}
-        width={vertical ? 28 : 160}
-        height={vertical ? 72 : 32}
+        width={vertical ? 44 : 240}
+        height={vertical ? 112 : 48}
       />
     );
   },

@@ -68,6 +68,30 @@ export const entry: ChartEntry = {
     title: "Bundle composition",
     code: `import { PartitionStrip } from "${PKG}/partition-strip";\n\n<PartitionStrip data={bundle} title="Bundle composition" />`,
   },
+  sampleData: [
+    {
+      name: "bundle",
+      code: `const bundle = [
+  {
+    label: "JS",
+    children: [
+      { label: "react", value: 28 },
+      { label: "vendor", value: 12 },
+      { label: "app", value: 8 },
+    ],
+  },
+  {
+    label: "CSS",
+    children: [
+      { label: "tailwind", value: 16 },
+      { label: "custom", value: 8 },
+    ],
+  },
+  { label: "img", value: 18 },
+  { label: "font", value: 10 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -139,7 +163,7 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "storage cell",
-    code: `<PartitionStrip data={usage} labels={false} width={80} height={16} />`,
+    code: `<PartitionStrip data={bundle} labels={false} width={80} height={16} />`,
     node: <PartitionStrip data={TREE} labels={false} summary={false} width={80} height={16} />,
   },
   {

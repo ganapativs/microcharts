@@ -64,18 +64,20 @@ export const entry: ChartEntry = {
   demo: [87, 12],
   example: {
     title: "Classifier",
-    code: `import { ConfusionGrid } from "${PKG}/confusion-grid";
-
-const counts = {
+    code: `import { ConfusionGrid } from "${PKG}/confusion-grid";\n\n<ConfusionGrid data={counts} title="Classifier" />`,
+  },
+  sampleData: [
+    {
+      name: "counts",
+      code: `const counts = {
   labels: ["cat", "dog"],
   counts: [
     [88, 12],
     [10, 59],
   ],
-};
-
-<ConfusionGrid data={counts} title="Classifier" />`,
-  },
+};`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -161,12 +163,12 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "KPI card",
-    code: `<ConfusionGrid data={{ labels, counts }} label="accuracy" size={64} />`,
+    code: `<ConfusionGrid data={counts} label="accuracy" size={64} />`,
     node: <ConfusionGrid data={CATDOG} label="accuracy" summary={false} size={64} />,
   },
   {
     label: "worst-confusion accent",
-    code: `<ConfusionGrid data={cm} accent="errors" />`,
+    code: `<ConfusionGrid data={counts} accent="errors" />`,
     node: <ConfusionGrid data={THREE} accent="errors" summary={false} size={72} />,
   },
 ];

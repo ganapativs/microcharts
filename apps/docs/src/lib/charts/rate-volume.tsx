@@ -80,16 +80,18 @@ export const entry: ChartEntry = {
   demo: DEMO.map((d) => d.rate),
   example: {
     title: "Conversion rate",
-    code: `import { RateVolume } from "${PKG}/rate-volume";
-
-const periods = [
+    code: `import { RateVolume } from "${PKG}/rate-volume";\n\n<RateVolume data={periods} minVolume={50} title="Conversion rate" />`,
+  },
+  sampleData: [
+    {
+      name: "periods",
+      code: `const periods = [
   { rate: 0.023, volume: 220 }, { rate: 0.025, volume: 190 }, { rate: 0.028, volume: 160 },
   { rate: 0.029, volume: 130 }, { rate: 0.031, volume: 110 }, { rate: 0.034, volume: 90 },
   { rate: 0.036, volume: 66 }, { rate: 0.041, volume: 38 },
-];
-
-<RateVolume data={periods} minVolume={50} title="Conversion rate" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

@@ -59,6 +59,17 @@ export const entry: ChartEntry = {
     title: "Market size",
     code: `import { BubbleRow } from "${PKG}/bubble-row";\n\n<BubbleRow data={regions} title="Market size" />`,
   },
+  sampleData: [
+    {
+      name: "regions",
+      code: `const regions = [
+  { label: "EMEA", value: 1240 },
+  { label: "AMER", value: 890 },
+  { label: "APAC", value: 560 },
+  { label: "LATAM", value: 210 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

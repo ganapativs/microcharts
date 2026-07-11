@@ -68,6 +68,18 @@ export const entry: ChartEntry = {
     title: "W12 cohort",
     code: `import { RetentionCurve } from "${PKG}/retention-curve";\n\n<RetentionCurve data={cohort} unit="week" title="W12 cohort" />`,
   },
+  sampleData: [
+    {
+      name: "cohort",
+      code: `// a weekly cohort that decays then plateaus around 38%
+const cohort = [1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38, 0.379, 0.378];`,
+    },
+    {
+      name: "industry",
+      code: `// a leakier peer/industry curve (the subordinate ghost)
+const industry = [1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28, 0.279, 0.278];`,
+    },
+  ],
 };
 
 export function Preview() {

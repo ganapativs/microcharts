@@ -62,6 +62,12 @@ export const entry: ChartEntry = {
     title: "Now",
     code: `import { CometTrail } from "${PKG}/comet-trail";\n\n<CometTrail data={rollingWindow} title="Latency" />`,
   },
+  sampleData: [
+    {
+      name: "rollingWindow",
+      code: `const rollingWindow = [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -126,12 +132,12 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "shorter trail for a table cell",
-    code: `<CometTrail data={window} trail={6} />`,
+    code: `<CometTrail data={rollingWindow} trail={6} />`,
     node: <CometTrail data={RISING} trail={6} summary={false} width={100} />,
   },
   {
     label: "no label — the card prints the number",
-    code: `<CometTrail data={window} label="none" />`,
+    code: `<CometTrail data={rollingWindow} label="none" />`,
     node: <CometTrail data={RISING} label="none" summary={false} width={100} />,
   },
 ];

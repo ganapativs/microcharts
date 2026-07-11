@@ -68,8 +68,12 @@ export const entry: ChartEntry = {
   demo: CAUSES.map((c) => c.value),
   example: {
     title: "Incident causes",
-    code: `import { ParetoStrip } from "${PKG}/pareto-strip";
-
+    code: `import { ParetoStrip } from "${PKG}/pareto-strip";\n\n<ParetoStrip data={causes} unit="causes" metric="incidents" title="Incident causes" />`,
+  },
+  sampleData: [
+    {
+      name: "causes",
+      code: `// incident causes by count — a few dominate
 const causes = [
   { label: "Timeouts", value: 38 },
   { label: "OOM", value: 24 },
@@ -80,10 +84,9 @@ const causes = [
   { label: "Disk", value: 3 },
   { label: "DNS", value: 3 },
   { label: "Other bug", value: 2 },
-];
-
-<ParetoStrip data={causes} unit="causes" metric="incidents" title="Incident causes" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

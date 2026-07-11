@@ -76,13 +76,7 @@ export const entry: ChartEntry = {
   demo: TIMES.slice(0, 40),
   example: {
     title: "Response times",
-    code: `import { HistogramStrip } from "${PKG}/histogram-strip";
-
-const times = Array.from({ length: 120 }, (_, i) =>
-  i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
-);
-
-<HistogramStrip data={times} title="Response times" />`,
+    code: `import { HistogramStrip } from "${PKG}/histogram-strip";\n\n<HistogramStrip data={times} title="Response times" />`,
   },
   sampleData: [
     {

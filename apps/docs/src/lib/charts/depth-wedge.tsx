@@ -65,24 +65,29 @@ export const entry: ChartEntry = {
   demo: [18],
   example: {
     title: "Order book",
-    code: `import { DepthWedge } from "${PKG}/depth-wedge";
-
-const demand = [
+    code: `import { DepthWedge } from "${PKG}/depth-wedge";\n\n<DepthWedge data={{ demand, supply }} title="Order book" />`,
+  },
+  sampleData: [
+    {
+      name: "demand",
+      code: `const demand = [
   { level: 99.75, amount: 420 },
   { level: 99.5, amount: 360 },
   { level: 99.25, amount: 280 },
   { level: 99, amount: 200 },
   { level: 98.5, amount: 120 },
-];
-const supply = [
+];`,
+    },
+    {
+      name: "supply",
+      code: `const supply = [
   { level: 100.25, amount: 300 },
   { level: 100.5, amount: 240 },
   { level: 100.75, amount: 160 },
   { level: 101, amount: 90 },
-];
-
-<DepthWedge data={{ demand, supply }} title="Order book" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -159,12 +164,12 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "pair cell",
-    code: `<DepthWedge data={book} label="none" width={60} height={16} />`,
+    code: `<DepthWedge data={{ demand, supply }} label="none" width={60} height={16} />`,
     node: <DepthWedge data={BOOK} label="none" summary={false} width={60} height={16} />,
   },
   {
     label: "normalized",
-    code: `<DepthWedge data={book} normalize />`,
+    code: `<DepthWedge data={{ demand, supply }} normalize />`,
     node: <DepthWedge data={BOOK} normalize summary={false} width={220} height={26} />,
   },
 ];

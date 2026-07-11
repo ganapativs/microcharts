@@ -60,6 +60,10 @@ export const entry: ChartEntry = {
       name: "salaries",
       code: `const salaries = [42, 48, 51, 53, 55, 58, 61, 63, 66, 71, 55, 52, 49, 58, 62, 75, 83, 58, 54, 60];`,
     },
+    {
+      name: "yourOffer",
+      code: `const yourOffer = 62;`,
+    },
   ],
 };
 
@@ -104,7 +108,7 @@ export const playground: PlaygroundSpec = {
     [
       "<RugStrip",
       "  data={salaries}",
-      (s.markValue as boolean) && "  markValue={you}",
+      (s.markValue as boolean) && "  markValue={yourOffer}",
       s.orientation === "vertical" && '  orientation="vertical"',
       (s.domain as boolean) && "  domain={[0, 150]}",
       "/>",
@@ -126,7 +130,7 @@ export const playground: PlaygroundSpec = {
     [
       "<RugStrip",
       "  data={salaries}",
-      (s.markValue as boolean) && "  markValue={you}",
+      (s.markValue as boolean) && "  markValue={yourOffer}",
       s.orientation === "vertical" && '  orientation="vertical"',
       (s.domain as boolean) && "  domain={[0, 150]}",
       ui.animate && "  animate",

@@ -56,9 +56,12 @@ export const entry: ChartEntry = {
   demo: [800, 865],
   example: {
     title: "Queen stage",
-    code: `import { GradeProfile } from "${PKG}/grade-profile";
-
-const trail = [
+    code: `import { GradeProfile } from "${PKG}/grade-profile";\n\n<GradeProfile data={trail} format={(n) => \`\${n} m\`} title="Queen stage" />`,
+  },
+  sampleData: [
+    {
+      name: "trail",
+      code: `const trail = [
   { d: 0, elev: 800 },
   { d: 100, elev: 809 },
   { d: 250, elev: 812 },
@@ -66,10 +69,9 @@ const trail = [
   { d: 500, elev: 835 },
   { d: 700, elev: 833 },
   { d: 900, elev: 865 },
-];
-
-<GradeProfile data={trail} format={(n) => \`\${n} m\`} title="Queen stage" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -150,7 +152,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "call out the wall",
-    code: `<GradeProfile data={climb} bins={[4, 8, 12]} />`,
+    code: `<GradeProfile data={trail} bins={[4, 8, 12]} />`,
     node: (
       <GradeProfile
         data={TRAIL}

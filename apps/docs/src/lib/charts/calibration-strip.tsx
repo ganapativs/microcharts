@@ -62,9 +62,12 @@ export const entry: ChartEntry = {
   demo: [70, 52],
   example: {
     title: "Model calibration",
-    code: `import { CalibrationStrip } from "${PKG}/calibration-strip";
-
-const reliability = [
+    code: `import { CalibrationStrip } from "${PKG}/calibration-strip";\n\n<CalibrationStrip data={reliability} title="Model calibration" />`,
+  },
+  sampleData: [
+    {
+      name: "reliability",
+      code: `const reliability = [
   { predicted: 0.05, observed: 0.05, count: 100 },
   { predicted: 0.15, observed: 0.16, count: 90 },
   { predicted: 0.25, observed: 0.24, count: 80 },
@@ -75,10 +78,9 @@ const reliability = [
   { predicted: 0.7, observed: 0.52, count: 30 },
   { predicted: 0.85, observed: 0.83, count: 8 },
   { predicted: 0.95, observed: 0.9, count: 5 },
-];
-
-<CalibrationStrip data={reliability} title="Model calibration" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

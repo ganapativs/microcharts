@@ -56,16 +56,18 @@ export const entry: ChartEntry = {
   demo: ORG,
   example: {
     title: "Organic vs paid",
-    code: `import { SpreadBand } from "${PKG}/spread-band";
-
-const data = [
+    code: `import { SpreadBand } from "${PKG}/spread-band";\n\n<SpreadBand data={pairs} labels={["Organic", "Paid"]} title="Organic vs paid" />`,
+  },
+  sampleData: [
+    {
+      name: "pairs",
+      code: `const pairs = [
   { a: 8, b: 12 }, { a: 9, b: 12 }, { a: 11, b: 13 }, { a: 12, b: 13 },
   { a: 14, b: 13 }, { a: 15, b: 14 }, { a: 17, b: 14 }, { a: 18, b: 14 },
   { a: 20, b: 15 }, { a: 21, b: 15 }, { a: 23, b: 16 }, { a: 24, b: 16 },
-];
-
-<SpreadBand data={data} labels={["Organic", "Paid"]} title="Organic vs paid" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -104,7 +106,7 @@ export const playground: PlaygroundSpec = {
   code: (s) =>
     [
       "<SpreadBand",
-      "  data={data}",
+      "  data={pairs}",
       '  labels={["Organic", "Paid"]}',
       s.label !== "gap" && `  label="${s.label}"`,
       s.positive !== "up" && `  positive="${s.positive}"`,
@@ -127,7 +129,7 @@ export const playground: PlaygroundSpec = {
   codeInteractive: (s, _data, ui) =>
     [
       "<SpreadBand",
-      "  data={data}",
+      "  data={pairs}",
       '  labels={["Organic", "Paid"]}',
       s.label !== "gap" && `  label="${s.label}"`,
       s.positive !== "up" && `  positive="${s.positive}"`,

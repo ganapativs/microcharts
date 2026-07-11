@@ -54,12 +54,14 @@ export const entry: ChartEntry = {
   demo: YEARS,
   example: {
     title: "Account age",
-    code: `import { TreeRings } from "${PKG}/tree-rings";
-
-const years = [8, 12, 10, 18, 22, 15, 20, 14];
-
-<TreeRings data={years} unit="years" periodWord="year" title="Account age" />`,
+    code: `import { TreeRings } from "${PKG}/tree-rings";\n\n<TreeRings data={years} unit="years" periodWord="year" title="Account age" />`,
   },
+  sampleData: [
+    {
+      name: "years",
+      code: `const years = [8, 12, 10, 18, 22, 15, 20, 14];`,
+    },
+  ],
 };
 
 export function Preview() {

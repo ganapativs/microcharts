@@ -48,6 +48,16 @@ export const entry: ChartEntry = {
     title: "Device vs reference",
     code: `import { BiasStrip } from "${PKG}/bias-strip";\n\n<BiasStrip data={pairs} title="Device vs reference" />`,
   },
+  sampleData: [
+    {
+      name: "pairs",
+      code: `// a ~+2 bias with noise and two pairs beyond the limits of agreement
+const pairs = [
+  1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6, 2.7,
+  2.0,
+].map((d, i) => ({ a: i + d, b: i }));`,
+    },
+  ],
 };
 
 export function Preview() {

@@ -71,6 +71,20 @@ export const entry: ChartEntry = {
     title: "Error rate",
     code: `import { ChangePoint } from "${PKG}/change-point";\n\n<ChangePoint data={errors} label="delta" title="Error rate" />`,
   },
+  sampleData: [
+    {
+      name: "errors",
+      code: `// error rate that stepped up on the 14th, then held — a clean level shift
+const errors = [
+  ...Array(14).fill(0).map((_, i) => 30 + ((i * 7) % 5) - 2),
+  ...Array(20).fill(0).map((_, i) => 48 + ((i * 5) % 5) - 2),
+];`,
+    },
+    {
+      name: "ramp",
+      code: `const ramp = Array.from({ length: 40 }, (_, i) => 20 + i * 1.2);`,
+    },
+  ],
 };
 
 export function Preview() {

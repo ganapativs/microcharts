@@ -64,18 +64,20 @@ export const entry: ChartEntry = {
   demo: [46, 32, 28, 40, 18],
   example: {
     title: "Team sizes",
-    code: `import { CitySkyline } from "${PKG}/city-skyline";
-
-const teams = [
+    code: `import { CitySkyline } from "${PKG}/city-skyline";\n\n<CitySkyline data={teams} unit="teams" title="Team sizes" />`,
+  },
+  sampleData: [
+    {
+      name: "teams",
+      code: `const teams = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },
   { label: "Web", value: 28, lit: 0.9 },
   { label: "API", value: 40, lit: 0.3 },
   { label: "Data", value: 18, lit: 0.6 },
-];
-
-<CitySkyline data={teams} unit="teams" title="Team sizes" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

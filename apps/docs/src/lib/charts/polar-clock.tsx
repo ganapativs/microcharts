@@ -67,16 +67,22 @@ export const entry: ChartEntry = {
   demo: DAY,
   example: {
     title: "Traffic by hour",
-    code: `import { PolarClock } from "${PKG}/polar-clock";
-
-// 24 hourly values, midnight → 23:00
+    code: `import { PolarClock } from "${PKG}/polar-clock";\n\n<PolarClock data={byHour} now={14} title="Traffic by hour" />`,
+  },
+  sampleData: [
+    {
+      name: "byHour",
+      code: `// 24 hourly values, midnight → 23:00
 const byHour = [
   80, 81, 82, 83, 20, 85, 86, 87, 88, 89, 90, 91, 92, 93, 312, 95, 96, 97, 98, 99, 100, 101, 102,
   103,
-];
-
-<PolarClock data={byHour} now={14} title="Traffic by hour" />`,
-  },
+];`,
+    },
+    {
+      name: "week",
+      code: `const week = [120, 200, 180, 210, 260, 90, 60];`,
+    },
+  ],
 };
 
 export function Preview() {

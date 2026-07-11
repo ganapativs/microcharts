@@ -79,17 +79,7 @@ export const entry: ChartEntry = {
   demo: MIX.map((d) => d.value),
   example: {
     title: "Browser share",
-    code: `import { SegmentedBar } from "${PKG}/segmented-bar";
-
-const mix = [
-  { label: "Chrome", value: 620 },
-  { label: "Safari", value: 240 },
-  { label: "Firefox", value: 90 },
-  { label: "Edge", value: 30 },
-  { label: "Arc", value: 20 },
-];
-
-<SegmentedBar data={mix} title="Browser share" />`,
+    code: `import { SegmentedBar } from "${PKG}/segmented-bar";\n\n<SegmentedBar data={mix} title="Browser share" />`,
   },
   sampleData: [
     {

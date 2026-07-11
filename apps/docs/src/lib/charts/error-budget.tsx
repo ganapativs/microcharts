@@ -61,12 +61,15 @@ export const entry: ChartEntry = {
   demo: DEMO,
   example: {
     title: "Checkout SLO",
-    code: `import { ErrorBudget } from "${PKG}/error-budget";
-
-const remaining = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
-
-<ErrorBudget data={remaining} window={30} title="Checkout SLO" />`,
+    code: `import { ErrorBudget } from "${PKG}/error-budget";\n\n<ErrorBudget data={remaining} window={30} title="Checkout SLO" />`,
   },
+  sampleData: [
+    {
+      name: "remaining",
+      code: `// 12 days into a 30-day SLO window, burning slightly under the steady rate
+const remaining = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];`,
+    },
+  ],
 };
 
 export function Preview() {

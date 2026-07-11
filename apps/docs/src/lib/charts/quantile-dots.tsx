@@ -66,6 +66,15 @@ export const entry: ChartEntry = {
     title: "Bus wait",
     code: `import { QuantileDots } from "${PKG}/quantile-dots";\n\n<QuantileDots data={waits} threshold={15} format={(n) => \`\${n} min\`} title="Bus wait" />`,
   },
+  sampleData: [
+    {
+      name: "waits",
+      code: `// bus-wait times (minutes): right-skewed, a long tail past the 15-min SLA
+const waits = Array.from({ length: 200 }, (_, i) =>
+  Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)),
+);`,
+    },
+  ],
 };
 
 export function Preview() {

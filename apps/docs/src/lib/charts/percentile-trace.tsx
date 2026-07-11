@@ -65,6 +65,13 @@ export const entry: ChartEntry = {
     title: "Standing",
     code: `import { PercentileTrace } from "${PKG}/percentile-trace";\n\n<PercentileTrace data={ranks} unit="week" title="Standing" />`,
   },
+  sampleData: [
+    {
+      name: "ranks",
+      code: `// a weekly standing that drifts up from the middle half into the top band
+const ranks = [40, 46, 52, 58, 63, 68, 72, 76, 79, 81];`,
+    },
+  ],
 };
 
 export function Preview() {

@@ -54,6 +54,12 @@ export const entry: ChartEntry = {
     title: "Sprint melody",
     code: `import { MusicStaff } from "${PKG}/music-staff";\n\n<MusicStaff data={weeks} title="Sprint melody" />`,
   },
+  sampleData: [
+    {
+      name: "weeks",
+      code: `const weeks = [3, 5, 4, 8, 6, 9, 7, 11];`,
+    },
+  ],
 };
 
 export function Preview() {

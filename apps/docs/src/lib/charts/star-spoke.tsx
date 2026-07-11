@@ -56,18 +56,20 @@ export const entry: ChartEntry = {
   demo: [90, 60, 50, 30, 70],
   example: {
     title: "Product profile",
-    code: `import { StarSpoke } from "${PKG}/star-spoke";
-
-const metrics = [
+    code: `import { StarSpoke } from "${PKG}/star-spoke";\n\n<StarSpoke data={metrics} title="Product profile" />`,
+  },
+  sampleData: [
+    {
+      name: "metrics",
+      code: `const metrics = [
   { label: "Speed", value: 0.9 },
   { label: "Power", value: 0.6 },
   { label: "Range", value: 0.5 },
   { label: "Cost", value: 0.3 },
   { label: "Ease", value: 0.7 },
-];
-
-<StarSpoke data={metrics} title="Product profile" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

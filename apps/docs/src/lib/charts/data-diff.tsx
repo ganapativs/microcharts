@@ -71,8 +71,12 @@ export const entry: ChartEntry = {
   demo: DIFF.map((d) => d.added - d.removed),
   example: {
     title: "Schema diff",
-    code: `import { DataDiff } from "${PKG}/data-diff";
-
+    code: `import { DataDiff } from "${PKG}/data-diff";\n\n<DataDiff data={diff} title="Schema diff" />`,
+  },
+  sampleData: [
+    {
+      name: "diff",
+      code: `// a schema migration diff — rows added/removed per table
 const diff = [
   { key: "users", added: 340, removed: 120 },
   { key: "orders", added: 88, removed: 30 },
@@ -80,10 +84,9 @@ const diff = [
   { key: "tags", added: 24, removed: 8 },
   { key: "notes", added: 12, removed: 6 },
   { key: "flags", added: 8, removed: 3 },
-];
-
-<DataDiff data={diff} title="Schema diff" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

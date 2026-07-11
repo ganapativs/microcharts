@@ -76,9 +76,12 @@ export const entry: ChartEntry = {
   demo: [98, 71, 44, 63],
   example: {
     title: "Model answer",
-    code: `import { TokenConfidence } from "${PKG}/token-confidence";
-
-const tokens = [
+    code: `import { TokenConfidence } from "${PKG}/token-confidence";\n\n<TokenConfidence data={tokens} title="Model answer" />`,
+  },
+  sampleData: [
+    {
+      name: "tokens",
+      code: `const tokens = [
   { token: "The", confidence: 0.98 },
   { token: " Treaty", confidence: 0.93 },
   { token: " of", confidence: 0.99 },
@@ -87,10 +90,9 @@ const tokens = [
   { token: " signed", confidence: 0.9 },
   { token: " in", confidence: 0.97 },
   { token: " 1648", confidence: 0.44 },
-];
-
-<TokenConfidence data={tokens} title="Model answer" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {

@@ -78,14 +78,7 @@ export const entry: ChartEntry = {
   demo: BURSTS,
   example: {
     title: "Error bursts",
-    code: `import { Seismogram } from "${PKG}/seismogram";
-
-const burstsPerMinute = [
-  1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2,
-  0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1, 2, 1,
-];
-
-<Seismogram data={burstsPerMinute} title="Error bursts" />`,
+    code: `import { Seismogram } from "${PKG}/seismogram";\n\n<Seismogram data={burstsPerMinute} title="Error bursts" />`,
   },
   sampleData: [
     {

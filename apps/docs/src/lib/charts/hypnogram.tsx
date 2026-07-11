@@ -66,6 +66,23 @@ export const entry: ChartEntry = {
     title: "Sleep stages",
     code: `import { Hypnogram } from "${PKG}/hypnogram";\n\n<Hypnogram data={sleep} states={["Awake","REM","Light","Deep"]} title="Sleep stages" />`,
   },
+  sampleData: [
+    {
+      name: "sleep",
+      code: `const sleep = [
+  { t: 0, state: "Awake" },
+  { t: 8, state: "Light" },
+  { t: 22, state: "Deep" },
+  { t: 38, state: "Light" },
+  { t: 50, state: "REM" },
+  { t: 62, state: "Light" },
+  { t: 74, state: "Deep" },
+  { t: 86, state: "Light" },
+  { t: 98, state: "REM" },
+  { t: 110, state: "Awake" },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -171,7 +188,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "lanes (nominal)",
-    code: `<Hypnogram data={deploys} variant="lanes" />`,
+    code: `<Hypnogram data={sleep} variant="lanes" />`,
     node: (
       <Hypnogram
         data={SLEEP}

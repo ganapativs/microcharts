@@ -55,8 +55,14 @@ export const entry: ChartEntry = {
   demo: [3, 4, 5, 5, 6, 8, 7, 9, 11, 10],
   example: {
     title: "Sensor uptime",
-    code: `import { CoverageStrip } from "${PKG}/coverage-strip";\n\n// null = no measurement, 0 = a measured zero\nconst readings = [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10];\n\n<CoverageStrip data={readings} expected={18} label="percent" title="Sensor uptime" />`,
+    code: `import { CoverageStrip } from "${PKG}/coverage-strip";\n\n<CoverageStrip data={readings} expected={18} label="percent" title="Sensor uptime" />`,
   },
+  sampleData: [
+    {
+      name: "readings",
+      code: `// null = no measurement, 0 = a measured zero\nconst readings = [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10];`,
+    },
+  ],
 };
 
 export function Preview() {

@@ -61,6 +61,17 @@ export const entry: ChartEntry = {
     title: "Sprint 12",
     code: `import { BurnChart } from "${PKG}/burn-chart";\n\n<BurnChart data={{ plan, actual }} title="Sprint 12" />`,
   },
+  sampleData: [
+    {
+      name: "plan",
+      code: `// an 11-day sprint burning down; 6 days in, slightly behind → projected 2 days late
+const plan = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];`,
+    },
+    {
+      name: "actual",
+      code: `const actual = [40, 35, 31, 27, 24, 21];`,
+    },
+  ],
 };
 
 export function Preview() {
