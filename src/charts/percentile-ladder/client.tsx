@@ -18,9 +18,10 @@ import {
 export interface InteractivePercentileLadderProps extends PercentileLadderProps {
   strings?: QuantileStrings;
   /**
-   * Opt-in entrance motion (default `false`): the percentile ticks settle
-   * onto the track on first client-side mount. Inert on the server and on
-   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the percentile ticks pop onto
+   * the track in rank order (p50 → p99) on first client-side mount. Inert on
+   * the server and on hydrated server HTML; `prefers-reduced-motion` always
+   * wins.
    */
   animate?: boolean;
 }
@@ -45,8 +46,12 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
   const hostRef = useRef<HTMLSpanElement>(null);
   // Ticks (or dots in `marks="dot"`) carry the "data"/"flag" ink roles on
   // either <line> or <circle> — the attribute selector covers both mark modes.
-  useEntrance(hostRef, "settle", animate, {
+  // "trail" + order "index" lands them in rank order (they're already
+  // authored p50 → p99, so DOM order IS the rank order) — the ladder reads
+  // as climbing the percentiles, not a generic scatter of ticks.
+  useEntrance(hostRef, "trail", animate, {
     selector: '[data-mc-ink="data"], [data-mc-ink="flag"]',
+    order: "index",
   });
 
   // must match the static geometry (label font sizes the log-tag gutter)

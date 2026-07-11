@@ -13,9 +13,9 @@ import { QuantileDots as StaticQuantileDots, type QuantileDotsProps } from "./in
 export interface InteractiveQuantileDotsProps extends QuantileDotsProps {
   strings?: QuantileDotsStrings;
   /**
-   * Opt-in entrance motion (default `false`): the quantile dots settle into
-   * their columns on first client-side mount. Inert on the server and on
-   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the quantile dots pop into
+   * their columns in order on first client-side mount. Inert on the server
+   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -38,8 +38,11 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "settle", animate, {
+  // "trail" + order "index" pops the dots in their authored (quantile) order
+  // rather than a uniform stagger — the plot reads as being counted out.
+  useEntrance(hostRef, "trail", animate, {
     selector: '[data-mc-ink="neutral"], [data-mc-ink="flag"]',
+    order: "index",
   });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);

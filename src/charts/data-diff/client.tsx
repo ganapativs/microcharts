@@ -13,9 +13,9 @@ import { DataDiff as StaticDataDiff, dataDiffSummary, type DataDiffProps } from 
 export interface InteractiveDataDiffProps extends DataDiffProps {
   strings?: DataDiffStrings;
   /**
-   * Opt-in entrance motion (default `false`): the chart fades and scales in
-   * when the chart first mounts client-side. Inert on the server and on
-   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): rows pop in top-to-bottom
+   * sequence when the chart first mounts client-side. Inert on the server
+   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -41,7 +41,13 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "pop", animate);
+  // Rows are never merged — each row draws its own removed/added rects (plus
+  // an occasional 0/0 placeholder or opt-in net tick), all sharing that row's
+  // y — so "trail" + order "y" lands them row by row, top to bottom, instead
+  // of one whole-chart pop. `rect[data-mc-ink]` covers every row mark
+  // (negative/positive/neutral) and nothing else (the zero hairline is a
+  // <line>, tags are <text>).
+  useEntrance(hostRef, "trail", animate, { selector: "rect[data-mc-ink]", order: "y" });
 
   const geo = useMemo(
     () => dataDiffGeometry({ width, height, data, sort, domain, max }),

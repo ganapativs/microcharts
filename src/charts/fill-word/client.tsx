@@ -13,9 +13,10 @@ export interface InteractiveFillWordProps extends FillWordProps {
   live?: boolean;
   strings?: FillWordStrings;
   /**
-   * Opt-in entrance motion (default `false`): the word fades in when the
-   * chart first mounts client-side. Inert on the server and on hydrated
-   * server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the word wipes in left-to-right
+   * when the chart first mounts client-side — matching the fill encoding.
+   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
    */
   animate?: boolean;
 }
@@ -32,7 +33,14 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
     ...rest
   } = props;
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "fade", animate);
+  // "wipe" clips the whole <svg> left-to-right — the word fills left-to-right,
+  // so the entrance now matches the encoding instead of a plain fade. This
+  // targets the <svg> element's own clip-path; the live value transition
+  // (styles.css) clips only the inner accent <text> to its value fraction —
+  // different elements, different properties, so the two never fight: the
+  // svg-level reveal plays once on mount, then the text-level clip keeps
+  // tracking `value` independently afterward.
+  useEntrance(hostRef, "wipe", animate);
   const summary = fillWordSummary(value, word, mode, strings);
   const prev = useRef(value);
   const last = useRef(0);

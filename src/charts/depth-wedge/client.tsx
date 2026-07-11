@@ -24,9 +24,9 @@ const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveDepthWedgeProps extends DepthWedgeProps {
   /**
-   * Opt-in entrance motion (default `false`): the two wedges wipe on when the
-   * chart first mounts client-side. Inert on the server and on hydrated
-   * server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the bid/ask wedges sweep
+   * outward from the mid-price on first client-side mount. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -48,7 +48,14 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "wipe", animate);
+  // The two sides are separate paths (demand = "positive", supply =
+  // "negative"), never merged, so each can scale from its own center — a
+  // sweep with a centered origin reads as the book pushing outward from the
+  // mid-price on both sides at once, rather than one flat left→right reveal.
+  useEntrance(hostRef, "sweep", animate, {
+    selector: 'path[data-mc-ink="positive"], path[data-mc-ink="negative"]',
+    origin: "center",
+  });
 
   const geo = useMemo(
     () =>

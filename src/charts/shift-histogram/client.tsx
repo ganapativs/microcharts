@@ -17,9 +17,10 @@ import {
 export interface InteractiveShiftHistogramProps extends ShiftHistogramProps {
   strings?: ShiftStrings;
   /**
-   * Opt-in entrance motion (default `false`): the shared bins reveal
-   * left-to-right when the chart first mounts client-side. Inert on the
-   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the mirrored bins grow out of
+   * the center axis, sweeping left-to-right, when the chart first mounts
+   * client-side. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -44,10 +45,15 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // Bins mirror both up (before) and down (after) from a shared center axis —
-  // a per-bar scaleY "rise" would point the wrong way for one side, so treat
-  // this as an x-ordered bin sequence and reveal it left-to-right instead.
-  useEntrance(hostRef, "wipe", animate);
+  // Bins mirror both up (before) and down (after) from a shared center axis.
+  // Each bin rect's own bottom (up bins) or top (down bins) edge sits ON that
+  // axis, so a "rise" with a centered transform-origin grows every bin
+  // symmetrically out of its own middle toward — and away from — the center
+  // line, instead of one direction winning; order "x" sweeps the sequence
+  // left-to-right. `rect` alone covers before (neutral fill) and after
+  // (filled in mirror mode, outlined in overlay mode) — no other rects live
+  // in this chart.
+  useEntrance(hostRef, "rise", animate, { selector: "rect", origin: "center", order: "x" });
 
   const geo = useMemo(
     () =>

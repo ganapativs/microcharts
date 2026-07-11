@@ -13,9 +13,9 @@ import { BubbleRow as StaticBubbleRow, bubbleRowSummary, type BubbleRowProps } f
 export interface InteractiveBubbleRowProps extends BubbleRowProps {
   strings?: BubbleStrings;
   /**
-   * Opt-in entrance motion (default `false`): the bubbles settle into the
-   * row on first client-side mount. Inert on the server and on hydrated
-   * server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the bubbles inflate along the
+   * row, left to right, on first client-side mount. Inert on the server and
+   * on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -39,9 +39,10 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // `circle` (not the default ink selector) so bubbles still settle when a
-  // literal `color` prop drops the data-mc-ink attribute.
-  useEntrance(hostRef, "settle", animate, { selector: "circle" });
+  // `circle` (not the default ink selector) so bubbles still inflate when a
+  // literal `color` prop drops the data-mc-ink attribute. "trail" + order "x"
+  // sequences the pop by real x position, left to right along the row.
+  useEntrance(hostRef, "trail", animate, { selector: "circle", order: "x" });
 
   const labelBand = label === "none" ? 0 : fontSize + 2;
   // Same numeral-width spread as the static, so the overlay ring aligns exactly.
