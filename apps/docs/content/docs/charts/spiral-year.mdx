@@ -12,16 +12,6 @@ day's value reach for `ActivityGrid` or `HeatStrip`.
 <LiveDemo
   label="SpiralYear"
   sizeOf="spiral-year"
-  code={`import { SpiralYear } from "@microcharts/react/spiral-year";
-
-// 52 weekly values, a summer peak in week 30
-const byWeek = [
-85, 95, 107, 120, 135, 150, 166, 183, 200, 217, 234, 250, 265, 280, 293, 305, 315, 324, 331, 336,
-339, 340, 339, 336, 331, 324, 315, 305, 293, 480, 265, 250, 234, 217, 200, 183, 166, 150, 135,
-120, 107, 95, 85, 76, 69, 64, 61, 60, 61, 64, 69, 76,
-];
-
-<SpiralYear data={byWeek} title="Seasonality" />`}
 >
   <SpiralYear data={Array.from({ length: 52 }, (_, i) => { const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2)); return i === 29 ? 480 : s; })} title="Seasonality" size={80} />
 </LiveDemo>

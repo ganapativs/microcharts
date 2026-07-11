@@ -11,15 +11,6 @@ rhythm of a metric across the cycle is immediately legible.
 <LiveDemo
   label="PolarClock"
   sizeOf="polar-clock"
-  code={`import { PolarClock } from "@microcharts/react/polar-clock";
-
-// 24 hourly values, midnight → 23:00
-const byHour = [
-80, 81, 82, 83, 20, 85, 86, 87, 88, 89, 90, 91, 92, 93, 312, 95, 96, 97, 98, 99, 100, 101, 102,
-103,
-];
-
-<PolarClock data={byHour} now={14} title="Traffic by hour" />`}
 >
   <PolarClock data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h))} now={14} title="Traffic by hour" size={72} />
 </LiveDemo>

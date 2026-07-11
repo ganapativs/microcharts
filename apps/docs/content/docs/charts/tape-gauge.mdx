@@ -12,19 +12,6 @@ is the aviation primary-flight-display tape, shrunk to a word.
 <LiveDemo
   label="TapeGauge"
   sizeOf="tape-gauge"
-  code={`import { TapeGauge } from "@microcharts/react/tape-gauge";
-
-<TapeGauge
-  value={142}
-  rate={1}
-  zones={[
-    { from: 100, to: 130, tone: "pos" },
-    { from: 130, to: 150, tone: "warn" },
-    { from: 150, to: 200, tone: "neg" },
-  ]}
-  span={60}
-  title="Airspeed"
-/>`}
 >
   <TapeGauge
     value={142}

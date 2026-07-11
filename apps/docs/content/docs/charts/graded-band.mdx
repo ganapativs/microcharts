@@ -11,14 +11,6 @@ maps to probability level and nothing else.
 <LiveDemo
   label="GradedBand"
   sizeOf="graded-band"
-  code={`import { GradedBand } from "@microcharts/react/graded-band";
-
-const posterior = Array.from(
-{ length: 160 },
-(_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
-);
-
-<GradedBand data={posterior} label="median" title="Forecast estimate" />`}
 >
   <GradedBand
     data={Array.from({ length: 160 }, (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)))}

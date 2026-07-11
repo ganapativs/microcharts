@@ -12,11 +12,6 @@ color.
 <LiveDemo
   label="HeartbeatBlip"
   sizeOf="heartbeat-blip"
-  code={`import { HeartbeatBlip } from "@microcharts/react/heartbeat-blip";
-
-// pass 'now' from your data layer — never Date.now() in a server render
-
-<HeartbeatBlip events={eventTimestamps} now={serverNow} title="Requests" />`}
 >
   <HeartbeatBlip events={[97000, 92000, 85000, 70000, 55000, 48000]} now={100000} title="Requests" width={90} />
 </LiveDemo>

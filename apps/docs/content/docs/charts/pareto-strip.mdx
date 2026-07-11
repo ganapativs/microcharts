@@ -12,21 +12,6 @@ is a working reference, not a law, and `Other` never re-enters the ranking.
 <LiveDemo
   label="ParetoStrip"
   sizeOf="pareto-strip"
-  code={`import { ParetoStrip } from "@microcharts/react/pareto-strip";
-
-const causes = [
-{ label: "Timeouts", value: 38 },
-{ label: "OOM", value: 24 },
-{ label: "Deploy", value: 15 },
-{ label: "Config", value: 9 },
-{ label: "Network", value: 7 },
-{ label: "Auth", value: 4 },
-{ label: "Disk", value: 3 },
-{ label: "DNS", value: 3 },
-{ label: "Other bug", value: 2 },
-];
-
-<ParetoStrip data={causes} unit="causes" metric="incidents" title="Incident causes" />`}
 >
   <ParetoStrip
     data={[

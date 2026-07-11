@@ -11,15 +11,6 @@ grows — the download bar, told truthfully.
 <LiveDemo
   label="EtaBar"
   sizeOf="eta-bar"
-  code={`import { EtaBar } from "@microcharts/react/eta-bar";
-
-<EtaBar
-  progress={0.64}
-  elapsed={3.6}
-  rate={0.18}
-  formatEta={(t) => \`\${Math.round(t)} min\`}
-  title="Export"
-/>`}
 >
   <EtaBar progress={0.64} elapsed={3.6} rate={0.18} formatEta={(t) => `${Math.round(t)} min`} title="Export" width={280} height={16} />
 </LiveDemo>

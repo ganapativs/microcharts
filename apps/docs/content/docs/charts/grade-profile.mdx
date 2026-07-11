@@ -16,15 +16,6 @@ the interactive readout gives the exact grade.
 <LiveDemo
   label="GradeProfile"
   sizeOf="grade-profile"
-  code={`import { GradeProfile } from "@microcharts/react/grade-profile";
-
-const trail = [
-{ d: 0, elev: 800 }, { d: 100, elev: 809 }, { d: 250, elev: 812 },
-{ d: 350, elev: 817 }, { d: 500, elev: 835 }, { d: 700, elev: 833 },
-{ d: 900, elev: 865 },
-];
-
-<GradeProfile data={trail} format={(n) => \`\${n} m\`} title="Queen stage" />`}
 >
   <GradeProfile
     data={[
