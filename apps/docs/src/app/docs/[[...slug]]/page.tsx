@@ -88,5 +88,6 @@ export async function generateMetadata(props: PageProps<"/docs/[[...slug]]">): P
     description: page.data.description ?? "",
     path: page.url as `/${string}`,
     image: getPageImage(page).url as `/${string}`,
+    markdown: getPageMarkdownUrl(page).url as `/${string}`,
   });
 }

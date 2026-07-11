@@ -1,8 +1,18 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowUp, Grid2x2, Grid3x3, Search } from "lucide-react";
+import { ArrowDownAZ, ArrowUp, Grid2x2, Grid3x3, ListOrdered, Search } from "lucide-react";
 import type { ChartCollection } from "@/lib/charts/types";
+
+// Layout effect on the client (fires before paint), plain effect on the server
+// (no-op, avoids the SSR warning). Used to mark the plane "entered" BEFORE the
+// browser paints on a client re-navigation, so the entrance never replays.
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+// Module-scoped: true once the entrance has played. Survives client-side
+// navigations (module isn't re-evaluated), resets only on a full page load — so
+// the fade plays on first load, never again when you navigate back to /gallery.
+let hasEntered = false;
 
 /**
  * The floating command dock for the gallery. Everything the user drives lives
@@ -16,6 +26,7 @@ import type { ChartCollection } from "@/lib/charts/types";
  */
 
 type Density = "comfortable" | "compact";
+type Sort = "catalog" | "name";
 const DENSITY_KEY = "mc-gallery2-density";
 const TILT_MAX = 3; // degrees
 
@@ -24,8 +35,9 @@ const TILT_MAX = 3; // degrees
  * shareable + survives reload/back. Precedence: URL param > localStorage
  * (density only) > default. SSR-safe (returns defaults with no window).
  */
-function initialState(): { q: string; col: string; density: Density } {
-  if (typeof window === "undefined") return { q: "", col: "all", density: "comfortable" };
+function initialState(): { q: string; col: string; density: Density; sort: Sort } {
+  if (typeof window === "undefined")
+    return { q: "", col: "all", density: "comfortable", sort: "catalog" };
   const p = new URLSearchParams(window.location.search);
   const d = p.get("density");
   const stored = localStorage.getItem(DENSITY_KEY);
@@ -35,7 +47,12 @@ function initialState(): { q: string; col: string; density: Density } {
       : stored === "compact" || stored === "comfortable"
         ? stored
         : "comfortable";
-  return { q: p.get("q") ?? "", col: p.get("collection") ?? "all", density };
+  return {
+    q: p.get("q") ?? "",
+    col: p.get("collection") ?? "all",
+    density,
+    sort: p.get("sort") === "name" ? "name" : "catalog",
+  };
 }
 
 export function GalleryDock({
@@ -48,6 +65,7 @@ export function GalleryDock({
   const [q, setQ] = useState(() => initialState().q);
   const [col, setCol] = useState<string>(() => initialState().col);
   const [density, setDensity] = useState<Density>(() => initialState().density);
+  const [sort, setSort] = useState<Sort>(() => initialState().sort);
   const [shown, setShown] = useState<number | null>(null);
   const [atTop, setAtTop] = useState(true);
   const [dockHidden, setDockHidden] = useState(false);
@@ -56,7 +74,7 @@ export function GalleryDock({
   // against itself. Portal to <body> so the dock anchors to the viewport.
   const [mounted, setMounted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const firstFilter = useRef(true);
+  const lastCol = useRef<string | null>(null);
   const syncDock = useRef<() => void>(() => {});
   // Server-rendered rows never change, so query the DOM once and reuse it.
   const domRef = useRef<{
@@ -91,20 +109,48 @@ export function GalleryDock({
     else p.delete("collection");
     if (density !== "comfortable") p.set("density", density);
     else p.delete("density");
+    if (sort !== "catalog") p.set("sort", sort);
+    else p.delete("sort");
     const qs = p.toString();
     window.history.replaceState(
       null,
       "",
       window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash,
     );
-  }, [q, col, density]);
+  }, [q, col, density, sort]);
 
-  // Let the entrance ripple play once, then freeze it so filtering never replays.
+  // Sort by CSS `order` (no DOM churn, node identity preserved). Catalog =
+  // source order (blank). Name = alphabetical rank across the whole set — which
+  // crosses collections, so the wayfinding labels are suppressed (browse below).
   useEffect(() => {
+    const grid = document.querySelector<HTMLElement>(".g2-grid");
+    if (!grid) return;
+    const cells = Array.from(grid.querySelectorAll<HTMLElement>(".g2-cell"));
+    if (sort === "name") {
+      [...cells]
+        .sort((a, b) => (a.dataset.name ?? "").localeCompare(b.dataset.name ?? ""))
+        .forEach((c, i) => {
+          c.style.order = String(i);
+        });
+    } else {
+      for (const c of cells) c.style.order = "";
+    }
+  }, [sort]);
+
+  // Entrance runs ONCE per page load. On a client re-navigation to /gallery the
+  // module flag is already set, so we stamp [data-entered] before paint (layout
+  // effect) — the fade never replays and charts don't flash in twice. On the
+  // first load it plays, then locks so filtering never replays it either.
+  useIsoLayoutEffect(() => {
     const el = document.querySelector<HTMLElement>(".g2");
     if (!el) return;
+    if (hasEntered) {
+      el.dataset.entered = "true";
+      return;
+    }
     const t = window.setTimeout(() => {
       el.dataset.entered = "true";
+      hasEntered = true;
     }, 1100);
     return () => window.clearTimeout(t);
   }, []);
@@ -235,7 +281,16 @@ export function GalleryDock({
       card.hidden = !on;
       if (on) count++;
     }
-    if (dom.grid) dom.grid.hidden = count === 0;
+    if (dom.grid) {
+      dom.grid.hidden = count === 0;
+      // wayfinding labels show only in the pristine browse state; hide the
+      // redundant per-card tag once a single collection is filtered.
+      dom.grid.dataset.collectionFilter = col;
+      // browse (wayfinding labels) only in the pristine catalog view — not when
+      // filtered, searched, or sorted alphabetically (labels would be wrong).
+      if (col === "all" && !needle && sort === "catalog") dom.grid.dataset.browse = "true";
+      else delete dom.grid.dataset.browse;
+    }
     if (dom.empty) dom.empty.hidden = count !== 0;
     // Echo the actual miss back to the reader — the searched term, or the
     // collection name — so the empty state feels answered, not canned.
@@ -247,7 +302,7 @@ export function GalleryDock({
     // result count changed the page height — re-decide dock visibility after
     // layout so a small filtered set (short, non-scrollable page) keeps the dock.
     requestAnimationFrame(() => syncDock.current());
-  }, [q, col, collections]);
+  }, [q, col, sort, collections]);
 
   // Arrow-key roving across the visible plates — Left/Right step one, Up/Down
   // jump a row. Mirrors the 2-D keyboard nav the charts themselves ship, so a
@@ -284,18 +339,20 @@ export function GalleryDock({
   }, []);
 
   // Collection switch = a discrete moment worth acknowledging: the plane does a
-  // quick fade + rise so the new set reads as a fresh deal, not a silent swap.
-  // WAAPI (not CSS) so it restarts cleanly on every switch; skipped on the first
-  // render and under reduced-motion. Not fired on search keystrokes — that would
-  // strobe. transform+opacity only, one element, 60fps.
+  // On an ACTUAL collection change, cross-fade the new set (calm, opacity only).
+  // Fires only when `col` changes to a new value from a user click — never on
+  // mount/re-navigation. Tracking the last value (not a "first render" boolean)
+  // is robust to StrictMode's double-invoked effects, which would otherwise let
+  // the fade fire on remount and read as "it animated again". Reduced-motion + a
+  // no-WAAPI environment both no-op. Search keystrokes don't touch `col`.
   useEffect(() => {
-    if (firstFilter.current) {
-      firstFilter.current = false;
+    if (lastCol.current === null || lastCol.current === col) {
+      lastCol.current = col;
       return;
     }
+    lastCol.current = col;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const grid = document.querySelector<HTMLElement>(".g2-grid");
-    // opacity-only — a calm cross-fade of the new set, nothing moves.
     grid?.animate?.([{ opacity: 0.5 }, { opacity: 1 }], { duration: 260, easing: "ease-out" });
   }, [col]);
 
@@ -389,6 +446,28 @@ export function GalleryDock({
               aria-pressed={density === key}
               title={`${label} density`}
               aria-label={`${label} density`}
+            >
+              <Icon className="size-4" aria-hidden />
+            </button>
+          ))}
+        </div>
+
+        {/* sort — catalog order vs A–Z */}
+        <div className="g2-seg" role="group" aria-label="Sort">
+          {(
+            [
+              { key: "catalog", Icon: ListOrdered, label: "Catalog order" },
+              { key: "name", Icon: ArrowDownAZ, label: "A–Z by name" },
+            ] as const
+          ).map(({ key, Icon, label }) => (
+            <button
+              key={key}
+              type="button"
+              className="g2-icon-btn"
+              onClick={() => setSort(key)}
+              aria-pressed={sort === key}
+              title={label}
+              aria-label={label}
             >
               <Icon className="size-4" aria-hidden />
             </button>

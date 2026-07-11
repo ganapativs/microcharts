@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { CommandLine } from "./command-line";
 
 // Literal size classes so Tailwind sees them (cnfast doesn't merge conflicts).
 const SIZE = { 7: "size-7", 8: "size-8" } as const;
@@ -38,12 +39,7 @@ export function CopyButton({
 export function InstallCommand({ command = "pnpm add @microcharts/react" }: { command?: string }) {
   return (
     <div className="command-well not-prose group flex h-10 items-center gap-2.5 pl-3.5 pr-1.5">
-      <code className="min-w-0 flex-1 truncate font-mono text-sm text-fd-foreground">
-        <span aria-hidden className="mr-2 select-none text-fd-primary">
-          $
-        </span>
-        {command}
-      </code>
+      <CommandLine command={command} className="min-w-0 flex-1 truncate text-sm" />
       <CopyButton text={command} size={7} className="shrink-0" />
     </div>
   );

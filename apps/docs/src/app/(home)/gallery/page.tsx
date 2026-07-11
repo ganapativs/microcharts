@@ -1,5 +1,5 @@
+import { Fragment } from "react";
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { docsMeta } from "@/lib/metadata";
@@ -14,13 +14,13 @@ export const metadata: Metadata = docsMeta({
   path: "/gallery",
 });
 
-// Collection framing — used for the dock filters + the per-card tag. This is a
-// continuous plane, so collections are metadata, never section walls.
-const COLLECTIONS: { key: ChartCollection; label: string }[] = [
-  { key: "core", label: "Core" },
-  { key: "decision", label: "Decision" },
-  { key: "expressive", label: "Expressive" },
-  { key: "frontier", label: "Frontier" },
+// Collection framing — dock filters, the per-card tag, and the slim wayfinding
+// labels that mark each collection while browsing the whole catalog.
+const COLLECTIONS: { key: ChartCollection; label: string; blurb: string }[] = [
+  { key: "core", label: "Core", blurb: "The everyday instruments." },
+  { key: "decision", label: "Decision", blurb: "Tuned to one question." },
+  { key: "expressive", label: "Expressive", blurb: "Unusual, apt encodings." },
+  { key: "frontier", label: "Frontier", blurb: "Newer word-sized forms." },
 ];
 
 function keywords(c: ChartEntry): string {
@@ -28,8 +28,8 @@ function keywords(c: ChartEntry): string {
 }
 
 export default function GalleryPage() {
-  // One flat, catalog-ordered plane. Collection order first, then registry order
-  // within — so the sequence is stable and the corner index reads left-to-right.
+  // One flat, catalog-ordered plane, grouped by collection so the wayfinding
+  // labels (and the browse sequence) stay stable.
   const order: Record<ChartCollection, number> = {
     core: 0,
     decision: 1,
@@ -51,53 +51,60 @@ export default function GalleryPage() {
             {STABLE_CHARTS.length} charts, at true size.
           </h1>
           <p className="mt-4 text-fd-muted-foreground">
-            Every shipped microchart on one plane — at the size it lives in your interface, beside
-            the data it answers. Filter, search, and scan; each plate lights and tilts to your
-            cursor. The controls float at the bottom, where your hands already are.
+            Every chart at the size it lives — in a sentence, a table cell, a KPI card — beside the
+            decision it answers. Search or filter to the one you need.
           </p>
         </header>
 
         {/* ── the plane ─────────────────────────────────────────────────────
             One flat grid of instrument plates. The dock (client) toggles each
             [data-gallery-card]'s `hidden` from data-* keywords — with JS off,
-            every chart still renders in the default grid, fully SSR. */}
-        <div className="g2-grid" data-density="comfortable">
+            every chart still renders in the default grid, fully SSR. A slim
+            collection label opens each group, but only while browsing the whole
+            catalog (the dock sets [data-browse]); it's noise once you filter. */}
+        <div className="g2-grid" data-density="comfortable" data-browse>
           {charts.map((c, i) => {
             const Preview = CHART_MODULES[c.slug]!.Preview;
-            const idx = String(i + 1).padStart(2, "0");
+            const newGroup = i === 0 || charts[i - 1].collection !== c.collection;
+            const group = COLLECTIONS.find((g) => g.key === c.collection);
             return (
-              <article
-                key={c.slug}
-                className="g2-cell"
-                data-gallery-card
-                data-collection={c.collection}
-                data-keywords={keywords(c)}
-                style={{ "--i": i } as CSSProperties}
-              >
-                <Link
-                  href={`/docs/charts/${c.slug}`}
-                  className="g2-card"
-                  aria-label={`${c.name} — ${c.tagline}`}
+              <Fragment key={c.slug}>
+                {newGroup && group && (
+                  <div className="g2-group" data-group-label>
+                    <span className="g2-group-name mono-label text-fd-primary">{group.label}</span>
+                    <span className="g2-group-blurb">{group.blurb}</span>
+                    <span className="g2-group-n mono-label">{counts[c.collection]}</span>
+                  </div>
+                )}
+                <article
+                  className="g2-cell"
+                  data-gallery-card
+                  data-collection={c.collection}
+                  data-name={c.name}
+                  data-keywords={keywords(c)}
                 >
-                  <span className="g2-spot" aria-hidden />
-                  <ArrowUpRight className="g2-arrow size-4" aria-hidden />
-                  <div className="g2-stage">
-                    <Preview />
-                    <span className="g2-idx" aria-hidden>
-                      {idx}
-                    </span>
-                  </div>
-                  <div className="g2-meta">
-                    {/* name owns its own full-width line so it never truncates
-                        against the collection tag */}
-                    <span className="g2-name">{c.name}</span>
-                    <div className="g2-subrow">
-                      <p className="g2-tag">{c.tagline}</p>
-                      <span className="g2-coll">{c.collection}</span>
+                  <Link
+                    href={`/docs/charts/${c.slug}`}
+                    className="g2-card"
+                    aria-label={`${c.name} — ${c.tagline}`}
+                  >
+                    <span className="g2-spot" aria-hidden />
+                    <ArrowUpRight className="g2-arrow size-4" aria-hidden />
+                    <div className="g2-stage">
+                      <Preview />
                     </div>
-                  </div>
-                </Link>
-              </article>
+                    <div className="g2-meta">
+                      {/* name owns its own full-width line so it never truncates
+                          against the collection tag */}
+                      <span className="g2-name">{c.name}</span>
+                      <div className="g2-subrow">
+                        <p className="g2-tag">{c.tagline}</p>
+                        <span className="g2-coll">{c.collection}</span>
+                      </div>
+                    </div>
+                  </Link>
+                </article>
+              </Fragment>
             );
           })}
         </div>

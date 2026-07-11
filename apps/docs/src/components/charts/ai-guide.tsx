@@ -1,5 +1,5 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SparkBar } from "@microcharts/react/sparkbar";
@@ -7,35 +7,27 @@ import { Delta } from "@microcharts/react/delta";
 import { Bullet } from "@microcharts/react/bullet";
 import { ActivityGrid } from "@microcharts/react/activity-grid";
 import { cn } from "@/lib/cn";
+import { GRAMMAR } from "@/lib/ai-grammar";
+import { AGENT_RULES, MACHINE_SURFACES } from "@/lib/ai-providers";
 
 /**
  * The grammar explorer — the interactive heart of the AI-native guide. Pick a
  * chart type and a form (fenced block vs inline span) and see, in lockstep: the
  * exact text a model emits, that text rendered as the real shipped chart, and
  * the equivalent React. It's a live proof the plain-text grammar round-trips to
- * the same component a human would write by hand.
+ * the same component a human would write by hand. The grammar data is shared
+ * with the Markdown transform (`lib/ai-grammar`), so this and `/docs/ai.md`
+ * never disagree.
  */
 
 type Mode = "fenced" | "inline";
 
-interface Spec {
-  type: string;
-  label: string;
-  body: string;
-  sentence: string;
-  jsx: string;
-  render: (mode: Mode) => ReactNode;
-}
-
-const SPECS: Spec[] = [
-  {
-    type: "sparkline",
-    label: "Sparkline",
-    body: "132 148 141 165 159 182 176 203",
-    sentence: "Revenue climbed steadily {} through Q3.",
-    jsx: `<Sparkline\n  data={[132, 148, 141, 165, 159, 182, 176, 203]}\n  title="Revenue"\n/>`,
-    render: (m) =>
-      m === "fenced" ? (
+/** The one place a grammar type turns into a live chart — both entries share it. */
+function renderChart(type: string, mode: Mode): ReactNode {
+  const fenced = mode === "fenced";
+  switch (type) {
+    case "sparkline":
+      return fenced ? (
         <Sparkline
           data={[132, 148, 141, 165, 159, 182, 176, 203]}
           width={220}
@@ -53,16 +45,9 @@ const SPECS: Spec[] = [
           curve="smooth"
           summary={false}
         />
-      ),
-  },
-  {
-    type: "sparkbar",
-    label: "SparkBar",
-    body: "6 9 5 11 7 12 8 10",
-    sentence: "Shipping held steady {} all quarter.",
-    jsx: `<SparkBar\n  data={[6, 9, 5, 11, 7, 12, 8, 10]}\n  title="Deploys per day"\n/>`,
-    render: (m) =>
-      m === "fenced" ? (
+      );
+    case "sparkbar":
+      return fenced ? (
         <SparkBar
           data={[6, 9, 5, 11, 7, 12, 8, 10]}
           width={220}
@@ -71,31 +56,17 @@ const SPECS: Spec[] = [
         />
       ) : (
         <SparkBar data={[6, 9, 5, 11, 7, 12, 8, 10]} width={46} height={15} summary={false} />
-      ),
-  },
-  {
-    type: "delta",
-    label: "Delta",
-    body: "+0.184",
-    sentence: "Week over week that is {}, ahead of plan.",
-    jsx: `<Delta value={0.184} title="Week over week" />`,
-    render: (m) =>
-      m === "fenced" ? (
+      );
+    case "delta":
+      return fenced ? (
         <span className="text-2xl">
           <Delta value={0.184} title="Week over week" />
         </span>
       ) : (
         <Delta value={0.184} summary={false} />
-      ),
-  },
-  {
-    type: "bullet",
-    label: "Bullet",
-    body: "value=72 target=80 bands=50,90",
-    sentence: "We're at {} of the annual quota.",
-    jsx: `<Bullet\n  value={72}\n  target={80}\n  bands={[50, 90]}\n  title="Quota attainment"\n/>`,
-    render: (m) =>
-      m === "fenced" ? (
+      );
+    case "bullet":
+      return fenced ? (
         <Bullet
           value={72}
           target={80}
@@ -106,16 +77,9 @@ const SPECS: Spec[] = [
         />
       ) : (
         <Bullet value={72} target={80} bands={[50, 90]} width={58} height={11} summary={false} />
-      ),
-  },
-  {
-    type: "activity",
-    label: "ActivityGrid",
-    body: "0 2 1 3 4 2 1 3 2 4 3 2",
-    sentence: "Commit activity held steady {} across the team.",
-    jsx: `<ActivityGrid\n  data={[0, 2, 1, 3, 4, 2, 1, 3, 2, 4, 3, 2]}\n  layout="strip"\n  title="Commit activity"\n/>`,
-    render: (m) =>
-      m === "fenced" ? (
+      );
+    case "activity":
+      return fenced ? (
         <ActivityGrid
           data={[0, 2, 1, 3, 4, 2, 1, 3, 2, 4, 3, 2]}
           layout="strip"
@@ -129,9 +93,11 @@ const SPECS: Spec[] = [
           cell={6}
           summary={false}
         />
-      ),
-  },
-];
+      );
+    default:
+      return null;
+  }
+}
 
 function CopyButton({ text }: { text: string }) {
   const [done, setDone] = useState(false);
@@ -154,9 +120,9 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export function GrammarExplorer() {
-  const [type, setType] = useState(SPECS[0].type);
+  const [type, setType] = useState(GRAMMAR[0].type);
   const [mode, setMode] = useState<Mode>("fenced");
-  const spec = SPECS.find((s) => s.type === type) ?? SPECS[0];
+  const spec = GRAMMAR.find((s) => s.type === type) ?? GRAMMAR[0];
 
   const emitted =
     mode === "fenced"
@@ -170,7 +136,7 @@ export function GrammarExplorer() {
       {/* controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-3 py-2.5">
         <div className="flex flex-wrap gap-1.5">
-          {SPECS.map((s) => (
+          {GRAMMAR.map((s) => (
             <button
               key={s.type}
               type="button"
@@ -225,11 +191,13 @@ export function GrammarExplorer() {
           </div>
           <div className="grid-paper flex flex-1 items-center justify-center px-4 py-6">
             {mode === "fenced" ? (
-              spec.render("fenced")
+              renderChart(spec.type, "fenced")
             ) : (
               <p className="max-w-xs text-[0.95rem] leading-relaxed text-fd-foreground">
                 {before}
-                <span className="mx-1 inline-flex align-middle">{spec.render("inline")}</span>
+                <span className="mx-1 inline-flex align-middle">
+                  {renderChart(spec.type, "inline")}
+                </span>
                 {after}
               </p>
             )}
@@ -247,6 +215,105 @@ export function GrammarExplorer() {
           <pre className="overflow-x-auto whitespace-pre font-mono text-[0.8rem] leading-relaxed text-fd-muted-foreground">
             {spec.jsx}
           </pre>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Inline `code` → <code> for the rules list. Split alternates plain / code text;
+// the index is the correct, stable key here (a static string, order never changes).
+function InlineCode({ text }: { text: string }) {
+  const parts = text.split("`");
+  return (
+    <>
+      {parts.map((p, i) =>
+        // oxlint-disable-next-line react/no-array-index-key
+        i % 2 ? (
+          <code key={i} className="font-mono text-[0.85em] text-fd-primary">
+            {p}
+          </code>
+        ) : (
+          <span key={i}>{p}</span>
+        ),
+      )}
+    </>
+  );
+}
+
+/** A plain-text version of the whole contract — paste straight into a system prompt. */
+function promptText(): string {
+  const rows = GRAMMAR.map((g) => `  chart ${g.type}  ${g.body}   # ${g.blurb}`).join("\n");
+  const rules = AGENT_RULES.map((r) => `- ${r.replace(/`/g, "")}`).join("\n");
+  return [
+    "microcharts — emit a chart block instead of describing numbers.",
+    "Fenced ```chart <type> for a standalone chart; inline `chart <type> <data>` inside a sentence.",
+    "Body: whitespace/comma numbers, or key=value for composites.",
+    "",
+    rows,
+    "",
+    "Rules:",
+    rules,
+    "",
+    "API: /llms.txt · /catalog.json · append .md to any docs page.",
+  ].join("\n");
+}
+
+/**
+ * The closing reference card — the entire AI contract on one glanceable plane
+ * (grammar · rules · surfaces), copyable as a system-prompt block. Terminates
+ * the page with everything an agent needs in one place.
+ */
+export function AgentCheatSheet() {
+  return (
+    <div className="not-prose my-6 panel overflow-hidden">
+      <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
+        <span className="mono-label">agent cheat sheet</span>
+        <span className="flex items-center gap-2">
+          <span className="mono-label opacity-60">copy for a system prompt</span>
+          <CopyButton text={promptText()} />
+        </span>
+      </div>
+
+      {/* grammar */}
+      <div className="border-b border-hairline px-4 py-3.5">
+        <div className="mono-label mb-2.5 opacity-60">grammar</div>
+        <div className="grid gap-x-4 gap-y-1 font-mono text-[0.8rem] leading-relaxed sm:grid-cols-[max-content_1fr]">
+          {GRAMMAR.map((g) => (
+            <Fragment key={g.type}>
+              <span className="whitespace-nowrap text-fd-primary">chart {g.type}</span>
+              <span className="text-fd-muted-foreground">
+                {g.body} <span className="text-fd-muted-foreground/60">— {g.blurb}</span>
+              </span>
+            </Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* rules */}
+      <div className="border-b border-hairline px-4 py-3.5">
+        <div className="mono-label mb-2.5 opacity-60">rules</div>
+        <ul className="flex flex-col gap-1.5 text-[0.85rem] leading-relaxed text-fd-muted-foreground">
+          {AGENT_RULES.map((r) => (
+            <li key={r} className="flex gap-2">
+              <span className="mt-px shrink-0 text-fd-primary">→</span>
+              <span>
+                <InlineCode text={r} />
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* surfaces */}
+      <div className="px-4 py-3.5">
+        <div className="mono-label mb-2.5 opacity-60">surfaces</div>
+        <div className="flex flex-wrap gap-x-5 gap-y-1.5 font-mono text-[0.8rem]">
+          {MACHINE_SURFACES.map((s) => (
+            <a key={s.href} href={s.href} className="text-fd-primary link-underline">
+              {s.label}
+            </a>
+          ))}
         </div>
       </div>
     </div>

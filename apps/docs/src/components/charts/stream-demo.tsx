@@ -11,36 +11,146 @@
  * from a compact, LLM-friendly grammar), so this doubles as a docs-as-tests
  * proof that the format round-trips.
  *
- * Zero layout shift: a hidden "ghost" copy of the FINISHED reply reserves the
- * final height, and the streaming copy is overlaid on top — so the panel is its
- * final size from the first frame and nothing below it ever moves. All motion is
+ * A sector picker swaps between several replies — from a simple revenue recap to
+ * a dense ML-training report — so the format is shown across real use cases, not
+ * one canned example. Block fences carry a title after the type
+ * (```chart sparkbar Volume) so each chart reads accurately per sector.
+ *
+ * Zero layout shift *during* a stream: a hidden "ghost" copy of the finished
+ * reply reserves its height and the streaming copy overlays it. All motion is
  * reduced-motion gated.
  */
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SparkBar } from "@microcharts/react/sparkbar";
 import { Delta } from "@microcharts/react/delta";
 import { Bullet } from "@microcharts/react/bullet";
 import { ActivityGrid } from "@microcharts/react/activity-grid";
+import { Horizon } from "@microcharts/react/horizon";
+import { Waveform } from "@microcharts/react/waveform";
+import { Seismogram } from "@microcharts/react/seismogram";
+import { HeatStrip } from "@microcharts/react/heat-strip";
+import { RugStrip } from "@microcharts/react/rug-strip";
+import { HistogramStrip } from "@microcharts/react/histogram-strip";
+import { MiniBar } from "@microcharts/react/mini-bar";
+import { Funnel } from "@microcharts/react/funnel";
+import { Waterfall } from "@microcharts/react/waterfall";
+import { TrendArrow } from "@microcharts/react/trend-arrow";
+import { Progress } from "@microcharts/react/progress";
+import { ProgressRing } from "@microcharts/react/progress-ring";
+import { Thermometer } from "@microcharts/react/thermometer";
+import { StatusDot } from "@microcharts/react/status-dot";
+import { MicroBox } from "@microcharts/react/micro-box";
+import { TallyMarks } from "@microcharts/react/tally-marks";
+import { DotPlot } from "@microcharts/react/dot-plot";
 import { RotateCcw } from "lucide-react";
+import { cn } from "@/lib/cn";
 
-// The literal text the model "types". Grammar: inline `chart <type> <data>` for
-// word-sized charts in a sentence; a fenced ```chart <type> block for standalone
-// ones. Body is whitespace-separated numbers, or key=value for composites.
-const SCRIPT = `Q3 landed ahead of plan. Revenue climbed steadily \`chart sparkline 132 148 141 165 159 182 176 203\` through the quarter, at a healthy **9 deploys/day**:
+// Each reply the model "types". Grammar: inline `chart <type> <data>` for a
+// word-sized chart in a sentence; a fenced ```chart <type> <title> block for a
+// standalone one (body is whitespace/comma numbers, or key=value for composites).
+interface Stream {
+  id: string;
+  label: string;
+  hint: string;
+  script: string;
+}
 
-\`\`\`chart sparkbar
-6 9 5 11 7 12 8 10
+const STREAMS: Stream[] = [
+  {
+    id: "revenue",
+    label: "Revenue",
+    hint: "business recap",
+    script: `Q3 closed **12% ahead of plan**. Revenue built week over week \`chart sparkline 132 148 141 165 159 182 176 203\` — up \`chart delta +0.184\` on Q2 — and the growth was broad, not one big deal carrying the quarter:
+
+\`\`\`chart mini-bar Net-new revenue by region ($k)
+48 39 27 22 18
 \`\`\`
 
-Week over week that is \`chart delta +0.184\`, putting us at **72%** of the annual quota — just short of the 80% target:
+The funnel held up end to end. Lead → demo → trial → paid converted at **19%** overall, with the trial→paid step the one to watch:
 
-\`\`\`chart bullet
-value=72 target=80 bands=50,90
+\`\`\`chart funnel Q3 pipeline
+1000 540 320 190
 \`\`\`
 
-Commit activity held steady \`chart activity 0 2 1 3 4 2 1 3 2 4 3 2\` across the team.
-`;
+Expansion pulled its weight too — net revenue retention landed at **114%**. Forecasting Q4 flat-to-up from here.
+`,
+  },
+  {
+    id: "incident",
+    label: "Incident",
+    hint: "SRE / on-call",
+    script: `Postmortem for INC-2231. The 14:02 deploy regressed the write path — request volume held steady \`chart sparkbar 120 118 122 90 60 95 128 130\`, but 5xx errors spiked hard for six minutes:
+
+\`\`\`chart seismogram Errors per minute
+2 1 3 2 18 24 9 4 2 1 2 3
+\`\`\`
+
+We caught it fast: alert at 14:03, status \`chart status-dot warn\`, rollback at 14:08, green by 14:11. Deploys resumed once the canary cleared \`chart activity 1 0 2 3 1 0 2 4 3 2\`. Net customer impact was **~40s of elevated latency** — inside the error budget, no SLO breach. Action item: add a write-path smoke test to the canary.
+`,
+  },
+  {
+    id: "markets",
+    label: "Markets",
+    hint: "finance / trading",
+    script: `NVDA closed **+3.8%** \`chart trend-arrow +0.038\` on the session — a steady grind higher into the bell. Intraday returns stayed tight around the mean, no fat tails:
+
+\`\`\`chart histogram 1-min returns (bps)
+-2 -1 0 1 -1 2 1 0 3 1 -1 0 2 1 4 -2 1 0
+\`\`\`
+
+Fills clustered mid-book \`chart rug-strip 3 5 5 6 8 8 9 11 12 12 14\`, so slippage was minimal. P&L attribution across the desk's five names was clean — one detractor, four contributors:
+
+\`\`\`chart waterfall P&L attribution ($k)
+40 -12 28 -8 15
+\`\`\`
+
+The book now sits **14% over** its benchmark weight; trimming into strength on Monday.
+`,
+  },
+  {
+    id: "health",
+    label: "Health",
+    hint: "consumer wellness",
+    script: `Strong week overall. Your overnight heart rate stayed low and even — a solid recovery signal, and down from last week:
+
+\`\`\`chart horizon Resting HR, 7 nights (bpm)
+62 60 58 61 59 57 60 58 56 59 57 55
+\`\`\`
+
+You logged \`chart tally-marks 5\` workouts and closed \`chart progress value=0.9\` of the monthly move goal — one good push this weekend clears it. Recovery held strong across every system, HRV out in front:
+
+\`\`\`chart dot-plot Recovery by system (0–100)
+82 74 91 68 79
+\`\`\`
+`,
+  },
+  {
+    id: "ml",
+    label: "ML training",
+    hint: "advanced / dense",
+    script: `Run 47 promoted. Training loss fell cleanly \`chart sparkline 2.9 2.1 1.6 1.2 0.9 0.7 0.6 0.55\` over eight epochs — no divergence, no plateau — and eval cleared the promotion gate with room to spare:
+
+\`\`\`chart bullet Eval accuracy vs gate (%)
+value=94 target=90 bands=70,95
+\`\`\`
+
+Inference latency held tight under load, with a couple of tail spikes worth watching before we raise QPS:
+
+\`\`\`chart micro-box p99 latency (ms)
+18 20 19 21 22 24 26 30 38 55 90
+\`\`\`
+
+Accelerators ran near saturation the whole run \`chart progress-ring value=0.96\`, and attention density concentrated in the mid layers, exactly as this architecture predicts:
+
+\`\`\`chart heat-strip Attention weight by layer
+12 20 34 58 92 140 96 44 22 14
+\`\`\`
+
+Shipping to staging now; canary at 5% traffic.
+`,
+  },
+];
 
 type Node = { t: "text"; v: string } | { t: "code"; type: string; body: string; closed: boolean };
 
@@ -90,26 +200,152 @@ function kv(body: string): Record<string, string> {
   return out;
 }
 
-const CHART_W = 240;
+/** Block info string is `<type> [title…]`; split them, with a sensible default. */
+const DEFAULT_TITLE: Record<string, string> = {
+  sparkline: "Series",
+  sparkbar: "Values",
+  bullet: "Target",
+  delta: "Change",
+  activity: "Activity",
+};
+function splitInfo(info: string): { type: string; title: string } {
+  const sp = info.indexOf(" ");
+  const type = sp === -1 ? info : info.slice(0, sp);
+  const title = sp === -1 ? (DEFAULT_TITLE[type] ?? "Chart") : info.slice(sp + 1).trim();
+  return { type, title };
+}
 
-// Standalone block chart (the fenced form). Memoized: once a fence closes its
-// (type, body) are final, so it skips re-render on every later streamed token.
-const BlockChart = memo(function BlockChart({ type, body }: { type: string; body: string }) {
+const CHART_W = 240;
+const labeled = (b: string, prefix: string) =>
+  nums(b).map((v, i) => ({ label: `${prefix}${i + 1}`, value: v }));
+
+// One renderer for every supported grammar type — the demo reaches across the
+// catalog, not the same five charts everywhere. Charts are decorative
+// (summary={false}); block charts get a visible mono caption (from the info
+// string), inline ones are described by the surrounding sentence. Data is
+// number[], mapped to {label,value}[] for categorical charts, or key=value for
+// composites.
+// Data charts get the site accent so the stream reads vibrant, not monochrome
+// grey; charts that already encode meaning by colour (delta/trend/status/bullet/
+// progress/thermometer, the heat ramp) keep their own semantics.
+const TINTED = new Set([
+  "sparkline",
+  "sparkbar",
+  "horizon",
+  "waveform",
+  "seismogram",
+  "rug-strip",
+  "histogram",
+  "mini-bar",
+  "micro-box",
+  "dot-plot",
+  "funnel",
+  "waterfall",
+]);
+function renderStream(type: string, body: string, block: boolean): ReactNode {
+  const acc = TINTED.has(type)
+    ? { summary: false as const, color: "var(--mc-accent)" }
+    : { summary: false as const };
   switch (type) {
     case "sparkline":
       return (
         <Sparkline
           data={nums(body)}
-          width={CHART_W}
-          height={44}
+          width={block ? CHART_W : 54}
+          height={block ? 44 : 15}
           curve="smooth"
-          dots="minmax"
-          label="last"
-          title="Revenue"
+          dots={block ? "minmax" : undefined}
+          label={block ? "last" : undefined}
+          {...acc}
         />
       );
     case "sparkbar":
-      return <SparkBar data={nums(body)} width={CHART_W} height={44} title="Deploys per day" />;
+      return (
+        <SparkBar
+          data={nums(body)}
+          width={block ? CHART_W : 46}
+          height={block ? 44 : 15}
+          {...acc}
+        />
+      );
+    case "horizon":
+      return (
+        <Horizon data={nums(body)} width={block ? CHART_W : 56} height={block ? 34 : 14} {...acc} />
+      );
+    case "waveform":
+      return (
+        <Waveform
+          data={nums(body)}
+          width={block ? CHART_W : 54}
+          height={block ? 40 : 15}
+          {...acc}
+        />
+      );
+    case "seismogram":
+      return (
+        <Seismogram
+          data={nums(body)}
+          width={block ? CHART_W : 56}
+          height={block ? 40 : 16}
+          {...acc}
+        />
+      );
+    case "heat-strip":
+      return (
+        <HeatStrip
+          data={nums(body)}
+          width={block ? CHART_W : 56}
+          height={block ? 22 : 12}
+          {...acc}
+        />
+      );
+    case "rug-strip":
+      return (
+        <RugStrip
+          data={nums(body)}
+          width={block ? CHART_W : 56}
+          height={block ? 20 : 12}
+          {...acc}
+        />
+      );
+    case "histogram":
+      return (
+        <HistogramStrip
+          data={nums(body)}
+          width={block ? CHART_W : 60}
+          height={block ? 40 : 16}
+          {...acc}
+        />
+      );
+    case "activity":
+      return <ActivityGrid data={nums(body)} layout="strip" cell={block ? 10 : 6} {...acc} />;
+    case "mini-bar":
+      return (
+        <MiniBar
+          data={labeled(body, "c")}
+          width={block ? CHART_W : 56}
+          height={block ? 40 : 16}
+          {...acc}
+        />
+      );
+    case "funnel":
+      return (
+        <Funnel
+          data={labeled(body, "s")}
+          width={block ? CHART_W : 60}
+          height={block ? 44 : 18}
+          {...acc}
+        />
+      );
+    case "waterfall":
+      return (
+        <Waterfall
+          data={labeled(body, "S")}
+          width={block ? CHART_W : 64}
+          height={block ? 44 : 18}
+          {...acc}
+        />
+      );
     case "bullet": {
       const p = kv(body);
       return (
@@ -117,76 +353,111 @@ const BlockChart = memo(function BlockChart({ type, body }: { type: string; body
           value={Number(p.value)}
           target={p.target ? Number(p.target) : undefined}
           bands={p.bands ? p.bands.split(",").map(Number) : undefined}
-          width={CHART_W}
-          height={26}
-          title="Quota attainment"
+          width={block ? CHART_W : 58}
+          height={block ? 26 : 11}
+          {...acc}
+        />
+      );
+    }
+    case "progress": {
+      const p = kv(body);
+      const v = p.value !== undefined ? Number(p.value) : Number(body.trim());
+      return <Progress value={v} width={block ? CHART_W : 56} height={block ? 12 : 10} {...acc} />;
+    }
+    case "thermometer": {
+      const p = kv(body);
+      return (
+        <Thermometer
+          value={Number(p.value)}
+          target={p.target ? Number(p.target) : undefined}
+          height={block ? 48 : 22}
+          {...acc}
         />
       );
     }
     case "delta":
+      return <Delta value={Number(body.trim())} {...acc} />;
+    case "trend-arrow":
+      return <TrendArrow value={Number(body.trim())} {...acc} />;
+    case "status-dot":
       return (
-        <span className="text-xl">
-          <Delta value={Number(body.trim())} title="Week over week" />
-        </span>
+        <StatusDot
+          status={body.trim()}
+          style={{ width: block ? 12 : 10, height: block ? 12 : 10 }}
+          {...acc}
+        />
       );
-    case "activity":
-      return <ActivityGrid data={nums(body)} layout="strip" cell={10} title="Commit activity" />;
+    case "micro-box":
+      return (
+        <MicroBox
+          data={nums(body)}
+          width={block ? CHART_W : 64}
+          height={block ? 36 : 16}
+          {...acc}
+        />
+      );
+    case "progress-ring": {
+      const p = kv(body);
+      const v = p.value !== undefined ? Number(p.value) : Number(body.trim());
+      const d = block ? 30 : 15;
+      // label="none" drops the centred percent so the ring fills its box and
+      // sits centred on the text line instead of high (label reserves space).
+      return <ProgressRing value={v} label="none" style={{ width: d, height: d }} {...acc} />;
+    }
+    case "tally-marks": {
+      const p = kv(body);
+      const v = p.value !== undefined ? Number(p.value) : Number(body.trim());
+      return <TallyMarks value={v} height={block ? 24 : 15} {...acc} />;
+    }
+    case "dot-plot":
+      return (
+        <DotPlot
+          data={labeled(body, "d")}
+          width={block ? CHART_W : 60}
+          height={block ? 30 : 22}
+          {...acc}
+        />
+      );
     default:
       return null;
   }
+}
+
+// Text-like glyphs sit ON the line (their own baseline aligns). Delta and
+// StatusDot self-align; TrendArrow renders an SVG arrow that reads better
+// centred, so it uses the inline-flex wrapper like the other charts.
+const TEXT_GLYPH = new Set(["delta", "status-dot"]);
+
+// Standalone block chart (fenced form). Info string is `<type> [title…]`. Memoized:
+// once a fence closes its (info, body) are final, so it skips later token re-renders.
+const BlockChart = memo(function BlockChart({ info, body }: { info: string; body: string }) {
+  const { type, title } = splitInfo(info);
+  const node = renderStream(type, body, true);
+  if (!node) return null;
+  if (TEXT_GLYPH.has(type)) return <span className="text-xl">{node}</span>;
+  // A compact labeled figure — mono caption + chart, tight — so each block reads
+  // as a titled instrument, not a chart floating in whitespace.
+  return (
+    <figure className="not-prose flex flex-col gap-1.5">
+      <figcaption className="mono-label opacity-55">{title}</figcaption>
+      {node}
+    </figure>
+  );
 });
 
-// Word-sized chart that sits inside a sentence — the microcharts thesis. Decorative
-// (summary={false}); the surrounding text is its description. Memoized so revealed
-// inline charts don't re-render on every subsequent streamed token.
+// Word-sized chart that sits inside a sentence — the microcharts thesis.
 const InlineChart = memo(function InlineChart({ spec }: { spec: string }) {
   const sp = spec.indexOf(" ");
   const type = sp === -1 ? spec : spec.slice(0, sp);
   const data = sp === -1 ? "" : spec.slice(sp + 1);
-  const node = (() => {
-    switch (type) {
-      case "sparkline":
-        return (
-          <Sparkline
-            data={nums(data)}
-            width={52}
-            height={15}
-            curve="smooth"
-            dots="minmax"
-            summary={false}
-          />
-        );
-      case "sparkbar":
-        return <SparkBar data={nums(data)} width={46} height={15} summary={false} />;
-      case "delta":
-        return <Delta value={Number(data.trim())} summary={false} />;
-      case "bullet": {
-        const p = kv(data);
-        return (
-          <Bullet
-            value={Number(p.value)}
-            target={p.target ? Number(p.target) : undefined}
-            bands={p.bands ? p.bands.split(",").map(Number) : undefined}
-            width={58}
-            height={11}
-            summary={false}
-          />
-        );
-      }
-      case "activity":
-        return <ActivityGrid data={nums(data)} layout="strip" cell={6} summary={false} />;
-      default:
-        return null;
-    }
-  })();
+  const node = renderStream(type, data, false);
   if (!node) return null;
-  // Delta is text — the library's .mc-delta already vertical-aligns it to the
-  // line, so just give it breathing room (no transform that would drop it).
-  if (type === "delta") return <span className="mx-1">{node}</span>;
-  // SVG charts: match the proven FourContexts inline pattern (inline-flex +
-  // align-middle) so they sit centred on the text line; inline-flex still lets
-  // the morph transform apply.
-  return <span className="mc-morph mx-1 inline-flex align-middle">{node}</span>;
+  // Text glyphs (delta/status-dot) align to the line on their own.
+  if (TEXT_GLYPH.has(type)) return <span className="mx-1">{node}</span>;
+  // SVG charts: inline-block, sat on the text baseline like a capital letter
+  // (the glyph box has ~2px bottom padding, so -0.13em drops its visible base
+  // onto the baseline). Reads as part of the line, not floating above it.
+  return <span className="mc-morph mx-1 inline-block align-[-0.13em]">{node}</span>;
 });
 
 // Inline markdown — **bold**, an inline `chart …` span, or plain `code`.
@@ -227,8 +498,8 @@ function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; c
             <Inline text={n.v} />
           </span>
         ) : n.closed ? (
-          <span key={i} className={`my-3 flex justify-start${animate ? " mc-stream-chart" : ""}`}>
-            <BlockChart type={n.type} body={n.body} />
+          <span key={i} className={`my-2 flex justify-start${animate ? " mc-stream-chart" : ""}`}>
+            <BlockChart info={n.type} body={n.body} />
           </span>
         ) : (
           <code
@@ -244,11 +515,6 @@ function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; c
   );
 }
 
-// Reveal a token at a time (word / whitespace runs) rather than by character —
-// closer to how a model actually streams. The join reconstructs SCRIPT exactly.
-const TOKENS = SCRIPT.match(/\s+|\S+/g) ?? [];
-const FULL_NODES = parse(SCRIPT);
-
 // How long to wait AFTER revealing `last`, before the next token. Tuned to feel
 // like a real stream: words land at a readable clip, clauses breathe, and a
 // closed chart fence gets a beat so the raw→rendered morph is savoured.
@@ -263,22 +529,27 @@ function nextDelay(last: string | null, next: string): number {
 }
 
 export function StreamDemo() {
-  const total = TOKENS.length;
   const reduced =
     typeof window !== "undefined" &&
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+  const [activeId, setActiveId] = useState(STREAMS[0].id);
+  const active = useMemo(() => STREAMS.find((s) => s.id === activeId) ?? STREAMS[0], [activeId]);
+  const tokens = useMemo(() => active.script.match(/\s+|\S+/g) ?? [], [active]);
+  const fullNodes = useMemo(() => parse(active.script), [active]);
+  const total = tokens.length;
+
   const [count, setCount] = useState(0);
   const [running, setRunning] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const startedRef = useRef(false); // has the demo ever entered the viewport?
 
-  // Reduced motion: skip the animation, show the finished conversation. Done in
-  // an effect (not the initial state) so server + client first render agree.
+  // Reduced motion: skip animation, show the finished reply (per active stream).
   useEffect(() => {
     if (reduced) setCount(total);
   }, [reduced, total]);
 
-  // Start the stream only once it scrolls into view — below the fold, the whole
-  // point (watching the charts appear) would otherwise be missed.
+  // Start on scroll-in — below the fold, watching the charts appear would be missed.
   useEffect(() => {
     if (reduced) return;
     const el = rootRef.current;
@@ -287,6 +558,8 @@ export function StreamDemo() {
       (entries) => {
         for (const e of entries)
           if (e.isIntersecting) {
+            startedRef.current = true;
+            setCount(0);
             setRunning(true);
             io.disconnect();
           }
@@ -297,21 +570,32 @@ export function StreamDemo() {
     return () => io.disconnect();
   }, [reduced]);
 
-  // One timer per revealed token. Re-running per `count` (rather than a shared
-  // mutable ref) makes replay deterministic: reset count → this reschedules.
+  // Switching sector: restart the new reply from the top (only once the demo has
+  // been seen — otherwise the IO above owns the first play).
+  useEffect(() => {
+    if (reduced) {
+      setCount(total);
+      return;
+    }
+    if (!startedRef.current) return;
+    setCount(0);
+    setRunning(true);
+  }, [activeId, reduced, total]);
+
+  // One timer per revealed token. Re-running per `count` makes replay deterministic.
   useEffect(() => {
     if (!running) return;
     if (count >= total) {
       setRunning(false);
       return;
     }
-    const last = count > 0 ? (TOKENS[count - 1] ?? null) : null;
+    const last = count > 0 ? (tokens[count - 1] ?? null) : null;
     const id = window.setTimeout(
       () => setCount((c) => c + 1),
-      nextDelay(last, TOKENS[count] ?? ""),
+      nextDelay(last, tokens[count] ?? ""),
     );
     return () => clearTimeout(id);
-  }, [running, count, total]);
+  }, [running, count, total, tokens]);
 
   const replay = () => {
     if (reduced) return; // reduced motion stays on the finished conversation
@@ -319,20 +603,44 @@ export function StreamDemo() {
     setRunning(true);
   };
 
-  const revealed = useMemo(() => TOKENS.slice(0, count).join(""), [count]);
+  const revealed = useMemo(() => tokens.slice(0, count).join(""), [tokens, count]);
   const nodes = useMemo(() => parse(revealed), [revealed]);
   const done = count >= total;
   const status = done ? "streamed" : running && count === 0 ? "thinking…" : "streaming…";
-  // The ghost never changes — render it once, not on every token tick.
-  const ghost = useMemo(() => <Message nodes={FULL_NODES} animate={false} caret={false} />, []);
+  const ghost = useMemo(
+    () => <Message nodes={fullNodes} animate={false} caret={false} />,
+    [fullNodes],
+  );
 
   return (
     <div ref={rootRef} className="panel not-prose overflow-hidden">
+      {/* sector picker */}
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-hairline px-3 py-2.5">
+        {STREAMS.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            data-active={s.id === activeId}
+            onClick={() => setActiveId(s.id)}
+            title={s.hint}
+            className={cn(
+              "rounded-full border px-2.5 py-1 text-[0.78rem] transition-colors",
+              s.id === activeId
+                ? "border-fd-primary/50 bg-fd-primary/10 text-fd-foreground"
+                : "border-hairline text-fd-muted-foreground hover:border-fd-primary/30 hover:text-fd-foreground",
+            )}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
       {/* chat header */}
       <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
         <div className="flex items-center gap-2">
           <span className="size-2 rounded-full" style={{ background: "var(--accent)" }} />
           <span className="mono-label">assistant</span>
+          <span className="mono-label opacity-50">· {active.hint}</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="mono-label opacity-70">{status}</span>
@@ -348,8 +656,8 @@ export function StreamDemo() {
         </div>
       </div>
 
-      {/* the message. A hidden ghost of the FINISHED reply fixes the height; the
-          streaming copy overlays it, so nothing below the demo ever shifts. */}
+      {/* the message. A hidden ghost of the finished reply fixes the height; the
+          streaming copy overlays it, so nothing below the demo shifts mid-stream. */}
       <div className="grid-paper px-5 py-6">
         <div className="relative">
           <div aria-hidden className="invisible">

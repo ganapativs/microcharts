@@ -29,6 +29,9 @@ and carries an accessible description generated from the data itself.
   with zero client JavaScript, and add interactivity only from a separate `/interactive` subpath.
 - **Accessible by default.** Each chart is an `img` with a natural-language summary built from
   your data — nothing to remember, nothing to drift.
+- **AI-native.** A chart is plain `data` plus generated words, so a model can emit one
+  mid-sentence and read one back — [chat streams, agents, and tool output](/docs/ai) are
+  first-class homes, not an afterthought.
 - **Tiny.** Static charts span **0.9–3.6 kB gzip** (median 2.3), each imported from its own
   subpath and budget-gated in CI.
 
@@ -40,6 +43,11 @@ chart — so you pick by the _decision_ you need read, not by fighting an option
 
 <CatalogFacts />
 
+From sparklines to bump charts, funnels, honeycombs, and calendar strips — a small sample of
+what ships:
+
+<CatalogStrip />
+
 Browse them all on the [All charts](/docs/charts) page, which files every type under the
 question it answers — start from what you need someone to see, and land on the chart.
 
@@ -49,6 +57,10 @@ The point of a word-sized chart is that it belongs _in_ your interface, not in a
 off to the side. Here's the same chart doing its job in four different homes:
 
 <FourContexts slug="sparkline" />
+
+And increasingly, the interface writing the sentence is a model. Because every chart renders
+from plain data and describes itself in words, an assistant can draw one mid-reply and a
+person can trust what it says — [AI-native](/docs/ai) shows a live stream doing exactly that.
 
 Ready to render one? The [Quickstart](/docs/quickstart) gets you from install to a live chart
 in three steps.

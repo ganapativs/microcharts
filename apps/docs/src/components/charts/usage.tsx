@@ -1,5 +1,6 @@
 import { getChart } from "@/lib/catalog";
 import { CopyButton } from "@/components/ui/copy";
+import { CommandLine } from "@/components/ui/command-line";
 import { CodeWithData } from "@/components/ui/code-with-data";
 
 /**
@@ -29,9 +30,12 @@ export function Usage({ chart }: { chart: string }) {
       {/* Install — demoted to a hairline footer: small, muted, no shouting `$`. */}
       <div className="flex items-center gap-2 border-t border-hairline px-4 py-1.5">
         <span className="mono-label opacity-50">install</span>
-        <code className="min-w-0 flex-1 truncate font-mono text-xs text-fd-muted-foreground">
-          {install}
-        </code>
+        <CommandLine
+          command={install}
+          prompt={false}
+          dim
+          className="min-w-0 flex-1 truncate text-xs"
+        />
         <CopyButton text={install} size={7} className="shrink-0 opacity-60" />
       </div>
     </div>

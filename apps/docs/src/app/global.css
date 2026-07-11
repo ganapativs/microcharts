@@ -574,6 +574,42 @@ body {
     gap: clamp(0.3rem, 0.5vw, 0.45rem);
   }
 
+  /* ── wayfinding: a slim label opens each collection while browsing ─────────
+     A full-width row (spans the grid), quiet + editorial — orientation without
+     the section walls the continuous plane deliberately avoids. Shown ONLY when
+     browsing the whole catalog; the dock removes [data-browse] the moment you
+     filter or search, where the label would be redundant noise. */
+  .g2-group {
+    display: none;
+  }
+  .g2-grid[data-browse] .g2-group {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    grid-column: 1 / -1;
+    padding: 1.6rem 0.3rem 0.55rem;
+    margin-bottom: 0.1rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--hairline) 45%, transparent);
+  }
+  /* the first group sits right under the masthead — no big top gap */
+  .g2-grid[data-browse] .g2-group:first-child {
+    padding-top: 0.2rem;
+  }
+  .g2-group-blurb {
+    font-size: 0.8rem;
+    color: var(--color-fd-muted-foreground);
+    opacity: 0.75;
+  }
+  .g2-group-n {
+    margin-left: auto;
+    opacity: 0.45;
+  }
+  @media (max-width: 32rem) {
+    .g2-group-blurb {
+      display: none;
+    }
+  }
+
   /* the perspective host — filtering toggles this element's [hidden].
      NOTE: do NOT put `content-visibility: auto` here — it forces `contain:
      paint`, which clips the plate's hover lift-shadow, focus ring, and the
@@ -604,8 +640,11 @@ body {
     color: inherit;
     border-radius: var(--radius-panel);
     background-color: var(--glass-surface);
-    border: 1px solid var(--hairline);
-    box-shadow: var(--glass-edge), var(--glass-shadow);
+    /* Resting rim is deliberately quiet — a faint hairline, NO bright bevel — so
+       the grid of plates recedes and the charts lead. The lit edge + accent rim
+       return on hover/focus as the affordance (below). */
+    border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+    box-shadow: var(--glass-shadow);
     transform-style: preserve-3d;
     transform: rotateX(var(--ry)) rotateY(var(--rx)) translate3d(0, var(--lift), 0);
     transition:
@@ -655,31 +694,7 @@ body {
     opacity: 1;
   }
 
-  /* a quiet catalog stamp in the stage corner — not part of the reading flow,
-     it just marks position. Small, low, mono; lights a hair on hover. */
-  .g2-idx {
-    position: absolute;
-    bottom: 0.5rem;
-    right: 0.6rem;
-    z-index: 1;
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    color: var(--color-fd-muted-foreground);
-    opacity: 0.35;
-    transition:
-      color 0.3s var(--ease-out-quint),
-      opacity 0.3s var(--ease-out-quint);
-    pointer-events: none;
-    user-select: none;
-  }
-  .g2-cell:focus-within .g2-idx {
-    color: var(--accent);
-    opacity: 0.7;
-  }
-
-  /* the specimen stage — graph paper, chart lifted forward in 3-D */
+  /* the specimen stage — faint graph paper, chart lifted forward in 3-D */
   .g2-stage {
     position: relative;
     z-index: 1;
@@ -691,18 +706,21 @@ body {
     padding: clamp(1rem, 2vw, 1.6rem);
     border-radius: var(--radius-panel) var(--radius-panel) 0 0;
     transform: translateZ(16px);
+    /* graph paper is a whisper now — a texture you sense, not lines you count.
+       Across 100+ stages the old 42% rule read as noise competing with the
+       marks; at ~14% it just gives the stage a faint instrument character. */
     background-image:
       linear-gradient(
         to right,
-        color-mix(in oklab, var(--rule) 42%, transparent) 1px,
+        color-mix(in oklab, var(--rule) 14%, transparent) 1px,
         transparent 1px
       ),
       linear-gradient(
         to bottom,
-        color-mix(in oklab, var(--rule) 42%, transparent) 1px,
+        color-mix(in oklab, var(--rule) 14%, transparent) 1px,
         transparent 1px
       );
-    background-size: 1.375rem 1.375rem;
+    background-size: 1.6rem 1.6rem;
     transition: background-color 0.35s var(--ease-out-quint);
   }
   .g2-grid[data-density="compact"] .g2-stage {
@@ -737,7 +755,8 @@ body {
     flex-direction: column;
     gap: 0.2rem;
     padding: 0.85rem 1rem 0.95rem;
-    border-top: 1px solid var(--hairline);
+    /* match the quiet outer rim so the plate reads as one calm container */
+    border-top: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
     transform: translateZ(8px);
   }
   .g2-name {
@@ -772,6 +791,11 @@ body {
     text-transform: uppercase;
     color: var(--color-fd-muted-foreground);
     opacity: 0.6;
+  }
+  /* When a single collection is filtered, every card's tag says the same thing —
+     the active pill already tells you, so drop it as redundant. */
+  .g2-grid[data-collection-filter]:not([data-collection-filter="all"]) .g2-coll {
+    display: none;
   }
   /* Its two-line space is ALWAYS reserved (fixed height) so hover never grows
      the plate or shifts a neighbour — only the text fades in. */
@@ -821,10 +845,6 @@ body {
     }
     .g2-card:hover .g2-spot {
       opacity: 1;
-    }
-    .g2-card:hover .g2-idx {
-      color: var(--accent);
-      opacity: 0.7;
     }
     .g2-card:hover .g2-stage {
       background-color: color-mix(in oklab, var(--accent) 5%, transparent);
@@ -954,6 +974,7 @@ body {
     align-items: center;
   }
   .g2-dock-search input {
+    flex: none; /* keep a proper field — let the dock scroll rather than squish it into a lopsided circle */
     width: 8.5rem;
     background: transparent;
     border: 1px solid var(--hairline);
@@ -964,6 +985,8 @@ body {
     outline: none;
     transition:
       width 0.35s var(--ease-out-quint),
+      padding 0.3s var(--ease-out-quint),
+      color 0.2s var(--ease-out-quint),
       border-color 0.2s var(--ease-out-quint);
   }
   .g2-dock-search input:focus {
@@ -975,6 +998,9 @@ body {
     left: 0.65rem;
     pointer-events: none;
     color: var(--color-fd-muted-foreground);
+    transition:
+      left 0.3s var(--ease-out-quint),
+      transform 0.3s var(--ease-out-quint);
   }
   .g2-dock-div {
     width: 1px;
@@ -1014,9 +1040,29 @@ body {
       width: 2.75rem;
       height: 2.75rem;
     }
+    /* On touch, search is a centered icon button that expands on tap — a
+       squished half-field with a left-pinned icon read as "off-centre". It
+       reopens while focused OR while it holds a query. */
     .g2-dock-search input {
-      padding-block: 0.6rem;
+      width: 2.75rem;
+      padding: 0.6rem;
       font-size: 0.9rem;
+      color: transparent;
+    }
+    .g2-dock-search svg {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .g2-dock-search:focus-within input,
+    .g2-dock-search:has(input:not(:placeholder-shown)) input {
+      width: 11rem;
+      padding: 0.6rem 0.75rem 0.6rem 2rem;
+      color: var(--color-fd-foreground);
+    }
+    .g2-dock-search:focus-within svg,
+    .g2-dock-search:has(input:not(:placeholder-shown)) svg {
+      left: 0.7rem;
+      transform: none;
     }
   }
   .g2-top {
@@ -1116,14 +1162,6 @@ body {
     }
     .g2-dock[data-hidden] {
       transform: translateY(160%);
-    }
-    .g2-dock-search input,
-    .g2-dock-search input:focus {
-      width: 100%;
-      flex: 1;
-    }
-    .g2-dock-search {
-      flex: 1;
     }
   }
 }

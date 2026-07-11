@@ -6,6 +6,7 @@ import { docsMeta } from "@/lib/metadata";
 import { SITE } from "@/lib/site";
 import { Reveal } from "@/components/ui/reveal";
 import { CopyButton } from "@/components/ui/copy";
+import { CommandLine } from "@/components/ui/command-line";
 import { Brandmark } from "@/components/brandmark";
 import { ColorSwatch } from "@/components/brand/color-swatch";
 import { CELL_FILL, CELL_R, CELL_SIZE, CELLS, SQUIRCLE_PATH } from "@/lib/brand";
@@ -463,18 +464,26 @@ export default function BrandPage() {
           </Reveal>
           <Reveal delay={80} className="panel flex flex-col justify-center gap-3 p-7">
             {[
-              { k: "Name", v: "microcharts" },
-              { k: "Package", v: SITE.pkg },
-              { k: "Install", v: `pnpm add ${SITE.pkg}` },
+              { k: "Name", v: "microcharts", cmd: false },
+              { k: "Package", v: SITE.pkg, cmd: false },
+              { k: "Install", v: `pnpm add ${SITE.pkg}`, cmd: true },
             ].map((row) => (
               <div
                 key={row.k}
                 className="command-well flex items-center gap-2.5 py-2 pl-3.5 pr-1.5"
               >
                 <span className="mono-label w-16 shrink-0">{row.k}</span>
-                <code className="min-w-0 flex-1 truncate font-mono text-sm text-fd-foreground">
-                  {row.v}
-                </code>
+                {row.cmd ? (
+                  <CommandLine
+                    command={row.v}
+                    prompt={false}
+                    className="min-w-0 flex-1 truncate text-sm"
+                  />
+                ) : (
+                  <code className="min-w-0 flex-1 truncate font-mono text-sm text-fd-foreground">
+                    {row.v}
+                  </code>
+                )}
                 <CopyButton text={row.v} size={7} className="shrink-0" />
               </div>
             ))}

@@ -3,12 +3,12 @@
   "pages": [
     "index",
     "quickstart",
+    "ai",
     "charts",
     "---Guides---",
     "accessibility",
     "theming",
     "performance",
-    "ai",
     "design-notes"
   ]
 }

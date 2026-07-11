@@ -27,8 +27,10 @@ renders, and the React it's equivalent to:
 
 The body is whitespace- or comma-separated numbers for series charts, or `key=value` pairs for
 composites. These five cover the questions an assistant answers most — _trend, magnitude, change,
-attainment, cadence_ — and the pattern extends to any chart in the catalog: name a type, pick a
-body convention, map it to that chart's import.
+attainment, cadence_ — but the same pattern extends to any chart in the catalog: name a type,
+pick a body convention, map it to that chart's import.
+
+<CatalogStrip />
 
 ## Wire it up
 
@@ -43,17 +45,7 @@ Turning the grammar into components is a parser and a `switch` — no framework,
 Pull fenced blocks and inline spans out of partially-streamed Markdown. A fence that hasn't
 closed yet stays raw, then morphs the moment it does.
 
-<DynamicCodeBlock lang="ts" code={`const FENCE = /\`\`\`chart (\\w+)\\n([\\s\\S]*?)\`\`\`/g;
-const INLINE = /\`chart (\\w+) ([^\`]+)\`/g;
-
-const nums = (b: string) => b.split(/[\\s,]+/).map(Number).filter(Number.isFinite);
-const kv = (b: string) =>
-  Object.fromEntries(
-    b.split(/\\s+/).flatMap((t) => {
-      const i = t.indexOf("=");
-      return i > 0 ? [[t.slice(0, i), t.slice(i + 1)]] : [];
-    }),
-  );`} />
+<Snippet id="parse" />
 
 </Step>
 
@@ -64,26 +56,7 @@ const kv = (b: string) =>
 One `switch`. Because geometry is pure and charts render from `data` alone, the model's chart is
 identical to one you'd write by hand.
 
-<DynamicCodeBlock lang="tsx" code={`import { Sparkline } from "@microcharts/react/sparkline";
-import { SparkBar } from "@microcharts/react/sparkbar";
-import { Delta } from "@microcharts/react/delta";
-import { Bullet } from "@microcharts/react/bullet";
-import { ActivityGrid } from "@microcharts/react/activity-grid";
-
-export function ChartBlock({ type, body }: { type: string; body: string }) {
-  switch (type) {
-    case "sparkline": return <Sparkline data={nums(body)} title="Series" />;
-    case "sparkbar":  return <SparkBar data={nums(body)} title="Per period" />;
-    case "delta":     return <Delta value={Number(body.trim())} title="Change" />;
-    case "bullet": {
-      const p = kv(body);
-      return <Bullet value={+p.value} target={p.target ? +p.target : undefined}
-                     bands={p.bands?.split(",").map(Number)} title="Attainment" />;
-    }
-    case "activity":  return <ActivityGrid data={nums(body)} layout="strip" title="Cadence" />;
-    default: return null; // unknown type → leave the text as-is
-  }
-}`} />
+<Snippet id="map" />
 
 </Step>
 
@@ -100,65 +73,17 @@ standalone chart keeps its summary; give it a `title`.
 
 ## Prompt the model
 
-A few lines teach the grammar. Reach for the technique that matches how the model is driven:
+A few lines teach the grammar. Reach for the technique that matches how the model is driven —
+structured output and tool calls first, since that's how most agents run today:
 
-<Tabs items={["System prompt", "Few-shot", "Structured JSON", "Tool use", "Guardrails"]}>
-
-<Tab value="System prompt">
-
-Drop this into the system message — enough for a capable model to emit valid blocks unprompted.
-
-<DynamicCodeBlock lang="text" code={`When a number series would help, emit a chart block instead of prose.
-Fenced for a standalone chart, inline \`chart …\` for a word-sized one:
-
-\`\`\`chart sparkline
-132 148 141 165 159 182 176 203
-\`\`\`
-
-Types: sparkline · sparkbar (signed = win/loss) · delta (one signed ratio)
-· bullet (value= target= bands=) · activity (intensities).
-Never invent a pie or gauge — they aren't supported.`} />
-
-</Tab>
-
-<Tab value="Few-shot">
-
-When you want a specific house style, show one exchange. Models mirror the shape of the example.
-
-<DynamicCodeBlock lang="text" code={`User: How did deploys trend this week?
-Assistant: Steady, with a strong Thursday:
-
-\`\`\`chart sparkbar
-6 9 5 11 7 12 8 10
-\`\`\`
-
-User: And are we on track for the quota?
-Assistant: Close — \`chart delta +0.184\` week over week puts us here:
-
-\`\`\`chart bullet
-value=72 target=80 bands=50,90
-\`\`\``} />
-
-</Tab>
+<Tabs items={["Structured JSON", "Tool use", "System prompt", "Few-shot", "Guardrails"]}>
 
 <Tab value="Structured JSON">
 
-For pipelines that need validation, have the model return JSON and map it yourself — no parsing
+The default for anything production. Have the model return JSON and map it yourself — no parsing
 of prose. Constrain `type` to an enum and the output is always renderable.
 
-<DynamicCodeBlock lang="tsx" code={`type ChartSpec =
-  | { type: "sparkline" | "sparkbar" | "activity"; data: number[]; title?: string }
-  | { type: "delta"; value: number; title?: string }
-  | { type: "bullet"; value: number; target?: number; bands?: number[]; title?: string };
-
-// model returns ChartSpec (JSON mode / response_format) → render directly
-function Chart(spec: ChartSpec) {
-  switch (spec.type) {
-    case "sparkline": return <Sparkline data={spec.data} title={spec.title} />;
-    case "bullet":    return <Bullet {...spec} />;
-    // …one arm per type
-  }
-}`} />
+<Snippet id="structured" />
 
 </Tab>
 
@@ -167,22 +92,24 @@ function Chart(spec: ChartSpec) {
 Expose a single tool the model calls when a chart helps. Its arguments _are_ the chart spec, so
 there's nothing to parse and the schema enforces the shape.
 
-<DynamicCodeBlock lang="ts" code={`const renderChart = {
-  name: "render_chart",
-  description: "Render a microchart when a number series helps the reader.",
-  input_schema: {
-    type: "object",
-    required: ["type"],
-    properties: {
-      type: { enum: ["sparkline", "sparkbar", "delta", "bullet", "activity"] },
-      data: { type: "array", items: { type: "number" } },
-      value: { type: "number" }, target: { type: "number" },
-      bands: { type: "array", items: { type: "number" } },
-      title: { type: "string" },
-    },
-  },
-};
-// on tool_use → <Chart {...toolCall.input} />`} />
+<Snippet id="tool" />
+
+</Tab>
+
+<Tab value="System prompt">
+
+For free-form chat, drop this into the system message — enough for a capable model to emit valid
+blocks unprompted.
+
+<Snippet id="systemPrompt" />
+
+</Tab>
+
+<Tab value="Few-shot">
+
+When you want a specific house style, show one exchange. Models mirror the shape of the example.
+
+<Snippet id="fewShot" />
 
 </Tab>
 
@@ -191,14 +118,7 @@ there's nothing to parse and the schema enforces the shape.
 Never trust generated data blindly. Validate the type, coerce the numbers, and fall back to text
 when a block is malformed — the summary makes a graceful fallback trivial.
 
-<DynamicCodeBlock lang="ts" code={`const KNOWN = new Set(["sparkline", "sparkbar", "delta", "bullet", "activity"]);
-
-function safeBlock(type: string, body: string) {
-  if (!KNOWN.has(type)) return null;          // unknown type → render raw text
-  const data = nums(body);
-  if (type !== "delta" && data.length === 0) return null; // no numbers → skip
-  return { type, body };                       // charts already handle empty/NaN/±∞
-}`} />
+<Snippet id="guardrails" />
 
 </Tab>
 
@@ -220,16 +140,10 @@ Every path from model output to a rendered chart, with the one thing each needs.
 <Accordion title="Streaming chat reply — morph blocks as they close">
 
 Parse the partial Markdown on every token; render a fence as raw text until it closes, then swap
-in the chart. Word-sized charts land inside the sentence, standalone ones below it. The live
-demo at the top of this page is exactly this, and it's about forty lines.
+in the chart. Word-sized charts land inside the sentence, standalone ones below it. The live demo
+at the top of this page is exactly this, and it's about forty lines.
 
-<DynamicCodeBlock lang="tsx" code={`// on each streamed chunk:
-const nodes = parse(accumulatedText);   // text | {type, body, closed}
-return nodes.map((n) =>
-  n.type === "text" ? <Inline text={n.v} />
-  : n.closed        ? <ChartBlock type={n.type} body={n.body} />
-  :                   <pre>{n.raw}</pre>,   // still streaming → show raw
-);`} />
+<Snippet id="streaming" />
 
 </Accordion>
 
@@ -239,11 +153,7 @@ Static entries are hook-free, so an RSC assistant renders the model's charts to 
 server. Nothing hydrates; the chart ships as markup. Add `/interactive` only where you need hover
 or keyboard.
 
-<DynamicCodeBlock lang="tsx" code={`import { Sparkline } from "@microcharts/react/sparkline"; // no "use client"
-
-export default async function Answer({ spec }) {
-  return <ChartBlock type={spec.type} body={spec.body} />; // pure SVG, server-rendered
-}`} />
+<Snippet id="rsc" />
 
 </Accordion>
 
@@ -252,13 +162,7 @@ export default async function Answer({ spec }) {
 When a tool returns rows, render them instead of asking the model to describe them in prose — a
 `Sparkline` per row, a `Bullet` for a KPI against target.
 
-<DynamicCodeBlock lang="tsx" code={`{rows.map((r) => (
-  <tr key={r.id}>
-    <td>{r.name}</td>
-    <td><Sparkline data={r.history} summary={false} /></td>
-    <td><Bullet value={r.value} target={r.goal} summary={false} /></td>
-  </tr>
-))}`} />
+<Snippet id="toolOutput" />
 
 </Accordion>
 
@@ -268,11 +172,7 @@ Need a chart in a README, an email, or a non-React runtime? Today, render the st
 a string on the server. A first-class JSON spec and a React-free string renderer are on the
 roadmap for rendering to SVG with no React at all.
 
-<DynamicCodeBlock lang="ts" code={`import { renderToStaticMarkup } from "react-dom/server";
-import { Sparkline } from "@microcharts/react/sparkline";
-
-const svg = renderToStaticMarkup(<Sparkline data={data} title="Revenue" />);
-// → a self-contained <svg> string for anywhere HTML goes`} />
+<Snippet id="programmatic" />
 
 </Accordion>
 
@@ -293,16 +193,14 @@ it reads the true API instead of guessing.
 
 <SurfaceCards />
 
-## Which chart, and the rules
+## The whole contract, on one card
 
-Don't make the model memorize the catalog — [All charts](/docs/charts) files every type under the
-question it answers, and the [gallery](/gallery) shows them at a glance. An agent only needs the
-rules:
+Don't make a model memorize the catalog — [All charts](/docs/charts) files every type by the
+question it answers, and the [gallery](/gallery) shows them at a glance. Everything an agent
+needs to emit correct microcharts fits on one card — copy it straight into a system prompt:
 
-<Callout type="warn">
-  Import each chart from its own subpath (`@microcharts/react/sparkline`); add `/interactive` only
-  for hover and keyboard. Keep static charts hook-free so they're valid in RSC. Pass `data` and a
-  `title` and let the generated summary handle accessibility — `summary={false}` only when a chart
-  is decorative inside describing text. Never add a runtime dependency, and never reach for a pie
-  or gauge: they aren't shipped.
-</Callout>
+<AgentCheatSheet />
+
+That's the entire surface area: a grammar a model already knows how to write, and charts a
+person can trust on sight. Point an assistant at [`/llms.txt`](/llms.txt), or start from the
+[Quickstart](/docs/quickstart) and render your first chart in three steps.
