@@ -177,9 +177,16 @@ function Shell({
           {preview}
         </div>
       </div>
-      {hint && (
-        <p className="border-t border-hairline px-4 py-2 text-center text-[0.72rem] leading-snug text-fd-muted-foreground">
-          {hint}
+      {mode && onMode && (
+        /* Always rendered at a fixed height so switching modes never shifts
+           the layout; the static line doubles as interactive discoverability. */
+        <p
+          title={mode === "interactive" ? hint : undefined}
+          className="truncate border-t border-hairline px-4 py-2 text-center text-[0.72rem] leading-snug text-fd-muted-foreground"
+        >
+          {mode === "interactive"
+            ? (hint ?? "Hover or focus the chart — values are read out as you move.")
+            : "Static render — switch to Interactive for hover · keyboard · live values."}
         </p>
       )}
       {mode && onMode && (
@@ -322,7 +329,7 @@ export function Playground({ chart }: { chart: string }) {
       }
       sampleData={mod?.entry.sampleData}
       preview={interactive ? spec.renderInteractive!(state, data, ui) : spec.render(state, data)}
-      hint={interactive ? spec.interactiveHint : undefined}
+      hint={spec.interactiveHint}
       controls={
         <>
           {spec.knobs.map((k) => (
