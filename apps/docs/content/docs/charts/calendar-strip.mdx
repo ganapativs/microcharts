@@ -108,7 +108,7 @@ ActivityGrid and GardenGrid.
 >
   <CalendarStrip
     data={Array.from({ length: 14 }, (_, i) => ({
-      date: `2026-06-${String(18 + i).padStart(2, "0")}`,
+      date: new Date(Date.UTC(2026, 5, 18) + i * 86400000).toISOString().slice(0, 10),
       value: 0,
     }))}
     end="2026-07-01"
