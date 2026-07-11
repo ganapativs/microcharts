@@ -259,7 +259,8 @@ export function Playground({ chart }: { chart: string }) {
   if (!spec || !entry) return null;
 
   const interactive = mode === "interactive" && !!spec.renderInteractive;
-  const ui = { animate };
+  const canAnimate = interactive && spec.animates !== false;
+  const ui = { animate: canAnimate && animate };
 
   // remount (and morph) on discrete-knob, data, or mode changes — never on
   // slider drags. Remounting is also exactly what replays the entrance.
@@ -280,7 +281,7 @@ export function Playground({ chart }: { chart: string }) {
     : spec.code(state, data);
   const code = [
     `import { ${entry.name} } from "${importPath}";`,
-    ...(interactive && animate ? ['import "@microcharts/react/motion";'] : []),
+    ...(ui.animate ? ['import "@microcharts/react/motion";'] : []),
     "",
     jsx,
   ].join("\n");
@@ -290,7 +291,7 @@ export function Playground({ chart }: { chart: string }) {
       morphKey={morphKey}
       mode={spec.renderInteractive ? mode : undefined}
       onMode={spec.renderInteractive ? setMode : undefined}
-      onReplay={interactive && animate ? () => setTake((t) => t + 1) : undefined}
+      onReplay={ui.animate ? () => setTake((t) => t + 1) : undefined}
       onShuffle={
         spec.shuffle
           ? () => {
@@ -312,7 +313,7 @@ export function Playground({ chart }: { chart: string }) {
               onChange={(v) => setState((s) => ({ ...s, [k.key]: v }))}
             />
           ))}
-          {interactive && <Toggle label="animate" value={animate} onChange={setAnimate} />}
+          {canAnimate && <Toggle label="animate" value={animate} onChange={setAnimate} />}
         </>
       }
       code={code}

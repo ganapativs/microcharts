@@ -29,6 +29,11 @@ export interface ChartEntry {
   tagline: string;
   staticImport: string;
   interactiveImport?: string;
+  /**
+   * `false` ⇒ the interactive entry has no `animate` prop (HTML-based marks,
+   * or motion already IS the encoding) — prop table + playground omit it.
+   */
+  animates?: boolean;
   dataShape: string;
   /** Primary encoding channel + honest precision rating (plan/21 §4). */
   encoding: { channel: string; precision: string };
@@ -93,6 +98,11 @@ export interface PlaygroundSpec {
   ) => string;
   /** One-line affordance hint shown under the interactive preview. */
   interactiveHint?: string;
+  /**
+   * `false` ⇒ this chart has no entrance motion (HTML-based marks, or motion
+   * already IS the encoding) — the playground hides the animate toggle.
+   */
+  animates?: boolean;
 }
 
 /* ── copy-complete snippets ──────────────────────────────────────────────── */

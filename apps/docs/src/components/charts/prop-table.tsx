@@ -25,7 +25,7 @@ export function PropTable({ slug }: { slug: string }) {
               <td className="text-fd-muted-foreground">{p.description}</td>
             </tr>
           ))}
-          {chart.interactiveImport && (
+          {chart.interactiveImport && chart.animates !== false && (
             <tr>
               <td className="whitespace-nowrap font-mono text-fd-foreground">animate</td>
               <td className="font-mono text-xs text-fd-muted-foreground">boolean</td>
