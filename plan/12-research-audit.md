@@ -1687,3 +1687,15 @@ TransitionGrid (ConfusionGrid recipe), RaceSplitBars, runway (EtaBar), warming s
 - **Docs**: unified playground (static ↔ interactive mode, animate toggle, replay, imports-complete
   snippets) replaces the separate Playground + InteractiveDemo sections on every chart page;
   `animate` auto-documented in every interactive chart's prop table with reduced-motion/SSR notes.
+
+## 2026-07-11 — motion v2: chart-nature choreography (user craft round 2)
+
+User verdict on v1: archetype-generic fades don't express chart nature (a spiral should OPEN UP).
+Engine gained: `spin` (radial unwind: spiral-year, polar-clock, micro-donut), `grow` (tree-rings),
+`trail` (sequential mark pops along the chart's own order), `order: "x"|"y"|"index"` (real getBBox
+geometry sequencing for any mark archetype), and draw-synced dots (a dot pops exactly when the draw
+front reaches its x). 16 charts re-choreographed; every one verified via WAAPI introspection in the
+live docs (track shapes + ascending delays) and slow-motion frame capture. Two engine bugs found by
+the probes: whole-svg archetypes were being demoted by the selector-miss fallback (spin ran as wipe),
+and a long-running Next dev server serves a STALE compiled engine from node_modules — restart the
+docs dev server after every `pnpm build` before judging motion (turbopack does not watch node_modules).
