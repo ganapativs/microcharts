@@ -26,12 +26,15 @@ export const MC_DUR = {
 
 /** Entrance archetypes — the family a chart's entrance belongs to. */
 export type EntranceArchetype =
-  | "draw" // line charts: stroke-dashoffset reveal
+  | "draw" // line charts: stroke-dashoffset reveal; riding dots pop at the front
   | "wipe" // area charts: left→right clip reveal
   | "rise" // bar charts: scaleY from the baseline, staggered
   | "reveal" // cell grids: staggered fade
   | "settle" // dot/marker charts: staggered fade + scale
   | "sweep" // progress/fill charts: scaleX from the origin
+  | "trail" // discrete marks pop sequentially along the chart's own order
+  | "spin" // radial charts: unwind from the center (rotate + scale)
+  | "grow" // concentric charts: grow outward from the center
   | "pop" // single-glyph charts: fade + scale(0.97)
   | "fade"; // text/numeric charts: fade only
 
@@ -46,6 +49,14 @@ export interface EntranceOptions {
   origin?: "bottom" | "top" | "left" | "right" | "center" | "signed";
   /** Per-item stagger in ms (default 30, total capped at 240). */
   stagger?: number;
+  /**
+   * Sequence marks along real geometry ("x": left→right, "y": top→down) or
+   * DOM order ("index"). Implied "index" for trail; spreads delays across
+   * `window` instead of the fixed stagger.
+   */
+  order?: "index" | "x" | "y";
+  /** Total span (ms) of an ordered sequence (default 520 trail / 400 others). */
+  window?: number;
 }
 
 type Engine = (

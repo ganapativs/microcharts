@@ -40,7 +40,14 @@ const DUR: Record<EntranceArchetype, number> = {
   sweep: 400,
   pop: 200,
   fade: 250,
+  trail: 200, // per-mark pop; the sequence spans TRAIL_WINDOW
+  spin: 500,
+  grow: 400,
 };
+
+// Sequential choreography: marks pop along the chart's own order (DOM order,
+// or real x/y positions). The window is the whole sequence's span.
+const TRAIL_WINDOW = 520;
 
 // Progress-class reveals (a line drawing, a clip sweeping) are constant-rate
 // motion: a strong ease-out tail makes them sprint then crawl — the "stuck
@@ -51,9 +58,12 @@ const EASE: Record<EntranceArchetype, string> = {
   draw: EASE_EVEN,
   wipe: EASE_EVEN,
   sweep: EASE_EVEN,
+  spin: EASE_EVEN,
+  grow: EASE_EVEN,
   rise: MC_EASE_ENTER,
   reveal: MC_EASE_ENTER,
   settle: MC_EASE_ENTER,
+  trail: MC_EASE_ENTER,
   pop: MC_EASE_ENTER,
   fade: MC_EASE_ENTER,
 };
@@ -66,9 +76,15 @@ const MARKS: Record<EntranceArchetype, string> = {
   reveal: '[data-mc-ink="cell"], [data-mc-ink="unit-off"], [data-mc-cat]',
   settle: '[data-mc-ink="point"], circle[data-mc-ink="data"], circle[data-mc-ink="accent"]',
   sweep: '[data-mc-ink="fill"], rect[data-mc-ink="accent"], rect[data-mc-ink="data"]',
+  trail: '[data-mc-ink="point"], [data-mc-ink="bar"], [data-mc-ink="accent"], [data-mc-ink="data"]',
+  spin: "", // whole-svg radial unwind
+  grow: "", // whole-svg concentric growth
   pop: "",
   fade: "",
 };
+
+// Dots that ride a drawn line pop exactly as the draw front reaches them.
+const DRAW_DOTS = '[data-mc-ink="point"], circle';
 
 const STAGGER_CAP = 240;
 
@@ -113,6 +129,28 @@ if (typeof window !== "undefined") {
 
 function stagger(i: number, n: number, step: number): number {
   return i * Math.min(step, n > 1 ? STAGGER_CAP / (n - 1) : 0);
+}
+
+/**
+ * Normalized (0..1) position of each mark along the requested order — the
+ * chart's own geometry drives the sequence (a skyline rises left to right,
+ * a funnel squeezes top to bottom). Falls back to DOM order when geometry
+ * can't be read.
+ */
+function orderNorm(marks: SVGGraphicsElement[], order: "index" | "x" | "y"): number[] {
+  const n = marks.length;
+  if (order === "index" || n < 2) return marks.map((_, i) => (n > 1 ? i / (n - 1) : 0));
+  const pos = marks.map((el, i) => {
+    try {
+      const b = el.getBBox();
+      return order === "x" ? b.x + b.width / 2 : b.y + b.height / 2;
+    } catch {
+      return i;
+    }
+  });
+  const min = Math.min(...pos);
+  const span = Math.max(...pos) - min || 1;
+  return pos.map((v) => (v - min) / span);
 }
 
 /**
@@ -164,11 +202,10 @@ export function runEntrance(
     // A bare fade is not an entrance. Dense grids (a year of cells) don't get
     // 365 tracks, and a selector that matches nothing must not degrade to
     // nothing — both fall back to the O(1) clip reveal, which still MOVES.
-    // (wipe/pop/fade are whole-svg by design — an empty mark set is intended.)
-    if (
-      marks.length > 80 ||
-      (marks.length === 0 && kind !== "pop" && kind !== "fade" && kind !== "wipe")
-    ) {
+    // (whole-svg archetypes carry no mark set by design.)
+    const wholeSvg =
+      kind === "pop" || kind === "fade" || kind === "wipe" || kind === "spin" || kind === "grow";
+    if (marks.length > 80 || (marks.length === 0 && !wholeSvg)) {
       if (
         marks.length === 0 &&
         (typeof process === "undefined" || process.env.NODE_ENV !== "production")
@@ -187,13 +224,18 @@ export function runEntrance(
     // Whole-svg archetypes carry their own reveal; a parallel fade would
     // double-expose and wash the motion out.
     svg.style.opacity = "";
-    if (kind !== "wipe" && kind !== "pop") {
+    if (kind !== "wipe" && kind !== "pop" && kind !== "spin" && kind !== "grow") {
       anims.push(svg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: ease }));
     }
 
     const n = marks.length;
+    // Sequential choreography: an explicit order (or the trail archetype)
+    // spreads the marks across a window along the chart's own geometry.
+    const win = options.window ?? (kind === "trail" ? TRAIL_WINDOW : 400);
+    const norms =
+      options.order || kind === "trail" ? orderNorm(marks, options.order ?? "index") : null;
     marks.forEach((el, i) => {
-      const delay = stagger(i, n, step);
+      const delay = norms ? norms[i]! * win : stagger(i, n, step);
       const timing = { duration: dur, delay, easing: ease, fill: "backwards" as const };
       switch (kind) {
         case "draw": {
@@ -236,6 +278,7 @@ export function runEntrance(
           );
           break;
         }
+        case "trail":
         case "settle": {
           el.style.transformBox = "fill-box";
           el.style.transformOrigin = "center";
@@ -246,7 +289,7 @@ export function runEntrance(
           anims.push(
             el.animate(
               [
-                { opacity: 0, transform: "scale(0.6)" },
+                { opacity: 0, transform: kind === "trail" ? "scale(0.4)" : "scale(0.6)" },
                 { opacity: 1, transform: "scale(1)" },
               ],
               timing,
@@ -262,9 +305,41 @@ export function runEntrance(
       }
     });
 
+    // Dots that ride a drawn line pop out of it exactly as the draw front
+    // reaches them (delay follows each dot's x position).
+    const markSet = new Set<Element>(marks);
+    if (kind === "draw" && marks.length > 0) {
+      const dots = Array.from(svg.querySelectorAll<SVGGraphicsElement>(DRAW_DOTS)).filter(
+        (el) => !markSet.has(el),
+      );
+      const dotNorms = orderNorm(dots, "x");
+      dots.forEach((el, i) => {
+        markSet.add(el);
+        el.style.transformBox = "fill-box";
+        el.style.transformOrigin = "center";
+        cleanups.push(() => {
+          el.style.transformBox = "";
+          el.style.transformOrigin = "";
+        });
+        anims.push(
+          el.animate(
+            [
+              { opacity: 0, transform: "scale(0.4)" },
+              { opacity: 1, transform: "scale(1)" },
+            ],
+            {
+              duration: 180,
+              delay: dotNorms[i]! * dur * 0.92,
+              easing: MC_EASE_ENTER,
+              fill: "backwards",
+            },
+          ),
+        );
+      });
+    }
+
     // Whole-chart archetypes (and the coherent backdrop for mark archetypes).
     if (marks.length > 0) {
-      const markSet = new Set<Element>(marks);
       for (const el of svg.querySelectorAll<SVGGraphicsElement>(SUPPORT)) {
         if (markSet.has(el)) continue;
         anims.push(
@@ -278,7 +353,25 @@ export function runEntrance(
       }
     }
 
-    if (kind === "wipe") {
+    if (kind === "spin" || kind === "grow") {
+      // Radial charts unwind / concentric charts grow from their center.
+      svg.style.transformOrigin = "50% 50%";
+      cleanups.push(() => {
+        svg.style.transformOrigin = "";
+      });
+      anims.push(
+        svg.animate(
+          [
+            {
+              opacity: 0,
+              transform: kind === "spin" ? "rotate(-80deg) scale(0.35)" : "scale(0.5)",
+            },
+            { opacity: 1, transform: "none" },
+          ],
+          { duration: dur, easing: ease },
+        ),
+      );
+    } else if (kind === "wipe") {
       anims.push(
         svg.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0 0 0)" }], {
           duration: dur,

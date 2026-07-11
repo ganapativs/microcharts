@@ -45,9 +45,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   // Wedges carry either a category role or the rolled-up "other" neutral role
   // — the default "reveal" selector only matches data-mc-cat, so the neutral
   // wedge is added explicitly.
-  useEntrance(hostRef, "reveal", animate, {
-    selector: 'path[data-mc-ink="neutral"], path[data-mc-cat]',
-  });
+  useEntrance(hostRef, "spin", animate);
 
   const rolled = useMemo(
     () => rollup(data, maxWedges, strings.otherLabel),

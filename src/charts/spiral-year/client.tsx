@@ -49,9 +49,7 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "reveal", animate, {
-    selector: 'path[data-mc-ink="data"], path[data-mc-ink="bar"]',
-  });
+  useEntrance(hostRef, "spin", animate);
 
   const cadence = inferCadence(data.length, cadenceProp);
   const startIndex = useMemo(() => {

@@ -38,7 +38,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "pop", animate);
+  useEntrance(hostRef, "grow", animate);
 
   const geo = useMemo(
     () => treeRingsGeometry({ values: data, size, pad: 1, total }),

@@ -22,8 +22,6 @@ const TAU = Math.PI * 2;
 // role) — a stroke-based "draw" reveal would be invisible. Settling each
 // radial mark into place (fade + scale from its own center) suits the
 // self-contained wedge/ring glyph better.
-const POLAR_SELECTOR =
-  'path[data-mc-ink="bar"], path[data-mc-ink="accent"], path[data-mc-ink="cell"]';
 
 export interface InteractivePolarClockProps extends PolarClockProps {
   strings?: PolarClockStrings;
@@ -60,7 +58,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
   } = props;
   const n = data.length;
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "settle", animate, { selector: POLAR_SELECTOR });
+  useEntrance(hostRef, "spin", animate);
 
   const geo = useMemo(
     () => polarClockGeometry({ values: data, size, inner, start, pad: 1, mode, now }),
