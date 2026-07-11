@@ -187,12 +187,16 @@ function Shell({
           )}
         </div>
       </div>
-      <div className="grid-paper flex min-h-32 flex-col items-center justify-center gap-3 px-6 py-10">
+      <div className="grid-paper flex min-h-32 items-center justify-center px-6 py-10">
         <div key={morphKey} className="mc-morph flex w-full items-center justify-center">
           {preview}
         </div>
-        {hint && <p className="mono-label text-center text-[0.58rem] opacity-70">{hint}</p>}
       </div>
+      {hint && (
+        <p className="border-t border-hairline px-4 py-2 text-center text-[0.72rem] leading-snug text-fd-muted-foreground">
+          {hint}
+        </p>
+      )}
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-t border-hairline px-4 py-4">
         {controls}
       </div>

@@ -164,7 +164,11 @@ export function runEntrance(
     // A bare fade is not an entrance. Dense grids (a year of cells) don't get
     // 365 tracks, and a selector that matches nothing must not degrade to
     // nothing — both fall back to the O(1) clip reveal, which still MOVES.
-    if (marks.length > 80 || (marks.length === 0 && kind !== "pop" && kind !== "fade")) {
+    // (wipe/pop/fade are whole-svg by design — an empty mark set is intended.)
+    if (
+      marks.length > 80 ||
+      (marks.length === 0 && kind !== "pop" && kind !== "fade" && kind !== "wipe")
+    ) {
       if (
         marks.length === 0 &&
         (typeof process === "undefined" || process.env.NODE_ENV !== "production")

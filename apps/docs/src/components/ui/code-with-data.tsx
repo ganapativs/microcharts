@@ -25,8 +25,13 @@ export function CodeWithData({
   className?: string;
 }) {
   // Only surface the definitions this snippet actually references — a demo that
-  // inlines its own data shows no disclosure at all.
-  const used = (sampleData ?? []).filter((s) => new RegExp(`\\b${s.name}\\b`).test(code));
+  // inlines its own data (declares the variable itself) shows no disclosure at
+  // all; repeating the literal below the snippet would be pure duplication.
+  const used = (sampleData ?? []).filter(
+    (s) =>
+      new RegExp(`\\b${s.name}\\b`).test(code) &&
+      !new RegExp(`\\b(?:const|let|var)\\s+${s.name}\\b`).test(code),
+  );
   const defs = used.length ? used.map((s) => s.code).join("\n\n") : "";
   const runnable = defs ? `${defs}\n\n${code}` : code;
 
