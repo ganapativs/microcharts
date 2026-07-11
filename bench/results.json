@@ -1,0 +1,1095 @@
+{
+  "at": "2026-07-10T12:56:36.554Z",
+  "node": "v24.18.0",
+  "core": [
+    {
+      "label": "describeSeries (24 pts)",
+      "opsPerSec": 965717
+    }
+  ],
+  "charts": [
+    {
+      "slug": "sparkline",
+      "floor": 50,
+      "count": 500,
+      "ms": 6.3,
+      "msPer": 0.013,
+      "rowsPerMs": 78.8,
+      "avgBytes": 550,
+      "pass": true
+    },
+    {
+      "slug": "sparkbar",
+      "floor": 7,
+      "count": 500,
+      "ms": 37,
+      "msPer": 0.074,
+      "rowsPerMs": 13.5,
+      "avgBytes": 2700,
+      "pass": true
+    },
+    {
+      "slug": "delta",
+      "floor": 50,
+      "count": 500,
+      "ms": 4.3,
+      "msPer": 0.009,
+      "rowsPerMs": 116.4,
+      "avgBytes": 276,
+      "pass": true
+    },
+    {
+      "slug": "bullet",
+      "floor": 20,
+      "count": 500,
+      "ms": 8.5,
+      "msPer": 0.017,
+      "rowsPerMs": 58.5,
+      "avgBytes": 670,
+      "pass": true
+    },
+    {
+      "slug": "activity-grid",
+      "floor": 5,
+      "count": 500,
+      "ms": 58.5,
+      "msPer": 0.117,
+      "rowsPerMs": 8.5,
+      "avgBytes": 4514,
+      "pass": true
+    },
+    {
+      "slug": "trend-arrow",
+      "floor": 50,
+      "count": 500,
+      "ms": 5,
+      "msPer": 0.01,
+      "rowsPerMs": 99.4,
+      "avgBytes": 319,
+      "pass": true
+    },
+    {
+      "slug": "status-dot",
+      "floor": 50,
+      "count": 500,
+      "ms": 3.7,
+      "msPer": 0.007,
+      "rowsPerMs": 135.2,
+      "avgBytes": 264,
+      "pass": true
+    },
+    {
+      "slug": "heat-cell",
+      "floor": 50,
+      "count": 500,
+      "ms": 3.8,
+      "msPer": 0.008,
+      "rowsPerMs": 131.4,
+      "avgBytes": 261,
+      "pass": true
+    },
+    {
+      "slug": "progress",
+      "floor": 40,
+      "count": 500,
+      "ms": 6.2,
+      "msPer": 0.012,
+      "rowsPerMs": 80,
+      "avgBytes": 442,
+      "pass": true
+    },
+    {
+      "slug": "rug-strip",
+      "floor": 15,
+      "count": 500,
+      "ms": 8.4,
+      "msPer": 0.017,
+      "rowsPerMs": 59.3,
+      "avgBytes": 599,
+      "pass": true
+    },
+    {
+      "slug": "mini-bar",
+      "floor": 25,
+      "count": 500,
+      "ms": 11.9,
+      "msPer": 0.024,
+      "rowsPerMs": 42.1,
+      "avgBytes": 735,
+      "pass": true
+    },
+    {
+      "slug": "pictogram-row",
+      "floor": 30,
+      "count": 500,
+      "ms": 16.6,
+      "msPer": 0.033,
+      "rowsPerMs": 30.2,
+      "avgBytes": 876,
+      "pass": true
+    },
+    {
+      "slug": "seismogram",
+      "floor": 25,
+      "count": 500,
+      "ms": 4.4,
+      "msPer": 0.009,
+      "rowsPerMs": 112.8,
+      "avgBytes": 274,
+      "pass": true
+    },
+    {
+      "slug": "heat-strip",
+      "floor": 8,
+      "count": 500,
+      "ms": 50.5,
+      "msPer": 0.101,
+      "rowsPerMs": 9.9,
+      "avgBytes": 4165,
+      "pass": true
+    },
+    {
+      "slug": "dot-plot",
+      "floor": 20,
+      "count": 500,
+      "ms": 18,
+      "msPer": 0.036,
+      "rowsPerMs": 27.7,
+      "avgBytes": 1026,
+      "pass": true
+    },
+    {
+      "slug": "dumbbell",
+      "floor": 20,
+      "count": 500,
+      "ms": 22.7,
+      "msPer": 0.045,
+      "rowsPerMs": 22,
+      "avgBytes": 1701,
+      "pass": true
+    },
+    {
+      "slug": "paired-bars",
+      "floor": 25,
+      "count": 500,
+      "ms": 16.4,
+      "msPer": 0.033,
+      "rowsPerMs": 30.6,
+      "avgBytes": 1092,
+      "pass": true
+    },
+    {
+      "slug": "slope",
+      "floor": 20,
+      "count": 500,
+      "ms": 20.8,
+      "msPer": 0.042,
+      "rowsPerMs": 24,
+      "avgBytes": 1723,
+      "pass": true
+    },
+    {
+      "slug": "segmented-bar",
+      "floor": 25,
+      "count": 500,
+      "ms": 12.8,
+      "msPer": 0.026,
+      "rowsPerMs": 39,
+      "avgBytes": 662,
+      "pass": true
+    },
+    {
+      "slug": "histogram-strip",
+      "floor": 15,
+      "count": 500,
+      "ms": 14,
+      "msPer": 0.028,
+      "rowsPerMs": 35.6,
+      "avgBytes": 877,
+      "pass": true
+    },
+    {
+      "slug": "micro-box",
+      "floor": 20,
+      "count": 500,
+      "ms": 7.3,
+      "msPer": 0.015,
+      "rowsPerMs": 69,
+      "avgBytes": 533,
+      "pass": true
+    },
+    {
+      "slug": "progress-ring",
+      "floor": 40,
+      "count": 500,
+      "ms": 5,
+      "msPer": 0.01,
+      "rowsPerMs": 99.7,
+      "avgBytes": 391,
+      "pass": true
+    },
+    {
+      "slug": "micro-donut",
+      "floor": 30,
+      "count": 500,
+      "ms": 9.3,
+      "msPer": 0.019,
+      "rowsPerMs": 53.9,
+      "avgBytes": 578,
+      "pass": true
+    },
+    {
+      "slug": "funnel",
+      "floor": 25,
+      "count": 500,
+      "ms": 16,
+      "msPer": 0.032,
+      "rowsPerMs": 31.3,
+      "avgBytes": 799,
+      "pass": true
+    },
+    {
+      "slug": "likert-strip",
+      "floor": 25,
+      "count": 500,
+      "ms": 17.3,
+      "msPer": 0.035,
+      "rowsPerMs": 28.9,
+      "avgBytes": 1123,
+      "pass": true
+    },
+    {
+      "slug": "micro-scatter",
+      "floor": 5,
+      "count": 500,
+      "ms": 55,
+      "msPer": 0.11,
+      "rowsPerMs": 9.1,
+      "avgBytes": 3519,
+      "pass": true
+    },
+    {
+      "slug": "waterfall",
+      "floor": 10,
+      "count": 500,
+      "ms": 24.2,
+      "msPer": 0.048,
+      "rowsPerMs": 20.6,
+      "avgBytes": 1800,
+      "pass": true
+    },
+    {
+      "slug": "bump-strip",
+      "floor": 9,
+      "count": 500,
+      "ms": 39.9,
+      "msPer": 0.08,
+      "rowsPerMs": 12.5,
+      "avgBytes": 1973,
+      "pass": true
+    },
+    {
+      "slug": "dual-sparkline",
+      "floor": 30,
+      "count": 500,
+      "ms": 9.6,
+      "msPer": 0.019,
+      "rowsPerMs": 52,
+      "avgBytes": 957,
+      "pass": true
+    },
+    {
+      "slug": "stacked-area",
+      "floor": 15,
+      "count": 500,
+      "ms": 28.3,
+      "msPer": 0.057,
+      "rowsPerMs": 17.7,
+      "avgBytes": 3205,
+      "pass": true
+    },
+    {
+      "slug": "ohlc",
+      "floor": 6,
+      "count": 500,
+      "ms": 71.7,
+      "msPer": 0.143,
+      "rowsPerMs": 7,
+      "avgBytes": 6591,
+      "pass": true
+    },
+    {
+      "slug": "horizon",
+      "floor": 20,
+      "count": 500,
+      "ms": 9.1,
+      "msPer": 0.018,
+      "rowsPerMs": 54.8,
+      "avgBytes": 721,
+      "pass": true
+    },
+    {
+      "slug": "calendar-strip",
+      "floor": 5,
+      "count": 500,
+      "ms": 53.4,
+      "msPer": 0.107,
+      "rowsPerMs": 9.4,
+      "avgBytes": 3707,
+      "pass": true
+    },
+    {
+      "slug": "event-timeline",
+      "floor": 15,
+      "count": 500,
+      "ms": 16.8,
+      "msPer": 0.034,
+      "rowsPerMs": 29.7,
+      "avgBytes": 1122,
+      "pass": true
+    },
+    {
+      "slug": "coverage-strip",
+      "floor": 6,
+      "count": 500,
+      "ms": 66.8,
+      "msPer": 0.134,
+      "rowsPerMs": 7.5,
+      "avgBytes": 4927,
+      "pass": true
+    },
+    {
+      "slug": "benchmark-strip",
+      "floor": 30,
+      "count": 500,
+      "ms": 9.9,
+      "msPer": 0.02,
+      "rowsPerMs": 50.7,
+      "avgBytes": 732,
+      "pass": true
+    },
+    {
+      "slug": "percentile-ladder",
+      "floor": 25,
+      "count": 500,
+      "ms": 14,
+      "msPer": 0.028,
+      "rowsPerMs": 35.8,
+      "avgBytes": 911,
+      "pass": true
+    },
+    {
+      "slug": "graded-band",
+      "floor": 25,
+      "count": 500,
+      "ms": 12.9,
+      "msPer": 0.026,
+      "rowsPerMs": 38.6,
+      "avgBytes": 653,
+      "pass": true
+    },
+    {
+      "slug": "icon-array",
+      "floor": 7,
+      "count": 500,
+      "ms": 32.6,
+      "msPer": 0.065,
+      "rowsPerMs": 15.4,
+      "avgBytes": 2372,
+      "pass": true
+    },
+    {
+      "slug": "rate-volume",
+      "floor": 3,
+      "count": 500,
+      "ms": 73.1,
+      "msPer": 0.146,
+      "rowsPerMs": 6.8,
+      "avgBytes": 5565,
+      "pass": true
+    },
+    {
+      "slug": "net-flow",
+      "floor": 8,
+      "count": 500,
+      "ms": 29.7,
+      "msPer": 0.059,
+      "rowsPerMs": 16.9,
+      "avgBytes": 2139,
+      "pass": true
+    },
+    {
+      "slug": "retention-curve",
+      "floor": 12,
+      "count": 500,
+      "ms": 13.2,
+      "msPer": 0.026,
+      "rowsPerMs": 37.9,
+      "avgBytes": 1013,
+      "pass": true
+    },
+    {
+      "slug": "burn-chart",
+      "floor": 10,
+      "count": 500,
+      "ms": 20.2,
+      "msPer": 0.04,
+      "rowsPerMs": 24.8,
+      "avgBytes": 1638,
+      "pass": true
+    },
+    {
+      "slug": "error-budget",
+      "floor": 12,
+      "count": 500,
+      "ms": 17.1,
+      "msPer": 0.034,
+      "rowsPerMs": 29.3,
+      "avgBytes": 1464,
+      "pass": true
+    },
+    {
+      "slug": "control-strip",
+      "floor": 12,
+      "count": 500,
+      "ms": 10,
+      "msPer": 0.02,
+      "rowsPerMs": 50.2,
+      "avgBytes": 897,
+      "pass": true
+    },
+    {
+      "slug": "pareto-strip",
+      "floor": 20,
+      "count": 500,
+      "ms": 17.5,
+      "msPer": 0.035,
+      "rowsPerMs": 28.6,
+      "avgBytes": 1435,
+      "pass": true
+    },
+    {
+      "slug": "data-diff",
+      "floor": 20,
+      "count": 500,
+      "ms": 22.2,
+      "msPer": 0.044,
+      "rowsPerMs": 22.5,
+      "avgBytes": 1624,
+      "pass": true
+    },
+    {
+      "slug": "ensemble-ghosts",
+      "floor": 12,
+      "count": 500,
+      "ms": 42.8,
+      "msPer": 0.086,
+      "rowsPerMs": 11.7,
+      "avgBytes": 2987,
+      "pass": false
+    },
+    {
+      "slug": "change-point",
+      "floor": 12,
+      "count": 500,
+      "ms": 20.5,
+      "msPer": 0.041,
+      "rowsPerMs": 24.4,
+      "avgBytes": 1861,
+      "pass": true
+    },
+    {
+      "slug": "cycle-plot",
+      "floor": 17,
+      "count": 500,
+      "ms": 25.8,
+      "msPer": 0.052,
+      "rowsPerMs": 19.4,
+      "avgBytes": 2263,
+      "pass": true
+    },
+    {
+      "slug": "quadrant-dot",
+      "floor": 15,
+      "count": 500,
+      "ms": 26.3,
+      "msPer": 0.053,
+      "rowsPerMs": 19,
+      "avgBytes": 2078,
+      "pass": true
+    },
+    {
+      "slug": "shift-histogram",
+      "floor": 6,
+      "count": 500,
+      "ms": 42.5,
+      "msPer": 0.085,
+      "rowsPerMs": 11.8,
+      "avgBytes": 3025,
+      "pass": true
+    },
+    {
+      "slug": "ab-strips",
+      "floor": 15,
+      "count": 500,
+      "ms": 26.6,
+      "msPer": 0.053,
+      "rowsPerMs": 18.8,
+      "avgBytes": 1363,
+      "pass": true
+    },
+    {
+      "slug": "quantile-dots",
+      "floor": 6,
+      "count": 500,
+      "ms": 41,
+      "msPer": 0.082,
+      "rowsPerMs": 12.2,
+      "avgBytes": 2535,
+      "pass": true
+    },
+    {
+      "slug": "forecast-cone",
+      "floor": 10,
+      "count": 500,
+      "ms": 22.9,
+      "msPer": 0.046,
+      "rowsPerMs": 21.8,
+      "avgBytes": 1795,
+      "pass": true
+    },
+    {
+      "slug": "tally-marks",
+      "floor": 40,
+      "count": 500,
+      "ms": 3.7,
+      "msPer": 0.007,
+      "rowsPerMs": 135.8,
+      "avgBytes": 373,
+      "pass": true
+    },
+    {
+      "slug": "dice-pips",
+      "floor": 40,
+      "count": 500,
+      "ms": 7.6,
+      "msPer": 0.015,
+      "rowsPerMs": 65.5,
+      "avgBytes": 481,
+      "pass": true
+    },
+    {
+      "slug": "fill-word",
+      "floor": 40,
+      "count": 500,
+      "ms": 5.3,
+      "msPer": 0.011,
+      "rowsPerMs": 94,
+      "avgBytes": 467,
+      "pass": true
+    },
+    {
+      "slug": "fat-digits",
+      "floor": 40,
+      "count": 500,
+      "ms": 4.6,
+      "msPer": 0.009,
+      "rowsPerMs": 109,
+      "avgBytes": 293,
+      "pass": true
+    },
+    {
+      "slug": "thermometer",
+      "floor": 30,
+      "count": 500,
+      "ms": 9.1,
+      "msPer": 0.018,
+      "rowsPerMs": 54.9,
+      "avgBytes": 862,
+      "pass": true
+    },
+    {
+      "slug": "moon-phase",
+      "floor": 40,
+      "count": 500,
+      "ms": 4.6,
+      "msPer": 0.009,
+      "rowsPerMs": 107.6,
+      "avgBytes": 371,
+      "pass": true
+    },
+    {
+      "slug": "hourglass",
+      "floor": 40,
+      "count": 500,
+      "ms": 9.1,
+      "msPer": 0.018,
+      "rowsPerMs": 55,
+      "avgBytes": 900,
+      "pass": true
+    },
+    {
+      "slug": "balance-beam",
+      "floor": 40,
+      "count": 500,
+      "ms": 6.9,
+      "msPer": 0.014,
+      "rowsPerMs": 72.3,
+      "avgBytes": 479,
+      "pass": true
+    },
+    {
+      "slug": "sprout-row",
+      "floor": 20,
+      "count": 500,
+      "ms": 15.8,
+      "msPer": 0.032,
+      "rowsPerMs": 31.7,
+      "avgBytes": 1376,
+      "pass": true
+    },
+    {
+      "slug": "garden-grid",
+      "floor": 6,
+      "count": 500,
+      "ms": 49,
+      "msPer": 0.098,
+      "rowsPerMs": 10.2,
+      "avgBytes": 2458,
+      "pass": true
+    },
+    {
+      "slug": "bubble-row",
+      "floor": 15,
+      "count": 500,
+      "ms": 24.3,
+      "msPer": 0.049,
+      "rowsPerMs": 20.6,
+      "avgBytes": 1495,
+      "pass": true
+    },
+    {
+      "slug": "music-staff",
+      "floor": 15,
+      "count": 500,
+      "ms": 22.7,
+      "msPer": 0.045,
+      "rowsPerMs": 22.1,
+      "avgBytes": 1697,
+      "pass": true
+    },
+    {
+      "slug": "tree-rings",
+      "floor": 10,
+      "count": 500,
+      "ms": 12.4,
+      "msPer": 0.025,
+      "rowsPerMs": 40.3,
+      "avgBytes": 2576,
+      "pass": true
+    },
+    {
+      "slug": "city-skyline",
+      "floor": 10,
+      "count": 500,
+      "ms": 16.3,
+      "msPer": 0.033,
+      "rowsPerMs": 30.7,
+      "avgBytes": 1333,
+      "pass": true
+    },
+    {
+      "slug": "honeycomb",
+      "floor": 40,
+      "count": 500,
+      "ms": 11.1,
+      "msPer": 0.022,
+      "rowsPerMs": 45,
+      "avgBytes": 2804,
+      "pass": true
+    },
+    {
+      "slug": "constellation",
+      "floor": 20,
+      "count": 500,
+      "ms": 20,
+      "msPer": 0.04,
+      "rowsPerMs": 25,
+      "avgBytes": 1124,
+      "pass": true
+    },
+    {
+      "slug": "polar-clock",
+      "floor": 8,
+      "count": 500,
+      "ms": 19,
+      "msPer": 0.038,
+      "rowsPerMs": 26.3,
+      "avgBytes": 2520,
+      "pass": true
+    },
+    {
+      "slug": "spiral-year",
+      "floor": 6,
+      "count": 500,
+      "ms": 21.1,
+      "msPer": 0.042,
+      "rowsPerMs": 23.7,
+      "avgBytes": 3786,
+      "pass": true
+    },
+    {
+      "slug": "breathing-dot",
+      "floor": 95,
+      "count": 500,
+      "ms": 4.6,
+      "msPer": 0.009,
+      "rowsPerMs": 108,
+      "avgBytes": 369,
+      "pass": true
+    },
+    {
+      "slug": "heartbeat-blip",
+      "floor": 40,
+      "count": 500,
+      "ms": 8,
+      "msPer": 0.016,
+      "rowsPerMs": 62.7,
+      "avgBytes": 1163,
+      "pass": true
+    },
+    {
+      "slug": "comet-trail",
+      "floor": 12,
+      "count": 500,
+      "ms": 20.4,
+      "msPer": 0.041,
+      "rowsPerMs": 24.5,
+      "avgBytes": 1403,
+      "pass": true
+    },
+    {
+      "slug": "orbit-status",
+      "floor": 80,
+      "count": 500,
+      "ms": 5.3,
+      "msPer": 0.011,
+      "rowsPerMs": 94.3,
+      "avgBytes": 454,
+      "pass": true
+    },
+    {
+      "slug": "time-in-range",
+      "floor": 30,
+      "count": 500,
+      "ms": 13.4,
+      "msPer": 0.027,
+      "rowsPerMs": 37.4,
+      "avgBytes": 947,
+      "pass": true
+    },
+    {
+      "slug": "hypnogram",
+      "floor": 20,
+      "count": 500,
+      "ms": 24.1,
+      "msPer": 0.048,
+      "rowsPerMs": 20.8,
+      "avgBytes": 1939,
+      "pass": true
+    },
+    {
+      "slug": "eta-bar",
+      "floor": 60,
+      "count": 500,
+      "ms": 6.3,
+      "msPer": 0.013,
+      "rowsPerMs": 79.5,
+      "avgBytes": 474,
+      "pass": true
+    },
+    {
+      "slug": "waveform",
+      "floor": 6,
+      "count": 500,
+      "ms": 63.8,
+      "msPer": 0.128,
+      "rowsPerMs": 7.8,
+      "avgBytes": 2104,
+      "pass": true
+    },
+    {
+      "slug": "event-raster",
+      "floor": 12,
+      "count": 500,
+      "ms": 34.4,
+      "msPer": 0.069,
+      "rowsPerMs": 14.6,
+      "avgBytes": 3528,
+      "pass": true
+    },
+    {
+      "slug": "rubric-strip",
+      "floor": 15,
+      "count": 500,
+      "ms": 26.4,
+      "msPer": 0.053,
+      "rowsPerMs": 18.9,
+      "avgBytes": 1868,
+      "pass": true
+    },
+    {
+      "slug": "token-confidence",
+      "floor": 8,
+      "count": 500,
+      "ms": 46.8,
+      "msPer": 0.094,
+      "rowsPerMs": 10.7,
+      "avgBytes": 1982,
+      "pass": true
+    },
+    {
+      "slug": "wind-barb",
+      "floor": 65,
+      "count": 500,
+      "ms": 7,
+      "msPer": 0.014,
+      "rowsPerMs": 71.2,
+      "avgBytes": 518,
+      "pass": true
+    },
+    {
+      "slug": "star-spoke",
+      "floor": 26,
+      "count": 500,
+      "ms": 15.8,
+      "msPer": 0.032,
+      "rowsPerMs": 31.6,
+      "avgBytes": 1286,
+      "pass": true
+    },
+    {
+      "slug": "minimap-strip",
+      "floor": 8,
+      "count": 500,
+      "ms": 46.2,
+      "msPer": 0.092,
+      "rowsPerMs": 10.8,
+      "avgBytes": 2229,
+      "pass": true
+    },
+    {
+      "slug": "dual-window-meter",
+      "floor": 17,
+      "count": 500,
+      "ms": 23.5,
+      "msPer": 0.047,
+      "rowsPerMs": 21.3,
+      "avgBytes": 1863,
+      "pass": true
+    },
+    {
+      "slug": "depth-wedge",
+      "floor": 40,
+      "count": 500,
+      "ms": 10.3,
+      "msPer": 0.021,
+      "rowsPerMs": 48.7,
+      "avgBytes": 980,
+      "pass": true
+    },
+    {
+      "slug": "partition-strip",
+      "floor": 13,
+      "count": 500,
+      "ms": 35.7,
+      "msPer": 0.071,
+      "rowsPerMs": 14,
+      "avgBytes": 2021,
+      "pass": true
+    },
+    {
+      "slug": "calibration-strip",
+      "floor": 8,
+      "count": 500,
+      "ms": 54.9,
+      "msPer": 0.11,
+      "rowsPerMs": 9.1,
+      "avgBytes": 2227,
+      "pass": true
+    },
+    {
+      "slug": "confusion-grid",
+      "floor": 13,
+      "count": 500,
+      "ms": 29.7,
+      "msPer": 0.059,
+      "rowsPerMs": 16.8,
+      "avgBytes": 2707,
+      "pass": true
+    },
+    {
+      "slug": "folded-day-band",
+      "floor": 6,
+      "count": 500,
+      "ms": 28.3,
+      "msPer": 0.057,
+      "rowsPerMs": 17.7,
+      "avgBytes": 1773,
+      "pass": true
+    },
+    {
+      "slug": "volume-profile",
+      "floor": 20,
+      "count": 500,
+      "ms": 16.4,
+      "msPer": 0.033,
+      "rowsPerMs": 30.6,
+      "avgBytes": 736,
+      "pass": true
+    },
+    {
+      "slug": "phase-trace",
+      "floor": 28,
+      "count": 500,
+      "ms": 13.8,
+      "msPer": 0.028,
+      "rowsPerMs": 36.3,
+      "avgBytes": 1332,
+      "pass": true
+    },
+    {
+      "slug": "trace-fold",
+      "floor": 7,
+      "count": 500,
+      "ms": 61.1,
+      "msPer": 0.122,
+      "rowsPerMs": 8.2,
+      "avgBytes": 3678,
+      "pass": true
+    },
+    {
+      "slug": "tape-gauge",
+      "floor": 20,
+      "count": 500,
+      "ms": 15.2,
+      "msPer": 0.03,
+      "rowsPerMs": 32.8,
+      "avgBytes": 1093,
+      "pass": true
+    },
+    {
+      "slug": "station-glyph",
+      "floor": 20,
+      "count": 500,
+      "ms": 12.6,
+      "msPer": 0.025,
+      "rowsPerMs": 39.6,
+      "avgBytes": 1038,
+      "pass": true
+    },
+    {
+      "slug": "cohort-triangle",
+      "floor": 3,
+      "count": 500,
+      "ms": 119.4,
+      "msPer": 0.239,
+      "rowsPerMs": 4.2,
+      "avgBytes": 9737,
+      "pass": true
+    },
+    {
+      "slug": "streak-spark",
+      "floor": 15,
+      "count": 500,
+      "ms": 24.7,
+      "msPer": 0.049,
+      "rowsPerMs": 20.3,
+      "avgBytes": 1913,
+      "pass": true
+    },
+    {
+      "slug": "grade-profile",
+      "floor": 11,
+      "count": 500,
+      "ms": 33.5,
+      "msPer": 0.067,
+      "rowsPerMs": 14.9,
+      "avgBytes": 2552,
+      "pass": true
+    },
+    {
+      "slug": "win-prob-worm",
+      "floor": 25,
+      "count": 500,
+      "ms": 35.5,
+      "msPer": 0.071,
+      "rowsPerMs": 14.1,
+      "avgBytes": 1264,
+      "pass": false
+    },
+    {
+      "slug": "queue-depth",
+      "floor": 30,
+      "count": 500,
+      "ms": 13.1,
+      "msPer": 0.026,
+      "rowsPerMs": 38.1,
+      "avgBytes": 2008,
+      "pass": true
+    },
+    {
+      "slug": "spread-band",
+      "floor": 18,
+      "count": 500,
+      "ms": 21.9,
+      "msPer": 0.044,
+      "rowsPerMs": 22.8,
+      "avgBytes": 2677,
+      "pass": true
+    },
+    {
+      "slug": "bias-strip",
+      "floor": 6,
+      "count": 500,
+      "ms": 59.7,
+      "msPer": 0.119,
+      "rowsPerMs": 8.4,
+      "avgBytes": 3876,
+      "pass": true
+    },
+    {
+      "slug": "percentile-trace",
+      "floor": 33,
+      "count": 500,
+      "ms": 11.6,
+      "msPer": 0.023,
+      "rowsPerMs": 43.1,
+      "avgBytes": 1061,
+      "pass": true
+    }
+  ],
+  "scenarios": [
+    {
+      "count": 100,
+      "ms": 1.1,
+      "msPer": 0.011,
+      "rowsPerMs": 90.8,
+      "avgBytes": 550
+    },
+    {
+      "count": 500,
+      "ms": 5.7,
+      "msPer": 0.011,
+      "rowsPerMs": 88.4,
+      "avgBytes": 550
+    },
+    {
+      "count": 1000,
+      "ms": 12,
+      "msPer": 0.012,
+      "rowsPerMs": 83.6,
+      "avgBytes": 550
+    }
+  ]
+}
