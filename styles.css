@@ -175,10 +175,13 @@
     display: inline-flex;
     vertical-align: middle;
   }
+  /* @mc-chart progress */
   /* interactive Progress: the fill glides to its new width (gated below) */
   :where(.mc-progress-live .mc-progress-fill) {
     transition: width var(--mc-duration) var(--mc-easing);
   }
+  /* @mc-chart-end */
+  /* @mc-chart eta-bar */
   /* interactive EtaBar: the elapsed/remainder split eases as the rate updates
      (SVG geometry props; jumps where unsupported). Inside .mc-root → the
      reduced-motion block below gates it. Never animate ahead of received data. */
@@ -187,16 +190,22 @@
       x var(--mc-duration) var(--mc-easing),
       width var(--mc-duration) var(--mc-easing);
   }
+  /* @mc-chart-end */
+  /* @mc-chart fill-word */
   /* interactive FillWord: the ink edge glides along the word (the accent copy
      is inside .mc-root, so the reduced-motion block below already gates it) */
   :where(.mc-fillword-live text[data-mc-ink="accent"]) {
     transition: clip-path var(--mc-duration) var(--mc-easing);
   }
+  /* @mc-chart-end */
+  /* @mc-chart fat-digits */
   /* interactive FatDigits: the weight eases on variable fonts (snaps otherwise);
      tspans are inside .mc-root, so reduced-motion gates it below */
   :where(.mc-fat-live tspan) {
     transition: font-weight var(--mc-duration) var(--mc-easing);
   }
+  /* @mc-chart-end */
+  /* @mc-chart thermometer */
   /* interactive Thermometer: the fill glides to its new level (SVG geometry
      properties; jumps where unsupported). Inside .mc-root → reduced-motion-gated */
   :where(.mc-thermo-live rect) {
@@ -205,6 +214,8 @@
       height var(--mc-duration) var(--mc-easing),
       width var(--mc-duration) var(--mc-easing);
   }
+  /* @mc-chart-end */
+  /* @mc-chart balance-beam */
   /* interactive BalanceBeam: the beam + weights ease to the new tilt (SVG
      geometry props; jump where unsupported). Inside .mc-root → reduced-motion-gated */
   :where(.mc-beam-live :is(line, rect, circle)) {
@@ -218,6 +229,7 @@
       cx var(--mc-duration) var(--mc-easing),
       cy var(--mc-duration) var(--mc-easing);
   }
+  /* @mc-chart-end */
 }
 
 @layer microcharts.charts {
@@ -411,13 +423,16 @@
     fill: var(--mc-surface, Canvas);
   }
 
+  /* @mc-chart sparkline */
   /* Interactive sparkline crosshair — a dashed guide reads as "measuring" the
      focused point rather than just crossing it. Scoped to the interactive
      wrapper (styled here so the client entry stays under its size budget). */
   :where(.mc-spark-interactive [data-mc-ink="muted"]) {
     stroke-dasharray: 1.5 2;
   }
+  /* @mc-chart-end */
 
+  /* @mc-chart token-confidence */
   /* TokenConfidence (plan/25 §7) — the text IS the chart. Three discrete tiers
      as typographic underlines: tier = color AND thickness AND stroke style, so
      it is never color-alone. Confident tokens get NO mark (reading stays
@@ -457,6 +472,7 @@
     outline: 2px solid var(--mc-accent);
     outline-offset: 1px;
   }
+  /* @mc-chart-end */
 
   /* Interactive readout — the value revealed on hover/focus. A small chip on an
      opaque surface so the figure stays legible over any mark or content it

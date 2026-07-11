@@ -893,14 +893,16 @@
       "types": "./dist/shared/motion-engine.d.ts",
       "import": "./dist/shared/motion-engine.js"
     },
-    "./styles.css": "./styles.css"
+    "./styles.css": "./styles.css",
+    "./styles/core.css": "./dist/styles/core.css",
+    "./styles/*.css": "./dist/styles/*.css"
   },
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "tsdown && node scripts/gen-style-splits.mjs",
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",

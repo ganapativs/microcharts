@@ -31,7 +31,13 @@ const entries = [
 
 const seen = new Set();
 for (const [subpath, value] of Object.entries(pkg.exports)) {
-  if (subpath === "." || subpath === "./package.json" || subpath === "./styles.css") continue;
+  if (
+    subpath === "." ||
+    subpath === "./package.json" ||
+    subpath === "./styles.css" ||
+    subpath.startsWith("./styles/")
+  )
+    continue;
   const slug = subpath.replace(/^\.\//, "").replace(/\/interactive$/, "");
   const kind = subpath.endsWith("/interactive") ? "interactive" : "static";
   const budget = budgets.charts[slug]?.[kind];
