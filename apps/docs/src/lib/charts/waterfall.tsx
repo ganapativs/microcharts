@@ -1,4 +1,5 @@
 import { Waterfall } from "@microcharts/react/waterfall";
+import { Waterfall as WaterfallInteractive } from "@microcharts/react/waterfall/interactive";
 import { InteractiveDemo } from "./waterfall.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -140,6 +141,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <WaterfallInteractive
+      data={PL}
+      start={s.start as number}
+      total={s.total as boolean}
+      label={s.delta ? "delta" : "none"}
+      positive={s.positive as "up" | "down"}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={32}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Waterfall",
+      "  data={steps}",
+      `  start={${s.start}}`,
+      s.total === false && "  total={false}",
+      s.delta && '  label="delta"',
+      s.positive !== "up" && `  positive="${s.positive}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow through the steps — each announces its delta and the running level.",
 };
 
 export const recipes: Recipe[] = [

@@ -3,9 +3,10 @@
 // (pointer x → bin). ←/→ step bins, M jumps to the two median bins. The live
 // region states each bin's before/after proportions. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { shiftHistogramGeometry } from "./geometry.js";
 import {
   ShiftHistogram as StaticShiftHistogram,
@@ -15,6 +16,12 @@ import {
 
 export interface InteractiveShiftHistogramProps extends ShiftHistogramProps {
   strings?: ShiftStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the shared bins reveal
+   * left-to-right when the chart first mounts client-side. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const pct = (share: number): string => `${Math.round(share * 100)}%`;
@@ -32,8 +39,15 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
     strings = EN_SHIFT,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Bins mirror both up (before) and down (after) from a shared center axis —
+  // a per-bar scaleY "rise" would point the wrong way for one side, so treat
+  // this as an x-ordered bin sequence and reveal it left-to-right instead.
+  useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(
     () =>
@@ -132,6 +146,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
 
   return (
     <span
+      ref={hostRef}
       className="mc-shift-histogram-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

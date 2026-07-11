@@ -1,4 +1,5 @@
 import { ShiftHistogram } from "@microcharts/react/shift-histogram";
+import { ShiftHistogram as ShiftHistogramInteractive } from "@microcharts/react/shift-histogram/interactive";
 import { InteractiveDemo } from "./shift-histogram.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -128,6 +129,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ShiftHistogramInteractive
+      data={{ before: BEFORE, after: AFTER }}
+      format={MS}
+      mode={s.mode as "mirror" | "overlay"}
+      bins={s.bins === "auto" ? undefined : Number(s.bins)}
+      label={s.label as "shift" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ShiftHistogram",
+      "  data={{ before, after }}",
+      s.mode !== "mirror" && `  mode="${s.mode}"`,
+      s.bins !== "auto" && `  bins={${s.bins}}`,
+      s.label !== "shift" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the bins — each announces the before/after proportions; M jumps to the median bins.",
 };
 
 export const recipes: Recipe[] = [

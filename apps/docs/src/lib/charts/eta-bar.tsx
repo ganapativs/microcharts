@@ -1,4 +1,5 @@
 import { EtaBar } from "@microcharts/react/eta-bar";
+import { EtaBar as EtaBarInteractive } from "@microcharts/react/eta-bar/interactive";
 import { InteractiveDemo } from "./eta-bar.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -108,6 +109,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <EtaBarInteractive
+      progress={(s.progress as number) / 100}
+      elapsed={3.6}
+      rate={(s.rate as number) / 100}
+      label={s.label as "eta" | "percent" | "none"}
+      formatEta={min}
+      animate={ui.animate}
+      summary={false}
+      width={300}
+      height={16}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<EtaBar",
+      `  progress={${((s.progress as number) / 100).toFixed(2)}}`,
+      "  elapsed={3.6}",
+      `  rate={${((s.rate as number) / 100).toFixed(2)}}`,
+      s.label !== "eta" && `  label="${s.label}"`,
+      "  formatEta={(t) => `${Math.round(t)} min`}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "A live transfer — when the rate dips, the remainder honestly grows. Focus reads the forecast.",
 };
 
 export const recipes: Recipe[] = [

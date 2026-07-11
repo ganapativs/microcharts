@@ -2,10 +2,11 @@
 // Interactive <PairedBars> (plan/22 #12). One pointer listener; pair by
 // category-band lookup. ←/→ rove pairs ("East: 940 vs 1,200."). Composes the
 // static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { isFiniteValue } from "../../core/types.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { pairedBarsGeometry } from "./geometry.js";
 import {
   PairedBars as StaticPairedBars,
@@ -13,8 +14,20 @@ import {
   type PairedBarsProps,
 } from "./index.js";
 
+// Only the value bars (bar/positive/negative) animate — the muted "neutral"
+// ref ghost stays static, arriving with the base whole-chart fade instead.
+const VALUE_SELECTOR =
+  'rect[data-mc-ink="bar"], rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]';
+
 export interface InteractivePairedBarsProps extends PairedBarsProps {
   strings?: PairedStrings;
+  /**
+   * Opt-in entrance motion (default `false`): value bars rise from the
+   * baseline (vertical) or sweep in from the left (horizontal) when the chart
+   * first mounts client-side. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
@@ -30,8 +43,14 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
     strings = EN_PAIRED,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, orientation === "horizontal" ? "sweep" : "rise", animate, {
+    selector: VALUE_SELECTOR,
+  });
 
   const geo = useMemo(
     () =>
@@ -118,6 +137,7 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-paired-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

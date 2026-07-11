@@ -1,4 +1,5 @@
 import { VolumeProfile } from "@microcharts/react/volume-profile";
+import { VolumeProfile as VolumeProfileInteractive } from "@microcharts/react/volume-profile/interactive";
 import { InteractiveDemo } from "./volume-profile.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -117,6 +118,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <VolumeProfileInteractive
+      data={PROFILE}
+      align={s.align as "left" | "right"}
+      label={s.label as "poc" | "none"}
+      valueArea={(s.valueArea as number) / 100}
+      animate={ui.animate}
+      summary={false}
+      width={120}
+      height={80}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<VolumeProfile",
+      "  data={profile}",
+      s.align !== "left" && `  align="${s.align}"`,
+      s.label !== "poc" && `  label="${s.label}"`,
+      s.valueArea !== 70 && `  valueArea={${((s.valueArea as number) / 100).toFixed(2)}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use ↑/↓ across the levels — each announces its share of total activity, and the POC is flagged.",
 };
 
 export const recipes: Recipe[] = [

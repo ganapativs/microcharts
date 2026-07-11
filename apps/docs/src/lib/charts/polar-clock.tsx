@@ -1,4 +1,5 @@
 import { PolarClock } from "@microcharts/react/polar-clock";
+import { PolarClock as PolarClockInteractive } from "@microcharts/react/polar-clock/interactive";
 import { InteractiveDemo } from "./polar-clock.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -120,6 +121,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PolarClockInteractive
+      data={DAY}
+      now={s.now as number}
+      mode={s.mode as "length" | "opacity"}
+      labels={s.labels === "on"}
+      animate={ui.animate}
+      summary={false}
+      size={120}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PolarClock",
+      "  data={byHour}",
+      `  now={${s.now}}`,
+      s.mode !== "length" && `  mode="${s.mode}"`,
+      s.labels === "off" && "  labels={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover around the face or arrow through the hours — each segment announces its time and value.",
 };
 
 export const recipes: Recipe[] = [

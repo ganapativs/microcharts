@@ -1,4 +1,5 @@
 import { RateVolume } from "@microcharts/react/rate-volume";
+import { RateVolume as RateVolumeInteractive } from "@microcharts/react/rate-volume/interactive";
 import { InteractiveDemo } from "./rate-volume.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -150,6 +151,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <RateVolumeInteractive
+      data={FRAC}
+      format={PCT}
+      minVolume={s.minVolume ? 50 : undefined}
+      curve={s.curve as "linear" | "step"}
+      label={s.label as "last" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<RateVolume",
+      "  data={periods}",
+      s.minVolume && "  minVolume={50}",
+      s.curve !== "linear" && `  curve="${s.curve}"`,
+      s.label !== "last" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the periods — each announces the rate and the volume it stands on.",
 };
 
 export const recipes: Recipe[] = [

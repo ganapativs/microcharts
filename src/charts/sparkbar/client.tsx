@@ -5,12 +5,25 @@
 // colors, endpoint label AND annotation children — the client only overlays a
 // focus outline + readout and owns interaction. Re-implementing the SVG here
 // used to mis-color win-loss ties and drop annotations/labels (plan/12).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import { describeSeries } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { labelMetrics, sparkBarGeometry } from "./geometry.js";
 import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
+
+// Bars carry valence tokens (bar/accent/positive/negative), not just "bar" —
+// the default `rise` selector only matches "bar", so every ink role is listed.
+const BAR_SELECTOR =
+  'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"], rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]';
 
 // The SVG fills the focusable wrapper so its box coincides with the wrapper's —
 // the %-positioned hit zones + readout map 1:1 and the chart scales fluidly.
@@ -18,6 +31,12 @@ const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveSparkBarProps extends SparkBarProps {
   onPointFocus?: (index: number | null) => void;
+  /**
+   * Opt-in entrance motion (default `false`): the bars rise from the baseline
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
@@ -35,10 +54,14 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     format,
     locale,
     onPointFocus,
+    animate = false,
     className,
     style,
     children,
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "rise", animate, { selector: BAR_SELECTOR });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
@@ -143,6 +166,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className={className ? `mc-sparkbar-interactive ${className}` : "mc-sparkbar-interactive"}
       style={wrapStyle}
       tabIndex={0}

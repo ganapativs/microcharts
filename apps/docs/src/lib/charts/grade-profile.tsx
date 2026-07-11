@@ -1,4 +1,5 @@
 import { GradeProfile } from "@microcharts/react/grade-profile";
+import { GradeProfile as GradeProfileInteractive } from "@microcharts/react/grade-profile/interactive";
 import { InteractiveDemo } from "./grade-profile.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -114,6 +115,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <GradeProfileInteractive
+      data={TRAIL}
+      label={s.label ? "max" : "none"}
+      bins={[3, 6, Number(s.hard)]}
+      format={m}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={48}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<GradeProfile",
+      "  data={trail}",
+      s.label === false && '  label="none"',
+      s.hard !== 10 && `  bins={[3, 6, ${s.hard}]}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover, or use ←/→ — each pitch announces its distance, true grade, and cumulative climb.",
 };
 
 export const recipes: Recipe[] = [

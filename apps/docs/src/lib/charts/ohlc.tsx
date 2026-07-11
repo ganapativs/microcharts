@@ -1,4 +1,5 @@
 import { Ohlc } from "@microcharts/react/ohlc";
+import { Ohlc as OhlcInteractive } from "@microcharts/react/ohlc/interactive";
 import { InteractiveDemo } from "./ohlc.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -142,6 +143,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <OhlcInteractive
+      data={PERIODS}
+      variant={s.variant as "candle" | "bars"}
+      label={s.label as "last" | "none"}
+      maxPeriods={s.maxPeriods as number}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={32}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Ohlc",
+      "  data={sessions}",
+      s.variant !== "candle" && `  variant="${s.variant}"`,
+      s.label !== "none" && `  label="${s.label}"`,
+      s.maxPeriods !== 20 && `  maxPeriods={${s.maxPeriods}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow through the sessions — each announces open, high, low, and close.",
 };
 
 export const recipes: Recipe[] = [

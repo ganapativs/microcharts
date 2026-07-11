@@ -1,4 +1,5 @@
 import { CitySkyline } from "@microcharts/react/city-skyline";
+import { CitySkyline as CitySkylineInteractive } from "@microcharts/react/city-skyline/interactive";
 import { InteractiveDemo } from "./city-skyline.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -116,6 +117,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <CitySkylineInteractive
+      data={TEAMS}
+      labels={s.labels as boolean}
+      label={s.value ? "value" : "none"}
+      ground={s.ground as boolean}
+      unit="teams"
+      animate={ui.animate}
+      summary={false}
+      bw={16}
+      gap={6}
+      height={s.labels || s.value ? 52 : 44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<CitySkyline",
+      "  data={teams}",
+      s.labels && "  labels",
+      s.value && '  label="value"',
+      s.ground === false && "  ground={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow ←/→ across the buildings — each announces its size and its lit fraction. Height is the precise read; the lit windows are impressionistic (mostly lit / half lit / dark).",
 };
 
 export const recipes: Recipe[] = [

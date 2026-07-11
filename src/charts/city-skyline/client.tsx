@@ -2,9 +2,10 @@
 // Interactive <CitySkyline> (plan/24 #14). x-band pointer lookup → highlight the
 // building + announce it; ←/→ roving; the lit fraction is announced as a percent
 // (secondary channel). Composes the static component.
-import { useMemo, useState, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { citySkylineGeometry } from "./geometry.js";
 import { EN_SKYLINE, type SkylineStrings } from "../../core/strings-skyline.js";
 import {
@@ -13,8 +14,19 @@ import {
   type CitySkylineProps,
 } from "./index.js";
 
+// Buildings (rect, ink="bar") rise from the ground; the lit-window pattern
+// (path, ink="accent") rises with them, staggered slightly after — windows
+// "turning on" after each building settles.
+const SKYLINE_SELECTOR = 'rect[data-mc-ink="bar"], path[data-mc-ink="accent"]';
+
 export interface InteractiveCitySkylineProps extends CitySkylineProps {
   strings?: SkylineStrings;
+  /**
+   * Opt-in entrance motion (default `false`): buildings rise from the ground
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode {
@@ -32,9 +44,12 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     title,
     summary,
     strings = EN_SKYLINE,
+    animate = false,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.3);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "rise", animate, { selector: SKYLINE_SELECTOR });
 
   const groundY = height - (labels ? fontSize + 2 : 2);
   const geo = useMemo(
@@ -94,6 +109,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className="mc-skyline-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

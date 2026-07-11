@@ -1,4 +1,5 @@
 import { Funnel } from "@microcharts/react/funnel";
+import { Funnel as FunnelInteractive } from "@microcharts/react/funnel/interactive";
 import { InteractiveDemo } from "./funnel.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -141,6 +142,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <FunnelInteractive
+      data={PIPE}
+      mode={s.mode as "absolute" | "rate"}
+      connectors={s.connectors as boolean}
+      label={s.label as "none" | "percent" | "value"}
+      highlight={(s.highlight as boolean) ? "Activated" : undefined}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={78}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Funnel",
+      "  data={stages}",
+      s.mode !== "absolute" && `  mode="${s.mode}"`,
+      !(s.connectors as boolean) && "  connectors={false}",
+      s.label !== "none" && `  label="${s.label}"`,
+      (s.highlight as boolean) && '  highlight="Activated"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow through the stages — each announces its retained share of the first.",
 };
 
 export const recipes: Recipe[] = [

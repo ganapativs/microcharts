@@ -1,4 +1,5 @@
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
+import { HistogramStrip as HistogramStripInteractive } from "@microcharts/react/histogram-strip/interactive";
 import { InteractiveDemo } from "./histogram-strip.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -145,6 +146,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <HistogramStripInteractive
+      data={TIMES}
+      bins={s.bins as number}
+      markValue={(s.markValue as boolean) ? 45 : undefined}
+      domain={(s.domain as boolean) ? [0, 100] : undefined}
+      locale={s.locale as string}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={64}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<HistogramStrip",
+      "  data={times}",
+      `  bins={${s.bins}}`,
+      (s.markValue as boolean) && "  markValue={45}",
+      (s.domain as boolean) && "  domain={[0, 100]}",
+      (s.locale as string) !== "en-US" && `  locale="${s.locale}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow through the bins — each announces its range and count.",
 };
 
 export const recipes: Recipe[] = [

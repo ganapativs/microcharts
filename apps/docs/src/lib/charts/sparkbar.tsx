@@ -163,6 +163,41 @@ export const playground: PlaygroundSpec = {
       .filter(Boolean)
       .join("\n");
   },
+  renderInteractive: (s, data, ui) => {
+    const shown = s.mode === "winloss" ? data.map((n) => (n % 2 === 0 ? 1 : -1)) : data;
+    const gap = Number((s.gap as number).toFixed(2));
+    return (
+      <SparkBarInteractive
+        data={shown}
+        width={340}
+        height={92}
+        mode={s.mode as "bar" | "winloss"}
+        gap={gap}
+        label={s.label ? "last" : "none"}
+        locale={s.locale as string}
+        animate={ui.animate}
+        className="w-full max-w-md"
+        title="Playground"
+      />
+    );
+  },
+  codeInteractive: (s, data, ui) => {
+    const shown = s.mode === "winloss" ? data.map((n) => (n % 2 === 0 ? 1 : -1)) : data;
+    const gap = Number((s.gap as number).toFixed(2));
+    return [
+      "<SparkBar",
+      `  data={[${shown.join(", ")}]}`,
+      `  mode="${s.mode}"`,
+      gap !== 0.25 && `  gap={${gap}}`,
+      s.label && '  label="last"',
+      s.locale !== "en-US" && `  locale="${s.locale}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  },
+  interactiveHint: "Hover a bar, or focus and step through with ← →.",
 };
 
 export const recipes: Recipe[] = [

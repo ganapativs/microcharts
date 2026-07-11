@@ -1,8 +1,16 @@
 "use client";
 // Interactive <VolumeProfile> (plan/25 §16). One pointer listener; nearest level
 // bin by y. ↑/↓ rove bins. Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_VOLUME_PROFILE } from "../../core/strings-volume-profile.js";
 import { binMass, volumeProfileGeometry } from "./geometry.js";
 import {
@@ -13,7 +21,20 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function VolumeProfile(props: VolumeProfileProps): React.ReactNode {
+// Bars are single merged `path`s (one per role), not `rect`s — the default
+// `sweep` selector only matches rects.
+const PROFILE_SELECTOR = 'path[data-mc-ink="bar"], path[data-mc-ink="accent"]';
+
+export interface InteractiveVolumeProfileProps extends VolumeProfileProps {
+  /**
+   * Opt-in entrance motion (default `false`): level bars sweep in from the
+   * `align` edge when the chart first mounts client-side. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function VolumeProfile(props: InteractiveVolumeProfileProps): React.ReactNode {
   const {
     data,
     valueArea = 0.7,
@@ -26,8 +47,15 @@ export function VolumeProfile(props: VolumeProfileProps): React.ReactNode {
     strings = EN_VOLUME_PROFILE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "sweep", animate, {
+    selector: PROFILE_SELECTOR,
+    origin: align === "right" ? "right" : "left",
+  });
 
   const geo = useMemo(
     () => volumeProfileGeometry({ data, bins, valueArea, align, width, height, gutter: 0 }),
@@ -90,6 +118,7 @@ export function VolumeProfile(props: VolumeProfileProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-volprofile-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
