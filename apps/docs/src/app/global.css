@@ -1468,6 +1468,12 @@ body {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
+/* Long lines (interactive import paths) scroll instead of running under the
+   floating copy button; the padding reserves the button's column. */
+.code-inset pre {
+  overflow-x: auto !important;
+  padding-right: 2.75rem !important;
+}
 
 /* Standalone markdown code fences (Fumadocs) — the SAME shell as .panel /
    .command-well, so a ```fenced block```, an install panel, and a LiveDemo all

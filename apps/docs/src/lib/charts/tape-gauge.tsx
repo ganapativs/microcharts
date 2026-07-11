@@ -130,8 +130,8 @@ export const playground: PlaygroundSpec = {
         span={60}
         orientation={s.orientation as "vertical" | "horizontal"}
         summary={false}
-        width={vertical ? 28 : 160}
-        height={vertical ? 72 : 32}
+        width={vertical ? 44 : 240}
+        height={vertical ? 112 : 48}
       />
     );
   },
