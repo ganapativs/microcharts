@@ -35,9 +35,18 @@ export function CodeWithData({
   );
   const defs = used.length ? used.map((s) => s.code).join("\n\n") : "";
   const pointer = used.length
-    ? `// ${used.map((s) => s.name).join(", ")} — real values under “Sample data” below\n`
+    ? `// ${used.map((s) => s.name).join(", ")} — real values under “Sample data” below`
     : "";
-  const shown = pointer && !code.includes("Sample data") ? pointer + code : code;
+  // The pointer sits right above the JSX (where the variable is used), not
+  // above the imports.
+  let shown = code;
+  if (pointer && !code.includes("Sample data")) {
+    const lines = code.split("\n");
+    const jsx = lines.findIndex((l) => l.startsWith("<"));
+    if (jsx >= 0) lines.splice(jsx, 0, pointer);
+    else lines.unshift(pointer);
+    shown = lines.join("\n");
+  }
   const runnable = defs ? `${defs}\n\n${code}` : code;
 
   return (
