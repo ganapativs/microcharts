@@ -1,9 +1,6 @@
 import { StreakSpark } from "@microcharts/react/streak-spark";
 import { StreakSpark as StreakSparkInteractive } from "@microcharts/react/streak-spark/interactive";
-import { InteractiveDemo } from "./streak-spark.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -114,6 +111,7 @@ export const playground: PlaygroundSpec = {
       width={340}
       height={92}
       className="w-full max-w-md"
+      style={{ height: "auto" }}
       title="Playground"
     />
   ),
@@ -208,7 +206,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

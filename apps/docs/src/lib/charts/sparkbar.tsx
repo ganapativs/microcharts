@@ -1,6 +1,5 @@
 import { SparkBar } from "@microcharts/react/sparkbar";
 import { SparkBar as SparkBarInteractive } from "@microcharts/react/sparkbar/interactive";
-import { DemoPanel } from "@/components/charts/demo-panel";
 import { wave } from "./demo-data";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -99,21 +98,6 @@ export const showcase = {
   ),
 };
 
-export function InteractiveDemo() {
-  return (
-    <DemoPanel hint="Hover a bar, or focus and step through with ← →.">
-      <SparkBarInteractive
-        data={[5, 8, 3, 9, 6, 11, 4, 10, 7, 12, 8, 6]}
-        width={340}
-        height={92}
-        label="last"
-        className="w-full max-w-md"
-        title="Deploys per day"
-      />
-    </DemoPanel>
-  );
-}
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "mode", options: ["bar", "winloss"], init: "bar" },
@@ -144,6 +128,7 @@ export const playground: PlaygroundSpec = {
         label={s.label ? "last" : "none"}
         locale={s.locale as string}
         className="w-full max-w-md"
+        style={{ height: "auto" }}
         title="Playground"
       />
     );
@@ -316,7 +301,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,
