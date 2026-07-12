@@ -48,7 +48,7 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
 
 export function SiteFooter() {
   return (
-    <footer className="relative mt-24 overflow-hidden border-t border-hairline">
+    <footer className="relative overflow-hidden">
       <div className="relative z-10 mx-auto max-w-6xl px-4 pb-4 pt-14 sm:px-6">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           <div className="col-span-2 sm:col-span-1">
