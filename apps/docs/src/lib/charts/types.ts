@@ -140,6 +140,41 @@ export interface ChartContexts {
   tab: ContextHome;
 }
 
+/* ── copy-complete snippets ──────────────────────────────────────────────── */
+
+/**
+ * A named sample-data literal that a chart's snippets reference (`data={accounts}`).
+ * Surfaced once per page in a collapsible "sample data" disclosure so every
+ * copy-pasted snippet actually runs — no phantom variables (plan/20 docs-as-tests).
+ */
+export interface SampleData {
+  /** The variable a snippet binds to, e.g. `"accounts"`. */
+  name: string;
+  /** Its full definition, e.g. `const accounts = [\n  { label: "Acme", value: 3 },\n];`. */
+  code: string;
+}
+
+/* ── four homes (chart-true placements) ──────────────────────────────────── */
+
+/**
+ * One placement home. The host copy is written for THIS chart's job — a StatusDot
+ * sits in "the API is ● operational", a SproutRow in an account-health column —
+ * never a generic "signups held steady" template.
+ */
+export interface ContextHome {
+  /** Realistic host with the live mark embedded (sentence, row, card, tab). */
+  render: () => ReactNode;
+  /** Copy-complete JSX for the placement; vars resolve via `sampleData`. */
+  code: string;
+}
+
+export interface ChartContexts {
+  sentence: ContextHome;
+  cell: ContextHome;
+  kpi: ContextHome;
+  tab: ContextHome;
+}
+
 /* ── sizing recipes ──────────────────────────────────────────────────────── */
 
 export interface Recipe {
