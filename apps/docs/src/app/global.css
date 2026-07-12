@@ -2010,91 +2010,77 @@ div:where(
     }
   }
 
-  /* ── Instrument crosshair behind the cluster ────────────────────────────
-     A faint hairline cross splits the cluster into quadrants; a soft accent
-     signal travels down the vertical axis and across the horizontal one, so
-     the board reads like a live instrument. Paint-only (background-position on
-     1px lines is cheap); matte, low-opacity. Corner blooms handled inline. */
+  /* ── Instrument frame behind the cluster ────────────────────────────────
+     A rounded hairline frame around the tile grid, one vertical axis down the
+     centre, three horizontal rules (one under each chart row), and small nodes
+     where the vertical axis crosses the row gaps. A soft accent signal travels
+     down the vertical axis so the board reads like a live instrument. Paint-only
+     (background-position on a 1px line); matte, low-opacity. */
+  .hx-frame {
+    border: 1px solid color-mix(in oklab, var(--hairline) 62%, transparent);
+    border-radius: 16px;
+  }
   .hx-cross-line {
     position: absolute;
     overflow: hidden;
-    background: color-mix(in oklab, var(--hairline) 52%, transparent);
+    background: color-mix(in oklab, var(--hairline) 46%, transparent);
   }
-  /* Fade each axis out toward its ends so the cross reads as a soft crosshair,
-     not a hard box; the mask also feathers the travelling signal in and out. */
+  /* vertical axis — end-faded so it doesn't collide with the rounded corners */
   .hx-cross-v {
     left: 50%;
-    top: -4%;
-    bottom: -4%;
+    top: 7%;
+    bottom: 7%;
     width: 1px;
     transform: translateX(-0.5px);
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
-    mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
   }
+  /* horizontal rules — full width, feathered at both ends; `top` set inline */
   .hx-cross-h {
-    top: 50%;
-    left: -3%;
-    right: -3%;
+    left: 5%;
+    right: 5%;
     height: 1px;
     transform: translateY(-0.5px);
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
-    mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
   }
-  /* the travelling signal — a bright band sliding along each axis */
-  .hx-cross-v::after,
-  .hx-cross-h::after {
+  /* the travelling signal — a bright band sliding down the vertical axis */
+  .hx-cross-v::after {
     content: "";
     position: absolute;
     inset: 0;
     background-repeat: no-repeat;
-  }
-  .hx-cross-v::after {
     background-image: linear-gradient(
       to bottom,
       transparent,
       color-mix(in oklab, var(--accent) 72%, transparent),
       transparent
     );
-    background-size: 100% 34%;
+    background-size: 100% 30%;
     animation: hx-thread-v 6.5s ease-in-out infinite;
-  }
-  .hx-cross-h::after {
-    background-image: linear-gradient(
-      to right,
-      transparent,
-      color-mix(in oklab, var(--accent) 72%, transparent),
-      transparent
-    );
-    background-size: 28% 100%;
-    animation: hx-thread-h 8s ease-in-out infinite;
-    animation-delay: -2.5s;
   }
   @keyframes hx-thread-v {
     0% {
-      background-position: 0 -40%;
+      background-position: 0 -30%;
     }
     100% {
-      background-position: 0 140%;
+      background-position: 0 130%;
     }
   }
-  @keyframes hx-thread-h {
-    0% {
-      background-position: -40% 0;
-    }
-    100% {
-      background-position: 140% 0;
-    }
-  }
-  /* a quiet node where the axes meet */
-  .hx-cross-hub {
+  /* nodes on the vertical axis at the row gaps; `top` set inline */
+  .hx-cross-node {
     position: absolute;
     left: 50%;
-    top: 50%;
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     translate: -50% -50%;
     border-radius: 9999px;
     background: color-mix(in oklab, var(--accent) 55%, transparent);
+  }
+  .hx-cross-node--hub {
+    width: 5px;
+    height: 5px;
+    background: color-mix(in oklab, var(--accent) 70%, transparent);
     box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 12%, transparent);
     animation: hx-pulse 2.4s ease-in-out infinite;
   }
@@ -2105,8 +2091,7 @@ div:where(
   .hx-swap,
   .hx-pulse,
   .hx-cross-v::after,
-  .hx-cross-h::after,
-  .hx-cross-hub {
+  .hx-cross-node--hub {
     animation: none;
   }
   .hx-tile {

@@ -137,44 +137,58 @@ export function LivingCatalog({ total }: { total: number }) {
             "radial-gradient(44% 42% at 100% 2%, color-mix(in oklab, var(--accent) 15%, transparent), transparent 70%), radial-gradient(42% 40% at 0% 100%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 72%)",
         }}
       />
-      {/* instrument crosshair + travelling signal, behind the tiles */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <span className="hx-cross-line hx-cross-v" />
-        <span className="hx-cross-line hx-cross-h" />
-        <span className={live ? "hx-cross-hub" : "hx-cross-hub [animation:none]"} />
-      </div>
+      {/* framed instrument grid around the tiles: rounded border, one vertical
+          axis, three horizontal rules (one under each chart row), nodes at the
+          row gaps, and a signal travelling down the axis */}
+      <div className="relative">
+        <div
+          aria-hidden
+          className="hx-frame pointer-events-none absolute -inset-2.5 -z-10 sm:-inset-3"
+        >
+          <span className="hx-cross-line hx-cross-v" />
+          <span className="hx-cross-line hx-cross-h" style={{ top: "33.33%" }} />
+          <span className="hx-cross-line hx-cross-h" style={{ top: "66.66%" }} />
+          <span className="hx-cross-line hx-cross-h" style={{ top: "99%" }} />
+          <span className="hx-cross-node" style={{ top: "33.33%" }} />
+          <span
+            className={live ? "hx-cross-node hx-cross-node--hub" : "hx-cross-node"}
+            style={{ top: "50%" }}
+          />
+          <span className="hx-cross-node" style={{ top: "66.66%" }} />
+        </div>
 
-      <ul className="grid grid-cols-2 gap-2.5 sm:gap-3">
-        {board.map((cell, i) => {
-          const mod = CHART_MODULES[cell.slug];
-          const entry = getChart(cell.slug);
-          if (!mod || !entry) return <li key={i} aria-hidden />;
-          const { Preview } = mod;
-          return (
-            <li key={i}>
-              <Link
-                href={`/docs/charts/${cell.slug}`}
-                aria-label={`${entry.name}: ${entry.tagline}`}
-                className="hx-tile group flex flex-col items-center justify-center gap-2 rounded-[14px] px-3 py-4 no-underline"
-              >
-                <span
-                  key={cell.nonce}
-                  className="hx-slot hx-swap flex min-h-[4.75rem] w-full items-center justify-center"
+        <ul className="grid grid-cols-2 gap-2.5 sm:gap-3">
+          {board.map((cell, i) => {
+            const mod = CHART_MODULES[cell.slug];
+            const entry = getChart(cell.slug);
+            if (!mod || !entry) return <li key={i} aria-hidden />;
+            const { Preview } = mod;
+            return (
+              <li key={i}>
+                <Link
+                  href={`/docs/charts/${cell.slug}`}
+                  aria-label={`${entry.name}: ${entry.tagline}`}
+                  className="hx-tile group flex flex-col items-center justify-center gap-2 rounded-[14px] px-3 py-4 no-underline"
                 >
-                  <Preview />
-                </span>
-                <span className="hx-slot-name mono-label truncate text-[0.58rem] tracking-[0.12em] opacity-55 group-hover:text-fd-primary group-hover:opacity-100">
-                  {entry.name}
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                  <span
+                    key={cell.nonce}
+                    className="hx-slot hx-swap flex min-h-[4.75rem] w-full items-center justify-center"
+                  >
+                    <Preview />
+                  </span>
+                  <span className="hx-slot-name mono-label truncate text-[0.58rem] tracking-[0.12em] opacity-55 group-hover:text-fd-primary group-hover:opacity-100">
+                    {entry.name}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
       {/* centered anchor for the cluster — the "live" pulse doubles as the
           gallery invitation, so the whole catalog is one click from the fold */}
-      <div className="mt-4 flex justify-center">
+      <div className="mt-5 flex justify-center">
         <Link
           href="/gallery"
           aria-label={`Browse all ${total} chart types in the gallery`}
