@@ -1,9 +1,6 @@
 import { ControlStrip } from "@microcharts/react/control-strip";
 import { ControlStrip as ControlStripInteractive } from "@microcharts/react/control-strip/interactive";
-import { InteractiveDemo } from "./control-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // 30 fill-weight readings (g); mostly in control, two excursions
@@ -181,7 +178,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

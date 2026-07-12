@@ -1,9 +1,6 @@
 import { MicroDonut } from "@microcharts/react/micro-donut";
 import { MicroDonut as MicroDonutInteractive } from "@microcharts/react/micro-donut/interactive";
-import { InteractiveDemo } from "./micro-donut.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const MIX = [
@@ -259,7 +256,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

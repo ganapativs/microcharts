@@ -1,9 +1,6 @@
 import { PictogramRow } from "@microcharts/react/pictogram-row";
 import { PictogramRow as PictogramRowInteractive } from "@microcharts/react/pictogram-row/interactive";
-import { InteractiveDemo } from "./pictogram-row.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -257,7 +254,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

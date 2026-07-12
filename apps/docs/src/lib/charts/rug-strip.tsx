@@ -1,9 +1,6 @@
 import { RugStrip } from "@microcharts/react/rug-strip";
 import { RugStrip as RugStripInteractive } from "@microcharts/react/rug-strip/interactive";
-import { InteractiveDemo } from "./rug-strip.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const FIELD = [42, 48, 51, 53, 55, 58, 61, 63, 66, 71, 55, 52, 49, 58, 62, 75, 83, 58, 54, 60];
@@ -277,7 +274,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

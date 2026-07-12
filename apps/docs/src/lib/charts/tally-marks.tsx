@@ -1,9 +1,6 @@
 import { TallyMarks } from "@microcharts/react/tally-marks";
 import { TallyMarks as TallyMarksInteractive } from "@microcharts/react/tally-marks/interactive";
-import { InteractiveDemo } from "./tally-marks.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -166,7 +163,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

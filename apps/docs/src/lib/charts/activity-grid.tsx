@@ -1,6 +1,5 @@
 import { ActivityGrid } from "@microcharts/react/activity-grid";
 import { ActivityGrid as ActivityGridInteractive } from "@microcharts/react/activity-grid/interactive";
-import { DemoPanel } from "@/components/charts/demo-panel";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
@@ -122,14 +121,6 @@ export const showcase = {
   hint: "cadence",
   Node: () => <ActivityGridInteractive data={showcaseGrid} cell={9} title="Commit activity" />,
 };
-
-export function InteractiveDemo() {
-  return (
-    <DemoPanel hint="Hover a cell, or focus and move in 2-D with the arrow keys.">
-      <ActivityGridInteractive data={demoGrid} cell={13} title="Commit activity" />
-    </DemoPanel>
-  );
-}
 
 export const playground: PlaygroundSpec = {
   // `data` isn't a knob — the wave is the fixture; shuffle regenerates it.
@@ -343,7 +334,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

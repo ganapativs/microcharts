@@ -1,9 +1,6 @@
 import { SpreadBand } from "@microcharts/react/spread-band";
 import { SpreadBand as SpreadBandInteractive } from "@microcharts/react/spread-band/interactive";
-import { InteractiveDemo } from "./spread-band.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const ORG = [8, 9, 11, 12, 14, 15, 17, 18, 20, 21, 23, 24];
@@ -183,7 +180,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

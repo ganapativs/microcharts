@@ -1,9 +1,6 @@
 import { QueueDepth } from "@microcharts/react/queue-depth";
 import { QueueDepth as QueueDepthInteractive } from "@microcharts/react/queue-depth/interactive";
-import { InteractiveDemo } from "./queue-depth.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a support backlog growing through capacity (100) to 2.14× at the end
@@ -161,7 +158,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,9 +1,6 @@
 import { CyclePlot } from "@microcharts/react/cycle-plot";
 import { CyclePlot as CyclePlotInteractive } from "@microcharts/react/cycle-plot/interactive";
-import { InteractiveDemo } from "./cycle-plot.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -207,7 +204,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

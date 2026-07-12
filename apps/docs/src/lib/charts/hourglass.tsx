@@ -1,9 +1,6 @@
 import { Hourglass } from "@microcharts/react/hourglass";
 import { Hourglass as HourglassInteractive } from "@microcharts/react/hourglass/interactive";
-import { InteractiveDemo } from "./hourglass.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -153,7 +150,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

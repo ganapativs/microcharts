@@ -1,9 +1,6 @@
 import { CometTrail } from "@microcharts/react/comet-trail";
 import { CometTrail as CometTrailInteractive } from "@microcharts/react/comet-trail/interactive";
-import { InteractiveDemo } from "./comet-trail.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -163,7 +160,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

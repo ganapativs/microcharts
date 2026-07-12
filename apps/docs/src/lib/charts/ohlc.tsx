@@ -1,9 +1,6 @@
 import { Ohlc } from "@microcharts/react/ohlc";
 import { Ohlc as OhlcInteractive } from "@microcharts/react/ohlc/interactive";
-import { InteractiveDemo } from "./ohlc.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const PERIODS = Array.from({ length: 20 }, (_, i) => {
@@ -308,7 +305,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

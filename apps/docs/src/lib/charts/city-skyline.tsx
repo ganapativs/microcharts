@@ -1,9 +1,6 @@
 import { CitySkyline } from "@microcharts/react/city-skyline";
 import { CitySkyline as CitySkylineInteractive } from "@microcharts/react/city-skyline/interactive";
-import { InteractiveDemo } from "./city-skyline.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 type Team = { label: string; value: number; lit?: number };
@@ -185,7 +182,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,9 +1,6 @@
 import { BubbleRow } from "@microcharts/react/bubble-row";
 import { BubbleRow as BubbleRowInteractive } from "@microcharts/react/bubble-row/interactive";
-import { InteractiveDemo } from "./bubble-row.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 type Row = { label: string; value: number }[];
@@ -171,7 +168,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

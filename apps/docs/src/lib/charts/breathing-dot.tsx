@@ -1,9 +1,6 @@
 import { BreathingDot } from "@microcharts/react/breathing-dot";
 import { BreathingDot as BreathingDotInteractive } from "@microcharts/react/breathing-dot/interactive";
-import { InteractiveDemo } from "./breathing-dot.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -141,7 +138,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

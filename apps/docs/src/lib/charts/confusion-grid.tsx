@@ -1,9 +1,6 @@
 import { ConfusionGrid } from "@microcharts/react/confusion-grid";
 import { ConfusionGrid as ConfusionGridInteractive } from "@microcharts/react/confusion-grid/interactive";
-import { InteractiveDemo } from "./confusion-grid.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const CATDOG = {
@@ -185,7 +182,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,9 +1,6 @@
 import { HeatCell } from "@microcharts/react/heat-cell";
 import { HeatCell as HeatCellInteractive } from "@microcharts/react/heat-cell/interactive";
-import { InteractiveDemo } from "./heat-cell.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const D = [0, 100] as const;
@@ -297,7 +294,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

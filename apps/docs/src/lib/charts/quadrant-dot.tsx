@@ -1,9 +1,6 @@
 import { QuadrantDot } from "@microcharts/react/quadrant-dot";
 import { QuadrantDot as QuadrantDotInteractive } from "@microcharts/react/quadrant-dot/interactive";
-import { InteractiveDemo } from "./quadrant-dot.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a prioritization backlog — effort (x) vs impact (y)
@@ -248,7 +245,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

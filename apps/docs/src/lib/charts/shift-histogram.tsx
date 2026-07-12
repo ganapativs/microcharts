@@ -1,9 +1,6 @@
 import { ShiftHistogram } from "@microcharts/react/shift-histogram";
 import { ShiftHistogram as ShiftHistogramInteractive } from "@microcharts/react/shift-histogram/interactive";
-import { InteractiveDemo } from "./shift-histogram.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // latency (ms) before/after a fix — the whole distribution moved left
@@ -220,7 +217,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

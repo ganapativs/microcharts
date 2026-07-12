@@ -1,9 +1,6 @@
 import { CalibrationStrip } from "@microcharts/react/calibration-strip";
 import { CalibrationStrip as CalibrationStripInteractive } from "@microcharts/react/calibration-strip/interactive";
-import { InteractiveDemo } from "./calibration-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const BINS = [
@@ -181,7 +178,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -90,7 +90,7 @@ the same data — so they never share a mark.
 
 <LiveDemo
   label="one slot always missing"
-  code={`// Sunday is null every week — that slot skips both its mean tick and
+  code={`// slot 0 is null every cycle — that slot skips both its mean tick and
 // the spine, which breaks cleanly around the gap instead of interpolating
 <CyclePlot
   data={[null, 40, 45, 48, 52, 61, null, 42, 45, 48, 52, 61, null, 44, 45, 48, 52, 61]}

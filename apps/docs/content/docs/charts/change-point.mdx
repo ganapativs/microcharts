@@ -112,7 +112,7 @@ production anomaly pipelines, pass your own break indices and the chart becomes 
 </LiveDemo>
 
 With a `locale`, the summary and delta label format their numbers in that locale's own
-grouping and decimal marks. Auto-detection (`breaks="auto"`) only runs past 8 points — a
+grouping and decimal marks. Auto-detection (`breaks="auto"`) only runs at 8 or more points — a
 six-point series with an obvious jump still renders as one flat, unbroken regime unless you
 pass `breaks` explicitly; this is deliberate, since a two-segment fit on that few points is
 mostly noise. A single point has no line to draw and no break to find; `data={[]}` renders the

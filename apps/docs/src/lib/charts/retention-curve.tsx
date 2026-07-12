@@ -1,9 +1,6 @@
 import { RetentionCurve } from "@microcharts/react/retention-curve";
 import { RetentionCurve as RetentionCurveInteractive } from "@microcharts/react/retention-curve/interactive";
-import { InteractiveDemo } from "./retention-curve.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a weekly cohort that decays then plateaus around 38%
@@ -190,7 +187,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

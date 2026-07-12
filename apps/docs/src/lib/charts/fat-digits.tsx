@@ -1,9 +1,6 @@
 import { FatDigits } from "@microcharts/react/fat-digits";
 import { FatDigits as FatDigitsInteractive } from "@microcharts/react/fat-digits/interactive";
-import { InteractiveDemo } from "./fat-digits.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const COLUMN = [1204, 318, 76, 942, 2100, 55];
@@ -162,7 +159,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

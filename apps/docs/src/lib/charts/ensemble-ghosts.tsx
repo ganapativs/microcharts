@@ -1,9 +1,6 @@
 import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
 import { EnsembleGhosts as EnsembleGhostsInteractive } from "@microcharts/react/ensemble-ghosts/interactive";
-import { InteractiveDemo } from "./ensemble-ghosts.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // 24 simulated futures — a fan of walks with diverse shapes (deterministic)
@@ -183,7 +180,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

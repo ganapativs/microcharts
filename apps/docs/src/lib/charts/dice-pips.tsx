@@ -1,9 +1,6 @@
 import { DicePips } from "@microcharts/react/dice-pips";
 import { DicePips as DicePipsInteractive } from "@microcharts/react/dice-pips/interactive";
-import { InteractiveDemo } from "./dice-pips.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -122,7 +119,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

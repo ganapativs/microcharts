@@ -1,9 +1,6 @@
 import { SpiralYear } from "@microcharts/react/spiral-year";
 import { SpiralYear as SpiralYearInteractive } from "@microcharts/react/spiral-year/interactive";
-import { InteractiveDemo } from "./spiral-year.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -167,7 +164,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

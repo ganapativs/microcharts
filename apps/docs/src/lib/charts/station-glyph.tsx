@@ -1,9 +1,6 @@
 import { StationGlyph } from "@microcharts/react/station-glyph";
 import { StationGlyph as StationGlyphInteractive } from "@microcharts/react/station-glyph/interactive";
-import { InteractiveDemo } from "./station-glyph.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const OBS = {
@@ -172,7 +169,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

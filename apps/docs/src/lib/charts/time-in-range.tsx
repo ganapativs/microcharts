@@ -1,9 +1,6 @@
 import { TimeInRange } from "@microcharts/react/time-in-range";
 import { TimeInRange as TimeInRangeInteractive } from "@microcharts/react/time-in-range/interactive";
-import { InteractiveDemo } from "./time-in-range.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const GLUCOSE = { severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 };
@@ -201,7 +198,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -16,6 +16,7 @@ convergence.
 <Slope data={[
   { label: "East", from: 40, to: 47 },
   { label: "West", from: 55, to: 41 },
+  { label: "South", from: 30, to: 33 },
 ]} title="Before vs after" />`}
 >
   <Slope
@@ -157,10 +158,10 @@ announced "incomplete", never interpolated.
 
 ## Accessibility
 
-The accessible name counts directions and leads with the biggest mover — **"5 categories:
-3 up, 2 down. Largest change Mid, up 75%."** The interactive entry finds the nearest line
+The accessible name counts directions and leads with the biggest mover — **"3 categories:
+2 up, 1 down. Largest change West, down 25%."** The interactive entry finds the nearest line
 under the pointer and roves categories ordered by their after-value, announcing each
-slope (**"East: 48 to 61, up 27%."**).
+slope (**"East: 40 to 47, up 18%."**).
 
 ## Props
 

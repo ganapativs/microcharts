@@ -1,9 +1,6 @@
 import { IconArray } from "@microcharts/react/icon-array";
 import { IconArray as IconArrayInteractive } from "@microcharts/react/icon-array/interactive";
-import { InteractiveDemo } from "./icon-array.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -171,7 +168,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

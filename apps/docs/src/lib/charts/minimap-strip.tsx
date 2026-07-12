@@ -1,9 +1,6 @@
 import { MinimapStrip } from "@microcharts/react/minimap-strip";
 import { MinimapStrip as MinimapStripInteractive } from "@microcharts/react/minimap-strip/interactive";
-import { InteractiveDemo } from "./minimap-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const CONTENT = Array.from(
@@ -169,7 +166,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,9 +1,6 @@
 import { Thermometer } from "@microcharts/react/thermometer";
 import { Thermometer as ThermometerInteractive } from "@microcharts/react/thermometer/interactive";
-import { InteractiveDemo } from "./thermometer.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -176,7 +173,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

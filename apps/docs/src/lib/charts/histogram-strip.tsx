@@ -1,9 +1,6 @@
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { HistogramStrip as HistogramStripInteractive } from "@microcharts/react/histogram-strip/interactive";
-import { InteractiveDemo } from "./histogram-strip.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const TIMES = Array.from({ length: 120 }, (_, i) =>
@@ -285,7 +282,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

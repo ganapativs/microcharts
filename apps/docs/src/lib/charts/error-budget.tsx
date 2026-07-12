@@ -1,9 +1,6 @@
 import { ErrorBudget } from "@microcharts/react/error-budget";
 import { ErrorBudget as ErrorBudgetInteractive } from "@microcharts/react/error-budget/interactive";
-import { InteractiveDemo } from "./error-budget.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // 12 days into a 30-day SLO window, burning slightly under the steady rate
@@ -201,7 +198,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

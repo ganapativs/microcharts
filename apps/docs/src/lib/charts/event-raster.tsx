@@ -1,9 +1,6 @@
 import { EventRaster } from "@microcharts/react/event-raster";
 import { EventRaster as EventRasterInteractive } from "@microcharts/react/event-raster/interactive";
-import { InteractiveDemo } from "./event-raster.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const RASTER = [
@@ -181,7 +178,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

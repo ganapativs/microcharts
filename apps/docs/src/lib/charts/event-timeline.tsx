@@ -1,9 +1,6 @@
 import { EventTimeline } from "@microcharts/react/event-timeline";
 import { EventTimeline as EventTimelineInteractive } from "@microcharts/react/event-timeline/interactive";
-import { InteractiveDemo } from "./event-timeline.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const H = 3_600_000;
@@ -286,7 +283,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

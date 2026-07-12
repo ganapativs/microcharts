@@ -1,9 +1,6 @@
 import { PercentileTrace } from "@microcharts/react/percentile-trace";
 import { PercentileTrace as PercentileTraceInteractive } from "@microcharts/react/percentile-trace/interactive";
-import { InteractiveDemo } from "./percentile-trace.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a weekly standing that drifts up from the middle half into the top band
@@ -169,7 +166,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

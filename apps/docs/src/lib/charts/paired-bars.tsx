@@ -1,9 +1,6 @@
 import { PairedBars } from "@microcharts/react/paired-bars";
 import { PairedBars as PairedBarsInteractive } from "@microcharts/react/paired-bars/interactive";
-import { InteractiveDemo } from "./paired-bars.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 type PairRow = { label: string; value: number | null; ref: number | null }[];
@@ -302,7 +299,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

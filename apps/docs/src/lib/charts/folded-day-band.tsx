@@ -1,9 +1,6 @@
 import { FoldedDayBand } from "@microcharts/react/folded-day-band";
 import { FoldedDayBand as FoldedDayBandInteractive } from "@microcharts/react/folded-day-band/interactive";
-import { InteractiveDemo } from "./folded-day-band.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const curve = (h: number) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
@@ -195,7 +192,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

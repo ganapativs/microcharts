@@ -1,9 +1,6 @@
 import { ABStrips } from "@microcharts/react/ab-strips";
 import { ABStrips as ABStripsInteractive } from "@microcharts/react/ab-strips/interactive";
-import { InteractiveDemo } from "./ab-strips.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // two latency arms (ms): B (test) centered a bit lower than A (control), overlapping
@@ -202,7 +199,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

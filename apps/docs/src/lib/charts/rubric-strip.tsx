@@ -1,9 +1,6 @@
 import { RubricStrip } from "@microcharts/react/rubric-strip";
 import { RubricStrip as RubricStripInteractive } from "@microcharts/react/rubric-strip/interactive";
-import { InteractiveDemo } from "./rubric-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const RUBRIC = [
@@ -163,7 +160,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

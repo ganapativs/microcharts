@@ -1,9 +1,6 @@
 import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
 import { DualWindowMeter as DualWindowMeterInteractive } from "@microcharts/react/dual-window-meter/interactive";
-import { InteractiveDemo } from "./dual-window-meter.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const LOUDNESS = Array.from(
@@ -209,7 +206,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

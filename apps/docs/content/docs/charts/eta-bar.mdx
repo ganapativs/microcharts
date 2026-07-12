@@ -107,9 +107,9 @@ can format the unit itself in whatever locale-aware way the caller needs.
   <EtaBar progress={1} elapsed={12} rate={0.1} title="Complete" width={280} height={16} />
 </LiveDemo>
 
-A zero or absent `rate` (and no positive average derivable from `elapsed`) renders the remainder
-as a diagonal-hatched texture instead of a solid bar — "unknown," not a hidden guess — and the
-summary says **"stalled"** rather than naming a duration. When the predicted remainder is far
+An explicit `rate` of `0`, or an absent `rate` from which no positive average can be derived from
+`elapsed`, renders the remainder as a diagonal-hatched texture instead of a solid bar — "unknown,"
+not a hidden guess — and the summary says **"stalled"** rather than naming a duration. When the predicted remainder is far
 larger than the elapsed time, the done segment would round to an unreadable sliver, so the
 geometry clamps it to a visible 10% and adds a chevron marking the clamp as approximate. At
 `progress >= 1` the bar fills completely regardless of `rate`.

@@ -1,9 +1,6 @@
 import { GradedBand } from "@microcharts/react/graded-band";
 import { GradedBand as GradedBandInteractive } from "@microcharts/react/graded-band/interactive";
-import { InteractiveDemo } from "./graded-band.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // posterior draws for one estimate (deterministic pseudo-sample)
@@ -186,7 +183,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

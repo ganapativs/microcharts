@@ -1,9 +1,6 @@
 import { DataDiff } from "@microcharts/react/data-diff";
 import { DataDiff as DataDiffInteractive } from "@microcharts/react/data-diff/interactive";
-import { InteractiveDemo } from "./data-diff.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a schema migration diff — rows added/removed per table
@@ -195,7 +192,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

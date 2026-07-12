@@ -1,9 +1,6 @@
 import { TrendArrow } from "@microcharts/react/trend-arrow";
 import { TrendArrow as TrendArrowInteractive } from "@microcharts/react/trend-arrow/interactive";
-import { InteractiveDemo } from "./trend-arrow.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const PCT = { style: "percent", maximumFractionDigits: 0 } as const;
@@ -300,7 +297,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

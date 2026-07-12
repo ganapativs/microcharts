@@ -1,9 +1,6 @@
 import { GardenGrid } from "@microcharts/react/garden-grid";
 import { GardenGrid as GardenGridInteractive } from "@microcharts/react/garden-grid/interactive";
-import { InteractiveDemo } from "./garden-grid.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // 12 weeks of activity, some quiet
@@ -166,7 +163,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

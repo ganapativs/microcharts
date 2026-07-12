@@ -1,9 +1,6 @@
 import { QuantileDots } from "@microcharts/react/quantile-dots";
 import { QuantileDots as QuantileDotsInteractive } from "@microcharts/react/quantile-dots/interactive";
-import { InteractiveDemo } from "./quantile-dots.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // bus-wait times (minutes): right-skewed, a long tail past the 15-min SLA
@@ -215,7 +212,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

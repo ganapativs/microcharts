@@ -1,9 +1,6 @@
 import { HeatStrip } from "@microcharts/react/heat-strip";
 import { HeatStrip as HeatStripInteractive } from "@microcharts/react/heat-strip/interactive";
-import { InteractiveDemo } from "./heat-strip.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const LOAD = Array.from({ length: 30 }, (_, i) => Math.round(Math.sin(i / 4) * 40 + 50));
@@ -266,7 +263,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

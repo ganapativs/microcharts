@@ -1,9 +1,6 @@
 import { DualSparkline } from "@microcharts/react/dual-sparkline";
 import { DualSparkline as DualSparklineInteractive } from "@microcharts/react/dual-sparkline/interactive";
-import { InteractiveDemo } from "./dual-sparkline.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const US = [12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21];
@@ -281,7 +278,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

@@ -1,8 +1,5 @@
 import { WindBarb } from "@microcharts/react/wind-barb";
-import { InteractiveDemo } from "./wind-barb.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -130,7 +127,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

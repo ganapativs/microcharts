@@ -1,9 +1,6 @@
 import { BumpStrip } from "@microcharts/react/bump-strip";
 import { BumpStrip as BumpStripInteractive } from "@microcharts/react/bump-strip/interactive";
-import { InteractiveDemo } from "./bump-strip.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const RANKS = [5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1];
@@ -274,7 +271,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

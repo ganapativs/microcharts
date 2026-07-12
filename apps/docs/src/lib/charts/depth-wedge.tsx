@@ -1,9 +1,6 @@
 import { DepthWedge } from "@microcharts/react/depth-wedge";
 import { DepthWedge as DepthWedgeInteractive } from "@microcharts/react/depth-wedge/interactive";
-import { InteractiveDemo } from "./depth-wedge.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const BOOK = {
@@ -194,7 +191,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

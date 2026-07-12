@@ -1,9 +1,6 @@
 import { Waterfall } from "@microcharts/react/waterfall";
 import { Waterfall as WaterfallInteractive } from "@microcharts/react/waterfall/interactive";
-import { InteractiveDemo } from "./waterfall.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const PL = [
@@ -325,7 +322,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

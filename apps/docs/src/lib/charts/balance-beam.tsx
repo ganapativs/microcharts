@@ -1,9 +1,6 @@
 import { BalanceBeam } from "@microcharts/react/balance-beam";
 import { BalanceBeam as BalanceBeamInteractive } from "@microcharts/react/balance-beam/interactive";
-import { InteractiveDemo } from "./balance-beam.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 type Pair = [{ label: string; value: number }, { label: string; value: number }];
@@ -205,7 +202,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

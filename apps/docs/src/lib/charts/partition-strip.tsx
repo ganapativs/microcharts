@@ -1,9 +1,6 @@
 import { PartitionStrip } from "@microcharts/react/partition-strip";
 import { PartitionStrip as PartitionStripInteractive } from "@microcharts/react/partition-strip/interactive";
-import { InteractiveDemo } from "./partition-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const TREE = [
@@ -193,7 +190,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

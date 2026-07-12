@@ -1,9 +1,6 @@
 import { MicroBox } from "@microcharts/react/micro-box";
 import { MicroBox as MicroBoxInteractive } from "@microcharts/react/micro-box/interactive";
-import { InteractiveDemo } from "./micro-box.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const RAW = [12, 30, 35, 38, 42, 45, 48, 51, 60, 96];
@@ -264,7 +261,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

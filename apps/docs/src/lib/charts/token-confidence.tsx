@@ -1,9 +1,6 @@
 import { TokenConfidence } from "@microcharts/react/token-confidence";
 import { TokenConfidence as TokenConfidenceInteractive } from "@microcharts/react/token-confidence/interactive";
-import { InteractiveDemo } from "./token-confidence.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const ANSWER = [
@@ -198,7 +195,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

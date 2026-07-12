@@ -1,9 +1,6 @@
 import { StackedArea } from "@microcharts/react/stacked-area";
 import { StackedArea as StackedAreaInteractive } from "@microcharts/react/stacked-area/interactive";
-import { InteractiveDemo } from "./stacked-area.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const MIX = [
@@ -320,7 +317,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

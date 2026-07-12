@@ -1,9 +1,6 @@
 import { MusicStaff } from "@microcharts/react/music-staff";
 import { MusicStaff as MusicStaffInteractive } from "@microcharts/react/music-staff/interactive";
-import { InteractiveDemo } from "./music-staff.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const MELODY = [3, 5, 4, 8, 6, 9, 7, 11];
@@ -163,7 +160,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

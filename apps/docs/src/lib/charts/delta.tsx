@@ -1,9 +1,6 @@
 import { Delta } from "@microcharts/react/delta";
 import { Delta as DeltaInteractive } from "@microcharts/react/delta/interactive";
-import { InteractiveDemo } from "./delta.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -337,7 +334,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

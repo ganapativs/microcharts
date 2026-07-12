@@ -102,7 +102,11 @@ The median shift label and accessible summary follow `format`/`locale` — 12000
   code={`// the after sample hasn't landed yet — before renders alone
 const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
 
-<ShiftHistogram data={{ before, after: [] }} title="Awaiting after sample" />`}
+<ShiftHistogram
+  data={{ before, after: [] }}
+  format={(n) => Math.round(n) + " ms"}
+  title="Awaiting after sample"
+/>`}
 >
   <ShiftHistogram
     data={{

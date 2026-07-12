@@ -1,9 +1,6 @@
 import { PhaseTrace } from "@microcharts/react/phase-trace";
 import { PhaseTrace as PhaseTraceInteractive } from "@microcharts/react/phase-trace/interactive";
-import { InteractiveDemo } from "./phase-trace.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a coupled CPU×latency trajectory with a lag loop
@@ -207,7 +204,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,9 +1,6 @@
 import { TreeRings } from "@microcharts/react/tree-rings";
 import { TreeRings as TreeRingsInteractive } from "@microcharts/react/tree-rings/interactive";
-import { InteractiveDemo } from "./tree-rings.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const YEARS = [8, 12, 10, 18, 22, 15, 20, 14];
@@ -178,7 +175,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,9 +1,6 @@
 import { StarSpoke } from "@microcharts/react/star-spoke";
 import { StarSpoke as StarSpokeInteractive } from "@microcharts/react/star-spoke/interactive";
-import { InteractiveDemo } from "./star-spoke.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const PROFILE = [
@@ -178,7 +175,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

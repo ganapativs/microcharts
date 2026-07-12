@@ -4,7 +4,7 @@ description: A tally-marks chart for React — four-and-strike clusters of five 
 ---
 
 TallyMarks answers "how many?" the way a human actually counts — in four-and-strike clusters of
-five. The count reads back exactly: no scale to calibrate, no color to decode. Past `max` the marks
+five. The count reads back exactly: no scale to calibrate, no color to decode. Past `total` the marks
 stop growing and a `+N` numeral tells the truth, so a cell never blows out its width. Marks are
 never resized to fit — width grows with the count until the cap, then the numeral takes over.
 
@@ -37,11 +37,11 @@ never resized to fit — width grows with the count until the cap, then the nume
 <LiveDemo
   label="hand-drawn pen + capped width"
   code={`<TallyMarks value={17} pen="drawn" />
-<TallyMarks value={38} max={20} />`}
+<TallyMarks value={38} total={20} />`}
 >
   <span className="inline-flex gap-4 items-center">
     <TallyMarks value={17} pen="drawn" height={20} />
-    <TallyMarks value={38} max={20} height={20} />
+    <TallyMarks value={38} total={20} height={20} />
   </span>
 </LiveDemo>
 
@@ -74,7 +74,7 @@ never resized to fit — width grows with the count until the cap, then the nume
 The ruled pen is the default because product tables want precision first — evenly ruled strokes
 count back fastest. The `drawn` pen adds a seeded, deterministic jitter (same count always renders
 identically, on the server and after hydration) for the editorial voice, and it only perturbs how
-each stroke is drawn — the count is never touched. Past `max`, the default `overflow="numeral"`
+each stroke is drawn — the count is never touched. Past `total`, the default `overflow="numeral"`
 appends a `+N` so the true total survives even when the marks can't; `overflow="clamp"` suppresses
 the numeral for dense columns, and the accessible name still carries the exact count.
 

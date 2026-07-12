@@ -1,9 +1,6 @@
 import { BurnChart } from "@microcharts/react/burn-chart";
 import { BurnChart as BurnChartInteractive } from "@microcharts/react/burn-chart/interactive";
-import { InteractiveDemo } from "./burn-chart.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // an 11-day sprint burning down; 6 days in, slightly behind → projected 2 days late
@@ -206,7 +203,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

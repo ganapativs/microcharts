@@ -1,9 +1,6 @@
 import { EtaBar } from "@microcharts/react/eta-bar";
 import { EtaBar as EtaBarInteractive } from "@microcharts/react/eta-bar/interactive";
-import { InteractiveDemo } from "./eta-bar.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const min = (t: number) => `${Math.round(t)} min`;
@@ -175,7 +172,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

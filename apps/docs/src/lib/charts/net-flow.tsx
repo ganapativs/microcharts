@@ -1,9 +1,6 @@
 import { NetFlow } from "@microcharts/react/net-flow";
 import { NetFlow as NetFlowInteractive } from "@microcharts/react/net-flow/interactive";
-import { InteractiveDemo } from "./net-flow.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // monthly cash flow (values in $k) — mostly net-positive, two months in the red
@@ -210,7 +207,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

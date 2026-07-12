@@ -3,8 +3,8 @@ import type { ComponentType, ReactNode } from "react";
 /**
  * Per-chart registry contract (plan/21 §6.0.A). Every chart contributes ONE
  * module under `lib/charts/‹slug›.tsx` implementing `ChartModule`; the shared
- * shells (gallery, playground, interactive demo, sizing, four-contexts,
- * showcase) interpret it. No per-slug switches anywhere else.
+ * shells (gallery, playground, sizing, four-contexts, showcase) interpret it.
+ * No per-slug switches anywhere else.
  */
 
 export type ChartStatus = "stable" | "planned";
@@ -158,8 +158,6 @@ export interface ChartModule {
   Preview: ComponentType;
   /** Homepage instrument-strip card (interactive entry, fixed size). */
   showcase: { hint: string; Node: ComponentType };
-  /** Full interactive-demo panel (compose the shared `DemoPanel`). */
-  InteractiveDemo: ComponentType;
   playground: PlaygroundSpec;
   recipes: Recipe[];
   /** The chart at context scale, for the four-contexts grid. */

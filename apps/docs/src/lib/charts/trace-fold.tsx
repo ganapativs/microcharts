@@ -1,9 +1,6 @@
 import { TraceFold } from "@microcharts/react/trace-fold";
 import { TraceFold as TraceFoldInteractive } from "@microcharts/react/trace-fold/interactive";
-import { InteractiveDemo } from "./trace-fold.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const ms = (n: number) => `${Math.round(n)} ms`;
@@ -179,7 +176,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

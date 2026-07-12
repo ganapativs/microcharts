@@ -1,9 +1,6 @@
 import { Hypnogram } from "@microcharts/react/hypnogram";
 import { Hypnogram as HypnogramInteractive } from "@microcharts/react/hypnogram/interactive";
-import { InteractiveDemo } from "./hypnogram.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const SLEEP = [
@@ -227,7 +224,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

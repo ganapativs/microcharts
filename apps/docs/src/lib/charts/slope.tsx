@@ -1,9 +1,6 @@
 import { Slope } from "@microcharts/react/slope";
 import { Slope as SlopeInteractive } from "@microcharts/react/slope/interactive";
-import { InteractiveDemo } from "./slope.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const RANKS = [
@@ -262,7 +259,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

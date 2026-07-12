@@ -1,9 +1,6 @@
 import { Seismogram } from "@microcharts/react/seismogram";
 import { Seismogram as SeismogramInteractive } from "@microcharts/react/seismogram/interactive";
-import { InteractiveDemo } from "./seismogram.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // A dense, bursty signal — mostly-live slots with quiet gaps and a few real
@@ -288,7 +285,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

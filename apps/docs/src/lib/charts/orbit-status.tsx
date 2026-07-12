@@ -1,9 +1,6 @@
 import { OrbitStatus } from "@microcharts/react/orbit-status";
 import { OrbitStatus as OrbitStatusInteractive } from "@microcharts/react/orbit-status/interactive";
-import { InteractiveDemo } from "./orbit-status.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const LD: [number, number] = [0, 500];
@@ -208,7 +205,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

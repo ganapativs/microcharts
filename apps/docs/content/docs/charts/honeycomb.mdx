@@ -74,7 +74,7 @@ them, for surfaces where the outline reads as noise. Auto packing is the default
 honeycomb is the recognizable form. The unit is the cell, and its size never changes with value — the
 count varies, the geometry doesn't — which is what keeps this honest area-filling _occupancy_, distinct
 from a `PictogramRow` counting unlike things. Above sixty cells, unit counting stops being countable, so
-the chart refuses and the docs steer to `Progress`: refusing is the feature. A value past the total
+the chart emits a dev warning and the docs steer to `Progress`. A value past the total
 fills every cell, but the accessible name still states the true number — occupancy is never silently
 clipped.
 

@@ -1,9 +1,6 @@
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { SegmentedBar as SegmentedBarInteractive } from "@microcharts/react/segmented-bar/interactive";
-import { InteractiveDemo } from "./segmented-bar.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const MIX = [
@@ -293,7 +290,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

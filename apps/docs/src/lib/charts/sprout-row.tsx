@@ -1,9 +1,6 @@
 import { SproutRow } from "@microcharts/react/sprout-row";
 import { SproutRow as SproutRowInteractive } from "@microcharts/react/sprout-row/interactive";
-import { InteractiveDemo } from "./sprout-row.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 type Row = { label: string; value: number | null }[];
@@ -244,7 +241,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

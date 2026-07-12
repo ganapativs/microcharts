@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import { CELL_R, CELL_SIZE, CELLS, SQUIRCLE_PATH } from "@/lib/brand";
 
 /**
  * The footer brand moment: "the catalog surfaces."
@@ -439,6 +440,12 @@ export function FooterMark() {
     let fontSize = 0;
     const letters: { ch: string; x: number }[] = [];
     let maskP = -1; // reveal progress the mask was last rasterized at
+    // the brandmark drawn into the canvas, leading the word (same hollow
+    // letterpress treatment); geometry from the canonical lib/brand spec
+    let markSize = 0;
+    let markX = 0;
+    let markY = 0;
+    const squircle = new Path2D(SQUIRCLE_PATH);
     let field: HTMLCanvasElement | null = null;
     let fctx: CanvasRenderingContext2D | null = null;
     let layer: HTMLCanvasElement | null = null;
@@ -459,36 +466,53 @@ export function FooterMark() {
     // double-tap deals every chart new data
     let seedShift = 0;
     let lastDownT = -1;
-    // per-cell chart archetype, precomputed with neighbor avoidance so the
-    // same chart never renders adjacent (left/up/diagonals)
-    let typeGrid = new Uint8Array(0);
+    // The field is an infinite conveyor: rows drift upward forever, and new
+    // charts enter from the bottom. Archetypes are computed lazily per
+    // VIRTUAL row (world-space, not screen-space) with neighbor avoidance —
+    // same chart never adjacent (left/up/diagonals) — and cached in a small
+    // sliding window.
     let typeSeed = -1;
     const N_TYPES = 19;
     const EMPTY = 255; // ~1/3 of the lattice stays open — air, not wallpaper
+    const DRIFT = 8; // px/s upward — a new row surfaces every ~2s
     // Ordered-dither sparsity: a Bayer threshold keeps the gaps evenly
     // spread (every 4×4 block loses the same share — no random holes),
     // and a hash jitter breaks the pattern's regularity.
     const BAYER4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
-    const buildTypes = () => {
-      typeGrid = new Uint8Array(cols * rows);
-      spring = new Float32Array(cols * rows * 4);
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const seed = r * 197 + c * 13 + 7 + seedShift;
-          const threshold = (BAYER4[(r % 4) * 4 + (c % 4)] + 0.5) / 16;
-          if (threshold + (hash(seed + 7.7) - 0.5) * 0.14 < 0.33) {
-            typeGrid[r * cols + c] = EMPTY;
-            continue;
-          }
-          let t = Math.floor(hash(seed + 0.5) * N_TYPES);
-          const left = c > 0 ? typeGrid[r * cols + c - 1] : -1;
-          const up = r > 0 ? typeGrid[(r - 1) * cols + c] : -1;
-          const upL = r > 0 && c > 0 ? typeGrid[(r - 1) * cols + c - 1] : -1;
-          const upR = r > 0 && c < cols - 1 ? typeGrid[(r - 1) * cols + c + 1] : -1;
-          while (t === left || t === up || t === upL || t === upR) t = (t + 1) % N_TYPES;
-          typeGrid[r * cols + c] = t;
+    const rowTypes = new Map<number, Uint8Array>();
+    const typesFor = (vr: number): Uint8Array => {
+      const hit = rowTypes.get(vr);
+      if (hit) return hit;
+      const prev = rowTypes.get(vr - 1);
+      const row = new Uint8Array(cols);
+      for (let c = 0; c < cols; c++) {
+        const seed = vr * 197 + c * 13 + 7 + seedShift;
+        const threshold = (BAYER4[(((vr % 4) + 4) % 4) * 4 + (c % 4)] + 0.5) / 16;
+        if (threshold + (hash(seed + 7.7) - 0.5) * 0.14 < 0.33) {
+          row[c] = EMPTY;
+          continue;
+        }
+        let t = Math.floor(hash(seed + 0.5) * N_TYPES);
+        const left = c > 0 ? row[c - 1] : -1;
+        const up = prev ? prev[c] : -1;
+        const upL = prev && c > 0 ? prev[c - 1] : -1;
+        const upR = prev && c < cols - 1 ? prev[c + 1] : -1;
+        while (t === left || t === up || t === upL || t === upR) t = (t + 1) % N_TYPES;
+        row[c] = t;
+      }
+      rowTypes.set(vr, row);
+      // evict rows that scrolled far past the window
+      if (rowTypes.size > rows * 3 + 8) {
+        for (const k of rowTypes.keys()) {
+          if (k < vr - rows * 2) rowTypes.delete(k);
+          else break;
         }
       }
+      return row;
+    };
+    const buildTypes = () => {
+      rowTypes.clear();
+      spring = new Float32Array(cols * (rows + 2) * 4);
       typeSeed = seedShift;
     };
     // adaptive quality: settle to half-rate when idle, degrade once if slow
@@ -507,18 +531,25 @@ export function FooterMark() {
     let lastMoveT = 0;
     let springEnergy = 0;
     let lastDrawMs = 0;
+    let lastRowShift = -1; // conveyor row the spring buffer is aligned to
 
-    // ── live palette (rebuilt only when tokens change) ────────────────────
+    // ── live palette — refreshed on theme/accent MUTATIONS, never per frame
+    // (getComputedStyle in the raf loop forces style recalc = hover hitches)
     let key = "";
+    let light = false;
     let pal: Palette = { accent: "#2f52d4", pos: "#009E73", neg: "#D55E00", neutral: "#616773" };
     const refreshPalette = () => {
+      light = !document.documentElement.classList.contains("dark");
       const cs = getComputedStyle(document.documentElement);
-      const raw = ["--accent", "--mc-positive", "--mc-negative", "--mc-neutral"]
-        .map((v) => cs.getPropertyValue(v))
-        .join("|");
+      const raw =
+        (light ? "l|" : "d|") +
+        ["--accent", "--mc-positive", "--mc-negative", "--mc-neutral"]
+          .map((v) => cs.getPropertyValue(v))
+          .join("|");
       if (raw === key) return;
       key = raw;
-      const [a, p, n, m] = raw.split("|").map(parseColor);
+      // slot 0 is the light/dark prefix — colors start at 1
+      const [, a, p, n, m] = raw.split("|").map(parseColor);
       pal = {
         accent: a ? css(a) : pal.accent,
         pos: p ? css(p) : pal.pos,
@@ -556,7 +587,10 @@ export function FooterMark() {
       // The vignette lives in-canvas as a cached shade layer: an elliptical
       // falloff crossed with a tall top fade, so the field condenses at the
       // word and dissolves gradually INTO the footer above — never a cut.
-      [vrx, vry, vcy] = w < 640 ? [1.05, 1.25, 0.52] : [0.82, 1.18, 0.52];
+      // the vignette centers on the word band near the footer's bottom; the
+      // tall ellipse + top fade let the field climb gently behind the links
+      const wordCY = clamp01((h - 128) / h);
+      [vrx, vry, vcy] = w < 640 ? [1.05, 1.25, wordCY] : [0.82, 1.18, wordCY];
       host.style.maskImage = "";
       (host.style as { webkitMaskImage?: string }).webkitMaskImage = "";
       shade = document.createElement("canvas");
@@ -580,15 +614,17 @@ export function FooterMark() {
         sc.fillStyle = rg;
         sc.fillRect(-cx, -cy / sy, w, h / sy);
         sc.restore();
-        // eased top fade — the field breathes in from the page above, and
-        // stops short of the word's cap height so letters stay full-ink.
+        // deep top fade — the field is only a whisper behind the link grid
+        // (roughly the footer's upper 60%) and surfaces fully just below it,
+        // so the columns read on calm ground and the word gets the density.
         // NB: destination-in clears everything the source doesn't cover, so
         // the gradient must span the full height (solid below the fade).
-        const f = 0.28;
+        const f = 0.6;
         const lg = sc.createLinearGradient(0, 0, 0, h);
         lg.addColorStop(0, "rgba(0,0,0,0)");
-        lg.addColorStop(0.4 * f, "rgba(0,0,0,0.3)");
-        lg.addColorStop(0.75 * f, "rgba(0,0,0,0.7)");
+        lg.addColorStop(0.45 * f, "rgba(0,0,0,0.1)");
+        lg.addColorStop(0.75 * f, "rgba(0,0,0,0.3)");
+        lg.addColorStop(0.92 * f, "rgba(0,0,0,0.65)");
         lg.addColorStop(f, "rgba(0,0,0,1)");
         lg.addColorStop(1, "rgba(0,0,0,1)");
         sc.globalCompositeOperation = "destination-in";
@@ -622,19 +658,31 @@ export function FooterMark() {
       // the word is centered in the field with equal air above and below;
       // the height cap keeps it clear of the legal bar riding the bottom
       const family = getComputedStyle(host).fontFamily || "sans-serif";
-      let fs = h * 0.6;
+      // absolute cap — the canvas is the whole footer, so the word sizes to
+      // its reserved band; one size on every page, home included
+      let fs = 88;
       mctx.font = `620 ${fs}px ${family}`;
       const avail = w * 0.86;
-      const tw = mctx.measureText("microcharts").width;
-      if (tw > avail) fs *= avail / tw;
+      // the brandmark leads the word inside the canvas: mark + gap ≈ 1em,
+      // so the fit measures the full lockup, not just the letters
+      let tw = mctx.measureText("microcharts").width;
+      if (tw + fs > avail) fs *= avail / (tw + fs);
       fontSpec = `620 ${fs}px ${family}`;
-      // word rides slightly above center — the legal bar borrows bottom air
-      textY = h * 0.45 + fs * 0.03;
+      // bottom-anchored: the word lives in the reserved band above the bar,
+      // with air below matching the air above (grid → word ≈ word → bar)
+      textY = h - 128 + fs * 0.03;
       fontSize = fs;
-      // per-letter x origins (left-aligned) for the staggered scroll reveal
       mctx.font = fontSpec;
+      tw = mctx.measureText(WORD).width;
+      // squircle sized to the caps, vertically centered on the baseline band
+      markSize = fs * 0.72;
+      const gap = fs * 0.26;
+      let lx = (w - (tw + markSize + gap)) / 2;
+      markX = lx;
+      markY = textY - markSize * 0.52;
+      lx += markSize + gap;
+      // per-letter x origins (left-aligned) for the staggered scroll reveal
       letters.length = 0;
-      let lx = (w - mctx.measureText(WORD).width) / 2;
       for (const ch2 of WORD) {
         letters.push({ ch: ch2, x: lx });
         lx += mctx.measureText(ch2).width;
@@ -645,11 +693,16 @@ export function FooterMark() {
       maskP = -1; // force a mask render at the current reveal progress
     };
 
-    // staggered per-letter reveal: letters rise out of the field, left to
-    // right, fully scrubbed by scroll (li = local progress of letter i)
+    // staggered reveal, left to right, fully scrubbed by scroll — item 0 is
+    // the brandmark, items 1..n the letters (li = local progress of item i)
     const letterState = (i: number, pw: number) => {
       const S = 0.5; // portion of progress spent on the stagger
-      const li = easeOutQuint(clamp01((pw - (i / (WORD.length - 1)) * S) / (1 - S)));
+      const li = easeOutQuint(clamp01((pw - ((i + 1) / WORD.length) * S) / (1 - S)));
+      return { a: li, dy: (1 - li) * fontSize * 0.38 };
+    };
+    const markState = (pw: number) => {
+      const S = 0.5;
+      const li = easeOutQuint(clamp01(pw / (1 - S)));
       return { a: li, dy: (1 - li) * fontSize * 0.38 };
     };
 
@@ -672,24 +725,28 @@ export function FooterMark() {
       maskP = pw;
     };
 
-    // scroll progress: 0 = field area below the fold, 1 = fully pulled up.
-    // Normalized to the field's own height so surfacing starts the moment
-    // the area scrolls in — no dead blank band waiting for the reveal.
+    // scroll progress, anchored to the WORD BAND (not the whole footer —
+    // the canvas spans the full footer now, and the page runs out of scroll
+    // before a footer-height scrub could finish): 0 = the band is a full
+    // band-height below the fold, 1 = the footer bottom reaches the viewport
+    // bottom, i.e. the reveal completes exactly as you land on it.
     const progress = () => {
       const r = host.getBoundingClientRect();
       const vh = window.innerHeight || 1;
-      return clamp01((vh - r.top) / Math.min(r.height * 1.2, vh));
+      return clamp01(1 - (r.bottom - vh) / 240);
     };
 
     const draw = (nowMs: number, still = false) => {
       if (!mask || !field || !fctx || !layer || !lctx) return;
       if (typeSeed !== seedShift) buildTypes(); // double-tap re-dealt the data
-      refreshPalette();
       const t = nowMs / 1000;
       const p = still || reduced ? 1 : progress();
       // the wordmark reveal is scrubbed by scroll; the mask re-rasterizes
       // only while the reveal is actually moving, then stays cached
-      const pWord = still || reduced ? 1 : easeOutQuint(clamp01((p - 0.3) / 0.7));
+      // the word reveal is scrubbed by scroll, windowed to when the band is
+      // actually VISIBLE: it starts as the word enters the viewport (p≈0.55)
+      // and completes exactly at the bottom — characters ride the scroll.
+      const pWord = still || reduced ? 1 : clamp01((p - 0.55) / 0.45);
       if (Math.abs(pWord - maskP) > 0.0005) renderMask(pWord);
 
       // frame dt for the spring field; pointer wake decays when the mouse rests
@@ -704,23 +761,45 @@ export function FooterMark() {
       let energyAcc = 0;
 
       // ── render the living mosaic once ───────────────────────────────────
+      // infinite conveyor: the lattice drifts upward forever; virtual rows
+      // advance as whole rows wrap, so fresh charts surface from the bottom
       fctx.clearRect(0, 0, w, h);
       const gx0 = (w - cols * cellW) / 2;
       const gy0 = (h - rows * cellH) / 2;
-      for (let r = 0; r < rows; r++) {
+      const drift = t * DRIFT;
+      const rowShift = Math.floor(drift / cellH);
+      const frac = drift - rowShift * cellH;
+      // springs live in VISUAL slots, but the conveyor re-assigns slot
+      // contents as rows wrap — shift the state buffer in lockstep or every
+      // displaced chart snaps to rest on each row boundary (visible reset)
+      if (!still && lastRowShift >= 0 && rowShift !== lastRowShift) {
+        const dRows = rowShift - lastRowShift;
+        const stride = cols * 4;
+        if (dRows > 0 && dRows <= rows) {
+          spring.copyWithin(0, dRows * stride);
+          spring.fill(0, spring.length - dRows * stride);
+        } else if (dRows !== 0) {
+          spring.fill(0); // huge jump (tab resume) — settle everything
+        }
+      }
+      if (!still) lastRowShift = rowShift;
+      for (let r = 0; r <= rows; r++) {
+        const vr = r + rowShift;
+        const rowT = typesFor(vr);
         for (let c = 0; c < cols; c++) {
           const idx = r * cols + c;
-          if (typeGrid[idx] === EMPTY) continue;
-          const seed = r * 197 + c * 13 + 7 + seedShift;
+          if (rowT[c] === EMPTY) continue;
+          const seed = vr * 197 + c * 13 + 7 + seedShift;
           // pull-up: bottom rows surface first, each cell with its own lag
           const lag =
-            ((rows - 1 - r) / Math.max(rows - 1, 1)) * ENTER_TAIL + hash(seed) * LAG_JITTER;
+            ((rows - 1 - Math.min(r, rows - 1)) / Math.max(rows - 1, 1)) * ENTER_TAIL +
+            hash(seed) * LAG_JITTER;
           const e = still || reduced ? 1 : easeOutQuint(clamp01((p - lag) / (1 - MAX_LAG)));
           if (e <= 0.01) continue;
 
           // hand-set, not wallpaper: every cell sits a hair off the lattice
           let x = gx0 + c * cellW + (hash(seed + 2.2) - 0.5) * 5;
-          let y = gy0 + r * cellH + (hash(seed + 4.4) - 0.5) * 4 + (1 - e) * cellH * 2.6;
+          let y = gy0 + r * cellH - frac + (hash(seed + 4.4) - 0.5) * 4 + (1 - e) * cellH * 2.6;
 
           // skip cells the vignette mask fully hides (corners, top edge)
           const ndx = (x + cellW / 2 - w / 2) / (w * vrx);
@@ -737,15 +816,29 @@ export function FooterMark() {
             let svy = spring[i4 + 3];
             let fx = 0;
             let fy = 0;
-            if (px > -1e8 && Math.abs(mvx) + Math.abs(mvy) > 4) {
+            if (px > -1e8) {
               const dxp = x + cellW / 2 - px;
               const dyp = y + cellH / 2 - py;
-              const L = cellW * 4.5;
               const d2p = dxp * dxp + dyp * dyp;
-              if (d2p < L * L * 9) {
-                const gg = Math.exp(-d2p / (2 * L * L));
-                fx = mvx * gg * 1.2;
-                fy = mvy * gg * 1.2;
+              // the cursor parts the field — cells are shoved radially away
+              // and spring home once it passes (works even when hovering
+              // still, so the pointer always displaces, never just tints)
+              const Lr = cellW * 2.8;
+              if (d2p < Lr * Lr * 9) {
+                const rep = Math.exp(-d2p / (2 * Lr * Lr)) * 1100;
+                const d = Math.sqrt(d2p) || 1;
+                fx += (dxp / d) * rep;
+                fy += (dyp / d) * rep;
+              }
+              // plus the wake: fast sweeps drag cells along the direction
+              // of travel
+              if (Math.abs(mvx) + Math.abs(mvy) > 4) {
+                const L = cellW * 4.5;
+                if (d2p < L * L * 9) {
+                  const gg = Math.exp(-d2p / (2 * L * L));
+                  fx += mvx * gg * 1.2;
+                  fy += mvy * gg * 1.2;
+                }
               }
             }
             if (
@@ -802,13 +895,15 @@ export function FooterMark() {
           fctx.globalAlpha = e * Math.min(1, 0.9 + energy * 0.4);
           drawCell(
             fctx,
-            typeGrid[r * cols + c],
+            rowT[c],
             cellW - 6,
             cellH - 5,
             seed,
             // energy nudges phase a touch — never scale the clock itself,
             // or a moving pointer turns phase shifts into flicker
-            reduced ? 2.6 : t + energy * 0.35,
+            // phase nudge kept small — big values read as shimmer when a
+            // fast sweep swings energy 0→1 across a region
+            reduced ? 2.6 : t + energy * 0.18,
             pal,
           );
           fctx.restore();
@@ -820,7 +915,6 @@ export function FooterMark() {
       // from the field is its ink ────────────────────────────────────────
       // shared tuning; light gets only a whisper more letter ink — the field
       // and torch stay identical so the mood matches dark
-      const light = !document.documentElement.classList.contains("dark");
       const fieldA = 0.16;
       const torchA = 0.34;
       const slabA = light ? 0.14 : 0.11;
@@ -864,6 +958,34 @@ export function FooterMark() {
         ctx.fillStyle = pal.accent;
         ctx.lineWidth = 1;
         const breath = still || reduced ? 0 : Math.sin(t * 0.45) * 0.07;
+
+        // the brandmark leads the lockup — hollow squircle + graded cells in
+        // the same letterpress ink, revealing first
+        if (markSize > 0) {
+          const m = markState(pWord);
+          if (m.a > 0.004) {
+            const s = markSize / 32;
+            ctx.save();
+            ctx.translate(markX, markY + m.dy);
+            ctx.scale(s, s);
+            ctx.globalAlpha = slabA * m.a;
+            // oxlint-disable-next-line unicorn/no-array-fill-with-reference-type -- canvas Path2D fill, not Array#fill
+            ctx.fill(squircle);
+            ctx.globalAlpha = (outlineA + breath) * m.a;
+            ctx.lineWidth = 1.4 / s;
+            ctx.stroke(squircle);
+            for (const cell of CELLS) {
+              ctx.globalAlpha = (0.35 + 0.55 * cell.o) * m.a;
+              ctx.beginPath();
+              if (typeof ctx.roundRect === "function")
+                ctx.roundRect(cell.x, cell.y, CELL_SIZE, CELL_SIZE, CELL_R);
+              else ctx.rect(cell.x, cell.y, CELL_SIZE, CELL_SIZE);
+              ctx.fill();
+            }
+            ctx.restore();
+            ctx.lineWidth = 1;
+          }
+        }
         for (let i = 0; i < letters.length; i++) {
           const { a, dy } = letterState(i, pWord);
           if (a <= 0.004) continue;
@@ -936,7 +1058,9 @@ export function FooterMark() {
       running = false;
       cancelAnimationFrame(raf);
     };
-    const drawStill = () => draw(2600, true);
+    // still frames reuse the last live timestamp so the conveyor position
+    // matches the running loop — a mid-animation repaint never time-warps
+    const drawStill = () => draw(lastDrawMs || 2600, true);
 
     // ── wiring ────────────────────────────────────────────────────────────
     const ro = new ResizeObserver(() => {
@@ -956,7 +1080,10 @@ export function FooterMark() {
     document.addEventListener("visibilitychange", onVis);
 
     // theme / accent switches repaint paused and reduced-motion renders
-    const mo = new MutationObserver(() => drawStill());
+    const mo = new MutationObserver(() => {
+      refreshPalette();
+      drawStill();
+    });
     mo.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class", "data-accent", "data-mc-preset"],
@@ -1001,6 +1128,7 @@ export function FooterMark() {
       host.addEventListener("pointerdown", onDown);
     }
 
+    refreshPalette();
     build();
     // resample once webfonts land so the mask uses the display face
     document.fonts?.ready.then(() => {
@@ -1023,13 +1151,20 @@ export function FooterMark() {
   }, []);
 
   return (
-    <div
-      ref={hostRef}
-      className="display relative h-[clamp(180px,20vw,300px)] w-full select-none"
-      role="img"
-      aria-label="microcharts"
-    >
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
-    </div>
+    <>
+      {/* the field is the footer's background — it fills the whole footer
+          (nearest positioned ancestor) while the links float above it */}
+      <div
+        ref={hostRef}
+        className="display absolute inset-0 select-none"
+        role="img"
+        aria-label="microcharts"
+      >
+        <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
+      </div>
+      {/* in-flow spacer reserving the word band below the link grid — the
+          lockup can never collide with footer content */}
+      <div aria-hidden className="h-[200px]" />
+    </>
   );
 }

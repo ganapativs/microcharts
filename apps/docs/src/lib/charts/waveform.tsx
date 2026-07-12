@@ -1,9 +1,6 @@
 import { Waveform } from "@microcharts/react/waveform";
 import { Waveform as WaveformInteractive } from "@microcharts/react/waveform/interactive";
-import { InteractiveDemo } from "./waveform.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const WAVE = Array.from(
@@ -170,7 +167,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

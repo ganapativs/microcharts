@@ -1,9 +1,6 @@
 import { MoonPhase } from "@microcharts/react/moon-phase";
 import { MoonPhase as MoonPhaseInteractive } from "@microcharts/react/moon-phase/interactive";
-import { InteractiveDemo } from "./moon-phase.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -139,7 +136,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

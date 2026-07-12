@@ -1,9 +1,6 @@
 import { VolumeProfile } from "@microcharts/react/volume-profile";
 import { VolumeProfile as VolumeProfileInteractive } from "@microcharts/react/volume-profile/interactive";
-import { InteractiveDemo } from "./volume-profile.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const PROFILE = [
@@ -181,7 +178,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

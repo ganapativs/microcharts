@@ -1,9 +1,6 @@
 import { GradeProfile } from "@microcharts/react/grade-profile";
 import { GradeProfile as GradeProfileInteractive } from "@microcharts/react/grade-profile/interactive";
-import { InteractiveDemo } from "./grade-profile.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const m = (n: number) => `${n} m`;
@@ -186,7 +183,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,9 +1,6 @@
 import { ChangePoint } from "@microcharts/react/change-point";
 import { ChangePoint as ChangePointInteractive } from "@microcharts/react/change-point/interactive";
-import { InteractiveDemo } from "./change-point.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // error rate that stepped up on the 14th, then held — a clean level shift
@@ -193,7 +190,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

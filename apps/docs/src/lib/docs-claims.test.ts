@@ -48,6 +48,9 @@ describe("docs guide claims stay true", () => {
     const src = bySrc("performance.mdx");
     expect(src).toContain(`${SIZE.min} kB and ${SIZE.max} kB`);
     expect(src).toContain(`median of ${SIZE.median} kB`);
+    // The interactive-entry median is hand-typed in prose too — guard it so it
+    // can't silently drift from the measured value the way it did once before.
+    expect(src).toContain(`median ${SIZE.interactiveMedian} kB`);
   });
 
   it("index.mdx quotes the size stats rounded to one decimal", () => {

@@ -1,9 +1,6 @@
 import { RateVolume } from "@microcharts/react/rate-volume";
 import { RateVolume as RateVolumeInteractive } from "@microcharts/react/rate-volume/interactive";
-import { InteractiveDemo } from "./rate-volume.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a conversion rate climbing as reach drains away — the last reading is a big
@@ -231,7 +228,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,9 +1,6 @@
 import { Funnel } from "@microcharts/react/funnel";
 import { Funnel as FunnelInteractive } from "@microcharts/react/funnel/interactive";
-import { InteractiveDemo } from "./funnel.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const PIPE = [
@@ -284,7 +281,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

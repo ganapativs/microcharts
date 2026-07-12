@@ -48,11 +48,16 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-hairline">
-      <div className="mx-auto max-w-6xl px-4 pb-4 pt-14 sm:px-6">
+    <footer className="relative mt-24 overflow-hidden border-t border-hairline">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-4 pt-14 sm:px-6">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           <div className="col-span-2 sm:col-span-1">
-            <div className="text-[0.95rem] font-semibold tracking-tight">microcharts</div>
+            <Link
+              href="/"
+              className="inline-block text-[0.95rem] font-semibold tracking-tight transition-colors hover:text-fd-primary"
+            >
+              microcharts
+            </Link>
             <p className="mt-2 max-w-52 text-sm text-fd-muted-foreground">{SITE.tagline}</p>
             <div className="mono-label mt-4">Zero deps · MIT</div>
           </div>
@@ -87,11 +92,12 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* The brand moment — the catalog surfaces beneath the wordmark, and the
-          legal bar floats on the same field. */}
+      {/* the field is the footer's background (absolute inset-0 canvas) plus
+          an in-flow spacer reserving the word band; the legal bar floats on
+          the field at the footer's true bottom edge */}
       <FooterMark />
 
-      <div className="relative z-10 mx-auto -mt-9 max-w-6xl px-4 pb-8 sm:px-6 sm:-mt-8">
+      <div className="absolute inset-x-0 bottom-3 z-10 mx-auto max-w-6xl px-4 sm:bottom-4 sm:px-6">
         <div className="flex flex-col gap-3 text-fd-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span className="mono-label flex items-center gap-1.5">
             <span>© 2026</span>

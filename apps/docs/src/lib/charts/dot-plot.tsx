@@ -1,9 +1,6 @@
 import { DotPlot } from "@microcharts/react/dot-plot";
 import { DotPlot as DotPlotInteractive } from "@microcharts/react/dot-plot/interactive";
-import { InteractiveDemo } from "./dot-plot.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const TEAM = [
@@ -266,7 +263,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

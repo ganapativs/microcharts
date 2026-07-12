@@ -13,6 +13,18 @@ and the value area (the levels holding most of the activity) is shaded.
   sizeOf="volume-profile"
   code={`import { VolumeProfile } from "@microcharts/react/volume-profile";
 
+const profile = [
+  { level: 134, weight: 3 },
+  { level: 136, weight: 6 },
+  { level: 138, weight: 11 },
+  { level: 140, weight: 18 },
+  { level: 142, weight: 26 },
+  { level: 144, weight: 20 },
+  { level: 146, weight: 12 },
+  { level: 148, weight: 7 },
+  { level: 150, weight: 4 },
+];
+
 <VolumeProfile data={profile} title="Volume by price" />`}
 >
   <VolumeProfile

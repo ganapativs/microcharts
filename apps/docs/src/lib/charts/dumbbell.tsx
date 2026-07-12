@@ -1,9 +1,6 @@
 import { Dumbbell } from "@microcharts/react/dumbbell";
 import { Dumbbell as DumbbellInteractive } from "@microcharts/react/dumbbell/interactive";
-import { InteractiveDemo } from "./dumbbell.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const BANDS = [
@@ -242,7 +239,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

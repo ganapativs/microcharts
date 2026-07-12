@@ -1,9 +1,6 @@
 import { CoverageStrip } from "@microcharts/react/coverage-strip";
 import { CoverageStrip as CoverageStripInteractive } from "@microcharts/react/coverage-strip/interactive";
-import { InteractiveDemo } from "./coverage-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a live window with real gaps: null = no measurement, 0 = a measured zero.
@@ -207,7 +204,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

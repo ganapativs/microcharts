@@ -1,9 +1,6 @@
 import { MicroScatter } from "@microcharts/react/micro-scatter";
 import { MicroScatter as MicroScatterInteractive } from "@microcharts/react/micro-scatter/interactive";
-import { InteractiveDemo } from "./micro-scatter.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const CLOUD = Array.from({ length: 24 }, (_, i) => ({
@@ -301,7 +298,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

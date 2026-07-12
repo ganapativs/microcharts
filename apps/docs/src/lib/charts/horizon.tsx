@@ -1,9 +1,6 @@
 import { Horizon } from "@microcharts/react/horizon";
 import { Horizon as HorizonInteractive } from "@microcharts/react/horizon/interactive";
-import { InteractiveDemo } from "./horizon.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const LOAD = [
@@ -270,7 +267,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

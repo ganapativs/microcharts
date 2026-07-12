@@ -122,7 +122,6 @@ import { FourContexts } from "@/components/charts/contexts";
 import { Sizing } from "@/components/charts/sizing";
 import { Playground } from "@/components/charts/playground";
 import { Usage } from "@/components/charts/usage";
-import { InteractiveDemo } from "@/components/charts/interactive";
 import { PropTable } from "@/components/charts/prop-table";
 import { ChartChooser } from "@/components/charts/chooser";
 import { PackageTabs } from "@/components/ui/package-tabs";
@@ -282,7 +281,6 @@ export function getMDXComponents(components?: MDXComponents) {
     Sizing,
     Playground,
     Usage,
-    InteractiveDemo,
     PropTable,
     ChartChooser,
     PackageTabs,

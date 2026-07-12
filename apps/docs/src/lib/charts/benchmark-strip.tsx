@@ -1,9 +1,6 @@
 import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
 import { BenchmarkStrip as BenchmarkStripInteractive } from "@microcharts/react/benchmark-strip/interactive";
-import { InteractiveDemo } from "./benchmark-strip.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // 42 peer latencies (ms), stable + deterministic
@@ -199,7 +196,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

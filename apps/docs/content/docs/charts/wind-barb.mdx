@@ -29,7 +29,42 @@ WindBarb has no interactive mode — a single glyph carries the whole reading, s
 is the full sentence. This gallery is the read-back key: each full barb is one `step`, a half barb
 is half a `step`, and a pennant is five.
 
-<InteractiveDemo slug="wind-barb" />
+<LiveDemo
+  label="compass — the same magnitude at eight bearings"
+  code={`<WindBarb direction={45} magnitude={35} />`}
+>
+  <span style={{ display: "inline-flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}>
+    <WindBarb direction={0} magnitude={35} title="0°" size={40} summary={false} />
+    <WindBarb direction={45} magnitude={35} title="45°" size={40} summary={false} />
+    <WindBarb direction={90} magnitude={35} title="90°" size={40} summary={false} />
+    <WindBarb direction={135} magnitude={35} title="135°" size={40} summary={false} />
+    <WindBarb direction={180} magnitude={35} title="180°" size={40} summary={false} />
+    <WindBarb direction={225} magnitude={35} title="225°" size={40} summary={false} />
+    <WindBarb direction={270} magnitude={35} title="270°" size={40} summary={false} />
+    <WindBarb direction={315} magnitude={35} title="315°" size={40} summary={false} />
+  </span>
+</LiveDemo>
+
+<LiveDemo
+  label="magnitude ladder — count the barbs: a half barb is 5, a full barb 10, a pennant 50"
+  code={`<WindBarb direction={90} magnitude={55} label="value" />`}
+>
+  <span
+    style={{
+      display: "inline-flex",
+      gap: "0.75rem",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <WindBarb direction={90} magnitude={5} label="value" title="5" size={44} summary={false} />
+    <WindBarb direction={90} magnitude={15} label="value" title="15" size={44} summary={false} />
+    <WindBarb direction={90} magnitude={32} label="value" title="32" size={44} summary={false} />
+    <WindBarb direction={90} magnitude={55} label="value" title="55" size={44} summary={false} />
+    <WindBarb direction={90} magnitude={80} label="value" title="80" size={44} summary={false} />
+  </span>
+</LiveDemo>
 
 ## When to use it
 

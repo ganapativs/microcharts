@@ -6,9 +6,11 @@ import { CELL_FILL, CELL_R, CELL_SIZE, CELLS, SQUIRCLE_PATH } from "@/lib/brand"
  * is the single canonical spec in `lib/brand.ts`, shared with the favicon /
  * apple icon / OG badge so every surface matches exactly.
  *
- * variant "solid" → accent squircle, near-white cells knocked out (the standard
- *                    logo: nav, favicon, wordmark badge).
- * variant "line"  → transparent, cells in currentColor (footers, mono contexts).
+ * variant "solid"   → accent squircle, near-white cells knocked out (the
+ *                     standard logo: nav, favicon, wordmark badge).
+ * variant "line"    → transparent, cells in currentColor (mono contexts).
+ * variant "outline" → hollow: hairline squircle + cells, all currentColor —
+ *                     the letterpress treatment the footer wordmark uses.
  */
 export function Brandmark({
   size = 24,
@@ -16,9 +18,35 @@ export function Brandmark({
   className,
 }: {
   size?: number;
-  variant?: "solid" | "line";
+  variant?: "solid" | "line" | "outline";
   className?: string;
 }) {
+  if (variant === "outline") {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 32 32"
+        fill="none"
+        aria-hidden
+        className={className}
+      >
+        <path d={SQUIRCLE_PATH} stroke="currentColor" strokeWidth={1.5} opacity={0.55} />
+        {CELLS.map((c) => (
+          <rect
+            key={c.x}
+            x={c.x}
+            y={c.y}
+            width={CELL_SIZE}
+            height={CELL_SIZE}
+            rx={CELL_R}
+            fill="currentColor"
+            opacity={c.o}
+          />
+        ))}
+      </svg>
+    );
+  }
   if (variant === "line") {
     return (
       <svg

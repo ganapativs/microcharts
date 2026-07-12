@@ -1,9 +1,6 @@
 import { PercentileLadder } from "@microcharts/react/percentile-ladder";
 import { PercentileLadder as PercentileLadderInteractive } from "@microcharts/react/percentile-ladder/interactive";
-import { InteractiveDemo } from "./percentile-ladder.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a long-tailed latency sample (ms)
@@ -201,7 +198,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

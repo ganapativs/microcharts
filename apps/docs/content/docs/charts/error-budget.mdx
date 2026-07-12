@@ -114,7 +114,7 @@ rather than the English "62%".
 </LiveDemo>
 
 With no data the chart renders an empty root and the accessible name says **"No data."**; a
-single point still draws the diagonal, wedges, and endpoint against a 1-step window, though
+single point still draws the diagonal, wedges, and endpoint, though
 `currentRate` (which needs a prior step) reads `0`. Once the remaining line reaches zero before
 `window` elapses, the line stops at that step and an ✕ replaces the endpoint dot — no further
 steps are drawn, extrapolated, or implied, and the summary reads **"Budget exhausted at day 7

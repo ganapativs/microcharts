@@ -1,9 +1,6 @@
 import { WinProbWorm } from "@microcharts/react/win-prob-worm";
 import { WinProbWorm as WinProbWormInteractive } from "@microcharts/react/win-prob-worm/interactive";
-import { InteractiveDemo } from "./win-prob-worm.client";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a game where the lead flips three times, then home pulls away to 98%
@@ -173,7 +170,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,
