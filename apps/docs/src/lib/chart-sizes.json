@@ -117,7 +117,7 @@
   },
   "stacked-area": {
     "static": 2.82,
-    "interactive": 4.18
+    "interactive": 4.17
   },
   "ohlc": {
     "static": 2.42,
@@ -168,7 +168,7 @@
     "interactive": 3.59
   },
   "control-strip": {
-    "static": 2.68,
+    "static": 2.67,
     "interactive": 3.86
   },
   "forecast-cone": {
@@ -273,7 +273,7 @@
   },
   "constellation": {
     "static": 2.82,
-    "interactive": 4.09
+    "interactive": 4.08
   },
   "polar-clock": {
     "static": 2.89,
@@ -304,7 +304,7 @@
     "interactive": 3.82
   },
   "icon-array": {
-    "static": 2.07,
+    "static": 2.06,
     "interactive": 3.29
   },
   "time-in-range": {
@@ -375,7 +375,7 @@
     "interactive": 3.86
   },
   "phase-trace": {
-    "static": 2.28,
+    "static": 2.27,
     "interactive": 3.47
   },
   "trace-fold": {
@@ -391,11 +391,11 @@
     "interactive": 3.9
   },
   "cohort-triangle": {
-    "static": 2.41,
+    "static": 2.4,
     "interactive": 3.65
   },
   "streak-spark": {
-    "static": 2.43,
+    "static": 2.42,
     "interactive": 3.59
   },
   "grade-profile": {
@@ -426,6 +426,6 @@
     "static": 1.46
   },
   "motion": {
-    "static": 2.47
+    "static": 2.35
   }
 }
