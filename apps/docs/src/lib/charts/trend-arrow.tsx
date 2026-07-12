@@ -155,7 +155,7 @@ export const playground: PlaygroundSpec = {
       (s.showValue as boolean) && "  showValue",
       s.positive === "down" && '  positive="down"',
       '  format={{ style: "percent", maximumFractionDigits: 0 }}',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -290,9 +290,20 @@ export function markCode(): string {
   return `<TrendArrow value={0.12} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-3">
+      <TrendArrowInteractive value={0.3} summary={false} animate />
+      <TrendArrow value={0} summary={false} />
+      <TrendArrow value={-0.3} summary={false} />
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -137,7 +137,7 @@ export const playground: PlaygroundSpec = {
       `  value={${s.value}}`,
       s.range !== "p5p95" && `  range="${s.range}"`,
       s.label !== "percentile" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -192,9 +192,23 @@ export function markCode(): string {
   return `<BenchmarkStrip data={peerLatencies} value={value} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <BenchmarkStripInteractive
+      data={PEERS}
+      value={312}
+      summary={false}
+      width={140}
+      height={14}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -108,7 +108,7 @@ export const playground: PlaygroundSpec = {
       "  data={accounts}",
       s.labels && "  labels",
       s.value && '  label="value"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -234,9 +234,14 @@ export function markCode(): string {
   return `<SproutRow data={accounts} />`;
 }
 
+export function PreviewLive() {
+  return <SproutRowInteractive data={ACCTS} summary={false} height={22} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

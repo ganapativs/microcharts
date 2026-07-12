@@ -135,7 +135,7 @@ export const playground: PlaygroundSpec = {
       s.folds !== "2" && `  folds={${s.folds}}`,
       s.mode !== "mirror" && `  mode="${s.mode}"`,
       s.baseline !== 0 && `  baseline={${s.baseline}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -259,9 +259,14 @@ export function markCode(): string {
   return `<Horizon data={series} />`;
 }
 
+export function PreviewLive() {
+  return <HorizonInteractive data={LOAD} summary={false} width={130} height={16} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

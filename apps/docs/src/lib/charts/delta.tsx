@@ -215,7 +215,7 @@ export const playground: PlaygroundSpec = {
     }
     if (positive === "down") lines.push('  positive="down"');
     if (locale !== "en-US") lines.push(`  locale="${locale}"`);
-    if (ui.animate) lines.push("  animate");
+    if (ui.animate) lines.push(" animate");
     lines.push("/>");
     return lines.join("\n");
   },
@@ -326,9 +326,18 @@ export function markCode(): string {
   return `<Delta value={0.124} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="text-2xl">
+      <DeltaInteractive value={0.184} summary={false} animate />
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

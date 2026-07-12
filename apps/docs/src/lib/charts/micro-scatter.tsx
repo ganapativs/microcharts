@@ -159,7 +159,7 @@ export const playground: PlaygroundSpec = {
       s.r !== 1.5 && `  r={${s.r}}`,
       (s.zoom as boolean) && "  xDomain={[0, 12]}",
       (s.zoom as boolean) && "  domain={[0, 60]}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -285,9 +285,14 @@ export function markCode(): string {
   return `<MicroScatter data={pairs} />`;
 }
 
+export function PreviewLive() {
+  return <MicroScatterInteractive data={CLOUD} summary={false} width={110} height={66} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

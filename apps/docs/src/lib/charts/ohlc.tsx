@@ -147,7 +147,7 @@ export const playground: PlaygroundSpec = {
       s.variant !== "candle" && `  variant="${s.variant}"`,
       s.label !== "none" && `  label="${s.label}"`,
       s.maxPeriods !== 20 && `  maxPeriods={${s.maxPeriods}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -297,9 +297,14 @@ export function markCode(): string {
   return `<Ohlc data={sessions} />`;
 }
 
+export function PreviewLive() {
+  return <OhlcInteractive data={PERIODS} summary={false} width={140} height={24} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

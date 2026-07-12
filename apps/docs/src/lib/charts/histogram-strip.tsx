@@ -158,7 +158,7 @@ export const playground: PlaygroundSpec = {
       (s.markValue as boolean) && "  markValue={45}",
       (s.domain as boolean) && "  domain={[0, 100]}",
       (s.locale as string) !== "en-US" && `  locale="${s.locale}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -275,9 +275,14 @@ export function markCode(): string {
   return `<HistogramStrip data={times} />`;
 }
 
+export function PreviewLive() {
+  return <HistogramStripInteractive data={TIMES} summary={false} width={130} height={34} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

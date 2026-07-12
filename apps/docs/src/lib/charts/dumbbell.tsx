@@ -126,7 +126,7 @@ export const playground: PlaygroundSpec = {
       (s.positive as boolean) && '  positive="up"',
       (s.values as boolean) && '  label="value"',
       (s.highlight as boolean) && '  highlight="Berlin"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -231,9 +231,14 @@ export function markCode(): string {
   return `<Dumbbell data={[{ from: 48, to: 68 }]} />`;
 }
 
+export function PreviewLive() {
+  return <DumbbellInteractive data={BANDS} summary={false} width={130} height={52} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

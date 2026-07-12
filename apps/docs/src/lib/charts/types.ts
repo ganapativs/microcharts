@@ -124,6 +124,12 @@ export interface ChartModule {
   entry: ChartEntry;
   /** Static render for the gallery card. */
   Preview: ComponentType;
+  /**
+   * Interactive-entry twin of `Preview` at the SAME size/props, with entrance
+   * `animate` on. Gallery + homepage hero prefer it unless the visitor chooses
+   * static or prefers reduced motion (then they stay on `Preview`).
+   */
+  PreviewLive?: ComponentType;
   /** Homepage instrument-strip card (interactive entry, fixed size). */
   showcase: { hint: string; Node: ComponentType };
   playground: PlaygroundSpec;

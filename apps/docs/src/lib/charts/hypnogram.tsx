@@ -167,7 +167,7 @@ export const playground: PlaygroundSpec = {
       s.variant !== "steps" && `  variant="${s.variant}"`,
       s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
       s.connectors === false && "  connectors={false}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -220,9 +220,24 @@ export function markCode(): string {
   return `<Hypnogram data={sleep} states={["Awake", "REM", "Light", "Deep"]} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <HypnogramInteractive
+      data={SLEEP}
+      states={STATES}
+      domain={DOM}
+      summary={false}
+      width={150}
+      height={64}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

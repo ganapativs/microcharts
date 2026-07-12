@@ -127,7 +127,7 @@ export const playground: PlaygroundSpec = {
       `  rate={${((s.rate as number) / 100).toFixed(2)}}`,
       s.label !== "eta" && `  label="${s.label}"`,
       "  formatEta={(t) => `${Math.round(t)} min`}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -168,9 +168,25 @@ export function markCode(): string {
   return `<EtaBar progress={0.64} elapsed={3.6} rate={0.18} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <EtaBarInteractive
+      progress={0.64}
+      elapsed={3.6}
+      rate={0.18}
+      formatEta={min}
+      summary={false}
+      width={130}
+      height={14}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

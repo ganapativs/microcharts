@@ -137,7 +137,7 @@ export const playground: PlaygroundSpec = {
       "  data={reliability}",
       s.variant !== "dots" && `  variant="${s.variant}"`,
       s.minSupport !== 11 && `  minSupport={${s.minSupport}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -174,9 +174,16 @@ export function markCode(): string {
   return `<CalibrationStrip data={reliability} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <CalibrationStripInteractive data={BINS} summary={false} width={130} height={32} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

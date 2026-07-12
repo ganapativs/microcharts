@@ -134,7 +134,7 @@ export const playground: PlaygroundSpec = {
       s.ghosts !== 8 && `  ghosts={${s.ghosts}}`,
       s.emphasis !== "nearest-median" && `  emphasis="${s.emphasis}"`,
       s.endpoints && "  endpoints",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -176,9 +176,16 @@ export function markCode(): string {
   return `<EnsembleGhosts data={futures} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <EnsembleGhostsInteractive data={FUTURES} summary={false} width={120} height={28} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

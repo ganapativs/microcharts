@@ -130,7 +130,7 @@ export const playground: PlaygroundSpec = {
       "  data={latencies}",
       s.whiskers !== "minmax" && `  whiskers="${s.whiskers}"`,
       s.whiskers === "tukey" && s.outliers === false && "  outliers={false}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -248,9 +248,14 @@ export function markCode(): string {
   return `<MicroBox data={values} />`;
 }
 
+export function PreviewLive() {
+  return <MicroBoxInteractive data={RAW} summary={false} width={130} height={22} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

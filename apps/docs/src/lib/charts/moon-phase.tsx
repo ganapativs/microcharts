@@ -132,9 +132,20 @@ export function markCode(): string {
   return `<MoonPhase value={0.68} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-3">
+      {[0.1, 0.35, 0.5, 0.75, 1].map((v) => (
+        <MoonPhaseInteractive key={v} value={v} summary={false} size={20} />
+      ))}
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

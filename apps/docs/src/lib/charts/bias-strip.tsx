@@ -113,7 +113,7 @@ export const playground: PlaygroundSpec = {
       (s.wide as boolean) && "  limits={2.58}",
       !(s.caption as boolean) && '  label="none"',
       s.r !== 1.5 && `  r={${s.r}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -156,9 +156,14 @@ export function markCode(): string {
   return `<BiasStrip data={pairs} />`;
 }
 
+export function PreviewLive() {
+  return <BiasStripInteractive data={PAIRS} summary={false} width={120} height={64} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

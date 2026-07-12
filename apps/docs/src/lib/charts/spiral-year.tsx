@@ -129,7 +129,7 @@ export const playground: PlaygroundSpec = {
       s.steps !== "5" && `  steps={${s.steps}}`,
       s.mark !== "dot" && `  mark="${s.mark}"`,
       s.monthTicks !== "on" && "  monthTicks={false}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -160,9 +160,14 @@ export function markCode(): string {
   return `<SpiralYear data={byWeek} />`;
 }
 
+export function PreviewLive() {
+  return <SpiralYearInteractive data={YEAR} summary={false} size={40} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

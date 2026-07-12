@@ -130,7 +130,7 @@ export const playground: PlaygroundSpec = {
       `  target={${s.target}}`,
       s.bands && "  bands={[50, 90]}",
       s.domain && "  domain={[0, 60]}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -280,9 +280,24 @@ export function markCode(width?: number, height?: number): string {
   return `<Bullet value={72} target={80} bands={[50, 90]}${size} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <BulletInteractive
+      value={72}
+      target={80}
+      bands={[50, 90]}
+      width={190}
+      height={22}
+      summary={false}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

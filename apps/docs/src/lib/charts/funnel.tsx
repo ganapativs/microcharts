@@ -150,7 +150,7 @@ export const playground: PlaygroundSpec = {
       !(s.connectors as boolean) && "  connectors={false}",
       s.label !== "none" && `  label="${s.label}"`,
       (s.highlight as boolean) && '  highlight="Activated"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -272,9 +272,14 @@ export function markCode(): string {
   return `<Funnel data={stages} />`;
 }
 
+export function PreviewLive() {
+  return <FunnelInteractive data={PIPE} summary={false} width={130} height={40} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

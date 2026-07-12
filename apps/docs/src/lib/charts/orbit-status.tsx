@@ -201,9 +201,23 @@ export function markCode(): string {
   return `<OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <OrbitStatusInteractive
+      latency={240}
+      rate={12}
+      latencyDomain={LD}
+      rateDomain={RD}
+      summary={false}
+      size={24}
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

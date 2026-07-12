@@ -125,7 +125,7 @@ export const playground: PlaygroundSpec = {
       `  data={{ content, window: [${s.window}, ${(s.window as number) + 140}], marks, known }}`,
       s.variant !== "bars" && `  variant="${s.variant}"`,
       s.markLane === false && "  markLane={false}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -162,9 +162,14 @@ export function markCode(): string {
   return `<MinimapStrip data={{ content, window, marks, known }} />`;
 }
 
+export function PreviewLive() {
+  return <MinimapStripInteractive data={DATA} summary={false} width={130} height={16} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

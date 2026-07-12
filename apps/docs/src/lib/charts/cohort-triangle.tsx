@@ -161,7 +161,7 @@ export const playground: PlaygroundSpec = {
       s.highlight !== "none" && `  highlight="${s.highlight}"`,
       `  cell={${s.cell}}`,
       '  unit="month"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -196,9 +196,16 @@ export function markCode(): string {
   return `<CohortTriangle data={cohorts} labels={false} cell={7} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <CohortTriangleInteractive data={COHORTS} cell={10} labels={false} summary={false} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

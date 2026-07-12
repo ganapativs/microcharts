@@ -125,7 +125,7 @@ export const playground: PlaygroundSpec = {
       s.total !== "20" && `  total={${s.total}}`,
       s.label !== "ratio" && `  label="${s.label}"`,
       s.shape !== "square" && `  shape="${s.shape}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -164,9 +164,16 @@ export function markCode(): string {
   return `<IconArray value={0.15} total={20} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <IconArrayInteractive value={0.15} total={20} summary={false} width={110} height={26} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

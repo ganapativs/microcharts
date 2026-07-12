@@ -123,7 +123,7 @@ export const playground: PlaygroundSpec = {
       "<StatusDot",
       `  status="${s.status}"`,
       (s.pulse as boolean) && "  pulse",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -253,9 +253,26 @@ export function markCode(): string {
   return `<StatusDot status="ok" />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-3">
+      {(["ok", "warn", "error", "off", "busy"] as const).map((s) => (
+        <StatusDotInteractive
+          key={s}
+          status={s}
+          summary={false}
+          style={{ width: 14, height: 14 }}
+          animate
+        />
+      ))}
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

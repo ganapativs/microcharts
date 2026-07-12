@@ -136,7 +136,7 @@ export const playground: PlaygroundSpec = {
       "  domain={[0, 100]}",
       s.steps !== 5 && `  steps={${s.steps}}`,
       s.shape !== "square" && `  shape="${s.shape}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -253,9 +253,16 @@ export function markCode(): string {
   return `<HeatStrip data={data} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <HeatStripInteractive data={LOAD} domain={D} summary={false} width={130} height={18} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

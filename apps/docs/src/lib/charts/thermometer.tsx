@@ -128,7 +128,7 @@ export const playground: PlaygroundSpec = {
       `  target={${s.target}}`,
       s.orientation !== "vertical" && `  orientation="${s.orientation}"`,
       s.bulb === false && "  bulb={false}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -169,9 +169,20 @@ export function markCode(): string {
   return `<Thermometer value={72} target={80} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-end gap-3">
+      <ThermometerInteractive value={72} target={80} summary={false} animate />
+      <ThermometerInteractive value={40} summary={false} animate />
+      <ThermometerInteractive value={95} summary={false} animate />
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

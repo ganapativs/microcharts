@@ -156,9 +156,14 @@ export function markCode(): string {
   return `<CometTrail data={rollingWindow} />`;
 }
 
+export function PreviewLive() {
+  return <CometTrailInteractive data={RISING} summary={false} width={80} />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

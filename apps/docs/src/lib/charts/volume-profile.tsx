@@ -136,7 +136,7 @@ export const playground: PlaygroundSpec = {
       s.align !== "left" && `  align="${s.align}"`,
       s.label !== "poc" && `  label="${s.label}"`,
       s.valueArea !== 70 && `  valueArea={${((s.valueArea as number) / 100).toFixed(2)}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -174,9 +174,14 @@ export function markCode(): string {
   return `<VolumeProfile data={profile} />`;
 }
 
+export function PreviewLive() {
+  return <VolumeProfileInteractive data={PROFILE} summary={false} width={60} height={40} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

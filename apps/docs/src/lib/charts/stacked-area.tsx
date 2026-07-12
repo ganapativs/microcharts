@@ -166,7 +166,7 @@ export const playground: PlaygroundSpec = {
       s.label !== "none" && `  label="${s.label}"`,
       s.curve !== "linear" && `  curve="${s.curve}"`,
       s.locale !== "en-US" && `  locale="${s.locale}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -308,9 +308,14 @@ export function markCode(): string {
   return `<StackedArea data={mix} />`;
 }
 
+export function PreviewLive() {
+  return <StackedAreaInteractive data={MIX} summary={false} width={130} height={22} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -124,7 +124,7 @@ export const playground: PlaygroundSpec = {
       s.rows !== 7 && `  rows={${s.rows}}`,
       s.steps !== "5" && `  steps={${s.steps}}`,
       s.empty !== "outline" && `  empty="${s.empty}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -159,9 +159,14 @@ export function markCode(): string {
   return `<GardenGrid data={weeks} />`;
 }
 
+export function PreviewLive() {
+  return <GardenGridInteractive data={WEEKS} summary={false} cell={9} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

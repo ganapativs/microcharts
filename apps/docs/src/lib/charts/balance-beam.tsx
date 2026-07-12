@@ -137,7 +137,7 @@ export const playground: PlaygroundSpec = {
       `  data={[{ label: "Inflow", value: ${s.left} }, { label: "Outflow", value: ${s.right} }]}`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       s.label && '  label="values"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -198,9 +198,27 @@ export function markCode(): string {
   return `<BalanceBeam data={[{ label: "A", value: 620 }, { label: "B", value: 480 }]} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-4">
+      <BalanceBeamInteractive data={FLOW} summary={false} width={56} height={24} animate />
+      <BalanceBeam
+        data={[
+          { label: "A", value: 500 },
+          { label: "B", value: 500 },
+        ]}
+        summary={false}
+        width={56}
+        height={24}
+      />
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

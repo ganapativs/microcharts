@@ -136,7 +136,7 @@ export const playground: PlaygroundSpec = {
       s.steps !== 5 && `  steps={${s.steps}}`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       (s.label as boolean) && '  label="value"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -284,9 +284,27 @@ export function markCode(): string {
   return `<HeatCell value={72} domain={[0, 100]} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {[12, 35, 58, 79, 96].map((v) => (
+        <HeatCellInteractive
+          key={v}
+          value={v}
+          domain={D}
+          summary={false}
+          style={{ width: 16, height: 16 }}
+          animate
+        />
+      ))}
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

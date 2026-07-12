@@ -125,7 +125,7 @@ export const playground: PlaygroundSpec = {
       (s.stem as boolean) && "  stem",
       (s.values as boolean) && '  label="value"',
       (s.highlight as boolean) && '  highlight="Ada"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -255,9 +255,14 @@ export function markCode(): string {
   return `<DotPlot data={team} />`;
 }
 
+export function PreviewLive() {
+  return <DotPlotInteractive data={TEAM} summary={false} width={130} height={70} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

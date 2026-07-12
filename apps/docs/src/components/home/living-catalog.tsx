@@ -1,5 +1,6 @@
 "use client";
 // oxlint-disable react/no-array-index-key -- tiles are positional; the inner span keys on `nonce` to remount on swap
+import "@microcharts/react/motion"; // enables `animate` entrance on the live hero cluster
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -127,7 +128,10 @@ export function LivingCatalog({ total }: { total: number }) {
             const mod = CHART_MODULES[cell.slug];
             const entry = getChart(cell.slug);
             if (!mod || !entry) return <li key={i} aria-hidden />;
-            const { Preview } = mod;
+            // Once live (mounted, motion allowed) render the interactive
+            // twin so the entrance animates on load + on each swap; reduced-motion
+            // visitors never flip `live` on, so they keep the static Preview.
+            const Preview = live && mod.PreviewLive ? mod.PreviewLive : mod.Preview;
             return (
               <li key={i}>
                 <Link

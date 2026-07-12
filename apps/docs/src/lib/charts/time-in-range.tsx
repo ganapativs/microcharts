@@ -148,7 +148,7 @@ export const playground: PlaygroundSpec = {
       `  data={{ below: 9, in: ${s.in}, above: 19 }}`,
       s.label !== "in" && `  label="${s.label}"`,
       s.orientation !== "horizontal" && `  orientation="${s.orientation}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -194,9 +194,14 @@ export function markCode(): string {
   return `<TimeInRange data={{ below: 9, in: 72, above: 19 }} />`;
 }
 
+export function PreviewLive() {
+  return <TimeInRangeInteractive data={GLUCOSE} summary={false} width={130} height={16} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -215,7 +215,7 @@ export const playground: PlaygroundSpec = {
       (s.highlight as boolean) && `  highlight="${target}"`,
       s.orientation === "horizontal" && '  orientation="horizontal"',
       signed && '  positive="up"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -342,9 +342,14 @@ export function markCode(): string {
   return `<MiniBar data={mix} />`;
 }
 
+export function PreviewLive() {
+  return <MiniBarInteractive data={MIX} summary={false} width={100} height={32} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

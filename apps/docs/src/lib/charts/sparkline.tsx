@@ -163,7 +163,7 @@ export const playground: PlaygroundSpec = {
       s.fill && "  fill",
       s.band && "  band={[10, 26]}",
       s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -286,9 +286,23 @@ export function markCode(width?: number, height?: number): string {
   return `<Sparkline data={data}${size} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <SparklineInteractive
+      data={entry.demo}
+      width={180}
+      height={48}
+      dots="minmax"
+      summary={false}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

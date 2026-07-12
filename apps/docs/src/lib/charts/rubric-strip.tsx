@@ -113,7 +113,7 @@ export const playground: PlaygroundSpec = {
       "  data={criteria}",
       s.labels === false && "  labels={false}",
       s.showTarget && `  target={${((s.target as number) / 100).toFixed(2)}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -156,9 +156,14 @@ export function markCode(): string {
   return `<RubricStrip data={criteria} />`;
 }
 
+export function PreviewLive() {
+  return <RubricStripInteractive data={RUBRIC} summary={false} width={120} height={30} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -191,7 +191,7 @@ export const playground: PlaygroundSpec = {
       s.shape !== "square" && `  shape="${s.shape}"`,
       Number(s.cell) !== 7 && `  cell={${s.cell}}`,
       Number(s.gap) !== 1 && `  gap={${s.gap}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -324,9 +324,22 @@ export function markCode(): string {
   return `<CalendarStrip data={days} end={today} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <CalendarStripInteractive
+      data={DATA}
+      end={END}
+      summary={false}
+      style={{ width: 110, height: 62 }}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

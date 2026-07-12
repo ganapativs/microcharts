@@ -1920,14 +1920,12 @@ div:where(
     border: 1px solid transparent;
     transition:
       background-color 0.2s var(--ease-out-quint),
-      border-color 0.2s var(--ease-out-quint),
-      transform 0.2s var(--ease-out-quint);
+      border-color 0.2s var(--ease-out-quint);
   }
   @media (hover: hover) and (pointer: fine) {
     .hx-tile:hover {
       background-color: var(--glass-surface);
       border-color: color-mix(in oklab, var(--accent) 34%, var(--hairline));
-      transform: translateY(-2px);
     }
   }
   /* one tile fading to a new chart — opacity + scale + a touch of blur (GPU) */

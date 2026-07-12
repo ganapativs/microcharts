@@ -146,7 +146,7 @@ export const playground: PlaygroundSpec = {
       "  domain={today}",
       s.now && "  now={Date.now()}",
       s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -276,9 +276,23 @@ export function markCode(): string {
   return `<EventTimeline data={windows} domain={window} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <EventTimelineInteractive
+      data={DATA}
+      domain={WINDOW}
+      summary={false}
+      width={150}
+      height={20}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -107,7 +107,7 @@ export const playground: PlaygroundSpec = {
       "  data={data}",
       s.capacity && "  capacity={100}",
       s.label !== "last" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -154,9 +154,23 @@ export function markCode(): string {
   return `<QueueDepth data={data} capacity={100} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <QueueDepthInteractive
+      data={DATA}
+      capacity={CAP}
+      summary={false}
+      width={150}
+      height={26}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

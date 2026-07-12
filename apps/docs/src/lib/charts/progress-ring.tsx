@@ -116,7 +116,7 @@ export const playground: PlaygroundSpec = {
       (s.sweep as boolean) && "  sweep",
       s.weight !== 3 && `  weight={${s.weight}}`,
       (s.label as boolean) && '  label="percent"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -231,9 +231,21 @@ export function markCode(): string {
   return `<ProgressRing value={0.68} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <ProgressRingInteractive
+      value={0.68}
+      summary={false}
+      style={{ width: 40, height: 40 }}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

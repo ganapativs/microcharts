@@ -148,7 +148,7 @@ export const playground: PlaygroundSpec = {
       s.accent !== "diagonal" && `  accent="${s.accent}"`,
       s.label === true && '  label="accuracy"',
       s.round === true && '  shape="round"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -178,9 +178,14 @@ export function markCode(): string {
   return `<ConfusionGrid data={{ labels, counts }} />`;
 }
 
+export function PreviewLive() {
+  return <ConfusionGridInteractive data={CATDOG} summary={false} size={48} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -124,7 +124,7 @@ export const playground: PlaygroundSpec = {
       "  data={ranks}",
       s.bands === false && "  bands={false}",
       s.positive !== "up" && `  positive="${s.positive}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -162,9 +162,14 @@ export function markCode(): string {
   return `<PercentileTrace data={ranks} />`;
 }
 
+export function PreviewLive() {
+  return <PercentileTraceInteractive data={DEMO} summary={false} width={150} height={26} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

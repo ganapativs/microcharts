@@ -141,7 +141,7 @@ export const playground: PlaygroundSpec = {
       s.mode !== "down" && `  mode="${s.mode}"`,
       s.projection === false && "  projection={false}",
       s.label !== "gap" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -199,9 +199,22 @@ export function markCode(): string {
   return `<BurnChart data={{ plan, actual }} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <BurnChartInteractive
+      data={{ plan: PLAN, actual: ACTUAL }}
+      summary={false}
+      width={150}
+      height={26}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

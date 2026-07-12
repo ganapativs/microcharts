@@ -111,7 +111,7 @@ export const playground: PlaygroundSpec = {
       `  value={${(s.pct as number) / 100}}`,
       (s.segments as number) >= 2 && `  segments={${s.segments}}`,
       s.label !== "percent" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -248,9 +248,14 @@ export function markCode(): string {
   return `<Progress value={0.68} />`;
 }
 
+export function PreviewLive() {
+  return <ProgressInteractive value={0.68} summary={false} width={120} height={20} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

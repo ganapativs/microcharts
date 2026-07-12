@@ -159,7 +159,7 @@ export const playground: PlaygroundSpec = {
       (s.signed as boolean) && '  positive="up"',
       (s.flag as boolean) && "  anomaly={6}",
       (s.domain as boolean) && "  domain={[0, 20]}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -276,9 +276,14 @@ export function markCode(): string {
   return `<Seismogram data={burstsPerMinute} />`;
 }
 
+export function PreviewLive() {
+  return <SeismogramInteractive data={BURSTS} summary={false} width={140} height={28} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

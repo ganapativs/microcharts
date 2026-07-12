@@ -115,9 +115,20 @@ export function markCode(): string {
   return `<DicePips value={4} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-3">
+      {[1, 2, 3, 4, 5, 6].map((v) => (
+        <DicePipsInteractive key={v} value={v} summary={false} size={18} />
+      ))}
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

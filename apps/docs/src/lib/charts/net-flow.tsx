@@ -150,7 +150,7 @@ export const playground: PlaygroundSpec = {
       s.mode !== "area" && `  mode="${s.mode}"`,
       s.net === false && "  net={false}",
       s.label !== "last" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -203,9 +203,16 @@ export function markCode(): string {
   return `<NetFlow data={months} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <NetFlowInteractive data={DEMO} format={KFMT} summary={false} width={150} height={26} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

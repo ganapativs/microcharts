@@ -170,7 +170,7 @@ export const playground: PlaygroundSpec = {
       s.minVolume && "  minVolume={50}",
       s.curve !== "linear" && `  curve="${s.curve}"`,
       s.label !== "last" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -224,9 +224,23 @@ export function markCode(): string {
   return `<RateVolume data={periods} minVolume={50} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <RateVolumeInteractive
+      data={FRAC}
+      format={PCT}
+      summary={false}
+      width={150}
+      height={26}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

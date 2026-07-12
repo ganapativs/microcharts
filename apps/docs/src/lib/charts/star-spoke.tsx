@@ -128,7 +128,7 @@ export const playground: PlaygroundSpec = {
       s.guides === false && "  guides={false}",
       s.compare === true && "  compare={baseline}",
       s.labels === true && "  labels",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -171,9 +171,14 @@ export function markCode(): string {
   return `<StarSpoke data={metrics} />`;
 }
 
+export function PreviewLive() {
+  return <StarSpokeInteractive data={PROFILE} summary={false} size={84} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

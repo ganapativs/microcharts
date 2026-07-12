@@ -191,9 +191,16 @@ export function markCode(): string {
   return `<TokenConfidence data={tokens} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <TokenConfidenceInteractive data={ANSWER} summary={false} style={{ fontSize: "0.8rem" }} />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -139,7 +139,7 @@ export const playground: PlaygroundSpec = {
       s.label !== "ends" && `  label="${s.label}"`,
       s.dots !== "changes" && `  dots="${s.dots}"`,
       s.maxRank !== 5 && `  maxRank={${s.maxRank}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -262,9 +262,14 @@ export function markCode(): string {
   return `<BumpStrip data={weeklyRanks} />`;
 }
 
+export function PreviewLive() {
+  return <BumpStripInteractive data={RANKS} summary={false} width={130} height={20} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

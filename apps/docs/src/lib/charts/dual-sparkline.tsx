@@ -135,7 +135,7 @@ export const playground: PlaygroundSpec = {
       "  compare={market}",
       s.label !== "none" && `  label="${s.label}"`,
       s.band && "  band={[13, 16]}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -268,9 +268,23 @@ export function markCode(): string {
   return `<DualSparkline data={ours} compare={market} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <DualSparklineInteractive
+      data={US}
+      compare={BENCH}
+      summary={false}
+      width={130}
+      height={22}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -112,7 +112,7 @@ export const playground: PlaygroundSpec = {
       `  value={${s.value}}`,
       `  total={${s.total}}`,
       s.empty !== "outline" && `  empty="${s.empty}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -145,9 +145,16 @@ export function markCode(): string {
   return `<Honeycomb value={34} total={40} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <HoneycombInteractive value={34} total={40} unit="seats" summary={false} cell={4} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

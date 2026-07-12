@@ -114,7 +114,7 @@ export const playground: PlaygroundSpec = {
       `  total={${s.total}}`,
       s.shape !== "dot" && `  shape="${s.shape}"`,
       s.fractional !== "clip" && `  fractional="${s.fractional}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -242,9 +242,16 @@ export function markCode(): string {
   return `<PictogramRow value={3} total={5} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <PictogramRowInteractive value={5} total={8} summary={false} width={110} height={16} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

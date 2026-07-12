@@ -142,7 +142,7 @@ export const playground: PlaygroundSpec = {
       "  window={30}",
       s.wedges === false && "  rates={[1]}",
       s.label !== "remaining" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -194,9 +194,23 @@ export function markCode(): string {
   return `<ErrorBudget data={remaining} window={30} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <ErrorBudgetInteractive
+      data={DEMO}
+      window={WINDOW}
+      summary={false}
+      width={150}
+      height={26}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

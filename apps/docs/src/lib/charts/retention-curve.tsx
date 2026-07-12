@@ -146,7 +146,7 @@ export const playground: PlaygroundSpec = {
       s.benchmark && "  benchmark={industry}",
       s.plateau === false && "  plateau={false}",
       s.curve !== "step" && `  curve="${s.curve}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -183,9 +183,14 @@ export function markCode(): string {
   return `<RetentionCurve data={cohort} />`;
 }
 
+export function PreviewLive() {
+  return <RetentionCurveInteractive data={DEMO} summary={false} width={150} height={26} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -130,7 +130,7 @@ export const playground: PlaygroundSpec = {
       "  data={regions}",
       s.align !== "center" && `  align="${s.align}"`,
       s.label !== "value" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -164,9 +164,14 @@ export function markCode(): string {
   return `<BubbleRow data={regions} />`;
 }
 
+export function PreviewLive() {
+  return <BubbleRowInteractive data={REGIONS} summary={false} height={30} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

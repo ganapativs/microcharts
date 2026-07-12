@@ -140,7 +140,7 @@ export const playground: PlaygroundSpec = {
       s.rings !== "stroke" && `  rings="${s.rings}"`,
       s.highlight !== "last" && `  highlight="${s.highlight}"`,
       s.label && '  label="last"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -171,9 +171,14 @@ export function markCode(): string {
   return `<TreeRings data={years} />`;
 }
 
+export function PreviewLive() {
+  return <TreeRingsInteractive data={YEARS} summary={false} size={28} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

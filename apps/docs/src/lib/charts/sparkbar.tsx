@@ -176,7 +176,7 @@ export const playground: PlaygroundSpec = {
       gap !== 0.25 && `  gap={${gap}}`,
       s.label && '  label="last"',
       s.locale !== "en-US" && `  locale="${s.locale}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -294,9 +294,14 @@ export function markCode(width?: number, height?: number): string {
   return `<SparkBar data={data}${size} />`;
 }
 
+export function PreviewLive() {
+  return <SparkBarInteractive data={entry.demo} width={180} height={48} summary={false} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

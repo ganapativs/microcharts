@@ -139,7 +139,7 @@ export const playground: PlaygroundSpec = {
       s.maxWedges !== 4 && `  maxWedges={${s.maxWedges}}`,
       s.weight !== 5 && `  weight={${s.weight}}`,
       (s.decorative as boolean) && "  decorative",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -247,9 +247,16 @@ export function markCode(): string {
   return `<MicroDonut data={mix} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <MicroDonutInteractive data={MIX} summary={false} style={{ width: 40, height: 40 }} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

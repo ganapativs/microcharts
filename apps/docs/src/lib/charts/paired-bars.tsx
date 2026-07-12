@@ -167,7 +167,7 @@ export const playground: PlaygroundSpec = {
       (s.positive as boolean) && '  positive="up"',
       s.orientation === "horizontal" && '  orientation="horizontal"',
       s.locale !== "en-US" && `  locale="${s.locale}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -290,9 +290,14 @@ export function markCode(): string {
   return `<PairedBars data={pairs} />`;
 }
 
+export function PreviewLive() {
+  return <PairedBarsInteractive data={BUDGET} summary={false} width={120} height={40} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

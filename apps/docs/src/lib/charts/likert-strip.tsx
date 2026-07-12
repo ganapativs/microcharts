@@ -140,7 +140,7 @@ export const playground: PlaygroundSpec = {
       "  data={responses}",
       s.neutral !== "split" && `  neutral="${s.neutral}"`,
       s.label !== "ends" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -281,9 +281,14 @@ export function markCode(): string {
   return `<LikertStrip data={responses} />`;
 }
 
+export function PreviewLive() {
+  return <LikertStripInteractive data={SURVEY} summary={false} width={130} height={20} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

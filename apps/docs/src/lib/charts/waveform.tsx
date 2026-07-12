@@ -130,7 +130,7 @@ export const playground: PlaygroundSpec = {
       s.variant !== "bars" && `  variant="${s.variant}"`,
       s.mirror === false && "  mirror={false}",
       `  progress={${((s.progress as number) / 100).toFixed(2)}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -163,9 +163,14 @@ export function markCode(): string {
   return `<Waveform data={samples} />`;
 }
 
+export function PreviewLive() {
+  return <WaveformInteractive data={WAVE} summary={false} width={130} height={26} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

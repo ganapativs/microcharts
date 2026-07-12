@@ -142,7 +142,7 @@ export const playground: PlaygroundSpec = {
       `  now={${s.now}}`,
       s.mode !== "length" && `  mode="${s.mode}"`,
       s.labels === "off" && "  labels={false}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -173,9 +173,14 @@ export function markCode(): string {
   return `<PolarClock data={byHour} now={14} />`;
 }
 
+export function PreviewLive() {
+  return <PolarClockInteractive data={DAY} now={14} summary={false} size={40} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

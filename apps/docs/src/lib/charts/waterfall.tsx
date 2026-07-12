@@ -148,7 +148,7 @@ export const playground: PlaygroundSpec = {
       s.total === false && "  total={false}",
       s.delta && '  label="delta"',
       s.positive !== "up" && `  positive="${s.positive}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -314,9 +314,16 @@ export function markCode(): string {
   return `<Waterfall data={steps} start={open} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <WaterfallInteractive data={PL} start={60} summary={false} width={130} height={24} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

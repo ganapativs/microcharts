@@ -157,7 +157,7 @@ export const playground: PlaygroundSpec = {
       s.label !== "none" && `  label="${s.label}"`,
       s.order !== "data" && `  order="${s.order}"`,
       s.maxSegments !== 5 && `  maxSegments={${s.maxSegments}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -281,9 +281,14 @@ export function markCode(): string {
   return `<SegmentedBar data={mix} />`;
 }
 
+export function PreviewLive() {
+  return <SegmentedBarInteractive data={MIX} summary={false} width={130} height={16} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

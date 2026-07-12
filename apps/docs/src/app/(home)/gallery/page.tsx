@@ -3,9 +3,10 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { docsMeta } from "@/lib/metadata";
-import { CHART_MODULES, STABLE_CHARTS } from "@/lib/charts/registry";
+import { STABLE_CHARTS } from "@/lib/charts/registry";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
 import { GalleryDock } from "./gallery-dock";
+import { GalleryStage } from "./gallery-stage";
 
 export const metadata: Metadata = docsMeta({
   title: "Gallery",
@@ -57,7 +58,6 @@ export default function GalleryPage() {
 
         <div className="g2-grid" data-density="comfortable" data-browse>
           {charts.map((c, i) => {
-            const Preview = CHART_MODULES[c.slug]!.Preview;
             const newGroup = i === 0 || charts[i - 1].collection !== c.collection;
             const group = COLLECTIONS.find((g) => g.key === c.collection);
             return (
@@ -84,7 +84,7 @@ export default function GalleryPage() {
                     <span className="g2-spot" aria-hidden />
                     <ArrowUpRight className="g2-arrow size-4" aria-hidden />
                     <div className="g2-stage">
-                      <Preview />
+                      <GalleryStage slug={c.slug} />
                     </div>
                     <div className="g2-meta">
                       {/* name owns its own full-width line so it never truncates

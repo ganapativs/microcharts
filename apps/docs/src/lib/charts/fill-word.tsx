@@ -107,7 +107,7 @@ export const playground: PlaygroundSpec = {
       `  value={${((s.value as number) / 100).toFixed(2)}}`,
       s.mode !== "fill" && `  mode="${s.mode}"`,
       s.label && '  label="value"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -140,9 +140,19 @@ export function markCode(): string {
   return `<FillWord word="loading" value={0.62} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-4">
+      <FillWordInteractive word="uploading" value={0.62} summary={false} fontSize={13} animate />
+      <FillWord word="expiring" value={0.7} mode="drain" summary={false} fontSize={13} />
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

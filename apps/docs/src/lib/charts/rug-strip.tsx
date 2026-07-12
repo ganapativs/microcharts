@@ -130,7 +130,7 @@ export const playground: PlaygroundSpec = {
       (s.markValue as boolean) && "  markValue={yourOffer}",
       s.orientation === "vertical" && '  orientation="vertical"',
       (s.domain as boolean) && "  domain={[0, 150]}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -266,9 +266,23 @@ export function markCode(): string {
   return `<RugStrip data={data} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <RugStripInteractive
+      data={FIELD}
+      markValue={62}
+      summary={false}
+      width={120}
+      height={16}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

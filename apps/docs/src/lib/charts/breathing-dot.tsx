@@ -134,9 +134,14 @@ export function markCode(): string {
   return `<BreathingDot value={0.42} />`;
 }
 
+export function PreviewLive() {
+  return <BreathingDotInteractive value={0.42} summary={false} size={20} />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

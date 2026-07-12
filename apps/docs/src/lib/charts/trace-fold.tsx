@@ -134,7 +134,7 @@ export const playground: PlaygroundSpec = {
       "  data={spans}",
       s.emphasis !== "critical" && `  emphasis="${s.emphasis}"`,
       s.labels === false && "  labels={false}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -172,9 +172,23 @@ export function markCode(): string {
   return `<TraceFold data={spans} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <TraceFoldInteractive
+      data={TRACE}
+      format={ms}
+      summary={false}
+      width={180}
+      height={48}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

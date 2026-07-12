@@ -139,7 +139,7 @@ export const playground: PlaygroundSpec = {
       s.label !== "none" && `  label="${s.label}"`,
       (s.positive as boolean) && '  positive="up"',
       (s.highlight as boolean) && '  highlight="West"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -250,9 +250,14 @@ export function markCode(): string {
   return `<Slope data={cohorts} />`;
 }
 
+export function PreviewLive() {
+  return <SlopeInteractive data={RANKS} summary={false} width={90} height={70} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

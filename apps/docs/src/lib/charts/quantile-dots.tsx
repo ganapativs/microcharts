@@ -150,7 +150,7 @@ export const playground: PlaygroundSpec = {
       `  threshold={${s.threshold}}`,
       s.count !== "20" && `  count={${s.count}}`,
       s.side !== "above" && `  side="${s.side}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -208,9 +208,24 @@ export function markCode(): string {
   return `<QuantileDots data={waits} threshold={15} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <QuantileDotsInteractive
+      data={WAITS}
+      threshold={15}
+      format={MIN_FMT}
+      summary={false}
+      width={150}
+      height={24}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,
