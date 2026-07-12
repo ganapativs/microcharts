@@ -1,8 +1,6 @@
 import { PictogramRow } from "@microcharts/react/pictogram-row";
-import { InteractiveDemo } from "./pictogram-row.client";
+import { PictogramRow as PictogramRowInteractive } from "@microcharts/react/pictogram-row/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -102,6 +100,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PictogramRowInteractive
+      value={s.value as number}
+      total={s.total as number}
+      shape={s.shape as "dot" | "square"}
+      fractional={s.fractional as "clip" | "round"}
+      summary={false}
+      animate={ui.animate}
+      width={240}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PictogramRow",
+      `  value={${s.value}}`,
+      `  total={${s.total}}`,
+      s.shape !== "dot" && `  shape="${s.shape}"`,
+      s.fractional !== "clip" && `  fractional="${s.fractional}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Step the count — each change announces the new figure politely.",
 };
 
 export const recipes: Recipe[] = [
@@ -231,7 +254,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

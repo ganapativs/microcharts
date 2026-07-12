@@ -1,8 +1,6 @@
 import { QueueDepth } from "@microcharts/react/queue-depth";
-import { InteractiveDemo } from "./queue-depth.client";
+import { QueueDepth as QueueDepthInteractive } from "@microcharts/react/queue-depth/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a support backlog growing through capacity (100) to 2.14× at the end
@@ -92,6 +90,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <QueueDepthInteractive
+      data={DATA}
+      capacity={s.capacity ? CAP : undefined}
+      label={s.label as "last" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<QueueDepth",
+      "  data={data}",
+      s.capacity && "  capacity={100}",
+      s.label !== "last" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the periods — each announces the depth and whether it's above capacity.",
 };
 
 export const recipes: Recipe[] = [
@@ -136,7 +158,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

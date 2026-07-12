@@ -13,9 +13,6 @@ not color alone.
 <LiveDemo
   label="BiasStrip"
   sizeOf="bias-strip"
-  code={`import { BiasStrip } from "@microcharts/react/bias-strip";
-
-<BiasStrip data={pairs} title="Device vs reference" />`}
 >
   <span className="text-lg">
     {"Device and reference "}
@@ -35,10 +32,6 @@ not color alone.
 ## Try it
 
 <Playground chart="bias-strip" />
-
-## Interactive
-
-<InteractiveDemo slug="bias-strip" />
 
 ## When to use it
 
@@ -131,7 +124,7 @@ aren't meaningful, so the band and bias line drop out and only the dots and the 
 reference remain — the mean difference is still stated in the summary. When the two methods
 agree perfectly the band collapses to a hair around the zero line rather than vanishing, so
 "nothing to see" still reads as a deliberate, measured result. Pairs with a non-finite value
-are dropped and counted; past 40 pairs the dots are uniformly downsampled for display while
+are dropped before the stats and the count; past 40 pairs the dots are uniformly downsampled for display while
 the bias and limits still use every pair.
 
 ## Four homes

@@ -38,10 +38,6 @@ const month = (x) => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"][x];
 
 <Playground chart="constellation" />
 
-## Interactive
-
-<InteractiveDemo slug="constellation" />
-
 ## When to use it
 
 - **Good for** — sparse incidents or outages on a timeline, milestones carrying a magnitude, or any rare events where the sequence is the story.
@@ -101,11 +97,11 @@ const month = (x) => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"][x];
 
 <LiveDemo
   label="no values — jittered layout encodes nothing"
-  code={`<Constellation data={[{ x: 0 }, { x: 2 }, { x: 5 }, { x: 8 }]} title="Undated magnitudes" />`}
+  code={`<Constellation data={[{ x: 0 }, { x: 2 }, { x: 5 }, { x: 8 }]} title="No values" />`}
 >
   <Constellation
     data={[{ x: 0 }, { x: 2 }, { x: 5 }, { x: 8 }]}
-    title="Undated magnitudes"
+    title="No values"
     width={110}
     height={28}
   />

@@ -1,8 +1,6 @@
 import { CalendarStrip } from "@microcharts/react/calendar-strip";
-import { InteractiveDemo } from "./calendar-strip.client";
+import { CalendarStrip as CalendarStripInteractive } from "@microcharts/react/calendar-strip/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // pinned end — docs must be deterministic (never a live "now")
@@ -148,7 +146,7 @@ export const playground: PlaygroundSpec = {
       summary={false}
       style={{
         width: 180,
-        height: Number(s.weeks) * (Number(s.cell) + Number(s.gap)) + 6,
+        height: "auto",
       }}
     />
   ),
@@ -166,6 +164,40 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <CalendarStripInteractive
+      data={DATA}
+      end={END}
+      weeks={Number(s.weeks)}
+      weekStart={s.weekStart === "sunday" ? 0 : 1}
+      shape={s.shape as "square" | "round" | "dot"}
+      cell={Number(s.cell)}
+      gap={Number(s.gap)}
+      summary={false}
+      animate={ui.animate}
+      style={{
+        width: 180,
+        height: "auto",
+      }}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<CalendarStrip",
+      "  data={days}",
+      `  end="${END}"`,
+      s.weeks !== "4" && `  weeks={${s.weeks}}`,
+      s.weekStart === "sunday" && "  weekStart={0}",
+      s.shape !== "square" && `  shape="${s.shape}"`,
+      Number(s.cell) !== 7 && `  cell={${s.cell}}`,
+      Number(s.gap) !== 1 && `  gap={${s.gap}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover a day or arrow through the grid (←/→ day, ↑/↓ week) — each announces its real calendar day.",
 };
 
 export const recipes: Recipe[] = [
@@ -301,7 +333,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

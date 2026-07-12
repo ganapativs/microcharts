@@ -12,12 +12,6 @@ carries **identity**, not valence (up isn't "good") — that's the whole point o
 <LiveDemo
   label="ShiftHistogram"
   sizeOf="shift-histogram"
-  code={`import { ShiftHistogram } from "@microcharts/react/shift-histogram";
-
-const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
-const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
-
-<ShiftHistogram data={{ before, after }} title="The fix" />`}
 >
   <ShiftHistogram
     data={{
@@ -37,10 +31,6 @@ const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
 ## Try it
 
 <Playground chart="shift-histogram" />
-
-## Interactive
-
-<InteractiveDemo slug="shift-histogram" />
 
 ## When to use it
 
@@ -112,7 +102,11 @@ The median shift label and accessible summary follow `format`/`locale` — 12000
   code={`// the after sample hasn't landed yet — before renders alone
 const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
 
-<ShiftHistogram data={{ before, after: [] }} title="Awaiting after sample" />`}
+<ShiftHistogram
+  data={{ before, after: [] }}
+  format={(n) => Math.round(n) + " ms"}
+  title="Awaiting after sample"
+/>`}
 >
   <ShiftHistogram
     data={{

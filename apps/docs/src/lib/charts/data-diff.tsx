@@ -1,8 +1,6 @@
 import { DataDiff } from "@microcharts/react/data-diff";
-import { InteractiveDemo } from "./data-diff.client";
+import { DataDiff as DataDiffInteractive } from "@microcharts/react/data-diff/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a schema migration diff — rows added/removed per table
@@ -70,8 +68,12 @@ export const entry: ChartEntry = {
   demo: DIFF.map((d) => d.added - d.removed),
   example: {
     title: "Schema diff",
-    code: `import { DataDiff } from "${PKG}/data-diff";
-
+    code: `import { DataDiff } from "${PKG}/data-diff";\n\n<DataDiff data={diff} title="Schema diff" />`,
+  },
+  sampleData: [
+    {
+      name: "diff",
+      code: `// a schema migration diff — rows added/removed per table
 const diff = [
   { key: "users", added: 340, removed: 120 },
   { key: "orders", added: 88, removed: 30 },
@@ -79,10 +81,9 @@ const diff = [
   { key: "tags", added: 24, removed: 8 },
   { key: "notes", added: 12, removed: 6 },
   { key: "flags", added: 8, removed: 3 },
-];
-
-<DataDiff data={diff} title="Schema diff" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -131,6 +132,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <DataDiffInteractive
+      data={DIFF}
+      labels={s.labels as boolean}
+      net={s.net as boolean}
+      sort={s.sort as "none" | "net" | "magnitude"}
+      label={s.label as "totals" | "none"}
+      summary={false}
+      animate={ui.animate}
+      width={220}
+      height={80}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<DataDiff",
+      "  data={diff}",
+      s.labels && "  labels",
+      s.net && "  net",
+      s.sort !== "none" && `  sort="${s.sort}"`,
+      s.label !== "none" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow down the rows — each announces its added, removed, and net change.",
 };
 
 export const recipes: Recipe[] = [
@@ -163,7 +192,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

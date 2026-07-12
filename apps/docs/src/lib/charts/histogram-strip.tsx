@@ -1,8 +1,6 @@
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
-import { InteractiveDemo } from "./histogram-strip.client";
+import { HistogramStrip as HistogramStripInteractive } from "@microcharts/react/histogram-strip/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const TIMES = Array.from({ length: 120 }, (_, i) =>
@@ -75,13 +73,7 @@ export const entry: ChartEntry = {
   demo: TIMES.slice(0, 40),
   example: {
     title: "Response times",
-    code: `import { HistogramStrip } from "${PKG}/histogram-strip";
-
-const times = Array.from({ length: 120 }, (_, i) =>
-  i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
-);
-
-<HistogramStrip data={times} title="Response times" />`,
+    code: `import { HistogramStrip } from "${PKG}/histogram-strip";\n\n<HistogramStrip data={times} title="Response times" />`,
   },
   sampleData: [
     {
@@ -145,6 +137,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <HistogramStripInteractive
+      data={TIMES}
+      bins={s.bins as number}
+      markValue={(s.markValue as boolean) ? 45 : undefined}
+      domain={(s.domain as boolean) ? [0, 100] : undefined}
+      locale={s.locale as string}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={64}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<HistogramStrip",
+      "  data={times}",
+      `  bins={${s.bins}}`,
+      (s.markValue as boolean) && "  markValue={45}",
+      (s.domain as boolean) && "  domain={[0, 100]}",
+      (s.locale as string) !== "en-US" && `  locale="${s.locale}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow through the bins — each announces its range and count.",
 };
 
 export const recipes: Recipe[] = [
@@ -263,7 +282,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

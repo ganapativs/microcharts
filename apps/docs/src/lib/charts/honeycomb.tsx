@@ -1,8 +1,6 @@
 import { Honeycomb } from "@microcharts/react/honeycomb";
-import { InteractiveDemo } from "./honeycomb.client";
+import { Honeycomb as HoneycombInteractive } from "@microcharts/react/honeycomb/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -97,6 +95,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <HoneycombInteractive
+      value={s.value as number}
+      total={s.total as number}
+      empty={s.empty as "outline" | "blank"}
+      unit="seats"
+      summary={false}
+      animate={ui.animate}
+      cell={7}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Honeycomb",
+      `  value={${s.value}}`,
+      `  total={${s.total}}`,
+      s.empty !== "outline" && `  empty="${s.empty}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Tap to take another seat — the new count fills a cell and is announced through a polite live region. Hover reveals the value / total. The cells are anonymous units, so there is no per-cell cursor.",
 };
 
 export const recipes: Recipe[] = [
@@ -127,7 +149,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

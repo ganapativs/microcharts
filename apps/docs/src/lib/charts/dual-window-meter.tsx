@@ -1,8 +1,6 @@
 import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
-import { InteractiveDemo } from "./dual-window-meter.client";
+import { DualWindowMeter as DualWindowMeterInteractive } from "@microcharts/react/dual-window-meter/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const LOUDNESS = Array.from(
@@ -59,20 +57,17 @@ export const entry: ChartEntry = {
   demo: [-22],
   example: {
     title: "Loudness",
-    code: `import { DualWindowMeter } from "${PKG}/dual-window-meter";
-
-const samples = Array.from(
+    code: `import { DualWindowMeter } from "${PKG}/dual-window-meter";\n\n<DualWindowMeter\n  data={samples}\n  target={-23}\n  format={{ maximumFractionDigits: 1 }}\n  title="Loudness"\n/>`,
+  },
+  sampleData: [
+    {
+      name: "samples",
+      code: `const samples = Array.from(
   { length: 60 },
   (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0),
-);
-
-<DualWindowMeter
-  data={samples}
-  target={-23}
-  format={{ maximumFractionDigits: 1 }}
-  title="Loudness"
-/>`,
-  },
+);`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -130,12 +125,38 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <DualWindowMeterInteractive
+      data={LOUDNESS}
+      target={-23}
+      windows={[s.fast as number, s.slow as number]}
+      band={s.band ? [-25, -21] : undefined}
+      summary={false}
+      animate={ui.animate}
+      width={320}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<DualWindowMeter",
+      "  data={samples}",
+      "  target={-23}",
+      `  windows={[${s.fast}, ${s.slow}]}`,
+      s.band === true && "  band={[-25, -21]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the samples — the thin fast window and thick slow window read against the target.",
 };
 
 export const recipes: Recipe[] = [
   {
     label: "latency SLO cell",
-    code: `<DualWindowMeter data={latency} target={200} width={80} height={16} />`,
+    code: `<DualWindowMeter data={samples} target={200} width={80} height={16} />`,
     node: (
       <DualWindowMeter
         data={LOUDNESS}
@@ -149,7 +170,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "with corridor",
-    code: `<DualWindowMeter data={cpu} target={70} band={[60, 80]} />`,
+    code: `<DualWindowMeter data={samples} target={70} band={[60, 80]} />`,
     node: (
       <DualWindowMeter
         data={LOUDNESS}
@@ -185,7 +206,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

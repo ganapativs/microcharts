@@ -1,8 +1,6 @@
 import { Slope } from "@microcharts/react/slope";
-import { InteractiveDemo } from "./slope.client";
+import { Slope as SlopeInteractive } from "@microcharts/react/slope/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const RANKS = [
@@ -123,6 +121,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <SlopeInteractive
+      data={RANKS}
+      label={s.label as "none" | "value" | "label" | "both"}
+      positive={(s.positive as boolean) ? "up" : undefined}
+      highlight={(s.highlight as boolean) ? "West" : undefined}
+      animate={ui.animate}
+      summary={false}
+      width={200}
+      height={130}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Slope",
+      "  data={cohorts}",
+      s.label !== "none" && `  label="${s.label}"`,
+      (s.positive as boolean) && '  positive="up"',
+      (s.highlight as boolean) && '  highlight="West"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover near a line or rove with ↑/↓ (ordered by the after value) — each announces its slope.",
 };
 
 export const recipes: Recipe[] = [
@@ -235,7 +259,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

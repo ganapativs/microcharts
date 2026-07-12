@@ -1,8 +1,6 @@
 import { RateVolume } from "@microcharts/react/rate-volume";
-import { InteractiveDemo } from "./rate-volume.client";
+import { RateVolume as RateVolumeInteractive } from "@microcharts/react/rate-volume/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a conversion rate climbing as reach drains away — the last reading is a big
@@ -79,16 +77,18 @@ export const entry: ChartEntry = {
   demo: DEMO.map((d) => d.rate),
   example: {
     title: "Conversion rate",
-    code: `import { RateVolume } from "${PKG}/rate-volume";
-
-const periods = [
+    code: `import { RateVolume } from "${PKG}/rate-volume";\n\n<RateVolume data={periods} minVolume={50} title="Conversion rate" />`,
+  },
+  sampleData: [
+    {
+      name: "periods",
+      code: `const periods = [
   { rate: 0.023, volume: 220 }, { rate: 0.025, volume: 190 }, { rate: 0.028, volume: 160 },
   { rate: 0.029, volume: 130 }, { rate: 0.031, volume: 110 }, { rate: 0.034, volume: 90 },
   { rate: 0.036, volume: 66 }, { rate: 0.041, volume: 38 },
-];
-
-<RateVolume data={periods} minVolume={50} title="Conversion rate" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -150,6 +150,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <RateVolumeInteractive
+      data={FRAC}
+      format={PCT}
+      minVolume={s.minVolume ? 50 : undefined}
+      curve={s.curve as "linear" | "step"}
+      label={s.label as "last" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<RateVolume",
+      "  data={periods}",
+      s.minVolume && "  minVolume={50}",
+      s.curve !== "linear" && `  curve="${s.curve}"`,
+      s.label !== "last" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the periods — each announces the rate and the volume it stands on.",
 };
 
 export const recipes: Recipe[] = [
@@ -201,7 +228,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

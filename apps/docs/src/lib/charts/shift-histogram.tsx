@@ -1,8 +1,6 @@
 import { ShiftHistogram } from "@microcharts/react/shift-histogram";
-import { InteractiveDemo } from "./shift-histogram.client";
+import { ShiftHistogram as ShiftHistogramInteractive } from "@microcharts/react/shift-histogram/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // latency (ms) before/after a fix — the whole distribution moved left
@@ -59,13 +57,19 @@ export const entry: ChartEntry = {
   demo: AFTER,
   example: {
     title: "The fix",
-    code: `import { ShiftHistogram } from "${PKG}/shift-histogram";
-
-const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
-const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
-
-<ShiftHistogram data={{ before, after }} title="The fix" />`,
+    code: `import { ShiftHistogram } from "${PKG}/shift-histogram";\n\n<ShiftHistogram data={{ before, after }} title="The fix" />`,
   },
+  sampleData: [
+    {
+      name: "before",
+      code: `// latency (ms) before/after a fix — the whole distribution moved left
+const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);`,
+    },
+    {
+      name: "after",
+      code: `const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -128,6 +132,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ShiftHistogramInteractive
+      data={{ before: BEFORE, after: AFTER }}
+      format={MS}
+      mode={s.mode as "mirror" | "overlay"}
+      bins={s.bins === "auto" ? undefined : Number(s.bins)}
+      label={s.label as "shift" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ShiftHistogram",
+      "  data={{ before, after }}",
+      s.mode !== "mirror" && `  mode="${s.mode}"`,
+      s.bins !== "auto" && `  bins={${s.bins}}`,
+      s.label !== "shift" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the bins — each announces the before/after proportions; M jumps to the median bins.",
 };
 
 export const recipes: Recipe[] = [
@@ -186,7 +217,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,8 +1,6 @@
 import { NetFlow } from "@microcharts/react/net-flow";
-import { InteractiveDemo } from "./net-flow.client";
+import { NetFlow as NetFlowInteractive } from "@microcharts/react/net-flow/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // monthly cash flow (values in $k) — mostly net-positive, two months in the red
@@ -77,16 +75,19 @@ export const entry: ChartEntry = {
   demo: DEMO.map((d) => d.in - d.out),
   example: {
     title: "Monthly cash flow",
-    code: `import { NetFlow } from "${PKG}/net-flow";
-
+    code: `import { NetFlow } from "${PKG}/net-flow";\n\n<NetFlow data={months} title="Monthly cash flow" />`,
+  },
+  sampleData: [
+    {
+      name: "months",
+      code: `// monthly cash flow (values in $k) — mostly net-positive, two months in the red
 const months = [
   { in: 42, out: 31 }, { in: 38, out: 35 }, { in: 45, out: 29 }, { in: 40, out: 44 },
   { in: 52, out: 38 }, { in: 48, out: 41 }, { in: 55, out: 36 }, { in: 50, out: 47 },
   { in: 58, out: 39 }, { in: 44, out: 52 }, { in: 60, out: 41 }, { in: 57, out: 43 },
-];
-
-<NetFlow data={months} title="Monthly cash flow" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -129,6 +130,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <NetFlowInteractive
+      data={DEMO}
+      format={KFMT}
+      mode={s.mode as "area" | "bars"}
+      net={s.net as boolean}
+      label={s.label as "last" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<NetFlow",
+      "  data={months}",
+      s.mode !== "area" && `  mode="${s.mode}"`,
+      s.net === false && "  net={false}",
+      s.label !== "last" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the months — each announces inflow, outflow, and the signed net.",
 };
 
 export const recipes: Recipe[] = [
@@ -179,7 +207,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

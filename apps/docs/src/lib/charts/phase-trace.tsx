@@ -1,8 +1,6 @@
 import { PhaseTrace } from "@microcharts/react/phase-trace";
-import { InteractiveDemo } from "./phase-trace.client";
+import { PhaseTrace as PhaseTraceInteractive } from "@microcharts/react/phase-trace/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a coupled CPU×latency trajectory with a lag loop
@@ -55,6 +53,16 @@ export const entry: ChartEntry = {
     title: "CPU × latency",
     code: `import { PhaseTrace } from "${PKG}/phase-trace";\n\n<PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" title="Phase portrait" />`,
   },
+  sampleData: [
+    {
+      name: "trajectory",
+      code: `// a coupled CPU×latency trajectory with a lag loop
+const trajectory = Array.from({ length: 40 }, (_, i) => {
+  const t = (i / 40) * Math.PI * 2;
+  return { x: 55 + Math.cos(t) * 22, y: 110 + Math.sin(t - 0.9) * 40 };
+});`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -110,12 +118,42 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PhaseTraceInteractive
+      data={TRAJ}
+      xLabel="CPU"
+      yLabel="Latency"
+      tail={(s.tail as number) / 100}
+      grid={s.grid as boolean}
+      startDot={s.startDot as boolean}
+      animate={ui.animate}
+      summary={false}
+      width={110}
+      height={100}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PhaseTrace",
+      "  data={trajectory}",
+      '  xLabel="CPU"',
+      '  yLabel="Latency"',
+      s.tail !== 25 && `  tail={${((s.tail as number) / 100).toFixed(2)}}`,
+      s.grid === true && "  grid",
+      s.startDot === true && "  startDot",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or step with ←/→ — each point announces its position in time and on both named axes.",
 };
 
 export const recipes: Recipe[] = [
   {
     label: "service cell",
-    code: `<PhaseTrace data={traj} xLabel="CPU" yLabel="Latency" width={32} height={28} />`,
+    code: `<PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" width={32} height={28} />`,
     node: (
       <PhaseTrace
         data={TRAJ}
@@ -129,7 +167,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "quadrant grid",
-    code: `<PhaseTrace data={traj} grid startDot />`,
+    code: `<PhaseTrace data={trajectory} grid startDot />`,
     node: (
       <PhaseTrace
         data={TRAJ}
@@ -166,7 +204,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

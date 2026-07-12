@@ -1,8 +1,6 @@
 import { BiasStrip } from "@microcharts/react/bias-strip";
-import { InteractiveDemo } from "./bias-strip.client";
+import { BiasStrip as BiasStripInteractive } from "@microcharts/react/bias-strip/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -47,6 +45,16 @@ export const entry: ChartEntry = {
     title: "Device vs reference",
     code: `import { BiasStrip } from "${PKG}/bias-strip";\n\n<BiasStrip data={pairs} title="Device vs reference" />`,
   },
+  sampleData: [
+    {
+      name: "pairs",
+      code: `// a ~+2 bias with noise and two pairs beyond the limits of agreement
+const pairs = [
+  1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6, 2.7,
+  2.0,
+].map((d, i) => ({ a: i + d, b: i }));`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -86,6 +94,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <BiasStripInteractive
+      data={PAIRS}
+      limits={(s.wide as boolean) ? 2.58 : 1.96}
+      label={(s.caption as boolean) ? "bias" : "none"}
+      r={s.r as number}
+      summary={false}
+      animate={ui.animate}
+      width={220}
+      height={120}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BiasStrip",
+      "  data={pairs}",
+      (s.wide as boolean) && "  limits={2.58}",
+      !(s.caption as boolean) && '  label="none"',
+      s.r !== 1.5 && `  r={${s.r}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover the nearest pair or step by mean with ←/→ — each announces its mean, difference, and whether it clears the limits.",
 };
 
 export const recipes: Recipe[] = [
@@ -126,7 +160,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

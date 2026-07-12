@@ -3,8 +3,16 @@
 // segment under the cursor; ←/→ step segments. Each announces the distance,
 // grade, and cumulative climb — the readout gives the TRUE grade, not the bin.
 // Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_GRADE_PROFILE } from "../../core/strings-grade-profile.js";
 import { gradeLayout, gradeProfileGeometry } from "./geometry.js";
 import {
@@ -17,7 +25,24 @@ import {
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 const DEFAULT_BINS = [3, 6, 10] as const;
 
-export function GradeProfile(props: GradeProfileProps): React.ReactNode {
+// Segments quantize into 4 grade bins; bin 1 ("moderate") carries no ink
+// attribute at all (only data-mc-cat="1"), so every bin needs a term. The
+// ridge line (ink="data") is excluded — scaling a winding profile line via
+// scaleY would squash it; it simply fades in with the base svg opacity.
+const SEGMENT_SELECTOR =
+  'path[data-mc-ink="band"], path[data-mc-ink="negative"], path[data-mc-ink="bar"], path[data-mc-cat="1"]';
+
+export interface InteractiveGradeProfileProps extends GradeProfileProps {
+  /**
+   * Opt-in entrance motion (default `false`): the baseline-anchored terrain
+   * segments rise into place when the chart first mounts client-side. Inert
+   * on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
+   */
+  animate?: boolean;
+}
+
+export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNode {
   const {
     data,
     bins = DEFAULT_BINS,
@@ -29,8 +54,12 @@ export function GradeProfile(props: GradeProfileProps): React.ReactNode {
     strings = EN_GRADE_PROFILE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "rise", animate, { selector: SEGMENT_SELECTOR });
 
   const { topPad } = gradeLayout(height, label);
   const geo = useMemo(
@@ -102,6 +131,7 @@ export function GradeProfile(props: GradeProfileProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-grade-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -1,8 +1,6 @@
 import { StreakSpark } from "@microcharts/react/streak-spark";
-import { InteractiveDemo } from "./streak-spark.client";
+import { StreakSpark as StreakSparkInteractive } from "@microcharts/react/streak-spark/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -113,6 +111,7 @@ export const playground: PlaygroundSpec = {
       width={340}
       height={92}
       className="w-full max-w-md"
+      style={{ height: "auto" }}
       title="Playground"
     />
   ),
@@ -126,6 +125,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <StreakSparkInteractive
+      data={data}
+      positive={s.positive as "up" | "down"}
+      label={s.label as "current" | "both" | "none"}
+      animate={ui.animate}
+      width={340}
+      height={92}
+      className="w-full max-w-md"
+      title="Playground"
+    />
+  ),
+  codeInteractive: (s, data, ui) =>
+    [
+      "<StreakSpark",
+      `  data={[${data.join(", ")}]}`,
+      s.positive !== "up" && `  positive="${s.positive}"`,
+      s.label !== "current" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover a run, or focus and step through with ← → — each run announces its length, outcome, and whether it is the record.",
 };
 
 export const recipes: Recipe[] = [
@@ -182,7 +206,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

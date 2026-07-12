@@ -1,8 +1,6 @@
 import { Waveform } from "@microcharts/react/waveform";
-import { InteractiveDemo } from "./waveform.client";
+import { Waveform as WaveformInteractive } from "@microcharts/react/waveform/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const WAVE = Array.from(
@@ -57,6 +55,17 @@ export const entry: ChartEntry = {
     title: "Voice memo",
     code: `import { Waveform } from "${PKG}/waveform";\n\n<Waveform data={samples} title="Voice memo" />`,
   },
+  sampleData: [
+    {
+      name: "samples",
+      code: `const samples = Array.from(
+  { length: 200 },
+  (_, i) =>
+    (i === 126 ? 0.82 : Math.sin(i / 3) * 0.15 + Math.sin(i / 11) * 0.35) *
+    (1 - Math.abs(i - 100) / 260),
+);`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -102,6 +111,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <WaveformInteractive
+      data={WAVE}
+      variant={s.variant as "bars" | "envelope"}
+      mirror={s.mirror as boolean}
+      progress={(s.progress as number) / 100}
+      animate={ui.animate}
+      summary={false}
+      width={320}
+      height={32}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Waveform",
+      "  data={samples}",
+      s.variant !== "bars" && `  variant="${s.variant}"`,
+      s.mirror === false && "  mirror={false}",
+      `  progress={${((s.progress as number) / 100).toFixed(2)}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the buckets — each announces its position and peak amplitude.",
 };
 
 export const recipes: Recipe[] = [
@@ -132,7 +167,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

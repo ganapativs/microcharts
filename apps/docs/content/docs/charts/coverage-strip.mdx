@@ -12,12 +12,6 @@ across a gap.
 <LiveDemo
   label="CoverageStrip"
   sizeOf="coverage-strip"
-  code={`import { CoverageStrip } from "@microcharts/react/coverage-strip";
-
-// null = no measurement, 0 = a measured zero
-const readings = [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10];
-
-<CoverageStrip data={readings} expected={18} label="percent" title="Sensor uptime" />`}
 >
   <CoverageStrip
     data={[3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10]}
@@ -35,10 +29,6 @@ const readings = [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10];
 ## Try it
 
 <Playground chart="coverage-strip" />
-
-## Interactive
-
-<InteractiveDemo slug="coverage-strip" />
 
 ## When to use it
 

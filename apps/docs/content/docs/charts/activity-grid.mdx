@@ -15,7 +15,7 @@ const commitCounts = [
 0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3, 0, 2, 3, 4, 1, 2, 0,
 ];
 
-<ActivityGrid data={commitCounts} title="Commits" />`}
+<ActivityGrid data={commitCounts} title="Commit activity" />`}
 >
   <ActivityGrid
     data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3, 0, 2, 3, 4, 1, 2, 0]}
@@ -31,10 +31,6 @@ const commitCounts = [
 ## Try it
 
 <Playground chart="activity-grid" />
-
-## Interactive
-
-<InteractiveDemo slug="activity-grid" />
 
 ## When to use it
 
@@ -55,54 +51,52 @@ grid's aspect ratio.
 `layout="strip"` collapses to a single row for inline use.
 
 <LiveDemo
-  label="grid (default)"
-  code={`<ActivityGrid data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]} />`}
->
-  <ActivityGrid
-    data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]}
-    cell={12}
-    title="Grid"
-  />
-</LiveDemo>
+  label="grid (default) vs strip"
+  code={`const commits = [0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1];
 
-<LiveDemo
-  label="strip"
-  code={`<ActivityGrid data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4]} layout="strip" />`}
+<ActivityGrid data={commits} />
+<ActivityGrid data={commits.slice(0, 12)} layout="strip" />`}
 >
-  <ActivityGrid
-    data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4]}
-    layout="strip"
-    cell={12}
-    title="Strip"
-  />
+  <span className="inline-flex flex-col gap-3">
+    <ActivityGrid
+      data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]}
+      cell={12}
+      title="Grid"
+    />
+    <ActivityGrid
+      data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4]}
+      layout="strip"
+      cell={12}
+      title="Strip"
+    />
+  </span>
 </LiveDemo>
 
 `shape` swaps the cell mark — same data, same levels, different voice: `"round"` for
 friendlier product surfaces, `"dot"` adds breathing room in dense strips.
 
 <LiveDemo
-  label="round"
-  code={`<ActivityGrid data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]} shape="round" />`}
->
-  <ActivityGrid
-    data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]}
-    shape="round"
-    cell={12}
-    title="Round cells"
-  />
-</LiveDemo>
+  label="round vs dot"
+  code={`const commits = [0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1];
 
-<LiveDemo
-  label="dot"
-  code={`<ActivityGrid data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4]} layout="strip" shape="dot" />`}
+<ActivityGrid data={commits} shape="round" />
+<ActivityGrid data={commits.slice(0, 12)} layout="strip" shape="dot" />`}
 >
-  <ActivityGrid
-    data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4]}
-    layout="strip"
-    shape="dot"
-    cell={12}
-    title="Dot strip"
-  />
+  <span className="inline-flex flex-col gap-3">
+    <ActivityGrid
+      data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1]}
+      shape="round"
+      cell={12}
+      title="Round cells"
+    />
+    <ActivityGrid
+      data={[0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4]}
+      layout="strip"
+      shape="dot"
+      cell={12}
+      title="Dot strip"
+    />
+  </span>
 </LiveDemo>
 
 `start` aligns the grid to the real calendar: the first column pads down to the weekday

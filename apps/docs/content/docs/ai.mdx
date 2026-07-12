@@ -27,10 +27,8 @@ renders, and the React it's equivalent to:
 
 The body is whitespace- or comma-separated numbers for series charts, or `key=value` pairs for
 composites. These five cover the questions an assistant answers most — _trend, magnitude, change,
-attainment, cadence_ — but the same pattern extends to any chart in the catalog: name a type,
-pick a body convention, map it to that chart's import.
-
-<CatalogStrip />
+attainment, cadence_ — but the same pattern extends to [any chart in the catalog](/docs/charts):
+name a type, pick a body convention, map it to that chart's import.
 
 ## Wire it up
 
@@ -127,7 +125,8 @@ when a block is malformed — the summary makes a graceful fallback trivial.
 ## Where it runs
 
 A chart is plain text and JSON, so anything that reads or writes text can emit one and render it
-back — no SDK, no partnership, no island bridge.
+back — a chat reply, a generated slide, a rendered report — no SDK, no partnership, no island
+bridge.
 
 <ProviderWall />
 

@@ -1,8 +1,6 @@
 import { QuantileDots } from "@microcharts/react/quantile-dots";
-import { InteractiveDemo } from "./quantile-dots.client";
+import { QuantileDots as QuantileDotsInteractive } from "@microcharts/react/quantile-dots/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // bus-wait times (minutes): right-skewed, a long tail past the 15-min SLA
@@ -65,6 +63,15 @@ export const entry: ChartEntry = {
     title: "Bus wait",
     code: `import { QuantileDots } from "${PKG}/quantile-dots";\n\n<QuantileDots data={waits} threshold={15} format={(n) => \`\${n} min\`} title="Bus wait" />`,
   },
+  sampleData: [
+    {
+      name: "waits",
+      code: `// bus-wait times (minutes): right-skewed, a long tail past the 15-min SLA
+const waits = Array.from({ length: 200 }, (_, i) =>
+  Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)),
+);`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -123,6 +130,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <QuantileDotsInteractive
+      data={WAITS}
+      count={Number(s.count)}
+      threshold={s.threshold as number}
+      side={s.side as "above" | "below"}
+      format={MIN_FMT}
+      summary={false}
+      animate={ui.animate}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<QuantileDots",
+      "  data={waits}",
+      `  threshold={${s.threshold}}`,
+      s.count !== "20" && `  count={${s.count}}`,
+      s.side !== "above" && `  side="${s.side}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover to drag the threshold — the count of dots past the line recomputes as you move it.",
 };
 
 export const recipes: Recipe[] = [
@@ -178,7 +212,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -10,13 +10,6 @@ counts are not supported; that's SparkBar's contract.
 <LiveDemo
   label="HistogramStrip"
   sizeOf="histogram-strip"
-  code={`import { HistogramStrip } from "@microcharts/react/histogram-strip";
-
-const responseTimes = Array.from({ length: 120 }, (_, i) =>
-i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
-);
-
-<HistogramStrip data={responseTimes} title="Response times" />`}
 >
   <HistogramStrip
     data={Array.from({ length: 120 }, (_, i) =>
@@ -34,10 +27,6 @@ i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
 ## Try it
 
 <Playground chart="histogram-strip" />
-
-## Interactive
-
-<InteractiveDemo slug="histogram-strip" />
 
 ## When to use it
 
@@ -117,8 +106,8 @@ re-bins around it.
 
 ## Accessibility
 
-The accessible name names the modal bin — **"120 values, most between 40 and 50."** The
-interactive entry roves bins with range announcements (**"40 to 50: 34 values."**).
+The accessible name names the modal bin — **"120 values, most between 42.09 and 47.36."** The
+interactive entry roves bins with range announcements (**"42.09 to 47.36: 26 values."**).
 
 ## Props
 

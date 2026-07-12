@@ -38,10 +38,6 @@ smoothed or optimistic curve. The gap label states the signed schedule landing, 
 
 <Playground chart="burn-chart" />
 
-## Interactive
-
-<InteractiveDemo slug="burn-chart" />
-
 ## When to use it
 
 - **Good for** — a sprint burndown in a tab header, will-we-finish in a KPI card, plan vs actual with a projected landing.
@@ -157,7 +153,7 @@ projection at all (the fit needs at least two).
 
 The gap label, because "will we finish" is a number, not a vibe. History is drawn solid and
 exact; the projection is dotted, muted, and computed as a linear fit over the last
-`max(2, ⌈today/3⌉)` actual points — a stated method, never an optimistic hand-drawn curve.
+`max(2, ⌈actual/3⌉)` actual points — a stated method, never an optimistic hand-drawn curve.
 When the recent burn flattens, the projection never reaches zero and the summary says so
 outright ("not finishing at the current pace"), rather than implying a landing that isn't
 coming.

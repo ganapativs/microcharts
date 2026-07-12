@@ -10,13 +10,6 @@ benchmark whispers: dashed, thinner, neutral — never distinguished by color al
 <LiveDemo
   label="DualSparkline"
   sizeOf="dual-sparkline"
-  code={`import { DualSparkline } from "@microcharts/react/dual-sparkline";
-
-<DualSparkline
-  data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
-  compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
-  title="Conversion vs market"
-/>`}
 >
   <DualSparkline
     data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
@@ -34,10 +27,6 @@ benchmark whispers: dashed, thinner, neutral — never distinguished by color al
 
 <Playground chart="dual-sparkline" />
 
-## Interactive
-
-<InteractiveDemo slug="dual-sparkline" />
-
 ## When to use it
 
 - **Good for** — metric-vs-benchmark in table cells, actual-vs-plan in KPI cards.
@@ -50,39 +39,29 @@ benchmark whispers: dashed, thinner, neutral — never distinguished by color al
 ## Variants
 
 <LiveDemo
-  label="endpoint label"
-  code={`<DualSparkline
-  data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
-  compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
-  label="last"
-/>`}
+  label="endpoint label vs normal-range band"
+  dataOf="dual-sparkline"
+  code={`<DualSparkline data={ours} compare={market} label="last" />
+<DualSparkline data={ours} compare={market} band={[13, 16]} />`}
 >
-  <DualSparkline
-    data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
-    compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
-    label="last"
-    title="With last value"
-    width={220}
-    height={28}
-  />
-</LiveDemo>
-
-<LiveDemo
-  label="normal-range band"
-  code={`<DualSparkline
-  data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
-  compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
-  band={[13, 16]}
-/>`}
->
-  <DualSparkline
-    data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
-    compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
-    band={[13, 16]}
-    title="With band"
-    width={220}
-    height={28}
-  />
+  <span className="inline-flex flex-col gap-3">
+    <DualSparkline
+      data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
+      compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
+      label="last"
+      title="With last value"
+      width={220}
+      height={28}
+    />
+    <DualSparkline
+      data={[12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21]}
+      compare={[12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16]}
+      band={[13, 16]}
+      title="With band"
+      width={220}
+      height={28}
+    />
+  </span>
 </LiveDemo>
 
 ## Edge cases

@@ -1,8 +1,6 @@
 import { ParetoStrip } from "@microcharts/react/pareto-strip";
-import { InteractiveDemo } from "./pareto-strip.client";
+import { ParetoStrip as ParetoStripInteractive } from "@microcharts/react/pareto-strip/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // incident causes by count — a few dominate
@@ -67,8 +65,12 @@ export const entry: ChartEntry = {
   demo: CAUSES.map((c) => c.value),
   example: {
     title: "Incident causes",
-    code: `import { ParetoStrip } from "${PKG}/pareto-strip";
-
+    code: `import { ParetoStrip } from "${PKG}/pareto-strip";\n\n<ParetoStrip data={causes} unit="causes" metric="incidents" title="Incident causes" />`,
+  },
+  sampleData: [
+    {
+      name: "causes",
+      code: `// incident causes by count — a few dominate
 const causes = [
   { label: "Timeouts", value: 38 },
   { label: "OOM", value: 24 },
@@ -79,10 +81,9 @@ const causes = [
   { label: "Disk", value: 3 },
   { label: "DNS", value: 3 },
   { label: "Other bug", value: 2 },
-];
-
-<ParetoStrip data={causes} unit="causes" metric="incidents" title="Incident causes" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -133,6 +134,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ParetoStripInteractive
+      data={CAUSES}
+      threshold={s.threshold as number}
+      max={Number(s.max)}
+      unit="causes"
+      metric="incidents"
+      label={s.label as "count" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ParetoStrip",
+      "  data={causes}",
+      s.threshold !== 80 && `  threshold={${s.threshold}}`,
+      s.max !== "8" && `  max={${s.max}}`,
+      s.label !== "count" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the bars — each announces its share and the running cumulative; T jumps to the 80% crossing.",
 };
 
 export const recipes: Recipe[] = [
@@ -170,7 +199,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

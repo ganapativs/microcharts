@@ -1,8 +1,6 @@
 import { RetentionCurve } from "@microcharts/react/retention-curve";
-import { InteractiveDemo } from "./retention-curve.client";
+import { RetentionCurve as RetentionCurveInteractive } from "@microcharts/react/retention-curve/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a weekly cohort that decays then plateaus around 38%
@@ -67,6 +65,18 @@ export const entry: ChartEntry = {
     title: "W12 cohort",
     code: `import { RetentionCurve } from "${PKG}/retention-curve";\n\n<RetentionCurve data={cohort} unit="week" title="W12 cohort" />`,
   },
+  sampleData: [
+    {
+      name: "cohort",
+      code: `// a weekly cohort that decays then plateaus around 38%
+const cohort = [1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38, 0.379, 0.378];`,
+    },
+    {
+      name: "industry",
+      code: `// a leakier peer/industry curve (the subordinate ghost)
+const industry = [1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28, 0.279, 0.278];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -116,6 +126,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <RetentionCurveInteractive
+      data={DEMO}
+      benchmark={s.benchmark ? BENCH : undefined}
+      plateau={s.plateau as boolean}
+      curve={s.curve as "step" | "smooth"}
+      unit="week"
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<RetentionCurve",
+      "  data={cohort}",
+      s.benchmark && "  benchmark={industry}",
+      s.plateau === false && "  plateau={false}",
+      s.curve !== "step" && `  curve="${s.curve}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow across the weeks — each announces retention and the benchmark.",
 };
 
 export const recipes: Recipe[] = [
@@ -151,7 +187,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

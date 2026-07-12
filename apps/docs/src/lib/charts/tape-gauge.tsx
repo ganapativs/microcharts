@@ -1,8 +1,6 @@
 import { TapeGauge } from "@microcharts/react/tape-gauge";
-import { InteractiveDemo } from "./tape-gauge.client";
+import { TapeGauge as TapeGaugeInteractive } from "@microcharts/react/tape-gauge/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const ZONES = [
@@ -66,16 +64,18 @@ export const entry: ChartEntry = {
   demo: [142],
   example: {
     title: "Airspeed",
-    code: `import { TapeGauge } from "${PKG}/tape-gauge";
-
-const zones = [
+    code: `import { TapeGauge } from "${PKG}/tape-gauge";\n\n<TapeGauge value={142} rate={1} zones={zones} span={60} title="Airspeed" />`,
+  },
+  sampleData: [
+    {
+      name: "zones",
+      code: `const zones = [
   { from: 100, to: 130, tone: "pos" },
   { from: 130, to: 150, tone: "warn" },
   { from: 150, to: 200, tone: "neg" },
-];
-
-<TapeGauge value={142} rate={1} zones={zones} span={60} title="Airspeed" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -129,8 +129,8 @@ export const playground: PlaygroundSpec = {
         span={60}
         orientation={s.orientation as "vertical" | "horizontal"}
         summary={false}
-        width={vertical ? 28 : 160}
-        height={vertical ? 72 : 32}
+        width={vertical ? 44 : 240}
+        height={vertical ? 112 : 48}
       />
     );
   },
@@ -145,6 +145,36 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => {
+    const vertical = s.orientation !== "horizontal";
+    return (
+      <TapeGaugeInteractive
+        value={s.value as number}
+        rate={s.rate as number}
+        zones={ZONES}
+        span={60}
+        orientation={s.orientation as "vertical" | "horizontal"}
+        summary={false}
+        animate={ui.animate}
+        width={vertical ? 44 : 240}
+        height={vertical ? 112 : 48}
+      />
+    );
+  },
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<TapeGauge",
+      `  value={${s.value}}`,
+      s.rate !== 0 && `  rate={${s.rate}}`,
+      "  zones={zones}",
+      s.orientation !== "vertical" && `  orientation="${s.orientation}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "A live reading: the scale scrolls while the value stays parked at the pointer; chevrons show how fast it's moving, and each change is announced politely.",
 };
 
 export const recipes: Recipe[] = [
@@ -203,7 +233,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

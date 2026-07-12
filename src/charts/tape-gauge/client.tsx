@@ -5,6 +5,7 @@
 // Composes the static entry (canon); the scale window stays centered on value.
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_TAPE_GAUGE } from "../../core/strings-tape-gauge.js";
 import { autoSpan } from "./index.js";
 import { TapeGauge as StaticTapeGauge, tapeGaugeSummary, type TapeGaugeProps } from "./index.js";
@@ -15,6 +16,15 @@ const FILL: CSSProperties = { width: "100%", height: "auto" };
 export interface InteractiveTapeGaugeProps extends TapeGaugeProps {
   /** Minimum ms between live-region announcements (documented throttle). */
   announceEvery?: number;
+  /**
+   * Opt-in entrance motion (default `false`): the instrument fades and scales
+   * in when the chart first mounts client-side. A whole-glyph entrance rather
+   * than a per-mark one — the tape has no single fill/sweep mark (zone
+   * stripes, ticks, a fixed pointer, and chevrons all read together as one
+   * instrument). Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
@@ -33,8 +43,12 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     title,
     summary,
     announceEvery = 5000,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "pop", animate);
 
   const span = spanProp && spanProp > 0 ? spanProp : autoSpan(value, zones, rate);
   const tiers = tiersProp ?? [span / 60, span / 15];
@@ -61,6 +75,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-tape-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

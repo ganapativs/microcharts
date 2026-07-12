@@ -11,11 +11,6 @@ different from a low value.
 <LiveDemo
   label="HeatStrip"
   sizeOf="heat-strip"
-  code={`import { HeatStrip } from "@microcharts/react/heat-strip";
-
-const hourlyLoad = [12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35];
-
-<HeatStrip data={hourlyLoad} domain={[0, 100]} title="Load per hour" />`}
 >
   <HeatStrip
     data={[12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35]}
@@ -32,10 +27,6 @@ const hourlyLoad = [12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 
 ## Try it
 
 <Playground chart="heat-strip" />
-
-## Interactive
-
-<InteractiveDemo slug="heat-strip" />
 
 ## When to use it
 
@@ -97,8 +88,8 @@ max-per-bucket only.
 
 The summary reuses `describeSeries` verbatim — for the load strip above that's **"Trending
 up 192%. Range 12 to 90. Last value 35."** — so a color ramp is never the only channel. The
-interactive CPU-pressure strip above roves cells with ActivityGrid-parity announcements
-("Point 7 of 30: 90.", empty slots as "no data").
+interactive entry roves cells with ActivityGrid-parity announcements
+(**"Point 8 of 20: 90."**, empty slots as "no data").
 
 ## Props
 

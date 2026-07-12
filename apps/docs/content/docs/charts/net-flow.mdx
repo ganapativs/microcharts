@@ -12,15 +12,6 @@ answers both.
 <LiveDemo
   label="NetFlow"
   sizeOf="net-flow"
-  code={`import { NetFlow } from "@microcharts/react/net-flow";
-
-const months = [
-{ in: 42, out: 31 }, { in: 38, out: 35 }, { in: 45, out: 29 }, { in: 40, out: 44 },
-{ in: 52, out: 38 }, { in: 48, out: 41 }, { in: 55, out: 36 }, { in: 50, out: 47 },
-{ in: 58, out: 39 }, { in: 44, out: 52 }, { in: 60, out: 41 }, { in: 57, out: 43 },
-];
-
-<NetFlow data={months} title="Monthly cash flow" />`}
 >
   <NetFlow
     data={[
@@ -42,10 +33,6 @@ const months = [
 ## Try it
 
 <Playground chart="net-flow" />
-
-## Interactive
-
-<InteractiveDemo slug="net-flow" />
 
 ## When to use it
 
@@ -156,7 +143,7 @@ point would imply continuity the data doesn't have. `in`/`out` are magnitudes: a
 is invalid input, not a reversed direction, so it's coerced to `0`. When every period's
 magnitudes are zero (all periods coerced or genuinely empty), NetFlow draws only the zero
 baseline — no areas, no bars, no net line — and the accessible name says so plainly: **"No flow
-across 1 periods."**
+across 1 period."**
 
 ## Four homes
 

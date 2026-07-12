@@ -12,9 +12,6 @@ area, not their width, is proportional to value). For a precise comparison, reac
 <LiveDemo
   label="BalanceBeam"
   sizeOf="balance-beam"
-  code={`import { BalanceBeam } from "@microcharts/react/balance-beam";
-
-<BalanceBeam data={[{ label: "Inflow", value: 620 }, { label: "Outflow", value: 480 }]} />`}
 >
   <BalanceBeam data={[{ label: "Inflow", value: 620 }, { label: "Outflow", value: 480 }]} label="values" title="Cash flow" width={80} height={30} />
 </LiveDemo>
@@ -26,10 +23,6 @@ area, not their width, is proportional to value). For a precise comparison, reac
 ## Try it
 
 <Playground chart="balance-beam" />
-
-## Interactive
-
-<InteractiveDemo slug="balance-beam" />
 
 ## When to use it
 
@@ -141,7 +134,7 @@ is honest: there is nothing to weigh.
 Ratio mode is the default because most two-sided comparisons are share-of-whole questions, and square
 weights are the default because circles under-read area at this size. The tilt saturates at `maxTilt`
 degrees — a deliberate honesty choice: past a point, a steeper beam would imply a precision the eye
-can't extract, so the angle levels off and the docs show the saturation curve. Direction and rough
+can't extract, so the angle levels off. Direction and rough
 magnitude always agree, and the two channels (tilt and weight area) never disagree. For same-scale
 rows that should tilt comparably, `mode="difference"` scales the imbalance by a shared `domain`.
 

@@ -3,14 +3,21 @@
 // x snaps to the nearest quantile edge. ↑/↓ switch rows, ←/→ step edges. The
 // median edge announces the row median + delta vs the other arm; other edges
 // announce the percentile. Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
 import { abStripsGeometry } from "./geometry.js";
 import { ABStrips as StaticABStrips, abSummary, type ABStripsProps } from "./index.js";
 
 export interface InteractiveABStripsProps extends ABStripsProps {
   strings?: ABStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the two median dots settle onto
+   * their bands on first client-side mount. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
@@ -24,8 +31,12 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
     strings = EN_AB,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "settle", animate, { selector: "circle[data-mc-ink]" });
 
   const labelChars = Math.max(labels[0].length, labels[1].length);
   const geo = useMemo(
@@ -113,6 +124,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-ab-strips-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

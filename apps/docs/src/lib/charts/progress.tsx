@@ -1,8 +1,6 @@
 import { Progress } from "@microcharts/react/progress";
-import { InteractiveDemo } from "./progress.client";
+import { Progress as ProgressInteractive } from "@microcharts/react/progress/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -96,6 +94,29 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ProgressInteractive
+      value={(s.pct as number) / 100}
+      segments={(s.segments as number) >= 2 ? (s.segments as number) : undefined}
+      label={s.label as "percent" | "value" | "fraction" | "none"}
+      summary={false}
+      animate={ui.animate}
+      width={200}
+      height={26}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Progress",
+      `  value={${(s.pct as number) / 100}}`,
+      (s.segments as number) >= 2 && `  segments={${s.segments}}`,
+      s.label !== "percent" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Step the value — the fill glides and whole-percent changes announce politely.",
 };
 
 export const recipes: Recipe[] = [
@@ -235,7 +256,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

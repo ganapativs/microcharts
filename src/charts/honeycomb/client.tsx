@@ -4,12 +4,20 @@
 // anonymous units, not addressable data points. Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
 import { Honeycomb as StaticHoneycomb, honeycombSummary, type HoneycombProps } from "./index.js";
 
 export interface InteractiveHoneycombProps extends HoneycombProps {
   live?: boolean;
   strings?: HoneycombStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the occupancy sweeps in left to
+   * right on first client-side mount (fill order is row-major, so a clip-reveal
+   * echoes the real fill sweep). Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
@@ -22,12 +30,15 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
     unit = "",
     format,
     locale,
+    animate = false,
     ...rest
   } = props;
   const summary = honeycombSummary(value, { total, unit, strings, format, locale });
   const [hover, setHover] = useState(false);
   const [announced, setAnnounced] = useState("");
   const prev = useRef(value);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   useEffect(() => {
     if (prev.current === value) return;
@@ -41,6 +52,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-honeycomb-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

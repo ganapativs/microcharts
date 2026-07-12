@@ -1,8 +1,6 @@
 import { Funnel } from "@microcharts/react/funnel";
-import { InteractiveDemo } from "./funnel.client";
+import { Funnel as FunnelInteractive } from "@microcharts/react/funnel/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const PIPE = [
@@ -64,16 +62,7 @@ export const entry: ChartEntry = {
   demo: PIPE.map((d) => d.value),
   example: {
     title: "Signup funnel",
-    code: `import { Funnel } from "${PKG}/funnel";
-
-const stages = [
-  { label: "Visitors", value: 12400 },
-  { label: "Signups", value: 5704 },
-  { label: "Activated", value: 2730 },
-  { label: "Paid", value: 1116 },
-];
-
-<Funnel data={stages} title="Signup funnel" />`,
+    code: `import { Funnel } from "${PKG}/funnel";\n\n<Funnel data={stages} title="Signup funnel" />`,
   },
   sampleData: [
     {
@@ -141,6 +130,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <FunnelInteractive
+      data={PIPE}
+      mode={s.mode as "absolute" | "rate"}
+      connectors={s.connectors as boolean}
+      label={s.label as "none" | "percent" | "value"}
+      highlight={(s.highlight as boolean) ? "Activated" : undefined}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={78}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Funnel",
+      "  data={stages}",
+      s.mode !== "absolute" && `  mode="${s.mode}"`,
+      !(s.connectors as boolean) && "  connectors={false}",
+      s.label !== "none" && `  label="${s.label}"`,
+      (s.highlight as boolean) && '  highlight="Activated"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow through the stages — each announces its retained share of the first.",
 };
 
 export const recipes: Recipe[] = [
@@ -264,7 +281,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

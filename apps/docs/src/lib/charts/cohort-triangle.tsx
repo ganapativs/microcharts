@@ -1,8 +1,6 @@
 import { CohortTriangle } from "@microcharts/react/cohort-triangle";
-import { InteractiveDemo } from "./cohort-triangle.client";
+import { CohortTriangle as CohortTriangleInteractive } from "@microcharts/react/cohort-triangle/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -83,18 +81,22 @@ export const entry: ChartEntry = {
   demo: [100, 62, 48, 41, 38, 37],
   example: {
     title: "Monthly retention cohorts",
-    code: `import { CohortTriangle } from "${PKG}/cohort-triangle";
-
+    code: `import { CohortTriangle } from "${PKG}/cohort-triangle";\n\n<CohortTriangle data={cohorts} unit="month" title="Monthly retention" />`,
+  },
+  sampleData: [
+    {
+      name: "cohorts",
+      code: `// Five monthly vintages, decaying then flattening — ragged because newer
+// cohorts have been observed for fewer months. March leaks worst by month 1.
 const cohorts = [
   { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
   { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
   { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
   { label: "Apr", values: [1, 0.55, 0.42] },
   { label: "May", values: [1, 0.52] },
-];
-
-<CohortTriangle data={cohorts} unit="month" title="Monthly retention" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -140,6 +142,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <CohortTriangleInteractive
+      data={COHORTS}
+      labels={s.labels as boolean}
+      highlight={s.highlight === "none" ? undefined : (s.highlight as string)}
+      cell={Number(s.cell)}
+      unit="month"
+      animate={ui.animate}
+      title="Playground"
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<CohortTriangle",
+      "  data={cohorts}",
+      s.labels === false && "  labels={false}",
+      s.highlight !== "none" && `  highlight="${s.highlight}"`,
+      `  cell={${s.cell}}`,
+      '  unit="month"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover a cell, or focus and move in 2-D with the arrow keys — each cell announces its cohort, age, and retention.",
 };
 
 export const recipes: Recipe[] = [
@@ -172,7 +200,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

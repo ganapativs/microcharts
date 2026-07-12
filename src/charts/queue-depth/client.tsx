@@ -2,14 +2,21 @@
 // Interactive <QueueDepth> (plan/26 §5). One pointer listener + nearest-x math
 // across the finite points; ←/→ step periods, Home/End jump ends. Composes the
 // static component (canon); the crosshair + focus ring are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_QUEUE_DEPTH, type QueueDepthStrings } from "../../core/strings-queue-depth.js";
 import { queueDepthGeometry } from "./geometry.js";
 import { QueueDepth as StaticQueueDepth, queueSummary, type QueueDepthProps } from "./index.js";
 
 export interface InteractiveQueueDepthProps extends QueueDepthProps {
   strings?: QueueDepthStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the backlog area wipes on when
+   * the chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
@@ -24,8 +31,12 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
     strings = EN_QUEUE_DEPTH,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(
     () => queueDepthGeometry({ width, height, data, capacity, domain: props.domain }),
@@ -100,6 +111,7 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-queue-depth-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -10,18 +10,6 @@ line is the question; everything else is the answer.
 <LiveDemo
   label="LikertStrip"
   sizeOf="likert-strip"
-  code={`import { LikertStrip } from "@microcharts/react/likert-strip";
-
-<LikertStrip
-  data={[
-    { label: "Strongly disagree", value: 10 },
-    { label: "Disagree", value: 14 },
-    { label: "Neutral", value: 14 },
-    { label: "Agree", value: 34 },
-    { label: "Strongly agree", value: 28 },
-  ]}
-  title="Q1 satisfaction"
-/>`}
 >
   <LikertStrip
     data={[
@@ -44,10 +32,6 @@ line is the question; everything else is the answer.
 
 <Playground chart="likert-strip" />
 
-## Interactive
-
-<InteractiveDemo slug="likert-strip" />
-
 ## When to use it
 
 - **Good for** — survey question rows (share one scale via SparkGroup), sentiment in cards.
@@ -60,60 +44,40 @@ line is the question; everything else is the answer.
 ## Variants
 
 <LiveDemo
-  label="omit neutral"
+  label="omit neutral vs net score"
+  dataOf="likert-strip"
   code={`// the known critique of center-split neutral — supported, never silent
-<LikertStrip
-  data={[
-    { label: "Strongly disagree", value: 10 },
-    { label: "Disagree", value: 14 },
-    { label: "Neutral", value: 14 },
-    { label: "Agree", value: 34 },
-    { label: "Strongly agree", value: 28 },
-  ]}
-  neutral="omit"
-/>`}
+<LikertStrip data={responses} neutral="omit" />
+<LikertStrip data={responses} label="net" />`}
 >
-  <LikertStrip
-    data={[
-      { label: "Strongly disagree", value: 10 },
-      { label: "Disagree", value: 14 },
-      { label: "Neutral", value: 14 },
-      { label: "Agree", value: 34 },
-      { label: "Strongly agree", value: 28 },
-    ]}
-    neutral="omit"
-    title="Omit neutral"
-    width={220}
-    height={24}
-  />
-</LiveDemo>
-
-<LiveDemo
-  label="net score"
-  code={`<LikertStrip
-  data={[
-    { label: "Strongly disagree", value: 10 },
-    { label: "Disagree", value: 14 },
-    { label: "Neutral", value: 14 },
-    { label: "Agree", value: 34 },
-    { label: "Strongly agree", value: 28 },
-  ]}
-  label="net"
-/>`}
->
-  <LikertStrip
-    data={[
-      { label: "Strongly disagree", value: 10 },
-      { label: "Disagree", value: 14 },
-      { label: "Neutral", value: 14 },
-      { label: "Agree", value: 34 },
-      { label: "Strongly agree", value: 28 },
-    ]}
-    label="net"
-    title="Net score"
-    width={220}
-    height={24}
-  />
+  <span className="inline-flex flex-col gap-3">
+    <LikertStrip
+      data={[
+        { label: "Strongly disagree", value: 10 },
+        { label: "Disagree", value: 14 },
+        { label: "Neutral", value: 14 },
+        { label: "Agree", value: 34 },
+        { label: "Strongly agree", value: 28 },
+      ]}
+      neutral="omit"
+      title="Omit neutral"
+      width={220}
+      height={24}
+    />
+    <LikertStrip
+      data={[
+        { label: "Strongly disagree", value: 10 },
+        { label: "Disagree", value: 14 },
+        { label: "Neutral", value: 14 },
+        { label: "Agree", value: 34 },
+        { label: "Strongly agree", value: 28 },
+      ]}
+      label="net"
+      title="Net score"
+      width={220}
+      height={24}
+    />
+  </span>
 </LiveDemo>
 
 ## Four homes

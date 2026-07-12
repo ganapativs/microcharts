@@ -1,8 +1,6 @@
 import { TraceFold } from "@microcharts/react/trace-fold";
-import { InteractiveDemo } from "./trace-fold.client";
+import { TraceFold as TraceFoldInteractive } from "@microcharts/react/trace-fold/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const ms = (n: number) => `${Math.round(n)} ms`;
@@ -57,9 +55,12 @@ export const entry: ChartEntry = {
   demo: [214, 86],
   example: {
     title: "Request trace",
-    code: `import { TraceFold } from "${PKG}/trace-fold";
-
-const spans = [
+    code: `import { TraceFold } from "${PKG}/trace-fold";\n\n<TraceFold data={spans} title="Request trace" />`,
+  },
+  sampleData: [
+    {
+      name: "spans",
+      code: `const spans = [
   { label: "request", start: 0, duration: 214, depth: 0 },
   { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
   { label: "auth", start: 0, duration: 8, depth: 1, parent: 0 },
@@ -69,10 +70,9 @@ const spans = [
   { label: "decode", start: 82, duration: 12, depth: 2, parent: 1 },
   { label: "log", start: 200, duration: 14, depth: 1, parent: 0 },
   { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 },
-];
-
-<TraceFold data={spans} title="Request trace" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -116,6 +116,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <TraceFoldInteractive
+      data={TRACE}
+      emphasis={s.emphasis as "critical" | "none"}
+      labels={s.labels as boolean}
+      format={ms}
+      animate={ui.animate}
+      summary={false}
+      width={320}
+      height={48}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<TraceFold",
+      "  data={spans}",
+      s.emphasis !== "critical" && `  emphasis="${s.emphasis}"`,
+      s.labels === false && "  labels={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover, or use ←/→ within a depth and ↑/↓ between depths — each span announces its duration, share, and path status.",
 };
 
 export const recipes: Recipe[] = [
@@ -151,7 +176,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

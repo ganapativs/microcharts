@@ -2,8 +2,9 @@
 // Interactive <DualSparkline> (plan/22 #22). Nearest-x lookup announces BOTH
 // series ("Point 9 of 12: 17 vs 15."); crosshair touches both lines. ←/→
 // steps x. Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_VS, type VsStrings } from "../../core/strings-vs.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -17,6 +18,12 @@ import {
 export interface InteractiveDualSparklineProps extends DualSparklineProps {
   strings?: VsStrings;
   seriesStrings?: SeriesStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the primary line draws on when
+   * the chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function DualSparkline(props: InteractiveDualSparklineProps): React.ReactNode {
@@ -35,8 +42,12 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
     seriesStrings = EN_SERIES,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 8));
@@ -131,6 +142,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
 
   return (
     <span
+      ref={hostRef}
       className="mc-dual-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

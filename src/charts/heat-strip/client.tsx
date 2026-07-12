@@ -3,8 +3,9 @@
 // lookup. ←/→ roving cell focus with the ActivityGrid focus-ring style — the
 // 1-D restriction of its 2-D nav, same wording, same overlay. Composes the
 // static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import { heatStripGeometry } from "./geometry.js";
@@ -12,6 +13,12 @@ import { HeatStrip as StaticHeatStrip, type HeatStripProps } from "./index.js";
 
 export interface InteractiveHeatStripProps extends HeatStripProps {
   strings?: SeriesStrings & SlotStrings;
+  /**
+   * Opt-in entrance motion (default `false`): cells fade in on first
+   * client-side mount. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const DEFAULT_STRINGS = { ...EN_SERIES, ...EN_SLOTS };
@@ -29,8 +36,12 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
     strings = DEFAULT_STRINGS,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate);
 
   const geo = useMemo(
     () => heatStripGeometry({ width, height, values: data, domain, steps, shape }),
@@ -98,6 +109,7 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-heat-strip-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

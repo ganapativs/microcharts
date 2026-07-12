@@ -1,15 +1,26 @@
 "use client";
 // Interactive <Funnel> (plan/22 #19). One pointer listener; stage by x-band.
 // ←/→ rove stages ("Checkout: 2,730 — 22% of visitors."). Composes the static.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { funnelGeometry } from "./geometry.js";
 import { Funnel as StaticFunnel, funnelSummary, type FunnelProps } from "./index.js";
 
+// Stage columns carry "bar" or "accent" (the highlighted leak) — the default
+// `rise` selector only matches "bar".
+const STAGE_SELECTOR = 'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"]';
+
 export interface InteractiveFunnelProps extends FunnelProps {
   strings?: CompositionStrings;
+  /**
+   * Opt-in entrance motion (default `false`): stage columns rise from the
+   * baseline when the chart first mounts client-side. Inert on the server
+   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
@@ -25,8 +36,14 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     strings = EN_COMPOSITION,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // ordered by y, spread over a 450ms window — the funnel squeezes top→down
+  // instead of every stage rising in lockstep.
+  useEntrance(hostRef, "rise", animate, { selector: STAGE_SELECTOR, order: "y", window: 450 });
 
   const geo = useMemo(
     () =>
@@ -109,6 +126,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-funnel-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

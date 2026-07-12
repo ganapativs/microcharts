@@ -1,8 +1,6 @@
 import { CometTrail } from "@microcharts/react/comet-trail";
-import { InteractiveDemo } from "./comet-trail.client";
+import { CometTrail as CometTrailInteractive } from "@microcharts/react/comet-trail/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -16,6 +14,10 @@ export const entry: ChartEntry = {
   tagline: "Where the value is now, and where it has just been.",
   staticImport: `${PKG}/comet-trail`,
   interactiveImport: `${PKG}/comet-trail/interactive`,
+  // The easing head + opacity-fading trail IS the encoding (age is motion) —
+  // a mount entrance would fight that live motion, so this chart has no
+  // `animate` prop at all.
+  animates: false,
   dataShape: "number[]",
   encoding: {
     channel: "head position (now) + opacity-fading positional trail",
@@ -57,6 +59,12 @@ export const entry: ChartEntry = {
     title: "Now",
     code: `import { CometTrail } from "${PKG}/comet-trail";\n\n<CometTrail data={rollingWindow} title="Latency" />`,
   },
+  sampleData: [
+    {
+      name: "rollingWindow",
+      code: `const rollingWindow = [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -92,17 +100,41 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  // No `animate` prop exists on this chart (see entry.animates) — the head's
+  // own easing motion + fading trail IS the encoding.
+  renderInteractive: (s) => (
+    <CometTrailInteractive
+      data={RISING}
+      trail={s.trail as number}
+      label={s.label as "last" | "none"}
+      summary={false}
+      width={180}
+    />
+  ),
+  codeInteractive: (s) =>
+    [
+      "<CometTrail",
+      "  data={rollingWindow}",
+      s.trail !== 12 && `  trail={${s.trail}}`,
+      s.label !== "last" && `  label="${s.label}"`,
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "A live rolling value. The bright head is now; the fading trail is where it has just been (opacity is age, never value). Each update eases the head to the new position — a steady stream makes the comet, a stall goes still. Reduced-motion readers get the same decaying dot-sparkline, repositioned instantly.",
+  animates: false,
 };
 
 export const recipes: Recipe[] = [
   {
     label: "shorter trail for a table cell",
-    code: `<CometTrail data={window} trail={6} />`,
+    code: `<CometTrail data={rollingWindow} trail={6} />`,
     node: <CometTrail data={RISING} trail={6} summary={false} width={100} />,
   },
   {
     label: "no label — the card prints the number",
-    code: `<CometTrail data={window} label="none" />`,
+    code: `<CometTrail data={rollingWindow} label="none" />`,
     node: <CometTrail data={RISING} label="none" summary={false} width={100} />,
   },
 ];
@@ -128,7 +160,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

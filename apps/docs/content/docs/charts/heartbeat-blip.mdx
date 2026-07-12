@@ -12,11 +12,6 @@ color.
 <LiveDemo
   label="HeartbeatBlip"
   sizeOf="heartbeat-blip"
-  code={`import { HeartbeatBlip } from "@microcharts/react/heartbeat-blip";
-
-// pass 'now' from your data layer — never Date.now() in a server render
-
-<HeartbeatBlip events={eventTimestamps} now={serverNow} title="Requests" />`}
 >
   <HeartbeatBlip events={[97000, 92000, 85000, 70000, 55000, 48000]} now={100000} title="Requests" width={90} />
 </LiveDemo>
@@ -28,10 +23,6 @@ color.
 ## Try it
 
 <Playground chart="heartbeat-blip" />
-
-## Interactive
-
-<InteractiveDemo slug="heartbeat-blip" />
 
 ## Motion, and reduced motion
 
@@ -131,7 +122,7 @@ BreathingDot.
 
 ## Accessibility
 
-The accessible name is the count, the window, and the time since the last event — **"12 events in the
+The accessible name is the count, the window, and the time since the last event — **"6 events in the
 last minute; last 3s ago."** — or **"No events in the last minute."** when the trace is flat. The trace
 sweeps only when motion is allowed and on-screen; the live region announces on data change, and there is
 no per-spike navigation because the spikes are transient — the summary is the record.

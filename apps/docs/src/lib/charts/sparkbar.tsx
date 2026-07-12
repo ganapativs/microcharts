@@ -1,6 +1,5 @@
 import { SparkBar } from "@microcharts/react/sparkbar";
 import { SparkBar as SparkBarInteractive } from "@microcharts/react/sparkbar/interactive";
-import { DemoPanel } from "@/components/charts/demo-panel";
 import { wave } from "./demo-data";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -99,21 +98,6 @@ export const showcase = {
   ),
 };
 
-export function InteractiveDemo() {
-  return (
-    <DemoPanel hint="Hover a bar, or focus and step through with ← →.">
-      <SparkBarInteractive
-        data={[5, 8, 3, 9, 6, 11, 4, 10, 7, 12, 8, 6]}
-        width={340}
-        height={92}
-        label="last"
-        className="w-full max-w-md"
-        title="Deploys per day"
-      />
-    </DemoPanel>
-  );
-}
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "mode", options: ["bar", "winloss"], init: "bar" },
@@ -144,6 +128,7 @@ export const playground: PlaygroundSpec = {
         label={s.label ? "last" : "none"}
         locale={s.locale as string}
         className="w-full max-w-md"
+        style={{ height: "auto" }}
         title="Playground"
       />
     );
@@ -163,6 +148,41 @@ export const playground: PlaygroundSpec = {
       .filter(Boolean)
       .join("\n");
   },
+  renderInteractive: (s, data, ui) => {
+    const shown = s.mode === "winloss" ? data.map((n) => (n % 2 === 0 ? 1 : -1)) : data;
+    const gap = Number((s.gap as number).toFixed(2));
+    return (
+      <SparkBarInteractive
+        data={shown}
+        width={340}
+        height={92}
+        mode={s.mode as "bar" | "winloss"}
+        gap={gap}
+        label={s.label ? "last" : "none"}
+        locale={s.locale as string}
+        animate={ui.animate}
+        className="w-full max-w-md"
+        title="Playground"
+      />
+    );
+  },
+  codeInteractive: (s, data, ui) => {
+    const shown = s.mode === "winloss" ? data.map((n) => (n % 2 === 0 ? 1 : -1)) : data;
+    const gap = Number((s.gap as number).toFixed(2));
+    return [
+      "<SparkBar",
+      `  data={[${shown.join(", ")}]}`,
+      `  mode="${s.mode}"`,
+      gap !== 0.25 && `  gap={${gap}}`,
+      s.label && '  label="last"',
+      s.locale !== "en-US" && `  locale="${s.locale}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  },
+  interactiveHint: "Hover a bar, or focus and step through with ← →.",
 };
 
 export const recipes: Recipe[] = [
@@ -281,7 +301,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

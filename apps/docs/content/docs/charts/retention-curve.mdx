@@ -37,10 +37,6 @@ subordinate ghost.
 
 <Playground chart="retention-curve" />
 
-## Interactive
-
-<InteractiveDemo slug="retention-curve" />
-
 ## When to use it
 
 - **Good for** — a cohort retention curve in a KPI card, your decay vs an industry benchmark, spotting whether retention plateaus (or keeps leaking).
@@ -123,7 +119,7 @@ subordinate ghost.
   />
 </LiveDemo>
 
-A single period is too short for plateau detection (the window needs at least three finite
+A single period is too short for plateau detection (the window needs at least four finite
 points) and renders as a single step with no visible line. `data` accepts either a 0–1
 fraction or a 0–100 percent series — whichever the max value implies — so a raw percent
 export renders identically to its fraction form without a manual divide. With a `locale`, the

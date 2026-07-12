@@ -12,9 +12,6 @@ trail is recency context, never data you have to decode.
 <LiveDemo
   label="CometTrail"
   sizeOf="comet-trail"
-  code={`import { CometTrail } from "@microcharts/react/comet-trail";
-
-<CometTrail data={rollingWindow} title="Latency" />`}
 >
   <CometTrail data={[40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87]} title="Latency" width={90} />
 </LiveDemo>
@@ -26,10 +23,6 @@ trail is recency context, never data you have to decode.
 ## Try it
 
 <Playground chart="comet-trail" />
-
-## Interactive
-
-<InteractiveDemo slug="comet-trail" />
 
 ## Motion, and reduced motion
 
@@ -106,7 +99,7 @@ that it stops being a trail and becomes a sparkline, which is the better tool fo
 
 The accessible name is the now-value and the recent trend — **"Now 87, rising over the last 12
 updates."** — or **"Now 87."** for a single point. Arrow keys step back through the trail
-("3 updates ago: 74.") and return toward now; motion is gated on `prefers-reduced-motion`, and the trail
+("3 updates ago: 78.") and return toward now; motion is gated on `prefers-reduced-motion`, and the trail
 opacity is age, never a value you must read from fading.
 
 ## Props

@@ -1,8 +1,6 @@
 import { GradedBand } from "@microcharts/react/graded-band";
-import { InteractiveDemo } from "./graded-band.client";
+import { GradedBand as GradedBandInteractive } from "@microcharts/react/graded-band/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // posterior draws for one estimate (deterministic pseudo-sample)
@@ -60,15 +58,18 @@ export const entry: ChartEntry = {
   demo: [12, 17, 21, 21, 26, 38],
   example: {
     title: "Forecast estimate",
-    code: `import { GradedBand } from "${PKG}/graded-band";
-
+    code: `import { GradedBand } from "${PKG}/graded-band";\n\n<GradedBand data={posterior} label="median" title="Forecast estimate" />`,
+  },
+  sampleData: [
+    {
+      name: "posterior",
+      code: `// posterior draws for one estimate (deterministic pseudo-sample)
 const posterior = Array.from(
   { length: 160 },
   (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
-);
-
-<GradedBand data={posterior} label="median" title="Forecast estimate" />`,
-  },
+);`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -123,6 +124,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <GradedBandInteractive
+      data={data}
+      levels={s.levels === "50/90" ? [50, 90] : [50, 80, 95]}
+      softEdge={s.softEdge as boolean}
+      label={s.label as "none" | "median"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={16}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<GradedBand",
+      "  data={posterior}",
+      s.levels === "50/90" && "  levels={[50, 90]}",
+      s.softEdge && "  softEdge",
+      s.label !== "none" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow outward from the median — each level announces its interval.",
 };
 
 export const recipes: Recipe[] = [
@@ -157,7 +183,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

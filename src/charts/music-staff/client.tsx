@@ -2,8 +2,9 @@
 // Interactive <MusicStaff> (plan/24 #12). Sparkline model: one pointer listener
 // + nearest-note lookup, ←/→ roving, a ring on the focused note, EN.point
 // announcements. Composes the static component (ring as its child).
-import { useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -14,6 +15,12 @@ const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveMusicStaffProps extends MusicStaffProps {
   strings?: SeriesStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the note heads settle onto the
+   * staff on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
@@ -32,8 +39,14 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
     strings = EN_SERIES,
     className,
     style,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // "trail" ordered by x — notes land left→right along the staff, echoing a
+  // melody played in time order rather than a generic staggered settle.
+  useEntrance(hostRef, "trail", animate, { order: "x" });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const last = lastFinite(data);
@@ -99,6 +112,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className={className ? `mc-staff-live ${className}` : "mc-staff-live"}
       style={{ display: "inline-block", position: "relative", lineHeight: 0, ...style }}
       tabIndex={0}

@@ -1,8 +1,6 @@
 import { Ohlc } from "@microcharts/react/ohlc";
-import { InteractiveDemo } from "./ohlc.client";
+import { Ohlc as OhlcInteractive } from "@microcharts/react/ohlc/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const PERIODS = Array.from({ length: 20 }, (_, i) => {
@@ -60,18 +58,7 @@ export const entry: ChartEntry = {
   demo: PERIODS.map((p) => p.close),
   example: {
     title: "ACME sessions",
-    code: `import { Ohlc } from "${PKG}/ohlc";
-
-const sessions = [
-  { open: 140.1, high: 143.4, low: 137.2, close: 142.3 },
-  { open: 142.6, high: 146.8, low: 141.0, close: 144.9 },
-  { open: 144.5, high: 145.2, low: 140.1, close: 141.4 },
-  { open: 141.1, high: 144.7, low: 139.5, close: 143.8 },
-  { open: 143.9, high: 148.2, low: 142.8, close: 147.5 },
-  { open: 147.2, high: 149.9, low: 144.6, close: 145.9 },
-];
-
-<Ohlc data={sessions} title="ACME sessions" />`,
+    code: `import { Ohlc } from "${PKG}/ohlc";\n\n<Ohlc data={sessions} title="ACME sessions" />`,
   },
   sampleData: [
     {
@@ -142,6 +129,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <OhlcInteractive
+      data={PERIODS}
+      variant={s.variant as "candle" | "bars"}
+      label={s.label as "last" | "none"}
+      maxPeriods={s.maxPeriods as number}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={32}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Ohlc",
+      "  data={sessions}",
+      s.variant !== "candle" && `  variant="${s.variant}"`,
+      s.label !== "none" && `  label="${s.label}"`,
+      s.maxPeriods !== 20 && `  maxPeriods={${s.maxPeriods}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow through the sessions — each announces open, high, low, and close.",
 };
 
 export const recipes: Recipe[] = [
@@ -292,7 +305,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

@@ -2,8 +2,9 @@
 // Interactive <SegmentedBar> (plan/22 #14). One pointer listener; segment by
 // x lookup. ←/→ rove segments incl. "Other", which announces its member count
 // ("Other: 5%, 3 categories."). Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { largestRemainderPercents, rollup, segmentedBarGeometry } from "./geometry.js";
 import {
@@ -14,6 +15,12 @@ import {
 
 export interface InteractiveSegmentedBarProps extends SegmentedBarProps {
   strings?: CompositionStrings;
+  /**
+   * Opt-in entrance motion (default `false`): segments fade in left to right
+   * on first client-side mount. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNode {
@@ -28,8 +35,14 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
     strings = EN_COMPOSITION,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate, {
+    selector: 'rect[data-mc-cat], rect[data-mc-ink="neutral"]',
+  });
 
   const rolled = useMemo(() => {
     let r = rollup(data, maxSegments, strings.otherLabel);
@@ -115,6 +128,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
 
   return (
     <span
+      ref={hostRef}
       className="mc-segbar-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

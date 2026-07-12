@@ -3,8 +3,9 @@
 // reading math; ←/→ step readings and the live region states the percentile at
 // that reading. Composes the static component (canon) — the crosshair + focus
 // ring are overlay children, never a re-implemented SVG.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import {
   EN_PERCENTILE_TRACE,
   type PercentileTraceStrings,
@@ -20,6 +21,12 @@ const INT: Intl.NumberFormatOptions = { maximumFractionDigits: 0 };
 
 export interface InteractivePercentileTraceProps extends PercentileTraceProps {
   strings?: PercentileTraceStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the line draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function PercentileTrace(props: InteractivePercentileTraceProps): React.ReactNode {
@@ -33,8 +40,12 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
     strings = EN_PERCENTILE_TRACE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(() => percentileGeometry({ width, height, data }), [width, height, data]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -105,6 +116,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
 
   return (
     <span
+      ref={hostRef}
       className="mc-percentile-trace-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

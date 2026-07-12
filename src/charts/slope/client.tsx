@@ -3,8 +3,9 @@
 // vertical distance at the pointer's interpolated x (pure point-to-segment
 // math over ≤ 7 lines). ↑/↓ rove categories ordered by their `to` value.
 // Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { pairChange } from "../dumbbell/index.js";
 import { slopeGeometry } from "./geometry.js";
@@ -12,6 +13,12 @@ import { Slope as StaticSlope, slopeSummary, type SlopeProps } from "./index.js"
 
 export interface InteractiveSlopeProps extends SlopeProps {
   strings?: PairedStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the lines draw on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Slope(props: InteractiveSlopeProps): React.ReactNode {
@@ -26,8 +33,12 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
     strings = EN_PAIRED,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate, { selector: "line" });
 
   const fontSize = 6;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -146,6 +157,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-slope-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

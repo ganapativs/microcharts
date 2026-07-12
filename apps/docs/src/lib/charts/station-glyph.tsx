@@ -1,8 +1,6 @@
 import { StationGlyph } from "@microcharts/react/station-glyph";
-import { InteractiveDemo } from "./station-glyph.client";
+import { StationGlyph as StationGlyphInteractive } from "@microcharts/react/station-glyph/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const OBS = {
@@ -94,6 +92,35 @@ export const playground: PlaygroundSpec = {
       "  pressure={1013}",
       "/>",
     ].join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <StationGlyphInteractive
+      station="KSFO"
+      cloud={s.cloud as number}
+      wind={{ direction: s.direction as number, magnitude: s.magnitude as number }}
+      temp={16}
+      dewpoint={9}
+      pressure={1013}
+      summary={false}
+      animate={ui.animate}
+      size={44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<StationGlyph",
+      '  station="KSFO"',
+      `  cloud={${s.cloud}}`,
+      `  wind={{ direction: ${s.direction}, magnitude: ${s.magnitude} }}`,
+      "  temp={16}",
+      "  dewpoint={9}",
+      "  pressure={1013}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Focus the glyph and use ←/→ to step through each field — station, wind, sky, temperature, dew point, pressure — announced one at a time. Home reads the whole observation.",
 };
 
 export const recipes: Recipe[] = [
@@ -142,7 +169,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

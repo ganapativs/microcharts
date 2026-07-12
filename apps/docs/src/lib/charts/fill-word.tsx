@@ -1,8 +1,6 @@
 import { FillWord } from "@microcharts/react/fill-word";
-import { InteractiveDemo } from "./fill-word.client";
+import { FillWord as FillWordInteractive } from "@microcharts/react/fill-word/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -91,6 +89,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <FillWordInteractive
+      word={s.mode === "drain" ? "expiring" : "uploading"}
+      value={(s.value as number) / 100}
+      mode={s.mode as "fill" | "drain"}
+      label={s.label ? "value" : "none"}
+      summary={false}
+      animate={ui.animate}
+      fontSize={18}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<FillWord",
+      `  word="${s.mode === "drain" ? "expiring" : "uploading"}"`,
+      `  value={${((s.value as number) / 100).toFixed(2)}}`,
+      s.mode !== "fill" && `  mode="${s.mode}"`,
+      s.label && '  label="value"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Tap to advance — the accent ink edge glides along the word (reduced-motion → it jumps) and the new percentage is announced through a polite live region, throttled so a streaming value never spams.",
 };
 
 export const recipes: Recipe[] = [
@@ -121,7 +144,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

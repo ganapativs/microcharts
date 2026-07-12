@@ -26,10 +26,6 @@ dark", not a number. Omit `lit` everywhere and it's a plain, honest bar row.
 
 <Playground chart="city-skyline" />
 
-## Interactive
-
-<InteractiveDemo slug="city-skyline" />
-
 ## When to use it
 
 - **Good for** — team or region size plus an activation read, an org KPI where two variables are the story, or a per-BU comparison with utilization.
@@ -99,7 +95,7 @@ dark", not a number. Omit `lit` everywhere and it's a plain, honest bar row.
 <LiveDemo
   label="too short for windows"
   code={`// a building under one window row renders as a solid tower — its lit
-// fraction still reads in the summary and on hover
+// fraction still reads on hover and keyboard focus
 <CitySkyline
   data={[
     { label: "big", value: 40, lit: 0.8 },
@@ -131,7 +127,7 @@ zero-anchored bars; the lit windows are quantized to the window count and filled
 activation reads as a fill level. There is no roofline variation, no antennas, and nothing encoded in
 building width — width, roof, and ground are constants, because every mark must earn its place. The
 secondary channel drops out before the primary: a building too short for any window row is a solid
-tower, and its `lit` still shows in the summary and on hover.
+tower, and its `lit` still shows in the per-building readout on hover or keyboard focus.
 
 ## Accessibility
 

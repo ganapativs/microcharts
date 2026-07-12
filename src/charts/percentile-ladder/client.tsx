@@ -3,8 +3,9 @@
 // nearest-tick math. ←/→ step ticks; each announces its value and its multiple
 // of the median ("p99: 2.1 s — 17× the median."). Composes the static component
 // (canon); the probe line is an overlay child re-using geometry.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { round2 } from "../../core/types.js";
 import { percentileLadderGeometry } from "./geometry.js";
@@ -16,6 +17,13 @@ import {
 
 export interface InteractivePercentileLadderProps extends PercentileLadderProps {
   strings?: QuantileStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the percentile ticks pop onto
+   * the track in rank order (p50 → p99) on first client-side mount. Inert on
+   * the server and on hydrated server HTML; `prefers-reduced-motion` always
+   * wins.
+   */
+  animate?: boolean;
 }
 
 export function PercentileLadder(props: InteractivePercentileLadderProps): React.ReactNode {
@@ -31,8 +39,20 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     strings = EN_QUANTILE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Ticks (or dots in `marks="dot"`) carry the "data"/"flag" ink roles on
+  // either <line> or <circle> — the attribute selector covers both mark modes.
+  // "trail" + order "index" lands them in rank order (they're already
+  // authored p50 → p99, so DOM order IS the rank order) — the ladder reads
+  // as climbing the percentiles, not a generic scatter of ticks.
+  useEntrance(hostRef, "trail", animate, {
+    selector: '[data-mc-ink="data"], [data-mc-ink="flag"]',
+    order: "index",
+  });
 
   // must match the static geometry (label font sizes the log-tag gutter)
   const font = Math.min(9, Math.max(6, Math.round(height * 0.5)));
@@ -122,6 +142,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
 
   return (
     <span
+      ref={hostRef}
       className="mc-percentile-ladder-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

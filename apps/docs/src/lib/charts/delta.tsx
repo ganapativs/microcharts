@@ -1,9 +1,6 @@
 import { Delta } from "@microcharts/react/delta";
 import { Delta as DeltaInteractive } from "@microcharts/react/delta/interactive";
-import { InteractiveDemo } from "./delta.client";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -155,6 +152,74 @@ export const playground: PlaygroundSpec = {
     lines.push("/>");
     return lines.join("\n");
   },
+  renderInteractive: (s, _data, ui) => {
+    const pct = s.pct as number;
+    const positive = s.positive as "up" | "down";
+    const mode = s.mode as string;
+    const locale = s.locale as string;
+    if (mode === "from prior") {
+      return (
+        <span className="text-3xl">
+          <DeltaInteractive
+            value={100 + pct}
+            from={100}
+            positive={positive}
+            locale={locale}
+            summary={false}
+            animate={ui.animate}
+          />
+        </span>
+      );
+    }
+    if (mode === "currency") {
+      return (
+        <span className="text-3xl">
+          <DeltaInteractive
+            value={pct * 1000}
+            format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
+            positive={positive}
+            locale={locale}
+            summary={false}
+            animate={ui.animate}
+          />
+        </span>
+      );
+    }
+    return (
+      <span className="text-3xl">
+        <DeltaInteractive
+          value={pct / 100}
+          positive={positive}
+          locale={locale}
+          summary={false}
+          animate={ui.animate}
+        />
+      </span>
+    );
+  },
+  codeInteractive: (s, _data, ui) => {
+    const pct = s.pct as number;
+    const positive = s.positive as "up" | "down";
+    const mode = s.mode as string;
+    const locale = s.locale as string;
+    const lines = ["<Delta"];
+    if (mode === "from prior") {
+      lines.push(`  value={${100 + pct}}`, "  from={100}");
+    } else if (mode === "currency") {
+      lines.push(
+        `  value={${pct * 1000}}`,
+        '  format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}',
+      );
+    } else {
+      lines.push(`  value={${(pct / 100).toFixed(2)}}`);
+    }
+    if (positive === "down") lines.push('  positive="down"');
+    if (locale !== "en-US") lines.push(`  locale="${locale}"`);
+    if (ui.animate) lines.push("  animate");
+    lines.push("/>");
+    return lines.join("\n");
+  },
+  interactiveHint: "Shuffle the value — it re-announces politely to screen readers.",
 };
 
 export const recipes: Recipe[] = [
@@ -269,7 +334,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

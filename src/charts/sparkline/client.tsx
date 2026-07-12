@@ -10,8 +10,16 @@
 //   3. The wrapper owns the accessible name (role=img + aria-label) and the
 //      roving keyboard; announcements go through a polite live region using
 //      the i18n-able SummaryStrings (plan/08 §5).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -28,6 +36,12 @@ export interface InteractiveSparklineProps extends SparklineProps {
   onPointFocus?: (index: number | null) => void;
   /** Swappable announcement strings (defaults to EN). */
   strings?: SeriesStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the line draws on when the chart
+   * first mounts client-side. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
@@ -45,10 +59,14 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     locale,
     onPointFocus,
     strings = EN_SERIES,
+    animate = false,
     className,
     style,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
@@ -156,6 +174,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className={className ? `mc-spark-interactive ${className}` : "mc-spark-interactive"}
       style={wrapStyle}
       tabIndex={0}

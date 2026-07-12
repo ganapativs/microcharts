@@ -12,11 +12,6 @@ physics) sit below it as faint policy context.
 <LiveDemo
   label="ErrorBudget"
   sizeOf="error-budget"
-  code={`import { ErrorBudget } from "@microcharts/react/error-budget";
-
-const remaining = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
-
-<ErrorBudget data={remaining} window={30} title="Checkout SLO" />`}
 >
   <ErrorBudget
     data={[1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62]}
@@ -36,10 +31,6 @@ const remaining = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64,
 
 <Playground chart="error-budget" />
 
-## Interactive
-
-<InteractiveDemo slug="error-budget" />
-
 ## When to use it
 
 - **Good for** — an SLO error budget in a KPI card, a service list where each row is a budget, spotting a fast-burn before it exhausts the window.
@@ -53,12 +44,9 @@ const remaining = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64,
 
 <LiveDemo
   label="fast-burn + diagonal only"
+  dataOf="error-budget"
   code={`<ErrorBudget data={[1, 0.82, 0.6, 0.38, 0.18, 0.04, 0]} window={20} />
-<ErrorBudget
-  data={[1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62]}
-  window={30}
-  rates={[1]}
-/>`}
+<ErrorBudget data={remaining} window={30} rates={[1]} />`}
 >
   <span className="inline-flex flex-col gap-1.5">
     <ErrorBudget
@@ -83,11 +71,8 @@ const remaining = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64,
 
 <LiveDemo
   label="locale"
-  code={`<ErrorBudget
-  data={[1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62]}
-  window={30}
-  locale="de-DE"
-/>`}
+  dataOf="error-budget"
+  code={`<ErrorBudget data={remaining} window={30} locale="de-DE" />`}
 >
   <ErrorBudget
     data={[1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62]}
@@ -129,7 +114,7 @@ rather than the English "62%".
 </LiveDemo>
 
 With no data the chart renders an empty root and the accessible name says **"No data."**; a
-single point still draws the diagonal, wedges, and endpoint against a 1-step window, though
+single point still draws the diagonal, wedges, and endpoint, though
 `currentRate` (which needs a prior step) reads `0`. Once the remaining line reaches zero before
 `window` elapses, the line stops at that step and an ✕ replaces the endpoint dot — no further
 steps are drawn, extrapolated, or implied, and the summary reads **"Budget exhausted at day 7

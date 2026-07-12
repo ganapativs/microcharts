@@ -46,10 +46,6 @@ const sessions = [
 
 <Playground chart="ohlc" />
 
-## Interactive
-
-<InteractiveDemo slug="ohlc" />
-
 ## When to use it
 
 - **Good for** — watchlist table rows, ticker KPI cards.
@@ -62,7 +58,7 @@ const sessions = [
 ## Variants
 
 <LiveDemo
-  label="bars"
+  label="bars vs last close label"
   code={`// open tick left, close tick right — the pre-candle convention
 const sessions = [
   { open: 140.1, high: 143.4, low: 137.2, close: 142.3 },
@@ -73,53 +69,41 @@ const sessions = [
   { open: 147.2, high: 149.9, low: 144.6, close: 145.9 },
 ];
 
-<Ohlc data={sessions} variant="bars" />`}
->
-  <Ohlc
-    data={Array.from({ length: 20 }, (_, i) => {
-      const base = 140 + Math.sin(i / 3) * 8 + i * 0.6;
-      return {
-        open: Math.round(base * 10) / 10,
-        high: Math.round((base + 3 + (i % 3)) * 10) / 10,
-        low: Math.round((base - 3 - (i % 2)) * 10) / 10,
-        close: Math.round((base + (i % 2 === 0 ? 2 : -1.5)) * 10) / 10,
-      };
-    })}
-    variant="bars"
-    title="Bar form"
-    width={240}
-    height={30}
-  />
-</LiveDemo>
-
-<LiveDemo
-  label="last close label"
-  code={`const sessions = [
-  { open: 140.1, high: 143.4, low: 137.2, close: 142.3 },
-  { open: 142.6, high: 146.8, low: 141.0, close: 144.9 },
-  { open: 144.5, high: 145.2, low: 140.1, close: 141.4 },
-  { open: 141.1, high: 144.7, low: 139.5, close: 143.8 },
-  { open: 143.9, high: 148.2, low: 142.8, close: 147.5 },
-  { open: 147.2, high: 149.9, low: 144.6, close: 145.9 },
-];
-
+<Ohlc data={sessions} variant="bars" />
 <Ohlc data={sessions} label="last" />`}
 >
-  <Ohlc
-    data={Array.from({ length: 20 }, (_, i) => {
-      const base = 140 + Math.sin(i / 3) * 8 + i * 0.6;
-      return {
-        open: Math.round(base * 10) / 10,
-        high: Math.round((base + 3 + (i % 3)) * 10) / 10,
-        low: Math.round((base - 3 - (i % 2)) * 10) / 10,
-        close: Math.round((base + (i % 2 === 0 ? 2 : -1.5)) * 10) / 10,
-      };
-    })}
-    label="last"
-    title="With last close"
-    width={260}
-    height={30}
-  />
+  <span className="inline-flex flex-col gap-3">
+    <Ohlc
+      data={Array.from({ length: 20 }, (_, i) => {
+        const base = 140 + Math.sin(i / 3) * 8 + i * 0.6;
+        return {
+          open: Math.round(base * 10) / 10,
+          high: Math.round((base + 3 + (i % 3)) * 10) / 10,
+          low: Math.round((base - 3 - (i % 2)) * 10) / 10,
+          close: Math.round((base + (i % 2 === 0 ? 2 : -1.5)) * 10) / 10,
+        };
+      })}
+      variant="bars"
+      title="Bar form"
+      width={240}
+      height={30}
+    />
+    <Ohlc
+      data={Array.from({ length: 20 }, (_, i) => {
+        const base = 140 + Math.sin(i / 3) * 8 + i * 0.6;
+        return {
+          open: Math.round(base * 10) / 10,
+          high: Math.round((base + 3 + (i % 3)) * 10) / 10,
+          low: Math.round((base - 3 - (i % 2)) * 10) / 10,
+          close: Math.round((base + (i % 2 === 0 ? 2 : -1.5)) * 10) / 10,
+        };
+      })}
+      label="last"
+      title="With last close"
+      width={260}
+      height={30}
+    />
+  </span>
 </LiveDemo>
 
 ## Edge cases
@@ -174,7 +158,7 @@ height so doji sessions stay visible.
 
 The accessible name is the run read — **"20 periods. Last close 150.3, up 7.4%; range
 136.4 to 156."** The interactive entry announces each session's four prices (**"Period
-18 of 20: open 149.1, high 154.1, low 145.1, close 151.1."**).
+18 of 20: open 145.6, high 150.6, low 141.6, close 144.1."**).
 
 ## Props
 

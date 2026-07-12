@@ -1,6 +1,5 @@
 import { Bullet } from "@microcharts/react/bullet";
 import { Bullet as BulletInteractive } from "@microcharts/react/bullet/interactive";
-import { DemoPanel } from "@/components/charts/demo-panel";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
@@ -76,22 +75,6 @@ export const showcase = {
   ),
 };
 
-export function InteractiveDemo() {
-  return (
-    <DemoPanel hint="Hover or focus to hear the value against its target.">
-      <BulletInteractive
-        value={72}
-        target={80}
-        bands={[50, 90]}
-        width={320}
-        height={30}
-        className="w-full max-w-md"
-        title="Quota attainment"
-      />
-    </DemoPanel>
-  );
-}
-
 // color, format, locale, id, className, style, children: styling/formatting
 // escape hatches, not chart-shape knobs — no interactive control (consistent
 // with every other chart's playground). title/summary are accessible-name
@@ -112,6 +95,7 @@ export const playground: PlaygroundSpec = {
       width={300}
       height={28}
       className="w-full max-w-md"
+      style={{ height: "auto" }}
       title="Playground"
     />
   ),
@@ -126,6 +110,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <BulletInteractive
+      value={s.value as number}
+      target={s.target as number}
+      bands={s.bands ? [50, 90] : undefined}
+      domain={s.domain ? [0, 60] : undefined}
+      animate={ui.animate}
+      width={300}
+      height={28}
+      className="w-full max-w-md"
+      title="Playground"
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Bullet",
+      `  value={${s.value}}`,
+      `  target={${s.target}}`,
+      s.bands && "  bands={[50, 90]}",
+      s.domain && "  domain={[0, 60]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or focus to hear the value against its target.",
 };
 
 export const recipes: Recipe[] = [
@@ -277,7 +287,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

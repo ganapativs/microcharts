@@ -2,17 +2,32 @@
 // Interactive <MicroBox> (plan/22 #16). Pointer → nearest of the five stat
 // positions by x; ←/→ steps the fixed 5-stop roving model min → q1 → median →
 // q3 → max ("Median: 42."). Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { computeFive, microBoxGeometry } from "./geometry.js";
 import { MicroBox as StaticMicroBox, microBoxSummary, type MicroBoxProps } from "./index.js";
 
 const STOPS = ["min", "q1", "median", "q3", "max"] as const;
 type Stop = (typeof STOPS)[number];
 
+// The whisker/box/median ensemble (and the too-few-observations raw dots) —
+// filled marks (fill:none, stroke:none per role), never the ridge/line shapes
+// a "draw" reveal would need. Settling them into place as markers fits a
+// floating box-and-whisker read (no shared zero baseline to rise from).
+const BOX_SELECTOR =
+  'line[data-mc-ink="muted"], rect[data-mc-ink="band"], line[data-mc-ink="data"], circle[data-mc-ink="point"]';
+
 export interface InteractiveMicroBoxProps extends MicroBoxProps {
   strings?: DistStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the whisker, box, median tick
+   * (or the raw dots, below 5 observations) settle into place when the chart
+   * first mounts client-side. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
@@ -28,8 +43,12 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
     strings = EN_DIST,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "settle", animate, { selector: BOX_SELECTOR });
 
   const resolved = useMemo(() => computeFive(data, stats), [data, stats]);
   const geo = useMemo(
@@ -113,6 +132,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-box-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

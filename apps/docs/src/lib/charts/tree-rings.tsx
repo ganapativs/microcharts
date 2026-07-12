@@ -1,8 +1,6 @@
 import { TreeRings } from "@microcharts/react/tree-rings";
-import { InteractiveDemo } from "./tree-rings.client";
+import { TreeRings as TreeRingsInteractive } from "@microcharts/react/tree-rings/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const YEARS = [8, 12, 10, 18, 22, 15, 20, 14];
@@ -53,12 +51,14 @@ export const entry: ChartEntry = {
   demo: YEARS,
   example: {
     title: "Account age",
-    code: `import { TreeRings } from "${PKG}/tree-rings";
-
-const years = [8, 12, 10, 18, 22, 15, 20, 14];
-
-<TreeRings data={years} unit="years" periodWord="year" title="Account age" />`,
+    code: `import { TreeRings } from "${PKG}/tree-rings";\n\n<TreeRings data={years} unit="years" periodWord="year" title="Account age" />`,
   },
+  sampleData: [
+    {
+      name: "years",
+      code: `const years = [8, 12, 10, 18, 22, 15, 20, 14];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -120,6 +120,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <TreeRingsInteractive
+      data={YEARS}
+      rings={s.rings as "stroke" | "fill"}
+      highlight={s.highlight as "last" | "none"}
+      label={s.label ? "last" : "none"}
+      unit="years"
+      periodWord="year"
+      summary={false}
+      animate={ui.animate}
+      size={56}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<TreeRings",
+      "  data={years}",
+      s.rings !== "stroke" && `  rings="${s.rings}"`,
+      s.highlight !== "last" && `  highlight="${s.highlight}"`,
+      s.label && '  label="last"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover a ring, or arrow ←/→ from the centre out — each period announces its value. The channel is ring thickness, not area: equal thickness at a larger radius spans more area, so read thicknesses, not wedges.",
 };
 
 export const recipes: Recipe[] = [
@@ -148,7 +175,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

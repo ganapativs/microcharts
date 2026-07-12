@@ -77,6 +77,10 @@ export const BENCH = {
   slowest: bench.agg.slowest,
   belowFloor: bench.agg.belowFloor,
   chart: (slug: string) => bench.charts[slug as keyof typeof bench.charts],
+  /** `describeSeries` (24 pts), calls/sec — the real `pnpm bench` core measurement. */
+  describeSeriesOpsPerSec: bench.core[0]?.opsPerSec,
+  /** Same figure, rounded to the nearest thousand for prose (never hand-typed). */
+  describeSeriesOpsPerSecRounded: Math.round((bench.core[0]?.opsPerSec ?? 0) / 1000) * 1000,
 } as const;
 
 /** The headline "N charts on the server in about M ms" line, from the real run. */

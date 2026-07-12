@@ -5,6 +5,7 @@
 // component (canon).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import {
   PictogramRow as StaticPictogramRow,
@@ -16,12 +17,39 @@ export interface InteractivePictogramRowProps extends PictogramRowProps {
   /** Announce when the value changes (default true). */
   live?: boolean;
   strings?: ScalarStrings;
+  /**
+   * Opt-in entrance motion (default `false`): each unit settles into place,
+   * staggered, when the chart first mounts client-side. Inert on the server
+   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNode {
-  const { live = true, strings = EN_SCALAR, title, format, locale, ...rest } = props;
+  const {
+    live = true,
+    animate = false,
+    strings = EN_SCALAR,
+    title,
+    format,
+    locale,
+    ...rest
+  } = props;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const text = pictogramSummary(rest.value, rest.total, fmt, strings);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // "settle" — each unit (dot or square) fades + scales in like a marker, the
+  // best-read entrance for a row of repeated glyph units. Filled units carry
+  // their ink role on the fill mark itself (circle/rect/path), unfilled units
+  // carry it on the ring — a custom selector catches every unit regardless of
+  // shape or fill state (the default "settle" selector only matches circles).
+  // Index order over a 450ms window gives the row a counting feel (units
+  // settle one at a time, reading order) instead of a uniform staggered fade.
+  useEntrance(hostRef, "settle", animate, {
+    selector: "circle[data-mc-ink], rect[data-mc-ink], path[data-mc-ink]",
+    order: "index",
+    window: 450,
+  });
 
   const [announced, setAnnounced] = useState("");
   const prev = useRef(rest.value);
@@ -35,6 +63,7 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
 
   return (
     <span
+      ref={hostRef}
       className="mc-pictogram-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

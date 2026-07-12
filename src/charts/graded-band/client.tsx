@@ -3,8 +3,9 @@
 // edge math. ←/→ step levels outward/inward from the median; each announces its
 // interval ("80% interval: 17 to 26."). Composes the static component (canon);
 // the edge ticks are overlay children re-using geometry.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { gradedBandGeometry } from "./geometry.js";
 import {
@@ -15,6 +16,12 @@ import {
 
 export interface InteractiveGradedBandProps extends GradedBandProps {
   strings?: QuantileStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the nested bands wipe on when
+   * the chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
@@ -30,8 +37,12 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
     strings = EN_QUANTILE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(
     () => gradedBandGeometry({ width, height, data, levels, value, domain: props.domain }),
@@ -108,6 +119,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-graded-band-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

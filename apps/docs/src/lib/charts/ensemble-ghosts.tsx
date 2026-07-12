@@ -1,8 +1,6 @@
 import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
-import { InteractiveDemo } from "./ensemble-ghosts.client";
+import { EnsembleGhosts as EnsembleGhostsInteractive } from "@microcharts/react/ensemble-ghosts/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // 24 simulated futures — a fan of walks with diverse shapes (deterministic)
@@ -61,6 +59,17 @@ export const entry: ChartEntry = {
     title: "Simulated futures",
     code: `import { EnsembleGhosts } from "${PKG}/ensemble-ghosts";\n\n<EnsembleGhosts data={futures} title="Simulated futures" />`,
   },
+  sampleData: [
+    {
+      name: "futures",
+      code: `// 24 simulated futures — a fan of walks with diverse shapes
+const futures = Array.from({ length: 24 }, (_m, i) =>
+  Array.from({ length: 10 }, (_, t) =>
+    Math.round(40 + (i - 12) * 0.55 * t * 0.4 + 3 * Math.sin(i + t) + t * 0.5),
+  ),
+);`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -106,6 +115,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <EnsembleGhostsInteractive
+      data={FUTURES}
+      ghosts={s.ghosts as number}
+      emphasis={s.emphasis as "nearest-median" | "median"}
+      endpoints={s.endpoints as boolean}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<EnsembleGhosts",
+      "  data={futures}",
+      s.ghosts !== 8 && `  ghosts={${s.ghosts}}`,
+      s.emphasis !== "nearest-median" && `  emphasis="${s.emphasis}"`,
+      s.endpoints && "  endpoints",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover to flip through the futures one at a time (the HOP loop); with reduced motion, arrow keys step them instead — each member is announced.",
 };
 
 export const recipes: Recipe[] = [
@@ -145,7 +180,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

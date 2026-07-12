@@ -11,17 +11,6 @@ takes the classic **triangle** shape — and reading down a column compares ever
 <LiveDemo
   label="CohortTriangle"
   sizeOf="cohort-triangle"
-  code={`import { CohortTriangle } from "@microcharts/react/cohort-triangle";
-
-const cohorts = [
-  { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
-  { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
-  { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
-  { label: "Apr", values: [1, 0.55, 0.42] },
-  { label: "May", values: [1, 0.52] },
-];
-
-<CohortTriangle data={cohorts} unit="month" title="Monthly retention" />`}
 >
   <CohortTriangle
     data={[
@@ -45,10 +34,6 @@ const cohorts = [
 
 <Playground chart="cohort-triangle" />
 
-## Interactive
-
-<InteractiveDemo slug="cohort-triangle" />
-
 ## When to use it
 
 - **Good for** — monthly or weekly cohorts side by side, spotting which vintage decays worst,
@@ -71,59 +56,38 @@ Row labels are on by default. Turn them off for a dense, glanceable block, or `h
 vintage to anchor the equal-maturity comparison.
 
 <LiveDemo
-  label="highlight a vintage"
-  code={`<CohortTriangle
-  data={[
-    { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
-    { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
-    { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
-    { label: "Apr", values: [1, 0.55, 0.42] },
-    { label: "May", values: [1, 0.52] },
-  ]}
-  highlight="Mar"
-/>`}
+  label="highlight a vintage vs dense, no labels"
+  dataOf="cohort-triangle"
+  code={`<CohortTriangle data={cohorts} highlight="Mar" />
+<CohortTriangle data={cohorts} labels={false} cell={9} />`}
 >
-  <CohortTriangle
-    data={[
-      { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
-      { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
-      { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
-      { label: "Apr", values: [1, 0.55, 0.42] },
-      { label: "May", values: [1, 0.52] },
-    ]}
-    cell={16}
-    unit="month"
-    highlight="Mar"
-    title="Worst vintage ringed"
-  />
-</LiveDemo>
-
-<LiveDemo
-  label="dense, no labels"
-  code={`<CohortTriangle
-  data={[
-    { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
-    { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
-    { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
-    { label: "Apr", values: [1, 0.55, 0.42] },
-    { label: "May", values: [1, 0.52] },
-  ]}
-  labels={false}
-  cell={9}
-/>`}
->
-  <CohortTriangle
-    data={[
-      { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
-      { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
-      { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
-      { label: "Apr", values: [1, 0.55, 0.42] },
-      { label: "May", values: [1, 0.52] },
-    ]}
-    labels={false}
-    cell={9}
-    title="Dense block"
-  />
+  <span className="inline-flex flex-col gap-3">
+    <CohortTriangle
+      data={[
+        { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
+        { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
+        { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
+        { label: "Apr", values: [1, 0.55, 0.42] },
+        { label: "May", values: [1, 0.52] },
+      ]}
+      cell={16}
+      unit="month"
+      highlight="Mar"
+      title="Worst vintage ringed"
+    />
+    <CohortTriangle
+      data={[
+        { label: "Jan", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },
+        { label: "Feb", values: [1, 0.58, 0.44, 0.38, 0.35] },
+        { label: "Mar", values: [1, 0.47, 0.36, 0.31] },
+        { label: "Apr", values: [1, 0.55, 0.42] },
+        { label: "May", values: [1, 0.52] },
+      ]}
+      labels={false}
+      cell={9}
+      title="Dense block"
+    />
+  </span>
 </LiveDemo>
 
 The `unit` prop renames the age columns in the summary and announcements — `"month"`,
@@ -216,7 +180,7 @@ Intensity is a color channel, so CohortTriangle always pairs it with a numeric s
 compares at equal maturity — **"5 cohorts; at month 1, Mar retains worst (47%); newest May
 starts at 100%."**. Direction is stated in words, never by color alone, so it survives
 forced-colors and color-blind viewing. The interactive entry adds 2-D arrow-key navigation,
-announcing each cell as _"Feb cohort, month 1: 50%"_ as you move.
+announcing each cell as _"Feb cohort, month 1: 58%"_ as you move.
 
 ## Props
 

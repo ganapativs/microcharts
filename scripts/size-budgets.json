@@ -5,11 +5,11 @@
   "charts": {
     "sparkline": {
       "static": "3.65 kB",
-      "interactive": "4.65 kB"
+      "interactive": "5 kB"
     },
     "sparkbar": {
       "static": "3 kB",
-      "interactive": "4 kB"
+      "interactive": "4.35 kB"
     },
     "delta": {
       "static": "1.5 kB",
@@ -21,59 +21,59 @@
     },
     "activity-grid": {
       "static": "2.1 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "trend-arrow": {
       "static": "1.7 kB",
-      "interactive": "2 kB"
+      "interactive": "2.35 kB"
     },
     "status-dot": {
       "static": "1.6 kB",
-      "interactive": "1.9 kB"
+      "interactive": "2.25 kB"
     },
     "heat-cell": {
       "static": "1.8 kB",
-      "interactive": "2.2 kB"
+      "interactive": "2.55 kB"
     },
     "progress": {
       "static": "1.9 kB",
-      "interactive": "2.2 kB"
+      "interactive": "2.55 kB"
     },
     "rug-strip": {
       "static": "2.3 kB",
-      "interactive": "3.2 kB"
+      "interactive": "3.55 kB"
     },
     "mini-bar": {
       "static": "2.25 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "pictogram-row": {
       "static": "1.95 kB",
-      "interactive": "2.4 kB"
+      "interactive": "2.75 kB"
     },
     "seismogram": {
       "static": "2.4 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "heat-strip": {
       "static": "2.35 kB",
-      "interactive": "3.15 kB"
+      "interactive": "3.5 kB"
     },
     "dot-plot": {
       "static": "2.5 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "dumbbell": {
       "static": "2.7 kB",
-      "interactive": "3.65 kB"
+      "interactive": "4 kB"
     },
     "paired-bars": {
       "static": "2.5 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "slope": {
       "static": "2.95 kB",
-      "interactive": "3.95 kB"
+      "interactive": "4.3 kB"
     },
     "micro-scatter": {
       "static": "2.7 kB",
@@ -82,9 +82,12 @@
     "annotations": {
       "static": "1.5 kB"
     },
+    "motion": {
+      "static": "2.5 kB"
+    },
     "segmented-bar": {
       "static": "2.4 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "histogram-strip": {
       "static": "2.4 kB",
@@ -92,7 +95,7 @@
     },
     "micro-box": {
       "static": "2.6 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "progress-ring": {
       "static": "2.3 kB",
@@ -100,7 +103,7 @@
     },
     "micro-donut": {
       "static": "2.6 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "funnel": {
       "static": "2.6 kB",
@@ -108,7 +111,7 @@
     },
     "likert-strip": {
       "static": "2.6 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "waterfall": {
       "static": "2.8 kB",
@@ -120,11 +123,11 @@
     },
     "dual-sparkline": {
       "static": "3 kB",
-      "interactive": "3.9 kB"
+      "interactive": "4.25 kB"
     },
     "stacked-area": {
       "static": "2.9 kB",
-      "interactive": "3.9 kB"
+      "interactive": "4.25 kB"
     },
     "ohlc": {
       "static": "2.9 kB",
@@ -136,91 +139,91 @@
     },
     "calendar-strip": {
       "static": "2.5 kB",
-      "interactive": "3.5 kB"
+      "interactive": "3.85 kB"
     },
     "event-timeline": {
       "static": "3 kB",
-      "interactive": "4 kB"
+      "interactive": "4.35 kB"
     },
     "coverage-strip": {
       "static": "2.4 kB",
-      "interactive": "3.15 kB"
+      "interactive": "3.5 kB"
     },
     "benchmark-strip": {
       "static": "2.8 kB",
-      "interactive": "3.6 kB"
+      "interactive": "3.95 kB"
     },
     "percentile-ladder": {
       "static": "3 kB",
-      "interactive": "3.9 kB"
+      "interactive": "4.25 kB"
     },
     "graded-band": {
       "static": "2.75 kB",
-      "interactive": "3.55 kB"
+      "interactive": "3.9 kB"
     },
     "icon-array": {
       "static": "2.2 kB",
-      "interactive": "3 kB"
+      "interactive": "3.35 kB"
     },
     "rate-volume": {
       "static": "2.6 kB",
-      "interactive": "3.55 kB"
+      "interactive": "3.9 kB"
     },
     "net-flow": {
       "static": "2.7 kB",
-      "interactive": "3.5 kB"
+      "interactive": "3.85 kB"
     },
     "retention-curve": {
       "static": "2.8 kB",
-      "interactive": "3.6 kB"
+      "interactive": "3.95 kB"
     },
     "burn-chart": {
       "static": "2.9 kB",
-      "interactive": "3.8 kB"
+      "interactive": "4.15 kB"
     },
     "error-budget": {
       "static": "2.5 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "control-strip": {
       "static": "2.8 kB",
-      "interactive": "3.7 kB"
+      "interactive": "4.05 kB"
     },
     "forecast-cone": {
       "static": "3 kB",
-      "interactive": "3.85 kB"
+      "interactive": "4.2 kB"
     },
     "quantile-dots": {
       "static": "2.6 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "ab-strips": {
       "static": "2.85 kB",
-      "interactive": "3.8 kB"
+      "interactive": "4.15 kB"
     },
     "shift-histogram": {
       "static": "2.98 kB",
-      "interactive": "3.95 kB"
+      "interactive": "4.3 kB"
     },
     "pareto-strip": {
       "static": "2.5 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "data-diff": {
       "static": "2.7 kB",
-      "interactive": "3.55 kB"
+      "interactive": "3.9 kB"
     },
     "quadrant-dot": {
       "static": "2.4 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "cycle-plot": {
       "static": "2.5 kB",
-      "interactive": "3.5 kB"
+      "interactive": "3.85 kB"
     },
     "change-point": {
       "static": "2.98 kB",
-      "interactive": "3.98 kB"
+      "interactive": "4.33 kB"
     },
     "ensemble-ghosts": {
       "static": "2.5 kB",
@@ -236,7 +239,7 @@
     },
     "fill-word": {
       "static": "1.5 kB",
-      "interactive": "1.95 kB"
+      "interactive": "2.3 kB"
     },
     "fat-digits": {
       "static": "1.7 kB",
@@ -244,7 +247,7 @@
     },
     "thermometer": {
       "static": "2.3 kB",
-      "interactive": "2.8 kB"
+      "interactive": "3.15 kB"
     },
     "moon-phase": {
       "static": "1.4 kB",
@@ -264,23 +267,23 @@
     },
     "garden-grid": {
       "static": "1.9 kB",
-      "interactive": "2.9 kB"
+      "interactive": "3.25 kB"
     },
     "bubble-row": {
       "static": "1.9 kB",
-      "interactive": "2.65 kB"
+      "interactive": "3 kB"
     },
     "music-staff": {
       "static": "2.55 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "tree-rings": {
       "static": "1.95 kB",
-      "interactive": "2.8 kB"
+      "interactive": "3.15 kB"
     },
     "city-skyline": {
       "static": "2.1 kB",
-      "interactive": "2.9 kB"
+      "interactive": "3.25 kB"
     },
     "honeycomb": {
       "static": "1.8 kB",
@@ -288,15 +291,15 @@
     },
     "constellation": {
       "static": "2.85 kB",
-      "interactive": "3.8 kB"
+      "interactive": "4.15 kB"
     },
     "polar-clock": {
       "static": "2.95 kB",
-      "interactive": "3.85 kB"
+      "interactive": "4.2 kB"
     },
     "spiral-year": {
       "static": "2.8 kB",
-      "interactive": "3.7 kB"
+      "interactive": "4.05 kB"
     },
     "breathing-dot": {
       "static": "1.6 kB",
@@ -316,27 +319,27 @@
     },
     "time-in-range": {
       "static": "2.2 kB",
-      "interactive": "3.1 kB"
+      "interactive": "3.45 kB"
     },
     "hypnogram": {
       "static": "2.6 kB",
-      "interactive": "3.5 kB"
+      "interactive": "3.85 kB"
     },
     "eta-bar": {
       "static": "2.1 kB",
-      "interactive": "2.7 kB"
+      "interactive": "3.05 kB"
     },
     "waveform": {
       "static": "2.4 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "event-raster": {
       "static": "2.6 kB",
-      "interactive": "3.7 kB"
+      "interactive": "4.05 kB"
     },
     "rubric-strip": {
       "static": "2.2 kB",
-      "interactive": "3.2 kB"
+      "interactive": "3.55 kB"
     },
     "token-confidence": {
       "static": "1.5 kB",
@@ -347,7 +350,7 @@
     },
     "star-spoke": {
       "static": "2.2 kB",
-      "interactive": "3.1 kB"
+      "interactive": "3.45 kB"
     },
     "minimap-strip": {
       "static": "2.4 kB",
@@ -355,23 +358,23 @@
     },
     "dual-window-meter": {
       "static": "2.45 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "depth-wedge": {
       "static": "2.2 kB",
-      "interactive": "3.2 kB"
+      "interactive": "3.55 kB"
     },
     "partition-strip": {
       "static": "2.3 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "calibration-strip": {
       "static": "2.45 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "confusion-grid": {
       "static": "2.4 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "folded-day-band": {
       "static": "2.6 kB",
@@ -379,55 +382,55 @@
     },
     "volume-profile": {
       "static": "2.6 kB",
-      "interactive": "3.6 kB"
+      "interactive": "3.95 kB"
     },
     "phase-trace": {
       "static": "2.4 kB",
-      "interactive": "3.3 kB"
+      "interactive": "3.65 kB"
     },
     "trace-fold": {
       "static": "2.4 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "tape-gauge": {
       "static": "2.9 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "station-glyph": {
       "static": "3.05 kB",
-      "interactive": "3.6 kB"
+      "interactive": "3.95 kB"
     },
     "cohort-triangle": {
       "static": "2.5 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "streak-spark": {
       "static": "2.5 kB",
-      "interactive": "3.35 kB"
+      "interactive": "3.7 kB"
     },
     "grade-profile": {
       "static": "2.4 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "win-prob-worm": {
       "static": "3 kB",
-      "interactive": "3.9 kB"
+      "interactive": "4.25 kB"
     },
     "queue-depth": {
       "static": "2.7 kB",
-      "interactive": "3.55 kB"
+      "interactive": "3.9 kB"
     },
     "spread-band": {
       "static": "2.8 kB",
-      "interactive": "3.75 kB"
+      "interactive": "4.1 kB"
     },
     "bias-strip": {
       "static": "2.45 kB",
-      "interactive": "3.4 kB"
+      "interactive": "3.75 kB"
     },
     "percentile-trace": {
       "static": "2.4 kB",
-      "interactive": "3.25 kB"
+      "interactive": "3.6 kB"
     }
   }
 }

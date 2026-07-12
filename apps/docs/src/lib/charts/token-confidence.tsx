@@ -1,8 +1,6 @@
 import { TokenConfidence } from "@microcharts/react/token-confidence";
-import { InteractiveDemo } from "./token-confidence.client";
+import { TokenConfidence as TokenConfidenceInteractive } from "@microcharts/react/token-confidence/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const ANSWER = [
@@ -43,6 +41,9 @@ export const entry: ChartEntry = {
   nodeBudget: "1 span per token (HTML, not SVG)",
   bestFor: ["LLM answers in chat / transcripts", "flagging text to review"],
   avoidFor: ["numeric confidence auditing (CalibrationStrip)", "a single score (Delta)"],
+  // HTML host (the documented SVG exception — the text IS the chart), so there
+  // is no SVG mark for the entrance engine to animate.
+  animates: false,
   props: [
     {
       name: "data",
@@ -72,9 +73,12 @@ export const entry: ChartEntry = {
   demo: [98, 71, 44, 63],
   example: {
     title: "Model answer",
-    code: `import { TokenConfidence } from "${PKG}/token-confidence";
-
-const tokens = [
+    code: `import { TokenConfidence } from "${PKG}/token-confidence";\n\n<TokenConfidence data={tokens} title="Model answer" />`,
+  },
+  sampleData: [
+    {
+      name: "tokens",
+      code: `const tokens = [
   { token: "The", confidence: 0.98 },
   { token: " Treaty", confidence: 0.93 },
   { token: " of", confidence: 0.99 },
@@ -83,10 +87,9 @@ const tokens = [
   { token: " signed", confidence: 0.9 },
   { token: " in", confidence: 0.97 },
   { token: " 1648", confidence: 0.44 },
-];
-
-<TokenConfidence data={tokens} title="Model answer" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -101,6 +104,9 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
+  // HTML host, not SVG (the documented Chart-root exception) — no entrance
+  // motion to gate.
+  animates: false,
   knobs: [
     { kind: "range", key: "lo", label: "guessing < ", min: 20, max: 60, init: 50 },
     { kind: "range", key: "hi", label: "confident ≥ ", min: 60, max: 95, init: 80 },
@@ -128,6 +134,29 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s) => (
+    <TokenConfidenceInteractive
+      data={ANSWER}
+      tiers={[(s.lo as number) / 100, (s.hi as number) / 100]}
+      show={s.all ? "all" : "flagged"}
+      legend={s.legend as boolean}
+      summary={false}
+      style={{ fontSize: "0.95rem" }}
+    />
+  ),
+  codeInteractive: (s) =>
+    [
+      "<TokenConfidence",
+      "  data={tokens}",
+      `  tiers={[${((s.lo as number) / 100).toFixed(2)}, ${((s.hi as number) / 100).toFixed(2)}]}`,
+      s.all === true && '  show="all"',
+      s.legend === true && "  legend",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Tab in, then use ←/→ to rove the flagged tokens — each announces its tier and confidence.",
 };
 
 export const recipes: Recipe[] = [
@@ -166,7 +195,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,6 +1,5 @@
 import { Sparkline } from "@microcharts/react/sparkline";
 import { Sparkline as SparklineInteractive } from "@microcharts/react/sparkline/interactive";
-import { DemoPanel } from "@/components/charts/demo-panel";
 import { wave } from "./demo-data";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
@@ -99,22 +98,6 @@ export const showcase = {
   ),
 };
 
-export function InteractiveDemo() {
-  return (
-    <DemoPanel hint="Hover the line, or focus it and walk points with ← →.">
-      <SparklineInteractive
-        data={[12, 15, 13, 18, 16, 22, 19, 24, 21, 28, 25, 31, 29, 36]}
-        width={360}
-        height={96}
-        curve="smooth"
-        dots="minmax"
-        className="w-full max-w-md"
-        title="Monthly active developers"
-      />
-    </DemoPanel>
-  );
-}
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "curve", options: ["linear", "smooth", "step"], init: "smooth" },
@@ -139,6 +122,7 @@ export const playground: PlaygroundSpec = {
       band={s.band ? [10, 26] : undefined}
       label={s.label as "none" | "last" | "minmax"}
       className="w-full max-w-md"
+      style={{ height: "auto" }}
       title="Playground"
     />
   ),
@@ -155,6 +139,36 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <SparklineInteractive
+      data={data}
+      width={340}
+      height={92}
+      curve={s.curve as "linear" | "smooth" | "step"}
+      dots={s.dots as "auto" | "minmax" | "none"}
+      fill={s.fill as boolean}
+      band={s.band ? [10, 26] : undefined}
+      label={s.label as "none" | "last" | "minmax"}
+      animate={ui.animate}
+      className="w-full max-w-md"
+      title="Playground"
+    />
+  ),
+  codeInteractive: (s, data, ui) =>
+    [
+      "<Sparkline",
+      `  data={[${data.join(", ")}]}`,
+      `  curve="${s.curve}"`,
+      `  dots="${s.dots}"`,
+      s.fill && "  fill",
+      s.band && "  band={[10, 26]}",
+      s.label !== "none" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover the line, or focus it and walk points with ← →.",
 };
 
 export const recipes: Recipe[] = [
@@ -279,7 +293,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

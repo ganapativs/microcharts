@@ -56,14 +56,12 @@ const VISUAL_ONLY = [
   "PackageTabs",
   "Playground",
   "Instrument",
-  "InteractiveDemo",
   "PropTable",
   "Usage",
   "Sizing",
   "ChartChooser",
   "Reveal",
   "Showcase",
-  "DemoPanel",
 ];
 
 export function expandComponents(md: string): string {

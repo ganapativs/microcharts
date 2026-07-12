@@ -3,9 +3,10 @@
 // (pointer x → bin). ←/→ step bins, M jumps to the two median bins. The live
 // region states each bin's before/after proportions. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { shiftHistogramGeometry } from "./geometry.js";
 import {
   ShiftHistogram as StaticShiftHistogram,
@@ -15,6 +16,13 @@ import {
 
 export interface InteractiveShiftHistogramProps extends ShiftHistogramProps {
   strings?: ShiftStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the mirrored bins grow out of
+   * the center axis, sweeping left-to-right, when the chart first mounts
+   * client-side. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const pct = (share: number): string => `${Math.round(share * 100)}%`;
@@ -32,8 +40,20 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
     strings = EN_SHIFT,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Bins mirror both up (before) and down (after) from a shared center axis.
+  // Each bin rect's own bottom (up bins) or top (down bins) edge sits ON that
+  // axis, so a "rise" with a centered transform-origin grows every bin
+  // symmetrically out of its own middle toward — and away from — the center
+  // line, instead of one direction winning; order "x" sweeps the sequence
+  // left-to-right. `rect` alone covers before (neutral fill) and after
+  // (filled in mirror mode, outlined in overlay mode) — no other rects live
+  // in this chart.
+  useEntrance(hostRef, "rise", animate, { selector: "rect", origin: "center", order: "x" });
 
   const geo = useMemo(
     () =>
@@ -132,6 +152,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
 
   return (
     <span
+      ref={hostRef}
       className="mc-shift-histogram-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

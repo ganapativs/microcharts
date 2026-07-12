@@ -2,8 +2,16 @@
 // Interactive <DepthWedge> (plan/25 §12). One pointer listener; nearest level by
 // x reveals the cumulative depth on that side. ←/→ walk levels across the book.
 // Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_DEPTH_WEDGE } from "../../core/strings-depth-wedge.js";
 import { depthWedgeGeometry } from "./geometry.js";
 import {
@@ -14,7 +22,16 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
+export interface InteractiveDepthWedgeProps extends DepthWedgeProps {
+  /**
+   * Opt-in entrance motion (default `false`): the bid/ask wedges sweep
+   * outward from the mid-price on first client-side mount. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
   const {
     data,
     levels,
@@ -26,8 +43,19 @@ export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
     strings = EN_DEPTH_WEDGE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // The two sides are separate paths (demand = "positive", supply =
+  // "negative"), never merged, so each can scale from its own center — a
+  // sweep with a centered origin reads as the book pushing outward from the
+  // mid-price on both sides at once, rather than one flat left→right reveal.
+  useEntrance(hostRef, "sweep", animate, {
+    selector: 'path[data-mc-ink="positive"], path[data-mc-ink="negative"]',
+    origin: "center",
+  });
 
   const geo = useMemo(
     () =>
@@ -106,6 +134,7 @@ export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-depth-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
@@ -140,6 +169,7 @@ export function DepthWedge(props: DepthWedgeProps): React.ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {rest.children}
       </StaticDepthWedge>
       <span
         aria-live="polite"

@@ -1,8 +1,6 @@
 import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
-import { InteractiveDemo } from "./benchmark-strip.client";
+import { BenchmarkStrip as BenchmarkStripInteractive } from "@microcharts/react/benchmark-strip/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // 42 peer latencies (ms), stable + deterministic
@@ -58,8 +56,14 @@ export const entry: ChartEntry = {
   demo: PEERS,
   example: {
     title: "Latency vs peers",
-    code: `import { BenchmarkStrip } from "${PKG}/benchmark-strip";\n\n// 42 peer latencies (ms)\nconst peerLatencies = [${PEERS.join(", ")}];\n\n<BenchmarkStrip data={peerLatencies} value={312} format={{ style: "unit", unit: "millisecond" }} title="Latency vs peers" />`,
+    code: `import { BenchmarkStrip } from "${PKG}/benchmark-strip";\n\n<BenchmarkStrip data={peerLatencies} value={312} format={{ style: "unit", unit: "millisecond" }} title="Latency vs peers" />`,
   },
+  sampleData: [
+    {
+      name: "peerLatencies",
+      code: `// 42 peer latencies (ms)\nconst peerLatencies = [${PEERS.join(", ")}];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -114,6 +118,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <BenchmarkStripInteractive
+      data={data}
+      value={s.value as number}
+      range={s.range as "p5p95" | "minmax"}
+      label={s.label as "percentile" | "value" | "none"}
+      summary={false}
+      animate={ui.animate}
+      width={280}
+      height={16}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BenchmarkStrip",
+      "  data={peerLatencies}",
+      `  value={${s.value}}`,
+      s.range !== "p5p95" && `  range="${s.range}"`,
+      s.label !== "percentile" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the quantile edges — each names its percentile and value.",
 };
 
 export const recipes: Recipe[] = [
@@ -132,7 +162,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "polarity colors the dot",
-    code: `// latency: lower is better → below the median reads positive\n<BenchmarkStrip data={peers} value={230} positive="down" />`,
+    code: `// latency: lower is better → below the median reads positive\n<BenchmarkStrip data={peerLatencies} value={230} positive="down" />`,
     node: (
       <BenchmarkStrip
         data={PEERS}
@@ -159,14 +189,13 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 }
 
 export function markCode(): string {
-  return `<BenchmarkStrip data={peers} value={value} />`;
+  return `<BenchmarkStrip data={peerLatencies} value={value} />`;
 }
 
 export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

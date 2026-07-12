@@ -1,8 +1,6 @@
 import { Hypnogram } from "@microcharts/react/hypnogram";
-import { InteractiveDemo } from "./hypnogram.client";
+import { Hypnogram as HypnogramInteractive } from "@microcharts/react/hypnogram/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const SLEEP = [
@@ -65,6 +63,23 @@ export const entry: ChartEntry = {
     title: "Sleep stages",
     code: `import { Hypnogram } from "${PKG}/hypnogram";\n\n<Hypnogram data={sleep} states={["Awake","REM","Light","Deep"]} title="Sleep stages" />`,
   },
+  sampleData: [
+    {
+      name: "sleep",
+      code: `const sleep = [
+  { t: 0, state: "Awake" },
+  { t: 8, state: "Light" },
+  { t: 22, state: "Deep" },
+  { t: 38, state: "Light" },
+  { t: 50, state: "REM" },
+  { t: 62, state: "Light" },
+  { t: 74, state: "Deep" },
+  { t: 86, state: "Light" },
+  { t: 98, state: "REM" },
+  { t: 110, state: "Awake" },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -130,6 +145,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <HypnogramInteractive
+      data={SLEEP}
+      states={STATES}
+      domain={DOM}
+      variant={s.variant as "steps" | "lanes"}
+      emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
+      connectors={s.connectors as boolean}
+      animate={ui.animate}
+      summary={false}
+      width={300}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Hypnogram",
+      "  data={sleep}",
+      `  states={["Awake", "REM", "Light", "Deep"]}`,
+      s.variant !== "steps" && `  variant="${s.variant}"`,
+      s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
+      s.connectors === false && "  connectors={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow across the runs — each announces its state and time span.",
 };
 
 export const recipes: Recipe[] = [
@@ -142,7 +185,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "lanes (nominal)",
-    code: `<Hypnogram data={deploys} variant="lanes" />`,
+    code: `<Hypnogram data={sleep} variant="lanes" />`,
     node: (
       <Hypnogram
         data={SLEEP}
@@ -181,7 +224,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

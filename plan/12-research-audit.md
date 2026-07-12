@@ -1660,3 +1660,64 @@ the shipped 98, the plan/15 cut ledger, and the plan/05 bans). Approved: CohortT
 WinProbWorm, QueueDepth, SpreadBand, BiasStrip, PercentileTrace. Rejected with reasons (logged to prevent
 re-litigation): Q–Q micro (read-back), DirectionRose (PolarClock variant), mix-shift ribbons (QuipuCord class),
 TransitionGrid (ConfusionGrid recipe), RaceSplitBars, runway (EtaBar), warming stripes/spend-pace/swing needle (covered).
+
+## 2026-07-11 — unified opt-in entrance motion + CSS split (branch `unified-motion`)
+
+- **`animate` prop on interactive entries** (plan/04 §8.1 amended; static entries untouched). One
+  shared WAAPI engine, 8 archetypes (draw/wipe/rise/reveal/settle/sweep/pop/fade), one vocabulary:
+  entrances `cubic-bezier(0.23,1,0.32,1)`, 200–450 ms by archetype, 30 ms stagger capped at 240 ms
+  total; ≥80-mark grids fall back to the whole-svg fade (bounded work). Provenance: emil-design-eng /
+  apple-design skill standards (easing/duration/interruptibility tables), applied + self-reviewed
+  against the review-animations 10-standard checklist; durations trimmed one notch for word-sized
+  marks after that review.
+- **Engine delivery = import-once subpath `./motion`** (self-registers into the per-chart gate;
+  `sideEffects`-listed). Measured: engine 1.39 kB gz own budget row; gate ≈ +0.32 kB gz per wired
+  interactive subpath → plan/21 §1 "+0.35 kB motion-gate allowance" amendment. Rejected alternative:
+  dynamic `import()` from the gate — size-limit counts the async chunk into every interactive subpath
+  (+1.57 kB measured on sparkline), gutting the `static+1 kB` law for bytes most consumers never fetch.
+- **SSR/hydration contract**: entrances play ONLY on fresh client-side mounts (useSyncExternalStore
+  hydration latch) — server output byte-identical with/without `animate` (renderToString equality
+  test), hydrated paints never replay an entrance (no flash), hidden documents skip entirely
+  (background tabs/print/headless), `prefers-reduced-motion` skips, at-rest DOM proven byte-identical
+  in a real browser (src/shared/motion.browser.test.tsx).
+- **CSS delivery amendment** (plan/19): styles.css audit at 106 charts → ~90 % universal
+  (role system + a11y media blocks can't split); surgical split via `@mc-chart` markers →
+  generated `styles/core.css` + per-chart sheets, aggregate stays default. Entrance motion adds
+  ZERO CSS.
+- **Docs**: unified playground (static ↔ interactive mode, animate toggle, replay, imports-complete
+  snippets) replaces the separate Playground + InteractiveDemo sections on every chart page;
+  `animate` auto-documented in every interactive chart's prop table with reduced-motion/SSR notes.
+
+## 2026-07-11 — motion v2: chart-nature choreography (user craft round 2)
+
+User verdict on v1: archetype-generic fades don't express chart nature (a spiral should OPEN UP).
+Engine gained: `spin` (radial unwind: spiral-year, polar-clock, micro-donut), `grow` (tree-rings),
+`trail` (sequential mark pops along the chart's own order), `order: "x"|"y"|"index"` (real getBBox
+geometry sequencing for any mark archetype), and draw-synced dots (a dot pops exactly when the draw
+front reaches its x). 16 charts re-choreographed; every one verified via WAAPI introspection in the
+live docs (track shapes + ascending delays) and slow-motion frame capture. Two engine bugs found by
+the probes: whole-svg archetypes were being demoted by the selector-miss fallback (spin ran as wipe),
+and a long-running Next dev server serves a STALE compiled engine from node_modules — restart the
+docs dev server after every `pnpm build` before judging motion (turbopack does not watch node_modules).
+
+## 2026-07-11 — motion v3: three-act orchestration (user craft round 3)
+
+User verdict on v2: no story/rhythm — secondary ink either popped in via a disconnected fade or sat
+frozen ("half the chart animating"). Engine rewritten as a three-act scheduler on a 120 ms beat:
+Act 1 STAGE (all non-story, non-voice leaves fade in quietly over 2 beats — bands, tracks, ghost
+channels; nothing on a chart is ever unstaged), Act 2 STORY (the archetype performs, entering at
+beat 1 as the stage lands), Act 3 VOICE (text + accent/point/flag ink lands together at storyEnd −
+½ beat; draw-riding dots stay front-synced, incl. a lone endpoint dot syncing to its real viewBox x).
+New `defer` option casts a co-channel into the closing act (pareto line follows its bars). Verified
+by WAAPI probes on 12+ charts (stage/story/voice track shapes + delays) + full suites. SUPPORT pass
+retired (superseded by casting).
+
+## 2026-07-11 — motion v3.1: screen-space dash bug (user-reported, sparkline)
+
+Phantom second fragment animating from mid-line during dash draws at any CSS scale ≠ 1:
+`vector-effect: non-scaling-stroke` computes dash patterns post-transform (screen space) while
+`getTotalLength()` answers in user units, so the pattern repeat leaked into the visible path.
+Engine now scales the dash by the rendered factor (viewBox→client width) for non-scaling-stroke
+paths, +5 % guard (a dash longer than the path preserves the hold-invisible invariant). Affected
+all 20 draw charts; invisible at 1:1 word size — scaled-render checks are now part of the motion
+verification method (slow-mo frame capture at playground scale).

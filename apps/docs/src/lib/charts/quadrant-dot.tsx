@@ -1,8 +1,6 @@
 import { QuadrantDot } from "@microcharts/react/quadrant-dot";
-import { InteractiveDemo } from "./quadrant-dot.client";
+import { QuadrantDot as QuadrantDotInteractive } from "@microcharts/react/quadrant-dot/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a prioritization backlog — effort (x) vs impact (y)
@@ -84,6 +82,32 @@ export const entry: ChartEntry = {
     title: "Effort vs impact",
     code: `import { QuadrantDot } from "${PKG}/quadrant-dot";\n\n<QuadrantDot data={item} field={backlog} xLabel="effort" yLabel="impact" title="Effort vs impact" />`,
   },
+  sampleData: [
+    {
+      name: "item",
+      code: `// a prioritization backlog — effort (x) vs impact (y)
+const item = { x: 3, y: 9 };`,
+    },
+    {
+      name: "backlog",
+      code: `const backlog = [
+  { x: 2, y: 8 },
+  { x: 8, y: 9 },
+  { x: 3, y: 7 },
+  { x: 9, y: 2 },
+  { x: 7, y: 3 },
+  { x: 1, y: 1 },
+  { x: 5, y: 6 },
+  { x: 6, y: 8 },
+  { x: 4, y: 3 },
+  { x: 8, y: 5 },
+  { x: 2, y: 4 },
+  { x: 7, y: 7 },
+  { x: 3, y: 2 },
+  { x: 6, y: 1 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -140,6 +164,37 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <QuadrantDotInteractive
+      data={FOCAL}
+      field={FIELD}
+      {...AXES}
+      split={[s.splitX as number, s.splitY as number]}
+      region={s.region as boolean}
+      quadrants={s.named ? ["quick win", "big bet", "skip", "time sink"] : undefined}
+      title="Effort vs impact"
+      summary={false}
+      animate={ui.animate}
+      width={120}
+      height={120}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<QuadrantDot",
+      "  data={item}",
+      "  field={backlog}",
+      `  split={[${s.splitX}, ${s.splitY}]}`,
+      s.region === false && "  region={false}",
+      s.named && `  quadrants={["quick win", "big bet", "skip", "time sink"]}`,
+      '  xLabel="effort" yLabel="impact"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the peers — each announces its coords and quadrant, nearest-first from the focal dot.",
 };
 
 export const recipes: Recipe[] = [
@@ -190,7 +245,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

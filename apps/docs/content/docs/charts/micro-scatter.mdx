@@ -10,9 +10,6 @@ lying by occlusion, and duplicates are never jittered: position is the encoding.
 <LiveDemo
   label="MicroScatter"
   sizeOf="micro-scatter"
-  code={`import { MicroScatter } from "@microcharts/react/micro-scatter";
-
-<MicroScatter data={pairs} title="Latency vs error rate" />`}
 >
   <span className="text-lg">
     {"Latency and error rate "}
@@ -32,10 +29,6 @@ lying by occlusion, and duplicates are never jittered: position is the encoding.
 ## Try it
 
 <Playground chart="micro-scatter" />
-
-## Interactive
-
-<InteractiveDemo slug="micro-scatter" />
 
 ## When to use it
 
@@ -117,8 +110,8 @@ point.
 
 ## Why this default
 
-Axes are unlabeled at this scale, so `title` must name both variables — the a11y test in
-this repo asserts it in every example. The summary's relationship words are a documented
+Axes are unlabeled at this scale, so `title` must name both variables — the examples here
+all follow that convention. The summary's relationship words are a documented
 heuristic on |r| (≥ 0.7 strong, ≥ 0.4 moderate, ≥ 0.2 weak), and whenever a relationship
 word appears, r appears beside it: claim and evidence travel together. Fewer than 3
 points, or a zero-variance cloud, makes no claim at all.

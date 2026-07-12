@@ -1,8 +1,6 @@
 import { BumpStrip } from "@microcharts/react/bump-strip";
-import { InteractiveDemo } from "./bump-strip.client";
+import { BumpStrip as BumpStripInteractive } from "@microcharts/react/bump-strip/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const RANKS = [5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1];
@@ -124,6 +122,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <BumpStripInteractive
+      data={RANKS}
+      label={s.label as "ends" | "last" | "none"}
+      dots={s.dots as "changes" | "none"}
+      maxRank={(s.maxRank as number) === 5 ? undefined : (s.maxRank as number)}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BumpStrip",
+      "  data={weeklyRanks}",
+      s.label !== "ends" && `  label="${s.label}"`,
+      s.dots !== "changes" && `  dots="${s.dots}"`,
+      s.maxRank !== 5 && `  maxRank={${s.maxRank}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow through the weeks — each announces the rank held that period.",
 };
 
 export const recipes: Recipe[] = [
@@ -248,7 +271,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

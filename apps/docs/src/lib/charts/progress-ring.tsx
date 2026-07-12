@@ -1,8 +1,6 @@
 import { ProgressRing } from "@microcharts/react/progress-ring";
-import { InteractiveDemo } from "./progress-ring.client";
+import { ProgressRing as ProgressRingInteractive } from "@microcharts/react/progress-ring/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -99,6 +97,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ProgressRingInteractive
+      value={(s.pct as number) / 100}
+      sweep={s.sweep as boolean}
+      weight={s.weight as number}
+      label={(s.label as boolean) ? "percent" : "none"}
+      size={48}
+      summary={false}
+      animate={ui.animate}
+      style={{ width: 96, height: 96 }}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ProgressRing",
+      `  value={${(s.pct as number) / 100}}`,
+      (s.sweep as boolean) && "  sweep",
+      s.weight !== 3 && `  weight={${s.weight}}`,
+      (s.label as boolean) && '  label="percent"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Advance the ring — it announces only at quarter-threshold crossings (no spam).",
 };
 
 export const recipes: Recipe[] = [
@@ -215,7 +238,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

@@ -3,8 +3,9 @@
 // period math. ←/→ step periods; the live region states retention and, when a
 // benchmark is present, its value too. Composes the static component (canon);
 // the crosshair + ghost-value tick are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
 import { retentionGeometry } from "./geometry.js";
 import {
@@ -17,6 +18,12 @@ const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits:
 
 export interface InteractiveRetentionCurveProps extends RetentionCurveProps {
   strings?: RetentionStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the line draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function RetentionCurve(props: InteractiveRetentionCurveProps): React.ReactNode {
@@ -33,8 +40,12 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     strings = EN_RETENTION,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
     () =>
@@ -110,6 +121,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
 
   return (
     <span
+      ref={hostRef}
       className="mc-retention-curve-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

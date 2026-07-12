@@ -1,8 +1,6 @@
 import { Horizon } from "@microcharts/react/horizon";
-import { InteractiveDemo } from "./horizon.client";
+import { Horizon as HorizonInteractive } from "@microcharts/react/horizon/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const LOAD = [
@@ -54,13 +52,7 @@ export const entry: ChartEntry = {
   demo: LOAD,
   example: {
     title: "Cluster load",
-    code: `import { Horizon } from "${PKG}/horizon";
-
-const cpuLoad = [
-  2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
-];
-
-<Horizon data={cpuLoad} title="Cluster load" />`,
+    code: `import { Horizon } from "${PKG}/horizon";\n\n<Horizon data={cpuLoad} title="Cluster load" />`,
   },
   sampleData: [
     {
@@ -124,6 +116,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <HorizonInteractive
+      data={LOAD.map((v, i) => v - 20 + (i % 3))}
+      folds={Number(s.folds) as 2 | 3}
+      mode={s.mode as "mirror" | "offset"}
+      baseline={s.baseline as number}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={24}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<Horizon",
+      "  data={cpuLoad}",
+      s.folds !== "2" && `  folds={${s.folds}}`,
+      s.mode !== "mirror" && `  mode="${s.mode}"`,
+      s.baseline !== 0 && `  baseline={${s.baseline}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow across — each point announces its unfolded value.",
 };
 
 export const recipes: Recipe[] = [
@@ -250,7 +267,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

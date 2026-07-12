@@ -1,6 +1,5 @@
 import { ActivityGrid } from "@microcharts/react/activity-grid";
 import { ActivityGrid as ActivityGridInteractive } from "@microcharts/react/activity-grid/interactive";
-import { DemoPanel } from "@/components/charts/demo-panel";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
@@ -101,13 +100,7 @@ export const entry: ChartEntry = {
   demo: [0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3],
   example: {
     title: "Commits this month",
-    code: `import { ActivityGrid } from "${PKG}/activity-grid";
-
-const commits = [
-  0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3,
-];
-
-<ActivityGrid data={commits} title="Commits" />`,
+    code: `import { ActivityGrid } from "${PKG}/activity-grid";\n\n<ActivityGrid data={commits} title="Commits" />`,
   },
   sampleData: [
     {
@@ -128,14 +121,6 @@ export const showcase = {
   hint: "cadence",
   Node: () => <ActivityGridInteractive data={showcaseGrid} cell={9} title="Commit activity" />,
 };
-
-export function InteractiveDemo() {
-  return (
-    <DemoPanel hint="Hover a cell, or focus and move in 2-D with the arrow keys.">
-      <ActivityGridInteractive data={demoGrid} cell={13} title="Commit activity" />
-    </DemoPanel>
-  );
-}
 
 export const playground: PlaygroundSpec = {
   // `data` isn't a knob — the wave is the fixture; shuffle regenerates it.
@@ -182,6 +167,35 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <ActivityGridInteractive
+      data={data}
+      layout={s.layout as "grid" | "strip"}
+      shape={s.shape as "square" | "round" | "dot"}
+      cell={Number(s.cell)}
+      start={s.align !== "none" ? ALIGN_DATE : undefined}
+      weekStart={s.align === "sunday" ? 0 : 1}
+      domain={s.domain ? DOMAIN : undefined}
+      animate={ui.animate}
+      title="Playground"
+    />
+  ),
+  codeInteractive: (s, data, ui) =>
+    [
+      "<ActivityGrid",
+      `  data={/* ${data.length} values */}`,
+      `  layout="${s.layout}"`,
+      s.shape !== "square" && `  shape="${s.shape}"`,
+      `  cell={${s.cell}}`,
+      s.align !== "none" && `  start="${ALIGN_DATE}"`,
+      s.align === "sunday" && "  weekStart={0}",
+      s.domain && "  domain={[0, 6]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover a cell, or focus and move in 2-D with the arrow keys.",
 };
 
 export const recipes: Recipe[] = [
@@ -320,7 +334,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

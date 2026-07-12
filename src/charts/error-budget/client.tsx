@@ -3,8 +3,9 @@
 // math. ←/→ step; End jumps to now. The live region states remaining AND the
 // local burn multiple. Composes the static component (canon); the crosshair +
 // focus ring + readout chip are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
 import { errorBudgetGeometry } from "./geometry.js";
 import { ErrorBudget as StaticErrorBudget, RATE_FMT, type ErrorBudgetProps } from "./index.js";
@@ -13,6 +14,12 @@ const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits:
 
 export interface InteractiveErrorBudgetProps extends ErrorBudgetProps {
   strings?: ErrorBudgetStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the remaining-budget line draws
+   * on when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode {
@@ -28,8 +35,12 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
     strings = EN_ERROR_BUDGET,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
     () => errorBudgetGeometry({ width, height, data, window, rates }),
@@ -113,6 +124,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className="mc-error-budget-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

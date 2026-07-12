@@ -1,8 +1,6 @@
 import { GradeProfile } from "@microcharts/react/grade-profile";
-import { InteractiveDemo } from "./grade-profile.client";
+import { GradeProfile as GradeProfileInteractive } from "@microcharts/react/grade-profile/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const m = (n: number) => `${n} m`;
@@ -55,9 +53,12 @@ export const entry: ChartEntry = {
   demo: [800, 865],
   example: {
     title: "Queen stage",
-    code: `import { GradeProfile } from "${PKG}/grade-profile";
-
-const trail = [
+    code: `import { GradeProfile } from "${PKG}/grade-profile";\n\n<GradeProfile data={trail} format={(n) => \`\${n} m\`} title="Queen stage" />`,
+  },
+  sampleData: [
+    {
+      name: "trail",
+      code: `const trail = [
   { d: 0, elev: 800 },
   { d: 100, elev: 809 },
   { d: 250, elev: 812 },
@@ -65,10 +66,9 @@ const trail = [
   { d: 500, elev: 835 },
   { d: 700, elev: 833 },
   { d: 900, elev: 865 },
-];
-
-<GradeProfile data={trail} format={(n) => \`\${n} m\`} title="Queen stage" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -114,6 +114,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <GradeProfileInteractive
+      data={TRAIL}
+      label={s.label ? "max" : "none"}
+      bins={[3, 6, Number(s.hard)]}
+      format={m}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={48}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<GradeProfile",
+      "  data={trail}",
+      s.label === false && '  label="none"',
+      s.hard !== 10 && `  bins={[3, 6, ${s.hard}]}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover, or use ←/→ — each pitch announces its distance, true grade, and cumulative climb.",
 };
 
 export const recipes: Recipe[] = [
@@ -124,7 +149,7 @@ export const recipes: Recipe[] = [
   },
   {
     label: "call out the wall",
-    code: `<GradeProfile data={climb} bins={[4, 8, 12]} />`,
+    code: `<GradeProfile data={trail} bins={[4, 8, 12]} />`,
     node: (
       <GradeProfile
         data={TRAIL}
@@ -158,7 +183,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

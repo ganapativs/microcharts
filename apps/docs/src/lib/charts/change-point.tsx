@@ -1,8 +1,6 @@
 import { ChangePoint } from "@microcharts/react/change-point";
-import { InteractiveDemo } from "./change-point.client";
+import { ChangePoint as ChangePointInteractive } from "@microcharts/react/change-point/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // error rate that stepped up on the 14th, then held — a clean level shift
@@ -70,6 +68,20 @@ export const entry: ChartEntry = {
     title: "Error rate",
     code: `import { ChangePoint } from "${PKG}/change-point";\n\n<ChangePoint data={errors} label="delta" title="Error rate" />`,
   },
+  sampleData: [
+    {
+      name: "errors",
+      code: `// error rate that stepped up on the 14th, then held — a clean level shift
+const errors = [
+  ...Array(14).fill(0).map((_, i) => 30 + ((i * 7) % 5) - 2),
+  ...Array(20).fill(0).map((_, i) => 48 + ((i * 5) % 5) - 2),
+];`,
+    },
+    {
+      name: "ramp",
+      code: `const ramp = Array.from({ length: 40 }, (_, i) => 20 + i * 1.2);`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -113,6 +125,33 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ChangePointInteractive
+      data={s.preset === "ramp" ? RAMP : ERRORS}
+      max={s.max as number}
+      means={s.means as boolean}
+      label={s.delta ? "delta" : "none"}
+      title="Error rate"
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ChangePoint",
+      "  data={errors}",
+      s.max !== 2 && `  max={${s.max}}`,
+      s.means === false && "  means={false}",
+      s.delta && '  label="delta"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the points — each announces its value and regime; Tab jumps between the breaks, announcing the mean shift.",
 };
 
 export const recipes: Recipe[] = [
@@ -151,7 +190,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

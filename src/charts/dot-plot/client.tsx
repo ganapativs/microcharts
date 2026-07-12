@@ -2,8 +2,9 @@
 // Interactive <DotPlot> (plan/22 #10). One pointer listener; row by y-band
 // lookup (rows are the axis here) — ↑/↓ rove rows, announcing each category
 // with its rank ("Ada: 88 — 2nd of 5."). Composes the static component.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
 import { miniBarSummary } from "../mini-bar/index.js";
@@ -12,6 +13,12 @@ import { DotPlot as StaticDotPlot, type DotPlotProps } from "./index.js";
 
 export interface InteractiveDotPlotProps extends DotPlotProps {
   strings?: CategoryStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the row dots settle onto the
+   * scale on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
@@ -25,9 +32,13 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
     strings = EN_CATEGORY,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
   const height = props.height ?? Math.max(16, data.length * 8);
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "settle", animate);
 
   const fontSize = 6;
   const maxLabelChars = Math.min(
@@ -128,6 +139,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-dotplot-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

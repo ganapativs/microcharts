@@ -7,6 +7,7 @@
 // loop stops — never per frame. Composes the static component (canon).
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_ENSEMBLE, type EnsembleStrings } from "../../core/strings-ensemble.js";
 import { ensembleGeometry } from "./geometry.js";
 import {
@@ -17,6 +18,12 @@ import {
 
 export interface InteractiveEnsembleGhostsProps extends EnsembleGhostsProps {
   strings?: EnsembleStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the mean line draws on when
+   * the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.ReactNode {
@@ -32,8 +39,12 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     strings = EN_ENSEMBLE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
     () => ensembleGeometry({ width, height, data, ghosts, emphasis, domain }),
@@ -133,6 +144,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
 
   return (
     <span
+      ref={hostRef}
       className="mc-ensemble-ghosts-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

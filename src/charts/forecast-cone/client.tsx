@@ -3,8 +3,9 @@
 // nearest-x: history points announce a value, forecast points announce the
 // median + 80% interval. ←/→ step; Home/End jump the ends. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.js";
 import { forecastConeGeometry } from "./geometry.js";
 import {
@@ -15,6 +16,12 @@ import {
 
 export interface InteractiveForecastConeProps extends ForecastConeProps {
   strings?: ForecastStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the history line and fan cone
+   * wipe on when the chart first mounts client-side. Inert on the server and
+   * on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNode {
@@ -30,8 +37,12 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
     strings = EN_FORECAST,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(
     () => forecastConeGeometry({ width, height, data, forecast, target, domain: props.domain }),
@@ -114,6 +125,7 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
 
   return (
     <span
+      ref={hostRef}
       className="mc-forecast-cone-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

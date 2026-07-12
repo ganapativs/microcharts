@@ -11,9 +11,6 @@ a hidden wider track. It trades some precision for a read that needs no separate
 <LiveDemo
   label="FillWord"
   sizeOf="fill-word"
-  code={`import { FillWord } from "@microcharts/react/fill-word";
-
-<FillWord word="uploading" value={0.62} title="Upload" />`}
 >
   <FillWord word="uploading" value={0.62} title="Upload" fontSize={18} />
 </LiveDemo>
@@ -25,10 +22,6 @@ a hidden wider track. It trades some precision for a read that needs no separate
 ## Try it
 
 <Playground chart="fill-word" />
-
-## Interactive
-
-<InteractiveDemo slug="fill-word" />
 
 ## When to use it
 
@@ -89,7 +82,7 @@ story that fill cannot tell (TTLs, expiring sessions). Because glyph ink is unev
 ## Accessibility
 
 The accessible name names the task and its state — **"uploading: 62% complete."** — or, in drain
-mode, **"session: 25% remaining."** An empty word reads "No data." The interactive entry glides the
+mode, **"expiring: 70% remaining."** An empty word reads "No data." The interactive entry glides the
 ink edge with a reduced-motion-gated clip-path transition and announces changes through a polite
 live region, throttled to at most once a second so a streaming value never spams.
 

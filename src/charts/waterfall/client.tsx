@@ -2,15 +2,22 @@
 // Interactive <Waterfall> (plan/22 #20). One pointer listener; step by x-band.
 // ←/→ rove steps ("Refunds: −140, running 1,410."); End focuses the total.
 // Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue } from "../../core/types.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { waterfallGeometry } from "./geometry.js";
 import { Waterfall as StaticWaterfall, waterfallSummary, type WaterfallProps } from "./index.js";
 
 export interface InteractiveWaterfallProps extends WaterfallProps {
   strings?: FlowStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the sequence of steps reveals
+   * left-to-right when the chart first mounts client-side. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
@@ -26,8 +33,19 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     strings = EN_FLOW,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Waterfall bars float between running totals rather than sharing a zero
+  // baseline, so a per-bar scaleY "rise" points the wrong way for roughly
+  // half the steps. "trail" ordered by x tells the actual waterfall story
+  // instead: each step (and the total, being rightmost) lands in sequence.
+  // `rect[data-mc-ink]` catches every step bar (ink="positive"/"negative"/
+  // "neutral") and the total bar (ink="bar") but not the connector hairlines
+  // (those are <line>, not <rect>).
+  useEntrance(hostRef, "trail", animate, { selector: "rect[data-mc-ink]", order: "x" });
 
   const geo = useMemo(
     () =>
@@ -112,6 +130,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-waterfall-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

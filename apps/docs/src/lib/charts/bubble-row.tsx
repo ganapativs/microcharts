@@ -1,8 +1,6 @@
 import { BubbleRow } from "@microcharts/react/bubble-row";
-import { InteractiveDemo } from "./bubble-row.client";
+import { BubbleRow as BubbleRowInteractive } from "@microcharts/react/bubble-row/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 type Row = { label: string; value: number }[];
@@ -58,6 +56,17 @@ export const entry: ChartEntry = {
     title: "Market size",
     code: `import { BubbleRow } from "${PKG}/bubble-row";\n\n<BubbleRow data={regions} title="Market size" />`,
   },
+  sampleData: [
+    {
+      name: "regions",
+      code: `const regions = [
+  { label: "EMEA", value: 1240 },
+  { label: "AMER", value: 890 },
+  { label: "APAC", value: 560 },
+  { label: "LATAM", value: 210 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -105,6 +114,29 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <BubbleRowInteractive
+      data={REGIONS}
+      align={s.align as "center" | "baseline"}
+      label={s.label as "value" | "both" | "none"}
+      summary={false}
+      animate={ui.animate}
+      height={44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BubbleRow",
+      "  data={regions}",
+      s.align !== "center" && `  align="${s.align}"`,
+      s.label !== "value" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow ←/→ across the bubbles — each announces its exact value, the number the low-precision area can't carry.",
 };
 
 export const recipes: Recipe[] = [
@@ -136,7 +168,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -1,8 +1,6 @@
 import { PolarClock } from "@microcharts/react/polar-clock";
-import { InteractiveDemo } from "./polar-clock.client";
+import { PolarClock as PolarClockInteractive } from "@microcharts/react/polar-clock/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -66,16 +64,22 @@ export const entry: ChartEntry = {
   demo: DAY,
   example: {
     title: "Traffic by hour",
-    code: `import { PolarClock } from "${PKG}/polar-clock";
-
-// 24 hourly values, midnight → 23:00
+    code: `import { PolarClock } from "${PKG}/polar-clock";\n\n<PolarClock data={byHour} now={14} title="Traffic by hour" />`,
+  },
+  sampleData: [
+    {
+      name: "byHour",
+      code: `// 24 hourly values, midnight → 23:00
 const byHour = [
   80, 81, 82, 83, 20, 85, 86, 87, 88, 89, 90, 91, 92, 93, 312, 95, 96, 97, 98, 99, 100, 101, 102,
   103,
-];
-
-<PolarClock data={byHour} now={14} title="Traffic by hour" />`,
-  },
+];`,
+    },
+    {
+      name: "week",
+      code: `const week = [120, 200, 180, 210, 260, 90, 60];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -120,6 +124,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PolarClockInteractive
+      data={DAY}
+      now={s.now as number}
+      mode={s.mode as "length" | "opacity"}
+      labels={s.labels === "on"}
+      animate={ui.animate}
+      summary={false}
+      size={120}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PolarClock",
+      "  data={byHour}",
+      `  now={${s.now}}`,
+      s.mode !== "length" && `  mode="${s.mode}"`,
+      s.labels === "off" && "  labels={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover around the face or arrow through the hours — each segment announces its time and value.",
 };
 
 export const recipes: Recipe[] = [
@@ -148,7 +177,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

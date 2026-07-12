@@ -1,8 +1,6 @@
 import { EventTimeline } from "@microcharts/react/event-timeline";
-import { InteractiveDemo } from "./event-timeline.client";
+import { EventTimeline as EventTimelineInteractive } from "@microcharts/react/event-timeline/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const H = 3_600_000;
@@ -76,6 +74,10 @@ export const entry: ChartEntry = {
   { start: Date.UTC(2026, 5, 3, 20), label: "Release" },
 ];`,
     },
+    {
+      name: "today",
+      code: `const today: [number, number] = [Date.UTC(2026, 5, 3), Date.UTC(2026, 5, 4)];`,
+    },
   ],
 };
 
@@ -125,6 +127,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <EventTimelineInteractive
+      data={DATA}
+      domain={WINDOW}
+      now={s.now ? T0 + 21 * H : undefined}
+      label={s.label as "none" | "spans"}
+      animate={ui.animate}
+      width={280}
+      height={36}
+      summary={false}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<EventTimeline",
+      "  data={windows}",
+      "  domain={today}",
+      s.now && "  now={Date.now()}",
+      s.label !== "none" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover an item or arrow chronologically — spans announce their interval and duration, instants their moment.",
 };
 
 export const recipes: Recipe[] = [
@@ -255,7 +283,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

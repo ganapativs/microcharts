@@ -5,6 +5,7 @@
 // Composes the static entry (canon).
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_ETA_BAR } from "../../core/strings-eta-bar.js";
 import { EtaBar as StaticEtaBar, etaBarSummary, type EtaBarProps } from "./index.js";
 
@@ -13,6 +14,16 @@ const FILL: CSSProperties = { width: "100%", height: "auto" };
 export interface InteractiveEtaBarProps extends EtaBarProps {
   /** Minimum ms between live-region announcements (documented throttle). */
   announceEvery?: number;
+  /**
+   * Opt-in entrance motion (default `false`): the elapsed bar sweeps in from
+   * the left when the chart first mounts client-side. Independent of the
+   * existing CSS transition on the bar's x/width (which eases live prop
+   * updates, a different property than the WAAPI transform this drives) — the
+   * two never run at once, since the entrance fires once on mount before any
+   * value update. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
@@ -27,8 +38,12 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     title,
     summary,
     announceEvery = 10000,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "sweep", animate);
 
   const fmt = makeFormatter(format, locale);
   const full =
@@ -53,6 +68,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-eta-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

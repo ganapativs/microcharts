@@ -1,8 +1,6 @@
 import { PercentileTrace } from "@microcharts/react/percentile-trace";
-import { InteractiveDemo } from "./percentile-trace.client";
+import { PercentileTrace as PercentileTraceInteractive } from "@microcharts/react/percentile-trace/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a weekly standing that drifts up from the middle half into the top band
@@ -64,6 +62,13 @@ export const entry: ChartEntry = {
     title: "Standing",
     code: `import { PercentileTrace } from "${PKG}/percentile-trace";\n\n<PercentileTrace data={ranks} unit="week" title="Standing" />`,
   },
+  sampleData: [
+    {
+      name: "ranks",
+      code: `// a weekly standing that drifts up from the middle half into the top band
+const ranks = [40, 46, 52, 58, 63, 68, 72, 76, 79, 81];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -101,6 +106,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PercentileTraceInteractive
+      data={DEMO}
+      bands={s.bands as boolean}
+      positive={s.positive as "up" | "down"}
+      unit="week"
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PercentileTrace",
+      "  data={ranks}",
+      s.bands === false && "  bands={false}",
+      s.positive !== "up" && `  positive="${s.positive}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the weeks — each announces the percentile at that reading.",
 };
 
 export const recipes: Recipe[] = [
@@ -136,7 +166,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

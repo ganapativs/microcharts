@@ -2,8 +2,9 @@
 // Interactive <GardenGrid> (plan/24 #10). Same model as ActivityGrid: one
 // pointer listener + pure grid lookup, 2-D roving keyboard, a ring on the
 // focused cell. Announces the ordinal step, not a false-precise value.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { gardenGridGeometry } from "./geometry.js";
 import { EN_GARDEN, type GardenStrings } from "../../core/strings-garden.js";
 import {
@@ -14,6 +15,12 @@ import {
 
 export interface InteractiveGardenGridProps extends GardenGridProps {
   strings?: GardenStrings;
+  /**
+   * Opt-in entrance motion (default `false`): dots settle into place on first
+   * client-side mount. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
@@ -30,8 +37,15 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
     title,
     summary,
     strings = EN_GARDEN,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // "trail" (index order) — cells plant in a wave rather than a uniform
+  // staggered settle. Selector covers both empty (ink="muted") and filled
+  // (ink="point") cells; the default trail selector misses "muted".
+  useEntrance(hostRef, "trail", animate, { selector: "circle[data-mc-ink]" });
 
   const geo = useMemo(
     () => gardenGridGeometry({ values: data, rows, cell, gap, steps, domain, pad: 1 }),
@@ -109,6 +123,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-garden-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

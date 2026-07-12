@@ -10,9 +10,6 @@ SLAs, budgets, and quotas.
 <LiveDemo
   label="Bullet"
   sizeOf="bullet"
-  code={`import { Bullet } from "@microcharts/react/bullet";
-
-<Bullet value={72} target={80} bands={[50, 90]} title="Quota attainment" />`}
 >
   <Bullet value={72} target={80} bands={[50, 90]} width={200} height={22} title="Quota attainment" />
 </LiveDemo>
@@ -24,10 +21,6 @@ SLAs, budgets, and quotas.
 ## Try it
 
 <Playground chart="bullet" />
-
-## Interactive
-
-<InteractiveDemo slug="bullet" />
 
 ## When to use it
 
@@ -97,10 +90,10 @@ the track (Few's proportion, not a full-height fill) so the bands stay legible o
 
 ## Accessibility
 
-Bullet announces its value, its target, and where it lands among the bands — no color is
-required to tell whether the target was met, because the measure's length and the target
-tick encode it by position. The interactive entry reads the value and target on hover and
-focus.
+Bullet announces its value against its target — **"72 of 80 target."**. No color is required to
+read whether the target was met: the measure's length and the target tick encode it by position,
+and the qualitative bands sit behind them. The interactive entry reads the value and target on
+hover and focus.
 
 ## Props
 

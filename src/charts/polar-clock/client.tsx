@@ -3,10 +3,11 @@
 // (atan2, 12 o'clock clockwise) maps to a segment. Hover lifts that sector to the
 // accent and shows its label; ←/→ step segments circularly; a polite live region
 // announces the focused segment. Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { annulusSector } from "../../core/arc.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
 import { polarClockGeometry } from "./geometry.js";
 import {
@@ -17,8 +18,19 @@ import {
 
 const TAU = Math.PI * 2;
 
+// Segments/accent/level paths are FILLED shapes (fill, stroke:none per ink
+// role) — a stroke-based "draw" reveal would be invisible. Settling each
+// radial mark into place (fade + scale from its own center) suits the
+// self-contained wedge/ring glyph better.
+
 export interface InteractivePolarClockProps extends PolarClockProps {
   strings?: PolarClockStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the radial segments settle
+   * into place when the chart first mounts client-side. Inert on the server
+   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 function defaultSegmentLabel(strings: PolarClockStrings, index: number, n: number): string {
@@ -41,9 +53,12 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     strings = EN_POLAR_CLOCK,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
   const n = data.length;
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "spin", animate);
 
   const geo = useMemo(
     () => polarClockGeometry({ values: data, size, inner, start, pad: 1, mode, now }),
@@ -143,6 +158,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-polar-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

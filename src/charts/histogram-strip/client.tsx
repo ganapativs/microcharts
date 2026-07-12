@@ -1,9 +1,10 @@
 "use client";
 // Interactive <HistogramStrip> (plan/22 #15). One pointer listener; bin by
 // x-band. ←/→ rove bins ("40 to 50: 34 values."). Composes the static entry.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { histogramGeometry } from "./geometry.js";
 import {
   HistogramStrip as StaticHistogramStrip,
@@ -13,6 +14,12 @@ import {
 
 export interface InteractiveHistogramStripProps extends HistogramStripProps {
   strings?: DistStrings;
+  /**
+   * Opt-in entrance motion (default `false`): bins rise from the baseline
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function HistogramStrip(props: InteractiveHistogramStripProps): React.ReactNode {
@@ -28,8 +35,12 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
     strings = EN_DIST,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "rise", animate);
 
   const geo = useMemo(
     () => histogramGeometry({ width, height, values: data, domain, bins, markValue }),
@@ -94,6 +105,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
 
   return (
     <span
+      ref={hostRef}
       className="mc-histogram-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

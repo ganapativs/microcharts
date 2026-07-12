@@ -11,19 +11,6 @@ against a target line. It is the general form of any noisy metric with a complia
 <LiveDemo
   label="DualWindowMeter"
   sizeOf="dual-window-meter"
-  code={`import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
-
-const samples = Array.from(
-{ length: 60 },
-(_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0),
-);
-
-<DualWindowMeter
-  data={samples}
-  target={-23}
-  format={{ maximumFractionDigits: 1 }}
-  title="Loudness"
-/>`}
 >
   <DualWindowMeter
     data={Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 3) * 4 + Math.sin(i / 11) * 2 - (i > 40 ? 2 : 0))}
@@ -42,10 +29,6 @@ const samples = Array.from(
 ## Try it
 
 <Playground chart="dual-window-meter" />
-
-## Interactive
-
-<InteractiveDemo slug="dual-window-meter" />
 
 ## When to use it
 
@@ -162,7 +145,7 @@ filled, never faking a partial-window value.
 
 ## Accessibility
 
-The accessible name leads with the sustained read — **"Slow window 23.1 vs target 23; fast 20.4."**
+The accessible name leads with the sustained read — **"Slow window -23.1 vs target -23; fast -20.4."**
 The interactive entry roves the samples with ←/→, announcing the fast value, the slow value, and
 the target at each point.
 

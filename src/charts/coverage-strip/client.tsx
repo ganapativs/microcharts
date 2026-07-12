@@ -5,14 +5,21 @@
 // measured value, or "no measurement" (the honest distinction). Composes the
 // static component (canon); the focus ring is an overlay child re-using the
 // same geometry.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.js";
 import { coverageGeometry } from "./geometry.js";
 import { CoverageStrip as StaticCoverageStrip, type CoverageStripProps } from "./index.js";
 
 export interface InteractiveCoverageStripProps extends CoverageStripProps {
   strings?: CoverageStrings;
+  /**
+   * Opt-in entrance motion (default `false`): cells fade in on first
+   * client-side mount. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function CoverageStrip(props: InteractiveCoverageStripProps): React.ReactNode {
@@ -31,8 +38,14 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
     strings = EN_COVERAGE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate, {
+    selector: 'rect[data-mc-ink="cell"], rect[data-mc-ink="gap"]',
+  });
 
   // must match the static entry's font formula — the label gutter widens
   // totalWidth, and a mismatched fontSize would drift the readout off-cell
@@ -122,6 +135,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
 
   return (
     <span
+      ref={hostRef}
       className="mc-coverage-strip-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

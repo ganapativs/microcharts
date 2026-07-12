@@ -12,9 +12,6 @@ odds you must trust, and a frequency reads truer than a bare percentage.
 <LiveDemo
   label="QuantileDots"
   sizeOf="quantile-dots"
-  code={`import { QuantileDots } from "@microcharts/react/quantile-dots";
-
-<QuantileDots data={waits} threshold={15} format={(n) => \`\${n} min\`} title="Bus wait" />`}
 >
   <QuantileDots
     data={Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)))}
@@ -32,10 +29,6 @@ odds you must trust, and a frequency reads truer than a bare percentage.
 ## Try it
 
 <Playground chart="quantile-dots" />
-
-## Interactive
-
-<InteractiveDemo slug="quantile-dots" />
 
 ## When to use it
 

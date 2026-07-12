@@ -2,14 +2,22 @@
 // Interactive <SproutRow> (plan/24 #9). Roving 1-D keyboard (←/→) + nearest-slot
 // pointer lookup; announces each item's stage; a focus ring lifts the active
 // glyph. Composes the static component (overlay ring as children).
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { labelFont } from "../../core/labels.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { sproutRowGeometry } from "./geometry.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
 import { SproutRow as StaticSproutRow, sproutRowSummary, type SproutRowProps } from "./index.js";
 
 export interface InteractiveSproutRowProps extends SproutRowProps {
   strings?: SproutStrings;
+  /**
+   * Opt-in entrance motion (default `false`): each stage glyph settles into
+   * place, staggered, when the chart first mounts client-side — echoing the
+   * row sprouting in. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
@@ -20,10 +28,16 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     labels = false,
     height = 20,
     step = 16,
+    animate = false,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.34);
   const summary = sproutRowSummary(data, strings);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // "trail" ordered by x — the stage glyphs already carry data-mc-ink="point"
+  // (the default trail selector), so the row sprouts left→right instead of a
+  // uniform staggered settle.
+  useEntrance(hostRef, "trail", animate, { order: "x" });
   const geo = useMemo(
     () =>
       sproutRowGeometry({
@@ -70,6 +84,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-sprout-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

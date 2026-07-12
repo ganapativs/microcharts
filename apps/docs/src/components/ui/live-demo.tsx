@@ -11,6 +11,11 @@ type Tab = "preview" | "code";
 /**
  * Live demo surface: the real chart rendered above a Preview/Code toggle.
  * The code shown is the literal source for the rendered example.
+ *
+ * `code` is optional — when omitted, the surface renders the preview only
+ * (no Preview/Code seg, no code tab). Use this for hero demos whose snippet
+ * would just repeat the Install card's canonical usage right below it; the
+ * hero's job is to show the chart doing its job, not duplicate the snippet.
  */
 export function LiveDemo({
   children,
@@ -24,7 +29,7 @@ export function LiveDemo({
   grid = false,
 }: {
   children: ReactNode;
-  code: string;
+  code?: string;
   lang?: string;
   label?: string;
   meta?: string;
@@ -42,6 +47,7 @@ export function LiveDemo({
   const size = sizeOf ? CHART_GZIP[sizeOf]?.static : undefined;
   const metaText = meta ?? (size !== undefined ? `static · ${size} kB` : undefined);
   const data = sampleData ?? getChart(dataOf ?? sizeOf ?? "")?.sampleData;
+  const hasCode = code !== undefined;
 
   return (
     <div className="not-prose my-6 panel overflow-hidden">
@@ -53,25 +59,27 @@ export function LiveDemo({
           {metaText ? (
             <span className="mono-label mr-1 whitespace-nowrap opacity-70">{metaText}</span>
           ) : null}
-          <div role="tablist" aria-label="Demo view" className="seg">
-            {(["preview", "code"] as const).map((t) => (
-              <button
-                key={t}
-                role="tab"
-                aria-selected={tab === t}
-                data-active={tab === t}
-                type="button"
-                onClick={() => setTab(t)}
-                className="seg-opt uppercase"
-              >
-                {t}
-              </button>
-            ))}
-          </div>
+          {hasCode ? (
+            <div role="tablist" aria-label="Demo view" className="seg">
+              {(["preview", "code"] as const).map((t) => (
+                <button
+                  key={t}
+                  role="tab"
+                  aria-selected={tab === t}
+                  data-active={tab === t}
+                  type="button"
+                  onClick={() => setTab(t)}
+                  className="seg-opt uppercase"
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
 
-      {tab === "preview" ? (
+      {!hasCode || tab === "preview" ? (
         <div
           className={cn(
             "flex min-h-32 flex-wrap items-center justify-center gap-6 px-6 py-10",

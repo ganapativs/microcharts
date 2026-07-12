@@ -2,14 +2,21 @@
 // Interactive <Ohlc> (plan/22 #24). Nearest-x lookup; ←/→ steps the RENDERED
 // periods ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close
 // 148.20."). Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { ohlcGeometry } from "./geometry.js";
 import { Ohlc as StaticOhlc, ohlcSummary, type OhlcProps } from "./index.js";
 
 export interface InteractiveOhlcProps extends OhlcProps {
   strings?: OhlcStrings;
+  /**
+   * Opt-in entrance motion (default `false`): periods reveal left-to-right
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
@@ -26,8 +33,17 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     strings = EN_OHLC,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // "trail" ordered by x — periods land oldest→newest, one candle at a time.
+  // Candle bodies carry `data-mc-ohlc` (not `data-mc-ink`); the "bars"
+  // variant's ticks carry neither, so this selector matches only the candle
+  // bodies — the "bars" variant has no marks to select and the engine falls
+  // back to its whole-svg "wipe" reveal automatically (documented fallback).
+  useEntrance(hostRef, "trail", animate, { selector: "rect[data-mc-ohlc]", order: "x" });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(
@@ -130,6 +146,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-ohlc-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

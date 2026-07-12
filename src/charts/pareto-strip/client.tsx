@@ -3,13 +3,21 @@
 // (pointer x → bar). ←/→ step bars, T jumps to the threshold-crossing bar. The
 // live region states each bar's share + cumulative. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { paretoGeometry } from "./geometry.js";
 import { ParetoStrip as StaticParetoStrip, paretoSummary, type ParetoStripProps } from "./index.js";
 
 export interface InteractiveParetoStripProps extends ParetoStripProps {
   strings?: ParetoStrings;
+  /**
+   * Opt-in entrance motion (default `false`): bars rise from the baseline,
+   * left to right, on first client-side mount, and the cumulative-share line
+   * fades in once the bars have mostly landed. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const pct = (frac: number): string => `${Math.round(frac * 100)}%`;
@@ -26,8 +34,21 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
     strings = EN_PARETO,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // The cumulative line carries "muted" ink, not data/accent, so it's not a
+  // bar-rise candidate — it's excluded from the selector below (rects only)
+  // Three acts: the bars cascade left→right (story) and the cumulative line
+  // is deferred to the closing act — it arrives as the last bar lands, the
+  // conclusion drawn over the evidence.
+  useEntrance(hostRef, "rise", animate, {
+    selector: 'rect[data-mc-ink="accent"], rect[data-mc-ink="neutral"], rect[data-mc-ink="bar"]',
+    order: "x",
+    defer: 'path[data-mc-ink="muted"]',
+  });
 
   const geo = useMemo(
     () => paretoGeometry({ width, height, data, threshold, max }),
@@ -103,6 +124,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className="mc-pareto-strip-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -1,8 +1,6 @@
 import { MinimapStrip } from "@microcharts/react/minimap-strip";
-import { InteractiveDemo } from "./minimap-strip.client";
+import { MinimapStrip as MinimapStripInteractive } from "@microcharts/react/minimap-strip/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const CONTENT = Array.from(
@@ -110,6 +108,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <MinimapStripInteractive
+      data={{ ...DATA, window: [s.window as number, (s.window as number) + 140] }}
+      variant={s.variant as "bars" | "heat"}
+      markLane={s.markLane as boolean}
+      animate={ui.animate}
+      summary={false}
+      width={320}
+      height={20}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<MinimapStrip",
+      `  data={{ content, window: [${s.window}, ${(s.window as number) + 140}], marks, known }}`,
+      s.variant !== "bars" && `  variant="${s.variant}"`,
+      s.markLane === false && "  markLane={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Drag or click to move the viewport window; ←/→ nudge it (Shift for a bigger jump).",
 };
 
 export const recipes: Recipe[] = [
@@ -144,7 +166,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

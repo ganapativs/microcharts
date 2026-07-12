@@ -1,8 +1,6 @@
 import { ConfusionGrid } from "@microcharts/react/confusion-grid";
-import { InteractiveDemo } from "./confusion-grid.client";
+import { ConfusionGrid as ConfusionGridInteractive } from "@microcharts/react/confusion-grid/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const CATDOG = {
@@ -63,18 +61,20 @@ export const entry: ChartEntry = {
   demo: [87, 12],
   example: {
     title: "Classifier",
-    code: `import { ConfusionGrid } from "${PKG}/confusion-grid";
-
-const counts = {
+    code: `import { ConfusionGrid } from "${PKG}/confusion-grid";\n\n<ConfusionGrid data={counts} title="Classifier" />`,
+  },
+  sampleData: [
+    {
+      name: "counts",
+      code: `const counts = {
   labels: ["cat", "dog"],
   counts: [
     [88, 12],
     [10, 59],
   ],
-};
-
-<ConfusionGrid data={counts} title="Classifier" />`,
-  },
+};`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -128,17 +128,44 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ConfusionGridInteractive
+      data={THREE}
+      normalize={s.normalize as "row" | "none"}
+      accent={s.accent as "diagonal" | "errors"}
+      label={s.label ? "accuracy" : "none"}
+      shape={s.round ? "round" : "square"}
+      summary={false}
+      animate={ui.animate}
+      size={120}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ConfusionGrid",
+      "  data={{ labels, counts }}",
+      s.normalize !== "row" && `  normalize="${s.normalize}"`,
+      s.accent !== "diagonal" && `  accent="${s.accent}"`,
+      s.label === true && '  label="accuracy"',
+      s.round === true && '  shape="round"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use the arrow keys across the grid — each cell announces actual vs predicted as a share of the actual class.",
 };
 
 export const recipes: Recipe[] = [
   {
     label: "KPI card",
-    code: `<ConfusionGrid data={{ labels, counts }} label="accuracy" size={64} />`,
+    code: `<ConfusionGrid data={counts} label="accuracy" size={64} />`,
     node: <ConfusionGrid data={CATDOG} label="accuracy" summary={false} size={64} />,
   },
   {
     label: "worst-confusion accent",
-    code: `<ConfusionGrid data={cm} accent="errors" />`,
+    code: `<ConfusionGrid data={counts} accent="errors" />`,
     node: <ConfusionGrid data={THREE} accent="errors" summary={false} size={72} />,
   },
 ];
@@ -155,7 +182,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

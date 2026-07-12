@@ -1,8 +1,6 @@
 import { CitySkyline } from "@microcharts/react/city-skyline";
-import { InteractiveDemo } from "./city-skyline.client";
+import { CitySkyline as CitySkylineInteractive } from "@microcharts/react/city-skyline/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 type Team = { label: string; value: number; lit?: number };
@@ -63,18 +61,20 @@ export const entry: ChartEntry = {
   demo: [46, 32, 28, 40, 18],
   example: {
     title: "Team sizes",
-    code: `import { CitySkyline } from "${PKG}/city-skyline";
-
-const teams = [
+    code: `import { CitySkyline } from "${PKG}/city-skyline";\n\n<CitySkyline data={teams} unit="teams" title="Team sizes" />`,
+  },
+  sampleData: [
+    {
+      name: "teams",
+      code: `const teams = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },
   { label: "Web", value: 28, lit: 0.9 },
   { label: "API", value: 40, lit: 0.3 },
   { label: "Data", value: 18, lit: 0.6 },
-];
-
-<CitySkyline data={teams} unit="teams" title="Team sizes" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -116,6 +116,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <CitySkylineInteractive
+      data={TEAMS}
+      labels={s.labels as boolean}
+      label={s.value ? "value" : "none"}
+      ground={s.ground as boolean}
+      unit="teams"
+      animate={ui.animate}
+      summary={false}
+      bw={16}
+      gap={6}
+      height={s.labels || s.value ? 52 : 44}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<CitySkyline",
+      "  data={teams}",
+      s.labels && "  labels",
+      s.value && '  label="value"',
+      s.ground === false && "  ground={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow ←/→ across the buildings — each announces its size and its lit fraction. Height is the precise read; the lit windows are impressionistic (mostly lit / half lit / dark).",
 };
 
 export const recipes: Recipe[] = [
@@ -154,7 +182,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

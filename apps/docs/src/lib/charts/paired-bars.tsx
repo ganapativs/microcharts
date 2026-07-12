@@ -1,8 +1,6 @@
 import { PairedBars } from "@microcharts/react/paired-bars";
-import { InteractiveDemo } from "./paired-bars.client";
+import { PairedBars as PairedBarsInteractive } from "@microcharts/react/paired-bars/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 type PairRow = { label: string; value: number | null; ref: number | null }[];
@@ -61,16 +59,7 @@ export const entry: ChartEntry = {
   demo: BUDGET.map((d) => d.value ?? 0),
   example: {
     title: "Budget vs actual",
-    code: `import { PairedBars } from "${PKG}/paired-bars";
-
-const regions = [
-  { label: "East", value: 940, ref: 1200 },
-  { label: "West", value: 410, ref: 400 },
-  { label: "South", value: 620, ref: 600 },
-  { label: "North", value: 120, ref: 300 },
-];
-
-<PairedBars data={regions} title="Actual vs plan" />`,
+    code: `import { PairedBars } from "${PKG}/paired-bars";\n\n<PairedBars data={regions} title="Actual vs plan" />`,
   },
   sampleData: [
     {
@@ -156,6 +145,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PairedBarsInteractive
+      data={BUDGET}
+      mode={s.mode as "grouped" | "overlay"}
+      positive={(s.positive as boolean) ? "up" : undefined}
+      orientation={s.orientation as "horizontal" | "vertical"}
+      locale={s.locale as string}
+      animate={ui.animate}
+      summary={false}
+      style={
+        s.orientation === "horizontal" ? { width: 200, height: 110 } : { width: 220, height: 72 }
+      }
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PairedBars",
+      "  data={regions}",
+      s.mode !== "grouped" && `  mode="${s.mode}"`,
+      (s.positive as boolean) && '  positive="up"',
+      s.orientation === "horizontal" && '  orientation="horizontal"',
+      s.locale !== "en-US" && `  locale="${s.locale}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover a pair or rove with arrows — each announces value vs reference.",
 };
 
 export const recipes: Recipe[] = [
@@ -282,7 +299,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

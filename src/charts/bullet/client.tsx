@@ -3,17 +3,45 @@
 // visual, wrapped focusable, with a readout of the exact value vs target revealed
 // on hover or focus. The wrapper owns the accessible name (role=img); the inner
 // static chart is decorative so the reading isn't announced twice.
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
 
 // The static SVG fills the focusable wrapper so its box coincides with the
 // wrapper's — the readout anchors to the real chart edge, and it scales fluidly.
 const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
-export function Bullet(props: BulletProps): React.ReactNode {
-  const { value, target, format, locale, title, summary, className, style } = props;
+// The measure bar shares the "bar" ink with the background bands; it's always
+// the LAST `rect` sibling (bands render first, then the measure) so `:last-of-
+// type` isolates it without touching the static component.
+const MEASURE_SELECTOR = 'rect[data-mc-ink="bar"]:last-of-type';
+
+export interface InteractiveBulletProps extends BulletProps {
+  /**
+   * Opt-in entrance motion (default `false`): the measure bar sweeps in from
+   * the left when the chart first mounts client-side. Inert on the server and
+   * on hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function Bullet(props: InteractiveBulletProps): React.ReactNode {
+  const {
+    value,
+    target,
+    format,
+    locale,
+    title,
+    summary,
+    animate = false,
+    className,
+    style,
+    ...rest
+  } = props;
   const [open, setOpen] = useState(false);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "sweep", animate, { selector: MEASURE_SELECTOR });
 
   const fmt = makeFormatter(format, locale);
   const auto = bulletSummary(fmt(value), target === undefined ? null : fmt(target));
@@ -38,6 +66,7 @@ export function Bullet(props: BulletProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className={className ? `mc-bullet-interactive ${className}` : "mc-bullet-interactive"}
       style={wrapStyle}
       tabIndex={0}
@@ -48,7 +77,15 @@ export function Bullet(props: BulletProps): React.ReactNode {
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
     >
-      <StaticBullet {...props} summary={false} style={FILL} />
+      <StaticBullet
+        {...rest}
+        value={value}
+        target={target}
+        format={format}
+        locale={locale}
+        summary={false}
+        style={FILL}
+      />
       {open ? (
         <span className="mc-spark-readout" style={{ right: 0 }}>
           {readout}

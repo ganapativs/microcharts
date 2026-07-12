@@ -56,12 +56,14 @@ Composition, contrast, and the auto-summary all have to survive the smallest sup
 That constraint is what makes the charts calm: there's no room for anything that isn't carrying
 information, so nothing decorative gets in.
 
-## Motion is never a prop
+## Motion lives in the interactive build, not on every chart
 
-There's no `animate` prop. Static charts don't move at all; the interactive entries animate
-through CSS, gated on `prefers-reduced-motion`, and marks decelerate into place — they never
-bounce, loop, or draw the eye away from the data. Motion is a property of the interactive build,
-not a knob on every chart, so it can't be turned into decoration.
+Static charts don't move at all — there's nothing to animate and no `animate` prop to pass. Only
+the `/interactive` entries can play an entrance, and only when you opt in with `animate`
+(off by default). It runs through CSS, gated on `prefers-reduced-motion`, and marks decelerate
+into place — they never bounce, loop, or draw the eye away from the data. Motion is a property of
+the interactive build, not a knob bolted onto the static one, so it can't leak into a server
+render or turn into decoration.
 
 ## Budgets are build gates
 

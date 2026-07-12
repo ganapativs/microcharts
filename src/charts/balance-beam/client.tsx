@@ -5,6 +5,7 @@
 // announces when the heavier side flips. Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { balanceBeamGeometry } from "./geometry.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
 import { BalanceBeam as StaticBeam, balanceBeamSummary, type BalanceBeamProps } from "./index.js";
@@ -12,6 +13,14 @@ import { BalanceBeam as StaticBeam, balanceBeamSummary, type BalanceBeamProps } 
 export interface InteractiveBalanceBeamProps extends BalanceBeamProps {
   live?: boolean;
   strings?: BeamStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the two weights settle onto
+   * the beam on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins. Independent of the
+   * beam's own live-retilt CSS transition (that eases geometry attributes on
+   * data change; this animates transform/opacity on mount — no overlap).
+   */
+  animate?: boolean;
 }
 
 export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode {
@@ -25,11 +34,18 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
     maxTilt = 12,
     format,
     locale,
+    animate = false,
     ...rest
   } = props;
   const summary = balanceBeamSummary(data, { mode, domain, strings, format, locale });
   const [active, setActive] = useState<0 | 1 | null>(null);
   const [announced, setAnnounced] = useState("");
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Only the weights (dots) settle — the beam and fulcrum arrive via the base
+  // whole-svg fade, since a scaling line/path would read oddly at this scale.
+  useEntrance(hostRef, "settle", animate, {
+    selector: '[data-mc-ink="accent"], [data-mc-ink="point"]',
+  });
   const prevHeavier = useRef(
     balanceBeamGeometry({
       a: data[0].value,
@@ -81,6 +97,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
 
   return (
     <span
+      ref={hostRef}
       className="mc-beam-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -3,14 +3,21 @@
 // math. ←/→ step periods; the live region states in, out, AND signed net — the
 // full picture, never a net without its gross. Composes the static component
 // (canon); the crosshair + in/out value ticks are overlay children.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js";
 import { netFlowGeometry } from "./geometry.js";
 import { NetFlow as StaticNetFlow, netFlowSummary, signedNet, type NetFlowProps } from "./index.js";
 
 export interface InteractiveNetFlowProps extends NetFlowProps {
   strings?: NetFlowStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the flow areas wipe on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
@@ -24,8 +31,12 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
     strings = EN_NET_FLOW,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(
     () => netFlowGeometry({ width, height, data, mode, domain: props.domain }),
@@ -100,6 +111,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-net-flow-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

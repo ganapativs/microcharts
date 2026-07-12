@@ -1,8 +1,6 @@
 import { ControlStrip } from "@microcharts/react/control-strip";
-import { InteractiveDemo } from "./control-strip.client";
+import { ControlStrip as ControlStripInteractive } from "@microcharts/react/control-strip/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // 30 fill-weight readings (g); mostly in control, two excursions
@@ -66,8 +64,14 @@ export const entry: ChartEntry = {
   demo: DEMO,
   example: {
     title: "Line 3 fill weight",
-    code: `import { ControlStrip } from "${PKG}/control-strip";\n\n// 30 fill-weight readings (g); mostly in control, two excursions\nconst weights = [${DEMO.join(", ")}];\n\n<ControlStrip data={weights} title="Line 3 fill weight" />`,
+    code: `import { ControlStrip } from "${PKG}/control-strip";\n\n<ControlStrip data={weights} title="Line 3 fill weight" />`,
   },
+  sampleData: [
+    {
+      name: "weights",
+      code: `// 30 fill-weight readings (g); mostly in control, two excursions\nconst weights = [${DEMO.join(", ")}];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -113,6 +117,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ControlStripInteractive
+      data={DEMO}
+      limits={s.limits as "sigma" | "percentile"}
+      rules={s.rules ? "we" : "none"}
+      dots={s.dots ? "all" : "out"}
+      summary={false}
+      animate={ui.animate}
+      width={280}
+      height={26}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ControlStrip",
+      "  data={weights}",
+      s.limits !== "sigma" && `  limits="${s.limits}"`,
+      s.rules && '  rules="we"',
+      s.dots && '  dots="all"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the points — out-of-control points announce which limit they crossed.",
 };
 
 export const recipes: Recipe[] = [
@@ -148,7 +178,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

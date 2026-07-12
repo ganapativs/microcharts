@@ -3,8 +3,9 @@
 // encoding is learned: the nearest-x crosshair announces the TRUE value, not
 // the band, and raises a value dot at the folded position. ←/→ steps x.
 // Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -13,6 +14,12 @@ import { Horizon as StaticHorizon, type HorizonProps } from "./index.js";
 
 export interface InteractiveHorizonProps extends HorizonProps {
   strings?: SeriesStrings & SlotStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the folded bands wipe on when
+   * the chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 const DEFAULT_STRINGS = { ...EN_SERIES, ...EN_SLOTS };
@@ -31,8 +38,12 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
     strings = DEFAULT_STRINGS,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(
     () => horizonGeometry({ width, height, values: data, domain, baseline, folds, mode }),
@@ -102,6 +113,7 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-horizon-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

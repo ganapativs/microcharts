@@ -1,8 +1,6 @@
 import { SpiralYear } from "@microcharts/react/spiral-year";
-import { InteractiveDemo } from "./spiral-year.client";
+import { SpiralYear as SpiralYearInteractive } from "@microcharts/react/spiral-year/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 
@@ -62,17 +60,19 @@ export const entry: ChartEntry = {
   demo: YEAR,
   example: {
     title: "Seasonality",
-    code: `import { SpiralYear } from "${PKG}/spiral-year";
-
-// 52 weekly values, a summer peak in week 30
+    code: `import { SpiralYear } from "${PKG}/spiral-year";\n\n<SpiralYear data={byWeek} title="Seasonality" />`,
+  },
+  sampleData: [
+    {
+      name: "byWeek",
+      code: `// 52 weekly values, a summer peak in week 30
 const byWeek = [
   85, 95, 107, 120, 135, 150, 166, 183, 200, 217, 234, 250, 265, 280, 293, 305, 315, 324, 331, 336,
   339, 340, 339, 336, 331, 324, 315, 305, 293, 480, 265, 250, 234, 217, 200, 183, 166, 150, 135,
   120, 107, 95, 85, 76, 69, 64, 61, 60, 61, 64, 69, 76,
-];
-
-<SpiralYear data={byWeek} title="Seasonality" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -111,6 +111,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <SpiralYearInteractive
+      data={YEAR}
+      steps={s.steps === "3" ? 3 : 5}
+      mark={s.mark as "dot" | "arc"}
+      monthTicks={s.monthTicks === "on"}
+      animate={ui.animate}
+      summary={false}
+      size={128}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<SpiralYear",
+      "  data={byWeek}",
+      s.steps !== "5" && `  steps={${s.steps}}`,
+      s.mark !== "dot" && `  mark="${s.mark}"`,
+      s.monthTicks !== "on" && "  monthTicks={false}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover across the spiral or arrow along it week by week — each mark announces its period and value through a polite live region. Remember the channel is ordinal opacity: for an exact day, reach for ActivityGrid or HeatStrip.",
 };
 
 export const recipes: Recipe[] = [
@@ -139,7 +164,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

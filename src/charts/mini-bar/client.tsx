@@ -2,15 +2,28 @@
 // Interactive <MiniBar> (plan/22 #6). One pointer listener; bar index by
 // category-band lookup. ←/→ rove across bars ("East: 940 — 1st of 4."), focus
 // ring overlay on the active bar. Composes the static component (canon).
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { miniBarGeometry } from "./geometry.js";
 import { MiniBar as StaticMiniBar, miniBarSummary, sortData, type MiniBarProps } from "./index.js";
 
+// Bars carry valence tokens (bar/accent/positive/negative), not just "bar" —
+// the default archetype selectors only match "bar", so every ink role is listed.
+const BAR_SELECTOR =
+  'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"], rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]';
+
 export interface InteractiveMiniBarProps extends MiniBarProps {
   strings?: CategoryStrings;
+  /**
+   * Opt-in entrance motion (default `false`): bars rise from the baseline
+   * (vertical) or sweep in from the left (horizontal) when the chart first
+   * mounts client-side. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
@@ -26,8 +39,17 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     strings = EN_CATEGORY,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Horizontal bars grow rightward (sweep, scaleX); vertical bars rise from the
+  // baseline (scaleY) — the archetype tracks the chart's own orientation prop.
+  useEntrance(hostRef, orientation === "horizontal" ? "sweep" : "rise", animate, {
+    origin: "signed",
+    selector: BAR_SELECTOR,
+  });
 
   const sorted = useMemo(() => sortData(data, sort), [data, sort]);
   const geo = useMemo(
@@ -134,6 +156,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-minibar-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

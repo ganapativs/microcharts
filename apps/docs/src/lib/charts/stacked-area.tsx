@@ -1,8 +1,6 @@
 import { StackedArea } from "@microcharts/react/stacked-area";
-import { InteractiveDemo } from "./stacked-area.client";
+import { StackedArea as StackedAreaInteractive } from "@microcharts/react/stacked-area/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const MIX = [
@@ -56,15 +54,7 @@ export const entry: ChartEntry = {
   demo: MIX[0].values,
   example: {
     title: "Traffic mix",
-    code: `import { StackedArea } from "${PKG}/stacked-area";
-
-const mix = [
-  { label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
-  { label: "Web", values: [50, 48, 47, 45, 42, 41, 38, 36, 35, 33, 32, 30] },
-  { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
-];
-
-<StackedArea data={mix} title="Traffic mix" />`,
+    code: `import { StackedArea } from "${PKG}/stacked-area";\n\n<StackedArea data={mix} title="Traffic mix" />`,
   },
   sampleData: [
     {
@@ -154,6 +144,35 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <StackedAreaInteractive
+      data={MIX}
+      variant={s.variant as "stacked" | "ridge"}
+      order={s.order as "data" | "asc"}
+      label={s.label as "last" | "none"}
+      curve={s.curve as "linear" | "smooth"}
+      locale={s.locale as string}
+      animate={ui.animate}
+      summary={false}
+      width={260}
+      height={32}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<StackedArea",
+      "  data={mix}",
+      s.variant !== "stacked" && `  variant="${s.variant}"`,
+      s.order !== "data" && `  order="${s.order}"`,
+      s.label !== "none" && `  label="${s.label}"`,
+      s.curve !== "linear" && `  curve="${s.curve}"`,
+      s.locale !== "en-US" && `  locale="${s.locale}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow across — each point announces every layer's share at once.",
 };
 
 export const recipes: Recipe[] = [
@@ -298,7 +317,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

@@ -1,8 +1,6 @@
 import { RugStrip } from "@microcharts/react/rug-strip";
-import { InteractiveDemo } from "./rug-strip.client";
+import { RugStrip as RugStripInteractive } from "@microcharts/react/rug-strip/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const FIELD = [42, 48, 51, 53, 55, 58, 61, 63, 66, 71, 55, 52, 49, 58, 62, 75, 83, 58, 54, 60];
@@ -59,6 +57,10 @@ export const entry: ChartEntry = {
       name: "salaries",
       code: `const salaries = [42, 48, 51, 53, 55, 58, 61, 63, 66, 71, 55, 52, 49, 58, 62, 75, 83, 58, 54, 60];`,
     },
+    {
+      name: "yourOffer",
+      code: `const yourOffer = 62;`,
+    },
   ],
 };
 
@@ -103,13 +105,38 @@ export const playground: PlaygroundSpec = {
     [
       "<RugStrip",
       "  data={salaries}",
-      (s.markValue as boolean) && "  markValue={you}",
+      (s.markValue as boolean) && "  markValue={yourOffer}",
       s.orientation === "vertical" && '  orientation="vertical"',
       (s.domain as boolean) && "  domain={[0, 150]}",
       "/>",
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <RugStripInteractive
+      data={data}
+      markValue={(s.markValue as boolean) ? data[Math.floor(data.length / 2)] : undefined}
+      orientation={s.orientation as "horizontal" | "vertical"}
+      domain={(s.domain as boolean) ? [0, 150] : undefined}
+      summary={false}
+      animate={ui.animate}
+      style={s.orientation === "vertical" ? { width: 20, height: 140 } : { width: 220, height: 22 }}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<RugStrip",
+      "  data={salaries}",
+      (s.markValue as boolean) && "  markValue={yourOffer}",
+      s.orientation === "vertical" && '  orientation="vertical"',
+      (s.domain as boolean) && "  domain={[0, 150]}",
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover for the nearest observation; arrow keys walk them in sorted order with rank readouts.",
 };
 
 export const recipes: Recipe[] = [
@@ -247,7 +274,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

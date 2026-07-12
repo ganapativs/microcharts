@@ -1,8 +1,16 @@
 "use client";
 // Interactive <RubricStrip> (plan/25 §6). One pointer listener; row by y lookup.
 // ↑/↓ rove criteria. Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_RUBRIC } from "../../core/strings-rubric.js";
 import { rubricStripGeometry } from "./geometry.js";
 import {
@@ -13,7 +21,17 @@ import {
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function RubricStrip(props: RubricStripProps): React.ReactNode {
+export interface InteractiveRubricStripProps extends RubricStripProps {
+  /**
+   * Opt-in entrance motion (default `false`): each criterion's bar sweeps in
+   * from the left, staggered row by row, on first client-side mount. Inert on
+   * the server and on hydrated server HTML; `prefers-reduced-motion` always
+   * wins.
+   */
+  animate?: boolean;
+}
+
+export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode {
   const {
     data,
     labels = true,
@@ -25,8 +43,15 @@ export function RubricStrip(props: RubricStripProps): React.ReactNode {
     strings = EN_RUBRIC,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "sweep", animate, {
+    selector:
+      'rect[data-mc-ink="accent"], rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]',
+  });
 
   const n = Math.max(1, data.length);
   const height = heightProp ?? Math.min(32, Math.max(12, n * 8));
@@ -106,6 +131,7 @@ export function RubricStrip(props: RubricStripProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-rubric-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

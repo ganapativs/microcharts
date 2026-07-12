@@ -6,6 +6,7 @@
 // it. Composes the static entry (canon) — no re-implemented SVG.
 import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_STATION_GLYPH } from "../../core/strings-station-glyph.js";
 import { octant } from "../../core/strings-wind-barb.js";
 import {
@@ -17,7 +18,16 @@ import { stationGlyphGeometry } from "./geometry.js";
 
 const FILL: CSSProperties = { width: "100%", height: "auto" };
 
-export function StationGlyph(props: StationGlyphProps): React.ReactNode {
+export interface InteractiveStationGlyphProps extends StationGlyphProps {
+  /**
+   * Opt-in entrance motion (default `false`): the glyph fades and scales in
+   * when the chart first mounts client-side. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNode {
   const {
     cloud,
     wind,
@@ -31,8 +41,12 @@ export function StationGlyph(props: StationGlyphProps): React.ReactNode {
     strings = EN_STATION_GLYPH,
     title,
     summary,
+    animate = false,
+    ...rest
   } = props;
   const fmt = makeFormatter(format, locale);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "pop", animate);
 
   const full =
     summary === false
@@ -93,6 +107,7 @@ export function StationGlyph(props: StationGlyphProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-station-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
@@ -100,7 +115,22 @@ export function StationGlyph(props: StationGlyphProps): React.ReactNode {
       aria-label={label}
       onKeyDown={onKey}
     >
-      <StaticStationGlyph {...props} summary={false} style={FILL} />
+      <StaticStationGlyph
+        {...rest}
+        cloud={cloud}
+        wind={wind}
+        step={step}
+        temp={temp}
+        dewpoint={dewpoint}
+        pressure={pressure}
+        station={station}
+        format={format}
+        locale={locale}
+        strings={strings}
+        title={title}
+        summary={false}
+        style={FILL}
+      />
       <span
         aria-live="polite"
         style={{

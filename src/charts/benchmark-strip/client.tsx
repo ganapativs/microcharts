@@ -3,8 +3,9 @@
 // nearest-edge math (never a node per quantile). ←/→ step the five quantile
 // edges; each announces its name + value ("p75: 420 ms."). Composes the static
 // component (canon); the crosshair tick is an overlay child re-using geometry.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { benchmarkStripGeometry } from "./geometry.js";
 import {
@@ -15,6 +16,12 @@ import {
 
 export interface InteractiveBenchmarkStripProps extends BenchmarkStripProps {
   strings?: QuantileStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the focal dot settles onto the
+   * band on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.ReactNode {
@@ -30,8 +37,14 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
     strings = EN_QUANTILE,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "settle", animate, {
+    selector: 'circle[data-mc-w="support"], path',
+  });
 
   // must match the static's viewBox (the label gutter widens totalWidth)
   const font = Math.min(11, Math.max(7, Math.round(height * 0.62)));
@@ -117,6 +130,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
 
   return (
     <span
+      ref={hostRef}
       className="mc-benchmark-strip-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

@@ -1,8 +1,6 @@
 import { EventRaster } from "@microcharts/react/event-raster";
-import { InteractiveDemo } from "./event-raster.client";
+import { EventRaster as EventRasterInteractive } from "@microcharts/react/event-raster/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const RASTER = [
@@ -57,6 +55,17 @@ export const entry: ChartEntry = {
     title: "Service events",
     code: `import { EventRaster } from "${PKG}/event-raster";\n\n<EventRaster data={services} title="Service events" />`,
   },
+  sampleData: [
+    {
+      name: "services",
+      code: `const services = [
+  { label: "api", events: [2, 5, 6, 14, 20, 21, 33, 40, 41, 48, 55] },
+  { label: "db", events: [3, 6, 15, 21, 34, 41, 55] },
+  { label: "cache", events: [6, 21, 41, 55] },
+  { label: "queue", events: [10, 30, 50] },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -108,6 +117,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <EventRasterInteractive
+      data={RASTER}
+      emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
+      labels={s.labels as boolean}
+      overflow={s.overflow as "bin" | "clip"}
+      summary={false}
+      animate={ui.animate}
+      width={320}
+      height={36}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<EventRaster",
+      "  data={services}",
+      s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
+      s.labels === false && "  labels={false}",
+      s.overflow !== "bin" && `  overflow="${s.overflow}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use ↑/↓ for lanes and ←/→ for events — each announces its lane, time, and position.",
 };
 
 export const recipes: Recipe[] = [
@@ -143,7 +178,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

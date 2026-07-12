@@ -1,8 +1,6 @@
 import { PartitionStrip } from "@microcharts/react/partition-strip";
-import { InteractiveDemo } from "./partition-strip.client";
+import { PartitionStrip as PartitionStripInteractive } from "@microcharts/react/partition-strip/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const TREE = [
@@ -67,6 +65,30 @@ export const entry: ChartEntry = {
     title: "Bundle composition",
     code: `import { PartitionStrip } from "${PKG}/partition-strip";\n\n<PartitionStrip data={bundle} title="Bundle composition" />`,
   },
+  sampleData: [
+    {
+      name: "bundle",
+      code: `const bundle = [
+  {
+    label: "JS",
+    children: [
+      { label: "react", value: 28 },
+      { label: "vendor", value: 12 },
+      { label: "app", value: 8 },
+    ],
+  },
+  {
+    label: "CSS",
+    children: [
+      { label: "tailwind", value: 16 },
+      { label: "custom", value: 8 },
+    ],
+  },
+  { label: "img", value: 18 },
+  { label: "font", value: 10 },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -109,12 +131,36 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <PartitionStripInteractive
+      data={TREE}
+      labels={s.labels as boolean}
+      emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
+      summary={false}
+      animate={ui.animate}
+      width={320}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<PartitionStrip",
+      "  data={bundle}",
+      s.labels === false && "  labels={false}",
+      s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover, or use ←/→ within a row and ↑/↓ between a parent and its children — each announces its share.",
 };
 
 export const recipes: Recipe[] = [
   {
     label: "storage cell",
-    code: `<PartitionStrip data={usage} labels={false} width={80} height={16} />`,
+    code: `<PartitionStrip data={bundle} labels={false} width={80} height={16} />`,
     node: <PartitionStrip data={TREE} labels={false} summary={false} width={80} height={16} />,
   },
   {
@@ -144,7 +190,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

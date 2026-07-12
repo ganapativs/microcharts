@@ -1,16 +1,21 @@
 ---
 title: Introduction
-description: Word-sized charts for React — zero dependencies, 0.9–3.6 kB gzip each, accessible by default, and server-component safe. 106 chart types, one grammar.
+description: Word-sized charts for React, made for LLMs and humans — zero dependencies, 0.9–3.6 kB gzip each, accessible by default, and server-component safe. 106 chart types, one grammar.
 ---
 
-microcharts is a set of tiny, handcrafted charts for React. They're built to sit _inside_ an
-interface — in a sentence, a table cell, a KPI card, a tab header — where a full chart library
-would be too heavy and too loud. One quiet signal, read at a glance.
+microcharts is a set of tiny, handcrafted charts for React — **made for AI first, and for the
+people reading what it writes**. The grammar is small and predictable enough for a model to
+emit correctly mid-sentence, and every chart describes itself in words, so a chart an LLM
+streams into a chat reply, a document, or a generated slide is one a person can read and
+trust. They're built to sit _inside_ an interface — in a sentence, a table cell, a KPI card,
+a tab header, a streamed reply — where a full chart library would be too heavy and too loud.
+One quiet signal, read at a glance.
 
 <PackageTabs />
 
 Every chart renders from `data` alone, ships as pure SVG with **zero runtime dependencies**,
-and carries an accessible description generated from the data itself.
+and carries an accessible description generated from the data itself — the same properties
+that make it safe for a model to write are the ones that make it pleasant for a human to use.
 
 <LiveDemo
   label="Sparkline"
@@ -24,14 +29,15 @@ and carries an accessible description generated from the data itself.
 
 ## Why microcharts
 
+- **AI-native, by design.** A chart is plain `data` plus generated words, so a model can emit
+  one mid-sentence and read one back — [chat streams, agents, and tool output](/docs/ai) are
+  the primary homes, not an afterthought. One grammar across 106 types means an LLM that has
+  seen one chart can write them all.
 - **Zero dependencies.** No chart engine, no D3 — just SVG. CI-enforced, forever.
 - **Server-component safe.** Static charts are hook-free and listener-free; they render to HTML
   with zero client JavaScript, and add interactivity only from a separate `/interactive` subpath.
 - **Accessible by default.** Each chart is an `img` with a natural-language summary built from
   your data — nothing to remember, nothing to drift.
-- **AI-native.** A chart is plain `data` plus generated words, so a model can emit one
-  mid-sentence and read one back — [chat streams, agents, and tool output](/docs/ai) are
-  first-class homes, not an afterthought.
 - **Tiny.** Static charts span **0.9–3.6 kB gzip** (median 2.3), each imported from its own
   subpath and budget-gated in CI.
 
@@ -54,7 +60,9 @@ question it answers — start from what you need someone to see, and land on the
 ## Where they live
 
 The point of a word-sized chart is that it belongs _in_ your interface, not in a dashboard
-off to the side. Here's the same chart doing its job in four different homes:
+off to the side — and because it's plain SVG, "interface" isn't limited to a browser tab: the
+same markup drops into a slide or a rendered report as cleanly as a table cell. Here's the same
+chart doing its job in four different homes:
 
 <FourContexts slug="sparkline" />
 

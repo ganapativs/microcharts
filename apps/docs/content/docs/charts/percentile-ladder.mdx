@@ -42,10 +42,6 @@ renders when it applies.
 
 <Playground chart="percentile-ladder" />
 
-## Interactive
-
-<InteractiveDemo slug="percentile-ladder" />
-
 ## When to use it
 
 - **Good for** — latency SLOs in a sentence, the tail per endpoint in tables, payment-size spread.
@@ -58,7 +54,7 @@ renders when it applies.
 ## Variants
 
 <LiveDemo
-  label="scale + percentiles"
+  label="scale + percentiles + locale"
   code={`const latencies = Array.from({ length: 200 }, (_, i) =>
   i < 130
     ? 90 + (i % 50)
@@ -71,7 +67,14 @@ renders when it applies.
 
 <PercentileLadder data={latencies} scale="log" />
 <PercentileLadder data={latencies} ps={[50, 95, 99.9]} label="values" />
-<PercentileLadder data={latencies} marks="dot" />`}
+<PercentileLadder data={latencies} marks="dot" />
+// value labels and the summary format through Intl — "1.661 ms", not "1,661 ms"
+<PercentileLadder
+  data={latencies}
+  label="values"
+  format={{ style: "unit", unit: "millisecond", maximumFractionDigits: 0 }}
+  locale="de-DE"
+/>`}
 >
   <span className="inline-flex flex-col gap-2">
     <PercentileLadder
@@ -120,44 +123,24 @@ renders when it applies.
       width={220}
       height={18}
     />
+    <PercentileLadder
+      data={Array.from({ length: 200 }, (_, i) =>
+        i < 130
+          ? 90 + (i % 50)
+          : i < 180
+            ? 150 + ((i * 7) % 320)
+            : i < 196
+              ? 480 + ((i * 11) % 900)
+              : 1500 + ((i * 13) % 800),
+      )}
+      label="values"
+      format={{ style: "unit", unit: "millisecond", maximumFractionDigits: 0 }}
+      locale="de-DE"
+      title="de-DE locale"
+      width={260}
+      height={18}
+    />
   </span>
-</LiveDemo>
-
-<LiveDemo
-  label="de-DE locale"
-  code={`// value labels and the summary format through Intl — "1.661 ms", not "1,661 ms"
-<PercentileLadder
-  data={Array.from({ length: 200 }, (_, i) =>
-    i < 130
-      ? 90 + (i % 50)
-      : i < 180
-        ? 150 + ((i * 7) % 320)
-        : i < 196
-          ? 480 + ((i * 11) % 900)
-          : 1500 + ((i * 13) % 800),
-  )}
-  label="values"
-  format={{ style: "unit", unit: "millisecond", maximumFractionDigits: 0 }}
-  locale="de-DE"
-/>`}
->
-  <PercentileLadder
-    data={Array.from({ length: 200 }, (_, i) =>
-      i < 130
-        ? 90 + (i % 50)
-        : i < 180
-          ? 150 + ((i * 7) % 320)
-          : i < 196
-            ? 480 + ((i * 11) % 900)
-            : 1500 + ((i * 13) % 800),
-    )}
-    label="values"
-    format={{ style: "unit", unit: "millisecond", maximumFractionDigits: 0 }}
-    locale="de-DE"
-    title="de-DE locale"
-    width={260}
-    height={18}
-  />
 </LiveDemo>
 
 ## Edge cases
@@ -219,9 +202,9 @@ whenever it does, so the axis is never misread as linear.
 ## Accessibility
 
 The accessible name states every marked percentile and the tail's multiple of the median —
-**"p50 50, p90 90, p99 99 — the slowest 1% take 2× the median."** The interactive entry roves
-ticks with ←/→ (Home/End jump to the ends), announcing each tick's value and its multiple of the
-median (**"p99: 2.1 s — 17× the median."**).
+**"p50 124.5, p90 488.1, p99 1,661.13 — the slowest 1% take 13.3× the median."** The interactive
+entry roves ticks with ←/→ (Home/End jump to the ends), announcing each tick's value and its
+multiple of the median (**"p99: 1,661.13 — 13.3× the median."**).
 
 ## Props
 

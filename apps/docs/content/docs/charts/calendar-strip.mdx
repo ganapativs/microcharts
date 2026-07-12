@@ -10,9 +10,6 @@ read; for longer ordinal histories, use ActivityGrid.
 <LiveDemo
   label="CalendarStrip"
   sizeOf="calendar-strip"
-  code={`import { CalendarStrip } from "@microcharts/react/calendar-strip";
-
-<CalendarStrip data={days} end="2026-07-01" title="Deploy cadence" />`}
 >
   <CalendarStrip
     data={Array.from({ length: 18 }, (_, i) => ({
@@ -32,10 +29,6 @@ read; for longer ordinal histories, use ActivityGrid.
 ## Try it
 
 <Playground chart="calendar-strip" />
-
-## Interactive
-
-<InteractiveDemo slug="calendar-strip" />
 
 ## When to use it
 
@@ -112,7 +105,7 @@ ActivityGrid and GardenGrid.
 >
   <CalendarStrip
     data={Array.from({ length: 14 }, (_, i) => ({
-      date: `2026-06-${String(18 + i).padStart(2, "0")}`,
+      date: new Date(Date.UTC(2026, 5, 18) + i * 86400000).toISOString().slice(0, 10),
       value: 0,
     }))}
     end="2026-07-01"
@@ -140,8 +133,8 @@ never extrapolated.
 ## Accessibility
 
 The accessible name counts real days — **"Active 11 of 24 days over 4 weeks."** The
-interactive entry walks the grid in 2-D and announces real calendar days (**"Tuesday,
-June 9: 0."**, **"Tuesday, June 16: no data."**).
+interactive entry walks the grid in 2-D and announces real calendar days (**"Thursday,
+June 11: 0."**, **"Tuesday, June 23: no data."**).
 
 ## Props
 

@@ -1,8 +1,6 @@
 import { CoverageStrip } from "@microcharts/react/coverage-strip";
-import { InteractiveDemo } from "./coverage-strip.client";
+import { CoverageStrip as CoverageStripInteractive } from "@microcharts/react/coverage-strip/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // a live window with real gaps: null = no measurement, 0 = a measured zero.
@@ -54,8 +52,14 @@ export const entry: ChartEntry = {
   demo: [3, 4, 5, 5, 6, 8, 7, 9, 11, 10],
   example: {
     title: "Sensor uptime",
-    code: `import { CoverageStrip } from "${PKG}/coverage-strip";\n\n// null = no measurement, 0 = a measured zero\nconst readings = [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10];\n\n<CoverageStrip data={readings} expected={18} label="percent" title="Sensor uptime" />`,
+    code: `import { CoverageStrip } from "${PKG}/coverage-strip";\n\n<CoverageStrip data={readings} expected={18} label="percent" title="Sensor uptime" />`,
   },
+  sampleData: [
+    {
+      name: "readings",
+      code: `// null = no measurement, 0 = a measured zero\nconst readings = [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -129,6 +133,34 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <CoverageStripInteractive
+      data={data}
+      expected={18}
+      mode={s.mode as "binary" | "intensity"}
+      shape={s.shape as "square" | "round"}
+      label={s.label as "none" | "percent"}
+      summary={false}
+      animate={ui.animate}
+      width={260}
+      height={16}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<CoverageStrip",
+      "  data={readings}",
+      "  expected={18}",
+      s.mode !== "binary" && `  mode="${s.mode}"`,
+      s.shape !== "square" && `  shape="${s.shape}"`,
+      s.label !== "none" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow through the slots — each says whether it was measured, or missing.",
 };
 
 export const recipes: Recipe[] = [
@@ -172,7 +204,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

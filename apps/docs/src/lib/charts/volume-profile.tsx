@@ -1,8 +1,6 @@
 import { VolumeProfile } from "@microcharts/react/volume-profile";
-import { InteractiveDemo } from "./volume-profile.client";
+import { VolumeProfile as VolumeProfileInteractive } from "@microcharts/react/volume-profile/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 export const PROFILE = [
@@ -62,9 +60,12 @@ export const entry: ChartEntry = {
   demo: [142],
   example: {
     title: "Volume by price",
-    code: `import { VolumeProfile } from "${PKG}/volume-profile";
-
-const profile = [
+    code: `import { VolumeProfile } from "${PKG}/volume-profile";\n\n<VolumeProfile data={profile} title="Volume by price" />`,
+  },
+  sampleData: [
+    {
+      name: "profile",
+      code: `const profile = [
   { level: 134, weight: 3 },
   { level: 136, weight: 6 },
   { level: 138, weight: 11 },
@@ -74,10 +75,9 @@ const profile = [
   { level: 146, weight: 12 },
   { level: 148, weight: 7 },
   { level: 150, weight: 4 },
-];
-
-<VolumeProfile data={profile} title="Volume by price" />`,
-  },
+];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -102,8 +102,8 @@ export const playground: PlaygroundSpec = {
       label={s.label as "poc" | "none"}
       valueArea={(s.valueArea as number) / 100}
       summary={false}
-      width={120}
-      height={80}
+      width={200}
+      height={132}
     />
   ),
   code: (s) =>
@@ -117,6 +117,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <VolumeProfileInteractive
+      data={PROFILE}
+      align={s.align as "left" | "right"}
+      label={s.label as "poc" | "none"}
+      valueArea={(s.valueArea as number) / 100}
+      animate={ui.animate}
+      summary={false}
+      width={200}
+      height={132}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<VolumeProfile",
+      "  data={profile}",
+      s.align !== "left" && `  align="${s.align}"`,
+      s.label !== "poc" && `  label="${s.label}"`,
+      s.valueArea !== 70 && `  valueArea={${((s.valueArea as number) / 100).toFixed(2)}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use ↑/↓ across the levels — each announces its share of total activity, and the POC is flagged.",
 };
 
 export const recipes: Recipe[] = [
@@ -152,7 +178,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

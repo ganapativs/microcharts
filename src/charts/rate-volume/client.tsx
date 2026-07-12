@@ -3,9 +3,10 @@
 // math. ←/→ step periods; the live region ALWAYS pairs both numbers — a rate is
 // never announced without its volume. Composes the static component (canon); the
 // crosshair + bar highlight are overlay children re-using geometry.
-import { useCallback, useMemo, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { rateVolumeGeometry } from "./geometry.js";
 import {
   RateVolume as StaticRateVolume,
@@ -15,6 +16,12 @@ import {
 
 export interface InteractiveRateVolumeProps extends RateVolumeProps {
   strings?: RateVolumeStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the rate line draws on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
@@ -31,8 +38,15 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
     strings = EN_RATE_VOLUME,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // The precise rate line (ink="data") is the primary channel; the ghost
+  // volume bars are deliberately low-precision and simply fade in with the
+  // base svg opacity — no ink role of their own to animate as "marks".
+  useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
     () =>
@@ -133,6 +147,7 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
 
   return (
     <span
+      ref={hostRef}
       className="mc-rate-volume-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}

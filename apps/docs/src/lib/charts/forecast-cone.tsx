@@ -1,8 +1,6 @@
 import { ForecastCone } from "@microcharts/react/forecast-cone";
-import { InteractiveDemo } from "./forecast-cone.client";
+import { ForecastCone as ForecastConeInteractive } from "@microcharts/react/forecast-cone/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // weekly revenue ($M): 7 weeks of history, a 4-week widening forecast
@@ -72,17 +70,23 @@ export const entry: ChartEntry = {
   demo: [...HIST, ...FORE.mid],
   example: {
     title: "Q4 revenue",
-    code: `import { ForecastCone } from "${PKG}/forecast-cone";
-
-const history = [30, 32, 31, 34, 36, 35, 38];
-const forecast = {
+    code: `import { ForecastCone } from "${PKG}/forecast-cone";\n\n<ForecastCone data={history} forecast={forecast} target={45} title="Q4 revenue" />`,
+  },
+  sampleData: [
+    {
+      name: "history",
+      code: `// weekly revenue ($M): 7 weeks of history, a 4-week widening forecast
+const history = [30, 32, 31, 34, 36, 35, 38];`,
+    },
+    {
+      name: "forecast",
+      code: `const forecast = {
   mid: [39, 40, 41, 42],
   p80: [[36, 42], [35, 45], [34, 50], [33, 55]],
   p50: [[37, 41], [37, 43], [36, 46], [35, 49]],
-};
-
-<ForecastCone data={history} forecast={forecast} target={45} title="Q4 revenue" />`,
-  },
+};`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -137,6 +141,32 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <ForecastConeInteractive
+      data={HIST}
+      forecast={s.p50 ? FORE : { mid: FORE.mid, p80: FORE.p80 }}
+      target={s.target ? 45 : undefined}
+      label={s.label as "landing" | "none"}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={28}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<ForecastCone",
+      "  data={history}",
+      "  forecast={forecast}",
+      s.target && "  target={45}",
+      s.label !== "landing" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the weeks — history announces a value, the forecast region announces the median and 80% interval.",
 };
 
 export const recipes: Recipe[] = [
@@ -192,7 +222,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

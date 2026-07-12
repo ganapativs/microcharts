@@ -1,8 +1,6 @@
 import { MusicStaff } from "@microcharts/react/music-staff";
-import { InteractiveDemo } from "./music-staff.client";
+import { MusicStaff as MusicStaffInteractive } from "@microcharts/react/music-staff/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const MELODY = [3, 5, 4, 8, 6, 9, 7, 11];
@@ -53,6 +51,12 @@ export const entry: ChartEntry = {
     title: "Sprint melody",
     code: `import { MusicStaff } from "${PKG}/music-staff";\n\n<MusicStaff data={weeks} title="Sprint melody" />`,
   },
+  sampleData: [
+    {
+      name: "weeks",
+      code: `const weeks = [3, 5, 4, 8, 6, 9, 7, 11];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -98,6 +102,30 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <MusicStaffInteractive
+      data={data}
+      range={s.range as "ledger" | "staff"}
+      label={s.label ? "last" : "none"}
+      summary={false}
+      animate={ui.animate}
+      width={220}
+      height={40}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<MusicStaff",
+      "  data={weeks}",
+      s.range !== "ledger" && `  range="${s.range}"`,
+      s.label && '  label="last"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow ←/→ across the notes — each announces its position and value, like stepping through a melody.",
 };
 
 export const recipes: Recipe[] = [
@@ -132,7 +160,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

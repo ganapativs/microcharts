@@ -1,8 +1,16 @@
 "use client";
 // Interactive <CalibrationStrip> (plan/25 §14). One pointer listener; nearest bin
 // by x. ←/→ rove bins. Composes the static component (canon).
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_CALIBRATION } from "../../core/strings-calibration.js";
 import { calibrationGeometry, isBinned } from "./geometry.js";
 import {
@@ -20,11 +28,22 @@ function defaultMinSupport(data: CalibrationStripProps["data"]): number {
   return Math.max(10, Math.round(total * 0.02));
 }
 
-export function CalibrationStrip(props: CalibrationStripProps): React.ReactNode {
+export interface InteractiveCalibrationStripProps extends CalibrationStripProps {
+  /**
+   * Opt-in entrance motion (default `false`): the per-bin points settle onto
+   * the diagonal (dots variant) or the deviation columns fade in (bars
+   * variant) on first client-side mount. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
+}
+
+export function CalibrationStrip(props: InteractiveCalibrationStripProps): React.ReactNode {
   const {
     data,
     bins = 10,
     minSupport,
+    variant = "dots",
     width = 100,
     height = 32,
     format,
@@ -32,8 +51,17 @@ export function CalibrationStrip(props: CalibrationStripProps): React.ReactNode 
     strings = EN_CALIBRATION,
     title,
     summary,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, variant === "bars" ? "reveal" : "settle", animate, {
+    selector:
+      variant === "bars"
+        ? 'line[data-mc-ink="accent"]'
+        : 'circle[data-mc-ink="accent"], circle[data-mc-w="support"]',
+  });
 
   const ms = minSupport ?? defaultMinSupport(data);
   const supportHeight = Math.max(4, Math.round(height * 0.18));
@@ -104,6 +132,7 @@ export function CalibrationStrip(props: CalibrationStripProps): React.ReactNode 
 
   return (
     <span
+      ref={hostRef}
       className="mc-calib-live"
       style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
       tabIndex={0}
@@ -119,6 +148,7 @@ export function CalibrationStrip(props: CalibrationStripProps): React.ReactNode 
         data={data}
         bins={bins}
         minSupport={minSupport}
+        variant={variant}
         width={width}
         height={height}
         format={format}

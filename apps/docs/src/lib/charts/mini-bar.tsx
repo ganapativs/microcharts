@@ -1,8 +1,6 @@
 import { MiniBar } from "@microcharts/react/mini-bar";
-import { InteractiveDemo } from "./mini-bar.client";
+import { MiniBar as MiniBarInteractive } from "@microcharts/react/mini-bar/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const MIX = [
@@ -100,16 +98,7 @@ export const entry: ChartEntry = {
   demo: MIX.map((d) => d.value),
   example: {
     title: "Regional mix",
-    code: `import { MiniBar } from "${PKG}/mini-bar";
-
-const regions = [
-  { label: "East", value: 940 },
-  { label: "West", value: 410 },
-  { label: "South", value: 620 },
-  { label: "North", value: 120 },
-];
-
-<MiniBar data={regions} title="Sales by region" />`,
+    code: `import { MiniBar } from "${PKG}/mini-bar";\n\n<MiniBar data={regions} title="Sales by region" />`,
   },
   sampleData: [
     {
@@ -200,6 +189,42 @@ export const playground: PlaygroundSpec = {
       .filter(Boolean)
       .join("\n");
   },
+  renderInteractive: (s, _data, ui) => {
+    const signed = s.positive as boolean;
+    const rows = signed ? SIGNED : MIX;
+    return (
+      <MiniBarInteractive
+        data={rows}
+        sort={s.sort as "none" | "desc" | "asc"}
+        highlight={(s.highlight as boolean) ? rows[0]!.label : undefined}
+        orientation={s.orientation as "horizontal" | "vertical"}
+        positive={signed ? "up" : undefined}
+        animate={ui.animate}
+        summary={false}
+        width={160}
+        height={s.orientation === "horizontal" ? 96 : 52}
+      />
+    );
+  },
+  codeInteractive: (s, _data, ui) => {
+    const signed = s.positive as boolean;
+    const varName = signed ? "signed" : "regions";
+    const target = signed ? "Mon" : "East";
+    return [
+      "<MiniBar",
+      `  data={${varName}}`,
+      s.sort !== "none" && `  sort="${s.sort}"`,
+      (s.highlight as boolean) && `  highlight="${target}"`,
+      s.orientation === "horizontal" && '  orientation="horizontal"',
+      signed && '  positive="up"',
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  },
+  interactiveHint:
+    "Hover a bar or rove with arrow keys — each announces its label, value, and rank.",
 };
 
 export const recipes: Recipe[] = [
@@ -326,7 +351,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,

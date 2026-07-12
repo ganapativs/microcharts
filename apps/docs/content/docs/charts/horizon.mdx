@@ -3,7 +3,7 @@ title: Horizon
 description: A word-sized horizon chart for React — a wide-range series folded into a slim band, dozens of rows glanceable at once.
 ---
 
-Horizon answers "what happened across this wide-range series — in a 12-pixel row?" The
+Horizon answers "what happened across this wide-range series — in a 14-pixel row?" The
 series is cut into bands and folded: layer opacity carries magnitude, so extremes stay
 visible at heights where a sparkline would flatten into noise.
 
@@ -15,13 +15,6 @@ fold upward the same way.
 <LiveDemo
   label="Horizon"
   sizeOf="horizon"
-  code={`import { Horizon } from "@microcharts/react/horizon";
-
-const cpuLoad = [
-2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
-];
-
-<Horizon data={cpuLoad} title="Cluster load" />`}
 >
   <Horizon
     data={[2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20]}
@@ -38,10 +31,6 @@ const cpuLoad = [
 
 <Playground chart="horizon" />
 
-## Interactive
-
-<InteractiveDemo slug="horizon" />
-
 ## When to use it
 
 - **Good for** — dense monitoring rows (dozens stacked), wide-range series in tight cells.
@@ -55,11 +44,8 @@ const cpuLoad = [
 
 <LiveDemo
   label="three folds"
+  dataOf="horizon"
   code={`// 3 folds only when the range genuinely spans them
-const cpuLoad = [
-  2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
-];
-
 <Horizon data={cpuLoad} folds={3} />`}
 >
   <Horizon

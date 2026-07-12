@@ -31,6 +31,29 @@ function dataVars(code: string): string[] {
     .filter((v) => !["true", "false", "null", "undefined"].includes(v));
 }
 
+/** Bare `attr={identifier}` bindings for ANY JSX prop — not just `data`.
+ *  Inline literals (`markValue={5}`), member access (`data={s.x}`), and
+ *  expressions (`format={(n) => …}`) never match; only a lone identifier does.
+ *  Also covers object-shorthand bindings (`data={{ plan, actual }}`) — each
+ *  shorthand property is itself a bare identifier reference. */
+function attrVars(code: string): string[] {
+  const single = [...code.matchAll(/\b[A-Za-z_$][\w$]*=\{([A-Za-z_$][\w$]*)\}/g)].map((m) => m[1]!);
+  const shorthand = [...code.matchAll(/\b[A-Za-z_$][\w$]*=\{\{([^{}]*)\}\}/g)].flatMap((m) =>
+    m[1]!
+      .split(",")
+      .map((part) => part.trim())
+      .filter((part) => /^[A-Za-z_$][\w$]*$/.test(part)),
+  );
+  return [...single, ...shorthand].filter(
+    (v) => !["true", "false", "null", "undefined"].includes(v),
+  );
+}
+
+/** `const|let|var <name>` declarations inside a snippet. */
+function declaredVars(code: string): string[] {
+  return [...code.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)/g)].map((m) => m[1]!);
+}
+
 const migrated = STABLE_CHARTS.filter((c) => c.sampleData?.length);
 
 describe("snippet sample-data (no phantom variables)", () => {
@@ -43,7 +66,9 @@ describe("snippet sample-data (no phantom variables)", () => {
 
   it.each(migrated)("$name — every sampleData def is actually used", (chart) => {
     const mod = CHART_MODULES[chart.slug]!;
-    const referenced = new Set(displayedSnippets(mod).flatMap(dataVars));
+    // Broader than `dataVars`: a sampleData entry may back any prop, not just
+    // `data` (e.g. `markValue`, `domain`, `benchmark`, `field`).
+    const referenced = new Set(displayedSnippets(mod).flatMap(attrVars));
     for (const s of chart.sampleData!) {
       expect(referenced, `sampleData "${s.name}" is dead weight`).toContain(s.name);
     }
@@ -60,4 +85,45 @@ describe("snippet sample-data (no phantom variables)", () => {
       console.info(`sample-data pending: ${pending.map((c) => c.slug).join(", ")}`);
     expect(Array.isArray(pending)).toBe(true);
   });
+});
+
+/**
+ * The hardened example.code gate (LAW: data literals live ONLY in
+ * `sampleData`; snippets reference the named variable). Unlike the checks
+ * above — scoped to migrated charts and to the `data` prop — these run
+ * against EVERY stable chart's `entry.example.code`, the one snippet always
+ * shown first on a chart's doc page, and cover every prop, not just `data`.
+ * Hard failures: no pending-tracker exemption.
+ */
+describe("entry.example.code sample-data contract (hard gate)", () => {
+  it.each(STABLE_CHARTS)(
+    "$name — every bound identifier in example.code has exactly one sampleData entry",
+    (chart) => {
+      const mod = CHART_MODULES[chart.slug]!;
+      const names = (chart.sampleData ?? []).map((s) => s.name);
+      const referenced = attrVars(mod.entry.example.code);
+      for (const v of referenced) {
+        const count = names.filter((n) => n === v).length;
+        expect(
+          count,
+          `example.code references {${v}} — expected exactly one sampleData entry, found ${count}`,
+        ).toBe(1);
+      }
+    },
+  );
+
+  it.each(STABLE_CHARTS)(
+    "$name — example.code never redeclares a sampleData name inline",
+    (chart) => {
+      const mod = CHART_MODULES[chart.slug]!;
+      const names = new Set((chart.sampleData ?? []).map((s) => s.name));
+      const declared = declaredVars(mod.entry.example.code);
+      for (const d of declared) {
+        expect(
+          names.has(d),
+          `example.code declares "const ${d}" but sampleData also defines "${d}" — the literal must live only in sampleData`,
+        ).toBe(false);
+      }
+    },
+  );
 });

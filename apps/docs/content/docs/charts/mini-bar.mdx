@@ -10,14 +10,6 @@ order carries meaning that ranking would destroy, so `sort` is explicit, never s
 <LiveDemo
   label="MiniBar"
   sizeOf="mini-bar"
-  code={`import { MiniBar } from "@microcharts/react/mini-bar";
-
-<MiniBar data={[
-  { label: "East", value: 940 },
-  { label: "West", value: 410 },
-  { label: "South", value: 620 },
-  { label: "North", value: 120 },
-]} title="Sales by region" />`}
 >
   <MiniBar
     data={[
@@ -39,10 +31,6 @@ order carries meaning that ranking would destroy, so `sort` is explicit, never s
 
 <Playground chart="mini-bar" />
 
-## Interactive
-
-<InteractiveDemo slug="mini-bar" />
-
 ## When to use it
 
 - **Good for** — per-row category mix in tables, small comparisons in KPI cards.
@@ -55,56 +43,38 @@ order carries meaning that ranking would destroy, so `sort` is explicit, never s
 ## Variants
 
 <LiveDemo
-  label="ranked"
+  label="ranked vs highlight"
+  dataOf="mini-bar"
   code={`// reordering changes what the chart SAYS, so it's a data prop
-<MiniBar
-  data={[
-    { label: "East", value: 940 },
-    { label: "West", value: 410 },
-    { label: "South", value: 620 },
-    { label: "North", value: 120 },
-  ]}
-  sort="desc"
-/>`}
+<MiniBar data={regions} sort="desc" />
+<MiniBar data={regions} highlight="South" />`}
 >
-  <MiniBar
-    data={[
-      { label: "East", value: 940 },
-      { label: "West", value: 410 },
-      { label: "South", value: 620 },
-      { label: "North", value: 120 },
-    ]}
-    sort="desc"
-    title="Ranked"
-    width={120}
-    height={36}
-  />
-</LiveDemo>
-
-<LiveDemo
-  label="highlight"
-  code={`<MiniBar
-  data={[
-    { label: "East", value: 940 },
-    { label: "West", value: 410 },
-    { label: "South", value: 620 },
-    { label: "North", value: 120 },
-  ]}
-  highlight="South"
-/>`}
->
-  <MiniBar
-    data={[
-      { label: "East", value: 940 },
-      { label: "West", value: 410 },
-      { label: "South", value: 620 },
-      { label: "North", value: 120 },
-    ]}
-    highlight="South"
-    title="This row's category"
-    width={120}
-    height={36}
-  />
+  <span className="inline-flex gap-6">
+    <MiniBar
+      data={[
+        { label: "East", value: 940 },
+        { label: "West", value: 410 },
+        { label: "South", value: 620 },
+        { label: "North", value: 120 },
+      ]}
+      sort="desc"
+      title="Ranked"
+      width={120}
+      height={36}
+    />
+    <MiniBar
+      data={[
+        { label: "East", value: 940 },
+        { label: "West", value: 410 },
+        { label: "South", value: 620 },
+        { label: "North", value: 120 },
+      ]}
+      highlight="South"
+      title="This row's category"
+      width={120}
+      height={36}
+    />
+  </span>
 </LiveDemo>
 
 <LiveDemo

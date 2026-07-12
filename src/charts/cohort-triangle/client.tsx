@@ -4,8 +4,16 @@
 // arrow keys. Follows the CANONICAL INTERACTIVE PATTERN (CLAUDE.md): composes the
 // static component (summary={false}, focus ring as its child), one pointer
 // listener on the wrapper, announcements via CohortTriangleStrings.
-import { useCallback, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import {
   EN_COHORT_TRIANGLE,
   type CohortTriangleStrings,
@@ -28,6 +36,12 @@ const ARROWS: Record<string, [number, number]> = {
 export interface InteractiveCohortTriangleProps extends CohortTriangleProps {
   /** Swappable announcement strings (defaults to EN). */
   strings?: CohortTriangleStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the cells reveal on when the
+   * chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function CohortTriangle(props: InteractiveCohortTriangleProps): React.ReactNode {
@@ -45,8 +59,12 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
     summary,
     className,
     style,
+    animate = false,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate, { selector: 'rect[data-mc-ink="cell"]' });
 
   const geo = useMemo(
     () => cohortTriangleGeometry(data, { cell, gap, labels, highlight }),
@@ -129,6 +147,7 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
 
   return (
     <span
+      ref={hostRef}
       className={className ? `mc-cohort-interactive ${className}` : "mc-cohort-interactive"}
       style={wrapStyle}
       tabIndex={0}

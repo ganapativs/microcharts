@@ -1,8 +1,6 @@
 import { GardenGrid } from "@microcharts/react/garden-grid";
-import { InteractiveDemo } from "./garden-grid.client";
+import { GardenGrid as GardenGridInteractive } from "@microcharts/react/garden-grid/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // 12 weeks of activity, some quiet
@@ -54,12 +52,15 @@ export const entry: ChartEntry = {
   demo: WEEKS,
   example: {
     title: "Activity",
-    code: `import { GardenGrid } from "${PKG}/garden-grid";
-
-const weeks = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26];
-
-<GardenGrid data={weeks} title="Activity" unit="weeks" />`,
+    code: `import { GardenGrid } from "${PKG}/garden-grid";\n\n<GardenGrid data={weeks} title="Activity" unit="weeks" />`,
   },
+  sampleData: [
+    {
+      name: "weeks",
+      code: `// 12 weeks of activity, some quiet
+const weeks = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -105,6 +106,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <GardenGridInteractive
+      data={data}
+      rows={s.rows as number}
+      steps={Number(s.steps) as 3 | 5}
+      empty={s.empty as "outline" | "blank"}
+      summary={false}
+      animate={ui.animate}
+      cell={12}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<GardenGrid",
+      "  data={weeks}",
+      s.rows !== 7 && `  rows={${s.rows}}`,
+      s.steps !== "5" && `  steps={${s.steps}}`,
+      s.empty !== "outline" && `  empty="${s.empty}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover a dot, or focus the grid and walk it in 2-D with the arrow keys — each cell announces its ordinal step (1–5), not a false-precise value, since dot area reads to a step not a number.",
 };
 
 export const recipes: Recipe[] = [
@@ -137,7 +163,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

@@ -12,15 +12,6 @@ reads; for exact numbers, use a `Sparkline` for latency and a `Delta` or `MiniBa
 <LiveDemo
   label="OrbitStatus"
   sizeOf="orbit-status"
-  code={`import { OrbitStatus } from "@microcharts/react/orbit-status";
-
-<OrbitStatus
-  latency={240}
-  rate={12}
-  latencyDomain={[0, 500]}
-  rateDomain={[0, 20]}
-  title="Payments API"
-/>`}
 >
   <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} title="Payments API" size={40} />
 </LiveDemo>
@@ -32,10 +23,6 @@ reads; for exact numbers, use a `Sparkline` for latency and a `Delta` or `MiniBa
 ## Try it
 
 <Playground chart="orbit-status" />
-
-## Interactive
-
-<InteractiveDemo slug="orbit-status" />
 
 ## Motion, and reduced motion
 

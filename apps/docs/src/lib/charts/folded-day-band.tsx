@@ -1,8 +1,6 @@
 import { FoldedDayBand } from "@microcharts/react/folded-day-band";
-import { InteractiveDemo } from "./folded-day-band.client";
+import { FoldedDayBand as FoldedDayBandInteractive } from "@microcharts/react/folded-day-band/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const curve = (h: number) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
@@ -59,22 +57,26 @@ export const entry: ChartEntry = {
   demo: [82],
   example: {
     title: "Typical day",
-    code: `import { FoldedDayBand } from "${PKG}/folded-day-band";
-
-const curve = (h: number) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
-const observations = Array.from({ length: 14 }, (_d, d) =>
+    code: `import { FoldedDayBand } from "${PKG}/folded-day-band";\n\n<FoldedDayBand data={observations} today={today} title="Typical day" />`,
+  },
+  sampleData: [
+    {
+      name: "observations",
+      code: `const observations = Array.from({ length: 14 }, (_d, d) =>
   Array.from({ length: 24 }, (_h, h) => ({
     t: d * 24 + h,
-    value: Math.round(curve(h) + Math.sin(d + h) * 8),
+    value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + Math.sin(d + h) * 8),
   })),
-).flat();
-const today = Array.from({ length: 24 }, (_h, h) => ({
+).flat();`,
+    },
+    {
+      name: "today",
+      code: `const today = Array.from({ length: 24 }, (_h, h) => ({
   t: h,
-  value: Math.round(curve(h) + 14),
-}));
-
-<FoldedDayBand data={observations} today={today} title="Typical day" />`,
-  },
+  value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + 14),
+}));`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -123,12 +125,45 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => (
+    <FoldedDayBandInteractive
+      data={DATA}
+      today={s.today ? TODAY : undefined}
+      bands={
+        s.single
+          ? [[25, 75]]
+          : [
+              [25, 75],
+              [5, 95],
+            ]
+      }
+      bins={s.bins as number}
+      animate={ui.animate}
+      summary={false}
+      width={320}
+      height={40}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<FoldedDayBand",
+      "  data={observations}",
+      s.today === true && "  today={today}",
+      s.single === true && "  bands={[[25, 75]]}",
+      s.bins !== 24 && `  bins={${s.bins}}`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or use ←/→ across the folded axis — each position announces the median and middle half.",
 };
 
 export const recipes: Recipe[] = [
   {
     label: "on-call cell",
-    code: `<FoldedDayBand data={load} width={80} height={20} />`,
+    code: `<FoldedDayBand data={observations} width={80} height={20} />`,
     node: <FoldedDayBand data={DATA} summary={false} width={80} height={20} />,
   },
   {
@@ -157,7 +192,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

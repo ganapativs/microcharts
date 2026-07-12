@@ -1,8 +1,6 @@
 import { BurnChart } from "@microcharts/react/burn-chart";
-import { InteractiveDemo } from "./burn-chart.client";
+import { BurnChart as BurnChartInteractive } from "@microcharts/react/burn-chart/interactive";
 import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 // an 11-day sprint burning down; 6 days in, slightly behind → projected 2 days late
@@ -60,6 +58,17 @@ export const entry: ChartEntry = {
     title: "Sprint 12",
     code: `import { BurnChart } from "${PKG}/burn-chart";\n\n<BurnChart data={{ plan, actual }} title="Sprint 12" />`,
   },
+  sampleData: [
+    {
+      name: "plan",
+      code: `// an 11-day sprint burning down; 6 days in, slightly behind → projected 2 days late
+const plan = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];`,
+    },
+    {
+      name: "actual",
+      code: `const actual = [40, 35, 31, 27, 24, 21];`,
+    },
+  ],
 };
 
 export function Preview() {
@@ -108,6 +117,37 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, _data, ui) => {
+    const up = s.mode === "up";
+    const plan = up ? PLAN.map((v) => 40 - v) : PLAN;
+    const actual = up ? ACTUAL.map((v) => 40 - v) : ACTUAL;
+    return (
+      <BurnChartInteractive
+        data={{ plan, actual }}
+        mode={s.mode as "down" | "up"}
+        projection={s.projection as boolean}
+        label={s.label as "gap" | "none"}
+        animate={ui.animate}
+        summary={false}
+        width={280}
+        height={30}
+      />
+    );
+  },
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<BurnChart",
+      "  data={{ plan, actual }}",
+      s.mode !== "down" && `  mode="${s.mode}"`,
+      s.projection === false && "  projection={false}",
+      s.label !== "gap" && `  label="${s.label}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint:
+    "Hover or arrow across the days — history announces actual vs plan, the dotted region announces the projection.",
 };
 
 export const recipes: Recipe[] = [
@@ -163,7 +203,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   Mark,

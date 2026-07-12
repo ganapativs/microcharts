@@ -2,8 +2,9 @@
 // Interactive <CalendarStrip> (plan/22 #26). Hover a day or walk the grid in
 // 2-D (←/→ day, ↑/↓ week — ActivityGrid parity). Announces the real calendar
 // day: "Tuesday, June 24: 12." Composes the static component (canon).
-import { useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
 import { cellMetrics } from "../../shared/cell.js";
 import { calendarStripGeometry } from "./geometry.js";
@@ -25,6 +26,12 @@ export interface InteractiveCalendarStripProps extends CalendarStripProps {
   strings?: CalendarStrings;
   /** Announced day label (defaults to weekday + month + day, UTC). */
   dateFormat?: DateFormat;
+  /**
+   * Opt-in entrance motion (default `false`): cells fade in on first
+   * client-side mount. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
 }
 
 export function CalendarStrip(props: InteractiveCalendarStripProps): React.ReactNode {
@@ -44,10 +51,14 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
     dateFormat,
     title,
     summary,
+    animate = false,
     className,
     style,
     ...rest
   } = props;
+
+  const hostRef = useRef<HTMLSpanElement>(null);
+  useEntrance(hostRef, "reveal", animate);
 
   const endDay = useMemo(() => end ?? new Date(), [end]);
   const geo = useMemo(
@@ -146,6 +157,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
 
   return (
     <span
+      ref={hostRef}
       className={className ? `mc-calendar-live ${className}` : "mc-calendar-live"}
       style={wrapStyle}
       tabIndex={0}

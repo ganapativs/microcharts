@@ -1,8 +1,6 @@
 import { HeatStrip } from "@microcharts/react/heat-strip";
-import { InteractiveDemo } from "./heat-strip.client";
+import { HeatStrip as HeatStripInteractive } from "@microcharts/react/heat-strip/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
-
-export { InteractiveDemo };
 
 const PKG = "@microcharts/react";
 const LOAD = Array.from({ length: 30 }, (_, i) => Math.round(Math.sin(i / 4) * 40 + 50));
@@ -63,11 +61,7 @@ export const entry: ChartEntry = {
   demo: LOAD,
   example: {
     title: "Load per hour",
-    code: `import { HeatStrip } from "${PKG}/heat-strip";
-
-const hourlyLoad = [12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35];
-
-<HeatStrip data={hourlyLoad} domain={[0, 100]} title="Load per hour" />`,
+    code: `import { HeatStrip } from "${PKG}/heat-strip";\n\n<HeatStrip data={hourlyLoad} domain={[0, 100]} title="Load per hour" />`,
   },
   sampleData: [
     {
@@ -126,6 +120,31 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
+  renderInteractive: (s, data, ui) => (
+    <HeatStripInteractive
+      data={data}
+      domain={D}
+      steps={s.steps as number}
+      shape={s.shape as "square" | "round" | "dot"}
+      summary={false}
+      animate={ui.animate}
+      width={260}
+      height={30}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<HeatStrip",
+      "  data={hourlyLoad}",
+      "  domain={[0, 100]}",
+      s.steps !== 5 && `  steps={${s.steps}}`,
+      s.shape !== "square" && `  shape="${s.shape}"`,
+      ui.animate && "  animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  interactiveHint: "Hover or arrow through the cells — each announces its position and value.",
 };
 
 export const recipes: Recipe[] = [
@@ -244,7 +263,6 @@ export default {
   entry,
   Preview,
   showcase,
-  InteractiveDemo,
   playground,
   recipes,
   contexts,
