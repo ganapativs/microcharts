@@ -103,14 +103,6 @@ export function LivingCatalog({ total }: { total: number }) {
       onFocusCapture={hold}
       onBlurCapture={release}
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-x-6 -inset-y-8 -z-10 rounded-[28px]"
-        style={{
-          background:
-            "radial-gradient(44% 42% at 100% 2%, color-mix(in oklab, var(--accent) 15%, transparent), transparent 70%), radial-gradient(42% 40% at 0% 100%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 72%)",
-        }}
-      />
       <div className="relative">
         <div aria-hidden className="pointer-events-none absolute -inset-2.5 -z-10 sm:-inset-3">
           <span className="hx-cross-line hx-cross-v" />
