@@ -5,33 +5,9 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CHART_MODULES, getChart } from "@/lib/charts/registry";
 
-/**
- * The hero's living instrument cluster. A borderless set of real, shipped chart
- * components floating on the hero's grid-paper that (a) shuffles which types it
- * shows on every reload and (b) cross-fades ONE tile at a time to a fresh chart
- * on a calm interval — alive without ever jittering.
- *
- * Each tile renders the chart's canonical `Preview` — the SAME component the
- * gallery shows — so every mark is a real, correctly-composed chart (never the
- * generic word-glyph fed random data, which rendered some types wrong). Nothing
- * is clipped: the stage centers the preview with room to spare and scales wide
- * SVGs down to fit.
- *
- * Craft notes:
- *  - No card chrome: tiles are borderless at rest, a faint accent frost on hover.
- *    A soft accent glow sits behind the whole cluster so it reads as a hero.
- *  - Fixed tile boxes → zero layout shift. Motion is one tile's opacity+scale+blur
- *    (GPU only), never per-tile loops out of phase.
- *  - Deterministic first paint (server + first client render agree), then the
- *    shuffle + interval start after mount — no hydration mismatch, stable crawl.
- *  - Swapping PAUSES whenever the cluster is hovered or holds keyboard focus, so
- *    a link never retargets under the pointer, and while the tab is hidden.
- *  - Every tile is a real, labelled link to its chart page (crawlable anchor +
- *    aria-label), not aria-hidden decoration.
- *  - Reduced motion → a still, shuffled board with no interval and no heartbeat.
- */
+/** Hero chart cluster: gallery Previews, shuffle on load, one-tile crossfade. */
 
-/** Photogenic types whose gallery Preview reads well at cluster scale. */
+/** Types whose gallery Preview reads well at cluster scale. */
 const POOL = [
   "sparkline",
   "sparkbar",
@@ -127,33 +103,30 @@ export function LivingCatalog({ total }: { total: number }) {
       onFocusCapture={hold}
       onBlurCapture={release}
     >
-      {/* diagonal corner blooms — accent spreads from the top-right and
-          bottom-left so the cluster has a directional, lit-instrument feel */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-x-6 -inset-y-8 -z-10"
+        className="pointer-events-none absolute -inset-x-6 -inset-y-8 -z-10 rounded-[28px]"
         style={{
           background:
             "radial-gradient(44% 42% at 100% 2%, color-mix(in oklab, var(--accent) 15%, transparent), transparent 70%), radial-gradient(42% 40% at 0% 100%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 72%)",
         }}
       />
-      {/* framed instrument grid around the tiles: rounded border, one vertical
-          axis, three horizontal rules (one under each chart row), nodes at the
-          row gaps, and a signal travelling down the axis */}
       <div className="relative">
-        <div
-          aria-hidden
-          className="hx-frame pointer-events-none absolute -inset-2.5 -z-10 sm:-inset-3"
-        >
+        <div aria-hidden className="pointer-events-none absolute -inset-2.5 -z-10 sm:-inset-3">
           <span className="hx-cross-line hx-cross-v" />
-          <span className="hx-cross-line hx-cross-h" style={{ top: "33.33%" }} />
-          <span className="hx-cross-line hx-cross-h" style={{ top: "66.66%" }} />
-          <span className="hx-cross-line hx-cross-h" style={{ top: "99%" }} />
-          <span className="hx-cross-node" style={{ top: "33.33%" }} />
           <span
-            className={live ? "hx-cross-node hx-cross-node--hub" : "hx-cross-node"}
-            style={{ top: "50%" }}
+            className="hx-cross-line hx-cross-h"
+            style={{ top: "33.33%", animationDelay: "0s" }}
           />
+          <span
+            className="hx-cross-line hx-cross-h"
+            style={{ top: "66.66%", animationDelay: "-2.5s" }}
+          />
+          <span
+            className="hx-cross-line hx-cross-h"
+            style={{ top: "99%", animationDelay: "-5s" }}
+          />
+          <span className="hx-cross-node" style={{ top: "33.33%" }} />
           <span className="hx-cross-node" style={{ top: "66.66%" }} />
         </div>
 
@@ -186,8 +159,6 @@ export function LivingCatalog({ total }: { total: number }) {
         </ul>
       </div>
 
-      {/* centered anchor for the cluster — the "live" pulse doubles as the
-          gallery invitation, so the whole catalog is one click from the fold */}
       <div className="mt-5 flex justify-center">
         <Link
           href="/gallery"
