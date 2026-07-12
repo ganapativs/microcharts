@@ -1,4 +1,4 @@
-import { test } from "@playwright/test";
+import { test } from "./_fixtures";
 import { argosScreenshot } from "@argos-ci/playwright";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";

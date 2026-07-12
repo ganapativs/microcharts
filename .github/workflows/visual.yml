@@ -3,14 +3,34 @@ name: Visual
 # Runs on PRs + every main push. Argos stores + diffs baselines in the cloud
 # (needs the ARGOS_TOKEN secret). Main pushes refresh the reference build so PRs
 # always diff against current main, not a frozen manual dispatch. Manual kept.
+#
+# Path-filtered to what can actually change a rendered chart (source, styles,
+# the specs, the build/runner config) so docs-only or tooling-only PRs don't
+# spend Argos screenshots — the free plan caps at 5,000/month. Combined with the
+# single-project light+dark capture (tests/visual/_fixtures.ts), a build uploads
+# 104 screenshots, not 208.
 on:
   push:
     branches: [main]
+    paths: &visual_paths
+      - "src/**"
+      - "styles.css"
+      - "tests/visual/**"
+      - "playwright.config.ts"
+      - "tsdown.config.ts"
+      - ".github/workflows/visual.yml"
   pull_request:
+    paths: *visual_paths
   workflow_dispatch:
 
 permissions:
   contents: read
+
+# A newer push to the same ref cancels an in-flight visual run so rapid
+# iteration doesn't stack full builds against the screenshot quota.
+concurrency:
+  group: visual-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   visual:

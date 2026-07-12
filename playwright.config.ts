@@ -26,8 +26,10 @@ export default defineConfig({
     },
   },
   projects: [
-    { name: "light", use: { colorScheme: "light" } },
-    { name: "dark", use: { colorScheme: "dark" } },
+    // One Chromium project. Each spec captures light + dark in a single
+    // screenshot (see tests/visual/_fixtures.ts), so there is no separate dark
+    // project — that halves Argos uploads without losing theme coverage.
+    { name: "chromium", use: { colorScheme: "light" } },
     // Cross-browser smoke (render + console-error sweep, no Argos baselines):
     // opt-in via CROSS_BROWSER=1 — Safari's SVG/currentColor/sub-pixel quirks
     // and Firefox's are the targets; Argos pixel review stays Chromium-only.
