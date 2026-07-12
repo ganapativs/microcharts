@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Progress> (plan/22 #4). `live` re-announces through a polite
+// Interactive <Progress>. `live` re-announces through a polite
 // region, throttled to whole-percent changes (no spam while a value streams).
 // Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
 // mark). Composes the static component (canon).

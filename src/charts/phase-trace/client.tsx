@@ -1,5 +1,5 @@
 "use client";
-// Interactive <PhaseTrace> (plan/25 §17). Hover snaps to the nearest DATA point
+// Interactive <PhaseTrace>. Hover snaps to the nearest DATA point
 // (which carries a definite time index — spatial interpolation would lie at
 // crossings); ←/→ step time. Composes the static component (canon).
 import {

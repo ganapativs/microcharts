@@ -18,8 +18,8 @@ const RUBRIC = [
   { label: "Style", score: 0.41, weight: 1 },
 ];
 
-describe("<RubricStrip> (plan/25 §6, plan/17 F13)", () => {
-  it("renders a bar per criterion; docs-as-tests summary names extremes", () => {
+describe("<RubricStrip>", () => {
+  it("renders a bar per criterion summary names extremes", () => {
     const { container } = draw(<RubricStrip data={RUBRIC} width={120} height={32} />);
     // 4 tracks + 4 bars
     expect(container.querySelectorAll("rect").length).toBe(8);

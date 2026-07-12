@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Funnel> (plan/22 #19). One pointer listener; stage by x-band.
+// Interactive <Funnel>. One pointer listener; stage by x-band.
 // ←/→ rove stages ("Checkout: 2,730 — 22% of visitors."). Composes the static.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";

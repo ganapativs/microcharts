@@ -10,8 +10,7 @@ const MIX = [
   { label: "Edge", value: 30 },
   { label: "Arc", value: 20 },
 ];
-// Same 1,000-session total as MIX, so "Desktop" vs "Mobile" reads as one
-// real comparison — reused across the four homes below.
+// Same total as MIX for a fair Desktop vs Mobile comparison.
 const MOBILE = [
   { label: "Safari", value: 540 },
   { label: "Chrome", value: 380 },
@@ -166,16 +165,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — MicroDonut always doing the one thing it's for: a mix icon
-   riding beside a printed number. Desktop/Mobile share MIX's 1,000-session
-   total, so the two shares are directly comparable, never a generic
-   "signups"/"weekly active" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Chrome carried 62% of this week&rsquo;s sessions{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <MicroDonut data={MIX} decorative style={{ width: 16, height: 16 }} />
         </span>{" "}
         — Safari, Firefox, Edge, and Arc split the rest.

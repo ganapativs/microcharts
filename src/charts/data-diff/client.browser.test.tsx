@@ -8,7 +8,7 @@ const DIFF = [
   { key: "items", added: 40, removed: 20 },
 ];
 
-describe("interactive <DataDiff> (plan/23 #16)", () => {
+describe("interactive <DataDiff>", () => {
   it("arrow keys step rows; each announces added / removed / net", async () => {
     const screen = await render(<DataDiff data={DIFF} width={120} height={40} title="Diff" />);
     const wrap = screen.container.querySelector(".mc-data-diff-live") as HTMLElement;

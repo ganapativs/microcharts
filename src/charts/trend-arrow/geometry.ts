@@ -1,4 +1,4 @@
-// TrendArrow geometry — pure, React-free (plan/22 #1, S4). Direction glyphs as
+// TrendArrow geometry — pure, React-free. Direction glyphs as
 // precomputed unit polygons scaled into the box, 2-dp. The glyph never scales
 // with magnitude (an arrow twice as long is a lie at this precision); only its
 // orientation encodes. Flat is one shared shape across glyph families — "no
@@ -63,7 +63,7 @@ export interface TrendArrowGeometry {
   labelX: number;
   /** Baseline y, centered on the glyph midline, clamped by font ascent. */
   labelY: number;
-  /** Font size for the value text, in viewBox units (plan/18). */
+  /** Font size for the value text, in viewBox units. */
   fontSize: number;
 }
 

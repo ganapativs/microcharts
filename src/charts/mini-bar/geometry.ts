@@ -1,5 +1,5 @@
-// MiniBar geometry — pure, React-free (plan/22 #6, S2). Bar length from a
-// zero-anchored domain (non-negotiable: length lies unless anchored). Null
+// MiniBar geometry — pure, React-free. Bar length from a
+// zero-anchored domain (: length lies unless anchored). Null
 // values keep their slot (gap — alignment survives). Coords 2-dp.
 import { clamp, niceDomain, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";

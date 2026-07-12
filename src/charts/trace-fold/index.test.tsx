@@ -22,8 +22,8 @@ const TRACE = [
   { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 },
 ];
 
-describe("<TraceFold> (plan/25 §18, plan/17 F17)", () => {
-  it("renders a rect per span; docs-as-tests summary names the critical path", () => {
+describe("<TraceFold>", () => {
+  it("renders a rect per span summary names the critical path", () => {
     const { container } = draw(<TraceFold data={TRACE} width={200} height={40} />);
     expect(container.querySelectorAll("rect").length).toBe(9);
     const geo = traceFoldGeometry({ data: TRACE, width: 200, height: 40, rowGap: 1.2 });

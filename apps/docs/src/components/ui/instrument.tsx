@@ -1,10 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-/**
- * The instrument card — the site's repeating frame for a live chart.
- * Hairline panel, mono label, precise meta. Consistent premium rhythm.
- */
+/** Live-chart frame: hairline panel, mono label, meta. */
 export function Instrument({
   label,
   meta,

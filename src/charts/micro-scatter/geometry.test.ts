@@ -4,7 +4,7 @@ import { microScatterGeometry, relationshipTier } from "./geometry.js";
 
 const base = { width: 40, height: 24, trend: false };
 
-describe("microScatterGeometry (plan/22 #29)", () => {
+describe("microScatterGeometry", () => {
   it("perfect correlation → r = 1; perfect inverse → r = -1", () => {
     const pos = microScatterGeometry({
       ...base,

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <DotPlot> (plan/22 #10). One pointer listener; row by y-band
+// Interactive <DotPlot>. One pointer listener; row by y-band
 // lookup (rows are the axis here) — ↑/↓ rove rows, announcing each category
 // with its rank ("Ada: 88 — 2nd of 5."). Composes the static component.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

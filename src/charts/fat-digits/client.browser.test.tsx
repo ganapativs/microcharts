@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { FatDigits } from "./client.js";
 
-describe("interactive <FatDigits> (plan/24 #4)", () => {
+describe("interactive <FatDigits>", () => {
   it("announces the value + tier on change; quiet on mount", async () => {
     const screen = await render(<FatDigits value={200} domain={[0, 1000]} />);
     const live = document.querySelector('[aria-live="polite"]')!;

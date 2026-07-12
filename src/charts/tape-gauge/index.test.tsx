@@ -15,8 +15,8 @@ const ZONES = [
   { from: 150, to: 200, tone: "neg" as const },
 ];
 
-describe("<TapeGauge> (plan/25 §19, plan/17 F1)", () => {
-  it("renders zones + ticks + pointer readout; docs-as-tests summary", () => {
+describe("<TapeGauge>", () => {
+  it("renders zones + ticks + pointer readout summary", () => {
     const { container } = draw(
       <TapeGauge value={142} rate={1} zones={ZONES} span={25} height={64} />,
     );

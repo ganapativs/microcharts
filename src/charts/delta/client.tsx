@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Delta> (plan/04 §4, plan/08 §5). The static glyph+value plus a
+// Interactive <Delta>. The static glyph+value plus a
 // `live` mode: when the value changes it re-announces the new figure through a
 // polite region (for updating KPI cards) and gives a one-shot pulse. Motion is
 // gated on reduced-motion in CSS; the announcement always fires.

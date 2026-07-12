@@ -1,5 +1,5 @@
 "use client";
-// Interactive <CoverageStrip> (plan/23 #1). One pointer listener on the wrapper
+// Interactive <CoverageStrip>. One pointer listener on the wrapper
 // + pure grid lookup (x → slot by division) — never a node per cell. ←/→ steps
 // slots, Home/End jump. The live region says exactly what each slot is: a
 // measured value, or "no measurement" (the honest distinction). Composes the

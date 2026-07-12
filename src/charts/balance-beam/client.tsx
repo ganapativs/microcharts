@@ -1,5 +1,5 @@
 "use client";
-// Interactive <BalanceBeam> (plan/24 #8). Hover a side (nearest-half) or arrow
+// Interactive <BalanceBeam>. Hover a side (nearest-half) or arrow
 // Left/Right to focus it → readout shows its label + value; the beam eases to a
 // new tilt on data change (CSS geometry transition, reduced-motion-gated);
 // announces when the heavier side flips. Composes the static component.

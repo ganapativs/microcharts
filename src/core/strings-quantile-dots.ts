@@ -1,7 +1,7 @@
 // QuantileDots summary templates (quantile-dots) — its OWN module (NOT shared
 // with strings-freq/icon-array: a shared chunk taxes every consumer, and
 // icon-array sat at its size budget). Frequency framing ("N in count") reads
-// truer than a bare percentage (plan/16 rule #3). English lives only in core
+// truer than a bare percentage. English lives only in core
 // string modules (canon). Aggregate: core/strings.ts `EN`.
 import type { SummaryStrings } from "./summary.js";
 

@@ -11,7 +11,7 @@ const SAMPLE: NetFlowPeriod[] = [
   { in: 7, out: 5 },
 ];
 
-describe("interactive <NetFlow> (plan/23 #6)", () => {
+describe("interactive <NetFlow>", () => {
   it("arrow keys step periods; the live region gives in, out, and signed net", async () => {
     const screen = await render(<NetFlow data={SAMPLE} title="Cash flow" />);
     const wrap = screen.container.querySelector(".mc-net-flow-live") as HTMLElement;

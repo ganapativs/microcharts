@@ -7,7 +7,7 @@ const base = { width: 80, height: 20 };
 const DATA = [42, 55, 70, 88, 96, 120, 150, 182, 214];
 const CAP = 100;
 
-describe("queueDepthGeometry (plan/26 §5)", () => {
+describe("queueDepthGeometry", () => {
   it("draws a zero-anchored area, a top edge, and the capacity line", () => {
     const geo = queueDepthGeometry({ ...base, data: DATA, capacity: CAP })!;
     expect(geo.area).toMatch(/^M/);

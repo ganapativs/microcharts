@@ -148,15 +148,12 @@ const TRIALS: Row = [
   { label: "Quartz", value: 1 },
 ];
 
-/* The four homes — SproutRow always doing the one thing it's for: reading each
-   item's maturity at a glance. Every host is an account/portfolio surface, never
-   a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Account health this week{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <SproutRow data={ACCTS} summary={false} height={18} step={13} />
         </span>{" "}
         — two at bloom, one still seed.

@@ -1,4 +1,4 @@
-// <CitySkyline> — how groups compare on size, and how activated each is (plan/24
+// <CitySkyline> — how groups compare on size, and how activated each is (
 // #14, structured, flagship). Building HEIGHT (zero-anchored, high precision) is
 // the primary read; the lit-window FRACTION is a secondary low-precision channel
 // ("mostly lit / half lit / dark", not a number). No roofline/antenna/width
@@ -166,7 +166,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
       {labels
         ? geo.buildings.map((b) => {
             const t = data[b.index]!.label;
-            // drop a label that would collide with the neighbour cell (plan/18 §4)
+            // drop a label that would collide with the neighbour cell
             if (t.length * 0.62 * fontSize > bw + gap - 1) return null;
             return (
               <text

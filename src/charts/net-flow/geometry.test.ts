@@ -13,7 +13,7 @@ const SAMPLE: NetFlowPeriod[] = [
   { in: 7, out: 5 },
 ];
 
-describe("netFlowGeometry (plan/23 #6)", () => {
+describe("netFlowGeometry", () => {
   it("mirrors in above / out below one shared zero baseline", () => {
     const geo = netFlowGeometry({ ...base, data: SAMPLE })!;
     expect(geo.zeroY).toBe(10);

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <StationGlyph> (plan/25 §20). The glyph packs several fields into
+// Interactive <StationGlyph>. The glyph packs several fields into
 // one character; the interactive entry roves them with ←/→ so a screen-reader
 // user can step field-by-field (station, wind, sky, temp, dew, pressure) instead
 // of hearing one long string. Focus reads the whole observation; Home returns to

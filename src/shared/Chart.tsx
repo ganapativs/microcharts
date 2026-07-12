@@ -1,4 +1,4 @@
-// Root <svg> wrapper for every chart (plan/03 §3, plan/08). Hook-free and
+// Root <svg> wrapper for every chart. Hook-free and
 // listener-free → RSC-safe, SSR-static, zero client JS. Owns sizing and the
 // accessible naming (deterministic by default; <title>/<desc>+aria-labelledby
 // when an explicit stable `id` is supplied — see shared/a11y.ts).
@@ -6,13 +6,13 @@ import type { CSSProperties, ReactNode } from "react";
 import { accessibleNaming } from "./a11y.js";
 
 export interface ChartProps {
-  /** viewBox width/height in integer units (plan/03 §3). */
+  /** viewBox width/height in integer units. */
   width: number;
   height: number;
   /** Short accessible name. */
   title?: string | undefined;
   /**
-   * Accessible description — usually `describeSeries(...)` (plan/08 §2).
+   * Accessible description — usually `describeSeries(.)`.
    * `false` = decorative (T0): the chart is hidden from assistive tech.
    */
   summary?: string | false | undefined;

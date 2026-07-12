@@ -12,8 +12,8 @@ const fmt = makeFormatter(undefined, undefined);
 
 afterEach(() => vi.restoreAllMocks());
 
-describe("<WindBarb> (plan/25 §8, plan/17 F3)", () => {
-  it("renders a shaft; docs-as-tests summary names compass + degrees", () => {
+describe("<WindBarb>", () => {
+  it("renders a shaft summary names compass + degrees", () => {
     const { container } = draw(<WindBarb direction={225} magnitude={32} />);
     expect(container.querySelector('line[data-mc-ink="data"]')).not.toBeNull();
     expect(windBarbSummary(225, 32, 10, EN_WIND_BARB, fmt)).toBe("Southwest (225°), magnitude 32.");

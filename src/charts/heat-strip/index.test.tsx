@@ -7,7 +7,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<HeatStrip> (plan/22 #9, S1)", () => {
+describe("<HeatStrip>", () => {
   it("summary reuses describeSeries verbatim — the docs' real string", () => {
     const data = [3, 5, 4, 9, 7, 12, 15, 18, 17];
     const { container } = draw(<HeatStrip data={data} />);

@@ -1,5 +1,5 @@
 // <ErrorBudget> — are we burning the error budget too fast to survive the
-// window? (plan/23 #9). Budget remaining vs the steady-burn diagonal (the pace
+// window? Budget remaining vs the steady-burn diagonal (the pace
 // that exactly spends the window), with faster burn-rate reference lines (the
 // Google-SRE 1×/6×/14.4× CONVENTION — policy, not physics, so configurable and
 // rendered as faint region context, never data ink). Static, hook-free, RSC-safe.

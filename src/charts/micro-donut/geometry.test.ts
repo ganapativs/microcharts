@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { microDonutGeometry } from "./geometry.js";
 
-describe("microDonutGeometry (plan/22 #18)", () => {
+describe("microDonutGeometry", () => {
   it("wedges start at 12 o'clock, sweep clockwise, separated by gaps", () => {
     const geo = microDonutGeometry({ size: 24, shares: [0.5, 0.5], weight: 5 });
     expect(geo.wedges.length).toBe(2);

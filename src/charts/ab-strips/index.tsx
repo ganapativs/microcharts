@@ -1,4 +1,4 @@
-// <ABStrips> — did B beat A, by more than the overlap? (plan/23 #13). Two graded
+// <ABStrips> — did B beat A, by more than the overlap? Two graded
 // quantile strips on ONE shared scale: p5–95 outer, p25–75 inner, a median dot,
 // row A muted, row B accent. The visible overlap of the middle halves is the
 // answer, and the overlap number is always in the summary. Never a bare mean

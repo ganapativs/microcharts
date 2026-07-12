@@ -4,7 +4,7 @@ import { PercentileTrace } from "./client.js";
 
 const SAMPLE = [42, 48, 55, 61, 68, 74, 79, 81];
 
-describe("interactive <PercentileTrace> (plan/26 §8)", () => {
+describe("interactive <PercentileTrace>", () => {
   it("arrow keys step readings; announces the percentile at each", async () => {
     const screen = await render(<PercentileTrace data={SAMPLE} unit="week" title="Cohort" />);
     const wrap = screen.container.querySelector(".mc-percentile-trace-live") as HTMLElement;

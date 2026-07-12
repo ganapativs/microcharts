@@ -21,8 +21,8 @@ const SENT = [
   { token: " BC", confidence: 0.55 },
 ];
 
-describe("<TokenConfidence> (plan/25 §7, plan/17 F12)", () => {
-  it("renders one span per flagged token; confident tokens are bare text; docs-as-tests summary", () => {
+describe("<TokenConfidence>", () => {
+  it("renders one span per flagged token; confident tokens are bare text summary", () => {
     const { container } = draw(<TokenConfidence data={SENT} />);
     const host = container.querySelector(".mc-token-confidence")!;
     // SSR hot path: no per-token wrapper — only the 4 flagged (unsure/guessing)

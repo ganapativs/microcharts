@@ -10,7 +10,7 @@ const SLEEP = [
   { t: 90, state: "Awake" },
 ];
 
-describe("interactive <Hypnogram> (plan/25 §2)", () => {
+describe("interactive <Hypnogram>", () => {
   it("←/→ rove runs; each announces its state + span", async () => {
     const screen = await render(<Hypnogram data={SLEEP} domain={[0, 110]} title="Sleep" />);
     const wrap = screen.container.querySelector(".mc-hypno-live") as HTMLElement;

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <TimeInRange> (plan/25 §1). One pointer listener; zone by x/y
+// Interactive <TimeInRange>. One pointer listener; zone by x/y
 // lookup. ←/→ (or ↑/↓ vertical) rove zones, each announcing "{zone}: {pct}".
 // Composes the static component (canon) — overlays ride as children.
 import {

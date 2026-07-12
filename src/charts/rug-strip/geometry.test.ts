@@ -4,7 +4,7 @@ import { rugGeometry } from "./geometry.js";
 
 const base = { length: 60, thickness: 10, orientation: "horizontal" as const };
 
-describe("rugGeometry (plan/22 #5)", () => {
+describe("rugGeometry", () => {
   it("one tick per observation, sorted, positions inside the strip", () => {
     const geo = rugGeometry({ ...base, values: [9.7, 3.1, 5.2] });
     expect(geo.ticks.map((t) => t.value)).toEqual([3.1, 5.2, 9.7]);

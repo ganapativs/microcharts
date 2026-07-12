@@ -6,7 +6,7 @@ const base = { width: 80, height: 20 };
 // a right-skewed wait-time sample (minutes)
 const WAITS = Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 40) * 0.4 + (i % 7) * 1.5));
 
-describe("quantileDotsGeometry (plan/23 #12)", () => {
+describe("quantileDotsGeometry", () => {
   it("lays out `count` dots (default 20) stacked bottom-up", () => {
     const geo = quantileDotsGeometry({ ...base, data: WAITS })!;
     expect(geo.dots).toHaveLength(20);

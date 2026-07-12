@@ -1,8 +1,8 @@
-// <Sparkline> — the load-bearing default (plan/05 §2, the S1 trend view).
+// <Sparkline> — the load-bearing default.
 // Static, hook-free, listener-free → RSC-safe, SSR-static, zero client JS
-// (plan/03). Line / smooth / step, optional area fill, normal-range band,
+// Line / smooth / step, optional area fill, normal-range band,
 // endpoint / min-max dots, direct endpoint label, and an annotation-child
-// layer. Interactivity lives in the separate `./interactive` entry (plan/04 §4).
+// layer. Interactivity lives in the separate `./interactive` entry.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { linePath, smoothPath, stepPath, areaPath, type Curve } from "../../core/path.js";
@@ -21,25 +21,24 @@ const CURVE: Record<Curve, (p: readonly (readonly [number, number] | null)[]) =>
 };
 
 export interface SparklineProps {
-  /** The series. `null`/`NaN`/`±Infinity` are gaps (plan/09). `data` alone renders. */
+  /** The series. `null`/`NaN`/`±Infinity` are gaps. `data` alone renders. */
   data: readonly Value[];
   /** Fixed y-domain `[min, max]`; auto-fit to the data when omitted. */
   domain?: readonly [number, number] | undefined;
-  /** viewBox width/height in integer units (plan/03 §3). */
+  /** viewBox width/height in integer units. */
   width?: number | undefined;
   height?: number | undefined;
-  /** Line shape (plan/04). */
+  /** Line shape. */
   curve?: Curve | undefined;
-  /** Fill the area under the line; switches to a zero-anchored domain (plan/05). */
+  /** Fill the area under the line; switches to a zero-anchored domain. */
   fill?: boolean | undefined;
-  /** Constant normal-range `[lo, hi]` in data units, drawn lowest z (plan/05). */
+  /** Constant normal-range `[lo, hi]` in data units, drawn lowest z. */
   band?: readonly [number, number] | undefined;
   /** Endpoint dot (`"auto"`, default), `+` min/max dots (`"minmax"`), or `"none"`. */
   dots?: "auto" | "minmax" | "none" | undefined;
-  /** Direct value labels (plan/18 anchored, no measurement): the endpoint
-   *  (`"last"`) or the extremes (`"minmax"`). */
+  /** Direct value labels (no measurement): the endpoint (`"last"`) or the extremes (`"minmax"`). */
   label?: "none" | "last" | "minmax" | undefined;
-  /** Series color override (any CSS color); `prop > CSS var > preset` (plan/04). */
+  /** Series color override (any CSS color); `prop > CSS var > preset`. */
   color?: string | undefined;
   /** Accessible name. A string overrides the auto-summary; `false` = decorative. */
   title?: string | undefined;
@@ -55,7 +54,7 @@ export interface SparklineProps {
   id?: string | undefined;
   className?: string | undefined;
   style?: CSSProperties | undefined;
-  /** Annotation layer: `<Threshold>`, `<Marker>`, `<TargetZone>` … (plan/04 §8). */
+  /** Annotation layer: `<Threshold>`, `<Marker>`, `<TargetZone>` …. */
   children?: ReactNode;
 }
 
@@ -86,12 +85,12 @@ export function Sparkline(props: SparklineProps): ReactNode {
 
   // The endpoint label reserves a deterministic right gutter BEFORE geometry,
   // so the text always lands inside the viewBox — nothing may paint outside
-  // the chart's box (containment rule, CLAUDE.md). No DOM measurement.
+  // the chart's box (containment rule). No DOM measurement.
   const last = lastFinite(data);
   const labelText = label === "last" && last !== undefined ? fmt(last) : undefined;
   const metrics = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
 
-  // "minmax" labels reserve top/bottom gutters BEFORE geometry (plan/18) and
+  // "minmax" labels reserve top/bottom gutters BEFORE geometry and
   // sit above the max / below the min — the only spots the data can't occupy.
   // Documented affordance: below ~28px tall the gutters would crush the plot,
   // so the labels are omitted (the summary still reads the range).
@@ -111,7 +110,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
   });
   const d = CURVE[curve](geo.linePoints);
 
-  // annotations host contract (plan/22 #28): Marker x = data INDEX, Threshold/
+  // annotations host contract: Marker x = data INDEX, Threshold/
   // TargetZone y = data values. Non-annotation children pass through untouched
   // — zero render-tree change when no annotation children are present.
   const yScale = scaleLinear(geo.domain, [geo.plot.y1, geo.plot.y0]);

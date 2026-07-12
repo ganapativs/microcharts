@@ -1,4 +1,4 @@
-// <NetFlow> — in versus out, and where that leaves us net (plan/23 #6). Inflow
+// <NetFlow> — in versus out, and where that leaves us net. Inflow
 // area above a zero baseline, outflow mirrored below on ONE shared magnitude
 // scale, with the net line (in − out) on top. Static, hook-free, RSC-safe.
 // Both directions share one scale (never independently balanced); areas anchor
@@ -131,7 +131,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
       style={rootStyle}
     >
       {/* mirrored flow surfaces — pos/neg ink-role earns the forced-colors
-          distinction; opacity dialed inline (see plan/12 ghost/area note) */}
+          distinction; opacity dialed inline */}
       {geo.degenerate ? null : bars ? (
         <>
           {geo.inBars.map((b) =>

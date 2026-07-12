@@ -1,4 +1,4 @@
-// Thermometer geometry — pure, React-free (plan/24 #5, S4). A calibrated linear
+// Thermometer geometry — pure, React-free. A calibrated linear
 // tube: fill anchors at domain[0], never re-zeroed, never log — ticks calibrate
 // the read (that's what buys the high precision). The bulb is instrument chrome
 // (always full), never data. The fill rect width == the tube inner width, so no

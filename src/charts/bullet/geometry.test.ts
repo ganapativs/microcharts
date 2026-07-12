@@ -5,7 +5,7 @@ import { bulletGeometry } from "./geometry.js";
 const g = (o: Partial<Parameters<typeof bulletGeometry>[0]> & { value: number }) =>
   bulletGeometry({ width: 80, height: 16, ...o });
 
-describe("bulletGeometry (plan/05 S4, plan/09)", () => {
+describe("bulletGeometry", () => {
   it("measure bar spans 0 → value", () => {
     const b = g({ value: 50, domain: [0, 100] });
     expect(b.measure.x).toBe(1);

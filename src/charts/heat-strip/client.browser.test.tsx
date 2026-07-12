@@ -4,7 +4,7 @@ import { HeatStrip } from "./client.js";
 
 const DATA = [3, 9, null, 18];
 
-describe("interactive <HeatStrip> (plan/22 #9)", () => {
+describe("interactive <HeatStrip>", () => {
   it("arrow keys rove cells with ActivityGrid-parity announcements + ring", async () => {
     const screen = await render(<HeatStrip data={DATA} title="Load" />);
     const wrap = screen.container.querySelector(".mc-heat-strip-live") as HTMLElement;

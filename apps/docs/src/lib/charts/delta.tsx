@@ -254,10 +254,6 @@ const SECTIONS: { name: string; value: number; positive: "up" | "down" }[] = [
   { name: "Costs", value: -0.02, positive: "down" },
 ];
 
-/* The four homes — Delta always doing the one thing it's for: a signed change
-   read at a glance, direction doubled by glyph and color. Every host is a real
-   metric surface (latency, revenue-by-region, an MRR card, dashboard nav),
-   never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (

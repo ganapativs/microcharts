@@ -1,4 +1,4 @@
-// TallyMarks geometry — pure, React-free (plan/24 #1, S4). Counts the way a
+// TallyMarks geometry — pure, React-free. Counts the way a
 // human counts: four verticals struck through by a fifth per cluster of five,
 // then the remainder. Every stroke lands in ONE path (node budget 2 with the
 // overflow numeral). The `drawn` pen perturbs stroke RENDERING only via seeded
@@ -49,7 +49,7 @@ const OVERHANG = 1; // how far the strike pokes past the outer verticals
 
 export function tallyGeometry(opts: {
   value: number;
-  /** Discrete-count denominator (plan/04 §8 — renamed from `max`). */
+  /** Discrete-count denominator. */
   total: number;
   height: number;
   pad: number;

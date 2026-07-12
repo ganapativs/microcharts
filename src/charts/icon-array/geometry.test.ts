@@ -17,7 +17,7 @@ describe("resolveK (half-up, clamped)", () => {
   });
 });
 
-describe("iconArrayGeometry (plan/23 #21)", () => {
+describe("iconArrayGeometry", () => {
   it("N units, filled contiguous from the top-left in reading order", () => {
     const geo = iconArrayGeometry({ ...base, value: 0.15, total: 20 });
     expect(geo.units.length).toBe(20);

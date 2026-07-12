@@ -5,7 +5,7 @@ import { BurnChart } from "./client.js";
 const PLAN = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];
 const ACTUAL = [40, 38, 36, 34, 32, 30];
 
-describe("interactive <BurnChart> (plan/23 #8)", () => {
+describe("interactive <BurnChart>", () => {
   it("arrow keys step days; announces actual vs plan, then the projection region", async () => {
     const screen = await render(<BurnChart data={{ plan: PLAN, actual: ACTUAL }} title="Sprint" />);
     const wrap = screen.container.querySelector(".mc-burn-chart-live") as HTMLElement;

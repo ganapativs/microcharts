@@ -14,7 +14,7 @@ const FC: ForecastInput = {
   ],
 };
 
-describe("interactive <ForecastCone> (plan/23 #11)", () => {
+describe("interactive <ForecastCone>", () => {
   it("region-aware: history announces a value, forecast the median + interval", async () => {
     const screen = await render(<ForecastCone data={HIST} forecast={FC} title="Q4" />);
     const wrap = screen.container.querySelector(".mc-forecast-cone-live") as HTMLElement;

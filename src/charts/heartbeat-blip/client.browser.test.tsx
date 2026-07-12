@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { HeartbeatBlip } from "./client.js";
 
-describe("interactive <HeartbeatBlip> (plan/24 #20)", () => {
+describe("interactive <HeartbeatBlip>", () => {
   it("wrapper owns naming; static chart is decorative", async () => {
     const screen = await render(
       <HeartbeatBlip events={[97_000, 90_000, 80_000]} now={100_000} title="Requests" />,

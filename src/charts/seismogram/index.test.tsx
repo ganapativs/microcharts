@@ -7,7 +7,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<Seismogram> (plan/22 #8, S1 events)", () => {
+describe("<Seismogram>", () => {
   it("renders tick paths; summary is the docs' real string", () => {
     const data = [0, 3, 0, 0, 8, 1, 0, 2];
     const { container } = draw(<Seismogram data={data} />);

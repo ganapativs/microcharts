@@ -1,4 +1,4 @@
-// StationGlyph strings (plan/25 §20, plan/17 F2). A meteorological station model
+// StationGlyph strings. A meteorological station model
 // at word scale: sky-cover disc + wind barb + corner numerals. Reuses the wind
 // compass. No hardcoded English outside EN (i18n contract).
 import type { SummaryStrings } from "./summary.js";

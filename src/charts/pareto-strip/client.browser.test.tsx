@@ -10,7 +10,7 @@ const CAUSES = [
   { label: "Network", value: 7 },
 ];
 
-describe("interactive <ParetoStrip> (plan/23 #15)", () => {
+describe("interactive <ParetoStrip>", () => {
   it("arrow keys step bars; each announces share + cumulative", async () => {
     const screen = await render(<ParetoStrip data={CAUSES} width={200} title="Causes" />);
     const wrap = screen.container.querySelector(".mc-pareto-strip-live") as HTMLElement;

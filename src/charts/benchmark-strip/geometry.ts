@@ -1,4 +1,4 @@
-// BenchmarkStrip geometry — pure, React-free (plan/23 #2, structured). Is this
+// BenchmarkStrip geometry — pure, React-free. Is this
 // value normal for its peer group? A focal dot positioned against EMPIRICAL
 // quantile bands of the supplied peers — never a fitted distribution, no axis
 // (the band IS the reference frame). Small samples fall back to min–max so tail

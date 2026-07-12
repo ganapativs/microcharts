@@ -1,5 +1,5 @@
 // <Hourglass> — how much time is gone AND how much remains, the two-sided story
-// Progress can't tell (plan/24 #7, S4). Sand area splits top (remaining) /
+// Progress can't tell. Sand area splits top (remaining) /
 // bottom (elapsed), both AREA-TRUE. The stream is a binary "running" state mark,
 // only while 0<value<1 — never animated in the static entry. Static, hook-free.
 import type { CSSProperties, ReactNode } from "react";

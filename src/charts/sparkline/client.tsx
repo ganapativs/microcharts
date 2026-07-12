@@ -1,15 +1,14 @@
 "use client";
-// Interactive <Sparkline> (plan/04 §4, plan/08 T2). Opt-in entry:
+// Interactive <Sparkline>. Opt-in entry:
 //   import { Sparkline } from '@microcharts/react/sparkline/interactive'
 //
-// CANONICAL INTERACTIVE PATTERN (CLAUDE.md — every chart follows this):
 //   1. COMPOSE the static component (`summary={false}`, overlay marks passed
 //      as its children) — never re-implement the visual; it cannot drift.
 //   2. ONE pointer listener on the wrapper + nearest-stop math — never a DOM
-//      node per point (500 rows × 30 pts must stay cheap, plan/03 §6).
+//      node per point (500 rows × 30 pts must stay cheap).
 //   3. The wrapper owns the accessible name (role=img + aria-label) and the
 //      roving keyboard; announcements go through a polite live region using
-//      the i18n-able SummaryStrings (plan/08 §5).
+//      the i18n-able SummaryStrings.
 import {
   useCallback,
   useMemo,

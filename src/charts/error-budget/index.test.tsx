@@ -8,7 +8,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const OBSERVED = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
 
-describe("<ErrorBudget> (plan/23 #9)", () => {
+describe("<ErrorBudget>", () => {
   it("summary states remaining, elapsed, and burn rate — the real string", () => {
     const { container } = draw(<ErrorBudget data={OBSERVED} window={30} unit="day" />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

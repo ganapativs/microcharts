@@ -1,4 +1,4 @@
-// <EnsembleGhosts> — what could happen, across the simulated futures? (plan/23
+// <EnsembleGhosts> — what could happen, across the simulated futures? (
 // #20). A faint bundle of member paths + one emphasised representative, because a
 // mean line hides that futures disagree in SHAPE, not just endpoint. Ghost
 // selection + emphasis are DETERMINISTIC (endpoint-rank quantiles) — nothing

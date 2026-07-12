@@ -1,5 +1,5 @@
 "use client";
-// Interactive <PictogramRow> (plan/22 #7). `live` announces value changes
+// Interactive <PictogramRow>. `live` announces value changes
 // ("6 of 8."). No per-unit pointer targets — the units are ONE datum; hovering
 // unit 4 of 8 has no distinct meaning (documented skip). Composes the static
 // component (canon).

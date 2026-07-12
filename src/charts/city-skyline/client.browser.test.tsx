@@ -9,7 +9,7 @@ const TEAMS = [
   { label: "Web", value: 28 },
 ];
 
-describe("interactive <CitySkyline> (plan/24 #14)", () => {
+describe("interactive <CitySkyline>", () => {
   it("arrow keys rove buildings; the lit fraction is announced as a percent", async () => {
     const screen = await render(<CitySkyline data={TEAMS} title="Teams" />);
     const fig = screen.getByRole("img").element() as HTMLElement;

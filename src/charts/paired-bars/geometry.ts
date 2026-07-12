@@ -1,4 +1,4 @@
-// PairedBars geometry — pure, React-free (plan/22 #12, S2-referenced). Actual
+// PairedBars geometry — pure, React-free. Actual
 // vs expected per category: adjacent (grouped) or ghost-behind (overlay) bars
 // on ONE shared zero-anchored domain — comparing bars on different scales is
 // the cardinal grouped-bar lie. Coords 2-dp.

@@ -1,4 +1,4 @@
-// ConfusionGrid geometry — pure, React-free (plan/25 §21, plan/17 F21). A k×k
+// ConfusionGrid geometry — pure, React-free. A k×k
 // labeled agreement matrix at glyph scale: rows = actual, columns = predicted.
 // Cell ink = row-normalized share by default (the recall view — "of the actual
 // X, where did predictions go?"); the diagonal is agreement, accented by SHAPE

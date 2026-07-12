@@ -4,11 +4,9 @@ import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } f
 
 const PKG = "@microcharts/react";
 const RANKS = [5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1];
-// Second category, for the tab home — a product that's quietly slipping in Tea
-// while Coffee (RANKS) climbs, so the two tabs read as genuinely different stories.
+// Tab-home contrast series (Tea falling while Coffee climbs).
 const TEA_RANKS = [2, 3, 3, 4, 4, 5, 5, 6, 5, 6, 7, 7];
-// A Coffee bestseller board, for the cell home — our blend plus two competitors
-// on the same 12-week window, so the leaderboard reads as one real ranked list.
+// Cell-home leaderboard — same 12-week window.
 const LEADERBOARD: { name: string; ranks: (number | null)[] }[] = [
   { name: "Our Blend", ranks: RANKS },
   { name: "Sunrise Roast", ranks: [3, 3, 4, 4, 3, 3, 2, 3, 4, 4, 5, 5] },
@@ -162,15 +160,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — BumpStrip always doing the one thing it's for: where does
-   this rank, and which way is it moving. Every host is a real ranked-position
-   surface (bestseller category, competitor board), never a generic KPI template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Our blend&apos;s Coffee bestseller rank{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <BumpStrip data={RANKS} summary={false} width={70} height={16} />
         </span>{" "}
         — from #5 to #1 in twelve weeks.

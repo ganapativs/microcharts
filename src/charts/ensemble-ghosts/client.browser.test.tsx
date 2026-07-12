@@ -4,7 +4,7 @@ import { EnsembleGhosts } from "./client.js";
 
 const ENS = Array.from({ length: 12 }, (_, i) => [20, 20 + i, 31 + i * 2]);
 
-describe("interactive <EnsembleGhosts> (plan/23 #20)", () => {
+describe("interactive <EnsembleGhosts>", () => {
   it("←/→ step members discretely, announcing each (the reduced-motion path)", async () => {
     const screen = await render(
       <EnsembleGhosts data={ENS} width={160} height={40} title="Futures" />,

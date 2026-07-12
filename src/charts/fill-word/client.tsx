@@ -1,5 +1,5 @@
 "use client";
-// Interactive <FillWord> (plan/24 #3). The ink edge glides along the word via a
+// Interactive <FillWord>. The ink edge glides along the word via a
 // CSS clip-path transition (styles.css, reduced-motion-gated). Announces changes
 // through a polite region, throttled to ≥1 s so a streaming value never spams.
 // Wrapper focus only (one value). Composes the static component.

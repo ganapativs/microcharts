@@ -1,5 +1,5 @@
 "use client";
-// Interactive <GardenGrid> (plan/24 #10). Same model as ActivityGrid: one
+// Interactive <GardenGrid>. Same model as ActivityGrid: one
 // pointer listener + pure grid lookup, 2-D roving keyboard, a ring on the
 // focused cell. Announces the ordinal step, not a false-precise value.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

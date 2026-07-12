@@ -4,7 +4,7 @@ import { stackedAreaGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 16, curve: "linear" as const, gutterCh: 0, fontSize: 6 };
 
-describe("stackedAreaGeometry (plan/22 #23)", () => {
+describe("stackedAreaGeometry", () => {
   it("layers stack bottom-up, zero-anchored", () => {
     const geo = stackedAreaGeometry({
       ...base,

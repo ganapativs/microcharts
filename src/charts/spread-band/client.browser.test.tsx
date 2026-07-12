@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { SpreadBand } from "./client.js";
 
-describe("interactive <SpreadBand> (plan/26 §6)", () => {
+describe("interactive <SpreadBand>", () => {
   it("←/→ steps x announcing the lead at that point", async () => {
     const screen = await render(
       <SpreadBand

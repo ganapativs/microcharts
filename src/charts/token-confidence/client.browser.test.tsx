@@ -8,7 +8,7 @@ const SENT = [
   { token: " guess", confidence: 0.22 },
 ];
 
-describe("interactive <TokenConfidence> (plan/25 §7)", () => {
+describe("interactive <TokenConfidence>", () => {
   it("→ roves flagged tokens (skips confident); announces tier + confidence", async () => {
     const screen = await render(<TokenConfidence data={SENT} title="Answer" />);
     const host = screen.container.querySelector(".mc-tc-live") as HTMLElement;

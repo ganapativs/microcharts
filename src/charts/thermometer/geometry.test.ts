@@ -12,7 +12,7 @@ const base = {
   pad: 2,
 };
 
-describe("thermometerGeometry (plan/24 #5) — calibrated tube", () => {
+describe("thermometerGeometry — calibrated tube", () => {
   it("fill anchors at the bulb end and rises with value", () => {
     const lo = thermometerGeometry({ ...base, value: 10 });
     const hi = thermometerGeometry({ ...base, value: 90 });

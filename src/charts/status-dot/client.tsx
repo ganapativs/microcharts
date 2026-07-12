@@ -1,5 +1,5 @@
 "use client";
-// Interactive <StatusDot> (plan/22 #2). `live` announces state changes through
+// Interactive <StatusDot>. `live` announces state changes through
 // a polite region ("Deploys: warning."). No pointer math — a single 8-px state
 // mark has nothing to reveal on hover that the summary doesn't already say
 // (documented skip). Composes the static component (canon).

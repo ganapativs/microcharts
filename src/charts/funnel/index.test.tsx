@@ -14,8 +14,8 @@ const PIPE = [
   { label: "Paid", value: 1116 },
 ];
 
-describe("<Funnel> (plan/22 #19, S3-sequential)", () => {
-  it("stepped columns + slats; docs-as-tests summary", () => {
+describe("<Funnel>", () => {
+  it("stepped columns + slats summary", () => {
     const { container } = draw(<Funnel data={PIPE} />);
     expect(container.querySelectorAll("rect").length).toBe(4);
     expect(container.querySelectorAll("path").length).toBe(3);

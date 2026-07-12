@@ -3,7 +3,7 @@
 // which ships in the `@microcharts/react/annotations` entry the CONSUMER
 // imports. A host that renders no annotations therefore pays only this walker
 // (~0.2 kB), not the whole annotation layer — the per-subpath budgets stay
-// honest (plan/21 §1).
+// honest.
 import { Children, Fragment, isValidElement, type ReactNode } from "react";
 
 /** Brand key — a static field on each annotation component function. */

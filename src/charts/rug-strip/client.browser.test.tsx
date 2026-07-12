@@ -4,7 +4,7 @@ import { RugStrip } from "./client.js";
 
 const DATA = [3.1, 5.2, 9.7, 4.4];
 
-describe("interactive <RugStrip> (plan/22 #5)", () => {
+describe("interactive <RugStrip>", () => {
   it("arrow keys step through sorted observations with rank announcements", async () => {
     const screen = await render(<RugStrip data={DATA} title="Values" />);
     const wrap = screen.container.querySelector(".mc-rug-live") as HTMLElement;

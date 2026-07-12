@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { ProgressRing } from "./client.js";
 
-describe("interactive <ProgressRing> (plan/22 #17)", () => {
+describe("interactive <ProgressRing>", () => {
   it("announces only at quarter-threshold crossings", async () => {
     const screen = await render(<ProgressRing value={0.2} />);
     const live = document.querySelector('[aria-live="polite"]')!;

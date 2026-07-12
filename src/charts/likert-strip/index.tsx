@@ -1,4 +1,4 @@
-// <LikertStrip> — does the response lean agree or disagree (plan/22 #30,
+// <LikertStrip> — does the response lean agree or disagree (,
 // S2-ordinal diverging). The center line is the question; everything else is
 // the answer. Static, hook-free, RSC-safe. Neutral is NEVER hidden: `omit`
 // removes it from the bar but the labels/summary always carry it.

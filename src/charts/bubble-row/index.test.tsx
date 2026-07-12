@@ -12,7 +12,7 @@ const REGIONS = [
   { label: "LATAM", value: 210 },
 ] as const;
 
-describe("<BubbleRow> (plan/24 #11)", () => {
+describe("<BubbleRow>", () => {
   it("summary names the extremes", () => {
     const { container } = draw(<BubbleRow data={REGIONS} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

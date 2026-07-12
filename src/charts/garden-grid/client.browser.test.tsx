@@ -5,7 +5,7 @@ import { GardenGrid } from "./client.js";
 
 const WEEKS = [34, 10, 0, 20, 5, 0, 15, 8, 0, 25, 12, 3];
 
-describe("interactive <GardenGrid> (plan/24 #10)", () => {
+describe("interactive <GardenGrid>", () => {
   it("keyboard walks the grid and announces the ordinal step", async () => {
     const screen = await render(<GardenGrid data={WEEKS} title="Activity" />);
     const fig = screen.getByRole("img").element() as HTMLElement;

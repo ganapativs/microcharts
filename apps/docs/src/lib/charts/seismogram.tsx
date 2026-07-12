@@ -185,17 +185,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — Seismogram always doing the one thing it's for: reading
-   event density and shock size at a glance. Every host is an on-call/incident
-   surface — checkout error bursts, a service table, an alert-density KPI — never
-   a generic "signups" template. Cell/tab share domain={[0, 12]} so a busy row
-   and a quiet row are honestly comparable, per the `domain` prop's own job. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Checkout errors this hour{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Seismogram data={BURSTS} summary={false} width={90} height={16} />
         </span>{" "}
         — 29 events, spiking to 11 at minute 28.

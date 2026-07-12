@@ -7,7 +7,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<CoverageStrip> (plan/23 #1, S1-with-gaps)", () => {
+describe("<CoverageStrip>", () => {
   it("summary states coverage + longest gap — the docs' real string", () => {
     const data = [1, 1, null, 1, null, null, 1];
     const { container } = draw(<CoverageStrip data={data} expected={8} />);

@@ -1,20 +1,7 @@
 /**
- * Canonical brand-mark geometry — the SINGLE source so the nav wordmark, the
- * favicon, the apple-touch icon, and the OG badge are pixel-identical. Never
- * hand-redraw the mark; import these.
- *
- * The mark: three data cells climbing a diagonal inside a 32×32 box. Cells are a
- * warm near-white knocked out of an accent squircle. The squircle is ALWAYS a
- * saturated colour, so the cells stay near-white on every theme and accent —
- * they must never flip to a dark "surface" colour (that was the bug that made
- * the nav mark look like scattered dark squares).
- *
- * The squircle is a TRUE symmetric superellipse (n=4.5), generated centred on
- * (16,16) with a 2.4-unit bbox margin — verified so all four cell-to-edge gaps
- * are equal (6.6). The previous hand-drawn path was vertically off-centre
- * (bbox cy=14.6), which made the bottom-left cell crowd the edge. If the mark
- * ever changes, regenerate the path from a centred superellipse — do NOT
- * hand-tweak, and re-check getBBox stays centred at (16,16).
+ * Canonical brand-mark geometry (nav, favicon, apple-touch, OG).
+ * Squircle: centred superellipse n=4.5 — regenerate, don't hand-tweak.
+ * Cells stay near-white; the squircle is always a saturated accent.
  */
 export const SQUIRCLE_PATH =
   "M29.6 16L29.587 20.047L29.548 21.502L29.483 22.578L29.392 23.458L29.274 24.212L29.13 24.874L28.958 25.464L28.758 25.994L28.529 26.473L28.27 26.908L27.981 27.302L27.659 27.659L27.302 27.981L26.908 28.27L26.473 28.529L25.994 28.758L25.464 28.958L24.874 29.13L24.212 29.274L23.458 29.392L22.578 29.483L21.502 29.548L20.047 29.587L16 29.6L11.953 29.587L10.498 29.548L9.422 29.483L8.542 29.392L7.788 29.274L7.126 29.13L6.536 28.958L6.006 28.758L5.527 28.529L5.092 28.27L4.698 27.981L4.341 27.659L4.019 27.302L3.73 26.908L3.471 26.473L3.242 25.994L3.042 25.464L2.87 24.874L2.726 24.212L2.608 23.458L2.517 22.578L2.452 21.502L2.413 20.047L2.4 16L2.413 11.953L2.452 10.498L2.517 9.422L2.608 8.542L2.726 7.788L2.87 7.126L3.042 6.536L3.242 6.006L3.471 5.527L3.73 5.092L4.019 4.698L4.341 4.341L4.698 4.019L5.092 3.73L5.527 3.471L6.006 3.242L6.536 3.042L7.126 2.87L7.788 2.726L8.542 2.608L9.422 2.517L10.498 2.452L11.953 2.413L16 2.4L20.047 2.413L21.502 2.452L22.578 2.517L23.458 2.608L24.212 2.726L24.874 2.87L25.464 3.042L25.994 3.242L26.473 3.471L26.908 3.73L27.302 4.019L27.659 4.341L27.981 4.698L28.27 5.092L28.529 5.527L28.758 6.006L28.958 6.536L29.13 7.126L29.274 7.788L29.392 8.542L29.483 9.422L29.548 10.498L29.587 11.953Z";

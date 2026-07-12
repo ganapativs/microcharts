@@ -8,7 +8,7 @@ const MIX = [
   { label: "Firefox", value: 140 },
 ];
 
-describe("interactive <MicroDonut> (plan/22 #18)", () => {
+describe("interactive <MicroDonut>", () => {
   it("←/→ rove wedges with share announcements", async () => {
     const screen = await render(<MicroDonut data={MIX} title="Mix" />);
     const wrap = screen.container.querySelector(".mc-donut-live") as HTMLElement;

@@ -6,7 +6,7 @@ const base = { width: 80, height: 16 };
 // 12 in-control points around 10, then a spike to 16 (out)
 const SAMPLE = [10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16];
 
-describe("controlGeometry (plan/23 #10)", () => {
+describe("controlGeometry", () => {
   it("σ̂ = mean moving range / 1.128 (individuals estimator, not sample SD)", () => {
     // data with a constant moving range of 2 → MR̄ = 2 → σ̂ = 2/1.128 ≈ 1.773
     const geo = controlGeometry({ ...base, data: [10, 12, 10, 12, 10, 12, 10, 12, 10, 12] })!;

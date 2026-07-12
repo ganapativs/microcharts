@@ -9,7 +9,7 @@ const stepAt = (v: number) =>
   heatCellGeometry({ width: 12, height: 12, value: v, domain: [0, 100], steps: 5, shape: "square" })
     .step;
 
-describe("heatCellGeometry (plan/22 #3)", () => {
+describe("heatCellGeometry", () => {
   it("bins a value into 0-based steps over the domain", () => {
     expect(stepAt(0)).toBe(0);
     expect(stepAt(42)).toBe(2);

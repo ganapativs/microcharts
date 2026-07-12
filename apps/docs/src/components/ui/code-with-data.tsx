@@ -5,14 +5,7 @@ import { cn } from "@/lib/cn";
 import { CopyButton } from "@/components/ui/copy";
 import type { SampleData } from "@/lib/charts/types";
 
-/**
- * A code snippet that stays clean (`data={accounts}`) while the definitions its
- * variables need sit one click away in a collapsible "sample data" disclosure —
- * so what's shown reads uncluttered but what's copied always runs.
- *
- * `copyAll` copies the sample data + snippet as one runnable block; the inline
- * snippet keeps its own Fumadocs copy for the common "I already have data" case.
- */
+/** Snippet with collapsible sample-data disclosure; `copyAll` is runnable. */
 export function CodeWithData({
   code,
   sampleData,
@@ -24,10 +17,6 @@ export function CodeWithData({
   lang?: string;
   className?: string;
 }) {
-  // Standard: raw data literals live ONLY in the "Sample data" disclosure —
-  // snippets reference the variable and carry a one-line pointer comment
-  // (added here so all pages stay consistent and it can never drift). A demo
-  // that declares the variable itself gets no disclosure (no duplication).
   const used = (sampleData ?? []).filter(
     (s) =>
       new RegExp(`\\b${s.name}\\b`).test(code) &&
@@ -37,8 +26,6 @@ export function CodeWithData({
   const pointer = used.length
     ? `// ${used.map((s) => s.name).join(", ")} — real values under “Sample data” below`
     : "";
-  // The pointer sits right above the JSX (where the variable is used), not
-  // above the imports.
   let shown = code;
   if (pointer && !code.includes("Sample data")) {
     const lines = code.split("\n");

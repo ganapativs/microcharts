@@ -1,5 +1,5 @@
 "use client";
-// Interactive <SpreadBand> (plan/26 §6). Nearest-x lookup announces the lead at
+// Interactive <SpreadBand>. Nearest-x lookup announces the lead at
 // that point ("Point 6 of 12: organic +11 over paid."); the crosshair touches
 // both lines. ←/→ steps x. Composes the static component (canon).
 import {

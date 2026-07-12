@@ -1,5 +1,5 @@
 "use client";
-// Interactive <PairedBars> (plan/22 #12). One pointer listener; pair by
+// Interactive <PairedBars>. One pointer listener; pair by
 // category-band lookup. ←/→ rove pairs ("East: 940 vs 1,200."). Composes the
 // static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

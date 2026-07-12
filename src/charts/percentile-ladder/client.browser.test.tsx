@@ -4,7 +4,7 @@ import { PercentileLadder } from "./client.js";
 
 const SAMPLE = Array.from({ length: 101 }, (_, i) => i);
 
-describe("interactive <PercentileLadder> (plan/23 #3)", () => {
+describe("interactive <PercentileLadder>", () => {
   it("arrow keys step ticks; each states its multiple of the median", async () => {
     const screen = await render(<PercentileLadder data={SAMPLE} title="Latency" />);
     const wrap = screen.container.querySelector(".mc-percentile-ladder-live") as HTMLElement;

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { Progress } from "./client.js";
 
-describe("interactive <Progress> (plan/22 #4)", () => {
+describe("interactive <Progress>", () => {
   it("announces whole-percent changes; stays quiet on sub-percent noise", async () => {
     const screen = await render(<Progress value={0.5} />);
     const live = document.querySelector('[aria-live="polite"]')!;

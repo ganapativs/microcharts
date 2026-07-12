@@ -1,6 +1,6 @@
 "use client";
-// Interactive <MoonPhase> (plan/24 #6). Hover/focus reveals the percent; on
-// change the lit region cross-fades (opacity, NOT d: interpolation — plan/03);
+// Interactive <MoonPhase>. Hover/focus reveals the percent; on
+// change the lit region cross-fades (opacity, NOT d: interpolation — );
 // announces through a polite region, throttled to ≥1 s. Wrapper focus only.
 // Composes the static component.
 import { useEffect, useRef, useState } from "react";

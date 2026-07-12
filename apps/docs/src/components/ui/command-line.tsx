@@ -1,12 +1,6 @@
 import { cn } from "@/lib/cn";
 
-/**
- * Shell install commands render as plain foreground text everywhere they appear
- * (install pill, package tabs, brand sheet, usage footnote). This tokenizes one
- * into its shell parts so the binary, verb, flags, and package read distinctly —
- * the same restrained two-tone the fenced ```bash blocks get from Shiki, but for
- * our custom command wells that aren't real code fences.
- */
+/** Tokenize a shell install command for two-tone rendering in custom wells. */
 
 const BINARIES = new Set(["pnpm", "npm", "yarn", "bun", "npx", "pnpx", "bunx", "deno"]);
 const VERBS = new Set([

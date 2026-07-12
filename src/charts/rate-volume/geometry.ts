@@ -1,4 +1,4 @@
-// RateVolume geometry — pure, React-free (plan/23 #5). A rate moved — on what
+// RateVolume geometry — pure, React-free. A rate moved — on what
 // volume? The rate line is precise; the ghost volume bars are deliberately
 // low-precision context (the denominator), on their own zero-anchored scale.
 // A rate on zero volume is undefined and is never plotted (line gap + zero bar):
@@ -65,7 +65,7 @@ export function rateVolumeGeometry(opts: {
   const pad = opts.pad ?? 2;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
-  // 0.72·em/char over-estimates tabular digits + the wide "%" glyph (plan/18)
+  // 0.72·em/char over-estimates tabular digits + the wide "%" glyph
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
   const minVolume = opts.minVolume;
 

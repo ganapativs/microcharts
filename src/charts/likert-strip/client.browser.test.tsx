@@ -10,7 +10,7 @@ const SURVEY = [
   { label: "Strongly agree", value: 28 },
 ];
 
-describe("interactive <LikertStrip> (plan/22 #30)", () => {
+describe("interactive <LikertStrip>", () => {
   it("←/→ step levels in data order with share announcements", async () => {
     const screen = await render(<LikertStrip data={SURVEY} title="Q1" />);
     const wrap = screen.container.querySelector(".mc-likert-live") as HTMLElement;

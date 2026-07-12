@@ -7,7 +7,7 @@ import { valueEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<Progress> (plan/22 #4, S3)", () => {
+describe("<Progress>", () => {
   it("default: track + fill + percent label; summary is the docs' real string", () => {
     const { container } = draw(<Progress value={0.68} />);
     expect(container.querySelector('[data-mc-ink="band"]')).not.toBeNull();

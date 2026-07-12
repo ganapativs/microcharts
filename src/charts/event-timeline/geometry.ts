@@ -1,4 +1,4 @@
-// EventTimeline geometry — pure, React-free (plan/22 #27). Spans + point
+// EventTimeline geometry — pure, React-free. Spans + point
 // events on ONE linear time axis: duration is length, never log/compressed
 // time. Items overlapping the window edge are clipped flat (honest partial
 // visibility); fully-outside items are excluded (the component dev-warns).

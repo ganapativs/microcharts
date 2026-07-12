@@ -1,4 +1,4 @@
-// PhaseTrace geometry — pure, React-free (plan/25 §17, plan/17 F16). Two
+// PhaseTrace geometry — pure, React-free. Two
 // synchronized signals become an x×y trajectory; path order carries time and the
 // current state is a directed endpoint. Axes/domains are named and stated and
 // ALWAYS linear (no log option). Time direction stays recoverable via the

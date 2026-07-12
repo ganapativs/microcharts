@@ -7,7 +7,7 @@ const base = { width: 80, height: 20 };
 const PLAN = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];
 const ACTUAL = [40, 38, 36, 34, 32, 30];
 
-describe("burnGeometry (plan/23 #8)", () => {
+describe("burnGeometry", () => {
   it("draws a plan line, an actual line to today, and a projection", () => {
     const geo = burnGeometry({ ...base, plan: PLAN, actual: ACTUAL })!;
     expect(geo.plan.d).toMatch(/^M/);

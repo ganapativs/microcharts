@@ -6,7 +6,7 @@ import { bucketCount, waveformGeometry } from "./geometry.js";
 const noiseWithSpike = (n: number, spikeAt: number, spike: number) =>
   Array.from({ length: n }, (_, i) => (i === spikeAt ? spike : Math.sin(i / 3) * 0.15));
 
-describe("waveformGeometry (plan/25 §4, plan/17 F9)", () => {
+describe("waveformGeometry", () => {
   it("max-per-bucket: a lone spike survives compression, never averaged away", () => {
     const data = noiseWithSpike(200, 126, 0.82);
     const buckets = bucketCount(120, 200);

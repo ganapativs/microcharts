@@ -1,8 +1,8 @@
-// <ActivityGrid> — intensity calendar (plan/05 §3, S1 binned). GitHub's
+// <ActivityGrid> — intensity calendar. GitHub's
 // contribution graph, the proof that color-encodes-a-variable. Static, hook-free,
 // RSC-safe. Discrete levels (not a continuous ramp). The per-cell reading is the
 // accessible summary + (opt-in) interactive tooltip; the static grid never shows
-// per-cell numbers (unmeasurable + too dense) — a documented limitation (plan/18).
+// per-cell numbers (unmeasurable + too dense) — a documented limitation.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { seriesStats } from "../../core/stats.js";

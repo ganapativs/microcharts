@@ -1,4 +1,4 @@
-// <PictogramRow> — counts a human can verify by counting (plan/22 #7, S3).
+// <PictogramRow> — counts a human can verify by counting.
 // ●●●○○ — filled vs hollow is a SHAPE difference too, never opacity-alone.
 // Static, hook-free, RSC-safe. One row only (wrapped grids are ActivityGrid
 // territory); unit size is constant — never scaled by value.

@@ -1,4 +1,4 @@
-// <MicroScatter> — are these two variables related? (plan/22 #29, S1-XY).
+// <MicroScatter> — are these two variables related?
 // Static, hook-free, RSC-safe. Dots at 75% opacity so overplot reads as
 // density instead of lying by occlusion; duplicates are never jittered —
 // position IS the encoding. Whenever the summary uses a relationship word it

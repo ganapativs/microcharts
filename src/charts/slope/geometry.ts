@@ -1,4 +1,4 @@
-// Slope geometry — pure, React-free (plan/22 #13, S2-paired projected on
+// Slope geometry — pure, React-free (, S2-paired projected on
 // time). Two aligned columns, one y-domain (per-column normalization would
 // fake convergence). Label fitting is deterministic: rows closer than
 // fontSize × 1.1 drop their labels (count × height, no measurement). 2-dp.

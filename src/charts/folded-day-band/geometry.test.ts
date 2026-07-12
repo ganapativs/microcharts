@@ -12,7 +12,7 @@ const BANDS: [number, number][] = [
   [5, 95],
 ];
 
-describe("foldedBandGeometry (plan/25 §15, plan/17 F7)", () => {
+describe("foldedBandGeometry", () => {
   it("folds periods and finds the median peak", () => {
     const geo = foldedBandGeometry({
       data: DATA,

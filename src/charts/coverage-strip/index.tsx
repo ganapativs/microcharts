@@ -1,4 +1,4 @@
-// <CoverageStrip> — can I trust this data, where was nothing measured? (plan/23
+// <CoverageStrip> — can I trust this data, where was nothing measured? (
 // #1, S1-with-gaps). Measured cells are filled, gaps are hollow with a hairline
 // stroke: the distinction between `null` (no measurement) and `0` (a measured
 // zero) is the whole chart, and it is carried by SHAPE so it survives
@@ -80,7 +80,7 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
   }
 
   // label size in viewBox units — ~0.62·height, clamped 7–11 to match the rest
-  // of the catalog at any chart size (plan/12: labels are chart-proportional)
+  // of the catalog at any chart size
   const FONT = Math.min(11, Math.max(7, Math.round(height * 0.62)));
 
   const pctFmt = makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale);
@@ -100,7 +100,7 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
 
   const accName = summary === false ? false : (summary ?? coverageSummary(geo, pctFmt, strings));
   // pin the label size to viewBox units (the shared 0.75em default is ambient —
-  // it would render labels ~2× and break the reserved gutter). plan/12.
+  // it would render labels ~2× and break the reserved gutter).
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
   // a custom `color` must be inline STYLE: the "cell" role rule would override
   // a fill attribute. ONE shared object — never allocated per cell (SSR path).

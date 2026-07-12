@@ -1,4 +1,4 @@
-// <Horizon> — a wide-range series inside a 14-px row (plan/22 #25). The
+// <Horizon> — a wide-range series inside a 14-px row. The
 // canonical micro-density technique and this batch's flagship: folded opacity
 // bands, positive in accent, negative in the negative token, mirrored by
 // default. Fold count/mode never auto-switch (same series must render

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <EnsembleGhosts> (plan/23 #20) — the HOP loop. On hover/focus,
+// Interactive <EnsembleGhosts> — the HOP loop. On hover/focus,
 // cycle members one at a time at full opacity (~400 ms/frame ≈ 2.5 Hz, the
 // studied Hypothetical-Outcome-Plots cadence), looping until the pointer leaves.
 // Reduced-motion: NO loop — ←/→ step members discretely (same information,

@@ -18,7 +18,7 @@ const OBS = {
   station: "KSFO",
 } as const;
 
-describe("<StationGlyph> (plan/25 §20, plan/17 F2)", () => {
+describe("<StationGlyph>", () => {
   it("draws the disc, a cloud sector, corner numerals, and a wind barb", () => {
     const { container } = draw(<StationGlyph {...OBS} size={34} />);
     expect(container.querySelector("circle")).not.toBeNull();
@@ -27,7 +27,7 @@ describe("<StationGlyph> (plan/25 §20, plan/17 F2)", () => {
     expect(texts).toEqual(expect.arrayContaining(["KSFO", "16°", "9°", "1,013"]));
   });
 
-  it("docs-as-tests summary", () => {
+  it("summary", () => {
     expect(stationGlyphSummary(OBS, EN_STATION_GLYPH, fmt)).toBe(
       "KSFO, wind southwest 15; sky broken, 16° / 9°, 1,013.",
     );

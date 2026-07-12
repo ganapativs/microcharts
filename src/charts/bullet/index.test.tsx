@@ -7,7 +7,7 @@ import { valueEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<Bullet> (plan/05 S4, plan/08)", () => {
+describe("<Bullet>", () => {
   it("renders measure bar + target tick, role=img", () => {
     const { container } = draw(<Bullet value={72} target={80} title="Sales" />);
     expect(container.querySelector("svg")!.getAttribute("role")).toBe("img");

@@ -1,8 +1,8 @@
 "use client";
-// Interactive <BreathingDot> (plan/24 #19). Motion IS the encoding: the core dot
+// Interactive <BreathingDot>. Motion IS the encoding: the core dot
 // pulses, its rate + amplitude snapped to the 3 load bands (calm / elevated /
 // strained) so the motion states are nameable, not vibes. The loop is allowed
-// because the loop parameter (rate) is the datum (plan/06 §5). Gated on BOTH
+// because the loop parameter (rate) is the datum. Gated on BOTH
 // reduced-motion (→ the static frame) and on-screen (→ paused off-viewport).
 // Composes the static component (canon); a polite live region announces BAND
 // changes only, never per tick.

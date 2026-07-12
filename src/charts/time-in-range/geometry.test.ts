@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { timeInRangeGeometry, zonePercents, ZONE_ORDER } from "./geometry.js";
 
-describe("timeInRangeGeometry (plan/25 §1, plan/17 F6)", () => {
+describe("timeInRangeGeometry", () => {
   it("zones tile the strip in fixed semantic order", () => {
     const geo = timeInRangeGeometry({
       data: { below: 9, in: 72, above: 19 },

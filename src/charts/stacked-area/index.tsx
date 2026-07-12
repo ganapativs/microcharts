@@ -1,4 +1,4 @@
-// <StackedArea> — how did the COMPOSITION shift over time (plan/22 #23).
+// <StackedArea> — how did the COMPOSITION shift over time.
 // ≤ 3 series hard cap (thickness reading degrades combinatorially); the total
 // is always zero-anchored. `style="ridge"` = identical stacking math rendered
 // with smooth, opaque, crest-lit silhouettes — editorial texture, zero
@@ -42,7 +42,7 @@ export interface StackedAreaProps {
   /** ≤ 3 series (hard cap). */
   data: readonly StackedAreaDatum[];
   /** `"ridge"` — the relocated MountainRidges look; same stack, new skin.
-   *  (plan/21 §3 names this `style`; React reserves that for CSS — logged.) */
+   * */
   variant?: "stacked" | "ridge" | undefined;
   /** `"asc"` puts the smallest series on top (least thickness distortion). */
   order?: "data" | "asc" | undefined;
@@ -153,7 +153,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
               // top-edge hairline: no data-mc-cat stroke variant exists yet
               // (styles.css only element-splits accent/positive/negative/ghost
               // for stroked marks — cat roles are fill-only), so this stays a
-              // literal var() reference; ridge trades it for a fixed surface
+              // literal var reference; ridge trades it for a fixed surface
               // "crest light" instead of the category color.
               stroke={
                 variant === "ridge"

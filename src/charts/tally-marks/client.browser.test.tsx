@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { TallyMarks } from "./client.js";
 
-describe("interactive <TallyMarks> (plan/24 #1)", () => {
+describe("interactive <TallyMarks>", () => {
   it("announces the new total on change; quiet on mount", async () => {
     const screen = await render(<TallyMarks value={5} />);
     const live = document.querySelector('[aria-live="polite"]')!;

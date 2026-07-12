@@ -1,5 +1,5 @@
 "use client";
-// Interactive <BumpStrip> (plan/22 #21). Nearest-x pointer lookup; ←/→ step
+// Interactive <BumpStrip>. Nearest-x pointer lookup; ←/→ step
 // periods ("Week 4 of 12: #3."). Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";

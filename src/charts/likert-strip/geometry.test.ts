@@ -4,7 +4,7 @@ import { likertStripGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 12, neutral: "split" as const };
 
-describe("likertStripGeometry (plan/22 #30)", () => {
+describe("likertStripGeometry", () => {
   it("negatives left of center, positives right, neutral straddles (split)", () => {
     const geo = likertStripGeometry({ ...base, values: [10, 20, 14, 30, 26] })!;
     const neg = geo.segments.filter((s) => s.side < 0);

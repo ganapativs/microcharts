@@ -8,7 +8,7 @@ const DATA = [
   { label: "Sam", value: 88 },
 ];
 
-describe("interactive <DotPlot> (plan/22 #10)", () => {
+describe("interactive <DotPlot>", () => {
   it("↑/↓ rove rows with rank announcements + focus ring", async () => {
     const screen = await render(<DotPlot data={DATA} title="Scores" />);
     const wrap = screen.container.querySelector(".mc-dotplot-live") as HTMLElement;

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { etaBarGeometry } from "./geometry.js";
 
-describe("etaBarGeometry (plan/25 §3, plan/17 F14)", () => {
+describe("etaBarGeometry", () => {
   it("remainder is sized by observed rate, not linear interpolation", () => {
     const geo = etaBarGeometry({ progress: 0.64, elapsed: 3.6, rate: 0.18, width: 80, height: 8 });
     expect(geo.remainingTime).toBeCloseTo(2, 1);

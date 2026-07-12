@@ -1,4 +1,4 @@
-// <SpreadBand> — which of two series leads, by how much, and since when (plan/26
+// <SpreadBand> — which of two series leads, by how much, and since when (
 // §6). Subject (a) and reference (b) on ONE shared domain; the SIGNED gap between
 // them is filled and split at crossings, so "who is ahead" and "when it flipped"
 // read at a glance. The reference whispers (dashed, thinner, neutral); direction

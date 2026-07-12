@@ -12,7 +12,7 @@ const EVENTS = [
   { x: 5, y: 30, m: 3 },
 ] as const;
 
-describe("interactive <Constellation> (plan/24 #16)", () => {
+describe("interactive <Constellation>", () => {
   it("arrow keys step chronologically and announce time + value + magnitude", async () => {
     const screen = await render(
       <Constellation data={EVENTS} xFormat={monthFmt} title="Incidents" />,

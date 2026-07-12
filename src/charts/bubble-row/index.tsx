@@ -1,8 +1,7 @@
-// <BubbleRow> — roughly how a few magnitudes compare, with physical presence
-// (plan/24 #11, S2). THE catalog's honesty exemplar: circle area (r ∝ √value) is
-// the weakest common channel, so precision is LOW and value numerals are ON by
-// default — a low-precision channel owes the reader the number. For a precise
-// comparison, use MiniBar. Static, hook-free, RSC-safe.
+// <BubbleRow> — roughly how a few magnitudes compare, with physical presence.
+// Circle area (r ∝ √value) is the weakest common channel, so precision is LOW
+// and value numerals are ON by default — a low-precision channel owes the
+// reader the number. For a precise comparison, use MiniBar. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BUBBLE, type BubbleStrings } from "../../core/strings-bubble.js";

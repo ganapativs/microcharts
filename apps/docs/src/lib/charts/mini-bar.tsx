@@ -135,9 +135,7 @@ export const showcase = {
 
 // domain/color/format/locale/strings/id/className/style/children: styling/
 // formatting escape hatches, not chart-shape knobs — no interactive control
-// (consistent with every other chart's playground); locale is demoed inline
-// on the docs page instead. Every remaining documented prop (sort, highlight,
-// orientation, positive) has a knob below.
+
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -253,15 +251,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — MiniBar always answering "which category is biggest, by
-   roughly how much" against a Q3 regional-revenue narrative, so the mark's
-   numbers stay consistent with the summary text around it. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Q3 revenue splits four ways{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <MiniBar data={MIX} summary={false} width={70} height={16} />
         </span>{" "}
         — East alone outsells North more than seven to one.

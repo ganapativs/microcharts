@@ -1,4 +1,4 @@
-// Quantile machinery (plan/21 §6.0.C). Feeds five-number boxes, graded bands,
+// Quantile machinery. Feeds five-number boxes, graded bands,
 // percentile reads, and quantile dotplots. R-7 linear interpolation — the
 // default in most analytics tools, so a chart's median matches the user's
 // spreadsheet. Outputs are data-space (charts scale + round to viewBox).
@@ -12,7 +12,7 @@ export interface FiveNumber {
   max: number;
 }
 
-/** Finite values only, ascending. `.sort()` on a fresh array (ES2022 floor). */
+/** Finite values only, ascending. `.sort` on a fresh array (ES2022 floor). */
 function sortedFinite(values: readonly Value[]): number[] {
   const out: number[] = [];
   for (const v of values) if (isFiniteValue(v)) out.push(v);

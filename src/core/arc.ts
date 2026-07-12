@@ -1,8 +1,8 @@
-// Arc / sector / annulus SVG path builders (plan/21 §6.0.C). Ring-family
+// Arc / sector / annulus SVG path builders. Ring-family
 // charts share one angle convention: radians, 0 at 12 o'clock, positive =
 // clockwise (variable starts make identical fractions look different — the
 // start is fixed at the chart layer and documented there). Coords are rounded
-// to 2 decimals at generation (plan/07/09). Degenerate inputs (non-finite,
+// to 2 decimals at generation. Degenerate inputs (non-finite,
 // r ≤ 0, zero/negative sweep) return "" — an empty `d` renders nothing, so a
 // fraction-0 ring shows its track only, never a zero-length arc artifact.
 import { round2 as r2 } from "./types.js";

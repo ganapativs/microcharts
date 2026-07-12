@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { Honeycomb } from "./client.js";
 
-describe("interactive <Honeycomb> (plan/24 #15)", () => {
+describe("interactive <Honeycomb>", () => {
   it("announces the new count on change; quiet on mount", async () => {
     const screen = await render(<Honeycomb value={30} total={40} unit="seats" />);
     const live = document.querySelector('[aria-live="polite"]')!;

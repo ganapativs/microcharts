@@ -1,5 +1,5 @@
 "use client";
-// Interactive <BenchmarkStrip> (plan/23 #2). One pointer listener + pure
+// Interactive <BenchmarkStrip>. One pointer listener + pure
 // nearest-edge math (never a node per quantile). ←/→ step the five quantile
 // edges; each announces its name + value ("p75: 420 ms."). Composes the static
 // component (canon); the crosshair tick is an overlay child re-using geometry.

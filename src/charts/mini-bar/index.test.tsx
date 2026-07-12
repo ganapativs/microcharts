@@ -18,7 +18,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<MiniBar> (plan/22 #6, S2)", () => {
+describe("<MiniBar>", () => {
   it("renders one bar per category; summary is the docs' real string", () => {
     const { container } = draw(<MiniBar data={DATA} />);
     expect(container.querySelectorAll("rect").length).toBe(4);

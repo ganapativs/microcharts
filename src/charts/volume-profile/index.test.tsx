@@ -19,8 +19,8 @@ const PROFILE = [
   { level: 146, weight: 7 },
 ];
 
-describe("<VolumeProfile> (plan/25 §16, plan/17 F15)", () => {
-  it("renders bars + POC accent; docs-as-tests summary", () => {
+describe("<VolumeProfile>", () => {
+  it("renders bars + POC accent summary", () => {
     const { container } = draw(<VolumeProfile data={PROFILE} bins={5} width={80} height={40} />);
     expect(container.querySelector('path[data-mc-ink="bar"]')).not.toBeNull();
     const geo = volumeProfileGeometry({

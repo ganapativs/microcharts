@@ -1,4 +1,4 @@
-// Dumbbell geometry — pure, React-free (plan/22 #11, S2-paired). Two dot
+// Dumbbell geometry — pure, React-free. Two dot
 // positions + connecting span per row on one shared scale. Direction is
 // shape-coded (hollow from → filled to), never color-alone. Coords 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";

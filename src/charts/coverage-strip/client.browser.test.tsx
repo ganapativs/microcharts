@@ -4,7 +4,7 @@ import { CoverageStrip } from "./client.js";
 
 const DATA = [3, 9, null, 18];
 
-describe("interactive <CoverageStrip> (plan/23 #1)", () => {
+describe("interactive <CoverageStrip>", () => {
   it("arrow keys rove slots; the live region distinguishes measured from missing", async () => {
     const screen = await render(<CoverageStrip data={DATA} title="Uptime" />);
     const wrap = screen.container.querySelector(".mc-coverage-strip-live") as HTMLElement;

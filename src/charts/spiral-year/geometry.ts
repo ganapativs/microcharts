@@ -1,4 +1,4 @@
-// SpiralYear geometry — pure, React-free (plan/24 #18, S1 calendar). A year (or
+// SpiralYear geometry — pure, React-free. A year (or
 // several) wound onto an Archimedean spiral: angle = position in the year (Jan 1
 // at 12 o'clock, clockwise), each turn outward = the next year. Marks carry a
 // 5-step (or 3-step) opacity — the value's ORDINAL level; the spiral RADIUS

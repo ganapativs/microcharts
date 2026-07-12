@@ -1,8 +1,8 @@
-// HeartbeatBlip geometry — pure, React-free (plan/24 #20, structured events).
+// HeartbeatBlip geometry — pure, React-free.
 // Is it alive, and how busy? A baseline with an ECG-style spike at each event's
 // position across the recent window (x = how long ago). Zero events → an empty
 // spike path and the flat baseline IS the down signal (shape, not color). The
-// clock is passed in (`now`) — this file never calls Date.now() (SSR must be
+// clock is passed in (`now`) — this file never calls Date.now (SSR must be
 // deterministic; a mismatch is a hydration bug). All coords 2-dp.
 import { round2 } from "../../core/types.js";
 

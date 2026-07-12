@@ -9,7 +9,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const GAME = [50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98];
 const SIDES = ["home", "away"] as const;
 
-describe("<WinProbWorm> (plan/26 §4)", () => {
+describe("<WinProbWorm>", () => {
   it("summary names the leader, flips, and biggest swing — the real string", () => {
     const { container } = draw(<WinProbWorm data={GAME} sides={SIDES} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

@@ -6,7 +6,7 @@ const base = { width: 80, height: 20 };
 // a standing that climbs from the middle half up above it
 const SAMPLE = [42, 48, 55, 61, 68, 74, 79, 81];
 
-describe("percentileGeometry (plan/26 §8)", () => {
+describe("percentileGeometry", () => {
   it("locks the y-domain to [0,100]: 100 at top, 0 at bottom", () => {
     const geo = percentileGeometry({ ...base, data: [100, 50, 0] })!;
     expect(geo.line.d).toMatch(/^M/);

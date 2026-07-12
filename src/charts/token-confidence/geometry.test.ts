@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { tokenTierCounts, tokenTiers } from "./geometry.js";
 
-describe("tokenTiers (plan/25 §7, plan/17 F12)", () => {
+describe("tokenTiers", () => {
   it("maps confidence to three discrete tiers", () => {
     const t = tokenTiers({
       data: [

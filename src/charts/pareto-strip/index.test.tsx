@@ -17,7 +17,7 @@ const CAUSES = [
   { label: "Other bug", value: 2 },
 ];
 
-describe("<ParetoStrip> (plan/23 #15)", () => {
+describe("<ParetoStrip>", () => {
   it("summary states the vital-few count and cumulative — the real string", () => {
     const { container } = draw(<ParetoStrip data={CAUSES} unit="causes" metric="incidents" />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

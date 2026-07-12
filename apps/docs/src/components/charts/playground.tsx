@@ -1,9 +1,7 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import { Play, RotateCw } from "lucide-react";
-// Registers the entrance-motion engine once for every playground on the site —
-// the exact import a consumer adds to enable the `animate` prop.
-import "@microcharts/react/motion";
+import "@microcharts/react/motion"; // enables `animate` (same import consumers use)
 import { cn } from "@/lib/cn";
 import { getModule } from "@/lib/charts/registry";
 import { CodeWithData } from "@/components/ui/code-with-data";
@@ -178,8 +176,6 @@ function Shell({
         </div>
       </div>
       {mode && onMode && (
-        /* Always rendered at a fixed height so switching modes never shifts
-           the layout; the static line doubles as interactive discoverability. */
         <p
           title={mode === "interactive" ? hint : undefined}
           className="truncate border-t border-hairline px-4 py-2 text-center text-[0.72rem] leading-snug text-fd-muted-foreground"
@@ -190,8 +186,6 @@ function Shell({
         </p>
       )}
       {mode && onMode && (
-        /* The entry choice IS the product's grammar — give it a real surface,
-           not a header afterthought: two captioned options, full width. */
         <div
           role="radiogroup"
           aria-label="Chart entry"
@@ -289,8 +283,7 @@ export function Playground({ chart }: { chart: string }) {
   const canAnimate = interactive && spec.animates !== false;
   const ui = { animate: canAnimate && animate };
 
-  // remount (and morph) on discrete-knob, data, or mode changes — never on
-  // slider drags. Remounting is also exactly what replays the entrance.
+  // Remount on discrete knobs / data / mode — not on slider drags.
   const morphKey = spec.knobs
     .filter((k) => k.kind !== "range")
     .map((k) => String(state[k.key]))
@@ -298,8 +291,6 @@ export function Playground({ chart }: { chart: string }) {
     .concat([mode, String(animate), String(take)])
     .join("-");
 
-  // Copy-complete: the snippet always carries its own imports and reflects
-  // the exact playground state (docs-as-tests).
   const importPath = interactive
     ? (entry.interactiveImport ?? entry.staticImport)
     : entry.staticImport;

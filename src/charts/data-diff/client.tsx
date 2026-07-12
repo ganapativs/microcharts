@@ -1,5 +1,5 @@
 "use client";
-// Interactive <DataDiff> (plan/23 #16). One pointer listener + grid lookup
+// Interactive <DataDiff>. One pointer listener + grid lookup
 // (pointer y → row). ↑/↓ step rows, Home/End jump. The live region states each
 // row's added / removed / net. Composes the static component (canon); the focus
 // ring + readout chip are overlay children.

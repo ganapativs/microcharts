@@ -4,7 +4,7 @@ import { waterfallGeometry, placeWaterfallLabels } from "./geometry.js";
 
 const base = { width: 70, height: 18, start: 0, total: true };
 
-describe("waterfallGeometry (plan/22 #20)", () => {
+describe("waterfallGeometry", () => {
   it("bars float at the running level; total bar anchors at zero", () => {
     const geo = waterfallGeometry({ ...base, start: 1200, deltas: [300, -140, 180] });
     expect(geo.levels).toEqual([1500, 1360, 1540]);

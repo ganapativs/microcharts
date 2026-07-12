@@ -13,7 +13,7 @@ const BOOK = {
   ],
 };
 
-describe("interactive <DepthWedge> (plan/25 §12)", () => {
+describe("interactive <DepthWedge>", () => {
   it("→ walks levels; announces the cumulative depth on a side", async () => {
     const screen = await render(<DepthWedge data={BOOK} title="Book" width={160} height={24} />);
     const wrap = screen.container.querySelector(".mc-depth-live") as HTMLElement;

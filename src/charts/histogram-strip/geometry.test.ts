@@ -4,7 +4,7 @@ import { histogramGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 16 };
 
-describe("histogramGeometry (plan/22 #15)", () => {
+describe("histogramGeometry", () => {
   it("bins uniformly; counts zero-anchored; modal bin found", () => {
     const values = [1, 1, 1, 5, 5, 9];
     const geo = histogramGeometry({ ...base, values, bins: 3 });

@@ -8,7 +8,7 @@ const BINS = [
   { predicted: 0.8, observed: 0.62, count: 40 },
 ];
 
-describe("interactive <CalibrationStrip> (plan/25 §14)", () => {
+describe("interactive <CalibrationStrip>", () => {
   it("←/→ rove bins; announces predicted, observed, support", async () => {
     const screen = await render(
       <CalibrationStrip data={BINS} minSupport={10} title="Calib" width={160} height={32} />,

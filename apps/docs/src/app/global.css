@@ -1600,24 +1600,20 @@ div:where(
 }
 
 /* Gentle morph when a playground/prop change swaps the rendered chart. Keyed
-   remount replays it; purely cosmetic, fully reduced-motion-gated. */
+   remount replays it; purely cosmetic, fully reduced-motion-gated. Opacity-only
+   so it never fights `.mc-inline`'s optical `translate`. */
 @keyframes mc-morph {
   from {
     opacity: 0.55;
-    transform: translateY(2px) scale(0.995);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
 .mc-morph {
   animation: mc-morph 0.28s var(--ease-out-quint) both;
 }
 
-/* Streaming demo — a text caret that blinks while the model "types", and the
-   soft settle a chart makes when its fence closes and it morphs from raw
-   syntax to a rendered instrument. Both reduced-motion-gated below. */
 @keyframes mc-caret-blink {
   0%,
   49% {

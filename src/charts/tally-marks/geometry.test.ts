@@ -10,7 +10,7 @@ const g = (
 ) => tallyGeometry({ ...base, value, overflow: over, pen });
 const strokes = (d: string) => (d.match(/M/g) ?? []).length;
 
-describe("tallyGeometry (plan/24 #1) — count the way a human counts", () => {
+describe("tallyGeometry — count the way a human counts", () => {
   it("one stroke per count: 4 verticals + a strike per cluster of five", () => {
     // 23 = four struck clusters (20) + three remainder verticals = 23 strokes
     const r = g(23);

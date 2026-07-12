@@ -1,5 +1,5 @@
-// Progress geometry — pure, React-free (plan/22 #4, S3). Zero-anchored bar
-// length + a right label gutter reserved OUTSIDE the bar (plan/18 — never
+// Progress geometry — pure, React-free. Zero-anchored bar
+// length + a right label gutter reserved OUTSIDE the bar ( — never
 // measured): the viewBox widens for the label, the track never shrinks, so the
 // same fraction renders the same bar length whatever the label says (rows stay
 // comparable). `fraction` arrives pre-clamped to [0, 1]; overflow truth lives

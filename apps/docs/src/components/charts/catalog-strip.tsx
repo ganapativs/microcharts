@@ -4,13 +4,7 @@ import { STABLE_CHARTS, getChart } from "@/lib/catalog";
 import { getModule } from "@/lib/charts/registry";
 import { CATALOG } from "@/lib/docs-facts";
 
-/**
- * A representative slice of the *whole* catalog — not the same five charts the
- * guides use as worked examples. Slugs are sampled evenly across the registry
- * (which is ordered core → decision → expressive → frontier), so the strip spans
- * families and updates itself as the catalog grows. Deterministic: no random, so
- * server and client render the same set. Each mark links to its page.
- */
+/** Even sample across the registry (core → frontier). Deterministic. */
 function sample(count: number): string[] {
   const all = STABLE_CHARTS;
   if (all.length <= count) return all.map((c) => c.slug);
@@ -35,8 +29,6 @@ export function CatalogStrip({ count = 12 }: { count?: number }) {
               href={`/docs/charts/${slug}`}
               className="panel group flex items-center gap-3 px-3 py-2.5 no-underline"
             >
-              {/* clean word-sized mark — strip the chart's own labels so it reads
-                  as an identity glyph at this scale */}
               <span className="flex h-6 w-12 shrink-0 items-center justify-center overflow-hidden opacity-90 [&_text]:hidden">
                 <Mark data={c.demo} width={44} height={18} />
               </span>

@@ -178,15 +178,12 @@ const TEAMS: { name: string; value: number; target: number }[] = [
   { name: "South", value: 54, target: 80 },
 ];
 
-/* The four homes — Bullet always doing the one thing it's for: a measure read
-   against a target and qualitative bands. Every host is a progress/compliance
-   surface (quota, budget, SLA), never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Q3 quota attainment sits at{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Bullet value={72} target={80} bands={[50, 90]} summary={false} width={90} height={14} />
         </span>{" "}
         — inside the good band, short of target.

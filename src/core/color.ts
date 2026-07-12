@@ -1,8 +1,8 @@
-// Palette constants + categorical resolution (plan/06 §2). Runtime color comes
+// Palette constants + categorical resolution. Runtime color comes
 // from CSS custom properties at paint time; this module supplies the canonical
 // hex values (for the stylesheet + non-CSS renderers) and index → token mapping.
 
-/** Okabe-Ito colorblind-safe palette (plan/06). */
+/** Okabe-Ito colorblind-safe palette. */
 export const OKABE_ITO = {
   black: "#000000",
   orange: "#E69F00",
@@ -24,7 +24,7 @@ export const SEMANTIC = {
 } as const;
 
 /** Categorical order — yellow excluded from the default (low contrast on light
- *  backgrounds, plan/06/08). Micro charts rarely need > 3 series. */
+ * backgrounds, /08). Micro charts rarely need > 3 series. */
 export const CATEGORICAL = [
   OKABE_ITO.orange,
   OKABE_ITO.skyBlue,

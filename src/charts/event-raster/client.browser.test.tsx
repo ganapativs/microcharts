@@ -7,7 +7,7 @@ const RASTER = [
   { label: "db", events: [3, 6, 10] },
 ];
 
-describe("interactive <EventRaster> (plan/25 §5)", () => {
+describe("interactive <EventRaster>", () => {
   it("↓ then → roves lanes and events; announces the event", async () => {
     const screen = await render(
       <EventRaster data={RASTER} title="Events" width={160} height={24} />,

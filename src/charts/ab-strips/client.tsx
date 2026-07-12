@@ -1,5 +1,5 @@
 "use client";
-// Interactive <ABStrips> (plan/23 #13). One pointer listener: y picks the row,
+// Interactive <ABStrips>. One pointer listener: y picks the row,
 // x snaps to the nearest quantile edge. ↑/↓ switch rows, ←/→ step edges. The
 // median edge announces the row median + delta vs the other arm; other edges
 // announce the percentile. Composes the static component (canon).

@@ -1,4 +1,4 @@
-// Ohlc geometry — pure, React-free (plan/22 #24, structured). High-low wick +
+// Ohlc geometry — pure, React-free. High-low wick +
 // open-close body per period. Domain fits [min(low), max(high)] exactly —
 // price charts are position reads (documented like Sparkline's baseline
 // note). NEVER downsampled: past maxPeriods the most recent N render and the

@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<MoonPhase> (plan/24 #6)", () => {
+describe("<MoonPhase>", () => {
   it("progress summary is the real string", () => {
     const { container } = draw(<MoonPhase value={0.68} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

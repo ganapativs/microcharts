@@ -20,7 +20,7 @@ const FC: ForecastInput = {
   ],
 };
 
-describe("forecastConeGeometry (plan/23 #11)", () => {
+describe("forecastConeGeometry", () => {
   it("history line + boundary + dashed mid + 2 bands", () => {
     const geo = forecastConeGeometry({ ...base, data: HIST, forecast: FC })!;
     expect(geo.history.d).toMatch(/^M/);

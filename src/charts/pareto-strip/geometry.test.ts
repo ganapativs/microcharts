@@ -12,7 +12,7 @@ const CAUSES = [
   { label: "Other bugs", value: 7 },
 ];
 
-describe("paretoGeometry (plan/23 #15)", () => {
+describe("paretoGeometry", () => {
   it("sorts descending; bars carry share + running cumulative", () => {
     const shuffled = [CAUSES[2]!, CAUSES[0]!, CAUSES[4]!, CAUSES[1]!, CAUSES[3]!, CAUSES[5]!];
     const geo = paretoGeometry({ ...base, data: shuffled })!;

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <CometTrail> (plan/24 #21). Motion only on data change — no idle
+// Interactive <CometTrail>. Motion only on data change — no idle
 // loop: the head EASES to each new value (WAAPI transform, ~200 ms) and the old
 // head decays into the trail. A continuous stream makes the comet; a stalled
 // stream goes still, which is itself the signal. The dot jumps to truth, eased,

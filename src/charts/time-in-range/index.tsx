@@ -1,5 +1,5 @@
 // <TimeInRange> — how much of the period was the metric inside its acceptable
-// corridor, and which side did it miss on (plan/25 §1, plan/17 F6). Static,
+// corridor, and which side did it miss on. Static,
 // hook-free, RSC-safe. Zone order is semantic and immutable: the strip is read
 // by position first, color second — a clinically proven grammar (AGP lineage).
 import type { CSSProperties, ReactNode } from "react";

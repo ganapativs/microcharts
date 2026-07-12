@@ -1,4 +1,4 @@
-// <TrendArrow> — direction at glyph size (plan/22 #1, S4). "Which way is this
+// <TrendArrow> — direction at glyph size. "Which way is this
 // moving?" before any number. Static, hook-free, RSC-safe. Direction is never
 // color-alone: the glyph shape IS the direction (up / down / flat), color
 // reinforces valence per the `positive` polarity. Magnitude is only spoken by
@@ -16,7 +16,7 @@ export interface TrendArrowModel {
   valence: "pos" | "neg" | "flat";
   /** Formatted magnitude (`12%`), or `—` for non-finite input. */
   display: string;
-  /** Factual summary — direction + magnitude, never valence (plan/08). */
+  /** Factual summary — direction + magnitude, never valence. */
   summary: string;
 }
 
@@ -58,7 +58,7 @@ export interface TrendArrowProps {
   glyph?: TrendGlyph | undefined;
   /** Append the formatted value in a right gutter. */
   showValue?: boolean | undefined;
-  /** Which direction is "good" — flips only the color, never the glyph (plan/04 §6). */
+  /** Which direction is "good" — flips only the color, never the glyph. */
   positive?: "up" | "down" | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
   locale?: string | string[] | undefined;
@@ -89,7 +89,7 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
   const model = trendArrowModel(props);
   const geo = trendArrowGeometry({ width: SIZE, height: SIZE, direction: model.direction, glyph });
 
-  // Right gutter reserved from the rendered text's char count (plan/18 —
+  // Right gutter reserved from the rendered text's char count (
   // 0.62em/char over-estimate; never measured).
   const width = showValue
     ? Math.ceil(geo.labelX + model.display.length * geo.fontSize * 0.62 + 1)

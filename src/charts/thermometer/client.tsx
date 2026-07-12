@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Thermometer> (plan/24 #5). Hover/focus reveals the value readout;
+// Interactive <Thermometer>. Hover/focus reveals the value readout;
 // the fill glides to its new level (CSS, reduced-motion-gated); announces through
 // a polite region on change, and calls out a target crossing. No pointer math —
 // a single value; hover is a reveal, not a lookup. Composes the static component.

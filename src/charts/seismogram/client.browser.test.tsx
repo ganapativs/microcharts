@@ -4,7 +4,7 @@ import { Seismogram } from "./client.js";
 
 const DATA = [0, 3, 0, 8, 0];
 
-describe("interactive <Seismogram> (plan/22 #8)", () => {
+describe("interactive <Seismogram>", () => {
   it("arrow keys step slots; quiet slots announce no data", async () => {
     const screen = await render(<Seismogram data={DATA} title="Bursts" />);
     const wrap = screen.container.querySelector(".mc-seismo-live") as HTMLElement;

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { largestRemainderPercents, rollup, segmentedBarGeometry } from "./geometry.js";
 
-describe("segmentedBarGeometry (plan/22 #14)", () => {
+describe("segmentedBarGeometry", () => {
   it("segments fill the bar in proportion", () => {
     const geo = segmentedBarGeometry({ width: 60, height: 10, values: [62, 24, 14], fontSize: 6 });
     expect(geo.segments.length).toBe(3);

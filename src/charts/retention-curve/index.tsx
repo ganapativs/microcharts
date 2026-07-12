@@ -1,4 +1,4 @@
-// <RetentionCurve> — do they stay, and does the curve plateau? (plan/23 #7).
+// <RetentionCurve> — do they stay, and does the curve plateau?
 // A step line on a domain LOCKED to [0,1] (the full range is the honest frame
 // for a share), an optional dashed benchmark ghost behind, and a plateau marker
 // that appears only when the documented criterion holds. Static, hook-free,

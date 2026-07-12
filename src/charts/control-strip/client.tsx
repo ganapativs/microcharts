@@ -1,5 +1,5 @@
 "use client";
-// Interactive <ControlStrip> (plan/23 #10). One pointer listener + nearest-x.
+// Interactive <ControlStrip>. One pointer listener + nearest-x.
 // ←/→ step all points; Home/End jump ends. (Tab is left for focus egress —
 // trapping it to cycle violations would break keyboard escape; the violations
 // are visible as rings.) Composes the static component (canon); the crosshair +

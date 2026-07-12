@@ -4,7 +4,7 @@ import { dumbbellGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 12, gutterCh: 0, fontSize: 6 };
 
-describe("dumbbellGeometry (plan/22 #11)", () => {
+describe("dumbbellGeometry", () => {
   it("from/to positions share one scale; direction from data, not order", () => {
     const fwd = dumbbellGeometry({ ...base, pairs: [{ from: 62, to: 84 }] });
     const rev = dumbbellGeometry({ ...base, pairs: [{ from: 84, to: 62 }] });

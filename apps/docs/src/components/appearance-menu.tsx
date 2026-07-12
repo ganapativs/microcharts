@@ -6,9 +6,7 @@ import { Check, Monitor, Moon, Palette, Sun } from "lucide-react";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { cn } from "@/lib/cn";
 
-// Accent palette — solid, editorial (Cobalt is the default). Charts bind their
-// --mc-accent to whichever is chosen; a single honest colour, never a gradient
-// (color encodes data, it never decorates — CLAUDE.md non-negotiable #6).
+// Accent palette — Cobalt default. Charts bind `--mc-accent` to the choice.
 const SOLIDS = [
   { id: "cobalt", label: "Cobalt", swatch: "#2f52d4" },
   { id: "ember", label: "Ember", swatch: "#c2410c" },
@@ -24,8 +22,7 @@ const THEMES = [
   { id: "dark", icon: Moon, label: "Dark" },
 ] as const;
 
-// Chart presets — the library's token bundles. "modern" is the default (no
-// attribute); the rest set [data-mc-preset] on <html>. Charts recolor live.
+// Chart presets → [data-mc-preset] on <html> (modern = default, no attribute).
 const PRESETS = [
   { id: "modern", label: "Modern" },
   { id: "editorial", label: "Editorial" },

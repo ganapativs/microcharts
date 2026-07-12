@@ -17,7 +17,7 @@ const g = (
     ...extra,
   });
 
-describe("orbitStatusGeometry (plan/24 #22) — two live variables", () => {
+describe("orbitStatusGeometry — two live variables", () => {
   it("orbit radius grows with latency", () => {
     expect(g(100, 5).orbit.r).toBeLessThan(g(400, 5).orbit.r);
   });

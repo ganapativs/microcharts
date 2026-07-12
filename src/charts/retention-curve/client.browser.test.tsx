@@ -5,7 +5,7 @@ import { RetentionCurve } from "./client.js";
 const SAMPLE = [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34];
 const BENCH = [1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.28];
 
-describe("interactive <RetentionCurve> (plan/23 #7)", () => {
+describe("interactive <RetentionCurve>", () => {
   it("arrow keys step periods; announces retention and benchmark", async () => {
     const screen = await render(
       <RetentionCurve data={SAMPLE} benchmark={BENCH} unit="week" title="Cohort" />,

@@ -14,8 +14,8 @@ const PL = [
   { label: "Upsells", value: 60 },
 ];
 
-describe("<Waterfall> (plan/22 #20, S2-signed)", () => {
-  it("floating bars + connectors + total; docs-as-tests summary", () => {
+describe("<Waterfall>", () => {
+  it("floating bars + connectors + total summary", () => {
     const { container } = draw(<Waterfall data={PL} start={1200} />);
     expect(container.querySelectorAll("rect").length).toBe(5); // 4 steps + total
     expect(container.querySelectorAll("line").length).toBe(4);

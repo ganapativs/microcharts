@@ -10,7 +10,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const pathOf = (c: HTMLElement) => c.querySelector(".mc-trend path")!.getAttribute("d")!;
 const inkOf = (c: HTMLElement) => c.querySelector(".mc-trend path")!.getAttribute("data-mc-ink");
 
-describe("<TrendArrow> (plan/22 #1, S4)", () => {
+describe("<TrendArrow>", () => {
   it("positive → up glyph + positive ink; negative → distinct down glyph + negative ink", () => {
     const up = draw(<TrendArrow value={0.12} />).container;
     const down = draw(<TrendArrow value={-0.12} />).container;
@@ -37,14 +37,14 @@ describe("<TrendArrow> (plan/22 #1, S4)", () => {
     expect(inkOf(container)).toBe("positive");
   });
 
-  it("positive='down' flips ink, never the glyph (plan/04 §6)", () => {
+  it("positive='down' flips ink, never the glyph", () => {
     const up = draw(<TrendArrow value={0.1} />).container;
     const upBad = draw(<TrendArrow value={0.1} positive="down" />).container;
     expect(pathOf(upBad)).toBe(pathOf(up)); // same direction shape
     expect(inkOf(upBad)).toBe("negative"); // flipped valence
   });
 
-  it("summary: 'Up 12%.' — the docs' real string (docs-as-tests)", () => {
+  it("summary: 'Up 12%.' — the docs' real string", () => {
     const { container } = draw(
       <TrendArrow value={0.12} format={{ style: "percent", maximumFractionDigits: 0 }} />,
     );

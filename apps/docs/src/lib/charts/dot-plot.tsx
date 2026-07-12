@@ -148,16 +148,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — DotPlot always answering "how do a few named values compare
-   on one scale", never a generic "signups held steady" template. Every host
-   is a real leaderboard surface: a review-cycle sentence, a per-pod table,
-   a spread KPI, a pod switcher. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         This cycle's review scores{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <DotPlot data={TEAM} summary={false} width={76} height={34} />
         </span>{" "}
         spread from Kim's 41 to Ada's 96 — a 55-point range.

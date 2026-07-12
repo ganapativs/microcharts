@@ -1,5 +1,5 @@
 "use client";
-// Interactive <TreeRings> (plan/24 #13). Radial pointer lookup (distance from
+// Interactive <TreeRings>. Radial pointer lookup (distance from
 // centre → ring index) + ←/→ stepping inner→outer; the focused ring is ringed
 // and its period announced. Composes the static component.
 import { useMemo, useRef, useState, type PointerEvent } from "react";

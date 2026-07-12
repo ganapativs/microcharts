@@ -14,7 +14,7 @@ const at = (over: Partial<Parameters<typeof stationGlyphGeometry>[0]> = {}) =>
     ...over,
   });
 
-describe("stationGlyphGeometry (plan/25 §20, plan/17 F2)", () => {
+describe("stationGlyphGeometry", () => {
   it("sky cover rounds to a 0–4 index; disc fills by fraction", () => {
     expect(at({ cloud: 0 }).oktaIndex).toBe(0);
     expect(at({ cloud: 0.75 }).oktaIndex).toBe(3);

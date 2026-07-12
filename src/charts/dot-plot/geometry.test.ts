@@ -4,7 +4,7 @@ import { dotPlotGeometry, truncateLabel } from "./geometry.js";
 
 const base = { width: 60, height: 40, gutterCh: 5, fontSize: 6, stem: false };
 
-describe("dotPlotGeometry (plan/22 #10)", () => {
+describe("dotPlotGeometry", () => {
   it("one row per value; dots positioned on a shared scale", () => {
     const geo = dotPlotGeometry({ ...base, values: [10, 20, 30] });
     expect(geo.rows.length).toBe(3);

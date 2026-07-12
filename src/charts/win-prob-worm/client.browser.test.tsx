@@ -4,7 +4,7 @@ import { WinProbWorm } from "./client.js";
 
 const GAME = [50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98];
 
-describe("interactive <WinProbWorm> (plan/26 §4)", () => {
+describe("interactive <WinProbWorm>", () => {
   it("←/→ rove the points, announcing leader + probability; a readout chip shows it", async () => {
     const screen = await render(
       <WinProbWorm data={GAME} sides={["home", "away"]} width={220} height={32} title="Win prob" />,

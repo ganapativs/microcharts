@@ -89,8 +89,7 @@ export const showcase = {
 };
 
 // domain, format, locale, id, className, style, children: styling/formatting
-// escape hatches, not chart-shape knobs (consistent with every other chart's
-// playground).
+
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "start", label: "start", min: 0, max: 100, step: 5, init: 60 },
@@ -213,15 +212,12 @@ const BRIDGES: { name: string; steps: Step[]; positive: "up" | "down" }[] = [
   { name: "Costs", steps: PL.map((d) => ({ label: d.label, value: -d.value })), positive: "down" },
 ];
 
-/* The four homes — Waterfall always doing the one thing it's for: how signed
-   deltas compose into a total. Every host is a P&L or bridge surface, never a
-   generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Net income bridged from $60k to $87k this quarter{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Waterfall data={PL} start={60} summary={false} width={100} height={16} />
         </span>{" "}
         — Product and Services carried it past Refunds and Opex.

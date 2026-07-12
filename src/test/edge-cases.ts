@@ -1,4 +1,4 @@
-// Shared edge-case matrix (plan/21 §6.0.D, plan/09). Every chart's index.test
+// Shared edge-case matrix. Every chart's index.test
 // runs the SAME degenerate inputs, so "handles empty/null/NaN" is a suite-wide
 // invariant, not a per-chart courtesy — this kills the Grafana bug class.
 // Behavior asserted here is the documented floor: never crash, never leak a
@@ -64,7 +64,7 @@ function expectNoNonFiniteLeak(root: HTMLElement): void {
   expect(root.textContent).not.toMatch(/NaN|Infinity|undefined/);
 }
 
-/** The accessible-name contract holds even for degenerate data (plan/08). */
+/** The accessible-name contract holds even for degenerate data. */
 function expectA11yShape(root: HTMLElement): void {
   const named = root.querySelector('[role="img"][aria-label], [role="img"][aria-labelledby]');
   const decorative = root.querySelector('[aria-hidden="true"]');

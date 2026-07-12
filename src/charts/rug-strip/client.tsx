@@ -1,5 +1,5 @@
 "use client";
-// Interactive <RugStrip> (plan/22 #5). One pointer listener; nearest tick by
+// Interactive <RugStrip>. One pointer listener; nearest tick by
 // binary search over the sorted positions. ←/→ step through the SORTED
 // observations ("5.2 — 19th of 38."). Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

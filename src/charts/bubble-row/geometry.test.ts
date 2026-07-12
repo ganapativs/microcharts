@@ -5,7 +5,7 @@ import { bubbleRowGeometry } from "./geometry.js";
 const g = (values: (number | null)[], align: "center" | "baseline" = "center") =>
   bubbleRowGeometry({ values, height: 30, gap: 2, align, pad: 1, labelBand: 8 });
 
-describe("bubbleRowGeometry (plan/24 #11) — area-true bubbles", () => {
+describe("bubbleRowGeometry — area-true bubbles", () => {
   it("radius is √value (area-true, never linear)", () => {
     const geo = g([400, 100]);
     expect(geo.bubbles[0]!.r / geo.bubbles[1]!.r).toBeCloseTo(2, 1); // √(400/100)=2

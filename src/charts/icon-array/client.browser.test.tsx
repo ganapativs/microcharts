@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { IconArray } from "./client.js";
 
-describe("interactive <IconArray> (plan/23 #21)", () => {
+describe("interactive <IconArray>", () => {
   it("2-D roving announces the running count", async () => {
     const screen = await render(<IconArray value={0.15} total={20} title="Risk" />);
     const wrap = screen.container.querySelector(".mc-icon-array-live") as HTMLElement;

@@ -19,8 +19,8 @@ const TRAIL: GradePoint[] = [
   { d: 900, elev: 865 },
 ];
 
-describe("<GradeProfile> (plan/26 §3)", () => {
-  it("renders a quad per segment + a ridge; docs-as-tests summary", () => {
+describe("<GradeProfile>", () => {
+  it("renders a quad per segment + a ridge summary", () => {
     const { container } = draw(<GradeProfile data={TRAIL} width={120} height={40} />);
     expect(container.querySelectorAll("path").length).toBe(TRAIL.length); // 6 quads + 1 ridge
     const geo = gradeProfileGeometry({
@@ -82,7 +82,7 @@ describe("<GradeProfile> (plan/26 §3)", () => {
   });
 });
 
-describe("<GradeProfile> edge cases (plan/26 §3)", () => {
+describe("<GradeProfile> edge cases", () => {
   const cases: Record<string, GradePoint[]> = {
     empty: [],
     "single point": [{ d: 0, elev: 500 }],

@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<FillWord> (plan/24 #3)", () => {
+describe("<FillWord>", () => {
   it("summary is the real string: '{word}: {pct} complete.'", () => {
     const { container } = draw(<FillWord word="uploading" value={0.62} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

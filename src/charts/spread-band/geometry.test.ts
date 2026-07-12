@@ -4,7 +4,7 @@ import { spreadBandGeometry } from "./geometry.js";
 
 const base = { width: 80, height: 20, gutterCh: 0, fontSize: 6 };
 
-describe("spreadBandGeometry (plan/26 §6)", () => {
+describe("spreadBandGeometry", () => {
   it("one shared domain: the same value lands at the same y in both series", () => {
     const geo = spreadBandGeometry({
       ...base,

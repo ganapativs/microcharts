@@ -123,7 +123,6 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
-  // `data` isn't a knob — the wave is the fixture; shuffle regenerates it.
   // `title`/`summary` drive the accessible name, not a visual toggle — title
   // stays fixed to "Playground" below.
   knobs: [
@@ -237,15 +236,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — ActivityGrid always doing the one thing it's for: cadence
-   at a glance, never a single cell's exact value. Every host is a commit/deploy
-   surface (this chart's own bestFor), never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Commit cadence for the last two weeks{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <ActivityGrid data={demoGrid.slice(0, 14)} layout="strip" cell={7} summary={false} />
         </span>{" "}
         — bursts of shipping, punctuated by two dead-quiet days.

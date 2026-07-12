@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { ringGeometry } from "./geometry.js";
 
-describe("ringGeometry (plan/22 #17)", () => {
+describe("ringGeometry", () => {
   it("fraction 0 → track only (no zero-length arc artifact)", () => {
     const geo = ringGeometry({ size: 24, fraction: 0, weight: 3, sweep: false });
     expect(geo.track).not.toBe("");

@@ -15,8 +15,8 @@ const DATA = [
   { label: "Mid", from: 20, to: 35 },
 ];
 
-describe("<Slope> (plan/22 #13, S2-paired)", () => {
-  it("one line + endpoint dots per category; docs-as-tests summary", () => {
+describe("<Slope>", () => {
+  it("one line + endpoint dots per category summary", () => {
     const { container } = draw(<Slope data={DATA} />);
     expect(container.querySelectorAll("line").length).toBe(5);
     expect(container.querySelectorAll("circle").length).toBe(10);

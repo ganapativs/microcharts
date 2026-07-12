@@ -1,5 +1,5 @@
 // <TraceFold> — where did the latency go: which spans, at which depth, on the
-// path that actually determined the total (plan/25 §18, plan/17 F17). Static,
+// path that actually determined the total. Static,
 // hook-free, RSC-safe. One rect per span (x = start, width = duration, row =
 // depth); the critical path is accented so "which spans mattered" reads at once.
 import type { CSSProperties, ReactNode } from "react";

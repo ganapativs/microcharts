@@ -1,4 +1,4 @@
-// StatusDot geometry — pure, React-free (plan/22 #2, S4 categorical). Five
+// StatusDot geometry — pure, React-free. Five
 // distinct silhouettes paired with semantic tokens: the shape+color pairing is
 // the a11y contract (never color-alone by construction), so the glyphs must
 // survive grayscale, print, and forced-colors on silhouette alone.

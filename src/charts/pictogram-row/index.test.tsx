@@ -11,7 +11,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<PictogramRow> (plan/22 #7, S3)", () => {
+describe("<PictogramRow>", () => {
   it("filled + hollow units; summary is the docs' real string", () => {
     const { container } = draw(<PictogramRow value={5} total={8} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("5 of 8.");

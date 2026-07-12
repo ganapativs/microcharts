@@ -1,4 +1,4 @@
-// CometTrail geometry — pure, React-free (plan/24 #21, S1 rolling window). Where
+// CometTrail geometry — pure, React-free. Where
 // is the value now, and where has it just been? A head dot at the current value
 // plus a fading positional trail of recent points. Opacity encodes AGE only,
 // never value — the y position does value. x = age position (newest at right).

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <HistogramStrip> (plan/22 #15). One pointer listener; bin by
+// Interactive <HistogramStrip>. One pointer listener; bin by
 // x-band. ←/→ rove bins ("40 to 50: 34 values."). Composes the static entry.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";

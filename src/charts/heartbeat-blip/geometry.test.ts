@@ -5,7 +5,7 @@ import { heartbeatGeometry } from "./geometry.js";
 const g = (events: readonly number[], now = 100_000, win = 60_000) =>
   heartbeatGeometry({ events, window: win, now, width: 60, height: 16, pad: 1 });
 
-describe("heartbeatGeometry (plan/24 #20) — event liveness", () => {
+describe("heartbeatGeometry — event liveness", () => {
   it("counts in-window events and builds a spike per event", () => {
     const geo = g([97_000, 90_000, 80_000]);
     expect(geo.count).toBe(3);

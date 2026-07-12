@@ -1,4 +1,4 @@
-// QuadrantDot geometry — pure, React-free (plan/23 #17). Where does this item
+// QuadrantDot geometry — pure, React-free. Where does this item
 // sit in the 2×2, against the field? A focal dot placed by 2-D position, a
 // hairline cross at the split (default = domain midpoints, always overridable
 // but never hidden), and tiny muted ghost dots for the peer field. The read is

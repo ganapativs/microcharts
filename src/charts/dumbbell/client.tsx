@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Dumbbell> (plan/22 #11). One pointer listener; row by y-band.
+// Interactive <Dumbbell>. One pointer listener; row by y-band.
 // ↑/↓ rove rows; ←/→ within a row toggles the from/to announcement
 // ("From: 62,000." / "To: 84,000."). Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

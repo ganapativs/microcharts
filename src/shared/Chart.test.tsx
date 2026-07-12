@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import { Chart } from "./Chart.js";
 import { MicroProvider } from "./MicroProvider.js";
 
-describe("Chart (a11y composition, plan/08)", () => {
+describe("Chart (a11y composition, )", () => {
   it("is a role=img svg with an integer viewBox and mc-root class", () => {
     const { container } = render(<Chart width={80} height={20} summary="Trending up." />);
     const svg = container.querySelector("svg")!;
@@ -47,7 +47,7 @@ describe("Chart (a11y composition, plan/08)", () => {
   });
 });
 
-describe("MicroProvider (theming, plan/06)", () => {
+describe("MicroProvider (theming, )", () => {
   it("modern (default) sets no data-mc-theme attribute", () => {
     const { container } = render(<MicroProvider>x</MicroProvider>);
     expect(container.firstElementChild!.hasAttribute("data-mc-theme")).toBe(false);

@@ -1,4 +1,4 @@
-// TokenConfidence "geometry" — pure, React-free (plan/25 §7, plan/17 F12). No
+// TokenConfidence "geometry" — pure, React-free. No
 // SVG: the tiering is the only computation. Per-token confidence maps to THREE
 // discrete tiers, never a continuous gradient — people calibrate categorically,
 // and a gradient prop will never exist (color-alone would fail a11y anyway).

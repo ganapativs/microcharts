@@ -1,4 +1,4 @@
-// SproutRow geometry — pure, React-free (plan/24 #9, S2 ordinal). Four discrete
+// SproutRow geometry — pure, React-free. Four discrete
 // growth stages (seed → sprout → leaf → bloom) with glyph height STRICTLY
 // MONOTONIC so the ordering reads untrained (taller = further along). No
 // interpolated half-stages — a growth metaphor must not fake continuity. Each

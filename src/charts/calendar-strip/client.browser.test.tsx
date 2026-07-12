@@ -15,7 +15,7 @@ const mount = async (ui: React.ReactNode) => {
   return screen.getByRole("img").element() as HTMLElement;
 };
 
-describe("interactive <CalendarStrip> (plan/22 #26)", () => {
+describe("interactive <CalendarStrip>", () => {
   it("focusable role=img named by the calendar summary", async () => {
     const fig = await mount(<CalendarStrip data={DATA} end={END} title="Deploys" />);
     expect(fig.getAttribute("tabindex")).toBe("0");

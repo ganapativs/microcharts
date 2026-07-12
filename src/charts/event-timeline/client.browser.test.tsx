@@ -16,7 +16,7 @@ const mount = async (ui: React.ReactNode) => {
   return screen.getByRole("img").element() as HTMLElement;
 };
 
-describe("interactive <EventTimeline> (plan/22 #27)", () => {
+describe("interactive <EventTimeline>", () => {
   it("focusable role=img named by the coverage summary", async () => {
     const fig = await mount(<EventTimeline data={DATA} domain={WINDOW} title="api" />);
     expect(fig.getAttribute("aria-label")).toBe("api. 1 span covering 19% of the window; 1 event.");

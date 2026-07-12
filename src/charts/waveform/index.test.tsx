@@ -12,8 +12,8 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const fmt = makeFormatter(undefined, undefined);
 const SPIKE = Array.from({ length: 200 }, (_, i) => (i === 126 ? 0.82 : Math.sin(i / 3) * 0.15));
 
-describe("<Waveform> (plan/25 §4, plan/17 F9)", () => {
-  it("renders bar path; docs-as-tests summary discloses the peak", () => {
+describe("<Waveform>", () => {
+  it("renders bar path summary discloses the peak", () => {
     const { container } = draw(<Waveform data={SPIKE} />);
     expect(container.querySelector('path[data-mc-ink="bar"]')).not.toBeNull();
     expect(waveformSummary(SPIKE, EN_WAVEFORM, fmt)).toBe("Peak 0.82 at 63% through 200 samples.");

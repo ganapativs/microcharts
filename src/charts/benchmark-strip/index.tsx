@@ -1,4 +1,4 @@
-// <BenchmarkStrip> — is this value normal for its peer group? (plan/23 #2). A
+// <BenchmarkStrip> — is this value normal for its peer group? A
 // focal dot on a common scale against the peers' own empirical quantile bands.
 // Static, hook-free, RSC-safe. No axis: the band is the reference frame. Bands
 // are quantiles of the SUPPLIED peers, never a fitted curve; the stated
@@ -126,7 +126,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
   // the percentile/value reads OUT in a clean right gutter (over the band it was
   // cramped + low-contrast) — colored like the dot so it stays tied to the focal
   const midY = round2(height / 2);
-  // pin the label size to viewBox units (see coverage-strip / plan/12)
+  // pin the label size to viewBox units (see coverage-strip / )
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <PolarClock> (plan/24 #17). One pointer listener; the cursor angle
+// Interactive <PolarClock>. One pointer listener; the cursor angle
 // (atan2, 12 o'clock clockwise) maps to a segment. Hover lifts that sector to the
 // accent and shows its label; ←/→ step segments circularly; a polite live region
 // announces the focused segment. Composes the static component (canon).

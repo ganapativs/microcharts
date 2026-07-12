@@ -1,5 +1,5 @@
 "use client";
-// Interactive <TallyMarks> (plan/24 #1). Announces the new total through a
+// Interactive <TallyMarks>. Announces the new total through a
 // polite region on change; newly added marks draw in via a one-shot
 // stroke-dashoffset sweep (≤200 ms, reduced-motion → instant). No pointer or
 // keyboard model beyond wrapper focus — a count has no sub-parts to navigate.

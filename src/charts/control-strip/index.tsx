@@ -1,5 +1,5 @@
 // <ControlStrip> — is the process in control, or did something leave the band?
-// (plan/23 #10). A Shewhart individuals control chart: the band is center ± 3σ̂
+// A Shewhart individuals control chart: the band is center ± 3σ̂
 // (σ̂ = mean moving range / 1.128, stated — never a vague "±3 sigma"). Static,
 // hook-free, RSC-safe. In-control points are bare vertices; only out-of-control
 // points are marked (ringed, negative — the ring is a shape cue, not

@@ -1,8 +1,8 @@
-// <Delta> — change vs prior (plan/05 §2, S4). The most common SaaS KPI element:
+// <Delta> — change vs prior. The most common SaaS KPI element:
 // a direction glyph + signed value. Static, hook-free, RSC-safe. Rendered as
 // accessible inline HTML (not a tiny SVG viewBox) so the number flows and wraps
 // like text; the glyph is an inline SVG. Direction is ALWAYS double-encoded —
-// triangle shape (up/down/flat) AND color — never color alone (plan/08 1.4.1).
+// triangle shape (up/down/flat) AND color — never color alone.
 import { makeFormatter } from "../../core/format.js";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -23,7 +23,7 @@ export interface DeltaModel {
   /** `pos` | `neg` | `flat` (drives the valence color). */
   valence: "pos" | "neg" | "flat";
   glyphKey: "up" | "down" | "flat";
-  /** Factual summary sentence — direction + magnitude, never valence (plan/08). */
+  /** Factual summary sentence — direction + magnitude, never valence. */
   summary: string;
 }
 
@@ -38,7 +38,7 @@ export function deltaModel(props: DeltaProps): DeltaModel {
   const fmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
 
   // Non-finite input (NaN/±Infinity) renders the flat/em-dash form rather than
-  // "NaN%" — documented degenerate behavior (plan/09 edge matrix).
+  // "NaN%" — documented degenerate behavior.
   const magnitude = finite ? fmt(Math.abs(shown)) : "—";
   const display = finite ? `${sign > 0 ? "+" : sign < 0 ? "−" : ""}${magnitude}` : "—";
   const goodDir = positive === "up" ? 1 : -1;
@@ -56,7 +56,7 @@ export interface DeltaProps {
   value: number;
   /** Prior value; when given, Delta shows the percent change from it. */
   from?: number | undefined;
-  /** Which direction is "good" — flips only the color, never the glyph (plan/04 §6). */
+  /** Which direction is "good" — flips only the color, never the glyph. */
   positive?: "up" | "down" | undefined;
   /** Number formatting; defaults to a locale-aware percent. */
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;

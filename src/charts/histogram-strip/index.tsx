@@ -1,4 +1,4 @@
-// <HistogramStrip> — what does the distribution look like (plan/22 #15, S1).
+// <HistogramStrip> — what does the distribution look like.
 // Mode, spread, skew in a cell: ≤ 12 uniform bins, zero-anchored counts, never
 // density-smoothed. Contract: RAW observations in — pre-aggregated counts are
 // not supported (docs steer to SparkBar). Static, hook-free, RSC-safe.

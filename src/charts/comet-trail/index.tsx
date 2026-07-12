@@ -1,4 +1,4 @@
-// <CometTrail> — where is the value now, and where has it just been? (plan/24 #21,
+// <CometTrail> — where is the value now, and where has it just been? (,
 // S1 rolling window, motion type). The STATIC frame is a decaying dot-sparkline
 // with zero JS: a fading trail of recent points + a bright head dot at the current
 // value + the now-value numeral. Opacity encodes AGE only; the y position does

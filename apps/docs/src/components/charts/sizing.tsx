@@ -2,13 +2,7 @@ import type { ReactNode } from "react";
 import { LiveDemo } from "@/components/ui/live-demo";
 import { getModule } from "@/lib/charts/registry";
 
-/**
- * Per-chart "Sizing" section — the code-first answer to "how big is it and how
- * do I control that?". Every recipe pairs the real rendered chart with the
- * exact JSX that produced it, so the size prop the reader copies is the size
- * they see (docs-as-tests discipline, same contract as <LiveDemo>). Recipes
- * live in each chart's registry module.
- */
+/** Per-chart sizing recipes — each pairs a live chart with its exact JSX. */
 
 /** A visibly-constrained box so the "fills its container" recipe reads as fluid. */
 function FluidFrame({ children }: { children: ReactNode }) {

@@ -21,8 +21,8 @@ const PROFILE = [
 
 afterEach(() => vi.restoreAllMocks());
 
-describe("<StarSpoke> (plan/25 §9, plan/17 F11)", () => {
-  it("renders a value spoke path + a guide path; docs-as-tests summary", () => {
+describe("<StarSpoke>", () => {
+  it("renders a value spoke path + a guide path summary", () => {
     const { container } = draw(<StarSpoke data={PROFILE} />);
     expect(container.querySelector('path[data-mc-ink="data"]')).not.toBeNull();
     expect(starSpokeSummary(PROFILE, EN_STAR_SPOKE, fmt)).toBe(

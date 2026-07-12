@@ -209,15 +209,12 @@ const METRICS: { name: string; data: number[] }[] = [
   { name: "Network", data: [120, 118, 122, 119, 121, 120, 119, 118] },
 ];
 
-/* The four homes — Sparkline always doing the one thing it's for: a trend read
-   at a glance. Every host is a monitoring/ops surface (latency, connections,
-   resource load), distinct from the revenue example above the fold. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         p95 latency this week{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Sparkline data={LATENCY} summary={false} width={64} height={16} dots="none" />
         </span>{" "}
         — trending down.

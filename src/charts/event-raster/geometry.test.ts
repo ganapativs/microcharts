@@ -8,7 +8,7 @@ const RASTER = [
   { label: "cache", events: [5, 20, 40] },
 ];
 
-describe("eventRasterGeometry (plan/25 §5, plan/17 F18)", () => {
+describe("eventRasterGeometry", () => {
   it("one tick per event, one path per lane", () => {
     const geo = eventRasterGeometry({
       data: RASTER,

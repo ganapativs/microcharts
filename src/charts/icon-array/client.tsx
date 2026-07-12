@@ -1,5 +1,5 @@
 "use client";
-// Interactive <IconArray> (plan/23 #21). One pointer listener + pure grid
+// Interactive <IconArray>. One pointer listener + pure grid
 // lookup; ←/→/↑/↓ 2-D roving (ActivityGrid keyboard model, row-major here).
 // Each unit announces the running count — genuinely useful for a SR user
 // counting. Composes the static component (canon); the focus ring is an overlay

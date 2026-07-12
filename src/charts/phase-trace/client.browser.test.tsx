@@ -9,7 +9,7 @@ const TRAJ = [
   { x: 62, y: 130 },
 ];
 
-describe("interactive <PhaseTrace> (plan/25 §17)", () => {
+describe("interactive <PhaseTrace>", () => {
   it("←/→ step time; announce the point by its index + named axes", async () => {
     const screen = await render(
       <PhaseTrace

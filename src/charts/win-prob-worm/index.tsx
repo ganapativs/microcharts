@@ -1,4 +1,4 @@
-// <WinProbWorm> — who's winning, and when did it flip? (plan/26 §4). A single
+// <WinProbWorm> — who's winning, and when did it flip? A single
 // win-probability series on a FIXED 0–100 axis (never truncated — the honesty
 // rule): a dashed 50% midline, the worm split at every crossing so leading
 // stretches read accent and trailing stretches read neutral, a dot at each lead

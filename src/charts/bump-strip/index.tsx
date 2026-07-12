@@ -1,4 +1,4 @@
-// <BumpStrip> — how did this entity's RANK move (plan/22 #21, S1 ranks).
+// <BumpStrip> — how did this entity's RANK move.
 // #5 → #2: position among competitors, not magnitude. Rank 1 sits at the TOP
 // (inverted y — stated here and self-keyed by the "#" end labels). Step line:
 // a rank cannot be 2.4. `positive` is ignored — lower is always better in rank

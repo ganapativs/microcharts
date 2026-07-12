@@ -1,5 +1,5 @@
 "use client";
-// Interactive <EventTimeline> (plan/22 #27). Pointer → nearest item by x
+// Interactive <EventTimeline>. Pointer → nearest item by x
 // (span hit = containment, else nearest edge/point); ←/→ cycle items
 // chronologically; announces "Deploy freeze: Jun 3, 09:00 to 13:30 — 4h 30m."
 // Composes the static component (canon).

@@ -1,4 +1,4 @@
-// WinProbWorm geometry — pure, React-free (plan/26 §4). Who's winning, and when
+// WinProbWorm geometry — pure, React-free. Who's winning, and when
 // did it flip? A single win-probability series clamped to 0–100 on a FIXED
 // 0–100 axis (never truncated — the honesty rule for a probability), split at
 // every 50% crossing: the leading stretches (>50) read accent, the trailing
@@ -49,7 +49,7 @@ export function winProbWormGeometry(opts: {
   width: number;
   height: number;
   data: readonly (number | null)[];
-  /** Right gutter reserved for the "last" label (shrinks the plot, plan/18). */
+  /** Right gutter reserved for the "last" label (shrinks the plot). */
   gutterRight?: number | undefined;
   pad?: number | undefined;
 }): WinProbWormGeometry | null {
@@ -164,7 +164,7 @@ export function wormGutter(text: string, font: number): number {
 /**
  * Two-pass geometry resolve shared by both entries: probe once to learn the
  * "last" label text, reserve its gutter, then re-measure so the plot + endpoint
- * sit correctly (plan/18: gutter reserved BEFORE geometry). Pure, so the static
+ * sit correctly. Pure, so the static
  * and interactive entries compute identical numbers and cannot drift.
  */
 export function resolveWormGeo(opts: {

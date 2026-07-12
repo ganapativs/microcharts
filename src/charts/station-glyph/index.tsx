@@ -1,5 +1,5 @@
-// <StationGlyph> — a full weather observation in one character (plan/25 §20,
-// plan/17 F2). Static, hook-free, RSC-safe. Sky cover fills the center disc, a
+// <StationGlyph> — a full weather observation in one character (,
+// F2). Static, hook-free, RSC-safe. Sky cover fills the center disc, a
 // wind barb gives direction + quantized speed (reused from WindBarb), and up to
 // three corner numerals carry temperature, dew point, and pressure. One glyph,
 // four channels, no legend — the meteorologist's station model, shrunk to a word.

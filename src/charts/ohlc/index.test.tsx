@@ -21,7 +21,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<Ohlc> (plan/22 #24, structured)", () => {
+describe("<Ohlc>", () => {
   it("wick + body per period; hollow up / filled down; summary shape", () => {
     const { container } = draw(<Ohlc data={PERIODS} />);
     expect(container.querySelectorAll("rect").length).toBe(20); // one candle body per period

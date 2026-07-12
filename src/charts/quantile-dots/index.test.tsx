@@ -8,7 +8,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const UNIFORM = Array.from({ length: 20 }, (_, i) => i + 1); // 1..20
 
-describe("<QuantileDots> (plan/23 #12)", () => {
+describe("<QuantileDots>", () => {
   it("threshold summary uses frequency framing — the real string", () => {
     const { container } = draw(<QuantileDots data={UNIFORM} threshold={15} side="above" />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

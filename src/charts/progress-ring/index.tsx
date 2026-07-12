@@ -1,4 +1,4 @@
-// <ProgressRing> — how complete is this, at icon size (plan/22 #17, S3).
+// <ProgressRing> — how complete is this, at icon size.
 // Static, hook-free, RSC-safe. Start angle fixed at 12 o'clock, butt caps —
 // never a gauge: no needle, no red zone. `sweep` flips the data meaning from
 // "done grows" to "remaining shrinks" (countdown/cooldown); summary follows.

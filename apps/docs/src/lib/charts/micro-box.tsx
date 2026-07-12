@@ -81,12 +81,6 @@ export const showcase = {
   Node: () => <MicroBox data={RAW} title="Latency spread" width={130} height={22} />,
 };
 
-// data is the dataset (see `latencies` in sampleData), not a knob. stats is
-// the mutually-exclusive precomputed-aggregate path — shown separately in the
-// "precomputed stats" recipe below. domain/color/format/locale/title/summary/
-// id/className/style/children: styling/formatting escape hatches, not
-// chart-shape knobs — no interactive control (consistent with every other
-// chart's playground).
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -164,15 +158,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — MicroBox always doing the one thing it's for: reading a
-   metric's p50 and spread at a glance. Every host is a latency-monitoring
-   surface, never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Checkout latency this week{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <MicroBox stats={CHECKOUT} summary={false} width={90} height={16} />
         </span>{" "}
         — median 110ms, but the tail stretched past 300ms.

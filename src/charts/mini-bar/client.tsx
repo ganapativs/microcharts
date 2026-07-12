@@ -1,5 +1,5 @@
 "use client";
-// Interactive <MiniBar> (plan/22 #6). One pointer listener; bar index by
+// Interactive <MiniBar>. One pointer listener; bar index by
 // category-band lookup. ←/→ rove across bars ("East: 940 — 1st of 4."), focus
 // ring overlay on the active bar. Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

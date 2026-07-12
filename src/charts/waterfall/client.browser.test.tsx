@@ -7,7 +7,7 @@ const PL = [
   { label: "Refunds", value: -140 },
 ];
 
-describe("interactive <Waterfall> (plan/22 #20)", () => {
+describe("interactive <Waterfall>", () => {
   it("←/→ rove steps with running levels; End focuses the total", async () => {
     const screen = await render(<Waterfall data={PL} start={1200} title="P&L" />);
     const wrap = screen.container.querySelector(".mc-waterfall-live") as HTMLElement;

@@ -5,7 +5,7 @@ import { SpiralYear } from "./client.js";
 
 const YEAR = Array.from({ length: 52 }, (_, i) => (i === 29 ? 480 : i === 5 ? 10 : 100 + i));
 
-describe("interactive <SpiralYear> (plan/24 #18)", () => {
+describe("interactive <SpiralYear>", () => {
   it("arrow keys step chronologically and announce the period + value", async () => {
     const screen = await render(<SpiralYear data={YEAR} title="Year" size={64} />);
     const fig = screen.getByRole("img").element() as HTMLElement;

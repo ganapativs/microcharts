@@ -1,5 +1,5 @@
 "use client";
-// Interactive <RetentionCurve> (plan/23 #7). One pointer listener + nearest-
+// Interactive <RetentionCurve>. One pointer listener + nearest-
 // period math. ←/→ step periods; the live region states retention and, when a
 // benchmark is present, its value too. Composes the static component (canon);
 // the crosshair + ghost-value tick are overlay children.

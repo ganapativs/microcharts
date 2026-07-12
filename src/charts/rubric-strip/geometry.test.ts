@@ -9,7 +9,7 @@ const RUBRIC = [
   { label: "Style", score: 0.41, weight: 1 },
 ];
 
-describe("rubricStripGeometry (plan/25 §6, plan/17 F13)", () => {
+describe("rubricStripGeometry", () => {
   it("thickness ∝ weight, length ∝ score", () => {
     const geo = rubricStripGeometry({
       data: RUBRIC,

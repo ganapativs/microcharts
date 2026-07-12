@@ -13,7 +13,7 @@ const TEAMS = [
   { label: "Data", value: 18, lit: 0.6 },
 ];
 
-describe("<CitySkyline> (plan/24 #14)", () => {
+describe("<CitySkyline>", () => {
   it("summary names the count and tallest", () => {
     const { container } = draw(<CitySkyline data={TEAMS} unit="teams" />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
@@ -46,7 +46,7 @@ describe("<CitySkyline> (plan/24 #14)", () => {
   });
 
   it("labels + label='value' render text", () => {
-    // wide buildings so the labels fit (narrow cells drop long labels — plan/18)
+    // wide buildings so the labels fit (narrow cells drop long labels — )
     const cats = draw(<CitySkyline data={TEAMS} labels bw={40} />).container;
     expect([...cats.querySelectorAll("text")].map((t) => t.textContent)).toContain("Platform");
     const vals = draw(<CitySkyline data={TEAMS} label="value" />).container;

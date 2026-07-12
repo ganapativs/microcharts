@@ -1,4 +1,4 @@
-// <Ohlc> — each period's range and settlement (plan/22 #24, structured).
+// <Ohlc> — each period's range and settlement.
 // Candles: hollow up-bodies / filled down-bodies — direction is shape-coded
 // and survives grayscale print where green/red candles fail; valence tokens
 // reinforce. Market up/down semantics are fixed: `positive` is ignored
@@ -48,7 +48,7 @@ export function ohlcSummary(
 export interface OhlcProps {
   data: readonly OhlcDatum[];
   /** `"candle"` (default) | `"bars"` (open tick left, close tick right).
-   *  (plan/21 §3 names this `style`; React reserves that for CSS — logged.) */
+   * */
   variant?: "candle" | "bars" | undefined;
   /** Renders the most recent N with a dev warning past it (never averaged). */
   maxPeriods?: number | undefined;

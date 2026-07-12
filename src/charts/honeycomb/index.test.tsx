@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<Honeycomb> (plan/24 #15)", () => {
+describe("<Honeycomb>", () => {
   it("summary is the real string with the unit", () => {
     const { container } = draw(<Honeycomb value={34} total={40} unit="seats" />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

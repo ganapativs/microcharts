@@ -3,11 +3,8 @@ import { CHART_MODULES, STABLE_CHARTS } from "./registry";
 import type { ChartModule, KnobValue } from "./types";
 
 /**
- * The phantom-variable gate. Every `data={foo}` shown on a doc page must resolve
- * to a `foo` defined in the chart's `sampleData`, so a reader who copies a
- * snippet gets running code — never a `ReferenceError`. Enforced for every chart
- * that has migrated to authored contexts; a second, non-failing check tracks how
- * many charts still need the treatment.
+ * Phantom-variable gate: every `data={foo}` in displayed snippets must resolve
+ * via the chart's `sampleData`.
  */
 
 /** Every code string a doc page actually renders for a chart. */
@@ -73,27 +70,10 @@ describe("snippet sample-data (no phantom variables)", () => {
       expect(referenced, `sampleData "${s.name}" is dead weight`).toContain(s.name);
     }
   });
-
-  // Migration tracker — not a failure. Lists charts whose snippets reference a
-  // bare data var but haven't authored sampleData yet.
-  it("reports charts still needing sample-data", () => {
-    const pending = STABLE_CHARTS.filter((c) => !c.sampleData?.length).filter((c) =>
-      displayedSnippets(CHART_MODULES[c.slug]!).some((s) => dataVars(s).length),
-    );
-    // eslint-disable-next-line no-console
-    if (pending.length)
-      console.info(`sample-data pending: ${pending.map((c) => c.slug).join(", ")}`);
-    expect(Array.isArray(pending)).toBe(true);
-  });
 });
 
 /**
- * The hardened example.code gate (LAW: data literals live ONLY in
- * `sampleData`; snippets reference the named variable). Unlike the checks
- * above — scoped to migrated charts and to the `data` prop — these run
- * against EVERY stable chart's `entry.example.code`, the one snippet always
- * shown first on a chart's doc page, and cover every prop, not just `data`.
- * Hard failures: no pending-tracker exemption.
+ * Hard gate: `example.code` references sampleData vars — no inline literals.
  */
 describe("entry.example.code sample-data contract (hard gate)", () => {
   it.each(STABLE_CHARTS)(

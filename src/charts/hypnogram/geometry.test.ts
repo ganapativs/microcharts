@@ -12,7 +12,7 @@ const SLEEP = [
   { t: 90, state: "Awake" },
 ];
 
-describe("hypnogramGeometry (plan/25 §2, plan/17 F8)", () => {
+describe("hypnogramGeometry", () => {
   it("merges consecutive same-state entries", () => {
     const merged = mergeRuns(
       [

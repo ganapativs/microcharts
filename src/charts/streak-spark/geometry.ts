@@ -1,4 +1,4 @@
-// StreakSpark geometry — pure, React-free (plan/26 §2). Collapse a pass/fail/gap
+// StreakSpark geometry — pure, React-free. Collapse a pass/fail/gap
 // sequence into RUNS of equal outcome; each run is a bar whose width ∝ its length
 // on one shared scale (the runs tile the strip, so a wide bar is a genuinely long
 // run). Height + opacity encode run TYPE — streak (ok), break (fail), or the

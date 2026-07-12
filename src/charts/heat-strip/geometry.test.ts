@@ -4,7 +4,7 @@ import { HEAT_STRIP_MAX_CELLS, heatStripGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 10, steps: 5, shape: "square" as const };
 
-describe("heatStripGeometry (plan/22 #9)", () => {
+describe("heatStripGeometry", () => {
   it("one cell per slot; nulls hold their slot with a null step", () => {
     const geo = heatStripGeometry({ ...base, values: [3, null, 18] });
     expect(geo.cells.length).toBe(3);

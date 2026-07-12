@@ -87,7 +87,6 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
-  // `data` isn't a knob — the pipeline shape is the fixture, not a toggle.
   knobs: [
     {
       kind: "segmented",
@@ -173,16 +172,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — Funnel always answering "where does the pipeline leak",
-   never a generic "signups held steady" template. Every host is a real
-   conversion surface: a growth-report sentence, a per-campaign table, a
-   conversion KPI, a campaign switcher. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         This week's signup funnel{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Funnel data={PIPE} summary={false} width={64} height={20} />
         </span>{" "}
         converted 12,400 visitors to 1,116 paid — a 9% overall rate.

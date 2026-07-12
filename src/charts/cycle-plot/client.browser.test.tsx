@@ -6,7 +6,7 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const WEEKS: number[] = [];
 for (let w = 0; w < 6; w++) WEEKS.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
 
-describe("interactive <CyclePlot> (plan/23 #18)", () => {
+describe("interactive <CyclePlot>", () => {
   it("←/→ step slots, announcing the center + drift; a readout chip shows the value", async () => {
     const screen = await render(
       <CyclePlot

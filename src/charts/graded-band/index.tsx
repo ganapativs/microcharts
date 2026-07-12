@@ -1,4 +1,4 @@
-// <GradedBand> — how sure are we about one number? (plan/23 #4, S1). Nested
+// <GradedBand> — how sure are we about one number? Nested
 // central intervals graded by opacity, with a median tick. Static, hook-free,
 // RSC-safe. NEVER a bar from zero and no variant may add one (bar-plus-error-bar
 // induces edge-literalism bias); opacity maps to probability level and nothing
@@ -113,7 +113,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
   const medW = medText.length * FONT * 0.62;
   const medFlip = geo.median.x + 3 + medW > width - 1;
   const medX = round2(medFlip ? geo.median.x - 3 : geo.median.x + 3);
-  // pin the label size to viewBox units (see coverage-strip / plan/12)
+  // pin the label size to viewBox units (see coverage-strip / )
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
@@ -138,8 +138,8 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           style={{ fill: color ?? "var(--mc-accent)", fillOpacity: OPACITY(0, k) * 0.5 }}
         />
       ) : null}
-      {/* fill via inline STYLE (see benchmark-strip): the band ink-role CSS
-          would override a fill attribute to the faint --mc-band token. plan/12. */}
+      {/* fill via inline STYLE (see benchmark-strip): band ink-role CSS would
+          override a fill attribute to the faint --mc-band token. */}
       {geo.bands.map((b) => (
         <rect
           key={b.p}

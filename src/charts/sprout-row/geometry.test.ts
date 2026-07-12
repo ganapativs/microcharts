@@ -7,7 +7,7 @@ const topY = (d: string): number => {
   return Math.min(...ys);
 };
 
-describe("sproutRowGeometry (plan/24 #9) — ordinal growth", () => {
+describe("sproutRowGeometry — ordinal growth", () => {
   it("stages are rounded + clamped to 0–3; null passes through", () => {
     const geo = sproutRowGeometry({ stages: [null, -1, 2.6, 5], height: 20, step: 16, pad: 2 });
     expect(geo.slots.map((s) => s.stage)).toEqual([null, 0, 3, 3]);

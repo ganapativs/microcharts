@@ -9,10 +9,10 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const A = Array.from({ length: 60 }, (_, i) => 130 + ((i * 7) % 30) - 15);
 const B = Array.from({ length: 60 }, (_, i) => 118 + ((i * 7) % 30) - 15);
 
-describe("<ABStrips> (plan/23 #13)", () => {
+describe("<ABStrips>", () => {
   it("summary states medians, delta, and overlap — the real string", () => {
     const { container } = draw(<ABStrips data={{ a: A, b: B }} />);
-    // exact string pinned by the render (docs-as-tests)
+    // exact string pinned by the render
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toMatch(
       /^B median [\d.]+ vs A [\d.]+ \(-9%\); middle halves overlap \d+%\./,
     );

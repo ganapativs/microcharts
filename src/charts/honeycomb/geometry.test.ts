@@ -5,7 +5,7 @@ import { honeycombGeometry, hexPath, HONEYCOMB_MAX_CELLS } from "./geometry.js";
 const g = (value: number, total: number, rows: number | "auto" = "auto") =>
   honeycombGeometry({ value, total, rows, cellR: 4, pad: 1 });
 
-describe("honeycombGeometry (plan/24 #15) — hex occupancy", () => {
+describe("honeycombGeometry — hex occupancy", () => {
   it("total cells; filledCount = min(value, total), filled row-major", () => {
     const geo = g(6, 12);
     expect(geo.cells.length).toBe(12);

@@ -9,7 +9,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 // a standing that climbs from the middle half up above it
 const SAMPLE = [42, 48, 55, 61, 68, 74, 79, 81];
 
-describe("<PercentileTrace> (plan/26 §8)", () => {
+describe("<PercentileTrace>", () => {
   it("summary states current percentile, change, and band crossed — the real string", () => {
     const { container } = draw(<PercentileTrace data={SAMPLE} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

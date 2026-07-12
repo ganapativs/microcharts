@@ -9,7 +9,7 @@ const MS = (n: number) => `${Math.round(n)} ms`;
 const BEFORE = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
 const AFTER = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
 
-describe("<ShiftHistogram> (plan/23 #14)", () => {
+describe("<ShiftHistogram>", () => {
   it("summary states the median shift direction — the real string", () => {
     const { container } = draw(
       <ShiftHistogram data={{ before: BEFORE, after: AFTER }} format={MS} />,

@@ -1,4 +1,4 @@
-// <BurnChart> — will we finish on time? (plan/23 #8). A dashed plan line, the
+// <BurnChart> — will we finish on time? A dashed plan line, the
 // solid actual line to today, and a dotted projection whose slope is a linear
 // fit over the last k actual points — provisional by construction, never a
 // smoothed or optimistic curve. Static, hook-free, RSC-safe. Y zero-anchored.

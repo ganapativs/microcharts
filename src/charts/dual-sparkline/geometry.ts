@@ -1,4 +1,4 @@
-// DualSparkline geometry — pure, React-free (plan/22 #22, S1 + reference).
+// DualSparkline geometry — pure, React-free.
 // Two lines, ONE shared domain (the entire point is comparability): no dual
 // axes, no per-series normalization. Length mismatch → aligned from index 0,
 // the shorter series simply ends (stretching would fake correlation). 2-dp.
@@ -24,7 +24,7 @@ export interface DualGeometry {
 }
 
 // step is intentionally absent: on a two-line benchmark strip it reads as
-// noise, and dropping it keeps the entry inside the 3 kB hard cap (plan/12)
+// noise, and dropping it keeps the entry inside the 3 kB hard cap
 const CURVE: Record<Curve, (pts: ReadonlyArray<XY | null>) => string> = {
   linear: linePath,
   smooth: smoothPath,

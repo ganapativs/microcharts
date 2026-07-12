@@ -23,7 +23,7 @@ import { STATS } from "@/lib/stats";
 const TREND = [3, 5, 4, 8, 6, 9, 7, 11];
 const CADENCE = [0, 2, 1, 3, 4, 2, 1, 3, 2, 4, 3, 2];
 
-/* Real accessible strings — computed, never hand-written (docs-as-tests). */
+/* Accessible strings from describeSeries — not hand-written. */
 const HERO = [3, 5, 4, 8, 6, 9];
 const A11Y_ROWS = [
   { in: "[3, 5, 4, 8, 6, 9]", out: describeSeries(HERO) },
@@ -354,7 +354,7 @@ export default function HomePage() {
             {
               v: "≤ 6",
               u: "SVG nodes, typical chart",
-              note: "earn every mark",
+              note: "SVG node budget",
             },
           ].map((s, i) => (
             <Reveal key={s.u} delay={i * 60}>

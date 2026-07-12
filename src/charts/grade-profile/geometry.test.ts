@@ -19,7 +19,7 @@ const TRAIL: GradePoint[] = [
   { d: 900, elev: 865 }, // 16% → bin 3 (steepest)
 ];
 
-describe("gradeProfileGeometry (plan/26 §3)", () => {
+describe("gradeProfileGeometry", () => {
   it("quantizes each segment's grade into the right bin", () => {
     const geo = gradeProfileGeometry({ ...base, data: TRAIL });
     expect(geo.segments.map((s) => s.bin)).toEqual([2, 0, 1, 3, 0, 3]);

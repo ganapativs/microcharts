@@ -1,4 +1,4 @@
-// Horizon geometry — pure, React-free (plan/22 #25, S1). The canonical
+// Horizon geometry — pure, React-free. The canonical
 // micro-density technique: the area is folded into 2–3 opacity bands; darker
 // = farther from the baseline. Values exactly at a fold boundary belong to
 // the LOWER fold (half-open bands, property-tested). Fold count and mode are

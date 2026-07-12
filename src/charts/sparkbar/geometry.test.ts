@@ -8,7 +8,7 @@ const H = 20;
 const geo = (data: readonly Value[], opts = {}) =>
   sparkBarGeometry(data, { width: W, height: H, ...opts });
 
-describe("sparkBarGeometry (edge matrix, plan/09)", () => {
+describe("sparkBarGeometry (edge matrix, )", () => {
   it("empty → no bars", () => {
     expect(geo([]).bars).toEqual([]);
   });

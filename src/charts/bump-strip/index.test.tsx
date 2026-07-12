@@ -13,8 +13,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<BumpStrip> (plan/22 #21, S1 ranks)", () => {
-  it("step line + change dots + '#' end labels; docs-as-tests summary", () => {
+describe("<BumpStrip>", () => {
+  it("step line + change dots + '#' end labels summary", () => {
     const { container } = draw(<BumpStrip data={RANKS} />);
     expect(container.querySelector("path")).not.toBeNull();
     const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);

@@ -1,4 +1,4 @@
-// ControlStrip geometry — pure, React-free (plan/23 #10). Is the process in
+// ControlStrip geometry — pure, React-free. Is the process in
 // control, or did something leave the band? A Shewhart individuals chart: the
 // control band is center ± 3σ̂ where σ̂ = mean moving range / 1.128 (the
 // individuals estimator — sample SD is NOT used, it inflates limits under

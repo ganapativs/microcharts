@@ -21,7 +21,7 @@ const TREE = [
   { label: "HTML", value: 26 },
 ];
 
-describe("partitionStripGeometry (plan/25 §13, plan/17 F20)", () => {
+describe("partitionStripGeometry", () => {
   it("parent value = own value or the sum of its children", () => {
     expect(parentValue(TREE[0]!)).toBe(44);
     expect(parentValue(TREE[2]!)).toBe(26);

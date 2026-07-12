@@ -1,7 +1,7 @@
-// Sparkline geometry — pure, React-free, measurement-free (plan/03, plan/18).
+// Sparkline geometry — pure, React-free, measurement-free.
 // Maps a series into viewBox pixel space so the static component is a thin
 // render over this. Kept here (not inline) so it is property/edge-tested in the
-// node project without a browser. Coords are 2-dp (plan/07/09) via the kernel.
+// node project without a browser. Coords are 2-dp via the kernel.
 import { niceDomain, scaleLinear } from "../../core/scale.js";
 import { seriesStats } from "../../core/stats.js";
 import { isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
@@ -41,10 +41,10 @@ export interface SparkGeometry {
 }
 
 /**
- * Deterministic label sizing (no DOM measurement — plan/03). Font size is in
+ * Deterministic label sizing (no DOM measurement — ). Font size is in
  * viewBox units (set as an SVG attribute, so it scales with the chart instead
  * of drifting against em-based CSS), and the gutter reserves enough plot width
- * that the text NEVER paints outside the viewBox (containment rule, CLAUDE.md).
+ * that the text NEVER paints outside the viewBox (containment rule).
  * 0.62em-per-char is a safe over-estimate for tabular digits + separators.
  */
 export function labelMetrics(
@@ -80,7 +80,7 @@ export interface SparkGeometryOptions {
 
 /**
  * Places `data` into the chart's pixel box. Degenerate series are handled up
- * front (plan/09 edge matrix): empty / all-null → no marks, valid empty plot;
+ * front: empty / all-null → no marks, valid empty plot;
  * a single point sits centered; a flat series renders on the mid-line (the
  * scale maps a zero-span domain to its range midpoint).
  */
@@ -101,7 +101,7 @@ export function sparkGeometry(data: readonly Value[], opts: SparkGeometryOptions
     isFiniteValue(v) ? [round2(xFor(i)), round2(yScale(v))] : null,
   );
 
-  // Long-series guard (plan/21 §6.0.D): past maxPoints the DRAWN line drops to
+  // Long-series guard: past maxPoints the DRAWN line drops to
   // an index-preserving min/max envelope — same rule as core/downsample, but
   // reusing the already-scaled points so the guard costs no extra mapping.
   // Spikes keep their true x/y, empty buckets stay gaps; marks/summaries always
@@ -139,7 +139,7 @@ export function sparkGeometry(data: readonly Value[], opts: SparkGeometryOptions
   const max = stats ? mark(stats.maxIndex, stats.max) : null;
 
   // Area baseline: y(0) when zero-anchored (clamped into the domain), else the
-  // plot floor. Guarantees areas anchor honestly (plan/05/06, lie factor = 1).
+  // plot floor. Guarantees areas anchor honestly.
   const baselineVal = opts.zero ? Math.min(Math.max(0, domain[0]), domain[1]) : domain[0];
   const baselineY = round2(yScale(baselineVal));
 

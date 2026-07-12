@@ -9,7 +9,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 // A 24-hour day peaking at 14:00, quietest at 04:00.
 const DAY = Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 100 + h));
 
-describe("<PolarClock> (plan/24 #17)", () => {
+describe("<PolarClock>", () => {
   it("summary names the peak and quiet segment with hour labels", () => {
     const { container } = draw(<PolarClock data={DAY} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

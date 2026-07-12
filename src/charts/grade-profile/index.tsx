@@ -1,4 +1,4 @@
-// <GradeProfile> — how hard is the route, and where (plan/26 §3). Static,
+// <GradeProfile> — how hard is the route, and where. Static,
 // hook-free, RSC-safe. One baseline-anchored quad per segment, coloured by a
 // QUANTIZED grade bin (gentle → brutal); the elevation ridge rides on top and a
 // seat-gated summit tick calls out the steepest pitch. Descents are always the

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <StarSpoke> (plan/25 §9). One pointer listener; nearest spoke by
+// Interactive <StarSpoke>. One pointer listener; nearest spoke by
 // angle. ←/→ rotate focus through the spokes. Composes the static component.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";

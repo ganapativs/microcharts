@@ -117,7 +117,7 @@ export const playground: PlaygroundSpec = {
     },
     // `data` is the fixed demo series — edge cases (missing ref, single pair) get
     // their own LiveDemos below. `domain`/`color`/`format`/`strings`/`id`/
-    // `className`/`style`/`children` are styling or integration hooks, not knobs
+
     // a reader twiddles.
   ],
   render: (s) => (
@@ -194,17 +194,12 @@ const MARKETING: PairRow = [
   { label: "Events", value: 21, ref: 20 },
 ];
 
-/* The four homes — PairedBars always doing the one thing it's for: actual vs
-   plan on one shared scale. Every host is a real budget surface (a regional
-   spend line, a finance table, a budget KPI, a category tab), never a generic
-   "signups" template. Lower-than-plan is the good direction throughout —
-   positive="down" — because these are expense rows, not revenue. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Regional spend vs plan this quarter{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <PairedBars data={BUDGET} summary={false} width={100} height={18} />
         </span>{" "}
         — East is furthest off target, 940 spent against a 1,200 budget.

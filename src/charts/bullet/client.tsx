@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Bullet> (plan/04 §4, plan/08 T2). The static measure/target/bands
+// Interactive <Bullet>. The static measure/target/bands
 // visual, wrapped focusable, with a readout of the exact value vs target revealed
 // on hover or focus. The wrapper owns the accessible name (role=img); the inner
 // static chart is decorative so the reading isn't announced twice.

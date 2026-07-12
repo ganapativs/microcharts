@@ -1,4 +1,4 @@
-// Accessible-name plumbing (plan/08 §1, amended after the Phase 2 review).
+// Accessible-name plumbing.
 //
 // The static entry is hook-free (RSC-safe → no useId) and must produce output
 // that is IDENTICAL across server render, client render, StrictMode double
@@ -9,7 +9,7 @@
 //     (title + summary) and still render `<title>` for hover/secondary naming.
 //     Fully deterministic — nothing generated.
 //   - EXPLICIT `id` prop: the maximal `<title>/<desc>` + `aria-labelledby`
-//     wiring (plan/08's preferred pattern) — safe because the id is stable.
+// wiring — safe because the id is stable.
 //
 // Interactive entries use React's `useId` instead (client-only, always safe).
 

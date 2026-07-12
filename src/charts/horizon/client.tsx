@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Horizon> (plan/22 #25). Interaction is ESSENTIAL here — the
+// Interactive <Horizon>. Interaction is ESSENTIAL here — the
 // encoding is learned: the nearest-x crosshair announces the TRUE value, not
 // the band, and raises a value dot at the folded position. ←/→ steps x.
 // Composes the static component (canon).

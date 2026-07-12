@@ -19,7 +19,7 @@ function pathArea(d: string): number {
   return Math.abs(a) / 2;
 }
 
-describe("hourglassGeometry (plan/24 #7) — area-true sand", () => {
+describe("hourglassGeometry — area-true sand", () => {
   it("value 0 → all sand top, no stream", () => {
     const r = g(0);
     expect(r.topSand).not.toBe("");

@@ -5,7 +5,7 @@ import { percentileLadderGeometry } from "./geometry.js";
 const base = { width: 80, height: 12 };
 const SAMPLE = Array.from({ length: 101 }, (_, i) => i); // 0..100
 
-describe("percentileLadderGeometry (plan/23 #3)", () => {
+describe("percentileLadderGeometry", () => {
   it("ticks at the chosen percentiles, tail highest emphasis", () => {
     const geo = percentileLadderGeometry({ ...base, data: SAMPLE })!;
     expect(geo.ticks.map((t) => t.p)).toEqual([50, 90, 99]);

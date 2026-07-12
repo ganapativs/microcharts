@@ -13,8 +13,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<MicroBox> (plan/22 #16, S2)", () => {
-  it("whisker + IQR box + median tick; docs-as-tests summary", () => {
+describe("<MicroBox>", () => {
+  it("whisker + IQR box + median tick summary", () => {
     const { container } = draw(
       <MicroBox stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }} />,
     );

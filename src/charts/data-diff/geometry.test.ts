@@ -12,7 +12,7 @@ const DIFF = [
   { key: "flags", added: 8, removed: 3 },
 ];
 
-describe("dataDiffGeometry (plan/23 #16)", () => {
+describe("dataDiffGeometry", () => {
   it("both directions always drawn on one symmetric shared scale", () => {
     const geo = dataDiffGeometry({ ...base, data: DIFF })!;
     expect(geo.rows.length).toBe(6);

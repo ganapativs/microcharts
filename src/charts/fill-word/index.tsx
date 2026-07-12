@@ -1,8 +1,8 @@
 // <FillWord> — how far along a named task is, where the label IS the bar
-// (plan/24 #3, S4). A muted word with an accent copy clipped to the value
+// A muted word with an accent copy clipped to the value
 // fraction of the word's OWN inked extent (percentage inset → 50% bisects the
 // word, never a hidden wider track). No <clipPath> element → no generated id
-// (canon-safe). font-size is an SVG attribute (plan/18); textLength pins the
+// (canon-safe). font-size is an SVG attribute; textLength pins the
 // glyph extent so containment is provable server-side. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

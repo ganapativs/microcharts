@@ -8,15 +8,7 @@ import type { SampleData } from "@/lib/charts/types";
 
 type Tab = "preview" | "code";
 
-/**
- * Live demo surface: the real chart rendered above a Preview/Code toggle.
- * The code shown is the literal source for the rendered example.
- *
- * `code` is optional — when omitted, the surface renders the preview only
- * (no Preview/Code seg, no code tab). Use this for hero demos whose snippet
- * would just repeat the Install card's canonical usage right below it; the
- * hero's job is to show the chart doing its job, not duplicate the snippet.
- */
+/** Live chart with optional Preview/Code toggle. Omit `code` for preview-only. */
 export function LiveDemo({
   children,
   code,
@@ -33,9 +25,7 @@ export function LiveDemo({
   lang?: string;
   label?: string;
   meta?: string;
-  /** Chart slug — renders the MEASURED static gzip size as the meta text, so
-      doc pages never hand-key a number that can go stale. Also resolves the
-      chart's sample-data so any `data={var}` in the snippet stays runnable. */
+  /** Chart slug — measured gzip size as meta + sample-data for snippets. */
   sizeOf?: string;
   /** Override the slug used to resolve sample-data, when it differs from sizeOf. */
   dataOf?: string;
@@ -51,8 +41,6 @@ export function LiveDemo({
 
   return (
     <div className="not-prose my-6 panel overflow-hidden">
-      {/* flex-wrap + nowrap labels: at phone widths the seg drops to its own
-          line instead of the meta text breaking mid-token. */}
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-b border-hairline px-3 py-2">
         {label ? <span className="mono-label whitespace-nowrap pl-1">{label}</span> : <span />}
         <div className="flex items-center gap-2">

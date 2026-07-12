@@ -1,5 +1,5 @@
 "use client";
-// Interactive <QuadrantDot> (plan/23 #17). The focal is announced on focus;
+// Interactive <QuadrantDot>. The focal is announced on focus;
 // ←/→ cycle the field ghosts in nearest-first order, each read with its coords
 // and quadrant; a pointer picks the nearest dot within a 3-unit hit radius.
 // Composes the static component (canon); the focus ring + readout chip are

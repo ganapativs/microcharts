@@ -7,7 +7,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const ENS = Array.from({ length: 24 }, (_, i) => [31 + i, 31 + i, 31 + i]);
 
-describe("<EnsembleGhosts> (plan/23 #20)", () => {
+describe("<EnsembleGhosts>", () => {
   it("summary names the endpoint spread and the typical path — the real string", () => {
     const { container } = draw(<EnsembleGhosts data={ENS} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

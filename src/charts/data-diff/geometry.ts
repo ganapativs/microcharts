@@ -1,4 +1,4 @@
-// DataDiff geometry — pure, React-free (plan/23 #16). What changed between two
+// DataDiff geometry — pure, React-free. What changed between two
 // versions? One diverging bar per key: removed leftward (--mc-neg), added
 // rightward (--mc-pos), both ALWAYS drawn on ONE symmetric shared scale
 // (max(added,removed) across all rows) so a +500/−480 churn never looks like a

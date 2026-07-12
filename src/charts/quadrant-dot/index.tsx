@@ -1,5 +1,5 @@
 // <QuadrantDot> — where does this item sit in the 2×2, against the field?
-// (plan/23 #17). A focal dot placed by 2-D position, a hairline cross at the
+// A focal dot placed by 2-D position, a hairline cross at the
 // split (default = domain midpoints, always overridable, NEVER hidden), a faint
 // tint on the focal's quadrant, and tiny muted ghost dots for the peers. No
 // in-chart text at glyph scale — axis meaning lives in `title` + summary, so

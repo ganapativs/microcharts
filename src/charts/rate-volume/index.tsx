@@ -1,4 +1,4 @@
-// <RateVolume> — a rate moved, but on what volume? (plan/23 #5). A precise rate
+// <RateVolume> — a rate moved, but on what volume? A precise rate
 // line over deliberately low-precision ghost volume bars (the denominator). Static,
 // hook-free, RSC-safe. There is no prop to remove the bars: a rate without its
 // denominator is the lie this type prevents. The summary never states a rate

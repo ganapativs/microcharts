@@ -103,9 +103,7 @@ export const showcase = {
 
 // format/locale/strings/title/summary/id/className/style/children/width/height:
 // styling/formatting escape hatches, not chart-shape knobs — no interactive
-// control (consistent with every other chart's playground); locale is demoed
-// inline on the docs page instead. Every documented chart-shape prop
-// (maxSegments, order, label) has a knob below.
+
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -190,15 +188,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — SegmentedBar always doing the one thing it's for: reading a
-   composition at a glance. Every host is a real traffic-mix surface (site-wide,
-   per-page, per-property), never a generic "signups/revenue" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         This week&apos;s sessions skew Chrome{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <SegmentedBar data={MIX} summary={false} width={90} height={14} />
         </span>{" "}
         — 62% Chrome, 24% Safari, the rest long tail.

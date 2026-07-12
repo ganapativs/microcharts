@@ -1,4 +1,4 @@
-// Annotation layer (plan/22 #28, plan/04 §2.8). Declarative reference context
+// Annotation layer. Declarative reference context
 // — <Threshold> <TargetZone> <Marker> <Callout> — identical inside every host.
 // Static-safe by construction: no context, no cloneElement of consumer nodes,
 // no generated ids. Each component renders null on its own and carries its

@@ -16,7 +16,7 @@ const g = (
     ...extra,
   });
 
-describe("spiralYearGeometry (plan/24 #18) — calendar spiral", () => {
+describe("spiralYearGeometry — calendar spiral", () => {
   it("one mark per finite value; peak/min tracked", () => {
     const geo = g([10, 40, 20, 5]);
     expect(geo.marks.length).toBe(4);
@@ -50,7 +50,7 @@ describe("spiralYearGeometry (plan/24 #18) — calendar spiral", () => {
     expect(geo.marks.some((m) => m.index === 1)).toBe(false);
   });
 
-  it("step quantization spans 0..steps-1", () => {
+  it("step quantization spans 0.steps-1", () => {
     const geo = g([0, 25, 50, 75, 100]);
     const steps = new Set(geo.marks.map((m) => m.step));
     expect(Math.max(...steps)).toBe(4);

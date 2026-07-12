@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { MoonPhase } from "./client.js";
 
-describe("interactive <MoonPhase> (plan/24 #6)", () => {
+describe("interactive <MoonPhase>", () => {
   it("announces the phase on change (leading edge); quiet on mount", async () => {
     const screen = await render(<MoonPhase value={0.3} />);
     const live = document.querySelector('[aria-live="polite"]')!;

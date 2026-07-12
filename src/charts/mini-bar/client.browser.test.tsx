@@ -9,7 +9,7 @@ const DATA = [
   { label: "North", value: 120 },
 ];
 
-describe("interactive <MiniBar> (plan/22 #6)", () => {
+describe("interactive <MiniBar>", () => {
   it("arrow keys rove bars with rank announcements + focus ring", async () => {
     const screen = await render(<MiniBar data={DATA} title="Sales" />);
     const wrap = screen.container.querySelector(".mc-minibar-live") as HTMLElement;

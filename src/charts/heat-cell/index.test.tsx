@@ -7,7 +7,7 @@ import { valueEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<HeatCell> (plan/22 #3, S4)", () => {
+describe("<HeatCell>", () => {
   it("renders one stepped-opacity cell; summary is the docs' real string", () => {
     const { container } = draw(<HeatCell value={42} domain={[0, 100]} />);
     const rect = container.querySelector("rect")!;

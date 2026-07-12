@@ -1,4 +1,4 @@
-// <ShiftHistogram> — did the fix actually change the distribution? (plan/23 #14).
+// <ShiftHistogram> — did the fix actually change the distribution?
 // Mirrored bins over SHARED edges (before up muted, after down accent) with the
 // median shift as the precise takeaway. Heights are per-side proportions on one
 // shared scale, so unequal sample sizes cannot fake a shift. Mirror orientation

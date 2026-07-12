@@ -5,7 +5,7 @@ import { gradedBandGeometry } from "./geometry.js";
 const base = { width: 80, height: 12 };
 const SAMPLE = Array.from({ length: 101 }, (_, i) => i); // 0..100
 
-describe("gradedBandGeometry (plan/23 #4)", () => {
+describe("gradedBandGeometry", () => {
   it("nested intervals: each inner band sits inside its outer (invariant)", () => {
     const geo = gradedBandGeometry({ ...base, data: SAMPLE })!;
     // bands are widest-first

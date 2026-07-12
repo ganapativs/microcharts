@@ -8,7 +8,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const SAMPLE = Array.from({ length: 101 }, (_, i) => i);
 
-describe("<PercentileLadder> (plan/23 #3, S1)", () => {
+describe("<PercentileLadder>", () => {
   it("summary names the tail multiple — the docs' real string", () => {
     const { container } = draw(<PercentileLadder data={SAMPLE} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

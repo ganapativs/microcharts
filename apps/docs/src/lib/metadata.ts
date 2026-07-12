@@ -13,10 +13,7 @@ type MetaInput = {
   markdown?: `/${string}`;
 };
 
-/**
- * The one metadata contract (plan/20 §3). Every route calls this; no page
- * hand-rolls `<head>`. Domain comes from the swappable {@link SITE.url}.
- */
+/** Shared metadata contract for every docs route. */
 export function docsMeta({
   title,
   description,

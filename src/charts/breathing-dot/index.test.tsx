@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<BreathingDot> (plan/24 #19)", () => {
+describe("<BreathingDot>", () => {
   it("summary states the percent and the band word", () => {
     const { container } = draw(<BreathingDot value={0.42} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("Load 42% — calm.");

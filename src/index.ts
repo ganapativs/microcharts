@@ -9,12 +9,12 @@
 
 export const MICROCHARTS_VERSION = "0.0.1";
 
-// Flagship: standalone natural-language series summary (plan/08 §2).
+// Flagship: standalone natural-language series summary.
 export { describeSeries } from "./core/summary.js";
 export { EN } from "./core/strings.js";
 export type { SummaryStrings, DescribeOptions } from "./core/summary.js";
 
-// Theming + the shared chart shell (plan/06, plan/03).
+// Theming + the shared chart shell.
 export { MicroProvider } from "./shared/MicroProvider.js";
 export type { Preset, MicroProviderProps } from "./shared/MicroProvider.js";
 export { Chart } from "./shared/Chart.js";
@@ -25,14 +25,14 @@ export type { SparkGroupProps } from "./shared/SparkGroup.js";
 export type { Value, Polarity } from "./core/types.js";
 export { makeFormatter, type Format } from "./core/format.js";
 
-/** Shared prop grammar — one meaning per name across every chart (plan/04). */
+/** Shared prop grammar — one meaning per name across every chart. */
 export interface MicrochartCommonProps {
-  /** The series. `null`/`NaN` are gaps; `data` alone always renders (plan/04). */
+  /** The series. `null`/`NaN` are gaps; `data` alone always renders. */
   data: readonly (number | null)[];
   /** Fixed value domain `[min, max]`; auto-fit when omitted. */
   domain?: readonly [number, number];
   /** Accessible name. A string overrides the auto-summary; `false` = decorative. */
   summary?: string | false;
-  /** Visible title, wired into `aria-labelledby` (plan/08). */
+  /** Visible title, wired into `aria-labelledby`. */
   title?: string;
 }

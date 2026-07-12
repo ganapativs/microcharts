@@ -1,4 +1,4 @@
-// Server half of the motion matrix (plan/04 §8.1 amendment): `animate` is
+// Server half of the motion matrix: `animate` is
 // inert on the server — SSR output is byte-identical with and without it,
 // even when the motion engine module has been imported.
 import { describe, expect, it } from "vitest";

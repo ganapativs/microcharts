@@ -2,33 +2,11 @@
 import { useEffect, useRef } from "react";
 import { CELL_R, CELL_SIZE, CELLS, SQUIRCLE_PATH } from "@/lib/brand";
 
-/**
- * The footer brand moment: "the catalog surfaces."
- *
- * A field of tiny LIVING microcharts — sparklines, win/loss bars, deltas,
- * activity cells, progress rings, bullets, slopes, seismograms, dot plots,
- * streaks — drawn procedurally in the library's real semantic palette
- * (accent, positive, negative, neutral). Scrolling the footer into view
- * scrubs the field up out of the bottom edge (reversible — you pull it up).
- * The giant wordmark is cut pixel-crisp from the SAME field, so the letters
- * are made of bright charts while the faint field breathes behind them.
- * The pointer is a lens that reveals the faint catalog; a click sends a
- * data pulse rippling through the field.
- *
- * Performance: the text mask rasterizes once per resize/font-load; each
- * frame renders the mosaic once to an offscreen canvas and composites it
- * twice (faint full-bleed + bright masked). All randomness is a hash of the
- * cell index — deterministic, allocation-free frames. Cells fully hidden by
- * the vignette are culled; an idle field renders at half rate; a frame-cost
- * EMA degrades density/DPR one step on devices that can't hold the budget.
- * Colors read live from CSS tokens so themes and the accent picker retune
- * it. Matte — no glow. Reduced motion renders one fully-risen still frame.
- * Double-tap deals every chart new data.
- */
+/** Footer canvas: living chart mosaic masked by the wordmark. */
 
-const ENTER_TAIL = 0.45; // portion of progress used by the row stagger
-const LAG_JITTER = 0.18; // extra per-cell lag, so rows don't arrive as slabs
-const MAX_LAG = ENTER_TAIL + LAG_JITTER; // normalizer — every cell settles at p=1
+const ENTER_TAIL = 0.45;
+const LAG_JITTER = 0.18;
+const MAX_LAG = ENTER_TAIL + LAG_JITTER;
 
 const hash = (n: number) => {
   const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
@@ -1152,8 +1130,7 @@ export function FooterMark() {
 
   return (
     <>
-      {/* the field is the footer's background — it fills the whole footer
-          (nearest positioned ancestor) while the links float above it */}
+      {/* Full-bleed canvas behind the footer. */}
       <div
         ref={hostRef}
         className="display absolute inset-0 select-none"
@@ -1162,8 +1139,7 @@ export function FooterMark() {
       >
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden />
       </div>
-      {/* in-flow spacer reserving the word band below the link grid — the
-          lockup can never collide with footer content */}
+      {/* Spacer so the word band never collides with footer links. */}
       <div aria-hidden className="h-[200px]" />
     </>
   );

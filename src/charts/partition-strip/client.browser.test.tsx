@@ -13,7 +13,7 @@ const TREE = [
   { label: "CSS", value: 56 },
 ];
 
-describe("interactive <PartitionStrip> (plan/25 §13)", () => {
+describe("interactive <PartitionStrip>", () => {
   it("↓ drops into a child; announces its share of the whole and of its parent", async () => {
     const screen = await render(
       <PartitionStrip data={TREE} title="Bundle" width={200} height={24} />,

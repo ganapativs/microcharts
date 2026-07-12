@@ -1,8 +1,4 @@
-/**
- * The chart grammar, as data — the single source shared by the interactive
- * GrammarExplorer (adds a live render per type) and the Markdown transform
- * (expands `<GrammarExplorer />` into a text reference for machine surfaces).
- */
+/** Chart grammar data — shared by GrammarExplorer and the Markdown transform. */
 export interface GrammarType {
   type: string;
   label: string;

@@ -8,7 +8,7 @@ const g = (
 ) =>
   polarClockGeometry({ values, size: 24, inner: 0.35, start: 0, pad: 1, mode: "length", ...extra });
 
-describe("polarClockGeometry (plan/24 #17) — cyclic radial bars", () => {
+describe("polarClockGeometry — cyclic radial bars", () => {
   it("one segment per value; peak has the longest bar", () => {
     const geo = g([10, 40, 20, 5]);
     expect(geo.segments.length).toBe(4);

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <PartitionStrip> (plan/25 §13). One pointer listener; segment by
+// Interactive <PartitionStrip>. One pointer listener; segment by
 // row (y) + x lookup. ←/→ within a row, ↑/↓ between a parent and its first child
 // (2-D keyboard, ActivityGrid model). Composes the static component (canon).
 import {

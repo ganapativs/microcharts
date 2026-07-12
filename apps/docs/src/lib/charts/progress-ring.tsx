@@ -153,15 +153,12 @@ const COOLDOWNS: { name: string; value: number }[] = [
   { name: "Videos", value: 0.85 },
 ];
 
-/* The four homes — ProgressRing always answering "how complete is this?" at
-   icon size. Every host is a sync/backup/quota surface (its actual job),
-   never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Nightly backup is{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <ProgressRing value={0.68} summary={false} style={{ width: 18, height: 18 }} />
         </span>{" "}
         two-thirds through, about 12 minutes left.

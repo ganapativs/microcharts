@@ -1,5 +1,5 @@
 "use client";
-// Interactive <EventRaster> (plan/25 §5). One pointer listener; lane from y,
+// Interactive <EventRaster>. One pointer listener; lane from y,
 // nearest event from x. ↑/↓ lanes, ←/→ events within a lane (2-D keyboard,
 // ActivityGrid model). Composes the static component (canon).
 import {

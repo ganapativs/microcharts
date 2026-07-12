@@ -1,4 +1,4 @@
-// <Constellation> — when rare events happened, and how big (plan/24 #16, S1
+// <Constellation> — when rare events happened, and how big (, S1
 // points). Position is the channel: x = time, y = value; optional magnitude sets
 // area-true dot size. A hairline chronology line connects the events in time
 // order. When no values are given, vertical position is deterministic jitter that

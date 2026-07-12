@@ -17,7 +17,7 @@ const COHORTS: CohortRow[] = [
   { label: "Apr", values: [1, 0.52] },
 ];
 
-describe("<CohortTriangle> (plan/26 §1, plan/08)", () => {
+describe("<CohortTriangle>", () => {
   it("renders one cell per observed age, role=img", () => {
     const { container } = draw(<CohortTriangle data={COHORTS} labels={false} title="Cohorts" />);
     expect(container.querySelector("svg")!.getAttribute("role")).toBe("img");

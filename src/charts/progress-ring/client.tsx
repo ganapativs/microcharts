@@ -1,5 +1,5 @@
 "use client";
-// Interactive <ProgressRing> (plan/22 #17). `live` announces at 25/50/75/100%
+// Interactive <ProgressRing>. `live` announces at 25/50/75/100%
 // threshold crossings only (documented anti-spam rule). No pointer lookup
 // (single mark). Composes the static component (canon).
 import { useEffect, useMemo, useRef, useState } from "react";

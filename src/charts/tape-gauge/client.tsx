@@ -1,5 +1,5 @@
 "use client";
-// Interactive <TapeGauge> (plan/25 §19). `live` mode: the readout + chevron
+// Interactive <TapeGauge>. `live` mode: the readout + chevron
 // update as `value`/`rate` change, and a polite live region re-announces the
 // full reading, throttled (≥ 5 s). No pointer scrubbing — there is no series.
 // Composes the static entry (canon); the scale window stays centered on value.

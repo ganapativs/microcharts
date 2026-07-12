@@ -10,7 +10,7 @@ const GAME = [50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98];
 const TIGHT = [50, 53, 49, 52, 48, 51, 47, 50, 46, 49, 45, 48, 52];
 const num = (n: number): string => String(n);
 
-describe("winProbWormGeometry (plan/26 §4)", () => {
+describe("winProbWormGeometry", () => {
   it("splits at 50 crossings and counts the lead changes", () => {
     const geo = winProbWormGeometry({ ...base, data: GAME })!;
     expect(geo.flips).toBe(3);

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <ForecastCone> (plan/23 #11). One pointer listener + region-aware
+// Interactive <ForecastCone>. One pointer listener + region-aware
 // nearest-x: history points announce a value, forecast points announce the
 // median + 80% interval. ←/→ step; Home/End jump the ends. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.

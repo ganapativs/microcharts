@@ -114,7 +114,6 @@ export const playground: PlaygroundSpec = {
       options: ["en-US", "de-DE"],
       init: "en-US",
     },
-    // domain/format/strings/id/className/style/children: escape hatches and
     // accessible-name plumbing, not chart-shape knobs (consistent with every
     // other chart's playground).
   ],
@@ -216,16 +215,12 @@ const REVENUE = [
   { label: "Services", values: [10, 11, 12, 13, 14, 14, 15, 16, 16, 17, 17, 17] },
 ];
 
-/* The four homes — StackedArea always doing the one thing it's for: reading a
-   composition share-shift at a glance. Traffic mix (region table, sentence) and
-   revenue mix (KPI card, tab) are the two examples this chart's own bestFor
-   names — never a generic "signups"/"revenue vs users" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Traffic mix this year{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <StackedArea data={MIX} summary={false} width={80} height={16} />
         </span>{" "}
         — mobile overtook web, now 66% of sessions.

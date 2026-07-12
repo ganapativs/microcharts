@@ -9,7 +9,7 @@ const DATA = [
   { a: 22, b: 21 },
 ];
 
-describe("interactive <BiasStrip> (plan/26 §7)", () => {
+describe("interactive <BiasStrip>", () => {
   it("←/→ step pairs ordered by mean with mean/diff announcements + ring", async () => {
     const screen = await render(<BiasStrip data={DATA} title="Agreement" />);
     const wrap = screen.container.querySelector(".mc-bias-live") as HTMLElement;

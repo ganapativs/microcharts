@@ -1,5 +1,5 @@
 "use client";
-// Interactive <ErrorBudget> (plan/23 #9). One pointer listener + nearest-step
+// Interactive <ErrorBudget>. One pointer listener + nearest-step
 // math. ←/→ step; End jumps to now. The live region states remaining AND the
 // local burn multiple. Composes the static component (canon); the crosshair +
 // focus ring + readout chip are overlay children.

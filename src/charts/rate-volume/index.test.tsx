@@ -14,7 +14,7 @@ const SAMPLE: RateVolumePoint[] = [
   { rate: 4.1, volume: 38 },
 ];
 
-describe("<RateVolume> (plan/23 #5)", () => {
+describe("<RateVolume>", () => {
   it("summary always pairs rate with volume — the real string", () => {
     const { container } = draw(<RateVolume data={SAMPLE} minVolume={50} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

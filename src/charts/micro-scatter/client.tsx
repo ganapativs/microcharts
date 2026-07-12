@@ -1,5 +1,5 @@
 "use client";
-// Interactive <MicroScatter> (plan/22 #29). One pointer listener; nearest
+// Interactive <MicroScatter>. One pointer listener; nearest
 // point by squared Euclidean distance over the precomputed dots. ←/→ step
 // points ordered by x, announcing the formatted pair. Focus ring on the
 // active dot. Composes the static component (canon).

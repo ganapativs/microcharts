@@ -1,5 +1,5 @@
 "use client";
-// Interactive <StackedArea> (plan/22 #23). Nearest-x lookup announces ALL
+// Interactive <StackedArea>. Nearest-x lookup announces ALL
 // layers ("Point 8 of 12: Mobile 45%, Web 38%, API 17%."); ←/→ steps x, ↑/↓
 // cycles which layer the crosshair dot highlights. Composes the static.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

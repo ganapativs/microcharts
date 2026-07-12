@@ -87,8 +87,7 @@ export const showcase = {
 
 // domain/format/locale/strings/title/summary/id/className/style/children:
 // styling/formatting escape hatches or accessible-name overrides — no
-// interactive control (consistent with every other chart's playground).
-// data is the fixture the other knobs act on, not a knob itself.
+
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -208,15 +207,12 @@ const WATCHLIST: { symbol: string; sessions: typeof PERIODS }[] = [
   },
 ];
 
-/* The four homes — Ohlc always doing the one thing it's for: reading a
-   period's price action at a glance. Every host is a ticker/watchlist
-   surface, never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         ACME closed the session at{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Ohlc data={PERIODS} summary={false} width={90} height={14} />
         </span>{" "}
         $150.30, up 7.4% over 20 sessions.

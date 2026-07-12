@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<Thermometer> (plan/24 #5)", () => {
+describe("<Thermometer>", () => {
   it("summary states the value on its calibrated scale", () => {
     const { container } = draw(<Thermometer value={72} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("72 on a 0–100 scale.");

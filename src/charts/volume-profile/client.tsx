@@ -1,5 +1,5 @@
 "use client";
-// Interactive <VolumeProfile> (plan/25 §16). One pointer listener; nearest level
+// Interactive <VolumeProfile>. One pointer listener; nearest level
 // bin by y. ↑/↓ rove bins. Composes the static component (canon).
 import {
   useCallback,

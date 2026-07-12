@@ -5,9 +5,7 @@ import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } f
 const PKG = "@microcharts/react";
 const LOAD = Array.from({ length: 30 }, (_, i) => Math.round(Math.sin(i / 4) * 40 + 50));
 const D: [number, number] = [0, 100];
-// Same 20-minute window shown in the top-of-page demo (matches `example.code`
-// and `sampleData` below) — reused across the four homes so the copy quotes
-// numbers a reader can actually see on the page.
+// Matches the top-of-page demo series.
 const HOURLY_LOAD = [
   12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35,
 ];
@@ -81,7 +79,6 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
-  // `domain` isn't a knob: HeatStrip's whole point is calibrating against ONE
   // shared domain across rows (see "shared-domain rows" below) — a slider
   // that rescales just this one strip would demo the anti-pattern the page
   // warns against. `data` gets the shuffle button instead of a knob.
@@ -171,15 +168,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — HeatStrip always doing the one thing it's for: a shared-domain
-   intensity ribbon over time. Every host is a load/pressure monitoring surface
-   quoting the same 20-minute window, never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         API load over the last 20 minutes{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <HeatStrip data={HOURLY_LOAD} domain={D} summary={false} width={110} height={14} />
         </span>{" "}
         — peaked at 90% by minute 8, dipped to 28%, spiked again, then closed at 35%.

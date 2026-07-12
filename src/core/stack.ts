@@ -1,5 +1,5 @@
-// Stacking + share math (plan/21 §6.0.C). Compositions are zero-anchored
-// (lie factor = 1) and share one scale — never independently scaled to
+// Stacking + share math. Compositions are zero-anchored
+// and share one scale — never independently scaled to
 // balance the picture. Outputs are data-space (charts scale + round).
 import { isFiniteValue, type Value } from "./types.js";
 

@@ -4,7 +4,7 @@ import { pictogramGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 12, shape: "dot" as const, fractional: "clip" as const };
 
-describe("pictogramGeometry (plan/22 #7)", () => {
+describe("pictogramGeometry", () => {
   it("N units, constant size, fills per unit", () => {
     const geo = pictogramGeometry({ ...base, value: 2.5, total: 4 });
     expect(geo.units.map((u) => u.fill)).toEqual([1, 1, 0.5, 0]);

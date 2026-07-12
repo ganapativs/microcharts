@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Hypnogram> (plan/25 §2). One pointer listener; run lookup by x.
+// Interactive <Hypnogram>. One pointer listener; run lookup by x.
 // ←/→ rove runs, Home/End jump. Composes the static component (canon).
 import {
   useCallback,

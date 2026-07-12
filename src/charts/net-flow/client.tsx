@@ -1,5 +1,5 @@
 "use client";
-// Interactive <NetFlow> (plan/23 #6). One pointer listener + nearest-period
+// Interactive <NetFlow>. One pointer listener + nearest-period
 // math. ←/→ step periods; the live region states in, out, AND signed net — the
 // full picture, never a net without its gross. Composes the static component
 // (canon); the crosshair + in/out value ticks are overlay children.

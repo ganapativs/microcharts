@@ -1,4 +1,4 @@
-// <IconArray> — how likely is this, really? (plan/23 #21, S4 scalar rate). A
+// <IconArray> — how likely is this, really? A
 // stated rate made countable: filled units in a fixed N-unit grid with the
 // denominator visible. Static, hook-free, RSC-safe. Two moves kill denominator
 // neglect: the ratio label and the fixed grid. No partial-unit fills ever;
@@ -70,7 +70,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
   } = props;
 
   // label a touch smaller than the strips so the countable grid stays the hero
-  // (~0.5·height, clamped 7–10) — see coverage-strip / plan/12
+  // (~0.5·height, clamped 7–10) — see coverage-strip /
   const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
   const showLabel = label !== "none";
   const gutterCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
@@ -94,7 +94,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
         ? "positive"
         : "accent";
   const labelText = label === "percent" ? pctFmt(geo.k / geo.n) : `${geo.k} in ${geo.n}`;
-  // pin the label size to viewBox units (see coverage-strip / plan/12)
+  // pin the label size to viewBox units (see coverage-strip / )
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (

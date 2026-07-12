@@ -1,5 +1,5 @@
 "use client";
-// Interactive <SpiralYear> (plan/24 #18). One pointer listener; nearest mark by
+// Interactive <SpiralYear>. One pointer listener; nearest mark by
 // squared 2-D distance over the precomputed spiral marks. ←/→ step chronologically
 // along the spiral; a polite live region announces the focused period. Composes the
 // static component (canon).

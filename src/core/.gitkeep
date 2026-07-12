@@ -1,2 +1,1 @@
-# src/core — pure functions, zero React (scale, path, stats, summary, color,
-# bank). The portable kernel; keep it React-free (plan/03). Populated in Phase 1.
+# Pure functions, zero React — scale, path, stats, summary, color, bank.

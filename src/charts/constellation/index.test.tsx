@@ -15,7 +15,7 @@ const EVENTS = [
   { x: 5, y: 30, m: 3 },
 ] as const;
 
-describe("<Constellation> (plan/24 #16)", () => {
+describe("<Constellation>", () => {
   it("summary names the count, span, and largest event", () => {
     const { container } = draw(<Constellation data={EVENTS} xFormat={monthFmt} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

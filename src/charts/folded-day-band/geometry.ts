@@ -1,4 +1,4 @@
-// FoldedDayBand geometry — pure, React-free (plan/25 §15, plan/17 F7). Folds
+// FoldedDayBand geometry — pure, React-free. Folds
 // many periods onto one period axis: per-bin quantile envelopes (25–75, 5–95)
 // + a median line, optionally a "today" overlay. Envelopes come from REAL per-
 // bin quantiles, never smoothed across bins into shapes the data doesn't

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <RateVolume> (plan/23 #5). One pointer listener + nearest-period
+// Interactive <RateVolume>. One pointer listener + nearest-period
 // math. ←/→ step periods; the live region ALWAYS pairs both numbers — a rate is
 // never announced without its volume. Composes the static component (canon); the
 // crosshair + bar highlight are overlay children re-using geometry.

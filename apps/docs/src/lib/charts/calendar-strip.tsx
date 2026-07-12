@@ -229,18 +229,13 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — CalendarStrip always doing the one thing it's for: real
-   calendar-position rhythm, not slot-indexed history. Every host is a
-   deploy/release-cadence surface, never a generic "signups" template. Facts
-   quoted here (11 of 24 tracked days) match the chart's own accessible name
-   for this data/end/weeks — see "Accessibility" on the doc page. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         <span className="font-mono text-xs text-fd-muted-foreground">api</span> shipped on 11 of the
         last 24 tracked days{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <CalendarStrip data={DATA} end={END} summary={false} cell={4} />
         </span>{" "}
         — quiet on three, no telemetry the rest of this week.

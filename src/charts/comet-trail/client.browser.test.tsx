@@ -5,7 +5,7 @@ import { CometTrail } from "./client.js";
 
 const RISING = [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87];
 
-describe("interactive <CometTrail> (plan/24 #21)", () => {
+describe("interactive <CometTrail>", () => {
   it("wrapper owns naming; static chart is decorative", async () => {
     const screen = await render(<CometTrail data={RISING} title="Price" />);
     const wrap = screen.container.querySelector(".mc-comet-live")!;

@@ -1,4 +1,4 @@
-// <HeatStrip> — how did intensity evolve, glanceably (plan/22 #9, S1). The 1×N
+// <HeatStrip> — how did intensity evolve, glanceably. The 1×N
 // sibling of ActivityGrid: discrete color steps per time cell, shared step
 // scale + cell vocabulary. Static, hook-free, RSC-safe. Empty ≠ zero: a slot
 // with no record renders a hairline outline, visibly different from value 0.
@@ -55,7 +55,7 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
 
   const geo = heatStripGeometry({ width, height, values: data, domain, steps, shape });
   const fmt = makeFormatter(format, locale);
-  // S1 summary — reuses describeSeries verbatim (docs-as-tests)
+  // S1 summary — reuses describeSeries verbatim
   const accName =
     summary === false ? false : (summary ?? describeSeries(data, { format: fmt, strings }));
 

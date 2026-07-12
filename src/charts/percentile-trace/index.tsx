@@ -1,5 +1,5 @@
 // <PercentileTrace> — one entity's standing drifting inside a population
-// (plan/26 §8). Because the series IS percentile rank, the y-axis is LOCKED to
+// Because the series IS percentile rank, the y-axis is LOCKED to
 // [0,100] and the population bands (p25–75, p5–95) are fixed rects, not
 // estimates — the trace is the only line. Static, hook-free, RSC-safe. The
 // endpoint dot carries valence (`positive`); direction is also in the line, so
@@ -117,7 +117,7 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
 
   const lineColor = color ?? "var(--mc-accent)";
   // endpoint valence: rising standing is good by default; the line already
-  // carries direction, so this color is a redundant cue (plan/08)
+  // carries direction, so this color is a redundant cue
   const good = positive === "down" ? geo.delta < 0 : geo.delta > 0;
   const dotFill = geo.delta === 0 ? lineColor : good ? "var(--mc-positive)" : "var(--mc-negative)";
   // label y clamped by font ascent so the number never spills the viewBox

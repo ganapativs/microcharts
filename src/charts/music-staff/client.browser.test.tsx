@@ -5,7 +5,7 @@ import { MusicStaff } from "./client.js";
 
 const MELODY = [3, 5, 4, 8, 6, 9];
 
-describe("interactive <MusicStaff> (plan/24 #12)", () => {
+describe("interactive <MusicStaff>", () => {
   it("arrow keys step the notes and announce them", async () => {
     const screen = await render(<MusicStaff data={MELODY} title="Melody" />);
     const fig = screen.getByRole("img").element() as HTMLElement;

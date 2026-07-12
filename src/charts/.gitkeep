@@ -1,2 +1,1 @@
-# src/charts/<name>/{index.tsx,client.tsx} land here starting Phase 2.
-# Order: sparkline → sparkbar → delta → bullet → activitygrid (plan/10 §2).
+# Chart modules: src/charts/<name>/{index.tsx,client.tsx,...}

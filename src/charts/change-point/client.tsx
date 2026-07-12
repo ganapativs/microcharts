@@ -1,5 +1,5 @@
 "use client";
-// Interactive <ChangePoint> (plan/23 #19). ←/→ step points (value + regime);
+// Interactive <ChangePoint>. ←/→ step points (value + regime);
 // Tab cycles the breaks as first-class stops, each announcing the mean shift.
 // A pointer picks the nearest x. Composes the static component (canon); the
 // crosshair + readout chip are overlay children.

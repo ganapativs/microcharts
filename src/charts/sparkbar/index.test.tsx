@@ -8,7 +8,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 const D = [3, 5, 4, 7, 6, 9, 8, 11];
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<SparkBar> static structure (plan/05, plan/09)", () => {
+describe("<SparkBar> static structure", () => {
   it("renders one rect per finite value, role=img", () => {
     const { container } = draw(<SparkBar data={D} title="Weekly" />);
     expect(container.querySelector("svg")!.getAttribute("role")).toBe("img");
@@ -74,7 +74,7 @@ describe("<SparkBar> static structure (plan/05, plan/09)", () => {
   });
 });
 
-describe("<SparkBar> a11y (axe, plan/08)", () => {
+describe("<SparkBar> a11y (axe, )", () => {
   it("informative chart is axe-clean", async () => {
     const { container } = draw(<SparkBar data={D} title="Weekly" />);
     await expectNoA11yViolations(container);

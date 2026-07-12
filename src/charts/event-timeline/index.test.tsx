@@ -19,7 +19,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<EventTimeline> (plan/22 #27, structured)", () => {
+describe("<EventTimeline>", () => {
   it("track + span rects + point diamonds; coverage summary", () => {
     const { container } = draw(<EventTimeline data={DATA} domain={WINDOW} />);
     expect(container.querySelectorAll("rect").length).toBe(2);

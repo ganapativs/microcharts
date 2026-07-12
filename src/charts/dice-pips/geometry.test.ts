@@ -4,7 +4,7 @@ import { dicePipsGeometry } from "./geometry.js";
 
 const g = (value: number) => dicePipsGeometry({ value, size: 16, pad: 16 * 0.28 });
 
-describe("dicePipsGeometry (plan/24 #2) — canonical dice faces", () => {
+describe("dicePipsGeometry — canonical dice faces", () => {
   it("draws exactly `value` pips for faces 1–6", () => {
     for (let v = 1; v <= 6; v++) expect(g(v).pips.length).toBe(v);
   });

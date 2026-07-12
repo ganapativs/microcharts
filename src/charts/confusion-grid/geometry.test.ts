@@ -7,7 +7,7 @@ const COUNTS = [
   [10, 59],
 ];
 
-describe("confusionGridGeometry (plan/25 §21, plan/17 F21)", () => {
+describe("confusionGridGeometry", () => {
   it("computes accuracy, row totals, and the worst off-diagonal", () => {
     const geo = confusionGridGeometry({
       size: 40,

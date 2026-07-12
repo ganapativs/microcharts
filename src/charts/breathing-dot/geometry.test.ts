@@ -5,7 +5,7 @@ import { breathingDotGeometry } from "./geometry.js";
 const g = (value: number | null, thresholds: readonly [number, number] = [0.5, 0.8]) =>
   breathingDotGeometry({ value, size: 16, thresholds, pad: 1 });
 
-describe("breathingDotGeometry (plan/24 #19) — ambient load", () => {
+describe("breathingDotGeometry — ambient load", () => {
   it("bands split at the thresholds: < lower calm, [lower,upper) elevated, ≥ upper strained", () => {
     expect(g(0.3).band).toBe(0);
     expect(g(0.5).band).toBe(1); // at the lower edge → elevated

@@ -1,9 +1,4 @@
-/**
- * Provider groups and machine-surface metadata — pure data, no React, so both
- * the rendered components (`charts/ai-static`) and the Markdown transform
- * (`lib/md-transform`, run from Node) share one source. Logo labels resolve
- * through `AI_LOGOS`.
- */
+/** Provider groups + machine-surface metadata (shared by React + md-transform). */
 export interface ProviderGroup {
   title: string;
   note: string;

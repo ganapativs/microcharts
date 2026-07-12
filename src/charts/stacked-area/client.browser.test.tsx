@@ -8,7 +8,7 @@ const TRAFFIC = [
   { label: "API", values: [15, 17, 17] },
 ];
 
-describe("interactive <StackedArea> (plan/22 #23)", () => {
+describe("interactive <StackedArea>", () => {
   it("←/→ steps x announcing every layer's share", async () => {
     const screen = await render(<StackedArea data={TRAFFIC} title="Mix" />);
     const wrap = screen.container.querySelector(".mc-stacked-live") as HTMLElement;

@@ -12,8 +12,8 @@ const TIMES = Array.from({ length: 120 }, (_, i) =>
   i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
 );
 
-describe("<HistogramStrip> (plan/22 #15, S1 distribution)", () => {
-  it("bars per bin; docs-as-tests summary names the modal bin", () => {
+describe("<HistogramStrip>", () => {
+  it("bars per bin summary names the modal bin", () => {
     const { container } = draw(<HistogramStrip data={TIMES} />);
     expect(container.querySelectorAll("rect").length).toBeGreaterThan(3);
     const label = container.querySelector("svg")!.getAttribute("aria-label")!;

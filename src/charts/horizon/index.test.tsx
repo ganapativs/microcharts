@@ -9,7 +9,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
 const SERIES = Array.from({ length: 90 }, (_, i) => Math.sin(i / 7) * 60 + i * 0.4 - 12);
 
-describe("<Horizon> (plan/22 #25, S1)", () => {
+describe("<Horizon>", () => {
   it("folded bands; summary reuses describeSeries (folding is presentation)", () => {
     const { container } = draw(<Horizon data={[3, 5, 4, 9, 7, 12, 15, 18, 17]} />);
     expect(container.querySelectorAll("path").length).toBeGreaterThan(0);

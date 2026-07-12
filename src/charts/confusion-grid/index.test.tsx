@@ -17,8 +17,8 @@ const CATDOG = {
   ],
 };
 
-describe("<ConfusionGrid> (plan/25 §21, plan/17 F21)", () => {
-  it("renders k² cells; docs-as-tests summary with row-normalized phrasing", () => {
+describe("<ConfusionGrid>", () => {
+  it("renders k² cells summary with row-normalized phrasing", () => {
     const { container } = draw(<ConfusionGrid data={CATDOG} />);
     expect(container.querySelectorAll('rect[data-mc-ink="cell"]').length).toBe(4);
     expect(confusionSummary(CATDOG, EN_CONFUSION)).toBe(

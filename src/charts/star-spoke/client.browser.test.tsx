@@ -8,7 +8,7 @@ const PROFILE = [
   { label: "Cost", value: 0.3 },
 ];
 
-describe("interactive <StarSpoke> (plan/25 §9)", () => {
+describe("interactive <StarSpoke>", () => {
   it("→ rotates focus through spokes; announces label + value", async () => {
     const screen = await render(<StarSpoke data={PROFILE} title="Profile" size={64} />);
     const wrap = screen.container.querySelector(".mc-star-live") as HTMLElement;

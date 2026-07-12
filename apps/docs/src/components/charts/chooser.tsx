@@ -5,13 +5,7 @@ import { getChart } from "@/lib/catalog";
 import { getModule } from "@/lib/charts/registry";
 import { cn } from "@/lib/cn";
 
-/**
- * The catalog as a decision tool — not the gallery's visual browse, but the
- * "which chart do I use?" chooser. Every chart is filed under the question it
- * answers, best pick first, with its full one-line job. Pick a question to
- * narrow; the whole list is here when you want to scan. Registry-driven prose,
- * a hand-curated taxonomy. A coverage test proves the partition is total.
- */
+/** Chart chooser by decision question. Partition coverage asserted in tests. */
 
 interface Job {
   id: string;
@@ -20,8 +14,7 @@ interface Job {
   slugs: string[];
 }
 
-// Curated partition — every stable chart appears in exactly one job (asserted by
-// chooser.test.ts). Order within a job is best-pick-first.
+// Every stable chart in exactly one job (chooser.test.ts). Best pick first.
 const JOBS: Job[] = [
   {
     id: "trend",
@@ -201,9 +194,6 @@ function Row({ slug, first }: { slug: string; first: boolean }) {
         href={`/docs/charts/${slug}`}
         className="group flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 no-underline"
       >
-        {/* favicon-scale identity glyph — decorative shape only. `[&_text]:hidden`
-            strips the chart's own labels/numbers so it reads as a clean mark, and
-            the fixed box keeps every name in one column. */}
         <span
           aria-hidden
           className="chooser-glyph flex h-5 w-12 shrink-0 items-center justify-center overflow-hidden opacity-90"
@@ -230,7 +220,6 @@ export function ChartChooser() {
 
   return (
     <div className="not-prose my-8">
-      {/* question filter — the chooser's spine. "All" is the scan mode. */}
       <div className="mb-8 flex flex-wrap gap-2">
         <Chip label="All charts" activeState={active === null} onClick={() => setActive(null)} />
         {JOBS.map((j) => (

@@ -1,5 +1,5 @@
 // <MinimapStrip> — where am I in the whole, and where in the whole is everything
-// else I care about (plan/25 §10, plan/17 F10). Static, hook-free, RSC-safe.
+// else I care about. Static, hook-free, RSC-safe.
 // Content thumbnail + a viewport window + an annotation-tick lane, with fog over
 // unknown regions (absence ≠ zero) and the unknown share disclosed in the name.
 import type { CSSProperties, ReactNode } from "react";

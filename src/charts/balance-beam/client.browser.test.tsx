@@ -7,7 +7,7 @@ const IN_OUT = [
   { label: "outflow", value: 480 },
 ] as const;
 
-describe("interactive <BalanceBeam> (plan/24 #8)", () => {
+describe("interactive <BalanceBeam>", () => {
   it("announces when the heavier side flips", async () => {
     const screen = await render(<BalanceBeam data={IN_OUT} />);
     const live = document.querySelector('[aria-live="polite"]')!;

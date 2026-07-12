@@ -5,7 +5,7 @@ import { cometTrailGeometry } from "./geometry.js";
 const g = (values: readonly number[], trail = 12) =>
   cometTrailGeometry({ values, width: 60, height: 16, trail, pad: 1 });
 
-describe("cometTrailGeometry (plan/24 #21) — rolling window", () => {
+describe("cometTrailGeometry — rolling window", () => {
   it("head sits at the newest value on the right; trail is the prior points", () => {
     const geo = g([10, 20, 30, 40]);
     expect(geo.head!.index).toBe(3);

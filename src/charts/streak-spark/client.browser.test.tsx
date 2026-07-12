@@ -10,7 +10,7 @@ const mount = async () => {
   return screen.getByRole("img").element() as HTMLElement;
 };
 
-describe("interactive <StreakSpark> (plan/26 §2, plan/08 T2)", () => {
+describe("interactive <StreakSpark>", () => {
   it("focusable role=img with composed name", async () => {
     const fig = await mount();
     expect(fig.getAttribute("tabindex")).toBe("0");

@@ -1,4 +1,4 @@
-// Natural-language series summary — the flagship a11y feature (plan/08 §2).
+// Natural-language series summary — the flagship a11y feature.
 // Pure, deterministic, template-driven, i18n-able. No ML. Also exported
 // standalone. Implements the S1 (single trend series) shape; S2–S4 land with
 // their chart types.
@@ -21,7 +21,7 @@ export interface SummaryStrings {
   point: (position: number, total: number, value: string) => string;
   /** Interactive announcement for an empty slot, e.g. "Point 3 of 12: no data." */
   pointEmpty: (position: number, total: number) => string;
-  /** S4 scalar direction, e.g. "Up 12%." (trend-arrow; lands with it, plan/22 #1). */
+  /** S4 scalar direction, e.g. "Up 12%." (trend-arrow; lands with it). */
   scalarDir: (direction: "up" | "down", amount: string) => string;
   /** S4 within-noise-floor change (trend-arrow flatBand). */
   flatChange: string;
@@ -918,10 +918,10 @@ function makeFormatter(opts: DescribeOptions): (n: number) => string {
 
 /**
  * "Trending up 12%. Range 3 to 18. Last value 17." — the default accessible
- * name for a chart (plan/08). Degenerate series produce honest short forms:
+ * name for a chart. Degenerate series produce honest short forms:
  * empty/all-null → "No data.", one point → "Single value X.", constant →
  * "Flat at X." Direction is stated factually (up/down); valence/color live in
- * the component, never in the words (plan/04 rule 6, plan/08 1.4.1).
+ * the component, never in the words.
  */
 export function describeSeries(values: readonly Value[], opts: DescribeOptions = {}): string {
   const s = seriesStats(values);

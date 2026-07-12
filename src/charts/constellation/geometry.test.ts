@@ -5,7 +5,7 @@ import { constellationGeometry } from "./geometry.js";
 const g = (points: readonly { x: number; y?: number; m?: number }[], connect = true) =>
   constellationGeometry({ points, width: 60, height: 20, connect, rBase: 1.6, pad: 1 });
 
-describe("constellationGeometry (plan/24 #16) — sparse events", () => {
+describe("constellationGeometry — sparse events", () => {
   it("one star per finite-x point; connector polyline in time order", () => {
     const geo = g([
       { x: 3, y: 5 },

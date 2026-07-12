@@ -7,7 +7,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const WEEKS = [34, 10, 0, 20, 5, 0, 15, 8, 0, 25, 12, 3];
 
-describe("<GardenGrid> (plan/24 #10)", () => {
+describe("<GardenGrid>", () => {
   it("summary reports peak and active count", () => {
     const { container } = draw(<GardenGrid data={WEEKS} unit="weeks" />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

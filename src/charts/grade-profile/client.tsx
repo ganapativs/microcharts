@@ -1,5 +1,5 @@
 "use client";
-// Interactive <GradeProfile> (plan/26 §3). One pointer listener maps x → the
+// Interactive <GradeProfile>. One pointer listener maps x → the
 // segment under the cursor; ←/→ step segments. Each announces the distance,
 // grade, and cumulative climb — the readout gives the TRUE grade, not the bin.
 // Composes the static component (canon).

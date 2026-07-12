@@ -1,5 +1,5 @@
 // <PartitionStrip> — what the whole is made of, and what the big parts are made
-// of, with parentage visible (plan/25 §13, plan/17 F20). Static, hook-free,
+// of, with parentage visible. Static, hook-free,
 // RSC-safe. Two aligned rows beat a treemap because alignment is the comparison
 // channel. Two levels max — grandchildren are ignored with a dev warning.
 import type { CSSProperties, ReactNode } from "react";

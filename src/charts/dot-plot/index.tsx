@@ -1,7 +1,7 @@
-// <DotPlot> — a few named values on one scale (plan/22 #10, S2). Minimum ink
+// <DotPlot> — a few named values on one scale. Minimum ink
 // per comparison: dots over bars when the scale doesn't start at zero —
 // position lies less than truncated length. Static, hook-free, RSC-safe.
-// Category labels are anchor-only, truncated by character count (plan/18).
+// Category labels are anchor-only, truncated by character count.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
@@ -81,7 +81,7 @@ export function DotPlot(props: DotPlotProps): ReactNode {
   const accName = summary === false ? false : (summary ?? miniBarSummary(data, fmt, strings));
 
   // labels drop deterministically with density: category text needs
-  // fontSize × 1.25 of row pitch, value text a full 8-unit row (plan/18)
+  // fontSize × 1.25 of row pitch, value text a full 8-unit row
   const showCategories = geo.pitch >= fontSize * 1.25;
   const showValues = label === "value" && geo.pitch >= 8;
 
@@ -133,8 +133,7 @@ export function DotPlot(props: DotPlotProps): ReactNode {
               </text>
             ) : null}
             {showValues && isFiniteValue(d.value)
-              ? /* beside the dot; flips to the left side when the estimate
-                 would overflow the right edge (pure arithmetic, plan/18) */
+              ? /* beside the dot; flips left when the estimate would overflow */
                 (() => {
                   const text = fmt(d.value);
                   const fits = row.x + 4 + text.length * fontSize * 0.62 <= width;

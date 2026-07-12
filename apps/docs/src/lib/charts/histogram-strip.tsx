@@ -99,7 +99,7 @@ export const showcase = {
 export const playground: PlaygroundSpec = {
   // data is the fixed demo series; width/height/color/format/strings/title/
   // summary/id/className/style/children are sizing/styling/accessible-name
-  // chrome, not interactive read decisions — every remaining documented prop
+
   // (bins, markValue, domain, locale) has a control below.
   knobs: [
     { kind: "range", key: "bins", label: "bins", min: 3, max: 12, init: 8 },
@@ -187,15 +187,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — HistogramStrip always doing the one thing it's for: reading
-   a distribution's shape at a glance. Every host is a latency-monitoring
-   surface, never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         API latency this hour{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <HistogramStrip data={TIMES} summary={false} width={90} height={18} />
         </span>{" "}
         — most calls land 40–50 ms, a few tail past 70.

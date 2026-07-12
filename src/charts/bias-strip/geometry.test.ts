@@ -7,7 +7,7 @@ const base = { width: 56, height: 30, limits: 1.96, rad: 1.8 };
 // a clean paired set with a known +2 offset (b runs 2 below a)
 const OFFSET = Array.from({ length: 12 }, (_, i) => ({ a: i + 2, b: i }));
 
-describe("biasStripGeometry (plan/26 §7)", () => {
+describe("biasStripGeometry", () => {
   it("bias is the mean difference; band + limits appear at n ≥ 5", () => {
     const geo = biasStripGeometry({ ...base, data: OFFSET });
     expect(geo.bias).toBe(2);

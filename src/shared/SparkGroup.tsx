@@ -1,4 +1,4 @@
-// <SparkGroup> — shared-scale small multiples (plan/04 §5). Kills the #1
+// <SparkGroup> — shared-scale small multiples. Kills the #1
 // sparkline correctness bug: per-row auto-scaling, where each mini-chart fits
 // its own domain so rows are visually incomparable. Computes ONE domain across
 // all children and enforces ONE physical size.

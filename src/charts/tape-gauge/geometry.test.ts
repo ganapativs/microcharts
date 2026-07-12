@@ -8,7 +8,7 @@ const ZONES = [
   { from: 150, to: 200, tone: "neg" as const },
 ];
 
-describe("tapeGaugeGeometry (plan/25 §19, plan/17 F1)", () => {
+describe("tapeGaugeGeometry", () => {
   it("chevron tier is signed and quantized", () => {
     expect(chevronTier(1, [0.4, 1.6])).toBe(1);
     expect(chevronTier(-2, [0.4, 1.6])).toBe(-2);

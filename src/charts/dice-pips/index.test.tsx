@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<DicePips> (plan/24 #2)", () => {
+describe("<DicePips>", () => {
   it("summary is the real string: '{n} out of 6.'", () => {
     const { container } = draw(<DicePips value={4} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("4 out of 6.");

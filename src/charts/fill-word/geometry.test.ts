@@ -5,7 +5,7 @@ import { fillWordGeometry } from "./geometry.js";
 const g = (value: number, word = "uploading", mode: "fill" | "drain" = "fill", label = false) =>
   fillWordGeometry({ value, word, fontSize: 12, pad: 2, mode, label });
 
-describe("fillWordGeometry (plan/24 #3) — the label is the bar", () => {
+describe("fillWordGeometry — the label is the bar", () => {
   it("fill clips the right (1−value) of the word", () => {
     expect(g(0.62).clip).toBe("inset(0 38% 0 0)");
     expect(g(0.62).pct).toBe(62);

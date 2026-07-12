@@ -1,4 +1,4 @@
-// <PolarClock> — the shape of a day/week cycle: when is it busy? (plan/24 #17,
+// <PolarClock> — the shape of a day/week cycle: when is it busy? (,
 // S1 cyclic, flagship). Each segment is a radial bar at its fixed cycle angle,
 // length ∝ value, growing from an inner baseline. 0 at 12 o'clock, clockwise.
 // The channel is radial LENGTH from r0 (not sector area — r0 > 0 curbs the

@@ -6,7 +6,7 @@ const base = { width: 80, height: 20 };
 const A = Array.from({ length: 60 }, (_, i) => 120 + (i % 20) - 8 + (i % 3) * 4);
 const B = Array.from({ length: 60 }, (_, i) => 110 + (i % 20) - 8 + (i % 3) * 4);
 
-describe("abStripsGeometry (plan/23 #13)", () => {
+describe("abStripsGeometry", () => {
   it("two rows on one shared scale; medians + delta", () => {
     const geo = abStripsGeometry({ ...base, a: A, b: B })!;
     expect(geo.rows).toHaveLength(2);

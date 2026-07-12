@@ -7,13 +7,7 @@ import { SparkBar } from "@microcharts/react/sparkbar";
 import { Delta } from "@microcharts/react/delta";
 import { Bullet } from "@microcharts/react/bullet";
 
-/**
- * The hero proof for /stream — a compact assistant reply that streams in, and
- * the chart grammar it emits becomes real shipped components the moment each
- * span or fence closes. Deterministic script, viewport-triggered, replayable.
- * A hidden finished copy reserves the final height (zero layout shift), the
- * streaming copy paints over it. Reduced motion shows the finished reply.
- */
+/** Compact hero stream for /stream — chart grammar → real components. */
 
 type Seg =
   | { kind: "text"; text: string }
@@ -153,7 +147,7 @@ export function StreamVignette() {
         );
       else
         view.push(
-          <span key={i} className="hx-morph-in mx-1 inline-flex align-middle">
+          <span key={i} className="hx-morph-in mc-inline">
             {s.node}
           </span>,
         );
@@ -219,7 +213,7 @@ function FinishedReply() {
             {s.node}
           </span>
         ) : (
-          <span key={i} className="mx-1 inline-flex align-middle">
+          <span key={i} className="mc-inline">
             {s.node}
           </span>
         ),

@@ -1,4 +1,4 @@
-// RetentionCurve geometry — pure, React-free (plan/23 #7). Do they stay, and
+// RetentionCurve geometry — pure, React-free. Do they stay, and
 // does the curve plateau? A step line (cohort periods are discrete) on a
 // domain LOCKED to [0,1] — the full range is the honest frame for a share;
 // truncating the floor manufactures drama. Non-monotone bumps (resurrection)

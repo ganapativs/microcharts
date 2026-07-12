@@ -1,4 +1,4 @@
-// PolarClock geometry — pure, React-free (plan/24 #17, S1 cyclic). The shape of
+// PolarClock geometry — pure, React-free. The shape of
 // a day/week cycle: each segment is a radial bar at its fixed cycle angle,
 // length ∝ value, growing from an inner baseline r0 outward. 0 at 12 o'clock,
 // clockwise (core/arc convention). The channel is radial LENGTH from r0, never

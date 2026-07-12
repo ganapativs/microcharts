@@ -77,9 +77,8 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
-  // data isn't a knob — it's the dataset the other knobs act on.
   // domain/color/format/locale/strings are styling/formatting overrides,
-  // not interactive read decisions; every remaining documented prop
+
   // (positive, label, highlight) has a control below.
   knobs: [
     { kind: "toggle", key: "positive", label: "valence", init: false },
@@ -148,15 +147,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — Dumbbell always doing the one thing it's for: showing where
-   a row started and where it landed. Every host is a comp-review surface
-   (office bands, level bands), never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Berlin&apos;s band moved{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Dumbbell data={[{ from: 48, to: 68 }]} summary={false} width={70} height={14} />
         </span>{" "}
         from €48k to €68k after the review — up 42%.

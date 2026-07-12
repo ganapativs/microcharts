@@ -1,5 +1,5 @@
 // Shared motion primitives for the animated ("motion IS the encoding") charts
-// (plan/24 §motion, plan/06 §5 idle-loop exception). Client-only hooks: they
+// Client-only hooks: they
 // touch matchMedia / IntersectionObserver only inside effects, so importing this
 // from a client entry is SSR-safe. Every motion chart gates its WAAPI animation
 // on BOTH signals below — reduced-motion off, and on-screen — so an off-viewport
@@ -19,7 +19,7 @@ export function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-// One IntersectionObserver shared by every motion chart on the page (plan/03:
+// One IntersectionObserver shared by every motion chart on the page (:
 // "one shared IntersectionObserver"). Elements register a setter; the observer
 // flips it as they enter/leave the viewport.
 let sharedObserver: IntersectionObserver | null = null;

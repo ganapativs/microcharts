@@ -102,8 +102,7 @@ export const showcase = {
 // reads at n ≈ 24 — a per-click reshuffle would defeat "read it once, trust
 // it"). color, format, locale, id, className, style, children: styling/
 // formatting escape hatches, not chart-shape knobs — no interactive control
-// (consistent with every other chart's playground). title/summary are
-// accessible-name overrides, not shown here.
+
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "trend", label: "trend line", init: false },
@@ -187,30 +186,22 @@ export const recipes: Recipe[] = [
   },
 ];
 
-// Two rows sharing CLOUD's exact shape at different y-scale — Pearson r is
-// invariant under a positive linear rescale of one axis, so both legitimately
-// read r 0.93 without inventing new numbers (docs-as-tests: quoted r matches
-// what the component actually computes for this data).
+// Same shape as CLOUD at different y-scale — Pearson r stays 0.93.
 const SERVICES = [
   { name: "Checkout", pairs: CLOUD.map((p) => ({ x: p.x, y: p.y * 10 })) }, // p95 latency, ms
   { name: "Search", pairs: CLOUD.map((p) => ({ x: p.x, y: p.y * 5 })) },
 ];
 
-// Same x-range as CLOUD, y uncorrelated by construction (deterministic, not
-// random) — a genuine "this channel doesn't have the relationship" contrast
+// Same x-range, uncorrelated y (deterministic).
 // for the tab home, not a cosmetic second series.
 const ORGANIC = Array.from({ length: 24 }, (_, i) => ({ x: i, y: ((i * 13) % 7) * 10 }));
 
-/* The four homes — MicroScatter always doing the one thing it's for: is X
-   related to Y, honestly, with r traveling beside every claim. Every host is
-   a real correlation decision (spend, latency, channel), never a generic
-   "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Bundle size and paint time across last week&apos;s builds{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <MicroScatter data={CLOUD} summary={false} width={70} height={20} />
         </span>{" "}
         — heavier bundles paint slower, r 0.93.

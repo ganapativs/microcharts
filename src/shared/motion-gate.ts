@@ -1,4 +1,4 @@
-// Entrance-motion gate (plan/04 §8.1 amendment, plan/06 §5). The opt-in
+// Entrance-motion gate. The opt-in
 // `animate` prop on every `…/interactive` entry routes through this hook.
 //
 // Contract:

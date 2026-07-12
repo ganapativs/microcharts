@@ -5,7 +5,7 @@ import { TreeRings } from "./client.js";
 
 const YEARS = [8, 12, 10, 18, 22, 15, 20, 14];
 
-describe("interactive <TreeRings> (plan/24 #13)", () => {
+describe("interactive <TreeRings>", () => {
   it("arrow keys step rings inner→outer and announce the period", async () => {
     const screen = await render(<TreeRings data={YEARS} periodWord="year" title="Age" />);
     const fig = screen.getByRole("img").element() as HTMLElement;

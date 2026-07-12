@@ -20,7 +20,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("resolveAnnotations (plan/22 #28)", () => {
+describe("resolveAnnotations", () => {
   it("splits under (TargetZone) / over (Threshold, Marker, Callout) / rest", () => {
     const { under, over, rest } = resolveAnnotations(
       <>

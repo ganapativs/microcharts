@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { TimeInRange } from "./client.js";
 
-describe("interactive <TimeInRange> (plan/25 §1)", () => {
+describe("interactive <TimeInRange>", () => {
   it("←/→ rove zones; each announces its share + a readout chip", async () => {
     const screen = await render(<TimeInRange data={{ below: 9, in: 72, above: 19 }} title="TIR" />);
     const wrap = screen.container.querySelector(".mc-tir-live") as HTMLElement;

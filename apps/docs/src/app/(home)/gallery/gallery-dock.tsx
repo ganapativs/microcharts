@@ -392,7 +392,6 @@ export function GalleryDock({
       data-hidden={dockHidden || undefined}
     >
       <div className="g2-dock-bar glass glass-strong">
-        {/* collection filters */}
         <div className="flex items-center gap-0.5">
           {pills.map((p) => {
             const n = counts[p.key] ?? 0;
@@ -416,8 +415,6 @@ export function GalleryDock({
         </div>
 
         <span className="g2-dock-div" aria-hidden />
-
-        {/* search */}
         <div className="g2-dock-search">
           <Search className="size-4" aria-hidden />
           <input
@@ -429,8 +426,6 @@ export function GalleryDock({
             aria-label="Search charts"
           />
         </div>
-
-        {/* density */}
         <div className="g2-seg" role="group" aria-label="Density">
           {(
             [
@@ -451,8 +446,6 @@ export function GalleryDock({
             </button>
           ))}
         </div>
-
-        {/* sort — catalog order vs A–Z */}
         <div className="g2-seg" role="group" aria-label="Sort">
           {(
             [
@@ -475,13 +468,9 @@ export function GalleryDock({
         </div>
 
         <span className="g2-dock-div" aria-hidden />
-
-        {/* live count */}
         <span className="g2-dock-count" role="status" aria-live="polite">
           {shown !== null && shown !== total ? shown : total}
         </span>
-
-        {/* back to top — appears once scrolled */}
         <button
           type="button"
           className="g2-icon-btn g2-top"
