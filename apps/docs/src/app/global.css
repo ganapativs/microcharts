@@ -1210,6 +1210,13 @@ body {
 .cta-accent:hover::after {
   transform: translateX(120%);
 }
+/* Tactile press — the primary action scales down on pointer-down, matching
+   .cta-ghost, so the button acknowledges the press instantly (feedback on
+   press, not release). !important so it wins over the Tailwind hover-lift
+   utility on the buttons that carry one (same specificity, later layer). */
+.cta-accent:active {
+  transform: scale(0.97) !important;
+}
 
 /* Secondary action — the SAME liquid-glass material as .panel, at button scale:
    frosted body, a top-left sheen, the bevel, a crisp hairline rim, and a soft
