@@ -48,6 +48,16 @@ if (process.argv.includes("--check")) {
     console.error(
       "apps/docs/src/lib/chart-sizes.json is stale — run `pnpm build && node scripts/sync-sizes.mjs` and commit the result.",
     );
+    // Show exactly which lines drifted so a cross-platform gzip difference is
+    // debuggable from the CI log without re-running the build locally.
+    const a = committed.split("\n");
+    const b = out.split("\n");
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+      if (a[i] !== b[i])
+        console.error(
+          `  L${i + 1}: committed=${JSON.stringify(a[i])} expected=${JSON.stringify(b[i])}`,
+        );
+    }
     process.exit(1);
   }
   console.log("chart-sizes.json matches the measured build.");
