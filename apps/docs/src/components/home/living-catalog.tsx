@@ -127,15 +127,22 @@ export function LivingCatalog({ total }: { total: number }) {
       onFocusCapture={hold}
       onBlurCapture={release}
     >
-      {/* soft accent glow — the cluster reads as a hero, not a card */}
+      {/* diagonal corner blooms — accent spreads from the top-right and
+          bottom-left so the cluster has a directional, lit-instrument feel */}
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-x-6 -inset-y-8 -z-10"
         style={{
           background:
-            "radial-gradient(58% 52% at 62% 34%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 72%)",
+            "radial-gradient(44% 42% at 100% 2%, color-mix(in oklab, var(--accent) 15%, transparent), transparent 70%), radial-gradient(42% 40% at 0% 100%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 72%)",
         }}
       />
+      {/* instrument crosshair + travelling signal, behind the tiles */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <span className="hx-cross-line hx-cross-v" />
+        <span className="hx-cross-line hx-cross-h" />
+        <span className={live ? "hx-cross-hub" : "hx-cross-hub [animation:none]"} />
+      </div>
 
       <ul className="grid grid-cols-2 gap-2.5 sm:gap-3">
         {board.map((cell, i) => {

@@ -2009,12 +2009,104 @@ div:where(
       filter: blur(2px);
     }
   }
+
+  /* ── Instrument crosshair behind the cluster ────────────────────────────
+     A faint hairline cross splits the cluster into quadrants; a soft accent
+     signal travels down the vertical axis and across the horizontal one, so
+     the board reads like a live instrument. Paint-only (background-position on
+     1px lines is cheap); matte, low-opacity. Corner blooms handled inline. */
+  .hx-cross-line {
+    position: absolute;
+    overflow: hidden;
+    background: color-mix(in oklab, var(--hairline) 52%, transparent);
+  }
+  /* Fade each axis out toward its ends so the cross reads as a soft crosshair,
+     not a hard box; the mask also feathers the travelling signal in and out. */
+  .hx-cross-v {
+    left: 50%;
+    top: -4%;
+    bottom: -4%;
+    width: 1px;
+    transform: translateX(-0.5px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+  }
+  .hx-cross-h {
+    top: 50%;
+    left: -3%;
+    right: -3%;
+    height: 1px;
+    transform: translateY(-0.5px);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
+  }
+  /* the travelling signal — a bright band sliding along each axis */
+  .hx-cross-v::after,
+  .hx-cross-h::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+  }
+  .hx-cross-v::after {
+    background-image: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in oklab, var(--accent) 72%, transparent),
+      transparent
+    );
+    background-size: 100% 34%;
+    animation: hx-thread-v 6.5s ease-in-out infinite;
+  }
+  .hx-cross-h::after {
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in oklab, var(--accent) 72%, transparent),
+      transparent
+    );
+    background-size: 28% 100%;
+    animation: hx-thread-h 8s ease-in-out infinite;
+    animation-delay: -2.5s;
+  }
+  @keyframes hx-thread-v {
+    0% {
+      background-position: 0 -40%;
+    }
+    100% {
+      background-position: 0 140%;
+    }
+  }
+  @keyframes hx-thread-h {
+    0% {
+      background-position: -40% 0;
+    }
+    100% {
+      background-position: 140% 0;
+    }
+  }
+  /* a quiet node where the axes meet */
+  .hx-cross-hub {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    translate: -50% -50%;
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--accent) 55%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 12%, transparent);
+    animation: hx-pulse 2.4s ease-in-out infinite;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hx-morph-in,
   .hx-swap,
-  .hx-pulse {
+  .hx-pulse,
+  .hx-cross-v::after,
+  .hx-cross-h::after,
+  .hx-cross-hub {
     animation: none;
   }
   .hx-tile {
