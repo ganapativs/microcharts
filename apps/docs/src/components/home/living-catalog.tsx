@@ -148,11 +148,11 @@ export function LivingCatalog({ total }: { total: number }) {
               <Link
                 href={`/docs/charts/${cell.slug}`}
                 aria-label={`${entry.name}: ${entry.tagline}`}
-                className="hx-tile group flex flex-col items-center justify-center gap-2.5 rounded-[14px] px-3 py-5 no-underline"
+                className="hx-tile group flex flex-col items-center justify-center gap-2 rounded-[14px] px-3 py-4 no-underline"
               >
                 <span
                   key={cell.nonce}
-                  className="hx-slot hx-swap flex min-h-[5.25rem] w-full items-center justify-center"
+                  className="hx-slot hx-swap flex min-h-[4.75rem] w-full items-center justify-center"
                 >
                   <Preview />
                 </span>
@@ -167,7 +167,7 @@ export function LivingCatalog({ total }: { total: number }) {
 
       {/* centered anchor for the cluster — the "live" pulse doubles as the
           gallery invitation, so the whole catalog is one click from the fold */}
-      <div className="mt-5 flex justify-center">
+      <div className="mt-4 flex justify-center">
         <Link
           href="/gallery"
           aria-label={`Browse all ${total} chart types in the gallery`}
