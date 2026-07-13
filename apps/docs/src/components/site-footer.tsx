@@ -124,6 +124,13 @@ export function SiteFooter() {
             <a href={SITE.npm} className="link-underline hover:text-fd-foreground">
               npm
             </a>
+            {/* dofollow, UTM-tagged — Argos open-source plan requirement */}
+            <a
+              href="https://argos-ci.com?utm_source=microcharts&utm_campaign=oss"
+              className="link-underline hover:text-fd-foreground"
+            >
+              Visual tests by Argos
+            </a>
           </div>
         </div>
       </div>
