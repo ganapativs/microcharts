@@ -1,5 +1,15 @@
 # @microcharts/react
 
+## 0.2.0
+
+### Minor Changes
+
+- ef2df66: Ship the full catalog: 106 stable chart types (34 core, 26 decision, 23 expressive, 23
+  frontier), each with a static React Server Component entry and an `/interactive` twin, an
+  auto-generated accessible summary, opt-in mount animation via `@microcharts/react/motion`, and
+  a CI-gated size budget. Zero runtime dependencies; one shared `styles.css`. First public release
+  usable end to end.
+
 ## 0.1.0
 
 ### Minor Changes
@@ -158,8 +168,7 @@
     vertices; only out-of-control points are marked (ringed, negative). `limits="sigma"
 | "percentile"` (empirical p0.135/p99.865 for skew), `baseline` for a golden-period
     center, `rules="we"` for the enumerated Western Electric subset (WE-1/2/4, no rule
-    fires silently), `dots="all"` for sparse series. Fewer than 10 points → dashed band
-    - "limits provisional"; zero moving range → band collapses to the center hairline.
+    fires silently), `dots="all"` for sparse series. Fewer than 10 points → dashed band - "limits provisional"; zero moving range → band collapses to the center hairline.
 
   New `EN_CONTROL` summary module (`control`, `controlInControl`, `controlProvisional`,
   `controlAt`).

@@ -1,5 +1,12 @@
 # @microcharts/docs
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [ef2df66]
+  - @microcharts/react@0.2.0
+
 ## 0.0.1
 
 ### Patch Changes
