@@ -126,7 +126,7 @@ export function SiteFooter() {
             </a>
             {/* dofollow, UTM-tagged — Argos open-source plan requirement */}
             <a
-              href="https://argos-ci.com?utm_source=microcharts&utm_campaign=oss"
+              href="https://argos-ci.com?utm_source=ganapativs/microcharts&utm_campaign=oss"
               className="link-underline hover:text-fd-foreground"
             >
               Visual tests by Argos

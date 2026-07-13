@@ -10,7 +10,7 @@
 [![types](https://img.shields.io/npm/types/@microcharts/react?color=2f52d4)](https://microcharts.dev)
 [![React 18 · 19](https://img.shields.io/badge/React-18_·_19-077353)](https://microcharts.dev/docs/quickstart)
 [![MIT](https://img.shields.io/npm/l/@microcharts/react?color=666)](./LICENSE)
-[![Reviewed with Argos](https://argos-ci.com/badge.svg)](https://argos-ci.com?utm_source=microcharts&utm_campaign=oss)
+[![Reviewed with Argos](https://argos-ci.com/badge.svg)](https://argos-ci.com?utm_source=ganapativs/microcharts&utm_campaign=oss)
 
 **[Docs](https://microcharts.dev)** · **[Gallery](https://microcharts.dev/docs/charts)** · **[Quickstart](https://microcharts.dev/docs/quickstart)** · **[AI usage](https://microcharts.dev/docs/ai)** · **[llms.txt](https://microcharts.dev/llms.txt)**
 
