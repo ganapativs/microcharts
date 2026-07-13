@@ -159,9 +159,21 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Base", meta: "70%" },
-  { name: "Upside", meta: "42%" },
-  { name: "Downside", meta: "88%" },
+  { name: "Base", meta: "70%", data: FUTURES.slice(0, 12) as typeof FUTURES },
+  {
+    name: "Upside",
+    meta: "42%",
+    data: Array.from({ length: 12 }, (_, i) =>
+      Array.from({ length: 8 }, (_, t) => Math.round(30 + i * 0.8 + t * 1.5)),
+    ) as typeof FUTURES,
+  },
+  {
+    name: "Downside",
+    meta: "88%",
+    data: Array.from({ length: 12 }, (_, i) =>
+      Array.from({ length: 8 }, (_, t) => Math.round(50 + (i - 4) * 2.5 + t * 3.2)),
+    ) as typeof FUTURES,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -185,7 +197,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <EnsembleGhosts data={FUTURES} height={18} summary={false} />
+                <EnsembleGhosts data={row.data} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -205,7 +217,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">paths above target</span>
           </div>
         </div>
-        <EnsembleGhosts data={FUTURES} height={36} summary={false} />
+        <EnsembleGhosts data={CTX_ROWS[0]!.data} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">70%</span>\n  <span className="unit">paths above target</span>\n  <EnsembleGhosts data={futures} />\n</div>',
@@ -219,7 +231,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <EnsembleGhosts data={FUTURES} height={14} summary={false} />
+            <EnsembleGhosts data={row.data} height={14} summary={false} />
           </span>
         ))}
       </div>

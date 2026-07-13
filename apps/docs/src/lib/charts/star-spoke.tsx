@@ -158,10 +158,19 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const mkProfile = (highlight: string, value: number) =>
+  [
+    { label: "Speed", value: highlight === "Speed" ? value : 0.5 },
+    { label: "Power", value: 0.6 },
+    { label: "Range", value: highlight === "Range" ? value : 0.5 },
+    { label: "Cost", value: 0.3 },
+    { label: "Ease", value: highlight === "Ease" ? value : 0.5 },
+  ] as typeof PROFILE;
+
 const CTX_ROWS = [
-  { name: "Product A", meta: "0.9 speed" },
-  { name: "Product B", meta: "0.7 ease" },
-  { name: "Product C", meta: "0.8 range" },
+  { name: "Product A", meta: "0.9 speed", data: mkProfile("Speed", 0.9) },
+  { name: "Product B", meta: "0.7 ease", data: mkProfile("Ease", 0.7) },
+  { name: "Product C", meta: "0.8 range", data: mkProfile("Range", 0.8) },
 ];
 
 export const contexts: ChartContexts = {
@@ -185,7 +194,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <StarSpoke data={PROFILE} dots="tips" size={22} summary={false} />
+                <StarSpoke data={row.data} dots="tips" size={22} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -205,7 +214,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">top dimension</span>
           </div>
         </div>
-        <StarSpoke data={PROFILE} dots="tips" size={48} summary={false} />
+        <StarSpoke data={CTX_ROWS[0]!.data} dots="tips" size={48} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">0.9</span>\n  <span className="unit">top dimension</span>\n  <StarSpoke data={metrics} />\n</div>',
@@ -219,7 +228,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <StarSpoke data={PROFILE} dots="tips" size={18} summary={false} />
+            <StarSpoke data={row.data} dots="tips" size={18} summary={false} />
           </span>
         ))}
       </div>

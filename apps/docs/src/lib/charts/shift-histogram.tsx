@@ -1,6 +1,7 @@
 import { ShiftHistogram } from "@microcharts/react/shift-histogram";
 import { ShiftHistogram as ShiftHistogramInteractive } from "@microcharts/react/shift-histogram/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import { shiftHistogramFromDelta } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
 // latency (ms) before/after a fix — the whole distribution moved left
@@ -197,9 +198,9 @@ const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
 ];
 
 const CTX_ROWS = [
-  { name: "checkout", meta: "−20ms" },
-  { name: "auth", meta: "−8ms" },
-  { name: "search", meta: "−12ms" },
+  { name: "checkout", meta: "−20ms", data: shiftHistogramFromDelta(-20.0) },
+  { name: "auth", meta: "−8ms", data: shiftHistogramFromDelta(-8.0) },
+  { name: "search", meta: "−12ms", data: shiftHistogramFromDelta(-12.0) },
 ];
 
 export const contexts: ChartContexts = {
@@ -228,12 +229,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <ShiftHistogram
-                  data={{ before: BEFORE, after: AFTER }}
-                  format={MS}
-                  height={18}
-                  summary={false}
-                />
+                <ShiftHistogram data={row.data} format={MS} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -272,12 +268,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <ShiftHistogram
-              data={{ before: BEFORE, after: AFTER }}
-              format={MS}
-              height={14}
-              summary={false}
-            />
+            <ShiftHistogram data={row.data} format={MS} height={14} summary={false} />
           </span>
         ))}
       </div>

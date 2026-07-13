@@ -184,9 +184,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "US", meta: "Wed peak" },
-  { name: "EU", meta: "Tue peak" },
-  { name: "APAC", meta: "Thu peak" },
+  { name: "US", meta: "Wed peak", data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0] },
+  { name: "EU", meta: "Tue peak", data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0] },
+  { name: "APAC", meta: "Thu peak", data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0] },
 ];
 
 export const contexts: ChartContexts = {
@@ -218,7 +218,7 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <CyclePlot
-                  data={WEEKS}
+                  data={row.data}
                   period={7}
                   slots={DAYS}
                   cycleUnit="weeks"
@@ -245,7 +245,7 @@ export const contexts: ChartContexts = {
           </div>
         </div>
         <CyclePlot
-          data={WEEKS}
+          data={CTX_ROWS[0]!.data}
           period={7}
           slots={DAYS}
           cycleUnit="weeks"
@@ -266,7 +266,7 @@ export const contexts: ChartContexts = {
           >
             {row.name}
             <CyclePlot
-              data={WEEKS}
+              data={row.data}
               period={7}
               slots={DAYS}
               cycleUnit="weeks"

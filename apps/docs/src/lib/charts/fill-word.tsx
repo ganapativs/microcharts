@@ -130,9 +130,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "avatar.png", meta: "62%" },
-  { name: "report.pdf", meta: "100%" },
-  { name: "data.zip", meta: "18%" },
+  { name: "avatar.png", meta: "62%", data: [0.51, 0.52, 0.54, 0.56, 0.57, 0.59, 0.6, 0.62] },
+  { name: "report.pdf", meta: "100%", data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0] },
+  { name: "data.zip", meta: "18%", data: [0.15, 0.15, 0.16, 0.16, 0.17, 0.17, 0.18, 0.18] },
 ];
 
 export const contexts: ChartContexts = {

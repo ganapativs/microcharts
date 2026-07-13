@@ -171,9 +171,73 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "JS", meta: "44%" },
-  { name: "CSS", meta: "24%" },
-  { name: "img", meta: "18%" },
+  {
+    name: "JS",
+    meta: "44%",
+    data: [
+      {
+        label: "JS",
+        children: [
+          { label: "react", value: 28 },
+          { label: "vendor", value: 12 },
+          { label: "app", value: 8 },
+        ],
+      },
+      {
+        label: "CSS",
+        children: [
+          { label: "tailwind", value: 10 },
+          { label: "custom", value: 6 },
+        ],
+      },
+      { label: "img", value: 14 },
+      { label: "font", value: 8 },
+    ] as typeof TREE,
+  },
+  {
+    name: "CSS",
+    meta: "24%",
+    data: [
+      {
+        label: "JS",
+        children: [
+          { label: "react", value: 18 },
+          { label: "vendor", value: 8 },
+        ],
+      },
+      {
+        label: "CSS",
+        children: [
+          { label: "tailwind", value: 16 },
+          { label: "custom", value: 8 },
+        ],
+      },
+      { label: "img", value: 12 },
+      { label: "font", value: 6 },
+    ] as typeof TREE,
+  },
+  {
+    name: "img",
+    meta: "18%",
+    data: [
+      {
+        label: "JS",
+        children: [
+          { label: "react", value: 20 },
+          { label: "vendor", value: 10 },
+        ],
+      },
+      {
+        label: "CSS",
+        children: [
+          { label: "tailwind", value: 12 },
+          { label: "custom", value: 8 },
+        ],
+      },
+      { label: "img", value: 18 },
+      { label: "font", value: 8 },
+    ] as typeof TREE,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -197,7 +261,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <PartitionStrip data={TREE} height={18} summary={false} />
+                <PartitionStrip data={row.data} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -217,7 +281,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">of total size</span>
           </div>
         </div>
-        <PartitionStrip data={TREE} height={36} summary={false} />
+        <PartitionStrip data={CTX_ROWS[0]!.data} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">44%</span>\n  <span className="unit">of total size</span>\n  <PartitionStrip data={bundle} />\n</div>',
@@ -231,7 +295,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <PartitionStrip data={TREE} height={14} summary={false} />
+            <PartitionStrip data={row.data} height={14} summary={false} />
           </span>
         ))}
       </div>

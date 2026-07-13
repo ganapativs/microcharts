@@ -158,9 +158,29 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Q1", meta: "4 events" },
-  { name: "Q2", meta: "2 events" },
-  { name: "Q3", meta: "1 event" },
+  {
+    name: "Q1",
+    meta: "4 events",
+    data: [
+      { x: 0, y: 40, m: 2 },
+      { x: 2, y: 90, m: 7 },
+      { x: 5, y: 30, m: 3 },
+      { x: 8, y: 65, m: 5 },
+    ] as typeof INCIDENTS,
+  },
+  {
+    name: "Q2",
+    meta: "2 events",
+    data: [
+      { x: 1, y: 55, m: 4 },
+      { x: 6, y: 70, m: 6 },
+    ] as typeof INCIDENTS,
+  },
+  {
+    name: "Q3",
+    meta: "1 event",
+    data: [{ x: 3, y: 80, m: 8 }] as typeof INCIDENTS,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -184,7 +204,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <Constellation data={INCIDENTS} xFormat={monthFmt} height={18} summary={false} />
+                <Constellation data={row.data} xFormat={monthFmt} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -204,7 +224,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">this quarter</span>
           </div>
         </div>
-        <Constellation data={INCIDENTS} xFormat={monthFmt} height={36} summary={false} />
+        <Constellation data={CTX_ROWS[0]!.data} xFormat={monthFmt} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">4</span>\n  <span className="unit">this quarter</span>\n  <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} />\n</div>',
@@ -218,7 +238,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <Constellation data={INCIDENTS} xFormat={monthFmt} height={14} summary={false} />
+            <Constellation data={row.data} xFormat={monthFmt} height={14} summary={false} />
           </span>
         ))}
       </div>

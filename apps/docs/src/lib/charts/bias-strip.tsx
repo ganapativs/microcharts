@@ -1,6 +1,7 @@
 import { BiasStrip } from "@microcharts/react/bias-strip";
 import { BiasStrip as BiasStripInteractive } from "@microcharts/react/bias-strip/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import { biasPairsFromDrift } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
 
@@ -142,9 +143,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Sensor A", meta: "in spec" },
-  { name: "Sensor B", meta: "drift +2" },
-  { name: "Sensor C", meta: "in spec" },
+  { name: "Sensor A", meta: "in spec", data: biasPairsFromDrift(0.2) },
+  { name: "Sensor B", meta: "drift +2", data: biasPairsFromDrift(2.0) },
+  { name: "Sensor C", meta: "in spec", data: biasPairsFromDrift(0.1) },
 ];
 
 export const contexts: ChartContexts = {
@@ -168,7 +169,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{row.name}</td>
               <td className="py-1.5">
-                <BiasStrip data={PAIRS} summary={false} width={72} height={28} />
+                <BiasStrip data={row.data} summary={false} width={72} height={28} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -188,7 +189,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">mean bias · 95% LoA</span>
           </div>
         </div>
-        <BiasStrip data={PAIRS} limits={2.58} summary={false} width={200} height={48} />
+        <BiasStrip data={CTX_ROWS[0]!.data} limits={2.58} summary={false} width={200} height={48} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">+2.0</span>\n  <BiasStrip data={pairs} limits={2.58} width={200} height={48} />\n</div>',
@@ -202,7 +203,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <BiasStrip data={PAIRS} label="none" summary={false} width={44} height={22} />
+            <BiasStrip data={row.data} label="none" summary={false} width={44} height={22} />
           </span>
         ))}
       </div>

@@ -37,7 +37,7 @@ function KpiCard({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-1.5 rounded-lg border border-hairline p-3">
+    <div className="plate-inner flex flex-col gap-1.5 p-3">
       <span className="mono-label opacity-70">{label}</span>
       <div className="flex items-baseline gap-1.5">
         <span className="display text-lg tabular-nums leading-none sm:text-xl">{figure}</span>
@@ -62,7 +62,7 @@ function ProductSurface() {
         <KpiCard label="p95" figure="31ms" d={-0.14}>
           <Sparkline data={LAT} summary={false} width={110} height={22} dots="none" />
         </KpiCard>
-        <div className="col-span-2 flex flex-col gap-1.5 rounded-lg border border-hairline p-3 sm:col-span-1">
+        <div className="plate-inner col-span-2 flex flex-col gap-1.5 p-3 sm:col-span-1">
           <span className="mono-label opacity-70">error budget</span>
           <span className="display text-lg leading-none tabular-nums sm:text-xl">72%</span>
           <Bullet value={72} target={90} bands={[60, 95]} width={110} height={12} summary={false} />
@@ -105,7 +105,7 @@ function ReportSurface() {
         </span>{" "}
         <Delta value={0.184} summary={false} /> against plan, with new-logo mix steady.
       </p>
-      <figure className="rounded-lg border border-hairline p-3.5">
+      <figure className="plate-inner p-3.5">
         <SparkBar data={BOOKINGS} summary={false} width={340} height={54} className="w-full" />
         <figcaption className="mono-label mt-2 opacity-70">
           monthly bookings, $000 · fig. 3
@@ -136,7 +136,7 @@ function DocsSurface() {
       <p className="text-[0.92rem] leading-relaxed text-fd-muted-foreground">
         Drop a chart straight into Markdown — no image, no export step:
       </p>
-      <pre className="overflow-x-auto rounded-lg border border-hairline bg-fd-muted/30 p-3.5 font-mono text-[0.78rem] leading-relaxed">
+      <pre className="plate-inner overflow-x-auto p-3.5 font-mono text-[0.78rem] leading-relaxed">
         <code>
           <span className="text-fd-muted-foreground">p95 latency is easing off </span>
           {"\n"}
@@ -147,7 +147,7 @@ function DocsSurface() {
           <span className="text-fd-muted-foreground">across the release.</span>
         </code>
       </pre>
-      <div className="flex items-center gap-2 rounded-lg border border-hairline p-3.5 text-[0.92rem] leading-relaxed text-fd-foreground">
+      <div className="plate-inner flex items-center gap-2 p-3.5 text-[0.92rem] leading-relaxed text-fd-foreground">
         p95 latency is easing off{" "}
         <span className="mc-inline">
           <Sparkline

@@ -107,9 +107,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "INC-142", meta: "4" },
-  { name: "INC-141", meta: "2" },
-  { name: "INC-140", meta: "5" },
+  { name: "INC-142", meta: "4", data: [3, 3, 3, 3, 4, 4, 4, 4] },
+  { name: "INC-141", meta: "2", data: [1, 2, 2, 2, 2, 2, 2, 2] },
+  { name: "INC-140", meta: "5", data: [4, 4, 4, 4, 4, 5, 5, 5] },
 ];
 
 export const contexts: ChartContexts = {

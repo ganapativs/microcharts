@@ -147,9 +147,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Acme", meta: "2.1M" },
-  { name: "Globex", meta: "942K" },
-  { name: "Initech", meta: "318K" },
+  { name: "Acme", meta: "2.1M", value: 2100 },
+  { name: "Globex", meta: "942K", value: 942 },
+  { name: "Initech", meta: "318K", value: 318 },
 ];
 
 export const contexts: ChartContexts = {
@@ -169,16 +169,11 @@ export const contexts: ChartContexts = {
     render: () => (
       <table className="mc-inline-table w-full text-sm tabular-nums">
         <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
-          {CTX_ROWS.map((row, i) => (
+          {CTX_ROWS.map((row) => (
             <tr key={row.name}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{row.name}</td>
               <td className="py-1.5">
-                <FatDigits
-                  value={[2100, 942, 318][i]!}
-                  domain={DOMAIN}
-                  summary={false}
-                  fontSize={14}
-                />
+                <FatDigits value={row.value} domain={DOMAIN} summary={false} fontSize={14} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -186,7 +181,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: "<td>\n  <FatDigits value={1204} domain={[0, 2100]} />\n</td>",
+    code: "<td>\n  <FatDigits value={row.value} domain={[0, 2100]} />\n</td>",
   },
   kpi: {
     render: () => (
@@ -216,12 +211,12 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <FatDigits value={[2100, 942, 318][i]!} domain={DOMAIN} summary={false} fontSize={12} />
+            <FatDigits value={row.value} domain={DOMAIN} summary={false} fontSize={12} />
           </span>
         ))}
       </div>
     ),
-    code: '<button className="tab">\n  Acme <FatDigits value={2100} domain={[0, 2100]} />\n</button>',
+    code: '<button className="tab">\n  Acme <FatDigits value={row.value} domain={[0, 2100]} />\n</button>',
   },
 };
 

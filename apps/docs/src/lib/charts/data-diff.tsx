@@ -176,9 +176,31 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "users", meta: "+2 cols" },
-  { name: "orders", meta: "+1 table" },
-  { name: "events", meta: "−1 col" },
+  {
+    name: "users",
+    meta: "+2 cols",
+    data: [
+      { key: "email", added: 120, removed: 0 },
+      { key: "phone", added: 80, removed: 0 },
+      { key: "avatar", added: 40, removed: 20 },
+    ] as typeof DIFF,
+  },
+  {
+    name: "orders",
+    meta: "+1 table",
+    data: [
+      { key: "orders", added: 88, removed: 12 },
+      { key: "line_items", added: 40, removed: 8 },
+    ] as typeof DIFF,
+  },
+  {
+    name: "events",
+    meta: "−1 col",
+    data: [
+      { key: "payload", added: 10, removed: 45 },
+      { key: "legacy_id", added: 2, removed: 30 },
+    ] as typeof DIFF,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -202,7 +224,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <DataDiff data={DIFF} labels height={18} summary={false} />
+                <DataDiff data={row.data} labels height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -222,7 +244,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">tables added</span>
           </div>
         </div>
-        <DataDiff data={DIFF} labels height={36} summary={false} />
+        <DataDiff data={CTX_ROWS[0]!.data} labels height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">+3</span>\n  <span className="unit">tables added</span>\n  <DataDiff data={diff} />\n</div>',
@@ -236,7 +258,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <DataDiff data={DIFF} labels height={14} summary={false} />
+            <DataDiff data={row.data} labels height={14} summary={false} />
           </span>
         ))}
       </div>

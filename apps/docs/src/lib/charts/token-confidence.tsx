@@ -182,9 +182,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "facts", meta: "98%" },
-  { name: "dates", meta: "71%" },
-  { name: "names", meta: "88%" },
+  { name: "facts", meta: "98%", data: ANSWER.slice(0, 8) },
+  { name: "dates", meta: "71%", data: ANSWER.slice(4, 12) },
+  { name: "names", meta: "88%", data: ANSWER.slice(8, 16) },
 ];
 
 export const contexts: ChartContexts = {
@@ -212,11 +212,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <TokenConfidence
-                  data={ANSWER.slice(0, 6)}
-                  summary={false}
-                  style={{ fontSize: "0.65rem" }}
-                />
+                <TokenConfidence data={row.data} summary={false} style={{ fontSize: "0.65rem" }} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>

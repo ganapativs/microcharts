@@ -151,9 +151,13 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "microcharts", meta: "34 peak" },
-  { name: "docs", meta: "22 peak" },
-  { name: "api", meta: "18 peak" },
+  {
+    name: "microcharts",
+    meta: "34 peak",
+    data: [24480, 25840, 27200, 28560, 29920, 31280, 32640, 34000],
+  },
+  { name: "docs", meta: "22 peak", data: [15840, 16720, 17600, 18480, 19360, 20240, 21120, 22000] },
+  { name: "api", meta: "18 peak", data: [12960, 13680, 14400, 15120, 15840, 16560, 17280, 18000] },
 ];
 
 export const contexts: ChartContexts = {
@@ -177,7 +181,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <GardenGrid data={WEEKS} unit="weeks" cell={9} summary={false} />
+                <GardenGrid data={row.data} unit="weeks" cell={9} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -197,7 +201,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">peak week</span>
           </div>
         </div>
-        <GardenGrid data={WEEKS} unit="weeks" cell={12} summary={false} />
+        <GardenGrid data={CTX_ROWS[0]!.data} unit="weeks" cell={12} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">34</span>\n  <span className="unit">peak week</span>\n  <GardenGrid data={weeks} />\n</div>',
@@ -211,7 +215,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <GardenGrid data={WEEKS} unit="weeks" cell={7} summary={false} />
+            <GardenGrid data={row.data} unit="weeks" cell={7} summary={false} />
           </span>
         ))}
       </div>

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { SearchTrigger } from "fumadocs-ui/layouts/shared/slots/search-trigger";
 import { SITE } from "@/lib/site";
@@ -38,8 +39,24 @@ const ctrl = "ghost-ctrl size-8";
 
 export function SiteNav() {
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setScrolled(window.scrollY > 8));
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
-    <header className="glass-rail sticky top-0 z-40">
+    <header className="glass-rail sticky top-0 z-40" data-scrolled={scrolled || undefined}>
       <nav className="mx-auto flex h-14 max-w-6xl items-center gap-5 px-4 sm:px-6">
         <Wordmark />
         <div className="hidden items-center gap-0.5 md:flex">

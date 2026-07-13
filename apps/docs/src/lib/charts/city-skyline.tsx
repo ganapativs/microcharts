@@ -166,9 +166,33 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Platform", meta: "46" },
-  { name: "Core", meta: "32" },
-  { name: "Web", meta: "28" },
+  {
+    name: "Platform",
+    meta: "46",
+    data: [
+      { label: "Platform", value: 46, lit: 0.7 },
+      { label: "Core", value: 28, lit: 0.5 },
+      { label: "Web", value: 22, lit: 0.4 },
+    ] as Team[],
+  },
+  {
+    name: "Core",
+    meta: "32",
+    data: [
+      { label: "Platform", value: 38, lit: 0.6 },
+      { label: "Core", value: 32, lit: 0.8 },
+      { label: "Web", value: 20, lit: 0.5 },
+    ] as Team[],
+  },
+  {
+    name: "Web",
+    meta: "28",
+    data: [
+      { label: "Platform", value: 36, lit: 0.5 },
+      { label: "Core", value: 24, lit: 0.6 },
+      { label: "Web", value: 28, lit: 0.9 },
+    ] as Team[],
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -192,7 +216,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <CitySkyline data={TEAMS} labels unit="teams" height={18} summary={false} />
+                <CitySkyline data={row.data} labels unit="teams" height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -212,7 +236,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">heads · 70% lit</span>
           </div>
         </div>
-        <CitySkyline data={TEAMS} labels unit="teams" height={36} summary={false} />
+        <CitySkyline data={CTX_ROWS[0]!.data} labels unit="teams" height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">46</span>\n  <span className="unit">heads · 70% lit</span>\n  <CitySkyline data={teams} />\n</div>',
@@ -226,7 +250,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <CitySkyline data={TEAMS} labels unit="teams" height={14} summary={false} />
+            <CitySkyline data={row.data} labels unit="teams" height={14} summary={false} />
           </span>
         ))}
       </div>

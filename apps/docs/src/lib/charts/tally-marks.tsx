@@ -151,9 +151,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "District 1", meta: "23" },
-  { name: "District 2", meta: "18" },
-  { name: "District 3", meta: "31" },
+  { name: "District 1", meta: "23", data: [17, 17, 18, 19, 20, 21, 22, 23] },
+  { name: "District 2", meta: "18", data: [13, 14, 14, 15, 16, 17, 17, 18] },
+  { name: "District 3", meta: "31", data: [22, 24, 25, 26, 27, 29, 30, 31] },
 ];
 
 export const contexts: ChartContexts = {

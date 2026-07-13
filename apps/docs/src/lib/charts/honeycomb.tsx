@@ -135,9 +135,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Room A", meta: "34/40" },
-  { name: "Room B", meta: "28/40" },
-  { name: "Room C", meta: "12/40" },
+  { name: "Room A", meta: "34/40", data: [24, 26, 27, 29, 30, 31, 33, 34] },
+  { name: "Room B", meta: "28/40", data: [20, 21, 22, 24, 25, 26, 27, 28] },
+  { name: "Room C", meta: "12/40", data: [9, 9, 10, 10, 11, 11, 12, 12] },
 ];
 
 export const contexts: ChartContexts = {

@@ -21,9 +21,12 @@ function Logo({ name, className }: { name: string; className?: string }) {
 
 export function ProviderWall() {
   return (
-    <div className="not-prose my-6 flex flex-col gap-px overflow-hidden rounded-lg bg-hairline ring-1 ring-hairline">
+    <div className="panel not-prose my-6 flex flex-col gap-px overflow-hidden">
       {PROVIDER_GROUPS.map((g) => (
-        <div key={g.title} className="bg-fd-background p-4 sm:flex sm:items-start sm:gap-6">
+        <div
+          key={g.title}
+          className="border-t border-hairline p-4 first:border-t-0 sm:flex sm:items-start sm:gap-6"
+        >
           <div className="mb-3 shrink-0 sm:mb-0 sm:w-44">
             <div className="text-sm font-medium text-fd-foreground">{g.title}</div>
             <div className="mono-label mt-0.5 opacity-70">{g.note}</div>

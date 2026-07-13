@@ -1,6 +1,7 @@
 import { ErrorBudget } from "@microcharts/react/error-budget";
 import { ErrorBudget as ErrorBudgetInteractive } from "@microcharts/react/error-budget/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import { budgetRemainingCurve } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
 // 12 days into a 30-day SLO window, burning slightly under the steady rate
@@ -177,9 +178,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "checkout", meta: "34%" },
-  { name: "auth", meta: "72%" },
-  { name: "search", meta: "91%" },
+  { name: "checkout", meta: "34%", data: budgetRemainingCurve(0.34) },
+  { name: "auth", meta: "72%", data: budgetRemainingCurve(0.72) },
+  { name: "search", meta: "91%", data: budgetRemainingCurve(0.91) },
 ];
 
 export const contexts: ChartContexts = {
@@ -203,7 +204,13 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <ErrorBudget data={DEMO} window={WINDOW} unit="day" height={18} summary={false} />
+                <ErrorBudget
+                  data={row.data}
+                  window={WINDOW}
+                  unit="day"
+                  height={18}
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -223,7 +230,13 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">remaining</span>
           </div>
         </div>
-        <ErrorBudget data={DEMO} window={WINDOW} unit="day" height={36} summary={false} />
+        <ErrorBudget
+          data={CTX_ROWS[0]!.data}
+          window={WINDOW}
+          unit="day"
+          height={36}
+          summary={false}
+        />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">34%</span>\n  <span className="unit">remaining</span>\n  <ErrorBudget data={remaining} window={30} />\n</div>',
@@ -237,7 +250,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <ErrorBudget data={DEMO} window={WINDOW} unit="day" height={14} summary={false} />
+            <ErrorBudget data={row.data} window={WINDOW} unit="day" height={14} summary={false} />
           </span>
         ))}
       </div>

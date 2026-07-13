@@ -156,10 +156,24 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const mkTrace = (total: number) =>
+  [
+    { label: "request", start: 0, duration: total, depth: 0 },
+    { label: "handler", start: 8, duration: Math.round(total * 0.4), depth: 1, parent: 0 },
+    { label: "db", start: 12, duration: Math.round(total * 0.35), depth: 2, parent: 1 },
+    {
+      label: "serialize",
+      start: Math.round(total * 0.55),
+      duration: Math.round(total * 0.3),
+      depth: 1,
+      parent: 0,
+    },
+  ] as typeof TRACE;
+
 const CTX_ROWS = [
-  { name: "GET /api", meta: "214ms" },
-  { name: "POST /checkout", meta: "890ms" },
-  { name: "GET /health", meta: "12ms" },
+  { name: "GET /api", meta: "214ms", data: TRACE },
+  { name: "POST /checkout", meta: "890ms", data: mkTrace(890) },
+  { name: "GET /health", meta: "12ms", data: mkTrace(12) },
 ];
 
 export const contexts: ChartContexts = {
@@ -183,7 +197,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <TraceFold data={TRACE} format={ms} height={18} summary={false} />
+                <TraceFold data={row.data} format={ms} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -203,7 +217,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">total trace</span>
           </div>
         </div>
-        <TraceFold data={TRACE} format={ms} height={36} summary={false} />
+        <TraceFold data={CTX_ROWS[0]!.data} format={ms} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">214ms</span>\n  <span className="unit">total trace</span>\n  <TraceFold data={spans} />\n</div>',
@@ -217,7 +231,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <TraceFold data={TRACE} format={ms} height={14} summary={false} />
+            <TraceFold data={row.data} format={ms} height={14} summary={false} />
           </span>
         ))}
       </div>

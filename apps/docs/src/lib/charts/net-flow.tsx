@@ -189,9 +189,48 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Operating", meta: "+$62K" },
-  { name: "Investing", meta: "−$28K" },
-  { name: "Financing", meta: "+$8K" },
+  {
+    name: "Operating",
+    meta: "+$62K",
+    data: [
+      { in: 52, out: 38 },
+      { in: 55, out: 36 },
+      { in: 58, out: 34 },
+      { in: 60, out: 32 },
+      { in: 62, out: 30 },
+      { in: 64, out: 28 },
+      { in: 66, out: 26 },
+      { in: 68, out: 24 },
+    ] as typeof DEMO,
+  },
+  {
+    name: "Investing",
+    meta: "−$28K",
+    data: [
+      { in: 18, out: 32 },
+      { in: 16, out: 34 },
+      { in: 15, out: 36 },
+      { in: 14, out: 38 },
+      { in: 12, out: 40 },
+      { in: 11, out: 42 },
+      { in: 10, out: 44 },
+      { in: 8, out: 46 },
+    ] as typeof DEMO,
+  },
+  {
+    name: "Financing",
+    meta: "+$8K",
+    data: [
+      { in: 22, out: 18 },
+      { in: 23, out: 17 },
+      { in: 24, out: 17 },
+      { in: 25, out: 16 },
+      { in: 26, out: 16 },
+      { in: 27, out: 15 },
+      { in: 28, out: 15 },
+      { in: 29, out: 14 },
+    ] as typeof DEMO,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -215,7 +254,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <NetFlow data={DEMO} format={KFMT} height={18} summary={false} />
+                <NetFlow data={row.data} format={KFMT} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -235,7 +274,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">this month</span>
           </div>
         </div>
-        <NetFlow data={DEMO} format={KFMT} height={36} summary={false} />
+        <NetFlow data={CTX_ROWS[0]!.data} format={KFMT} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">+$42K</span>\n  <span className="unit">this month</span>\n  <NetFlow data={months} />\n</div>',
@@ -249,7 +288,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <NetFlow data={DEMO} format={KFMT} height={14} summary={false} />
+            <NetFlow data={row.data} format={KFMT} height={14} summary={false} />
           </span>
         ))}
       </div>

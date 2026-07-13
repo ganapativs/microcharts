@@ -209,10 +209,16 @@ const periods = [
   },
 ];
 
+const mkRateVol = (endRate: number, endVol: number) =>
+  Array.from({ length: 8 }, (_, i) => ({
+    rate: (endRate * (0.72 + (0.28 * i) / 7)) / 100,
+    volume: Math.round(endVol * (0.72 + (0.28 * i) / 7)),
+  })) as typeof FRAC;
+
 const CTX_ROWS = [
-  { name: "Web", meta: "4.2%" },
-  { name: "Mobile", meta: "3.1%" },
-  { name: "App", meta: "5.8%" },
+  { name: "Web", meta: "4.2%", data: mkRateVol(4.2, 220) },
+  { name: "Mobile", meta: "3.1%", data: mkRateVol(3.1, 180) },
+  { name: "App", meta: "5.8%", data: mkRateVol(5.8, 140) },
 ];
 
 export const contexts: ChartContexts = {
@@ -236,7 +242,13 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <RateVolume data={FRAC} format={PCT} minVolume={50} height={18} summary={false} />
+                <RateVolume
+                  data={row.data}
+                  format={PCT}
+                  minVolume={50}
+                  height={18}
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -256,7 +268,13 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">1,240 sessions</span>
           </div>
         </div>
-        <RateVolume data={FRAC} format={PCT} minVolume={50} height={36} summary={false} />
+        <RateVolume
+          data={CTX_ROWS[0]!.data}
+          format={PCT}
+          minVolume={50}
+          height={36}
+          summary={false}
+        />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">4.2%</span>\n  <span className="unit">1,240 sessions</span>\n  <RateVolume data={periods} minVolume={50} />\n</div>',
@@ -270,7 +288,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <RateVolume data={FRAC} format={PCT} minVolume={50} height={14} summary={false} />
+            <RateVolume data={row.data} format={PCT} minVolume={50} height={14} summary={false} />
           </span>
         ))}
       </div>

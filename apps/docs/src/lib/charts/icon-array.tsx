@@ -149,9 +149,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Cohort A", meta: "15%" },
-  { name: "Cohort B", meta: "8%" },
-  { name: "Cohort C", meta: "22%" },
+  { name: "Cohort A", meta: "15%", data: [0.12, 0.13, 0.13, 0.13, 0.14, 0.14, 0.15, 0.15] },
+  { name: "Cohort B", meta: "8%", data: [0.07, 0.07, 0.07, 0.07, 0.07, 0.08, 0.08, 0.08] },
+  { name: "Cohort C", meta: "22%", data: [0.18, 0.19, 0.19, 0.2, 0.2, 0.21, 0.21, 0.22] },
 ];
 
 export const contexts: ChartContexts = {

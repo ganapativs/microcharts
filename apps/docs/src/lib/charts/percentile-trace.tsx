@@ -147,9 +147,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Team A", meta: "81st" },
-  { name: "Team B", meta: "62nd" },
-  { name: "Team C", meta: "44th" },
+  { name: "Team A", meta: "81st", data: [58, 62, 65, 68, 71, 75, 78, 81] },
+  { name: "Team B", meta: "62nd", data: [45, 47, 50, 52, 55, 57, 60, 62] },
+  { name: "Team C", meta: "44th", data: [32, 33, 35, 37, 39, 40, 42, 44] },
 ];
 
 export const contexts: ChartContexts = {
@@ -173,7 +173,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <PercentileTrace data={DEMO} unit="week" height={18} summary={false} />
+                <PercentileTrace data={row.data} unit="week" height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -193,7 +193,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">percentile now</span>
           </div>
         </div>
-        <PercentileTrace data={DEMO} unit="week" height={36} summary={false} />
+        <PercentileTrace data={CTX_ROWS[0]!.data} unit="week" height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">81st</span>\n  <span className="unit">percentile now</span>\n  <PercentileTrace data={ranks} />\n</div>',
@@ -207,7 +207,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <PercentileTrace data={DEMO} unit="week" height={14} summary={false} />
+            <PercentileTrace data={row.data} unit="week" height={14} summary={false} />
           </span>
         ))}
       </div>

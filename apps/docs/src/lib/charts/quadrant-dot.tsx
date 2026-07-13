@@ -221,9 +221,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Auth refactor", meta: "quick win" },
-  { name: "Mobile app", meta: "big bet" },
-  { name: "Docs", meta: "fill-in" },
+  { name: "Auth refactor", meta: "quick win", data: { x: 2, y: 9 } as typeof FOCAL },
+  { name: "Mobile app", meta: "big bet", data: { x: 8, y: 9 } as typeof FOCAL },
+  { name: "Docs", meta: "fill-in", data: { x: 3, y: 2 } as typeof FOCAL },
 ];
 
 export const contexts: ChartContexts = {
@@ -247,7 +247,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <QuadrantDot data={FOCAL} field={FIELD} {...AXES} height={18} summary={false} />
+                <QuadrantDot data={row.data} field={FIELD} {...AXES} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -267,7 +267,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">initiative flagged</span>
           </div>
         </div>
-        <QuadrantDot data={FOCAL} field={FIELD} {...AXES} height={36} summary={false} />
+        <QuadrantDot data={CTX_ROWS[0]!.data} field={FIELD} {...AXES} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">1</span>\n  <span className="unit">initiative flagged</span>\n  <QuadrantDot data={item} field={backlog} />\n</div>',
@@ -281,7 +281,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <QuadrantDot data={FOCAL} field={FIELD} {...AXES} height={14} summary={false} />
+            <QuadrantDot data={row.data} field={FIELD} {...AXES} height={14} summary={false} />
           </span>
         ))}
       </div>

@@ -179,9 +179,30 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Operating", meta: "+620" },
-  { name: "Investing", meta: "−480" },
-  { name: "Financing", meta: "+140" },
+  {
+    name: "Operating",
+    meta: "+620",
+    data: [
+      { label: "Inflow", value: 620 },
+      { label: "Outflow", value: 180 },
+    ] as typeof FLOW,
+  },
+  {
+    name: "Investing",
+    meta: "−480",
+    data: [
+      { label: "Inflow", value: 120 },
+      { label: "Outflow", value: 600 },
+    ] as typeof FLOW,
+  },
+  {
+    name: "Financing",
+    meta: "+140",
+    data: [
+      { label: "Inflow", value: 200 },
+      { label: "Outflow", value: 60 },
+    ] as typeof FLOW,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -205,7 +226,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <BalanceBeam data={FLOW} label="values" height={18} summary={false} />
+                <BalanceBeam data={row.data} label="values" height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -225,7 +246,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">net inflow</span>
           </div>
         </div>
-        <BalanceBeam data={FLOW} label="values" height={36} summary={false} />
+        <BalanceBeam data={CTX_ROWS[0]!.data} label="values" height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">+140</span>\n  <span className="unit">net inflow</span>\n  <BalanceBeam data={[{ label: "A", value: 620 }, { label: "B", value: 480 }]} />\n</div>',
@@ -239,7 +260,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <BalanceBeam data={FLOW} label="values" height={14} summary={false} />
+            <BalanceBeam data={row.data} label="values" height={14} summary={false} />
           </span>
         ))}
       </div>

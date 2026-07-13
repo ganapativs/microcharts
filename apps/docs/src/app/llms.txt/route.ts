@@ -43,7 +43,7 @@ ${chartLines}
 
 ## Does Not Support
 
-- No pie, gauge, donut, or radial charts — they read too slowly at this size. Use Bullet or Delta.
+- No pie, needle-gauge/speedometer, battery, waffle, or violin. Part-to-whole at this size is [SegmentedBar](${mdUrl(["charts", "segmented-bar"])}) (comparative) or [MicroDonut](${mdUrl(["charts", "micro-donut"])}) (capped icon-size mix); measure-vs-target is [Bullet](${mdUrl(["charts", "bullet"])}) or [TapeGauge](${mdUrl(["charts", "tape-gauge"])}).
 - No runtime dependencies. Never add one to render a chart.
 - Static charts ship no client JavaScript. Interactivity is a separate \`/interactive\` import.
 `;

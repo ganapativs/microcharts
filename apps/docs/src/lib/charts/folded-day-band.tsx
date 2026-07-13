@@ -173,10 +173,18 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const mkFold = (offset: number) =>
+  Array.from({ length: 14 }, (_d, d) =>
+    Array.from({ length: 24 }, (_h, h) => ({
+      t: d * 24 + h,
+      value: Math.round(curve(h) + Math.sin(d + h) * 8 + offset),
+    })),
+  ).flat() as typeof DATA;
+
 const CTX_ROWS = [
-  { name: "US-East", meta: "+14" },
-  { name: "EU-West", meta: "+6" },
-  { name: "APAC", meta: "−3" },
+  { name: "US-East", meta: "+14", data: mkFold(14) },
+  { name: "EU-West", meta: "+6", data: mkFold(6) },
+  { name: "APAC", meta: "−3", data: mkFold(-3) },
 ];
 
 export const contexts: ChartContexts = {
@@ -200,7 +208,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <FoldedDayBand data={DATA} today={TODAY} height={18} summary={false} />
+                <FoldedDayBand data={row.data} today={TODAY} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -220,7 +228,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">above median at 2pm</span>
           </div>
         </div>
-        <FoldedDayBand data={DATA} today={TODAY} height={36} summary={false} />
+        <FoldedDayBand data={CTX_ROWS[0]!.data} today={TODAY} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">+14</span>\n  <span className="unit">above median at 2pm</span>\n  <FoldedDayBand data={observations} />\n</div>',
@@ -234,7 +242,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <FoldedDayBand data={DATA} today={TODAY} height={14} summary={false} />
+            <FoldedDayBand data={row.data} today={TODAY} height={14} summary={false} />
           </span>
         ))}
       </div>

@@ -189,9 +189,21 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Jan", meta: "37% M5" },
-  { name: "Feb", meta: "41% M5" },
-  { name: "Mar", meta: "38% M5" },
+  {
+    name: "Jan",
+    meta: "37% M5",
+    data: [{ label: "Jan", values: [1, 0.72, 0.58, 0.48, 0.41, 0.37] }] as typeof COHORTS,
+  },
+  {
+    name: "Feb",
+    meta: "41% M5",
+    data: [{ label: "Feb", values: [1, 0.68, 0.55, 0.48, 0.44, 0.41] }] as typeof COHORTS,
+  },
+  {
+    name: "Mar",
+    meta: "38% M5",
+    data: [{ label: "Mar", values: [1, 0.61, 0.5, 0.45, 0.41, 0.38] }] as typeof COHORTS,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -215,7 +227,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <CohortTriangle data={COHORTS} cell={9} unit="month" summary={false} />
+                <CohortTriangle data={row.data} cell={9} unit="month" summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -235,7 +247,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">M5 retention</span>
           </div>
         </div>
-        <CohortTriangle data={COHORTS} cell={12} unit="month" summary={false} />
+        <CohortTriangle data={CTX_ROWS[0]!.data} cell={12} unit="month" summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">37%</span>\n  <span className="unit">M5 retention</span>\n  <CohortTriangle data={cohorts} labels={false} cell={7} />\n</div>',
@@ -249,7 +261,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <CohortTriangle data={COHORTS} cell={7} unit="month" summary={false} />
+            <CohortTriangle data={row.data} cell={7} unit="month" summary={false} />
           </span>
         ))}
       </div>

@@ -26,6 +26,7 @@ export function inferMarkContextSpec(entry: ChartEntry): MarkContextSpec {
 
   const series = entry.demo.length >= 4 ? entry.demo : [3, 5, 4, 8, 6, 9, 7, 11, 10, 14];
   const alt = [...series].reverse();
+  const mid = series.map((v, i) => Math.round(v * (0.92 + (i % 3) * 0.03)));
 
   return {
     sentenceLead: `${title} this period`,
@@ -40,10 +41,12 @@ export function inferMarkContextSpec(entry: ChartEntry): MarkContextSpec {
     rows: [
       { name: "Primary", data: series, meta: figure },
       { name: "Compare", data: alt, meta: <Delta value={0.08} summary={false} /> },
+      { name: "Baseline", data: mid, meta: <Delta value={-0.03} summary={false} /> },
     ],
     tabs: [
       { name: title, data: series },
-      { name: "Alt", data: alt },
+      { name: "Compare", data: alt },
+      { name: "Baseline", data: mid },
     ],
   };
 }

@@ -168,9 +168,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "checkout", meta: "+0.8pp" },
-  { name: "auth", meta: "stable" },
-  { name: "search", meta: "+0.3pp" },
+  { name: "checkout", meta: "+0.8pp", data: [0.66, 0.68, 0.7, 0.72, 0.74, 0.76, 0.78, 0.8] },
+  { name: "auth", meta: "stable", data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0] },
+  { name: "search", meta: "+0.3pp", data: [0.25, 0.25, 0.26, 0.27, 0.28, 0.28, 0.29, 0.3] },
 ];
 
 export const contexts: ChartContexts = {
@@ -194,7 +194,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <ChangePoint data={ERRORS} label="delta" height={18} summary={false} />
+                <ChangePoint data={row.data} label="delta" height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -214,7 +214,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">post-change regime</span>
           </div>
         </div>
-        <ChangePoint data={ERRORS} label="delta" height={36} summary={false} />
+        <ChangePoint data={CTX_ROWS[0]!.data} label="delta" height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">2.1%</span>\n  <span className="unit">post-change regime</span>\n  <ChangePoint data={errors} />\n</div>',
@@ -228,7 +228,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <ChangePoint data={ERRORS} label="delta" height={14} summary={false} />
+            <ChangePoint data={row.data} label="delta" height={14} summary={false} />
           </span>
         ))}
       </div>

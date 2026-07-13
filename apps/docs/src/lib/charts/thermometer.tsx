@@ -161,9 +161,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Annual", meta: "$72K" },
-  { name: "Q4", meta: "$42K" },
-  { name: "Emergency", meta: "$18K" },
+  { name: "Annual", meta: "$72K", value: 72, target: 80 },
+  { name: "Q4", meta: "$42K", value: 42, target: 50 },
+  { name: "Emergency", meta: "$18K", value: 18, target: 25 },
 ];
 
 export const contexts: ChartContexts = {
@@ -187,7 +187,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <Thermometer value={72} target={80} height={18} summary={false} />
+                <Thermometer value={row.value} target={row.target} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -221,7 +221,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <Thermometer value={72} target={80} height={14} summary={false} />
+            <Thermometer value={row.value} target={row.target} height={14} summary={false} />
           </span>
         ))}
       </div>

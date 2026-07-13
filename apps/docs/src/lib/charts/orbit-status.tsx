@@ -183,9 +183,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "payments", meta: "240ms" },
-  { name: "auth", meta: "48ms" },
-  { name: "search", meta: "890ms" },
+  { name: "payments", meta: "240ms", data: [173, 182, 192, 202, 211, 221, 230, 240] },
+  { name: "auth", meta: "48ms", data: [35, 36, 38, 40, 42, 44, 46, 48] },
+  { name: "search", meta: "890ms", data: [641, 676, 712, 748, 783, 819, 854, 890] },
 ];
 
 export const contexts: ChartContexts = {

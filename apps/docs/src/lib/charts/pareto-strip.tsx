@@ -178,9 +178,39 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "deploy", meta: "42%" },
-  { name: "config", meta: "28%" },
-  { name: "network", meta: "18%" },
+  {
+    name: "deploy",
+    meta: "42%",
+    data: [
+      { label: "deploy", value: 42 },
+      { label: "config", value: 18 },
+      { label: "network", value: 12 },
+      { label: "auth", value: 8 },
+      { label: "other", value: 6 },
+    ] as typeof CAUSES,
+  },
+  {
+    name: "config",
+    meta: "28%",
+    data: [
+      { label: "config", value: 28 },
+      { label: "deploy", value: 22 },
+      { label: "network", value: 14 },
+      { label: "auth", value: 10 },
+      { label: "other", value: 8 },
+    ] as typeof CAUSES,
+  },
+  {
+    name: "network",
+    meta: "18%",
+    data: [
+      { label: "network", value: 18 },
+      { label: "deploy", value: 16 },
+      { label: "config", value: 12 },
+      { label: "dns", value: 9 },
+      { label: "other", value: 7 },
+    ] as typeof CAUSES,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -205,7 +235,7 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <ParetoStrip
-                  data={CAUSES}
+                  data={row.data}
                   unit="causes"
                   metric="incidents"
                   height={18}
@@ -230,7 +260,13 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">42% of incidents</span>
           </div>
         </div>
-        <ParetoStrip data={CAUSES} unit="causes" metric="incidents" height={36} summary={false} />
+        <ParetoStrip
+          data={CTX_ROWS[0]!.data}
+          unit="causes"
+          metric="incidents"
+          height={36}
+          summary={false}
+        />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">deploy</span>\n  <span className="unit">42% of incidents</span>\n  <ParetoStrip data={causes} />\n</div>',
@@ -245,7 +281,7 @@ export const contexts: ChartContexts = {
           >
             {row.name}
             <ParetoStrip
-              data={CAUSES}
+              data={row.data}
               unit="causes"
               metric="incidents"
               height={14}

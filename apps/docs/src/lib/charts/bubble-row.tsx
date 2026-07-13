@@ -153,9 +153,33 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "EMEA", meta: "1.24B" },
-  { name: "AMER", meta: "890M" },
-  { name: "APAC", meta: "560M" },
+  {
+    name: "EMEA",
+    meta: "1.24B",
+    data: [
+      { label: "EMEA", value: 1240 },
+      { label: "AMER", value: 420 },
+      { label: "APAC", value: 310 },
+    ] as typeof REGIONS,
+  },
+  {
+    name: "AMER",
+    meta: "890M",
+    data: [
+      { label: "EMEA", value: 520 },
+      { label: "AMER", value: 890 },
+      { label: "APAC", value: 280 },
+    ] as typeof REGIONS,
+  },
+  {
+    name: "APAC",
+    meta: "560M",
+    data: [
+      { label: "EMEA", value: 380 },
+      { label: "AMER", value: 340 },
+      { label: "APAC", value: 560 },
+    ] as typeof REGIONS,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -179,7 +203,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <BubbleRow data={REGIONS} height={18} summary={false} />
+                <BubbleRow data={row.data} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -199,7 +223,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">market size</span>
           </div>
         </div>
-        <BubbleRow data={REGIONS} height={36} summary={false} />
+        <BubbleRow data={CTX_ROWS[0]!.data} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">1.24B</span>\n  <span className="unit">market size</span>\n  <BubbleRow data={regions} />\n</div>',
@@ -213,7 +237,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <BubbleRow data={REGIONS} height={14} summary={false} />
+            <BubbleRow data={row.data} height={14} summary={false} />
           </span>
         ))}
       </div>

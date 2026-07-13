@@ -185,9 +185,21 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Track 1", meta: "−22" },
-  { name: "Track 2", meta: "−19" },
-  { name: "Track 3", meta: "−24" },
+  {
+    name: "Track 1",
+    meta: "−22",
+    data: [-18.04, -18.61, -19.17, -19.74, -20.3, -20.87, -21.43, -22.0],
+  },
+  {
+    name: "Track 2",
+    meta: "−19",
+    data: [-15.58, -16.07, -16.56, -17.05, -17.53, -18.02, -18.51, -19.0],
+  },
+  {
+    name: "Track 3",
+    meta: "−24",
+    data: [-19.68, -20.3, -20.91, -21.53, -22.15, -22.77, -23.38, -24.0],
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -218,7 +230,7 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <DualWindowMeter
-                  data={LOUDNESS}
+                  data={row.data}
                   target={-23}
                   format={{ maximumFractionDigits: 1 }}
                   height={18}
@@ -244,7 +256,7 @@ export const contexts: ChartContexts = {
           </div>
         </div>
         <DualWindowMeter
-          data={LOUDNESS}
+          data={CTX_ROWS[0]!.data}
           target={-23}
           format={{ maximumFractionDigits: 1 }}
           height={36}
@@ -264,7 +276,7 @@ export const contexts: ChartContexts = {
           >
             {row.name}
             <DualWindowMeter
-              data={LOUDNESS}
+              data={row.data}
               target={-23}
               format={{ maximumFractionDigits: 1 }}
               height={14}

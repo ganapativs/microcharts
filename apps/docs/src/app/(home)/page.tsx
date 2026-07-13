@@ -427,7 +427,7 @@ export default function HomePage() {
       {/* ── 05b · Every surface ──────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <SectionMark n="05b">One chart, every surface</SectionMark>
-        <div className="grid items-center gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-12">
+        <div className="grid items-start gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-12">
           <Reveal>
             <h2 className="display text-[length:var(--text-fluid-h2)]">
               The same mark in product, report, and docs.

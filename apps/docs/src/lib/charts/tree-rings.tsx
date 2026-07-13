@@ -163,9 +163,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Acme", meta: "8 yr" },
-  { name: "Globex", meta: "5 yr" },
-  { name: "Initech", meta: "3 yr" },
+  { name: "Acme", meta: "8 yr", data: [6, 6, 6, 7, 7, 7, 8, 8] },
+  { name: "Globex", meta: "5 yr", data: [4, 4, 4, 4, 4, 5, 5, 5] },
+  { name: "Initech", meta: "3 yr", data: [2, 2, 2, 3, 3, 3, 3, 3] },
 ];
 
 export const contexts: ChartContexts = {
@@ -197,7 +197,7 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <TreeRings
-                  data={YEARS}
+                  data={row.data}
                   label="last"
                   unit="years"
                   periodWord="year"
@@ -224,7 +224,7 @@ export const contexts: ChartContexts = {
           </div>
         </div>
         <TreeRings
-          data={YEARS}
+          data={CTX_ROWS[0]!.data}
           label="last"
           unit="years"
           periodWord="year"
@@ -245,7 +245,7 @@ export const contexts: ChartContexts = {
           >
             {row.name}
             <TreeRings
-              data={YEARS}
+              data={row.data}
               label="last"
               unit="years"
               periodWord="year"

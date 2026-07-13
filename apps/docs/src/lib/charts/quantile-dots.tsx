@@ -192,9 +192,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Route 42", meta: "16%" },
-  { name: "Route 18", meta: "8%" },
-  { name: "Route 7", meta: "22%" },
+  { name: "Route 42", meta: "16%", data: [0.13, 0.14, 0.14, 0.14, 0.15, 0.15, 0.16, 0.16] },
+  { name: "Route 18", meta: "8%", data: [0.07, 0.07, 0.07, 0.07, 0.07, 0.08, 0.08, 0.08] },
+  { name: "Route 7", meta: "22%", data: [0.18, 0.19, 0.19, 0.2, 0.2, 0.21, 0.21, 0.22] },
 ];
 
 export const contexts: ChartContexts = {
@@ -219,7 +219,7 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <QuantileDots
-                  data={WAITS}
+                  data={row.data}
                   threshold={15}
                   format={MIN_FMT}
                   height={18}
@@ -244,7 +244,13 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">over 15 min</span>
           </div>
         </div>
-        <QuantileDots data={WAITS} threshold={15} format={MIN_FMT} height={36} summary={false} />
+        <QuantileDots
+          data={CTX_ROWS[0]!.data}
+          threshold={15}
+          format={MIN_FMT}
+          height={36}
+          summary={false}
+        />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">16%</span>\n  <span className="unit">over 15 min</span>\n  <QuantileDots data={waits} threshold={15} />\n</div>',
@@ -259,7 +265,7 @@ export const contexts: ChartContexts = {
           >
             {row.name}
             <QuantileDots
-              data={WAITS}
+              data={row.data}
               threshold={15}
               format={MIN_FMT}
               height={14}

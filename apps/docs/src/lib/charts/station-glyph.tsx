@@ -158,9 +158,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "KSFO", meta: "16°C" },
-  { name: "KJFK", meta: "22°C" },
-  { name: "KORD", meta: "8°C" },
+  { name: "KSFO", meta: "16°C", data: [12, 12, 13, 13, 14, 15, 15, 16] },
+  { name: "KJFK", meta: "22°C", data: [16, 17, 18, 18, 19, 20, 21, 22] },
+  { name: "KORD", meta: "8°C", data: [6, 6, 6, 7, 7, 7, 8, 8] },
 ];
 
 export const contexts: ChartContexts = {

@@ -200,9 +200,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Q4", meta: "112%" },
-  { name: "Q3", meta: "98%" },
-  { name: "Q2", meta: "104%" },
+  { name: "Q4", meta: "112%", data: [1, 1, 1, 1, 1, 1, 1, 1] },
+  { name: "Q3", meta: "98%", data: [0.8, 0.83, 0.85, 0.88, 0.9, 0.93, 0.95, 0.98] },
+  { name: "Q2", meta: "104%", data: [1, 1, 1, 1, 1, 1, 1, 1] },
 ];
 
 export const contexts: ChartContexts = {
@@ -226,7 +226,13 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <ForecastCone data={HIST} forecast={FORE} target={45} height={18} summary={false} />
+                <ForecastCone
+                  data={row.data}
+                  forecast={FORE}
+                  target={45}
+                  height={18}
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -246,7 +252,13 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">of target (median)</span>
           </div>
         </div>
-        <ForecastCone data={HIST} forecast={FORE} target={45} height={36} summary={false} />
+        <ForecastCone
+          data={CTX_ROWS[0]!.data}
+          forecast={FORE}
+          target={45}
+          height={36}
+          summary={false}
+        />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">112%</span>\n  <span className="unit">of target (median)</span>\n  <ForecastCone data={history} forecast={forecast} />\n</div>',
@@ -260,7 +272,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <ForecastCone data={HIST} forecast={FORE} target={45} height={14} summary={false} />
+            <ForecastCone data={row.data} forecast={FORE} target={45} height={14} summary={false} />
           </span>
         ))}
       </div>

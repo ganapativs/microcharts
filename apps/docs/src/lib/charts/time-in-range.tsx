@@ -179,9 +179,21 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Patient A", meta: "72%" },
-  { name: "Patient B", meta: "68%" },
-  { name: "Patient C", meta: "81%" },
+  {
+    name: "Patient A",
+    meta: "72%",
+    data: { severeBelow: 2, below: 10, in: 72, above: 12, severeAbove: 4 } as typeof GLUCOSE,
+  },
+  {
+    name: "Patient B",
+    meta: "68%",
+    data: { severeBelow: 3, below: 12, in: 68, above: 13, severeAbove: 4 } as typeof GLUCOSE,
+  },
+  {
+    name: "Patient C",
+    meta: "81%",
+    data: { severeBelow: 1, below: 7, in: 81, above: 8, severeAbove: 3 } as typeof GLUCOSE,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -205,7 +217,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <TimeInRange data={GLUCOSE} height={18} summary={false} />
+                <TimeInRange data={row.data} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -225,7 +237,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">glucose TIR</span>
           </div>
         </div>
-        <TimeInRange data={GLUCOSE} height={36} summary={false} />
+        <TimeInRange data={CTX_ROWS[0]!.data} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">72%</span>\n  <span className="unit">glucose TIR</span>\n  <TimeInRange data={{ below: 9, in: 72, above: 19 }} />\n</div>',
@@ -239,7 +251,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <TimeInRange data={GLUCOSE} height={14} summary={false} />
+            <TimeInRange data={row.data} height={14} summary={false} />
           </span>
         ))}
       </div>

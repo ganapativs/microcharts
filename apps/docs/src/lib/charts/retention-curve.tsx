@@ -168,9 +168,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Jan", meta: "38%" },
-  { name: "Feb", meta: "41%" },
-  { name: "Mar", meta: "35%" },
+  { name: "Jan", meta: "38%", data: [0.31, 0.32, 0.33, 0.34, 0.35, 0.36, 0.37, 0.38] },
+  { name: "Feb", meta: "41%", data: [0.34, 0.35, 0.36, 0.37, 0.38, 0.39, 0.4, 0.41] },
+  { name: "Mar", meta: "35%", data: [0.29, 0.3, 0.3, 0.31, 0.32, 0.33, 0.34, 0.35] },
 ];
 
 export const contexts: ChartContexts = {
@@ -195,7 +195,7 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <RetentionCurve
-                  data={DEMO}
+                  data={row.data}
                   benchmark={BENCH}
                   unit="week"
                   height={18}
@@ -220,7 +220,13 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">retained</span>
           </div>
         </div>
-        <RetentionCurve data={DEMO} benchmark={BENCH} unit="week" height={36} summary={false} />
+        <RetentionCurve
+          data={CTX_ROWS[0]!.data}
+          benchmark={BENCH}
+          unit="week"
+          height={36}
+          summary={false}
+        />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">38%</span>\n  <span className="unit">retained</span>\n  <RetentionCurve data={cohort} />\n</div>',
@@ -234,7 +240,13 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <RetentionCurve data={DEMO} benchmark={BENCH} unit="week" height={14} summary={false} />
+            <RetentionCurve
+              data={row.data}
+              benchmark={BENCH}
+              unit="week"
+              height={14}
+              summary={false}
+            />
           </span>
         ))}
       </div>

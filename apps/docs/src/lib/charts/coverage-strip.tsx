@@ -186,9 +186,21 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "North", meta: "92%" },
-  { name: "South", meta: "86%" },
-  { name: "East", meta: "78%" },
+  {
+    name: "North",
+    meta: "92%",
+    data: [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10] as unknown as number[],
+  },
+  {
+    name: "South",
+    meta: "86%",
+    data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as unknown as number[],
+  },
+  {
+    name: "East",
+    meta: "78%",
+    data: [8, null, null, null, 9, 10, null, 11, 12, null, 13, 14] as unknown as number[],
+  },
 ];
 
 export const contexts: ChartContexts = {

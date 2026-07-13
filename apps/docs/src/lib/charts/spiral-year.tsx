@@ -152,9 +152,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "2024", meta: "wk 30" },
-  { name: "2023", meta: "wk 28" },
-  { name: "2022", meta: "wk 31" },
+  { name: "2024", meta: "wk 30", data: [21600, 22800, 24000, 25200, 26400, 27600, 28800, 30000] },
+  { name: "2023", meta: "wk 28", data: [20160, 21280, 22400, 23520, 24640, 25760, 26880, 28000] },
+  { name: "2022", meta: "wk 31", data: [22320, 23560, 24800, 26040, 27280, 28520, 29760, 31000] },
 ];
 
 export const contexts: ChartContexts = {
@@ -178,7 +178,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <SpiralYear data={YEAR} size={22} summary={false} />
+                <SpiralYear data={row.data} size={22} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -198,7 +198,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">summer peak</span>
           </div>
         </div>
-        <SpiralYear data={YEAR} size={48} summary={false} />
+        <SpiralYear data={CTX_ROWS[0]!.data} size={48} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">30</span>\n  <span className="unit">summer peak</span>\n  <SpiralYear data={byWeek} />\n</div>',
@@ -212,7 +212,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <SpiralYear data={YEAR} size={18} summary={false} />
+            <SpiralYear data={row.data} size={18} summary={false} />
           </span>
         ))}
       </div>

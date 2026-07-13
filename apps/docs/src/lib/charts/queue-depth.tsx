@@ -138,9 +138,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Tier 1", meta: "64" },
-  { name: "Tier 2", meta: "28" },
-  { name: "Tier 3", meta: "9" },
+  { name: "Tier 1", meta: "64", data: [46, 49, 51, 54, 56, 59, 61, 64] },
+  { name: "Tier 2", meta: "28", data: [20, 21, 22, 24, 25, 26, 27, 28] },
+  { name: "Tier 3", meta: "9", data: [6, 7, 7, 8, 8, 8, 9, 9] },
 ];
 
 export const contexts: ChartContexts = {
@@ -164,7 +164,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <QueueDepth data={DATA} capacity={CAP} height={18} summary={false} />
+                <QueueDepth data={row.data} capacity={CAP} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -184,7 +184,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">open tickets</span>
           </div>
         </div>
-        <QueueDepth data={DATA} capacity={CAP} height={36} summary={false} />
+        <QueueDepth data={CTX_ROWS[0]!.data} capacity={CAP} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">64</span>\n  <span className="unit">open tickets</span>\n  <QueueDepth data={data} capacity={100} />\n</div>',
@@ -198,7 +198,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <QueueDepth data={DATA} capacity={CAP} height={14} summary={false} />
+            <QueueDepth data={row.data} capacity={CAP} height={14} summary={false} />
           </span>
         ))}
       </div>

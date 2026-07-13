@@ -183,10 +183,16 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const mkTraj = (rx: number, ry: number, phase = 0) =>
+  Array.from({ length: 40 }, (_, i) => {
+    const t = (i / 40) * Math.PI * 2;
+    return { x: 55 + Math.cos(t + phase) * rx, y: 110 + Math.sin(t - 0.9 + phase) * ry };
+  }) as typeof TRAJ;
+
 const CTX_ROWS = [
-  { name: "api", meta: "loop" },
-  { name: "worker", meta: "stable" },
-  { name: "batch", meta: "spiral" },
+  { name: "api", meta: "loop", data: TRAJ },
+  { name: "worker", meta: "stable", data: mkTraj(8, 12) },
+  { name: "batch", meta: "spiral", data: mkTraj(28, 35, 0.8) },
 ];
 
 export const contexts: ChartContexts = {
@@ -211,7 +217,7 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <PhaseTrace
-                  data={TRAJ}
+                  data={row.data}
                   xLabel="CPU"
                   yLabel="Latency"
                   grid
@@ -237,7 +243,14 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">CPU × latency</span>
           </div>
         </div>
-        <PhaseTrace data={TRAJ} xLabel="CPU" yLabel="Latency" grid height={36} summary={false} />
+        <PhaseTrace
+          data={CTX_ROWS[0]!.data}
+          xLabel="CPU"
+          yLabel="Latency"
+          grid
+          height={36}
+          summary={false}
+        />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">loop</span>\n  <span className="unit">CPU × latency</span>\n  <PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" />\n</div>',
@@ -252,7 +265,7 @@ export const contexts: ChartContexts = {
           >
             {row.name}
             <PhaseTrace
-              data={TRAJ}
+              data={row.data}
               xLabel="CPU"
               yLabel="Latency"
               grid

@@ -1,6 +1,7 @@
 import { ABStrips } from "@microcharts/react/ab-strips";
 import { ABStrips as ABStripsInteractive } from "@microcharts/react/ab-strips/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import { abArmsFromDelta } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
 // two latency arms (ms): B (test) centered a bit lower than A (control), overlapping
@@ -179,9 +180,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "checkout", meta: "−12 ms" },
-  { name: "search", meta: "−8 ms" },
-  { name: "auth", meta: "+2 ms" },
+  { name: "checkout", meta: "−12 ms", data: abArmsFromDelta(-12.0) },
+  { name: "search", meta: "−8 ms", data: abArmsFromDelta(-8.0) },
+  { name: "auth", meta: "+2 ms", data: abArmsFromDelta(2.0) },
 ];
 
 export const contexts: ChartContexts = {
@@ -205,13 +206,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <ABStrips
-                  data={{ a: A, b: B }}
-                  format={MS}
-                  positive="down"
-                  height={18}
-                  summary={false}
-                />
+                <ABStrips data={row.data} format={MS} positive="down" height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -245,13 +240,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <ABStrips
-              data={{ a: A, b: B }}
-              format={MS}
-              positive="down"
-              height={14}
-              summary={false}
-            />
+            <ABStrips data={row.data} format={MS} positive="down" height={14} summary={false} />
           </span>
         ))}
       </div>

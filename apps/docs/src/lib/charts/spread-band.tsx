@@ -160,10 +160,20 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const mkPairs = (lead: number) =>
+  Array.from({ length: 12 }, (_, i) => ({
+    a: 12 + (lead * i) / 11,
+    b: 12 + (2 * i) / 11,
+  })) as typeof PAIRS;
+
 const CTX_ROWS = [
-  { name: "Organic", meta: "+18%" },
-  { name: "Paid", meta: "baseline" },
-  { name: "Referral", meta: "+6%" },
+  { name: "Organic", meta: "+18%", data: PAIRS },
+  {
+    name: "Paid",
+    meta: "baseline",
+    data: ORG.map((a) => ({ a, b: a })) as typeof PAIRS,
+  },
+  { name: "Referral", meta: "+6%", data: mkPairs(6) },
 ];
 
 export const contexts: ChartContexts = {
@@ -187,7 +197,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <SpreadBand data={PAIRS} labels={LABELS} height={18} summary={false} />
+                <SpreadBand data={row.data} labels={LABELS} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -207,7 +217,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">organic vs paid</span>
           </div>
         </div>
-        <SpreadBand data={PAIRS} labels={LABELS} height={36} summary={false} />
+        <SpreadBand data={CTX_ROWS[0]!.data} labels={LABELS} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">+18%</span>\n  <span className="unit">organic vs paid</span>\n  <SpreadBand data={pairs} labels={["Organic", "Paid"]} />\n</div>',
@@ -221,7 +231,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <SpreadBand data={PAIRS} labels={LABELS} height={14} summary={false} />
+            <SpreadBand data={row.data} labels={LABELS} height={14} summary={false} />
           </span>
         ))}
       </div>

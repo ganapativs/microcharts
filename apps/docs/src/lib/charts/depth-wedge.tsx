@@ -172,9 +172,39 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "BTC", meta: "0.04" },
-  { name: "ETH", meta: "0.06" },
-  { name: "SOL", meta: "0.11" },
+  { name: "BTC", meta: "0.04", data: BOOK as typeof BOOK },
+  {
+    name: "ETH",
+    meta: "0.06",
+    data: {
+      demand: [
+        { level: 99.7, amount: 380 },
+        { level: 99.4, amount: 260 },
+        { level: 99.1, amount: 150 },
+      ],
+      supply: [
+        { level: 100.3, amount: 280 },
+        { level: 100.6, amount: 190 },
+        { level: 100.9, amount: 100 },
+      ],
+    } as typeof BOOK,
+  },
+  {
+    name: "SOL",
+    meta: "0.11",
+    data: {
+      demand: [
+        { level: 99.5, amount: 320 },
+        { level: 99.0, amount: 220 },
+        { level: 98.5, amount: 140 },
+      ],
+      supply: [
+        { level: 100.5, amount: 260 },
+        { level: 101.0, amount: 180 },
+        { level: 101.5, amount: 90 },
+      ],
+    } as typeof BOOK,
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -198,7 +228,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <DepthWedge data={BOOK} height={18} summary={false} />
+                <DepthWedge data={row.data} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -218,7 +248,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">bid/ask imbalance</span>
           </div>
         </div>
-        <DepthWedge data={BOOK} height={36} summary={false} />
+        <DepthWedge data={CTX_ROWS[0]!.data} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">0.04</span>\n  <span className="unit">bid/ask imbalance</span>\n  <DepthWedge data={{ demand, supply }} />\n</div>',
@@ -232,7 +262,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <DepthWedge data={BOOK} height={14} summary={false} />
+            <DepthWedge data={row.data} height={14} summary={false} />
           </span>
         ))}
       </div>

@@ -151,9 +151,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Game 1", meta: "62%" },
-  { name: "Game 2", meta: "48%" },
-  { name: "Game 3", meta: "71%" },
+  { name: "Game 1", meta: "62%", data: [0.51, 0.52, 0.54, 0.56, 0.57, 0.59, 0.6, 0.62] },
+  { name: "Game 2", meta: "48%", data: [0.39, 0.41, 0.42, 0.43, 0.44, 0.46, 0.47, 0.48] },
+  { name: "Game 3", meta: "71%", data: [0.58, 0.6, 0.62, 0.64, 0.66, 0.67, 0.69, 0.71] },
 ];
 
 export const contexts: ChartContexts = {
@@ -177,7 +177,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <WinProbWorm data={GAME} sides={SIDES} height={18} summary={false} />
+                <WinProbWorm data={row.data} sides={SIDES} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -197,7 +197,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">win probability</span>
           </div>
         </div>
-        <WinProbWorm data={GAME} sides={SIDES} height={36} summary={false} />
+        <WinProbWorm data={CTX_ROWS[0]!.data} sides={SIDES} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">62%</span>\n  <span className="unit">win probability</span>\n  <WinProbWorm data={winProb} sides={["home", "away"]} />\n</div>',
@@ -211,7 +211,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <WinProbWorm data={GAME} sides={SIDES} height={14} summary={false} />
+            <WinProbWorm data={row.data} sides={SIDES} height={14} summary={false} />
           </span>
         ))}
       </div>

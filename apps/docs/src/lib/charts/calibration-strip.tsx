@@ -1,6 +1,7 @@
 import { CalibrationStrip } from "@microcharts/react/calibration-strip";
 import { CalibrationStrip as CalibrationStripInteractive } from "@microcharts/react/calibration-strip/interactive";
 import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import { calibrationBins } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
 export const BINS = [
@@ -160,9 +161,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "v2.1", meta: "0.92" },
-  { name: "v2.0", meta: "0.88" },
-  { name: "v1.9", meta: "0.81" },
+  { name: "v2.1", meta: "0.92", data: calibrationBins(0.92) },
+  { name: "v2.0", meta: "0.88", data: calibrationBins(0.88) },
+  { name: "v1.9", meta: "0.81", data: calibrationBins(0.81) },
 ];
 
 export const contexts: ChartContexts = {
@@ -171,7 +172,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Model calibration{" "}
         <span className="mc-inline">
-          <CalibrationStrip data={BINS} height={16} summary={false} />
+          <CalibrationStrip data={CTX_ROWS[0]!.data} height={16} summary={false} />
         </span>{" "}
         — well-calibrated above 0.6 predicted probability.
       </p>
@@ -186,7 +187,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <CalibrationStrip data={BINS} height={18} summary={false} />
+                <CalibrationStrip data={row.data} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -206,7 +207,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">ECE score</span>
           </div>
         </div>
-        <CalibrationStrip data={BINS} height={36} summary={false} />
+        <CalibrationStrip data={CTX_ROWS[0]!.data} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">0.92</span>\n  <span className="unit">ECE score</span>\n  <CalibrationStrip data={reliability} />\n</div>',
@@ -220,7 +221,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <CalibrationStrip data={BINS} height={14} summary={false} />
+            <CalibrationStrip data={row.data} height={14} summary={false} />
           </span>
         ))}
       </div>
