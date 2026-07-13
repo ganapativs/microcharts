@@ -1,6 +1,6 @@
 import { VolumeProfile } from "@microcharts/react/volume-profile";
 import { VolumeProfile as VolumeProfileInteractive } from "@microcharts/react/volume-profile/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const PROFILE = [
@@ -158,6 +158,94 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const TICKERS = [
+  { name: "AAPL", data: PROFILE, meta: "POC 142" },
+  {
+    name: "MSFT",
+    data: [
+      { level: 380, weight: 4 },
+      { level: 385, weight: 12 },
+      { level: 390, weight: 22 },
+      { level: 395, weight: 18 },
+    ],
+    meta: "POC 390",
+  },
+  {
+    name: "NVDA",
+    data: [
+      { level: 820, weight: 6 },
+      { level: 825, weight: 14 },
+      { level: 830, weight: 28 },
+      { level: 835, weight: 16 },
+    ],
+    meta: "POC 830",
+  },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Trades concentrated at{" "}
+        <span className="mc-inline">
+          <VolumeProfile data={PROFILE} label="none" summary={false} width={32} height={16} />
+        </span>{" "}
+        — point of control at 142, value area spans 138–146.
+      </p>
+    ),
+    code: '<p>\n  Trades at <VolumeProfile data={profile} label="none" width={32} height={16} /> — POC 142.\n</p>',
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {TICKERS.map((t) => (
+            <tr key={t.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground">{t.name}</td>
+              <td className="py-1.5">
+                <VolumeProfile data={t.data} label="none" summary={false} width={32} height={32} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{t.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: '<td><VolumeProfile data={profile} label="none" width={32} height={32} /></td>',
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Volume by price</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">142</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">point of control</span>
+          </div>
+        </div>
+        <VolumeProfile data={PROFILE} summary={false} width={80} height={56} />
+      </>
+    ),
+    code: '<div className="kpi"><span className="figure">142</span><VolumeProfile data={profile} width={80} height={56} /></div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {TICKERS.map((t, i) => (
+          <span
+            key={t.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {t.name}
+            <VolumeProfile data={t.data} label="none" summary={false} width={28} height={28} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">AAPL <VolumeProfile data={profile} label="none" width={28} height={28} /></button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <VolumeProfile
@@ -185,6 +273,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

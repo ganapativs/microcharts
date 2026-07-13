@@ -1,6 +1,6 @@
 import { MusicStaff } from "@microcharts/react/music-staff";
 import { MusicStaff as MusicStaffInteractive } from "@microcharts/react/music-staff/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 const MELODY = [3, 5, 4, 8, 6, 9, 7, 11];
@@ -141,6 +141,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const TEAMS = [
+  { name: "Platform", data: MELODY, meta: "peak 11" },
+  { name: "Core", data: [2, 4, 3, 6, 5, 7, 6, 9], meta: "peak 9" },
+  { name: "Web", data: [4, 3, 5, 4, 6, 5, 8, 7], meta: "peak 8" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Sprint velocity this cycle{" "}
+        <span className="mc-inline">
+          <MusicStaff data={MELODY} summary={false} width={90} height={20} />
+        </span>{" "}
+        — peaked in week 4, closing at 11 story points.
+      </p>
+    ),
+    code: "<p>\n  Sprint velocity <MusicStaff data={weeks} width={90} height={20} /> — peaked week 4.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {TEAMS.map((t) => (
+            <tr key={t.name}>
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{t.name}</td>
+              <td className="py-1.5">
+                <MusicStaff data={t.data} summary={false} width={72} height={18} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{t.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td><MusicStaff data={team.weeks} width={72} height={18} /></td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Sprint melody</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">11</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">peak story points, week 4</span>
+          </div>
+        </div>
+        <MusicStaff data={MELODY} summary={false} width={200} height={28} />
+      </>
+    ),
+    code: '<div className="kpi"><span className="figure">11</span><MusicStaff data={weeks} width={200} height={28} /></div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {TEAMS.map((t, i) => (
+          <span
+            key={t.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {t.name}
+            <MusicStaff data={t.data} summary={false} width={44} height={16} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">Platform <MusicStaff data={weeks} width={44} height={16} /></button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <MusicStaff
@@ -167,6 +237,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

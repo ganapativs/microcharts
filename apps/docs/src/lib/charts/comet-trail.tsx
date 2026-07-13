@@ -1,6 +1,6 @@
 import { CometTrail } from "@microcharts/react/comet-trail";
 import { CometTrail as CometTrailInteractive } from "@microcharts/react/comet-trail/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -139,6 +139,90 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const STREAMS = [
+  { name: "checkout-api", data: RISING, meta: "87 ms" },
+  { name: "auth-api", data: [12, 13, 14, 15, 16, 17, 18, 19], meta: "19 ms" },
+  { name: "search-api", data: [78, 79, 80, 81, 82, 83, 84, 85], meta: "85 ms" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        p95 latency is climbing{" "}
+        <span className="mc-inline">
+          <CometTrail data={RISING} label="none" summary={false} width={90} height={16} />
+        </span>{" "}
+        — now at 87, with the last hour of momentum visible.
+      </p>
+    ),
+    code: '<p>\n  p95 latency is climbing <CometTrail data={rollingWindow} label="none" width={90} height={16} /> — now at 87.\n</p>',
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {STREAMS.map((s) => (
+            <tr key={s.name}>
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{s.name}</td>
+              <td className="py-1.5">
+                <CometTrail
+                  data={s.data}
+                  trail={6}
+                  label="none"
+                  summary={false}
+                  width={72}
+                  height={16}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{s.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: '<td><CometTrail data={rollingWindow} trail={6} label="none" width={72} height={16} /></td>',
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">API latency</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">87</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">ms, now</span>
+          </div>
+        </div>
+        <CometTrail data={RISING} summary={false} width={200} height={36} />
+      </>
+    ),
+    code: '<div className="kpi"><span className="figure">87</span><CometTrail data={rollingWindow} width={200} height={36} /></div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {STREAMS.map((s, i) => (
+          <span
+            key={s.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {s.name.split("-")[0]}
+            <CometTrail
+              data={s.data}
+              trail={5}
+              label="none"
+              summary={false}
+              width={44}
+              height={14}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">checkout <CometTrail data={rollingWindow} trail={5} label="none" width={44} height={14} /></button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const vals = props.data.length ? props.data : RISING;
   return (
@@ -167,6 +251,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

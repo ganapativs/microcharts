@@ -209,17 +209,19 @@ export function GalleryDock({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Slip the dock away only when the footer is actually REACHED by scrolling — a
-  // scrollable page whose footer has risen into the dock's zone. When a filter
-  // leaves few results the page isn't scrollable, so the (always-visible) footer
-  // must NOT hide the dock. Re-checked on scroll, resize, and after every filter.
+  // Slip the dock away only when the user scrolls the footer up into the dock
+  // band. Tall viewports (and short filtered sets) often show the footer at
+  // rest — that must NOT hide the dock.
   useEffect(() => {
     const footer = document.querySelector("footer");
     syncDock.current = () => {
-      const doc = document.documentElement;
-      const scrollable = doc.scrollHeight - window.innerHeight > 80;
+      const overflow = document.documentElement.scrollHeight - window.innerHeight;
+      if (overflow <= 80 || window.scrollY < 48) {
+        setDockHidden(false);
+        return;
+      }
       const reached = footer ? footer.getBoundingClientRect().top < window.innerHeight - 56 : false;
-      setDockHidden(scrollable && reached);
+      setDockHidden(reached);
     };
     syncDock.current();
     const onResize = () => syncDock.current();
@@ -319,9 +321,8 @@ export function GalleryDock({
       dom.emptyQ.textContent = trimmed ? `“${trimmed}”` : label ? `${label} charts` : "that";
     }
     setShown(count);
-    // result count changed the page height — re-decide dock visibility after
-    // layout so a small filtered set (short, non-scrollable page) keeps the dock.
-    requestAnimationFrame(() => syncDock.current());
+    // Filter changes page height — wait for layout, then re-decide dock visibility.
+    requestAnimationFrame(() => requestAnimationFrame(() => syncDock.current()));
   }, [q, col, sort, collections]);
 
   // Arrow-key roving across the visible plates — Left/Right step one, Up/Down
@@ -358,7 +359,6 @@ export function GalleryDock({
     return () => grid.removeEventListener("keydown", onKey);
   }, []);
 
-  // Collection switch = a discrete moment worth acknowledging: the plane does a
   // On an ACTUAL collection change, cross-fade the new set (calm, opacity only).
   // Fires only when `col` changes to a new value from a user click — never on
   // mount/re-navigation. Tracking the last value (not a "first render" boolean)
@@ -371,6 +371,9 @@ export function GalleryDock({
       return;
     }
     lastCol.current = col;
+    // Jump to top so a prior scroll + short filtered page can't leave the dock
+    // tucked away behind a footer that was "reached" further down.
+    window.scrollTo(0, 0);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const grid = document.querySelector<HTMLElement>(".g2-grid");
     grid?.animate?.([{ opacity: 0.5 }, { opacity: 1 }], { duration: 260, easing: "ease-out" });
@@ -411,7 +414,7 @@ export function GalleryDock({
       aria-label="Gallery controls"
       data-hidden={dockHidden || undefined}
     >
-      <div className="g2-dock-bar glass glass-strong">
+      <div className="g2-dock-bar">
         <div className="flex items-center gap-0.5">
           {pills.map((p) => {
             const n = counts[p.key] ?? 0;

@@ -209,15 +209,15 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {BUDGET.slice(0, 3).map((r) => {
             const value = r.value ?? 0;
             const ref = r.ref ?? 0;
             const over = value >= ref;
             const gap = Math.abs(value - ref);
             return (
-              <tr key={r.label} className="border-t border-fd-border/60 first:border-0">
+              <tr key={r.label}>
                 <td className="py-1.5 pr-3 text-fd-muted-foreground">{r.label}</td>
                 <td className="py-1.5">
                   <PairedBars data={[r]} positive="down" summary={false} width={50} height={16} />

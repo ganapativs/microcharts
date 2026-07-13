@@ -1,6 +1,6 @@
 import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
 import { DualWindowMeter as DualWindowMeterInteractive } from "@microcharts/react/dual-window-meter/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const LOUDNESS = Array.from(
@@ -184,6 +184,112 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  {
+    name: "Track 1",
+    meta: "−22",
+    data: [-18.04, -18.61, -19.17, -19.74, -20.3, -20.87, -21.43, -22.0],
+  },
+  {
+    name: "Track 2",
+    meta: "−19",
+    data: [-15.58, -16.07, -16.56, -17.05, -17.53, -18.02, -18.51, -19.0],
+  },
+  {
+    name: "Track 3",
+    meta: "−24",
+    data: [-19.68, -20.3, -20.91, -21.53, -22.15, -22.77, -23.38, -24.0],
+  },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Integrated loudness{" "}
+        <span className="mc-inline">
+          <DualWindowMeter
+            data={LOUDNESS}
+            target={-23}
+            format={{ maximumFractionDigits: 1 }}
+            height={16}
+            summary={false}
+          />
+        </span>{" "}
+        — −22 LUFS, within broadcast target.
+      </p>
+    ),
+    code: "<p>\n  Integrated loudness <DualWindowMeter data={samples} target={-23} /> — −22 LUFS, within broadcast target.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <DualWindowMeter
+                  data={row.data}
+                  target={-23}
+                  format={{ maximumFractionDigits: 1 }}
+                  height={18}
+                  summary={false}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <DualWindowMeter data={samples} target={-23} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Loudness</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">−22</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">LUFS integrated</span>
+          </div>
+        </div>
+        <DualWindowMeter
+          data={CTX_ROWS[0]!.data}
+          target={-23}
+          format={{ maximumFractionDigits: 1 }}
+          height={36}
+          summary={false}
+        />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">−22</span>\n  <span className="unit">LUFS integrated</span>\n  <DualWindowMeter data={samples} target={-23} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <DualWindowMeter
+              data={row.data}
+              target={-23}
+              format={{ maximumFractionDigits: 1 }}
+              height={14}
+              summary={false}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Track 1 <DualWindowMeter data={samples} target={-23} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const data = props.data.length >= 8 ? props.data : LOUDNESS;
   return (
@@ -223,6 +329,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

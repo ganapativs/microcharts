@@ -1,6 +1,6 @@
 import { FatDigits } from "@microcharts/react/fat-digits";
 import { FatDigits as FatDigitsInteractive } from "@microcharts/react/fat-digits/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 const COLUMN = [1204, 318, 76, 942, 2100, 55];
@@ -146,6 +146,80 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Acme", meta: "2.1M", value: 2100 },
+  { name: "Globex", meta: "942K", value: 942 },
+  { name: "Initech", meta: "318K", value: 318 },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Revenue column scan{" "}
+        <span className="mc-inline">
+          <FatDigits value={2100} domain={DOMAIN} summary={false} fontSize={14} />
+        </span>{" "}
+        — Acme at 2.1M stands out.
+      </p>
+    ),
+    code: "<p>\n  Revenue column scan <FatDigits value={2100} domain={[0, 2100]} /> — Acme at 2.1M stands out.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{row.name}</td>
+              <td className="py-1.5">
+                <FatDigits value={row.value} domain={DOMAIN} summary={false} fontSize={14} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <FatDigits value={row.value} domain={[0, 2100]} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Acme</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">2.1M</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">revenue</span>
+          </div>
+        </div>
+        <span className="inline-flex flex-col items-end gap-0.5 tabular-nums">
+          {COLUMN.slice(0, 4).map((v) => (
+            <FatDigits key={v} value={v} domain={DOMAIN} summary={false} fontSize={13} />
+          ))}
+        </span>
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">2.1M</span>\n  <FatDigits value={2100} domain={[0, 2100]} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <FatDigits value={row.value} domain={DOMAIN} summary={false} fontSize={12} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Acme <FatDigits value={row.value} domain={[0, 2100]} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const v = props.data.length ? Math.abs(Math.round(props.data[0]!)) : 1204;
   return <FatDigits value={v} domain={DOMAIN} summary={false} fontSize={props.height ?? 14} />;
@@ -179,6 +253,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

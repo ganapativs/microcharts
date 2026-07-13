@@ -1,6 +1,6 @@
 import { GardenGrid } from "@microcharts/react/garden-grid";
 import { GardenGrid as GardenGridInteractive } from "@microcharts/react/garden-grid/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // 12 weeks of activity, some quiet
@@ -150,6 +150,80 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  {
+    name: "microcharts",
+    meta: "34 peak",
+    data: [24480, 25840, 27200, 28560, 29920, 31280, 32640, 34000],
+  },
+  { name: "docs", meta: "22 peak", data: [15840, 16720, 17600, 18480, 19360, 20240, 21120, 22000] },
+  { name: "api", meta: "18 peak", data: [12960, 13680, 14400, 15120, 15840, 16560, 17280, 18000] },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Contributions this quarter{" "}
+        <span className="mc-inline">
+          <GardenGrid data={WEEKS} unit="weeks" cell={8} summary={false} />
+        </span>{" "}
+        — busy mid-month, quiet weeks 4 and 10.
+      </p>
+    ),
+    code: "<p>\n  Contributions this quarter <GardenGrid data={weeks} /> — busy mid-month, quiet weeks 4 and 10.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <GardenGrid data={row.data} unit="weeks" cell={9} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <GardenGrid data={weeks} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Activity</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">34</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">peak week</span>
+          </div>
+        </div>
+        <GardenGrid data={CTX_ROWS[0]!.data} unit="weeks" cell={12} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">34</span>\n  <span className="unit">peak week</span>\n  <GardenGrid data={weeks} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <GardenGrid data={row.data} unit="weeks" cell={7} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  microcharts <GardenGrid data={weeks} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const data = props.data.length ? props.data : WEEKS;
   return <GardenGrid data={data} summary={false} cell={props.height ? props.height / 3 : 6} />;
@@ -170,6 +244,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

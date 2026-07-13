@@ -189,10 +189,10 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {HOSTS.map((h) => (
-            <tr key={h.name} className="border-t border-fd-border/60 first:border-0">
+            <tr key={h.name}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{h.name}</td>
               <td className="py-1.5">
                 <Horizon data={h.load} summary={false} width={70} height={14} />

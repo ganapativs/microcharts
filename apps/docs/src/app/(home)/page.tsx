@@ -10,6 +10,7 @@ import { getModule } from "@/lib/charts/registry";
 import { LivingCatalog } from "@/components/home/living-catalog";
 import { StreamVignette } from "@/components/home/stream-vignette";
 import { FourContexts } from "@/components/charts/contexts";
+import { SurfaceCarousel } from "@/components/home/surface-carousel";
 import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
 import { InstallCommand } from "@/components/ui/copy";
 import { Reveal } from "@/components/ui/reveal";
@@ -421,6 +422,25 @@ export default function HomePage() {
         <Reveal>
           <FourContexts slug="sparkline" />
         </Reveal>
+      </section>
+
+      {/* ── 05b · Every surface ──────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <SectionMark n="05b">One chart, every surface</SectionMark>
+        <div className="grid items-start gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-12">
+          <Reveal>
+            <h2 className="display text-[length:var(--text-fluid-h2)]">
+              The same mark in product, report, and docs.
+            </h2>
+            <p className="mt-4 max-w-md text-fd-muted-foreground">
+              The chart a model writes is the one your product renders, your report exports, and
+              your docs embed — plain SVG from <code>data</code> alone.
+            </p>
+          </Reveal>
+          <Reveal delay={80}>
+            <SurfaceCarousel />
+          </Reveal>
+        </div>
       </section>
 
       {/* ── 06 · Honest engineering ──────────────────────────────────────── */}

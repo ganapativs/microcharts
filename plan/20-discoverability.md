@@ -291,7 +291,7 @@ Rules:
 - Keep `/llms-full.txt` generated from canonical docs content.
 - Include only URLs that return 200.
 - Include `.md` links, not HTML links, when equivalent Markdown exists.
-- Add "do not use" notes for common hallucination traps: no pie, no gauge, no runtime dependencies, no default client JS.
+- Add "do not use" notes for common hallucination traps: no pie, no needle-gauge, no battery/waffle/violin, no runtime dependencies, no default client JS. Do **not** ban MicroDonut/ProgressRing/TapeGauge — those ship; ban the classic forms they replace.
 
 ### 5.2 Markdown Mirrors
 

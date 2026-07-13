@@ -163,7 +163,7 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
+      <table className="mc-inline-table w-full text-sm tabular-nums">
         <thead>
           <tr className="text-fd-muted-foreground text-xs">
             <th className="pb-1.5 pr-3 text-left font-normal">Pod</th>
@@ -171,14 +171,14 @@ export const contexts: ChartContexts = {
             <th className="pb-1.5 pl-3 text-right font-normal">Range</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {(
             [
               ["Engineering", TEAM, "41–96"],
               ["Design", DESIGN, "62–84"],
             ] as const
           ).map(([name, rows, range]) => (
-            <tr key={name} className="border-t border-fd-border/60 first:border-0">
+            <tr key={name}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{name}</td>
               <td className="py-1.5">
                 <DotPlot data={rows} summary={false} width={70} height={24} />

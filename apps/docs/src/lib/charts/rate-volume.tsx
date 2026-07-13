@@ -1,6 +1,6 @@
 import { RateVolume } from "@microcharts/react/rate-volume";
 import { RateVolume as RateVolumeInteractive } from "@microcharts/react/rate-volume/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a conversion rate climbing as reach drains away — the last reading is a big
@@ -209,7 +209,105 @@ const periods = [
   },
 ];
 
+const mkRateVol = (endRate: number, endVol: number) =>
+  Array.from({ length: 8 }, (_, i) => ({
+    rate: (endRate * (0.72 + (0.28 * i) / 7)) / 100,
+    volume: Math.round(endVol * (0.72 + (0.28 * i) / 7)),
+  })) as typeof FRAC;
+
+const CTX_ROWS = [
+  { name: "Web", meta: "4.2%", data: mkRateVol(4.2, 220) },
+  { name: "Mobile", meta: "3.1%", data: mkRateVol(3.1, 180) },
+  { name: "App", meta: "5.8%", data: mkRateVol(5.8, 140) },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Conversion rate{" "}
+        <span className="mc-inline">
+          <RateVolume data={FRAC} format={PCT} minVolume={50} height={16} summary={false} />
+        </span>{" "}
+        — 4.2% on 1,240 sessions this week.
+      </p>
+    ),
+    code: "<p>\n  Conversion rate <RateVolume data={periods} minVolume={50} /> — 4.2% on 1,240 sessions this week.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <RateVolume
+                  data={row.data}
+                  format={PCT}
+                  minVolume={50}
+                  height={18}
+                  summary={false}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <RateVolume data={periods} minVolume={50} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Conversion</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">4.2%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">1,240 sessions</span>
+          </div>
+        </div>
+        <RateVolume
+          data={CTX_ROWS[0]!.data}
+          format={PCT}
+          minVolume={50}
+          height={36}
+          summary={false}
+        />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">4.2%</span>\n  <span className="unit">1,240 sessions</span>\n  <RateVolume data={periods} minVolume={50} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <RateVolume data={row.data} format={PCT} minVolume={50} height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Web <RateVolume data={periods} minVolume={50} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
+  if (!props.data.length) {
+    return (
+      <RateVolume
+        data={FRAC}
+        summary={false}
+        width={props.width ?? 70}
+        height={props.height ?? 18}
+      />
+    );
+  }
   return (
     <RateVolume
       data={props.data.map((v, j) => ({ rate: v, volume: 40 + ((j * 13) % 160) }))}
@@ -244,6 +342,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

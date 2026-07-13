@@ -44,7 +44,7 @@
   --color-fd-foreground: #12151d;
   --color-fd-muted: #e2e7f0;
   --color-fd-muted-foreground: #5a616f;
-  --color-fd-border: #d0d7e3;
+  --color-fd-border: color-mix(in oklab, #d0d7e3 80%, var(--color-fd-card));
   --color-fd-card: #fdfeff;
   --color-fd-card-foreground: #12151d;
   --color-fd-popover: #fdfeff;
@@ -77,7 +77,7 @@
   --glass-bright: 1.02;
   --grain-opacity: 0.016;
   /* Shared border token for panels, chips, wells, tables, fences. */
-  --hairline: color-mix(in oklab, #1a2438 17%, transparent);
+  --hairline: color-mix(in oklab, #1a2438 14%, transparent);
   /* Soft top sheen + faint underside — bevel, not a thick lip. */
   --glass-edge:
     inset 0 1px 0.5px color-mix(in oklab, #ffffff 72%, transparent),
@@ -151,7 +151,7 @@
   --color-fd-foreground: #e9e8e3;
   --color-fd-muted: #15171e;
   --color-fd-muted-foreground: #928d84;
-  --color-fd-border: #262935;
+  --color-fd-border: color-mix(in oklab, #262935 50%, var(--color-fd-card));
   --color-fd-card: #14161d;
   --color-fd-card-foreground: #e9e8e3;
   --color-fd-popover: #14161d;
@@ -179,16 +179,16 @@
   --glass-sat: 1.7;
   --glass-bright: 1.12;
   --grain-opacity: 0.05;
-  /* border token (dark) — the cool near-white line the dark chips + rims had. */
-  --hairline: color-mix(in oklab, #cdd8f5 17%, transparent);
+  /* border token (dark) — quiet rim; halved from the pre-polish cool near-white line. */
+  --hairline: color-mix(in oklab, #cdd8f5 9%, transparent);
   --glass-edge:
-    inset 0 1px 0.5px color-mix(in oklab, #ffffff 20%, transparent),
-    inset 0 -1px 1.5px color-mix(in oklab, #ffffff 5%, transparent),
-    inset 0 0 0 1px color-mix(in oklab, #cdd8f5 10%, transparent);
+    inset 0 1px 0.5px color-mix(in oklab, #ffffff 10%, transparent),
+    inset 0 -1px 1.5px color-mix(in oklab, #ffffff 2.5%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, #cdd8f5 5%, transparent);
   --glass-edge-lift:
-    inset 0 1.5px 0.5px color-mix(in oklab, #ffffff 34%, transparent),
-    inset 0 -1px 2px color-mix(in oklab, #ffffff 9%, transparent),
-    inset 0 0 0 1px color-mix(in oklab, var(--accent) 40%, transparent);
+    inset 0 1.5px 0.5px color-mix(in oklab, #ffffff 17%, transparent),
+    inset 0 -1px 2px color-mix(in oklab, #ffffff 4.5%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--accent) 20%, transparent);
   --glass-shadow:
     0 1px 1px color-mix(in oklab, #000 30%, transparent),
     0 7px 18px -11px color-mix(in oklab, #000 40%, transparent);
@@ -431,55 +431,28 @@ body {
 
 /* Glass material: .glass / .glass-strong / .glass-lift. Charts never get these. */
 @layer components {
-  /* Shared liquid-glass recipe — .glass and .panel are the same material.
-     Surface is translucent (field shows through + saturates); the bevelled
-     edge + rim carry the read; the drop shadow is barely there. */
+  /* Portal plate — matches gallery .g2-card resting shell: translucent matte
+     surface, quiet 50% rim, ambient shadow only (no bevel / no backdrop stack). */
   .glass,
   .panel {
     position: relative;
     isolation: isolate;
     background-color: var(--glass-surface);
-    /* a soft top-left sheen (light catching the surface) + faint accent tint,
-       both painted over the blurred, saturated backdrop. */
-    background-image:
-      radial-gradient(135% 100% at 12% -12%, var(--glass-sheen), transparent 46%),
-      linear-gradient(var(--glass-tint), var(--glass-tint));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
-      brightness(var(--glass-bright));
-    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
-      brightness(var(--glass-bright));
     border-radius: var(--radius-panel);
-    /* One border language: the panel rim uses the same --hairline as chips,
-       wells, and tables, so light + dark read consistently. It's a real border
-       (never covered by a recessed child) and the glass bevel below carries the
-       "round". */
-    border: 1px solid var(--hairline);
-    box-shadow: var(--glass-edge), var(--glass-shadow);
-  }
-  /* NO glossy rim pseudo — the user found a bright specular edge too glossy
-     (matte is the brand). The edge read is carried entirely by the thin
-     --glass-edge bevel (a crisp 1px top line, matte) + the --hairline rim. This
-     also keeps the perf win: only ONE backdrop-filter pass per panel, no rim
-     pass. Don't reintroduce a bright rim gradient or a rim backdrop-filter. */
-  /* fine frost grain — one tiled turbulence field so the surface isn't a dead
-     flat plane. Kept very low so text + chart strokes stay crisp. */
-  .glass::after,
-  .panel::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 1;
-    opacity: var(--grain-opacity);
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+    box-shadow: var(--glass-shadow);
+    transition:
+      border-color 0.32s var(--ease-out-quint),
+      box-shadow 0.32s var(--ease-out-quint);
   }
   .glass-strong {
-    background-color: var(--glass-surface-strong);
+    /* Floating overlays (appearance menu) — near-opaque so page ink can't
+       bleed through; light blur only as a soft edge, not the readability. */
+    background-color: color-mix(in oklab, var(--color-fd-card) 94%, transparent);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   }
-  /* Interactive hover: the edge brightens toward the accent and the panel
-     lifts a hair — refraction intensifying, not a shadow growing. */
+  /* Interactive hover: accent rim + lift — gallery .g2-card focus-within parity. */
   .glass-lift {
     transition:
       box-shadow 0.32s var(--ease-out-quint),
@@ -487,9 +460,26 @@ body {
       transform 0.32s var(--ease-out-quint);
   }
   .glass-lift:hover {
-    border-color: color-mix(in oklab, var(--accent) 40%, var(--hairline));
+    border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline));
     box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
     transform: translateY(-2px);
+  }
+
+  /* In-panel dividers — gallery .g2-meta shelf parity. */
+  .panel :where([class*="border-hairline"]),
+  .glass :where([class*="border-hairline"]) {
+    border-color: color-mix(in oklab, var(--hairline) 50%, transparent);
+  }
+  .panel.divide-hairline > :not([hidden]) ~ :not([hidden]),
+  .glass.divide-hairline > :not([hidden]) ~ :not([hidden]) {
+    border-color: color-mix(in oklab, var(--hairline) 50%, transparent);
+  }
+
+  /* Nested chips inside carousel / four-homes surfaces. */
+  .plate-inner {
+    border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+    border-radius: var(--radius-control);
+    background-color: color-mix(in oklab, var(--glass-surface-strong) 50%, transparent);
   }
 
   /* Gallery plane: full-bleed grid, floating dock, pointer tilt. Reuses site tokens. */
@@ -499,7 +489,6 @@ body {
      header behaves normally everywhere else. */
   :root[data-g2-mounted] header.glass-rail {
     transition: transform 0.4s var(--ease-out-quint);
-    will-change: transform;
   }
   :root[data-g2-mounted][data-g2-nav="hidden"] header.glass-rail {
     transform: translateY(-100%);
@@ -869,6 +858,12 @@ body {
     border-radius: 999px;
     overflow-x: auto;
     scrollbar-width: none;
+    /* Quiet frost — page-bg mix, no accent tint (that read as a blue pill). */
+    background-color: color-mix(in oklab, var(--color-fd-background) 78%, transparent);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+    border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+    box-shadow: var(--glass-shadow);
   }
   .g2-dock-bar::-webkit-scrollbar {
     display: none;
@@ -1308,17 +1303,25 @@ body {
   outline-offset: 2px;
 }
 
-/* Sticky glass header rail — translucent, blurred, with a lit hairline under
-   edge instead of a hard border. */
+/* Sticky header — clear at rest; frost only after scroll. */
 .glass-rail {
-  /* The nav blends into the page — a translucent film, no bar, no dividing
-     line. A light tint + backdrop blur keep the wordmark and links legible over
-     scrolling content; there is deliberately no under-edge rule so the header
-     reads as part of the page, not a separate section (same call as the
-     footer). A11y fallbacks below swap in a solid fill. */
-  background-color: color-mix(in oklab, var(--color-fd-background) 24%, transparent);
-  -webkit-backdrop-filter: blur(18px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
-  backdrop-filter: blur(18px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+  background-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition:
+    background-color 200ms ease-out,
+    backdrop-filter 200ms ease-out,
+    -webkit-backdrop-filter 200ms ease-out;
+}
+.glass-rail[data-scrolled] {
+  background-color: color-mix(in oklab, var(--color-fd-background) 72%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+  backdrop-filter: blur(16px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-rail {
+    transition: none;
+  }
 }
 
 /* Standalone command block — the SAME shell as .panel (one border language for
@@ -1327,13 +1330,9 @@ body {
 .command-well {
   position: relative;
   background-color: var(--glass-surface-strong);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
-    brightness(var(--glass-bright));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
-    brightness(var(--glass-bright));
-  border: 1px solid var(--hairline);
+  border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
   border-radius: var(--radius-panel);
-  box-shadow: var(--glass-edge), var(--glass-shadow);
+  box-shadow: var(--glass-shadow);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -1425,7 +1424,7 @@ body {
    quiet row a reader opens only when they need to copy something runnable. Sits
    flush inside a .code-inset band, separated by the same hairline as every rim. */
 .sample-data {
-  border-top: 1px solid var(--hairline);
+  border-top: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
 }
 .sample-data-summary {
   display: flex;
@@ -1445,7 +1444,7 @@ body {
   color: var(--color-fd-muted-foreground);
 }
 .sample-data[open] .sample-data-summary {
-  border-bottom: 1px solid var(--hairline);
+  border-bottom: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
 }
 .sample-data-body {
   /* Recess the definitions a touch deeper than the primary snippet, so the
@@ -1484,9 +1483,9 @@ body {
 figure:has(> pre),
 .prose figure:has(pre) {
   background-color: var(--glass-surface-strong) !important;
-  border: 1px solid var(--hairline) !important;
+  border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent) !important;
   border-radius: var(--radius-panel) !important;
-  box-shadow: var(--glass-edge), var(--glass-shadow) !important;
+  box-shadow: var(--glass-shadow) !important;
 }
 figure:has(> pre) pre,
 figure:has(> pre) .shiki,
@@ -1504,21 +1503,21 @@ figure:has(> pre) .shiki,
   padding: 0.1em 0.4em;
   font-size: 0.86em;
   color: var(--color-fd-foreground);
-  box-shadow: inset 0 0 0 1px var(--hairline);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--hairline) 50%, transparent);
 }
 
 /* Tables (markdown + PropTable) — the SAME container shell as .panel (real
    hairline border + --radius-panel + bevel + lift), so a table reads as one of
    the family. Row dividers are the same hairline; header = mono label. */
-.prose table,
+.prose table:not(.mc-inline-table),
 .mc-table {
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
   overflow: hidden;
-  border: 1px solid var(--hairline);
+  border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
   border-radius: var(--radius-panel);
-  box-shadow: var(--glass-edge), var(--glass-shadow);
+  box-shadow: var(--glass-shadow);
 }
 .prose thead th,
 .mc-table thead th {
@@ -1536,9 +1535,65 @@ figure:has(> pre) .shiki,
 .prose tbody td,
 .mc-table tbody td {
   border: 0;
-  border-top: 1px solid var(--hairline);
+  border-top: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
   padding: 0.7rem 1rem;
   vertical-align: top;
+}
+.prose tbody tr:first-child td,
+.mc-table tbody tr:first-child td {
+  border-top: 0;
+}
+
+/* PropTable — auto layout by default; fixed only after a manual resize. */
+.mc-prop-table thead th {
+  position: relative;
+}
+.mc-prop-table[data-sized] {
+  table-layout: fixed;
+  width: 100%;
+}
+.mc-prop-table__type {
+  min-width: 10.5rem;
+}
+.mc-prop-table__handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  z-index: 1;
+  width: 7px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: col-resize;
+  touch-action: none;
+}
+.mc-prop-table__handle::after {
+  content: "";
+  position: absolute;
+  inset: 18% 3px;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.15s var(--ease-out-quint);
+}
+.mc-prop-table__handle:hover::after,
+.mc-prop-table__handle:active::after {
+  background: color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+/* Four-homes / carousel embed tables — row dividers only; already inside .panel. */
+.prose table.mc-inline-table,
+table.mc-inline-table {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+.prose table.mc-inline-table tbody td,
+table.mc-inline-table tbody td {
+  border-top: 0;
+  padding: 0;
+  vertical-align: middle;
 }
 
 /* Fumadocs doc cards (the <Cards>/<Card> blocks) AND the built-in prev/next page
@@ -1550,13 +1605,9 @@ a:where([class~="bg-fd-card"][class~="rounded-xl"]),
 a:where(:has(> div > svg[class~="lucide-chevron-left"])),
 a:where(:has(> div > svg[class~="lucide-chevron-right"])) {
   background-color: var(--glass-surface) !important;
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
-    brightness(var(--glass-bright));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
-    brightness(var(--glass-bright));
-  border: 1px solid var(--hairline) !important;
+  border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent) !important;
   border-radius: var(--radius-panel) !important;
-  box-shadow: var(--glass-edge), var(--glass-shadow) !important;
+  box-shadow: var(--glass-shadow) !important;
   transition:
     box-shadow 0.3s var(--ease-out-quint),
     border-color 0.3s var(--ease-out-quint),
@@ -1566,7 +1617,7 @@ a:where([class~="bg-fd-card"][class~="rounded-xl"]):hover,
 a:where(:has(> div > svg[class~="lucide-chevron-left"])):hover,
 a:where(:has(> div > svg[class~="lucide-chevron-right"])):hover {
   background-color: var(--glass-surface) !important;
-  border-color: color-mix(in oklab, var(--accent) 40%, var(--hairline)) !important;
+  border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline)) !important;
   box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift) !important;
   transform: translateY(-2px);
 }
@@ -1580,7 +1631,7 @@ div:where(
 ) {
   margin-top: 3rem;
   padding-top: 2.25rem;
-  border-top: 1px solid var(--hairline);
+  border-top: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
 }
 
 /* Chip / swatch press feedback in the picker. */
@@ -1752,19 +1803,24 @@ div:where(
    Text and chart contrast must never depend on the frost. -------------------- */
 @media (prefers-reduced-transparency: reduce) {
   .glass,
-  .panel,
-  .glass-rail {
+  .panel {
     background-color: var(--glass-solid);
     background-image: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
-  .glass-rail {
-    background-color: var(--color-fd-background);
+  .glass-strong {
+    background-color: var(--color-fd-card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
-  .glass::after,
-  .panel::after {
-    display: none;
+  .glass-rail {
+    background-color: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass-rail[data-scrolled] {
+    background-color: var(--color-fd-background);
   }
   .ghost-ctrl:hover {
     -webkit-backdrop-filter: none;
@@ -1775,6 +1831,12 @@ div:where(
     background-color: var(--color-fd-card);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+  :root[data-g2-mounted] .g2-dock-bar {
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: var(--glass-solid);
   }
   .cta-ghost {
     background-color: var(--color-fd-card);
@@ -1789,16 +1851,20 @@ div:where(
 @media (prefers-contrast: more) {
   .glass,
   .panel,
-  .glass-rail {
+  .glass-strong {
     background-color: var(--glass-solid);
     background-image: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     box-shadow: inset 0 0 0 1px var(--color-fd-foreground);
   }
-  .glass::after,
-  .panel::after {
-    display: none;
+  .glass-rail {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass-rail[data-scrolled] {
+    background-color: var(--color-fd-background);
+    box-shadow: inset 0 0 0 1px var(--color-fd-foreground);
   }
 }
 @media (forced-colors: active) {
@@ -1810,8 +1876,6 @@ div:where(
     backdrop-filter: none;
     border: 1px solid CanvasText;
   }
-  .glass::after,
-  .panel::after,
   .cta-accent::after {
     display: none;
   }
@@ -1938,6 +2002,42 @@ div:where(
       scale: 0.94;
       filter: blur(3px);
     }
+  }
+  /* Surface carousel: the incoming surface rises + de-blurs, and its rows settle
+     in a short hand-dealt stagger while the outgoing one fades under it. */
+  .hx-surface-in {
+    animation: hx-surface-in 0.58s var(--ease-out-expo) both;
+  }
+  @keyframes hx-surface-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.985);
+      filter: blur(4px);
+    }
+  }
+  .hx-surface-in > * > * {
+    animation: hx-surface-row 0.46s var(--ease-out-quint) both;
+  }
+  @keyframes hx-surface-row {
+    from {
+      opacity: 0;
+      transform: translateY(9px);
+    }
+  }
+  .hx-surface-in > * > *:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .hx-surface-in > * > *:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  .hx-surface-in > * > *:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+  .hx-surface-in > * > *:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+  .hx-surface-in > * > *:nth-child(n + 5) {
+    animation-delay: 0.25s;
   }
   .hx-slot-name {
     transition:

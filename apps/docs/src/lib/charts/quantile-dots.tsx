@@ -1,6 +1,6 @@
 import { QuantileDots } from "@microcharts/react/quantile-dots";
 import { QuantileDots as QuantileDotsInteractive } from "@microcharts/react/quantile-dots/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // bus-wait times (minutes): right-skewed, a long tail past the 15-min SLA
@@ -191,7 +191,107 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Route 42", meta: "16%", data: [0.13, 0.14, 0.14, 0.14, 0.15, 0.15, 0.16, 0.16] },
+  { name: "Route 18", meta: "8%", data: [0.07, 0.07, 0.07, 0.07, 0.07, 0.08, 0.08, 0.08] },
+  { name: "Route 7", meta: "22%", data: [0.18, 0.19, 0.19, 0.2, 0.2, 0.21, 0.21, 0.22] },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Bus wait times{" "}
+        <span className="mc-inline">
+          <QuantileDots data={WAITS} threshold={15} format={MIN_FMT} height={16} summary={false} />
+        </span>{" "}
+        — 16% of waits exceed the 15 min SLA.
+      </p>
+    ),
+    code: "<p>\n  Bus wait times <QuantileDots data={waits} threshold={15} /> — 16% of waits exceed the 15 min SLA.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <QuantileDots
+                  data={row.data}
+                  threshold={15}
+                  format={MIN_FMT}
+                  height={18}
+                  summary={false}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <QuantileDots data={waits} threshold={15} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">SLA risk</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">16%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">over 15 min</span>
+          </div>
+        </div>
+        <QuantileDots
+          data={CTX_ROWS[0]!.data}
+          threshold={15}
+          format={MIN_FMT}
+          height={36}
+          summary={false}
+        />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">16%</span>\n  <span className="unit">over 15 min</span>\n  <QuantileDots data={waits} threshold={15} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <QuantileDots
+              data={row.data}
+              threshold={15}
+              format={MIN_FMT}
+              height={14}
+              summary={false}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Route 42 <QuantileDots data={waits} threshold={15} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
+  if (!props.data.length) {
+    return (
+      <QuantileDots
+        data={WAITS}
+        threshold={15}
+        count={16}
+        summary={false}
+        width={props.width ?? 70}
+        height={props.height ?? 18}
+      />
+    );
+  }
   return (
     <QuantileDots
       data={props.data.map((v) => 4 + (Math.abs(v) % 20))}
@@ -229,6 +329,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

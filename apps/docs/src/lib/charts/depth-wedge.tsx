@@ -1,6 +1,6 @@
 import { DepthWedge } from "@microcharts/react/depth-wedge";
 import { DepthWedge as DepthWedgeInteractive } from "@microcharts/react/depth-wedge/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const BOOK = {
@@ -171,6 +171,106 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "BTC", meta: "0.04", data: BOOK as typeof BOOK },
+  {
+    name: "ETH",
+    meta: "0.06",
+    data: {
+      demand: [
+        { level: 99.7, amount: 380 },
+        { level: 99.4, amount: 260 },
+        { level: 99.1, amount: 150 },
+      ],
+      supply: [
+        { level: 100.3, amount: 280 },
+        { level: 100.6, amount: 190 },
+        { level: 100.9, amount: 100 },
+      ],
+    } as typeof BOOK,
+  },
+  {
+    name: "SOL",
+    meta: "0.11",
+    data: {
+      demand: [
+        { level: 99.5, amount: 320 },
+        { level: 99.0, amount: 220 },
+        { level: 98.5, amount: 140 },
+      ],
+      supply: [
+        { level: 100.5, amount: 260 },
+        { level: 101.0, amount: 180 },
+        { level: 101.5, amount: 90 },
+      ],
+    } as typeof BOOK,
+  },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Order book depth{" "}
+        <span className="mc-inline">
+          <DepthWedge data={BOOK} height={16} summary={false} />
+        </span>{" "}
+        — bid-side liquidity thicker below mid.
+      </p>
+    ),
+    code: "<p>\n  Order book depth <DepthWedge data={{ demand, supply }} /> — bid-side liquidity thicker below mid.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <DepthWedge data={row.data} height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <DepthWedge data={{ demand, supply }} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Spread</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">0.04</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">bid/ask imbalance</span>
+          </div>
+        </div>
+        <DepthWedge data={CTX_ROWS[0]!.data} height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">0.04</span>\n  <span className="unit">bid/ask imbalance</span>\n  <DepthWedge data={{ demand, supply }} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <DepthWedge data={row.data} height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  BTC <DepthWedge data={{ demand, supply }} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <DepthWedge
@@ -198,6 +298,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

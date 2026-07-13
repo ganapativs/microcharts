@@ -245,13 +245,13 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {[
             { name: "production", data: DATA, note: "near-daily" },
             { name: "staging", data: STAGING, note: "sparse" },
           ].map((env) => (
-            <tr key={env.name} className="border-t border-fd-border/60 first:border-0">
+            <tr key={env.name}>
               <td className="py-1.5 pr-3 font-mono text-xs text-fd-muted-foreground">{env.name}</td>
               <td className="py-1.5">
                 <CalendarStrip data={env.data} end={END} weeks={2} summary={false} />

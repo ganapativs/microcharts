@@ -60,15 +60,21 @@ question it answers — start from what you need someone to see, and land on the
 ## Where they live
 
 The point of a word-sized chart is that it belongs _in_ your interface, not in a dashboard
-off to the side — and because it's plain SVG, "interface" isn't limited to a browser tab: the
-same markup drops into a slide or a rendered report as cleanly as a table cell. Here's the same
-chart doing its job in four different homes:
+off to the side. And because it's plain SVG that renders from `data` alone, "interface" isn't
+limited to a browser tab:
+
+- **In your product** — a trend in a table cell, a KPI card, a tab header, a dense dashboard,
+  where a full chart engine would be too heavy and too loud.
+- **In a report or slide** — a figure in a rendered PDF or deck, the same markup that drops into
+  a table cell, with nothing to export.
+- **In your docs** — inline in Markdown, next to the sentence that explains it. The charts on
+  this very page are rendered exactly that way — MDX in, live SVG out.
+- **In an AI reply** — streamed mid-sentence by a model, since every chart is plain data plus
+  generated words. [AI-native](/docs/ai) shows a live stream doing exactly that.
+
+Here's the same chart doing its job in four of those homes:
 
 <FourContexts slug="sparkline" />
-
-And increasingly, the interface writing the sentence is a model. Because every chart renders
-from plain data and describes itself in words, an assistant can draw one mid-reply and a
-person can trust what it says — [AI-native](/docs/ai) shows a live stream doing exactly that.
 
 Ready to render one? The [Quickstart](/docs/quickstart) gets you from install to a live chart
 in three steps.

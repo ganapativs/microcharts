@@ -1,6 +1,6 @@
 import { QueueDepth } from "@microcharts/react/queue-depth";
 import { QueueDepth as QueueDepthInteractive } from "@microcharts/react/queue-depth/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a support backlog growing through capacity (100) to 2.14× at the end
@@ -137,8 +137,80 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Tier 1", meta: "64", data: [46, 49, 51, 54, 56, 59, 61, 64] },
+  { name: "Tier 2", meta: "28", data: [20, 21, 22, 24, 25, 26, 27, 28] },
+  { name: "Tier 3", meta: "9", data: [6, 7, 7, 8, 8, 8, 9, 9] },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Support queue backlog{" "}
+        <span className="mc-inline">
+          <QueueDepth data={DATA} capacity={CAP} height={16} summary={false} />
+        </span>{" "}
+        — 64 open, approaching capacity.
+      </p>
+    ),
+    code: "<p>\n  Support queue backlog <QueueDepth data={data} capacity={100} /> — 64 open, approaching capacity.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <QueueDepth data={row.data} capacity={CAP} height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <QueueDepth data={data} capacity={100} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Backlog</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">64</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">open tickets</span>
+          </div>
+        </div>
+        <QueueDepth data={CTX_ROWS[0]!.data} capacity={CAP} height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">64</span>\n  <span className="unit">open tickets</span>\n  <QueueDepth data={data} capacity={100} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <QueueDepth data={row.data} capacity={CAP} height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Tier 1 <QueueDepth data={data} capacity={100} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
-  const depth = props.data.map((v, k) => Math.max(0, 40 + k * 12 + (Math.abs(v) % 20)));
+  const depth = (props.data.length ? props.data : DATA).map((v, k) =>
+    Math.max(0, 40 + k * 12 + (Math.abs(v) % 20)),
+  );
   return (
     <QueueDepth
       data={depth}
@@ -174,6 +246,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

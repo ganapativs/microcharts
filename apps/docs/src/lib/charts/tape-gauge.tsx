@@ -1,6 +1,6 @@
 import { TapeGauge } from "@microcharts/react/tape-gauge";
 import { TapeGauge as TapeGaugeInteractive } from "@microcharts/react/tape-gauge/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const ZONES = [
@@ -211,6 +211,83 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Eng 1", meta: "142", data: [102, 108, 114, 119, 125, 131, 136, 142] },
+  { name: "Eng 2", meta: "138", data: [99, 105, 110, 116, 121, 127, 132, 138] },
+  { name: "Eng 3", meta: "145", data: [104, 110, 116, 122, 128, 133, 139, 145] },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Airspeed reading{" "}
+        <span className="mc-inline">
+          <TapeGauge value={142} rate={1} zones={ZONES} span={60} height={16} summary={false} />
+        </span>{" "}
+        — 142 knots, rising into caution band.
+      </p>
+    ),
+    code: "<p>\n  Airspeed reading <TapeGauge value={142} rate={1} zones={zones} span={60} /> — 142 knots, rising into caution band.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <TapeGauge
+                  value={142}
+                  rate={1}
+                  zones={ZONES}
+                  span={60}
+                  height={18}
+                  summary={false}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <TapeGauge value={142} rate={1} zones={zones} span={60} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Airspeed</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">142</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">knots ↑</span>
+          </div>
+        </div>
+        <TapeGauge value={142} rate={1} zones={ZONES} span={60} height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">142</span>\n  <span className="unit">knots ↑</span>\n  <TapeGauge value={142} rate={1} zones={zones} span={60} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <TapeGauge value={142} rate={1} zones={ZONES} span={60} height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Cruise <TapeGauge value={142} rate={1} zones={zones} span={60} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <TapeGauge
@@ -251,6 +328,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

@@ -1,6 +1,6 @@
 import { BreathingDot } from "@microcharts/react/breathing-dot";
 import { BreathingDot as BreathingDotInteractive } from "@microcharts/react/breathing-dot/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -125,6 +125,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "api", meta: "42%", value: 0.42 },
+  { name: "worker", meta: "68%", value: 0.68 },
+  { name: "db", meta: "31%", value: 0.31 },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        System load right now{" "}
+        <span className="mc-inline">
+          <BreathingDot value={0.42} size={20} summary={false} />
+        </span>{" "}
+        — moderate strain, pulsing at 42%.
+      </p>
+    ),
+    code: "<p>\n  System load right now <BreathingDot value={0.42} /> — moderate strain, pulsing at 42%.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <BreathingDot value={row.value} size={22} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <BreathingDot value={0.42} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Load</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">42%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">current strain</span>
+          </div>
+        </div>
+        <BreathingDot value={0.42} size={48} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">42%</span>\n  <span className="unit">current strain</span>\n  <BreathingDot value={0.42} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <BreathingDot value={row.value} size={18} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  api <BreathingDot value={0.42} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const v = props.data.length ? Math.abs(props.data[0]!) % 1 : 0.42;
   return <BreathingDot value={v} summary={false} size={props.height ?? 16} />;
@@ -145,6 +215,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

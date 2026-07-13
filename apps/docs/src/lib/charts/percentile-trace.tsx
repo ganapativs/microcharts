@@ -1,6 +1,6 @@
 import { PercentileTrace } from "@microcharts/react/percentile-trace";
 import { PercentileTrace as PercentileTraceInteractive } from "@microcharts/react/percentile-trace/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a weekly standing that drifts up from the middle half into the top band
@@ -146,8 +146,80 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Team A", meta: "81st", data: [58, 62, 65, 68, 71, 75, 78, 81] },
+  { name: "Team B", meta: "62nd", data: [45, 47, 50, 52, 55, 57, 60, 62] },
+  { name: "Team C", meta: "44th", data: [32, 33, 35, 37, 39, 40, 42, 44] },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Standing over the season{" "}
+        <span className="mc-inline">
+          <PercentileTrace data={DEMO} unit="week" height={16} summary={false} />
+        </span>{" "}
+        — climbed from 40th to 81st percentile.
+      </p>
+    ),
+    code: "<p>\n  Standing over the season <PercentileTrace data={ranks} /> — climbed from 40th to 81st percentile.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <PercentileTrace data={row.data} unit="week" height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <PercentileTrace data={ranks} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Standing</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">81st</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">percentile now</span>
+          </div>
+        </div>
+        <PercentileTrace data={CTX_ROWS[0]!.data} unit="week" height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">81st</span>\n  <span className="unit">percentile now</span>\n  <PercentileTrace data={ranks} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <PercentileTrace data={row.data} unit="week" height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Team A <PercentileTrace data={ranks} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
-  const norm = props.data.map((v, j) => Math.min(94, 22 + j * 6 + (Math.abs(v) % 5) * 2));
+  const norm = (props.data.length ? props.data : DEMO).map((v, j) =>
+    Math.min(94, 22 + j * 6 + (Math.abs(v) % 5) * 2),
+  );
   return (
     <PercentileTrace
       data={norm}
@@ -173,6 +245,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

@@ -1,6 +1,6 @@
 import { RetentionCurve } from "@microcharts/react/retention-curve";
 import { RetentionCurve as RetentionCurveInteractive } from "@microcharts/react/retention-curve/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a weekly cohort that decays then plateaus around 38%
@@ -167,8 +167,98 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Jan", meta: "38%", data: [0.31, 0.32, 0.33, 0.34, 0.35, 0.36, 0.37, 0.38] },
+  { name: "Feb", meta: "41%", data: [0.34, 0.35, 0.36, 0.37, 0.38, 0.39, 0.4, 0.41] },
+  { name: "Mar", meta: "35%", data: [0.29, 0.3, 0.3, 0.31, 0.32, 0.33, 0.34, 0.35] },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        W12 cohort retention{" "}
+        <span className="mc-inline">
+          <RetentionCurve data={DEMO} benchmark={BENCH} unit="week" height={16} summary={false} />
+        </span>{" "}
+        — 38% at week 12, above benchmark.
+      </p>
+    ),
+    code: "<p>\n  W12 cohort retention <RetentionCurve data={cohort} /> — 38% at week 12, above benchmark.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <RetentionCurve
+                  data={row.data}
+                  benchmark={BENCH}
+                  unit="week"
+                  height={18}
+                  summary={false}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <RetentionCurve data={cohort} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">W12 cohort</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">38%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">retained</span>
+          </div>
+        </div>
+        <RetentionCurve
+          data={CTX_ROWS[0]!.data}
+          benchmark={BENCH}
+          unit="week"
+          height={36}
+          summary={false}
+        />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">38%</span>\n  <span className="unit">retained</span>\n  <RetentionCurve data={cohort} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <RetentionCurve
+              data={row.data}
+              benchmark={BENCH}
+              unit="week"
+              height={14}
+              summary={false}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Jan <RetentionCurve data={cohort} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
-  const norm = props.data.map((v, j) => Math.max(0.1, 1 - j * 0.12 - (Math.abs(v) % 3) * 0.02));
+  const norm = (props.data.length ? props.data : DEMO).map((v, j) =>
+    Math.max(0.1, 1 - j * 0.12 - (Math.abs(v) % 3) * 0.02),
+  );
   return (
     <RetentionCurve
       data={norm}
@@ -194,6 +284,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;
