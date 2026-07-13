@@ -3,7 +3,7 @@
   // No Worker code — Cloudflare serves ./out directly from the edge.
   //   pnpm --filter @microcharts/docs cf:deploy
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "microcharts-docs",
+  "name": "microcharts",
   "compatibility_date": "2025-07-01",
   "assets": {
     "directory": "./out",

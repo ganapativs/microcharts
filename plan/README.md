@@ -35,6 +35,8 @@
 | [23-batch-2-decision-micrographs.md](23-batch-2-decision-micrographs.md) | Batch 2 spec: 21 decision micrographs (incl. IconArray) — per-chart briefs with research constraints baked in |
 | [24-batch-3-expressive.md](24-batch-3-expressive.md) | Batch 3 spec: 22 expressive types (in-package) — per-chart briefs incl. motion/reduced-motion contracts |
 | [25-batch-4-frontier-and-release.md](25-batch-4-frontier-and-release.md) | Batch 4 spec: 21 frontier types (incl. ConfusionGrid) + release sync/pitch checklist (README, npm, GitHub, docs stats, llms, OG) |
+| [26-proposal-round-charts.md](26-proposal-round-charts.md) | Proposal-round specs: catalog 98 → 106 (the 8 approved additions) |
+| [27-launch-execution.md](27-launch-execution.md) | **Launch runbook (Part B → Phase 4):** ordered copy-paste checklist — Cloudflare domain (`microcharts.dev`) + Workers deploy, Web Analytics, npm `0.2.0` publish (OIDC), GitHub topics/social/discussions, Search Console/sitemap, announce |
 | [chart-gallery.html](chart-gallery.html)                 | **Visual reference: all 100 chart types drawn in the design language** + context demos + 5-theme strip + live palette switcher & dark mode                                                                                                       |
 
 ## Headline decisions
