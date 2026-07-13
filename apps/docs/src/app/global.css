@@ -178,12 +178,12 @@
   --glass-sat: 1.7;
   --glass-bright: 1.12;
   --grain-opacity: 0.05;
-  /* border token (dark) — quiet rim; halved from the pre-polish cool near-white line. */
-  --hairline: color-mix(in oklab, #cdd8f5 9%, transparent);
+  /* border token (dark) — cool near-white line; keep it readable on chrome rims. */
+  --hairline: color-mix(in oklab, #cdd8f5 16%, transparent);
   --glass-edge:
-    inset 0 1px 0.5px color-mix(in oklab, #ffffff 10%, transparent),
-    inset 0 -1px 1.5px color-mix(in oklab, #ffffff 2.5%, transparent),
-    inset 0 0 0 1px color-mix(in oklab, #cdd8f5 5%, transparent);
+    inset 0 1px 0.5px color-mix(in oklab, #ffffff 16%, transparent),
+    inset 0 -1px 1.5px color-mix(in oklab, #ffffff 4%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, #cdd8f5 10%, transparent);
   --glass-edge-lift:
     inset 0 1.5px 0.5px color-mix(in oklab, #ffffff 17%, transparent),
     inset 0 -1px 2px color-mix(in oklab, #ffffff 4.5%, transparent),
@@ -861,8 +861,8 @@ body {
     background-color: color-mix(in oklab, var(--color-fd-background) 78%, transparent);
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
     backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-    border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
-    box-shadow: var(--glass-shadow);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--glass-edge), var(--glass-shadow);
   }
   .g2-dock-bar::-webkit-scrollbar {
     display: none;
@@ -1212,9 +1212,9 @@ body {
   background-image: none;
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
   backdrop-filter: blur(12px) saturate(1.2);
-  border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+  border: 1px solid var(--hairline);
   color: var(--color-fd-muted-foreground);
-  box-shadow: var(--glass-shadow);
+  box-shadow: var(--glass-edge), var(--glass-shadow);
   transition:
     border-color 0.2s var(--ease-out-quint),
     box-shadow 0.2s var(--ease-out-quint),
@@ -1225,7 +1225,9 @@ body {
 .cta-ghost:hover {
   border-color: color-mix(in oklab, var(--accent) 34%, var(--hairline));
   color: var(--color-fd-foreground);
-  box-shadow: 0 2px 9px -5px color-mix(in oklab, var(--accent) 34%, transparent);
+  box-shadow:
+    var(--glass-edge),
+    0 2px 9px -5px color-mix(in oklab, var(--accent) 34%, transparent);
 }
 .cta-ghost:active {
   transform: scale(0.97);
