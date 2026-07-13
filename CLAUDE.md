@@ -1,95 +1,157 @@
-# microcharts — CLAUDE.md
+# microcharts — contributor & agent guide
 
-Word-sized charts for React. Zero dependencies, ~1–2 kB gzip per chart, accessible by default, handcrafted-feeling. Brand: **microcharts**. Primary package: **`@microcharts/react`** (name live on npm; unscoped `microcharts`/`microchart` are blocked for everyone by npm's similarity rule — never retry them).
+Word-sized charts for React: zero runtime dependencies, ~1–3 kB gzip per chart, accessible by
+default, handcrafted-feeling. They're built to sit _inside_ an interface — a sentence, a table
+cell, a KPI card, a tab header, a streamed AI reply — and to be safe for a model to emit and a
+person to read. Package: **`@microcharts/react`**.
 
-## Design Context
+This file is the working contract for anyone (human or AI) changing the code. The rules below are
+not style preferences — several are enforced in CI, and violating them is a bug.
 
-### Users
+## Design principles
 
-Expert chartists, UI engineers, and product developers embedding dense, glanceable data into sentences, table cells, KPI cards, tabs, editorial layouts, and AI-generated interfaces. Their job is to communicate one decision-relevant signal immediately, without surrendering accessibility, performance, or implementation quality.
+1. **Earn every mark:** each pixel must encode data, state, structure, or a useful interaction cue.
+2. **First read instant, second read rewarding:** clarity at a glance may reveal finer structure on inspection.
+3. **Prefer uncommon questions over uncommon shapes:** add a chart only when it answers a practical decision the catalog cannot already answer well.
+4. **Delight without lying:** motion, rhythm, texture, and direct manipulation may delight, but never change what the data means.
+5. **Tiny size is a design material, not a limitation:** composition, contrast, and summaries must survive the smallest supported context.
 
-### Brand Personality
-
-Precise, handcrafted, and quietly audacious. The experience should create confidence first, then reward attention with restrained delight. It should feel like an expert instrument with a human hand behind it: never clinical, ornamental, or self-impressed.
-
-### Aesthetic Direction
-
-Micro-scale editorial instruments: crisp geometry, strong rhythm, direct labeling, purposeful semantic color, and occasional expressive forms whose novelty comes from an unusually apt encoding. Modern and futuristic means sharper thinking and better behavior—not neon glow, glass effects, dashboard chrome, or decorative complexity. Every chart must remain excellent in light, dark, print, and dense product contexts.
-
-### Design Principles
-
-1. Earn every mark: each pixel must encode data, state, structure, or a useful interaction cue.
-2. Make the first read instant and the second read rewarding; clarity at a glance may reveal finer structure on inspection.
-3. Prefer uncommon questions over uncommon shapes: add a chart only when it answers a practical decision that the catalog cannot already answer well.
-4. Let delight emerge from motion, rhythm, texture, and direct manipulation without changing the data's meaning.
-5. Treat tiny size as a design material, not a limitation: composition, contrast, and summaries must survive the smallest supported context.
-
-**The plan is law.** Every decision below is researched, verified, and cross-referenced in `plan/` (22 docs). Read the specific doc before working in its area; `plan/README.md` is the index. `plan/12-research-audit.md` classifies every claim's provenance — new factual claims must be added there. `plan/chart-gallery.html` is the visual reference for all 100 chart types (self-rendering, zero-dep — open it). **Docs-site / README / npm-metadata / share-card work is governed by `plan/20-discoverability.md`** (metadata contract, llms surface, OG cards — roadmap step 3.5 is its launch gate; built with the docs app, never bolted on after).
+Charts must remain excellent in light, dark, print, and dense product contexts. "Modern" means
+sharper thinking and better behavior — not neon glow, glass, dashboard chrome, or decorative
+complexity.
 
 ## Non-negotiables (violating any of these is a bug)
 
-1. **Zero runtime dependencies.** `dependencies: {}` forever, CI-enforced. React is a peer: `"react": "^18.0.0 || ^19.0.0"`. Scales, paths, easing, color, stats, summaries — all in-house. All 106 chart types ship in `@microcharts/react` — single package (`@microcharts/expressive` cancelled 2026-07-08, plan/21 §0); only `@microcharts/outline` (real opentype.js dep) stays a separate future package. Any third-party dev-dep must be registry-verified actively maintained before adoption.
-2. **Budgets are CI gates** (plan/07 amended + plan/21 §1, budget model v2): ≤ 3 kB gzip per static subpath (≤ 2 kB target, Delta-class ≤ 1.5 kB), interactive ≤ static + 1 kB, shared kernel ≤ 5 kB, styles.css ≤ 12 kB, ≤ 6 SVG nodes typical per chart, 0 client JS for static charts in RSC. The old "≤ 10 kB whole library" gate is retired — barrel size tracked + published honestly, never gated or marketed as a cap. `.size-limit.json` is generated (`scripts/gen-size-limits.mjs` from `scripts/size-budgets.json`), never hand-edited.
-3. **Static-first architecture** (plan/03): default exports are hook-free, listener-free, observer-free pure-SVG components — RSC-safe, SSR-static. Interactivity/animation live only in separate `'use client'` entries (`…/interactive`). Never blur this line.
-4. **One grammar** (plan/04 + §8 amendment): `data` alone always renders something beautiful. Same prop names = same meaning on every chart (`domain`, `color`, `title`, `summary`, `label`, `dots`, `format`, `positive`; `animate` is NOT a prop — motion lives in the `…/interactive` entry + CSS). Variants are props; new data shape = new component. No option-bag objects in the common path. Annotations are children (`<Threshold>`, `<Marker>`, `<TargetZone>`, `<Callout>`, `<Marker celebrate>`). Contract-v1 rulings (highlight/markValue/emphasis, total/max, `data-mc-w` width roles…) in plan/04 §8 — follow them for every chart.
-5. **Accessible by default** (plan/08): every chart `role="img"` + `<title>` + `aria-labelledby` (NOT bare aria-label). Auto-generated natural-language summary (`describeSeries`) is the default accessible name — this is a flagship feature, industry first, verified. `summary={false}` = decorative opt-out. Direction/state never color-alone. Strokes ≥ 4.5:1 contrast in default themes. `prefers-reduced-motion`, `forced-colors`, `prefers-contrast` all handled (exact patterns in plan/08 — they were verification-corrected; don't improvise).
-6. **Design principles applied silently**: Tufte/Few ground every default (data-ink, direct labels, no axes/legends/gridlines, areas anchor at zero, color encodes — never decorates, no 3-D/shadows/looping animation, hard-coded away not theme options). **Never name-drop Tufte or theory in external docs, marketing, code comments, or component copy.** The craft shows; it doesn't preach.
-7. **Honest encodings**: every chart type has one documented primary encoding channel + precision rating. Delight never lies. Lie factor = 1.
+1. **Zero runtime dependencies.** `dependencies: {}` forever, CI-enforced. React is a peer:
+   `"react": "^18.0.0 || ^19.0.0"`. Scales, paths, easing, color, stats, summaries — all in-house.
+   All chart types ship in the one `@microcharts/react` package. Any third-party dev-dependency must
+   be verified actively maintained before adoption.
+2. **Budgets are CI gates:** ≤ 3 kB gzip per static subpath (≤ 2 kB target, simple "Delta-class"
+   charts ≤ 1.5 kB), interactive ≤ static + 1 kB, shared kernel ≤ 5 kB, `styles.css` ≤ 12 kB, ≤ ~6
+   SVG nodes typical per chart, 0 client JS for static charts in RSC. `.size-limit.json` is generated
+   (`scripts/gen-size-limits.mjs` from `scripts/size-budgets.json`), never hand-edited.
+3. **Static-first architecture:** default exports are hook-free, listener-free, observer-free
+   pure-SVG components — RSC-safe, SSR-static. Interactivity and animation live only in separate
+   `'use client'` entries (`…/interactive`). Never blur this line.
+4. **One grammar:** `data` alone always renders something correct. The same prop name means the same
+   thing on every chart (`domain`, `color`, `title`, `summary`, `label`, `dots`, `format`,
+   `positive`). Variants are props; a new data shape is a new component. No option-bag objects in the
+   common path. Annotations are children (`<Threshold>`, `<Marker>`, `<TargetZone>`, `<Callout>`).
+5. **Accessible by default:** every chart is `role="img"` with a `<title>`. An auto-generated
+   natural-language summary (`describeSeries`) is the default accessible name; `summary={false}` is
+   the decorative opt-out. Direction and state are never color-alone. Strokes clear 4.5:1 contrast in
+   the default themes. `prefers-reduced-motion`, `forced-colors`, and `prefers-contrast` are all
+   handled — follow the existing patterns; don't improvise them.
+6. **Design applied silently:** data-ink first, direct labels, no axes/legends/gridlines, areas
+   anchor at zero, color encodes and never decorates, no 3-D/shadows/looping animation. These are
+   hard-coded away, not exposed as theme options. The craft shows in the output; the code and copy
+   don't lecture about it.
+7. **Honest encodings:** every chart type has one documented primary encoding channel and a precision
+   rating. Lie factor = 1.
 
-## Stack (verified July 2026 — do not substitute older tools)
+## Not shipped (by design)
 
-pnpm · TypeScript 6 strict (watch `@typescript/native-preview`/tsgo, adopt at stable) · **tsdown** build (tsup is maintenance-only) · **oxlint** + **oxfmt** (prettier fallback) · **lefthook** hooks · **Vitest 4** + @testing-library/react + **@fast-check/vitest** (property tests for all core math); **two projects** — node/jsdom for core math + static SVG attribute assertions, **`@vitest/browser` (Playwright provider) + `vitest-browser-react`** for interactive entries (jsdom has no SVG layout: `getBBox`/`getScreenCTM`/`getComputedTextLength` all return 0) · Playwright `toHaveScreenshot` in pinned Docker + **Argos CI** (Lost Pixel is dead; don't suggest it) · size-limit via custom CI step (the popular GitHub Action is stale) · **knip** (unused deps/exports/files — CI gate keeping zero-dep + tiny surface honest) · publint + arethetypeswrong on release · changesets + npm trusted publishing (OIDC, provenance automatic) · Renovate · MIT · Contributor Covenant 3.0. Docs: **Fumadocs** (React/Next-native — live-prop chart demos are first-class React, no island bridge; Shiki highlighting inherited from `fumadocs-core`, no standalone pin). Local workshop: **Storybook 10** (Vite builder; a11y addon → axe DoD, theme/viewport toggles → light/dark × preset matrix; Chromatic optional, else Argos). **not Sandpack** — stale. ESM-only, per-component subpath exports, `sideEffects: false`, types-first export conditions. **No React Compiler in v1** (its runtime package would be a real dependency under React 18).
+Pie, needle-gauge/speedometer, battery, waffle, and violin are intentionally excluded — each fails
+at micro scale or on the honest-encoding bar, and each has a strictly-better in-catalog replacement
+(Bullet for gauges, SegmentedBar for pie, MicroBox for violin). Admission bar for any new type:
+≤ 200×60 px, a unique data story, an honest channel, readable without training.
 
-## Architecture map (plan/03)
+## Stack
 
-`src/core/` = pure functions, zero React (scale, path, stats, summary, color, bank) — the portable kernel; keep it React-free so string/text/native renderers stay possible. `src/charts/<name>/` = static `index.tsx` + `client.tsx`. `src/shared/` = Chart root wrapper, SparkGroup, motion, a11y. **CSS delivery (plan/19):** one shared `@microcharts/react/styles.css` imported once, `@layer microcharts.{tokens,base,charts,motion}` with `:where()` zero-specificity — NOT per-chart-split; the ≤2 kB/subpath gate measures JS gzip only, CSS is one artifact against the library budget. **Text labels (plan/18):** static path places labels by `text-anchor` + tabular-nums + `ch` gutters — never measures text (unmeasurable server-side); static components must never call `getBBox`/`getComputedTextLength`/`getScreenCTM` (client entries may). Rendering: SVG-first, viewBox + `preserveAspectRatio` + `vector-effect: non-scaling-stroke` for responsiveness (no ResizeObserver by default), integer viewBox coords, `shape-rendering: crispEdges` only on rectilinear marks. Animation: CSS/WAAPI only — **no `d: path()` (no Safari)**, no SMIL, transform/opacity preferred, stroke-dashoffset entrance, one shared IntersectionObserver, all gated on reduced-motion. WASM: never (verified anti-pattern at micro N).
+pnpm · TypeScript strict · **tsdown** build · **oxlint** + **oxfmt** · **lefthook** hooks ·
+**Vitest** + @testing-library/react + **@fast-check/vitest** (property tests for all core math), in
+**two projects** — node/jsdom for core math + static SVG attribute assertions, and `@vitest/browser`
+(Playwright provider) + `vitest-browser-react` for interactive entries (jsdom has no SVG layout:
+`getBBox`/`getScreenCTM`/`getComputedTextLength` return 0) · Playwright screenshots + **Argos** for
+visual review · size-limit as a custom CI step · **knip** (unused deps/exports/files) · publint +
+arethetypeswrong on release · changesets + npm trusted publishing (OIDC, provenance). Docs:
+**Fumadocs** + Next static export. ESM-only, per-component subpath exports, `sideEffects: false`,
+types-first export conditions.
 
-## Theming (plan/06)
+## Architecture map
 
-~20 CSS custom properties (`--mc-*`) at low specificity = runtime contract; presets = token bundles (`modern` default, `editorial`, `mono`, `vivid`, + context presets `newspaper`/`magazine`/`poster`/`eink`/`print`). **Never use the name "tufte" as a preset id or in any code/docs/UI — the `editorial` preset embodies those principles without naming the person (non-negotiable #6).** Precedence: prop > CSS var scope > preset > default. Presets are visual only — never change data semantics. Colors: Okabe-Ito-derived semantic tokens (pos `#009E73`, neg `#D55E00`), palettes swap the accent only. Dark mode hand-tuned, never inverted. Charts never paint their own background. `tabular-nums` on all rendered numbers.
+- `src/core/` — pure functions, zero React (scale, path, stats, summary, color, format, labels). The
+  portable kernel; keep it React-free so string/text/native renderers stay possible.
+- `src/charts/<name>/` — `geometry.ts` (pure, React-free) · `index.tsx` (static, RSC-safe) ·
+  `client.tsx` (interactive, `'use client'`).
+- `src/shared/` — the `Chart` root wrapper, `SparkGroup`, motion engine, a11y, annotations.
+- **CSS delivery:** one shared `@microcharts/react/styles.css`, imported once, in
+  `@layer microcharts.{tokens,base,charts,motion}` with `:where()` zero-specificity so consumer
+  styles always win. The per-subpath size gate measures JS gzip only; CSS is one artifact.
+- **Text labels:** the static path places labels by `text-anchor` + tabular-nums + reserved gutters —
+  it never measures text (unmeasurable server-side). Static components must never call `getBBox` /
+  `getComputedTextLength` / `getScreenCTM`; client entries may.
+- **Rendering:** SVG-first, `viewBox` + `preserveAspectRatio` + `vector-effect: non-scaling-stroke`
+  for responsiveness (no ResizeObserver by default), integer viewBox coords, `shape-rendering:
+  crispEdges` only on rectilinear marks.
+- **Animation:** CSS/WAAPI only — no `d: path()` (no Safari), no SMIL; transform/opacity preferred,
+  stroke-dashoffset entrance, one shared IntersectionObserver, all gated on reduced-motion.
 
-## Catalog (106 types shipped — core 34, decision 26, expressive 23, frontier 23; all stable, all with doc pages + package exports. Verify against `STABLE_CHARTS.length` in `apps/docs/src/lib/charts/registry.ts`. Original plan target was 100 — plan/05 core 36, plan/16 decision 21, plan/15 expressive 22, plan/17 frontier 21; expanded 96→100 on 2026-07-08 with research-verified MicroScatter, LikertStrip, IconArray, ConfusionGrid — plan/12 audit. Collection tallies drifted from the plan as types landed; the registry is the source of truth.)
+## Theming
 
-**DECISION 2026-07-08 (plan/21 — read it before any chart work): the full catalog ships in `@microcharts/react`, single package, BEFORE launch**, in five gated batches — Batch 0 foundation/hardening (plan/21 §6), Batch 1 core 29 (plan/22), Batch 2 decision 21 (plan/23), Batch 3 expressive 22 (plan/24), Batch 4 frontier 21 + release sync (plan/25). Collections (core/decision/expressive/frontier) are catalog metadata, never package or import-path boundaries. No batch N+1 before batch N's gate. Shipped so far: all 106 stable chart types (core 34, decision 26, expressive 23, frontier 23) — full doc pages + package exports for each; the batches above are done. (Genesis five were Sparkline (+band), SparkBar (+win-loss), Delta, Bullet, ActivityGrid.) **Every chart ships a static default (`…/name`) AND a `…/name/interactive` client entry** — the DoD's "static + interactive entries" is universal, not opt-in (Delta = live announce, Bullet = value/target readout, ActivityGrid = cell hover + 2-D keyboard nav). Skip an interactive entry only when a type has no meaningful interaction, and say why. Not shipping: pie, gauge, battery, waffle, violin (reasons + replacements in plan/05 §4; glanceability research backs it). Cut ledger in plan/15 — don't resurrect cut charts without new evidence. Admission bar for new types: ≤ 200×60 px, unique data story, honest channel, read-back without training.
+~20 `--mc-*` CSS custom properties at low specificity are the runtime contract; presets are token
+bundles (`modern` default, `editorial`, `mono`, `vivid`, plus print/e-ink context presets).
+Precedence: prop > CSS var scope > preset > default. Presets are visual only and never change data
+semantics. Colors are Okabe-Ito-derived semantic tokens (positive `#009E73`, negative `#D55E00`);
+palettes swap the accent only. Dark mode is hand-tuned, never inverted. Charts never paint their own
+background. `tabular-nums` on all rendered numbers. (The principled preset is named `editorial`.)
 
-## Component canon (Phase 2 review, 2026-07-06 — every future chart follows this exactly)
+## Component canon (every chart follows this)
 
-**File anatomy per chart** (`src/charts/<name>/`): `geometry.ts` (pure, React-free, property/edge-tested in the node project) · `index.tsx` (static: hook-free, listener-free, RSC-safe) · `client.tsx` (interactive, `"use client"`) · `index.test.tsx` + `geometry.test.ts` (node) · `client.browser.test.tsx` (real browser). Add the subpath pair to `package.json#exports`, `tsdown` entries, and `.size-limit.json` in the same PR.
+**File anatomy** (`src/charts/<name>/`): `geometry.ts` (pure, property/edge-tested in the node
+project) · `index.tsx` (static: hook-free, listener-free, RSC-safe) · `client.tsx` (interactive) ·
+`index.test.tsx` + `geometry.test.ts` (node) · `client.browser.test.tsx` (real browser). Add the
+subpath pair to `package.json#exports`, the `tsdown` entries, and `.size-limit.json` in the same PR.
 
-**The canonical interactive pattern** (violations = the review's #1 finding; never regress):
-1. **Compose the static component** — `<Static… {...props} summary={false}>` with overlay marks (crosshair, focus ring) passed as its `children`. NEVER re-implement the SVG in the client entry; geometry is pure, so both entries computing it get identical numbers and the visual cannot drift.
-2. **One pointer listener on the wrapper** + pure math (nearest-x / grid lookup) — never a DOM node per data point (500 rows × 30 points must stay cheap).
-3. Wrapper `<span tabIndex={0} role="img" aria-label={title + summary}>` owns naming + roving keyboard; announcements through a polite live region using `SummaryStrings` (i18n contract — **no hardcoded English outside `EN`**). Shared summary text lives in ONE exported function (`bulletSummary`, `activitySummary` pattern) used by both entries.
+**The canonical interactive pattern** (never regress):
+1. **Compose the static component** — render `<Static… {...props} summary={false}>` with overlay
+   marks (crosshair, focus ring) as its `children`. Never re-implement the SVG in the client entry;
+   geometry is pure, so both entries compute identical numbers and the visual cannot drift.
+2. **One pointer listener on the wrapper** + pure math (nearest-x / grid lookup) — never a DOM node
+   per data point (500 rows × 30 points must stay cheap).
+3. Wrapper `<span tabIndex={0} role="img">` owns naming + roving keyboard; announcements go through a
+   polite live region using `SummaryStrings` (the i18n contract — no hardcoded English outside `EN`).
+   Shared summary text lives in one exported function used by both entries.
 
-**Accessible naming (amended plan/08 §1):** default = deterministic composed `aria-label` (+ id-less `<title>`); explicit `id` prop opts into `<title>/<desc>` + `aria-labelledby`. NEVER generate ids in static components (module counters desync under StrictMode/concurrent renders → hydration mismatches). Interactive entries may use `useId`.
+**Accessible naming:** default = a deterministic composed `aria-label` (plus an id-less `<title>`);
+an explicit `id` prop opts into `<title>/<desc>` + `aria-labelledby`. Never generate ids in static
+components (module counters desync under StrictMode/concurrent renders → hydration mismatches).
+Interactive entries may use `useId`.
 
-**Containment (hard rule):** nothing may paint outside the viewBox — `.mc-root` has `overflow: visible`, so an escape is a layout spill, not a clip. Direct labels reserve a deterministic gutter BEFORE geometry (`labelMetrics`: fontSize in viewBox units set as an SVG attribute — never em-based CSS for in-chart text — and a 0.62·em/char over-estimate); label y is clamped by font ascent. Every chart ships a containment test asserting coords + estimated text extents ≤ viewBox.
+**Containment (hard rule):** nothing may paint outside the viewBox — `.mc-root` has
+`overflow: visible`, so an escape is a layout spill, not a clip. Direct labels reserve a deterministic
+gutter before geometry (fontSize in viewBox units set as an SVG attribute — never em-based CSS for
+in-chart text — with a per-char over-estimate); label y is clamped by font ascent. Every chart ships
+a containment test asserting coords + estimated text extents ≤ viewBox.
 
-**Runtime + perf rules:** ES2022 floor — no `toSorted`/`toReversed`/etc. (tsc lib ES2023 stays green while Safari < 16.4 crashes; `unicorn/no-array-sort|no-array-reverse` are off in `.oxlintrc.json` for exactly this reason). Number formatting only via `makeFormatter` (`core/format.ts`, cached `Intl.NumberFormat`) — never `new Intl.NumberFormat` in a component. Geometry inputs → outputs must be pure and 2-dp rounded at generation.
+**Runtime + perf:** ES2022 floor — no `toSorted`/`toReversed`/etc. (Safari < 16.4 crashes even
+though the tsc lib is newer). Number formatting only via `makeFormatter` (`core/format.ts`, cached
+`Intl.NumberFormat`) — never `new Intl.NumberFormat` in a component. Geometry inputs → outputs must
+be pure and 2-dp rounded at generation.
 
-**Budgets (measured reality, plan/07 §amended + plan/21 §1):** static ≤ 3 kB gz per subpath (Delta-class simple charts ≤ 1.5 kB), interactive ≤ static + 1 kB, shared kernel ≤ 5 kB, styles.css ≤ 12 kB shared (raised from 10 kB for the full catalog, 2026-07-08). SSR bench floor: ≥ ~50 rows/ms.
+## Quality bar (per-chart Definition of Done)
 
-## Docs site (`apps/docs` — Phase 3, plan/20)
+Static + interactive entries · shared edge-case fixture suite green (empty, single point, all-equal,
+nulls, all-null, negatives, NaN/±Infinity — documented behavior) · property tests · axe clean +
+summary correct · visual baselines approved (light/dark × presets) · size-budget entry · a doc page ·
+a bench scenario. SVG testing uses normalized attribute assertions (coords rounded to 2 decimals at
+generation), never whole-markup snapshots. React 18 + 19 matrix, StrictMode on.
 
-Independent pnpm workspace (`apps/*`). **Fumadocs 16 + Next 16 static export (`output: 'export'`)** — deployable to Cloudflare Workers Static Assets (`wrangler.jsonc`), Vercel, or any CDN with zero server runtime. Consumes the built library (`@microcharts/react` → `dist/`), so **`pnpm build` before docs build/dev**. Domain is swappable via `SITE.url` (`src/lib/site.ts`, env `NEXT_PUBLIC_SITE_URL`) — never scatter `microcharts.dev` (unregistered).
+## Docs site (`apps/docs`)
 
-**Design is law here too** (memory: `docs-site-design-system` — read it): "editorial measurement instrument" — matte premium, minimal, visual-first (charts are the heroes, minimum text), hairline precision, mono metadata. Fonts **Bricolage Grotesque** (expressive display) + **Hanken Grotesk** (UI) + **JetBrains Mono** — distinctive, NOT the AI serif pack (Fraunces/Playfair/Instrument) nor wide grotesques (Instrument Sans/Lato). Color is a **single `--accent` token** (drives chrome + links + focus + chart `--mc-accent`) with a **rich global accent picker** (`[data-accent]`, 6 non-AI presets incl. NO purple, default Cobalt — never cyan-on-dark / purple-gradient / neon; the picker has a live chart preview). Warm-tinted neutrals, never pure black/white. Hero background is faint grid-paper (a WebGL shader was tried and reverted). **Every chart page** has a live `Playground` + per-variant `LiveDemo` code toggles (consistency). Light+dark premium parity (rich on AMOLED/XDR), fully fluid/responsive, restrained motion (all reduced-motion-gated), must NOT feel like stock Fumadocs, every UI element gets a unique feel. Reskin via `--color-fd-*` overrides in `src/app/global.css`; bind `--mc-*` to the site (next-themes class) theme, not the OS. Do NOT wrap Fumadocs `DocsLayout` children in a keyed transition div (breaks its sticky grid). `describeSeries` output in docs must be the REAL string (docs-as-tests). Never name-drop Tufte/theory (non-negotiable #6). Apply the frontend-design skill's AI-slop DON'Ts.
+Independent pnpm workspace. **Fumadocs + Next static export (`output: 'export'`)** — deployable to
+any static host. It consumes the built library (`@microcharts/react` → `dist/`), so **build the
+library before building or developing the docs** (`pnpm build:site` does both). The site origin is
+swappable via `NEXT_PUBLIC_SITE_URL`. Every doc example must be a real, compiled component
+(docs-as-tests): `describeSeries` output shown in docs must be the actual generated string. The docs
+also publish machine surfaces — `/llms.txt`, `/llms-full.txt`, and `/catalog.json` — kept in sync
+with `package.json#exports` and gated by tests.
 
-**Discoverability is built in from the first route, never bolted on** (plan/20 §16): `docsMeta()` on every route, JSON-LD helpers, `sitemap.xml`/`robots.txt`, per-page + default OG, curated `/llms.txt` + `/llms-full.txt` + `.md` mirrors + generated `/microcharts.catalog.json` (from the `src/lib/catalog.ts` registry, validated against `package.json#exports`). `metadata.test.ts` gates the built HTML. See memory `docs-site-architecture` for structure, commands, and gotchas.
+## Working rules
 
-## Quality bar (plan/09)
-
-Per-chart Definition of Done: static + interactive entries · shared edge-case fixture suite green (empty, single point, all-equal, nulls, all-null, negatives, NaN/±Infinity — documented behavior, this kills the Grafana bug class) · property tests · axe clean + summary correct · visual baselines approved (light/dark × presets) · size budget entry · doc page with 4 contexts (sentence/cell/KPI card/tab) · bench scenario. SVG testing: normalized attribute assertions (coords rounded to 2 decimals at generation), never whole-markup snapshots. React 18 + 19 matrix, StrictMode on.
-
-## Roadmap position (plan/10)
-
-Phases 0–6 with ✋ checkpoints. **`plan/STATUS.md` is the live execution tracker — read it first, and update it in the same commit as any work it tracks** (roadmap = the plan; STATUS = what's actually done). Current status: Phases 0–2 complete; Phase 3 docs site largely done; **next execution front = Phase 3.75 full-catalog buildout (plan/21, batches in plan/22–25), then Checkpoint 3, then launch**. Don't skip checkpoint gates; don't start Phase N+1 work mid-Phase N without flagging it.
-
-## Working rules for Claude sessions
-
-- Before implementing in any area, read its plan doc; when code and plan conflict, surface it — don't silently diverge. Plan changes get written back to `plan/` + audit entry.
-- Commit style: conventional commits, subject ≤ 50 chars, body only when why isn't obvious.
-- Never add a dependency (even dev) without checking registry freshness and noting it in the audit doc.
-- Every doc example must be a compiled fixture (docs-as-tests) — never write doc snippets that don't build.
-- Bench claims and README numbers must be reproducible from `bench/` — no hand-waved performance marketing.
-- When adding a chart type: catalog table row + gallery renderer + spec schema entry + summary template + DoD checklist, in the same PR.
+- Commit style: conventional commits, subject ≤ 50 chars, body only when the "why" isn't obvious.
+- Never add a dependency (even a dev one) without checking that it's actively maintained.
+- Every doc example must be a compiled fixture — never write snippets that don't build.
+- Bench and README numbers must be reproducible from `bench/` — no hand-waved performance claims.
+- When adding a chart type, do it all in one PR: the chart, its tests, its gallery/registry entry,
+  its summary template, its doc page, and its size-budget entry.
