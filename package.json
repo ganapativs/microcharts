@@ -45,859 +45,1073 @@
     "./package.json": "./package.json",
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./sparkline": {
       "types": "./dist/charts/sparkline/index.d.ts",
-      "import": "./dist/charts/sparkline/index.js"
+      "import": "./dist/charts/sparkline/index.js",
+      "default": "./dist/charts/sparkline/index.js"
     },
     "./sparkline/interactive": {
       "types": "./dist/charts/sparkline/client.d.ts",
-      "import": "./dist/charts/sparkline/client.js"
+      "import": "./dist/charts/sparkline/client.js",
+      "default": "./dist/charts/sparkline/client.js"
     },
     "./sparkbar": {
       "types": "./dist/charts/sparkbar/index.d.ts",
-      "import": "./dist/charts/sparkbar/index.js"
+      "import": "./dist/charts/sparkbar/index.js",
+      "default": "./dist/charts/sparkbar/index.js"
     },
     "./sparkbar/interactive": {
       "types": "./dist/charts/sparkbar/client.d.ts",
-      "import": "./dist/charts/sparkbar/client.js"
+      "import": "./dist/charts/sparkbar/client.js",
+      "default": "./dist/charts/sparkbar/client.js"
     },
     "./delta": {
       "types": "./dist/charts/delta/index.d.ts",
-      "import": "./dist/charts/delta/index.js"
+      "import": "./dist/charts/delta/index.js",
+      "default": "./dist/charts/delta/index.js"
     },
     "./delta/interactive": {
       "types": "./dist/charts/delta/client.d.ts",
-      "import": "./dist/charts/delta/client.js"
+      "import": "./dist/charts/delta/client.js",
+      "default": "./dist/charts/delta/client.js"
     },
     "./bullet": {
       "types": "./dist/charts/bullet/index.d.ts",
-      "import": "./dist/charts/bullet/index.js"
+      "import": "./dist/charts/bullet/index.js",
+      "default": "./dist/charts/bullet/index.js"
     },
     "./bullet/interactive": {
       "types": "./dist/charts/bullet/client.d.ts",
-      "import": "./dist/charts/bullet/client.js"
+      "import": "./dist/charts/bullet/client.js",
+      "default": "./dist/charts/bullet/client.js"
     },
     "./activity-grid": {
       "types": "./dist/charts/activity-grid/index.d.ts",
-      "import": "./dist/charts/activity-grid/index.js"
+      "import": "./dist/charts/activity-grid/index.js",
+      "default": "./dist/charts/activity-grid/index.js"
     },
     "./activity-grid/interactive": {
       "types": "./dist/charts/activity-grid/client.d.ts",
-      "import": "./dist/charts/activity-grid/client.js"
+      "import": "./dist/charts/activity-grid/client.js",
+      "default": "./dist/charts/activity-grid/client.js"
     },
     "./trend-arrow": {
       "types": "./dist/charts/trend-arrow/index.d.ts",
-      "import": "./dist/charts/trend-arrow/index.js"
+      "import": "./dist/charts/trend-arrow/index.js",
+      "default": "./dist/charts/trend-arrow/index.js"
     },
     "./trend-arrow/interactive": {
       "types": "./dist/charts/trend-arrow/client.d.ts",
-      "import": "./dist/charts/trend-arrow/client.js"
+      "import": "./dist/charts/trend-arrow/client.js",
+      "default": "./dist/charts/trend-arrow/client.js"
     },
     "./status-dot": {
       "types": "./dist/charts/status-dot/index.d.ts",
-      "import": "./dist/charts/status-dot/index.js"
+      "import": "./dist/charts/status-dot/index.js",
+      "default": "./dist/charts/status-dot/index.js"
     },
     "./status-dot/interactive": {
       "types": "./dist/charts/status-dot/client.d.ts",
-      "import": "./dist/charts/status-dot/client.js"
+      "import": "./dist/charts/status-dot/client.js",
+      "default": "./dist/charts/status-dot/client.js"
     },
     "./heat-cell": {
       "types": "./dist/charts/heat-cell/index.d.ts",
-      "import": "./dist/charts/heat-cell/index.js"
+      "import": "./dist/charts/heat-cell/index.js",
+      "default": "./dist/charts/heat-cell/index.js"
     },
     "./heat-cell/interactive": {
       "types": "./dist/charts/heat-cell/client.d.ts",
-      "import": "./dist/charts/heat-cell/client.js"
+      "import": "./dist/charts/heat-cell/client.js",
+      "default": "./dist/charts/heat-cell/client.js"
     },
     "./progress": {
       "types": "./dist/charts/progress/index.d.ts",
-      "import": "./dist/charts/progress/index.js"
+      "import": "./dist/charts/progress/index.js",
+      "default": "./dist/charts/progress/index.js"
     },
     "./progress/interactive": {
       "types": "./dist/charts/progress/client.d.ts",
-      "import": "./dist/charts/progress/client.js"
+      "import": "./dist/charts/progress/client.js",
+      "default": "./dist/charts/progress/client.js"
     },
     "./rug-strip": {
       "types": "./dist/charts/rug-strip/index.d.ts",
-      "import": "./dist/charts/rug-strip/index.js"
+      "import": "./dist/charts/rug-strip/index.js",
+      "default": "./dist/charts/rug-strip/index.js"
     },
     "./rug-strip/interactive": {
       "types": "./dist/charts/rug-strip/client.d.ts",
-      "import": "./dist/charts/rug-strip/client.js"
+      "import": "./dist/charts/rug-strip/client.js",
+      "default": "./dist/charts/rug-strip/client.js"
     },
     "./mini-bar": {
       "types": "./dist/charts/mini-bar/index.d.ts",
-      "import": "./dist/charts/mini-bar/index.js"
+      "import": "./dist/charts/mini-bar/index.js",
+      "default": "./dist/charts/mini-bar/index.js"
     },
     "./mini-bar/interactive": {
       "types": "./dist/charts/mini-bar/client.d.ts",
-      "import": "./dist/charts/mini-bar/client.js"
+      "import": "./dist/charts/mini-bar/client.js",
+      "default": "./dist/charts/mini-bar/client.js"
     },
     "./pictogram-row": {
       "types": "./dist/charts/pictogram-row/index.d.ts",
-      "import": "./dist/charts/pictogram-row/index.js"
+      "import": "./dist/charts/pictogram-row/index.js",
+      "default": "./dist/charts/pictogram-row/index.js"
     },
     "./pictogram-row/interactive": {
       "types": "./dist/charts/pictogram-row/client.d.ts",
-      "import": "./dist/charts/pictogram-row/client.js"
+      "import": "./dist/charts/pictogram-row/client.js",
+      "default": "./dist/charts/pictogram-row/client.js"
     },
     "./seismogram": {
       "types": "./dist/charts/seismogram/index.d.ts",
-      "import": "./dist/charts/seismogram/index.js"
+      "import": "./dist/charts/seismogram/index.js",
+      "default": "./dist/charts/seismogram/index.js"
     },
     "./seismogram/interactive": {
       "types": "./dist/charts/seismogram/client.d.ts",
-      "import": "./dist/charts/seismogram/client.js"
+      "import": "./dist/charts/seismogram/client.js",
+      "default": "./dist/charts/seismogram/client.js"
     },
     "./heat-strip": {
       "types": "./dist/charts/heat-strip/index.d.ts",
-      "import": "./dist/charts/heat-strip/index.js"
+      "import": "./dist/charts/heat-strip/index.js",
+      "default": "./dist/charts/heat-strip/index.js"
     },
     "./heat-strip/interactive": {
       "types": "./dist/charts/heat-strip/client.d.ts",
-      "import": "./dist/charts/heat-strip/client.js"
+      "import": "./dist/charts/heat-strip/client.js",
+      "default": "./dist/charts/heat-strip/client.js"
     },
     "./dot-plot": {
       "types": "./dist/charts/dot-plot/index.d.ts",
-      "import": "./dist/charts/dot-plot/index.js"
+      "import": "./dist/charts/dot-plot/index.js",
+      "default": "./dist/charts/dot-plot/index.js"
     },
     "./dot-plot/interactive": {
       "types": "./dist/charts/dot-plot/client.d.ts",
-      "import": "./dist/charts/dot-plot/client.js"
+      "import": "./dist/charts/dot-plot/client.js",
+      "default": "./dist/charts/dot-plot/client.js"
     },
     "./dumbbell": {
       "types": "./dist/charts/dumbbell/index.d.ts",
-      "import": "./dist/charts/dumbbell/index.js"
+      "import": "./dist/charts/dumbbell/index.js",
+      "default": "./dist/charts/dumbbell/index.js"
     },
     "./dumbbell/interactive": {
       "types": "./dist/charts/dumbbell/client.d.ts",
-      "import": "./dist/charts/dumbbell/client.js"
+      "import": "./dist/charts/dumbbell/client.js",
+      "default": "./dist/charts/dumbbell/client.js"
     },
     "./paired-bars": {
       "types": "./dist/charts/paired-bars/index.d.ts",
-      "import": "./dist/charts/paired-bars/index.js"
+      "import": "./dist/charts/paired-bars/index.js",
+      "default": "./dist/charts/paired-bars/index.js"
     },
     "./paired-bars/interactive": {
       "types": "./dist/charts/paired-bars/client.d.ts",
-      "import": "./dist/charts/paired-bars/client.js"
+      "import": "./dist/charts/paired-bars/client.js",
+      "default": "./dist/charts/paired-bars/client.js"
     },
     "./slope": {
       "types": "./dist/charts/slope/index.d.ts",
-      "import": "./dist/charts/slope/index.js"
+      "import": "./dist/charts/slope/index.js",
+      "default": "./dist/charts/slope/index.js"
     },
     "./slope/interactive": {
       "types": "./dist/charts/slope/client.d.ts",
-      "import": "./dist/charts/slope/client.js"
+      "import": "./dist/charts/slope/client.js",
+      "default": "./dist/charts/slope/client.js"
     },
     "./micro-scatter": {
       "types": "./dist/charts/micro-scatter/index.d.ts",
-      "import": "./dist/charts/micro-scatter/index.js"
+      "import": "./dist/charts/micro-scatter/index.js",
+      "default": "./dist/charts/micro-scatter/index.js"
     },
     "./micro-scatter/interactive": {
       "types": "./dist/charts/micro-scatter/client.d.ts",
-      "import": "./dist/charts/micro-scatter/client.js"
+      "import": "./dist/charts/micro-scatter/client.js",
+      "default": "./dist/charts/micro-scatter/client.js"
     },
     "./segmented-bar": {
       "types": "./dist/charts/segmented-bar/index.d.ts",
-      "import": "./dist/charts/segmented-bar/index.js"
+      "import": "./dist/charts/segmented-bar/index.js",
+      "default": "./dist/charts/segmented-bar/index.js"
     },
     "./segmented-bar/interactive": {
       "types": "./dist/charts/segmented-bar/client.d.ts",
-      "import": "./dist/charts/segmented-bar/client.js"
+      "import": "./dist/charts/segmented-bar/client.js",
+      "default": "./dist/charts/segmented-bar/client.js"
     },
     "./histogram-strip": {
       "types": "./dist/charts/histogram-strip/index.d.ts",
-      "import": "./dist/charts/histogram-strip/index.js"
+      "import": "./dist/charts/histogram-strip/index.js",
+      "default": "./dist/charts/histogram-strip/index.js"
     },
     "./histogram-strip/interactive": {
       "types": "./dist/charts/histogram-strip/client.d.ts",
-      "import": "./dist/charts/histogram-strip/client.js"
+      "import": "./dist/charts/histogram-strip/client.js",
+      "default": "./dist/charts/histogram-strip/client.js"
     },
     "./micro-box": {
       "types": "./dist/charts/micro-box/index.d.ts",
-      "import": "./dist/charts/micro-box/index.js"
+      "import": "./dist/charts/micro-box/index.js",
+      "default": "./dist/charts/micro-box/index.js"
     },
     "./micro-box/interactive": {
       "types": "./dist/charts/micro-box/client.d.ts",
-      "import": "./dist/charts/micro-box/client.js"
+      "import": "./dist/charts/micro-box/client.js",
+      "default": "./dist/charts/micro-box/client.js"
     },
     "./progress-ring": {
       "types": "./dist/charts/progress-ring/index.d.ts",
-      "import": "./dist/charts/progress-ring/index.js"
+      "import": "./dist/charts/progress-ring/index.js",
+      "default": "./dist/charts/progress-ring/index.js"
     },
     "./progress-ring/interactive": {
       "types": "./dist/charts/progress-ring/client.d.ts",
-      "import": "./dist/charts/progress-ring/client.js"
+      "import": "./dist/charts/progress-ring/client.js",
+      "default": "./dist/charts/progress-ring/client.js"
     },
     "./micro-donut": {
       "types": "./dist/charts/micro-donut/index.d.ts",
-      "import": "./dist/charts/micro-donut/index.js"
+      "import": "./dist/charts/micro-donut/index.js",
+      "default": "./dist/charts/micro-donut/index.js"
     },
     "./micro-donut/interactive": {
       "types": "./dist/charts/micro-donut/client.d.ts",
-      "import": "./dist/charts/micro-donut/client.js"
+      "import": "./dist/charts/micro-donut/client.js",
+      "default": "./dist/charts/micro-donut/client.js"
     },
     "./funnel": {
       "types": "./dist/charts/funnel/index.d.ts",
-      "import": "./dist/charts/funnel/index.js"
+      "import": "./dist/charts/funnel/index.js",
+      "default": "./dist/charts/funnel/index.js"
     },
     "./funnel/interactive": {
       "types": "./dist/charts/funnel/client.d.ts",
-      "import": "./dist/charts/funnel/client.js"
+      "import": "./dist/charts/funnel/client.js",
+      "default": "./dist/charts/funnel/client.js"
     },
     "./likert-strip": {
       "types": "./dist/charts/likert-strip/index.d.ts",
-      "import": "./dist/charts/likert-strip/index.js"
+      "import": "./dist/charts/likert-strip/index.js",
+      "default": "./dist/charts/likert-strip/index.js"
     },
     "./likert-strip/interactive": {
       "types": "./dist/charts/likert-strip/client.d.ts",
-      "import": "./dist/charts/likert-strip/client.js"
+      "import": "./dist/charts/likert-strip/client.js",
+      "default": "./dist/charts/likert-strip/client.js"
     },
     "./waterfall": {
       "types": "./dist/charts/waterfall/index.d.ts",
-      "import": "./dist/charts/waterfall/index.js"
+      "import": "./dist/charts/waterfall/index.js",
+      "default": "./dist/charts/waterfall/index.js"
     },
     "./waterfall/interactive": {
       "types": "./dist/charts/waterfall/client.d.ts",
-      "import": "./dist/charts/waterfall/client.js"
+      "import": "./dist/charts/waterfall/client.js",
+      "default": "./dist/charts/waterfall/client.js"
     },
     "./bump-strip": {
       "types": "./dist/charts/bump-strip/index.d.ts",
-      "import": "./dist/charts/bump-strip/index.js"
+      "import": "./dist/charts/bump-strip/index.js",
+      "default": "./dist/charts/bump-strip/index.js"
     },
     "./bump-strip/interactive": {
       "types": "./dist/charts/bump-strip/client.d.ts",
-      "import": "./dist/charts/bump-strip/client.js"
+      "import": "./dist/charts/bump-strip/client.js",
+      "default": "./dist/charts/bump-strip/client.js"
     },
     "./dual-sparkline": {
       "types": "./dist/charts/dual-sparkline/index.d.ts",
-      "import": "./dist/charts/dual-sparkline/index.js"
+      "import": "./dist/charts/dual-sparkline/index.js",
+      "default": "./dist/charts/dual-sparkline/index.js"
     },
     "./dual-sparkline/interactive": {
       "types": "./dist/charts/dual-sparkline/client.d.ts",
-      "import": "./dist/charts/dual-sparkline/client.js"
+      "import": "./dist/charts/dual-sparkline/client.js",
+      "default": "./dist/charts/dual-sparkline/client.js"
     },
     "./stacked-area": {
       "types": "./dist/charts/stacked-area/index.d.ts",
-      "import": "./dist/charts/stacked-area/index.js"
+      "import": "./dist/charts/stacked-area/index.js",
+      "default": "./dist/charts/stacked-area/index.js"
     },
     "./stacked-area/interactive": {
       "types": "./dist/charts/stacked-area/client.d.ts",
-      "import": "./dist/charts/stacked-area/client.js"
+      "import": "./dist/charts/stacked-area/client.js",
+      "default": "./dist/charts/stacked-area/client.js"
     },
     "./ohlc": {
       "types": "./dist/charts/ohlc/index.d.ts",
-      "import": "./dist/charts/ohlc/index.js"
+      "import": "./dist/charts/ohlc/index.js",
+      "default": "./dist/charts/ohlc/index.js"
     },
     "./ohlc/interactive": {
       "types": "./dist/charts/ohlc/client.d.ts",
-      "import": "./dist/charts/ohlc/client.js"
+      "import": "./dist/charts/ohlc/client.js",
+      "default": "./dist/charts/ohlc/client.js"
     },
     "./horizon": {
       "types": "./dist/charts/horizon/index.d.ts",
-      "import": "./dist/charts/horizon/index.js"
+      "import": "./dist/charts/horizon/index.js",
+      "default": "./dist/charts/horizon/index.js"
     },
     "./horizon/interactive": {
       "types": "./dist/charts/horizon/client.d.ts",
-      "import": "./dist/charts/horizon/client.js"
+      "import": "./dist/charts/horizon/client.js",
+      "default": "./dist/charts/horizon/client.js"
     },
     "./calendar-strip": {
       "types": "./dist/charts/calendar-strip/index.d.ts",
-      "import": "./dist/charts/calendar-strip/index.js"
+      "import": "./dist/charts/calendar-strip/index.js",
+      "default": "./dist/charts/calendar-strip/index.js"
     },
     "./calendar-strip/interactive": {
       "types": "./dist/charts/calendar-strip/client.d.ts",
-      "import": "./dist/charts/calendar-strip/client.js"
+      "import": "./dist/charts/calendar-strip/client.js",
+      "default": "./dist/charts/calendar-strip/client.js"
     },
     "./event-timeline": {
       "types": "./dist/charts/event-timeline/index.d.ts",
-      "import": "./dist/charts/event-timeline/index.js"
+      "import": "./dist/charts/event-timeline/index.js",
+      "default": "./dist/charts/event-timeline/index.js"
     },
     "./event-timeline/interactive": {
       "types": "./dist/charts/event-timeline/client.d.ts",
-      "import": "./dist/charts/event-timeline/client.js"
+      "import": "./dist/charts/event-timeline/client.js",
+      "default": "./dist/charts/event-timeline/client.js"
     },
     "./coverage-strip": {
       "types": "./dist/charts/coverage-strip/index.d.ts",
-      "import": "./dist/charts/coverage-strip/index.js"
+      "import": "./dist/charts/coverage-strip/index.js",
+      "default": "./dist/charts/coverage-strip/index.js"
     },
     "./coverage-strip/interactive": {
       "types": "./dist/charts/coverage-strip/client.d.ts",
-      "import": "./dist/charts/coverage-strip/client.js"
+      "import": "./dist/charts/coverage-strip/client.js",
+      "default": "./dist/charts/coverage-strip/client.js"
     },
     "./benchmark-strip": {
       "types": "./dist/charts/benchmark-strip/index.d.ts",
-      "import": "./dist/charts/benchmark-strip/index.js"
+      "import": "./dist/charts/benchmark-strip/index.js",
+      "default": "./dist/charts/benchmark-strip/index.js"
     },
     "./benchmark-strip/interactive": {
       "types": "./dist/charts/benchmark-strip/client.d.ts",
-      "import": "./dist/charts/benchmark-strip/client.js"
+      "import": "./dist/charts/benchmark-strip/client.js",
+      "default": "./dist/charts/benchmark-strip/client.js"
     },
     "./percentile-ladder": {
       "types": "./dist/charts/percentile-ladder/index.d.ts",
-      "import": "./dist/charts/percentile-ladder/index.js"
+      "import": "./dist/charts/percentile-ladder/index.js",
+      "default": "./dist/charts/percentile-ladder/index.js"
     },
     "./percentile-ladder/interactive": {
       "types": "./dist/charts/percentile-ladder/client.d.ts",
-      "import": "./dist/charts/percentile-ladder/client.js"
+      "import": "./dist/charts/percentile-ladder/client.js",
+      "default": "./dist/charts/percentile-ladder/client.js"
     },
     "./graded-band": {
       "types": "./dist/charts/graded-band/index.d.ts",
-      "import": "./dist/charts/graded-band/index.js"
+      "import": "./dist/charts/graded-band/index.js",
+      "default": "./dist/charts/graded-band/index.js"
     },
     "./graded-band/interactive": {
       "types": "./dist/charts/graded-band/client.d.ts",
-      "import": "./dist/charts/graded-band/client.js"
+      "import": "./dist/charts/graded-band/client.js",
+      "default": "./dist/charts/graded-band/client.js"
     },
     "./net-flow": {
       "types": "./dist/charts/net-flow/index.d.ts",
-      "import": "./dist/charts/net-flow/index.js"
+      "import": "./dist/charts/net-flow/index.js",
+      "default": "./dist/charts/net-flow/index.js"
     },
     "./retention-curve": {
       "types": "./dist/charts/retention-curve/index.d.ts",
-      "import": "./dist/charts/retention-curve/index.js"
+      "import": "./dist/charts/retention-curve/index.js",
+      "default": "./dist/charts/retention-curve/index.js"
     },
     "./retention-curve/interactive": {
       "types": "./dist/charts/retention-curve/client.d.ts",
-      "import": "./dist/charts/retention-curve/client.js"
+      "import": "./dist/charts/retention-curve/client.js",
+      "default": "./dist/charts/retention-curve/client.js"
     },
     "./burn-chart": {
       "types": "./dist/charts/burn-chart/index.d.ts",
-      "import": "./dist/charts/burn-chart/index.js"
+      "import": "./dist/charts/burn-chart/index.js",
+      "default": "./dist/charts/burn-chart/index.js"
     },
     "./burn-chart/interactive": {
       "types": "./dist/charts/burn-chart/client.d.ts",
-      "import": "./dist/charts/burn-chart/client.js"
+      "import": "./dist/charts/burn-chart/client.js",
+      "default": "./dist/charts/burn-chart/client.js"
     },
     "./error-budget": {
       "types": "./dist/charts/error-budget/index.d.ts",
-      "import": "./dist/charts/error-budget/index.js"
+      "import": "./dist/charts/error-budget/index.js",
+      "default": "./dist/charts/error-budget/index.js"
     },
     "./error-budget/interactive": {
       "types": "./dist/charts/error-budget/client.d.ts",
-      "import": "./dist/charts/error-budget/client.js"
+      "import": "./dist/charts/error-budget/client.js",
+      "default": "./dist/charts/error-budget/client.js"
     },
     "./control-strip": {
       "types": "./dist/charts/control-strip/index.d.ts",
-      "import": "./dist/charts/control-strip/index.js"
+      "import": "./dist/charts/control-strip/index.js",
+      "default": "./dist/charts/control-strip/index.js"
     },
     "./control-strip/interactive": {
       "types": "./dist/charts/control-strip/client.d.ts",
-      "import": "./dist/charts/control-strip/client.js"
+      "import": "./dist/charts/control-strip/client.js",
+      "default": "./dist/charts/control-strip/client.js"
     },
     "./forecast-cone": {
       "types": "./dist/charts/forecast-cone/index.d.ts",
-      "import": "./dist/charts/forecast-cone/index.js"
+      "import": "./dist/charts/forecast-cone/index.js",
+      "default": "./dist/charts/forecast-cone/index.js"
     },
     "./forecast-cone/interactive": {
       "types": "./dist/charts/forecast-cone/client.d.ts",
-      "import": "./dist/charts/forecast-cone/client.js"
+      "import": "./dist/charts/forecast-cone/client.js",
+      "default": "./dist/charts/forecast-cone/client.js"
     },
     "./quantile-dots": {
       "types": "./dist/charts/quantile-dots/index.d.ts",
-      "import": "./dist/charts/quantile-dots/index.js"
+      "import": "./dist/charts/quantile-dots/index.js",
+      "default": "./dist/charts/quantile-dots/index.js"
     },
     "./quantile-dots/interactive": {
       "types": "./dist/charts/quantile-dots/client.d.ts",
-      "import": "./dist/charts/quantile-dots/client.js"
+      "import": "./dist/charts/quantile-dots/client.js",
+      "default": "./dist/charts/quantile-dots/client.js"
     },
     "./ab-strips": {
       "types": "./dist/charts/ab-strips/index.d.ts",
-      "import": "./dist/charts/ab-strips/index.js"
+      "import": "./dist/charts/ab-strips/index.js",
+      "default": "./dist/charts/ab-strips/index.js"
     },
     "./ab-strips/interactive": {
       "types": "./dist/charts/ab-strips/client.d.ts",
-      "import": "./dist/charts/ab-strips/client.js"
+      "import": "./dist/charts/ab-strips/client.js",
+      "default": "./dist/charts/ab-strips/client.js"
     },
     "./shift-histogram": {
       "types": "./dist/charts/shift-histogram/index.d.ts",
-      "import": "./dist/charts/shift-histogram/index.js"
+      "import": "./dist/charts/shift-histogram/index.js",
+      "default": "./dist/charts/shift-histogram/index.js"
     },
     "./shift-histogram/interactive": {
       "types": "./dist/charts/shift-histogram/client.d.ts",
-      "import": "./dist/charts/shift-histogram/client.js"
+      "import": "./dist/charts/shift-histogram/client.js",
+      "default": "./dist/charts/shift-histogram/client.js"
     },
     "./pareto-strip": {
       "types": "./dist/charts/pareto-strip/index.d.ts",
-      "import": "./dist/charts/pareto-strip/index.js"
+      "import": "./dist/charts/pareto-strip/index.js",
+      "default": "./dist/charts/pareto-strip/index.js"
     },
     "./pareto-strip/interactive": {
       "types": "./dist/charts/pareto-strip/client.d.ts",
-      "import": "./dist/charts/pareto-strip/client.js"
+      "import": "./dist/charts/pareto-strip/client.js",
+      "default": "./dist/charts/pareto-strip/client.js"
     },
     "./data-diff": {
       "types": "./dist/charts/data-diff/index.d.ts",
-      "import": "./dist/charts/data-diff/index.js"
+      "import": "./dist/charts/data-diff/index.js",
+      "default": "./dist/charts/data-diff/index.js"
     },
     "./data-diff/interactive": {
       "types": "./dist/charts/data-diff/client.d.ts",
-      "import": "./dist/charts/data-diff/client.js"
+      "import": "./dist/charts/data-diff/client.js",
+      "default": "./dist/charts/data-diff/client.js"
     },
     "./quadrant-dot": {
       "types": "./dist/charts/quadrant-dot/index.d.ts",
-      "import": "./dist/charts/quadrant-dot/index.js"
+      "import": "./dist/charts/quadrant-dot/index.js",
+      "default": "./dist/charts/quadrant-dot/index.js"
     },
     "./quadrant-dot/interactive": {
       "types": "./dist/charts/quadrant-dot/client.d.ts",
-      "import": "./dist/charts/quadrant-dot/client.js"
+      "import": "./dist/charts/quadrant-dot/client.js",
+      "default": "./dist/charts/quadrant-dot/client.js"
     },
     "./cycle-plot": {
       "types": "./dist/charts/cycle-plot/index.d.ts",
-      "import": "./dist/charts/cycle-plot/index.js"
+      "import": "./dist/charts/cycle-plot/index.js",
+      "default": "./dist/charts/cycle-plot/index.js"
     },
     "./cycle-plot/interactive": {
       "types": "./dist/charts/cycle-plot/client.d.ts",
-      "import": "./dist/charts/cycle-plot/client.js"
+      "import": "./dist/charts/cycle-plot/client.js",
+      "default": "./dist/charts/cycle-plot/client.js"
     },
     "./change-point": {
       "types": "./dist/charts/change-point/index.d.ts",
-      "import": "./dist/charts/change-point/index.js"
+      "import": "./dist/charts/change-point/index.js",
+      "default": "./dist/charts/change-point/index.js"
     },
     "./change-point/interactive": {
       "types": "./dist/charts/change-point/client.d.ts",
-      "import": "./dist/charts/change-point/client.js"
+      "import": "./dist/charts/change-point/client.js",
+      "default": "./dist/charts/change-point/client.js"
     },
     "./ensemble-ghosts": {
       "types": "./dist/charts/ensemble-ghosts/index.d.ts",
-      "import": "./dist/charts/ensemble-ghosts/index.js"
+      "import": "./dist/charts/ensemble-ghosts/index.js",
+      "default": "./dist/charts/ensemble-ghosts/index.js"
     },
     "./ensemble-ghosts/interactive": {
       "types": "./dist/charts/ensemble-ghosts/client.d.ts",
-      "import": "./dist/charts/ensemble-ghosts/client.js"
+      "import": "./dist/charts/ensemble-ghosts/client.js",
+      "default": "./dist/charts/ensemble-ghosts/client.js"
     },
     "./tally-marks": {
       "types": "./dist/charts/tally-marks/index.d.ts",
-      "import": "./dist/charts/tally-marks/index.js"
+      "import": "./dist/charts/tally-marks/index.js",
+      "default": "./dist/charts/tally-marks/index.js"
     },
     "./tally-marks/interactive": {
       "types": "./dist/charts/tally-marks/client.d.ts",
-      "import": "./dist/charts/tally-marks/client.js"
+      "import": "./dist/charts/tally-marks/client.js",
+      "default": "./dist/charts/tally-marks/client.js"
     },
     "./dice-pips": {
       "types": "./dist/charts/dice-pips/index.d.ts",
-      "import": "./dist/charts/dice-pips/index.js"
+      "import": "./dist/charts/dice-pips/index.js",
+      "default": "./dist/charts/dice-pips/index.js"
     },
     "./dice-pips/interactive": {
       "types": "./dist/charts/dice-pips/client.d.ts",
-      "import": "./dist/charts/dice-pips/client.js"
+      "import": "./dist/charts/dice-pips/client.js",
+      "default": "./dist/charts/dice-pips/client.js"
     },
     "./fill-word": {
       "types": "./dist/charts/fill-word/index.d.ts",
-      "import": "./dist/charts/fill-word/index.js"
+      "import": "./dist/charts/fill-word/index.js",
+      "default": "./dist/charts/fill-word/index.js"
     },
     "./fill-word/interactive": {
       "types": "./dist/charts/fill-word/client.d.ts",
-      "import": "./dist/charts/fill-word/client.js"
+      "import": "./dist/charts/fill-word/client.js",
+      "default": "./dist/charts/fill-word/client.js"
     },
     "./fat-digits": {
       "types": "./dist/charts/fat-digits/index.d.ts",
-      "import": "./dist/charts/fat-digits/index.js"
+      "import": "./dist/charts/fat-digits/index.js",
+      "default": "./dist/charts/fat-digits/index.js"
     },
     "./fat-digits/interactive": {
       "types": "./dist/charts/fat-digits/client.d.ts",
-      "import": "./dist/charts/fat-digits/client.js"
+      "import": "./dist/charts/fat-digits/client.js",
+      "default": "./dist/charts/fat-digits/client.js"
     },
     "./thermometer": {
       "types": "./dist/charts/thermometer/index.d.ts",
-      "import": "./dist/charts/thermometer/index.js"
+      "import": "./dist/charts/thermometer/index.js",
+      "default": "./dist/charts/thermometer/index.js"
     },
     "./thermometer/interactive": {
       "types": "./dist/charts/thermometer/client.d.ts",
-      "import": "./dist/charts/thermometer/client.js"
+      "import": "./dist/charts/thermometer/client.js",
+      "default": "./dist/charts/thermometer/client.js"
     },
     "./moon-phase": {
       "types": "./dist/charts/moon-phase/index.d.ts",
-      "import": "./dist/charts/moon-phase/index.js"
+      "import": "./dist/charts/moon-phase/index.js",
+      "default": "./dist/charts/moon-phase/index.js"
     },
     "./moon-phase/interactive": {
       "types": "./dist/charts/moon-phase/client.d.ts",
-      "import": "./dist/charts/moon-phase/client.js"
+      "import": "./dist/charts/moon-phase/client.js",
+      "default": "./dist/charts/moon-phase/client.js"
     },
     "./hourglass": {
       "types": "./dist/charts/hourglass/index.d.ts",
-      "import": "./dist/charts/hourglass/index.js"
+      "import": "./dist/charts/hourglass/index.js",
+      "default": "./dist/charts/hourglass/index.js"
     },
     "./hourglass/interactive": {
       "types": "./dist/charts/hourglass/client.d.ts",
-      "import": "./dist/charts/hourglass/client.js"
+      "import": "./dist/charts/hourglass/client.js",
+      "default": "./dist/charts/hourglass/client.js"
     },
     "./balance-beam": {
       "types": "./dist/charts/balance-beam/index.d.ts",
-      "import": "./dist/charts/balance-beam/index.js"
+      "import": "./dist/charts/balance-beam/index.js",
+      "default": "./dist/charts/balance-beam/index.js"
     },
     "./balance-beam/interactive": {
       "types": "./dist/charts/balance-beam/client.d.ts",
-      "import": "./dist/charts/balance-beam/client.js"
+      "import": "./dist/charts/balance-beam/client.js",
+      "default": "./dist/charts/balance-beam/client.js"
     },
     "./sprout-row": {
       "types": "./dist/charts/sprout-row/index.d.ts",
-      "import": "./dist/charts/sprout-row/index.js"
+      "import": "./dist/charts/sprout-row/index.js",
+      "default": "./dist/charts/sprout-row/index.js"
     },
     "./sprout-row/interactive": {
       "types": "./dist/charts/sprout-row/client.d.ts",
-      "import": "./dist/charts/sprout-row/client.js"
+      "import": "./dist/charts/sprout-row/client.js",
+      "default": "./dist/charts/sprout-row/client.js"
     },
     "./garden-grid": {
       "types": "./dist/charts/garden-grid/index.d.ts",
-      "import": "./dist/charts/garden-grid/index.js"
+      "import": "./dist/charts/garden-grid/index.js",
+      "default": "./dist/charts/garden-grid/index.js"
     },
     "./garden-grid/interactive": {
       "types": "./dist/charts/garden-grid/client.d.ts",
-      "import": "./dist/charts/garden-grid/client.js"
+      "import": "./dist/charts/garden-grid/client.js",
+      "default": "./dist/charts/garden-grid/client.js"
     },
     "./bubble-row": {
       "types": "./dist/charts/bubble-row/index.d.ts",
-      "import": "./dist/charts/bubble-row/index.js"
+      "import": "./dist/charts/bubble-row/index.js",
+      "default": "./dist/charts/bubble-row/index.js"
     },
     "./bubble-row/interactive": {
       "types": "./dist/charts/bubble-row/client.d.ts",
-      "import": "./dist/charts/bubble-row/client.js"
+      "import": "./dist/charts/bubble-row/client.js",
+      "default": "./dist/charts/bubble-row/client.js"
     },
     "./music-staff": {
       "types": "./dist/charts/music-staff/index.d.ts",
-      "import": "./dist/charts/music-staff/index.js"
+      "import": "./dist/charts/music-staff/index.js",
+      "default": "./dist/charts/music-staff/index.js"
     },
     "./music-staff/interactive": {
       "types": "./dist/charts/music-staff/client.d.ts",
-      "import": "./dist/charts/music-staff/client.js"
+      "import": "./dist/charts/music-staff/client.js",
+      "default": "./dist/charts/music-staff/client.js"
     },
     "./tree-rings": {
       "types": "./dist/charts/tree-rings/index.d.ts",
-      "import": "./dist/charts/tree-rings/index.js"
+      "import": "./dist/charts/tree-rings/index.js",
+      "default": "./dist/charts/tree-rings/index.js"
     },
     "./tree-rings/interactive": {
       "types": "./dist/charts/tree-rings/client.d.ts",
-      "import": "./dist/charts/tree-rings/client.js"
+      "import": "./dist/charts/tree-rings/client.js",
+      "default": "./dist/charts/tree-rings/client.js"
     },
     "./city-skyline": {
       "types": "./dist/charts/city-skyline/index.d.ts",
-      "import": "./dist/charts/city-skyline/index.js"
+      "import": "./dist/charts/city-skyline/index.js",
+      "default": "./dist/charts/city-skyline/index.js"
     },
     "./city-skyline/interactive": {
       "types": "./dist/charts/city-skyline/client.d.ts",
-      "import": "./dist/charts/city-skyline/client.js"
+      "import": "./dist/charts/city-skyline/client.js",
+      "default": "./dist/charts/city-skyline/client.js"
     },
     "./honeycomb": {
       "types": "./dist/charts/honeycomb/index.d.ts",
-      "import": "./dist/charts/honeycomb/index.js"
+      "import": "./dist/charts/honeycomb/index.js",
+      "default": "./dist/charts/honeycomb/index.js"
     },
     "./honeycomb/interactive": {
       "types": "./dist/charts/honeycomb/client.d.ts",
-      "import": "./dist/charts/honeycomb/client.js"
+      "import": "./dist/charts/honeycomb/client.js",
+      "default": "./dist/charts/honeycomb/client.js"
     },
     "./constellation": {
       "types": "./dist/charts/constellation/index.d.ts",
-      "import": "./dist/charts/constellation/index.js"
+      "import": "./dist/charts/constellation/index.js",
+      "default": "./dist/charts/constellation/index.js"
     },
     "./constellation/interactive": {
       "types": "./dist/charts/constellation/client.d.ts",
-      "import": "./dist/charts/constellation/client.js"
+      "import": "./dist/charts/constellation/client.js",
+      "default": "./dist/charts/constellation/client.js"
     },
     "./polar-clock": {
       "types": "./dist/charts/polar-clock/index.d.ts",
-      "import": "./dist/charts/polar-clock/index.js"
+      "import": "./dist/charts/polar-clock/index.js",
+      "default": "./dist/charts/polar-clock/index.js"
     },
     "./polar-clock/interactive": {
       "types": "./dist/charts/polar-clock/client.d.ts",
-      "import": "./dist/charts/polar-clock/client.js"
+      "import": "./dist/charts/polar-clock/client.js",
+      "default": "./dist/charts/polar-clock/client.js"
     },
     "./spiral-year": {
       "types": "./dist/charts/spiral-year/index.d.ts",
-      "import": "./dist/charts/spiral-year/index.js"
+      "import": "./dist/charts/spiral-year/index.js",
+      "default": "./dist/charts/spiral-year/index.js"
     },
     "./spiral-year/interactive": {
       "types": "./dist/charts/spiral-year/client.d.ts",
-      "import": "./dist/charts/spiral-year/client.js"
+      "import": "./dist/charts/spiral-year/client.js",
+      "default": "./dist/charts/spiral-year/client.js"
     },
     "./breathing-dot": {
       "types": "./dist/charts/breathing-dot/index.d.ts",
-      "import": "./dist/charts/breathing-dot/index.js"
+      "import": "./dist/charts/breathing-dot/index.js",
+      "default": "./dist/charts/breathing-dot/index.js"
     },
     "./breathing-dot/interactive": {
       "types": "./dist/charts/breathing-dot/client.d.ts",
-      "import": "./dist/charts/breathing-dot/client.js"
+      "import": "./dist/charts/breathing-dot/client.js",
+      "default": "./dist/charts/breathing-dot/client.js"
     },
     "./heartbeat-blip": {
       "types": "./dist/charts/heartbeat-blip/index.d.ts",
-      "import": "./dist/charts/heartbeat-blip/index.js"
+      "import": "./dist/charts/heartbeat-blip/index.js",
+      "default": "./dist/charts/heartbeat-blip/index.js"
     },
     "./heartbeat-blip/interactive": {
       "types": "./dist/charts/heartbeat-blip/client.d.ts",
-      "import": "./dist/charts/heartbeat-blip/client.js"
+      "import": "./dist/charts/heartbeat-blip/client.js",
+      "default": "./dist/charts/heartbeat-blip/client.js"
     },
     "./comet-trail": {
       "types": "./dist/charts/comet-trail/index.d.ts",
-      "import": "./dist/charts/comet-trail/index.js"
+      "import": "./dist/charts/comet-trail/index.js",
+      "default": "./dist/charts/comet-trail/index.js"
     },
     "./comet-trail/interactive": {
       "types": "./dist/charts/comet-trail/client.d.ts",
-      "import": "./dist/charts/comet-trail/client.js"
+      "import": "./dist/charts/comet-trail/client.js",
+      "default": "./dist/charts/comet-trail/client.js"
     },
     "./orbit-status": {
       "types": "./dist/charts/orbit-status/index.d.ts",
-      "import": "./dist/charts/orbit-status/index.js"
+      "import": "./dist/charts/orbit-status/index.js",
+      "default": "./dist/charts/orbit-status/index.js"
     },
     "./orbit-status/interactive": {
       "types": "./dist/charts/orbit-status/client.d.ts",
-      "import": "./dist/charts/orbit-status/client.js"
+      "import": "./dist/charts/orbit-status/client.js",
+      "default": "./dist/charts/orbit-status/client.js"
     },
     "./net-flow/interactive": {
       "types": "./dist/charts/net-flow/client.d.ts",
-      "import": "./dist/charts/net-flow/client.js"
+      "import": "./dist/charts/net-flow/client.js",
+      "default": "./dist/charts/net-flow/client.js"
     },
     "./rate-volume": {
       "types": "./dist/charts/rate-volume/index.d.ts",
-      "import": "./dist/charts/rate-volume/index.js"
+      "import": "./dist/charts/rate-volume/index.js",
+      "default": "./dist/charts/rate-volume/index.js"
     },
     "./rate-volume/interactive": {
       "types": "./dist/charts/rate-volume/client.d.ts",
-      "import": "./dist/charts/rate-volume/client.js"
+      "import": "./dist/charts/rate-volume/client.js",
+      "default": "./dist/charts/rate-volume/client.js"
     },
     "./icon-array": {
       "types": "./dist/charts/icon-array/index.d.ts",
-      "import": "./dist/charts/icon-array/index.js"
+      "import": "./dist/charts/icon-array/index.js",
+      "default": "./dist/charts/icon-array/index.js"
     },
     "./icon-array/interactive": {
       "types": "./dist/charts/icon-array/client.d.ts",
-      "import": "./dist/charts/icon-array/client.js"
+      "import": "./dist/charts/icon-array/client.js",
+      "default": "./dist/charts/icon-array/client.js"
     },
     "./time-in-range": {
       "types": "./dist/charts/time-in-range/index.d.ts",
-      "import": "./dist/charts/time-in-range/index.js"
+      "import": "./dist/charts/time-in-range/index.js",
+      "default": "./dist/charts/time-in-range/index.js"
     },
     "./time-in-range/interactive": {
       "types": "./dist/charts/time-in-range/client.d.ts",
-      "import": "./dist/charts/time-in-range/client.js"
+      "import": "./dist/charts/time-in-range/client.js",
+      "default": "./dist/charts/time-in-range/client.js"
     },
     "./hypnogram": {
       "types": "./dist/charts/hypnogram/index.d.ts",
-      "import": "./dist/charts/hypnogram/index.js"
+      "import": "./dist/charts/hypnogram/index.js",
+      "default": "./dist/charts/hypnogram/index.js"
     },
     "./hypnogram/interactive": {
       "types": "./dist/charts/hypnogram/client.d.ts",
-      "import": "./dist/charts/hypnogram/client.js"
+      "import": "./dist/charts/hypnogram/client.js",
+      "default": "./dist/charts/hypnogram/client.js"
     },
     "./eta-bar": {
       "types": "./dist/charts/eta-bar/index.d.ts",
-      "import": "./dist/charts/eta-bar/index.js"
+      "import": "./dist/charts/eta-bar/index.js",
+      "default": "./dist/charts/eta-bar/index.js"
     },
     "./eta-bar/interactive": {
       "types": "./dist/charts/eta-bar/client.d.ts",
-      "import": "./dist/charts/eta-bar/client.js"
+      "import": "./dist/charts/eta-bar/client.js",
+      "default": "./dist/charts/eta-bar/client.js"
     },
     "./waveform": {
       "types": "./dist/charts/waveform/index.d.ts",
-      "import": "./dist/charts/waveform/index.js"
+      "import": "./dist/charts/waveform/index.js",
+      "default": "./dist/charts/waveform/index.js"
     },
     "./waveform/interactive": {
       "types": "./dist/charts/waveform/client.d.ts",
-      "import": "./dist/charts/waveform/client.js"
+      "import": "./dist/charts/waveform/client.js",
+      "default": "./dist/charts/waveform/client.js"
     },
     "./event-raster": {
       "types": "./dist/charts/event-raster/index.d.ts",
-      "import": "./dist/charts/event-raster/index.js"
+      "import": "./dist/charts/event-raster/index.js",
+      "default": "./dist/charts/event-raster/index.js"
     },
     "./event-raster/interactive": {
       "types": "./dist/charts/event-raster/client.d.ts",
-      "import": "./dist/charts/event-raster/client.js"
+      "import": "./dist/charts/event-raster/client.js",
+      "default": "./dist/charts/event-raster/client.js"
     },
     "./rubric-strip": {
       "types": "./dist/charts/rubric-strip/index.d.ts",
-      "import": "./dist/charts/rubric-strip/index.js"
+      "import": "./dist/charts/rubric-strip/index.js",
+      "default": "./dist/charts/rubric-strip/index.js"
     },
     "./rubric-strip/interactive": {
       "types": "./dist/charts/rubric-strip/client.d.ts",
-      "import": "./dist/charts/rubric-strip/client.js"
+      "import": "./dist/charts/rubric-strip/client.js",
+      "default": "./dist/charts/rubric-strip/client.js"
     },
     "./token-confidence": {
       "types": "./dist/charts/token-confidence/index.d.ts",
-      "import": "./dist/charts/token-confidence/index.js"
+      "import": "./dist/charts/token-confidence/index.js",
+      "default": "./dist/charts/token-confidence/index.js"
     },
     "./token-confidence/interactive": {
       "types": "./dist/charts/token-confidence/client.d.ts",
-      "import": "./dist/charts/token-confidence/client.js"
+      "import": "./dist/charts/token-confidence/client.js",
+      "default": "./dist/charts/token-confidence/client.js"
     },
     "./wind-barb": {
       "types": "./dist/charts/wind-barb/index.d.ts",
-      "import": "./dist/charts/wind-barb/index.js"
+      "import": "./dist/charts/wind-barb/index.js",
+      "default": "./dist/charts/wind-barb/index.js"
     },
     "./star-spoke": {
       "types": "./dist/charts/star-spoke/index.d.ts",
-      "import": "./dist/charts/star-spoke/index.js"
+      "import": "./dist/charts/star-spoke/index.js",
+      "default": "./dist/charts/star-spoke/index.js"
     },
     "./star-spoke/interactive": {
       "types": "./dist/charts/star-spoke/client.d.ts",
-      "import": "./dist/charts/star-spoke/client.js"
+      "import": "./dist/charts/star-spoke/client.js",
+      "default": "./dist/charts/star-spoke/client.js"
     },
     "./minimap-strip": {
       "types": "./dist/charts/minimap-strip/index.d.ts",
-      "import": "./dist/charts/minimap-strip/index.js"
+      "import": "./dist/charts/minimap-strip/index.js",
+      "default": "./dist/charts/minimap-strip/index.js"
     },
     "./minimap-strip/interactive": {
       "types": "./dist/charts/minimap-strip/client.d.ts",
-      "import": "./dist/charts/minimap-strip/client.js"
+      "import": "./dist/charts/minimap-strip/client.js",
+      "default": "./dist/charts/minimap-strip/client.js"
     },
     "./dual-window-meter": {
       "types": "./dist/charts/dual-window-meter/index.d.ts",
-      "import": "./dist/charts/dual-window-meter/index.js"
+      "import": "./dist/charts/dual-window-meter/index.js",
+      "default": "./dist/charts/dual-window-meter/index.js"
     },
     "./dual-window-meter/interactive": {
       "types": "./dist/charts/dual-window-meter/client.d.ts",
-      "import": "./dist/charts/dual-window-meter/client.js"
+      "import": "./dist/charts/dual-window-meter/client.js",
+      "default": "./dist/charts/dual-window-meter/client.js"
     },
     "./depth-wedge": {
       "types": "./dist/charts/depth-wedge/index.d.ts",
-      "import": "./dist/charts/depth-wedge/index.js"
+      "import": "./dist/charts/depth-wedge/index.js",
+      "default": "./dist/charts/depth-wedge/index.js"
     },
     "./depth-wedge/interactive": {
       "types": "./dist/charts/depth-wedge/client.d.ts",
-      "import": "./dist/charts/depth-wedge/client.js"
+      "import": "./dist/charts/depth-wedge/client.js",
+      "default": "./dist/charts/depth-wedge/client.js"
     },
     "./partition-strip": {
       "types": "./dist/charts/partition-strip/index.d.ts",
-      "import": "./dist/charts/partition-strip/index.js"
+      "import": "./dist/charts/partition-strip/index.js",
+      "default": "./dist/charts/partition-strip/index.js"
     },
     "./partition-strip/interactive": {
       "types": "./dist/charts/partition-strip/client.d.ts",
-      "import": "./dist/charts/partition-strip/client.js"
+      "import": "./dist/charts/partition-strip/client.js",
+      "default": "./dist/charts/partition-strip/client.js"
     },
     "./calibration-strip": {
       "types": "./dist/charts/calibration-strip/index.d.ts",
-      "import": "./dist/charts/calibration-strip/index.js"
+      "import": "./dist/charts/calibration-strip/index.js",
+      "default": "./dist/charts/calibration-strip/index.js"
     },
     "./calibration-strip/interactive": {
       "types": "./dist/charts/calibration-strip/client.d.ts",
-      "import": "./dist/charts/calibration-strip/client.js"
+      "import": "./dist/charts/calibration-strip/client.js",
+      "default": "./dist/charts/calibration-strip/client.js"
     },
     "./confusion-grid": {
       "types": "./dist/charts/confusion-grid/index.d.ts",
-      "import": "./dist/charts/confusion-grid/index.js"
+      "import": "./dist/charts/confusion-grid/index.js",
+      "default": "./dist/charts/confusion-grid/index.js"
     },
     "./confusion-grid/interactive": {
       "types": "./dist/charts/confusion-grid/client.d.ts",
-      "import": "./dist/charts/confusion-grid/client.js"
+      "import": "./dist/charts/confusion-grid/client.js",
+      "default": "./dist/charts/confusion-grid/client.js"
     },
     "./folded-day-band": {
       "types": "./dist/charts/folded-day-band/index.d.ts",
-      "import": "./dist/charts/folded-day-band/index.js"
+      "import": "./dist/charts/folded-day-band/index.js",
+      "default": "./dist/charts/folded-day-band/index.js"
     },
     "./folded-day-band/interactive": {
       "types": "./dist/charts/folded-day-band/client.d.ts",
-      "import": "./dist/charts/folded-day-band/client.js"
+      "import": "./dist/charts/folded-day-band/client.js",
+      "default": "./dist/charts/folded-day-band/client.js"
     },
     "./volume-profile": {
       "types": "./dist/charts/volume-profile/index.d.ts",
-      "import": "./dist/charts/volume-profile/index.js"
+      "import": "./dist/charts/volume-profile/index.js",
+      "default": "./dist/charts/volume-profile/index.js"
     },
     "./volume-profile/interactive": {
       "types": "./dist/charts/volume-profile/client.d.ts",
-      "import": "./dist/charts/volume-profile/client.js"
+      "import": "./dist/charts/volume-profile/client.js",
+      "default": "./dist/charts/volume-profile/client.js"
     },
     "./phase-trace": {
       "types": "./dist/charts/phase-trace/index.d.ts",
-      "import": "./dist/charts/phase-trace/index.js"
+      "import": "./dist/charts/phase-trace/index.js",
+      "default": "./dist/charts/phase-trace/index.js"
     },
     "./phase-trace/interactive": {
       "types": "./dist/charts/phase-trace/client.d.ts",
-      "import": "./dist/charts/phase-trace/client.js"
+      "import": "./dist/charts/phase-trace/client.js",
+      "default": "./dist/charts/phase-trace/client.js"
     },
     "./trace-fold": {
       "types": "./dist/charts/trace-fold/index.d.ts",
-      "import": "./dist/charts/trace-fold/index.js"
+      "import": "./dist/charts/trace-fold/index.js",
+      "default": "./dist/charts/trace-fold/index.js"
     },
     "./trace-fold/interactive": {
       "types": "./dist/charts/trace-fold/client.d.ts",
-      "import": "./dist/charts/trace-fold/client.js"
+      "import": "./dist/charts/trace-fold/client.js",
+      "default": "./dist/charts/trace-fold/client.js"
     },
     "./tape-gauge": {
       "types": "./dist/charts/tape-gauge/index.d.ts",
-      "import": "./dist/charts/tape-gauge/index.js"
+      "import": "./dist/charts/tape-gauge/index.js",
+      "default": "./dist/charts/tape-gauge/index.js"
     },
     "./tape-gauge/interactive": {
       "types": "./dist/charts/tape-gauge/client.d.ts",
-      "import": "./dist/charts/tape-gauge/client.js"
+      "import": "./dist/charts/tape-gauge/client.js",
+      "default": "./dist/charts/tape-gauge/client.js"
     },
     "./station-glyph": {
       "types": "./dist/charts/station-glyph/index.d.ts",
-      "import": "./dist/charts/station-glyph/index.js"
+      "import": "./dist/charts/station-glyph/index.js",
+      "default": "./dist/charts/station-glyph/index.js"
     },
     "./station-glyph/interactive": {
       "types": "./dist/charts/station-glyph/client.d.ts",
-      "import": "./dist/charts/station-glyph/client.js"
+      "import": "./dist/charts/station-glyph/client.js",
+      "default": "./dist/charts/station-glyph/client.js"
     },
     "./cohort-triangle": {
       "types": "./dist/charts/cohort-triangle/index.d.ts",
-      "import": "./dist/charts/cohort-triangle/index.js"
+      "import": "./dist/charts/cohort-triangle/index.js",
+      "default": "./dist/charts/cohort-triangle/index.js"
     },
     "./cohort-triangle/interactive": {
       "types": "./dist/charts/cohort-triangle/client.d.ts",
-      "import": "./dist/charts/cohort-triangle/client.js"
+      "import": "./dist/charts/cohort-triangle/client.js",
+      "default": "./dist/charts/cohort-triangle/client.js"
     },
     "./streak-spark": {
       "types": "./dist/charts/streak-spark/index.d.ts",
-      "import": "./dist/charts/streak-spark/index.js"
+      "import": "./dist/charts/streak-spark/index.js",
+      "default": "./dist/charts/streak-spark/index.js"
     },
     "./streak-spark/interactive": {
       "types": "./dist/charts/streak-spark/client.d.ts",
-      "import": "./dist/charts/streak-spark/client.js"
+      "import": "./dist/charts/streak-spark/client.js",
+      "default": "./dist/charts/streak-spark/client.js"
     },
     "./grade-profile": {
       "types": "./dist/charts/grade-profile/index.d.ts",
-      "import": "./dist/charts/grade-profile/index.js"
+      "import": "./dist/charts/grade-profile/index.js",
+      "default": "./dist/charts/grade-profile/index.js"
     },
     "./grade-profile/interactive": {
       "types": "./dist/charts/grade-profile/client.d.ts",
-      "import": "./dist/charts/grade-profile/client.js"
+      "import": "./dist/charts/grade-profile/client.js",
+      "default": "./dist/charts/grade-profile/client.js"
     },
     "./win-prob-worm": {
       "types": "./dist/charts/win-prob-worm/index.d.ts",
-      "import": "./dist/charts/win-prob-worm/index.js"
+      "import": "./dist/charts/win-prob-worm/index.js",
+      "default": "./dist/charts/win-prob-worm/index.js"
     },
     "./win-prob-worm/interactive": {
       "types": "./dist/charts/win-prob-worm/client.d.ts",
-      "import": "./dist/charts/win-prob-worm/client.js"
+      "import": "./dist/charts/win-prob-worm/client.js",
+      "default": "./dist/charts/win-prob-worm/client.js"
     },
     "./queue-depth": {
       "types": "./dist/charts/queue-depth/index.d.ts",
-      "import": "./dist/charts/queue-depth/index.js"
+      "import": "./dist/charts/queue-depth/index.js",
+      "default": "./dist/charts/queue-depth/index.js"
     },
     "./queue-depth/interactive": {
       "types": "./dist/charts/queue-depth/client.d.ts",
-      "import": "./dist/charts/queue-depth/client.js"
+      "import": "./dist/charts/queue-depth/client.js",
+      "default": "./dist/charts/queue-depth/client.js"
     },
     "./spread-band": {
       "types": "./dist/charts/spread-band/index.d.ts",
-      "import": "./dist/charts/spread-band/index.js"
+      "import": "./dist/charts/spread-band/index.js",
+      "default": "./dist/charts/spread-band/index.js"
     },
     "./spread-band/interactive": {
       "types": "./dist/charts/spread-band/client.d.ts",
-      "import": "./dist/charts/spread-band/client.js"
+      "import": "./dist/charts/spread-band/client.js",
+      "default": "./dist/charts/spread-band/client.js"
     },
     "./bias-strip": {
       "types": "./dist/charts/bias-strip/index.d.ts",
-      "import": "./dist/charts/bias-strip/index.js"
+      "import": "./dist/charts/bias-strip/index.js",
+      "default": "./dist/charts/bias-strip/index.js"
     },
     "./bias-strip/interactive": {
       "types": "./dist/charts/bias-strip/client.d.ts",
-      "import": "./dist/charts/bias-strip/client.js"
+      "import": "./dist/charts/bias-strip/client.js",
+      "default": "./dist/charts/bias-strip/client.js"
     },
     "./percentile-trace": {
       "types": "./dist/charts/percentile-trace/index.d.ts",
-      "import": "./dist/charts/percentile-trace/index.js"
+      "import": "./dist/charts/percentile-trace/index.js",
+      "default": "./dist/charts/percentile-trace/index.js"
     },
     "./percentile-trace/interactive": {
       "types": "./dist/charts/percentile-trace/client.d.ts",
-      "import": "./dist/charts/percentile-trace/client.js"
+      "import": "./dist/charts/percentile-trace/client.js",
+      "default": "./dist/charts/percentile-trace/client.js"
     },
     "./annotations": {
       "types": "./dist/annotations.d.ts",
-      "import": "./dist/annotations.js"
+      "import": "./dist/annotations.js",
+      "default": "./dist/annotations.js"
     },
     "./motion": {
       "types": "./dist/shared/motion-engine.d.ts",
-      "import": "./dist/shared/motion-engine.js"
+      "import": "./dist/shared/motion-engine.js",
+      "default": "./dist/shared/motion-engine.js"
     },
     "./styles.css": "./styles.css",
     "./styles/core.css": "./dist/styles/core.css",
