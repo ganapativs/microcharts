@@ -1,20 +1,26 @@
 {
   "name": "@microcharts/react",
   "version": "0.1.0",
-  "description": "Word-sized charts for React. Zero dependencies, tiny, accessible by default.",
+  "description": "Word-sized charts for React, made for LLMs and humans. 106 chart types, zero runtime dependencies, 0.9–3.6 kB gzip each, accessible by default, and server-component safe.",
   "keywords": [
     "accessible",
+    "ai",
     "chart",
     "charts",
     "dataviz",
+    "llm",
     "microchart",
+    "microcharts",
     "react",
+    "react-server-components",
     "rsc",
+    "server-components",
     "sparkline",
     "svg",
+    "visualization",
     "zero-dependency"
   ],
-  "homepage": "https://github.com/ganapativs/microcharts#readme",
+  "homepage": "https://microcharts.dev",
   "bugs": {
     "url": "https://github.com/ganapativs/microcharts/issues"
   },
