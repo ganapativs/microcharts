@@ -1,14 +1,14 @@
 <div align="center">
 
-# microcharts
+<img src="assets/promo.png" alt="microcharts — word-sized charts for React, made for AI first and for the people reading what it writes. 106 chart types, zero dependencies, 0.91–3.61 kB gzip each." width="920">
 
-**Word-sized charts for React — made for AI first, and for the people reading what it writes.**
+<br>
 
-[![npm](https://img.shields.io/npm/v/@microcharts/react?color=0072b2&label=npm)](https://www.npmjs.com/package/@microcharts/react)
-[![gzip per chart](https://img.shields.io/badge/per_chart-0.9–3.6_kB_gz-0072b2)](https://microcharts.dev/docs/performance)
-[![zero dependencies](https://img.shields.io/badge/dependencies-0-009e73)](https://microcharts.dev)
-[![types](https://img.shields.io/npm/types/@microcharts/react?color=0072b2)](https://microcharts.dev)
-[![React 18 · 19](https://img.shields.io/badge/React-18_·_19-009e73)](https://microcharts.dev/docs/quickstart)
+[![npm](https://img.shields.io/npm/v/@microcharts/react?color=2f52d4&label=npm)](https://www.npmjs.com/package/@microcharts/react)
+[![gzip per chart](https://img.shields.io/badge/per_chart-0.91–3.61_kB_gz-2f52d4)](https://microcharts.dev/docs/performance)
+[![zero dependencies](https://img.shields.io/badge/dependencies-0-077353)](https://microcharts.dev)
+[![types](https://img.shields.io/npm/types/@microcharts/react?color=2f52d4)](https://microcharts.dev)
+[![React 18 · 19](https://img.shields.io/badge/React-18_·_19-077353)](https://microcharts.dev/docs/quickstart)
 [![MIT](https://img.shields.io/npm/l/@microcharts/react?color=666)](./LICENSE)
 
 **[Docs](https://microcharts.dev)** · **[Gallery](https://microcharts.dev/docs/charts)** · **[Quickstart](https://microcharts.dev/docs/quickstart)** · **[AI usage](https://microcharts.dev/docs/ai)** · **[llms.txt](https://microcharts.dev/llms.txt)**
