@@ -22,12 +22,14 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const ROOT = process.cwd();
-const SVG = join(ROOT, "assets/promo.svg");
-const PNG = join(ROOT, "assets/promo.png");
-const PUBLIC = join(ROOT, "apps/docs/public/promo.png");
-// The SVG is 1200px wide; sharp reads SVG at 72dpi, so density 192 ≈ 2.7× →
-// a crisp ~3200px render that stays legible when GitHub scales it to ~920px.
-const DENSITY = 192;
+// sharp reads SVG at 72dpi, so `density` sets the raster scale. Each image is
+// mirrored to apps/docs/public/ so microcharts.dev/<name>.png stays in sync.
+const IMAGES = [
+  // README hero — 1200×420 wide banner, density 192 ≈ 2.7× → ~3200px.
+  { name: "promo", density: 192 },
+  // GitHub social preview — 1280×640 (2:1), density 144 = 2× → 2560×1280.
+  { name: "social", density: 144 },
+];
 
 /** Find sharp in the pnpm store (avoids a declared dep + keeps knip quiet). */
 async function loadSharp() {
@@ -50,11 +52,15 @@ async function loadSharp() {
   );
 }
 
-if (!existsSync(SVG)) throw new Error(`missing ${SVG}`);
-
 const sharp = await loadSharp();
-await sharp(readFileSync(SVG), { density: DENSITY }).png({ compressionLevel: 9 }).toFile(PNG);
-copyFileSync(PNG, PUBLIC);
 
-const kb = (statSync(PNG).size / 1024).toFixed(1);
-console.log(`promo.png regenerated (${kb} kB) → assets/ + apps/docs/public/`);
+for (const { name, density } of IMAGES) {
+  const svg = join(ROOT, `assets/${name}.svg`);
+  const png = join(ROOT, `assets/${name}.png`);
+  const pub = join(ROOT, `apps/docs/public/${name}.png`);
+  if (!existsSync(svg)) throw new Error(`missing ${svg}`);
+  await sharp(readFileSync(svg), { density }).png({ compressionLevel: 9 }).toFile(png);
+  copyFileSync(png, pub);
+  const kb = (statSync(png).size / 1024).toFixed(1);
+  console.log(`${name}.png regenerated (${kb} kB) → assets/ + apps/docs/public/`);
+}
