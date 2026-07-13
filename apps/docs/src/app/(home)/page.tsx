@@ -9,6 +9,7 @@ import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { getModule } from "@/lib/charts/registry";
 import { LivingCatalog } from "@/components/home/living-catalog";
 import { StreamVignette } from "@/components/home/stream-vignette";
+import { FourContexts } from "@/components/charts/contexts";
 import { SurfaceCarousel } from "@/components/home/surface-carousel";
 import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
 import { InstallCommand } from "@/components/ui/copy";
@@ -409,30 +410,32 @@ export default function HomePage() {
 
       {/* ── 05 · Where they live ─────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <SectionMark n="05">One chart, every surface</SectionMark>
+        <SectionMark n="05">One chart, four homes</SectionMark>
+        <Reveal className="mb-2 max-w-2xl">
+          <h2 className="display text-[length:var(--text-fluid-h2)]">
+            Built to live inside your interface.
+          </h2>
+          <p className="mt-4 max-w-xl text-fd-muted-foreground">
+            The same component, doing its job in a sentence, a table cell, a KPI card, and a tab.
+          </p>
+        </Reveal>
+        <Reveal>
+          <FourContexts slug="sparkline" />
+        </Reveal>
+      </section>
+
+      {/* ── 05b · Every surface ──────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <SectionMark n="05b">One chart, every surface</SectionMark>
         <div className="grid items-center gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-12">
           <Reveal>
             <h2 className="display text-[length:var(--text-fluid-h2)]">
-              Built to live inside your interface.
+              The same mark in product, report, and docs.
             </h2>
             <p className="mt-4 max-w-md text-fd-muted-foreground">
-              The chart a model writes is the same one your product renders, your report exports,
-              and your docs embed — because it&rsquo;s plain SVG that reads from <code>data</code>{" "}
-              alone, &ldquo;interface&rdquo; isn&rsquo;t just a browser tab.
+              The chart a model writes is the one your product renders, your report exports, and
+              your docs embed — plain SVG from <code>data</code> alone.
             </p>
-            <ul className="mt-6 flex flex-col gap-2.5">
-              {[
-                ["In the product", "table cells, KPI cards, tabs, dashboards"],
-                ["In a report", "a figure in a rendered slide or PDF"],
-                ["In the docs", "inline in Markdown — these pages do it live"],
-                ["In an AI reply", "streamed mid-sentence, as above"],
-              ].map(([k, v]) => (
-                <li key={k} className="flex items-baseline gap-2.5 text-sm">
-                  <span className="w-28 shrink-0 font-medium text-fd-foreground">{k}</span>
-                  <span className="text-fd-muted-foreground">{v}</span>
-                </li>
-              ))}
-            </ul>
           </Reveal>
           <Reveal delay={80}>
             <SurfaceCarousel />

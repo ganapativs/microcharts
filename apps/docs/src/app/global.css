@@ -2043,8 +2043,12 @@ div:where(
   }
 
   /* ── Instrument grid behind the cluster ──────────────────────────────────
-     One vertical axis, horizontal rules in explicit row-gap bands, and nodes
-     at each gap — geometry comes from layout, not percentage guesses. */
+     One vertical axis, three horizontal rules (one under each chart row), and
+     nodes at the two row gaps (no border, no centre hub). Soft accent signals
+     travel down the vertical axis AND across each horizontal, so the board
+     reads like a live instrument. Paint-only (background-position on 1px
+     lines); matte, low-opacity. The rounded bound lives on the outer bloom
+     layer (inline style), not here. */
   .hx-cross-line {
     position: absolute;
     overflow: hidden;
@@ -2052,8 +2056,8 @@ div:where(
   }
   .hx-cross-v {
     left: 50%;
-    top: 0;
-    bottom: 0;
+    top: 7%;
+    bottom: 7%;
     width: 1px;
     transform: translateX(-0.5px);
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
