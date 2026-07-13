@@ -149,7 +149,7 @@ export const playground: PlaygroundSpec = {
       s.normalize === true && "  normalize",
       s.label !== "spread" && `  label="${s.label}"`,
       s.levels !== 2 && `  levels={${s.levels}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -187,9 +187,14 @@ export function markCode(): string {
   return `<DepthWedge data={{ demand, supply }} />`;
 }
 
+export function PreviewLive() {
+  return <DepthWedgeInteractive data={BOOK} summary={false} width={130} height={24} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

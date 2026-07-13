@@ -1,5 +1,5 @@
 "use client";
-// Interactive <MicroDonut> (plan/22 #18). Pointer → wedge by atan2 angle
+// Interactive <MicroDonut>. Pointer → wedge by atan2 angle
 // lookup (pure); ←/→ rove wedges. Disabled entirely when `decorative` — an
 // aria-hidden chart must not be a tab stop. Composes the static component.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

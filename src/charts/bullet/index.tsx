@@ -1,8 +1,8 @@
-// <Bullet> — value vs target vs qualitative bands (plan/05 §2, S4). Ships
+// <Bullet> — value vs target vs qualitative bands. Ships
 // instead of a gauge (Few). Static, hook-free, RSC-safe. Graduated neutral
 // bands sit lowest; the measure bar and target tick carry the reading. The tick
 // is a distinct shape+position from the bar, so target vs measure never relies
-// on color alone (plan/08 1.4.1).
+// on color alone.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter } from "../../core/format.js";

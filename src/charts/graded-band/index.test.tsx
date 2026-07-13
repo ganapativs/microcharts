@@ -8,7 +8,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const SAMPLE = Array.from({ length: 101 }, (_, i) => i);
 
-describe("<GradedBand> (plan/23 #4, S1)", () => {
+describe("<GradedBand>", () => {
   it("summary states median + innermost and outermost intervals — the real string", () => {
     const { container } = draw(<GradedBand data={SAMPLE} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

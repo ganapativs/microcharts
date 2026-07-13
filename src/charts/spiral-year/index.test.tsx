@@ -9,7 +9,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 // 52 weeks peaking at week 30 (index 29), low at week 6 (index 5).
 const YEAR = Array.from({ length: 52 }, (_, i) => (i === 29 ? 480 : i === 5 ? 10 : 100 + i));
 
-describe("<SpiralYear> (plan/24 #18)", () => {
+describe("<SpiralYear>", () => {
   it("summary names the count, peak, and low with period labels", () => {
     const { container } = draw(<SpiralYear data={YEAR} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

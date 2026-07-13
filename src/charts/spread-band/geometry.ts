@@ -1,4 +1,4 @@
-// SpreadBand geometry — pure, React-free (plan/26 §6). Which of two series leads,
+// SpreadBand geometry — pure, React-free. Which of two series leads,
 // by how much, since when: subject (a) and reference (b) on ONE shared domain,
 // with the SIGNED gap between them filled and split at interpolated crossings.
 // A null in either series is a gap in BOTH (the gap is undefined there), so the

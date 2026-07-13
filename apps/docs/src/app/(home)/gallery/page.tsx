@@ -3,21 +3,22 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { docsMeta } from "@/lib/metadata";
-import { CHART_MODULES, STABLE_CHARTS } from "@/lib/charts/registry";
+import { STABLE_CHARTS } from "@/lib/charts/registry";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
 import { GalleryDock } from "./gallery-dock";
+import { GalleryStage } from "./gallery-stage";
 
 export const metadata: Metadata = docsMeta({
   title: "Gallery",
   description:
-    "The full microcharts catalog as one immersive plane — every shipped chart at true word-size, searchable, filterable, and tilting to your cursor. A contact sheet for word-sized instruments.",
+    "Every shipped microcharts chart at true word-size — searchable, filterable, and browsable as one grid.",
   path: "/gallery",
 });
 
 // Collection framing — dock filters, the per-card tag, and the slim wayfinding
 // labels that mark each collection while browsing the whole catalog.
 const COLLECTIONS: { key: ChartCollection; label: string; blurb: string }[] = [
-  { key: "core", label: "Core", blurb: "The everyday instruments." },
+  { key: "core", label: "Core", blurb: "Everyday charts." },
   { key: "decision", label: "Decision", blurb: "Tuned to one question." },
   { key: "expressive", label: "Expressive", blurb: "Unusual, apt encodings." },
   { key: "frontier", label: "Frontier", blurb: "Newer word-sized forms." },
@@ -44,7 +45,6 @@ export default function GalleryPage() {
   return (
     <>
       <div className="g2">
-        {/* ── masthead — just scrolls away with the content ─────────────────── */}
         <header className="g2-head">
           <span className="mono-label text-fd-primary">The catalog</span>
           <h1 className="display mt-3 text-fluid-h2 text-[length:var(--text-fluid-h2)]">
@@ -56,15 +56,8 @@ export default function GalleryPage() {
           </p>
         </header>
 
-        {/* ── the plane ─────────────────────────────────────────────────────
-            One flat grid of instrument plates. The dock (client) toggles each
-            [data-gallery-card]'s `hidden` from data-* keywords — with JS off,
-            every chart still renders in the default grid, fully SSR. A slim
-            collection label opens each group, but only while browsing the whole
-            catalog (the dock sets [data-browse]); it's noise once you filter. */}
         <div className="g2-grid" data-density="comfortable" data-browse>
           {charts.map((c, i) => {
-            const Preview = CHART_MODULES[c.slug]!.Preview;
             const newGroup = i === 0 || charts[i - 1].collection !== c.collection;
             const group = COLLECTIONS.find((g) => g.key === c.collection);
             return (
@@ -91,7 +84,7 @@ export default function GalleryPage() {
                     <span className="g2-spot" aria-hidden />
                     <ArrowUpRight className="g2-arrow size-4" aria-hidden />
                     <div className="g2-stage">
-                      <Preview />
+                      <GalleryStage slug={c.slug} />
                     </div>
                     <div className="g2-meta">
                       {/* name owns its own full-width line so it never truncates

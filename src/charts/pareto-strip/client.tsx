@@ -1,5 +1,5 @@
 "use client";
-// Interactive <ParetoStrip> (plan/23 #15). One pointer listener + grid lookup
+// Interactive <ParetoStrip>. One pointer listener + grid lookup
 // (pointer x → bar). ←/→ step bars, T jumps to the threshold-crossing bar. The
 // live region states each bar's share + cumulative. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.

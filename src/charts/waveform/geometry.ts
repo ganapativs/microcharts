@@ -1,4 +1,4 @@
-// Waveform geometry — pure, React-free (plan/25 §4, plan/17 F9). Mirrored
+// Waveform geometry — pure, React-free. Mirrored
 // amplitude bars around a center hairline, compressed by MAX-PER-BUCKET (never
 // mean — a mean hides spikes, and a spike is usually the whole point). The auto
 // domain is symmetric ±max|data| so shape reads honestly; the peak is disclosed

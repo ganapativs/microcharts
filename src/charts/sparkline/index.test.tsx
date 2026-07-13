@@ -9,7 +9,7 @@ const D = [4, 6, 5, 9, 7, 8, 11, 9, 13, 12];
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<Sparkline> static structure (plan/03, plan/09)", () => {
+describe("<Sparkline> static structure", () => {
   it("renders a role=img svg with the data path", () => {
     const { container } = draw(<Sparkline data={D} title="Revenue" />);
     const svg = container.querySelector("svg")!;
@@ -131,7 +131,7 @@ seriesEdgeSuite("Sparkline", (data) => (
   <Sparkline data={[...data]} label="last" dots="minmax" title="Edge" />
 ));
 
-describe("<Sparkline> edge inputs (plan/09)", () => {
+describe("<Sparkline> edge inputs", () => {
   it("empty data → no path, 'No data.' summary, no crash", () => {
     const { container } = draw(<Sparkline data={[]} title="Empty" />);
     expect(container.querySelector('[data-mc-ink="data"]')).toBeNull();
@@ -149,7 +149,7 @@ describe("<Sparkline> edge inputs (plan/09)", () => {
   });
 });
 
-describe("<Sparkline> a11y (axe, plan/08)", () => {
+describe("<Sparkline> a11y (axe, )", () => {
   it("informative chart is axe-clean", async () => {
     const { container } = draw(<Sparkline data={D} title="Weekly revenue" />);
     await expectNoA11yViolations(container);
@@ -161,7 +161,7 @@ describe("<Sparkline> a11y (axe, plan/08)", () => {
   });
 });
 
-describe("containment (CLAUDE.md: nothing paints outside the viewBox)", () => {
+describe("containment", () => {
   it("label='last' reserves a gutter — text start + estimated width stays inside", () => {
     const { container } = render(
       <Sparkline data={[3, 5, 4, 8, 6, 1284]} width={80} height={20} label="last" />,

@@ -130,7 +130,7 @@ export const playground: PlaygroundSpec = {
       '  labels={["Organic", "Paid"]}',
       s.label !== "gap" && `  label="${s.label}"`,
       s.positive !== "up" && `  positive="${s.positive}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -176,9 +176,23 @@ export function markCode(): string {
   return `<SpreadBand data={pairs} labels={["Organic", "Paid"]} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <SpreadBandInteractive
+      data={PAIRS}
+      labels={LABELS}
+      summary={false}
+      width={140}
+      height={26}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

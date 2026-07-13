@@ -135,7 +135,7 @@ export const playground: PlaygroundSpec = {
       s.folds !== "2" && `  folds={${s.folds}}`,
       s.mode !== "mirror" && `  mode="${s.mode}"`,
       s.baseline !== 0 && `  baseline={${s.baseline}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -174,16 +174,12 @@ const HOSTS: Host[] = [
   },
 ];
 
-/* The four homes — Horizon always doing the one thing it's for: a wide-range
-   series folded flat enough to sit in a monitoring row. Every host is an
-   ops/infra surface (cluster load, per-host rows), never a generic
-   "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Cluster load this hour{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Horizon data={LOAD} summary={false} width={64} height={14} />
         </span>{" "}
         — peaked near 45 before dropping under 10, now steady at 20.
@@ -263,9 +259,14 @@ export function markCode(): string {
   return `<Horizon data={series} />`;
 }
 
+export function PreviewLive() {
+  return <HorizonInteractive data={LOAD} summary={false} width={130} height={16} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

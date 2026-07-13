@@ -1,5 +1,5 @@
 "use client";
-// Interactive <SegmentedBar> (plan/22 #14). One pointer listener; segment by
+// Interactive <SegmentedBar>. One pointer listener; segment by
 // x lookup. ←/→ rove segments incl. "Other", which announces its member count
 // ("Other: 5%, 3 categories."). Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

@@ -14,7 +14,7 @@ const FIELD = [
   { x: 1, y: 1 },
 ];
 
-describe("<QuadrantDot> (plan/23 #17)", () => {
+describe("<QuadrantDot>", () => {
   it("summary names position, the axis-relative quadrant, and peers — the real string", () => {
     const { container } = draw(
       <QuadrantDot

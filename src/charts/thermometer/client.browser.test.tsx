@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { Thermometer } from "./client.js";
 
-describe("interactive <Thermometer> (plan/24 #5)", () => {
+describe("interactive <Thermometer>", () => {
   it("announces the value on change; quiet on mount", async () => {
     const screen = await render(<Thermometer value={40} target={80} />);
     const live = document.querySelector('[aria-live="polite"]')!;

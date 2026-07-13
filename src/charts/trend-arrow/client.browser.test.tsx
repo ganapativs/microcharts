@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { TrendArrow } from "./client.js";
 
-describe("interactive <TrendArrow> (plan/22 #1)", () => {
+describe("interactive <TrendArrow>", () => {
   it("focusable wrapper owns the naming; static chart is decorative", async () => {
     const screen = await render(<TrendArrow value={0.12} title="Growth" />);
     const wrap = screen.container.querySelector(".mc-trend-live")!;

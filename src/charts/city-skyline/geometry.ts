@@ -1,5 +1,5 @@
-// CitySkyline geometry — pure, React-free (plan/24 #14, S-structured, flagship).
-// Two variables ARE the story (plan/05 §1 escape clause): building HEIGHT (the
+// CitySkyline geometry — pure, React-free.
+// Two variables ARE the story: building HEIGHT (the
 // primary, high-precision channel, zero-anchored) + lit-window FRACTION (a
 // secondary, low-precision "mostly lit / half lit / dark"). Windows: fixed 2
 // columns, filled bottom-up, quantized to the window count. No roofline/antenna/

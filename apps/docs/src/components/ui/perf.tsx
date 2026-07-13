@@ -2,12 +2,7 @@ import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { CATALOG, SIZE, BENCH, FLAGSHIP, STATIC_SIZES, sizeRow } from "@/lib/docs-facts";
 import { getChart } from "@/lib/catalog";
 
-/**
- * Performance-page instruments. Every number is read from `docs-facts`, which
- * derives it from the measured build + bench — so these tables can never quote
- * a figure the tooling didn't produce. All are server components (zero client
- * JS), and the size distribution is drawn by the library plotting itself.
- */
+/** Perf-page figures from measured `docs-facts` (build + bench). */
 
 // ── Size distribution — the library charting its own gzip footprint ──────────
 export function SizeDistribution() {

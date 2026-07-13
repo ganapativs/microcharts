@@ -14,8 +14,8 @@ const NOISE = Array.from({ length: 40 }, (_, i) => 74 + Math.sin(i / 4) * 3 + (i
 
 afterEach(() => vi.restoreAllMocks());
 
-describe("<DualWindowMeter> (plan/25 §11, plan/17 F4)", () => {
-  it("renders both traces + target; docs-as-tests summary leads with the slow read", () => {
+describe("<DualWindowMeter>", () => {
+  it("renders both traces + target summary leads with the slow read", () => {
     const { container } = draw(<DualWindowMeter data={NOISE} target={75} />);
     expect(container.querySelectorAll("path").length).toBe(2);
     expect(dualWindowSummary(20.4, 23.1, 23, EN_DUAL_WINDOW, fmt)).toBe(

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { HeatCell } from "./client.js";
 
-describe("interactive <HeatCell> (plan/22 #3)", () => {
+describe("interactive <HeatCell>", () => {
   it("focus reveals the calibrated readout + announces it", async () => {
     const screen = await render(<HeatCell value={42} domain={[0, 100]} title="Load" />);
     const wrap = screen.container.querySelector(".mc-heat-cell-live") as HTMLElement;

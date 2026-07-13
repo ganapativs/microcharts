@@ -10,7 +10,7 @@ const PROFILE = [
   { level: 146, weight: 7 },
 ];
 
-describe("volumeProfileGeometry (plan/25 §16, plan/17 F15)", () => {
+describe("volumeProfileGeometry", () => {
   it("finds the POC (modal level) and the value area", () => {
     const geo = volumeProfileGeometry({
       data: PROFILE,

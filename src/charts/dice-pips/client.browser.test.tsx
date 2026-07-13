@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { DicePips } from "./client.js";
 
-describe("interactive <DicePips> (plan/24 #2)", () => {
+describe("interactive <DicePips>", () => {
   it("announces the new face on change; quiet on mount", async () => {
     const screen = await render(<DicePips value={2} />);
     const live = document.querySelector('[aria-live="polite"]')!;

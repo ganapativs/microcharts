@@ -5,17 +5,12 @@ import { SITE } from "@/lib/site";
 import { jsonLdScript, softwareSourceCodeJsonLd, websiteJsonLd } from "@/lib/jsonld";
 import "./global.css";
 
-// Hanken Grotesk — crisp, compact humanist body/UI (narrower than Instrument
-// Sans). Excellent tabular numerals for the charts to inherit.
 const sans = Hanken_Grotesk({
   subsets: ["latin"],
   variable: "--font-sans-src",
   display: "swap",
 });
 
-// Bricolage Grotesque — an expressive, optical display grotesque with genuine
-// character (the "handcrafted" voice). Distinct from the serif-heavy AI
-// editorial pack; carries the big hero + section headings.
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--font-display-src",
@@ -28,11 +23,9 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
-// No-flash appearance: apply the saved accent + chart preset before first paint.
+// Apply saved accent + chart preset before first paint.
 const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem("mc-accent");if(a&&a!=="cobalt")d.dataset.accent=a;var p=localStorage.getItem("mc-preset");if(p&&p!=="modern")d.dataset.mcPreset=p}catch(e){}`;
 
-// A quiet hello for the curious dev who opens the console — real product facts,
-// not filler. Fires once per full load; the wordmark carries the accent.
 const CONSOLE_SCRIPT = `try{console.log("%c${SITE.name}%c\\n${SITE.tagline}\\nZero dependencies, ~1 kB gzip per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#2f52d4;font-weight:700;font-size:13px","color:#8a8a8a;font-size:11px;line-height:1.6")}catch(e){}`;
 
 export const metadata: Metadata = {

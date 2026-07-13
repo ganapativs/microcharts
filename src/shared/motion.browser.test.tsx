@@ -1,4 +1,4 @@
-// The animate contract (plan/04 §8.1 amendment): opt-in, engine-gated,
+// The animate contract: opt-in, engine-gated,
 // reduced-motion-aware, at-rest output identical to the static render.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-react";

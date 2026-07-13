@@ -1,4 +1,4 @@
-// <QueueDepth> — is the backlog draining or growing? (plan/26 §5). A
+// <QueueDepth> — is the backlog draining or growing? A
 // zero-anchored stock area, a dashed capacity hairline, and above-capacity
 // spans re-stroked in the negative ink (shape + color, never color alone). The
 // endpoint label carries a trend glyph fit over the last quarter. Static,

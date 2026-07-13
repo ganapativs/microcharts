@@ -155,7 +155,7 @@ export const playground: PlaygroundSpec = {
       (s.showValue as boolean) && "  showValue",
       s.positive === "down" && '  positive="down"',
       '  format={{ style: "percent", maximumFractionDigits: 0 }}',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -186,15 +186,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — TrendArrow always doing the one thing it's for: reading a
-   direction before any number. Every host is an ops/metrics surface (its
-   bestFor), never a generic "signups held steady" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         P95 latency{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <TrendArrow
             value={0.09}
             positive="down"
@@ -293,9 +290,20 @@ export function markCode(): string {
   return `<TrendArrow value={0.12} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-3">
+      <TrendArrowInteractive value={0.3} summary={false} animate />
+      <TrendArrow value={0} summary={false} />
+      <TrendArrow value={-0.3} summary={false} />
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

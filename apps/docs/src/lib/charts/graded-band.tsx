@@ -143,7 +143,7 @@ export const playground: PlaygroundSpec = {
       s.levels === "50/90" && "  levels={[50, 90]}",
       s.softEdge && "  softEdge",
       s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -179,9 +179,14 @@ export function markCode(): string {
   return `<GradedBand data={posterior} />`;
 }
 
+export function PreviewLive() {
+  return <GradedBandInteractive data={DRAWS} summary={false} width={140} height={14} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

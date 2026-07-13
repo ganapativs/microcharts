@@ -1,5 +1,5 @@
 "use client";
-// Interactive <BurnChart> (plan/23 #8). One pointer listener + nearest-period
+// Interactive <BurnChart>. One pointer listener + nearest-period
 // math across history AND the projection region. ←/→ step days, Home/End jump
 // start/deadline. Composes the static component (canon); the crosshair + marker
 // are overlay children.

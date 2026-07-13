@@ -111,7 +111,7 @@ export const playground: PlaygroundSpec = {
       `  value={${(s.pct as number) / 100}}`,
       (s.segments as number) >= 2 && `  segments={${s.segments}}`,
       s.label !== "percent" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -152,16 +152,12 @@ const STEPS: { name: string; done: number }[] = [
   { name: "Invite team", done: 0 },
 ];
 
-/* The four homes — Progress always doing the one thing it's for: "how far along,
-   exactly," with the percent label carrying the datum. Every host is a real
-   completion surface (a migration cutover, a release checklist, a quota card,
-   a stepped setup flow), never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Database migration to the new cluster is{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Progress value={0.68} title="Migration status" summary={false} width={90} height={18} />
         </span>{" "}
         — on track for Friday&rsquo;s cutover.
@@ -252,9 +248,14 @@ export function markCode(): string {
   return `<Progress value={0.68} />`;
 }
 
+export function PreviewLive() {
+  return <ProgressInteractive value={0.68} summary={false} width={120} height={20} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -1,4 +1,4 @@
-// BiasStrip geometry — pure, React-free (plan/26 §7, F-BiasStrip). A word-sized
+// BiasStrip geometry — pure, React-free. A word-sized
 // Bland–Altman plot (Bland & Altman 1986): x = the mean of a paired measurement
 // (a+b)/2, y = their difference (a−b) centered on 0, so a systematic offset from
 // the zero line reads as vertical drift. The bias (mean difference) and the
@@ -136,7 +136,7 @@ export function biasStripGeometry(opts: {
       h = 0.75;
       top = (biasY ?? zeroY) - h / 2;
     }
-    // top and h derive from in-range sy() values, so the band already fits
+    // top and h derive from in-range sy values, so the band already fits
     band = { y: round2(top), height: round2(h) };
   }
 

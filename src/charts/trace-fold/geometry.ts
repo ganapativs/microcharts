@@ -1,4 +1,4 @@
-// TraceFold geometry — pure, React-free (plan/25 §18, plan/17 F17). Where did the
+// TraceFold geometry — pure, React-free. Where did the
 // latency go: one rect per span (x = start wall-clock, width = duration, row =
 // nesting depth), the CRITICAL PATH accented. Widths are durations on one linear
 // shared time scale — never per-row normalized; the only distortion is a 1-unit

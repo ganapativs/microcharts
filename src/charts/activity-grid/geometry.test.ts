@@ -3,7 +3,7 @@ import { test, fc } from "@fast-check/vitest";
 import { activityGridGeometry } from "./geometry.js";
 import type { Value } from "../../core/types.js";
 
-describe("activityGridGeometry (plan/05 S1-binned, plan/09)", () => {
+describe("activityGridGeometry", () => {
   it("empty → no cells, zero cols", () => {
     const g = activityGridGeometry([]);
     expect(g.cells).toEqual([]);

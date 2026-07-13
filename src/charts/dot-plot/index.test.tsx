@@ -17,7 +17,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<DotPlot> (plan/22 #10, S2)", () => {
+describe("<DotPlot>", () => {
   it("one dot + label per row; summary is the docs' real string", () => {
     const { container } = draw(<DotPlot data={DATA} />);
     expect(container.querySelectorAll("circle").length).toBe(3);

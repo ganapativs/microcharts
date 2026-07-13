@@ -1,5 +1,5 @@
-// SparkBar geometry — pure, React-free (plan/03). Discrete periods as bars,
-// anchored at zero (lie factor = 1, plan/06). Shares the placement idiom with
+// SparkBar geometry — pure, React-free. Discrete periods as bars,
+// anchored at zero. Shares the placement idiom with
 // the Sparkline but emits rects, not a path. Win-loss collapses magnitude to a
 // three-state win/loss/tie glyph (tie = thin mid-line dash). Coords 2-dp via the kernel.
 import { niceDomain, scaleLinear } from "../../core/scale.js";

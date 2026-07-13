@@ -4,7 +4,7 @@ import { Waveform } from "./client.js";
 
 const SPIKE = Array.from({ length: 60 }, (_, i) => (i === 30 ? 0.9 : Math.sin(i / 2) * 0.2));
 
-describe("interactive <Waveform> (plan/25 §4)", () => {
+describe("interactive <Waveform>", () => {
   it("←/→ rove buckets; each announces its position + peak", async () => {
     const screen = await render(<Waveform data={SPIKE} title="Wave" width={120} height={24} />);
     const wrap = screen.container.querySelector(".mc-wave-live") as HTMLElement;

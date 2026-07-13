@@ -16,8 +16,8 @@ const SURVEY = [
   { label: "Strongly agree", value: 28 },
 ];
 
-describe("<LikertStrip> (plan/22 #30, S2-ordinal)", () => {
-  it("diverging segments + center line; docs-as-tests summary", () => {
+describe("<LikertStrip>", () => {
+  it("diverging segments + center line summary", () => {
     const { container } = draw(<LikertStrip data={SURVEY} />);
     expect(container.querySelector("line")).not.toBeNull();
     expect(container.querySelectorAll("rect").length).toBe(5);

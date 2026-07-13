@@ -9,14 +9,14 @@ const mount = async () => {
   return screen.getByRole("img").element() as HTMLElement;
 };
 
-describe("interactive <SparkBar> (plan/04 §4, plan/08 T2)", () => {
+describe("interactive <SparkBar>", () => {
   it("focusable role=img with composed name", async () => {
     const fig = await mount();
     expect(fig.getAttribute("tabindex")).toBe("0");
     expect(fig.getAttribute("aria-label")).toMatch(/Weekly\. Trending up/);
   });
 
-  it("win-loss tie stays neutral, never a green win (regression, plan/12)", async () => {
+  it("win-loss tie stays neutral, never a green win (regression, )", async () => {
     // 0 is a tie: it must take the neutral 'bar' ink, not 'positive'.
     const screen = await render(<SparkBar data={[3, -2, 0, 5]} mode="winloss" title="WL" />);
     const fig = screen.getByRole("img").element() as HTMLElement;

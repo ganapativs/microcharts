@@ -1,4 +1,4 @@
-// CoverageStrip geometry — pure, React-free (plan/23 #1, S1-with-gaps). The
+// CoverageStrip geometry — pure, React-free. The
 // chart is the distinction between `null` (no measurement) and `0` (a measured
 // zero): measured cells are filled, gaps are hollow (shape cue, survives
 // forced-colors). `expected` lets trailing missingness count — an array that

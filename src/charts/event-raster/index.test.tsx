@@ -15,8 +15,8 @@ const RASTER = [
   { label: "cache", events: [5, 20, 40] },
 ];
 
-describe("<EventRaster> (plan/25 §5, plan/17 F18)", () => {
-  it("renders a lane path per source; docs-as-tests summary", () => {
+describe("<EventRaster>", () => {
+  it("renders a lane path per source summary", () => {
     const { container } = draw(<EventRaster data={RASTER} width={160} height={24} />);
     expect(container.querySelectorAll("path").length).toBe(3);
     expect(eventRasterSummary(RASTER, [], EN_EVENT_RASTER)).toBe(

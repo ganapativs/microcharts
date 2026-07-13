@@ -1,4 +1,4 @@
-// Series statistics — feeds a11y summaries + mark placement (plan/03, plan/08).
+// Series statistics — feeds a11y summaries + mark placement.
 import { isFiniteValue, type Value } from "./types.js";
 
 export interface SeriesStats {
@@ -24,11 +24,11 @@ export interface SeriesStats {
 /**
  * Reduces a series to its summary stats, ignoring null/NaN/±Infinity. Returns
  * null when no finite value exists (empty / all-null) — the documented
- * degenerate case (plan/03 §4, plan/09 edge matrix). Indices point back into
+ * degenerate case. Indices point back into
  * the original array so marks land on the right x position even with gaps.
  */
 /** Last finite value in the series, or undefined. Single reverse loop — no
- *  array copy, no ES2023 APIs (CLAUDE.md: ES2022 runtime floor). */
+ * array copy, no ES2023 APIs. */
 export function lastFinite(values: readonly Value[]): number | undefined {
   for (let i = values.length - 1; i >= 0; i--) {
     const v = values[i];

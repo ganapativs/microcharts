@@ -132,7 +132,7 @@ export const playground: PlaygroundSpec = {
       "  data={trail}",
       s.label === false && '  label="none"',
       s.hard !== 10 && `  bins={[3, 6, ${s.hard}]}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -179,9 +179,14 @@ export function markCode(): string {
   return `<GradeProfile data={trail} />`;
 }
 
+export function PreviewLive() {
+  return <GradeProfileInteractive data={TRAIL} summary={false} width={150} height={44} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

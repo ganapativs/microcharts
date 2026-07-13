@@ -8,7 +8,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const SAMPLE = [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34];
 
-describe("<RetentionCurve> (plan/23 #7)", () => {
+describe("<RetentionCurve>", () => {
   it("summary states last retention + plateau — the real string", () => {
     const { container } = draw(<RetentionCurve data={SAMPLE} unit="week" />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

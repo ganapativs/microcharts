@@ -20,8 +20,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<SegmentedBar> (plan/22 #14, S3)", () => {
-  it("≤ 5 segments with an Other rollup; docs-as-tests summary", () => {
+describe("<SegmentedBar>", () => {
+  it("≤ 5 segments with an Other rollup summary", () => {
     const { container } = draw(<SegmentedBar data={MIX} />);
     expect(container.querySelectorAll("rect").length).toBe(5);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

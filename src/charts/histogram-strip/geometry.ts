@@ -1,4 +1,4 @@
-// HistogramStrip geometry — pure, React-free (plan/22 #15, S1 distribution).
+// HistogramStrip geometry — pure, React-free.
 // Uniform bins, counts zero-anchored, never density-smoothed. `markValue` is a
 // VALUE whose bin gets accent — it marks the bin, never re-bins around the
 // value. 2-dp.

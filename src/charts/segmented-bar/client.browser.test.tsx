@@ -11,7 +11,7 @@ const MIX = [
   { label: "Brave", value: 8 },
 ];
 
-describe("interactive <SegmentedBar> (plan/22 #14)", () => {
+describe("interactive <SegmentedBar>", () => {
   it("←/→ rove segments; Other announces its member count", async () => {
     const screen = await render(<SegmentedBar data={MIX} title="Share" />);
     const wrap = screen.container.querySelector(".mc-segbar-live") as HTMLElement;

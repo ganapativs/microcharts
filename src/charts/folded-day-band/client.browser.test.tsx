@@ -7,7 +7,7 @@ const DATA = Array.from({ length: 3 }, (_p, p) =>
   Array.from({ length: 24 }, (_h, h) => ({ t: p * 24 + h, value: curve(h) + [-2, 0, 2][p]! })),
 ).flat();
 
-describe("interactive <FoldedDayBand> (plan/25 §15)", () => {
+describe("interactive <FoldedDayBand>", () => {
   it("←/→ rove fold bins; announce median + middle half", async () => {
     const screen = await render(<FoldedDayBand data={DATA} title="Day" width={200} height={40} />);
     const wrap = screen.container.querySelector(".mc-folded-live") as HTMLElement;

@@ -7,7 +7,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const YEARS = [8, 12, 10, 18, 22, 15, 20, 14];
 
-describe("<TreeRings> (plan/24 #13)", () => {
+describe("<TreeRings>", () => {
   it("summary names the latest and biggest period", () => {
     const { container } = draw(<TreeRings data={YEARS} unit="years" periodWord="year" />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <DualWindowMeter> (plan/25 §11). One pointer listener; nearest
+// Interactive <DualWindowMeter>. One pointer listener; nearest
 // sample by x reveals both window values against the target. ←/→ rove points.
 // Composes the static component (canon).
 import {

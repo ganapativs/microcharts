@@ -1,6 +1,6 @@
-// ChangePoint geometry — pure, React-free (plan/23 #19). When did the behaviour
+// ChangePoint geometry — pure, React-free. When did the behaviour
 // change level? A break marker + regime shading, over the series line. The
-// detector lives HERE, not in core (plan/21 §6.0.C) and is a documented
+// detector lives HERE, not in core and is a documented
 // HEURISTIC, not statistics: two-segment mean-shift via binary segmentation,
 // gated on both an SS-reduction ratio and an effect size, recursing up to `max`.
 // Coords 2-dp, integer viewBox.

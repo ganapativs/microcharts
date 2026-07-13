@@ -17,8 +17,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<StackedArea> (plan/22 #23, S1-multi)", () => {
-  it("≤ 3 stacked layers; docs-as-tests summary names the leader", () => {
+describe("<StackedArea>", () => {
+  it("≤ 3 stacked layers summary names the leader", () => {
     const { container } = draw(<StackedArea data={TRAFFIC} />);
     expect(container.querySelectorAll("g").length).toBe(3);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

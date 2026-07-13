@@ -160,7 +160,7 @@ export const playground: PlaygroundSpec = {
       "  forecast={forecast}",
       s.target && "  target={45}",
       s.label !== "landing" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -218,9 +218,23 @@ export function markCode(): string {
   return `<ForecastCone data={history} forecast={forecast} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <ForecastConeInteractive
+      data={HIST}
+      forecast={FORE}
+      summary={false}
+      width={150}
+      height={24}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

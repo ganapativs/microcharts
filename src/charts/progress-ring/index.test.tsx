@@ -7,7 +7,7 @@ import { valueEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<ProgressRing> (plan/22 #17, S3)", () => {
+describe("<ProgressRing>", () => {
   it("track + value arc; summary reuses the progress wording", () => {
     const { container } = draw(<ProgressRing value={0.68} />);
     expect(container.querySelectorAll("path").length).toBe(2);

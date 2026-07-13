@@ -1,4 +1,4 @@
-// <SproutRow> — how mature/healthy is each item in a small set (plan/24 #9, S2
+// <SproutRow> — how mature/healthy is each item in a small set (, S2
 // ordinal). Four discrete growth stages (seed → sprout → leaf → bloom); glyph
 // height is strictly monotonic so the ordering reads untrained (taller = further
 // along). No half-stages — a growth metaphor must not fake continuity. Static,

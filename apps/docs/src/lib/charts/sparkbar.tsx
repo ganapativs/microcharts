@@ -176,7 +176,7 @@ export const playground: PlaygroundSpec = {
       gap !== 0.25 && `  gap={${gap}}`,
       s.label && '  label="last"',
       s.locale !== "en-US" && `  locale="${s.locale}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -210,15 +210,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — SparkBar always doing one of its two jobs: a magnitude count
-   or a win/loss/tie streak. Every host is a deploy/CI surface, never a generic
-   "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Deploys peaked at nine mid-week{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <SparkBar data={DEPLOYS} summary={false} width={70} height={16} />
         </span>{" "}
         — quieter since.
@@ -297,9 +294,14 @@ export function markCode(width?: number, height?: number): string {
   return `<SparkBar data={data}${size} />`;
 }
 
+export function PreviewLive() {
+  return <SparkBarInteractive data={entry.demo} width={180} height={48} summary={false} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -1,10 +1,10 @@
 "use client";
-// Interactive <SparkBar> (plan/04 §4, plan/08 T2). Keyboard + pointer bar
+// Interactive <SparkBar>. Keyboard + pointer bar
 // navigation with a polite live readout, roving focus on an HTML overlay.
 // COMPOSES the static entry (component canon): the static renders the bars,
 // colors, endpoint label AND annotation children — the client only overlays a
 // focus outline + readout and owns interaction. Re-implementing the SVG here
-// used to mis-color win-loss ties and drop annotations/labels (plan/12).
+// used to mis-color win-loss ties and drop annotations/labels.
 import {
   useCallback,
   useMemo,
@@ -101,7 +101,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
   );
 
   // ONE listener; nearest bar by x distance to its centre in viewBox space —
-  // never a DOM node per bar (plan/03 §6). Gaps snap to the closest bar.
+  // never a DOM node per bar. Gaps snap to the closest bar.
   const onPointerMove = useCallback(
     (e: PointerEvent<HTMLElement>) => {
       if (geo.bars.length === 0) return;

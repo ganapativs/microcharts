@@ -96,33 +96,27 @@ it exists:
 
 ```css
 :root {
-  /* ── Semantic colour — encodes MEANING, never decoration ─────────────── */
+  /* Semantic colour */
 
-  /* Default ink: lines, bars, labels. Dark mode ships a hand-tuned value,
-     not an inversion. */
+  /* Default ink: lines, bars, labels. Dark mode is hand-tuned, not inverted. */
   --mc-stroke: #171717;
 
-  /* The "good" direction — a colour-blind-safe green, always paired with a
-     ▲ so meaning never rests on colour alone. */
+  /* Good direction — colour-blind-safe green; pair with ▲. */
   --mc-positive: #009e73;
 
-  /* The "bad" direction — colour-blind-safe vermillion, paired with a ▼. */
+  /* Bad direction — colour-blind-safe vermillion; pair with ▼. */
   --mc-negative: #d55e00;
 
   /* No-signal marks: baselines, inactive points, empty cells. */
   --mc-neutral: #8a8a8a;
 
-  /* The single emphasis colour — one highlighted series or endpoint.
-     Rebind this to your brand. */
+  /* Emphasis colour — rebind to your brand. */
   --mc-accent: #0072b2;
 
-  /* Normal-range shading, derived from the ink so it always matches. */
+  /* Normal-range shading, derived from the ink. */
   --mc-band: color-mix(in oklab, var(--mc-stroke) 8%, transparent);
 
-  /* ── Categorical palette — only for the rare multi-series chart ────────
-     Six hues that stay distinguishable across the common colour-vision
-     types AND in greyscale/print. Ordered high-contrast-first, so a 2- or
-     3-series chart reaches for the most separable pair first. */
+  /* Categorical palette — multi-series only; high-contrast first. */
   --mc-cat-1: #e69f00;
   --mc-cat-2: #56b4e9;
   --mc-cat-3: #009e73;
@@ -130,10 +124,9 @@ it exists:
   --mc-cat-5: #d55e00;
   --mc-cat-6: #cc79a7;
 
-  /* ── Geometry — treats size as a design material ───────────────────────*/
+  /* Geometry */
 
-  /* Light by default so a chart reads at text weight inline; bump to
-     ~2 when it stands alone. */
+  /* Light by default for inline use; bump to ~2 when standalone. */
   --mc-stroke-width: 1.5;
 
   /* Spacing between grouped marks; em-based so it scales with the font. */
@@ -142,23 +135,18 @@ it exists:
   /* Direct-label text size, relative to the chart's font. */
   --mc-label-size: 0.75em;
 
-  /* ── Motion & type — applied only where it earns its place ─────────────*/
+  /* Motion & type */
 
-  /* Entrance timing for interactive entries; static charts never animate
-     (zero client JS). */
+  /* Entrance timing for interactive entries; static charts never animate. */
   --mc-duration: 300ms;
 
-  /* Ease-out: marks decelerate into place, never bounce or loop. */
+  /* Ease-out entrance; no bounce or loop. */
   --mc-easing: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* Charts borrow your UI font + tabular numerals by default; pin a family
-     here to override. */
+  /* Inherits the host UI font + tabular numerals by default. */
   --mc-font: inherit;
 
-  /* ── Interactive readout surface — the only opaque plane a mark sits on ──
-     The value chip shown on hover/focus. Defaults to the system canvas so it
-     adapts with no config; point these at your popover tokens to match a
-     themed surface. */
+  /* Interactive readout chip (hover/focus). Defaults to system canvas. */
   --mc-surface: Canvas;
   --mc-surface-ink: CanvasText;
   --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);

@@ -1,9 +1,9 @@
-// <StreakSpark> — the current run against the record, with run texture (plan/26
+// <StreakSpark> — the current run against the record, with run texture (
 // §2). Static, hook-free, RSC-safe. A pass/fail sequence collapses to RUNS: ok
 // runs sit low and translucent, break (fail) runs sit thin and saturated, and
 // the CURRENT run is the loud accent bar at the right. The record streak wears a
 // small triangle tick. Direction is encoded by height + opacity AND color, never
-// color alone (plan/08 1.4.1); the count labels are plain integers, seat-gated.
+// color alone; the count labels are plain integers, seat-gated.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";

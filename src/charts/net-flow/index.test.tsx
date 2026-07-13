@@ -16,7 +16,7 @@ const SAMPLE: NetFlowPeriod[] = [
   { in: 7, out: 5 },
 ];
 
-describe("<NetFlow> (plan/23 #6)", () => {
+describe("<NetFlow>", () => {
   it("summary states signed net, gross, and net-positive count — the real string", () => {
     const { container } = draw(<NetFlow data={SAMPLE} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

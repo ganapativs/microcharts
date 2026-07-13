@@ -4,7 +4,7 @@ import { horizonGeometry } from "./geometry.js";
 
 const base = { width: 80, height: 14, baseline: 0, folds: 2 as const, mode: "mirror" as const };
 
-describe("horizonGeometry (plan/22 #25)", () => {
+describe("horizonGeometry", () => {
   it("values within fold 1 render exactly one band (no phantom dark bands)", () => {
     const geo = horizonGeometry({ ...base, values: [1, 2, 3, 2, 1], domain: undefined });
     // max dev 3, foldSize 1.5 → values 2..3 reach fold 2; use tight data:

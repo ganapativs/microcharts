@@ -5,7 +5,7 @@ import { ohlcGeometry } from "./geometry.js";
 const base = { width: 80, height: 16, gutterCh: 0, fontSize: 6 };
 const p = (open: number, high: number, low: number, close: number) => ({ open, high, low, close });
 
-describe("ohlcGeometry (plan/22 #24)", () => {
+describe("ohlcGeometry", () => {
   it("wick spans high-low; body spans open-close; up/doji flags", () => {
     const geo = ohlcGeometry({
       ...base,

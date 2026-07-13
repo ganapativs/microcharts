@@ -1,4 +1,4 @@
-// Portable kernel — pure functions, zero React (plan/03). Re-exported so charts
+// Portable kernel — pure functions, zero React. Re-exported so charts
 // (and future non-React renderers) import from one place.
 export { round2, isFiniteValue, type Value, type XY, type Polarity } from "./types.js";
 export { scaleLinear, clamp, extent, niceDomain, type Scale } from "./scale.js";

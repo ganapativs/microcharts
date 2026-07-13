@@ -7,7 +7,7 @@ const H = 20;
 const geo = (data: readonly StreakDatum[], opts = {}) =>
   streakSparkGeometry(data, { width: W, height: H, ...opts });
 
-describe("streakSparkGeometry (edge matrix, plan/09)", () => {
+describe("streakSparkGeometry (edge matrix, )", () => {
   it("empty → no runs", () => {
     expect(geo([]).runs).toEqual([]);
   });

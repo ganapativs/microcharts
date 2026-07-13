@@ -4,7 +4,7 @@ import { MinimapStrip } from "./client.js";
 
 const CONTENT = Array.from({ length: 1000 }, (_, i) => Math.sin(i / 30) + 1);
 
-describe("interactive <MinimapStrip> (plan/25 §10)", () => {
+describe("interactive <MinimapStrip>", () => {
   it("→ nudges the viewport window and announces it", async () => {
     const screen = await render(
       <MinimapStrip

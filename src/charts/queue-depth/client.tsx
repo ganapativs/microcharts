@@ -1,5 +1,5 @@
 "use client";
-// Interactive <QueueDepth> (plan/26 §5). One pointer listener + nearest-x math
+// Interactive <QueueDepth>. One pointer listener + nearest-x math
 // across the finite points; ←/→ step periods, Home/End jump ends. Composes the
 // static component (canon); the crosshair + focus ring are overlay children.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

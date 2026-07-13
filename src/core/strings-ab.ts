@@ -1,6 +1,6 @@
 // ABStrips summary templates (ab-strips) — its OWN module (see strings-scalar.ts
 // for the chunk rationale). The overlap number is always in the summary — the
-// overlap IS the honest answer (plan/16). English lives only in core string
+// overlap IS the honest answer. English lives only in core string
 // modules (canon). Aggregate: core/strings.ts `EN`.
 import type { SummaryStrings } from "./summary.js";
 

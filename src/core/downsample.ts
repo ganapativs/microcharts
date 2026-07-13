@@ -1,5 +1,5 @@
-// Long-series downsampling (plan/21 §6.0.C). Max-per-bucket, NEVER mean —
-// a spike is usually the whole reason someone is looking (plan/17 F9), and
+// Long-series downsampling. Max-per-bucket, NEVER mean
+// a spike is usually the whole reason someone is looking, and
 // averaging erases it. Buckets are index-proportional so time stays linear.
 // Outputs are data-space (charts scale + round to viewBox).
 import { isFiniteValue, type Value } from "./types.js";
@@ -51,7 +51,7 @@ export interface IndexedValue {
 
 /**
  * Index-preserving min/max decimation for LINE rendering (the long-series
- * sparkline guard, plan/21 §6.0.D). Each bucket contributes its min and max at
+ * sparkline guard, ). Each bucket contributes its min and max at
  * their ORIGINAL indices, in index order — spikes keep their true x position
  * and both extremes survive (never mean, never midpoint). Output ≤ 2·buckets
  * entries; `buckets ≥ length` is an identity pass-through.

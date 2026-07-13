@@ -1,5 +1,5 @@
 // <RubricStrip> — how a thing scored per criterion, with each criterion's weight
-// visible, without a fake composite number (plan/25 §6, plan/17 F13). Static,
+// visible, without a fake composite number. Static,
 // hook-free, RSC-safe. Bar length = score, bar thickness = weight share. There
 // is NO total bar and none may be added — that is the whole point.
 import type { CSSProperties, ReactNode } from "react";
@@ -36,7 +36,7 @@ export interface RubricStripProps {
   children?: ReactNode | undefined;
 }
 
-/** Shared summary — extremes only, NEVER a weighted total (plan/17 F13). */
+/** Shared summary — extremes only, NEVER a weighted total. */
 export function rubricStripSummary(
   data: readonly RubricStripDatum[],
   strings: RubricStrings,

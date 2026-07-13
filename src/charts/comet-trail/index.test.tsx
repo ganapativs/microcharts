@@ -8,7 +8,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
 const RISING = [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87];
 
-describe("<CometTrail> (plan/24 #21)", () => {
+describe("<CometTrail>", () => {
   it("summary states the now-value and the recent trend", () => {
     const { container } = draw(<CometTrail data={RISING} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

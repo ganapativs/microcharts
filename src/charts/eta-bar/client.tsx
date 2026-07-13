@@ -1,5 +1,5 @@
 "use client";
-// Interactive <EtaBar> (plan/25 §3). `live` mode: on prop change the remainder
+// Interactive <EtaBar>. `live` mode: on prop change the remainder
 // width transitions (CSS, reduced-motion → snap) and a polite live region
 // re-announces at most every 10 s. No pointer scrub — there is no series.
 // Composes the static entry (canon).

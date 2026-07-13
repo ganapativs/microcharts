@@ -6,7 +6,7 @@ const base = { width: 80, height: 20 };
 // a decaying cohort that flattens at the end
 const SAMPLE = [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34];
 
-describe("retentionGeometry (plan/23 #7)", () => {
+describe("retentionGeometry", () => {
   it("locks the y-domain to [0,1]: 1.0 at top, 0 at bottom", () => {
     const geo = retentionGeometry({ ...base, data: [1, 0.5, 0] })!;
     // period 0 = 1.0 near the top (small y), last = 0 near the bottom (large y)

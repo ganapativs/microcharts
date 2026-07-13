@@ -1,4 +1,4 @@
-// Constellation geometry — pure, React-free (plan/24 #16, S1 points). Sparse
+// Constellation geometry — pure, React-free. Sparse
 // events on a time axis: x = time (sacred, never jittered), y = value, optional
 // magnitude → area-true dot size (r ∝ √m). When no point carries a value, the
 // vertical position is deterministic seeded jitter (core/jitter) that ENCODES

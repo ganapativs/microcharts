@@ -1,4 +1,4 @@
-// Deterministic seeded pseudo-random (plan/21 §6.0.C). Ghost paths, drawn
+// Deterministic seeded pseudo-random. Ghost paths, drawn
 // strokes, celebrate particles, and constellation layout all need "random-
 // looking" offsets that are byte-identical across server render, hydration,
 // and visual-test runs — so the seed derives from the data and `Math.random`

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <DepthWedge> (plan/25 §12). One pointer listener; nearest level by
+// Interactive <DepthWedge>. One pointer listener; nearest level by
 // x reveals the cumulative depth on that side. ←/→ walk levels across the book.
 // Composes the static component (canon).
 import {

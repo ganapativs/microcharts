@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Seismogram> (plan/22 #8). One pointer listener; slot by x-band
+// Interactive <Seismogram>. One pointer listener; slot by x-band
 // over the rendered series. ←/→ step slots, Home/End jump to first/last EVENT
 // (not slot — quiet slots are skippable context). Announces via the shared
 // point template; quiet slots use the pointEmpty wording (ActivityGrid

@@ -18,8 +18,6 @@ export const metadata: Metadata = docsMeta({
   path: "/brand",
 });
 
-/* ── Downloadable logo assets — the real files under public/brand. Sources are
-   read at build so the copy-SVG button hands back the exact shipped file. ── */
 type Tile = "light" | "dark" | "auto";
 const ASSETS: { file: string; name: string; note: string; tile: Tile }[] = [
   { file: "mark.svg", name: "Primary", note: "Cobalt squircle", tile: "light" },
@@ -45,6 +43,13 @@ const ACCENTS: { name: string; light: string; dark: string }[] = [
   { name: "Rose", light: "#be123c", dark: "#fb6f89" },
 ];
 
+const SPECS: [string, string][] = [
+  ["Container", "Superellipse · n 4.5"],
+  ["Cells", "Three · graded fill"],
+  ["Grid", "32 × 32 units"],
+  ["Encoding", "Weight = value"],
+];
+
 function SectionMark({ n, children }: { n: string; children: React.ReactNode }) {
   return (
     <div className="mb-8 flex items-center gap-3">
@@ -55,8 +60,6 @@ function SectionMark({ n, children }: { n: string; children: React.ReactNode }) 
   );
 }
 
-/* A raw copy of the mark for diagrams (clear-space, misuse). Uses the canonical
-   geometry so every example is pixel-true to the shipped file. */
 function markInner(fill: string, cellFill = CELL_FILL, cellOpacity = true) {
   return (
     <>
@@ -79,97 +82,105 @@ function markInner(fill: string, cellFill = CELL_FILL, cellOpacity = true) {
 
 export default function BrandPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <header className="max-w-2xl">
-        <Reveal>
-          <span className="mono-label text-fd-primary">Brand kit</span>
-          <h1 className="display mt-3 text-[length:var(--text-fluid-h2)]">
-            The mark, and how to use it.
-          </h1>
-          <p className="mt-4 text-lg leading-relaxed text-fd-muted-foreground">
-            Everything you need to reference microcharts — logo variants, colors, and type. The mark
-            is a small instrument: three data cells climbing a diagonal, graded faint to solid.
-            Treat it with the same care the charts ask for.
-          </p>
-        </Reveal>
-        <Reveal delay={80} className="mt-8 flex flex-wrap items-center gap-3">
-          <a
-            href="/brand/microcharts-brand-kit.zip"
-            download
-            className="cta-accent group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
-          >
-            <Download className="size-4" />
-            Download kit
-            <span className="font-mono text-xs opacity-70">.zip</span>
-          </a>
-          <a
-            href={SITE.repo}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="cta-ghost inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-fd-foreground"
-          >
-            Source
-            <ArrowUpRight className="size-4 opacity-60" />
-          </a>
-        </Reveal>
-      </header>
+    <>
+      {/* ── Hero — no Reveal (gallery masthead pattern). Above-fold copy must
+          paint immediately; pending opacity:0 left the CTAs blank over the field. */}
+      <section className="relative">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 grid-paper opacity-60"
+        />
+        <div className="relative z-0 mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-18 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14">
+          <div>
+            <span className="mono-label text-fd-primary">Brand kit</span>
+            <h1 className="display mt-3 text-balance text-[length:var(--text-fluid-h2)] text-fd-foreground">
+              The mark, and how to use it.
+            </h1>
+            <p className="mt-4 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
+              Logo variants, colors, and type — the same small instrument that sits in the nav.
+              Three data cells climb a diagonal, graded faint to solid.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                href="/brand/microcharts-brand-kit.zip"
+                download
+                className="cta-accent group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
+              >
+                <Download className="size-4" />
+                Download kit
+                <span className="font-mono text-xs opacity-70">.zip</span>
+              </a>
+              <a
+                href={SITE.repo}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="cta-ghost inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-fd-foreground"
+              >
+                Source
+                <ArrowUpRight className="size-4 opacity-60" />
+              </a>
+            </div>
+          </div>
 
-      {/* ── 01 · The mark ─────────────────────────────────────────────── */}
-      <section className="mt-20">
-        <SectionMark n="01">The mark</SectionMark>
-        <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
-          <Reveal className="panel relative flex items-center justify-center overflow-hidden px-6 py-16">
+          <div className="panel relative flex min-h-[16rem] items-center justify-center overflow-hidden px-6 py-14 sm:min-h-[18rem]">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 grid-paper opacity-70"
+              className="pointer-events-none absolute inset-0 grid-paper opacity-50"
             />
-            <Brandmark size={132} className="relative drop-shadow-sm" />
-          </Reveal>
-          <Reveal delay={80} className="panel flex flex-col justify-center gap-5 p-7">
-            <p className="text-fd-foreground">
-              The three cells climb bottom-left to top-right, their fill grading from faint to
-              solid. That grade is the same honest encoding the charts use — value carried by
-              weight, not decoration. It borrows the ActivityGrid’s DNA, so the brand and the
-              product read as one hand.
-            </p>
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-hairline pt-5">
-              {[
-                ["Container", "Superellipse · n 4.5"],
-                ["Cells", "Three · graded fill"],
-                ["Grid", "32 × 32 units"],
-                ["Encoding", "Weight = value"],
-              ].map(([k, v]) => (
-                <div key={k}>
-                  <dt className="mono-label">{k}</dt>
-                  <dd className="mt-1 text-sm text-fd-foreground">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
+            <Brandmark size={148} className="relative drop-shadow-sm" />
+          </div>
         </div>
       </section>
 
-      {/* ── 02 · Logo variants / downloads ────────────────────────────── */}
-      <section className="mt-20">
+      {/* ── 01 · The mark ───────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <SectionMark n="01">The mark</SectionMark>
+        <Reveal className="mb-8 max-w-2xl">
+          <h2 className="display text-[length:var(--text-fluid-h2)]">ActivityGrid DNA, owned.</h2>
+          <p className="mt-4 max-w-xl text-fd-muted-foreground">
+            The three cells climb bottom-left to top-right, fill grading faint to solid. That grade
+            is the same honest encoding the charts use — value carried by weight, not decoration.
+          </p>
+        </Reveal>
+        <Reveal delay={60}>
+          <dl className="panel grid grid-cols-2 sm:grid-cols-4">
+            {SPECS.map(([k, v], i) => (
+              <div
+                key={k}
+                className={
+                  "flex flex-col gap-1.5 px-5 py-4" +
+                  (i % 2 === 1 ? " border-l border-hairline" : "") +
+                  (i >= 2 ? " border-t border-hairline sm:border-t-0" : "") +
+                  (i > 0 ? " sm:border-l sm:border-hairline" : "")
+                }
+              >
+                <dt className="mono-label leading-5">{k}</dt>
+                <dd className="text-sm leading-5 text-fd-foreground">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </Reveal>
+      </section>
+
+      {/* ── 02 · Logo variants ──────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <SectionMark n="02">Logo variants</SectionMark>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Reveal className="mb-8 max-w-2xl">
+          <h2 className="display text-[length:var(--text-fluid-h2)]">
+            Six SVGs. Copy or download.
+          </h2>
+          <p className="mt-4 max-w-xl text-fd-muted-foreground">
+            Primary Cobalt, adaptive for light/dark hosts, mono inks, and two accent siblings. Each
+            file is the shipped asset under{" "}
+            <span className="font-mono text-fd-foreground">/brand</span>.
+          </p>
+        </Reveal>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {ASSETS.map((a, i) => {
             const { src, bytes } = readAsset(a.file);
             return (
-              <Reveal key={a.file} delay={i * 50} className="glass flex flex-col overflow-hidden">
-                <div
-                  className={
-                    "relative flex min-h-[150px] items-center justify-center " +
-                    (a.tile === "dark"
-                      ? "bg-[#0a0b0f]"
-                      : a.tile === "light"
-                        ? "bg-[#e9edf4]"
-                        : "bg-gradient-to-br from-[#e9edf4] to-[#0a0b0f]")
-                  }
-                >
-                  {/* Plain <img>: the file IS the deliverable, and next/image
-                      is a non-starter under output:'export'. */}
+              <Reveal key={a.file} delay={i * 40} className="glass flex flex-col overflow-hidden">
+                <div className="bk-stage" data-tile={a.tile}>
                   <img
                     src={`/brand/${a.file}`}
                     alt={`microcharts mark — ${a.name}`}
@@ -178,9 +189,11 @@ export default function BrandPage() {
                   />
                 </div>
                 <div className="flex items-center justify-between gap-2 border-t border-hairline px-3.5 py-2.5">
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-fd-foreground">{a.name}</div>
-                    <div className="mono-label mt-0.5 truncate opacity-70">{a.note}</div>
+                  <div className="min-w-0 leading-5">
+                    <div className="truncate text-sm font-medium leading-5 text-fd-foreground">
+                      {a.name}
+                    </div>
+                    <div className="mono-label truncate leading-5 opacity-70">{a.note}</div>
                   </div>
                   <div className="flex shrink-0 items-center gap-0.5">
                     <CopyButton text={src} size={8} />
@@ -194,9 +207,11 @@ export default function BrandPage() {
                     </a>
                   </div>
                 </div>
-                <div className="mono-label flex items-center justify-between border-t border-hairline/70 px-3.5 py-2 opacity-60">
-                  <span>{a.file}</span>
-                  <span className="tabular-nums">{(bytes / 1024).toFixed(1)} kB · svg</span>
+                <div className="mono-label flex items-center justify-between border-t border-hairline/70 px-3.5 py-2 leading-5 opacity-60">
+                  <span className="truncate">{a.file}</span>
+                  <span className="shrink-0 tabular-nums">
+                    {(bytes / 1024).toFixed(1)} kB · svg
+                  </span>
                 </div>
               </Reveal>
             );
@@ -204,10 +219,19 @@ export default function BrandPage() {
         </div>
       </section>
 
-      {/* ── 03 · Clear space & size ───────────────────────────────────── */}
-      <section className="mt-20">
+      {/* ── 03 · Clear space & size ─────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <SectionMark n="03">Clear space &amp; size</SectionMark>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <Reveal className="mb-8 max-w-2xl">
+          <h2 className="display text-[length:var(--text-fluid-h2)]">
+            One cell of air. Sixteen pixels floor.
+          </h2>
+          <p className="mt-4 max-w-xl text-fd-muted-foreground">
+            Keep clear space of at least one cell-width on every side. Below 16 px the grade
+            collapses — never go smaller.
+          </p>
+        </Reveal>
+        <div className="grid gap-3 lg:grid-cols-2">
           <Reveal className="panel flex flex-col items-center justify-center gap-5 p-8">
             <svg
               viewBox="0 0 56 56"
@@ -229,42 +253,47 @@ export default function BrandPage() {
               />
               <g transform="translate(12 12)">{markInner("var(--accent)")}</g>
             </svg>
-            <p className="max-w-xs text-center text-sm text-fd-muted-foreground">
-              Keep clear space of at least{" "}
-              <span className="text-fd-foreground">one cell-width</span> around the mark. Nothing —
-              type, edges, other marks — enters the dashed field.
-            </p>
+            <p className="mono-label text-center opacity-70">dashed field = reserved space</p>
           </Reveal>
-          <Reveal delay={80} className="panel flex flex-col justify-center gap-6 p-8">
-            <div className="flex items-end gap-7">
+          <Reveal delay={80} className="panel flex flex-col justify-center gap-8 p-8">
+            <div className="grid grid-cols-3 gap-4">
               {[
                 { px: 16, label: "16 px", role: "Favicon · minimum" },
                 { px: 24, label: "24 px", role: "Inline · UI" },
                 { px: 40, label: "40 px", role: "Comfortable" },
               ].map((s) => (
                 <div key={s.px} className="flex flex-col items-center gap-3">
-                  <Brandmark size={s.px} />
+                  <div className="flex h-10 items-end justify-center">
+                    <Brandmark size={s.px} />
+                  </div>
                   <div className="text-center">
-                    <div className="font-mono text-xs tabular-nums text-fd-foreground">
+                    <div className="font-mono text-xs leading-5 tabular-nums text-fd-foreground">
                       {s.label}
                     </div>
-                    <div className="mono-label mt-0.5 opacity-70">{s.role}</div>
+                    <div className="mono-label leading-5 opacity-70">{s.role}</div>
                   </div>
                 </div>
               ))}
             </div>
-            <p className="border-t border-hairline pt-5 text-sm text-fd-muted-foreground">
-              Below 16 px the cells lose the grade and the read collapses — never go smaller. The
-              SVG scales cleanly above it to any size.
+            <p className="border-t border-hairline pt-5 text-sm leading-relaxed text-fd-muted-foreground">
+              The SVG scales cleanly above 16 px to any size. Prefer the adaptive mark when the host
+              theme can flip.
             </p>
           </Reveal>
         </div>
       </section>
 
-      {/* ── 04 · Misuse ───────────────────────────────────────────────── */}
-      <section className="mt-20">
+      {/* ── 04 · Misuse ─────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <SectionMark n="04">Don’t</SectionMark>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <Reveal className="mb-8 max-w-2xl">
+          <h2 className="display text-[length:var(--text-fluid-h2)]">Protect the read.</h2>
+          <p className="mt-4 max-w-xl text-fd-muted-foreground">
+            Recolor cells, invert fills, rotate, stretch, add effects, or reflow the grid — each
+            breaks the encoding the mark shares with the charts.
+          </p>
+        </Reveal>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {[
             {
               label: "Recolor the cells",
@@ -288,8 +317,6 @@ export default function BrandPage() {
             },
             {
               label: "Invert fills",
-              /* ink-on-ink so the "cells vanish" mistake stays visible on the
-                 dark tile too (a hardcoded #14161d blob disappeared in dark). */
               svg: markInner("var(--color-fd-foreground)", "var(--color-fd-foreground)"),
             },
             {
@@ -338,19 +365,16 @@ export default function BrandPage() {
               ),
             },
           ].map((d, i) => (
-            <Reveal key={d.label} delay={i * 40} className="glass flex flex-col overflow-hidden">
-              <div className="relative flex min-h-[104px] items-center justify-center bg-[#e9edf4] dark:bg-[#14161d]">
+            <Reveal key={d.label} delay={i * 35} className="glass flex flex-col overflow-hidden">
+              <div className="bk-stage relative min-h-[6.5rem]" data-tile="light">
                 <svg viewBox="0 0 32 32" width="56" height="56" aria-hidden>
                   {d.svg}
                 </svg>
-                <span
-                  aria-hidden
-                  className="absolute right-2 top-2 grid size-5 place-items-center rounded-full bg-[#ad4713] font-mono text-[11px] font-bold text-white"
-                >
-                  ✕
+                <span aria-hidden className="bk-badge absolute right-2 top-2">
+                  ×
                 </span>
               </div>
-              <div className="border-t border-hairline px-3 py-2 text-center">
+              <div className="border-t border-hairline px-3 py-2.5 text-center">
                 <span className="text-xs text-fd-muted-foreground">{d.label}</span>
               </div>
             </Reveal>
@@ -358,16 +382,17 @@ export default function BrandPage() {
         </div>
       </section>
 
-      {/* ── 05 · Color ────────────────────────────────────────────────── */}
-      <section className="mt-20">
+      {/* ── 05 · Color ──────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <SectionMark n="05">Color</SectionMark>
-
-        <p className="mb-5 max-w-2xl text-sm text-fd-muted-foreground">
-          One accent token drives the whole system — chrome, links, and the charts’ emphasis. Cobalt
-          is the default; five siblings swap in through the picker. Each is hand-tuned for light and
-          dark. Click any chip to copy its hex.
-        </p>
-        <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Reveal className="mb-8 max-w-2xl">
+          <h2 className="display text-[length:var(--text-fluid-h2)]">One accent. Six tunings.</h2>
+          <p className="mt-4 max-w-xl text-fd-muted-foreground">
+            A single token drives chrome, links, and chart emphasis. Cobalt is the default; five
+            siblings swap through the picker. Click any chip to copy its hex.
+          </p>
+        </Reveal>
+        <div className="grid grid-cols-1 gap-x-3 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
           {ACCENTS.map((a) => (
             <div key={a.name} className="grid grid-cols-2 gap-2">
               <ColorSwatch hex={a.light} name={a.name} role="Light" />
@@ -376,8 +401,8 @@ export default function BrandPage() {
           ))}
         </div>
 
-        <div className="mt-8 grid gap-8 md:grid-cols-2">
-          <div>
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <Reveal>
             <div className="mono-label mb-3">Neutrals</div>
             <div className="grid grid-cols-2 gap-2">
               <ColorSwatch hex="#e9edf4" name="Paper" role="Light" ring />
@@ -386,25 +411,30 @@ export default function BrandPage() {
               <ColorSwatch hex="#e9e8e3" name="Ink" role="Dark" ring />
               <ColorSwatch hex="#faf7f1" name="Cell fill" role="Mark" ring />
             </div>
-          </div>
-          <div>
-            <div className="mono-label mb-3">Semantic — direction never rides on color alone</div>
+          </Reveal>
+          <Reveal delay={60}>
+            <div className="mono-label mb-3">Semantic — never color alone</div>
             <div className="grid grid-cols-2 gap-2">
-              {/* Keep in sync with the site --mc-positive/--mc-negative in
-                  global.css (contrast-tuned to clear 4.5:1 on light glass). */}
               <ColorSwatch hex="#077353" name="Positive" role="Light" />
               <ColorSwatch hex="#34d399" name="Positive" role="Dark" />
               <ColorSwatch hex="#ad4713" name="Negative" role="Light" />
               <ColorSwatch hex="#fb8c5a" name="Negative" role="Dark" />
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ── 06 · Type ─────────────────────────────────────────────────── */}
-      <section className="mt-20">
+      {/* ── 06 · Type ───────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <SectionMark n="06">Type</SectionMark>
-        <div className="grid gap-4 md:grid-cols-3">
+        <Reveal className="mb-8 max-w-2xl">
+          <h2 className="display text-[length:var(--text-fluid-h2)]">Three voices. One system.</h2>
+          <p className="mt-4 max-w-xl text-fd-muted-foreground">
+            Display for titles, grotesk for reading, mono for measurement. Same trio as the rest of
+            the site.
+          </p>
+        </Reveal>
+        <div className="grid gap-3 md:grid-cols-3">
           {[
             {
               cls: "display text-5xl",
@@ -428,95 +458,122 @@ export default function BrandPage() {
               use: "Labels, sizes, coordinates, snippets.",
             },
           ].map((t, i) => (
-            <Reveal key={t.name} delay={i * 60} className="panel flex flex-col gap-4 p-6">
+            <Reveal
+              key={t.name}
+              delay={i * 50}
+              className="glass flex h-full flex-col gap-4 px-5 py-6"
+            >
               <div className={t.cls + " text-fd-foreground"}>{t.specimen}</div>
-              <div className="mt-auto border-t border-hairline pt-4">
-                <div className="text-sm font-medium text-fd-foreground">{t.name}</div>
-                <div className="mono-label mt-1">{t.role}</div>
-                <p className="mt-2 text-sm text-fd-muted-foreground">{t.use}</p>
+              <div className="mt-auto border-t border-hairline pt-4 leading-5">
+                <div className="text-sm font-medium leading-5 text-fd-foreground">{t.name}</div>
+                <div className="mono-label leading-5">{t.role}</div>
+                <p className="mt-2 text-sm leading-5 text-fd-muted-foreground">{t.use}</p>
               </div>
             </Reveal>
           ))}
         </div>
       </section>
 
-      {/* ── 07 · The name ─────────────────────────────────────────────── */}
-      <section className="mt-20">
+      {/* ── 07 · The name ───────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <SectionMark n="07">The name</SectionMark>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <Reveal className="panel flex flex-col gap-4 p-7">
+        <Reveal className="mb-8 max-w-2xl">
+          <h2 className="display text-[length:var(--text-fluid-h2)]">One lowercase word.</h2>
+          <p className="mt-4 max-w-xl text-fd-muted-foreground">
+            Always “microcharts” — even at the start of a sentence. Never MicroCharts, micro charts,
+            or µcharts.
+          </p>
+        </Reveal>
+        <div className="grid items-stretch gap-3 lg:grid-cols-2">
+          <Reveal className="panel flex h-full flex-col gap-5 p-7">
             <div className="flex items-center gap-3">
               <Brandmark size={30} />
-              <span className="text-2xl font-semibold tracking-[-0.01em] text-fd-foreground">
+              <span className="text-2xl font-semibold leading-none tracking-[-0.01em] text-fd-foreground">
                 microcharts
               </span>
             </div>
-            <ul className="mt-1 space-y-2.5 text-sm text-fd-muted-foreground">
-              <li>
-                <span className="text-fd-foreground">One lowercase word</span> — “microcharts,” even
-                at the start of a sentence.
-              </li>
-              <li>Never “Microcharts,” “MicroCharts,” “micro charts,” or “µcharts.”</li>
-              <li>
-                The mark may pair with the wordmark or stand alone. Don’t redraw the wordmark.
-              </li>
+            <ul className="space-y-2.5 text-sm text-fd-muted-foreground">
+              <li>The mark may pair with the wordmark or stand alone.</li>
+              <li>Don’t redraw the wordmark — use the shipped lockup.</li>
             </ul>
           </Reveal>
-          <Reveal delay={80} className="panel flex flex-col justify-center gap-3 p-7">
-            {[
-              { k: "Name", v: "microcharts", cmd: false },
-              { k: "Package", v: SITE.pkg, cmd: false },
-              { k: "Install", v: `pnpm add ${SITE.pkg}`, cmd: true },
-            ].map((row) => (
-              <div
-                key={row.k}
-                className="command-well flex items-center gap-2.5 py-2 pl-3.5 pr-1.5"
-              >
-                <span className="mono-label w-16 shrink-0">{row.k}</span>
-                {row.cmd ? (
-                  <CommandLine
-                    command={row.v}
-                    prompt={false}
-                    className="min-w-0 flex-1 truncate text-sm"
-                  />
-                ) : (
-                  <code className="min-w-0 flex-1 truncate font-mono text-sm text-fd-foreground">
-                    {row.v}
-                  </code>
-                )}
-                <CopyButton text={row.v} size={7} className="shrink-0" />
-              </div>
-            ))}
+          <Reveal delay={80} className="panel flex h-full flex-col overflow-hidden p-0">
+            <dl className="grid h-full min-h-[8.25rem] grid-rows-3 divide-y divide-hairline">
+              {[
+                { k: "Name", v: "microcharts", cmd: false },
+                { k: "Package", v: SITE.pkg, cmd: false },
+                { k: "Install", v: `pnpm add ${SITE.pkg}`, cmd: true },
+              ].map((row) => (
+                <div
+                  key={row.k}
+                  className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-x-3 px-4"
+                >
+                  <dt className="mono-label">{row.k}</dt>
+                  <dd className="min-w-0">
+                    {row.cmd ? (
+                      <CommandLine
+                        command={row.v}
+                        prompt={false}
+                        className="block truncate text-sm"
+                      />
+                    ) : (
+                      <code className="block truncate font-mono text-sm text-fd-foreground">
+                        {row.v}
+                      </code>
+                    )}
+                  </dd>
+                  <CopyButton text={row.v} size={7} className="shrink-0" />
+                </div>
+              ))}
+            </dl>
           </Reveal>
         </div>
       </section>
 
-      {/* ── Permission note ───────────────────────────────────────────── */}
-      <Reveal className="mt-20 border-t border-hairline pt-8">
-        <p className="max-w-2xl text-sm text-fd-muted-foreground">
-          Use the mark to link to or reference microcharts — a “built with,” a talk slide, an
-          integration. Don’t modify it, use it as your own product’s mark, or imply endorsement. The
-          library’s code is{" "}
-          <a
-            href={SITE.repo}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="link-underline text-fd-foreground"
-          >
-            MIT
-          </a>
-          . Questions? Reach out on{" "}
-          <a
-            href={SITE.authorX}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="link-underline text-fd-foreground"
-          >
-            {SITE.authorXHandle}
-          </a>
-          .
-        </p>
-      </Reveal>
-    </div>
+      {/* ── Permission ──────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <div className="panel relative flex flex-col gap-4 overflow-hidden px-6 py-12 sm:px-10">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 grid-paper opacity-40"
+          />
+          <h2 className="display relative max-w-2xl text-[length:var(--text-fluid-h2)] text-fd-foreground">
+            Use it to point at the work.
+          </h2>
+          <p className="relative max-w-2xl text-sm leading-relaxed text-fd-muted-foreground">
+            Link to or reference microcharts — a “built with,” a talk slide, an integration. Don’t
+            modify the mark, use it as your own product’s mark, or imply endorsement. The code is{" "}
+            <a
+              href={SITE.repo}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="link-underline text-fd-foreground"
+            >
+              MIT
+            </a>
+            . Questions?{" "}
+            <a
+              href={SITE.authorX}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="link-underline text-fd-foreground"
+            >
+              {SITE.authorXHandle}
+            </a>
+            .
+          </p>
+          <div className="relative mt-2">
+            <a
+              href="/brand/microcharts-brand-kit.zip"
+              download
+              className="cta-accent inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
+            >
+              <Download className="size-4" />
+              Download kit
+            </a>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

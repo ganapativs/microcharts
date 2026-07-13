@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { FillWord } from "./client.js";
 
-describe("interactive <FillWord> (plan/24 #3)", () => {
+describe("interactive <FillWord>", () => {
   it("announces changes through a polite region (leading edge)", async () => {
     const screen = await render(<FillWord word="uploading" value={0.2} />);
     const live = document.querySelector('[aria-live="polite"]')!;

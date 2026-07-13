@@ -21,8 +21,8 @@ const SLEEP = [
 
 afterEach(() => vi.restoreAllMocks());
 
-describe("<Hypnogram> (plan/25 §2, plan/17 F8)", () => {
-  it("renders a step path; docs-as-tests summary", () => {
+describe("<Hypnogram>", () => {
+  it("renders a step path summary", () => {
     const { container } = draw(<Hypnogram data={SLEEP} domain={[0, 110]} />);
     expect(container.querySelector('path[data-mc-ink="data"]')).not.toBeNull();
     expect(hypnogramSummary(SLEEP, ["Awake", "Light", "Deep", "REM"], [0, 110], EN_HYPNOGRAM)).toBe(

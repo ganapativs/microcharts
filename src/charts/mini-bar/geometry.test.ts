@@ -4,7 +4,7 @@ import { miniBarGeometry } from "./geometry.js";
 
 const base = { width: 50, height: 16, orientation: "vertical" as const };
 
-describe("miniBarGeometry (plan/22 #6)", () => {
+describe("miniBarGeometry", () => {
   it("bars are zero-anchored: tallest value spans to the top, all rest to baseline", () => {
     const geo = miniBarGeometry({ ...base, values: [10, 5] });
     expect(geo.bars[0]!.y).toBe(0);
@@ -12,7 +12,7 @@ describe("miniBarGeometry (plan/22 #6)", () => {
     expect(geo.bars[1]!.h).toBeCloseTo(geo.bars[0]!.h / 2, 1);
   });
 
-  it("explicit domain is widened to include zero (anchoring is non-negotiable)", () => {
+  it("explicit domain is widened to include zero (anchoring is )", () => {
     const geo = miniBarGeometry({ ...base, values: [10, 20], domain: [10, 20] });
     // if the domain were [10,20], value 10 would render 0 height — it must not
     expect(geo.bars[0]!.h).toBeGreaterThan(0);

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <MinimapStrip> (plan/25 §10). Drag or click to move the viewport
+// Interactive <MinimapStrip>. Drag or click to move the viewport
 // window; ←/→ nudge 5% (Shift 20%). The window maps linearly to the domain — no
 // fisheye. Composes the static component (canon).
 import {

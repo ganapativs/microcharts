@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Waterfall> (plan/22 #20). One pointer listener; step by x-band.
+// Interactive <Waterfall>. One pointer listener; step by x-band.
 // ←/→ rove steps ("Refunds: −140, running 1,410."); End focuses the total.
 // Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

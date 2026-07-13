@@ -15,7 +15,7 @@ function firstYs(container: HTMLElement): number[] {
   });
 }
 
-describe("<SparkGroup> shared scale (plan/04 §5)", () => {
+describe("<SparkGroup> shared scale", () => {
   it("shared domain: equal values land at equal y across children", () => {
     const { container } = draw(
       <SparkGroup width={80} height={20}>

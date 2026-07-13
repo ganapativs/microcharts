@@ -1,5 +1,5 @@
-// <VolumeProfile> — at which LEVEL did activity concentrate, not when (plan/25
-// §16, plan/17 F15). Static, hook-free, RSC-safe. A histogram perpendicular to
+// <VolumeProfile> — at which LEVEL did activity concentrate, not when (
+// §16, F15). Static, hook-free, RSC-safe. A histogram perpendicular to
 // the trend axis: y = level, bars extend horizontally by activity mass. The
 // modal bin (POC) is accented and the value area is shaded — a stated 70%
 // convention, never an implied confidence interval.
@@ -102,7 +102,7 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
       {/* value area band — a true background band (real data extent, kept for
           the craft/overlap + forced-colors exemption); fill via inline STYLE,
           not the token, so the accent tint stays distinct from a plain neutral
-          band (plan/12 benchmark-strip precedent). */}
+          band (benchmark-strip precedent). */}
       {geo.valueAreaRect ? (
         <rect
           x={geo.valueAreaRect.x}

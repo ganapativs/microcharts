@@ -1,4 +1,4 @@
-// <QuantileDots> — what are the odds, in COUNTABLE form? (plan/23 #12). A
+// <QuantileDots> — what are the odds, in COUNTABLE form? A
 // quantile dotplot: `count` dots at equal-probability quantiles, stacked into
 // columns. Each dot ≈ a 1-in-count chance — NOT a raw observation. Past a
 // threshold, dots are re-inked accent AND ringed (never color-alone), and the

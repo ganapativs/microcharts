@@ -1,4 +1,4 @@
-// DualWindowMeter geometry — pure, React-free (plan/25 §11, plan/17 F4). Two
+// DualWindowMeter geometry — pure, React-free. Two
 // rolling means of one raw series co-plotted against a compliance target: fast
 // window thin, slow window thick. The plotted values are rolling means and the
 // window sizes are part of the meaning (stated, never hidden). A trace starts

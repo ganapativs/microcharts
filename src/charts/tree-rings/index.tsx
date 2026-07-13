@@ -1,9 +1,9 @@
-// <TreeRings> — how growth accumulated, period over period (plan/24 #13, S1,
+// <TreeRings> — how growth accumulated, period over period (, S1,
 // flagship). Radial ring THICKNESS ∝ per-period value, oldest at the centre. The
 // channel is thickness, never area (equal thickness at a larger radius spans more
 // area — the ring illusion). Static, hook-free, RSC-safe.
 //
-// NOTE (plan/12): the spec named the render variant `style`, but every chart
+// NOTE: the spec named the render variant `style`, but every chart
 // exposes `style?: CSSProperties`; the knob ships as `rings` here to keep it.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
@@ -15,7 +15,7 @@ import { ringAnnulus, ringOutline, treeRingsGeometry } from "./geometry.js";
 
 export interface TreeRingsProps {
   data: readonly number[];
-  /** Which period's ring to pick out: `last` (default), `none`, or an index (plan/04 §8: datum addressing → `highlight`). */
+  /** Which period's ring to pick out: `last` (default), `none`, or an index. */
   highlight?: "last" | "none" | number | undefined;
   /** Expected lifetime Σ — the disc fills only Σdata/total of the radius. */
   total?: number | undefined;

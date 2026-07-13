@@ -1,4 +1,4 @@
-// <EventTimeline> — what happened when, and for how long (plan/22 #27).
+// <EventTimeline> — what happened when, and for how long.
 // Uptime windows, on-call shifts, release spans + incident points on one row.
 // Diamonds mark instants, rects mark durations — the TYPE distinction is a
 // shape, so it survives 12 px where color coding wouldn't. Static, hook-free,

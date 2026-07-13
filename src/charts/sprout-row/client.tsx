@@ -1,5 +1,5 @@
 "use client";
-// Interactive <SproutRow> (plan/24 #9). Roving 1-D keyboard (←/→) + nearest-slot
+// Interactive <SproutRow>. Roving 1-D keyboard (←/→) + nearest-slot
 // pointer lookup; announces each item's stage; a focus ring lifts the active
 // glyph. Composes the static component (overlay ring as children).
 import { useMemo, useRef, useState } from "react";

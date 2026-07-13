@@ -1,4 +1,4 @@
-// Calendar grid math (plan/21 §6.0.C). UTC ONLY — every function works from
+// Calendar grid math. UTC ONLY — every function works from
 // UTC date parts, so the same input renders identically in any host timezone
 // (the SSR/hydration + visual-test requirement; a live "now" never enters —
 // callers pass `end` explicitly). Dates travel as ISO `yyyy-mm-dd` strings +

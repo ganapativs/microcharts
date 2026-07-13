@@ -14,8 +14,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<DualSparkline> (plan/22 #22)", () => {
-  it("dashed reference behind a solid primary; docs-as-tests summary", () => {
+describe("<DualSparkline>", () => {
+  it("dashed reference behind a solid primary summary", () => {
     const { container } = draw(<DualSparkline data={YOU} compare={PLAN} />);
     const paths = [...container.querySelectorAll("path")];
     expect(paths.length).toBe(2);

@@ -1,4 +1,4 @@
-// LikertStrip geometry — pure, React-free (plan/22 #30, S2-ordinal diverging).
+// LikertStrip geometry — pure, React-free.
 // Signed segment lengths from a center line via core/stack.divergingStack.
 // Graded opacity encodes ordinal distance from neutral, never magnitude. 2-dp.
 import { divergingStack, type DivergingStack } from "../../core/stack.js";

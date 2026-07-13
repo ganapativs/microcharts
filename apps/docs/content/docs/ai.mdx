@@ -65,6 +65,19 @@ identical to one you'd write by hand.
 An inline chart is decorative — the sentence describes it, so pass `summary={false}`. A
 standalone chart keeps its summary; give it a `title`.
 
+Wrap every inline SVG mark in `className="mc-inline"` — the class ships in
+`@microcharts/react/styles.css` (imported once in the Quickstart). Leave `Delta` bare; it
+is a text metric and owns its baseline. Override `--mc-inline-nudge` only if your type face
+needs a different optical lift.
+
+```tsx
+NVDA closed +3.8%{" "}
+<span className="mc-inline">
+  <TrendArrow value={0.038} summary={false} />
+</span>{" "}
+on the session — up <Delta value={0.038} summary={false} /> week over week.
+```
+
 </Step>
 
 </Steps>

@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<TallyMarks> (plan/24 #1)", () => {
+describe("<TallyMarks>", () => {
   it("summary is the real string: '{n} counted.'", () => {
     const { container } = draw(<TallyMarks value={23} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("23 counted.");

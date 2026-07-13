@@ -21,8 +21,8 @@ const BANDS: [number, number][] = [
   [5, 95],
 ];
 
-describe("<FoldedDayBand> (plan/25 §15, plan/17 F7)", () => {
-  it("renders envelopes + median; docs-as-tests summary with today clause", () => {
+describe("<FoldedDayBand>", () => {
+  it("renders envelopes + median summary with today clause", () => {
     const { container } = draw(<FoldedDayBand data={DATA} today={TODAY} />);
     expect(container.querySelector('path[data-mc-ink="data"]')).not.toBeNull();
     const geo = foldedBandGeometry({

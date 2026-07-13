@@ -16,7 +16,7 @@ function toSubpath(importPath: string): string {
   return importPath.replace(pkg.name, ".");
 }
 
-describe("catalog ↔ package exports (plan/20 §5.3)", () => {
+describe("catalog ↔ package exports", () => {
   it("is the microcharts package", () => {
     expect(pkg.name).toBe("@microcharts/react");
   });

@@ -140,7 +140,7 @@ export const playground: PlaygroundSpec = {
       "  data={responses}",
       s.neutral !== "split" && `  neutral="${s.neutral}"`,
       s.label !== "ends" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -193,15 +193,12 @@ const RETURNING = [
   { label: "Strongly agree", value: 42 },
 ];
 
-/* The four homes — LikertStrip always answering "does the response lean agree
-   or disagree, and how hard" for a real survey/sentiment surface, never a
-   generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Checkout satisfaction, Q1{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <LikertStrip data={SURVEY} summary={false} label="none" width={90} height={16} />
         </span>{" "}
         — 62% agree, 24% disagree. Leans positive.
@@ -284,9 +281,14 @@ export function markCode(): string {
   return `<LikertStrip data={responses} />`;
 }
 
+export function PreviewLive() {
+  return <LikertStripInteractive data={SURVEY} summary={false} width={130} height={20} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

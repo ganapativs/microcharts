@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { OrbitStatus } from "./client.js";
 
-describe("interactive <OrbitStatus> (plan/24 #22)", () => {
+describe("interactive <OrbitStatus>", () => {
   it("wrapper owns naming; static chart is decorative", async () => {
     const screen = await render(
       <OrbitStatus

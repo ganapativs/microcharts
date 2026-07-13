@@ -1,5 +1,5 @@
 "use client";
-// Interactive <HeatCell> (plan/22 #3). One target — no pointer lookup needed;
+// Interactive <HeatCell>. One target — no pointer lookup needed;
 // focus/hover reveals the formatted value + calibrated level with ActivityGrid
 // announcement parity ("42 — level 3 of 5."). Composes the static entry.
 import { useMemo, useRef, useState } from "react";

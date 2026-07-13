@@ -1,4 +1,4 @@
-// <SpiralYear> — how did the year breathe? Seasonality at a glance (plan/24 #18,
+// <SpiralYear> — how did the year breathe? Seasonality at a glance (,
 // S1 calendar). A calendar series wound onto an Archimedean spiral: angle =
 // position in the year (Jan 1 at 12 o'clock, clockwise), each turn outward = the
 // next year. The value is a 5-step (or 3-step) opacity — an ORDINAL channel, the

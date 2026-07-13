@@ -5,9 +5,7 @@ import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } f
 const PKG = "@microcharts/react";
 const D = [0, 100] as const;
 
-/* Shared demo matrix for the four homes — a tiny shard × hour load grid, the
-   exact "table-cell matrix" HeatCell exists for. One domain (D) throughout,
-   never per-cell auto-scaled. */
+/* Shared shard × hour load matrix (one domain throughout). */
 const HOURS = ["00:00", "06:00", "12:00", "18:00"] as const;
 const SHARDS = [
   { label: "shard-a", load: [18, 42, 76, 55] },
@@ -81,7 +79,6 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
-  // `domain` is deliberately not a knob: it's fixed to [0, 100] here because
   // the entire point of HeatCell is calibrating against ONE shared domain —
   // letting readers drag it per-cell would demo the anti-pattern the
   // "shared-domain rule" section on this page warns against.
@@ -139,7 +136,7 @@ export const playground: PlaygroundSpec = {
       s.steps !== 5 && `  steps={${s.steps}}`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       (s.label as boolean) && '  label="value"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -180,15 +177,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — HeatCell always doing the one thing it's for: a single
-   calibrated step, laid out by the host, sharing one domain. Every host is an
-   ops/load surface, never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         shard-a load just crossed{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <HeatCell value={76} domain={D} summary={false} style={{ width: 14, height: 14 }} />
         </span>{" "}
         76% — level 4 of 5, its hottest slot today.
@@ -290,9 +284,27 @@ export function markCode(): string {
   return `<HeatCell value={72} domain={[0, 100]} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {[12, 35, 58, 79, 96].map((v) => (
+        <HeatCellInteractive
+          key={v}
+          value={v}
+          domain={D}
+          summary={false}
+          style={{ width: 16, height: 16 }}
+          animate
+        />
+      ))}
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -4,7 +4,7 @@ import { QuantileDots } from "./client.js";
 
 const UNIFORM = Array.from({ length: 20 }, (_, i) => i + 1); // 1..20
 
-describe("interactive <QuantileDots> (plan/23 #12)", () => {
+describe("interactive <QuantileDots>", () => {
   it("the probe: hovering recomputes the count past the live threshold", async () => {
     const screen = await render(
       <QuantileDots data={UNIFORM} threshold={15} side="above" title="Bus wait" />,

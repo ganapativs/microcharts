@@ -1,16 +1,9 @@
 import { CELL_FILL, CELL_R, CELL_SIZE, CELLS, SQUIRCLE_PATH } from "@/lib/brand";
 
 /**
- * microcharts brand mark — three data cells climbing a diagonal, fill graded
- * faint → solid (ActivityGrid DNA; ownable, crisp at a 16 px favicon). Geometry
- * is the single canonical spec in `lib/brand.ts`, shared with the favicon /
- * apple icon / OG badge so every surface matches exactly.
- *
- * variant "solid"   → accent squircle, near-white cells knocked out (the
- *                     standard logo: nav, favicon, wordmark badge).
- * variant "line"    → transparent, cells in currentColor (mono contexts).
- * variant "outline" → hollow: hairline squircle + cells, all currentColor —
- *                     the letterpress treatment the footer wordmark uses.
+ * Brand mark — three cells on a diagonal. Geometry from `lib/brand.ts`.
+ * solid: accent squircle + near-white cells · line: currentColor cells ·
+ * outline: hairline squircle + cells (footer letterpress).
  */
 export function Brandmark({
   size = 24,

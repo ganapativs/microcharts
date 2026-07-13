@@ -5,7 +5,7 @@ import { PolarClock } from "./client.js";
 
 const WEEK = [120, 200, 180, 210, 260, 90, 60]; // Sun..Sat
 
-describe("interactive <PolarClock> (plan/24 #17)", () => {
+describe("interactive <PolarClock>", () => {
   it("arrow keys step segments circularly and announce weekday + value", async () => {
     const screen = await render(<PolarClock data={WEEK} title="Week" />);
     const fig = screen.getByRole("img").element() as HTMLElement;

@@ -1,5 +1,5 @@
 // <CalendarStrip> — what did the last few weeks look like, day by day
-// (plan/22 #26). Real calendar position (weekday rhythm) is the point — for
+// Real calendar position (weekday rhythm) is the point — for
 // longer ordinal histories use ActivityGrid. Honesty: a day with no record
 // renders visibly different from a day with value 0, and future days are
 // blank, never extrapolated. All date math UTC (core/calendar). Static,
@@ -66,7 +66,7 @@ export interface CalendarStripProps {
   /** Explicit `[min, max]` for step bucketing; auto-fit when omitted. */
   domain?: readonly [number, number] | undefined;
   /** Cell edge length in viewBox units (default 7 — grid-sibling parity with
-   *  ActivityGrid/GardenGrid; plan/04 §8). */
+   * ActivityGrid/GardenGrid; ). */
   cell?: number | undefined;
   gap?: number | undefined;
   color?: string | undefined;

@@ -15,7 +15,7 @@ const BINS = [
   { predicted: 0.95, observed: 0.9, count: 5 },
 ];
 
-describe("calibrationGeometry (plan/25 §14, plan/17 F19)", () => {
+describe("calibrationGeometry", () => {
   it("discriminates pre-binned from raw input", () => {
     expect(isBinned(BINS)).toBe(true);
     expect(isBinned([{ p: 0.5, outcome: 1 }])).toBe(false);

@@ -148,7 +148,7 @@ export const playground: PlaygroundSpec = {
       "  data={bundle}",
       s.labels === false && "  labels={false}",
       s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -186,9 +186,14 @@ export function markCode(): string {
   return `<PartitionStrip data={bundle} />`;
 }
 
+export function PreviewLive() {
+  return <PartitionStripInteractive data={TREE} summary={false} width={140} height={24} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

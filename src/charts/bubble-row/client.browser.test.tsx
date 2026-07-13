@@ -9,7 +9,7 @@ const REGIONS = [
   { label: "LATAM", value: 210 },
 ] as const;
 
-describe("interactive <BubbleRow> (plan/24 #11)", () => {
+describe("interactive <BubbleRow>", () => {
   it("arrow keys rove and announce each bubble's exact value", async () => {
     const screen = await render(<BubbleRow data={REGIONS} title="Markets" />);
     const fig = screen.getByRole("img").element() as HTMLElement;

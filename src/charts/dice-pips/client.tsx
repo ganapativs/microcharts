@@ -1,5 +1,5 @@
 "use client";
-// Interactive <DicePips> (plan/24 #2). Announces the new face through a polite
+// Interactive <DicePips>. Announces the new face through a polite
 // region on change; the pip set cross-fades (opacity, reduced-motion → instant).
 // No sub-part navigation — the pips are one value. Composes the static component.
 import { useEffect, useRef, useState } from "react";

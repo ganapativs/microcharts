@@ -46,10 +46,12 @@ export function ColorSwatch({
           )}
         />
       </span>
-      <span className="min-w-0">
-        {role && <span className="mono-label block leading-tight opacity-70">{role}</span>}
-        <span className="block truncate text-sm font-medium text-fd-foreground">{name}</span>
-        <span className="block font-mono text-xs uppercase tabular-nums text-fd-muted-foreground">
+      <span className="min-w-0 leading-5">
+        {role && <span className="mono-label block leading-5 opacity-70">{role}</span>}
+        <span className="block truncate text-sm font-medium leading-5 text-fd-foreground">
+          {name}
+        </span>
+        <span className="block font-mono text-xs uppercase leading-5 tabular-nums text-fd-muted-foreground">
           {copied ? "copied" : hex}
         </span>
       </span>

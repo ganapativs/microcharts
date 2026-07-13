@@ -12,7 +12,7 @@ const OBS = {
   station: "KSFO",
 } as const;
 
-describe("interactive <StationGlyph> (plan/25 §20)", () => {
+describe("interactive <StationGlyph>", () => {
   it("roves fields with ←/→ into a live region", async () => {
     const screen = await render(<StationGlyph {...OBS} title="Observation" size={40} />);
     const wrap = screen.container.querySelector(".mc-station-live") as HTMLElement;

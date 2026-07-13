@@ -143,7 +143,7 @@ export const playground: PlaygroundSpec = {
       `  data={[${data.join(", ")}]}`,
       s.positive !== "up" && `  positive="${s.positive}"`,
       s.label !== "current" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -202,9 +202,14 @@ export function markCode(width?: number, height?: number): string {
   return `<StreakSpark data={data}${size} />`;
 }
 
+export function PreviewLive() {
+  return <StreakSparkInteractive data={STREAK} width={180} height={48} summary={false} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

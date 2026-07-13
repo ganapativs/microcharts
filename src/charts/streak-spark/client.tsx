@@ -1,5 +1,5 @@
 "use client";
-// Interactive <StreakSpark> (plan/26 §2, plan/08 T2). ←/→ roves runs with a
+// Interactive <StreakSpark>. ←/→ roves runs with a
 // polite readout; the pointer picks the nearest run by x. COMPOSES the static
 // entry (component canon): the static renders the run bars, triangle tick and
 // count labels; the client only overlays a focus outline + readout and owns
@@ -81,7 +81,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
   );
 
   // ONE listener; nearest run by x distance to its centre in viewBox space —
-  // never a DOM node per run (plan/03 §6).
+  // never a DOM node per run.
   const onPointerMove = useCallback(
     (e: PointerEvent<HTMLElement>) => {
       if (geo.runs.length === 0) return;

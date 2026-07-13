@@ -59,10 +59,7 @@ export function softwareSourceCodeJsonLd() {
   };
 }
 
-/**
- * Serialize JSON-LD safely for inline `<script type="application/ld+json">`
- * (plan/20 §4 rendering rule).
- */
+/** Serialize JSON-LD for inline `<script type="application/ld+json">`. */
 export function jsonLdScript(data: unknown): string {
   return JSON.stringify(data).replaceAll("<", "\\u003c");
 }

@@ -1,4 +1,4 @@
-// CalibrationStrip geometry — pure, React-free (plan/25 §14, plan/17 F19). When
+// CalibrationStrip geometry — pure, React-free. When
 // a model says 70%, does it happen 70% of the time — and is there enough data to
 // even ask. Predicted × observed against the identity diagonal, with an
 // ALWAYS-ON support lane (per-bin counts) so tiny bins never look authoritative.

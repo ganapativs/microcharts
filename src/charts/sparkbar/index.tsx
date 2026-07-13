@@ -1,8 +1,8 @@
-// <SparkBar> — discrete periods as bars (plan/05 §2, S1). Static, hook-free,
+// <SparkBar> — discrete periods as bars. Static, hook-free,
 // RSC-safe. Zero-anchored bars; `mode="winloss"` collapses magnitude to a
 // three-state streak: win above the mid-line, loss below, tie (0) a thin
 // neutral dash on it. Negative bars take the negative token so direction is encoded
-// by position AND color (plan/08 1.4.1). Endpoint bar gets accent emphasis.
+// by position AND color. Endpoint bar gets accent emphasis.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter } from "../../core/format.js";
@@ -67,7 +67,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
   const fmt = makeFormatter(format, locale);
 
   // The endpoint label reserves a deterministic right gutter BEFORE geometry, so
-  // bars never sit under it (plan/18; mirrors the Sparkline).
+  // bars never sit under it.
   let labelText: string | undefined;
   if (label === "last" && mode === "bar") {
     for (let i = data.length - 1; i >= 0; i--) {
@@ -89,7 +89,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
   });
   const last = geo.bars.at(-1);
 
-  // annotations host contract (plan/22 #28): Marker x = data INDEX (bar slot
+  // annotations host contract: Marker x = data INDEX (bar slot
   // center), Threshold/TargetZone y = data values (sign space in win-loss).
   const ann = resolveAnnotations(children, {
     x: (i) => geo.x0 + i * geo.slot + geo.slot / 2,

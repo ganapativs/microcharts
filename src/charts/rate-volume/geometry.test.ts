@@ -10,7 +10,7 @@ const SAMPLE: RateVolumePoint[] = [
   { rate: 4.1, volume: 38 },
 ];
 
-describe("rateVolumeGeometry (plan/23 #5)", () => {
+describe("rateVolumeGeometry", () => {
   it("one bar per period, zero-anchored (bottom edge)", () => {
     const geo = rateVolumeGeometry({ ...base, data: SAMPLE })!;
     expect(geo.bars).toHaveLength(4);

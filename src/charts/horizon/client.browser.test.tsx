@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { Horizon } from "./client.js";
 
-describe("interactive <Horizon> (plan/22 #25)", () => {
+describe("interactive <Horizon>", () => {
   it("announces the TRUE value, not the band", async () => {
     const screen = await render(<Horizon data={[5, -12, 96, 40]} title="Load" />);
     const wrap = screen.container.querySelector(".mc-horizon-live") as HTMLElement;

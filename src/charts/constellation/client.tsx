@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Constellation> (plan/24 #16). One pointer listener; nearest event
+// Interactive <Constellation>. One pointer listener; nearest event
 // by squared 2-D distance over the precomputed stars. ←/→ step chronologically.
 // Focus ring on the active event; readout names the time, value, and magnitude.
 // Composes the static component (canon). Vertical jitter (value-less data) stays

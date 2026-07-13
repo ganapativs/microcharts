@@ -1,4 +1,4 @@
-// <BalanceBeam> — which side outweighs, and roughly by how much (plan/24 #8, S2
+// <BalanceBeam> — which side outweighs, and roughly by how much (, S2
 // exactly two). Tilt direction is instant; the angle SATURATES at maxTilt (read
 // direction + rough magnitude, not an exact ratio — docs steer precise ratios to
 // PairedBars/Delta). Weights are area-true. Endpoints are pre-rotated in geometry
@@ -122,7 +122,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
   // The heavier pan is accented — the "which side wins" read is instant, and it
   // only reinforces the tilt (never the sole cue), so direction stays legible
   // without colour. An explicit `color` overrides both pans (user intent wins);
-  // otherwise the fill comes from the accent/point ink roles (plan/24 #8).
+  // otherwise the fill comes from the accent/point ink roles.
   const weightMark = (w: { cx: number; cy: number; half: number }, key: string, heavy: boolean) => {
     const inkProps = color
       ? { style: { fill: color } }

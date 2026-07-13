@@ -1,4 +1,4 @@
-// <MicroDonut> — roughly what is this made of, at icon size (plan/22 #18, S3).
+// <MicroDonut> — roughly what is this made of, at icon size.
 // An honest, capped concession to a ubiquitous demand: the docs' first
 // paragraph steers to SegmentedBar for any comparative read. Wedge cap +
 // labeled rollup are non-optional; never explode, tilt, or shadow. Static,

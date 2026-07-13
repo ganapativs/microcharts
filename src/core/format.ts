@@ -1,6 +1,6 @@
-// Cached number formatting (plan/04 rule 7). `Intl.NumberFormat` construction
+// Cached number formatting. `Intl.NumberFormat` construction
 // is ~µs-expensive; per-render/per-call construction multiplies across
-// hundreds of chart instances (plan/07). One bounded cache, keyed by
+// hundreds of chart instances. One bounded cache, keyed by
 // locale + options. Pure module state — safe on server and client.
 export type Format = Intl.NumberFormatOptions | ((n: number) => string);
 
@@ -35,7 +35,7 @@ export function makeFormatter(
   return (n) => nf.format(n);
 }
 
-// Cached date/time formatting (plan/22 shared conventions) — same caching
+// Cached date/time formatting — same caching
 // discipline as numbers. `Intl.DateTimeFormat` construction is even costlier.
 export type DateFormat = Intl.DateTimeFormatOptions | ((d: Date) => string);
 

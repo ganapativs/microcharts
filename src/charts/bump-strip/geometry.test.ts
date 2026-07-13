@@ -4,7 +4,7 @@ import { bumpGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 16, gutterLeftCh: 2, gutterRightCh: 2, fontSize: 6 };
 
-describe("bumpGeometry (plan/22 #21)", () => {
+describe("bumpGeometry", () => {
   it("rank 1 sits at the TOP (inverted y, documented)", () => {
     const geo = bumpGeometry({ ...base, ranks: [1, 5] });
     expect(geo.points[0]!.y).toBeLessThan(geo.points[1]!.y);

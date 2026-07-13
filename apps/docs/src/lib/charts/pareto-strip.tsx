@@ -155,7 +155,7 @@ export const playground: PlaygroundSpec = {
       s.threshold !== 80 && `  threshold={${s.threshold}}`,
       s.max !== "8" && `  max={${s.max}}`,
       s.label !== "count" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -195,9 +195,14 @@ export function markCode(): string {
   return `<ParetoStrip data={causes} />`;
 }
 
+export function PreviewLive() {
+  return <ParetoStripInteractive data={CAUSES} summary={false} width={160} height={22} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

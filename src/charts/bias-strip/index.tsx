@@ -1,5 +1,5 @@
 // <BiasStrip> — is there a systematic offset between two ways of measuring the
-// same thing? (plan/26 §7, F-BiasStrip). Static, hook-free, RSC-safe. A
+// same thing? Static, hook-free, RSC-safe. A
 // word-sized Bland–Altman plot: each dot is one pair at (mean, difference); the
 // zero line is perfect agreement, the accent line is the measured bias, and the
 // faint band is the ±k·σ limits of agreement. Dots at 75% opacity so overplot

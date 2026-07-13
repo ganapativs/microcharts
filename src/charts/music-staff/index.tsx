@@ -1,4 +1,4 @@
-// <MusicStaff> — the shape of a short series read as melody (plan/24 #12, S1).
+// <MusicStaff> — the shape of a short series read as melody.
 // Pitch (vertical position on a 5-line staff) is the only channel; time is the
 // x order. Reuses describeSeries verbatim (same S1 pipeline as Sparkline) — no
 // new summary template. Static, hook-free, RSC-safe.

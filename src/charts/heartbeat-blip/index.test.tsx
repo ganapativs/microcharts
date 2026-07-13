@@ -8,7 +8,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
 const EVENTS = [97_000, 90_000, 80_000];
 
-describe("<HeartbeatBlip> (plan/24 #20)", () => {
+describe("<HeartbeatBlip>", () => {
   it("summary states count, window, and time since last", () => {
     const { container } = draw(<HeartbeatBlip events={EVENTS} now={100_000} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

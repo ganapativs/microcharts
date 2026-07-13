@@ -10,15 +10,7 @@ import { cn } from "@/lib/cn";
 import { GRAMMAR } from "@/lib/ai-grammar";
 import { AGENT_RULES, MACHINE_SURFACES } from "@/lib/ai-providers";
 
-/**
- * The grammar explorer — the interactive heart of the AI-native guide. Pick a
- * chart type and a form (fenced block vs inline span) and see, in lockstep: the
- * exact text a model emits, that text rendered as the real shipped chart, and
- * the equivalent React. It's a live proof the plain-text grammar round-trips to
- * the same component a human would write by hand. The grammar data is shared
- * with the Markdown transform (`lib/ai-grammar`), so this and `/docs/ai.md`
- * never disagree.
- */
+/** Interactive grammar explorer — fenced/inline → live chart + React. */
 
 type Mode = "fenced" | "inline";
 
@@ -133,7 +125,6 @@ export function GrammarExplorer() {
 
   return (
     <div className="not-prose my-6 panel overflow-hidden">
-      {/* controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-3 py-2.5">
         <div className="flex flex-wrap gap-1.5">
           {GRAMMAR.map((s) => (
@@ -171,7 +162,6 @@ export function GrammarExplorer() {
       </div>
 
       <div className="grid gap-px bg-hairline sm:grid-cols-2">
-        {/* the model emits */}
         <div className="flex flex-col bg-fd-background">
           <div className="flex items-center justify-between px-4 py-2">
             <span className="mono-label">the model emits</span>
@@ -183,8 +173,6 @@ export function GrammarExplorer() {
             </pre>
           </div>
         </div>
-
-        {/* renders as */}
         <div className="flex flex-col bg-fd-background">
           <div className="px-4 py-2">
             <span className="mono-label">renders as</span>
@@ -195,17 +183,13 @@ export function GrammarExplorer() {
             ) : (
               <p className="max-w-xs text-[0.95rem] leading-relaxed text-fd-foreground">
                 {before}
-                <span className="mx-1 inline-flex align-middle">
-                  {renderChart(spec.type, "inline")}
-                </span>
+                <span className="mc-inline">{renderChart(spec.type, "inline")}</span>
                 {after}
               </p>
             )}
           </div>
         </div>
       </div>
-
-      {/* the react equivalent */}
       <div className="border-t border-hairline">
         <div className="flex items-center justify-between px-4 py-2">
           <span className="mono-label">the same thing in react</span>
@@ -259,11 +243,7 @@ function promptText(): string {
   ].join("\n");
 }
 
-/**
- * The closing reference card — the entire AI contract on one glanceable plane
- * (grammar · rules · surfaces), copyable as a system-prompt block. Terminates
- * the page with everything an agent needs in one place.
- */
+/** Agent contract card — grammar, rules, surfaces; copyable as a system prompt. */
 export function AgentCheatSheet() {
   return (
     <div className="not-prose my-6 panel overflow-hidden">
@@ -275,7 +255,6 @@ export function AgentCheatSheet() {
         </span>
       </div>
 
-      {/* grammar */}
       <div className="border-b border-hairline px-4 py-3.5">
         <div className="mono-label mb-2.5 opacity-60">grammar</div>
         <div className="grid gap-x-4 gap-y-1 font-mono text-[0.8rem] leading-relaxed sm:grid-cols-[max-content_1fr]">
@@ -290,7 +269,6 @@ export function AgentCheatSheet() {
         </div>
       </div>
 
-      {/* rules */}
       <div className="border-b border-hairline px-4 py-3.5">
         <div className="mono-label mb-2.5 opacity-60">rules</div>
         <ul className="flex flex-col gap-1.5 text-[0.85rem] leading-relaxed text-fd-muted-foreground">
@@ -305,7 +283,6 @@ export function AgentCheatSheet() {
         </ul>
       </div>
 
-      {/* surfaces */}
       <div className="px-4 py-3.5">
         <div className="mono-label mb-2.5 opacity-60">surfaces</div>
         <div className="flex flex-wrap gap-x-5 gap-y-1.5 font-mono text-[0.8rem]">

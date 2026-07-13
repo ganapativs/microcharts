@@ -4,7 +4,7 @@ import { computeFive, microBoxGeometry } from "./geometry.js";
 
 const RAW = [12, 30, 35, 38, 42, 45, 48, 51, 60, 96];
 
-describe("microBoxGeometry (plan/22 #16)", () => {
+describe("microBoxGeometry", () => {
   it("box spans the IQR; median tick inside it; whiskers min-max by default", () => {
     const r = computeFive(RAW, undefined)!;
     const geo = microBoxGeometry({

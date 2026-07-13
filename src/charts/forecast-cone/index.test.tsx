@@ -28,7 +28,7 @@ const FC: ForecastInput = {
   ],
 };
 
-describe("<ForecastCone> (plan/23 #11)", () => {
+describe("<ForecastCone>", () => {
   it("summary states median, horizon interval, and today — the real string", () => {
     const { container } = draw(<ForecastCone data={HIST} forecast={FC} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

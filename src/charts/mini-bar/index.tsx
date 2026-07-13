@@ -1,4 +1,4 @@
-// <MiniBar> — which category is biggest, and by roughly how much (plan/22 #6,
+// <MiniBar> — which category is biggest, and by roughly how much (,
 // S2). Static, hook-free, RSC-safe. Bars are always zero-anchored; the data's
 // own order is the default truth (`sort` never silently defaults to ranking —
 // weekday order, funnel order carry meaning sorting would destroy). No

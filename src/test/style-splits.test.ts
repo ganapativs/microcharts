@@ -1,4 +1,4 @@
-// Guards the plan/19 CSS-delivery escape hatch (scripts/gen-style-splits.mjs):
+// Guards the CSS-delivery escape hatch (scripts/gen-style-splits.mjs):
 // the per-chart `@mc-chart <slug> … @mc-chart-end` markers hand-authored in
 // styles.css must stay accurate as the file evolves — a stale/incorrect
 // marker would silently ship a broken "one chart" CSS import.

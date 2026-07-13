@@ -1,4 +1,4 @@
-// VolumeProfile geometry — pure, React-free (plan/25 §16, plan/17 F15). A
+// VolumeProfile geometry — pure, React-free. A
 // histogram turned PERPENDICULAR to the usual trend axis: y = level (binned),
 // bars extend horizontally by activity mass at that level. The modal bin (POC)
 // is accented and the value area (smallest contiguous span holding `valueArea`

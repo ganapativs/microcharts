@@ -4,7 +4,7 @@ import { ControlStrip } from "./client.js";
 
 const SAMPLE = [10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16];
 
-describe("interactive <ControlStrip> (plan/23 #10)", () => {
+describe("interactive <ControlStrip>", () => {
   it("arrow keys step points; out points announce which limit was crossed", async () => {
     const screen = await render(<ControlStrip data={SAMPLE} title="Line 3" />);
     const wrap = screen.container.querySelector(".mc-control-strip-live") as HTMLElement;

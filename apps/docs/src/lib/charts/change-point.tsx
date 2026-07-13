@@ -145,7 +145,7 @@ export const playground: PlaygroundSpec = {
       s.max !== 2 && `  max={${s.max}}`,
       s.means === false && "  means={false}",
       s.delta && '  label="delta"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -186,9 +186,14 @@ export function markCode(): string {
   return `<ChangePoint data={errors} />`;
 }
 
+export function PreviewLive() {
+  return <ChangePointInteractive data={ERRORS} summary={false} width={120} height={16} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

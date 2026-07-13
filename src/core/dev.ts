@@ -1,4 +1,4 @@
-// Dev-only warnings (plan/22 shared conventions). Stripped in production by the
+// Dev-only warnings. Stripped in production by the
 // standard NODE_ENV replacement every React bundler performs; guarded so the
 // bare-browser ESM path (no `process`) stays silent instead of throwing.
 const seen = new Set<string>();

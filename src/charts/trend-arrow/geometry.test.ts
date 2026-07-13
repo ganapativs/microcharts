@@ -12,7 +12,7 @@ function coords(d: string): { xs: number[]; ys: number[] } {
   };
 }
 
-describe("trendArrowGeometry (plan/22 #1)", () => {
+describe("trendArrowGeometry", () => {
   it("up and down are distinct for every glyph family", () => {
     for (const glyph of GLYPHS) {
       const up = trendArrowGeometry({ width: 16, height: 16, direction: "up", glyph });

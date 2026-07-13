@@ -1,5 +1,5 @@
 "use client";
-// Interactive <HeatStrip> (plan/22 #9). One pointer listener; cell by x-band
+// Interactive <HeatStrip>. One pointer listener; cell by x-band
 // lookup. ←/→ roving cell focus with the ActivityGrid focus-ring style — the
 // 1-D restriction of its 2-D nav, same wording, same overlay. Composes the
 // static component (canon).

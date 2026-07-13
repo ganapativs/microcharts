@@ -10,7 +10,7 @@ const PROFILE = [
   { level: 146, weight: 7 },
 ];
 
-describe("interactive <VolumeProfile> (plan/25 §16)", () => {
+describe("interactive <VolumeProfile>", () => {
   it("↑/↓ rove levels; POC announces its clause", async () => {
     const screen = await render(
       <VolumeProfile data={PROFILE} bins={5} title="Volume" width={120} height={60} />,

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { starSpokeGeometry } from "./geometry.js";
 
-describe("starSpokeGeometry (plan/25 §9, plan/17 F11)", () => {
+describe("starSpokeGeometry", () => {
   it("first spoke is at 12 o'clock, second is clockwise", () => {
     const geo = starSpokeGeometry({ values: [1, 1, 1, 1], domain: [0, 1], width: 32, height: 32 });
     expect(geo.spokes[0]!.tx).toBeCloseTo(16, 1); // straight up: x = center

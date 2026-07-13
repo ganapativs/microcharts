@@ -1,7 +1,7 @@
-// FillWord geometry — pure, React-free (plan/24 #3, S4). The label IS the bar:
+// FillWord geometry — pure, React-free. The label IS the bar:
 // a muted word with an accent copy clipped to the value fraction of its own
 // glyph extent (percentage inset → 50% visually bisects the word, never a
-// hidden wider track). Glyph extent is estimated deterministically (plan/18
+// hidden wider track). Glyph extent is estimated deterministically (
 // 0.62 em/char) + pinned with textLength so containment is provable without
 // measuring text server-side. All coords 2-dp.
 import { round2 } from "../../core/types.js";
@@ -15,7 +15,7 @@ export interface FillWordGeometry {
   y: number;
   width: number;
   height: number;
-  /** clip-path inset() value for the accent copy (empty word → null). */
+  /** clip-path inset value for the accent copy (empty word → null). */
   clip: string | null;
   /** Whole-percent for the summary/label. */
   pct: number;

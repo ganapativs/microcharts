@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { Delta } from "./client.js";
 
-describe("interactive <Delta> (plan/04 §4, plan/08 §5)", () => {
+describe("interactive <Delta>", () => {
   it("renders the static delta plus a polite live region", async () => {
     const screen = await render(<Delta value={0.12} />);
     const wrap =

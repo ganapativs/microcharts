@@ -1,4 +1,4 @@
-// <Progress> — "how far along is this, exactly?" (plan/22 #4, S3). Static,
+// <Progress> — "how far along is this, exactly?". Static,
 // hook-free, RSC-safe. The percent label is the datum — a bare bar is
 // decoration — so `label="percent"` is the default. The bar is always
 // zero-anchored and clamps at 100%; past that, the LABEL carries the truth

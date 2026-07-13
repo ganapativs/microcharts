@@ -10,7 +10,7 @@ const CATDOG = {
   ],
 };
 
-describe("interactive <ConfusionGrid> (plan/25 §21)", () => {
+describe("interactive <ConfusionGrid>", () => {
   it("→ roves cells; announces actual/predicted with row-share phrasing", async () => {
     const screen = await render(<ConfusionGrid data={CATDOG} title="Classifier" size={80} />);
     const wrap = screen.container.querySelector(".mc-confusion-live") as HTMLElement;

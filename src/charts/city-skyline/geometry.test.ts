@@ -5,7 +5,7 @@ import { citySkylineGeometry } from "./geometry.js";
 const g = (data: { value: number; lit?: number }[]) =>
   citySkylineGeometry({ data, bw: 9, height: 24, groundY: 22, maxH: 20, gap: 3, pad: 2 });
 
-describe("citySkylineGeometry (plan/24 #14) — height + lit windows", () => {
+describe("citySkylineGeometry — height + lit windows", () => {
   it("heights are zero-anchored; the tallest fills maxH", () => {
     const geo = g([{ value: 46 }, { value: 23 }, { value: 0 }]);
     expect(geo.buildings[0]!.h).toBeCloseTo(20, 1); // 46 = max → full

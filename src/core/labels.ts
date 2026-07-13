@@ -1,4 +1,4 @@
-// Deterministic 1-D label layout (plan/18 discipline: pure arithmetic, no
+// Deterministic 1-D label layout ( discipline: pure arithmetic, no
 // measurement). Given desired label positions on one axis, spread them to a
 // minimum pitch inside [min, max] with the least total displacement — the
 // classic greedy forward/backward sweep. Returns null when they cannot all

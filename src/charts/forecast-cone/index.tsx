@@ -1,4 +1,4 @@
-// <ForecastCone> — will we land where we need to? (plan/23 #11). History as a
+// <ForecastCone> — will we land where we need to? History as a
 // solid line, then a fan of prediction bands (p80 outer, p50 inner) widening
 // over the horizon with a DASHED median — an estimate never renders as fact.
 // Static, hook-free, RSC-safe. The fan's entire honesty is visible confidence

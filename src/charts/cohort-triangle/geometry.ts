@@ -1,4 +1,4 @@
-// CohortTriangle geometry — pure, React-free (plan/26 §1). Which vintage retains
+// CohortTriangle geometry — pure, React-free. Which vintage retains
 // worst, compared at equal maturity. Rows = cohorts (input order top→bottom),
 // columns = age; each cell is a rect shaded by a discrete retention level.
 // Ragged rows: a cohort observed for fewer ages leaves its trailing columns
@@ -18,7 +18,7 @@ export const PCT_FORMAT: Intl.NumberFormatOptions = {
   style: "percent",
   maximumFractionDigits: 0,
 };
-/** Admission caps (plan/26 §1) — beyond these the block stops being glanceable. */
+/** Admission caps — beyond these the block stops being glanceable. */
 export const MAX_COHORTS = 12;
 export const MAX_AGES = 12;
 

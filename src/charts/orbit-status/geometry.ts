@@ -1,4 +1,4 @@
-// OrbitStatus geometry — pure, React-free (plan/24 #22, structured two-variable).
+// OrbitStatus geometry — pure, React-free.
 // How slow and how busy is this dependency right now? Orbit RADIUS = latency;
 // orbit DASH DENSITY = call rate (quantized to 5 steps — denser = busier), which
 // the interactive entry mirrors as angular SPEED. Both are LOW-precision ordinal

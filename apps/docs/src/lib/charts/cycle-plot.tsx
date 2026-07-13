@@ -157,7 +157,7 @@ export const playground: PlaygroundSpec = {
       s.center !== "mean" && `  center="${s.center}"`,
       s.trend !== "line" && `  trend="${s.trend}"`,
       s.spine === false && "  spine={false}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -200,9 +200,16 @@ export function markCode(): string {
   return `<CyclePlot data={daily} period={7} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <CyclePlotInteractive data={WEEKS} period={7} summary={false} width={100} height={24} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

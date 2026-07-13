@@ -4,7 +4,7 @@ import { statusDotGeometry, type StatusGlyph } from "./geometry.js";
 
 const GLYPHS: StatusGlyph[] = ["circle", "triangle", "diamond", "ring", "half"];
 
-describe("statusDotGeometry (plan/22 #2)", () => {
+describe("statusDotGeometry", () => {
   it("every glyph renders a distinct silhouette (the a11y pairing contract)", () => {
     const marks = GLYPHS.map((glyph) => statusDotGeometry({ width: 8, height: 8, glyph }));
     const keys = marks.map((m) =>

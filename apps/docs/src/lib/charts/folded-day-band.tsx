@@ -151,7 +151,7 @@ export const playground: PlaygroundSpec = {
       s.today === true && "  today={today}",
       s.single === true && "  bands={[[25, 75]]}",
       s.bins !== 24 && `  bins={${s.bins}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -188,9 +188,14 @@ export function markCode(): string {
   return `<FoldedDayBand data={observations} />`;
 }
 
+export function PreviewLive() {
+  return <FoldedDayBandInteractive data={DATA} summary={false} width={140} height={32} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

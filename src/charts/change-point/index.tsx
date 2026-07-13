@@ -1,4 +1,4 @@
-// <ChangePoint> — when did the behaviour change level? (plan/23 #19). Regime
+// <ChangePoint> — when did the behaviour change level? Regime
 // shading (neutral identity, not valence) + per-regime mean hairlines + the
 // series line + break markers (hairline + top triangle). The detector is a
 // documented HEURISTIC (geometry.ts), and explicit `breaks` is the recommended

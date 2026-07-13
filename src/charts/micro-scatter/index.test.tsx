@@ -17,7 +17,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<MicroScatter> (plan/22 #29, S1-XY)", () => {
+describe("<MicroScatter>", () => {
   it("dots at 75% opacity; summary states r with the relationship word", () => {
     const { container } = draw(<MicroScatter data={CLOUD} />);
     const dot = container.querySelector("circle")!;

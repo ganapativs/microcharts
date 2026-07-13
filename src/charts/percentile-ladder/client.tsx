@@ -1,5 +1,5 @@
 "use client";
-// Interactive <PercentileLadder> (plan/23 #3). One pointer listener + pure
+// Interactive <PercentileLadder>. One pointer listener + pure
 // nearest-tick math. ←/→ step ticks; each announces its value and its multiple
 // of the median ("p99: 2.1 s — 17× the median."). Composes the static component
 // (canon); the probe line is an overlay child re-using geometry.

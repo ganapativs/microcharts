@@ -1,4 +1,4 @@
-// <Dumbbell> — where each row started and ended (plan/22 #11, S2-paired).
+// <Dumbbell> — where each row started and ended.
 // Static, hook-free, RSC-safe. Hollow → filled reads as before → after without
 // a legend; with `positive` the connector takes the valence token by direction.
 // For RANGES (min→max) docs require dropping `positive` — a range has no
@@ -160,7 +160,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
         const leftX = row.x0 !== null && row.x1 !== null ? Math.min(row.x0, row.x1) : null;
         const rightX = row.x0 !== null && row.x1 !== null ? Math.max(row.x0, row.x1) : null;
         // values render only when BOTH the span is wide enough and each label's
-        // estimate stays inside the viewBox (pure arithmetic — plan/18)
+        // estimate stays inside the viewBox (pure arithmetic — )
         const leftVal = leftX !== null ? (row.x0! <= row.x1! ? d.from : d.to) : 0;
         const rightVal = rightX !== null ? (row.x0! <= row.x1! ? d.to : d.from) : 0;
         const showValues =

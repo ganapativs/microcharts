@@ -1,4 +1,4 @@
-// <StatusDot> — "what state is this thing in right now?" (plan/22 #2, S4
+// <StatusDot> — "what state is this thing in right now?" (, S4
 // categorical). Static, hook-free, RSC-safe. Each state pairs a distinct
 // silhouette with a semantic token — never color-alone by construction; the
 // mapping is a contract (`color` recolors, never reshapes). Five built-ins;

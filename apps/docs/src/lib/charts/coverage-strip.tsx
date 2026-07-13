@@ -154,7 +154,7 @@ export const playground: PlaygroundSpec = {
       s.mode !== "binary" && `  mode="${s.mode}"`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -200,9 +200,22 @@ export function markCode(): string {
   return `<CoverageStrip data={data} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <CoverageStripInteractive
+      data={[...COVERAGE]}
+      summary={false}
+      width={130}
+      height={12}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

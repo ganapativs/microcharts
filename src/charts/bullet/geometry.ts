@@ -1,5 +1,5 @@
-// Bullet geometry — pure, React-free (plan/05 §2, S4). Few's gauge replacement:
-// a measure bar against qualitative bands with a target tick. Horizontal scale
+// Bullet geometry — pure, React-free.
+// A measure bar against qualitative bands with a target tick. Horizontal scale
 // anchored at zero. Coords 2-dp via the kernel.
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
@@ -38,7 +38,7 @@ export interface BulletGeometryOptions {
 export function bulletGeometry(opts: BulletGeometryOptions): BulletGeometry {
   const { width, height, pad = 1 } = opts;
   // Non-finite inputs are documented no-shows: NaN/±Infinity value → zero-width
-  // measure, unusable target → no tick, bad bands/domain dropped (plan/09 —
+  // measure, unusable target → no tick, bad bands/domain dropped (
   // degenerates render as designed empties, never as NaN attributes).
   const hasValue = Number.isFinite(opts.value);
   const value = hasValue ? opts.value : 0;

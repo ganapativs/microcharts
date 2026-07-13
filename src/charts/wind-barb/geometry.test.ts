@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { windBarbGeometry } from "./geometry.js";
 
-describe("windBarbGeometry (plan/25 §8, plan/17 F3)", () => {
+describe("windBarbGeometry", () => {
   it("quantizes magnitude into pennant / full / half barbs", () => {
     const geo = windBarbGeometry({ direction: 0, magnitude: 65, step: 10, width: 24, height: 24 });
     expect(geo.counts).toEqual({ pennant: 1, full: 1, half: 1 }); // 50 + 10 + 5

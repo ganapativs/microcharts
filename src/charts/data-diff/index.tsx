@@ -1,4 +1,4 @@
-// <DataDiff> — what changed between two versions? (plan/23 #16). One diverging
+// <DataDiff> — what changed between two versions? One diverging
 // bar per key: removed leftward (--mc-neg), added rightward (--mc-pos), both
 // ALWAYS drawn on one symmetric shared scale. Net is a summary tick, never a
 // replacement for the two bars (a +500/−480 churn must never look like +20/−0).

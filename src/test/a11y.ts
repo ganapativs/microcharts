@@ -1,5 +1,5 @@
 // Shared axe-core harness for the node/jsdom Vitest project.
-// Every chart's DoD includes "axe clean" (plan/08, plan/09) — tests call
+// Every chart's DoD includes "axe clean" — tests call
 // `expectNoA11yViolations(container)` after rendering. Rules needing real
 // layout/contrast belong in the browser project or Playwright + @axe-core.
 import axe, { type AxeResults, type RunOptions } from "axe-core";

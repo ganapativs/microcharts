@@ -1,5 +1,5 @@
 // <GardenGrid> — the rhythm of activity over time, legible in grayscale and
-// print (plan/24 #10, S1 binned). ActivityGrid's sibling: dot AREA (single ink)
+// print. ActivityGrid's sibling: dot AREA (single ink)
 // carries a 5-step ordinal instead of color. Zero renders a hairline ring
 // (present, quiet); null renders nothing (missing ≠ zero). Static, hook-free.
 import type { CSSProperties, ReactNode } from "react";
@@ -15,7 +15,7 @@ export interface GardenGridProps {
   rows?: number | undefined;
   steps?: 3 | 5 | undefined;
   /** How zero-value cells render (default `"outline"` — a quiet hairline ring;
-   *  shared `EmptyCellStyle` (plan/04 §8), same vocabulary as Honeycomb. */
+   * shared `EmptyCellStyle`, same vocabulary as Honeycomb. */
   empty?: EmptyCellStyle | undefined;
   domain?: readonly [number, number] | undefined;
   /** Noun for the summary count (default "periods"). */

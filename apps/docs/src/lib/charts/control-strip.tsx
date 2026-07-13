@@ -136,7 +136,7 @@ export const playground: PlaygroundSpec = {
       s.limits !== "sigma" && `  limits="${s.limits}"`,
       s.rules && '  rules="we"',
       s.dots && '  dots="all"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -174,9 +174,14 @@ export function markCode(): string {
   return `<ControlStrip data={weights} />`;
 }
 
+export function PreviewLive() {
+  return <ControlStripInteractive data={DEMO} summary={false} width={150} height={22} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

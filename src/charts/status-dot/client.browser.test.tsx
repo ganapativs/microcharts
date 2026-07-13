@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { StatusDot } from "./client.js";
 
-describe("interactive <StatusDot> (plan/22 #2)", () => {
+describe("interactive <StatusDot>", () => {
   it("focusable wrapper owns the naming; quiet on mount", async () => {
     const screen = await render(<StatusDot status="ok" title="Deploys" />);
     const wrap = screen.container.querySelector(".mc-status-live")!;

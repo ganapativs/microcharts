@@ -1,4 +1,4 @@
-// Banking to 45° (plan/03, plan/06 §5). Suggests a width so the median absolute
+// Banking to 45°. Suggests a width so the median absolute
 // segment slope renders near 45° — the aspect ratio at which slope differences
 // are most perceptible (Cleveland). A suggestion only; callers may override.
 import { isFiniteValue, round2, type Value } from "./types.js";
@@ -36,9 +36,9 @@ export function bankTo45(values: readonly Value[], height: number): number {
   const yRange = max - min;
   if (yRange === 0) return round2(height * 4);
 
-  // .slice().sort(), not .toSorted(): the ES2023 API is a silent runtime cliff
+  // .slice.sort, not.toSorted: the ES2023 API is a silent runtime cliff
   // on Safari < 16.4 while tsc (lib ES2023) stays green. Library rule: no
-  // post-ES2022 runtime APIs (CLAUDE.md).
+  // post-ES2022 runtime APIs.
   const medSlope = median(slopes.slice().sort((a, b) => a - b));
   if (medSlope === 0) return round2(height * 4);
 

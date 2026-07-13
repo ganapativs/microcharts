@@ -118,7 +118,7 @@ export const playground: PlaygroundSpec = {
       "  domain={[0, 2100]}",
       s.encode !== "value" && `  encode="${s.encode}"`,
       s.tiers !== "5" && `  tiers={${s.tiers}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -155,9 +155,27 @@ export function markCode(): string {
   return `<FatDigits value={1204} domain={[0, 2100]} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex flex-col items-end gap-1 tabular-nums">
+      {COLUMN.map((v) => (
+        <FatDigitsInteractive
+          key={v}
+          value={v}
+          domain={DOMAIN}
+          summary={false}
+          fontSize={14}
+          animate
+        />
+      ))}
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

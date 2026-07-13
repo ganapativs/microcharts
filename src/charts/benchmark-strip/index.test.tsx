@@ -8,7 +8,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const PEERS = Array.from({ length: 40 }, (_, i) => i + 1);
 
-describe("<BenchmarkStrip> (plan/23 #2, structured)", () => {
+describe("<BenchmarkStrip>", () => {
   it("summary states value, percentile, n, and the middle half — the real string", () => {
     const { container } = draw(
       <BenchmarkStrip data={PEERS} value={20} format={{ maximumFractionDigits: 0 }} />,

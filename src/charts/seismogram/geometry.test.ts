@@ -4,7 +4,7 @@ import { seismogramGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 16, mode: "intensity" as const };
 
-describe("seismogramGeometry (plan/22 #8)", () => {
+describe("seismogramGeometry", () => {
   it("unsigned → centered baseline, ticks mirror symmetrically (seismograph)", () => {
     const geo = seismogramGeometry({ ...base, values: [0, 3, 0, 8, 1] });
     expect(geo.signed).toBe(false);

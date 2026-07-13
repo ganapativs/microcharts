@@ -1,5 +1,5 @@
 // <DepthWedge> — how much pressure is stacked on each side of the current level,
-// and how wide the gap between them is (plan/25 §12, plan/17 F5). Static,
+// and how wide the gap between them is. Static,
 // hook-free, RSC-safe. Two cumulative step-wedges meeting at the spread. The
 // y-scale is linear and the visible range is stated — never a silent log.
 import type { CSSProperties, ReactNode } from "react";

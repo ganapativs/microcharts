@@ -1,4 +1,4 @@
-// Hourglass geometry — pure, React-free (plan/24 #7, S4). The two-sided story
+// Hourglass geometry — pure, React-free. The two-sided story
 // Progress can't tell: sand area split top (remaining) / bottom (elapsed). Both
 // are AREA-TRUE (a naive linear-height fill would overstate early progress by up
 // to 2×). Closed forms: top bulb is apex-down, remaining r=1−value fills from the

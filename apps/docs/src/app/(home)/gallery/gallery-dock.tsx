@@ -1,8 +1,23 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { ArrowDownAZ, ArrowUp, Grid2x2, Grid3x3, ListOrdered, Search } from "lucide-react";
+import {
+  ArrowDownAZ,
+  ArrowUp,
+  Grid2x2,
+  Grid3x3,
+  ListOrdered,
+  Search,
+  Sparkles,
+  Square,
+} from "lucide-react";
 import type { ChartCollection } from "@/lib/charts/types";
+import {
+  getGalleryMode,
+  setGalleryMode,
+  subscribeGalleryMode,
+  type GalleryMode,
+} from "./gallery-mode";
 
 // Layout effect on the client (fires before paint), plain effect on the server
 // (no-op, avoids the SSR warning). Used to mark the plane "entered" BEFORE the
@@ -16,13 +31,13 @@ let hasEntered = false;
 
 /**
  * The floating command dock for the gallery. Everything the user drives lives
- * here, at the bottom of the viewport. The plane itself is server-rendered and
- * never re-created — this only:
+ * here, at the bottom of the viewport. The plane itself is server-rendered for
+ * structure; each card stage hydrates and can flip live ↔ static:
  *   · toggles each card's `hidden` from data-* keywords (RSC-safe, JS-off = grid)
  *   · flips `data-density` on the grid; slides the site nav away on scroll-down
+ *   · live mode = interactive entries + entrance animate (default); static = SSR twins
  *   · roves focus across the visible plates with the arrow keys
  *   · runs ONE delegated pointer handler that tilts + lights the hovered plate
- * No chart JS ships; nothing here re-renders the catalog.
  */
 
 type Density = "comfortable" | "compact";
@@ -69,6 +84,11 @@ export function GalleryDock({
   const [shown, setShown] = useState<number | null>(null);
   const [atTop, setAtTop] = useState(true);
   const [dockHidden, setDockHidden] = useState(false);
+  const mode = useSyncExternalStore(
+    subscribeGalleryMode,
+    getGalleryMode,
+    () => "live" as GalleryMode,
+  );
   // The dock is fixed to the viewport, but the (home) layout's RouteTransition
   // wrapper is a transformed ancestor — which would trap `position: fixed`
   // against itself. Portal to <body> so the dock anchors to the viewport.
@@ -392,7 +412,6 @@ export function GalleryDock({
       data-hidden={dockHidden || undefined}
     >
       <div className="g2-dock-bar glass glass-strong">
-        {/* collection filters */}
         <div className="flex items-center gap-0.5">
           {pills.map((p) => {
             const n = counts[p.key] ?? 0;
@@ -416,8 +435,6 @@ export function GalleryDock({
         </div>
 
         <span className="g2-dock-div" aria-hidden />
-
-        {/* search */}
         <div className="g2-dock-search">
           <Search className="size-4" aria-hidden />
           <input
@@ -429,8 +446,26 @@ export function GalleryDock({
             aria-label="Search charts"
           />
         </div>
-
-        {/* density */}
+        <div className="g2-seg" role="group" aria-label="Render mode">
+          {(
+            [
+              { key: "live" as const, Icon: Sparkles, label: "Live — interactive, animated" },
+              { key: "static" as const, Icon: Square, label: "Static — no motion" },
+            ] as const
+          ).map(({ key, Icon, label }) => (
+            <button
+              key={key}
+              type="button"
+              className="g2-icon-btn"
+              onClick={() => setGalleryMode(key)}
+              aria-pressed={mode === key}
+              title={label}
+              aria-label={label}
+            >
+              <Icon className="size-4" aria-hidden />
+            </button>
+          ))}
+        </div>
         <div className="g2-seg" role="group" aria-label="Density">
           {(
             [
@@ -451,8 +486,6 @@ export function GalleryDock({
             </button>
           ))}
         </div>
-
-        {/* sort — catalog order vs A–Z */}
         <div className="g2-seg" role="group" aria-label="Sort">
           {(
             [
@@ -475,13 +508,9 @@ export function GalleryDock({
         </div>
 
         <span className="g2-dock-div" aria-hidden />
-
-        {/* live count */}
         <span className="g2-dock-count" role="status" aria-live="polite">
           {shown !== null && shown !== total ? shown : total}
         </span>
-
-        {/* back to top — appears once scrolled */}
         <button
           type="button"
           className="g2-icon-btn g2-top"

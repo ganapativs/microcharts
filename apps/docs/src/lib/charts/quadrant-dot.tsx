@@ -188,7 +188,7 @@ export const playground: PlaygroundSpec = {
       s.region === false && "  region={false}",
       s.named && `  quadrants={["quick win", "big bet", "skip", "time sink"]}`,
       '  xLabel="effort" yLabel="impact"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -241,9 +241,24 @@ export function markCode(): string {
   return `<QuadrantDot data={item} field={backlog} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <QuadrantDotInteractive
+      data={FOCAL}
+      field={FIELD}
+      {...AXES}
+      summary={false}
+      width={48}
+      height={48}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

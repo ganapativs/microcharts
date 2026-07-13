@@ -16,7 +16,7 @@ const mount = async (ui: React.ReactNode) => {
   return screen.getByRole("img").element() as HTMLElement;
 };
 
-describe("interactive <CohortTriangle> (plan/26 §1, plan/08)", () => {
+describe("interactive <CohortTriangle>", () => {
   it("focusable role=img with the equal-maturity name", async () => {
     const fig = await mount(<CohortTriangle data={COHORTS} title="Cohorts" />);
     expect(fig.getAttribute("tabindex")).toBe("0");

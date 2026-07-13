@@ -2,12 +2,7 @@ import { FileText, Braces, FileCode, ArrowUpRight } from "lucide-react";
 import { AI_LOGOS } from "@/lib/ai-logos";
 import { PROVIDER_GROUPS, MACHINE_SURFACES } from "@/lib/ai-providers";
 
-/**
- * Static (zero-JS) building blocks for the AI-native guide: the provider logo
- * wall (proof the plain-text format works anywhere) and the machine-readable
- * surface cards. Logos are inlined, normalized to `currentColor`, so they theme
- * with the page and ship no network requests.
- */
+/** Static AI guide blocks: provider logo wall + machine-surface cards. */
 
 function Logo({ name, className }: { name: string; className?: string }) {
   const l = AI_LOGOS[name];

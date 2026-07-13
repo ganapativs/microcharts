@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { BreathingDot } from "./client.js";
 
-describe("interactive <BreathingDot> (plan/24 #19)", () => {
+describe("interactive <BreathingDot>", () => {
   it("pulses the core dot (motion IS the encoding)", async () => {
     const screen = await render(<BreathingDot value={0.65} title="Load" />);
     const core = screen.container.querySelector(".mc-breathing-core") as SVGCircleElement;

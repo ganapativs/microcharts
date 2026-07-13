@@ -7,7 +7,7 @@ const mount = async (ui: React.ReactNode) => {
   return screen.getByRole("img").element() as HTMLElement;
 };
 
-describe("interactive <Bullet> (plan/04 §4, plan/08 T2)", () => {
+describe("interactive <Bullet>", () => {
   it("focusable role=img with the composed name; inner chart is decorative", async () => {
     const fig = await mount(<Bullet value={72} target={80} title="Sales" />);
     expect(fig.getAttribute("tabindex")).toBe("0");

@@ -14,7 +14,7 @@ const ACCT = [
   { label: "Foxtrot", value: 2 },
 ] as const;
 
-describe("<SproutRow> (plan/24 #9)", () => {
+describe("<SproutRow>", () => {
   it("summary counts blooms and seeds", () => {
     const { container } = draw(<SproutRow data={ACCT} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

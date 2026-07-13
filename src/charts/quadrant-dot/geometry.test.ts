@@ -12,7 +12,7 @@ const FIELD = [
   { x: 1, y: 1 },
 ];
 
-describe("quadrantDotGeometry (plan/23 #17)", () => {
+describe("quadrantDotGeometry", () => {
   it("focal quadrant by boundary rule ≥ split ⇒ right/top", () => {
     // domain 1..9 both axes → split at 5; focal (3,9) is x<5 (left), y≥5 (top) → TL=0
     const geo = quadrantDotGeometry({ ...base, data: { x: 3, y: 9 }, field: FIELD })!;

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { progressGeometry } from "./geometry.js";
 
-describe("progressGeometry (plan/22 #4)", () => {
+describe("progressGeometry", () => {
   it("fill is fraction × track width, zero-anchored", () => {
     const geo = progressGeometry({ width: 48, height: 8, fraction: 0.5, gutterCh: 0, fontSize: 6 });
     expect(geo.fill.x).toBe(0);

@@ -19,7 +19,7 @@ const routes = [
   "gallery.html",
 ];
 
-describe.skipIf(!hasBuild)("built docs metadata (plan/20 §11)", () => {
+describe.skipIf(!hasBuild)("built docs metadata", () => {
   it.each(routes)("%s has complete, non-conflicting metadata", (route) => {
     const html = readFileSync(outDir + route, "utf8");
     expect(html.match(/<link rel="canonical"/g) ?? []).toHaveLength(1);

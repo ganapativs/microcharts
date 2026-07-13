@@ -1,5 +1,5 @@
 // <CalibrationStrip> — when a model says 70%, does it happen 70% of the time,
-// and where is there enough data to even ask (plan/25 §14, plan/17 F19). Static,
+// and where is there enough data to even ask. Static,
 // hook-free, RSC-safe. Predicted × observed against the identity diagonal, with
 // an always-on support lane; low-support bins render open + faded so tiny bins
 // never look authoritative. No single-number calibration score is ever shown.
@@ -24,7 +24,7 @@ export interface CalibrationStripProps {
   /** Below this a bin is low-confidence (open + faded). Default max(10, 2%). */
   minSupport?: number | undefined;
   /** `"bars"` draws signed deviation columns from the diagonal.
-   *  (plan/25 §14 names this `style`; React reserves that for CSS — logged.) */
+   * */
   variant?: "dots" | "bars" | undefined;
   width?: number | undefined;
   height?: number | undefined;

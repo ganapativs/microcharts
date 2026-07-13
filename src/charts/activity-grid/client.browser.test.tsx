@@ -11,7 +11,7 @@ const mount = async (ui: React.ReactNode) => {
   return screen.getByRole("img").element() as HTMLElement;
 };
 
-describe("interactive <ActivityGrid> (plan/04 §4, plan/08 T2)", () => {
+describe("interactive <ActivityGrid>", () => {
   it("focusable role=img with the total/peak name", async () => {
     const fig = await mount(<ActivityGrid data={DATA} title="Commits" />);
     expect(fig.getAttribute("tabindex")).toBe("0");

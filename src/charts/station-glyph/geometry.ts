@@ -1,4 +1,4 @@
-// StationGlyph geometry — pure, React-free (plan/25 §20, plan/17 F2). A
+// StationGlyph geometry — pure, React-free. A
 // meteorological station model at word scale: a sky-cover disc (fraction filled
 // as a pie sector), a wind barb reused from ../wind-barb, and corner numerals
 // placed by the component. All coordinates are ABSOLUTE in the viewBox (the

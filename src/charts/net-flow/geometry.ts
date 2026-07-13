@@ -1,4 +1,4 @@
-// NetFlow geometry — pure, React-free (plan/23 #6). In vs out, and where that
+// NetFlow geometry — pure, React-free. In vs out, and where that
 // leaves us net. Inflow area above a zero baseline, outflow mirrored below on
 // ONE shared magnitude scale (never independently scaled to balance the
 // picture), with the net line (in − out) restoring the precise decision value.

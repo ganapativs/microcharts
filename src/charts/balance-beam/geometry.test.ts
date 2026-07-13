@@ -14,7 +14,7 @@ const g = (a: number, b: number, extra: Partial<Parameters<typeof balanceBeamGeo
     ...extra,
   });
 
-describe("balanceBeamGeometry (plan/24 #8) — tilt + area-true weights", () => {
+describe("balanceBeamGeometry — tilt + area-true weights", () => {
   it("heavier side tilts down; direction is instant", () => {
     const left = g(620, 480);
     expect(left.heavier).toBe(-1);

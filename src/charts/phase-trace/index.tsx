@@ -1,5 +1,5 @@
 // <PhaseTrace> — how two coupled signals move together: loops (lag/feedback),
-// clusters (regimes), and where the system is now (plan/25 §17, plan/17 F16).
+// clusters (regimes), and where the system is now.
 // Static, hook-free, RSC-safe. Path order carries time; the current state is a
 // directed endpoint. Axes are named and stated, domains always linear.
 import type { CSSProperties, ReactNode } from "react";

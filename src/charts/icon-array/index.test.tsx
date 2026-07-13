@@ -7,7 +7,7 @@ import { valueEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<IconArray> (plan/23 #21, S4 scalar rate)", () => {
+describe("<IconArray>", () => {
   it("summary states the count and the percent — the docs' real string", () => {
     const { container } = draw(<IconArray value={0.15} total={20} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("3 in 20. About 15%.");

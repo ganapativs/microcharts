@@ -1,5 +1,5 @@
 "use client";
-// Interactive <TraceFold> (plan/25 §18). One pointer listener; span by row (y) +
+// Interactive <TraceFold>. One pointer listener; span by row (y) +
 // x lookup. ←/→ within a depth row, ↑/↓ between depths (2-D keyboard). Composes
 // the static component (canon).
 import {

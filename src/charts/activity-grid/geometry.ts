@@ -1,4 +1,4 @@
-// ActivityGrid geometry — pure, React-free (plan/05 §3, S1 binned). The GitHub
+// ActivityGrid geometry — pure, React-free. The GitHub
 // contribution strip: value → discrete intensity level → cell. Column-major fill
 // (each column is a week, filled top-to-bottom). Discrete levels keep it honest —
 // color encodes a binned variable, never a continuous illusion. Coords are ints

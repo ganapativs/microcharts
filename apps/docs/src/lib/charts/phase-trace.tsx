@@ -141,7 +141,7 @@ export const playground: PlaygroundSpec = {
       s.tail !== 25 && `  tail={${((s.tail as number) / 100).toFixed(2)}}`,
       s.grid === true && "  grid",
       s.startDot === true && "  startDot",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -200,9 +200,24 @@ export function markCode(): string {
   return `<PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" />`;
 }
 
+export function PreviewLive() {
+  return (
+    <PhaseTraceInteractive
+      data={TRAJ}
+      xLabel="CPU"
+      yLabel="Latency"
+      summary={false}
+      width={44}
+      height={40}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

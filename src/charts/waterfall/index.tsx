@@ -1,4 +1,4 @@
-// <Waterfall> — how the deltas compose into the total (plan/22 #20). P&L in a
+// <Waterfall> — how the deltas compose into the total. P&L in a
 // cell. Sign is encoded by vertical direction from the running level AND by
 // valence token — never color-alone. The zero-anchored total bar stays on by
 // default: a waterfall without a grounded total is unverifiable. Static,

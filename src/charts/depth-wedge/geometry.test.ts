@@ -14,7 +14,7 @@ const BOOK = {
   ],
 };
 
-describe("depthWedgeGeometry (plan/25 §12, plan/17 F5)", () => {
+describe("depthWedgeGeometry", () => {
   it("builds two wedges, the spread, and the lead ratio", () => {
     const geo = depthWedgeGeometry({
       ...BOOK,

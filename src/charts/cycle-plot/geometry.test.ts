@@ -17,7 +17,7 @@ for (let w = 0; w < 6; w++) {
   );
 }
 
-describe("cycleGeometry (plan/23 #18)", () => {
+describe("cycleGeometry", () => {
   it("reshapes into `period` slots; means position the spine", () => {
     const geo = cycleGeometry({ ...base, data: WEEKS, period: 7 })!;
     expect(geo.slots.length).toBe(7);

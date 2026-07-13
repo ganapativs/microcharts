@@ -10,7 +10,7 @@ const TRAIL = [
   { d: 900, elev: 865 },
 ];
 
-describe("interactive <GradeProfile> (plan/26 §3)", () => {
+describe("interactive <GradeProfile>", () => {
   it("→ roves segments; announces the true grade + cumulative climb", async () => {
     const screen = await render(
       <GradeProfile data={TRAIL} format={(n) => `${n} m`} title="Route" width={200} height={40} />,

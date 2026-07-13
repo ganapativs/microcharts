@@ -146,7 +146,7 @@ export const playground: PlaygroundSpec = {
       "  domain={today}",
       s.now && "  now={Date.now()}",
       s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -177,15 +177,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — EventTimeline always answering "what happened when, and for
-   how long": a coverage read, per-service rows, an SLA-style KPI, status tabs.
-   Every host is an uptime/on-call surface, never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         API status today{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <EventTimeline data={DATA} domain={WINDOW} summary={false} width={90} height={14} />
         </span>{" "}
         — 3 spans covering 63% of the window, one incident logged.
@@ -279,9 +276,23 @@ export function markCode(): string {
   return `<EventTimeline data={windows} domain={window} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <EventTimelineInteractive
+      data={DATA}
+      domain={WINDOW}
+      summary={false}
+      width={150}
+      height={20}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

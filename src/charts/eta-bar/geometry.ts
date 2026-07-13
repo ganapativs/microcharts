@@ -1,4 +1,4 @@
-// EtaBar geometry — pure, React-free (plan/25 §3, plan/17 F14). The x-axis is
+// EtaBar geometry — pure, React-free. The x-axis is
 // TIME, not fraction: the remainder is sized by the OBSERVED rate, never linear
 // interpolation. When the rate drops, the remainder visibly grows — that is the
 // feature. Rate ≤ 0 / absent → indeterminate (stalled), never a fake countdown.

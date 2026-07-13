@@ -1,4 +1,4 @@
-// <Funnel> — where does the pipeline leak (plan/22 #19, S3-sequential).
+// <Funnel> — where does the pipeline leak.
 // Stepped columns over the classic silhouette: the silhouette is a shape, not
 // a measurement. Static, hook-free, RSC-safe. Non-monotonic stages render
 // truthfully and the summary says so.

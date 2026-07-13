@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { Hourglass } from "./client.js";
 
-describe("interactive <Hourglass> (plan/24 #7)", () => {
+describe("interactive <Hourglass>", () => {
   it("announces only when a documented threshold is crossed", async () => {
     const screen = await render(<Hourglass value={0.3} />);
     const live = document.querySelector('[aria-live="polite"]')!;

@@ -4,7 +4,7 @@ import { TapeGauge } from "./client.js";
 
 const ZONES = [{ from: 130, to: 150, tone: "warn" as const }];
 
-describe("interactive <TapeGauge> (plan/25 §19)", () => {
+describe("interactive <TapeGauge>", () => {
   it("announces the full reading in a live region", async () => {
     const screen = await render(
       <TapeGauge value={142} rate={1} zones={ZONES} span={25} title="Airspeed" height={80} />,

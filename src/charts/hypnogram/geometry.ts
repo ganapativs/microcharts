@@ -1,4 +1,4 @@
-// Hypnogram geometry — pure, React-free (plan/25 §2, plan/17 F8). A categorical
+// Hypnogram geometry — pure, React-free. A categorical
 // step strip that REFUSES interpolation: state is a fact, not a sample of a
 // continuum, so runs are right-angle (H/V) only — never a diagonal. Consecutive
 // same-state entries merge; the last state holds to domain[1]. 2-dp.

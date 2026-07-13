@@ -18,7 +18,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<PairedBars> (plan/22 #12, S2-referenced)", () => {
+describe("<PairedBars>", () => {
   it("value + muted ref per pair; summary leads with the largest gap", () => {
     const { container } = draw(<PairedBars data={DATA} />);
     expect(container.querySelectorAll("rect").length).toBe(8);

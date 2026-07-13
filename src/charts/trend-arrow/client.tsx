@@ -1,5 +1,5 @@
 "use client";
-// Interactive <TrendArrow> (plan/22 #1). No pointer math — there is nothing to
+// Interactive <TrendArrow>. No pointer math — there is nothing to
 // point at. `live` mode announces direction changes through a polite region and
 // gives the glyph a one-shot pulse (CSS, reduced-motion-gated). Keyboard: the
 // wrapper is focusable, nothing more. Composes the static component (canon).

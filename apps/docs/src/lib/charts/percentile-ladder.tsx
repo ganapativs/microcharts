@@ -149,7 +149,7 @@ export const playground: PlaygroundSpec = {
       s.scale !== "linear" && `  scale="${s.scale}"`,
       s.label !== "ps" && `  label="${s.label}"`,
       s.marks !== "tick" && `  marks="${s.marks}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -194,9 +194,16 @@ export function markCode(): string {
   return `<PercentileLadder data={latencies} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <PercentileLadderInteractive data={LATENCY} summary={false} width={140} height={14} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

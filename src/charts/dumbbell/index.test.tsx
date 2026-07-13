@@ -7,8 +7,8 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<Dumbbell> (plan/22 #11, S2-paired)", () => {
-  it("single row: connector + hollow from-dot + filled to-dot; docs-as-tests summary", () => {
+describe("<Dumbbell>", () => {
+  it("single row: connector + hollow from-dot + filled to-dot summary", () => {
     const { container } = draw(<Dumbbell data={[{ from: 62000, to: 84000 }]} />);
     expect(container.querySelector("line")).not.toBeNull();
     const circles = [...container.querySelectorAll("circle")];

@@ -153,7 +153,7 @@ export const playground: PlaygroundSpec = {
       s.net && "  net",
       s.sort !== "none" && `  sort="${s.sort}"`,
       s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -188,9 +188,14 @@ export function markCode(): string {
   return `<DataDiff data={diff} />`;
 }
 
+export function PreviewLive() {
+  return <DataDiffInteractive data={DIFF} summary={false} width={120} height={40} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

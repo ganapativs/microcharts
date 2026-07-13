@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { fatDigitsGeometry, fatTier } from "./geometry.js";
 
-describe("fatTier (plan/24 #4) — ordinal weight tiers", () => {
+describe("fatTier — ordinal weight tiers", () => {
   it("maps value through domain to a tier (5 steps)", () => {
     expect(fatTier(0, [0, 100], 5)).toEqual({ weight: 300, tier: 1 });
     expect(fatTier(50, [0, 100], 5)).toEqual({ weight: 600, tier: 3 });

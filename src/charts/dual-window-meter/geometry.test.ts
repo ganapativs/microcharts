@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { dualWindowGeometry, rollingMean } from "./geometry.js";
 
-describe("dualWindowGeometry (plan/25 §11, plan/17 F4)", () => {
+describe("dualWindowGeometry", () => {
   it("rolling mean has a leading gap until the window fills", () => {
     expect(rollingMean([1, 2, 3, 4], 2)).toEqual([null, 1.5, 2.5, 3.5]);
     expect(rollingMean([1, 2, 3], 3)).toEqual([null, null, 2]);

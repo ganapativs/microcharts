@@ -7,7 +7,7 @@ const PERIODS = [
   { open: 148.2, high: 150.0, low: 147.1, close: 149.5 },
 ];
 
-describe("interactive <Ohlc> (plan/22 #24)", () => {
+describe("interactive <Ohlc>", () => {
   it("←/→ steps periods with full OHLC announcements", async () => {
     const screen = await render(<Ohlc data={PERIODS} title="AAPL" />);
     const wrap = screen.container.querySelector(".mc-ohlc-live") as HTMLElement;

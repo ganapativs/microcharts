@@ -1,5 +1,5 @@
 "use client";
-// Interactive <WinProbWorm> (plan/26 §4). ←/→ (Home/End) rove the points, each
+// Interactive <WinProbWorm>. ←/→ (Home/End) rove the points, each
 // announcing the current leader + probability; a pointer picks the nearest x.
 // Composes the static component (canon) — the crosshair + readout chip are
 // overlay children, the worm/midline/dots come from the static so the two

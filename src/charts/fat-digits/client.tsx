@@ -1,5 +1,5 @@
 "use client";
-// Interactive <FatDigits> (plan/24 #4). Announces the value + tier through a
+// Interactive <FatDigits>. Announces the value + tier through a
 // polite region on change; the weight eases via CSS on variable fonts (snaps
 // otherwise), with no layout shift (tabular-nums). Wrapper focus only — the
 // numeral is one value. Composes the static component.

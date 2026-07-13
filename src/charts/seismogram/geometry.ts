@@ -1,4 +1,4 @@
-// Seismogram geometry — pure, React-free (plan/22 #8, S1 events). Ticks read as
+// Seismogram geometry — pure, React-free. Ticks read as
 // a seismograph trace: presence = density, LENGTH = intensity, centered on a
 // midline so spikes flare symmetrically (the instrument's signature). Unsigned
 // intensity mirrors each tick about the center; signed data keeps a zero

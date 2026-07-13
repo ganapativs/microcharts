@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Slope> (plan/22 #13). One pointer listener; nearest line by
+// Interactive <Slope>. One pointer listener; nearest line by
 // vertical distance at the pointer's interpolated x (pure point-to-segment
 // math over ≤ 7 lines). ↑/↓ rove categories ordered by their `to` value.
 // Composes the static component (canon).

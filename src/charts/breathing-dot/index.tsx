@@ -1,4 +1,4 @@
-// <BreathingDot> — how loaded is the system right now, ambiently? (plan/24 #19,
+// <BreathingDot> — how loaded is the system right now, ambiently? (,
 // S4, motion type). The STATIC frame is a real chart with zero JS: a core dot
 // colored by threshold band, and a level ring whose distance from the core IS the
 // level read. The interactive entry adds a pulse whose rate encodes the level.

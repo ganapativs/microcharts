@@ -1,7 +1,7 @@
-// SVG path builders (plan/03 §4). Inputs are points ALREADY in pixel/viewBox
-// space; `null` breaks the line into separate subpaths (gaps, plan/03). Coords
-// are rounded to 2 decimals at generation (plan/07: smaller output + stable
-// attribute assertions, plan/09). Static-safe: no measurement, no DOM.
+// SVG path builders. Inputs are points ALREADY in pixel/viewBox
+// space; `null` breaks the line into separate subpaths (gaps). Coords
+// are rounded to 2 decimals at generation (: smaller output + stable
+// attribute assertions, ). Static-safe: no measurement, no DOM.
 import { round2 as r, type XY } from "./types.js";
 
 export type Curve = "linear" | "smooth" | "step";
@@ -83,7 +83,7 @@ const TOP: Record<Curve, (p: ReadonlyArray<XY | null>) => string> = {
 /**
  * Filled area between the series and a baseline (in the same pixel space).
  * Each gap-free run is closed independently: baseline → top curve → baseline.
- * Areas anchor at a zero/baseline y (plan/06: lie factor = 1).
+ * Areas anchor at a zero/baseline y.
  */
 export function areaPath(
   points: ReadonlyArray<XY | null>,

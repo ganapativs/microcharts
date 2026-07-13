@@ -14,7 +14,7 @@ const step = (a: number, na: number, b: number, nb: number): number[] => [
   ...Array(nb).fill(b),
 ];
 
-describe("detectBreaks (plan/23 #19) — a labelled heuristic", () => {
+describe("detectBreaks — a labelled heuristic", () => {
   it("finds the exact index on a clean step", () => {
     expect(detectBreaks(step(10, 10, 50, 10))).toEqual([10]);
   });
@@ -62,7 +62,7 @@ describe("detectBreaks (plan/23 #19) — a labelled heuristic", () => {
   );
 });
 
-describe("changePointGeometry (plan/23 #19)", () => {
+describe("changePointGeometry", () => {
   it("segments + break carry the regime means and signed delta", () => {
     const geo = changePointGeometry({ ...base, data: step(10, 10, 15, 10) })!;
     expect(geo.breaks.length).toBe(1);

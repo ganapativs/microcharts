@@ -14,7 +14,7 @@ const TRACE = [
   { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 },
 ];
 
-describe("traceFoldGeometry (plan/25 §18, plan/17 F17)", () => {
+describe("traceFoldGeometry", () => {
   it("walks the critical path (longest-duration child at each level)", () => {
     const flags = criticalPath(TRACE);
     // request → db.query → index-scan

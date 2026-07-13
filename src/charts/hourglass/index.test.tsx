@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<Hourglass> (plan/24 #7)", () => {
+describe("<Hourglass>", () => {
   it("summary carries both sides", () => {
     const { container } = draw(<Hourglass value={0.75} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

@@ -9,7 +9,7 @@ const TRACE = [
   { label: "render", start: 130, duration: 60, depth: 1, parent: 0 },
 ];
 
-describe("interactive <TraceFold> (plan/25 §18)", () => {
+describe("interactive <TraceFold>", () => {
   it("↓ then → roves spans; announces the span with depth + share", async () => {
     const screen = await render(
       <TraceFold data={TRACE} format={ms} title="Trace" width={200} height={30} />,

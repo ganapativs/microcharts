@@ -9,7 +9,7 @@ const ACCT = [
   { label: "Gamma", value: null },
 ] as const;
 
-describe("interactive <SproutRow> (plan/24 #9)", () => {
+describe("interactive <SproutRow>", () => {
   it("arrow keys rove and announce each item's stage", async () => {
     const screen = await render(<SproutRow data={ACCT} title="Accounts" />);
     const fig = screen.getByRole("img").element() as HTMLElement;

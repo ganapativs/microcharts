@@ -1,5 +1,5 @@
 "use client";
-// Interactive <MicroBox> (plan/22 #16). Pointer → nearest of the five stat
+// Interactive <MicroBox>. Pointer → nearest of the five stat
 // positions by x; ←/→ steps the fixed 5-stop roving model min → q1 → median →
 // q3 → max ("Median: 42."). Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

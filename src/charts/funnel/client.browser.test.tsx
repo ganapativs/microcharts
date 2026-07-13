@@ -8,7 +8,7 @@ const PIPE = [
   { label: "Checkout", value: 2730 },
 ];
 
-describe("interactive <Funnel> (plan/22 #19)", () => {
+describe("interactive <Funnel>", () => {
   it("←/→ rove stages with retained-share announcements", async () => {
     const screen = await render(<Funnel data={PIPE} title="Pipeline" />);
     const wrap = screen.container.querySelector(".mc-funnel-live") as HTMLElement;

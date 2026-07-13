@@ -1,4 +1,4 @@
-// ProgressRing geometry — pure, React-free (plan/22 #17, S3). Arc sweep from a
+// ProgressRing geometry — pure, React-free. Arc sweep from a
 // FIXED 12-o'clock start, clockwise, butt caps — the two quiet ways rings
 // inflate progress, both removed. `sweep` mode renders the REMAINING fraction
 // as a shrinking filled sector (countdown semantics). 2-dp via core/arc.

@@ -7,7 +7,7 @@ const DATA = [
   { label: "Berlin", from: 48, to: 68 },
 ];
 
-describe("interactive <Dumbbell> (plan/22 #11)", () => {
+describe("interactive <Dumbbell>", () => {
   it("↑/↓ rove rows; ←/→ toggle from/to announcements", async () => {
     const screen = await render(<Dumbbell data={DATA} title="Bands" />);
     const wrap = screen.container.querySelector(".mc-dumbbell-live") as HTMLElement;

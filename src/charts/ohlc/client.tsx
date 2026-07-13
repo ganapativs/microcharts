@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Ohlc> (plan/22 #24). Nearest-x lookup; ←/→ steps the RENDERED
+// Interactive <Ohlc>. Nearest-x lookup; ←/→ steps the RENDERED
 // periods ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close
 // 148.20."). Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

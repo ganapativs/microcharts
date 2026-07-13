@@ -5,7 +5,7 @@ import { musicStaffGeometry } from "./geometry.js";
 const g = (values: (number | null)[], range: "staff" | "ledger" = "ledger") =>
   musicStaffGeometry({ values, width: 60, height: 20, range, pad: 2 });
 
-describe("musicStaffGeometry (plan/24 #12) — pitch on a staff", () => {
+describe("musicStaffGeometry — pitch on a staff", () => {
   it("always draws five staff lines", () => {
     expect(g([1, 2, 3]).staffYs.length).toBe(5);
   });

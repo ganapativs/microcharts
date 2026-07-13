@@ -60,11 +60,6 @@ export const showcase = {
   Node: () => <PictogramRow value={6.5} total={8} title="Capacity used" width={110} height={16} />,
 };
 
-// renderPoint is a render-prop escape hatch (custom unit glyph), not a knob.
-// color, format, locale, strings, title, summary, id, className, style,
-// children: styling/formatting/accessible-name overrides, not chart-shape
-// knobs — no interactive control (consistent with every other chart's
-// playground).
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value", min: 0, max: 8, step: 0.5, init: 5 },
@@ -119,7 +114,7 @@ export const playground: PlaygroundSpec = {
       `  total={${s.total}}`,
       s.shape !== "dot" && `  shape="${s.shape}"`,
       s.fractional !== "clip" && `  fractional="${s.fractional}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -162,15 +157,12 @@ const PRODUCTS: { label: string; value: number; total: number }[] = [
   { label: "Aria Lite", value: 2, total: 5 },
 ];
 
-/* The four homes — PictogramRow always doing the one thing it's for: a count
-   a reader can verify by counting. Every host is a seats/slots/ratings
-   surface, never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         The oversight committee holds{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <PictogramRow value={5} total={8} summary={false} width={90} height={16} />
         </span>{" "}
         of its 8 seats — a working majority.
@@ -250,9 +242,16 @@ export function markCode(): string {
   return `<PictogramRow value={3} total={5} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <PictogramRowInteractive value={5} total={8} summary={false} width={110} height={16} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

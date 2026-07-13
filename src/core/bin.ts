@@ -1,4 +1,4 @@
-// Uniform binning (plan/21 §6.0.C). Histogram-class charts bin raw
+// Uniform binning. Histogram-class charts bin raw
 // observations here; counts stay zero-anchored and are never smoothed.
 // Outputs are data-space (charts scale + round to viewBox).
 import { isFiniteValue, type Value } from "./types.js";

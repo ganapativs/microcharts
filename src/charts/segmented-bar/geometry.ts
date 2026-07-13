@@ -1,4 +1,4 @@
-// SegmentedBar geometry — pure, React-free (plan/22 #14, S3). Parts of a whole
+// SegmentedBar geometry — pure, React-free. Parts of a whole
 // as segment lengths in one fixed-length bar. > maxSegments → top-(max−1) by
 // value + a labeled "Other" rollup: nothing is ever silently dropped. 2-dp.
 import { normalizeShares } from "../../core/stack.js";

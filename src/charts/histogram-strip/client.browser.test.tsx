@@ -4,7 +4,7 @@ import { HistogramStrip } from "./client.js";
 
 const VALUES = [1, 1, 1, 5, 5, 9];
 
-describe("interactive <HistogramStrip> (plan/22 #15)", () => {
+describe("interactive <HistogramStrip>", () => {
   it("←/→ rove bins with range announcements", async () => {
     const screen = await render(<HistogramStrip data={VALUES} bins={3} title="Dist" />);
     const wrap = screen.container.querySelector(".mc-histogram-live") as HTMLElement;

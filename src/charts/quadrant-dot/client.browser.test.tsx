@@ -9,7 +9,7 @@ const FIELD = [
   { x: 9, y: 2 },
 ];
 
-describe("interactive <QuadrantDot> (plan/23 #17)", () => {
+describe("interactive <QuadrantDot>", () => {
   it("arrow keys cycle peers nearest-first; each announces coords + quadrant", async () => {
     const screen = await render(
       <QuadrantDot

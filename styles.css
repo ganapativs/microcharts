@@ -1,16 +1,15 @@
 /*
- * @microcharts/react — shared stylesheet (see plan/19-css-delivery.md).
+ * @microcharts/react — shared stylesheet.
  * One artifact, imported once:  import '@microcharts/react/styles.css'
  * Not per-chart-split. Zero-specificity via :where() so consumer overrides win.
  * Theme by overriding --mc-* at any scope. Charts never paint a background.
- * Token names + values per plan/06.
  */
 
 @layer microcharts.tokens, microcharts.base, microcharts.charts, microcharts.motion;
 
 @layer microcharts.tokens {
   :where(:root) {
-    /* semantic color — Okabe-Ito-derived (plan/06 §2) */
+    /* semantic color — Okabe-Ito-derived */
     --mc-stroke: #171717; /* primary data ink */
     --mc-positive: #009e73; /* up / good */
     --mc-negative: #d55e00; /* down / bad */
@@ -32,6 +31,9 @@
     --mc-gap: 0.25em;
     --mc-font: inherit;
     --mc-label-size: 0.75em;
+    /* Optical lift for `.mc-inline` beside digits ("+3.8%"). VA-middle alone
+       seats SVG marks ~1.4px low; override per face if needed. */
+    --mc-inline-nudge: -0.14em;
 
     /* interactive readout chip surface — a tooltip needs a legible backing, so
        this is the one place a mark sits on an opaque plane. Defaults to the
@@ -45,8 +47,7 @@
     --mc-duration: 300ms;
     --mc-easing: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out */
   }
-
-  /* Dark mode — hand-tuned, never auto-inverted (plan/06 §2). */
+  /* Dark mode — hand-tuned, never auto-inverted. */
   @media (prefers-color-scheme: dark) {
     :where(:root) {
       --mc-stroke: #ededed;
@@ -65,8 +66,7 @@
     --mc-neutral: #9a9a9a;
     --mc-moon: #ecc766;
   }
-
-  /* Presets = token bundles (plan/06 §3, layer 2). Visual only. */
+  /* Presets = token bundles. Visual only. */
   /* "editorial" — hairline, sharp, a single restrained red endpoint accent.
      Ink is left to the active theme (never pinned to a light value) so the
      preset stays legible on dark surfaces too — its identity is the weight and
@@ -107,14 +107,32 @@
     font-size: var(--mc-label-size);
     fill: var(--mc-stroke);
   }
-  /* small-multiples wrapper — layout-neutral by default (plan/04 §5) */
+  /* small-multiples wrapper — layout-neutral by default */
   :where(.mc-group) {
     display: inline-flex;
     flex-wrap: wrap;
     gap: var(--mc-gap);
     align-items: center;
   }
-  /* focusable interactive charts never lose a visible ring (plan/08 §4) */
+  /* Word-sized chart in running prose. Wraps any SVG mark next to digits;
+     leave <Delta> bare — it owns baseline. Ships in styles.css so hosts only
+     add className="mc-inline". */
+  :where(.mc-inline) {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    margin-inline: 0.2em;
+    translate: 0 var(--mc-inline-nudge);
+  }
+  :where(.mc-inline > .mc-root),
+  :where(.mc-inline > .mc-status) {
+    vertical-align: middle;
+  }
+  :where(.mc-inline > .mc-trend) {
+    width: 0.95em;
+    height: 0.95em;
+  }
+  /* focusable interactive charts never lose a visible ring */
   :where(.mc-root:focus-visible) {
     outline: 2px solid var(--mc-accent);
     outline-offset: 2px;
@@ -234,7 +252,7 @@
 
 @layer microcharts.charts {
   /* ink roles — marks carry data-mc-ink; color/width come from tokens so a
-     single --mc-* override retunes every chart (plan/06 §3). */
+     single --mc-* override retunes every chart. */
   :where(.mc-root [data-mc-ink="data"]) {
     fill: none;
     stroke: var(--mc-stroke);
@@ -282,7 +300,7 @@
     fill: none;
     stroke: var(--mc-neutral);
   }
-  /* direct value labels (plan/18) — quieter than data ink, never the loudest mark */
+  /* direct value labels — quieter than data ink, never the loudest mark */
   :where(.mc-root text[data-mc-ink="label"]) {
     fill: var(--mc-neutral);
     stroke: none;
@@ -293,7 +311,7 @@
     stroke: none;
   }
   /* solid bars — neutral fill; valence variants encode sign (redundant with
-     position, never color-alone — plan/08 1.4.1) */
+     position, never color-alone) */
   :where(.mc-root [data-mc-ink="bar"]) {
     fill: var(--mc-stroke);
     stroke: none;
@@ -433,7 +451,7 @@
   /* @mc-chart-end */
 
   /* @mc-chart token-confidence */
-  /* TokenConfidence (plan/25 §7) — the text IS the chart. Three discrete tiers
+  /* TokenConfidence — the text IS the chart. Three discrete tiers
      as typographic underlines: tier = color AND thickness AND stroke style, so
      it is never color-alone. Confident tokens get NO mark (reading stays
      primary). The host is inline HTML, not SVG. */
@@ -602,7 +620,7 @@
     :where(.mc-root) {
       forced-color-adjust: none;
     }
-    /* data ink → CanvasText, accent → Highlight, muted → GrayText (plan/08 §4) */
+    /* data ink → CanvasText, accent → Highlight, muted → GrayText */
     :where(.mc-root [data-mc-ink="data"]) {
       stroke: CanvasText;
     }

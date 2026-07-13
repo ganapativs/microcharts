@@ -1,5 +1,5 @@
 "use client";
-// Interactive <TokenConfidence> (plan/25 §7). Roving tabIndex across FLAGGED
+// Interactive <TokenConfidence>. Roving tabIndex across FLAGGED
 // tokens (confident tokens are skipped — they carry no mark); focus announces
 // the tier + confidence. HTML host (the documented SVG exception); shares the
 // pure tiering with the static entry.

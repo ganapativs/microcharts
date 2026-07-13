@@ -1,4 +1,4 @@
-// EnsembleGhosts geometry — pure, React-free (plan/23 #20). What could happen,
+// EnsembleGhosts geometry — pure, React-free. What could happen,
 // across the simulated futures? A faint bundle of member paths + one emphasized
 // representative — because a mean line hides that futures disagree in SHAPE, not
 // just endpoint. Ghost SELECTION is deterministic (endpoint-rank quantiles, no

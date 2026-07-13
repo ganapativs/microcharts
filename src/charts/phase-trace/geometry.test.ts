@@ -12,7 +12,7 @@ const TRAJ = [
   { x: 62, y: 130 },
 ];
 
-describe("phaseTraceGeometry (plan/25 §17, plan/17 F16)", () => {
+describe("phaseTraceGeometry", () => {
   it("splits the trajectory into a muted trail + an accent tail with an arrow", () => {
     const geo = phaseTraceGeometry({
       data: TRAJ,

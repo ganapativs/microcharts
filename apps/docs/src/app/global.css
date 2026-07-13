@@ -4,14 +4,8 @@
 @import "@microcharts/react/styles.css";
 
 /*
- * microcharts docs — "instrument glass".
- * A frosted-matte optical material framing matte, honest charts. The chrome is
- * translucent, layered, and lit; the charts stay opaque and precise. Not stock
- * Fumadocs, not an Apple clone (see memory: docs-site-design-system).
- *
- * The material is defined ONCE here as tokens + reusable classes (.glass,
- * .panel, .cta-accent, .ghost-ctrl). Surfaces inherit it — never re-roll glass
- * per component. Charts are never blurred or translucent (non-negotiable #7).
+ * Docs chrome: frosted glass tokens + reusable classes (.glass, .panel,
+ * .cta-accent, .ghost-ctrl). Charts stay opaque — never blurred here.
  */
 
 @theme {
@@ -38,22 +32,14 @@
   --color-hairline: var(--hairline);
 }
 
-/*
- * Accent is a single token (--accent) that everything derives from — chrome,
- * links, focus rings, AND the chart emphasis color. The global picker swaps it
- * via [data-accent] (see accent presets below). Default = Cobalt (rich, calm,
- * deliberately NOT the cyan-on-dark / purple-gradient AI palette).
- */
+/* --accent drives chrome + chart emphasis; [data-accent] swaps it. Default Cobalt. */
 :root {
   /* accent — Cobalt default (light) */
   --accent: #2f52d4;
   --accent-strong: #2543b8;
   --accent-fg: #fdfdff;
 
-  /* Light: cool "pristine glass" — a bright, faintly blue-grey field so frosted
-     white glass separates and its vibrancy (saturated backdrop) reads. Cooler +
-     brighter than the old warm cream, which read flat/grey under near-white glass.
-     A whisper of warmth survives only in the field's corner, never the neutrals. */
+  /* Light field: cool blue-grey so frosted glass separates. */
   --color-fd-background: #e9edf4;
   --color-fd-foreground: #12151d;
   --color-fd-muted: #e2e7f0;
@@ -78,34 +64,21 @@
   --rule: var(--color-fd-border);
   --signal: var(--accent);
 
-  /* ── Liquid glass material (light) ──────────────────────────────────────────
-     A faint, LIGHTWEIGHT near-white frost — ONE card-based material for every
-     block. The read is carried by a thin rim + a soft bevel + a barely-there
-     ambient lift + vibrancy (backdrop saturate 1.9 blooms the colour behind it),
-     NEVER by weight or colour. MATTE: restrained sheen, faint grain, no glossy
-     specular edge. Kept translucent so a panel's tone sits close to the field
-     instead of popping forward as a heavy card (matched to the dark theme's
-     floating panes — the user prefers that lightness).
-     History, do NOT undo: warm cream → cool field; a light-blue panel tint was
-     tried and reverted (it split the UI — wells/seg/popover/sidebar/a11y
-     fallbacks all use the white card token, so only some blocks went blue). */
+  /* Glass material (light): translucent frost, thin rim, soft bevel, matte grain.
+     Keep cool field (not warm cream); avoid blue panel tint (split UI). */
   --glass-surface: color-mix(in oklab, var(--color-fd-card) 46%, transparent);
   --glass-surface-strong: color-mix(in oklab, var(--color-fd-card) 62%, transparent);
   --glass-tint: color-mix(in oklab, var(--accent) 5%, transparent);
   --glass-sheen: color-mix(in oklab, #eef3fc 16%, transparent);
-  /* opaque fill for the a11y (reduced-transparency / high-contrast) fallback —
-     the same white card as the rest, so fallback blocks match too. */
+  /* Opaque a11y fallback — same card token as the rest. */
   --glass-solid: var(--color-fd-card);
   --glass-blur: 14px;
   --glass-sat: 1.9;
   --glass-bright: 1.02;
   --grain-opacity: 0.016;
-  /* ONE border token — panel rims, chips, wells, segmented, tables, code fences
-     all use this. A thin cool blue-ink rim is what defines a light panel now that
-     the shadow is nearly gone; 17% keeps it crisp but weightless. */
+  /* Shared border token for panels, chips, wells, tables, fences. */
   --hairline: color-mix(in oklab, #1a2438 17%, transparent);
-  /* A soft near-white specular top + a whisper of cool-dark underside — a light
-     bevel, not a thick lip. The rim (--hairline) is the real border. */
+  /* Soft top sheen + faint underside — bevel, not a thick lip. */
   --glass-edge:
     inset 0 1px 0.5px color-mix(in oklab, #ffffff 72%, transparent),
     inset 0 -1px 1px color-mix(in oklab, #1b2740 6%, transparent);
@@ -426,8 +399,7 @@ body {
   border-color: var(--rule);
 }
 
-/* Faint engineered graph-paper backdrop (the instrument tell). Layered INSIDE
-   glass panels, it reads as etched measurement lines under the frost. */
+/* Graph-paper backdrop inside glass panels. */
 .grid-paper {
   background-image:
     linear-gradient(
@@ -457,18 +429,7 @@ body {
   background-size: 100% 1.5px;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   INSTRUMENT GLASS — the material.
-   .glass          base frosted surface: translucent fill, backdrop blur, cool
-                   depth shadow, a single specular top edge + hairline ring, and
-                   a frost grain that makes it matte instead of wet acrylic.
-   .glass-strong   less translucent (popovers/menus over busy content).
-   .glass-lift     interactive hover: elevation + brighter specular.
-   Charts are NEVER given these classes.
-
-   Declared in @layer components so Tailwind utilities still win — e.g. a
-   portalled popover adding `.fixed` overrides `.glass`'s positioning context.
-   ══════════════════════════════════════════════════════════════════════════ */
+/* Glass material: .glass / .glass-strong / .glass-lift. Charts never get these. */
 @layer components {
   /* Shared liquid-glass recipe — .glass and .panel are the same material.
      Surface is translucent (field shows through + saturates); the bevelled
@@ -531,13 +492,7 @@ body {
     transform: translateY(-2px);
   }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     GALLERY — "contact sheet". A full-bleed, continuous plane of instrument
-     plates. Chrome auto-hides; a floating dock owns the controls; each plate
-     tilts + lights toward the pointer. Everything below reuses the SAME tokens
-     as the rest of the site (--accent, --glass-*, --hairline, --rule) so it
-     reads as one material, and every motion is reduced-motion gated.
-     ══════════════════════════════════════════════════════════════════════════ */
+  /* Gallery plane: full-bleed grid, floating dock, pointer tilt. Reuses site tokens. */
 
   /* nav auto-hide — only while a gallery-2 page is mounted (the client sets
      [data-g2-mounted] on <html> and flips [data-g2-nav]). Scoped so the shared
@@ -640,9 +595,7 @@ body {
     color: inherit;
     border-radius: var(--radius-panel);
     background-color: var(--glass-surface);
-    /* Resting rim is deliberately quiet — a faint hairline, NO bright bevel — so
-       the grid of plates recedes and the charts lead. The lit edge + accent rim
-       return on hover/focus as the affordance (below). */
+    /* Quiet resting rim — hover carries the accent. */
     border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
     box-shadow: var(--glass-shadow);
     transform-style: preserve-3d;
@@ -861,11 +814,7 @@ body {
     }
   }
 
-  /* One-time entrance, deliberately CALM: a plain opacity fade, nothing moves.
-     Two elements only — the masthead fades in, then the whole grid fades in a
-     beat later (as one plane, not a per-card wave — no stagger to twitch the
-     eye). Opacity is GPU-cheap and reads as "settling in", not "performing".
-     Gated to no-preference; reduced-motion gets the static end state. */
+  /* One-time entrance: opacity only. */
   @media (prefers-reduced-motion: no-preference) {
     .g2:not([data-entered]) .g2-head {
       animation: g2-fade 0.55s ease-out backwards;
@@ -1166,6 +1115,46 @@ body {
   }
 }
 
+/* ── Brand kit specimen stages ───────────────────────────────────────────────
+   Same instrument-plate language as .g2-stage: faint graph paper, fixed grounds
+   for light/dark mark previews (the deliverable must read on those papers). */
+.bk-stage {
+  position: relative;
+  display: flex;
+  min-height: 9.5rem;
+  align-items: center;
+  justify-content: center;
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--rule) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--rule) 14%, transparent) 1px, transparent 1px);
+  background-size: 12px 12px;
+  background-position: -1px -1px;
+}
+.bk-stage[data-tile="light"] {
+  background-color: #e9edf4;
+}
+.bk-stage[data-tile="dark"] {
+  background-color: #0a0b0f;
+}
+.bk-stage[data-tile="auto"] {
+  background-color: transparent;
+  background-image: linear-gradient(135deg, #e9edf4 49.5%, #0a0b0f 50.5%);
+  background-size: 100% 100%;
+}
+.bk-badge {
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--mc-negative) 88%, #000);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
 /* Primary CTA — a solid accent lozenge (kept opaque for punch + contrast) with
    a specular top edge and a slow light sweep on hover. Never translucent: the
    primary action must stay unmistakable. */
@@ -1210,6 +1199,13 @@ body {
 .cta-accent:hover::after {
   transform: translateX(120%);
 }
+/* Tactile press — the primary action scales down on pointer-down, matching
+   .cta-ghost, so the button acknowledges the press instantly (feedback on
+   press, not release). !important so it wins over the Tailwind hover-lift
+   utility on the buttons that carry one (same specificity, later layer). */
+.cta-accent:active {
+  transform: scale(0.97) !important;
+}
 
 /* Secondary action — the SAME liquid-glass material as .panel, at button scale:
    frosted body, a top-left sheen, the bevel, a crisp hairline rim, and a soft
@@ -1235,9 +1231,7 @@ body {
     color 0.2s var(--ease-out-quint),
     transform 0.12s var(--ease-out-quint);
 }
-/* Quiet, delightful hover — an accent-tinted rim + a small soft accent glow +
-   the text darkening to full ink. NO elevation jump (the old --glass-shadow-lift
-   was a 30px cast on a 30px button = the "horrible" heavy hover). */
+/* Hover: accent rim + soft glow; no elevation jump. */
 .cta-ghost:hover {
   border-color: color-mix(in oklab, var(--accent) 34%, var(--hairline));
   color: var(--color-fd-foreground);
@@ -1301,7 +1295,15 @@ body {
 /* One keyboard focus ring for the whole control canon — the accent, offset so
    it reads on glass in both themes. :where() keeps specificity at zero so any
    component can override. Charts keep the library's own focus treatment. */
-:where(.cta-accent, .cta-ghost, .ghost-ctrl, .seg-opt, .mc-range, .link-underline):focus-visible {
+:where(
+  .cta-accent,
+  .cta-ghost,
+  .ghost-ctrl,
+  .seg-opt,
+  .mc-range,
+  .link-underline,
+  .hx-slot-link
+):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -1309,13 +1311,14 @@ body {
 /* Sticky glass header rail — translucent, blurred, with a lit hairline under
    edge instead of a hard border. */
 .glass-rail {
-  background-color: color-mix(in oklab, var(--color-fd-background) 38%, transparent);
-  -webkit-backdrop-filter: blur(20px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
-  backdrop-filter: blur(20px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
-  /* A single faint hairline under-edge — the same border token as everything
-     else, softened, so the rail reads consistently in light + dark instead of
-     the old white-based ring that vanished on light. */
-  box-shadow: inset 0 -1px 0 0 color-mix(in oklab, var(--hairline) 70%, transparent);
+  /* The nav blends into the page — a translucent film, no bar, no dividing
+     line. A light tint + backdrop blur keep the wordmark and links legible over
+     scrolling content; there is deliberately no under-edge rule so the header
+     reads as part of the page, not a separate section (same call as the
+     footer). A11y fallbacks below swap in a solid fill. */
+  background-color: color-mix(in oklab, var(--color-fd-background) 24%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+  backdrop-filter: blur(18px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
 }
 
 /* Standalone command block — the SAME shell as .panel (one border language for
@@ -1597,24 +1600,20 @@ div:where(
 }
 
 /* Gentle morph when a playground/prop change swaps the rendered chart. Keyed
-   remount replays it; purely cosmetic, fully reduced-motion-gated. */
+   remount replays it; purely cosmetic, fully reduced-motion-gated. Opacity-only
+   so it never fights `.mc-inline`'s optical `translate`. */
 @keyframes mc-morph {
   from {
     opacity: 0.55;
-    transform: translateY(2px) scale(0.995);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
 .mc-morph {
   animation: mc-morph 0.28s var(--ease-out-quint) both;
 }
 
-/* Streaming demo — a text caret that blinks while the model "types", and the
-   soft settle a chart makes when its fence closes and it morphs from raw
-   syntax to a rendered instrument. Both reduced-motion-gated below. */
 @keyframes mc-caret-blink {
   0%,
   49% {
@@ -1870,5 +1869,230 @@ div:where(
     background-color: var(--color-fd-background);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+}
+
+/* ---- Home concept: /elements --------------------------------------------- */
+@layer components {
+  /* A live chart sitting inside display type. The SVG scales with the font
+     (the viewBox carries geometry; vector-effect keeps strokes crisp), so the
+     mark reads as a word in the sentence, not a figure beside it. */
+  .hx-word {
+    display: inline-flex;
+    align-items: center;
+    margin-inline: 0.09em;
+    vertical-align: -0.03em;
+  }
+  .hx-word svg {
+    height: 0.56em;
+    width: auto;
+    overflow: visible;
+  }
+  /* strip-shaped marks (cell rows, bands) sit lower than stroke marks —
+     x-height, not cap-height, or they read as blocks instead of words */
+  .hx-word--band svg {
+    height: 0.32em;
+  }
+  /* Subtle hover scale on headline charts. */
+  @media (hover: hover) and (pointer: fine) {
+    .hx-word svg {
+      transition: scale 0.22s var(--ease-out-quint);
+    }
+    .hx-word:hover svg {
+      scale: 1.07;
+    }
+  }
+
+  /* Hero living-catalog tiles. */
+  .hx-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+  }
+  /* Scale wide Previews down so nothing clips. */
+  .hx-slot svg {
+    max-width: 100%;
+    height: auto;
+  }
+  /* Tile: transparent rim at rest; accent frost on hover/focus. */
+  .hx-tile {
+    border: 1px solid transparent;
+    transition:
+      background-color 0.2s var(--ease-out-quint),
+      border-color 0.2s var(--ease-out-quint);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hx-tile:hover {
+      background-color: var(--glass-surface);
+      border-color: color-mix(in oklab, var(--accent) 34%, var(--hairline));
+    }
+  }
+  /* one tile fading to a new chart — opacity + scale + a touch of blur (GPU) */
+  .hx-swap {
+    animation: hx-swap 0.55s var(--ease-out-expo);
+  }
+  @keyframes hx-swap {
+    from {
+      opacity: 0;
+      scale: 0.94;
+      filter: blur(3px);
+    }
+  }
+  .hx-slot-name {
+    transition:
+      color 0.18s var(--ease-out-quint),
+      opacity 0.18s var(--ease-out-quint);
+  }
+  /* the "live" heartbeat next to the count */
+  .hx-pulse {
+    animation: hx-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes hx-pulse {
+    0%,
+    100% {
+      opacity: 0.45;
+      scale: 0.82;
+    }
+    50% {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  /* Staggered settle for children of a revealed block. Set --i inline. */
+  [data-reveal="pending"] .hx-stagger {
+    opacity: 0;
+  }
+  [data-reveal="in"] .hx-stagger {
+    animation: hx-settle 0.5s var(--ease-out-quint) both;
+    animation-delay: min(calc(var(--i, 0) * 34ms), 300ms);
+  }
+  @keyframes hx-settle {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+
+  /* Stream vignette: emitted grammar text settles into the shipped chart. */
+  .hx-morph-in {
+    animation: hx-morph-in 0.42s var(--ease-out-expo);
+  }
+  @keyframes hx-morph-in {
+    from {
+      opacity: 0;
+      transform: translateY(3px) scale(0.985);
+      filter: blur(2px);
+    }
+  }
+
+  /* ── Instrument grid behind the cluster ──────────────────────────────────
+     One vertical axis, three horizontal rules (one under each chart row), and
+     nodes at the two row gaps (no border, no centre hub). Soft accent signals
+     travel down the vertical axis AND across each horizontal, so the board
+     reads like a live instrument. Paint-only (background-position on 1px
+     lines); matte, low-opacity. The rounded bound lives on the outer bloom
+     layer (inline style), not here. */
+  .hx-cross-line {
+    position: absolute;
+    overflow: hidden;
+    background: color-mix(in oklab, var(--hairline) 46%, transparent);
+  }
+  .hx-cross-v {
+    left: 50%;
+    top: 7%;
+    bottom: 7%;
+    width: 1px;
+    transform: translateX(-0.5px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  }
+  /* horizontal rules — full width, feathered at both ends; `top` set inline */
+  .hx-cross-h {
+    left: 5%;
+    right: 5%;
+    height: 1px;
+    transform: translateY(-0.5px);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  }
+  /* travelling signals — a bright band sliding along each axis */
+  .hx-cross-v::after,
+  .hx-cross-h::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+  }
+  .hx-cross-v::after {
+    background-image: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in oklab, var(--accent) 72%, transparent),
+      transparent
+    );
+    background-size: 100% 30%;
+    animation: hx-thread-v 6.5s ease-in-out infinite;
+  }
+  .hx-cross-h::after {
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in oklab, var(--accent) 72%, transparent),
+      transparent
+    );
+    background-size: 26% 100%;
+    animation: hx-thread-h 7.5s ease-in-out infinite;
+    /* per-row delay set inline so the three don't sweep in lockstep */
+  }
+  @keyframes hx-thread-v {
+    0% {
+      background-position: 0 -30%;
+    }
+    100% {
+      background-position: 0 130%;
+    }
+  }
+  @keyframes hx-thread-h {
+    0% {
+      background-position: -30% 0;
+    }
+    100% {
+      background-position: 130% 0;
+    }
+  }
+  /* the two nodes on the vertical axis at the row gaps; `top` set inline */
+  .hx-cross-node {
+    position: absolute;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    translate: -50% -50%;
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--accent) 60%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 10%, transparent);
+    animation: hx-pulse 2.6s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-morph-in,
+  .hx-swap,
+  .hx-pulse,
+  .hx-cross-v::after,
+  .hx-cross-h::after,
+  .hx-cross-node {
+    animation: none;
+  }
+  .hx-tile {
+    transition: none;
+  }
+  [data-reveal] .hx-stagger {
+    animation: none;
+    opacity: 1;
+  }
+  .hx-word svg {
+    transition: none;
   }
 }

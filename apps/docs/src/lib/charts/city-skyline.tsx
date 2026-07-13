@@ -137,7 +137,7 @@ export const playground: PlaygroundSpec = {
       s.labels && "  labels",
       s.value && '  label="value"',
       s.ground === false && "  ground={false}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -178,9 +178,14 @@ export function markCode(): string {
   return `<CitySkyline data={teams} />`;
 }
 
+export function PreviewLive() {
+  return <CitySkylineInteractive data={TEAMS} summary={false} height={26} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

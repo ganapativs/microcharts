@@ -14,7 +14,7 @@ const DIFF = [
   { key: "flags", added: 8, removed: 3 },
 ];
 
-describe("<DataDiff> (plan/23 #16)", () => {
+describe("<DataDiff>", () => {
   it("summary names totals, key count, and the largest change — the real string", () => {
     const { container } = draw(<DataDiff data={DIFF} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

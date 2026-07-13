@@ -25,8 +25,8 @@ const BINS = [
   { predicted: 0.95, observed: 0.9, count: 5 },
 ];
 
-describe("<CalibrationStrip> (plan/25 §14, plan/17 F19)", () => {
-  it("renders dots + diagonal + support lane; docs-as-tests summary", () => {
+describe("<CalibrationStrip>", () => {
+  it("renders dots + diagonal + support lane summary", () => {
     const { container } = draw(<CalibrationStrip data={BINS} />);
     expect(container.querySelectorAll("circle").length).toBe(10);
     expect(container.querySelector("path[stroke-dasharray]")).not.toBeNull();

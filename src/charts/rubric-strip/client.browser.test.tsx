@@ -8,7 +8,7 @@ const RUBRIC = [
   { label: "Style", score: 0.41, weight: 1 },
 ];
 
-describe("interactive <RubricStrip> (plan/25 §6)", () => {
+describe("interactive <RubricStrip>", () => {
   it("↓ roves criteria; announces score + weight share", async () => {
     const screen = await render(<RubricStrip data={RUBRIC} title="Eval" width={120} height={30} />);
     const wrap = screen.container.querySelector(".mc-rubric-live") as HTMLElement;

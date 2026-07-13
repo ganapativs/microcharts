@@ -11,7 +11,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<RugStrip> (plan/22 #5, S1 distribution)", () => {
+describe("<RugStrip>", () => {
   it("renders tick tiers; summary is the docs' real string", () => {
     const values = [3.1, 5.2, 9.7, 4.4, 6.8, 5.2];
     const { container } = draw(<RugStrip data={values} />);

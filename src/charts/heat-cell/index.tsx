@@ -1,4 +1,4 @@
-// <HeatCell> — one calibrated color step (plan/22 #3, S4). The building block
+// <HeatCell> — one calibrated color step. The building block
 // for host-owned grids: "how intense is this value against a known scale?"
 // Static, hook-free, RSC-safe. Discrete steps only, and every cell in one host
 // grid must share one `domain` — per-cell auto-scaling is the lie SparkGroup
@@ -28,7 +28,7 @@ export interface HeatCellProps {
   value: number;
   /** Discrete perceptual steps (shared scale with ActivityGrid/HeatStrip). */
   steps?: number | undefined;
-  /** Shared cell vocabulary (plan/21 §3). */
+  /** Shared cell vocabulary. */
   shape?: CellShape | undefined;
   /** Calibration scale. Defaults to [0, 1] — a lone cell has no data to
    *  auto-scale from; pass the host grid's real domain. */

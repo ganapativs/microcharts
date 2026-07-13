@@ -10,7 +10,7 @@ const SAMPLE: RateVolumePoint[] = [
   { rate: 4.1, volume: 38 },
 ];
 
-describe("interactive <RateVolume> (plan/23 #5)", () => {
+describe("interactive <RateVolume>", () => {
   it("arrow keys step periods; the live region always pairs both numbers", async () => {
     const screen = await render(<RateVolume data={SAMPLE} minVolume={50} title="Rate" />);
     const wrap = screen.container.querySelector(".mc-rate-volume-live") as HTMLElement;

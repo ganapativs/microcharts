@@ -1,5 +1,5 @@
 "use client";
-// Interactive <GradedBand> (plan/23 #4). One pointer listener + pure nearest-
+// Interactive <GradedBand>. One pointer listener + pure nearest-
 // edge math. ←/→ step levels outward/inward from the median; each announces its
 // interval ("80% interval: 17 to 26."). Composes the static component (canon);
 // the edge ticks are overlay children re-using geometry.

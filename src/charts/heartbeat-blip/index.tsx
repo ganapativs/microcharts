@@ -1,4 +1,4 @@
-// <HeartbeatBlip> — is it alive, and how busy? (plan/24 #20, structured events,
+// <HeartbeatBlip> — is it alive, and how busy? (, structured events,
 // motion type, flagship). A baseline with an ECG-style spike at each event across
 // the recent window; the STATIC frame shows the spike positions with zero JS, and
 // an empty baseline IS the down signal (shape, never color). The interactive entry
@@ -13,7 +13,7 @@ import { labelFont } from "../../core/labels.js";
 import { heartbeatGeometry } from "./geometry.js";
 
 export interface HeartbeatBlipProps {
-  /** Event timestamps (ms). Not a value series (plan/04 §8 — renamed from `data`). */
+  /** Event timestamps (ms). Not a value series. */
   events: readonly number[];
   /** The visible recent window (ms). Default 60000. */
   window?: number | undefined;

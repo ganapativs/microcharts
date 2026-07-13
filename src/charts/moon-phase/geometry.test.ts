@@ -5,7 +5,7 @@ import { moonGeometry } from "./geometry.js";
 const g = (value: number, mode: "progress" | "cycle" = "progress") =>
   moonGeometry({ value, mode, size: 16, pad: 0.5 });
 
-describe("moonGeometry (plan/24 #6) — area-true illumination", () => {
+describe("moonGeometry — area-true illumination", () => {
   it("progress: illumination equals the value (monotonic)", () => {
     expect(g(0).litFraction).toBe(0);
     expect(g(0.5).litFraction).toBe(0.5);

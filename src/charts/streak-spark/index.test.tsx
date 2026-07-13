@@ -30,7 +30,7 @@ const STREAK = [
 const D = [true, true, false, true]; // runs: ok2, fail1, ok1
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<StreakSpark> static structure (plan/26, plan/09)", () => {
+describe("<StreakSpark> static structure", () => {
   it("renders one rect per run, role=img", () => {
     const { container } = draw(<StreakSpark data={D} title="Deploys" />);
     expect(container.querySelector("svg")!.getAttribute("role")).toBe("img");
@@ -102,7 +102,7 @@ describe("<StreakSpark> static structure (plan/26, plan/09)", () => {
   });
 });
 
-describe("<StreakSpark> a11y (axe, plan/08)", () => {
+describe("<StreakSpark> a11y (axe, )", () => {
   it("informative chart is axe-clean", async () => {
     const { container } = draw(<StreakSpark data={STREAK} title="Deploys" />);
     await expectNoA11yViolations(container);

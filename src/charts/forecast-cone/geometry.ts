@@ -1,4 +1,4 @@
-// ForecastCone geometry — pure, React-free (plan/23 #11). Will we land where we
+// ForecastCone geometry — pure, React-free. Will we land where we
 // need to? History as a solid line, then a fan of prediction bands (p80, p50)
 // widening over the horizon with a DASHED median (an estimate never renders as
 // fact). The fan's whole honesty is visible confidence decay, so: at most 2

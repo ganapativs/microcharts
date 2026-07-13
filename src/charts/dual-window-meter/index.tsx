@@ -1,5 +1,5 @@
 // <DualWindowMeter> — is the level compliant against its target both right now
-// and on average (plan/25 §11, plan/17 F4). Static, hook-free, RSC-safe. Two
+// and on average. Static, hook-free, RSC-safe. Two
 // rolling means of one raw series: fast window thin, slow window thick, against
 // a target line. The window sizes are part of the reading and appear in docs.
 import type { CSSProperties, ReactNode } from "react";
@@ -160,7 +160,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
       {geo.bandRect ? (
         // fill via inline STYLE (see graded-band/benchmark-strip): the band
         // ink-role CSS would set --mc-band, overriding it here to a flatter
-        // neutral corridor tint (plan/12)
+        // neutral corridor tint
         <rect
           x={geo.bandRect.x}
           y={geo.bandRect.y}

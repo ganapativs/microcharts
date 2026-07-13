@@ -12,11 +12,7 @@ function mdUrl(slugs: string[]): string {
   return abs(getPageMarkdownUrl(page).url);
 }
 
-/**
- * Curated LLM map (plan/20 §5.1) — a map, not a dump. Links resolve to Markdown
- * mirrors (200), plus explicit "does not support" notes to head off
- * hallucinations. `/llms-full.txt` carries the full generated context.
- */
+/** Curated LLM docs map. Full corpus lives at `/llms-full.txt`. */
 export function GET() {
   const chartLines = STABLE_CHARTS.map(
     (c) => `- [${c.name}](${mdUrl(["charts", c.slug])}): ${c.tagline}`,

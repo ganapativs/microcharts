@@ -1,8 +1,8 @@
-// FatDigits geometry — pure, React-free (plan/24 #4, S4). The numeral itself is
+// FatDigits geometry — pure, React-free. The numeral itself is
 // the exact channel; font-WEIGHT is a redundant preattentive tier (5 or 3
 // ordinal steps) so big numbers in a dense column pop before you read them.
-// DEVIATION from FatFonts (plan/12): the source encodes magnitude as glyph ink
-// AREA via a custom font; shipping a font would break zero-dep (non-negotiable
+// DEVIATION from FatFonts: the source encodes magnitude as glyph ink
+// AREA via a custom font; shipping a font would break zero-dep (
 // #1), so we map to discrete font-weight tiers on the inherited font. Weight is
 // ordinal, never continuous; the numeral is always the exact value.
 import { round2 } from "../../core/types.js";

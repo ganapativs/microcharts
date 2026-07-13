@@ -144,7 +144,7 @@ export const playground: PlaygroundSpec = {
       "  target={-23}",
       `  windows={[${s.fast}, ${s.slow}]}`,
       s.band === true && "  band={[-25, -21]}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -202,9 +202,24 @@ export function markCode(): string {
   return `<DualWindowMeter data={samples} target={-23} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <DualWindowMeterInteractive
+      data={LOUDNESS}
+      target={-23}
+      format={{ maximumFractionDigits: 1 }}
+      summary={false}
+      width={130}
+      height={24}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

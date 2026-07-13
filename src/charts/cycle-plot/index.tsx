@@ -1,5 +1,5 @@
 // <CyclePlot> — what repeats beneath the trend, and is any slot drifting?
-// (plan/23 #18). The series is reshaped into `period` slots; each slot shows its
+// The series is reshaped into `period` slots; each slot shows its
 // own raw values across cycles as a muted polyline (time order, never smoothed,
 // never joined across a slot boundary) plus a mean/median tick, and the accent
 // spine connects the slot centers. Seasonality and drift are different questions

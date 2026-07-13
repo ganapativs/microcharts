@@ -1,4 +1,4 @@
-// StackedArea geometry — pure, React-free (plan/22 #23, S1-multi ≤ 3).
+// StackedArea geometry — pure, React-free.
 // Zero-anchored cumulative stacking via core/stack. `style="ridge"` renders
 // the SAME stack offsets with smooth silhouettes (editorial texture, zero
 // semantic change — the visual test asserts identical offsets). 2-dp.

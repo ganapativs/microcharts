@@ -1,5 +1,5 @@
 "use client";
-// Interactive <BiasStrip> (plan/26 §7). One pointer listener; nearest pair by
+// Interactive <BiasStrip>. One pointer listener; nearest pair by
 // squared Euclidean distance over the precomputed dots. ←/→ step pairs ordered
 // by mean, announcing the formatted mean, difference, and whether the pair falls
 // outside the limits of agreement. Focus ring on the active dot. Composes the

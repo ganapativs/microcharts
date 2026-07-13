@@ -4,7 +4,7 @@ import { ChangePoint } from "./client.js";
 
 const STEP = [...Array(34).fill(32), ...Array(20).fill(48)];
 
-describe("interactive <ChangePoint> (plan/23 #19)", () => {
+describe("interactive <ChangePoint>", () => {
   it("←/→ step points, announcing value + regime; a readout chip shows the value", async () => {
     const screen = await render(
       <ChangePoint data={STEP} width={200} height={32} title="Error rate" />,

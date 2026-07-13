@@ -4,7 +4,7 @@ import { dualSparklineGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 16, gutterCh: 0, fontSize: 6 };
 
-describe("dualSparklineGeometry (plan/22 #22)", () => {
+describe("dualSparklineGeometry", () => {
   it("one shared domain: the same value lands at the same y in both series", () => {
     const geo = dualSparklineGeometry({ ...base, primary: [0, 10], compare: [10, 0] });
     expect(geo.primaryPoints[1]![1]).toBe(geo.comparePoints[0]![1]);

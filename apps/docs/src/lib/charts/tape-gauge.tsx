@@ -168,7 +168,7 @@ export const playground: PlaygroundSpec = {
       s.rate !== 0 && `  rate={${s.rate}}`,
       "  zones={zones}",
       s.orientation !== "vertical" && `  orientation="${s.orientation}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -229,9 +229,25 @@ export function markCode(): string {
   return `<TapeGauge value={142} rate={1} zones={zones} span={60} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <TapeGaugeInteractive
+      value={142}
+      rate={1}
+      zones={ZONES}
+      span={60}
+      summary={false}
+      width={46}
+      height={60}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

@@ -1,4 +1,4 @@
-// DotPlot geometry — pure, React-free (plan/22 #10, S2). Dot position on one
+// DotPlot geometry — pure, React-free. Dot position on one
 // common scale: minimum ink per comparison. Without `stem` the domain may be
 // data-fit (position read); WITH `stem` the domain is forced through zero
 // (magnitude read) — the prop flips the honesty regime. Coords 2-dp.
@@ -88,7 +88,7 @@ export function dotPlotGeometry(opts: {
   };
 }
 
-/** Truncate a category label by CHARACTER COUNT (never measured — plan/18). */
+/** Truncate a category label by CHARACTER COUNT (never measured — ). */
 export function truncateLabel(label: string, max = 6): string {
   return label.length <= max ? label : `${label.slice(0, max)}…`;
 }

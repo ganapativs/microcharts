@@ -76,7 +76,7 @@ export const showcase = {
 export const playground: PlaygroundSpec = {
   // data is the fixed/shuffled demo series; width/height/color/format/locale/
   // strings/title/summary/id/className/style/children are sizing/styling/
-  // accessible-name chrome, not interactive read decisions — every remaining
+
   // documented prop (markValue, orientation, domain) has a control below.
   knobs: [
     { kind: "toggle", key: "markValue", label: "markValue", init: true },
@@ -130,7 +130,7 @@ export const playground: PlaygroundSpec = {
       (s.markValue as boolean) && "  markValue={yourOffer}",
       s.orientation === "vertical" && '  orientation="vertical"',
       (s.domain as boolean) && "  domain={[0, 150]}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -172,16 +172,12 @@ const BANDS: { role: string; salaries: number[]; offer: number }[] = [
   { role: "Sales", salaries: FIELD.map((v) => Math.round(v * 0.68)), offer: 40 },
 ];
 
-/* The four homes — RugStrip always doing the one thing it's for: showing where
-   one raw value sits inside a real field, never a binned or averaged stand-in.
-   Every host is a comp-review surface (the chart's actual "Pay band" job),
-   never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Their $62k offer sits{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <RugStrip data={FIELD} markValue={62} summary={false} height={18} />
         </span>{" "}
         inside the band, not at either edge.
@@ -270,9 +266,23 @@ export function markCode(): string {
   return `<RugStrip data={data} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <RugStripInteractive
+      data={FIELD}
+      markValue={62}
+      summary={false}
+      width={120}
+      height={16}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

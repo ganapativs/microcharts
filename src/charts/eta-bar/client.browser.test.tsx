@@ -4,7 +4,7 @@ import { EtaBar } from "./client.js";
 
 const min = (t: number) => `${Math.round(t)} min`;
 
-describe("interactive <EtaBar> (plan/25 §3)", () => {
+describe("interactive <EtaBar>", () => {
   it("focus reveals the forecast readout + announces it", async () => {
     const screen = await render(
       <EtaBar

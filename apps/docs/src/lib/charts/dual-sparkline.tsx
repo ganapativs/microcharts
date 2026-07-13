@@ -84,9 +84,6 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
-  // data/compare are the dataset, not knobs. compareLabel/curve/domain/color/format/
-  // locale/strings/seriesStrings are styling/formatting/i18n overrides, not interactive
-  // read decisions — every remaining documented prop (band, label) has a control below.
   knobs: [
     {
       kind: "segmented",
@@ -138,7 +135,7 @@ export const playground: PlaygroundSpec = {
       "  compare={market}",
       s.label !== "none" && `  label="${s.label}"`,
       s.band && "  band={[13, 16]}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -168,15 +165,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — DualSparkline always doing the one thing it's for: reading a
-   metric against its benchmark on one shared scale. Every host is a conversion
-   funnel tracked against market/plan, never a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Checkout conversion is outrunning the market{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <DualSparkline data={US} compare={BENCH} summary={false} width={70} height={18} />
         </span>{" "}
         — up 75% this quarter against the market&apos;s 33% gain.
@@ -274,9 +268,23 @@ export function markCode(): string {
   return `<DualSparkline data={ours} compare={market} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <DualSparklineInteractive
+      data={US}
+      compare={BENCH}
+      summary={false}
+      width={130}
+      height={22}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

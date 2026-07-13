@@ -191,7 +191,7 @@ export const playground: PlaygroundSpec = {
       s.shape !== "square" && `  shape="${s.shape}"`,
       Number(s.cell) !== 7 && `  cell={${s.cell}}`,
       Number(s.gap) !== 1 && `  gap={${s.gap}}`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -229,18 +229,13 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — CalendarStrip always doing the one thing it's for: real
-   calendar-position rhythm, not slot-indexed history. Every host is a
-   deploy/release-cadence surface, never a generic "signups" template. Facts
-   quoted here (11 of 24 tracked days) match the chart's own accessible name
-   for this data/end/weeks — see "Accessibility" on the doc page. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         <span className="font-mono text-xs text-fd-muted-foreground">api</span> shipped on 11 of the
         last 24 tracked days{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <CalendarStrip data={DATA} end={END} summary={false} cell={4} />
         </span>{" "}
         — quiet on three, no telemetry the rest of this week.
@@ -329,9 +324,22 @@ export function markCode(): string {
   return `<CalendarStrip data={days} end={today} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <CalendarStripInteractive
+      data={DATA}
+      end={END}
+      summary={false}
+      style={{ width: 110, height: 62 }}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

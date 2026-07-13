@@ -1,5 +1,5 @@
 // <DualSparkline> — how is this series doing against its benchmark
-// (plan/22 #22). Exactly 2 series, ever: 3+ overlapped lines at 16 px are
+// Exactly 2 series, ever: 3+ overlapped lines at 16 px are
 // unreadable (SparkGroup for that). The reference whispers: dashed + thinner +
 // neutral, never color-alone. One shared domain — no dual axes. Static,
 // hook-free, RSC-safe.

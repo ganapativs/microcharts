@@ -119,7 +119,7 @@ export const playground: PlaygroundSpec = {
       "  data={weeks}",
       s.range !== "ledger" && `  range="${s.range}"`,
       s.label && '  label="last"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -156,9 +156,14 @@ export function markCode(): string {
   return `<MusicStaff data={weeks} />`;
 }
 
+export function PreviewLive() {
+  return <MusicStaffInteractive data={MELODY} summary={false} width={80} height={22} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

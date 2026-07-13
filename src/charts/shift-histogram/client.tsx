@@ -1,5 +1,5 @@
 "use client";
-// Interactive <ShiftHistogram> (plan/23 #14). One pointer listener + grid lookup
+// Interactive <ShiftHistogram>. One pointer listener + grid lookup
 // (pointer x → bin). ←/→ step bins, M jumps to the two median bins. The live
 // region states each bin's before/after proportions. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.

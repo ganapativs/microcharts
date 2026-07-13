@@ -4,7 +4,7 @@ import { minimapDomain, minimapGeometry } from "./geometry.js";
 
 const CONTENT = Array.from({ length: 1200 }, (_, i) => Math.sin(i / 40) + 1);
 
-describe("minimapGeometry (plan/25 §10, plan/17 F10)", () => {
+describe("minimapGeometry", () => {
   it("maps the window linearly and downsamples content", () => {
     const geo = minimapGeometry({
       content: CONTENT,

@@ -1,9 +1,8 @@
 "use client";
-// Interactive <CohortTriangle> (plan/26 §1). The heatmap interaction: hover a
+// Interactive <CohortTriangle>. The heatmap interaction: hover a
 // cell for its retention, or roving-focus the block and walk it in 2-D with the
-// arrow keys. Follows the CANONICAL INTERACTIVE PATTERN (CLAUDE.md): composes the
-// static component (summary={false}, focus ring as its child), one pointer
-// listener on the wrapper, announcements via CohortTriangleStrings.
+// arrow keys. Composes the static component (summary={false}, focus ring as its
+// child), one pointer listener on the wrapper, announcements via CohortTriangleStrings.
 import {
   useCallback,
   useMemo,

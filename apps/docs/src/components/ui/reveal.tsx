@@ -1,14 +1,7 @@
 "use client";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
-/**
- * Fades + rises its children once when scrolled into view. Motion is gated on
- * prefers-reduced-motion by the `.reveal` keyframe; here we just toggle it.
- *
- * All <Reveal>s share ONE IntersectionObserver (a page can hold dozens — the
- * gallery, the brand page — and an observer-per-element is needless overhead).
- * Each element registers a one-shot callback and is unobserved on first hit.
- */
+/** Scroll-into-view fade. All instances share one IntersectionObserver. */
 type RevealCb = () => void;
 let sharedIO: IntersectionObserver | null = null;
 const callbacks = new WeakMap<Element, RevealCb>();
@@ -27,9 +20,16 @@ function getSharedIO(): IntersectionObserver | null {
         }
       }
     },
-    { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+    { threshold: 0.08, rootMargin: "0px 0px -4% 0px" },
   );
   return sharedIO;
+}
+
+/** True when any part of the box is in the visible viewport (generous). */
+function isInView(el: Element): boolean {
+  const r = el.getBoundingClientRect();
+  const vh = window.innerHeight || 0;
+  return r.bottom > 0 && r.top < vh;
 }
 
 export function Reveal({
@@ -46,12 +46,19 @@ export function Reveal({
   const ref = useRef<HTMLElement>(null);
   const [shown, setShown] = useState(false);
 
-  useEffect(() => {
+  // useLayoutEffect so above-fold nodes flip pending→in before paint when
+  // possible — avoids a blank hero sitting on the field gradient during the
+  // route-fade + IO microtask race.
+  useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (isInView(el)) {
+      setShown(true);
+      return;
+    }
     const io = getSharedIO();
     if (!io) {
-      setShown(true); // no IntersectionObserver → reveal immediately
+      setShown(true);
       return;
     }
     callbacks.set(el, () => setShown(true));

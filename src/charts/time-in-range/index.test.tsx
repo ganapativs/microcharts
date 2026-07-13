@@ -9,8 +9,8 @@ import type { Value } from "../../core/types.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<TimeInRange> (plan/25 §1, plan/17 F6)", () => {
-  it("renders one rect per present zone; docs-as-tests summary + label", () => {
+describe("<TimeInRange>", () => {
+  it("renders one rect per present zone summary + label", () => {
     const { container } = draw(<TimeInRange data={{ below: 9, in: 72, above: 19 }} />);
     expect(container.querySelectorAll("rect").length).toBe(3);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

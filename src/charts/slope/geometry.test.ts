@@ -4,7 +4,7 @@ import { slopeGeometry } from "./geometry.js";
 
 const base = { width: 40, height: 40, gutterLeftCh: 0, gutterRightCh: 0, fontSize: 6 };
 
-describe("slopeGeometry (plan/22 #13)", () => {
+describe("slopeGeometry", () => {
   it("both columns share ONE y-domain (no fake convergence)", () => {
     const geo = slopeGeometry({
       ...base,

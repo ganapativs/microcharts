@@ -7,7 +7,7 @@ const g = (
   extra: Partial<Parameters<typeof gardenGridGeometry>[0]> = {},
 ) => gardenGridGeometry({ values, rows: 7, cell: 10, gap: 2, steps: 5, pad: 1, ...extra });
 
-describe("gardenGridGeometry (plan/24 #10) — area-quantized dots", () => {
+describe("gardenGridGeometry — area-quantized dots", () => {
   it("column-major grid: cols = ceil(n / rows)", () => {
     const geo = g(Array.from({ length: 15 }, (_, i) => i));
     expect(geo.cols).toBe(3); // ceil(15/7)

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <FoldedDayBand> (plan/25 §15). One pointer listener; nearest fold
+// Interactive <FoldedDayBand>. One pointer listener; nearest fold
 // bin by x. ←/→ rove bins. Composes the static component (canon).
 import {
   useCallback,

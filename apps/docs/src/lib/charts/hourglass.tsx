@@ -146,9 +146,20 @@ export function markCode(): string {
   return `<Hourglass value={0.7} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-3">
+      {[0.15, 0.4, 0.6, 0.85].map((v) => (
+        <HourglassInteractive key={v} value={v} summary={false} />
+      ))}
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

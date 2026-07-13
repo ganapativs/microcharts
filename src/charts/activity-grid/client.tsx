@@ -1,8 +1,7 @@
 "use client";
-// Interactive <ActivityGrid> (plan/04 §4, plan/08 T2). The GitHub interaction:
+// Interactive <ActivityGrid>. The GitHub interaction:
 // hover a cell for its value, or roving-focus the grid and walk it in 2-D with
-// the arrow keys. Follows the CANONICAL INTERACTIVE PATTERN (CLAUDE.md):
-// composes the static component (summary={false}, focus ring as its child),
+// the arrow keys. Composes the static component (summary={false}, focus ring as its child),
 // one pointer listener on the wrapper, announcements via SummaryStrings.
 import {
   useCallback,

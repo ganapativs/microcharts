@@ -10,8 +10,8 @@ import { valueEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const min = (t: number) => `${Math.round(t)} min`;
 
-describe("<EtaBar> (plan/25 §3, plan/17 F14)", () => {
-  it("renders done + remaining; docs-as-tests summary", () => {
+describe("<EtaBar>", () => {
+  it("renders done + remaining summary", () => {
     const { container } = draw(
       <EtaBar progress={0.64} elapsed={3.6} rate={0.18} formatEta={min} width={120} height={14} />,
     );

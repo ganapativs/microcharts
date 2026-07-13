@@ -1,4 +1,4 @@
-// TreeRings geometry — pure, React-free (plan/24 #13, S1, flagship). The channel
+// TreeRings geometry — pure, React-free. The channel
 // is radial ring THICKNESS (spacing between consecutive boundaries) ∝ per-period
 // value — oldest at the centre, newest outermost. NOT area: equal thickness at a
 // larger radius spans more area (the ring illusion), so the docs say "compare
@@ -21,7 +21,7 @@ export interface TreeRingsGeometry {
 }
 
 /** A full circle as two half-arcs, 2-dp — exported so multiple ring outlines
- *  can be merged into one path (SSR hot path: one node, not N — plan/25 brief §per-chart 4). */
+ * can be merged into one path (SSR hot path: one node, not N — brief §per-chart 4). */
 export function ringOutline(cx: number, cy: number, r: number): string {
   const l = round2(cx - r);
   const rt = round2(cx + r);

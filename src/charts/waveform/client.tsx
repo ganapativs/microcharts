@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Waveform> (plan/25 §4). One pointer listener; bucket by x lookup.
+// Interactive <Waveform>. One pointer listener; bucket by x lookup.
 // Hover shows the bucket peak + crosshair; ←/→ rove buckets. Composes the static
 // component (canon). onPointFocus supports scrub-to-seek recipes.
 import {

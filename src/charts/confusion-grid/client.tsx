@@ -1,5 +1,5 @@
 "use client";
-// Interactive <ConfusionGrid> (plan/25 §21). One pointer listener; cell by grid
+// Interactive <ConfusionGrid>. One pointer listener; cell by grid
 // lookup. 2-D arrow roving (ActivityGrid model); Home/End jump the diagonal. The
 // live region reuses the FULL row/column labels — this entry is the full-label
 // read-back path. Composes the static component (canon).

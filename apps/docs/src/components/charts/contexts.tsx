@@ -12,9 +12,7 @@ const HOMES = [
   { key: "tab", label: "In a tab header" },
 ] as const;
 
-/* ── generic fallback (migration only) ────────────────────────────────────
-   Used only for charts that haven't authored `contexts` yet. Deliberately
-   plain so an un-migrated page reads as "placeholder", not "finished". */
+/** Fallback when a chart hasn't authored `contexts` yet. */
 function genericContexts(mod: ChartModule): ChartContexts {
   const { Mark } = mod;
   const data = mod.entry.demo;
@@ -24,7 +22,7 @@ function genericContexts(mod: ChartModule): ChartContexts {
       render: () => (
         <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
           Signups held steady{" "}
-          <span className="mx-1 inline-flex align-middle">
+          <span className="mc-inline">
             <Mark data={data} />
           </span>{" "}
           through the quarter, closing at <span className="font-mono tabular-nums">{last}</span>.
@@ -98,11 +96,7 @@ function genericContexts(mod: ChartModule): ChartContexts {
   };
 }
 
-/**
- * The four homes — the same chart doing its job in a sentence, a table cell, a
- * KPI card, and a tab. Bodies + code come from the chart's authored `contexts`,
- * so the copy is true to what THIS chart measures — never a shared template.
- */
+/** Chart in four placements: sentence, cell, KPI, tab. */
 export function FourContexts({ slug }: { slug: string }) {
   const mod = getModule(slug);
   const [tab, setTab] = useState<"preview" | "code">("preview");
@@ -129,8 +123,6 @@ export function FourContexts({ slug }: { slug: string }) {
         </div>
       </div>
 
-      {/* One card shell for both modes — identical header bar so the title never
-          moves on toggle; only the body below it swaps. */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {HOMES.map(({ key, label }) => {
           const home = ctx[key];

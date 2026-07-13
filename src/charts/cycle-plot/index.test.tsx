@@ -9,7 +9,7 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const WEEKS: number[] = [];
 for (let w = 0; w < 6; w++) WEEKS.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
 
-describe("<CyclePlot> (plan/23 #18)", () => {
+describe("<CyclePlot>", () => {
   it("summary names peak, dip, and the leading drift — the real string", () => {
     const { container } = draw(
       <CyclePlot data={WEEKS} period={7} slots={DAYS} cycleUnit="weeks" />,

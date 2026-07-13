@@ -28,8 +28,8 @@ const TREE = [
   { label: "HTML", value: 26 },
 ];
 
-describe("<PartitionStrip> (plan/25 §13, plan/17 F20)", () => {
-  it("renders parent + child rects; docs-as-tests summary", () => {
+describe("<PartitionStrip>", () => {
+  it("renders parent + child rects summary", () => {
     const { container } = draw(<PartitionStrip data={TREE} width={200} height={24} />);
     // 3 parents + 5 children
     expect(container.querySelectorAll("rect").length).toBe(8);

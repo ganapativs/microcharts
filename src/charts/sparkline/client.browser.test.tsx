@@ -9,7 +9,7 @@ const mount = async () => {
   return screen.getByRole("img").element() as HTMLElement;
 };
 
-describe("interactive <Sparkline> (plan/04 §4, plan/08 T2)", () => {
+describe("interactive <Sparkline>", () => {
   it("renders a focusable role=img with the composed accessible name", async () => {
     const fig = await mount();
     expect(fig.getAttribute("tabindex")).toBe("0");

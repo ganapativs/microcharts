@@ -1,4 +1,4 @@
-// <OrbitStatus> — how slow and how busy is this dependency right now? (plan/24
+// <OrbitStatus> — how slow and how busy is this dependency right now? (
 // #22, structured two-variable, motion type). The STATIC frame carries BOTH
 // variables with zero JS: orbit radius = latency, orbit dash density = call rate
 // (quantized to 5 steps, "denser dashes = more calls"), satellite at the top. The

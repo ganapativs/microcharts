@@ -11,7 +11,7 @@ const COHORTS: CohortRow[] = [
   { label: "Apr", values: [1, 0.52] },
 ];
 
-describe("cohortTriangleGeometry (plan/26 §1)", () => {
+describe("cohortTriangleGeometry", () => {
   it("empty → no cells, zero rows/cols", () => {
     const g = cohortTriangleGeometry([]);
     expect(g.cells).toEqual([]);
@@ -76,7 +76,7 @@ describe("cohortTriangleGeometry (plan/26 §1)", () => {
     expect(g.cells[0]!.gap).toBe(false);
   });
 
-  it("levels bucket into 0..LEVELS-1 and rise with value", () => {
+  it("levels bucket into 0.LEVELS-1 and rise with value", () => {
     const g = cohortTriangleGeometry([{ label: "c", values: [0, 0.25, 0.5, 0.75, 1] }]);
     const levels = g.cells.map((c) => c.level);
     expect(Math.min(...levels)).toBe(0);

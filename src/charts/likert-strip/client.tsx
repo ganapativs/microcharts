@@ -1,5 +1,5 @@
 "use client";
-// Interactive <LikertStrip> (plan/22 #30). One pointer listener; segment by
+// Interactive <LikertStrip>. One pointer listener; segment by
 // x-band lookup. ←/→ step levels in DATA order ("Agree: 34%, level 4 of 5.").
 // Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

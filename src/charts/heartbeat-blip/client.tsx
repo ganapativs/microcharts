@@ -1,5 +1,5 @@
 "use client";
-// Interactive <HeartbeatBlip> (plan/24 #20). Motion IS the encoding: the trace
+// Interactive <HeartbeatBlip>. Motion IS the encoding: the trace
 // advances in real time so old spikes drift left and new events enter at the
 // right — the blip frequency IS the event rate. Every spike is ONE real event;
 // nothing is synthesized on a timer (a fake pulse on a dead service is the one

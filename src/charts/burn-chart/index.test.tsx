@@ -8,7 +8,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const PLAN = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];
 const ACTUAL = [40, 38, 36, 34, 32, 30];
 
-describe("<BurnChart> (plan/23 #8)", () => {
+describe("<BurnChart>", () => {
   it("summary states progress vs plan and the projected landing — the real string", () => {
     const { container } = draw(<BurnChart data={{ plan: PLAN, actual: ACTUAL }} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

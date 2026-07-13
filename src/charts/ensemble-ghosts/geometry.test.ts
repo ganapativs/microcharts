@@ -6,7 +6,7 @@ const base = { width: 80, height: 20 };
 // 24 members: constant lines at 31..54 (endpoints span that range)
 const ENS = Array.from({ length: 24 }, (_, i) => [31 + i, 31 + i, 31 + i]);
 
-describe("selectGhosts (plan/23 #20) — deterministic", () => {
+describe("selectGhosts — deterministic", () => {
   it("same input → same ghosts, every call", () => {
     const a = selectGhosts(ENS, 8);
     const b = selectGhosts(ENS, 8);
@@ -26,7 +26,7 @@ describe("selectGhosts (plan/23 #20) — deterministic", () => {
   });
 });
 
-describe("ensembleGeometry (plan/23 #20)", () => {
+describe("ensembleGeometry", () => {
   it("renders up to `ghosts` faint paths + one emphasis", () => {
     const geo = ensembleGeometry({ ...base, data: ENS, ghosts: 8 })!;
     expect(geo.ghostPaths.length).toBeLessThanOrEqual(8);

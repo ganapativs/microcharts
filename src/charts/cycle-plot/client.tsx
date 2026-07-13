@@ -1,5 +1,5 @@
 "use client";
-// Interactive <CyclePlot> (plan/23 #18). ←/→ step slots (announcing the slot's
+// Interactive <CyclePlot>. ←/→ step slots (announcing the slot's
 // center, cycle count, and drift); ↑/↓ step cycles within the focused slot
 // (announcing individual observations). A pointer picks the slot under the
 // cursor. Composes the static component (canon); the focus band + readout chip

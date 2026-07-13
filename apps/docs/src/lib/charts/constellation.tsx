@@ -131,7 +131,7 @@ export const playground: PlaygroundSpec = {
       "  data={events}",
       s.connect !== "on" && "  connect={false}",
       s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -175,9 +175,16 @@ export function markCode(): string {
   return `<Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <ConstellationInteractive data={INCIDENTS} summary={false} width={90} height={26} animate />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

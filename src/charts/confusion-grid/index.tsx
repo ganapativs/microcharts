@@ -1,5 +1,5 @@
 // <ConfusionGrid> — where do the errors go, the one thing accuracy-as-a-number
-// hides (plan/25 §21, plan/17 F21). Static, hook-free, RSC-safe. A k×k agreement
+// hides. Static, hook-free, RSC-safe. A k×k agreement
 // matrix (rows = actual, columns = predicted); cell ink = row-normalized share,
 // the diagonal accented by SHAPE (an inset stroke), never color-alone. Accuracy
 // is off by default and never leaves the grid.
@@ -40,7 +40,7 @@ export interface ConfusionGridProps {
 /** Shared summary — accuracy + the worst confusion (row-normalized phrasing).
  *  Clamps to the same k ≤ 4 the visual renders (see the component's `kk`) —
  *  otherwise a k > 4 matrix would announce an accuracy/confusion the grid
- *  itself never shows, a real accessible-name/visual mismatch (plan/08). */
+ * itself never shows, a real accessible-name/visual mismatch. */
 export function confusionSummary(data: ConfusionGridDatum, strings: ConfusionStrings): string {
   const { labels, counts } = data;
   const k = Math.max(2, Math.min(4, labels.length));

@@ -86,10 +86,6 @@ export const showcase = {
   Node: () => <StatusDot status="busy" pulse title="Pipeline" style={{ width: 18, height: 18 }} />,
 };
 
-// states/color: vocabulary/styling escape hatches, not chart-shape knobs — no
-// interactive control (consistent with every other chart's playground; the
-// "custom vocabulary" recipe below already demonstrates `states`). Every
-// remaining documented prop (status, pulse) has a knob below.
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -127,7 +123,7 @@ export const playground: PlaygroundSpec = {
       "<StatusDot",
       `  status="${s.status}"`,
       (s.pulse as boolean) && "  pulse",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -161,21 +157,22 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — StatusDot always doing the one thing it's for: naming a
-   state at a glance, shape+color paired. Every host is a service/ops surface,
-   never a generic "signups"/"weekly active" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Checkout is{" "}
-        <StatusDot status="ok" summary={false} style={{ width: "0.7em", height: "0.7em" }} />{" "}
+        <span className="mc-inline">
+          <StatusDot status="ok" summary={false} style={{ width: "0.7em", height: "0.7em" }} />
+        </span>{" "}
         operational; Billing is{" "}
-        <StatusDot status="warn" summary={false} style={{ width: "0.7em", height: "0.7em" }} />{" "}
+        <span className="mc-inline">
+          <StatusDot status="warn" summary={false} style={{ width: "0.7em", height: "0.7em" }} />
+        </span>{" "}
         degraded.
       </p>
     ),
-    code: `<p>\n  Checkout is <StatusDot status="ok" style={{ width: "0.7em", height: "0.7em" }} />{" "}\n  operational; Billing is <StatusDot status="warn" style={{ width: "0.7em", height: "0.7em" }} />{" "}\n  degraded.\n</p>`,
+    code: `<p>\n  Checkout is{" "}\n  <span className="mc-inline">\n    <StatusDot status="ok" style={{ width: "0.7em", height: "0.7em" }} />\n  </span>{" "}\n  operational; Billing is{" "}\n  <span className="mc-inline">\n    <StatusDot status="warn" style={{ width: "0.7em", height: "0.7em" }} />\n  </span>{" "}\n  degraded.\n</p>`,
   },
   cell: {
     render: () => (
@@ -256,9 +253,26 @@ export function markCode(): string {
   return `<StatusDot status="ok" />`;
 }
 
+export function PreviewLive() {
+  return (
+    <span className="inline-flex items-center gap-3">
+      {(["ok", "warn", "error", "off", "busy"] as const).map((s) => (
+        <StatusDotInteractive
+          key={s}
+          status={s}
+          summary={false}
+          style={{ width: 14, height: 14 }}
+          animate
+        />
+      ))}
+    </span>
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

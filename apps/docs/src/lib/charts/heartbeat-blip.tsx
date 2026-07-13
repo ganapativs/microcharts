@@ -164,9 +164,14 @@ export function markCode(): string {
   return `<HeartbeatBlip events={eventTimestamps} now={serverNow} />`;
 }
 
+export function PreviewLive() {
+  return <HeartbeatBlipInteractive events={BUSY} now={NOW} summary={false} width={80} />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

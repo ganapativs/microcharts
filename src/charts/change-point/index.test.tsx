@@ -8,7 +8,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 // 34 points at 32, then 20 at 48 → a clean +50% step at index 34
 const STEP = [...Array(34).fill(32), ...Array(20).fill(48)];
 
-describe("<ChangePoint> (plan/23 #19)", () => {
+describe("<ChangePoint>", () => {
   it("summary names the shift, break, means, and tail — the real string", () => {
     const { container } = draw(<ChangePoint data={STEP} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <RubricStrip> (plan/25 §6). One pointer listener; row by y lookup.
+// Interactive <RubricStrip>. One pointer listener; row by y lookup.
 // ↑/↓ rove criteria. Composes the static component (canon).
 import {
   useCallback,

@@ -7,7 +7,7 @@ const base = { width: 80, height: 20 };
 const BEFORE = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
 const AFTER = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
 
-describe("shiftHistogramGeometry (plan/23 #14)", () => {
+describe("shiftHistogramGeometry", () => {
   it("shared bin edges for both sides; mirrored up/down heights", () => {
     const geo = shiftHistogramGeometry({ ...base, before: BEFORE, after: AFTER })!;
     expect(geo.bins.length).toBeGreaterThan(0);

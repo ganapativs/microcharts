@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<FatDigits> (plan/24 #4)", () => {
+describe("<FatDigits>", () => {
   it("summary is the real string: '{value} — tier {t} of {tiers}.'", () => {
     const { container } = draw(<FatDigits value={1204} domain={[0, 1500]} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("1,204 — tier 4 of 5.");

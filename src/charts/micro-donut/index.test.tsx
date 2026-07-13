@@ -15,7 +15,7 @@ const MIX = [
   { label: "Arc", value: 20 },
 ];
 
-describe("<MicroDonut> (plan/22 #18, S3)", () => {
+describe("<MicroDonut>", () => {
   it("≤ 4 wedges + Other rollup; summary reuses the shares wording", () => {
     const { container } = draw(<MicroDonut data={MIX} />);
     expect(container.querySelectorAll("path").length).toBe(4);

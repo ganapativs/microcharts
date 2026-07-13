@@ -136,7 +136,7 @@ export const playground: PlaygroundSpec = {
       s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
       s.labels === false && "  labels={false}",
       s.overflow !== "bin" && `  overflow="${s.overflow}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -174,9 +174,14 @@ export function markCode(): string {
   return `<EventRaster data={services} />`;
 }
 
+export function PreviewLive() {
+  return <EventRasterInteractive data={RASTER} summary={false} width={220} height={56} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

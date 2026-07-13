@@ -1,4 +1,4 @@
-// <Honeycomb> — how many of the available slots are taken (plan/24 #15, S4).
+// <Honeycomb> — how many of the available slots are taken.
 // Occupancy of capacity in an area-filling hex grid: units are countable (total
 // ≤ 60). Two merged <path> nodes (filled + empty) keep the node count O(1). Fill
 // order is row-major from the top-left (occupancy reads as a sweep). Static,
@@ -19,7 +19,7 @@ export interface HoneycombProps {
   /** Rows: a number, or `auto` (near-square). `1` = a strip. */
   rows?: number | "auto" | undefined;
   /** Empty cells: `"outline"` (default hairline ring) or `"blank"` (nothing
-   *  drawn — GardenGrid's pattern). Shared `EmptyCellStyle` (plan/04 §8). */
+   * drawn — GardenGrid's pattern). Shared `EmptyCellStyle`. */
   empty?: EmptyCellStyle | undefined;
   /** Noun for the summary (e.g. "seats"). */
   unit?: string | undefined;

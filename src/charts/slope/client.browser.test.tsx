@@ -7,7 +7,7 @@ const DATA = [
   { label: "West", from: 55, to: 41 },
 ];
 
-describe("interactive <Slope> (plan/22 #13)", () => {
+describe("interactive <Slope>", () => {
   it("↑/↓ rove categories ordered by `to`, announcing slopes", async () => {
     const screen = await render(<Slope data={DATA} title="Ranks" />);
     const wrap = screen.container.querySelector(".mc-slope-live") as HTMLElement;

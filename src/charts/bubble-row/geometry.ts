@@ -1,4 +1,4 @@
-// BubbleRow geometry — pure, React-free (plan/24 #11, S2). The catalog's honesty
+// BubbleRow geometry — pure, React-free. The catalog's honesty
 // exemplar: r ∝ √value with NO exceptions (a linear-radius map would be a ~squared
 // lie), and NO sorting (order = data order — reordering is the caller's statement).
 // Area comparison is the weakest common channel — precision is LOW and the docs

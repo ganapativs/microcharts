@@ -4,7 +4,7 @@ import { funnelGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 18, mode: "absolute" as const, connectors: true, fontSize: 0 };
 
-describe("funnelGeometry (plan/22 #19)", () => {
+describe("funnelGeometry", () => {
   it("column heights ∝ value, zero-anchored; slats connect stages", () => {
     const geo = funnelGeometry({ ...base, values: [100, 46, 22] });
     expect(geo.stages[0]!.h).toBeGreaterThan(geo.stages[1]!.h);

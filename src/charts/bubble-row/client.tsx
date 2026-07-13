@@ -1,5 +1,5 @@
 "use client";
-// Interactive <BubbleRow> (plan/24 #11). Nearest-bubble pointer lookup + ←/→
+// Interactive <BubbleRow>. Nearest-bubble pointer lookup + ←/→
 // roving; announces each bubble's exact value (the number the low-precision area
 // can't carry); the focused bubble gets a thicker ring. Composes the static.
 import { useMemo, useRef, useState, type PointerEvent } from "react";

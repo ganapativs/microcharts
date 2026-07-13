@@ -4,21 +4,8 @@
 // index is the correct key. Content-derived keys would remount — and re-animate —
 // already-rendered charts on every token tick.
 /**
- * The AI-native centerpiece — a scripted assistant reply streams in token by
- * token, and the chart syntax it emits becomes real, accessible microcharts:
- * inline `chart …` spans render word-sized inside the sentence, fenced ```chart
- * blocks render standalone. The charts are the actual shipped components (parsed
- * from a compact, LLM-friendly grammar), so this doubles as a docs-as-tests
- * proof that the format round-trips.
- *
- * A sector picker swaps between several replies — from a simple revenue recap to
- * a dense ML-training report — so the format is shown across real use cases, not
- * one canned example. Block fences carry a title after the type
- * (```chart sparkbar Volume) so each chart reads accurately per sector.
- *
- * Zero layout shift *during* a stream: a hidden "ghost" copy of the finished
- * reply reserves its height and the streaming copy overlays it. All motion is
- * reduced-motion gated.
+ * Scripted assistant stream: inline `chart …` and fenced ```chart blocks
+ * parse into real shipped components. Ghost copy reserves height (no CLS).
  */
 import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Sparkline } from "@microcharts/react/sparkline";
@@ -423,10 +410,11 @@ function renderStream(type: string, body: string, block: boolean): ReactNode {
   }
 }
 
-// Text-like glyphs sit ON the line (their own baseline aligns). Delta and
-// StatusDot self-align; TrendArrow renders an SVG arrow that reads better
-// centred, so it uses the inline-flex wrapper like the other charts.
-const TEXT_GLYPH = new Set(["delta", "status-dot"]);
+// Text metrics (Delta) keep their own baseline so the number sits on the
+// sentence line. Every other inline SVG mark gets `.mc-inline` — measured:
+// VA-middle alone seats marks ~1.4px below adjacent digit mid; the wrap's
+// --mc-inline-nudge (-0.14em) corrects it.
+const TEXT_GLYPH = new Set(["delta"]);
 
 // Standalone block chart (fenced form). Info string is `<type> [title…]`. Memoized:
 // once a fence closes its (info, body) are final, so it skips later token re-renders.
@@ -434,9 +422,7 @@ const BlockChart = memo(function BlockChart({ info, body }: { info: string; body
   const { type, title } = splitInfo(info);
   const node = renderStream(type, body, true);
   if (!node) return null;
-  if (TEXT_GLYPH.has(type)) return <span className="text-xl">{node}</span>;
-  // A compact labeled figure — mono caption + chart, tight — so each block reads
-  // as a titled instrument, not a chart floating in whitespace.
+  if (type === "delta" || type === "status-dot") return <span className="text-xl">{node}</span>;
   return (
     <figure className="not-prose flex flex-col gap-1.5">
       <figcaption className="mono-label opacity-55">{title}</figcaption>
@@ -445,19 +431,15 @@ const BlockChart = memo(function BlockChart({ info, body }: { info: string; body
   );
 });
 
-// Word-sized chart that sits inside a sentence — the microcharts thesis.
+// Inline chart inside a sentence.
 const InlineChart = memo(function InlineChart({ spec }: { spec: string }) {
   const sp = spec.indexOf(" ");
   const type = sp === -1 ? spec : spec.slice(0, sp);
   const data = sp === -1 ? "" : spec.slice(sp + 1);
   const node = renderStream(type, data, false);
   if (!node) return null;
-  // Text glyphs (delta/status-dot) align to the line on their own.
   if (TEXT_GLYPH.has(type)) return <span className="mx-1">{node}</span>;
-  // SVG charts: inline-block, sat on the text baseline like a capital letter
-  // (the glyph box has ~2px bottom padding, so -0.13em drops its visible base
-  // onto the baseline). Reads as part of the line, not floating above it.
-  return <span className="mc-morph mx-1 inline-block align-[-0.13em]">{node}</span>;
+  return <span className="mc-inline mc-morph">{node}</span>;
 });
 
 // Inline markdown — **bold**, an inline `chart …` span, or plain `code`.
@@ -515,9 +497,7 @@ function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; c
   );
 }
 
-// How long to wait AFTER revealing `last`, before the next token. Tuned to feel
-// like a real stream: words land at a readable clip, clauses breathe, and a
-// closed chart fence gets a beat so the raw→rendered morph is savoured.
+// Delay after revealing `last` before the next token.
 function nextDelay(last: string | null, next: string): number {
   if (last === null) return 450; // a beat of "thinking" before the first token
   if (last.includes("\n\n")) return 300; // paragraph break

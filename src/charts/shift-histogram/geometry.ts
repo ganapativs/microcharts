@@ -1,4 +1,4 @@
-// ShiftHistogram geometry — pure, React-free (plan/23 #14). Did the fix actually
+// ShiftHistogram geometry — pure, React-free. Did the fix actually
 // change the distribution? Mirrored bins (before up, after down) over SHARED bin
 // edges, with the median shift as the precise takeaway. Heights are per-side
 // PROPORTIONS (each side's counts ÷ that side's n) on ONE shared height scale

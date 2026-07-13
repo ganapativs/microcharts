@@ -84,9 +84,8 @@ export const showcase = {
 };
 
 export const playground: PlaygroundSpec = {
-  // data isn't a knob — it's the two-moment pair the other knobs act on.
   // domain/color/format/locale/strings are styling/formatting overrides,
-  // not interactive read decisions; every remaining documented prop
+
   // (label, positive, highlight) has a control below.
   knobs: [
     {
@@ -140,7 +139,7 @@ export const playground: PlaygroundSpec = {
       s.label !== "none" && `  label="${s.label}"`,
       (s.positive as boolean) && '  positive="up"',
       (s.highlight as boolean) && '  highlight="West"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -162,16 +161,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
-/* The four homes — Slope always doing the one thing it's for: showing who rose
-   and who fell between two moments. Every host is a before/after or rank-shuffle
-   surface (renewal by region, a plan-tier comparison), never a generic
-   "signups held steady" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         West&apos;s renewal rate slid from best to worst region{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <Slope
             data={[{ label: "West", from: 55, to: 41 }]}
             summary={false}
@@ -255,9 +250,14 @@ export function markCode(): string {
   return `<Slope data={cohorts} />`;
 }
 
+export function PreviewLive() {
+  return <SlopeInteractive data={RANKS} summary={false} width={90} height={70} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

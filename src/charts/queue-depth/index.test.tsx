@@ -9,7 +9,7 @@ const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const DATA = [42, 55, 70, 88, 96, 120, 150, 182, 214];
 const CAP = 100;
 
-describe("<QueueDepth> (plan/26 §5)", () => {
+describe("<QueueDepth>", () => {
   it("summary states depth, breach ratio, and the last-quarter trend — the real string", () => {
     const { container } = draw(<QueueDepth data={DATA} capacity={CAP} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

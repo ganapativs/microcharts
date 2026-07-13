@@ -1,4 +1,4 @@
-// RugStrip geometry — pure, React-free (plan/22 #5, S1 distribution). Every
+// RugStrip geometry — pure, React-free. Every
 // tick is one real observation: no jitter, no smoothing, no thinning. Density
 // reads by ink accumulation — and because SVG paints ONE path's stroke as a
 // single operation (overlaps inside a path never composite), multiplicity is

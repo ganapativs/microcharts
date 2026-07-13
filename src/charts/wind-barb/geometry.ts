@@ -1,4 +1,4 @@
-// WindBarb geometry — pure, React-free (plan/25 §8, plan/17 F3). Direction as a
+// WindBarb geometry — pure, React-free. Direction as a
 // shaft angle + QUANTIZED magnitude as WMO barbs (pennant = 5·step, full = step,
 // half = step/2). Quantization is the honesty, not a limitation. 0° = up/north,
 // clockwise. Reused by station-glyph (chart-local import). 2-dp.

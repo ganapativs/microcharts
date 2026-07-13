@@ -1,4 +1,4 @@
-// MicroDonut geometry — pure, React-free (plan/22 #18, S3). ≤ 4 annulus
+// MicroDonut geometry — pure, React-free. ≤ 4 annulus
 // sectors + "Other" rollup, 2° gaps, 12-o'clock start. The hole is mandatory:
 // angle + arc-length double-encode where the pie's area read fails. 2-dp.
 import { annulusSector, TAU } from "../../core/arc.js";

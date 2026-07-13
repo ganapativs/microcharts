@@ -7,8 +7,8 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const MELODY = [3, 5, 4, 8, 6, 9];
 
-describe("<MusicStaff> (plan/24 #12)", () => {
-  it("summary reuses describeSeries verbatim (docs-as-tests)", () => {
+describe("<MusicStaff>", () => {
+  it("summary reuses describeSeries verbatim", () => {
     const { container } = draw(<MusicStaff data={MELODY} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
       "Trending up 200%. Range 3 to 9. Last value 9.",

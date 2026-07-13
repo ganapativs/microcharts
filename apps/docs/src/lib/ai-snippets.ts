@@ -1,10 +1,4 @@
-/**
- * Code samples for the AI-native guide, kept in a real module rather than inline
- * MDX fences. Two reasons: MDX strips leading indentation from code strings
- * nested inside components like <Tab>, and a raw ``` fence inside a fenced block
- * breaks the page. As plain TS template literals the indentation is exact and
- * the strings are unit-testable. Rendered via <Snippet id=… />.
- */
+/** AI guide code samples as TS strings (MDX fences would strip indent / nest badly). */
 export interface Snippet {
   lang: string;
   code: string;

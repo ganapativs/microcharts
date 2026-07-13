@@ -3,12 +3,7 @@ import { CopyButton } from "@/components/ui/copy";
 import { CommandLine } from "@/components/ui/command-line";
 import { CodeWithData } from "@/components/ui/code-with-data";
 
-/**
- * Import + usage for a chart. The import is the payload a reader wants up top;
- * the install command rides underneath as a quiet footnote — they installed the
- * package on the quickstart, so it's kept reachable, not repeated at full volume.
- * Snippet vars resolve through the sample-data disclosure (docs-as-tests).
- */
+/** Import + usage for a chart; install command as a quiet footnote. */
 export function Usage({ chart }: { chart: string }) {
   const c = getChart(chart);
   if (!c) return null;
@@ -27,7 +22,6 @@ export function Usage({ chart }: { chart: string }) {
 
       <CodeWithData code={`${imports}\n\n${usage}`} sampleData={c.sampleData} />
 
-      {/* Install — demoted to a hairline footer: small, muted, no shouting `$`. */}
       <div className="flex items-center gap-2 border-t border-hairline px-4 py-1.5">
         <span className="mono-label opacity-50">install</span>
         <CommandLine

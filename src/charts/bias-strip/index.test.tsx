@@ -21,7 +21,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<BiasStrip> (plan/26 §7, F-BiasStrip)", () => {
+describe("<BiasStrip>", () => {
   it("dots at 75% opacity; summary reports bias and within-limits share", () => {
     const { container } = draw(<BiasStrip data={OFFSET} />);
     const dot = container.querySelector('circle[data-mc-ink="point"]')!;

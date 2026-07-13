@@ -1,5 +1,5 @@
 "use client";
-// Interactive <PercentileTrace> (plan/26 §8). One pointer listener + nearest-
+// Interactive <PercentileTrace>. One pointer listener + nearest-
 // reading math; ←/→ step readings and the live region states the percentile at
 // that reading. Composes the static component (canon) — the crosshair + focus
 // ring are overlay children, never a re-implemented SVG.

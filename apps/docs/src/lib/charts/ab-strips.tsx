@@ -138,7 +138,7 @@ export const playground: PlaygroundSpec = {
       "  data={{ a: control, b: test }}",
       s.positive === "down" && '  positive="down"',
       s.label !== "delta" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -195,9 +195,24 @@ export function markCode(): string {
   return `<ABStrips data={{ a, b }} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <ABStripsInteractive
+      data={{ a: A, b: B }}
+      format={MS}
+      positive="down"
+      summary={false}
+      width={160}
+      height={22}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

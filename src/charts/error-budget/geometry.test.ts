@@ -6,7 +6,7 @@ const base = { width: 80, height: 20 };
 // 30-day window, 12 days observed, burning near steady
 const OBSERVED = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
 
-describe("errorBudgetGeometry (plan/23 #9)", () => {
+describe("errorBudgetGeometry", () => {
   it("diagonal spans (0,1)→(1,0); remaining maps 1=top, 0=bottom", () => {
     const geo = errorBudgetGeometry({ ...base, data: [1, 0.5, 0] })!;
     // (0,1) → top-left, (1,0) → bottom-right

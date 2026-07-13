@@ -6,7 +6,7 @@ const MS = (n: number) => `${Math.round(n)} ms`;
 const BEFORE = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
 const AFTER = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
 
-describe("interactive <ShiftHistogram> (plan/23 #14)", () => {
+describe("interactive <ShiftHistogram>", () => {
   it("arrow keys step bins; each announces before/after proportions", async () => {
     const screen = await render(
       <ShiftHistogram

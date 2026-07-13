@@ -1,4 +1,4 @@
-// DepthWedge geometry — pure, React-free (plan/25 §12, plan/17 F5). Two filled
+// DepthWedge geometry — pure, React-free. Two filled
 // cumulative step-wedges meeting at the spread: demand accumulates leftward from
 // the gap, supply rightward. The y-scale is LINEAR, full stop — no `scale` prop,
 // no silent log (documented steer to full-size tools). The visible `levels`

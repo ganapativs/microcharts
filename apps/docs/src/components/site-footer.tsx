@@ -11,8 +11,6 @@ function XMark() {
   );
 }
 
-// A handful of flagship charts — the footer is a signpost, not the catalog.
-// The full list lives in the gallery (linked below); 90 rows here overflowed it.
 const FEATURED_SLUGS = ["sparkline", "sparkbar", "delta", "bullet", "activity-grid"];
 const featured = FEATURED_SLUGS.map((slug) => STABLE_CHARTS.find((c) => c.slug === slug)).filter(
   (c): c is (typeof STABLE_CHARTS)[number] => c !== undefined,
@@ -48,7 +46,7 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
 
 export function SiteFooter() {
   return (
-    <footer className="relative mt-24 overflow-hidden border-t border-hairline">
+    <footer className="relative overflow-hidden">
       <div className="relative z-10 mx-auto max-w-6xl px-4 pb-4 pt-14 sm:px-6">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           <div className="col-span-2 sm:col-span-1">
@@ -92,9 +90,6 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* the field is the footer's background (absolute inset-0 canvas) plus
-          an in-flow spacer reserving the word band; the legal bar floats on
-          the field at the footer's true bottom edge */}
       <FooterMark />
 
       <div className="absolute inset-x-0 bottom-3 z-10 mx-auto max-w-6xl px-4 sm:bottom-4 sm:px-6">

@@ -8,7 +8,7 @@ const DATA = [
   { x: 3, y: 20 },
 ];
 
-describe("interactive <MicroScatter> (plan/22 #29)", () => {
+describe("interactive <MicroScatter>", () => {
   it("←/→ step points ordered by x with pair announcements + ring", async () => {
     const screen = await render(<MicroScatter data={DATA} title="Correlation" />);
     const wrap = screen.container.querySelector(".mc-scatter-live") as HTMLElement;

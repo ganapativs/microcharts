@@ -108,7 +108,7 @@ export const playground: PlaygroundSpec = {
       "  data={accounts}",
       s.labels && "  labels",
       s.value && '  label="value"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -148,15 +148,12 @@ const TRIALS: Row = [
   { label: "Quartz", value: 1 },
 ];
 
-/* The four homes — SproutRow always doing the one thing it's for: reading each
-   item's maturity at a glance. Every host is an account/portfolio surface, never
-   a generic "signups" template. */
 export const contexts: ChartContexts = {
   sentence: {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Account health this week{" "}
-        <span className="mx-1 inline-flex align-middle">
+        <span className="mc-inline">
           <SproutRow data={ACCTS} summary={false} height={18} step={13} />
         </span>{" "}
         — two at bloom, one still seed.
@@ -237,9 +234,14 @@ export function markCode(): string {
   return `<SproutRow data={accounts} />`;
 }
 
+export function PreviewLive() {
+  return <SproutRowInteractive data={ACCTS} summary={false} height={22} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

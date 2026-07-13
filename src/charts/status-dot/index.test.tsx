@@ -5,7 +5,7 @@ import { StatusDot, STATUS_STATES } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 
 // Shared numeric edge matrix does not apply: the data shape is a string state
-// key, not numbers (plan/22 #2). The categorical degenerate — an unknown key —
+// key, not numbers. The categorical degenerate — an unknown key
 // is covered below instead.
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
@@ -14,7 +14,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<StatusDot> (plan/22 #2, S4 categorical)", () => {
+describe("<StatusDot>", () => {
   it("each built-in state renders a distinct silhouette (never color-alone)", () => {
     const shapes = Object.keys(STATUS_STATES).map((status) => {
       const { container } = draw(<StatusDot status={status} />);

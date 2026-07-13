@@ -8,7 +8,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const days = Array.from({ length: 35 }, (_, i) => i % 7);
 
-describe("<ActivityGrid> (plan/05 S1-binned, plan/08)", () => {
+describe("<ActivityGrid>", () => {
   it("renders one cell per value, role=img", () => {
     const { container } = draw(<ActivityGrid data={days} title="Activity" />);
     expect(container.querySelector("svg")!.getAttribute("role")).toBe("img");
@@ -51,7 +51,7 @@ describe("<ActivityGrid> (plan/05 S1-binned, plan/08)", () => {
 
 seriesEdgeSuite("ActivityGrid", (data) => <ActivityGrid data={[...data]} title="Edge" />);
 
-describe("<ActivityGrid> shape + calendar alignment (plan/21 §6.0.D)", () => {
+describe("<ActivityGrid> shape + calendar alignment", () => {
   it("shape defaults to crisp square (rx 1, crispEdges)", () => {
     const { container } = draw(<ActivityGrid data={[1, 2]} />);
     const r = container.querySelector('rect[data-mc-ink="cell"]')!;

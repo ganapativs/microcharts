@@ -114,7 +114,7 @@ export const playground: PlaygroundSpec = {
       "  temp={16}",
       "  dewpoint={9}",
       "  pressure={1013}",
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -165,9 +165,14 @@ export function markCode(): string {
   return `<StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} />`;
 }
 
+export function PreviewLive() {
+  return <StationGlyphInteractive {...OBS} summary={false} size={48} animate />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

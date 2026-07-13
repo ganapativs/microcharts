@@ -5,7 +5,7 @@ import { QueueDepth } from "./client.js";
 const DATA = [42, 55, 70, 88, 96, 120, 150, 182, 214];
 const CAP = 100;
 
-describe("interactive <QueueDepth> (plan/26 §5)", () => {
+describe("interactive <QueueDepth>", () => {
   it("arrow keys step periods; announces depth and the breach state", async () => {
     const screen = await render(<QueueDepth data={DATA} capacity={CAP} title="Queue" />);
     const wrap = screen.container.querySelector(".mc-queue-depth-live") as HTMLElement;

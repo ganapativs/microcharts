@@ -1,5 +1,5 @@
 "use client";
-// Interactive <CitySkyline> (plan/24 #14). x-band pointer lookup → highlight the
+// Interactive <CitySkyline>. x-band pointer lookup → highlight the
 // building + announce it; ←/→ roving; the lit fraction is announced as a percent
 // (secondary channel). Composes the static component.
 import { useMemo, useRef, useState, type PointerEvent } from "react";

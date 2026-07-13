@@ -1,5 +1,5 @@
 "use client";
-// Interactive <CalibrationStrip> (plan/25 §14). One pointer listener; nearest bin
+// Interactive <CalibrationStrip>. One pointer listener; nearest bin
 // by x. ←/→ rove bins. Composes the static component (canon).
 import {
   useCallback,

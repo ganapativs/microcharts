@@ -24,8 +24,8 @@ const BOOK = {
   ],
 };
 
-describe("<DepthWedge> (plan/25 §12, plan/17 F5)", () => {
-  it("renders two wedges; docs-as-tests summary scoped to the range", () => {
+describe("<DepthWedge>", () => {
+  it("renders two wedges summary scoped to the range", () => {
     const { container } = draw(<DepthWedge data={BOOK} />);
     expect(container.querySelectorAll("path").length).toBe(2);
     const geo = depthWedgeGeometry({

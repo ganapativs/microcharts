@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Honeycomb> (plan/24 #15). Announces the count on change; hover
+// Interactive <Honeycomb>. Announces the count on change; hover
 // reveals the "value of total" readout. No per-cell keyboard nav — cells are
 // anonymous units, not addressable data points. Composes the static component.
 import { useEffect, useRef, useState } from "react";

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <Hourglass> (plan/24 #7). Sand levels cross-fade on change (opacity
+// Interactive <Hourglass>. Sand levels cross-fade on change (opacity
 // swap — not d: interpolation); announces at documented thresholds (50 / 90 /
 // 100%), not on every tick. Wrapper focus only. Composes the static component.
 import { useEffect, useRef, useState } from "react";

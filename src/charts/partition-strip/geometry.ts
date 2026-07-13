@@ -1,4 +1,4 @@
-// PartitionStrip geometry — pure, React-free (plan/25 §13, plan/17 F20). Two
+// PartitionStrip geometry — pure, React-free. Two
 // rows: parents on top (width = share of whole), children aligned exactly under
 // their parents below. TWO LEVELS MAX — deeper hierarchies become unreadable
 // texture, which is why treemaps fail the admission bar. Alignment is the

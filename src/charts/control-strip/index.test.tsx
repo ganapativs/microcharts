@@ -8,7 +8,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const SAMPLE = [10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16];
 
-describe("<ControlStrip> (plan/23 #10)", () => {
+describe("<ControlStrip>", () => {
   it("summary states out count, center, and limits — the real string", () => {
     const { container } = draw(<ControlStrip data={SAMPLE} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

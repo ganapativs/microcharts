@@ -1,10 +1,10 @@
-// <TallyMarks> — how many, counted the way a human counts (plan/24 #1, S4).
+// <TallyMarks> — how many, counted the way a human counts.
 // Four-and-strike clusters of five, then the remainder; the count reads back
 // exactly up to `total`, after which a `+N` numeral tells the truth (marks are
 // never resized to fit — width grows, honesty holds). Static, hook-free,
 // RSC-safe. `pen="drawn"` perturbs stroke rendering only; the count is unchanged.
 //
-// NOTE (plan/12 audit): the spec named this variant `style`, but every chart
+// NOTE: the spec named this variant `style`, but every chart
 // exposes `style?: CSSProperties`; the knob is `pen` here to keep that passthrough.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
@@ -14,8 +14,7 @@ import { tallyGeometry, type TallyOverflow, type TallyPen } from "./geometry.js"
 export interface TallyMarksProps {
   /** The count. Floored to an integer; negatives clamp to 0 (documented). */
   value: number;
-  /** Marks drawn before the numeral/clamp overflow. Default 25 (plan/04 §8 —
-   *  discrete-count denominator, renamed from `max`). */
+  /** Marks drawn before the numeral/clamp overflow. Default 25 (discrete-count denominator, renamed from `max`). */
   total?: number | undefined;
   /** `numeral` appends `+N`; `clamp` stops drawing (summary keeps the truth). */
   overflow?: TallyOverflow | undefined;
@@ -35,7 +34,7 @@ const FONT = 9; // overflow numeral, viewBox units
 const PAD = 2;
 
 export function tallySummary(value: number, strings: TallyStrings = EN_TALLY): string {
-  // count is an integer — String() keeps the accessible name SSR-deterministic
+  // count is an integer — String keeps the accessible name SSR-deterministic
   // (a locale-formatter would risk a server/client hydration mismatch).
   const count = Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
   return strings.tally(String(count));

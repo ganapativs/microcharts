@@ -4,7 +4,7 @@ import { GradedBand } from "./client.js";
 
 const SAMPLE = Array.from({ length: 101 }, (_, i) => i);
 
-describe("interactive <GradedBand> (plan/23 #4)", () => {
+describe("interactive <GradedBand>", () => {
   it("arrow keys step levels outward, announcing each interval", async () => {
     const screen = await render(<GradedBand data={SAMPLE} title="Estimate" />);
     const wrap = screen.container.querySelector(".mc-graded-band-live") as HTMLElement;

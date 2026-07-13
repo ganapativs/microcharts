@@ -1,5 +1,5 @@
 // <EtaBar> — how long is this actually going to take, given how it has actually
-// been going (plan/25 §3, plan/17 F14). Static, hook-free, RSC-safe. The bar's
+// been going. Static, hook-free, RSC-safe. The bar's
 // x-axis is TIME: solid = elapsed share of the predicted total, the muted
 // remainder is sized by the observed rate — the download bar, told truthfully.
 import type { CSSProperties, ReactNode } from "react";

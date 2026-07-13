@@ -152,7 +152,7 @@ export const playground: PlaygroundSpec = {
       s.mode !== "mirror" && `  mode="${s.mode}"`,
       s.bins !== "auto" && `  bins={${s.bins}}`,
       s.label !== "shift" && `  label="${s.label}"`,
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -213,9 +213,23 @@ export function markCode(): string {
   return `<ShiftHistogram data={{ before, after }} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <ShiftHistogramInteractive
+      data={{ before: BEFORE, after: AFTER }}
+      format={MS}
+      summary={false}
+      width={160}
+      height={24}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

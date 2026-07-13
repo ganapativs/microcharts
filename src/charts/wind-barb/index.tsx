@@ -1,5 +1,5 @@
 // <WindBarb> — which way it's flowing and roughly how hard, in one character
-// (plan/25 §8, plan/17 F3). Static, hook-free, RSC-safe. Direction is the shaft
+// Static, hook-free, RSC-safe. Direction is the shaft
 // angle; magnitude is QUANTIZED into WMO barbs (that quantization is the honesty
 // — the per-barb quantum is stated next to every example). No interactive entry:
 // a single glyph has no meaningful pointer/keyboard interaction (the a11y name
@@ -18,8 +18,7 @@ export interface WindBarbProps {
   magnitude: number;
   /** Full-barb quantum; sets the read-back key ("each barb = 10"). */
   step?: number | undefined;
-  /** Numeric magnitude beside the glyph, anchored + tabular (plan/04 §8 —
-   *  the one label-boolean-to-enum break, matching the family vocabulary). */
+  /** Numeric magnitude beside the glyph, anchored + tabular (label boolean→enum, matching the family vocabulary). */
   label?: "value" | "none" | undefined;
   /** `"arrow"` = plain direction arrow + label when quantized barbs don't fit. */
   variant?: "barb" | "arrow" | undefined;

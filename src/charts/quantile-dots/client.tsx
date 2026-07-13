@@ -1,5 +1,5 @@
 "use client";
-// Interactive <QuantileDots> — the probe (plan/23 #12). Pointer x moves a live
+// Interactive <QuantileDots> — the probe. Pointer x moves a live
 // threshold; the count past it recomputes purely. ←/→ nudge the probe one bin,
 // Enter announces, Esc returns to the prop threshold. Composes the static
 // component with the live threshold (canon); the readout chip reports the odds.

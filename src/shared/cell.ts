@@ -1,4 +1,4 @@
-// Shared cell vocabulary (plan/21 §3): every cell-based chart (ActivityGrid,
+// Shared cell vocabulary: every cell-based chart (ActivityGrid,
 // HeatCell, HeatStrip, CalendarStrip) speaks the same `shape` prop and renders
 // through the same mark metrics, so a "round" cell means one thing everywhere.
 // `crisp` only on rectilinear marks (canon: crispEdges never on curves).

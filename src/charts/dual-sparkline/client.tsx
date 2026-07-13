@@ -1,5 +1,5 @@
 "use client";
-// Interactive <DualSparkline> (plan/22 #22). Nearest-x lookup announces BOTH
+// Interactive <DualSparkline>. Nearest-x lookup announces BOTH
 // series ("Point 9 of 12: 17 vs 15."); crosshair touches both lines. ←/→
 // steps x. Composes the static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";

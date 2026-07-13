@@ -4,7 +4,7 @@ import { pairedBarsGeometry } from "./geometry.js";
 
 const base = { width: 60, height: 20, mode: "grouped" as const, orientation: "vertical" as const };
 
-describe("pairedBarsGeometry (plan/22 #12)", () => {
+describe("pairedBarsGeometry", () => {
   it("value + ref share ONE zero-anchored domain (auto: max of both)", () => {
     const geo = pairedBarsGeometry({ ...base, pairs: [{ value: 50, ref: 100 }] });
     const v = geo.pairs[0]!.valueRect!;

@@ -1,5 +1,5 @@
 // <PercentileLadder> — what does the tail look like, not just the median?
-// (plan/23 #3, S1). Ticks at chosen percentiles on a zero-anchored track;
+// Ticks at chosen percentiles on a zero-anchored track;
 // graduated height + accent make the tail read strongest. Static, hook-free,
 // RSC-safe. The origin is never cropped (tick distances are the story); a log
 // transform is never silent — an in-chart `log` tag renders when it applies.
@@ -53,13 +53,13 @@ export interface PercentileLadderProps {
 
 const LABEL_MIN_WIDTH = 56;
 // label size in viewBox units — a touch smaller than the strips (three labels
-// must share the track), ~0.5·height clamped 6–9 (plan/12)
+// must share the track), ~0.5·height clamped 6–9
 const labelFont = (height: number): number => Math.min(9, Math.max(6, Math.round(height * 0.5)));
 
 /** Places tick labels at their tick x (clamped inside the box), ENDPOINT-FIRST:
  *  p50 and the tail always win; an interior label is dropped (→ null) when it
  *  would collide — so clustered percentiles never merge into unreadable text
- *  (plan/18 degradation — never measure, never overlap). */
+ * */
 export function ladderLabelLayout(
   geo: PercentileLadderGeometry,
   texts: readonly string[],
@@ -148,7 +148,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   const labelX = showLabels ? ladderLabelLayout(geo, texts, width, FONT) : null;
   // keep the alphabetic descender (≈0.22·fs) inside the viewBox
   const labelY = round2(height - FONT * 0.22 - 0.2);
-  // pin the label size to viewBox units (see coverage-strip / plan/12)
+  // pin the label size to viewBox units (see coverage-strip / )
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
@@ -197,7 +197,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
             style={{
               // hardcoded (not the token) ONLY because this subpath is pinned at the 3 kB
               // hard cap and the token-var string costs ~20 B; base 1.5 == the default
-              // --mc-stroke-width, so it matches peers at the default theme (plan/12).
+              // mc-stroke-width, so it matches peers at the default theme.
               strokeWidth: tail ? 2 : 1.5,
               opacity,
               ...(stroke ? { stroke } : null),

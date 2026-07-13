@@ -15,7 +15,7 @@ describe("empiricalPercentile (mid-rank rule)", () => {
   });
 });
 
-describe("benchmarkStripGeometry (plan/23 #2)", () => {
+describe("benchmarkStripGeometry", () => {
   it("nested bands: inner (p25–75) sits inside outer (p5–95)", () => {
     const geo = benchmarkStripGeometry({ ...base, data: PEERS, value: 20 })!;
     expect(geo.inner.x).toBeGreaterThanOrEqual(geo.outer.x - 0.01);

@@ -1,5 +1,5 @@
 // <TapeGauge> — the level right now, which zone it's in, and how fast it's moving,
-// with the eye parked in one place (plan/25 §19, plan/17 F1). Static, hook-free,
+// with the eye parked in one place. Static, hook-free,
 // RSC-safe. The scale scrolls, the value doesn't; the chevron encodes rate, the
 // position encodes level, and the two never blend. NASA-studied instrument.
 import type { CSSProperties, ReactNode } from "react";
@@ -89,7 +89,7 @@ export function tapeGaugeSummary(
   return strings.tapeGauge(fmt(value), rateClause, zoneClause);
 }
 
-/** Text width over-estimate (plan/18): 0.62 em/char at font size `f`. */
+/** Text width over-estimate: 0.62 em/char at font size `f`. */
 const est = (chars: number, f: number): number => 0.62 * f * chars;
 
 export function TapeGauge(props: TapeGaugeProps): ReactNode {

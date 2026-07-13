@@ -19,7 +19,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("<CalendarStrip> (plan/22 #26, structured)", () => {
+describe("<CalendarStrip>", () => {
   it("renders real calendar cells with the composed summary", () => {
     const { container } = draw(<CalendarStrip data={DATA} end={END} />);
     const svg = container.querySelector("svg")!;

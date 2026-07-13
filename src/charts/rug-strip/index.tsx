@@ -1,4 +1,4 @@
-// <RugStrip> — where the raw observations actually sit (plan/22 #5, S1
+// <RugStrip> — where the raw observations actually sit (, S1
 // distribution). Static, hook-free, RSC-safe. Every tick is one observation;
 // density comes from ink accumulation only (tiered opacity, see geometry).
 // The strongest single story is `markValue`: one raw value against the field.

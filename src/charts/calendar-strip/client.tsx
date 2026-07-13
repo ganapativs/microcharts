@@ -1,5 +1,5 @@
 "use client";
-// Interactive <CalendarStrip> (plan/22 #26). Hover a day or walk the grid in
+// Interactive <CalendarStrip>. Hover a day or walk the grid in
 // 2-D (←/→ day, ↑/↓ week — ActivityGrid parity). Announces the real calendar
 // day: "Tuesday, June 24: 12." Composes the static component (canon).
 import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";

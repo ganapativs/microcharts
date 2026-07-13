@@ -23,8 +23,8 @@ const TRAJ = [
 
 afterEach(() => vi.restoreAllMocks());
 
-describe("<PhaseTrace> (plan/25 §17, plan/17 F16)", () => {
-  it("renders trail + tail + endpoint; docs-as-tests summary with named axes", () => {
+describe("<PhaseTrace>", () => {
+  it("renders trail + tail + endpoint summary with named axes", () => {
     const { container } = draw(<PhaseTrace data={TRAJ} xLabel="CPU" yLabel="Latency" />);
     expect(container.querySelector('path[data-mc-ink="muted"]')).not.toBeNull();
     expect(container.querySelector('path[stroke="var(--mc-accent)"]')).not.toBeNull();

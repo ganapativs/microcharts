@@ -11,8 +11,8 @@ const ORG = [8, 9, 11, 12, 14, 15, 17, 18, 20, 21, 23, 24];
 const PAID = [12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 16, 16];
 const PAIRS = ORG.map((a, i) => ({ a, b: PAID[i]! }));
 
-describe("<SpreadBand> (plan/26 §6)", () => {
-  it("signed bands + dashed reference behind a solid subject; docs-as-tests summary", () => {
+describe("<SpreadBand>", () => {
+  it("signed bands + dashed reference behind a solid subject summary", () => {
     const { container } = draw(<SpreadBand data={PAIRS} labels={["Organic", "Paid"]} />);
     const paths = [...container.querySelectorAll("path")];
     // aLeadBand, bLeadBand, reference, subject

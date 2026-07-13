@@ -1,4 +1,4 @@
-// ABStrips geometry — pure, React-free (plan/23 #13). Did B beat A — and by
+// ABStrips geometry — pure, React-free. Did B beat A — and by
 // more than the overlap? Two graded quantile strips on ONE shared x scale; the
 // visible overlap of the middle halves IS the answer. Never a bare mean bar —
 // the distribution context is mandatory. Coords 2-dp, integer viewBox.

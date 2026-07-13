@@ -22,7 +22,7 @@ function apexPointsUp(pathD: string): boolean {
   return apex !== undefined && base !== undefined && apex < base;
 }
 
-describe("<Delta> (plan/05 S4, plan/08)", () => {
+describe("<Delta>", () => {
   it("up glyph points up and down glyph points down (honest direction)", () => {
     const up = draw(<Delta value={0.1} />)
       .container.querySelector(".mc-delta path")!
@@ -82,7 +82,7 @@ describe("<Delta> (plan/05 S4, plan/08)", () => {
     expect(container.querySelector(".mc-delta-num")!.textContent).toBe("+$1,500");
   });
 
-  it("non-finite value → em-dash + 'No change.', not 'NaN%' (plan/09)", () => {
+  it("non-finite value → em-dash + 'No change.', not 'NaN%'", () => {
     const { container } = draw(<Delta value={Number.NaN} />);
     const el = container.querySelector(".mc-delta")!;
     expect(el.getAttribute("data-mc-valence")).toBe("flat");

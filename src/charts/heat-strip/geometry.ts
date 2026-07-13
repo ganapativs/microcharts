@@ -1,4 +1,4 @@
-// HeatStrip geometry — pure, React-free (plan/22 #9, S1). Value-by-time as
+// HeatStrip geometry — pure, React-free. Value-by-time as
 // calibrated color cells: the 1×N sibling of ActivityGrid, same step scale and
 // cell vocabulary as HeatCell. Nulls hold their slot (time alignment survives);
 // long series collapse via max-per-bucket ONLY. Coords 2-dp.

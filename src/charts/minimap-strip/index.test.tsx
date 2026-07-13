@@ -19,8 +19,8 @@ const DATA = {
   known: [[0, 1104]] as [number, number][],
 };
 
-describe("<MinimapStrip> (plan/25 §10, plan/17 F10)", () => {
-  it("renders the window + content + marks; docs-as-tests summary", () => {
+describe("<MinimapStrip>", () => {
+  it("renders the window + content + marks summary", () => {
     const { container } = draw(<MinimapStrip data={DATA} />);
     expect(container.querySelectorAll("rect").length).toBeGreaterThanOrEqual(1);
     expect(minimapSummary(DATA, minimapDomain(DATA), 0.08, EN_MINIMAP, fmt)).toBe(

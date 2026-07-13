@@ -1,5 +1,5 @@
 // <Hypnogram> — which discrete state the system was in over time, and how choppy
-// the transitions were (plan/25 §2, plan/17 F8). Static, hook-free, RSC-safe.
+// the transitions were. Static, hook-free, RSC-safe.
 // A categorical step strip that REFUSES interpolation: no diagonals, no curves,
 // ever — a state is a fact, not a sample of a continuum (the anti-line-chart).
 import type { CSSProperties, ReactNode } from "react";
@@ -23,7 +23,7 @@ export interface HypnogramProps {
   /** Left-gutter state names (default: on when width ≥ 96). */
   labels?: boolean | undefined;
   /** `"lanes"` renders nominal states as filled blocks — no implied rank.
-   *  (plan/21 §3 names this `style`; React reserves that for CSS — logged.) */
+   * */
   variant?: "steps" | "lanes" | undefined;
   /** Time extent; the last state holds to `domain[1]`. */
   domain?: readonly [number, number] | undefined;

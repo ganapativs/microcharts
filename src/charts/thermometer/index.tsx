@@ -1,5 +1,5 @@
 // <Thermometer> — where a value sits on a calibrated range, and how close to a
-// goal (plan/24 #5, S4). A linear ticked tube; fill anchors at domain[0], never
+// goal. A linear ticked tube; fill anchors at domain[0], never
 // re-zeroed or log — the ticks calibrate the read. The bulb is instrument chrome
 // (always full), never data. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";

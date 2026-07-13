@@ -4,7 +4,7 @@ import { ErrorBudget } from "./client.js";
 
 const OBSERVED = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
 
-describe("interactive <ErrorBudget> (plan/23 #9)", () => {
+describe("interactive <ErrorBudget>", () => {
   it("arrow keys step; the live region states remaining + burn rate", async () => {
     const screen = await render(<ErrorBudget data={OBSERVED} window={30} unit="day" title="SLO" />);
     const wrap = screen.container.querySelector(".mc-error-budget-live") as HTMLElement;

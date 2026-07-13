@@ -8,7 +8,7 @@ const H = 20;
 const geo = (data: readonly Value[], opts = {}) =>
   sparkGeometry(data, { width: W, height: H, ...opts });
 
-describe("sparkGeometry (edge matrix, plan/09)", () => {
+describe("sparkGeometry (edge matrix, )", () => {
   it("empty → no marks, no points, valid plot", () => {
     const g = geo([]);
     expect(g.points).toEqual([]);
@@ -143,7 +143,7 @@ describe("sparkGeometry (invariants)", () => {
   );
 });
 
-describe("long-series guard (plan/21 §6.0.D — min/max decimation)", () => {
+describe("long-series guard", () => {
   const long = Array.from({ length: 10_000 }, (_, i) => 50 + Math.sin(i / 7) * 20);
 
   it("points stays 1:1 with data; linePoints collapses past maxPoints", () => {

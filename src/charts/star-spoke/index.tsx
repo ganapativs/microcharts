@@ -1,5 +1,5 @@
 // <StarSpoke> — an entity's profile across a few metrics, and which entity in a
-// set is the odd one out (plan/25 §9, plan/17 F11). Static, hook-free, RSC-safe.
+// set is the odd one out. Static, hook-free, RSC-safe.
 // Spokes only — NO contour polygon, ever (a `polygon` prop will never exist):
 // the enclosed area lies about magnitude and axis order, and contour-free wins
 // for outlier tasks. Faint guides are the read-back scaffold.
@@ -110,7 +110,7 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
       })
     : null;
   // fmt (an Intl.NumberFormat lookup) is only needed for the auto summary — skip
-  // it entirely when summary is explicitly off (SSR hot path: plan/25 §9 bench).
+  // it entirely when summary is explicitly off (SSR hot path: bench).
   const accName =
     summary === false
       ? false

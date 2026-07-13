@@ -4,7 +4,7 @@ import { COVERAGE_MAX_SLOTS, coverageGeometry } from "./geometry.js";
 
 const base = { width: 80, height: 10, shape: "square" as const };
 
-describe("coverageGeometry (plan/23 #1)", () => {
+describe("coverageGeometry", () => {
   it("measured cells are present, null cells are gaps — 0 ≠ null", () => {
     const geo = coverageGeometry({ ...base, data: [0, null, 3, null, null] });
     expect(geo.cells.map((c) => c.present)).toEqual([true, false, true, false, false]);

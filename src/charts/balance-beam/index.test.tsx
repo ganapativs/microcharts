@@ -10,7 +10,7 @@ const IN_OUT = [
   { label: "outflow", value: 480 },
 ] as const;
 
-describe("<BalanceBeam> (plan/24 #8)", () => {
+describe("<BalanceBeam>", () => {
   it("summary names both sides and the heavier one", () => {
     const { container } = draw(<BalanceBeam data={IN_OUT} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

@@ -1,4 +1,4 @@
-// <DicePips> — a small count/severity read instantly as a die face (plan/24
+// <DicePips> — a small count/severity read instantly as a die face (
 // #2, S4). Canonical pip patterns 1–6 only; 0 is an empty face (zero, not
 // missing), and > 6 shows a centered numeral rather than inventing a 7/8/9
 // pattern — the face never pretends. Static, hook-free, RSC-safe.

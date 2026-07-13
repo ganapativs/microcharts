@@ -128,7 +128,7 @@ export const playground: PlaygroundSpec = {
       '  sides={["home", "away"]}',
       s.swing === false && "  markSwing={false}",
       s.label === false && '  label="none"',
-      ui.animate && "  animate",
+      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -166,9 +166,23 @@ export function markCode(): string {
   return `<WinProbWorm data={winProb} sides={["home", "away"]} />`;
 }
 
+export function PreviewLive() {
+  return (
+    <WinProbWormInteractive
+      data={GAME}
+      sides={SIDES}
+      summary={false}
+      width={120}
+      height={16}
+      animate
+    />
+  );
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

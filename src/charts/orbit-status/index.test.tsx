@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
-describe("<OrbitStatus> (plan/24 #22)", () => {
+describe("<OrbitStatus>", () => {
   it("summary states both variables with units", () => {
     const { container } = draw(
       <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} />,

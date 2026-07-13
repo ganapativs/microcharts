@@ -4,7 +4,7 @@ import { BenchmarkStrip } from "./client.js";
 
 const PEERS = Array.from({ length: 40 }, (_, i) => i + 1);
 
-describe("interactive <BenchmarkStrip> (plan/23 #2)", () => {
+describe("interactive <BenchmarkStrip>", () => {
   it("arrow keys step the quantile edges with named announcements", async () => {
     const screen = await render(
       <BenchmarkStrip

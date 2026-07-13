@@ -1,5 +1,5 @@
 // <TokenConfidence> — which parts of generated text you should double-check
-// (plan/25 §7, plan/17 F12). The documented exception to the SVG Chart root:
+// The documented exception to the SVG Chart root:
 // THE TEXT IS THE CHART. Static, hook-free, RSC-safe. Confidence maps to three
 // discrete tiers as typographic underlines (color + thickness + stroke style —
 // never color-alone); confident tokens get NO mark so reading stays primary.

@@ -1,5 +1,5 @@
 "use client";
-// Interactive <MusicStaff> (plan/24 #12). Sparkline model: one pointer listener
+// Interactive <MusicStaff>. Sparkline model: one pointer listener
 // + nearest-note lookup, ←/→ roving, a ring on the focused note, EN.point
 // announcements. Composes the static component (ring as its child).
 import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";

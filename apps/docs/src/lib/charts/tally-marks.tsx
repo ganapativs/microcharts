@@ -159,9 +159,14 @@ export function markCode(): string {
   return `<TallyMarks value={12} />`;
 }
 
+export function PreviewLive() {
+  return <TallyMarksInteractive value={23} summary={false} height={16} />;
+}
+
 export default {
   entry,
   Preview,
+  PreviewLive,
   showcase,
   playground,
   recipes,

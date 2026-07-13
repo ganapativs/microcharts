@@ -3,7 +3,7 @@
 // same import-once shape as styles.css). Registers itself into motion-gate;
 // charts that never animate never carry it. One WAAPI implementation per
 // entrance archetype so every chart's motion is the same system: one easing,
-// one duration scale, one stagger rule (plan/06 §5).
+// one duration scale, one stagger rule.
 //
 // Rules enforced here:
 //   - transform / opacity / stroke-dashoffset only (GPU-friendly; no layout).
@@ -258,7 +258,7 @@ export function runEntrance(
     // ACT 2 — the story performs, entering on the beat as the stage lands.
     // Dash lengths for `vector-effect: non-scaling-stroke` paths are computed
     // by the browser in SCREEN space (the effect applies post-transform), but
-    // getTotalLength() answers in user units — at any CSS scale ≠ 1 the dash
+    // getTotalLength answers in user units — at any CSS scale ≠ 1 the dash
     // pattern's repeat would leak in as a phantom second fragment. Scale by
     // the rendered factor (+5% guard; a dash longer than the path is safe).
     const svgRect = svg.getBoundingClientRect();

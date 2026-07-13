@@ -1,4 +1,4 @@
-// PercentileTrace geometry — pure, React-free (plan/26 §8). One entity's
+// PercentileTrace geometry — pure, React-free. One entity's
 // STANDING drifting inside a population. The series IS percentile rank, so the
 // y-axis is LOCKED to [0,100] — the honest frame — and the population bands
 // (p25–75, p5–95) are constant by definition, not estimated. That constancy is

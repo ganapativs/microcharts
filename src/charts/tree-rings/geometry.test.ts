@@ -5,7 +5,7 @@ import { treeRingsGeometry } from "./geometry.js";
 const g = (values: number[], total?: number) =>
   treeRingsGeometry({ values, size: 24, pad: 1, total });
 
-describe("treeRingsGeometry (plan/24 #13) — radial thickness", () => {
+describe("treeRingsGeometry — radial thickness", () => {
   it("one ring per period; radii march outward", () => {
     const geo = g([5, 5, 5, 5]);
     expect(geo.rings.length).toBe(4);
