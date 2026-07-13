@@ -1,0 +1,103 @@
+<svg width="1200" height="420" viewBox="0 0 1200 420" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#151924"/>
+      <stop offset="1" stop-color="#0f121a"/>
+    </linearGradient>
+    <linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6d8cf5" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#6d8cf5" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- panel -->
+  <rect x="0.5" y="0.5" width="1199" height="419" rx="22" fill="url(#panel)"/>
+  <rect x="0.5" y="0.5" width="1199" height="419" rx="22" stroke="#faf7f1" stroke-opacity="0.08"/>
+
+  <!-- brand mark: squircle + three climbing cells -->
+  <g transform="translate(56,44) scale(1.5)">
+    <path d="M29.6 16L29.587 20.047L29.548 21.502L29.483 22.578L29.392 23.458L29.274 24.212L29.13 24.874L28.958 25.464L28.758 25.994L28.529 26.473L28.27 26.908L27.981 27.302L27.659 27.659L27.302 27.981L26.908 28.27L26.473 28.529L25.994 28.758L25.464 28.958L24.874 29.13L24.212 29.274L23.458 29.392L22.578 29.483L21.502 29.548L20.047 29.587L16 29.6L11.953 29.587L10.498 29.548L9.422 29.483L8.542 29.392L7.788 29.274L7.126 29.13L6.536 28.958L6.006 28.758L5.527 28.529L5.092 28.27L4.698 27.981L4.341 27.659L4.019 27.302L3.73 26.908L3.471 26.473L3.242 25.994L3.042 25.464L2.87 24.874L2.726 24.212L2.608 23.458L2.517 22.578L2.452 21.502L2.413 20.047L2.4 16L2.413 11.953L2.452 10.498L2.517 9.422L2.608 8.542L2.726 7.788L2.87 7.126L3.042 6.536L3.242 6.006L3.471 5.527L3.73 5.092L4.019 4.698L4.341 4.341L4.698 4.019L5.092 3.73L5.527 3.471L6.006 3.242L6.536 3.042L7.126 2.87L7.788 2.726L8.542 2.608L9.422 2.517L10.498 2.452L11.953 2.413L16 2.4L20.047 2.413L21.502 2.452L22.578 2.517L23.458 2.608L24.212 2.726L24.874 2.87L25.464 3.042L25.994 3.242L26.473 3.471L26.908 3.73L27.302 4.019L27.659 4.341L27.981 4.698L28.27 5.092L28.529 5.527L28.758 6.006L28.958 6.536L29.13 7.126L29.274 7.788L29.392 8.542L29.483 9.422L29.548 10.498L29.587 11.953Z" fill="#3a5bd9"/>
+    <rect x="9" y="19" width="4" height="4" rx="1.2" fill="#faf7f1" opacity="0.4"/>
+    <rect x="14" y="14" width="4" height="4" rx="1.2" fill="#faf7f1" opacity="0.7"/>
+    <rect x="19" y="9" width="4" height="4" rx="1.2" fill="#faf7f1"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="120" y="84" font-size="40" font-weight="700" letter-spacing="-0.02em" fill="#f4f1ea">microcharts</text>
+
+  <!-- tagline -->
+  <text x="57" y="128" font-size="18" fill="#9aa3b6">Word-sized charts for React — built for AI, and for the people reading what it writes.</text>
+
+  <!-- ===================== specimen band ===================== -->
+  <!-- cells: x0=76 w=192 step=214 -->
+  <g>
+    <!-- 1 · SPARKLINE -->
+    <g transform="translate(76,168)">
+      <rect x="0" y="0" width="192" height="150" rx="14" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <path d="M20 96 L44 82 L68 88 L92 60 L116 70 L140 40 L164 52 L172 30 L172 118 L20 118 Z" fill="url(#spark)"/>
+      <path d="M20 96 L44 82 L68 88 L92 60 L116 70 L140 40 L164 52 L172 30" fill="none" stroke="#6d8cf5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="172" cy="30" r="4.2" fill="#6d8cf5"/>
+      <text x="20" y="140" font-size="11" letter-spacing="0.08em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">SPARKLINE</text>
+    </g>
+
+    <!-- 2 · SPARKBAR (win/loss) -->
+    <g transform="translate(290,168)">
+      <rect x="0" y="0" width="192" height="150" rx="14" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <g>
+        <rect x="22" y="52" width="12" height="26" rx="2" fill="#2dd4a7"/>
+        <rect x="40" y="78" width="12" height="24" rx="2" fill="#ff8a4c"/>
+        <rect x="58" y="44" width="12" height="34" rx="2" fill="#2dd4a7"/>
+        <rect x="76" y="52" width="12" height="26" rx="2" fill="#2dd4a7"/>
+        <rect x="94" y="78" width="12" height="20" rx="2" fill="#ff8a4c"/>
+        <rect x="112" y="38" width="12" height="40" rx="2" fill="#2dd4a7"/>
+        <rect x="130" y="78" width="12" height="16" rx="2" fill="#ff8a4c"/>
+        <rect x="148" y="48" width="12" height="30" rx="2" fill="#2dd4a7"/>
+        <line x1="18" y1="78" x2="172" y2="78" stroke="#faf7f1" stroke-opacity="0.14"/>
+      </g>
+      <text x="20" y="140" font-size="11" letter-spacing="0.08em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">SPARKBAR</text>
+    </g>
+
+    <!-- 3 · ACTIVITY GRID -->
+    <g transform="translate(504,168)">
+      <rect x="0" y="0" width="192" height="150" rx="14" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <g transform="translate(22,40)">
+        <!-- 10 cols x 5 rows, graded cobalt -->
+        <g fill="#6d8cf5">
+          <rect x="0" y="0" width="11" height="11" rx="2.5" opacity="0.15"/><rect x="15" y="0" width="11" height="11" rx="2.5" opacity="0.35"/><rect x="30" y="0" width="11" height="11" rx="2.5" opacity="0.6"/><rect x="45" y="0" width="11" height="11" rx="2.5" opacity="0.2"/><rect x="60" y="0" width="11" height="11" rx="2.5" opacity="0.85"/><rect x="75" y="0" width="11" height="11" rx="2.5" opacity="0.5"/><rect x="90" y="0" width="11" height="11" rx="2.5" opacity="1"/><rect x="105" y="0" width="11" height="11" rx="2.5" opacity="0.3"/><rect x="120" y="0" width="11" height="11" rx="2.5" opacity="0.7"/><rect x="135" y="0" width="11" height="11" rx="2.5" opacity="0.45"/>
+          <rect x="0" y="15" width="11" height="11" rx="2.5" opacity="0.4"/><rect x="15" y="15" width="11" height="11" rx="2.5" opacity="0.2"/><rect x="30" y="15" width="11" height="11" rx="2.5" opacity="0.75"/><rect x="45" y="15" width="11" height="11" rx="2.5" opacity="0.9"/><rect x="60" y="15" width="11" height="11" rx="2.5" opacity="0.35"/><rect x="75" y="15" width="11" height="11" rx="2.5" opacity="0.6"/><rect x="90" y="15" width="11" height="11" rx="2.5" opacity="0.25"/><rect x="105" y="15" width="11" height="11" rx="2.5" opacity="1"/><rect x="120" y="15" width="11" height="11" rx="2.5" opacity="0.5"/><rect x="135" y="15" width="11" height="11" rx="2.5" opacity="0.8"/>
+          <rect x="0" y="30" width="11" height="11" rx="2.5" opacity="0.6"/><rect x="15" y="30" width="11" height="11" rx="2.5" opacity="0.9"/><rect x="30" y="30" width="11" height="11" rx="2.5" opacity="0.3"/><rect x="45" y="30" width="11" height="11" rx="2.5" opacity="0.5"/><rect x="60" y="30" width="11" height="11" rx="2.5" opacity="0.7"/><rect x="75" y="30" width="11" height="11" rx="2.5" opacity="0.2"/><rect x="90" y="30" width="11" height="11" rx="2.5" opacity="0.85"/><rect x="105" y="30" width="11" height="11" rx="2.5" opacity="0.45"/><rect x="120" y="30" width="11" height="11" rx="2.5" opacity="1"/><rect x="135" y="30" width="11" height="11" rx="2.5" opacity="0.35"/>
+          <rect x="0" y="45" width="11" height="11" rx="2.5" opacity="0.25"/><rect x="15" y="45" width="11" height="11" rx="2.5" opacity="0.55"/><rect x="30" y="45" width="11" height="11" rx="2.5" opacity="0.8"/><rect x="45" y="45" width="11" height="11" rx="2.5" opacity="0.4"/><rect x="60" y="45" width="11" height="11" rx="2.5" opacity="1"/><rect x="75" y="45" width="11" height="11" rx="2.5" opacity="0.6"/><rect x="90" y="45" width="11" height="11" rx="2.5" opacity="0.3"/><rect x="105" y="45" width="11" height="11" rx="2.5" opacity="0.7"/><rect x="120" y="45" width="11" height="11" rx="2.5" opacity="0.5"/><rect x="135" y="45" width="11" height="11" rx="2.5" opacity="0.9"/>
+        </g>
+      </g>
+      <text x="20" y="140" font-size="11" letter-spacing="0.08em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ACTIVITY</text>
+    </g>
+
+    <!-- 4 · BULLET -->
+    <g transform="translate(718,168)">
+      <rect x="0" y="0" width="192" height="150" rx="14" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <g transform="translate(22,54)">
+        <rect x="0" y="0" width="148" height="22" rx="4" fill="#faf7f1" opacity="0.08"/>
+        <rect x="0" y="0" width="92" height="22" rx="4" fill="#faf7f1" opacity="0.14"/>
+        <rect x="0" y="6" width="112" height="10" rx="3" fill="#6d8cf5"/>
+        <line x1="128" y1="-6" x2="128" y2="28" stroke="#f4f1ea" stroke-width="2.4"/>
+      </g>
+      <text x="22" y="118" xml:space="preserve" font-size="15" font-weight="600" fill="#f4f1ea" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">76<tspan fill="#7f889b"> / 80</tspan></text>
+      <text x="20" y="140" font-size="11" letter-spacing="0.08em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">BULLET</text>
+    </g>
+
+    <!-- 5 · DELTA -->
+    <g transform="translate(932,168)">
+      <rect x="0" y="0" width="192" height="150" rx="14" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <g transform="translate(30,58)">
+        <path d="M9 0 L18 15 L0 15 Z" fill="#2dd4a7"/>
+        <text x="30" y="15" font-size="30" font-weight="700" fill="#f4f1ea" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">+12.4%</text>
+      </g>
+      <text x="30" y="112" font-size="13" fill="#7f889b">1,240 → 1,394</text>
+      <text x="20" y="140" font-size="11" letter-spacing="0.08em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">DELTA</text>
+    </g>
+  </g>
+
+  <!-- footer stat line -->
+  <text x="57" y="366" xml:space="preserve" font-size="13.5" fill="#8b93a6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">106 chart types<tspan fill="#5b6377">   ·   </tspan>0 dependencies<tspan fill="#5b6377">   ·   </tspan>0.91–3.61 kB gzip<tspan fill="#5b6377">   ·   </tspan>RSC-safe<tspan fill="#5b6377">   ·   </tspan>accessible by default</text>
+  <text x="1143" y="366" font-size="13.5" text-anchor="end" fill="#6d8cf5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">microcharts.dev</text>
+</svg>

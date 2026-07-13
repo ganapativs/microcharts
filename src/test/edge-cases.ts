@@ -86,12 +86,17 @@ export function seriesEdgeSuite(
 ): void {
   describe(`<${name}> shared edge matrix (src/test/edge-cases.ts)`, () => {
     for (const [label, series] of Object.entries(EDGE_SERIES)) {
+      // The "10k points" stress case renders up to 10k marks; per-mark charts
+      // (dot-plot, dumbbell, slope, rubric-strip) emit that many DOM nodes, and
+      // jsdom's node creation — not the geometry — dominates. A loaded CI runner
+      // can brush the default 5s. Give the suite headroom; it asserts crash- and
+      // NaN-resistance, not speed (the SSR bench guards throughput separately).
       it(`${label} → renders, no non-finite leak, a11y contract holds`, () => {
         const container = runCase(renderChart(series));
         expect(container.firstElementChild, "renders something").not.toBeNull();
         expectNoNonFiniteLeak(container);
         expectA11yShape(container);
-      });
+      }, 20_000);
     }
   });
 }

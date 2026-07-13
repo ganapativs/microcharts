@@ -220,13 +220,11 @@ would strand the remaining Checkpoint 3 / batch-gate work that references it.
 | all non-`main` branches (7 remote: batch-4-frontier, docs-chart-page-polish, feat/*, superaudit, unified-motion) | **delete** — each carries `plan/` in its own history |
 | tags / GitHub releases | squash drops them; re-tag `v0.2.0` on the new initial commit after |
 
-### Prepare the slimmed CLAUDE.md first (staging, ahead of launch)
+### CLAUDE.md — already public (done 2026-07-13, PR #16)
 
-Draft the public CLAUDE.md as `CLAUDE.public.md` while the internal one is still in use. Keep:
-non-negotiables (zero-dep, budgets, static-first, grammar, a11y, honest encodings), the
-architecture map, theming contract, the component canon, and the working-rules/commit-style
-section. Strip: every `plan/NN` reference, the roadmap/STATUS pointers, brand positioning prose,
-the cut ledger, and competitor/strategy notes. Swap it in during the squash below.
+`CLAUDE.md` was already replaced with the slimmed public contributor/agent guide (non-negotiables,
+architecture map, theming, component canon, DoD, working rules; no `plan/` references, roadmap,
+strategy, or cut ledger). So the squash below only needs to delete `plan/` — no CLAUDE swap step.
 
 ### Squash procedure (one-way — read twice, run once)
 
@@ -234,10 +232,9 @@ the cut ledger, and competitor/strategy notes. Swap it in during the squash belo
 # 0. main is at the exact tree you want public. All branches merged/closed. Clean working tree.
 git checkout main && git pull
 
-# 1. Remove internal docs; swap in the slimmed CLAUDE.md
+# 1. Remove internal docs (CLAUDE.md is already the public version)
 git rm -r plan/
-cp CLAUDE.public.md CLAUDE.md && rm CLAUDE.public.md
-git add -A && git commit -m "chore: remove internal planning docs; slim CLAUDE.md for public"
+git commit -m "chore: remove internal planning docs"
 
 # 2. Collapse ALL history into a single commit via an orphan branch
 git checkout --orphan _public
@@ -293,7 +290,7 @@ Analytics cadence per plan/20 §13.
 | Bind custom domain | **user** | Cloudflare dashboard |
 | Enable Web Analytics | **user** | zero-code, one click |
 | `changeset version` + publish | **user** | OIDC configured; runs on push to `main` |
-| Draft slimmed `CLAUDE.public.md` | agent | when ready — strip plan refs + strategy (§7) |
+| Slim `CLAUDE.md` for public | ✅ done | PR #16 — replaced with public contributor guide |
 | Remove `plan/` + fresh-slate squash | **user** | §7 — destructive, one-way, before going public |
 | Make repo public | **user** | GitHub settings — only AFTER the squash |
 | Topics / social / discussions | **user** | GitHub settings (values above) |
