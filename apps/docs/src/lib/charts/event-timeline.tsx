@@ -192,15 +192,15 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {(
             [
               ["API", DATA, 1],
               ["Auth", AUTH, 0],
             ] as const
           ).map(([name, rows, incidents]) => (
-            <tr key={name} className="border-t border-fd-border/60 first:border-0">
+            <tr key={name}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{name}</td>
               <td className="py-1.5">
                 <EventTimeline data={rows} domain={WINDOW} summary={false} width={90} height={14} />

@@ -192,7 +192,7 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
+      <table className="mc-inline-table w-full text-sm tabular-nums">
         <thead>
           <tr className="text-fd-muted-foreground text-xs">
             <th className="pb-1.5 pr-3 text-left font-normal" />
@@ -203,9 +203,9 @@ export const contexts: ChartContexts = {
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {SHARDS.map((s) => (
-            <tr key={s.label} className="border-t border-fd-border/60 first:border-0">
+            <tr key={s.label}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{s.label}</td>
               {s.load.map((v, i) => (
                 <td key={HOURS[i]} className="px-1 py-1.5">

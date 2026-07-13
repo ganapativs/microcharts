@@ -1,6 +1,6 @@
 import { Hypnogram } from "@microcharts/react/hypnogram";
 import { Hypnogram as HypnogramInteractive } from "@microcharts/react/hypnogram/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const SLEEP = [
@@ -200,6 +200,126 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const NIGHTS = [
+  { name: "Mon", data: SLEEP, meta: "2 deep blocks" },
+  {
+    name: "Tue",
+    data: [
+      { t: 0, state: "Awake" },
+      { t: 10, state: "Light" },
+      { t: 30, state: "Deep" },
+      { t: 50, state: "REM" },
+      { t: 70, state: "Awake" },
+    ],
+    meta: "1 deep block",
+  },
+  {
+    name: "Wed",
+    data: [
+      { t: 0, state: "Light" },
+      { t: 20, state: "Deep" },
+      { t: 45, state: "REM" },
+      { t: 65, state: "Light" },
+      { t: 90, state: "Awake" },
+    ],
+    meta: "REM-heavy",
+  },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Last night&apos;s sleep{" "}
+        <span className="mc-inline">
+          <Hypnogram
+            data={SLEEP}
+            states={STATES}
+            domain={DOM}
+            summary={false}
+            width={90}
+            height={16}
+          />
+        </span>{" "}
+        — two deep blocks, REM before wake.
+      </p>
+    ),
+    code: "<p>\n  Last night&apos;s sleep <Hypnogram data={sleep} states={states} width={90} height={16} /> — two deep blocks.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {NIGHTS.map((n) => (
+            <tr key={n.name}>
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{n.name}</td>
+              <td className="py-1.5">
+                <Hypnogram
+                  data={n.data}
+                  states={STATES}
+                  domain={DOM}
+                  summary={false}
+                  width={72}
+                  height={16}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{n.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td><Hypnogram data={night.states} states={states} width={72} height={16} /></td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Sleep stages</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">2</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">
+              deep cycles · REM before wake
+            </span>
+          </div>
+        </div>
+        <Hypnogram
+          data={SLEEP}
+          states={STATES}
+          domain={DOM}
+          summary={false}
+          width={200}
+          height={30}
+        />
+      </>
+    ),
+    code: '<div className="kpi"><span className="figure">2 deep</span><Hypnogram data={sleep} states={states} width={200} height={30} /></div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {NIGHTS.map((n, i) => (
+          <span
+            key={n.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {n.name}
+            <Hypnogram
+              data={n.data}
+              states={STATES}
+              domain={DOM}
+              summary={false}
+              width={54}
+              height={14}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">Mon <Hypnogram data={sleep} states={states} width={54} height={14} /></button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const names = ["Awake", "Light", "Deep", "REM"];
   const data = props.data
@@ -241,6 +361,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

@@ -1,6 +1,6 @@
 import { NetFlow } from "@microcharts/react/net-flow";
 import { NetFlow as NetFlowInteractive } from "@microcharts/react/net-flow/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // monthly cash flow (values in $k) — mostly net-positive, two months in the red
@@ -188,7 +188,82 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Operating", meta: "+$62K" },
+  { name: "Investing", meta: "−$28K" },
+  { name: "Financing", meta: "+$8K" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Monthly cash flow{" "}
+        <span className="mc-inline">
+          <NetFlow data={DEMO} format={KFMT} height={16} summary={false} />
+        </span>{" "}
+        — net positive for the third month.
+      </p>
+    ),
+    code: "<p>\n  Monthly cash flow <NetFlow data={months} /> — net positive for the third month.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <NetFlow data={DEMO} format={KFMT} height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <NetFlow data={months} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Net flow</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">+$42K</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">this month</span>
+          </div>
+        </div>
+        <NetFlow data={DEMO} format={KFMT} height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">+$42K</span>\n  <span className="unit">this month</span>\n  <NetFlow data={months} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <NetFlow data={DEMO} format={KFMT} height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Operating <NetFlow data={months} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
+  if (!props.data.length) {
+    return (
+      <NetFlow data={DEMO} summary={false} width={props.width ?? 70} height={props.height ?? 18} />
+    );
+  }
   return (
     <NetFlow
       data={props.data.map((v, j) => ({ in: Math.abs(v) + 4, out: Math.abs(v) * 0.7 + (j % 4) }))}
@@ -216,6 +291,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

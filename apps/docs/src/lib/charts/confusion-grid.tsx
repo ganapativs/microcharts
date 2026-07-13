@@ -1,6 +1,6 @@
 import { ConfusionGrid } from "@microcharts/react/confusion-grid";
 import { ConfusionGrid as ConfusionGridInteractive } from "@microcharts/react/confusion-grid/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const CATDOG = {
@@ -170,6 +170,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "cats", meta: "87%" },
+  { name: "dogs", meta: "88%" },
+  { name: "birds", meta: "91%" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Classifier accuracy{" "}
+        <span className="mc-inline">
+          <ConfusionGrid data={CATDOG} summary={false} size={20} />
+        </span>{" "}
+        — 87% cats correct, 12% dogs misclassified.
+      </p>
+    ),
+    code: "<p>\n  Classifier accuracy <ConfusionGrid data={{ labels, counts }} /> — 87% cats correct, 12% dogs misclassified.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <ConfusionGrid data={CATDOG} summary={false} size={22} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <ConfusionGrid data={{ labels, counts }} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Accuracy</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">87%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">cats correct</span>
+          </div>
+        </div>
+        <ConfusionGrid data={CATDOG} summary={false} size={48} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">87%</span>\n  <ConfusionGrid data={{ labels, counts }} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <ConfusionGrid data={CATDOG} summary={false} size={18} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  cats <ConfusionGrid data={{ labels, counts }} />\n</button>',
+  },
+};
+
 export function Mark() {
   return <ConfusionGrid data={CATDOG} summary={false} size={44} />;
 }
@@ -189,6 +259,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

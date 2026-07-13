@@ -183,10 +183,10 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {TENANTS.map((t) => (
-            <tr key={t.name} className="border-t border-fd-border/60 first:border-0">
+            <tr key={t.name}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{t.name}</td>
               <td className="py-1.5">
                 <HeatStrip data={t.load} domain={D} summary={false} width={90} height={14} />

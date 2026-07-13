@@ -1,6 +1,6 @@
 import { Constellation } from "@microcharts/react/constellation";
 import { Constellation as ConstellationInteractive } from "@microcharts/react/constellation/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -157,6 +157,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Q1", meta: "4 events" },
+  { name: "Q2", meta: "2 events" },
+  { name: "Q3", meta: "1 event" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Incidents this quarter{" "}
+        <span className="mc-inline">
+          <Constellation data={INCIDENTS} xFormat={monthFmt} height={16} summary={false} />
+        </span>{" "}
+        — four events, largest severity in February.
+      </p>
+    ),
+    code: "<p>\n  Incidents this quarter <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} /> — four events, largest severity in February.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <Constellation data={INCIDENTS} xFormat={monthFmt} height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Incidents</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">4</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">this quarter</span>
+          </div>
+        </div>
+        <Constellation data={INCIDENTS} xFormat={monthFmt} height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">4</span>\n  <span className="unit">this quarter</span>\n  <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <Constellation data={INCIDENTS} xFormat={monthFmt} height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Prod <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const pts = props.data.length
     ? props.data.map((v, i) => ({ x: i, y: Math.abs(v), m: (Math.abs(v) % 5) + 1 }))
@@ -188,6 +258,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

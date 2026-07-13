@@ -1,6 +1,6 @@
 import { ForecastCone } from "@microcharts/react/forecast-cone";
 import { ForecastCone as ForecastConeInteractive } from "@microcharts/react/forecast-cone/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // weekly revenue ($M): 7 weeks of history, a 4-week widening forecast
@@ -199,8 +199,80 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Q4", meta: "112%" },
+  { name: "Q3", meta: "98%" },
+  { name: "Q2", meta: "104%" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Q4 revenue forecast{" "}
+        <span className="mc-inline">
+          <ForecastCone data={HIST} forecast={FORE} target={45} height={16} summary={false} />
+        </span>{" "}
+        — median path clears target by week 3.
+      </p>
+    ),
+    code: "<p>\n  Q4 revenue forecast <ForecastCone data={history} forecast={forecast} /> — median path clears target by week 3.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <ForecastCone data={HIST} forecast={FORE} target={45} height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <ForecastCone data={history} forecast={forecast} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Q4 revenue</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">112%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">of target (median)</span>
+          </div>
+        </div>
+        <ForecastCone data={HIST} forecast={FORE} target={45} height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">112%</span>\n  <span className="unit">of target (median)</span>\n  <ForecastCone data={history} forecast={forecast} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <ForecastCone data={HIST} forecast={FORE} target={45} height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Q4 <ForecastCone data={history} forecast={forecast} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
-  const hist = props.data.slice(0, 5).map((v) => 30 + (Math.abs(v) % 10));
+  const hist = (props.data.length ? props.data : HIST)
+    .slice(0, 5)
+    .map((v) => 30 + (Math.abs(v) % 10));
   const mid = [38, 40, 42];
   const p80 = mid.map((v, j) => [v - 3 - j * 2, v + 3 + j * 2] as [number, number]);
   return (
@@ -238,6 +310,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

@@ -1,6 +1,6 @@
 import { Hourglass } from "@microcharts/react/hourglass";
 import { Hourglass as HourglassInteractive } from "@microcharts/react/hourglass/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -137,6 +137,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Admin", meta: "75%" },
+  { name: "Editor", meta: "42%" },
+  { name: "Viewer", meta: "15%" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Session time remaining{" "}
+        <span className="mc-inline">
+          <Hourglass value={0.7} label="remaining" height={16} summary={false} />
+        </span>{" "}
+        — 75% elapsed, renew soon.
+      </p>
+    ),
+    code: "<p>\n  Session time remaining <Hourglass value={0.7} /> — 75% elapsed, renew soon.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <Hourglass value={0.7} label="remaining" height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <Hourglass value={0.7} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Session</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">75%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">elapsed</span>
+          </div>
+        </div>
+        <Hourglass value={0.7} label="remaining" height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">75%</span>\n  <span className="unit">elapsed</span>\n  <Hourglass value={0.7} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <Hourglass value={0.7} label="remaining" height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Admin <Hourglass value={0.7} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const v = props.data.length ? (Math.abs(props.data[0]!) % 100) / 100 : 0.7;
   return <Hourglass value={v} summary={false} height={props.height ?? 24} />;
@@ -163,6 +233,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

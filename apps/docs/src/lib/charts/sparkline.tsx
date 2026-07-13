@@ -224,10 +224,10 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {SERVICES.map((s) => (
-            <tr key={s.name} className="border-t border-fd-border/60 first:border-0">
+            <tr key={s.name}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{s.name}</td>
               <td className="py-1.5">
                 <Sparkline data={s.data} summary={false} width={64} height={18} dots="none" />

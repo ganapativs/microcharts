@@ -1,6 +1,6 @@
 import { CitySkyline } from "@microcharts/react/city-skyline";
 import { CitySkyline as CitySkylineInteractive } from "@microcharts/react/city-skyline/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 type Team = { label: string; value: number; lit?: number };
@@ -165,6 +165,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Platform", meta: "46" },
+  { name: "Core", meta: "32" },
+  { name: "Web", meta: "28" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Team sizes across eng{" "}
+        <span className="mc-inline">
+          <CitySkyline data={TEAMS} labels unit="teams" height={16} summary={false} />
+        </span>{" "}
+        — Platform is largest at 46, 70% activated.
+      </p>
+    ),
+    code: "<p>\n  Team sizes across eng <CitySkyline data={teams} /> — Platform is largest at 46, 70% activated.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <CitySkyline data={TEAMS} labels unit="teams" height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <CitySkyline data={teams} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Platform</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">46</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">heads · 70% lit</span>
+          </div>
+        </div>
+        <CitySkyline data={TEAMS} labels unit="teams" height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">46</span>\n  <span className="unit">heads · 70% lit</span>\n  <CitySkyline data={teams} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <CitySkyline data={TEAMS} labels unit="teams" height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Platform <CitySkyline data={teams} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const data = (props.data.length ? props.data.slice(0, 5) : [46, 32, 28, 40, 18]).map((v, i) => ({
     label: `#${i}`,
@@ -189,6 +259,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

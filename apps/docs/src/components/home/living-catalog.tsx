@@ -36,8 +36,22 @@ const POOL = [
 ] as const;
 
 const COUNT = 6;
+const COLS = 2;
+const ROWS = COUNT / COLS;
 
 type Cell = { slug: string; nonce: number };
+
+function RowGap({ delay }: { delay: string }) {
+  return (
+    <div aria-hidden className="relative h-2.5 shrink-0 sm:h-3">
+      <span
+        className="hx-cross-line hx-cross-h absolute top-1/2 right-[5%] left-[5%]"
+        style={{ animationDelay: delay }}
+      />
+      <span className="hx-cross-node absolute top-1/2 left-1/2" />
+    </div>
+  );
+}
 
 /** Deterministic first board — first COUNT slugs, so the server and first client
  *  render agree (no flash) and there is a stable set to crawl. */
@@ -105,57 +119,50 @@ export function LivingCatalog({ total }: { total: number }) {
       onBlurCapture={release}
     >
       <div className="relative">
-        <div aria-hidden className="pointer-events-none absolute -inset-2.5 -z-10 sm:-inset-3">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <span className="hx-cross-line hx-cross-v" />
-          <span
-            className="hx-cross-line hx-cross-h"
-            style={{ top: "33.33%", animationDelay: "0s" }}
-          />
-          <span
-            className="hx-cross-line hx-cross-h"
-            style={{ top: "66.66%", animationDelay: "-2.5s" }}
-          />
-          <span
-            className="hx-cross-line hx-cross-h"
-            style={{ top: "99%", animationDelay: "-5s" }}
-          />
-          <span className="hx-cross-node" style={{ top: "33.33%" }} />
-          <span className="hx-cross-node" style={{ top: "66.66%" }} />
         </div>
 
-        <ul className="grid grid-cols-2 gap-2.5 sm:gap-3">
-          {board.map((cell, i) => {
-            const mod = CHART_MODULES[cell.slug];
-            const entry = getChart(cell.slug);
-            if (!mod || !entry) return <li key={i} aria-hidden />;
-            // Once live (mounted, motion allowed) render the interactive
-            // twin so the entrance animates on load + on each swap; reduced-motion
-            // visitors never flip `live` on, so they keep the static Preview.
-            const Preview = live && mod.PreviewLive ? mod.PreviewLive : mod.Preview;
+        <div className="flex flex-col">
+          {Array.from({ length: ROWS }, (_, ri) => {
             return (
-              <li key={i}>
-                <Link
-                  href={`/docs/charts/${cell.slug}`}
-                  aria-label={`${entry.name}: ${entry.tagline}`}
-                  className="hx-tile group flex flex-col items-center justify-center gap-2 rounded-[14px] px-3 py-4 no-underline"
-                >
-                  <span
-                    key={cell.nonce}
-                    className="hx-slot hx-swap flex min-h-[4.75rem] w-full items-center justify-center"
-                  >
-                    <Preview />
-                  </span>
-                  <span className="hx-slot-name mono-label truncate text-[0.58rem] tracking-[0.12em] opacity-55 group-hover:text-fd-primary group-hover:opacity-100">
-                    {entry.name}
-                  </span>
-                </Link>
-              </li>
+              <div key={ri}>
+                {ri > 0 ? <RowGap delay={ri === 1 ? "0s" : "-2.5s"} /> : null}
+                <ul className="grid grid-cols-2 gap-2.5 sm:gap-3">
+                  {board.slice(ri * COLS, ri * COLS + COLS).map((cell, ci) => {
+                    const i = ri * COLS + ci;
+                    const mod = CHART_MODULES[cell.slug];
+                    const entry = getChart(cell.slug);
+                    if (!mod || !entry) return <li key={i} aria-hidden />;
+                    const Preview = live && mod.PreviewLive ? mod.PreviewLive : mod.Preview;
+                    return (
+                      <li key={i}>
+                        <Link
+                          href={`/docs/charts/${cell.slug}`}
+                          aria-label={`${entry.name}: ${entry.tagline}`}
+                          className="hx-tile group flex h-[7.5rem] flex-col items-center justify-between rounded-[14px] px-3 py-3 no-underline"
+                        >
+                          <span
+                            key={cell.nonce}
+                            className="hx-slot hx-swap flex h-[4.5rem] w-full shrink-0 items-center justify-center"
+                          >
+                            <Preview />
+                          </span>
+                          <span className="hx-slot-name mono-label shrink-0 truncate text-[0.58rem] tracking-[0.12em] opacity-55 group-hover:text-fd-primary group-hover:opacity-100">
+                            {entry.name}
+                          </span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             );
           })}
-        </ul>
+        </div>
       </div>
 
-      <div className="mt-5 flex justify-center">
+      <div className="mt-2.5 flex justify-center sm:mt-3">
         <Link
           href="/gallery"
           aria-label={`Browse all ${total} chart types in the gallery`}

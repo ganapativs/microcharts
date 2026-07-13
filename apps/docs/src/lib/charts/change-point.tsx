@@ -1,6 +1,6 @@
 import { ChangePoint } from "@microcharts/react/change-point";
 import { ChangePoint as ChangePointInteractive } from "@microcharts/react/change-point/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // error rate that stepped up on the 14th, then held — a clean level shift
@@ -167,6 +167,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "checkout", meta: "+0.8pp" },
+  { name: "auth", meta: "stable" },
+  { name: "search", meta: "+0.3pp" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Error rate this week{" "}
+        <span className="mc-inline">
+          <ChangePoint data={ERRORS} label="delta" height={16} summary={false} />
+        </span>{" "}
+        — step-up on day 14, regime break at 2.1%.
+      </p>
+    ),
+    code: "<p>\n  Error rate this week <ChangePoint data={errors} /> — step-up on day 14, regime break at 2.1%.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <ChangePoint data={ERRORS} label="delta" height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <ChangePoint data={errors} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Error rate</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">2.1%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">post-change regime</span>
+          </div>
+        </div>
+        <ChangePoint data={ERRORS} label="delta" height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">2.1%</span>\n  <span className="unit">post-change regime</span>\n  <ChangePoint data={errors} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <ChangePoint data={ERRORS} label="delta" height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  checkout <ChangePoint data={errors} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const data = [
     ...props.data.slice(0, 8).map((v) => 20 + (Math.abs(v) % 6)),
@@ -197,6 +267,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

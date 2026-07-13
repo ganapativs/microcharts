@@ -1,6 +1,6 @@
 import { GradeProfile } from "@microcharts/react/grade-profile";
 import { GradeProfile as GradeProfileInteractive } from "@microcharts/react/grade-profile/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 const m = (n: number) => `${n} m`;
@@ -163,6 +163,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Stage 12", meta: "865 m" },
+  { name: "Stage 11", meta: "420 m" },
+  { name: "Stage 10", meta: "210 m" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Queen stage elevation{" "}
+        <span className="mc-inline">
+          <GradeProfile data={TRAIL} format={m} height={16} summary={false} />
+        </span>{" "}
+        — 865 m gain over 800 km.
+      </p>
+    ),
+    code: "<p>\n  Queen stage elevation <GradeProfile data={trail} /> — 865 m gain over 800 km.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <GradeProfile data={TRAIL} format={m} height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <GradeProfile data={trail} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Elevation</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">865 m</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">total gain</span>
+          </div>
+        </div>
+        <GradeProfile data={TRAIL} format={m} height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">865 m</span>\n  <span className="unit">total gain</span>\n  <GradeProfile data={trail} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <GradeProfile data={TRAIL} format={m} height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Stage 12 <GradeProfile data={trail} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <GradeProfile
@@ -190,6 +260,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

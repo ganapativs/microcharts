@@ -203,12 +203,12 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {PAGES.map((p) => {
             const top = topShare(p.mix);
             return (
-              <tr key={p.path} className="border-t border-fd-border/60 first:border-0">
+              <tr key={p.path}>
                 <td className="py-1.5 pr-3 text-fd-muted-foreground">{p.path}</td>
                 <td className="py-1.5">
                   <SegmentedBar data={p.mix} summary={false} width={90} height={12} />

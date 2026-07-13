@@ -1,6 +1,6 @@
 import { Honeycomb } from "@microcharts/react/honeycomb";
 import { Honeycomb as HoneycombInteractive } from "@microcharts/react/honeycomb/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -134,6 +134,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Room A", meta: "34/40" },
+  { name: "Room B", meta: "28/40" },
+  { name: "Room C", meta: "12/40" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Seat occupancy{" "}
+        <span className="mc-inline">
+          <Honeycomb value={34} total={40} unit="seats" cell={8} summary={false} />
+        </span>{" "}
+        — 34 of 40 taken, one row left.
+      </p>
+    ),
+    code: "<p>\n  Seat occupancy <Honeycomb value={34} total={40} /> — 34 of 40 taken, one row left.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <Honeycomb value={34} total={40} unit="seats" cell={9} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <Honeycomb value={34} total={40} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Occupancy</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">34/40</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">seats taken</span>
+          </div>
+        </div>
+        <Honeycomb value={34} total={40} unit="seats" cell={12} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">34/40</span>\n  <span className="unit">seats taken</span>\n  <Honeycomb value={34} total={40} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <Honeycomb value={34} total={40} unit="seats" cell={7} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Room A <Honeycomb value={34} total={40} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const v = props.data.length ? Math.abs(Math.round(props.data[0]!)) % 40 : 28;
   return (
@@ -158,6 +228,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

@@ -163,10 +163,10 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {ACCTS.slice(0, 3).map((a) => (
-            <tr key={a.label} className="border-t border-fd-border/60 first:border-0">
+            <tr key={a.label}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{a.label}</td>
               <td className="py-1.5">
                 <SproutRow data={[a]} summary={false} height={18} step={13} />

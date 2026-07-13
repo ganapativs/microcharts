@@ -1510,7 +1510,7 @@ figure:has(> pre) .shiki,
 /* Tables (markdown + PropTable) — the SAME container shell as .panel (real
    hairline border + --radius-panel + bevel + lift), so a table reads as one of
    the family. Row dividers are the same hairline; header = mono label. */
-.prose table,
+.prose table:not(.mc-inline-table),
 .mc-table {
   border-collapse: separate;
   border-spacing: 0;
@@ -1539,6 +1539,25 @@ figure:has(> pre) .shiki,
   border-top: 1px solid var(--hairline);
   padding: 0.7rem 1rem;
   vertical-align: top;
+}
+.prose tbody tr:first-child td,
+.mc-table tbody tr:first-child td {
+  border-top: 0;
+}
+
+/* Four-homes / carousel embed tables — row dividers only; already inside .panel. */
+.prose table.mc-inline-table,
+table.mc-inline-table {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+.prose table.mc-inline-table tbody td,
+table.mc-inline-table tbody td {
+  border-top: 0;
+  padding: 0;
+  vertical-align: middle;
 }
 
 /* Fumadocs doc cards (the <Cards>/<Card> blocks) AND the built-in prev/next page
@@ -1939,6 +1958,42 @@ div:where(
       filter: blur(3px);
     }
   }
+  /* Surface carousel: the incoming surface rises + de-blurs, and its rows settle
+     in a short hand-dealt stagger while the outgoing one fades under it. */
+  .hx-surface-in {
+    animation: hx-surface-in 0.58s var(--ease-out-expo) both;
+  }
+  @keyframes hx-surface-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.985);
+      filter: blur(4px);
+    }
+  }
+  .hx-surface-in > * > * {
+    animation: hx-surface-row 0.46s var(--ease-out-quint) both;
+  }
+  @keyframes hx-surface-row {
+    from {
+      opacity: 0;
+      transform: translateY(9px);
+    }
+  }
+  .hx-surface-in > * > *:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .hx-surface-in > * > *:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  .hx-surface-in > * > *:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+  .hx-surface-in > * > *:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+  .hx-surface-in > * > *:nth-child(n + 5) {
+    animation-delay: 0.25s;
+  }
   .hx-slot-name {
     transition:
       color 0.18s var(--ease-out-quint),
@@ -1988,12 +2043,8 @@ div:where(
   }
 
   /* ── Instrument grid behind the cluster ──────────────────────────────────
-     One vertical axis, three horizontal rules (one under each chart row), and
-     nodes at the two row gaps (no border, no centre hub). Soft accent signals
-     travel down the vertical axis AND across each horizontal, so the board
-     reads like a live instrument. Paint-only (background-position on 1px
-     lines); matte, low-opacity. The rounded bound lives on the outer bloom
-     layer (inline style), not here. */
+     One vertical axis, horizontal rules in explicit row-gap bands, and nodes
+     at each gap — geometry comes from layout, not percentage guesses. */
   .hx-cross-line {
     position: absolute;
     overflow: hidden;
@@ -2001,8 +2052,8 @@ div:where(
   }
   .hx-cross-v {
     left: 50%;
-    top: 7%;
-    bottom: 7%;
+    top: 0;
+    bottom: 0;
     width: 1px;
     transform: translateX(-0.5px);
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);

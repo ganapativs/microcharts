@@ -266,10 +266,10 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {REGION_DELTAS.map((r) => (
-            <tr key={r.region} className="border-t border-fd-border/60 first:border-0">
+            <tr key={r.region}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{r.region}</td>
               <td className="py-1.5 pr-3 text-right">{r.revenue}</td>
               <td className="py-1.5 text-right">

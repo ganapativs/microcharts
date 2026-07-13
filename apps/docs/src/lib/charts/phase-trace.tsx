@@ -1,6 +1,6 @@
 import { PhaseTrace } from "@microcharts/react/phase-trace";
 import { PhaseTrace as PhaseTraceInteractive } from "@microcharts/react/phase-trace/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a coupled CPU×latency trajectory with a lag loop
@@ -183,6 +183,90 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "api", meta: "loop" },
+  { name: "worker", meta: "stable" },
+  { name: "batch", meta: "spiral" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        CPU × latency phase{" "}
+        <span className="mc-inline">
+          <PhaseTrace data={TRAJ} xLabel="CPU" yLabel="Latency" grid height={16} summary={false} />
+        </span>{" "}
+        — lag loop in the upper-right regime.
+      </p>
+    ),
+    code: '<p>\n  CPU × latency phase <PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" /> — lag loop in the upper-right regime.\n</p>',
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <PhaseTrace
+                  data={TRAJ}
+                  xLabel="CPU"
+                  yLabel="Latency"
+                  grid
+                  height={18}
+                  summary={false}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: '<td>\n  <PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" />\n</td>',
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Phase</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">loop</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">CPU × latency</span>
+          </div>
+        </div>
+        <PhaseTrace data={TRAJ} xLabel="CPU" yLabel="Latency" grid height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">loop</span>\n  <span className="unit">CPU × latency</span>\n  <PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <PhaseTrace
+              data={TRAJ}
+              xLabel="CPU"
+              yLabel="Latency"
+              grid
+              height={14}
+              summary={false}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  api <PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return (
     <PhaseTrace
@@ -221,6 +305,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

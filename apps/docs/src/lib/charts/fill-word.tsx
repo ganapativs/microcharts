@@ -1,6 +1,6 @@
 import { FillWord } from "@microcharts/react/fill-word";
 import { FillWord as FillWordInteractive } from "@microcharts/react/fill-word/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -129,6 +129,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "avatar.png", meta: "62%" },
+  { name: "report.pdf", meta: "100%" },
+  { name: "data.zip", meta: "18%" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Upload progress{" "}
+        <span className="mc-inline">
+          <FillWord word="uploading" value={0.62} fontSize={13} summary={false} />
+        </span>{" "}
+        — 62% of the file transferred.
+      </p>
+    ),
+    code: '<p>\n  Upload progress <FillWord word="loading" value={0.62} /> — 62% of the file transferred.\n</p>',
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <FillWord word="uploading" value={0.62} fontSize={13} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: '<td>\n  <FillWord word="loading" value={0.62} />\n</td>',
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Upload</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">62%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">complete</span>
+          </div>
+        </div>
+        <FillWord word="uploading" value={0.62} fontSize={16} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">62%</span>\n  <span className="unit">complete</span>\n  <FillWord word="loading" value={0.62} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <FillWord word="uploading" value={0.62} fontSize={11} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  avatar <FillWord word="loading" value={0.62} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const v = props.data.length ? (Math.abs(props.data[0]!) % 100) / 100 : 0.62;
   return (
@@ -156,6 +226,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

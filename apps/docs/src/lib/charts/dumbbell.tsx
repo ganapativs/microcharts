@@ -162,10 +162,10 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {BANDS.map((b) => (
-            <tr key={b.label} className="border-t border-fd-border/60 first:border-0">
+            <tr key={b.label}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{b.label}</td>
               <td className="py-1.5">
                 <Dumbbell data={[b]} summary={false} width={70} height={14} />

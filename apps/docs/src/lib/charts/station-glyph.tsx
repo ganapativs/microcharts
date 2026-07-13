@@ -1,6 +1,6 @@
 import { StationGlyph } from "@microcharts/react/station-glyph";
 import { StationGlyph as StationGlyphInteractive } from "@microcharts/react/station-glyph/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const OBS = {
@@ -157,6 +157,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "KSFO", meta: "16°C" },
+  { name: "KJFK", meta: "22°C" },
+  { name: "KORD", meta: "8°C" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        KSFO conditions{" "}
+        <span className="mc-inline">
+          <StationGlyph {...OBS} size={20} summary={false} />
+        </span>{" "}
+        — overcast, SW 15 kt, 16°C.
+      </p>
+    ),
+    code: '<p>\n  KSFO conditions <StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} /> — overcast, SW 15 kt, 16°C.\n</p>',
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <StationGlyph {...OBS} size={22} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: '<td>\n  <StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} />\n</td>',
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">KSFO</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">16°C</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">· 1013 hPa</span>
+          </div>
+        </div>
+        <StationGlyph {...OBS} size={48} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">16°C</span>\n  <span className="unit">· 1013 hPa</span>\n  <StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <StationGlyph {...OBS} size={18} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  KSFO <StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   return <StationGlyph {...OBS} summary={false} size={props.height ?? 30} />;
 }
@@ -176,6 +246,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

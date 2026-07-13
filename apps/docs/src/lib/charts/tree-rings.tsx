@@ -1,6 +1,6 @@
 import { TreeRings } from "@microcharts/react/tree-rings";
 import { TreeRings as TreeRingsInteractive } from "@microcharts/react/tree-rings/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 const YEARS = [8, 12, 10, 18, 22, 15, 20, 14];
@@ -162,6 +162,104 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "Acme", meta: "8 yr" },
+  { name: "Globex", meta: "5 yr" },
+  { name: "Initech", meta: "3 yr" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Account age{" "}
+        <span className="mc-inline">
+          <TreeRings
+            data={YEARS}
+            label="last"
+            unit="years"
+            periodWord="year"
+            size={20}
+            summary={false}
+          />
+        </span>{" "}
+        — 8 years, last year the thickest ring.
+      </p>
+    ),
+    code: "<p>\n  Account age <TreeRings data={years} /> — 8 years, last year the thickest ring.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <TreeRings
+                  data={YEARS}
+                  label="last"
+                  unit="years"
+                  periodWord="year"
+                  size={22}
+                  summary={false}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <TreeRings data={years} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Age</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">8 yr</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">account tenure</span>
+          </div>
+        </div>
+        <TreeRings
+          data={YEARS}
+          label="last"
+          unit="years"
+          periodWord="year"
+          size={48}
+          summary={false}
+        />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">8 yr</span>\n  <span className="unit">account tenure</span>\n  <TreeRings data={years} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <TreeRings
+              data={YEARS}
+              label="last"
+              unit="years"
+              periodWord="year"
+              size={18}
+              summary={false}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Acme <TreeRings data={years} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const data = props.data.length ? props.data.slice(0, 10).map((v) => Math.abs(v)) : YEARS;
   return <TreeRings data={data} summary={false} size={props.height ?? 20} />;
@@ -182,6 +280,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

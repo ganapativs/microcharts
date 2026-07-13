@@ -222,10 +222,10 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {WATCHLIST.map((t) => (
-            <tr key={t.symbol} className="border-t border-fd-border/60 first:border-0">
+            <tr key={t.symbol}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{t.symbol}</td>
               <td className="py-1.5">
                 <Ohlc data={t.sessions} summary={false} width={70} height={16} />

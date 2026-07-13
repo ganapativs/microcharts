@@ -208,10 +208,10 @@ export const contexts: ChartContexts = {
   },
   cell: {
     render: () => (
-      <table className="w-full text-sm tabular-nums">
-        <tbody>
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
           {QUESTIONS.map((row) => (
-            <tr key={row.q} className="border-t border-fd-border/60 first:border-0">
+            <tr key={row.q}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{row.q}</td>
               <td className="py-1.5">
                 <LikertStrip data={row.data} summary={false} label="net" width={120} height={16} />

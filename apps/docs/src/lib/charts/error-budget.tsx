@@ -1,6 +1,6 @@
 import { ErrorBudget } from "@microcharts/react/error-budget";
 import { ErrorBudget as ErrorBudgetInteractive } from "@microcharts/react/error-budget/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // 12 days into a 30-day SLO window, burning slightly under the steady rate
@@ -176,8 +176,78 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "checkout", meta: "34%" },
+  { name: "auth", meta: "72%" },
+  { name: "search", meta: "91%" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Checkout SLO budget{" "}
+        <span className="mc-inline">
+          <ErrorBudget data={DEMO} window={WINDOW} unit="day" height={16} summary={false} />
+        </span>{" "}
+        — 34% remaining, burn rate elevated.
+      </p>
+    ),
+    code: "<p>\n  Checkout SLO budget <ErrorBudget data={remaining} window={30} /> — 34% remaining, burn rate elevated.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <ErrorBudget data={DEMO} window={WINDOW} unit="day" height={18} summary={false} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <ErrorBudget data={remaining} window={30} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Error budget</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">34%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">remaining</span>
+          </div>
+        </div>
+        <ErrorBudget data={DEMO} window={WINDOW} unit="day" height={36} summary={false} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">34%</span>\n  <span className="unit">remaining</span>\n  <ErrorBudget data={remaining} window={30} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <ErrorBudget data={DEMO} window={WINDOW} unit="day" height={14} summary={false} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  checkout <ErrorBudget data={remaining} window={30} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
-  const norm = props.data.map((v, k, a) =>
+  const norm = (props.data.length ? props.data : DEMO).map((v, k, a) =>
     Math.max(0, 1 - k / a.length - (Math.abs(v) % 3) * 0.03),
   );
   return (
@@ -214,6 +284,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

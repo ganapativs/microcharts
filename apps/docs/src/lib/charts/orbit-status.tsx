@@ -1,6 +1,6 @@
 import { OrbitStatus } from "@microcharts/react/orbit-status";
 import { OrbitStatus as OrbitStatusInteractive } from "@microcharts/react/orbit-status/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 const LD: [number, number] = [0, 500];
@@ -182,6 +182,104 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const CTX_ROWS = [
+  { name: "payments", meta: "240ms" },
+  { name: "auth", meta: "48ms" },
+  { name: "search", meta: "890ms" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Payments API health{" "}
+        <span className="mc-inline">
+          <OrbitStatus
+            latency={240}
+            rate={12}
+            latencyDomain={LD}
+            rateDomain={RD}
+            size={20}
+            summary={false}
+          />
+        </span>{" "}
+        — 240 ms latency, 12 req/s, orbit stable.
+      </p>
+    ),
+    code: "<p>\n  Payments API health <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} /> — 240 ms latency, 12 req/s, orbit stable.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {CTX_ROWS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
+              <td className="py-1.5">
+                <OrbitStatus
+                  latency={240}
+                  rate={12}
+                  latencyDomain={LD}
+                  rateDomain={RD}
+                  size={22}
+                  summary={false}
+                />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Payments</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">240ms</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">· 12 rps</span>
+          </div>
+        </div>
+        <OrbitStatus
+          latency={240}
+          rate={12}
+          latencyDomain={LD}
+          rateDomain={RD}
+          size={48}
+          summary={false}
+        />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">240ms</span>\n  <span className="unit">· 12 rps</span>\n  <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {CTX_ROWS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name}
+            <OrbitStatus
+              latency={240}
+              rate={12}
+              latencyDomain={LD}
+              rateDomain={RD}
+              size={18}
+              summary={false}
+            />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  payments <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const latency = props.data.length ? Math.abs(props.data[0]!) % 500 : 240;
   const rate = props.data.length > 1 ? Math.abs(props.data[1]!) % 20 : 12;
@@ -221,6 +319,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;

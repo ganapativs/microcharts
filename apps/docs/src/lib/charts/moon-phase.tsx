@@ -1,6 +1,6 @@
 import { MoonPhase } from "@microcharts/react/moon-phase";
 import { MoonPhase as MoonPhaseInteractive } from "@microcharts/react/moon-phase/interactive";
-import type { ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -123,6 +123,76 @@ export const recipes: Recipe[] = [
   },
 ];
 
+const SPRINTS = [
+  { name: "Sprint 12", value: 0.68, meta: "68%" },
+  { name: "Sprint 11", value: 1, meta: "100%" },
+  { name: "Sprint 10", value: 0.82, meta: "82%" },
+];
+
+export const contexts: ChartContexts = {
+  sentence: {
+    render: () => (
+      <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
+        Sprint progress{" "}
+        <span className="mc-inline">
+          <MoonPhase value={0.68} summary={false} size={16} />
+        </span>{" "}
+        — 68% through, waxing past half.
+      </p>
+    ),
+    code: "<p>\n  Sprint progress <MoonPhase value={0.68} /> — 68% through, waxing past half.\n</p>",
+  },
+  cell: {
+    render: () => (
+      <table className="mc-inline-table w-full text-sm tabular-nums">
+        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-fd-border/60">
+          {SPRINTS.map((row) => (
+            <tr key={row.name}>
+              <td className="py-1.5 pr-3 text-fd-muted-foreground">{row.name}</td>
+              <td className="py-1.5">
+                <MoonPhase value={row.value} summary={false} size={16} />
+              </td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    code: "<td>\n  <MoonPhase value={0.68} />\n</td>",
+  },
+  kpi: {
+    render: () => (
+      <>
+        <div>
+          <div className="text-fd-muted-foreground text-xs">Sprint</div>
+          <div className="flex items-end gap-2">
+            <span className="display text-3xl tabular-nums">68%</span>
+            <span className="mb-1 text-fd-muted-foreground text-xs">complete</span>
+          </div>
+        </div>
+        <MoonPhase value={0.68} summary={false} size={36} />
+      </>
+    ),
+    code: '<div className="kpi">\n  <span className="figure">68%</span>\n  <MoonPhase value={0.68} />\n</div>',
+  },
+  tab: {
+    render: () => (
+      <div className="flex flex-wrap gap-1.5">
+        {SPRINTS.map((row, i) => (
+          <span
+            key={row.name}
+            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+          >
+            {row.name.replace("Sprint ", "S")}
+            <MoonPhase value={row.value} summary={false} size={14} />
+          </span>
+        ))}
+      </div>
+    ),
+    code: '<button className="tab">\n  Sprint 12 <MoonPhase value={0.68} />\n</button>',
+  },
+};
+
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   const v = props.data.length ? (Math.abs(props.data[0]!) % 100) / 100 : 0.68;
   return <MoonPhase value={v} summary={false} size={props.height ?? 16} />;
@@ -149,6 +219,7 @@ export default {
   showcase,
   playground,
   recipes,
+  contexts,
   Mark,
   markCode,
 } satisfies ChartModule;
