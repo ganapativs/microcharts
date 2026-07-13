@@ -229,6 +229,12 @@ export default defineConfig({
   dts: true,
   clean: true,
   treeshake: true,
+  // Ship a minified runtime: smaller npm tarball, and correct bytes for
+  // consumers that import the ESM directly (Deno, CDN, no bundler). Bundling
+  // consumers re-minify anyway; the per-subpath size gate already measures a
+  // minified+gzipped build via @size-limit/preset-small-lib, so the published
+  // per-chart kB figures are unaffected.
+  minify: true,
   platform: "neutral",
   outDir: "dist",
 });

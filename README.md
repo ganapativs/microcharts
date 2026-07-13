@@ -35,7 +35,7 @@ human to use.
   JavaScript**. Interactivity is a separate opt-in `/interactive` import.
 - **Accessible by default.** Every chart is an `img` with a natural-language summary built from
   your data — nothing to remember, nothing to drift. → [Accessibility](https://microcharts.dev/docs/accessibility)
-- **Tiny + honest.** **0.92–3.62 kB gzip** per chart (median 2.28; 26 of 106 under 2 kB),
+- **Tiny + honest.** **0.91–3.61 kB gzip** per chart (median 2.28; 26 of 106 under 2 kB),
   budget-gated in CI. Every type has one documented, honest encoding channel. Delight never lies.
 
 ## Install
