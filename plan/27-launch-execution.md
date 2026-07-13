@@ -54,12 +54,29 @@ harmless, but not ideal for a launch-day first impression.
 ## 2 · Deploy the docs site
 
 The site is a **Next 16 static export** (`output: 'export'` → `apps/docs/out/`) served by
-**Cloudflare Workers Static Assets**. Config already exists: `apps/docs/wrangler.jsonc`
-(name `microcharts-docs`, serves `./out`).
+**Cloudflare Workers Static Assets**. Config: `apps/docs/wrangler.jsonc` (name `microcharts`,
+serves `./out`).
 
-### Build must see the library first
+### Option A — git-connected Workers Builds (what's set up)
 
-The docs consume `@microcharts/react` from `dist/`, so build the library before the docs:
+The repo is connected to a Cloudflare Worker (`microcharts`) for automatic builds on push. It's a
+**monorepo**, so the build must build the library (`@microcharts/react` → `dist/`) **before** the
+docs `next build` — CF's default single-command build does not, which is why the first build
+failed. Dashboard → Workers & Pages → `microcharts` → Settings → Build:
+
+| Setting | Value |
+| --- | --- |
+| Root directory | `/` (repo root — so pnpm installs the whole workspace and reads root `.node-version`) |
+| Build command | `pnpm build:site` (root script: builds the library, then the docs) |
+| Deploy command | `pnpm --filter @microcharts/docs exec wrangler deploy` (runs in `apps/docs`, finds `wrangler.jsonc`, serves `out/`) |
+| Node version | 24 (auto from `.node-version`; a `NODE_VERSION=24` build var also works) |
+| Production branch | a branch that has these fixes — merge `chore/launch-prep` → `main`, or point CF at the branch |
+
+`build:site` = `pnpm --filter @microcharts/react build && pnpm --filter @microcharts/docs build`.
+The Worker-name warning clears once the deployed `wrangler.jsonc` says `microcharts` (fixed on
+`chore/launch-prep`; `main` still has the old `microcharts-docs`).
+
+### Option B — deploy from your machine (no git connection)
 
 ```bash
 pnpm build                                   # build the library (repo root)
@@ -67,7 +84,7 @@ pnpm --filter @microcharts/docs cf:deploy    # builds docs (out/) + wrangler dep
 ```
 
 `cf:deploy` = `pnpm build && wrangler deploy`. First `wrangler` run opens a browser to
-authenticate to your Cloudflare account. This publishes to the `*.workers.dev` preview URL.
+authenticate. Publishes to the `*.workers.dev` preview URL.
 
 ### Set the production origin
 
