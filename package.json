@@ -909,6 +909,7 @@
   },
   "scripts": {
     "build": "tsdown && node scripts/gen-style-splits.mjs",
+    "build:site": "pnpm --filter @microcharts/react build && pnpm --filter @microcharts/docs build",
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
