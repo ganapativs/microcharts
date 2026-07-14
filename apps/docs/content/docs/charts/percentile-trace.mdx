@@ -4,7 +4,7 @@ description: A percentile-rank chart for React — one entity's standing traced 
 ---
 
 PercentileTrace answers "is this entity's standing rising or slipping inside the pack?". It
-traces one **percentile rank** over time on a scale **locked to 0–100**. Because the axis *is*
+traces one **percentile rank** over time on a scale **locked to 0–100**. Because the axis _is_
 rank, the population is constant by definition — the middle-half (**p25–75**) and near-full
 (**p5–95**) bands are fixed fields, not estimates — so the only line on the chart is the entity
 itself, drifting through a known landscape.
@@ -73,7 +73,7 @@ itself, drifting through a known landscape.
 </LiveDemo>
 
 The endpoint dot carries **valence**: by default a rising standing is good, so it turns
-positive; set `positive="down"` when slipping *down* the pack is the win (a support ticket's
+positive; set `positive="down"` when slipping _down_ the pack is the win (a support ticket's
 backlog rank, say). The line already encodes the direction, so the color is only a redundant
 cue — never the sole signal.
 
@@ -105,13 +105,7 @@ cue — never the sole signal.
   code={`// ranks are 0–100 — values outside are clamped (and dev-warn once)
 <PercentileTrace data={[102, 88, 96]} unit="week" />`}
 >
-  <PercentileTrace
-    data={[102, 88, 96]}
-    unit="week"
-    title="Clamped ranks"
-    width={180}
-    height={26}
-  />
+  <PercentileTrace data={[102, 88, 96]} unit="week" title="Clamped ranks" width={180} height={26} />
 </LiveDemo>
 
 <LiveDemo
@@ -147,7 +141,7 @@ comma.
 
 ## Why this default
 
-The full 0–100 axis with fixed bands, because a percentile is a standing *within a population*
+The full 0–100 axis with fixed bands, because a percentile is a standing _within a population_
 — truncating the axis would hide how much headroom or floor is left, and re-estimating the
 bands from the single traced series would be a fiction. The middle-half and near-full fields
 are exact by construction, so the chart shows one honest line over a landscape you can trust,

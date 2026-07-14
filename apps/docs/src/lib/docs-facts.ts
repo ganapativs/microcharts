@@ -54,8 +54,23 @@ export const SIZE = {
     .sort((a, b) => b.kB - a.kB),
 } as const;
 
-/** The five charts the guides use as worked examples (import-path + size tables). */
-export const FLAGSHIP = ["sparkline", "sparkbar", "delta", "bullet", "activity-grid"] as const;
+// The size table anchors to the whole catalog, not a hand-picked few: the
+// smallest, the median, and the largest measured static chart. Derived, so it
+// can never drift into a cherry-picked subset.
+const sized = STABLE_CHARTS.map((c) => ({
+  slug: c.slug,
+  name: c.name,
+  kB: CHART_GZIP[c.slug]?.static,
+}))
+  .filter((c): c is { slug: string; name: string; kB: number } => typeof c.kB === "number")
+  .sort((a, b) => a.kB - b.kB);
+
+/** Smallest / median / largest static chart — the size span across all N charts. */
+export const SIZE_SPAN = [
+  { ...sized[0]!, role: "smallest" },
+  { ...sized[Math.floor(sized.length / 2)]!, role: "median" },
+  { ...sized[sized.length - 1]!, role: "largest" },
+] as const;
 
 export function sizeRow(slug: string) {
   const c = CHART_GZIP[slug];

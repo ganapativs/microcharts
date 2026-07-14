@@ -54,7 +54,9 @@ import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annot
 
 <LiveDemo
   label="celebrate — a milestone crossing"
-  sampleData={[{ name: "signups", code: "const signups = [3, 4, 5, 5, 6, 8, 9, 11, 12, 14, 15, 17];" }]}
+  sampleData={[
+    { name: "signups", code: "const signups = [3, 4, 5, 5, 6, 8, 9, 11, 12, 14, 15, 17];" },
+  ]}
   code={`<Sparkline data={signups} width={160} height={36}>
   <Marker x={9} celebrate label="10k!" />
 </Sparkline>`}
@@ -71,7 +73,9 @@ import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annot
 
 <LiveDemo
   label="callout — one narrated point"
-  sampleData={[{ name: "latency", code: "const latency = [48, 52, 45, 58, 51, 47, 55, 49, 51, 46];" }]}
+  sampleData={[
+    { name: "latency", code: "const latency = [48, 52, 45, 58, 51, 47, 55, 49, 51, 46];" },
+  ]}
   code={`<Sparkline data={latency} width={160} height={40}>
   <Callout x={3} y={58} label="cache miss" />
 </Sparkline>`}

@@ -8,11 +8,13 @@ cycle becomes a radial bar at its fixed angle, growing outward from an inner bas
 busier times. Midnight (or your week-start) sits at 12 o'clock and the cycle runs clockwise, so the
 rhythm of a metric across the cycle is immediately legible.
 
-<LiveDemo
-  label="PolarClock"
-  sizeOf="polar-clock"
->
-  <PolarClock data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h))} now={14} title="Traffic by hour" size={72} />
+<LiveDemo label="PolarClock" sizeOf="polar-clock">
+  <PolarClock
+    data={Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h))}
+    now={14}
+    title="Traffic by hour"
+    size={72}
+  />
 </LiveDemo>
 
 ## Install

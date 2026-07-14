@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CATALOG, SIZE, BENCH, STATIC_SIZES } from "./docs-facts";
+import { CATALOG, SIZE, SIZE_SPAN, BENCH, STATIC_SIZES } from "./docs-facts";
 import { STABLE_CHARTS } from "./charts/registry";
 import { CHART_GZIP } from "./stats";
 
@@ -24,6 +24,24 @@ describe("docs-facts derivations", () => {
       expect(CHART_GZIP[c.slug]?.static).toBe(c.kB);
       expect(c.kB).toBeGreaterThan(3);
     }
+  });
+
+  // performance.mdx prose names these explicitly ("Just one chart sits above the
+  // 3 kB reference line — Sparkline — with Station Glyph … landing right on it").
+  // If the measured sizes shift, the prose is stale — fail here so it gets revisited.
+  it("matches the performance.mdx claim about the 3 kB line", () => {
+    expect(SIZE.over3).toHaveLength(1);
+    expect(SIZE.over3[0]?.slug).toBe("sparkline");
+    expect(CHART_GZIP["station-glyph"]?.static).toBe(3);
+  });
+
+  // The perf-page size table shows the catalog span, not a hand-picked few.
+  it("size span is the real smallest / median / largest, drawn from every chart", () => {
+    expect(SIZE_SPAN.map((s) => s.role)).toEqual(["smallest", "median", "largest"]);
+    expect(SIZE_SPAN[0].kB).toBe(SIZE.min);
+    expect(SIZE_SPAN[2].kB).toBe(SIZE.max);
+    // median row is the middle of all measured sizes, so the table spans the set
+    expect(SIZE_SPAN[1].kB).toBe(SIZE.median);
   });
 
   it("bench summary covers every stable chart and the scaling scenarios", () => {

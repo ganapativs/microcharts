@@ -51,6 +51,12 @@ export const entry: ChartEntry = {
       description: "Latency extent (insist on it — a lone radius is meaningless).",
     },
     {
+      name: "rateDomain",
+      type: "[number, number]",
+      required: false,
+      description: "Rate extent (default [0, 2·rate]).",
+    },
+    {
       name: "alert",
       type: "number",
       required: false,

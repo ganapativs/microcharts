@@ -32,11 +32,11 @@ The single most common accessibility bug in charting is a broken summary for emp
 flat data. microcharts produces an honest short form instead — every string below is the
 literal output of `describeSeries`:
 
-| Data                | Accessible summary  |
-| ------------------- | ------------------- |
-| `[]` / all-null     | `No data.`          |
-| `[7]`               | `Single value 7.`   |
-| `[5, 5, 5, 5]`      | `Flat at 5.`        |
+| Data                 | Accessible summary                               |
+| -------------------- | ------------------------------------------------ |
+| `[]` / all-null      | `No data.`                                       |
+| `[7]`                | `Single value 7.`                                |
+| `[5, 5, 5, 5]`       | `Flat at 5.`                                     |
 | `[9, 7, 8, 4, 5, 2]` | `Trending down 78%. Range 2 to 9. Last value 2.` |
 
 ## Every chart is an `img`
@@ -97,9 +97,15 @@ Nothing about a chart is hard-coded to English or to left-to-right layout.
   <Sparkline data={data} locale="de-DE" format={{ style: "currency", currency: "EUR" }} />
   ```
 
-- **Localized words.** The summary templates are a swappable contract (`SummaryStrings`; English
-  ships as the default). Provide translated templates via the interactive `strings` prop, or
-  override the whole sentence with a `summary` string, and the announcement speaks your language.
+  See [Formatting & scale](/docs/formatting) for the full `format` / `locale` story, including the
+  exported `makeFormatter` helper for matching your prose numbers to a chart's.
+
+- **Localized words.** The summary templates are a swappable contract (`SummaryStrings`; the
+  English set ships as the exported `EN` dictionary). Spread `EN` and override the keys you're
+  translating, then pass the result via the interactive `strings` prop — or override the whole
+  sentence with a `summary` string — and the announcement speaks your language. The generator
+  itself is exported too: `import { describeSeries } from "@microcharts/react"` returns the exact
+  sentence for a series, handy for tests, tooltips, or feeding a model.
 
 - **RTL layouts.** A chart is direction-neutral SVG with a localized text name, so it drops into
   an RTL document without breaking — it's an `img`, not a run of text. Time-ordered charts keep

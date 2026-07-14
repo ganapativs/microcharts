@@ -7,10 +7,7 @@ LikertStrip answers "does the response lean agree or disagree — and how hard?"
 valence + balance read that SegmentedBar (unvalenced composition) cannot say. The center
 line is the question; everything else is the answer.
 
-<LiveDemo
-  label="LikertStrip"
-  sizeOf="likert-strip"
->
+<LiveDemo label="LikertStrip" sizeOf="likert-strip">
   <LikertStrip
     data={[
       { label: "Strongly disagree", value: 10 },
@@ -20,7 +17,8 @@ line is the question; everything else is the answer.
       { label: "Strongly agree", value: 28 },
     ]}
     title="Q1 satisfaction"
-    width={220} height={24}
+    width={220}
+    height={24}
   />
 </LiveDemo>
 

@@ -10,14 +10,19 @@ the faint band is the limits of agreement. Dots render at 75% opacity so overplo
 density, and pairs beyond the limits are enlarged and re-inked so outliers read on shape,
 not color alone.
 
-<LiveDemo
-  label="BiasStrip"
-  sizeOf="bias-strip"
->
+<LiveDemo label="BiasStrip" sizeOf="bias-strip">
   <span className="text-lg">
     {"Device and reference "}
     <BiasStrip
-      data={Array.from({ length: 20 }, (_, i) => ({ a: i + [1.8,2.4,1.5,2.9,2.1,1.2,2.6,3.0,1.9,2.3,6.5,2.0,1.7,2.8,2.2,-1.5,2.5,1.6,2.7,2.0][i], b: i }))}
+      data={Array.from({ length: 20 }, (_, i) => ({
+        a:
+          i +
+          [
+            1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5,
+            1.6, 2.7, 2.0,
+          ][i],
+        b: i,
+      }))}
       title="Device vs reference"
       style={{ width: "3.4em", height: "1.9em" }}
     />
@@ -54,7 +59,15 @@ difference, so a bias jumps off the zero line where a scatter would hide it on t
 <BiasStrip data={pairs} limits={2.58} />`}
 >
   <BiasStrip
-    data={Array.from({ length: 20 }, (_, i) => ({ a: i + [1.8,2.4,1.5,2.9,2.1,1.2,2.6,3.0,1.9,2.3,6.5,2.0,1.7,2.8,2.2,-1.5,2.5,1.6,2.7,2.0][i], b: i }))}
+    data={Array.from({ length: 20 }, (_, i) => ({
+      a:
+        i +
+        [
+          1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6,
+          2.7, 2.0,
+        ][i],
+      b: i,
+    }))}
     limits={2.58}
     title="99% limits"
     style={{ width: 150, height: 84 }}
@@ -63,7 +76,15 @@ difference, so a bias jumps off the zero line where a scatter would hide it on t
 
 <LiveDemo label="no caption" code={`<BiasStrip data={pairs} label="none" />`}>
   <BiasStrip
-    data={Array.from({ length: 20 }, (_, i) => ({ a: i + [1.8,2.4,1.5,2.9,2.1,1.2,2.6,3.0,1.9,2.3,6.5,2.0,1.7,2.8,2.2,-1.5,2.5,1.6,2.7,2.0][i], b: i }))}
+    data={Array.from({ length: 20 }, (_, i) => ({
+      a:
+        i +
+        [
+          1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6,
+          2.7, 2.0,
+        ][i],
+      b: i,
+    }))}
     label="none"
     title="No caption"
     style={{ width: 150, height: 84 }}
@@ -72,7 +93,15 @@ difference, so a bias jumps off the zero line where a scatter would hide it on t
 
 <LiveDemo label="bigger dots" code={`<BiasStrip data={pairs} r={2.5} />`}>
   <BiasStrip
-    data={Array.from({ length: 20 }, (_, i) => ({ a: i + [1.8,2.4,1.5,2.9,2.1,1.2,2.6,3.0,1.9,2.3,6.5,2.0,1.7,2.8,2.2,-1.5,2.5,1.6,2.7,2.0][i], b: i }))}
+    data={Array.from({ length: 20 }, (_, i) => ({
+      a:
+        i +
+        [
+          1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6,
+          2.7, 2.0,
+        ][i],
+      b: i,
+    }))}
     r={2.5}
     title="Bigger dots"
     style={{ width: 150, height: 84 }}

@@ -7,10 +7,7 @@ SegmentedBar answers "what is this made of, and in what proportions?". Segments 
 sum to the full bar; past `maxSegments` the tail rolls into a labeled "Other" — nothing
 is silently dropped. A flat bar beats a donut of the same data at every size we ship.
 
-<LiveDemo
-  label="SegmentedBar"
-  sizeOf="segmented-bar"
->
+<LiveDemo label="SegmentedBar" sizeOf="segmented-bar">
   <SegmentedBar
     data={[
       { label: "Chrome", value: 620 },
@@ -20,7 +17,8 @@ is silently dropped. A flat bar beats a donut of the same data at every size we 
       { label: "Arc", value: 20 },
     ]}
     title="Browser share"
-    width={220} height={20}
+    width={220}
+    height={20}
   />
 </LiveDemo>
 

@@ -8,15 +8,16 @@ graded by opacity, with a median tick. It is **never** a bar from zero — a bar
 error bar induces edge-literalism bias, so this form exists precisely to avoid it. Opacity
 maps to probability level and nothing else.
 
-<LiveDemo
-  label="GradedBand"
-  sizeOf="graded-band"
->
+<LiveDemo label="GradedBand" sizeOf="graded-band">
   <GradedBand
-    data={Array.from({ length: 160 }, (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)))}
+    data={Array.from(
+      { length: 160 },
+      (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
+    )}
     label="median"
     title="Forecast estimate"
-    width={240} height={16}
+    width={240}
+    height={16}
   />
 </LiveDemo>
 

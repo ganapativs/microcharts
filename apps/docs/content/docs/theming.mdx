@@ -3,9 +3,10 @@ title: Theming
 description: Theme microcharts with ~20 CSS custom properties and named presets — override a token at any scope, switch presets with a data attribute, keep semantic colors meaning what they say, and get hand-tuned dark mode and forced-colors support for free.
 ---
 
-microcharts theming is CSS custom properties, all the way down. There's no theme provider to
-wire up and no Tailwind requirement — set a `--mc-*` variable at any scope and every chart
-inside it retunes, with zero re-render and no build step.
+microcharts theming is CSS custom properties, all the way down. There's no theme provider you
+_have_ to wire up and no Tailwind requirement — set a `--mc-*` variable at any scope and every
+chart inside it retunes, with zero re-render and no build step. (Prefer a React component to a
+raw attribute? [`MicroProvider`](#a-component-api-if-you-prefer) wraps the same contract.)
 
 ## Override a token
 
@@ -48,7 +49,7 @@ lower and only that subtree changes.
 <html style={{ "--mc-accent": "var(--brand-500)" }}>
 
 // just this card's charts
-<div style={{ "--mc-stroke-width": 2, "--mc-radius": 3 }}>
+<div style={{ "--mc-stroke-width": 2, "--mc-gap": "0.15em" }}>
   <SparkBar data={weekly} />
 </div>
 ```
@@ -83,10 +84,29 @@ JavaScript. They change how charts _look_, never what the data _means_.
 </LiveDemo>
 
 <Callout type="info">
-  This site's appearance menu (the palette icon in the nav) previews these presets and accents
-  live — every chart on every page retunes as you switch, because it's the same token contract
-  you'd use in your own app.
+  This site's appearance menu (the palette icon in the nav) previews these presets and accents live
+  — every chart on every page retunes as you switch, because it's the same token contract you'd use
+  in your own app.
 </Callout>
+
+## A component API, if you prefer
+
+Everything above works through plain attributes and CSS variables — but if you'd rather set the
+theme in JSX, `MicroProvider` wraps the same contract in a component. It's hook-free and
+RSC-safe, so it works in Server Components too.
+
+```tsx
+import { MicroProvider } from "@microcharts/react";
+
+<MicroProvider theme="editorial" tokens={{ "--mc-accent": "var(--brand-500)" }}>
+  <Sparkline data={data} />
+</MicroProvider>;
+```
+
+It renders a single `<div>` that sets `data-mc-theme` (the preset) plus any `tokens` as inline
+`--mc-*` custom properties — identical to writing them by hand. `theme` takes any preset
+(`modern`, `editorial`, `mono`, `vivid`, `dark`); `tokens` takes any `--mc-*` overrides. Reach
+for whichever reads better in your code — it's the same cascade underneath.
 
 ## The token set
 
@@ -135,6 +155,9 @@ it exists:
   /* Direct-label text size, relative to the chart's font. */
   --mc-label-size: 0.75em;
 
+  /* Baseline nudge for `.mc-inline` marks beside text; tune per font. */
+  --mc-inline-nudge: -0.14em;
+
   /* Motion & type */
 
   /* Entrance timing for interactive entries; static charts never animate. */
@@ -152,6 +175,27 @@ it exists:
   --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);
 }
 ```
+
+## The font
+
+`--mc-font` defaults to `inherit`, so charts adopt the font of whatever contains them and read as
+part of your interface. That means the rule is really about your page, not the library: if the
+surrounding page sets a `font-family`, charts follow it for free. If it doesn't — as in some
+minimal starters and code sandboxes — SVG text falls back to the browser default (usually a
+serif), and labels come out looking wrong.
+
+Two fixes, either works: give your page a font the normal way, or font the charts directly by
+pointing `--mc-font` at a stack.
+
+```css
+:root {
+  /* charts only — the rest of the page is untouched */
+  --mc-font: system-ui, sans-serif;
+}
+```
+
+Numbers always render with `tabular-nums` regardless, so columns of figures stay aligned in any
+font.
 
 ## Semantic vs categorical color
 

@@ -55,6 +55,12 @@ export const entry: ChartEntry = {
       description: "Visible scale extent; fixed while live.",
     },
     {
+      name: "rateTiers",
+      type: "[number, number]",
+      required: false,
+      description: "Thresholds for 1 and 2 chevrons (default [span/60, span/15]).",
+    },
+    {
       name: "orientation",
       type: '"vertical" | "horizontal"',
       required: false,

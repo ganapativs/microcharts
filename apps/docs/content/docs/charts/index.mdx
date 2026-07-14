@@ -22,11 +22,7 @@ exactly that way: start from the question, land on the chart.
 
 ## Static and interactive
 
-Each chart ships two entries. The **static** one is hook-free and server-component
-safe — zero client JavaScript, the default. The **interactive** one adds hover,
-keyboard navigation, and live announcements. Import whichever the context needs.
-
-```tsx
-import { Sparkline } from "@microcharts/react/sparkline"; //             static, RSC-safe
-import { Sparkline } from "@microcharts/react/sparkline/interactive"; // hover + keyboard
-```
+Each chart ships two entries — a hook-free **static** default (server-component safe,
+zero client JavaScript) and an **interactive** twin from a `/interactive` subpath. Every
+chart page lists both import paths; the [Quickstart](/docs/quickstart#add-interactivity)
+covers when to reach for which.

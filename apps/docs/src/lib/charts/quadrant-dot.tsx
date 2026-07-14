@@ -59,6 +59,18 @@ export const entry: ChartEntry = {
       description: "The peer set — omit for a lone glyph.",
     },
     {
+      name: "xDomain",
+      type: "[number, number]",
+      required: false,
+      description: "The x-axis range (default: derived from the data); domain stays the y-axis.",
+    },
+    {
+      name: "domain",
+      type: "[number, number]",
+      required: false,
+      description: "The y-axis range (default: derived from the data).",
+    },
+    {
       name: "split",
       type: "[number, number]",
       required: false,
@@ -75,6 +87,12 @@ export const entry: ChartEntry = {
       type: "string",
       required: false,
       description: "Axis nouns for the summary — pass them, the axes are unlabeled at glyph size.",
+    },
+    {
+      name: "region",
+      type: "boolean",
+      required: false,
+      description: "Faint tint on the focal's quadrant (default true; false for dense grids).",
     },
   ],
   demo: FIELD.map((p) => p.y - p.x),

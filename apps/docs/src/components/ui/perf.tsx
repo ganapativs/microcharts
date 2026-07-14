@@ -1,62 +1,53 @@
-import { HistogramStrip } from "@microcharts/react/histogram-strip";
-import { CATALOG, SIZE, BENCH, FLAGSHIP, STATIC_SIZES, sizeRow } from "@/lib/docs-facts";
+import { SizeFootprintCard } from "@/components/home/size-footprint-card";
+import { CATALOG, SIZE, BENCH, SIZE_SPAN, sizeRow } from "@/lib/docs-facts";
 import { getChart } from "@/lib/catalog";
 
 /** Perf-page figures from measured `docs-facts` (build + bench). */
 
-// ── Size distribution — the library charting its own gzip footprint ──────────
+// ── Size distribution — same interactive footprint as the home page ──────────
 export function SizeDistribution() {
   return (
-    <figure className="not-prose my-6 panel overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-hairline px-4 py-2.5">
-        <span className="mono-label">static gzip · {SIZE.count} charts</span>
-        <span className="mono-label whitespace-nowrap opacity-70">
-          {SIZE.min}–{SIZE.max} kB · median {SIZE.median} kB
-        </span>
-      </div>
-      <div className="flex items-center justify-center px-6 py-8">
-        <HistogramStrip
-          data={STATIC_SIZES}
-          markValue={3}
-          width={340}
-          height={72}
-          format={{ maximumFractionDigits: 1, style: "unit", unit: "kilobyte" }}
-          title={`Static gzip size of all ${SIZE.count} charts`}
-        />
-      </div>
-      <figcaption className="border-t border-hairline px-4 py-2.5 text-[0.82rem] leading-relaxed text-fd-muted-foreground">
-        {SIZE.under2} of {SIZE.count} charts ship under 2 kB; {SIZE.under3} under 3 kB. The two
-        above the line —{" "}
-        {SIZE.over3.map((c, i) => (
-          <span key={c.slug}>
-            {i > 0 && ", "}
-            <span className="text-fd-foreground">{c.name}</span> ({c.kB} kB)
-          </span>
-        ))}{" "}
-        — carry the most geometry. The mark sits at the 3 kB reference.
-      </figcaption>
+    <figure className="not-prose my-6">
+      <SizeFootprintCard />
+      {SIZE.over3.length > 0 ? (
+        <figcaption className="mt-3 text-[0.82rem] leading-relaxed text-fd-muted-foreground">
+          {SIZE.under2} of {SIZE.count} charts ship under 2 kB; {SIZE.under3} under 3 kB. Above the
+          3 kB mark —{" "}
+          {SIZE.over3.map((c, i) => (
+            <span key={c.slug}>
+              {i > 0 && ", "}
+              <span className="text-fd-foreground">{c.name}</span> ({c.kB} kB)
+            </span>
+          ))}
+          .
+        </figcaption>
+      ) : null}
     </figure>
   );
 }
 
-// ── Flagship size table — static / interactive per subpath ───────────────────
+// ── Size span — smallest / median / largest across the whole catalog ─────────
 export function SizeTable() {
   return (
     <div className="not-prose my-6 overflow-x-auto">
       <table className="w-full text-sm tabular-nums">
         <thead>
           <tr className="border-b border-hairline text-left">
+            <th className="py-2 pr-4 font-medium text-fd-muted-foreground">
+              Across all {SIZE.count} charts
+            </th>
             <th className="py-2 pr-4 font-medium text-fd-muted-foreground">Chart</th>
             <th className="py-2 pr-4 font-medium text-fd-muted-foreground">Static</th>
             <th className="py-2 font-medium text-fd-muted-foreground">Interactive</th>
           </tr>
         </thead>
         <tbody>
-          {FLAGSHIP.map((slug) => {
+          {SIZE_SPAN.map(({ slug, role }) => {
             const r = sizeRow(slug);
             const name = getChart(slug)?.name ?? slug;
             return (
               <tr key={slug} className="border-b border-hairline/50 last:border-0">
+                <td className="py-2 pr-4 text-fd-muted-foreground">{role}</td>
                 <td className="py-2 pr-4 text-fd-foreground">{name}</td>
                 <td className="py-2 pr-4">{r.static?.toFixed(2)} kB</td>
                 <td className="py-2">{r.interactive?.toFixed(2)} kB</td>

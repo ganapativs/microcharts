@@ -9,11 +9,13 @@ at the right edge, so the rate you see **is** the event rate. Every spike is one
 synthesized pulse on a timer — and an empty, flat baseline is the down signal, carried by shape, not
 color.
 
-<LiveDemo
-  label="HeartbeatBlip"
-  sizeOf="heartbeat-blip"
->
-  <HeartbeatBlip events={[97000, 92000, 85000, 70000, 55000, 48000]} now={100000} title="Requests" width={90} />
+<LiveDemo label="HeartbeatBlip" sizeOf="heartbeat-blip">
+  <HeartbeatBlip
+    events={[97000, 92000, 85000, 70000, 55000, 48000]}
+    now={100000}
+    title="Requests"
+    width={90}
+  />
 </LiveDemo>
 
 ## Install

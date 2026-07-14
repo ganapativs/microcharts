@@ -61,6 +61,12 @@ export const entry: ChartEntry = {
       description: "The landing reference the cone must clear (adds a clearance clause).",
     },
     {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: 'Period noun for the summary (default "week").',
+    },
+    {
       name: "label",
       type: '"landing" | "none"',
       required: false,

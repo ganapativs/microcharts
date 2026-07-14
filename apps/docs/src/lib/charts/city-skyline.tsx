@@ -57,6 +57,18 @@ export const entry: ChartEntry = {
       required: false,
       description: "Numeral above each building.",
     },
+    {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: "Category noun for the summary (default 'groups').",
+    },
+    {
+      name: "bw",
+      type: "number",
+      required: false,
+      description: "Building width in viewBox units (default 9).",
+    },
   ],
   demo: [46, 32, 28, 40, 18],
   example: {

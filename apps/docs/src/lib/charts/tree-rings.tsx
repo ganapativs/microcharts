@@ -47,6 +47,18 @@ export const entry: ChartEntry = {
       required: false,
       description: "Boundary rings (default) or filled annuli.",
     },
+    {
+      name: "periodWord",
+      type: "string",
+      required: false,
+      description: 'Singular period noun for the summary (default "period").',
+    },
+    {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: 'Plural period noun for the summary (default "periods").',
+    },
   ],
   demo: YEARS,
   example: {

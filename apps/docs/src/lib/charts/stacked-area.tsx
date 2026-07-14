@@ -50,6 +50,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Endpoint share labels per series (deterministic drop-out).",
     },
+    {
+      name: "curve",
+      type: '"linear" | "smooth" | "step"',
+      required: false,
+      description: "Line interpolation (default linear); ridge forces smooth.",
+    },
   ],
   demo: MIX[0].values,
   example: {

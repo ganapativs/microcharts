@@ -30,11 +30,16 @@ describe("docs guide claims stay true", () => {
   }
 
   it("the catalog count quoted in prose matches the registry", () => {
-    // Every "<N> chart types" claim in the guides must be the real total.
-    const claim = /\b(\d+)\s+chart types\b/g;
+    // Catalog-relative counts must stay derived, in every phrasing the guides use:
+    //   "N chart types" / "N types"  → the total
+    //   "the other N"                → total minus the one you imported
+    // (2–3 digit only, so small unrelated numbers like "two types" don't match.)
     for (const { f, src } of guides) {
-      for (const m of src.matchAll(claim)) {
+      for (const m of src.matchAll(/\b(\d{2,3})\s+(?:chart )?types\b/g)) {
         expect(Number(m[1]), `${f} quotes "${m[0]}"`).toBe(CATALOG.total);
+      }
+      for (const m of src.matchAll(/\bthe other (\d{2,3})\b/g)) {
+        expect(Number(m[1]), `${f} quotes "${m[0]}"`).toBe(CATALOG.total - 1);
       }
     }
   });

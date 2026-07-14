@@ -55,6 +55,12 @@ export const entry: ChartEntry = {
       description: "Locale start-of-week (default Monday).",
     },
     {
+      name: "steps",
+      type: "number",
+      required: false,
+      description: "Intensity steps including the zero track (default 5).",
+    },
+    {
       name: "shape",
       type: '"square" | "round" | "dot"',
       required: false,

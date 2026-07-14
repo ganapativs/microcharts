@@ -35,6 +35,12 @@ export const entry: ChartEntry = {
       description: '"3 in 20" (default) reads better than "15%" for lay audiences.',
     },
     {
+      name: "shape",
+      type: '"square" | "round" | "dot"',
+      required: false,
+      description: "Shared cell vocabulary (default square).",
+    },
+    {
       name: "positive",
       type: '"up" | "down"',
       required: false,

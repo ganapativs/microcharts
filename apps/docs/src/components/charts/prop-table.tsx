@@ -33,5 +33,22 @@ export function PropTable({ slug }: { slug: string }) {
     });
   }
 
-  return <PropTableView rows={rows} />;
+  return (
+    <>
+      <PropTableView rows={rows} />
+      <p className="-mt-3 text-sm text-fd-muted-foreground">
+        Plus the shared grammar — <code className="text-xs">data</code>,{" "}
+        <code className="text-xs">domain</code>, <code className="text-xs">color</code>,{" "}
+        <code className="text-xs">title</code>, <code className="text-xs">summary</code>,{" "}
+        <code className="text-xs">format</code> — and the layout props (
+        <code className="text-xs">width</code>, <code className="text-xs">height</code>,{" "}
+        <code className="text-xs">className</code>, <code className="text-xs">style</code>) that
+        every chart accepts. See{" "}
+        <a href="/docs/quickstart#the-shared-grammar" className="underline">
+          the shared grammar
+        </a>
+        .
+      </p>
+    </>
+  );
 }

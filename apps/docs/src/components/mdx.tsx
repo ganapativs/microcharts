@@ -130,6 +130,7 @@ import { GrammarExplorer, AgentCheatSheet } from "@/components/charts/ai-guide";
 import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
 import { CatalogStrip } from "@/components/charts/catalog-strip";
 import { Snippet } from "@/components/ui/snippet";
+import { AgentPromptCopy } from "@/components/ui/agent-prompt-copy";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { Accordions, Accordion } from "fumadocs-ui/components/accordion";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
@@ -291,6 +292,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ProviderWall,
     SurfaceCards,
     Snippet,
+    AgentPromptCopy,
     DynamicCodeBlock,
     Accordions,
     Accordion,

@@ -64,6 +64,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "'totals' prints a +added / −removed footer.",
     },
+    {
+      name: "max",
+      type: "number",
+      required: false,
+      description: "Row cap (default 12); rows beyond it are dropped with a dev warning.",
+    },
   ],
   demo: DIFF.map((d) => d.added - d.removed),
   example: {

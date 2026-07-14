@@ -9,11 +9,21 @@ taller always means further along and the ordering reads without the legend. The
 and there are exactly four; there are no half-stages, because a growth metaphor must not fake
 continuity.
 
-<LiveDemo
-  label="SproutRow"
-  sizeOf="sprout-row"
->
-  <SproutRow data={[{ label: "Acme", value: 3 }, { label: "Beta", value: 2 }, { label: "Gamma", value: 3 }, { label: "Delta", value: 1 }, { label: "Echo", value: 0 }, { label: "Foxtrot", value: 2 }]} labels title="Account health" height={30} step={24} />
+<LiveDemo label="SproutRow" sizeOf="sprout-row">
+  <SproutRow
+    data={[
+      { label: "Acme", value: 3 },
+      { label: "Beta", value: 2 },
+      { label: "Gamma", value: 3 },
+      { label: "Delta", value: 1 },
+      { label: "Echo", value: 0 },
+      { label: "Foxtrot", value: 2 },
+    ]}
+    labels
+    title="Account health"
+    height={30}
+    step={24}
+  />
 </LiveDemo>
 
 The key, shown once: **seed → sprout → leaf → bloom**.

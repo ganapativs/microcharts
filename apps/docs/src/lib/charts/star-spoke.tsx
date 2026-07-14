@@ -49,6 +49,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Muted ghost baseline spokes.",
     },
+    {
+      name: "labels",
+      type: "boolean",
+      required: false,
+      description: "Spoke labels at the tips (default true; drop out below size 44).",
+    },
   ],
   demo: [90, 60, 50, 30, 70],
   example: {

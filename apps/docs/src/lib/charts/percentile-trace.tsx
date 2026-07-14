@@ -56,6 +56,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Final percentile in a right gutter.",
     },
+    {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: "Reading noun for the interactive announcement (default 'step').",
+    },
   ],
   demo: DEMO,
   example: {

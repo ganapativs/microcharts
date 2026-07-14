@@ -9,10 +9,7 @@ worm at the 50% line: while your side leads the line reads accent, when it trail
 dot marks each lead change. Because a win-probability curve is a modelled read, the summary always says
 so, "per the supplied model".
 
-<LiveDemo
-  label="WinProbWorm"
-  sizeOf="win-prob-worm"
->
+<LiveDemo label="WinProbWorm" sizeOf="win-prob-worm">
   <WinProbWorm
     data={[50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98]}
     sides={["home", "away"]}
@@ -111,7 +108,13 @@ At a taller size the biggest single momentum swing gets a hair connector and a s
   code={`// a constant 50 reads as tied — the worm sits on the midline
 <WinProbWorm data={[50, 50, 50, 50, 50]} sides={["home", "away"]} />`}
 >
-  <WinProbWorm data={[50, 50, 50, 50, 50]} sides={["home", "away"]} title="Tied" width={160} height={24} />
+  <WinProbWorm
+    data={[50, 50, 50, 50, 50]}
+    sides={["home", "away"]}
+    title="Tied"
+    width={160}
+    height={24}
+  />
 </LiveDemo>
 
 <LiveDemo label="single point" code={`<WinProbWorm data={[72]} sides={["home", "away"]} />`}>

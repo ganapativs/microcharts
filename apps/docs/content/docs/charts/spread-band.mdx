@@ -8,15 +8,21 @@ gap between a subject and its reference is filled and split at every crossing, s
 ahead and when it last flipped both read at a glance. The reference whispers: dashed,
 thinner, neutral — direction is carried by the fill sign and the text, never color alone.
 
-<LiveDemo
-  label="SpreadBand"
-  sizeOf="spread-band"
->
+<LiveDemo label="SpreadBand" sizeOf="spread-band">
   <SpreadBand
     data={[
-      { a: 8, b: 12 }, { a: 9, b: 12 }, { a: 11, b: 13 }, { a: 12, b: 13 },
-      { a: 14, b: 13 }, { a: 15, b: 14 }, { a: 17, b: 14 }, { a: 18, b: 14 },
-      { a: 20, b: 15 }, { a: 21, b: 15 }, { a: 23, b: 16 }, { a: 24, b: 16 },
+      { a: 8, b: 12 },
+      { a: 9, b: 12 },
+      { a: 11, b: 13 },
+      { a: 12, b: 13 },
+      { a: 14, b: 13 },
+      { a: 15, b: 14 },
+      { a: 17, b: 14 },
+      { a: 18, b: 14 },
+      { a: 20, b: 15 },
+      { a: 21, b: 15 },
+      { a: 23, b: 16 },
+      { a: 24, b: 16 },
     ]}
     labels={["Organic", "Paid"]}
     title="Organic vs paid"
@@ -57,8 +63,12 @@ thinner, neutral — direction is carried by the fill sign and the text, never c
 >
   <SpreadBand
     data={[
-      { a: 8, b: 12 }, { a: 12, b: 13 }, { a: 14, b: 13 }, { a: 17, b: 14 },
-      { a: 20, b: 15 }, { a: 24, b: 16 },
+      { a: 8, b: 12 },
+      { a: 12, b: 13 },
+      { a: 14, b: 13 },
+      { a: 17, b: 14 },
+      { a: 20, b: 15 },
+      { a: 24, b: 16 },
     ]}
     labels={["Organic", "Paid"]}
     label="none"
@@ -82,8 +92,12 @@ thinner, neutral — direction is carried by the fill sign and the text, never c
 >
   <SpreadBand
     data={[
-      { a: 18, b: 12 }, { a: 16, b: 12 }, { a: 14, b: 13 }, { a: 11, b: 13 },
-      { a: 9, b: 14 }, { a: 8, b: 14 },
+      { a: 18, b: 12 },
+      { a: 16, b: 12 },
+      { a: 14, b: 13 },
+      { a: 11, b: 13 },
+      { a: 9, b: 14 },
+      { a: 8, b: 14 },
     ]}
     labels={["Latency", "Budget"]}
     positive="down"
@@ -108,10 +122,18 @@ thinner, neutral — direction is carried by the fill sign and the text, never c
 >
   <SpreadBand
     data={[
-      { a: 8000, b: 12000 }, { a: 9000, b: 12000 }, { a: 11000, b: 13000 },
-      { a: 12000, b: 13000 }, { a: 14000, b: 13000 }, { a: 15000, b: 14000 },
-      { a: 17000, b: 14000 }, { a: 18000, b: 14000 }, { a: 20000, b: 15000 },
-      { a: 21000, b: 15000 }, { a: 23000, b: 16000 }, { a: 24000, b: 16000 },
+      { a: 8000, b: 12000 },
+      { a: 9000, b: 12000 },
+      { a: 11000, b: 13000 },
+      { a: 12000, b: 13000 },
+      { a: 14000, b: 13000 },
+      { a: 15000, b: 14000 },
+      { a: 17000, b: 14000 },
+      { a: 18000, b: 14000 },
+      { a: 20000, b: 15000 },
+      { a: 21000, b: 15000 },
+      { a: 23000, b: 16000 },
+      { a: 24000, b: 16000 },
     ]}
     labels={["Organic", "Paid"]}
     locale="de-DE"
@@ -133,7 +155,11 @@ crossed at point 5."
 <SpreadBand data={[{ a: 10, b: 5 }, { a: 12, b: 6 }, { a: 14, b: 7 }]} labels={["A", "B"]} />`}
 >
   <SpreadBand
-    data={[{ a: 10, b: 5 }, { a: 12, b: 6 }, { a: 14, b: 7 }]}
+    data={[
+      { a: 10, b: 5 },
+      { a: 12, b: 6 },
+      { a: 14, b: 7 },
+    ]}
     labels={["A", "B"]}
     title="Never crosses"
     width={200}
@@ -147,7 +173,12 @@ crossed at point 5."
 <SpreadBand data={[{ a: 12, b: 12 }, { a: 15, b: 15 }, { a: 14, b: 14 }, { a: 18, b: 18 }]} />`}
 >
   <SpreadBand
-    data={[{ a: 12, b: 12 }, { a: 15, b: 15 }, { a: 14, b: 14 }, { a: 18, b: 18 }]}
+    data={[
+      { a: 12, b: 12 },
+      { a: 15, b: 15 },
+      { a: 14, b: 14 },
+      { a: 18, b: 18 },
+    ]}
     title="Level throughout"
     width={200}
     height={30}
@@ -159,7 +190,12 @@ crossed at point 5."
   code={`<SpreadBand data={[{ a: 12, b: 10 }, { a: 14, b: null }, { a: 13, b: 12 }, { a: 16, b: 13 }]} labels={["A", "B"]} />`}
 >
   <SpreadBand
-    data={[{ a: 12, b: 10 }, { a: 14, b: null }, { a: 13, b: 12 }, { a: 16, b: 13 }]}
+    data={[
+      { a: 12, b: 10 },
+      { a: 14, b: null },
+      { a: 13, b: 12 },
+      { a: 16, b: 13 },
+    ]}
     labels={["A", "B"]}
     title="Shared gaps"
     width={200}

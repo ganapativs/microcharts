@@ -48,6 +48,18 @@ export const entry: ChartEntry = {
       description: "The dotted extrapolation to the deadline (default true).",
     },
     {
+      name: "work",
+      type: "string",
+      required: false,
+      description: "Work-unit noun for the summary (default 'points').",
+    },
+    {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: "Period noun for the summary and gap label (default 'day').",
+    },
+    {
       name: "label",
       type: '"gap" | "none"',
       required: false,

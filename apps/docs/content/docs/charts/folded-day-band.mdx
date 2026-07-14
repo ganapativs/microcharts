@@ -13,14 +13,14 @@ is right now inside the usual band, or an outlier?
   sizeOf="folded-day-band"
   code={`import { FoldedDayBand } from "@microcharts/react/folded-day-band";
 
-const curve = (h) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
-const observations = Array.from({ length: 14 }, (_d, d) =>
-Array.from({ length: 24 }, (_h, h) => ({
-t: d * 24 + h,
-value: Math.round(curve(h) + Math.sin(d + h) * 8),
+const curve = (h) => 40 + 42 _ Math.max(0, 1 - Math.abs(h - 14) / 10);
+const observations = Array.from({ length: 14 }, (\_d, d) =>
+Array.from({ length: 24 }, (\_h, h) => ({
+t: d _ 24 + h,
+value: Math.round(curve(h) + Math.sin(d + h) \* 8),
 })),
 ).flat();
-const today = Array.from({ length: 24 }, (_h, h) => ({
+const today = Array.from({ length: 24 }, (\_h, h) => ({
 t: h,
 value: Math.round(curve(h) + 14),
 }));

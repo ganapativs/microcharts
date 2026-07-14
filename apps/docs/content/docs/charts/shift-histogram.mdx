@@ -9,10 +9,7 @@ histograms around a center line — **before** upward (muted), **after** downwar
 proportions on one shared scale, so a bigger sample on one side can't fake a shift. The mirror
 carries **identity**, not valence (up isn't "good") — that's the whole point of the symmetry.
 
-<LiveDemo
-  label="ShiftHistogram"
-  sizeOf="shift-histogram"
->
+<LiveDemo label="ShiftHistogram" sizeOf="shift-histogram">
   <ShiftHistogram
     data={{
       before: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
@@ -20,7 +17,8 @@ carries **identity**, not valence (up isn't "good") — that's the whole point o
     }}
     format={(n) => `${Math.round(n)} ms`}
     title="The fix"
-    width={260} height={30}
+    width={260}
+    height={30}
   />
 </LiveDemo>
 

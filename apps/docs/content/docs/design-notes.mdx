@@ -79,6 +79,14 @@ subpath so you only bundle what you import. The catalog's collections — core, 
 expressive, frontier — are just metadata for browsing; they're never package or import
 boundaries. There's no plugin to install, no engine to configure.
 
+The root barrel (`@microcharts/react`, no subpath) carries only the shared pieces, so importing
+it pulls in no chart code: the `Chart` root wrapper every chart composes — a `role="img"` `<svg>`
+with the viewBox, `title`, and generated `summary` already wired, there if you ever need to build
+a custom mark — plus [`SparkGroup`](/docs/composition#small-multiples-one-shared-scale) for
+shared-scale small multiples, [`MicroProvider`](/docs/theming#a-component-api-if-you-prefer) for
+theming, and the `describeSeries` / `makeFormatter` / `EN` helpers documented under
+[Formatting](/docs/formatting) and [Accessibility](/docs/accessibility).
+
 ## The bar for a new chart type
 
 A new chart earns its place only if it clears a real bar: it reads at word size (roughly

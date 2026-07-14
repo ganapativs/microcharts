@@ -53,6 +53,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Percentile pairs, outermost last.",
     },
+    {
+      name: "bins",
+      type: "number",
+      required: false,
+      description: "Fold-axis resolution (default 24).",
+    },
   ],
   demo: [82],
   example: {

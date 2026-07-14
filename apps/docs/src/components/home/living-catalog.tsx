@@ -156,23 +156,23 @@ export function LivingCatalog({ total }: { total: number }) {
       </div>
 
       <div className="mt-5 flex justify-center">
-        <Link
-          href="/gallery"
-          aria-label={`Browse all ${total} chart types in the gallery`}
-          className="group inline-flex items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
-        >
-          <span
-            aria-hidden
-            className={`size-1.5 rounded-full bg-fd-primary ${live ? "hx-pulse" : ""}`}
-          />
-          <span className="mono-label">
-            the catalog, live <span className="text-hairline">·</span>{" "}
-            <span className="underline decoration-1 underline-offset-[5px] transition-[text-decoration-color] [text-decoration-color:color-mix(in_oklab,var(--accent)_45%,transparent)] group-hover:[text-decoration-color:var(--accent)]">
-              browse all {total}
-            </span>
+        <div className="inline-flex items-center gap-2.5">
+          <span className="mono-label inline-flex h-8 items-center gap-2 leading-none text-fd-muted-foreground">
+            <span
+              aria-hidden
+              className={`size-1.5 shrink-0 rounded-full bg-fd-primary ${live ? "hx-pulse" : ""}`}
+            />
+            the catalog, live
           </span>
-          <ArrowRight className="size-3.5 text-fd-primary transition-transform group-hover:translate-x-0.5" />
-        </Link>
+          <Link
+            href="/gallery"
+            aria-label={`Browse all ${total} chart types in the gallery`}
+            className="cta-ghost group inline-flex h-8 items-center gap-1.5 px-3 text-[0.8rem] font-medium leading-none text-fd-foreground no-underline"
+          >
+            Browse all {total}
+            <ArrowRight className="size-3.5 shrink-0 text-fd-primary transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
       </div>
     </div>
   );

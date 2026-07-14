@@ -14,7 +14,8 @@
     "typecheck": "fumadocs-mdx && next typegen && tsc --noEmit",
     "test": "vitest run",
     "cf:deploy": "pnpm build && wrangler deploy",
-    "cf:preview": "pnpm build && wrangler dev"
+    "cf:preview": "pnpm build && wrangler dev",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@microcharts/react": "workspace:*",

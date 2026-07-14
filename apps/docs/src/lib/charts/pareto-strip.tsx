@@ -56,6 +56,18 @@ export const entry: ChartEntry = {
       description: "Categories beyond max roll up into Other (default 8, always last).",
     },
     {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: "Category noun for the summary (default 'causes').",
+    },
+    {
+      name: "metric",
+      type: "string",
+      required: false,
+      description: "Total-metric noun for the summary (default 'the total').",
+    },
+    {
       name: "label",
       type: '"count" | "none"',
       required: false,

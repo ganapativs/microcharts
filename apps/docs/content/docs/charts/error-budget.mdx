@@ -9,17 +9,15 @@ the window — so "too fast" is legible at a glance: below the diagonal means yo
 your budget. Faster burn-rate reference lines (the Google-SRE 1×/6×/14.4× **convention**, not
 physics) sit below it as faint policy context.
 
-<LiveDemo
-  label="ErrorBudget"
-  sizeOf="error-budget"
->
+<LiveDemo label="ErrorBudget" sizeOf="error-budget">
   <ErrorBudget
     data={[1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62]}
     window={30}
     unit="day"
     label="remaining"
     title="Checkout SLO"
-    width={260} height={30}
+    width={260}
+    height={30}
   />
 </LiveDemo>
 

@@ -50,6 +50,12 @@ export const entry: ChartEntry = {
       description: "Burn-rate reference multiples (default the SRE 1×/6×/14.4× convention).",
     },
     {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: 'Period noun for the summary (default "day").',
+    },
+    {
       name: "label",
       type: '"remaining" | "none"',
       required: false,

@@ -42,6 +42,12 @@ export const entry: ChartEntry = {
       description: "Index of the current segment to accent.",
     },
     {
+      name: "inner",
+      type: "number",
+      required: false,
+      description: "Inner radius fraction r0 — the zero baseline bars grow from (default 0.35).",
+    },
+    {
       name: "mode",
       type: '"length" | "opacity"',
       required: false,
@@ -59,6 +65,12 @@ export const entry: ChartEntry = {
       required: false,
       description:
         "Hairline cardinal ticks at 0/¼/½/¾ — the at-rest orientation cue. Default true.",
+    },
+    {
+      name: "formatSegment",
+      type: "(index, n) => string",
+      required: false,
+      description: "Segment index → label (default: HH:00 for n=24, weekday for n=7, else index).",
     },
   ],
   demo: DAY,

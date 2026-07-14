@@ -46,6 +46,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "How empty cells render (default outline).",
     },
+    {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: 'Noun for the summary (e.g. "seats").',
+    },
   ],
   demo: [34],
   example: {

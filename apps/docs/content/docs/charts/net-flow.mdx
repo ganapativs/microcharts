@@ -9,20 +9,27 @@ independently scaled to balance the picture), and the net line (`in − out`) ri
 restore the precise decision value. Gross and net answer different questions; the cell
 answers both.
 
-<LiveDemo
-  label="NetFlow"
-  sizeOf="net-flow"
->
+<LiveDemo label="NetFlow" sizeOf="net-flow">
   <NetFlow
     data={[
-      { in: 42, out: 31 }, { in: 38, out: 35 }, { in: 45, out: 29 }, { in: 40, out: 44 },
-      { in: 52, out: 38 }, { in: 48, out: 41 }, { in: 55, out: 36 }, { in: 50, out: 47 },
-      { in: 58, out: 39 }, { in: 44, out: 52 }, { in: 60, out: 41 }, { in: 57, out: 43 },
+      { in: 42, out: 31 },
+      { in: 38, out: 35 },
+      { in: 45, out: 29 },
+      { in: 40, out: 44 },
+      { in: 52, out: 38 },
+      { in: 48, out: 41 },
+      { in: 55, out: 36 },
+      { in: 50, out: 47 },
+      { in: 58, out: 39 },
+      { in: 44, out: 52 },
+      { in: 60, out: 41 },
+      { in: 57, out: 43 },
     ]}
     format={(n) => `${n}k`}
     label="last"
     title="Monthly cash flow"
-    width={260} height={30}
+    width={260}
+    height={30}
   />
 </LiveDemo>
 
