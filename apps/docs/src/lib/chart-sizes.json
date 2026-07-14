@@ -93,7 +93,7 @@
   },
   "micro-donut": {
     "static": 2.26,
-    "interactive": 3.54
+    "interactive": 3.55
   },
   "funnel": {
     "static": 2.13,
@@ -308,8 +308,8 @@
     "interactive": 3.29
   },
   "time-in-range": {
-    "static": 2.14,
-    "interactive": 3.4
+    "static": 2.13,
+    "interactive": 3.39
   },
   "hypnogram": {
     "static": 2.46,
@@ -426,9 +426,9 @@
     "static": 1.45
   },
   "theme": {
-    "static": 2.2
+    "static": 2.05
   },
   "motion": {
-    "static": 2.75
+    "static": 2.92
   }
 }
