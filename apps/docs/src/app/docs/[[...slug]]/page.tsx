@@ -15,6 +15,7 @@ import { gitConfig } from "@/lib/shared";
 import { docsMeta } from "@/lib/metadata";
 import { abs } from "@/lib/site";
 import { breadcrumbJsonLd, jsonLdScript, techArticleJsonLd } from "@/lib/jsonld";
+import { RouteTransition } from "@/components/route-transition";
 
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const params = await props.params;
@@ -53,23 +54,28 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
           ),
         }}
       />
-      <DocsTitle className="font-display text-[2.15em] font-medium tracking-[-0.025em]">
-        {page.data.title}
-      </DocsTitle>
-      <DocsDescription className="mb-0 text-base">{page.data.description}</DocsDescription>
-      <div className="flex flex-row items-center gap-1.5 border-b border-hairline pb-6">
-        {/* Route the Fumadocs built-ins through the canon secondary button so the
-            title row matches every other text action on the site. */}
-        <MarkdownCopyButton markdownUrl={markdownUrl} className="cta-ghost" />
-        <ViewOptionsPopover
-          markdownUrl={markdownUrl}
-          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`}
-          className="cta-ghost"
-        />
-      </div>
-      <DocsBody>
-        <MDX components={getMDXComponents({ a: createRelativeLink(source, page) })} />
-      </DocsBody>
+      {/* Calm fade + lift on navigation. Wraps only the article content — never
+          the DocsPage grid-area siblings (toc/sidebar), which must stay direct
+          grid children of the layout. Keyed on pathname; reduced-motion gated. */}
+      <RouteTransition>
+        <DocsTitle className="font-display text-[2.15em] font-medium tracking-[-0.025em]">
+          {page.data.title}
+        </DocsTitle>
+        <DocsDescription className="mb-0 text-base">{page.data.description}</DocsDescription>
+        <div className="flex flex-row items-center gap-1.5 border-b border-hairline pb-6">
+          {/* Route the Fumadocs built-ins through the canon secondary button so the
+              title row matches every other text action on the site. */}
+          <MarkdownCopyButton markdownUrl={markdownUrl} className="cta-ghost" />
+          <ViewOptionsPopover
+            markdownUrl={markdownUrl}
+            githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`}
+            className="cta-ghost"
+          />
+        </div>
+        <DocsBody>
+          <MDX components={getMDXComponents({ a: createRelativeLink(source, page) })} />
+        </DocsBody>
+      </RouteTransition>
     </DocsPage>
   );
 }
