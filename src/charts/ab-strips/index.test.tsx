@@ -36,10 +36,18 @@ describe("<ABStrips>", () => {
 
   it("two rows: outer + inner band + median dot each, plus A/B tags", () => {
     const { container } = draw(<ABStrips data={{ a: A, b: B }} />);
-    // row A is neutral ink, row B is accent ink (no custom `color` here) — each
-    // row's outer+inner rects live inside a `<g>`, unlike the contested-zone rect
+    // row A's bands carry the neutral ink role; row B's bands are accent-COLORED
+    // via a plain fill (no accent ink role, so the entrance keeps them out of the
+    // late "voice" act). Each row's outer+inner rects live inside a `<g>`, unlike
+    // the contested-zone rect.
     expect(container.querySelectorAll('g > rect[data-mc-ink="neutral"]').length).toBe(2); // A
-    expect(container.querySelectorAll('g > rect[data-mc-ink="accent"]').length).toBe(2); // B
+    const bRects = [...container.querySelectorAll("g > rect")].filter(
+      (r) => r.getAttribute("fill") === "var(--mc-accent)",
+    );
+    expect(bRects.length).toBe(2); // B — accent fill, no accent ink
+    expect(container.querySelectorAll('rect[data-mc-ink="accent"]').length).toBe(0);
+    // the accent voice stays with B's median dot
+    expect(container.querySelectorAll('circle[data-mc-ink="accent"]').length).toBe(1);
     expect(container.querySelectorAll("circle").length).toBe(2); // medians
     const tags = [...container.querySelectorAll("text")].map((t) => t.textContent);
     expect(tags).toContain("A");

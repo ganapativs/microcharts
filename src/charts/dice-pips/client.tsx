@@ -24,13 +24,26 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
     prev.current = value;
     if (live) setAnnounced(summary);
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    // A new face is a roll landing — pips pop into place (scale + a tiny
+    // per-pip stagger), not a flat dissolve.
     const marks = wrap.current?.querySelectorAll<SVGElement>('[data-mc-ink="point"]');
-    marks?.forEach((m) =>
-      m.animate([{ opacity: 0 }, { opacity: 1 }], {
-        duration: 150,
-        easing: "cubic-bezier(0.23, 1, 0.32, 1)",
-      }),
-    );
+    marks?.forEach((m, i) => {
+      m.style.transformBox = "fill-box";
+      m.style.transformOrigin = "center";
+      m.animate(
+        [
+          { opacity: 0, transform: "scale(0.6)" },
+          { opacity: 1, transform: "scale(1)" },
+        ],
+        { duration: 150, delay: i * 20, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      ).finished.then(
+        () => {
+          m.style.transformBox = "";
+          m.style.transformOrigin = "";
+        },
+        () => {},
+      );
+    });
   }, [value, live, summary]);
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;

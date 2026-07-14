@@ -8,10 +8,7 @@ points along the bearing and the barbs count the magnitude: a half barb, a full 
 are fixed quanta, so the glyph reads at a glance without a scale. Quantization is the honesty here,
 not a limitation — the per-barb quantum is stated next to every example.
 
-<LiveDemo
-  label="WindBarb"
-  sizeOf="wind-barb"
->
+<LiveDemo label="WindBarb" sizeOf="wind-barb">
   <WindBarb direction={225} magnitude={32} step={10} label="value" title="Wind" size={64} />
 </LiveDemo>
 
@@ -33,7 +30,9 @@ is half a `step`, and a pennant is five.
   label="compass — the same magnitude at eight bearings"
   code={`<WindBarb direction={45} magnitude={35} />`}
 >
-  <span style={{ display: "inline-flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}>
+  <span
+    style={{ display: "inline-flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}
+  >
     <WindBarb direction={0} magnitude={35} title="0°" size={40} summary={false} />
     <WindBarb direction={45} magnitude={35} title="45°" size={40} summary={false} />
     <WindBarb direction={90} magnitude={35} title="90°" size={40} summary={false} />

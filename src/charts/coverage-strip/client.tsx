@@ -15,8 +15,10 @@ import { CoverageStrip as StaticCoverageStrip, type CoverageStripProps } from ".
 export interface InteractiveCoverageStripProps extends CoverageStripProps {
   strings?: CoverageStrings;
   /**
-   * Opt-in entrance motion (default `false`): cells fade in on first
-   * client-side mount. Inert on the server and on hydrated server HTML;
+   * Opt-in entrance motion (default `false`): the strip wipes in left to right
+   * on first client-side mount — a time-forward reveal for the 1×N slots (an
+   * index cascade over so many cells collapses under the stagger cap into a
+   * near-simultaneous fade). Inert on the server and on hydrated server HTML;
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
@@ -43,8 +45,14 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // Time runs along x: each slot lights up in turn, oldest→newest. An explicit
+  // `order:"x"` + `window` spreads the cascade across the whole strip (it does
+  // NOT collapse under the default stagger cap), so the reveal reads as time
+  // advancing cell by cell; past `maxMarks` a dense strip still falls to wipe.
   useEntrance(hostRef, "reveal", animate, {
     selector: 'rect[data-mc-ink="cell"], rect[data-mc-ink="gap"]',
+    order: "x",
+    window: 400,
   });
 
   // must match the static entry's font formula — the label gutter widens

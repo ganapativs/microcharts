@@ -63,7 +63,10 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "reveal", animate, { selector: 'rect[data-mc-ink="cell"]' });
+  // reveal by age COLUMN (`order:"x"`) — the maturity/age axis is the
+  // comparison, so cells should cascade left→right across ages, not in DOM
+  // row-major order (which would sweep cohort-by-cohort and fight the axis).
+  useEntrance(hostRef, "reveal", animate, { selector: 'rect[data-mc-ink="cell"]', order: "x" });
 
   const geo = useMemo(
     () => cohortTriangleGeometry(data, { cell, gap, labels, highlight }),

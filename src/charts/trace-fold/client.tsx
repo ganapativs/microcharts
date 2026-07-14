@@ -20,9 +20,10 @@ const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveTraceFoldProps extends TraceFoldProps {
   /**
-   * Opt-in entrance motion (default `false`): the span rects wipe on when the
-   * chart first mounts client-side. Inert on the server and on hydrated
-   * server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the flame builds the way a call
+   * stack forms — each frame grows DOWN from its parent, cascading depth by
+   * depth from the root row. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -42,7 +43,16 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "wipe", animate);
+  // A flame graph is a tree, not a filmstrip — a flat L→R wipe slices frames
+  // mid-shape and hides the nesting. Instead each frame grows down from its
+  // top edge (where it meets its parent) and the rows cascade by depth, so the
+  // stack visibly unwinds from the root.
+  useEntrance(hostRef, "rise", animate, {
+    selector: "rect[data-mc-ink]",
+    origin: "top",
+    order: "y",
+    window: 450,
+  });
 
   const depthCount = Math.max(1, new Set(data.slice(0, 40).map((s) => s.depth)).size);
   const height = heightProp ?? Math.min(48, Math.max(16, depthCount * 10));

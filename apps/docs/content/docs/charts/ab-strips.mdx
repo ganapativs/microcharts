@@ -9,10 +9,7 @@ a median dot, with row A muted and row B accent. The visible overlap of the two 
 is the answer — and the overlap number is always in the summary, because an average delta
 without its spread is how A/B results lie.
 
-<LiveDemo
-  label="ABStrips"
-  sizeOf="ab-strips"
->
+<LiveDemo label="ABStrips" sizeOf="ab-strips">
   <ABStrips
     data={{
       a: Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22),
@@ -21,7 +18,8 @@ without its spread is how A/B results lie.
     format={(n) => `${Math.round(n)} ms`}
     positive="down"
     title="Latency A/B"
-    width={260} height={26}
+    width={260}
+    height={26}
   />
 </LiveDemo>
 

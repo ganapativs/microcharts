@@ -139,6 +139,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
       {geo.tailPath ? (
         <path
           d={geo.tailPath}
+          data-mc-ink="accent"
           fill="none"
           stroke="var(--mc-accent)"
           strokeLinejoin="round"
@@ -158,6 +159,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
       {geo.arrow ? (
         <path
           d={geo.arrow}
+          data-mc-ink="flag"
           fill="none"
           stroke="var(--mc-accent)"
           strokeLinecap="round"

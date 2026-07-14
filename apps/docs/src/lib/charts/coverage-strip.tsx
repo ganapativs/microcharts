@@ -43,6 +43,18 @@ export const entry: ChartEntry = {
       description: "Presence only (default), or shade measured cells by value.",
     },
     {
+      name: "steps",
+      type: "number",
+      required: false,
+      description: "Intensity granularity (default 5).",
+    },
+    {
+      name: "shape",
+      type: '"square" | "round" | "dot"',
+      required: false,
+      description: "Cell shape from the shared vocabulary (default 'square').",
+    },
+    {
       name: "label",
       type: '"percent" | "none"',
       required: false,

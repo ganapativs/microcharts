@@ -49,6 +49,12 @@ export const entry: ChartEntry = {
       description: "Mirror (default) or after-as-outline over before fill.",
     },
     {
+      name: "labels",
+      type: "[string, string]",
+      required: false,
+      description: "Side identities for the summary (default ['before', 'after']).",
+    },
+    {
       name: "label",
       type: '"shift" | "none"',
       required: false,

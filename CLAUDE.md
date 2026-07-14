@@ -89,12 +89,21 @@ types-first export conditions.
 
 ## Theming
 
-~20 `--mc-*` CSS custom properties at low specificity are the runtime contract; presets are token
-bundles (`modern` default, `editorial`, `mono`, `vivid`, plus print/e-ink context presets).
+~Two dozen `--mc-*` CSS custom properties at low specificity are the runtime contract; presets are
+token bundles (`modern` default, `editorial`, `mono`, `vivid`, plus output-context `print`/`eink`).
 Precedence: prop > CSS var scope > preset > default. Presets are visual only and never change data
-semantics. Colors are Okabe-Ito-derived semantic tokens (positive `#009E73`, negative `#D55E00`);
+semantics. Colors are matte semantic tokens on Okabe-Ito hue geometry — CVD-safe (bluish-green
+positive `#0E7A5F` vs vermillion negative `#BD4B2D`), deepened for an editorial, non-poppy finish;
 palettes swap the accent only. Dark mode is hand-tuned, never inverted. Charts never paint their own
-background. `tabular-nums` on all rendered numbers. (The principled preset is named `editorial`.)
+background. `tabular-nums` on all rendered numbers, in `--mc-font-numeric` (tracks `--mc-font`; give
+figures a mono/brand face without touching labels). `--mc-label-weight` sets label weight;
+`--mc-density` scales stroke + label + gap together (compact `< 1` vs comfortable `> 1`, box
+untouched). `defineTheme` (`@microcharts/react/theme`, opt-in subpath, in-house OKLCH, zero-dep)
+derives a matched CVD-safe palette + hand-tuned-style dark twins from one accent — never moving the
+valence hues; returns `vars`/`style`/`css(selector)`/`extend()`. Categorical charts (SegmentedBar,
+StackedArea, PartitionStrip, Hypnogram, MicroDonut) take a per-instance `colors[]` over `--mc-cat-*`
+(additive inline override — the `data-mc-cat` attribute stays for motion + forced-colors).
+(The principled preset is named `editorial`.)
 
 ## Component canon (every chart follows this)
 

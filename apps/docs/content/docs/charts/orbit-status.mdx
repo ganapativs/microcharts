@@ -9,11 +9,15 @@ denser dashes meaning more calls. In the interactive entry the satellite orbits 
 that rate, so a busy service visibly spins faster. Both channels are deliberately low-precision ambient
 reads; for exact numbers, use a `Sparkline` for latency and a `Delta` or `MiniBar` for rate.
 
-<LiveDemo
-  label="OrbitStatus"
-  sizeOf="orbit-status"
->
-  <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} title="Payments API" size={40} />
+<LiveDemo label="OrbitStatus" sizeOf="orbit-status">
+  <OrbitStatus
+    latency={240}
+    rate={12}
+    latencyDomain={[0, 500]}
+    rateDomain={[0, 20]}
+    title="Payments API"
+    size={40}
+  />
 </LiveDemo>
 
 ## Install

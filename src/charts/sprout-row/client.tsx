@@ -34,10 +34,15 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
   const fontSize = props.fontSize ?? labelFont(height, 0.34);
   const summary = sproutRowSummary(data, strings);
   const hostRef = useRef<HTMLSpanElement>(null);
-  // "trail" ordered by x — the stage glyphs already carry data-mc-ink="point"
-  // (the default trail selector), so the row sprouts left→right instead of a
-  // uniform staggered settle.
-  useEntrance(hostRef, "trail", animate, { order: "x" });
+  // "rise" from the soil: each stage glyph (data-mc-ink="point") grows upward
+  // from its baseline, left→right — the row literally sprouts. "trail" scaled
+  // each glyph from its own centre, which read as popping in place, not growing
+  // out of the ground.
+  useEntrance(hostRef, "rise", animate, {
+    selector: '[data-mc-ink="point"]',
+    origin: "bottom",
+    order: "x",
+  });
   const geo = useMemo(
     () =>
       sproutRowGeometry({

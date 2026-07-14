@@ -153,7 +153,9 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         data-mc-w="hair"
         vectorEffect="non-scaling-stroke"
       />
-      {/* before bins — upward, muted */}
+      {/* before bins — upward, muted. They sit ON the center axis and grow up,
+          so the sweep pins each bin's bottom edge to the axis (origin "bottom")
+          — a centered origin would detach them from the shared mirror line. */}
       {geo.bins.map((b) =>
         b.up > 0 ? (
           <rect
@@ -163,6 +165,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
             width={b.width}
             height={b.up}
             data-mc-ink="neutral"
+            data-mc-origin="bottom"
             shapeRendering="crispEdges"
             fillOpacity={0.55}
           />
@@ -172,6 +175,8 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
       {geo.bins.map((b) =>
         b.down > 0 ? (
           overlay ? (
+            // overlay after-bins render ABOVE the axis (like before bins), so
+            // they too grow up from the center line → pin the bottom edge.
             <rect
               key={`a${b.x}`}
               x={b.x}
@@ -180,10 +185,13 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
               height={b.down}
               fill="none"
               stroke={afterFill}
+              data-mc-origin="bottom"
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
           ) : (
+            // mirror after-bins hang BELOW the axis → pin the top edge so they
+            // grow downward out of the shared center line.
             <rect
               key={`a${b.x}`}
               x={b.x}
@@ -191,6 +199,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
               width={b.width}
               height={b.down}
               data-mc-ink="bar"
+              data-mc-origin="top"
               shapeRendering="crispEdges"
               style={{ fill: afterFill }}
             />

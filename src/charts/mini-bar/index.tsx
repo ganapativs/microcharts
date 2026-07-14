@@ -138,6 +138,18 @@ export function MiniBar(props: MiniBarProps): ReactNode {
               ? "positive"
               : "negative"
             : "bar";
+        // Growth edge follows the bar's TRUE geometric sign (not a valence
+        // token): below-zero bars grow from the zero line downward/leftward.
+        // The interactive entry reads this to animate each bar from its own
+        // baseline edge — so `positive="down"` and unlabeled negatives are honest.
+        const origin =
+          orientation === "vertical"
+            ? b.sign < 0
+              ? "top"
+              : "bottom"
+            : b.sign < 0
+              ? "right"
+              : "left";
         return (
           <rect
             key={b.index}
@@ -147,6 +159,7 @@ export function MiniBar(props: MiniBarProps): ReactNode {
             height={b.h}
             shapeRendering="crispEdges"
             data-mc-ink={ink}
+            data-mc-origin={origin}
             style={!isHl && color ? { fill: color } : undefined}
           />
         );

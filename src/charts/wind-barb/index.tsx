@@ -119,6 +119,10 @@ export function WindBarb(props: WindBarbProps): ReactNode {
         />
       ) : (
         <>
+          {/* Shaft, barbs and arrowhead carry 1.25× the inherited stroke: at
+              glyph scale the short barb ticks and half-barbs read as one blob
+              at the base width, so the primary marks are nudged heavier to keep
+              feather counts (the encoded speed) countable. */}
           <line
             x1={geo.shaft.x1}
             y1={geo.shaft.y1}

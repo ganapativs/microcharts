@@ -47,9 +47,14 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "rise", animate, {
+  // The bars are ONE merged path (node budget), so they can't scale per-bar.
+  // `scan` reveals that path with a clip window sweeping left→right — the signal
+  // scans in like a playhead — while it opens from the axis: a mirrored waveform
+  // grows out of the center line, a magnitude-only one up from the baseline, and
+  // the filled envelope just wipes across.
+  useEntrance(hostRef, "scan", animate, {
     selector: 'path[data-mc-ink="bar"]',
-    origin: "center",
+    origin: (props.variant ?? "bars") === "envelope" ? "left" : mirror ? "center" : "bottom",
   });
 
   const buckets = useMemo(() => bucketCount(width, Math.max(1, data.length)), [width, data.length]);

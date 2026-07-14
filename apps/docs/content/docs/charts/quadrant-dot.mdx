@@ -8,16 +8,24 @@ placed by 2-D position, a hairline cross marks the split (the domain midpoints b
 overridable but **never hidden**), and the peers show as tiny muted ghosts. The read is quadrant
 **membership** first; exact position is the second read — which is why it lives at glyph scale.
 
-<LiveDemo
-  label="QuadrantDot"
-  sizeOf="quadrant-dot"
->
+<LiveDemo label="QuadrantDot" sizeOf="quadrant-dot">
   <QuadrantDot
     data={{ x: 3, y: 9 }}
     field={[
-      { x: 2, y: 8 }, { x: 8, y: 9 }, { x: 3, y: 7 }, { x: 9, y: 2 }, { x: 7, y: 3 },
-      { x: 1, y: 1 }, { x: 5, y: 6 }, { x: 6, y: 8 }, { x: 4, y: 3 }, { x: 8, y: 5 },
-      { x: 2, y: 4 }, { x: 7, y: 7 }, { x: 3, y: 2 }, { x: 6, y: 1 },
+      { x: 2, y: 8 },
+      { x: 8, y: 9 },
+      { x: 3, y: 7 },
+      { x: 9, y: 2 },
+      { x: 7, y: 3 },
+      { x: 1, y: 1 },
+      { x: 5, y: 6 },
+      { x: 6, y: 8 },
+      { x: 4, y: 3 },
+      { x: 8, y: 5 },
+      { x: 2, y: 4 },
+      { x: 7, y: 7 },
+      { x: 3, y: 2 },
+      { x: 6, y: 1 },
     ]}
     xDomain={[0, 10]}
     domain={[0, 10]}

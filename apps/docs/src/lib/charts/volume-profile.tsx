@@ -56,6 +56,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "The POC level beside the accent bar.",
     },
+    {
+      name: "bins",
+      type: "number",
+      required: false,
+      description: "Number of histogram bins (default 12).",
+    },
   ],
   demo: [142],
   example: {

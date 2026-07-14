@@ -15,6 +15,7 @@ so "are we near our best" reads without counting.
   code={`import { StreakSpark } from "@microcharts/react/streak-spark";
 
 // 1 = passing build, 0 = failing build
+
 <StreakSpark
   data={[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1]}
   label="both"
@@ -133,20 +134,14 @@ summary localizes together.
 
 ## Edge cases
 
-<LiveDemo
-  label="single outcome"
-  code={`<StreakSpark data={[1]} title="One build" />`}
->
+<LiveDemo label="single outcome" code={`<StreakSpark data={[1]} title="One build" />`}>
   <StreakSpark data={[1]} title="One build" width={160} height={24} />
 </LiveDemo>
 
 A lone outcome is one current run of length 1, and it is trivially its own record — the summary reads
 **"Current run 1 passing, unbroken."**
 
-<LiveDemo
-  label="all failing"
-  code={`<StreakSpark data={[0, 0, 0, 0, 0]} title="Rough week" />`}
->
+<LiveDemo label="all failing" code={`<StreakSpark data={[0, 0, 0, 0, 0]} title="Rough week" />`}>
   <StreakSpark data={[0, 0, 0, 0, 0]} title="Rough week" width={200} height={24} />
 </LiveDemo>
 
@@ -159,9 +154,9 @@ tick, and the summary reads **"Current run 5 failing; no completed streak."**
 
 ## Why this default
 
-Runs, not per-outcome ticks, because the decision is about *length* — "how long have we held" and
+Runs, not per-outcome ticks, because the decision is about _length_ — "how long have we held" and
 "how does that compare to our best". Width encodes run length on one shared scale, so a wide bar is a
-genuinely long run and the eye compares them honestly. Height and opacity encode run *type* (streak,
+genuinely long run and the eye compares them honestly. Height and opacity encode run _type_ (streak,
 break, current) — never magnitude — so the ribbon never implies a size it doesn't have. The record
 tick and the accented current bar answer the two questions the raw list can't, at a glance.
 

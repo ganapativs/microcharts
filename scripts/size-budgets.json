@@ -82,8 +82,11 @@
     "annotations": {
       "static": "1.5 kB"
     },
-    "motion": {
+    "theme": {
       "static": "2.5 kB"
+    },
+    "motion": {
+      "static": "3 kB"
     },
     "segmented-bar": {
       "static": "2.4 kB",

@@ -17,6 +17,9 @@ export interface PartitionStripProps {
   emphasis?: string | undefined;
   /** Parent-row labels with size drop-out. */
   labels?: boolean | undefined;
+  /** Per-group colours, cycled; overrides `--mc-cat-N` for this instance. The
+   *  emphasised node and muted siblings keep their accent/neutral roles. */
+  colors?: readonly string[] | undefined;
   width?: number | undefined;
   height?: number | undefined;
   strings?: PartitionStrings | undefined;
@@ -70,6 +73,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
     data,
     emphasis,
     labels = true,
+    colors,
     width = 120,
     height = 24,
     strings = EN_PARTITION,
@@ -127,6 +131,10 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
           ink = { "data-mc-cat": (seg.group % CAT_N) + 1 };
           opacity = seg.row === 0 ? 0.9 : 0.55;
         }
+        const catFill =
+          colors && ink["data-mc-cat"] !== undefined
+            ? colors[seg.group % colors.length]
+            : undefined;
         // seat gate: wide enough for the text AND a parent row tall enough to
         // hold the floor font without bleeding — else labels drop out cleanly
         const fits =
@@ -144,6 +152,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
             height={rowH}
             fillOpacity={opacity}
             {...ink}
+            style={catFill ? { fill: catFill } : undefined}
           />,
         ];
         if (fits)

@@ -23,6 +23,8 @@ export interface MicroDonutProps {
   decorative?: boolean | undefined;
   /** Annulus thickness (shared with ProgressRing). */
   weight?: number | undefined;
+  /** Per-wedge colours, cycled; overrides `--mc-cat-N`. "Other" stays neutral. */
+  colors?: readonly string[] | undefined;
   size?: number | undefined;
   strings?: CompositionStrings | undefined;
   title?: string | undefined;
@@ -41,6 +43,7 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
     maxWedges = 4,
     decorative = false,
     weight = 5,
+    colors,
     size = 24,
     strings = EN_COMPOSITION,
     title,
@@ -76,10 +79,23 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
     >
       {geo.wedges.map((w, i) => {
         const d = rolled[w.index]!;
-        return d.members > 1 ? (
-          <path key={w.index} d={w.d} data-mc-ink="neutral" />
-        ) : (
-          <path key={w.index} d={w.d} data-mc-cat={(i % CAT_N) + 1} />
+        // Stroked centerline band (see geometry): color rides an inline stroke
+        // token — the rolled-up "other" wedge is neutral, the rest categorical.
+        const stroke =
+          d.members > 1
+            ? "var(--mc-neutral)"
+            : colors
+              ? colors[i % colors.length]
+              : `var(--mc-cat-${(i % CAT_N) + 1})`;
+        return (
+          <path
+            key={w.index}
+            className="mc-donut-wedge"
+            d={w.d}
+            fill="none"
+            strokeLinecap="butt"
+            style={{ strokeWidth: geo.weight, stroke }}
+          />
         );
       })}
       {children}

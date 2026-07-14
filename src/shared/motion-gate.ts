@@ -21,7 +21,7 @@ export const MC_EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)"; // on-screen morp
 export const MC_DUR = {
   /** press / hover / focus feedback */ interact: 120,
   /** value + state updates */ update: 240,
-  /** entrance base */ enter: 420,
+  /** entrance base (3 beats — the engine's story spine) */ enter: 360,
 } as const;
 
 /** Entrance archetypes — the family a chart's entrance belongs to. */
@@ -35,6 +35,7 @@ export type EntranceArchetype =
   | "trail" // discrete marks pop sequentially along the chart's own order
   | "spin" // radial charts: unwind from the center (rotate + scale)
   | "grow" // concentric charts: grow outward from the center
+  | "scan" // merged bar/area paths: clip reveal sweeping L→R, growing from `origin`
   | "pop" // single-glyph charts: fade + scale(0.97)
   | "fade"; // text/numeric charts: fade only
 
@@ -58,11 +59,33 @@ export interface EntranceOptions {
   /** Total span (ms) of an ordered sequence (default 520 trail / 400 others). */
   window?: number;
   /**
+   * `draw` only: draw the stroked marks as ONE continuous sweep at constant
+   * speed — each mark's duration is proportional to its stroke length and marks
+   * are baton-passed end to end (mark i+1 starts exactly as mark i finishes).
+   * For a ring of arcs this is constant ANGULAR velocity clockwise from the
+   * path's start, so a donut reads as one value accumulating from 12 o'clock —
+   * never several segments racing at once. `window` is the whole sweep's span.
+   */
+  proportional?: boolean;
+  /**
    * Elements to cast into the closing act (they enter as the story lands)
    * instead of the quiet opening stage — e.g. a cumulative line that must
    * follow its bars.
    */
   defer?: string;
+  /**
+   * Stroked connectors that DRAW themselves on after the story marks land and
+   * before the voice speaks — a dumbbell's bar between its two dots, a lollipop
+   * stem to its dot. stroke-dashoffset, so the line grows to join the marks.
+   */
+  link?: string;
+  /**
+   * Max per-mark tracks before the entrance collapses to one whole-svg wipe
+   * (default 80 — a year of cells shouldn't spawn 365 animations). Raise it
+   * only for a fixed, bounded grid whose per-mark story IS the point (a
+   * 100-unit icon array counting up), never for open-ended data.
+   */
+  maxMarks?: number;
 }
 
 type Engine = (

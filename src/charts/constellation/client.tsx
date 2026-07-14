@@ -45,11 +45,18 @@ export function Constellation(props: InteractiveConstellationProps): React.React
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // "draw" — the chronology line draws left→right; the star dots pop out of
-  // it exactly as the draw front reaches them (engine-automatic). The
+  // With the chronology line, "draw" traces it left→right and the star dots pop
+  // out of it exactly as the draw front reaches them (engine-automatic). The
   // connector carries ink="ghost" (not "data"/"accent"), so the draw default
-  // selector misses it — pass it explicitly.
-  useEntrance(hostRef, "draw", animate, { selector: 'path[data-mc-ink="ghost"]' });
+  // selector misses it — pass it explicitly. With `connect={false}` there's no
+  // path to draw, and a linear wipe over a 2-D scatter would imply an order the
+  // data doesn't have — so the star dots just settle in place.
+  useEntrance(
+    hostRef,
+    connect ? "draw" : "settle",
+    animate,
+    connect ? { selector: 'path[data-mc-ink="ghost"]' } : { selector: "circle" },
+  );
 
   const geo = useMemo(
     () =>

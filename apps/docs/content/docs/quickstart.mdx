@@ -3,19 +3,97 @@ title: Quickstart
 description: Install @microcharts/react, import the stylesheet once, and render your first accessible chart — static in a Server Component, or interactive on the client.
 ---
 
-## Install
+## Set up with an AI agent
+
+Prefer to automate it? Hand this prompt to your coding agent — **Cursor, Claude Code, GitHub
+Copilot, Codex**, or any frontier model. It installs the package, wires the stylesheet, reads the
+live docs and machine catalog, records the conventions in your repo's agent-rules file, and
+renders a first chart to verify. Works on a fresh repo or an existing one.
+
+<div className="agent-prompt">
+
+```md title="Paste into your agent"
+Set up **@microcharts/react** in this repo — word-sized, zero-dependency React charts. Work through every step; don't stop to ask.
+
+## 1 · Install
+
+- Add `@microcharts/react` (peer dependency: React 18 or 19; no other runtime deps).
+- Import the stylesheet once, at your app root: `import "@microcharts/react/styles.css"`
+
+## 2 · Learn the API
+
+Read the live docs before writing any chart code:
+
+- Full docs → https://microcharts.dev/llms-full.txt
+- Catalog → https://microcharts.dev/catalog.json
+
+Pick a chart by the decision it must show, then copy its exact import path and props from the catalog.
+
+## 3 · Record the conventions
+
+Add a `## microcharts` section to `AGENTS.md` (create it if missing — Cursor, Copilot and Codex read it; for Claude Code, run `ln -s AGENTS.md CLAUDE.md`). Capture these rules:
+
+- Import per subpath, e.g. `@microcharts/react/sparkline`. The default export is static — RSC-safe, zero client JS. Use the `/interactive` subpath only for hover or keyboard.
+- `data` alone always renders. One grammar on every chart: `data`, `domain`, `color`, `title`, `summary`, `format`, `positive`, `label`, `dots`. Chart-specific props are in `catalog.json`.
+- Accessibility is automatic (`role="img"` + a generated summary). Inline in a sentence: wrap the mark in `<span className="mc-inline">` and pass `summary={false}`.
+- Theme with `--mc-*` variables or a preset attribute `data-mc-theme="editorial | mono | vivid | dark | print | eink"` (or `defineTheme` from `@microcharts/react/theme` for a derived palette). Never hardcode colors; charts paint no background — place them on a surface with contrast.
+- `width` and `height` are viewBox units; fill a container with `style={{ width: "100%", height: "auto" }}`.
+- Format numbers with one `format` prop (`Intl.NumberFormatOptions` or `(n) => string`) plus `locale`. Fix the scale with `domain={[min, max]}`. Share one scale across small multiples with `SparkGroup`.
+- Annotations are children: `Threshold`, `TargetZone`, `Marker`, `Callout` from `@microcharts/react/annotations`.
+- Never add a runtime dependency to render a chart. No pie or gauge — use `Bullet`, `SegmentedBar`, or `MicroDonut`.
+
+## 4 · Verify
+
+Render `<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />` in a real page, run the app or build, and confirm it appears with styles applied.
+```
+
+<AgentPromptCopy />
+
+</div>
+
+<Callout type="info">
+  The prompt reads the always-current [`/llms-full.txt`](/llms-full.txt) and
+  [`/catalog.json`](/catalog.json), so your agent works from today's real API — props, data shapes,
+  and import paths — instead of a memorized guess.
+</Callout>
+
+That's the whole setup: the agent adds `@microcharts/react`, imports the stylesheet, and writes
+your conventions file — nothing left for you to wire up. Skip straight to
+[your first chart](#your-first-chart). Not using an agent? The same setup by hand is two steps:
+
+<Accordions type="single" className="mc-manual-setup">
+
+<Accordion title="Set it up by hand — the two steps the agent runs for you">
+
+**1 · Install.** React 18 or 19 is a peer dependency; there are no other runtime dependencies.
 
 <PackageTabs />
 
-## Import the stylesheet once
-
-microcharts ships a single stylesheet — import it once at the root of your app. It carries all
-theming tokens and chart styles in a low-specificity cascade layer, so your own styles always
-win.
+**2 · Import the stylesheet once** at the root of your app — it carries every theming token and
+chart style in a low-specificity cascade layer, so your own styles always win.
 
 ```tsx title="app/layout.tsx"
 import "@microcharts/react/styles.css";
 ```
+
+<Callout type="warn">
+  Charts **inherit your page's font**. If the surrounding page never sets a `font-family` (some
+  minimal starters and sandboxes don't), SVG text falls back to a serif and labels look wrong —
+  give your page a font, or set one just for charts:
+
+```css
+:root {
+  --mc-font: system-ui, sans-serif;
+}
+```
+
+Full detail — why it inherits, and per-scope fonting — in [Theming](/docs/theming#the-font).
+
+</Callout>
+
+</Accordion>
+
+</Accordions>
 
 ## Your first chart
 
@@ -28,11 +106,40 @@ JavaScript** — it's pure SVG, and its accessible name is generated from the da
   code={`import { Sparkline } from "@microcharts/react/sparkline";
 
 export default function Page() {
-  return <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
+return <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
 }`}
+
 >
+
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} title="Weekly revenue" />
 </LiveDemo>
+
+## The shared grammar
+
+One idea runs through the whole catalog: **the same prop name means the same thing on every
+chart.** Learn these once and they transfer everywhere — a new chart type is a new data shape,
+never a new vocabulary. `data` alone always renders something correct; everything else is opt-in.
+
+| Prop       | Type                                        | What it does                                                                                                                              |
+| ---------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`     | `(number \| null)[]`                        | The series. `null` / `NaN` are gaps, never zeros. The one required prop.                                                                  |
+| `domain`   | `[min, max]`                                | Fix the value range instead of auto-fitting — see [Formatting & scale](/docs/formatting#scale-the-domain-decision).                       |
+| `color`    | `string`                                    | Mark color: any CSS color or a token (`"var(--mc-accent)"`). Semantic tokens keep their meaning — see [Theming](/docs/theming).           |
+| `title`    | `string`                                    | A visible title, wired into the chart's accessible name.                                                                                  |
+| `summary`  | `string \| false`                           | Override the auto-generated accessible sentence, or pass `false` to mark the chart decorative — see [Accessibility](/docs/accessibility). |
+| `format`   | `Intl.NumberFormatOptions \| (n) => string` | How numbers render in labels and summaries — see [Formatting & scale](/docs/formatting).                                                  |
+| `positive` | `"up" \| "down"`                            | Which direction is good, so color and arrows point the honest way (lower latency is `"down"`).                                            |
+| `label`    | _per chart_                                 | A short direct label next to the mark, in a reserved gutter — never an axis or legend.                                                    |
+| `dots`     | _per chart_                                 | Which individual points to emphasize (e.g. `"minmax"` on a line).                                                                         |
+
+Not every prop applies to every chart — a bar chart has no `dots` — but wherever a concept
+exists, its prop name and meaning are always these. Each one has a deeper home:
+[Formatting & scale](/docs/formatting) owns `format` and `domain`, [Theming](/docs/theming) owns
+`color`, and [Accessibility](/docs/accessibility) owns `summary`. Every chart also takes the
+layout props (`width`, `height`, `className`, `style`, `id`; see [Sizing](/docs/sizing)) and a
+few props specific to its own shape, listed in the prop table on each chart's page. To place
+charts in real UI — or render several on one shared scale with `SparkGroup` — see
+[Composition](/docs/composition).
 
 ## Add interactivity
 
@@ -81,6 +188,7 @@ each page listing its own import path and props.
 ## Next steps
 
 - **[All charts](/docs/charts)** — the full catalog, filed by the question each chart answers.
+- **[Sizing & scaling](/docs/sizing)** — fixed size, filling a container, and inline-in-text.
 - **[AI-native](/docs/ai)** — render charts straight from a model stream, agent, or tool call.
 - **[Theming](/docs/theming)** — rebind one CSS variable and every chart follows your brand.
 - **[Accessibility](/docs/accessibility)** — how the generated summaries and keyboard support work.

@@ -8,15 +8,15 @@ import { describe, expect, it } from "vitest";
 const outDir = resolve(process.cwd(), "out") + "/";
 const hasBuild = existsSync(outDir);
 
-// Static export emits flat `<route>.html` files (trailingSlash: false).
+// Static export emits `<route>/index.html` (trailingSlash: true).
 const routes = [
   "index.html",
-  "docs.html",
-  "docs/quickstart.html",
-  "docs/charts/sparkline.html",
-  "docs/accessibility.html",
-  "docs/performance.html",
-  "gallery.html",
+  "docs/index.html",
+  "docs/quickstart/index.html",
+  "docs/charts/sparkline/index.html",
+  "docs/accessibility/index.html",
+  "docs/performance/index.html",
+  "gallery/index.html",
 ];
 
 describe.skipIf(!hasBuild)("built docs metadata", () => {
@@ -34,5 +34,7 @@ describe.skipIf(!hasBuild)("built docs metadata", () => {
   it("llms.txt and catalog json are emitted", () => {
     expect(existsSync(outDir + "llms.txt")).toBe(true);
     expect(existsSync(outDir + "catalog.json")).toBe(true);
+    // the catalog's `$schema` target must ship alongside it (copied from public/)
+    expect(existsSync(outDir + "catalog.schema.json")).toBe(true);
   });
 });

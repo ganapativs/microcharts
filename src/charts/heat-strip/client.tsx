@@ -14,8 +14,10 @@ import { HeatStrip as StaticHeatStrip, type HeatStripProps } from "./index.js";
 export interface InteractiveHeatStripProps extends HeatStripProps {
   strings?: SeriesStrings & SlotStrings;
   /**
-   * Opt-in entrance motion (default `false`): cells fade in on first
-   * client-side mount. Inert on the server and on hydrated server HTML;
+   * Opt-in entrance motion (default `false`): the strip wipes in left to right
+   * on first client-side mount — a time-forward reveal for the 1×N cells (an
+   * index cascade over many cells collapses under the stagger cap into a
+   * near-simultaneous fade). Inert on the server and on hydrated server HTML;
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
@@ -41,7 +43,14 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "reveal", animate);
+  // Time runs along x: cells light up in turn, oldest→newest. `order:"x"` +
+  // `window` spreads the cascade across the strip (it does NOT flatten under
+  // the default stagger cap), reading as time advancing cell by cell.
+  useEntrance(hostRef, "reveal", animate, {
+    selector: 'rect[data-mc-ink="cell"]',
+    order: "x",
+    window: 400,
+  });
 
   const geo = useMemo(
     () => heatStripGeometry({ width, height, values: data, domain, steps, shape }),

@@ -39,7 +39,11 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "draw", animate);
+  // The actual line (ink="data") draws as the story; the dotted projection is
+  // the future, so defer it into the closing act — it arrives as the actual
+  // line lands, never before it. (Matched by its unique 1 2 dash pattern so no
+  // static markup changes.)
+  useEntrance(hostRef, "draw", animate, { defer: 'path[stroke-dasharray="1 2"]' });
 
   const geo = useMemo(
     () =>

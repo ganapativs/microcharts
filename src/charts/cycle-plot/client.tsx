@@ -47,7 +47,15 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "draw", animate);
+  // The spine (ink="data") is the primary draw. With `spine={false}` (the rare
+  // within-slot-drift-only mode) there's no data path, so draw the ghost
+  // within-slot polylines instead of falling through to a whole-svg wipe.
+  useEntrance(
+    hostRef,
+    "draw",
+    animate,
+    props.spine === false ? { selector: 'path[data-mc-ink="ghost"]' } : undefined,
+  );
 
   const geo = useMemo(
     () => cycleGeometry({ width, height, data, period, center, domain }),

@@ -8,15 +8,13 @@ ActivityGrid: the same discrete step scale, the same cell vocabulary, laid on a 
 timeline. Empty is not zero — a slot with no record renders a hairline outline, visibly
 different from a low value.
 
-<LiveDemo
-  label="HeatStrip"
-  sizeOf="heat-strip"
->
+<LiveDemo label="HeatStrip" sizeOf="heat-strip">
   <HeatStrip
     data={[12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35]}
     domain={[0, 100]}
     title="Load per hour"
-    width={240} height={20}
+    width={240}
+    height={20}
   />
 </LiveDemo>
 

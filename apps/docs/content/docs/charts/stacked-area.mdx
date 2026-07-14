@@ -7,10 +7,7 @@ StackedArea answers "how is the composition shifting over time?" Layer thickness
 share; the stack always sums to 100%. Three series is the hard cap — beyond that,
 thickness at 16 px stops being readable.
 
-<LiveDemo
-  label="StackedArea"
-  sizeOf="stacked-area"
->
+<LiveDemo label="StackedArea" sizeOf="stacked-area">
   <StackedArea
     data={[
       { label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
@@ -18,7 +15,8 @@ thickness at 16 px stops being readable.
       { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
     ]}
     title="Traffic mix"
-    width={220} height={30}
+    width={220}
+    height={30}
   />
 </LiveDemo>
 

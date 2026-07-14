@@ -26,11 +26,29 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     if (prev.current === value) return;
     prev.current = value;
     if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      // The terminator can't morph (no d: interpolation on Safari), but a bare
+      // fade reads flat — pair it with a subtle bloom so the light visibly
+      // changes rather than dissolving.
       const lit = wrap.current?.querySelector<SVGPathElement>("path");
-      lit?.animate([{ opacity: 0 }, { opacity: 1 }], {
-        duration: 200,
-        easing: "cubic-bezier(0.23, 1, 0.32, 1)",
-      });
+      if (lit) {
+        lit.style.transformBox = "fill-box";
+        lit.style.transformOrigin = "center";
+        lit
+          .animate(
+            [
+              { opacity: 0, transform: "scale(0.94)" },
+              { opacity: 1, transform: "scale(1)" },
+            ],
+            { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+          )
+          .finished.then(
+            () => {
+              lit.style.transformBox = "";
+              lit.style.transformOrigin = "";
+            },
+            () => {},
+          );
+      }
     }
     if (!live) return;
     const emit = () => {

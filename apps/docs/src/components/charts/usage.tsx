@@ -15,7 +15,7 @@ export function Usage({ chart }: { chart: string }) {
 
   return (
     <div className="panel not-prose my-6 overflow-hidden">
-      <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-2.5">
+      <div className="flex items-center justify-between gap-3 px-4 py-2.5">
         <span className="mono-label">Import &amp; use</span>
         <span className="mono-label opacity-60">{c.staticImport.replace("@microcharts/", "")}</span>
       </div>

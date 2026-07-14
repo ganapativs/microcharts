@@ -10,6 +10,7 @@ const config = {
   // `public/docs/` by `scripts/gen-md.mjs` (pre-dev / pre-build), so they work
   // in dev and export alike with no rewrites, middleware, or runtime.
   output: "export",
+  trailingSlash: true,
   reactStrictMode: true,
   images: { unoptimized: true },
 };

@@ -14,10 +14,12 @@ import {
   type CitySkylineProps,
 } from "./index.js";
 
-// Buildings (rect, ink="bar") rise from the ground; the lit-window pattern
-// (path, ink="accent") rises with them, staggered slightly after — windows
-// "turning on" after each building settles.
-const SKYLINE_SELECTOR = 'rect[data-mc-ink="bar"], path[data-mc-ink="accent"]';
+// Only the buildings (rect, ink="bar") rise from the ground. The lit-window
+// pattern (path, ink="accent") is left OUT of the rise story on purpose: a
+// scaleY rise would stretch the fixed-size window marks. As accent ink it
+// enters via the VOICE act instead — fading in after the buildings settle,
+// reading as windows "turning on".
+const SKYLINE_SELECTOR = 'rect[data-mc-ink="bar"]';
 
 export interface InteractiveCitySkylineProps extends CitySkylineProps {
   strings?: SkylineStrings;

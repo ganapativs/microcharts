@@ -52,8 +52,8 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
   // Each lane's events are merged into one raster path (or, when binned, a
   // handful of count rects) rather than discrete per-event elements —
   // settle's per-mark scale would shift tick x-positions non-uniformly
-  // within a lane, so reveal (fade-only, staggered per lane) is used
-  // instead, matching the lane-by-lane scan order.
+  // within a lane. wipe (a left→right clip) uncovers events in chronological
+  // order along the shared time axis, matching how a raster is read.
   useEntrance(hostRef, "wipe", animate);
 
   const lanes = useMemo(() => data.slice(0, LANE_CAP), [data]);

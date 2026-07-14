@@ -48,6 +48,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "How zero cells render (default outline).",
     },
+    {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: 'Noun for the summary count (default "periods").',
+    },
   ],
   demo: WEEKS,
   example: {

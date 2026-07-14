@@ -59,6 +59,18 @@ export const entry: ChartEntry = {
       required: false,
       description: "Formats time for the summary (e.g. a month name).",
     },
+    {
+      name: "xDomain",
+      type: "[number, number]",
+      required: false,
+      description: "Time (x) extent (default: data extent).",
+    },
+    {
+      name: "rBase",
+      type: "number",
+      required: false,
+      description: "Base dot radius in viewBox units (default 1.6).",
+    },
   ],
   demo: [40, 90, 30, 65],
   example: {

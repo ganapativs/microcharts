@@ -54,6 +54,12 @@ export const entry: ChartEntry = {
       description: "Step (default — cohorts are discrete) or smooth (editorial).",
     },
     {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: "Period noun for the summary (default 'period').",
+    },
+    {
       name: "label",
       type: '"last" | "none"',
       required: false,

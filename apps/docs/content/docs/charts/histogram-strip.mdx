@@ -7,10 +7,7 @@ HistogramStrip answers "what does the distribution look like?". Raw observations
 ≤ 12 uniform bins out — counts zero-anchored, never density-smoothed. Pre-aggregated
 counts are not supported; that's SparkBar's contract.
 
-<LiveDemo
-  label="HistogramStrip"
-  sizeOf="histogram-strip"
->
+<LiveDemo label="HistogramStrip" sizeOf="histogram-strip">
   <HistogramStrip
     data={Array.from({ length: 120 }, (_, i) =>
       i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),

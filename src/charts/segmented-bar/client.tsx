@@ -16,9 +16,9 @@ import {
 export interface InteractiveSegmentedBarProps extends SegmentedBarProps {
   strings?: CompositionStrings;
   /**
-   * Opt-in entrance motion (default `false`): segments fade in left to right
-   * on first client-side mount. Inert on the server and on hydrated server
-   * HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): segments sweep in left to right,
+   * assembling into the whole bar on first client-side mount. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -40,7 +40,9 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "reveal", animate, {
+  // "sweep" from the left — a part-to-whole bar reads best assembling left→right
+  // (each segment grows from its own left edge) rather than fading in place.
+  useEntrance(hostRef, "sweep", animate, {
     selector: 'rect[data-mc-cat], rect[data-mc-ink="neutral"]',
   });
 

@@ -63,6 +63,9 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
   // The soft accent glow behind the focal dot has no data-mc-ink attribute
   // (a literal fill), so it isn't selected — it still fades in with the base
   // whole-svg fade.
+  // Focal + peer ghosts settle together. (The focal is always present; the
+  // peer `field` is optional, so it must stay in the selector — deferring it
+  // would leave a fieldless chart with no story mark and collapse to a wipe.)
   useEntrance(hostRef, "settle", animate, {
     selector: 'circle[data-mc-ink="data"], circle[data-mc-ink="ghost"]',
   });

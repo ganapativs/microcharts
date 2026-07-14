@@ -42,6 +42,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Barb direction + speed.",
     },
+    {
+      name: "step",
+      type: "number",
+      required: false,
+      description: "Wind-barb quantum — each full barb (default 10).",
+    },
     { name: "temp", type: "number", required: false, description: "Upper-left numeral." },
     { name: "dewpoint", type: "number", required: false, description: "Lower-left numeral." },
     { name: "pressure", type: "number", required: false, description: "Upper-right numeral." },

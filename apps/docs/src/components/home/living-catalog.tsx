@@ -1,5 +1,4 @@
 "use client";
-// oxlint-disable react/no-array-index-key -- tiles are positional; the inner span keys on `nonce` to remount on swap
 import "@microcharts/react/motion"; // enables `animate` entrance on the live hero cluster
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -124,25 +123,22 @@ export function LivingCatalog({ total }: { total: number }) {
         </div>
 
         <ul className="grid grid-cols-2 gap-2.5 sm:gap-3">
-          {board.map((cell, i) => {
+          {board.map((cell) => {
             const mod = CHART_MODULES[cell.slug];
             const entry = getChart(cell.slug);
-            if (!mod || !entry) return <li key={i} aria-hidden />;
+            if (!mod || !entry) return <li key={cell.nonce} aria-hidden />;
             // Once live (mounted, motion allowed) render the interactive
             // twin so the entrance animates on load + on each swap; reduced-motion
             // visitors never flip `live` on, so they keep the static Preview.
             const Preview = live && mod.PreviewLive ? mod.PreviewLive : mod.Preview;
             return (
-              <li key={i}>
+              <li key={cell.nonce}>
                 <Link
                   href={`/docs/charts/${cell.slug}`}
                   aria-label={`${entry.name}: ${entry.tagline}`}
                   className="hx-tile group flex flex-col items-center justify-center gap-2 rounded-[14px] px-3 py-4 no-underline"
                 >
-                  <span
-                    key={cell.nonce}
-                    className="hx-slot hx-swap flex min-h-[4.75rem] w-full items-center justify-center"
-                  >
+                  <span className="hx-slot hx-swap flex min-h-[4.75rem] w-full items-center justify-center">
                     <Preview />
                   </span>
                   <span className="hx-slot-name mono-label truncate text-[0.58rem] tracking-[0.12em] opacity-55 group-hover:text-fd-primary group-hover:opacity-100">
@@ -156,23 +152,25 @@ export function LivingCatalog({ total }: { total: number }) {
       </div>
 
       <div className="mt-5 flex justify-center">
-        <Link
-          href="/gallery"
-          aria-label={`Browse all ${total} chart types in the gallery`}
-          className="group inline-flex items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
-        >
-          <span
-            aria-hidden
-            className={`size-1.5 rounded-full bg-fd-primary ${live ? "hx-pulse" : ""}`}
-          />
-          <span className="mono-label">
-            the catalog, live <span className="text-hairline">·</span>{" "}
-            <span className="underline decoration-1 underline-offset-[5px] transition-[text-decoration-color] [text-decoration-color:color-mix(in_oklab,var(--accent)_45%,transparent)] group-hover:[text-decoration-color:var(--accent)]">
-              browse all {total}
-            </span>
+        <div className="inline-flex items-center gap-2.5">
+          <span className="mono-label inline-flex h-8 items-center gap-2 leading-none text-fd-muted-foreground">
+            <span
+              aria-hidden
+              className={`size-1.5 shrink-0 rounded-full bg-fd-primary ${live ? "hx-pulse" : ""}`}
+            />
+            the catalog, live
           </span>
-          <ArrowRight className="size-3.5 text-fd-primary transition-transform group-hover:translate-x-0.5" />
-        </Link>
+          <Link
+            href="/gallery"
+            aria-label={`Browse all ${total} chart types in the gallery`}
+            className="cta-ghost group inline-flex h-8 items-center gap-2 py-0 pl-3 pr-1.5 text-[0.8rem] font-medium leading-none text-fd-foreground no-underline"
+          >
+            Browse all {total}
+            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-fd-primary text-fd-primary-foreground transition-transform group-hover:translate-x-0.5">
+              <ArrowRight className="size-3" />
+            </span>
+          </Link>
+        </div>
       </div>
     </div>
   );

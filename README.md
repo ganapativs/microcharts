@@ -2,6 +2,10 @@
 
 <img src="assets/promo.png" alt="microcharts — word-sized charts for React, made for AI first and for the people reading what it writes. 106 chart types, zero dependencies, 0.91–3.61 kB gzip each." width="920">
 
+# @microcharts/react
+
+**Word-sized charts for React** — zero runtime dependencies, ~1–3&nbsp;kB gzip each, accessible by default, and server-component safe.
+
 <br>
 
 [![npm](https://img.shields.io/npm/v/@microcharts/react?color=2f52d4&label=npm)](https://www.npmjs.com/package/@microcharts/react)
@@ -27,6 +31,11 @@ itself in words. So a chart an LLM streams into a chat reply is one a person can
 the properties that make it safe for a model to write are the ones that make it pleasant for a
 human to use.
 
+> **Status: production-ready, still earning its scars.** microcharts is tested and ready to use in
+> production, but it hasn't been battle-tested across every stack and edge yet — you may hit the
+> occasional rough edge. When you do, tell us: bug reports and feature requests on
+> [GitHub issues](https://github.com/ganapativs/microcharts/issues) are how it keeps getting sharper.
+
 ## Why
 
 - **AI-native.** A chart is plain `data` plus a generated sentence. One grammar across all 106
@@ -36,7 +45,7 @@ human to use.
   JavaScript**. Interactivity is a separate opt-in `/interactive` import.
 - **Accessible by default.** Every chart is an `img` with a natural-language summary built from
   your data — nothing to remember, nothing to drift. → [Accessibility](https://microcharts.dev/docs/accessibility)
-- **Tiny + honest.** **0.91–3.61 kB gzip** per chart (median 2.28; 26 of 106 under 2 kB),
+- **Tiny + honest.** **0.91–3.61 kB gzip** per chart (median 2.27; 26 of 106 under 2 kB),
   budget-gated in CI. Every type has one documented, honest encoding channel. Delight never lies.
 
 ## Install
@@ -96,19 +105,32 @@ import { Threshold, Marker } from "@microcharts/react/annotations";
 
 ## Theme it
 
-Roughly 20 `--mc-*` CSS custom properties are the runtime contract; presets are token bundles.
-Set one on a subtree with the provider — presets are visual only and never change what the data
-means:
+About two dozen `--mc-*` CSS custom properties are the runtime contract; presets are token
+bundles. Set one on a subtree with the provider — presets are visual only and never change what
+the data means:
 
 ```tsx
 import { MicroProvider } from "@microcharts/react";
 
-<MicroProvider preset="editorial">
+<MicroProvider theme="editorial">
   <Sparkline data={[3, 5, 4, 8, 6, 9]} />
 </MicroProvider>;
 ```
 
-Presets: `modern` (default), `editorial`, `mono`, `vivid`. Dark mode is hand-tuned, not inverted.
+Presets: `modern` (default), `editorial`, `mono`, `vivid`, plus output-context `print` and `eink`.
+Dark mode is hand-tuned, not inverted. For a whole brand theme, `defineTheme` (from
+`@microcharts/react/theme`) derives a matched, colour-blind-safe palette and dark twins from one
+accent:
+
+```tsx
+import { defineTheme } from "@microcharts/react/theme";
+
+const brand = defineTheme({ accent: "#6d28d9" });
+<MicroProvider style={brand.style}>…</MicroProvider>;
+```
+
+Retune density with one scalar (`--mc-density`), give figures their own face (`--mc-font-numeric`),
+or recolour a single categorical chart with a `colors` array.
 → [Theming guide](https://microcharts.dev/docs/theming)
 
 ## The catalog

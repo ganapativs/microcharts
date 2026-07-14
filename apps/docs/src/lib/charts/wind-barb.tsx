@@ -40,6 +40,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Numeric magnitude beside the glyph.",
     },
+    {
+      name: "variant",
+      type: '"barb" | "arrow"',
+      required: false,
+      description: '"arrow" swaps quantized barbs for a plain direction arrow + label.',
+    },
   ],
   demo: [32],
   example: {

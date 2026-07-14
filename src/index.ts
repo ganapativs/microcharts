@@ -25,14 +25,32 @@ export type { SparkGroupProps } from "./shared/SparkGroup.js";
 export type { Value, Polarity } from "./core/types.js";
 export { makeFormatter, type Format } from "./core/format.js";
 
-/** Shared prop grammar — one meaning per name across every chart. */
+import type { CSSProperties } from "react";
+
+/**
+ * The shared prop grammar — one meaning per name across every chart. Each chart
+ * declares the subset it supports inline (kept per-file for tree-shaking and
+ * clarity), but a prop that appears here carries this exact type wherever a
+ * chart uses it — held to the contract by `grammar-conformance.test.ts` so the
+ * grammar can't drift one chart at a time. Categorical charts also take a
+ * `colors` array; a new data shape is a new component, not a variant here.
+ */
 export interface MicrochartCommonProps {
-  /** The series. `null`/`NaN` are gaps; `data` alone always renders. */
+  /** The series. `null`/`NaN` are gaps; `data` alone always renders. Charts with
+   *  a structured input (points, segments, events) document their own shape. */
   data: readonly (number | null)[];
   /** Fixed value domain `[min, max]`; auto-fit when omitted. */
   domain?: readonly [number, number];
-  /** Accessible name. A string overrides the auto-summary; `false` = decorative. */
-  summary?: string | false;
+  /** Mark colour: any CSS colour or token string (`"var(--mc-accent)"`). */
+  color?: string;
   /** Visible title, wired into `aria-labelledby`. */
   title?: string;
+  /** Accessible name. A string overrides the auto-summary; `false` = decorative. */
+  summary?: string | false;
+  /** Stable id root — opts into `<title>`/`<desc>` + `aria-labelledby` naming. */
+  id?: string;
+  /** Class on the chart root. */
+  className?: string;
+  /** Inline style on the chart root (a common place to set width/height). */
+  style?: CSSProperties;
 }

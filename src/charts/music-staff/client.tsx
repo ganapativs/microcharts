@@ -45,8 +45,14 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // "trail" ordered by x — notes land left→right along the staff, echoing a
-  // melody played in time order rather than a generic staggered settle.
-  useEntrance(hostRef, "trail", animate, { order: "x" });
+  // melody played in time order rather than a generic staggered settle. The
+  // melodic contour connects those notes in time, so it must arrive AFTER them,
+  // not fade in during the quiet stage before its own noteheads exist: `defer`
+  // casts it into the closing act. (Its `data-mc-w="tick"` uniquely picks the
+  // contour; the staff + ledger paths carry data-mc-ink="muted" instead.)
+  // Notes play in left→right, then the melodic contour DRAWS through them in
+  // time order — the line connects the notes it just laid down.
+  useEntrance(hostRef, "trail", animate, { order: "x", link: 'path[data-mc-w="tick"]' });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const last = lastFinite(data);

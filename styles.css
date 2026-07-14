@@ -9,28 +9,42 @@
 
 @layer microcharts.tokens {
   :where(:root) {
-    /* semantic color — Okabe-Ito-derived */
-    --mc-stroke: #171717; /* primary data ink */
-    --mc-positive: #009e73; /* up / good */
-    --mc-negative: #d55e00; /* down / bad */
-    --mc-neutral: #8a8a8a; /* no-valence data */
-    --mc-accent: #0072b2; /* emphasis: endpoint dot, active */
+    /* semantic color — matte finish, Okabe-Ito hue geometry (CVD-safe): the
+       positive stays a bluish-green and the negative a warm vermillion so the
+       pair survives deuteranopia, but every tone is deepened + slightly
+       desaturated to read rich and editorial rather than bright/poppy. All
+       clear ≥ 3:1 on the default white surface (deeper than the source hues). */
+    --mc-stroke: #1a1917; /* primary data ink — warm graphite near-black */
+    --mc-positive: #0e7a5f; /* up / good — deep viridian */
+    --mc-negative: #bd4b2d; /* down / bad — burnt terracotta */
+    --mc-neutral: #8a8986; /* no-valence data — warm gray */
+    --mc-accent: #1f6091; /* emphasis: endpoint dot, active — deep steel blue */
     --mc-band: color-mix(in oklab, var(--mc-stroke) 8%, transparent);
-    --mc-moon: #c99a3a; /* warm moonlight (MoonPhase lit area) */
+    --mc-moon: #c1922f; /* warm moonlight (MoonPhase lit area) — rich amber */
 
-    /* categorical (valence-free series) — yellow omitted from the default order */
-    --mc-cat-1: #e69f00;
-    --mc-cat-2: #56b4e9;
-    --mc-cat-3: #009e73;
-    --mc-cat-4: #0072b2;
-    --mc-cat-5: #d55e00;
-    --mc-cat-6: #cc79a7;
+    /* categorical (valence-free series) — matte jewel tones, hue-diverse and
+       lightness-ordered for grayscale/CVD separation. Ochre omitted-of-yellow
+       leads; the two blues split by lightness (cerulean light, sapphire deep). */
+    --mc-cat-1: #d2982f; /* gold */
+    --mc-cat-2: #5b9fd4; /* azure */
+    --mc-cat-3: #2e8c66; /* emerald */
+    --mc-cat-4: #285788; /* sapphire */
+    --mc-cat-5: #c2543a; /* terracotta */
+    --mc-cat-6: #a85c8c; /* mauve */
 
     /* geometry + type */
     --mc-stroke-width: 1.5;
     --mc-gap: 0.25em;
+    /* Uniform scale for stroke weight, label size, and small-multiple gap — one
+       lever for compact (< 1) vs comfortable (> 1) density. The box set by
+       width/height props is unaffected; density tunes ink + type, not layout. */
+    --mc-density: 1;
     --mc-font: inherit;
+    /* Face for tabular figures + labels. Tracks --mc-font by default so digits
+       match the page; override to give numbers a dedicated brand or mono face. */
+    --mc-font-numeric: var(--mc-font);
     --mc-label-size: 0.75em;
+    --mc-label-weight: 400;
     /* Optical lift for `.mc-inline` beside digits ("+3.8%"). VA-middle alone
        seats SVG marks ~1.4px low; override per face if needed. */
     --mc-inline-nudge: -0.14em;
@@ -50,21 +64,37 @@
   /* Dark mode — hand-tuned, never auto-inverted. */
   @media (prefers-color-scheme: dark) {
     :where(:root) {
-      --mc-stroke: #ededed;
-      --mc-positive: #2dd4a7;
-      --mc-negative: #ff8a4c;
-      --mc-accent: #4cc2ff;
-      --mc-neutral: #9a9a9a;
-      --mc-moon: #ecc766; /* brighter warm on dark surfaces */
+      /* Matte on dark — lifted for legibility but chroma held back so the tones
+         read rich/muted, never neon-glow. Warm off-white ink softens the stark. */
+      --mc-stroke: #eae9e6;
+      --mc-positive: #45a385; /* sage-emerald */
+      --mc-negative: #df7856; /* warm terracotta */
+      --mc-accent: #5ea1cf; /* steel-sky */
+      --mc-neutral: #9a9a97;
+      --mc-moon: #e0be6f; /* warm amber on dark surfaces */
+      /* Categorical is lifted on dark — deep light-mode jewels go muddy on
+         near-black, so each cat gets a hand-tuned brighter twin (same hue). */
+      --mc-cat-1: #e2b45c;
+      --mc-cat-2: #6fb0e0;
+      --mc-cat-3: #4fb08d;
+      --mc-cat-4: #6e9bd1;
+      --mc-cat-5: #e07e5e;
+      --mc-cat-6: #c486b0;
     }
   }
   :where([data-mc-theme="dark"]) {
-    --mc-stroke: #ededed;
-    --mc-positive: #2dd4a7;
-    --mc-negative: #ff8a4c;
-    --mc-accent: #4cc2ff;
-    --mc-neutral: #9a9a9a;
-    --mc-moon: #ecc766;
+    --mc-stroke: #eae9e6;
+    --mc-positive: #45a385;
+    --mc-negative: #df7856;
+    --mc-accent: #5ea1cf;
+    --mc-neutral: #9a9a97;
+    --mc-moon: #e0be6f;
+    --mc-cat-1: #e2b45c;
+    --mc-cat-2: #6fb0e0;
+    --mc-cat-3: #4fb08d;
+    --mc-cat-4: #6e9bd1;
+    --mc-cat-5: #e07e5e;
+    --mc-cat-6: #c486b0;
   }
   /* Presets = token bundles. Visual only. */
   /* "editorial" — hairline, sharp, a single restrained red endpoint accent.
@@ -75,7 +105,7 @@
      or app shell sets it on <html>) — so preset bundles have ONE source here and
      hosts never re-declare them. Per-instance [data-mc-theme] wins by proximity. */
   :where([data-mc-theme="editorial"], [data-mc-preset="editorial"]) {
-    --mc-accent: #b8112a;
+    --mc-accent: #a32236; /* matte claret — restrained, not signal-red */
     --mc-stroke-width: 1;
   }
   :where([data-mc-theme="mono"], [data-mc-preset="mono"]) {
@@ -89,8 +119,33 @@
      the preset only turns up weight + valence. (editorial's red IS its identity,
      so that one keeps its pin.) */
   :where([data-mc-theme="vivid"], [data-mc-preset="vivid"]) {
-    --mc-positive: #00c896;
-    --mc-negative: #ff5630;
+    --mc-positive: #0f9e78; /* louder than default, still matte not neon */
+    --mc-negative: #e24d2e;
+    --mc-stroke-width: 2;
+  }
+  /* "print" — paper output: near-black ink at a hairline weight; valence
+     deepened for CMYK so up/down survive a colour print; band barely there. */
+  :where([data-mc-theme="print"], [data-mc-preset="print"]) {
+    --mc-stroke: #1a1a1a;
+    --mc-neutral: #666666;
+    --mc-positive: #0c6249;
+    --mc-negative: #a33f22;
+    --mc-accent: #14507a;
+    --mc-moon: #7a5a12;
+    --mc-band: color-mix(in oklab, #1a1a1a 9%, transparent);
+    --mc-stroke-width: 1.25;
+  }
+  /* "eink" — grayscale e-paper: no chroma (the panel can't show it), so sign
+     rides lightness (positive black vs negative gray, mirroring forced-colors)
+     and strokes thicken for low-DPI, low-refresh legibility. */
+  :where([data-mc-theme="eink"], [data-mc-preset="eink"]) {
+    --mc-stroke: #000000;
+    --mc-positive: #000000;
+    --mc-negative: #595959;
+    --mc-neutral: #8c8c8c;
+    --mc-accent: #000000;
+    --mc-moon: #000000;
+    --mc-band: color-mix(in oklab, #000000 14%, transparent);
     --mc-stroke-width: 2;
   }
 }
@@ -101,17 +156,22 @@
     vertical-align: middle;
     overflow: visible;
     font: var(--mc-font);
+    /* density-scaled stroke weight consumed by the ink + width roles below, so
+       one --mc-density retunes every stroke without touching the base token. */
+    --mc-sw: calc(var(--mc-stroke-width) * var(--mc-density));
   }
   :where(.mc-root text) {
     font-variant-numeric: tabular-nums;
-    font-size: var(--mc-label-size);
+    font-family: var(--mc-font-numeric);
+    font-weight: var(--mc-label-weight);
+    font-size: calc(var(--mc-label-size) * var(--mc-density));
     fill: var(--mc-stroke);
   }
   /* small-multiples wrapper — layout-neutral by default */
   :where(.mc-group) {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: var(--mc-gap);
+    gap: calc(var(--mc-gap) * var(--mc-density));
     align-items: center;
   }
   /* Word-sized chart in running prose. Wraps any SVG mark next to digits;
@@ -150,6 +210,7 @@
     align-items: baseline;
     gap: var(--mc-gap);
     font: var(--mc-font);
+    font-family: var(--mc-font-numeric);
     font-variant-numeric: tabular-nums;
     color: var(--mc-neutral);
     vertical-align: baseline;
@@ -256,7 +317,7 @@
   :where(.mc-root [data-mc-ink="data"]) {
     fill: none;
     stroke: var(--mc-stroke);
-    stroke-width: var(--mc-stroke-width);
+    stroke-width: var(--mc-sw);
     stroke-linejoin: round;
     stroke-linecap: round;
   }
@@ -285,16 +346,16 @@
      every stroke in a chart, not just the data line. At the default 1.5 these
      resolve to 1 / 0.75 / 0.5 — the weights the charts were hand-tuned to. */
   :where(.mc-root [data-mc-w="full"]) {
-    stroke-width: var(--mc-stroke-width);
+    stroke-width: var(--mc-sw);
   }
   :where(.mc-root [data-mc-w="support"]) {
-    stroke-width: calc(var(--mc-stroke-width) * 2 / 3);
+    stroke-width: calc(var(--mc-sw) * 2 / 3);
   }
   :where(.mc-root [data-mc-w="tick"]) {
-    stroke-width: calc(var(--mc-stroke-width) / 2);
+    stroke-width: calc(var(--mc-sw) / 2);
   }
   :where(.mc-root [data-mc-w="hair"]) {
-    stroke-width: calc(var(--mc-stroke-width) / 3);
+    stroke-width: calc(var(--mc-sw) / 3);
   }
   :where(.mc-root [data-mc-ink="muted"]) {
     fill: none;
@@ -354,13 +415,13 @@
     fill: var(--mc-band);
     stroke: var(--mc-neutral);
     stroke-opacity: 0.4;
-    stroke-width: calc(var(--mc-stroke-width) / 3);
+    stroke-width: calc(var(--mc-sw) / 3);
   }
   :where(.mc-root [data-mc-ink="gap"]) {
     fill: var(--mc-band);
     stroke: var(--mc-neutral);
     stroke-opacity: 0.35;
-    stroke-width: calc(var(--mc-stroke-width) / 3);
+    stroke-width: calc(var(--mc-sw) / 3);
   }
   /* Ghost = low-precision context behind the primary mark (RateVolume volume
      bars, QuadrantDot peer dots, CyclePlot slot lines, ChangePoint regime means,
@@ -550,10 +611,34 @@
     display: inline-block;
     animation: mc-pulse var(--mc-duration) var(--mc-easing);
   }
+  /* mount entrance for the HTML number — the `pop` engine animates only the
+     glyph svg, so the number gets its own lift+scale to arrive in step. */
+  @keyframes mc-delta-num-in {
+    from {
+      opacity: 0;
+      transform: translateY(2px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  :where(.mc-delta-live[data-enter="1"] .mc-delta-num) {
+    display: inline-block;
+    animation: mc-delta-num-in 200ms var(--mc-easing) backwards;
+  }
   /* one-shot glyph pulse when an interactive TrendArrow's direction changes */
   :where(.mc-trend-live[data-pulse="1"] .mc-root) {
     transform-origin: center;
     animation: mc-pulse var(--mc-duration) var(--mc-easing);
+  }
+
+  /* Hourglass sand scales from the floor so the value cross-fade reads as
+     draining (top settles down) / filling (bottom grows up) — see client.tsx.
+     Declaring the box here keeps the interactive JS to a single animate call. */
+  :where(.mc-hourglass-sand) {
+    transform-box: fill-box;
+    transform-origin: center bottom;
   }
 
   /* StatusDot "live now" halo — expands + fades from the mark. This is a state

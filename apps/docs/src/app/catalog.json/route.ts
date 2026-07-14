@@ -1,32 +1,11 @@
-import { CHARTS } from "@/lib/catalog";
-import { SITE, abs } from "@/lib/site";
+import { buildCatalog } from "@/lib/catalog-json";
 
 export const revalidate = false;
 export const dynamic = "force-static";
 
-/** Machine catalog generated from the chart registry. */
+/** Machine catalog generated from the chart registry. See `lib/catalog-json.ts`. */
 export function GET() {
-  const catalog = {
-    $schema: abs("/catalog.schema.json"),
-    package: SITE.pkg,
-    homepage: SITE.url,
-    charts: CHARTS.map((c) => ({
-      name: c.name,
-      slug: c.slug,
-      status: c.status === "stable" ? "stable" : "planned",
-      docs: abs(`/docs/charts/${c.slug}`),
-      staticImport: c.staticImport,
-      interactiveImport: c.interactiveImport,
-      dataShape: c.dataShape,
-      primaryEncoding: c.encoding.channel,
-      bestFor: c.bestFor,
-      avoidFor: c.avoidFor,
-      props: c.props.map((p) => ({ name: p.name, type: p.type, required: p.required })),
-      examples: [{ title: c.example.title, code: c.example.code }],
-    })),
-  };
-
-  return new Response(JSON.stringify(catalog, null, 2), {
+  return new Response(JSON.stringify(buildCatalog(), null, 2), {
     headers: { "Content-Type": "application/json" },
   });
 }

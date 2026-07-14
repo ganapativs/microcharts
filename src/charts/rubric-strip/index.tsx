@@ -135,7 +135,6 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
             width={row.barWidth}
             height={row.height}
             rx={Math.min(1, row.height / 2)}
-            shapeRendering="crispEdges"
             data-mc-ink={ink}
           />,
         ];

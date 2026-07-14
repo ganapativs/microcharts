@@ -55,6 +55,12 @@ export const entry: ChartEntry = {
       description: "Locale start-of-week (default Monday).",
     },
     {
+      name: "steps",
+      type: "number",
+      required: false,
+      description: "Intensity steps including the zero track (default 5).",
+    },
+    {
       name: "shape",
       type: '"square" | "round" | "dot"',
       required: false,
@@ -71,6 +77,13 @@ export const entry: ChartEntry = {
       type: "number",
       required: false,
       description: "Gap between cells (default 1).",
+    },
+    {
+      name: "dateFormat",
+      type: "Intl.DateTimeFormatOptions | (d: Date) => string",
+      required: false,
+      interactive: true,
+      description: "Announced day label (defaults to weekday + month + day, UTC).",
     },
   ],
   demo: DATA.map((d) => d.value),

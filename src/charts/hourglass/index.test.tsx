@@ -18,6 +18,8 @@ describe("<Hourglass>", () => {
     const { container } = draw(<Hourglass value={0.5} />);
     // glass-fill + top sand + bottom sand + glass-outline
     expect(container.querySelectorAll("path").length).toBe(4);
+    // only the two sand paths carry the class the value cross-fade is scoped to
+    expect(container.querySelectorAll("path.mc-hourglass-sand").length).toBe(2);
     expect(container.querySelectorAll("rect").length).toBe(2); // end-cap plates
     expect(container.querySelectorAll("line").length).toBe(1); // stream
   });

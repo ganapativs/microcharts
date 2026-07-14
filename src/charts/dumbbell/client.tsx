@@ -43,9 +43,17 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   // "trail" ordered by y — rows populate top→down, one at a time. Covers both
   // endpoints regardless of shape: the "from" hollow ring has no data-mc-ink
-  // attribute, only the "to" dot does — a bare `circle` selector catches
-  // both; the connector arrives via the base whole-svg fade.
-  useEntrance(hostRef, "trail", animate, { selector: "circle", order: "y" });
+  // attribute, only the "to" dot does — a bare `circle` selector catches both.
+  // The connector is valence-encoded DATA (its color reads the change
+  // direction), so it must arrive WITH the endpoints, not materialize before
+  // them: `defer` casts it into the closing act so it draws in as the dots land
+  // The two endpoint dots land first (top→down), then the change bar DRAWS
+  // between them dot-to-dot, then the labels speak — the pair connects itself.
+  useEntrance(hostRef, "trail", animate, {
+    selector: "circle",
+    order: "y",
+    link: "line[data-mc-ink]",
+  });
 
   const fontSize = 6;
   const hasLabels = data.some((d) => d.label);

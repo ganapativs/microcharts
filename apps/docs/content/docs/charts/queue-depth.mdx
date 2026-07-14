@@ -9,15 +9,13 @@ depth runs above capacity, the top edge is re-stroked in the negative ink, so a 
 change in _shape_ as well as color. The endpoint carries the current value and a trend glyph
 (▴/▾) fit over the last quarter of the window.
 
-<LiveDemo
-  label="QueueDepth"
-  sizeOf="queue-depth"
->
+<LiveDemo label="QueueDepth" sizeOf="queue-depth">
   <QueueDepth
     data={[42, 55, 70, 88, 96, 120, 150, 182, 214]}
     capacity={100}
     title="Support queue"
-    width={260} height={30}
+    width={260}
+    height={30}
   />
 </LiveDemo>
 

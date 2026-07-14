@@ -15,6 +15,7 @@ export const SITE = {
   authorUrl: "https://meetguns.com",
   authorX: "https://x.com/ganapativs",
   authorXHandle: "@ganapativs",
+  authorGithub: "https://github.com/ganapativs",
   ogImageAlt: "microcharts — tiny accessible React charts rendered inline",
 } as const;
 

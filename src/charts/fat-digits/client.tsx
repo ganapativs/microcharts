@@ -13,9 +13,9 @@ export interface InteractiveFatDigitsProps extends FatDigitsProps {
   live?: boolean;
   strings?: FatStrings;
   /**
-   * Opt-in entrance motion (default `false`): the numeral fades in when the
-   * chart first mounts client-side. Inert on the server and on hydrated
-   * server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the numeral lifts and scales in
+   * (a subtle `pop`) when the chart first mounts client-side. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -35,7 +35,7 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
     ...rest
   } = props;
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "fade", animate);
+  useEntrance(hostRef, "pop", animate);
   const summary = fatDigitsSummary(value, { encode, tiers, domain, strings, format, locale });
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");

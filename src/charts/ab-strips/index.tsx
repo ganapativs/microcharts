@@ -174,8 +174,15 @@ export function ABStrips(props: ABStripsProps): ReactNode {
           overrides it, in which case the fill can't come from a static role. */}
       {geo.rows.map((r, i) => {
         const isB = i === 1;
-        const custom = isB && color ? color : undefined;
-        const ink = custom ? undefined : isB ? "accent" : "neutral";
+        // Row B's bands are accent-COLORED but must not carry the accent INK
+        // ROLE here: the motion engine casts accent ink into the closing "voice"
+        // act, which would pop B's bands late while row A's neutral bands fade in
+        // during the quiet opening stage — an asymmetric two-arm entrance.
+        // Painting the accent as a plain fill (exactly as the `color` override
+        // already does) keeps both rows' bands in the opening stage so the two
+        // arms arrive together; the accent voice stays with B's median dot.
+        const bandFill = isB ? (color ?? "var(--mc-accent)") : undefined;
+        const bandInk = isB ? undefined : "neutral";
         return (
           <g key={`band-${labels[i]}`}>
             <rect
@@ -184,8 +191,8 @@ export function ABStrips(props: ABStripsProps): ReactNode {
               width={r.outer.width}
               height={1.8}
               rx={0.9}
-              data-mc-ink={ink}
-              fill={custom}
+              data-mc-ink={bandInk}
+              fill={bandFill}
               fillOpacity={i === 0 ? 0.26 : 0.2}
             />
             <rect
@@ -194,8 +201,8 @@ export function ABStrips(props: ABStripsProps): ReactNode {
               width={r.inner.width}
               height={4}
               rx={1.5}
-              data-mc-ink={ink}
-              fill={custom}
+              data-mc-ink={bandInk}
+              fill={bandFill}
               fillOpacity={i === 0 ? 0.42 : 0.38}
             />
           </g>

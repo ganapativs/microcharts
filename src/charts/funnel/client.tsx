@@ -41,9 +41,10 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // ordered by y, spread over a 450ms window — the funnel squeezes top→down
-  // instead of every stage rising in lockstep.
-  useEntrance(hostRef, "rise", animate, { selector: STAGE_SELECTOR, order: "y", window: 450 });
+  // ordered by x (stage/pipeline order, left→right), spread over a 450ms window
+  // — the cascade follows the funnel sequence, not bar height, so a
+  // non-monotonic funnel still animates in stage order.
+  useEntrance(hostRef, "rise", animate, { selector: STAGE_SELECTOR, order: "x", window: 450 });
 
   const geo = useMemo(
     () =>

@@ -215,12 +215,23 @@
       transparent 72%
     );
 
-  /* microcharts dark tokens, bound to the site theme (see :root note). */
+  /* microcharts dark tokens, bound to the site theme (see :root note). Matte,
+     never neon — the deep field gives ample contrast headroom. */
   --mc-stroke: #e9e6df;
-  --mc-positive: #34d399;
-  --mc-negative: #fb8c5a;
+  --mc-positive: #45a385;
+  --mc-negative: #df7856;
   --mc-accent: var(--accent);
   --mc-neutral: #8f8a80;
+  /* Categorical must be re-declared here: the library keys its dark cats off
+     @media(prefers-color-scheme)/[data-mc-theme], but the docs force theme via
+     the .dark class — so without this the light cats would paint on dark. Same
+     lifted hues as the library dark set. */
+  --mc-cat-1: #e2b45c;
+  --mc-cat-2: #6fb0e0;
+  --mc-cat-3: #4fb08d;
+  --mc-cat-4: #6e9bd1;
+  --mc-cat-5: #e07e5e;
+  --mc-cat-6: #c486b0;
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
   --mc-surface-edge: var(--color-fd-border);
@@ -236,8 +247,8 @@
    deliberately overrides the accent picker while active; vivid and mono
    follow the library too. ------------------------------------------------ */
 :root[data-mc-preset="editorial"] {
-  /* hairline ink, signature red endpoint — a printed-page restraint */
-  --mc-accent: #b8112a;
+  /* hairline ink, signature claret endpoint — a printed-page restraint */
+  --mc-accent: #a32236;
   --mc-stroke-width: 1;
 }
 :root[data-mc-preset="mono"] {
@@ -250,8 +261,30 @@
 }
 :root[data-mc-preset="vivid"] {
   /* bolder ink + punchier valence; accent stays user-chosen */
-  --mc-positive: #00c896;
-  --mc-negative: #ff5630;
+  --mc-positive: #0f9e78;
+  --mc-negative: #e24d2e;
+  --mc-stroke-width: 2;
+}
+:root[data-mc-preset="print"] {
+  /* paper output — near-black ink, hairline weight, valence deepened for CMYK */
+  --mc-stroke: #1a1a1a;
+  --mc-neutral: #666666;
+  --mc-positive: #0c6249;
+  --mc-negative: #a33f22;
+  --mc-accent: #14507a;
+  --mc-moon: #7a5a12;
+  --mc-band: color-mix(in oklab, #1a1a1a 9%, transparent);
+  --mc-stroke-width: 1.25;
+}
+:root[data-mc-preset="eink"] {
+  /* grayscale e-paper — sign rides lightness, heavier strokes for low refresh */
+  --mc-stroke: #000000;
+  --mc-positive: #000000;
+  --mc-negative: #595959;
+  --mc-neutral: #8c8c8c;
+  --mc-accent: #000000;
+  --mc-moon: #000000;
+  --mc-band: color-mix(in oklab, #000000 14%, transparent);
   --mc-stroke-width: 2;
 }
 
@@ -414,6 +447,15 @@ body {
   background-size: 32px 32px;
   -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 40%, transparent 100%);
   mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 40%, transparent 100%);
+}
+
+/* Paper surface for the preset preview tiles — a fixed warm-white "page" (never
+   follows the docs theme) with a faint dot grid, so mono/print/eink inks, which
+   run near-black, always preview truthfully on light stock. */
+.preset-paper {
+  background-color: #f7f6f3;
+  background-image: radial-gradient(circle at 1px 1px, rgba(20, 18, 15, 0.06) 1px, transparent 0);
+  background-size: 11px 11px;
 }
 
 /* Draw-in underline on hover for text links. */
@@ -1488,6 +1530,86 @@ figure:has(> pre) .shiki,
   background: transparent !important;
 }
 
+/* The "paste into your agent" prompt wraps instead of scrolling, so it fills the
+   panel and stays readable at any viewport — no horizontal scroll. Prose wraps
+   at spaces; only over-long tokens (URLs) break. Scoped to .agent-prompt so real
+   code fences keep their horizontal scroll. */
+.agent-prompt {
+  position: relative;
+}
+.agent-prompt pre {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  /* reserve room for the floating copy button at the bottom */
+  padding-bottom: 4rem !important;
+}
+.agent-prompt pre,
+.agent-prompt pre code,
+.agent-prompt .line {
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* The "set it up by hand" accordion ships pb-2 — a touch tight under the closing
+   callout. A little more breathing room at the bottom. */
+.mc-manual-setup .prose-no-margin {
+  padding-bottom: 1rem;
+}
+
+/* Floating accent "copy prompt" button, centred at the bottom of the block —
+   the primary action for the whole prompt. The top-right copy button keeps its
+   default quiet styling. A scrim fades the last lines under it. */
+.agent-prompt::after {
+  content: "";
+  position: absolute;
+  inset: auto 1px 1px 1px;
+  height: 5rem;
+  border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+  background: linear-gradient(to top, var(--glass-surface-strong) 30%, transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+.agent-prompt-copy {
+  position: absolute;
+  left: 50%;
+  bottom: 0.9rem;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* fixed width so swapping "Copy setup prompt" ↔ "Copied" never re-centres */
+  min-width: 12rem;
+  gap: 0.45rem;
+  padding: 0.5rem 1.05rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--accent-fg);
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0.5px color-mix(in oklab, #fff 50%, transparent),
+    0 6px 18px -6px color-mix(in oklab, var(--accent) 60%, transparent),
+    0 1px 2px color-mix(in oklab, #000 28%, transparent);
+  transition:
+    transform 0.15s var(--ease-out-quint),
+    background 0.2s var(--ease-out-quint);
+}
+.agent-prompt-copy:hover {
+  transform: translateX(-50%) translateY(-1px);
+  background: color-mix(in oklab, var(--accent) 90%, #000);
+}
+.agent-prompt-copy:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
 /* Inline code chips — markdown inline code only (classless <code>). Component
    command lines use classed <code> inside .not-prose and must stay bare, or the
    chip ring becomes a second border inside the panel. */
@@ -1747,14 +1869,15 @@ div:where(
   animation: pop-in 0.2s var(--ease-out-expo) both;
 }
 
+/* Opacity only — no transform. A transformed ancestor (even the identity
+   matrix a `both`-filled animation holds at rest) breaks in-page anchor /
+   fragment scrolling: TOC links land the heading at the wrong offset. */
 @keyframes route-fade {
   from {
     opacity: 0;
-    transform: translateY(7px);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
 .route-fade {
@@ -1890,7 +2013,17 @@ div:where(
   letter-spacing: -0.016em;
 }
 .prose :where(h1, h2, h3, h4) {
-  scroll-margin-top: 5rem;
+  /* Below xl the sticky toc-popover bar (2.5rem) rides the top of the content
+     column — and on mobile the header nav too — so anchored headings must
+     clear them or they land hidden underneath. */
+  scroll-margin-top: calc(var(--fd-header-height, 0px) + 2.5rem + 1rem);
+}
+@media (min-width: 1280px) {
+  /* xl: the side TOC replaces the popover bar, no chrome sits over the content,
+     so a heading lands at the top with only a little breathing room. */
+  .prose :where(h1, h2, h3, h4) {
+    scroll-margin-top: 1rem;
+  }
 }
 /* prose links carry a soft accent underline instead of the default */
 .prose a:not([class]) {

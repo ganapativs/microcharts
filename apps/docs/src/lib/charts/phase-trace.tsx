@@ -36,6 +36,18 @@ export const entry: ChartEntry = {
       description: "Axis names — the summary reads them.",
     },
     {
+      name: "xDomain",
+      type: "[number, number]",
+      required: false,
+      description: "Fix the x-axis range (default: the data's x-extent).",
+    },
+    {
+      name: "yDomain",
+      type: "[number, number]",
+      required: false,
+      description: "Fix the y-axis range (default: the data's y-extent).",
+    },
+    {
       name: "tail",
       type: "number",
       required: false,
@@ -46,6 +58,12 @@ export const entry: ChartEntry = {
       type: "boolean",
       required: false,
       description: "Quadrant hairlines for regime reads.",
+    },
+    {
+      name: "startDot",
+      type: "boolean",
+      required: false,
+      description: "Anchor the path's origin for full-journey reads (default false).",
     },
   ],
   demo: [62, 130],

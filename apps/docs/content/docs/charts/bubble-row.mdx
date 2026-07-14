@@ -8,11 +8,17 @@ circles whose **area** (not width) is proportional to value. Area is the weakest
 this is the catalog's honest low-precision exemplar: **for a precise comparison, use `MiniBar`.** The
 value numerals are on by default, because a low-precision channel owes the reader the number.
 
-<LiveDemo
-  label="BubbleRow"
-  sizeOf="bubble-row"
->
-  <BubbleRow data={[{ label: "EMEA", value: 1240 }, { label: "AMER", value: 890 }, { label: "APAC", value: 560 }, { label: "LATAM", value: 210 }]} title="Market size" height={36} />
+<LiveDemo label="BubbleRow" sizeOf="bubble-row">
+  <BubbleRow
+    data={[
+      { label: "EMEA", value: 1240 },
+      { label: "AMER", value: 890 },
+      { label: "APAC", value: 560 },
+      { label: "LATAM", value: 210 },
+    ]}
+    title="Market size"
+    height={36}
+  />
 </LiveDemo>
 
 ## Install

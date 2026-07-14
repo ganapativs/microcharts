@@ -23,11 +23,14 @@ const THEMES = [
 ] as const;
 
 // Chart presets → [data-mc-preset] on <html> (modern = default, no attribute).
+// print + eink are output-context bundles (paper, grayscale e-paper).
 const PRESETS = [
   { id: "modern", label: "Modern" },
   { id: "editorial", label: "Editorial" },
   { id: "mono", label: "Mono" },
   { id: "vivid", label: "Vivid" },
+  { id: "print", label: "Print" },
+  { id: "eink", label: "E-ink" },
 ] as const;
 
 function AccentChip({
@@ -89,7 +92,7 @@ export function AppearanceMenu() {
       const r = ref.current.getBoundingClientRect();
       // approximate popover height (preview + theme + accent + chart-style rows)
       // so the up/down flip keeps it on-screen; err tall to avoid clipping.
-      const PANEL_H = 460;
+      const PANEL_H = 510;
       const openUp = r.bottom + PANEL_H > window.innerHeight && r.top > PANEL_H;
       const vertical: CSSProperties = openUp
         ? { bottom: window.innerHeight - r.top + 10 }

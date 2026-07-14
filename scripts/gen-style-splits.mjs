@@ -1,16 +1,22 @@
 #!/usr/bin/env node
 /**
- * Splits `styles.css` (plan/19 CSS-delivery escape hatch) into:
+ * Splits `styles.css` (plan/19 CSS-delivery escape hatch) and minifies every
+ * shipped CSS artifact:
  *
+ *   dist/styles.css             — the whole library, minified (this is what
+ *                                 `@microcharts/react/styles.css` resolves to)
  *   dist/styles/core.css        — everything NOT inside an `@mc-chart` marker
  *   dist/styles/<slug>.css      — one file per single-chart-specific block
  *
- * `styles.css` stays the source of truth and the recommended default import
- * (one shared artifact — plan/19). The per-chart split is an opt-in escape
- * hatch for consumers who import exactly one chart and want to shave the
- * ~2.2 kB of chart-specific rules they don't use; `core.css` + `<slug>.css`
- * together are byte-for-byte equivalent to the matching subset of
- * `styles.css` (same rules, same `@layer` membership, same cascade order).
+ * `styles.css` (repo root) stays the unminified source of truth: its
+ * `@mc-chart` markers drive this generator and the docs read it directly for
+ * token/preset parity. Only the `dist/` copies ship, and all of them are
+ * minified (comments + whitespace stripped via esbuild — no rule merging, so
+ * `@layer` membership and cascade order are preserved). The per-chart split is
+ * an opt-in escape hatch for consumers who import exactly one chart and want to
+ * shave the chart-specific rules they don't use; `core.css` + `<slug>.css`
+ * together are semantically equivalent to the matching subset of `styles.css`
+ * (same rules, same `@layer` membership, same cascade order).
  *
  * Marking convention (hand-authored in styles.css, never generated):
  *   /* @mc-chart <slug> *\/  ...rules...  /* @mc-chart-end *\/
@@ -181,7 +187,7 @@ function listKnownChartDirs() {
     .map((d) => d.name);
 }
 
-function main() {
+async function main() {
   const src = readFileSync(srcPath, "utf8");
   const { files, slugs } = generateFromSource(src);
 
@@ -193,12 +199,26 @@ function main() {
     process.exit(1);
   }
 
+  // esbuild only strips comments + whitespace here (loader: "css", minify) — it
+  // never merges or reorders rules, so `@layer` membership and cascade order
+  // survive. Dynamically imported so the pure exports above stay dependency-free
+  // for src/test/style-splits.test.ts.
+  const { transformSync } = await import("esbuild");
+  const minify = (css) => transformSync(css, { loader: "css", minify: true }).code;
+
+  // Every shipped artifact is minified. The whole-library file lives at
+  // dist/styles.css (what `@microcharts/react/styles.css` resolves to); the
+  // split files live in dist/styles/.
+  const outputs = new Map([[resolve(root, "dist/styles.css"), minify(src)]]);
+  for (const [name, content] of Object.entries(files)) {
+    outputs.set(resolve(outDir, name), minify(content));
+  }
+
   if (process.argv.includes("--check")) {
     let stale = false;
-    for (const [name, content] of Object.entries(files)) {
-      const target = resolve(outDir, name);
+    for (const [target, content] of outputs) {
       if (!existsSync(target) || readFileSync(target, "utf8") !== content) {
-        console.error(`dist/styles/${name} is stale or missing.`);
+        console.error(`${target} is stale or missing.`);
         stale = true;
       }
     }
@@ -212,17 +232,17 @@ function main() {
       }
     }
     if (stale) {
-      console.error("Run `node scripts/gen-style-splits.mjs` to regenerate dist/styles/.");
+      console.error("Run `node scripts/gen-style-splits.mjs` to regenerate dist/ CSS.");
       process.exit(1);
     }
-    console.log(`dist/styles/ matches styles.css (${Object.keys(files).length} files).`);
+    console.log(`dist/ CSS matches styles.css (${outputs.size} files).`);
   } else {
     mkdirSync(outDir, { recursive: true });
-    for (const [name, content] of Object.entries(files)) {
-      writeFileSync(resolve(outDir, name), content);
+    for (const [target, content] of outputs) {
+      writeFileSync(target, content);
     }
     console.log(
-      `dist/styles/ generated: core.css + ${slugs.length} chart file(s) (${slugs.join(", ")}).`,
+      `dist/ CSS generated (minified): styles.css + core.css + ${slugs.length} chart file(s) (${slugs.join(", ")}).`,
     );
   }
 }
@@ -230,5 +250,8 @@ function main() {
 // Only run the CLI when this file is executed directly (`node
 // scripts/gen-style-splits.mjs`), not when imported by the test suite.
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main();
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }

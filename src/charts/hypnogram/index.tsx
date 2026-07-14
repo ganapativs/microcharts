@@ -25,6 +25,8 @@ export interface HypnogramProps {
   /** `"lanes"` renders nominal states as filled blocks — no implied rank.
    * */
   variant?: "steps" | "lanes" | undefined;
+  /** Per-state lane colours (`"lanes"` variant), cycled; overrides `--mc-cat-N`. */
+  colors?: readonly string[] | undefined;
   /** Time extent; the last state holds to `domain[1]`. */
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
@@ -85,6 +87,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
     emphasis,
     connectors = true,
     variant = "steps",
+    colors,
     labels: labelsProp,
     domain: domainProp,
     width = 140,
@@ -187,7 +190,10 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
               shapeRendering="crispEdges"
               data-mc-ink={emphasis ? (active ? "accent" : "neutral") : undefined}
               data-mc-cat={emphasis ? undefined : (r.row % CAT_N) + 1}
-              style={{ fillOpacity: emphasis && !active ? 0.35 : 0.9 }}
+              style={{
+                fillOpacity: emphasis && !active ? 0.35 : 0.9,
+                ...(colors && !emphasis ? { fill: colors[r.row % colors.length] } : null),
+              }}
             />
           );
         })

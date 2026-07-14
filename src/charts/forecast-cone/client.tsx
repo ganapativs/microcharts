@@ -42,6 +42,9 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // The cone widens left→right, so a wipe (left→right clip) uncovers the fan
+  // in forecast order — the best available archetype here. An ideal
+  // fan-from-origin grow doesn't exist in the engine yet.
   useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(

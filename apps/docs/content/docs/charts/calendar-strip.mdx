@@ -7,10 +7,7 @@ CalendarStrip answers "what did the last few weeks actually look like, day by da
 week-aligned recent activity where real calendar position matters. Weekday rhythm is the
 read; for longer ordinal histories, use ActivityGrid.
 
-<LiveDemo
-  label="CalendarStrip"
-  sizeOf="calendar-strip"
->
+<LiveDemo label="CalendarStrip" sizeOf="calendar-strip">
   <CalendarStrip
     data={Array.from({ length: 18 }, (_, i) => ({
       date: `2026-06-${String(4 + i).padStart(2, "0")}`,

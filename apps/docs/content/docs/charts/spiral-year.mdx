@@ -9,11 +9,15 @@ is the next year. The value becomes a five-step opacity, so busy stretches read 
 spiral. This is a **pattern instrument** — opacity is the weakest ordered channel, so for an exact
 day's value reach for `ActivityGrid` or `HeatStrip`.
 
-<LiveDemo
-  label="SpiralYear"
-  sizeOf="spiral-year"
->
-  <SpiralYear data={Array.from({ length: 52 }, (_, i) => { const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2)); return i === 29 ? 480 : s; })} title="Seasonality" size={80} />
+<LiveDemo label="SpiralYear" sizeOf="spiral-year">
+  <SpiralYear
+    data={Array.from({ length: 52 }, (_, i) => {
+      const s = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2));
+      return i === 29 ? 480 : s;
+    })}
+    title="Seasonality"
+    size={80}
+  />
 </LiveDemo>
 
 ## Install

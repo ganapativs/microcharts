@@ -18,7 +18,14 @@ const MIX = [
 describe("<MicroDonut>", () => {
   it("≤ 4 wedges + Other rollup; summary reuses the shares wording", () => {
     const { container } = draw(<MicroDonut data={MIX} />);
-    expect(container.querySelectorAll("path").length).toBe(4);
+    const wedges = container.querySelectorAll("path.mc-donut-wedge");
+    expect(wedges.length).toBe(4);
+    // Stroked band, not a filled sector: fill none + an inline stroke token.
+    for (const w of wedges) {
+      expect(w.getAttribute("fill")).toBe("none");
+      expect((w as SVGElement).style.stroke).toContain("var(--mc-");
+      expect((w as SVGElement).style.strokeWidth).not.toBe("");
+    }
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
       "Chrome 62%, Safari 24%, Firefox 9%, Other 5%.",
     );
@@ -45,3 +52,13 @@ describe("<MicroDonut>", () => {
 seriesEdgeSuite("MicroDonut", (data) => (
   <MicroDonut data={data.map((v, i) => ({ label: `c${i}`, value: v }))} title="Edge" />
 ));
+
+describe("<MicroDonut> colors", () => {
+  it("colors[] overrides wedge strokes, cycling; Other stays neutral", () => {
+    const { container } = draw(<MicroDonut data={MIX} colors={["rgb(1, 2, 3)", "rgb(4, 5, 6)"]} />);
+    const wedges = [...container.querySelectorAll("path.mc-donut-wedge")] as SVGElement[];
+    expect(wedges[0]!.style.stroke).toBe("rgb(1, 2, 3)");
+    expect(wedges[1]!.style.stroke).toBe("rgb(4, 5, 6)");
+    expect(wedges[wedges.length - 1]!.style.stroke).toBe("var(--mc-neutral)");
+  });
+});

@@ -8,11 +8,11 @@ always the exact value; font _weight_ is a second, redundant channel — five (o
 mapped from your `domain` — so the large numbers pop preattentively as you scan a column. Weight is
 never the primary read: it is ordinal and coarse, and the number is right there.
 
-<LiveDemo
-  label="FatDigits"
-  sizeOf="fat-digits"
->
-  <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }} className="tabular-nums">
+<LiveDemo label="FatDigits" sizeOf="fat-digits">
+  <span
+    style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}
+    className="tabular-nums"
+  >
     <FatDigits value={1204} domain={[0, 2100]} summary={false} fontSize={16} />
     <FatDigits value={318} domain={[0, 2100]} summary={false} fontSize={16} />
     <FatDigits value={2100} domain={[0, 2100]} summary={false} fontSize={16} />

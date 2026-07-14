@@ -44,6 +44,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Print the stage number above each glyph.",
     },
+    {
+      name: "step",
+      type: "number",
+      required: false,
+      description: "Horizontal spacing between glyph slots (default 16; widens for labels).",
+    },
   ],
   demo: [3, 2, 3, 1, 0, 2],
   example: {

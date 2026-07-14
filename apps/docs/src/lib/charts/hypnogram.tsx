@@ -57,6 +57,24 @@ export const entry: ChartEntry = {
       required: false,
       description: "Lanes for nominal states with no rank.",
     },
+    {
+      name: "connectors",
+      type: "boolean",
+      required: false,
+      description: "Vertical transition strokes (default true); off for ultra-dense strips.",
+    },
+    {
+      name: "labels",
+      type: "boolean",
+      required: false,
+      description: "Left-gutter state names (default: on when width ≥ 96).",
+    },
+    {
+      name: "colors",
+      type: "string[]",
+      required: false,
+      description: "Per-state lane colours (lanes variant), cycled; overrides --mc-cat-N.",
+    },
   ],
   demo: [0, 1, 2, 1, 3, 1, 0],
   example: {

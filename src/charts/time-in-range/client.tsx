@@ -46,8 +46,13 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
   const horizontal = orientation !== "vertical";
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "reveal", animate, {
+  // A composition bar should ASSEMBLE, not fade in place: each zone grows from
+  // the leading edge and the zones cascade in order, so the whole bar builds
+  // up the way its siblings (SegmentedBar, LikertStrip) do. Direction follows
+  // orientation — sweep across x when horizontal, rise up y when vertical.
+  useEntrance(hostRef, horizontal ? "sweep" : "rise", animate, {
     selector: "rect[data-mc-ink], rect[data-mc-cat]",
+    order: horizontal ? "x" : "y",
   });
 
   const geo = useMemo(

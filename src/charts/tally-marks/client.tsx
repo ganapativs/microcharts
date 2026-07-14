@@ -15,10 +15,14 @@ export interface InteractiveTallyMarksProps extends TallyMarksProps {
 }
 
 export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
-  const { live = true, strings = EN_TALLY, title, value, ...rest } = props;
+  const { live = true, strings = EN_TALLY, title, value, pen, ...rest } = props;
   const summary = tallySummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
   const prev = useRef(value);
+  // length of the path at the previous count — lets a +1 draw ONLY the newly
+  // added subpath (static dash prefix = the old marks) instead of re-drawing
+  // the whole tally on every increment.
+  const prevLen = useRef<number | null>(null);
   const [announced, setAnnounced] = useState("");
 
   useEffect(() => {
@@ -26,14 +30,23 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
     const grew = value > prev.current;
     prev.current = value;
     if (live) setAnnounced(summary);
+    const path = wrap.current?.querySelector<SVGPathElement>('path[data-mc-ink="data"]');
+    const len = path ? path.getTotalLength() : 0;
+    const from = prevLen.current;
+    prevLen.current = len; // keep synced for the next delta (grow OR shrink)
     if (!grew) return;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
-    const path = wrap.current?.querySelector<SVGPathElement>('path[data-mc-ink="data"]');
-    if (!path) return;
-    const len = path.getTotalLength();
+    if (!path || len === 0) return;
+    // The "ruled" pen appends strokes deterministically, so the prior marks are
+    // byte-identical (0…from stays put) and only the [from, len] tail is new —
+    // sweep the dashoffset over just that delta. The "drawn" pen re-seeds its
+    // jitter from the count, shifting every earlier stroke, so its prefix isn't
+    // stable: fall back to re-drawing the whole path. (The first grow after
+    // mount has no prior length either, so it also draws whole.)
+    const delta = pen !== "drawn" && from !== null && from < len ? len - from : len;
     path.style.strokeDasharray = String(len);
-    const anim = path.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], {
+    const anim = path.animate([{ strokeDashoffset: delta }, { strokeDashoffset: 0 }], {
       duration: 200,
       easing: "cubic-bezier(0.23, 1, 0.32, 1)",
     });
@@ -45,7 +58,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
       anim.cancel();
       path.style.strokeDasharray = "";
     };
-  }, [value, live, summary]);
+  }, [value, live, summary, pen]);
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
@@ -58,7 +71,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
       role="img"
       aria-label={label}
     >
-      <StaticTallyMarks {...rest} value={value} strings={strings} summary={false} />
+      <StaticTallyMarks {...rest} pen={pen} value={value} strings={strings} summary={false} />
       {live ? (
         <span
           aria-live="polite"

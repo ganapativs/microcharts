@@ -60,10 +60,12 @@ information, so nothing decorative gets in.
 
 Static charts don't move at all — there's nothing to animate and no `animate` prop to pass. Only
 the `/interactive` entries can play an entrance, and only when you opt in with `animate`
-(off by default). It runs through CSS, gated on `prefers-reduced-motion`, and marks decelerate
-into place — they never bounce, loop, or draw the eye away from the data. Motion is a property of
-the interactive build, not a knob bolted onto the static one, so it can't leak into a server
-render or turn into decoration.
+(off by default). It runs through CSS, gated on `prefers-reduced-motion`. Every entrance follows
+the logic of the data it draws: a line draws left-to-right along its time axis, bars grow from the
+baseline, a donut fills clockwise from twelve o'clock, and labels arrive last — they annotate marks
+that already exist. Marks decelerate into place; they never bounce, loop, or draw the eye away from
+the data. Motion is a property of the interactive build, not a knob bolted onto the static one, so
+it can't leak into a server render or turn into decoration.
 
 ## Budgets are build gates
 
@@ -78,6 +80,14 @@ All the chart types ship from a single package, `@microcharts/react`, each behin
 subpath so you only bundle what you import. The catalog's collections — core, decision,
 expressive, frontier — are just metadata for browsing; they're never package or import
 boundaries. There's no plugin to install, no engine to configure.
+
+The root barrel (`@microcharts/react`, no subpath) carries only the shared pieces, so importing
+it pulls in no chart code: the `Chart` root wrapper every chart composes — a `role="img"` `<svg>`
+with the viewBox, `title`, and generated `summary` already wired, there if you ever need to build
+a custom mark — plus [`SparkGroup`](/docs/composition#small-multiples-one-shared-scale) for
+shared-scale small multiples, [`MicroProvider`](/docs/theming#a-component-api-if-you-prefer) for
+theming, and the `describeSeries` / `makeFormatter` / `EN` helpers documented under
+[Formatting](/docs/formatting) and [Accessibility](/docs/accessibility).
 
 ## The bar for a new chart type
 

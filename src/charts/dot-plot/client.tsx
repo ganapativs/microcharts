@@ -38,7 +38,13 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
   const height = props.height ?? Math.max(16, data.length * 8);
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "settle", animate);
+  // Dots settle onto the scale (the story). With `stem`, the stem line is the
+  // magnitude-from-zero channel for each row — it must arrive WITH its dot, not
+  // ride the quiet stage ahead of it, so `defer` casts it into the closing act.
+  // (No-op when stem is off — its default — since no stem lines exist.)
+  // Dots settle in, then each stem DRAWS from the baseline up to its dot (when
+  // stem=true); the magnitude channel re-enacts itself instead of fading in.
+  useEntrance(hostRef, "settle", animate, { link: 'line[data-mc-ink="muted"]' });
 
   const fontSize = 6;
   const maxLabelChars = Math.min(

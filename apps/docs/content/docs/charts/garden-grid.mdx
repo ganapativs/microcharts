@@ -9,11 +9,13 @@ grayscale and print where a color heatmap would collapse. The radius is √-quan
 steps evenly. A zero cell is a hairline ring (present, but quiet); a `null` cell is nothing at all,
 because "missing" is not "zero".
 
-<LiveDemo
-  label="GardenGrid"
-  sizeOf="garden-grid"
->
-  <GardenGrid data={[12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26]} unit="weeks" title="Activity" cell={11} />
+<LiveDemo label="GardenGrid" sizeOf="garden-grid">
+  <GardenGrid
+    data={[12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26]}
+    unit="weeks"
+    title="Activity"
+    cell={11}
+  />
 </LiveDemo>
 
 ## Install

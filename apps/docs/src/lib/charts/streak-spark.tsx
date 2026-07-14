@@ -64,6 +64,13 @@ export const entry: ChartEntry = {
       required: false,
       description: "Override or disable the auto summary.",
     },
+    {
+      name: "onRunFocus",
+      type: "(index: number | null) => void",
+      required: false,
+      interactive: true,
+      description: "Fires as hover/keyboard focus moves across runs; `null` on blur.",
+    },
   ],
   demo: STREAK,
   example: {

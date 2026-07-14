@@ -9,20 +9,24 @@ rescaled to steepen the curve. The bars up to the threshold crossing are accent 
 few** — and the rest are muted, because the chart's one job is to say where to stop reading. 80%
 is a working reference, not a law, and `Other` never re-enters the ranking.
 
-<LiveDemo
-  label="ParetoStrip"
-  sizeOf="pareto-strip"
->
+<LiveDemo label="ParetoStrip" sizeOf="pareto-strip">
   <ParetoStrip
     data={[
-      { label: "Timeouts", value: 38 }, { label: "OOM", value: 24 }, { label: "Deploy", value: 15 },
-      { label: "Config", value: 9 }, { label: "Network", value: 7 }, { label: "Auth", value: 4 },
-      { label: "Disk", value: 3 }, { label: "DNS", value: 3 }, { label: "Other bug", value: 2 },
+      { label: "Timeouts", value: 38 },
+      { label: "OOM", value: 24 },
+      { label: "Deploy", value: 15 },
+      { label: "Config", value: 9 },
+      { label: "Network", value: 7 },
+      { label: "Auth", value: 4 },
+      { label: "Disk", value: 3 },
+      { label: "DNS", value: 3 },
+      { label: "Other bug", value: 2 },
     ]}
     unit="causes"
     metric="incidents"
     title="Incident causes"
-    width={260} height={28}
+    width={260}
+    height={28}
   />
 </LiveDemo>
 

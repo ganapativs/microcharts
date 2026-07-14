@@ -44,7 +44,11 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "reveal", animate);
+  // `defer` the diagonal/error emphasis ring into the closing VOICE act so it
+  // pops AFTER the cells, not before. (It can't carry data-mc-ink="accent" —
+  // a rect with that role gets a solid accent fill from the stylesheet and
+  // loses its inset-stroke identity; the ring is tagged data-mc-ring="accent".)
+  useEntrance(hostRef, "reveal", animate, { defer: 'rect[data-mc-ring="accent"]' });
 
   const { labels, counts } = data;
   const k = Math.max(2, Math.min(4, labels.length));

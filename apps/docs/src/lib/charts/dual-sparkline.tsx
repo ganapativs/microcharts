@@ -43,6 +43,18 @@ export const entry: ChartEntry = {
       description: "The benchmark — dashed, thinner, neutral.",
     },
     {
+      name: "compareLabel",
+      type: "string",
+      required: false,
+      description: "Names the reference in the summary and announcements.",
+    },
+    {
+      name: "curve",
+      type: '"linear" | "smooth" | "step"',
+      required: false,
+      description: "Line shape (default 'linear').",
+    },
+    {
       name: "band",
       type: "[number, number]",
       required: false,
@@ -53,6 +65,12 @@ export const entry: ChartEntry = {
       type: '"last" | "none"',
       required: false,
       description: "Endpoint value label for the primary series.",
+    },
+    {
+      name: "seriesStrings",
+      type: "SeriesStrings",
+      required: false,
+      description: "i18n strings for the per-series trend clauses.",
     },
   ],
   demo: US,

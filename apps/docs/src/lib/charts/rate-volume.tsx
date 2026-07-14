@@ -68,6 +68,18 @@ export const entry: ChartEntry = {
       description: "Volume has different units than rate; formatted separately.",
     },
     {
+      name: "unit",
+      type: "string",
+      required: false,
+      description: "Noun for the volume unit in the summary (default 'events').",
+    },
+    {
+      name: "volumeDomain",
+      type: "[number, number]",
+      required: false,
+      description: "Volume (bar) domain — defaults to [0, max], zero-anchored.",
+    },
+    {
       name: "label",
       type: '"last" | "none"',
       required: false,

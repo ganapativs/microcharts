@@ -13,12 +13,12 @@ export interface InteractiveTrendArrowProps extends TrendArrowProps {
   live?: boolean;
   strings?: ScalarStrings;
   /**
-   * Opt-in entrance motion (default `false`): the glyph fades in when the
-   * chart first mounts client-side. Fade only (no scale/transform) — the
-   * existing direction-change pulse animates `transform` on this same `.mc-root`
-   * svg, so the entrance stays off that property to never collide with it.
-   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
-   * always wins.
+   * Opt-in entrance motion (default `false`): the glyph lifts and scales in
+   * (a subtle `pop`) when the chart first mounts client-side. The pop is a
+   * one-shot at mount; the direction-change pulse (CSS `transform` on this same
+   * `.mc-root` svg) only fires on a later value change, so the two never run at
+   * once. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -29,7 +29,7 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
   const [pulse, setPulse] = useState(false);
   const prev = useRef(model.direction);
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "fade", animate);
+  useEntrance(hostRef, "pop", animate);
 
   useEffect(() => {
     if (prev.current === model.direction) return;

@@ -39,6 +39,18 @@ export const entry: ChartEntry = {
       description: "One value per day or week (cadence inferred from length).",
     },
     {
+      name: "cadence",
+      type: '"day" | "week"',
+      required: false,
+      description: "Data cadence; inferred from length (≈52 → week, else day) when omitted.",
+    },
+    {
+      name: "startDate",
+      type: "string",
+      required: false,
+      description: "ISO date anchoring index 0 to a calendar angle.",
+    },
+    {
       name: "steps",
       type: "3 | 5",
       required: false,

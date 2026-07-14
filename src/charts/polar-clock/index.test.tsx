@@ -37,9 +37,11 @@ describe("<PolarClock>", () => {
     expect(t!.textContent).toBe("40");
   });
 
-  it("now accents a segment", () => {
+  it("now accents a segment with a solid fill (not a hollow outline)", () => {
     const { container } = draw(<PolarClock data={[10, 40, 20]} now={1} />);
-    expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
+    const accent = container.querySelector('path[data-mc-ink="accent"]') as SVGElement | null;
+    expect(accent).not.toBeNull();
+    expect(accent!.style.fill).toBe("var(--mc-accent)");
   });
 
   it("opacity mode renders level cells", () => {

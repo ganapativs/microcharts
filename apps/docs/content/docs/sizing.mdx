@@ -1,0 +1,121 @@
+---
+title: Sizing & scaling
+description: How microcharts sizes itself — the intrinsic default box, width/height as viewBox units, filling a container fluidly with one line of CSS, and sitting inline in a sentence. Strokes stay crisp at any scale.
+---
+
+Every chart is a single `<svg>` with a `viewBox` and `preserveAspectRatio`, so scaling is a
+solved problem: give it a size in whatever way suits the layout and the geometry follows. There's
+no `ResizeObserver`, no layout effect, and no client JavaScript involved — a static chart scales
+purely through SVG and CSS.
+
+## The three ways to size a chart
+
+| You want…                    | Do this                                          |
+| ---------------------------- | ------------------------------------------------ |
+| A sensible default           | Pass nothing — every chart has an intrinsic box. |
+| An exact pixel size          | Set `width` / `height` props.                    |
+| To fill whatever contains it | Add `style={{ width: "100%", height: "auto" }}`. |
+
+## Default: data alone
+
+`data` alone always renders something correct — at the chart's own intrinsic size. Each chart
+type ships a default `width`/`height` tuned to its shape (a Sparkline is wide and short; a
+RubricStrip grows a row per criterion). Good for dropping a mark into a table cell or a sentence
+without thinking about dimensions.
+
+<LiveDemo
+  label="Intrinsic size"
+  sizeOf="sparkline"
+  code={`// no width/height → each chart's own default box
+<Sparkline data={[3, 5, 4, 8, 6, 9]} />`}
+>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />
+</LiveDemo>
+
+## Fixed size: width & height
+
+`width` and `height` are **viewBox units** — and because a static chart renders `<svg
+width={…} height={…}>`, they also set the rendered pixel box. So one pair of numbers controls both
+the coordinate space the geometry is drawn in and the size on screen.
+
+<LiveDemo
+  label="Fixed size"
+  code={`// width & height are viewBox units — they also set the pixel box
+<Sparkline data={[3, 5, 4, 8, 6, 9]} width={200} height={48} />`}
+>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={200} height={48} title="Weekly revenue" />
+</LiveDemo>
+
+<Callout type="info">
+  Because `width`/`height` set the viewBox, they change how much room the geometry has — a taller
+  RubricStrip gives each criterion a thicker row, a wider Sparkline spreads its points further
+  apart. They are layout dimensions, not a zoom level.
+</Callout>
+
+## Fill the container
+
+To make a chart fluid, stop pinning its pixel size and let CSS drive the width instead. The
+`viewBox` keeps the aspect ratio, so `height: auto` follows the width automatically. This is the
+one-liner for a KPI card, a responsive dashboard tile, or a full-width hero:
+
+```tsx
+<Sparkline data={data} style={{ width: "100%", height: "auto" }} />
+```
+
+The chart now grows and shrinks with its parent. Constrain it by sizing the container (or add a
+`max-width`), not the chart:
+
+```tsx
+<div style={{ width: "100%", maxWidth: 320 }}>
+  <Sparkline data={data} style={{ width: "100%", height: "auto" }} />
+</div>
+```
+
+You can still pass `width`/`height` alongside fluid CSS — they become the chart's intrinsic
+aspect ratio and its size before CSS overrides the width. If you use a utility framework, the
+equivalent classes work just as well (`className="w-full h-auto"`).
+
+<Callout type="info">
+  `.mc-root` is `display: inline-block` by default (so a chart flows next to text). When you make
+  one fill a block-level container, it behaves as expected — but if you ever see it not stretching,
+  that's the reason: give it a `display: block` or a flex/grid parent.
+</Callout>
+
+## Inline in a sentence
+
+A word-sized chart in running prose should scale with the **font**, not a pixel box. Wrap it in
+`className="mc-inline"` (shipped in `styles.css`) and size it in `em` so it rides the text:
+
+```tsx
+<p>
+  Revenue is up this week{" "}
+  <span className="mc-inline">
+    <Sparkline data={[3, 5, 4, 8, 6, 9]} style={{ height: "1em", width: "auto" }} />
+  </span>{" "}
+  and holding.
+</p>
+```
+
+`mc-inline` handles vertical alignment against the baseline; the `em` height ties the mark to the
+surrounding type size, so it stays proportional wherever the text lands.
+
+## Strokes stay crisp at any scale
+
+Scaling an SVG normally thickens or thins its lines. microcharts sets `vector-effect:
+non-scaling-stroke` on data marks, so a line drawn at 200 px and the same line at 800 px keep the
+**same visual stroke weight** — the geometry scales, the ink doesn't. Rectilinear marks also use
+`shape-rendering: crispEdges` so bars and grids stay sharp. You get responsive sizing without the
+usual blurriness or weight drift.
+
+Stroke weight is a token, not a size artifact — set `--mc-stroke-width` (see
+[Theming](/docs/theming)) if you want it heavier or lighter, independent of how big the chart is.
+
+For a whole dense context — a table packed with sparklines — reach for `--mc-density`: one scalar
+that scales stroke weight, label size, and small-multiple gap together (`< 1` tighter, `> 1`
+airier). It tunes the ink and type, never the box, so `width`/`height` still own the geometry.
+
+## Next steps
+
+- **[Theming](/docs/theming)** — colors, fonts, and stroke weight via `--mc-*` tokens.
+- **[Quickstart](/docs/quickstart)** — install, import the stylesheet, render your first chart.
+- **[All charts](/docs/charts)** — each page shows its own sizing recipes live.

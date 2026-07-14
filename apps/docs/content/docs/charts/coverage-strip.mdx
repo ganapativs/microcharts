@@ -9,16 +9,14 @@ slots are filled; gaps are hollow with a hairline outline. The distinction betwe
 by **shape**, so it survives forced-colors and print. Nothing is ever interpolated
 across a gap.
 
-<LiveDemo
-  label="CoverageStrip"
-  sizeOf="coverage-strip"
->
+<LiveDemo label="CoverageStrip" sizeOf="coverage-strip">
   <CoverageStrip
     data={[3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10]}
     expected={18}
     label="percent"
     title="Sensor uptime"
-    width={240} height={16}
+    width={240}
+    height={16}
   />
 </LiveDemo>
 

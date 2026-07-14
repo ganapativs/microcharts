@@ -9,16 +9,16 @@ observation. Add a `threshold` and the plot turns from shape into odds: the dots
 are re-inked and ringed, and the summary reads **"N in 20"** — because odds you can count beat
 odds you must trust, and a frequency reads truer than a bare percentage.
 
-<LiveDemo
-  label="QuantileDots"
-  sizeOf="quantile-dots"
->
+<LiveDemo label="QuantileDots" sizeOf="quantile-dots">
   <QuantileDots
-    data={Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)))}
+    data={Array.from({ length: 200 }, (_, i) =>
+      Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)),
+    )}
     threshold={15}
     format={(n) => `${n} min`}
     title="Bus wait"
-    width={260} height={30}
+    width={260}
+    height={30}
   />
 </LiveDemo>
 

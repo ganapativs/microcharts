@@ -3,9 +3,17 @@
 // `live` mode: when the value changes it re-announces the new figure through a
 // polite region (for updating KPI cards) and gives a one-shot pulse. Motion is
 // gated on reduced-motion in CSS; the announcement always fires.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { Delta as StaticDelta, deltaModel, type DeltaProps } from "./index.js";
+
+// Fresh-client-mount detector, mirroring the motion gate's hydration latch: the
+// value change edge is `true` on the very first render only while hydrating
+// server HTML, so a hydrated mount never re-enters. Kept local (the engine's
+// snapshot helpers are private) — three trivial constants, no shared coupling.
+const subscribeNever = (): (() => void) => () => {};
+const clientSnap = (): boolean => false;
+const serverSnap = (): boolean => true;
 
 export interface InteractiveDeltaProps extends DeltaProps {
   /** Announce + pulse when the value changes (default true). */
@@ -31,6 +39,15 @@ export function Delta({
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
 
+  // The `pop` entrance above animates only the glyph svg; the primary number is
+  // an HTML sibling outside it. Cast the number into the same mount entrance so
+  // it lifts+scales in beside the glyph instead of teleporting. Gated exactly
+  // like the glyph: opt-in, fresh client mount only (never over hydrated HTML),
+  // and `prefers-reduced-motion` strips the keyframe (motion layer).
+  const hydrating = useSyncExternalStore(subscribeNever, clientSnap, serverSnap);
+  const ssr = useRef(hydrating);
+  const enter = animate && !ssr.current;
+
   useEffect(() => {
     if (prev.current === props.value) return;
     prev.current = props.value;
@@ -41,7 +58,12 @@ export function Delta({
   }, [props.value, live]);
 
   return (
-    <span ref={hostRef} className="mc-delta-live" data-pulse={pulse ? "1" : undefined}>
+    <span
+      ref={hostRef}
+      className="mc-delta-live"
+      data-pulse={pulse ? "1" : undefined}
+      data-enter={enter ? "1" : undefined}
+    >
       <StaticDelta {...props} />
       {live ? (
         <span

@@ -72,6 +72,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Centered per segment (deterministic drop-out).",
     },
+    {
+      name: "colors",
+      type: "string[]",
+      required: false,
+      description: "Per-segment colours, cycled; overrides --mc-cat-N. Other stays neutral.",
+    },
   ],
   demo: MIX.map((d) => d.value),
   example: {

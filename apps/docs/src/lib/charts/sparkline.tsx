@@ -73,6 +73,14 @@ export const entry: ChartEntry = {
       required: false,
       description: "Override or disable the auto summary.",
     },
+    {
+      name: "onPointFocus",
+      type: "(index: number | null) => void",
+      required: false,
+      interactive: true,
+      description:
+        "Fires as hover/keyboard focus moves; `null` on blur. Wire crosshair or scrub-to-seek recipes.",
+    },
   ],
   demo: [3, 5, 4, 8, 6, 9, 7, 11, 10, 14],
   example: {

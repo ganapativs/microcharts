@@ -54,8 +54,12 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // The worm is one line split into below-50 (muted) + above-50 (accent) paths;
+  // stagger 0 starts both draw fronts together so the single worm reads as one
+  // continuous trace, not two sequential strokes.
   useEntrance(hostRef, "draw", animate, {
     selector: 'path[data-mc-ink="muted"], path[data-mc-ink="accent"]',
+    stagger: 0,
   });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);

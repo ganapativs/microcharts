@@ -156,6 +156,7 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
             geo.spokes.map((s) => ({ x: s.tx, y: s.ty })),
             Math.max(0.8, size * 0.045),
           )}
+          data-mc-ink="point"
           style={{ fill: "var(--mc-accent)" }}
         />
       ) : null}

@@ -447,26 +447,31 @@ function Inline({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean);
   return (
     <>
-      {parts.map((p, i) => {
-        if (p.startsWith("**") && p.endsWith("**"))
+      {parts.map((part) => {
+        if (part.startsWith("**") && part.endsWith("**"))
           return (
-            <strong key={i} className="font-medium text-fd-foreground">
-              {p.slice(2, -2)}
+            <strong key={`b:${part}`} className="font-medium text-fd-foreground">
+              {part.slice(2, -2)}
             </strong>
           );
-        if (p.startsWith("`") && p.endsWith("`")) {
-          const inner = p.slice(1, -1);
-          if (inner.startsWith("chart ")) return <InlineChart key={i} spec={inner.slice(6)} />;
+        if (part.startsWith("`") && part.endsWith("`")) {
+          const inner = part.slice(1, -1);
+          if (inner.startsWith("chart "))
+            return <InlineChart key={`chart:${inner}`} spec={inner.slice(6)} />;
           return (
-            <code key={i} className="font-mono text-[0.9em] text-fd-primary">
+            <code key={`code:${inner}`} className="font-mono text-[0.9em] text-fd-primary">
               {inner}
             </code>
           );
         }
-        return <span key={i}>{p}</span>;
+        return <span key={`t:${part}`}>{part}</span>;
       })}
     </>
   );
+}
+
+function nodeKey(n: Node): string {
+  return n.t === "text" ? `text:${n.v}` : `code:${n.type}:${n.closed}:${n.body}`;
 }
 
 // One rendered message body. `animate` adds the settle on block charts; the ghost
@@ -474,18 +479,21 @@ function Inline({ text }: { text: string }) {
 function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; caret: boolean }) {
   return (
     <div className="max-w-xl text-[0.98rem] leading-relaxed text-fd-foreground/85">
-      {nodes.map((n, i) =>
+      {nodes.map((n) =>
         n.t === "text" ? (
-          <span key={i} className="whitespace-pre-wrap">
+          <span key={nodeKey(n)} className="whitespace-pre-wrap">
             <Inline text={n.v} />
           </span>
         ) : n.closed ? (
-          <span key={i} className={`my-2 flex justify-start${animate ? " mc-stream-chart" : ""}`}>
+          <span
+            key={nodeKey(n)}
+            className={`my-2 flex justify-start${animate ? " mc-stream-chart" : ""}`}
+          >
             <BlockChart info={n.type} body={n.body} />
           </span>
         ) : (
           <code
-            key={i}
+            key={nodeKey(n)}
             className="code-inset my-3 block whitespace-pre px-4 py-3 font-mono text-[0.8rem] text-fd-muted-foreground"
           >
             {"```chart " + n.type + "\n" + n.body}

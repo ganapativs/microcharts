@@ -49,7 +49,10 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "spin", animate);
+  // The spiral's angle encodes the time of year, so the entrance must not
+  // rotate — "grow" scales it concentrically from the center, keeping every
+  // period at its true angular position.
+  useEntrance(hostRef, "grow", animate);
 
   const cadence = inferCadence(data.length, cadenceProp);
   const startIndex = useMemo(() => {

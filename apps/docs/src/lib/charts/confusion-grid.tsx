@@ -58,6 +58,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Overall accuracy in the gutter (opt-in).",
     },
+    {
+      name: "shape",
+      type: '"square" | "round"',
+      required: false,
+      description: "Cell shape from the shared vocabulary (default 'square').",
+    },
   ],
   demo: [87, 12],
   example: {

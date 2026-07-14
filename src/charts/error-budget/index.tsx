@@ -175,18 +175,20 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
             y1={height - 2 - 1.6}
             x2={geo.exhausted.x + 1.6}
             y2={height - 2 + 1.6}
-            stroke="var(--mc-negative)"
+            data-mc-ink="flag"
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
+            style={{ stroke: "var(--mc-negative)" }}
           />
           <line
             x1={geo.exhausted.x - 1.6}
             y1={height - 2 + 1.6}
             x2={geo.exhausted.x + 1.6}
             y2={height - 2 - 1.6}
-            stroke="var(--mc-negative)"
+            data-mc-ink="flag"
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
+            style={{ stroke: "var(--mc-negative)" }}
           />
         </>
       ) : (

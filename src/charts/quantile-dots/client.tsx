@@ -38,11 +38,12 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // "trail" + order "index" pops the dots in their authored (quantile) order
-  // rather than a uniform stagger — the plot reads as being counted out.
+  // "trail" + order "x" pops the dots by true column position, a clean
+  // left→right fill. Authored (index) order interleaves neutral and flagged
+  // dots into two waves; column order reads as the stack being counted out.
   useEntrance(hostRef, "trail", animate, {
     selector: '[data-mc-ink="neutral"], [data-mc-ink="flag"]',
-    order: "index",
+    order: "x",
   });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);

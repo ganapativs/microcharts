@@ -57,6 +57,18 @@ export const entry: ChartEntry = {
       required: false,
       description: "Within-slot micro-trend, or a spine-only quiet form.",
     },
+    {
+      name: "spine",
+      type: "boolean",
+      required: false,
+      description: "The slot-center spine (default true); false leaves within-slot drift only.",
+    },
+    {
+      name: "cycleUnit",
+      type: "string",
+      required: false,
+      description: "Cycle noun for the summary, e.g. 'weeks' (default 'cycles').",
+    },
   ],
   demo: WEEKS,
   example: {

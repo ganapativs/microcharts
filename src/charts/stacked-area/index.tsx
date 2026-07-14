@@ -48,6 +48,8 @@ export interface StackedAreaProps {
   order?: "data" | "asc" | undefined;
   /** `"last"` = endpoint share labels per series (deterministic drop-out). */
   label?: "last" | "none" | undefined;
+  /** Per-series colours, cycled; overrides `--mc-cat-N` for this instance. */
+  colors?: readonly string[] | undefined;
   curve?: Curve | undefined;
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
@@ -72,6 +74,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
     variant = "stacked",
     order = "data",
     label = "none",
+    colors,
     curve = "linear",
     domain,
     width = 60,
@@ -143,7 +146,10 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
             <path
               d={layer.dArea}
               data-mc-cat={(layer.index % CAT_N) + 1}
-              style={{ fillOpacity: variant === "ridge" ? 1 : 0.8 }}
+              style={{
+                fillOpacity: variant === "ridge" ? 1 : 0.8,
+                ...(colors ? { fill: colors[layer.index % colors.length] } : null),
+              }}
             />
           ) : null}
           {layer.dTop ? (
@@ -158,7 +164,9 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
               stroke={
                 variant === "ridge"
                   ? "var(--mc-surface, Canvas)"
-                  : `var(${CAT_TOKENS[layer.index % CAT_N]})`
+                  : colors
+                    ? colors[layer.index % colors.length]
+                    : `var(${CAT_TOKENS[layer.index % CAT_N]})`
               }
               data-mc-w={variant === "ridge" ? "support" : "tick"}
               vectorEffect="non-scaling-stroke"

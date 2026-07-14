@@ -8,13 +8,13 @@ about?". A content thumbnail sits under a viewport window and a lane of annotati
 region you haven't loaded or crawled is drawn as fog rather than blank — because absence is not the
 same as zero. The unknown share travels with the accessible name.
 
-<LiveDemo
-  label="MinimapStrip"
-  sizeOf="minimap-strip"
->
+<LiveDemo label="MinimapStrip" sizeOf="minimap-strip">
   <MinimapStrip
     data={{
-      content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6),
+      content: Array.from(
+        { length: 1200 },
+        (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6,
+      ),
       window: [520, 660],
       marks: [100, 600, 1100],
       known: [[0, 1104]],

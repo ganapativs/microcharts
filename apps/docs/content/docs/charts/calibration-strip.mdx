@@ -8,10 +8,7 @@ there enough data to even ask?". Each bin is a dot at its predicted probability 
 frequency, read against the identity diagonal, with a quiet support lane underneath. Bins with too
 little data render open and faded, so a confident-looking dot is never backed by three samples.
 
-<LiveDemo
-  label="CalibrationStrip"
-  sizeOf="calibration-strip"
->
+<LiveDemo label="CalibrationStrip" sizeOf="calibration-strip">
   <CalibrationStrip
     data={[
       { predicted: 0.05, observed: 0.05, count: 100 },
