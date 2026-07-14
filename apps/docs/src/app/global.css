@@ -1971,7 +1971,17 @@ div:where(
   letter-spacing: -0.016em;
 }
 .prose :where(h1, h2, h3, h4) {
-  scroll-margin-top: 5rem;
+  /* Below xl the sticky toc-popover bar (2.5rem) rides the top of the content
+     column — and on mobile the header nav too — so anchored headings must
+     clear them or they land hidden underneath. */
+  scroll-margin-top: calc(var(--fd-header-height, 0px) + 2.5rem + 1rem);
+}
+@media (min-width: 1280px) {
+  /* xl: the side TOC replaces the popover bar, no chrome sits over the content,
+     so a heading lands at the top with only a little breathing room. */
+  .prose :where(h1, h2, h3, h4) {
+    scroll-margin-top: 1.5rem;
+  }
 }
 /* prose links carry a soft accent underline instead of the default */
 .prose a:not([class]) {
