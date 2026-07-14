@@ -38,20 +38,26 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    # Playwright's own image ships the browsers preinstalled and matched to
+    # @playwright/test 1.61.1, so the browser vitest project needs no per-leg
+    # `playwright install` download (same trick as visual.yml).
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble
     strategy:
       fail-fast: false
       matrix:
-        # pnpm 11 requires Node >=22 (uses node:sqlite); Node 20 is also EOL.
-        # The published ESM artifact stays node-20-safe (engines: >=20) — we
-        # just can't run the pnpm-11 dev toolchain on 20.
-        node: [22, 24]
+        # React is the runtime axis CLAUDE.md mandates (18 + 19, StrictMode on).
+        # Node is fixed at 22 — the published ESM is node-20-safe ES2022, so the
+        # Node version moves only the dev toolchain, not chart behaviour; the
+        # container pins it. (Broader Node coverage, if ever wanted, belongs on a
+        # main-only or nightly run, not every PR push.)
         react: ["18", "19"]
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Pin React ${{ matrix.react }}
@@ -59,7 +65,6 @@ jobs:
         # requires an explicit workspace-root flag to add the React-matrix pin to
         # the root (lib) package (ERR_PNPM_ADDING_TO_ROOT otherwise).
         run: pnpm add -D -w react@${{ matrix.react }} react-dom@${{ matrix.react }}
-      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
 
   rsc:
