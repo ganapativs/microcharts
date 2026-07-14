@@ -1173,6 +1173,7 @@
     "@arethetypeswrong/cli": "^0.18.4",
     "@argos-ci/playwright": "^7.3.0",
     "@axe-core/playwright": "^4.12.1",
+    "@changesets/changelog-github": "^0.7.0",
     "@changesets/cli": "^2.31.0",
     "@fast-check/vitest": "^0.4.1",
     "@playwright/test": "^1.61.1",
