@@ -1827,14 +1827,15 @@ div:where(
   animation: pop-in 0.2s var(--ease-out-expo) both;
 }
 
+/* Opacity only — no transform. A transformed ancestor (even the identity
+   matrix a `both`-filled animation holds at rest) breaks in-page anchor /
+   fragment scrolling: TOC links land the heading at the wrong offset. */
 @keyframes route-fade {
   from {
     opacity: 0;
-    transform: translateY(7px);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
 .route-fade {
