@@ -52,3 +52,13 @@ describe("<MicroDonut>", () => {
 seriesEdgeSuite("MicroDonut", (data) => (
   <MicroDonut data={data.map((v, i) => ({ label: `c${i}`, value: v }))} title="Edge" />
 ));
+
+describe("<MicroDonut> colors", () => {
+  it("colors[] overrides wedge strokes, cycling; Other stays neutral", () => {
+    const { container } = draw(<MicroDonut data={MIX} colors={["rgb(1, 2, 3)", "rgb(4, 5, 6)"]} />);
+    const wedges = [...container.querySelectorAll("path.mc-donut-wedge")] as SVGElement[];
+    expect(wedges[0]!.style.stroke).toBe("rgb(1, 2, 3)");
+    expect(wedges[1]!.style.stroke).toBe("rgb(4, 5, 6)");
+    expect(wedges[wedges.length - 1]!.style.stroke).toBe("var(--mc-neutral)");
+  });
+});

@@ -48,6 +48,7 @@ describe("catalog ↔ package exports", () => {
         k !== "./package.json" &&
         k !== "./annotations" &&
         k !== "./motion" &&
+        k !== "./theme" &&
         !k.startsWith("./styles"),
     );
     for (const sub of chartSubpaths) {

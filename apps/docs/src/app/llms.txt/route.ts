@@ -59,7 +59,8 @@ export function GET() {
 
 Use \`${SITE.pkg}\` for React. Import individual charts from subpaths, for example
 \`${SITE.pkg}/sparkline\`. Static entries are hook-free and React Server Component safe.
-Interactive entries live under \`/interactive\`.
+Interactive entries live under \`/interactive\`. Theme with \`--mc-*\` CSS variables, or build a
+palette from one accent with \`defineTheme\` from \`${SITE.pkg}/theme\`.
 
 ${guideBlocks}
 

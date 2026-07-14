@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 const lib = readFileSync(resolve(process.cwd(), "../../styles.css"), "utf8");
 const docs = readFileSync(resolve(process.cwd(), "src/app/global.css"), "utf8");
 
-const PRESETS = ["editorial", "mono", "vivid"] as const;
+const PRESETS = ["editorial", "mono", "vivid", "print", "eink"] as const;
 
 /** Extract `--mc-*: value` declarations from the block whose selector matches. */
 function declarations(css: string, selectorPattern: RegExp): Record<string, string> {

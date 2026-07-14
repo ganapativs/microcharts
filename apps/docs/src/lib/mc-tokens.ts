@@ -56,6 +56,12 @@ export const SEMANTIC_TOKENS: ColorToken[] = [
     dark: "color-mix(in oklab, #eae9e6 8%, transparent)",
     derived: true,
   },
+  {
+    cssVar: "--mc-moon",
+    role: "MoonPhase lit area — warm amber",
+    light: "#c1922f",
+    dark: "#e0be6f",
+  },
 ];
 
 // Categorical palette — matte jewel tones, lightness-ordered, multi-series only.
@@ -108,6 +114,36 @@ export const PRESETS: Preset[] = [
     changes: [
       { cssVar: "--mc-positive", value: "#0f9e78" },
       { cssVar: "--mc-negative", value: "#e24d2e" },
+      { cssVar: "--mc-stroke-width", value: "2" },
+    ],
+  },
+  {
+    id: "print",
+    label: "Print",
+    note: "Paper output — near-black ink, hairline weight, valence deepened for CMYK.",
+    changes: [
+      { cssVar: "--mc-stroke", value: "#1a1a1a" },
+      { cssVar: "--mc-neutral", value: "#666666" },
+      { cssVar: "--mc-positive", value: "#0c6249" },
+      { cssVar: "--mc-negative", value: "#a33f22" },
+      { cssVar: "--mc-accent", value: "#14507a" },
+      { cssVar: "--mc-moon", value: "#7a5a12" },
+      { cssVar: "--mc-band", value: "color-mix(in oklab, #1a1a1a 9%, transparent)" },
+      { cssVar: "--mc-stroke-width", value: "1.25" },
+    ],
+  },
+  {
+    id: "eink",
+    label: "E-ink",
+    note: "Grayscale e-paper — sign rides lightness, heavier strokes for low refresh.",
+    changes: [
+      { cssVar: "--mc-stroke", value: "#000000" },
+      { cssVar: "--mc-positive", value: "#000000" },
+      { cssVar: "--mc-negative", value: "#595959" },
+      { cssVar: "--mc-neutral", value: "#8c8c8c" },
+      { cssVar: "--mc-accent", value: "#000000" },
+      { cssVar: "--mc-moon", value: "#000000" },
+      { cssVar: "--mc-band", value: "color-mix(in oklab, #000000 14%, transparent)" },
       { cssVar: "--mc-stroke-width", value: "2" },
     ],
   },

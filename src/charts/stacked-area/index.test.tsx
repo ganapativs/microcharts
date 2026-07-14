@@ -56,3 +56,18 @@ describe("<StackedArea>", () => {
 seriesEdgeSuite("StackedArea", (data) => (
   <StackedArea data={[{ label: "A", values: data }]} title="Edge" />
 ));
+
+describe("<StackedArea> colors", () => {
+  it("colors[] overrides the series palette, cycling", () => {
+    const { container } = draw(
+      <StackedArea data={TRAFFIC} colors={["rgb(1, 2, 3)", "rgb(4, 5, 6)"]} />,
+    );
+    const areas = [...container.querySelectorAll("path")].filter((p) =>
+      p.getAttribute("data-mc-cat"),
+    ) as SVGElement[];
+    expect(areas[0]!.style.fill).toBe("rgb(1, 2, 3)");
+    expect(areas[1]!.style.fill).toBe("rgb(4, 5, 6)");
+    expect(areas[2]!.style.fill).toBe("rgb(1, 2, 3)");
+    expect(areas[0]!.getAttribute("data-mc-cat")).toBe("1");
+  });
+});

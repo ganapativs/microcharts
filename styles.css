@@ -35,8 +35,16 @@
     /* geometry + type */
     --mc-stroke-width: 1.5;
     --mc-gap: 0.25em;
+    /* Uniform scale for stroke weight, label size, and small-multiple gap — one
+       lever for compact (< 1) vs comfortable (> 1) density. The box set by
+       width/height props is unaffected; density tunes ink + type, not layout. */
+    --mc-density: 1;
     --mc-font: inherit;
+    /* Face for tabular figures + labels. Tracks --mc-font by default so digits
+       match the page; override to give numbers a dedicated brand or mono face. */
+    --mc-font-numeric: var(--mc-font);
     --mc-label-size: 0.75em;
+    --mc-label-weight: 400;
     /* Optical lift for `.mc-inline` beside digits ("+3.8%"). VA-middle alone
        seats SVG marks ~1.4px low; override per face if needed. */
     --mc-inline-nudge: -0.14em;
@@ -115,6 +123,31 @@
     --mc-negative: #e24d2e;
     --mc-stroke-width: 2;
   }
+  /* "print" — paper output: near-black ink at a hairline weight; valence
+     deepened for CMYK so up/down survive a colour print; band barely there. */
+  :where([data-mc-theme="print"], [data-mc-preset="print"]) {
+    --mc-stroke: #1a1a1a;
+    --mc-neutral: #666666;
+    --mc-positive: #0c6249;
+    --mc-negative: #a33f22;
+    --mc-accent: #14507a;
+    --mc-moon: #7a5a12;
+    --mc-band: color-mix(in oklab, #1a1a1a 9%, transparent);
+    --mc-stroke-width: 1.25;
+  }
+  /* "eink" — grayscale e-paper: no chroma (the panel can't show it), so sign
+     rides lightness (positive black vs negative gray, mirroring forced-colors)
+     and strokes thicken for low-DPI, low-refresh legibility. */
+  :where([data-mc-theme="eink"], [data-mc-preset="eink"]) {
+    --mc-stroke: #000000;
+    --mc-positive: #000000;
+    --mc-negative: #595959;
+    --mc-neutral: #8c8c8c;
+    --mc-accent: #000000;
+    --mc-moon: #000000;
+    --mc-band: color-mix(in oklab, #000000 14%, transparent);
+    --mc-stroke-width: 2;
+  }
 }
 
 @layer microcharts.base {
@@ -123,17 +156,22 @@
     vertical-align: middle;
     overflow: visible;
     font: var(--mc-font);
+    /* density-scaled stroke weight consumed by the ink + width roles below, so
+       one --mc-density retunes every stroke without touching the base token. */
+    --mc-sw: calc(var(--mc-stroke-width) * var(--mc-density));
   }
   :where(.mc-root text) {
     font-variant-numeric: tabular-nums;
-    font-size: var(--mc-label-size);
+    font-family: var(--mc-font-numeric);
+    font-weight: var(--mc-label-weight);
+    font-size: calc(var(--mc-label-size) * var(--mc-density));
     fill: var(--mc-stroke);
   }
   /* small-multiples wrapper — layout-neutral by default */
   :where(.mc-group) {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: var(--mc-gap);
+    gap: calc(var(--mc-gap) * var(--mc-density));
     align-items: center;
   }
   /* Word-sized chart in running prose. Wraps any SVG mark next to digits;
@@ -172,6 +210,7 @@
     align-items: baseline;
     gap: var(--mc-gap);
     font: var(--mc-font);
+    font-family: var(--mc-font-numeric);
     font-variant-numeric: tabular-nums;
     color: var(--mc-neutral);
     vertical-align: baseline;
@@ -278,7 +317,7 @@
   :where(.mc-root [data-mc-ink="data"]) {
     fill: none;
     stroke: var(--mc-stroke);
-    stroke-width: var(--mc-stroke-width);
+    stroke-width: var(--mc-sw);
     stroke-linejoin: round;
     stroke-linecap: round;
   }
@@ -307,16 +346,16 @@
      every stroke in a chart, not just the data line. At the default 1.5 these
      resolve to 1 / 0.75 / 0.5 — the weights the charts were hand-tuned to. */
   :where(.mc-root [data-mc-w="full"]) {
-    stroke-width: var(--mc-stroke-width);
+    stroke-width: var(--mc-sw);
   }
   :where(.mc-root [data-mc-w="support"]) {
-    stroke-width: calc(var(--mc-stroke-width) * 2 / 3);
+    stroke-width: calc(var(--mc-sw) * 2 / 3);
   }
   :where(.mc-root [data-mc-w="tick"]) {
-    stroke-width: calc(var(--mc-stroke-width) / 2);
+    stroke-width: calc(var(--mc-sw) / 2);
   }
   :where(.mc-root [data-mc-w="hair"]) {
-    stroke-width: calc(var(--mc-stroke-width) / 3);
+    stroke-width: calc(var(--mc-sw) / 3);
   }
   :where(.mc-root [data-mc-ink="muted"]) {
     fill: none;
@@ -376,13 +415,13 @@
     fill: var(--mc-band);
     stroke: var(--mc-neutral);
     stroke-opacity: 0.4;
-    stroke-width: calc(var(--mc-stroke-width) / 3);
+    stroke-width: calc(var(--mc-sw) / 3);
   }
   :where(.mc-root [data-mc-ink="gap"]) {
     fill: var(--mc-band);
     stroke: var(--mc-neutral);
     stroke-opacity: 0.35;
-    stroke-width: calc(var(--mc-stroke-width) / 3);
+    stroke-width: calc(var(--mc-sw) / 3);
   }
   /* Ghost = low-precision context behind the primary mark (RateVolume volume
      bars, QuadrantDot peer dots, CyclePlot slot lines, ChangePoint regime means,

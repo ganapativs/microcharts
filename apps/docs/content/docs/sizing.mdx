@@ -110,6 +110,10 @@ usual blurriness or weight drift.
 Stroke weight is a token, not a size artifact — set `--mc-stroke-width` (see
 [Theming](/docs/theming)) if you want it heavier or lighter, independent of how big the chart is.
 
+For a whole dense context — a table packed with sparklines — reach for `--mc-density`: one scalar
+that scales stroke weight, label size, and small-multiple gap together (`< 1` tighter, `> 1`
+airier). It tunes the ink and type, never the box, so `width`/`height` still own the geometry.
+
 ## Next steps
 
 - **[Theming](/docs/theming)** — colors, fonts, and stroke weight via `--mc-*` tokens.

@@ -1,6 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Check } from "lucide-react";
+import { Sparkline } from "@microcharts/react/sparkline";
+import { MiniBar } from "@microcharts/react/mini-bar";
 import { cn } from "@/lib/cn";
 import { SEMANTIC_TOKENS, CATEGORICAL_TOKENS, PRESETS, type ColorToken } from "@/lib/mc-tokens";
 
@@ -95,45 +97,109 @@ export function TokenSwatches() {
   );
 }
 
+// A truthful light-surface context: every preset (including mono/print/eink,
+// whose inks run near-black) previews on "paper" regardless of the docs theme,
+// exactly as it renders on a light page. Values come from the same mirror the
+// swatches use, so the preview and the chips can never disagree.
+const LIGHT_BASE = Object.fromEntries(
+  [...SEMANTIC_TOKENS, ...CATEGORICAL_TOKENS].map((t) => [t.cssVar, t.light]),
+) as CSSProperties;
+
+// The preview exercises exactly the tokens presets retune: a line (stroke +
+// stroke-width) with an accent endpoint, over signed bars whose valence colours
+// (positive / negative) make mono's "all one ink" and vivid's punch obvious.
+const PREVIEW_SERIES = [5, 8, 6, 11, 9, 13, 11, 16, 14, 19];
+const PREVIEW_BARS = [
+  { label: "a", value: 4 },
+  { label: "b", value: -3 },
+  { label: "c", value: 6 },
+  { label: "d", value: -2 },
+  { label: "e", value: 3 },
+  { label: "f", value: 7 },
+  { label: "g", value: -4 },
+  { label: "h", value: 5 },
+];
+
+const isColor = (v: string) => /^(#|color-mix|var)/.test(v);
+const shortVar = (cssVar: string) => cssVar.replace("--mc-", "");
+
+// One retuned token: a colour gets a swatch, a stroke-width gets a line drawn at
+// that exact weight — so the delta is legible at a glance, not just as a hex.
+function DeltaChip({ cssVar, value }: { cssVar: string; value: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-md border border-fd-border/60 bg-fd-card/70 px-1.5 py-1">
+      {isColor(value) ? (
+        <span
+          aria-hidden
+          className="size-3.5 shrink-0 rounded-[3px] ring-1 ring-inset ring-black/15 dark:ring-white/15"
+          style={{ background: value }}
+        />
+      ) : (
+        <span aria-hidden className="flex size-3.5 shrink-0 items-center justify-center">
+          <span className="w-full rounded-full bg-fd-foreground" style={{ height: `${value}px` }} />
+        </span>
+      )}
+      <span className="mono-label text-[0.5rem] uppercase opacity-55">{shortVar(cssVar)}</span>
+      <span className="font-mono text-[0.68rem] tabular-nums text-fd-muted-foreground">
+        {value.startsWith("var(") ? "= ink" : value.startsWith("color-mix") ? "tint" : value}
+      </span>
+    </span>
+  );
+}
+
 /**
- * Compact companion: what each preset retunes, with a chip for any pinned
- * colour. Mirrors the library preset bundles (see `@/lib/mc-tokens`).
+ * What each preset retunes — shown, not just told. Each card renders real charts
+ * (a line + valence bars) under that preset's own tokens on a paper surface,
+ * then lists the changed tokens as colour/weight swatches. Mirrors
+ * `@/lib/mc-tokens`.
  */
 export function PresetDeltas() {
   return (
-    <div className="not-prose my-6 grid gap-3 sm:grid-cols-2">
+    <div className="not-prose my-6 grid gap-3.5 sm:grid-cols-2">
       {PRESETS.map((p) => {
-        const colorChange = p.changes.find(
-          (c) => c.cssVar === "--mc-accent" && c.value.startsWith("#"),
-        );
+        const style = {
+          ...LIGHT_BASE,
+          ...Object.fromEntries(p.changes.map((c) => [c.cssVar, c.value])),
+        } as CSSProperties;
         return (
-          <div key={p.id} className="rounded-xl border border-fd-border/70 p-3.5">
-            <div className="mb-1 flex items-center gap-2">
-              {colorChange && (
-                <span
-                  aria-hidden
-                  className="size-3.5 shrink-0 rounded-full ring-1 ring-inset ring-fd-border"
-                  style={{ background: colorChange.value }}
-                />
-              )}
-              <span className="text-sm font-medium text-fd-foreground">{p.label}</span>
-              {p.id === "modern" && (
-                <span className="mono-label text-[0.55rem] opacity-60">default</span>
+          <div
+            key={p.id}
+            className="group/preset overflow-hidden rounded-xl border border-fd-border/70 bg-fd-card/40 transition-all duration-200 hover:-translate-y-0.5 hover:border-fd-primary/40 hover:shadow-sm"
+          >
+            {/* live preview — real charts rendered under this preset's tokens,
+                on paper: a line (stroke + weight + accent dot) over signed bars
+                (positive / negative valence) so every preset reads distinctly. */}
+            <div
+              className="preset-paper flex flex-col items-center justify-center gap-2 px-4 py-3.5"
+              style={style}
+            >
+              <Sparkline
+                data={PREVIEW_SERIES}
+                width={200}
+                height={30}
+                curve="smooth"
+                fill
+                dots="minmax"
+                summary={false}
+              />
+              <MiniBar data={PREVIEW_BARS} positive="up" width={200} height={18} summary={false} />
+            </div>
+            <div className="border-t border-fd-border/60 p-3.5">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="text-sm font-semibold text-fd-foreground">{p.label}</span>
+                {p.id === "modern" && (
+                  <span className="mono-label text-[0.5rem] uppercase opacity-55">default</span>
+                )}
+              </div>
+              <p className="text-[0.78rem] leading-snug text-fd-muted-foreground">{p.note}</p>
+              {p.changes.length > 0 && (
+                <div className="mt-2.5 flex flex-wrap gap-1.5" style={style}>
+                  {p.changes.map((c) => (
+                    <DeltaChip key={c.cssVar} cssVar={c.cssVar} value={c.value} />
+                  ))}
+                </div>
               )}
             </div>
-            <p className="mb-2 text-[0.78rem] leading-snug text-fd-muted-foreground">{p.note}</p>
-            {p.changes.length > 0 && (
-              <ul className="space-y-0.5">
-                {p.changes.map((c) => (
-                  <li
-                    key={c.cssVar}
-                    className="font-mono text-[0.7rem] tabular-nums text-fd-muted-foreground"
-                  >
-                    <span className="text-fd-foreground/80">{c.cssVar}</span>: {c.value}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         );
       })}

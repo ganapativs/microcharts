@@ -59,6 +59,15 @@ export interface EntranceOptions {
   /** Total span (ms) of an ordered sequence (default 520 trail / 400 others). */
   window?: number;
   /**
+   * `draw` only: draw the stroked marks as ONE continuous sweep at constant
+   * speed — each mark's duration is proportional to its stroke length and marks
+   * are baton-passed end to end (mark i+1 starts exactly as mark i finishes).
+   * For a ring of arcs this is constant ANGULAR velocity clockwise from the
+   * path's start, so a donut reads as one value accumulating from 12 o'clock —
+   * never several segments racing at once. `window` is the whole sweep's span.
+   */
+  proportional?: boolean;
+  /**
    * Elements to cast into the closing act (they enter as the story lands)
    * instead of the quiet opening stage — e.g. a cumulative line that must
    * follow its bars.

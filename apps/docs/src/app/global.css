@@ -265,6 +265,28 @@
   --mc-negative: #e24d2e;
   --mc-stroke-width: 2;
 }
+:root[data-mc-preset="print"] {
+  /* paper output — near-black ink, hairline weight, valence deepened for CMYK */
+  --mc-stroke: #1a1a1a;
+  --mc-neutral: #666666;
+  --mc-positive: #0c6249;
+  --mc-negative: #a33f22;
+  --mc-accent: #14507a;
+  --mc-moon: #7a5a12;
+  --mc-band: color-mix(in oklab, #1a1a1a 9%, transparent);
+  --mc-stroke-width: 1.25;
+}
+:root[data-mc-preset="eink"] {
+  /* grayscale e-paper — sign rides lightness, heavier strokes for low refresh */
+  --mc-stroke: #000000;
+  --mc-positive: #000000;
+  --mc-negative: #595959;
+  --mc-neutral: #8c8c8c;
+  --mc-accent: #000000;
+  --mc-moon: #000000;
+  --mc-band: color-mix(in oklab, #000000 14%, transparent);
+  --mc-stroke-width: 2;
+}
 
 /* ---- Accent presets — the global picker sets [data-accent] on <html>.
    All tasteful, all non-AI: warm and cool, none neon-on-dark. --------------- */
@@ -425,6 +447,15 @@ body {
   background-size: 32px 32px;
   -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 40%, transparent 100%);
   mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 40%, transparent 100%);
+}
+
+/* Paper surface for the preset preview tiles — a fixed warm-white "page" (never
+   follows the docs theme) with a faint dot grid, so mono/print/eink inks, which
+   run near-black, always preview truthfully on light stock. */
+.preset-paper {
+  background-color: #f7f6f3;
+  background-image: radial-gradient(circle at 1px 1px, rgba(20, 18, 15, 0.06) 1px, transparent 0);
+  background-size: 11px 11px;
 }
 
 /* Draw-in underline on hover for text links. */

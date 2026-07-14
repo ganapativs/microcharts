@@ -59,6 +59,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Parent-row labels with size drop-out.",
     },
+    {
+      name: "colors",
+      type: "string[]",
+      required: false,
+      description: "Per-group colours, cycled; overrides --mc-cat-N. Accent/neutral roles keep.",
+    },
   ],
   demo: [44, 24, 18, 10],
   example: {

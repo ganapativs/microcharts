@@ -43,9 +43,16 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Wedges are stroked centerlines (see geometry), so the entrance DRAWS the
-  // wheel wedge-by-wedge, clockwise, in index order. The selector spans every
-  // wedge — categories and the rolled-up "other" — not just data-mc-cat.
-  useEntrance(hostRef, "draw", animate, { selector: ".mc-donut-wedge", order: "index" });
+  // wheel as ONE continuous sweep, clockwise from 12 o'clock — the ring fills
+  // like a value accumulating. `proportional` makes each wedge's draw time
+  // track its arc length and baton-passes them end to end, so the sweep holds a
+  // constant angular velocity instead of every wedge racing in the same 450ms.
+  // The selector spans every wedge — categories and the rolled-up "other".
+  useEntrance(hostRef, "draw", animate, {
+    selector: ".mc-donut-wedge",
+    proportional: true,
+    window: 520, // whole-ring sweep span
+  });
 
   const rolled = useMemo(
     () => rollup(data, maxWedges, strings.otherLabel),

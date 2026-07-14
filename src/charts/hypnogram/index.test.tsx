@@ -69,3 +69,22 @@ seriesEdgeSuite("Hypnogram", (data: readonly Value[]) => (
     title="Edge"
   />
 ));
+
+describe("<Hypnogram> colors", () => {
+  it("colors[] overrides lane fills in the lanes variant", () => {
+    const { container } = draw(
+      <Hypnogram
+        data={SLEEP}
+        domain={[0, 110]}
+        variant="lanes"
+        colors={["rgb(1, 2, 3)", "rgb(4, 5, 6)"]}
+      />,
+    );
+    const lanes = [...container.querySelectorAll("rect")].filter((r) =>
+      r.getAttribute("data-mc-cat"),
+    ) as SVGElement[];
+    expect(lanes.length).toBeGreaterThan(0);
+    expect(lanes[0]!.style.fill).toBe("rgb(1, 2, 3)");
+    expect(lanes[0]!.getAttribute("data-mc-cat")).toBe("1");
+  });
+});

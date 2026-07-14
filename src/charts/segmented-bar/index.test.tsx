@@ -81,6 +81,21 @@ describe("<SegmentedBar>", () => {
     const { container } = draw(<SegmentedBar data={MIX.slice(0, 3)} title="Browser share" />);
     await expectNoA11yViolations(container);
   });
+
+  it("colors[] overrides the palette per segment, cycling; Other stays neutral", () => {
+    const { container } = draw(
+      <SegmentedBar data={MIX} colors={["rgb(1, 2, 3)", "rgb(4, 5, 6)"]} />,
+    );
+    const rects = [...container.querySelectorAll("rect")] as SVGElement[];
+    expect(rects[0]!.style.fill).toBe("rgb(1, 2, 3)");
+    expect(rects[1]!.style.fill).toBe("rgb(4, 5, 6)");
+    expect(rects[2]!.style.fill).toBe("rgb(1, 2, 3)"); // cycles at length 2
+    // categorical attribute is retained (motion selectors + forced-colors rely on it)
+    expect(rects[0]!.getAttribute("data-mc-cat")).toBe("1");
+    const other = rects[rects.length - 1]!;
+    expect(other.getAttribute("data-mc-ink")).toBe("neutral");
+    expect(other.style.fill).toBe("");
+  });
 });
 
 seriesEdgeSuite("SegmentedBar", (data) => (

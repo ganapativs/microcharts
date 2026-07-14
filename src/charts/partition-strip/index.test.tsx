@@ -71,3 +71,17 @@ seriesEdgeSuite("PartitionStrip", (data: readonly Value[]) => (
     title="Edge"
   />
 ));
+
+describe("<PartitionStrip> colors", () => {
+  it("colors[] overrides group fills, cycling", () => {
+    const { container } = draw(
+      <PartitionStrip data={TREE} colors={["rgb(1, 2, 3)", "rgb(4, 5, 6)"]} />,
+    );
+    const cat = [...container.querySelectorAll("rect")].filter((r) =>
+      r.getAttribute("data-mc-cat"),
+    ) as SVGElement[];
+    expect(cat.length).toBeGreaterThan(0);
+    expect(cat.every((r) => r.style.fill !== "")).toBe(true);
+    expect(cat[0]!.style.fill).toBe("rgb(1, 2, 3)");
+  });
+});

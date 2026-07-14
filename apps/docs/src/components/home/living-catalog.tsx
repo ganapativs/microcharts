@@ -163,10 +163,12 @@ export function LivingCatalog({ total }: { total: number }) {
           <Link
             href="/gallery"
             aria-label={`Browse all ${total} chart types in the gallery`}
-            className="cta-ghost group inline-flex h-8 items-center gap-1.5 px-3 text-[0.8rem] font-medium leading-none text-fd-foreground no-underline"
+            className="cta-ghost group inline-flex h-8 items-center gap-2 py-0 pl-3 pr-1.5 text-[0.8rem] font-medium leading-none text-fd-foreground no-underline"
           >
             Browse all {total}
-            <ArrowRight className="size-3.5 shrink-0 text-fd-primary transition-transform group-hover:translate-x-0.5" />
+            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-fd-primary text-fd-primary-foreground transition-transform group-hover:translate-x-0.5">
+              <ArrowRight className="size-3" />
+            </span>
           </Link>
         </div>
       </div>

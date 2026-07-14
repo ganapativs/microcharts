@@ -1277,14 +1277,20 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/theme (static)",
+    "path": "dist/theme.js",
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
     "name": "@microcharts/react/motion (static)",
     "path": "dist/shared/motion-engine.js",
-    "limit": "2.8 kB",
+    "limit": "3 kB",
     "gzip": true
   },
   {
     "name": "styles.css (shared, whole library)",
-    "path": "styles.css",
+    "path": "dist/styles.css",
     "limit": "12 kB",
     "gzip": true
   }

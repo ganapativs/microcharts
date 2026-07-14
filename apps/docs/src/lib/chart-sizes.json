@@ -76,8 +76,8 @@
     "interactive": 3.34
   },
   "segmented-bar": {
-    "static": 2.31,
-    "interactive": 3.53
+    "static": 2.33,
+    "interactive": 3.55
   },
   "histogram-strip": {
     "static": 2.07,
@@ -92,8 +92,8 @@
     "interactive": 2.83
   },
   "micro-donut": {
-    "static": 2.25,
-    "interactive": 3.52
+    "static": 2.26,
+    "interactive": 3.54
   },
   "funnel": {
     "static": 2.13,
@@ -116,8 +116,8 @@
     "interactive": 4.11
   },
   "stacked-area": {
-    "static": 2.8,
-    "interactive": 4.16
+    "static": 2.83,
+    "interactive": 4.19
   },
   "ohlc": {
     "static": 2.4,
@@ -308,12 +308,12 @@
     "interactive": 3.29
   },
   "time-in-range": {
-    "static": 2.13,
-    "interactive": 3.39
+    "static": 2.14,
+    "interactive": 3.4
   },
   "hypnogram": {
-    "static": 2.43,
-    "interactive": 3.68
+    "static": 2.46,
+    "interactive": 3.71
   },
   "eta-bar": {
     "static": 1.97,
@@ -355,8 +355,8 @@
     "interactive": 3.24
   },
   "partition-strip": {
-    "static": 2.01,
-    "interactive": 3.33
+    "static": 2.06,
+    "interactive": 3.35
   },
   "calibration-strip": {
     "static": 2.42,
@@ -425,7 +425,10 @@
   "annotations": {
     "static": 1.45
   },
+  "theme": {
+    "static": 2.2
+  },
   "motion": {
-    "static": 2.74
+    "static": 2.75
   }
 }

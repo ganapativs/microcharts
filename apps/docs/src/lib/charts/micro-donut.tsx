@@ -61,6 +61,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Annulus thickness (shared with ProgressRing).",
     },
+    {
+      name: "colors",
+      type: "string[]",
+      required: false,
+      description: "Per-wedge colours, cycled; overrides --mc-cat-N. Other stays neutral.",
+    },
   ],
   demo: MIX.map((d) => d.value),
   example: {

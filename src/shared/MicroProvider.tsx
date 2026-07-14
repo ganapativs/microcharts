@@ -4,8 +4,9 @@
 // only — they never change data semantics.
 import type { CSSProperties, ReactNode } from "react";
 
-/** Built-in presets (token bundles in styles.css). `modern` is the default. */
-export type Preset = "modern" | "editorial" | "mono" | "vivid" | "dark";
+/** Built-in presets (token bundles in styles.css). `modern` is the default.
+ * `print` + `eink` are output-context bundles (paper, grayscale e-paper). */
+export type Preset = "modern" | "editorial" | "mono" | "vivid" | "dark" | "print" | "eink";
 
 export interface MicroProviderProps {
   theme?: Preset;

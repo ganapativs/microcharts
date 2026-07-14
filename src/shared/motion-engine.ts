@@ -32,23 +32,23 @@ interface Run {
 // Word-sized marks read fast — entrances sit at the top of the UI duration
 // scale only where the motion IS the encoding reveal (a line drawing on).
 const DUR: Record<EntranceArchetype, number> = {
-  draw: 450,
-  wipe: 400,
-  rise: 350,
-  reveal: 300,
-  settle: 300,
-  sweep: 400,
-  pop: 200,
-  fade: 250,
-  trail: 200, // per-mark pop; the sequence spans TRAIL_WINDOW
-  spin: 400,
-  grow: 400,
-  scan: 500, // a signal scanning in reads slower — you watch it fill
+  draw: 380,
+  wipe: 340,
+  rise: 300,
+  reveal: 260,
+  settle: 260,
+  sweep: 340,
+  pop: 190,
+  fade: 220,
+  trail: 180, // per-mark pop; the sequence spans TRAIL_WINDOW
+  spin: 340,
+  grow: 340,
+  scan: 440, // a signal scanning in reads slower — you watch it fill
 };
 
 // Sequential choreography: marks pop along the chart's own order (DOM order,
 // or real x/y positions). The window is the whole sequence's span.
-const TRAIL_WINDOW = 520;
+const TRAIL_WINDOW = 380;
 
 // Progress-class reveals (a line drawing, a clip sweeping) are constant-rate
 // motion: a strong ease-out tail makes them sprint then crawl — the "stuck
@@ -94,12 +94,12 @@ const DRAW_DOTS = '[data-mc-ink="point"], circle';
 // settles in quietly first; the STORY (the primary encoding) performs on the
 // beat as the stage lands; the VOICE (labels, values, accents, flags) speaks
 // as the story finishes. Nothing on the chart ever simply appears.
-const BEAT = 120;
+const BEAT = 90;
 const LEAVES = "path, rect, circle, line, ellipse, polygon, polyline, text";
 const VOICE_INK =
   '[data-mc-ink="accent"], [data-mc-ink="point"], [data-mc-ink="flag"], [data-mc-ink="label"]';
 
-const STAGGER_CAP = 240;
+const STAGGER_CAP = 180;
 
 // One observer for every entrance on the page; fires each chart once.
 let io: IntersectionObserver | null = null;
@@ -310,9 +310,30 @@ export function runEntrance(
     const n = marks.length;
     // Sequential choreography: an explicit order (or the trail archetype)
     // spreads the marks across a window along the chart's own geometry.
-    const win = options.window ?? (kind === "trail" ? TRAIL_WINDOW : 400);
+    const win = options.window ?? (kind === "trail" ? TRAIL_WINDOW : 300);
     const norms =
       options.order || kind === "trail" ? orderNorm(marks, options.order ?? "index") : null;
+    // Proportional draw: measure each arc so one sweep advances at ONE constant
+    // speed across the whole ring — mark i starts exactly where i-1 ended, and a
+    // long arc takes proportionally longer than a short one (constant angular
+    // velocity, not constant per-mark time). `propAt[i]` = normalized start [0,1).
+    let propAt: number[] | null = null;
+    if (options.proportional && kind === "draw" && n > 0) {
+      const lens = marks.map((el) => {
+        try {
+          return (el as SVGPathElement).getTotalLength() || 0;
+        } catch {
+          return 0;
+        }
+      });
+      const total = lens.reduce((s, l) => s + l, 0) || 1;
+      propAt = [];
+      let cum = 0;
+      for (const l of lens) {
+        propAt.push(cum / total);
+        cum += l;
+      }
+    }
     marks.forEach((el, i) => {
       // `scan` sweeps ONE shared clip window across the whole chart, so every
       // path it covers (a played/rest split, a peak bar) must start together —
@@ -326,7 +347,17 @@ export function runEntrance(
           // an area) has no stroke to draw, so `draw` is the wrong archetype for
           // it — author such shapes as a stroked centerline (a ring's value arc)
           // or give them a fill-appropriate archetype instead.
-          const a = dashDraw(el, screenK, cleanups, timing);
+          // Proportional marks sweep at one constant speed (linear per segment,
+          // baton-passed) so the ring fills like a value accumulating clockwise.
+          const drawTiming = propAt
+            ? {
+                duration: Math.max(60, ((propAt[i + 1] ?? 1) - propAt[i]!) * win),
+                delay: storyStart + propAt[i]! * win,
+                easing: "linear",
+                fill: "backwards" as const,
+              }
+            : timing;
+          const a = dashDraw(el, screenK, cleanups, drawTiming);
           if (a) anims.push(a);
           break;
         }
@@ -369,7 +400,7 @@ export function runEntrance(
           anims.push(
             el.animate(
               [
-                { opacity: 0, transform: kind === "trail" ? "scale(0.6)" : "scale(0.7)" },
+                { opacity: 0, transform: kind === "trail" ? "scale(0.72)" : "scale(0.82)" },
                 { opacity: 1, transform: "scale(1)" },
               ],
               timing,
@@ -405,8 +436,18 @@ export function runEntrance(
     });
 
     // When the story finishes — the voice waits for it.
-    const storySpan = norms ? win + dur : (n > 0 ? stagger(n - 1, n, step) : 0) + dur;
+    const storySpan = propAt
+      ? win
+      : norms
+        ? win + dur
+        : (n > 0 ? stagger(n - 1, n, step) : 0) + dur;
     const storyEnd = wholeSvgFinal ? dur : storyStart + storySpan;
+    // The acts OVERLAP rather than queue: a connector begins forming as its
+    // endpoints are ~60% landed (it "arrives" with them, not after a dead beat),
+    // and the voice speaks into the tail of the story. This keeps the causal
+    // ORDER while collapsing the dead air between acts — the whole entrance
+    // reads as one continuous gesture, not three sequential clips.
+    const storySettle = wholeSvgFinal ? storyEnd : storyEnd - Math.min(dur * 0.4, 130);
 
     // ACT 3 (positional) — dots that ride a drawn line pop out of it exactly
     // as the draw front reaches them (delay follows each dot's x position).
@@ -440,7 +481,7 @@ export function runEntrance(
         anims.push(
           el.animate(
             [
-              { opacity: 0, transform: "scale(0.6)" },
+              { opacity: 0, transform: "scale(0.72)" },
               { opacity: 1, transform: "scale(1)" },
             ],
             {
@@ -497,27 +538,37 @@ export function runEntrance(
     // ACT — the LINK draws: once the story marks have landed, connectors draw
     // themselves on (dot→dot, stem→dot) via stroke-dashoffset, so the shape
     // visibly joins the marks it belongs to before the voice speaks.
-    let linkEnd = storyEnd;
+    let linkEnd = storySettle;
     if (linkEls.length > 0) {
-      const timing = {
-        duration: 300,
-        delay: storyEnd,
-        easing: EASE_EVEN,
-        fill: "backwards" as const,
-      };
-      for (const el of linkEls) {
-        const a = dashDraw(el, screenK, cleanups, timing);
+      const linkDur = 200;
+      // Per-pair rhythm: when the story is ORDERED, each connector draws right
+      // after its OWN marks land — staggered along the same axis — instead of
+      // every link firing at one barrier. A dumbbell connects row by row,
+      // top→down (each pair's bar grows as that pair's dots settle); a slur
+      // draws left→right chasing its notes. Unordered stories keep the single
+      // group draw (stems that all belong to one baseline).
+      const linkAxis = options.order ?? (kind === "trail" ? "index" : null);
+      const linkNorms = linkAxis && linkEls.length > 1 ? orderNorm(linkEls, linkAxis) : null;
+      linkEls.forEach((el, i) => {
+        const delay = linkNorms ? storyStart + linkNorms[i]! * win + dur * 0.5 : storySettle;
+        const a = dashDraw(el, screenK, cleanups, {
+          duration: linkDur,
+          delay,
+          easing: EASE_EVEN,
+          fill: "backwards" as const,
+        });
         if (a) {
           anims.push(a);
           spoken.add(el);
         }
-      }
-      linkEnd = storyEnd + 300;
+        linkEnd = Math.max(linkEnd, delay + linkDur);
+      });
     }
 
-    // ACT 3 — the voice speaks as the link lands: values and accents pop,
-    // labels fade, all on the same final beat.
-    const voiceDelay = Math.max(linkEnd - BEAT / 2, storyStart + BEAT);
+    // ACT 3 — the voice speaks into the tail of the link/story: values and
+    // accents pop, labels fade, all on the same final beat — starting a beat
+    // before the connectors fully land so the close feels continuous.
+    const voiceDelay = Math.max(linkEnd - BEAT, storyStart + BEAT);
     for (const el of voiceEls) {
       if (spoken.has(el)) continue;
       // Text is a voice too — it should arrive, not blink on: a tiny lift and

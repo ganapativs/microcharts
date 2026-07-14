@@ -3,6 +3,7 @@
   "entry": [
     "src/core/index.ts",
     "src/shared/index.ts",
+    "src/theme.ts",
     "src/charts/*/index.tsx",
     "src/charts/*/client.tsx",
     "src/test/**/*.ts"
@@ -10,5 +11,5 @@
   "project": ["src/**/*.{ts,tsx}"],
   "ignore": ["fixtures/**", "apps/**"],
   "ignoreWorkspaces": ["fixtures/*", "apps/*"],
-  "ignoreDependencies": ["@vitest/browser", "fast-check", "@axe-core/playwright"]
+  "ignoreDependencies": ["@vitest/browser", "fast-check", "@axe-core/playwright", "esbuild"]
 }

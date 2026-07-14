@@ -47,6 +47,9 @@ importers:
       axe-core:
         specifier: ^4.12.1
         version: 4.12.1
+      esbuild:
+        specifier: ^0.28.1
+        version: 0.28.1
       fast-check:
         specifier: ^4.9.0
         version: 4.9.0

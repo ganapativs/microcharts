@@ -35,6 +35,9 @@ export interface SegmentedBarProps {
   order?: "data" | "desc" | undefined;
   /** `"percent"` | `"value"` centered per segment (deterministic drop-out). */
   label?: "none" | "percent" | "value" | undefined;
+  /** Per-segment colours, cycled; overrides `--mc-cat-N` for this instance. The
+   *  rolled-up "Other" segment stays neutral. */
+  colors?: readonly string[] | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
@@ -56,6 +59,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
     maxSegments = 5,
     order = "data",
     label = "none",
+    colors,
     width = 60,
     height = 10,
     format,
@@ -117,6 +121,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
               shapeRendering="crispEdges"
               data-mc-ink={isOther ? "neutral" : undefined}
               data-mc-cat={isOther ? undefined : (i % CAT_N) + 1}
+              style={colors && !isOther ? { fill: colors[i % colors.length] } : undefined}
             />
             {text !== undefined && seg.labelFits(text.length) ? (
               <text
