@@ -3,20 +3,33 @@
   "version": "0.2.1",
   "description": "Word-sized charts for React, made for LLMs and humans. 106 chart types, zero runtime dependencies, 0.9–3.6 kB gzip each, accessible by default, and server-component safe.",
   "keywords": [
+    "a11y",
     "accessible",
     "ai",
+    "bar-chart",
+    "bullet-chart",
     "chart",
+    "chart-component",
     "charts",
+    "data-visualization",
     "dataviz",
+    "gauge",
+    "heatmap",
+    "lightweight",
     "llm",
     "microchart",
     "microcharts",
     "react",
+    "react-charts",
     "react-server-components",
     "rsc",
     "server-components",
     "sparkline",
+    "sparklines",
+    "ssr",
     "svg",
+    "tree-shakeable",
+    "typescript",
     "visualization",
     "zero-dependency"
   ],
@@ -25,14 +38,18 @@
     "url": "https://github.com/ganapativs/microcharts/issues"
   },
   "license": "MIT",
-  "author": "Ganapati V S",
+  "author": {
+    "name": "Ganapati V S",
+    "email": "vsg.inbox@gmail.com",
+    "url": "https://meetguns.com"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ganapativs/microcharts.git"
   },
+  "funding": "https://github.com/sponsors/ganapativs",
   "files": [
     "dist",
-    "styles.css",
     "README.md",
     "LICENSE"
   ],
@@ -1108,12 +1125,17 @@
       "import": "./dist/annotations.js",
       "default": "./dist/annotations.js"
     },
+    "./theme": {
+      "types": "./dist/theme.d.ts",
+      "import": "./dist/theme.js",
+      "default": "./dist/theme.js"
+    },
     "./motion": {
       "types": "./dist/shared/motion-engine.d.ts",
       "import": "./dist/shared/motion-engine.js",
       "default": "./dist/shared/motion-engine.js"
     },
-    "./styles.css": "./styles.css",
+    "./styles.css": "./dist/styles.css",
     "./styles/core.css": "./dist/styles/core.css",
     "./styles/*.css": "./dist/styles/*.css"
   },
@@ -1161,6 +1183,7 @@
     "@vitest/browser": "^4.1.10",
     "@vitest/browser-playwright": "^4.1.10",
     "axe-core": "^4.12.1",
+    "esbuild": "^0.28.1",
     "fast-check": "^4.9.0",
     "jsdom": "^29.1.1",
     "knip": "^6.25.0",

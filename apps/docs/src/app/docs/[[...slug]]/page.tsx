@@ -15,6 +15,7 @@ import { gitConfig } from "@/lib/shared";
 import { docsMeta } from "@/lib/metadata";
 import { abs } from "@/lib/site";
 import { breadcrumbJsonLd, jsonLdScript, techArticleJsonLd } from "@/lib/jsonld";
+import { docLastModified } from "@/lib/doc-dates";
 import { RouteTransition } from "@/components/route-transition";
 
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
@@ -43,7 +44,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
             url,
             headline: page.data.title,
             description: page.data.description ?? "",
-            dateModified: "2026-07-07",
+            dateModified: docLastModified(page.path),
             image: abs(getPageImage(page).url),
           }),
         )}

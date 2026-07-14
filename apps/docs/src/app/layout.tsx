@@ -2,7 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Provider } from "@/components/provider";
 import { SITE } from "@/lib/site";
-import { jsonLdScript, softwareSourceCodeJsonLd, websiteJsonLd } from "@/lib/jsonld";
+import {
+  jsonLdScript,
+  softwareApplicationJsonLd,
+  softwareSourceCodeJsonLd,
+  websiteJsonLd,
+} from "@/lib/jsonld";
 import "./global.css";
 
 const sans = Hanken_Grotesk({
@@ -50,7 +55,10 @@ export const metadata: Metadata = {
     "tiny chart",
     "dataviz",
   ],
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    types: { "application/atom+xml": [{ url: "/rss.xml", title: `${SITE.name} releases` }] },
+  },
   // Crisp env-aware SVG favicon (app/brand/icon.svg); apple-touch icon is the
   // generated PNG (app/apple-icon.tsx) via its file convention.
   icons: { icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }] },
@@ -91,6 +99,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: CONSOLE_SCRIPT }} />
         <script type="application/ld+json">{jsonLdScript(websiteJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareSourceCodeJsonLd())}</script>
+        <script type="application/ld+json">{jsonLdScript(softwareApplicationJsonLd())}</script>
         <Provider>{children}</Provider>
       </body>
     </html>
