@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getChart } from "@/lib/catalog";
 import { PropTableView, type PropRow } from "./prop-table-view";
 
@@ -57,9 +58,9 @@ export function PropTable({ slug }: { slug: string }) {
         <code className="text-xs">className</code>, <code className="text-xs">style</code>) that
         every chart accepts. Interactive entries also share <code className="text-xs">animate</code>{" "}
         and <code className="text-xs">live</code>. See{" "}
-        <a href="/docs/quickstart#the-shared-grammar" className="underline">
+        <Link href="/docs/quickstart#the-shared-grammar" className="underline">
           the shared grammar
-        </a>
+        </Link>
         .
       </p>
     </>
