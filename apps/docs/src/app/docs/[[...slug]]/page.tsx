@@ -36,24 +36,18 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full} breadcrumb={{ enabled: false }}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbJsonLd(crumbs)) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: jsonLdScript(
-            techArticleJsonLd({
-              url,
-              headline: page.data.title,
-              description: page.data.description ?? "",
-              dateModified: "2026-07-07",
-              image: abs(getPageImage(page).url),
-            }),
-          ),
-        }}
-      />
+      <script type="application/ld+json">{jsonLdScript(breadcrumbJsonLd(crumbs))}</script>
+      <script type="application/ld+json">
+        {jsonLdScript(
+          techArticleJsonLd({
+            url,
+            headline: page.data.title,
+            description: page.data.description ?? "",
+            dateModified: "2026-07-07",
+            image: abs(getPageImage(page).url),
+          }),
+        )}
+      </script>
       {/* Calm fade + lift on navigation. Wraps only the article content — never
           the DocsPage grid-area siblings (toc/sidebar), which must stay direct
           grid children of the layout. Keyed on pathname; reduced-motion gated. */}

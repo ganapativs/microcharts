@@ -39,6 +39,14 @@ export const entry: ChartEntry = {
       required: false,
       description: 'Unit-bearing ETA label ("2 min") — the caller owns units.',
     },
+    {
+      name: "announceEvery",
+      type: "number",
+      required: false,
+      interactive: true,
+      description:
+        "Minimum ms between live-region announcements as the ETA streams (default 10000).",
+    },
   ],
   demo: [64],
   example: {

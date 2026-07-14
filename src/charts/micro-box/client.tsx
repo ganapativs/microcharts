@@ -12,12 +12,15 @@ import { MicroBox as StaticMicroBox, microBoxSummary, type MicroBoxProps } from 
 const STOPS = ["min", "q1", "median", "q3", "max"] as const;
 type Stop = (typeof STOPS)[number];
 
-// The whisker/box/median ensemble (and the too-few-observations raw dots) —
-// filled marks (fill:none, stroke:none per role), never the ridge/line shapes
-// a "draw" reveal would need. Settling them into place as markers fits a
-// floating box-and-whisker read (no shared zero baseline to rise from).
+// The CENTRAL marks — box (q1–q3) + median tick — plus the too-few-observations
+// raw dots. Settling them into place as markers fits a floating box-and-whisker
+// read (no shared zero baseline to rise from). The whisker is deliberately
+// EXCLUDED: settle scales each mark from its own center, and the whisker's
+// x-center (the full min–max midpoint) differs from the box's and the median's,
+// so settling all three would slide them apart during the pop. The whisker
+// instead fades in quietly on the stage while the box and median settle.
 const BOX_SELECTOR =
-  'line[data-mc-ink="muted"], rect[data-mc-ink="band"], line[data-mc-ink="data"], circle[data-mc-ink="point"]';
+  'rect[data-mc-ink="band"], line[data-mc-ink="data"], circle[data-mc-ink="point"]';
 
 export interface InteractiveMicroBoxProps extends MicroBoxProps {
   strings?: DistStrings;

@@ -35,6 +35,16 @@ describe("<TapeGauge>", () => {
     expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
   });
 
+  it("the center pointer is a solid filled triangle (not a hollow outline)", () => {
+    const { container } = draw(<TapeGauge value={142} zones={ZONES} span={25} height={64} />);
+    // the closed pointer triangle (ends in z) carries an inline accent fill
+    const pointer = [
+      ...container.querySelectorAll<SVGPathElement>('path[data-mc-ink="accent"]'),
+    ].find((p) => (p.getAttribute("d") ?? "").trim().endsWith("z"));
+    expect(pointer).toBeTruthy();
+    expect(pointer!.style.fill).toBe("var(--mc-accent)");
+  });
+
   it("no rate → no rate clause", () => {
     expect(tapeGaugeSummary(142, undefined, [1, 2], ZONES[1]!, EN_TAPE_GAUGE, fmt)).toBe(
       "Now 142; in the 130–150 zone.",

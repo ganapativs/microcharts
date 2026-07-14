@@ -46,8 +46,10 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   // Horizontal bars grow rightward (sweep, scaleX); vertical bars rise from the
   // baseline (scaleY) — the archetype tracks the chart's own orientation prop.
+  // Each bar carries its own `data-mc-origin` (from true geometric sign) in the
+  // static markup, so below-zero bars grow the honest way; the archetype default
+  // (bottom/left) covers the common all-positive case.
   useEntrance(hostRef, orientation === "horizontal" ? "sweep" : "rise", animate, {
-    origin: "signed",
     selector: BAR_SELECTOR,
   });
 

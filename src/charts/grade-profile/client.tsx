@@ -59,7 +59,14 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "rise", animate, { selector: SEGMENT_SELECTOR });
+  // The terrain builds along the route, left→right, re-enacting the traverse
+  // rather than rising all at once. (The ridge line stays context; a single
+  // entrance can't both rise the terrain and draw the ridge.)
+  useEntrance(hostRef, "rise", animate, {
+    selector: SEGMENT_SELECTOR,
+    order: "x",
+    window: 450,
+  });
 
   const { topPad } = gradeLayout(height, label);
   const geo = useMemo(

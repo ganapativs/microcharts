@@ -25,12 +25,19 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     if (before === value) return;
     prev.current = value;
     if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      // ≤200ms, canonical strong ease-out (Emil ruling).
-      wrap.current?.querySelectorAll<SVGPathElement>("path").forEach((p) =>
-        p.animate([{ opacity: 0 }, { opacity: 1 }], {
-          duration: 200,
-          easing: "cubic-bezier(0.23, 1, 0.32, 1)",
-        }),
+      // Sand FALLS: the top level settles down as it drains, the bottom pile
+      // grows up from the floor as it fills — both scale from the floor (origin
+      // set in styles.css) so the motion direction encodes gravity instead of a
+      // flat cross-fade. ≤200ms, canonical strong ease-out. Scoped to the sand
+      // paths (DOM order: top then bottom) so the glass frame never flickers.
+      wrap.current?.querySelectorAll<SVGPathElement>("path.mc-hourglass-sand").forEach((p, i) =>
+        p.animate(
+          [
+            { opacity: 0.4, transform: `scaleY(${i === 0 ? 1.08 : 0.92})` },
+            { opacity: 1, transform: "scaleY(1)" },
+          ],
+          { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+        ),
       );
     }
     // announce only when a documented threshold was crossed

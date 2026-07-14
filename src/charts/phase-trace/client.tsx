@@ -64,7 +64,10 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "draw", animate, { selector: 'path[data-mc-ink="muted"]' });
+  useEntrance(hostRef, "draw", animate, {
+    selector: 'path[data-mc-ink="muted"], path[data-mc-ink="accent"]',
+    order: "index",
+  });
 
   const finite = useMemo(
     () => data.filter((p) => isFiniteValue(p.x) && isFiniteValue(p.y)),

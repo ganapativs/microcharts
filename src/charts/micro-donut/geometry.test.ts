@@ -16,6 +16,18 @@ describe("microDonutGeometry", () => {
     expect(geo.wedges[0]!.a1 - geo.wedges[0]!.a0).toBeCloseTo(Math.PI * 2, 1);
   });
 
+  it("wedges are stroked open centerlines (no filled sector), weight exposed", () => {
+    const geo = microDonutGeometry({ size: 24, shares: [0.5, 0.5], weight: 5 });
+    expect(geo.weight).toBe(5);
+    for (const w of geo.wedges) {
+      // arcPath: single open arc — starts at a move, no sector spoke (L) or close (Z).
+      expect(w.d.startsWith("M")).toBe(true);
+      expect(w.d).toContain("A");
+      expect(w.d).not.toContain("Z");
+      expect(w.d).not.toContain("L");
+    }
+  });
+
   it("zero/negative shares are excluded", () => {
     const geo = microDonutGeometry({ size: 24, shares: [2, 0, -1, 3], weight: 5 });
     expect(geo.wedges.length).toBe(2);

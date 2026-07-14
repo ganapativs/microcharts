@@ -94,10 +94,15 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
       className={className ? `mc-depth ${className}` : "mc-depth"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
+      {/* The two wedges meet at the gap (midX): demand's inner edge is on the
+          right, supply's on the left. Pinning each sweep to its inner edge keeps
+          the spread stationary as they grow outward — instead of the gap
+          visibly widening/closing under a center origin. */}
       {geo.demandPath ? (
         <path
           d={geo.demandPath}
           data-mc-ink="positive"
+          data-mc-origin="right"
           fillOpacity={0.5}
           shapeRendering="crispEdges"
         />
@@ -106,6 +111,7 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
         <path
           d={geo.supplyPath}
           data-mc-ink="negative"
+          data-mc-origin="left"
           fillOpacity={0.5}
           shapeRendering="crispEdges"
         />

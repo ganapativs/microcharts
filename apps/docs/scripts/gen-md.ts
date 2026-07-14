@@ -16,7 +16,8 @@ import { expandComponents } from "../src/lib/md-transform.ts";
 
 const root = resolve(import.meta.dirname, "..");
 const contentDir = join(root, "content", "docs");
-const outDir = join(root, "public", "docs");
+const publicDir = join(root, "public");
+const outDir = join(publicDir, "docs");
 
 /** Collect every .mdx under content/docs. */
 function walk(dir: string, acc: string[] = []): string[] {
@@ -37,23 +38,45 @@ function parse(src: string): { title: string; body: string } {
   return { title, body };
 }
 
-// Clean the output dir so a removed/renamed page never leaves a stale mirror.
-rmSync(outDir, { recursive: true, force: true });
-
-let count = 0;
-for (const file of walk(contentDir)) {
-  const rel = relative(contentDir, file).replace(/\.mdx$/, ""); // e.g. "ai" | "charts/sparkline" | "index"
-  const isIndex = rel === "index";
-  const slug = isIndex ? "" : rel;
-  const url = slug ? `/docs/${slug}` : "/docs";
-  const target = slug ? join(outDir, `${slug}.md`) : join(root, "public", "docs.md");
-
-  const { title, body } = parse(readFileSync(file, "utf8"));
-  const md = `# ${title} (${url})\n\n${expandComponents(body)}\n`;
-
-  mkdirSync(dirname(target), { recursive: true });
-  writeFileSync(target, md);
-  count += 1;
+/**
+ * Map a content-relative path (no extension, e.g. `ai`, `charts/sparkline`,
+ * `index`, `charts/index`) to its published mirror. Any `…/index` collapses to
+ * its parent segment, matching how the Fumadocs source routes it (`charts/index`
+ * → slug `["charts"]` → `/docs/charts`); top-level `index` is the docs root.
+ * `targetRel` is the mirror path relative to `public/`, so a `public/` static
+ * file shadows the dynamic `/docs/[[...slug]]` page at the same URL.
+ */
+export function mirrorFor(rel: string): { slug: string; url: string; targetRel: string } {
+  const slug = rel === "index" ? "" : rel.replace(/\/index$/, "");
+  return {
+    slug,
+    url: slug ? `/docs/${slug}` : "/docs",
+    targetRel: slug ? `docs/${slug}.md` : "docs.md",
+  };
 }
 
-console.log(`gen-md: wrote ${count} Markdown mirror${count === 1 ? "" : "s"} to public/docs/.`);
+function generate(): number {
+  // Clean the output dir so a removed/renamed page never leaves a stale mirror.
+  rmSync(outDir, { recursive: true, force: true });
+
+  let count = 0;
+  for (const file of walk(contentDir)) {
+    const rel = relative(contentDir, file).replace(/\.mdx$/, "");
+    const { url, targetRel } = mirrorFor(rel);
+    const target = join(publicDir, targetRel);
+
+    const { title, body } = parse(readFileSync(file, "utf8"));
+    const md = `# ${title} (${url})\n\n${expandComponents(body)}\n`;
+
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, md);
+    count += 1;
+  }
+  return count;
+}
+
+// Only write when run as a script; importing (e.g. from the guard test) is pure.
+if (import.meta.main) {
+  const count = generate();
+  console.log(`gen-md: wrote ${count} Markdown mirror${count === 1 ? "" : "s"} to public/docs/.`);
+}

@@ -39,11 +39,17 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // "trail" ordered by x — periods land oldest→newest, one candle at a time.
-  // Candle bodies carry `data-mc-ohlc` (not `data-mc-ink`); the "bars"
-  // variant's ticks carry neither, so this selector matches only the candle
-  // bodies — the "bars" variant has no marks to select and the engine falls
-  // back to its whole-svg "wipe" reveal automatically (documented fallback).
-  useEntrance(hostRef, "trail", animate, { selector: "rect[data-mc-ohlc]", order: "x" });
+  // A candle is body + wick: the body rect carries `data-mc-ohlc`, the wick is
+  // a `line[data-mc-w="support"]` at the same x. Selecting BOTH keeps each
+  // period whole — the wick used to ride the quiet stage and so every wick
+  // faded in before any body popped. `order: "x"` clusters each period's marks
+  // at one x, so they enter together (a thin vertical wick scaling from its
+  // center is fine). The "bars" variant has no body rect, only support-tick
+  // lines; they now trail per period too instead of the whole-svg wipe.
+  useEntrance(hostRef, "trail", animate, {
+    selector: 'rect[data-mc-ohlc], line[data-mc-w="support"]',
+    order: "x",
+  });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(

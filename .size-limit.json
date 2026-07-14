@@ -1279,7 +1279,7 @@
   {
     "name": "@microcharts/react/motion (static)",
     "path": "dist/shared/motion-engine.js",
-    "limit": "2.5 kB",
+    "limit": "2.8 kB",
     "gzip": true
   },
   {

@@ -42,7 +42,10 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "wipe", animate);
+  // Nested central intervals are symmetric about the median, so a left→right
+  // wipe would imply a false ordering. `grow` blooms the whole band
+  // concentrically outward from the center (the point estimate) instead.
+  useEntrance(hostRef, "grow", animate);
 
   const geo = useMemo(
     () => gradedBandGeometry({ width, height, data, levels, value, domain: props.domain }),

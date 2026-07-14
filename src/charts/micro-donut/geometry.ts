@@ -1,11 +1,18 @@
-// MicroDonut geometry — pure, React-free. ≤ 4 annulus
-// sectors + "Other" rollup, 2° gaps, 12-o'clock start. The hole is mandatory:
-// angle + arc-length double-encode where the pie's area read fails. 2-dp.
-import { annulusSector, TAU } from "../../core/arc.js";
+// MicroDonut geometry — pure, React-free. ≤ 4 category
+// wedges + "Other" rollup, 2° gaps, 12-o'clock start. Each wedge is a STROKED
+// open centerline at mid-radius (stroke-width = ring weight), not a filled
+// annulus sector — the same mechanism as ProgressRing: a stroked arc's length
+// is drawable, so the entrance builds the wheel wedge-by-wedge around the clock
+// via stroke-dashoffset, and at rest the butt-capped band fills the same radial
+// span [rInner, rOuter] a filled sector would, so the ring reads identically.
+// The hole is mandatory: angle + arc-length double-encode where the pie's area
+// read fails. 2-dp.
+import { arcPath, TAU } from "../../core/arc.js";
 import { normalizeShares } from "../../core/stack.js";
 import { round2 } from "../../core/types.js";
 
 export interface Wedge {
+  /** Value arc — a stroked open centerline at mid-radius. */
   d: string;
   share: number;
   /** Start/end angle (radians from 12 o'clock, clockwise). */
@@ -19,14 +26,16 @@ export function microDonutGeometry(opts: {
   shares: readonly number[];
   weight: number;
   gapDeg?: number | undefined;
-}): { wedges: Wedge[] } {
-  const { size, shares, weight, gapDeg = 2 } = opts;
-  const norm = normalizeShares(shares);
-  if (!norm) return { wedges: [] };
-
+}): { wedges: Wedge[]; weight: number } {
+  const { size, shares, gapDeg = 2 } = opts;
   const c = size / 2;
   const rOuter = c - 0.5;
-  const rInner = Math.max(1, rOuter - Math.min(weight, rOuter - 1));
+  const weight = round2(Math.min(Math.max(opts.weight, 1), rOuter - 0.5));
+  const norm = normalizeShares(shares);
+  if (!norm) return { wedges: [], weight };
+
+  const rInner = rOuter - weight;
+  const rMid = round2((rOuter + rInner) / 2);
   const positive = norm.shares.filter((s) => s > 0);
   const gap = positive.length > 1 ? (gapDeg * Math.PI) / 180 : 0;
   const usable = TAU - gap * positive.length;
@@ -38,7 +47,7 @@ export function microDonutGeometry(opts: {
     const a0 = angle;
     const a1 = angle + share * usable;
     wedges.push({
-      d: annulusSector(c, c, rOuter, rInner, a0, a1),
+      d: arcPath(c, c, rMid, a0, a1),
       share: round2(share),
       a0: round2(a0),
       a1: round2(a1),
@@ -46,5 +55,5 @@ export function microDonutGeometry(opts: {
     });
     angle = a1 + gap;
   });
-  return { wedges };
+  return { wedges, weight };
 }

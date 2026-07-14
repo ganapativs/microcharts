@@ -19,9 +19,10 @@ import {
 const TAU = Math.PI * 2;
 
 // Segments/accent/level paths are FILLED shapes (fill, stroke:none per ink
-// role) — a stroke-based "draw" reveal would be invisible. Settling each
-// radial mark into place (fade + scale from its own center) suits the
-// self-contained wedge/ring glyph better.
+// role) — a stroke-based "draw" reveal would be invisible. Angle encodes the
+// cycle position, so the entrance must never rotate (a spin would imply time
+// itself is turning): "grow" scales the whole clock concentrically from the
+// center outward, leaving every segment at its true hour.
 
 export interface InteractivePolarClockProps extends PolarClockProps {
   strings?: PolarClockStrings;
@@ -58,7 +59,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
   } = props;
   const n = data.length;
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "spin", animate);
+  useEntrance(hostRef, "grow", animate);
 
   const geo = useMemo(
     () => polarClockGeometry({ values: data, size, inner, start, pad: 1, mode, now }),

@@ -37,9 +37,9 @@ export function BrandColorSection() {
           <div className="mono-label mb-3">Semantic — never color alone</div>
           <div className="grid grid-cols-2 gap-2">
             <ColorSwatch hex="#077353" name="Positive" role="Light" />
-            <ColorSwatch hex="#34d399" name="Positive" role="Dark" />
+            <ColorSwatch hex="#45a385" name="Positive" role="Dark" />
             <ColorSwatch hex="#ad4713" name="Negative" role="Light" />
-            <ColorSwatch hex="#fb8c5a" name="Negative" role="Dark" />
+            <ColorSwatch hex="#df7856" name="Negative" role="Dark" />
           </div>
         </Reveal>
       </div>

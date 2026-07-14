@@ -78,6 +78,13 @@ export const entry: ChartEntry = {
       required: false,
       description: "Gap between cells (default 1).",
     },
+    {
+      name: "dateFormat",
+      type: "Intl.DateTimeFormatOptions | (d: Date) => string",
+      required: false,
+      interactive: true,
+      description: "Announced day label (defaults to weekday + month + day, UTC).",
+    },
   ],
   demo: DATA.map((d) => d.value),
   example: {

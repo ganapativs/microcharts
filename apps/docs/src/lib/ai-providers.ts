@@ -2,38 +2,70 @@
 export interface ProviderGroup {
   title: string;
   note: string;
+  /** Most-recognizable first — the compact home wall shows `lead` with logos,
+   *  the rest as a light text tail; the full docs wall shows them all. */
   names: string[];
+  /** How many of `names` lead with a logo in the compact variant. */
+  lead: number;
 }
 
 export const PROVIDER_GROUPS: ProviderGroup[] = [
   {
-    title: "Chat assistants",
+    title: "Chat assistants & models",
     note: "emit a chart block mid-reply",
-    names: ["claude", "openai", "gemini", "perplexity", "mistral"],
+    lead: 4,
+    names: [
+      "claude",
+      "openai",
+      "gemini",
+      "grok",
+      "deepseek",
+      "meta",
+      "mistral",
+      "perplexity",
+      "qwen",
+      "poe",
+    ],
   },
   {
-    title: "Coding agents & harnesses",
-    note: "scaffold components from the API",
+    title: "Coding agents & IDEs",
+    note: "scaffold components from the typed catalog",
+    lead: 6,
     names: [
       "cursor",
       "claude-code",
       "codex",
+      "v0",
       "opencode",
-      "cline",
-      "amp",
-      "zed",
-      "continue",
-      "roocode",
-      "warp",
-      "copilot",
-      "windsurf",
       "antigravity",
+      "windsurf",
+      "zed",
+      "cline",
+      "replit",
+      "continue",
+      "warp",
+      "amp",
+      "roocode",
+      "stackblitz",
+      "jetbrains",
+      "pi",
+      "copilot",
     ],
   },
   {
     title: "Frameworks & SDKs",
-    note: "render tool output to charts",
-    names: ["vercel", "langchain"],
+    note: "map tool-call output to charts",
+    lead: 4,
+    names: [
+      "vercel",
+      "openai-agents",
+      "langchain",
+      "anthropic",
+      "huggingface",
+      "ollama",
+      "pydantic",
+      "crewai",
+    ],
   },
 ];
 
@@ -50,6 +82,8 @@ export interface MachineSurface {
   label: string;
   note: string;
   body: string;
+  /** Optional subordinate link (e.g. the JSON Schema that describes this surface). */
+  aux?: { href: string; label: string };
 }
 
 export const MACHINE_SURFACES: MachineSurface[] = [
@@ -69,7 +103,8 @@ export const MACHINE_SURFACES: MachineSurface[] = [
     href: "/catalog.json",
     label: "/catalog.json",
     note: "every chart, typed",
-    body: "Machine catalog: each chart’s name, import paths, data shape, and props — generated from the same registry that builds this site.",
+    body: "Machine catalog: each chart’s name, import paths, data shape, and props (plus a shared-grammar block) — generated from the same registry that builds this site, and validated in CI against its JSON Schema.",
+    aux: { href: "/catalog.schema.json", label: "JSON Schema" },
   },
   {
     href: "/docs/ai.md",

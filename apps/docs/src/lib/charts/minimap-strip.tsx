@@ -46,6 +46,13 @@ export const entry: ChartEntry = {
       required: false,
       description: "Dedicated tick lane vs overlaying ticks.",
     },
+    {
+      name: "onWindowChange",
+      type: "(window: [number, number]) => void",
+      required: false,
+      interactive: true,
+      description: "Fires with the new `[start, end]` index range as the brush window is dragged.",
+    },
   ],
   demo: [12],
   example: {

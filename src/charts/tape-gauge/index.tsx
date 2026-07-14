@@ -227,8 +227,11 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               {t.s}
             </text>
           ))}
-          {/* fixed center pointer + readout */}
-          <path d={geo.pointer.path} data-mc-ink="accent" />
+          {/* fixed center pointer + readout. The pointer is a CLOSED triangle;
+              the accent-path CSS rule strokes (not fills) accent paths, so an
+              inline fill is needed for a solid arrow. The role is kept for the
+              forced-colors Highlight mapping. */}
+          <path d={geo.pointer.path} data-mc-ink="accent" style={{ fill: "var(--mc-accent)" }} />
           {label === "value" ? (
             <text
               x={geo.pointer.labelX}

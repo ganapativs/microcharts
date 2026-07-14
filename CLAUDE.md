@@ -92,7 +92,8 @@ types-first export conditions.
 ~20 `--mc-*` CSS custom properties at low specificity are the runtime contract; presets are token
 bundles (`modern` default, `editorial`, `mono`, `vivid`, plus print/e-ink context presets).
 Precedence: prop > CSS var scope > preset > default. Presets are visual only and never change data
-semantics. Colors are Okabe-Ito-derived semantic tokens (positive `#009E73`, negative `#D55E00`);
+semantics. Colors are matte semantic tokens on Okabe-Ito hue geometry — CVD-safe (bluish-green
+positive `#0E7A5F` vs vermillion negative `#BD4B2D`), deepened for an editorial, non-poppy finish;
 palettes swap the accent only. Dark mode is hand-tuned, never inverted. Charts never paint their own
 background. `tabular-nums` on all rendered numbers. (The principled preset is named `editorial`.)
 

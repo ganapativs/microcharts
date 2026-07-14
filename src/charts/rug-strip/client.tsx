@@ -52,9 +52,11 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Ticks are merged per-opacity-tier paths, not discrete per-observation
-  // elements — settle's scale would shift tick x-positions non-uniformly
-  // within a tier, so reveal (fade-only) is used instead.
-  useEntrance(hostRef, "wipe", animate);
+  // elements, so there is nothing to cascade — and a directional `wipe`/`reveal`
+  // would be wrong for `orientation="vertical"` (value axis is Y, not X). `pop`
+  // (whole-svg opacity + a subtle scale) is the honest orientation-agnostic
+  // reveal, and reads as arriving rather than a flat fade.
+  useEntrance(hostRef, "pop", animate);
 
   const geo = useMemo(
     () =>

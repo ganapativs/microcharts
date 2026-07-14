@@ -77,13 +77,23 @@ export function Hourglass(props: HourglassProps): ReactNode {
     >
       {/* glass — a faint filled silhouette gives the instrument body */}
       <path d={geo.frame} data-mc-ink="fill" />
-      {/* top sand — remaining (warm, lighter) */}
+      {/* top sand — remaining (warm, lighter). The `mc-hourglass-sand` class
+          scopes the interactive value cross-fade to the sand alone, so the
+          static glass frame + outline never flicker on a tick. */}
       {geo.topSand ? (
-        <path d={geo.topSand} style={{ fill: color ?? "var(--mc-moon)", fillOpacity: 0.5 }} />
+        <path
+          className="mc-hourglass-sand"
+          d={geo.topSand}
+          style={{ fill: color ?? "var(--mc-moon)", fillOpacity: 0.5 }}
+        />
       ) : null}
       {/* bottom sand — elapsed (warm, full) */}
       {geo.bottomSand ? (
-        <path d={geo.bottomSand} style={{ fill: color ?? "var(--mc-moon)" }} />
+        <path
+          className="mc-hourglass-sand"
+          d={geo.bottomSand}
+          style={{ fill: color ?? "var(--mc-moon)" }}
+        />
       ) : null}
       {/* glass outline over the sand */}
       <path d={geo.frame} data-mc-ink="muted" style={{ fill: "none", strokeOpacity: 0.7 }} />

@@ -205,20 +205,21 @@ export function GrammarExplorer() {
   );
 }
 
-// Inline `code` → <code> for the rules list. Split alternates plain / code text;
-// the index is the correct, stable key here (a static string, order never changes).
+// Inline `code` → <code> for the rules list. Split alternates plain / code text.
 function InlineCode({ text }: { text: string }) {
-  const parts = text.split("`");
+  const nodes = text.split("`").flatMap((value, slot) => {
+    if (!value) return [];
+    return [{ kind: (slot % 2 ? "code" : "text") as "code" | "text", value }];
+  });
   return (
     <>
-      {parts.map((p, i) =>
-        // oxlint-disable-next-line react/no-array-index-key
-        i % 2 ? (
-          <code key={i} className="font-mono text-[0.85em] text-fd-primary">
-            {p}
+      {nodes.map((n) =>
+        n.kind === "code" ? (
+          <code key={`code:${n.value}`} className="font-mono text-[0.85em] text-fd-primary">
+            {n.value}
           </code>
         ) : (
-          <span key={i}>{p}</span>
+          <span key={`text:${n.value}`}>{n.value}</span>
         ),
       )}
     </>

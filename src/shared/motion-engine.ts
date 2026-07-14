@@ -41,8 +41,9 @@ const DUR: Record<EntranceArchetype, number> = {
   pop: 200,
   fade: 250,
   trail: 200, // per-mark pop; the sequence spans TRAIL_WINDOW
-  spin: 500,
+  spin: 400,
   grow: 400,
+  scan: 500, // a signal scanning in reads slower — you watch it fill
 };
 
 // Sequential choreography: marks pop along the chart's own order (DOM order,
@@ -66,6 +67,7 @@ const EASE: Record<EntranceArchetype, string> = {
   trail: MC_EASE_ENTER,
   pop: MC_EASE_ENTER,
   fade: MC_EASE_ENTER,
+  scan: EASE_EVEN, // constant-rate sweep
 };
 
 /** Primary marks per archetype — selected by the ink roles charts already emit. */
@@ -79,6 +81,7 @@ const MARKS: Record<EntranceArchetype, string> = {
   trail: '[data-mc-ink="point"], [data-mc-ink="bar"], [data-mc-ink="accent"], [data-mc-ink="data"]',
   spin: "", // whole-svg radial unwind
   grow: "", // whole-svg concentric growth
+  scan: '[data-mc-ink="bar"], [data-mc-ink="fill"], path[data-mc-ink="data"]',
   pop: "",
   fade: "",
 };
@@ -134,6 +137,41 @@ if (typeof window !== "undefined") {
 
 function stagger(i: number, n: number, step: number): number {
   return i * Math.min(step, n > 1 ? STAGGER_CAP / (n - 1) : 0);
+}
+
+/**
+ * Reveal a stroked path/line by sweeping its stroke-dashoffset from full length
+ * to zero — the line draws itself on. Shared by the `draw` archetype and the
+ * `link` connector act. Dash lengths for `vector-effect: non-scaling-stroke`
+ * paths are computed by the browser in SCREEN space (the effect applies
+ * post-transform) while getTotalLength answers in user units — at any CSS scale
+ * ≠ 1 the dash pattern's repeat would leak in as a phantom second fragment, so
+ * scale by the rendered factor (+5% guard; a dash longer than the path is safe).
+ * Returns null for a detached/zero-length/non-geometry element.
+ */
+function dashDraw(
+  el: SVGGraphicsElement,
+  screenK: number,
+  cleanups: (() => void)[],
+  timing: KeyframeAnimationOptions,
+): Animation | null {
+  let len = 0;
+  try {
+    len = (el as SVGPathElement).getTotalLength();
+  } catch {
+    return null;
+  }
+  if (len <= 0) return null;
+  const nonScaling =
+    el.getAttribute("vector-effect") === "non-scaling-stroke" ||
+    getComputedStyle(el).vectorEffect === "non-scaling-stroke";
+  const dash = (nonScaling ? len * screenK : len) * 1.05;
+  el.style.strokeDasharray = `${dash}`;
+  cleanups.push(() => {
+    el.style.strokeDasharray = "";
+    el.style.strokeDashoffset = "";
+  });
+  return el.animate([{ strokeDashoffset: `${dash}px` }, { strokeDashoffset: "0px" }], timing);
 }
 
 /**
@@ -210,7 +248,7 @@ export function runEntrance(
     // (whole-svg archetypes carry no mark set by design.)
     const wholeSvg =
       kind === "pop" || kind === "fade" || kind === "wipe" || kind === "spin" || kind === "grow";
-    if (marks.length > 80 || (marks.length === 0 && !wholeSvg)) {
+    if (marks.length > (options.maxMarks ?? 80) || (marks.length === 0 && !wholeSvg)) {
       if (
         marks.length === 0 &&
         (typeof process === "undefined" || process.env.NODE_ENV !== "production")
@@ -233,9 +271,14 @@ export function runEntrance(
     const storySet = new Set<Element>(marks);
     const stageEls: SVGGraphicsElement[] = [];
     const voiceEls: SVGGraphicsElement[] = [];
+    const linkEls: SVGGraphicsElement[] = [];
     for (const el of svg.querySelectorAll<SVGGraphicsElement>(LEAVES)) {
       if (storySet.has(el)) continue;
-      if (
+      // A LINK (a connector between the story's marks, a stem to a dot) draws
+      // itself on once those marks have landed — it belongs to neither the
+      // quiet stage nor the closing voice.
+      if (options.link && el.matches(options.link)) linkEls.push(el);
+      else if (
         el.tagName === "text" ||
         el.matches(VOICE_INK) ||
         (options.defer && el.matches(options.defer))
@@ -271,37 +314,33 @@ export function runEntrance(
     const norms =
       options.order || kind === "trail" ? orderNorm(marks, options.order ?? "index") : null;
     marks.forEach((el, i) => {
-      const delay = storyStart + (norms ? norms[i]! * win : stagger(i, n, step));
+      // `scan` sweeps ONE shared clip window across the whole chart, so every
+      // path it covers (a played/rest split, a peak bar) must start together —
+      // the clip does the sequencing; a per-mark stagger would desync the wave.
+      const delay =
+        kind === "scan" ? storyStart : storyStart + (norms ? norms[i]! * win : stagger(i, n, step));
       const timing = { duration: dur, delay, easing: ease, fill: "backwards" as const };
       switch (kind) {
         case "draw": {
-          let len = 0;
-          try {
-            len = (el as SVGPathElement).getTotalLength();
-          } catch {
-            /* detached / non-path */
-          }
-          if (len > 0) {
-            const nonScaling =
-              el.getAttribute("vector-effect") === "non-scaling-stroke" ||
-              getComputedStyle(el).vectorEffect === "non-scaling-stroke";
-            const dash = (nonScaling ? len * screenK : len) * 1.05;
-            len = dash;
-            el.style.strokeDasharray = `${dash}`;
-            cleanups.push(() => {
-              el.style.strokeDasharray = "";
-              el.style.strokeDashoffset = "";
-            });
-            anims.push(
-              el.animate([{ strokeDashoffset: `${len}px` }, { strokeDashoffset: "0px" }], timing),
-            );
-          }
+          // stroke-dashoffset only reveals a STROKE. A fill-only mark (a wedge,
+          // an area) has no stroke to draw, so `draw` is the wrong archetype for
+          // it — author such shapes as a stroked centerline (a ring's value arc)
+          // or give them a fill-appropriate archetype instead.
+          const a = dashDraw(el, screenK, cleanups, timing);
+          if (a) anims.push(a);
           break;
         }
         case "rise":
         case "sweep": {
           const axis = kind === "rise" ? "scaleY" : "scaleX";
-          let origin = options.origin ?? (kind === "rise" ? "bottom" : "left");
+          // A mark may pin its own growth edge (`data-mc-origin`) — needed when
+          // one chart grows marks toward different edges (a spread's two wedges
+          // meeting at the gap, a mirror histogram's bins emanating from a
+          // shared axis). Falls back to the chart-wide option, then the default.
+          let origin =
+            el.getAttribute("data-mc-origin") ??
+            options.origin ??
+            (kind === "rise" ? "bottom" : "left");
           // Bars extend AWAY from the zero line — negative marks grow toward
           // their own side of it (down for columns, left for horizontal bars).
           if (origin === "signed") {
@@ -330,7 +369,7 @@ export function runEntrance(
           anims.push(
             el.animate(
               [
-                { opacity: 0, transform: kind === "trail" ? "scale(0.4)" : "scale(0.6)" },
+                { opacity: 0, transform: kind === "trail" ? "scale(0.6)" : "scale(0.7)" },
                 { opacity: 1, transform: "scale(1)" },
               ],
               timing,
@@ -341,6 +380,25 @@ export function runEntrance(
         case "reveal":
           anims.push(el.animate([{ opacity: 0 }, { opacity: 1 }], timing));
           break;
+        case "scan": {
+          // A clip window that sweeps left→right while opening from `origin`, so
+          // a MERGED bar/area path (one node, for the budget) reveals region by
+          // region — the signal scans in — instead of scaling as one block. The
+          // clip is measured against the shared `view-box`, NOT each path's own
+          // box, so several paths that split one chart (a played/rest waveform,
+          // a peak bar) uncover under ONE sweep at the same x — not independently.
+          const o = options.origin ?? "left";
+          const from =
+            o === "center"
+              ? "inset(50% 100% 50% 0) view-box"
+              : o === "bottom"
+                ? "inset(100% 100% 0% 0%) view-box"
+                : "inset(0% 100% 0% 0%) view-box";
+          anims.push(
+            el.animate([{ clipPath: from }, { clipPath: "inset(0% 0% 0% 0%) view-box" }], timing),
+          );
+          break;
+        }
         default:
           break;
       }
@@ -382,7 +440,7 @@ export function runEntrance(
         anims.push(
           el.animate(
             [
-              { opacity: 0, transform: "scale(0.4)" },
+              { opacity: 0, transform: "scale(0.6)" },
               { opacity: 1, transform: "scale(1)" },
             ],
             {
@@ -407,7 +465,7 @@ export function runEntrance(
           [
             {
               opacity: 0,
-              transform: kind === "spin" ? "rotate(-80deg) scale(0.35)" : "scale(0.5)",
+              transform: kind === "spin" ? "rotate(-30deg) scale(0.9)" : "scale(0.6)",
             },
             { opacity: 1, transform: "none" },
           ],
@@ -421,49 +479,79 @@ export function runEntrance(
           easing: ease,
         }),
       );
-    } else if (kind === "pop") {
+    } else if (kind === "pop" || kind === "fade") {
+      // Whole-svg reveal: pop adds a subtle scale, fade is opacity only (the
+      // quietest option — for merged-path charts with no per-mark story and no
+      // meaningful direction; everything else should move).
       anims.push(
         svg.animate(
           [
-            { opacity: 0, transform: "scale(0.97)" },
-            { opacity: 1, transform: "scale(1)" },
+            { opacity: 0, transform: kind === "pop" ? "scale(0.97)" : "none" },
+            { opacity: 1, transform: "none" },
           ],
           { duration: dur, easing: ease },
         ),
       );
     }
 
-    // ACT 3 — the voice speaks as the story lands: values and accents pop,
+    // ACT — the LINK draws: once the story marks have landed, connectors draw
+    // themselves on (dot→dot, stem→dot) via stroke-dashoffset, so the shape
+    // visibly joins the marks it belongs to before the voice speaks.
+    let linkEnd = storyEnd;
+    if (linkEls.length > 0) {
+      const timing = {
+        duration: 300,
+        delay: storyEnd,
+        easing: EASE_EVEN,
+        fill: "backwards" as const,
+      };
+      for (const el of linkEls) {
+        const a = dashDraw(el, screenK, cleanups, timing);
+        if (a) {
+          anims.push(a);
+          spoken.add(el);
+        }
+      }
+      linkEnd = storyEnd + 300;
+    }
+
+    // ACT 3 — the voice speaks as the link lands: values and accents pop,
     // labels fade, all on the same final beat.
-    const voiceDelay = Math.max(storyEnd - BEAT / 2, storyStart + BEAT);
+    const voiceDelay = Math.max(linkEnd - BEAT / 2, storyStart + BEAT);
     for (const el of voiceEls) {
       if (spoken.has(el)) continue;
-      if (el.tagName === "text") {
-        anims.push(
-          el.animate([{ opacity: 0 }, { opacity: 1 }], {
+      // Text is a voice too — it should arrive, not blink on: a tiny lift and
+      // settle (≤1 user unit, anchored to its own text-anchor so it never
+      // drifts across its gutter). Other voice marks (accents, points) scale-pop.
+      const isText = el.tagName === "text";
+      const a = isText ? el.getAttribute("text-anchor") : null;
+      el.style.transformBox = "fill-box";
+      el.style.transformOrigin = isText
+        ? `${a === "end" ? "right" : a === "middle" ? "center" : "left"} center`
+        : "center";
+      cleanups.push(() => {
+        el.style.transformBox = "";
+        el.style.transformOrigin = "";
+      });
+      anims.push(
+        el.animate(
+          isText
+            ? [
+                { opacity: 0, transform: "translateY(1px) scale(0.98)" },
+                { opacity: 1, transform: "translateY(0px) scale(1)" },
+              ]
+            : [
+                { opacity: 0, transform: "scale(0.85)" },
+                { opacity: 1, transform: "scale(1)" },
+              ],
+          {
             duration: 1.5 * BEAT,
             delay: voiceDelay,
-            easing: EASE_EVEN,
+            easing: isText ? EASE_EVEN : MC_EASE_ENTER,
             fill: "backwards",
-          }),
-        );
-      } else {
-        el.style.transformBox = "fill-box";
-        el.style.transformOrigin = "center";
-        cleanups.push(() => {
-          el.style.transformBox = "";
-          el.style.transformOrigin = "";
-        });
-        anims.push(
-          el.animate(
-            [
-              { opacity: 0, transform: "scale(0.85)" },
-              { opacity: 1, transform: "scale(1)" },
-            ],
-            { duration: 1.5 * BEAT, delay: voiceDelay, easing: MC_EASE_ENTER, fill: "backwards" },
-          ),
-        );
-      }
+          },
+        ),
+      );
     }
 
     if (anims.length > 0) {

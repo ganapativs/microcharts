@@ -49,12 +49,12 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The two sides are separate paths (demand = "positive", supply =
-  // "negative"), never merged, so each can scale from its own center — a
-  // sweep with a centered origin reads as the book pushing outward from the
-  // mid-price on both sides at once, rather than one flat left→right reveal.
+  // "negative"), never merged. Each carries its own `data-mc-origin` in the
+  // static markup — demand pinned right, supply pinned left — so both sweep
+  // outward from the mid-price gap while the spread between them stays put,
+  // rather than the gap visibly widening/closing under a shared center origin.
   useEntrance(hostRef, "sweep", animate, {
     selector: 'path[data-mc-ink="positive"], path[data-mc-ink="negative"]',
-    origin: "center",
   });
 
   const geo = useMemo(

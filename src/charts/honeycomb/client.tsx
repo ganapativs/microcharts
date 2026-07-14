@@ -12,10 +12,11 @@ export interface InteractiveHoneycombProps extends HoneycombProps {
   live?: boolean;
   strings?: HoneycombStrings;
   /**
-   * Opt-in entrance motion (default `false`): the occupancy sweeps in left to
-   * right on first client-side mount (fill order is row-major, so a clip-reveal
-   * echoes the real fill sweep). Inert on the server and on hydrated server
-   * HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the comb grows in concentrically
+   * from the center on first client-side mount — a whole-shape reveal that
+   * suits the near-square multi-row grid (a vertical clip would slice hexes
+   * mid-shape). Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -38,7 +39,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
   const [announced, setAnnounced] = useState("");
   const prev = useRef(value);
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "wipe", animate);
+  useEntrance(hostRef, "grow", animate);
 
   useEffect(() => {
     if (prev.current === value) return;

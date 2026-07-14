@@ -46,7 +46,9 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
   const { rad, outlierRad, captionPad } = biasLayout(width, height, props.label ?? "bias", props.r);
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "settle", animate, { selector: "circle" });
+  // Dots settle in left→right along the mean axis (the same axis ←/→ nav
+  // walks) — a gentle directional scan rather than an orderless sparkle.
+  useEntrance(hostRef, "settle", animate, { selector: "circle", order: "x" });
 
   const geo = useMemo(
     () => biasStripGeometry({ width, height, data, limits, rad: outlierRad, captionPad }),

@@ -83,6 +83,10 @@ JavaScript. They change how charts _look_, never what the data _means_.
   </div>
 </LiveDemo>
 
+What each preset retunes — every other token stays at its default:
+
+<PresetDeltas />
+
 <Callout type="info">
   This site's appearance menu (the palette icon in the nav) previews these presets and accents live
   — every chart on every page retunes as you switch, because it's the same token contract you'd use
@@ -111,38 +115,45 @@ for whichever reads better in your code — it's the same cascade underneath.
 ## The token set
 
 Around twenty custom properties cover the whole surface. Set any of them at any scope and every
-chart inside retunes. Here's the full set with its defaults, grouped by what it controls and why
-it exists:
+chart inside retunes. Here are the colour tokens with their built-in light and dark values —
+every chip is the real shipped default, click to copy the hex:
+
+<TokenSwatches />
+
+Semantic tokens keep their meaning across themes; the six categorical hues are a last resort for
+genuine multi-series charts. Below is the same set as raw CSS — including the geometry, motion,
+and readout-surface tokens — ready to paste and override:
 
 ```css
 :root {
   /* Semantic colour */
 
   /* Default ink: lines, bars, labels. Dark mode is hand-tuned, not inverted. */
-  --mc-stroke: #171717;
+  --mc-stroke: #1a1917;
 
-  /* Good direction — colour-blind-safe green; pair with ▲. */
-  --mc-positive: #009e73;
+  /* Good direction — colour-blind-safe viridian; pair with ▲. */
+  --mc-positive: #0e7a5f;
 
-  /* Bad direction — colour-blind-safe vermillion; pair with ▼. */
-  --mc-negative: #d55e00;
+  /* Bad direction — colour-blind-safe terracotta; pair with ▼. */
+  --mc-negative: #bd4b2d;
 
   /* No-signal marks: baselines, inactive points, empty cells. */
-  --mc-neutral: #8a8a8a;
+  --mc-neutral: #8a8986;
 
   /* Emphasis colour — rebind to your brand. */
-  --mc-accent: #0072b2;
+  --mc-accent: #1f6091;
 
   /* Normal-range shading, derived from the ink. */
   --mc-band: color-mix(in oklab, var(--mc-stroke) 8%, transparent);
 
-  /* Categorical palette — multi-series only; high-contrast first. */
-  --mc-cat-1: #e69f00;
-  --mc-cat-2: #56b4e9;
-  --mc-cat-3: #009e73;
-  --mc-cat-4: #0072b2;
-  --mc-cat-5: #d55e00;
-  --mc-cat-6: #cc79a7;
+  /* Categorical palette — matte jewel tones; multi-series only, lightness-ordered.
+     Each has a hand-tuned brighter twin on dark surfaces (same hue, lifted). */
+  --mc-cat-1: #d2982f;
+  --mc-cat-2: #5b9fd4;
+  --mc-cat-3: #2e8c66;
+  --mc-cat-4: #285788;
+  --mc-cat-5: #c2543a;
+  --mc-cat-6: #a85c8c;
 
   /* Geometry */
 

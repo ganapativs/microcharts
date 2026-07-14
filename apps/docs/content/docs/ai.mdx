@@ -142,8 +142,11 @@ when a block is malformed — the summary makes a graceful fallback trivial.
 ## Where it runs
 
 A chart is plain text and JSON, so anything that reads or writes text can emit one and render it
-back — a chat reply, a generated slide, a rendered report — no SDK, no partnership, no island
-bridge.
+back — no SDK, no partnership, no island bridge. That spans the whole stack a model runs in
+today: the **chat assistants** that answer in prose, the **coding agents and IDEs** that scaffold
+the components from the typed catalog, and the **frameworks and SDKs** that wire tool-call output
+straight to charts. None of these is an integration we built — they work because the output is
+just text.
 
 <ProviderWall />
 

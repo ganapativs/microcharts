@@ -34,5 +34,7 @@ describe.skipIf(!hasBuild)("built docs metadata", () => {
   it("llms.txt and catalog json are emitted", () => {
     expect(existsSync(outDir + "llms.txt")).toBe(true);
     expect(existsSync(outDir + "catalog.json")).toBe(true);
+    // the catalog's `$schema` target must ship alongside it (copied from public/)
+    expect(existsSync(outDir + "catalog.schema.json")).toBe(true);
   });
 });

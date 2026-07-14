@@ -58,12 +58,12 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // Runs are fixed-height typed segments tiled like a cell strip (their
-  // height encodes run TYPE, not a baseline-anchored value) — not point
-  // markers or value bars, so reveal (fade-only, staggered) matches
-  // ActivityGrid's cell-grid archetype better than settle's scale, which
-  // would distort the variable-width rects.
-  useEntrance(hostRef, "wipe", animate);
+  // Runs are individual fixed-height typed segments (height encodes run TYPE,
+  // not a value), so settle's scale would distort the variable-width rects and
+  // a wipe would slice a run mid-width. An opacity `reveal` ordered by x lights
+  // each whole run in turn, oldest→current, ending on the accent bar — the
+  // streak visibly plays out along the time axis.
+  useEntrance(hostRef, "reveal", animate, { selector: "rect", order: "x" });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const geo = useMemo(

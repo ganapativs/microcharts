@@ -66,6 +66,14 @@ export const entry: ChartEntry = {
       required: false,
       description: "Tape direction (default vertical).",
     },
+    {
+      name: "announceEvery",
+      type: "number",
+      required: false,
+      interactive: true,
+      description:
+        "Minimum ms between live-region announcements as the value streams (default 5000).",
+    },
   ],
   demo: [142],
   example: {

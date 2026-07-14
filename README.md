@@ -27,6 +27,11 @@ itself in words. So a chart an LLM streams into a chat reply is one a person can
 the properties that make it safe for a model to write are the ones that make it pleasant for a
 human to use.
 
+> **Status: production-ready, still earning its scars.** microcharts is tested and ready to use in
+> production, but it hasn't been battle-tested across every stack and edge yet — you may hit the
+> occasional rough edge. When you do, tell us: bug reports and feature requests on
+> [GitHub issues](https://github.com/ganapativs/microcharts/issues) are how it keeps getting sharper.
+
 ## Why
 
 - **AI-native.** A chart is plain `data` plus a generated sentence. One grammar across all 106

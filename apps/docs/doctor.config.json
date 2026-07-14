@@ -1,0 +1,7 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "deadCode": false,
+  "rules": {
+    "react-doctor/only-export-components": "off"
+  }
+}

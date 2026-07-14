@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://microcharts.dev/catalog.schema.json",
+  "title": "microcharts catalog",
+  "description": "Machine-readable catalog of every microcharts chart: import paths, data shape, primary encoding, and props. `sharedProps` lists the grammar/layout/interactive props common to every chart; each chart's `props` lists only its chart-specific knobs. Read both to know a chart's full surface. Generated from the chart registry; served at /catalog.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["package", "homepage", "sharedProps", "charts"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI of this schema."
+    },
+    "package": {
+      "type": "string",
+      "description": "npm package name to install.",
+      "examples": ["@microcharts/react"]
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "description": "Documentation site origin."
+    },
+    "sharedProps": {
+      "type": "array",
+      "description": "Props whose name means the same thing on every chart — the shared grammar, layout props, i18n, and the shared interactive props (`animate`, `live`). Documented once here rather than repeated in every chart's `props`.",
+      "items": { "$ref": "#/$defs/prop" }
+    },
+    "charts": {
+      "type": "array",
+      "description": "Every catalogued chart.",
+      "items": { "$ref": "#/$defs/chart" }
+    }
+  },
+  "$defs": {
+    "prop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "required", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Prop name as written in JSX. A `/` joins a documented pair (e.g. `xLabel / yLabel`)."
+        },
+        "type": {
+          "type": "string",
+          "description": "TypeScript type, as source text."
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the prop must be passed."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One-line human description of the prop."
+        },
+        "interactive": {
+          "const": true,
+          "description": "Present and `true` only when the prop exists on the `…/interactive` entry alone (the static default component does not accept it)."
+        }
+      }
+    },
+    "chart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "slug",
+        "status",
+        "docs",
+        "staticImport",
+        "dataShape",
+        "primaryEncoding",
+        "bestFor",
+        "avoidFor",
+        "props",
+        "examples"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Component name (PascalCase).",
+          "examples": ["Sparkline"]
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "URL/registry slug (kebab-case)."
+        },
+        "status": {
+          "enum": ["stable", "planned"],
+          "description": "`stable` ships today; `planned` is catalogued but not yet released."
+        },
+        "docs": {
+          "type": "string",
+          "format": "uri",
+          "description": "Absolute URL of the chart's documentation page."
+        },
+        "staticImport": {
+          "type": "string",
+          "description": "Import path of the static, RSC-safe default entry.",
+          "examples": ["@microcharts/react/sparkline"]
+        },
+        "interactiveImport": {
+          "type": "string",
+          "description": "Import path of the `…/interactive` client entry, when the chart has one.",
+          "examples": ["@microcharts/react/sparkline/interactive"]
+        },
+        "dataShape": {
+          "type": "string",
+          "description": "The shape of the `data` prop, as source text."
+        },
+        "primaryEncoding": {
+          "type": "string",
+          "description": "The one documented primary encoding channel."
+        },
+        "bestFor": {
+          "type": "array",
+          "description": "Situations this chart is the right pick for.",
+          "items": { "type": "string" }
+        },
+        "avoidFor": {
+          "type": "array",
+          "description": "Situations to reach for a different chart instead.",
+          "items": { "type": "string" }
+        },
+        "props": {
+          "type": "array",
+          "description": "Chart-specific props. Every chart also accepts everything in top-level `sharedProps`.",
+          "items": { "$ref": "#/$defs/prop" }
+        },
+        "examples": {
+          "type": "array",
+          "description": "Runnable usage examples.",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "code"],
+            "properties": {
+              "title": { "type": "string" },
+              "code": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

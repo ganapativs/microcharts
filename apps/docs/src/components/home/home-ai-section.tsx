@@ -2,15 +2,16 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { StreamVignette } from "@/components/home/stream-vignette";
 import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
+import { PROVIDER_GROUPS } from "@/lib/ai-providers";
 import { Reveal } from "@/components/ui/reveal";
 
 const HOW_MODELS_USE = [
   {
-    who: "Chat assistants",
+    who: "Chat assistants & models",
     what: "emit a chart block mid-reply, and it renders in the answer",
   },
   {
-    who: "Coding agents & CLIs",
+    who: "Coding agents & IDEs",
     what: "scaffold components straight from the typed catalog",
   },
   {
@@ -18,6 +19,9 @@ const HOW_MODELS_USE = [
     what: "map tool-call output to a chart per row, no bridge",
   },
 ];
+
+// Live count of featured tools — derived from the wall data so it never drifts.
+const PROVIDER_COUNT = PROVIDER_GROUPS.reduce((n, g) => n + g.names.length, 0);
 
 function SectionMark({ n, children }: { n: string; children: React.ReactNode }) {
   return (
@@ -69,11 +73,21 @@ export function HomeAiSection({ catalogTotal }: { catalogTotal: number }) {
       </div>
 
       <Reveal delay={120} className="mt-10">
-        <div className="mono-label mb-3">runs where models already work</div>
-        <ProviderWall />
+        <div className="mb-3 flex items-baseline gap-2">
+          <span className="mono-label">runs where models already work</span>
+          <span className="h-px flex-1 bg-hairline" />
+          <span className="mono-label tabular-nums opacity-55">
+            {PROVIDER_COUNT} tools · chat, code, SDKs
+          </span>
+        </div>
+        <ProviderWall compact />
       </Reveal>
-      <Reveal delay={60} className="mt-6">
-        <div className="mono-label mb-3">and reads its own docs</div>
+      <Reveal delay={60} className="mt-8">
+        <div className="mb-3 flex items-baseline gap-2">
+          <span className="mono-label">and reads its own docs</span>
+          <span className="h-px flex-1 bg-hairline" />
+          <span className="mono-label opacity-55">generated, not written</span>
+        </div>
         <SurfaceCards />
       </Reveal>
     </section>

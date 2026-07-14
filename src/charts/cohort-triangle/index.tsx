@@ -130,7 +130,6 @@ export function CohortTriangle(props: CohortTriangleProps): ReactNode {
           width={cell}
           height={cell}
           rx={1}
-          shapeRendering="crispEdges"
           data-mc-ink={c.gap ? "gap" : "cell"}
           fillOpacity={c.gap ? undefined : levelOpacity(c.level)}
           style={!c.gap && color ? { fill: color } : undefined}

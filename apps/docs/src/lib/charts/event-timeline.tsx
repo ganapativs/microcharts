@@ -57,6 +57,14 @@ export const entry: ChartEntry = {
       required: false,
       description: "Centered in-span labels with deterministic drop-out.",
     },
+    {
+      name: "dateFormat",
+      type: "Intl.DateTimeFormatOptions | (d: Date) => string",
+      required: false,
+      interactive: true,
+      description:
+        "Announced timestamp format for focused events (defaults to a locale date-time).",
+    },
   ],
   demo: DATA.map((d) => ((d.end ?? d.start) - d.start) / H),
   example: {

@@ -47,7 +47,17 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
   const rad = Math.min(3, Math.max(1, props.r ?? 1.5));
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "settle", animate);
+  // Dots settle onto the plot (the story). With `trend`, the least-squares line
+  // is a summary OF those dots, so it should arrive AFTER them, not ride the
+  // quiet stage ahead: `defer` casts it into the closing act. (No-op when trend
+  // is off — its default — since no trend line exists.)
+  // The cloud draws itself across the x-axis (dots settle left→right), then the
+  // least-squares line DRAWS through it — the trend emerges from the points.
+  useEntrance(hostRef, "settle", animate, {
+    selector: "circle",
+    order: "x",
+    link: '[data-mc-ink="muted"]',
+  });
 
   const geo = useMemo(
     () =>

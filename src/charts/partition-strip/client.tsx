@@ -44,8 +44,12 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // reveal by x (`order:"x"`) — DOM order interleaves the two rows, so a plain
+  // index cascade breaks the vertical alignment channel; ordering by real x
+  // makes both rows fade in L→R in lockstep, preserving parent↔child alignment.
   useEntrance(hostRef, "reveal", animate, {
     selector: 'rect[data-mc-cat], rect[data-mc-ink="accent"], rect[data-mc-ink="neutral"]',
+    order: "x",
   });
 
   const geo = useMemo(

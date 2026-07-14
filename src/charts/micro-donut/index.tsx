@@ -76,10 +76,18 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
     >
       {geo.wedges.map((w, i) => {
         const d = rolled[w.index]!;
-        return d.members > 1 ? (
-          <path key={w.index} d={w.d} data-mc-ink="neutral" />
-        ) : (
-          <path key={w.index} d={w.d} data-mc-cat={(i % CAT_N) + 1} />
+        // Stroked centerline band (see geometry): color rides an inline stroke
+        // token — the rolled-up "other" wedge is neutral, the rest categorical.
+        const stroke = d.members > 1 ? "var(--mc-neutral)" : `var(--mc-cat-${(i % CAT_N) + 1})`;
+        return (
+          <path
+            key={w.index}
+            className="mc-donut-wedge"
+            d={w.d}
+            fill="none"
+            strokeLinecap="butt"
+            style={{ strokeWidth: geo.weight, stroke }}
+          />
         );
       })}
       {children}

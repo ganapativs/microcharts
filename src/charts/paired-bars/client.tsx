@@ -48,8 +48,11 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // Paired bars are effectively always zero-anchored positives (the `negative`
+  // ink is an under-target valence, not a below-zero sign), so bars grow from
+  // the shared baseline: the archetype default (bottom for rise, left for
+  // sweep) — never `origin:"signed"`, which would read that valence as sign.
   useEntrance(hostRef, orientation === "horizontal" ? "sweep" : "rise", animate, {
-    origin: "signed",
     selector: VALUE_SELECTOR,
   });
 

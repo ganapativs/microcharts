@@ -138,7 +138,7 @@ export function useFooterMarkCanvas(
     // (getComputedStyle in the raf loop forces style recalc = hover hitches)
     let key = "";
     let light = false;
-    let pal: Palette = { accent: "#2f52d4", pos: "#009E73", neg: "#D55E00", neutral: "#616773" };
+    let pal: Palette = { accent: "#2f52d4", pos: "#0E7A5F", neg: "#BD4B2D", neutral: "#616773" };
     const refreshPalette = () => {
       light = !document.documentElement.classList.contains("dark");
       const cs = getComputedStyle(document.documentElement);

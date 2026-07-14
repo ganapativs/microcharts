@@ -46,14 +46,14 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Bins mirror both up (before) and down (after) from a shared center axis.
-  // Each bin rect's own bottom (up bins) or top (down bins) edge sits ON that
-  // axis, so a "rise" with a centered transform-origin grows every bin
-  // symmetrically out of its own middle toward — and away from — the center
-  // line, instead of one direction winning; order "x" sweeps the sequence
-  // left-to-right. `rect` alone covers before (neutral fill) and after
-  // (filled in mirror mode, outlined in overlay mode) — no other rects live
-  // in this chart.
-  useEntrance(hostRef, "rise", animate, { selector: "rect", origin: "center", order: "x" });
+  // Each bin rect carries its own `data-mc-origin` in the static markup — up
+  // bins pin their bottom edge to the axis, mirror-mode down bins pin their top
+  // edge — so every bin grows out of the shared center line and stays attached
+  // to it, instead of detaching under a chart-wide centered origin. order "x"
+  // sweeps the sequence left-to-right. `rect` alone covers before (neutral
+  // fill) and after (filled in mirror mode, outlined in overlay mode) — no
+  // other rects live in this chart.
+  useEntrance(hostRef, "rise", animate, { selector: "rect", order: "x" });
 
   const geo = useMemo(
     () =>

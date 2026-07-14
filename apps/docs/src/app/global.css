@@ -215,12 +215,23 @@
       transparent 72%
     );
 
-  /* microcharts dark tokens, bound to the site theme (see :root note). */
+  /* microcharts dark tokens, bound to the site theme (see :root note). Matte,
+     never neon — the deep field gives ample contrast headroom. */
   --mc-stroke: #e9e6df;
-  --mc-positive: #34d399;
-  --mc-negative: #fb8c5a;
+  --mc-positive: #45a385;
+  --mc-negative: #df7856;
   --mc-accent: var(--accent);
   --mc-neutral: #8f8a80;
+  /* Categorical must be re-declared here: the library keys its dark cats off
+     @media(prefers-color-scheme)/[data-mc-theme], but the docs force theme via
+     the .dark class — so without this the light cats would paint on dark. Same
+     lifted hues as the library dark set. */
+  --mc-cat-1: #e2b45c;
+  --mc-cat-2: #6fb0e0;
+  --mc-cat-3: #4fb08d;
+  --mc-cat-4: #6e9bd1;
+  --mc-cat-5: #e07e5e;
+  --mc-cat-6: #c486b0;
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
   --mc-surface-edge: var(--color-fd-border);
@@ -236,8 +247,8 @@
    deliberately overrides the accent picker while active; vivid and mono
    follow the library too. ------------------------------------------------ */
 :root[data-mc-preset="editorial"] {
-  /* hairline ink, signature red endpoint — a printed-page restraint */
-  --mc-accent: #b8112a;
+  /* hairline ink, signature claret endpoint — a printed-page restraint */
+  --mc-accent: #a32236;
   --mc-stroke-width: 1;
 }
 :root[data-mc-preset="mono"] {
@@ -250,8 +261,8 @@
 }
 :root[data-mc-preset="vivid"] {
   /* bolder ink + punchier valence; accent stays user-chosen */
-  --mc-positive: #00c896;
-  --mc-negative: #ff5630;
+  --mc-positive: #0f9e78;
+  --mc-negative: #e24d2e;
   --mc-stroke-width: 2;
 }
 
@@ -1980,7 +1991,7 @@ div:where(
   /* xl: the side TOC replaces the popover bar, no chrome sits over the content,
      so a heading lands at the top with only a little breathing room. */
   .prose :where(h1, h2, h3, h4) {
-    scroll-margin-top: 1.5rem;
+    scroll-margin-top: 1rem;
   }
 }
 /* prose links carry a soft accent underline instead of the default */

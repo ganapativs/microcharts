@@ -25,9 +25,12 @@ describe("<Waveform>", () => {
 
   it("envelope variant renders one filled area path", () => {
     const { container } = draw(<Waveform data={SPIKE} variant="envelope" />);
-    // no bar path in envelope mode
-    expect(container.querySelector('path[data-mc-ink="bar"]')).toBeNull();
-    expect(container.querySelector("path")).not.toBeNull();
+    // one area path; it carries "bar" ink so the rise entrance covers it
+    // (the inline fill keeps the envelope color)
+    const paths = container.querySelectorAll("path");
+    expect(paths.length).toBe(1);
+    expect(paths[0]!.getAttribute("data-mc-ink")).toBe("bar");
+    expect(paths[0]!.getAttribute("style")).toContain("--mc-stroke");
   });
 
   it("progress splits played (accent) from the rest", () => {

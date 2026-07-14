@@ -12,9 +12,10 @@ import { LikertStrip as StaticLikertStrip, likertSummary, type LikertStripProps 
 export interface InteractiveLikertStripProps extends LikertStripProps {
   strings?: CompositionStrings;
   /**
-   * Opt-in entrance motion (default `false`): segments fade in from the
-   * center line on first client-side mount. Inert on the server and on
-   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): segments sweep outward from the
+   * center line on first client-side mount — negative ink grows left, positive
+   * right. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -36,7 +37,11 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "reveal", animate, {
+  // "sweep" with per-mark signed origin — the diverging composition grows OUT
+  // from the center line: negative ink grows leftward (origin right), positive
+  // rightward (origin left), echoing the encoding instead of a flat fade.
+  useEntrance(hostRef, "sweep", animate, {
+    origin: "signed",
     selector:
       'rect[data-mc-ink="negative"], rect[data-mc-ink="positive"], rect[data-mc-ink="neutral"]',
   });

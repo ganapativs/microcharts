@@ -47,7 +47,9 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   useEntrance(hostRef, "rise", animate, {
     selector: 'rect[data-mc-ink="accent"], rect[data-mc-ink="neutral"], rect[data-mc-ink="bar"]',
     order: "x",
-    defer: 'path[data-mc-ink="muted"]',
+    // Bars cascade up L→R by rank, then the cumulative 80% curve DRAWS across
+    // them — the running total traces itself over the evidence.
+    link: 'path[data-mc-ink="muted"]',
   });
 
   const geo = useMemo(

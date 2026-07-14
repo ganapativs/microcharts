@@ -21,7 +21,7 @@ export const MC_EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)"; // on-screen morp
 export const MC_DUR = {
   /** press / hover / focus feedback */ interact: 120,
   /** value + state updates */ update: 240,
-  /** entrance base */ enter: 420,
+  /** entrance base (3 beats — the engine's story spine) */ enter: 360,
 } as const;
 
 /** Entrance archetypes — the family a chart's entrance belongs to. */
@@ -35,6 +35,7 @@ export type EntranceArchetype =
   | "trail" // discrete marks pop sequentially along the chart's own order
   | "spin" // radial charts: unwind from the center (rotate + scale)
   | "grow" // concentric charts: grow outward from the center
+  | "scan" // merged bar/area paths: clip reveal sweeping L→R, growing from `origin`
   | "pop" // single-glyph charts: fade + scale(0.97)
   | "fade"; // text/numeric charts: fade only
 
@@ -63,6 +64,19 @@ export interface EntranceOptions {
    * follow its bars.
    */
   defer?: string;
+  /**
+   * Stroked connectors that DRAW themselves on after the story marks land and
+   * before the voice speaks — a dumbbell's bar between its two dots, a lollipop
+   * stem to its dot. stroke-dashoffset, so the line grows to join the marks.
+   */
+  link?: string;
+  /**
+   * Max per-mark tracks before the entrance collapses to one whole-svg wipe
+   * (default 80 — a year of cells shouldn't spawn 365 animations). Raise it
+   * only for a fixed, bounded grid whose per-mark story IS the point (a
+   * 100-unit icon array counting up), never for open-ended data.
+   */
+  maxMarks?: number;
 }
 
 type Engine = (

@@ -109,24 +109,38 @@ export function Waveform(props: WaveformProps): ReactNode {
       ) : null}
 
       {variant === "envelope" ? (
+        // data-mc-ink="bar" enrolls the envelope area in the rise story (the
+        // inline fill still wins for color) — without it the selector matches
+        // nothing and the entrance drops to the whole-svg wipe fallback.
         <path
           d={envelopePath({ data, width, height, buckets, domain: domain ?? null, mirror })}
+          data-mc-ink="bar"
           style={{ fill: "var(--mc-stroke)", fillOpacity: 0.85 }}
         />
       ) : hasProgress ? (
+        // Both halves of the split waveform carry "bar" ink so they rise as one
+        // body (inline fills keep the played/rest coloring).
         <>
           <path
             d={barsPath(rest, mirror, cy)}
+            data-mc-ink="bar"
             style={{ fill: "var(--mc-neutral)", fillOpacity: 0.45 }}
           />
-          <path d={barsPath(played, mirror, cy)} style={{ fill: "var(--mc-accent)" }} />
+          <path
+            d={barsPath(played, mirror, cy)}
+            data-mc-ink="bar"
+            style={{ fill: "var(--mc-accent)" }}
+          />
         </>
       ) : (
         <>
           <path d={geo.path} data-mc-ink="bar" />
           {geo.peak > 0 ? (
+            // "bar" ink enrolls the peak in the scan reveal so it's uncovered by
+            // the sweep like every other bar (inline fill keeps the accent color).
             <path
               d={barsPath([geo.bars[geo.peakIndex]!], mirror, cy)}
+              data-mc-ink="bar"
               style={{ fill: "var(--mc-accent)" }}
             />
           ) : null}

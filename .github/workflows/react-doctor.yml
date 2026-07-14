@@ -1,0 +1,44 @@
+# React Doctor — security, performance, correctness, a11y, architecture.
+# Config: apps/docs/doctor.config.json (scanned directory).
+# Docs: https://www.react.doctor/ci
+
+name: React Doctor
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  statuses: write
+
+concurrency:
+  group: react-doctor-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  react-doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: millionco/react-doctor@v2
+        with:
+          # Scan the docs app; doctor.config.json there disables library-noise
+          # rules (unused-export / only-export-components).
+          directory: apps/docs
+        # Advisory by default. Graduate later with blocking: error|warning.
+        # Full reference: https://www.react.doctor/ci
+        #   blocking: error
+        #   scope: full
+        #   comment: false
+        #   review-comments: false
+        #   commit-status: false
+        #   version: "0.7.7"
+        #   project: "web,admin"

@@ -43,11 +43,14 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
   // selector scoped to unit rects (excludes the label text) catches filled
   // units too. Index order over a 450ms window gives the grid a counting
   // feel (units light up one at a time, reading order) instead of a uniform
-  // staggered fade.
+  // staggered fade. `maxMarks: 100` keeps the per-unit cascade alive at the
+  // bounded 100-unit array — above the 80 default it would collapse to a
+  // whole-svg wipe, killing the count-up that IS the point here.
   useEntrance(hostRef, "reveal", animate, {
     selector: "rect[data-mc-ink]",
     order: "index",
     window: 450,
+    maxMarks: 100,
   });
 
   const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));

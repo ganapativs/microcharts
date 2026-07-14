@@ -56,6 +56,14 @@ export const entry: ChartEntry = {
       required: false,
       description: "Mirror around center; false for magnitude-only.",
     },
+    {
+      name: "onPointFocus",
+      type: "(index: number, fraction: number) => void",
+      required: false,
+      interactive: true,
+      description:
+        "Fires as focus moves, with the position as a 0–1 fraction — wire scrub-to-seek.",
+    },
   ],
   demo: [0.82],
   example: {

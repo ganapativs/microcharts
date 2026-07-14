@@ -10,6 +10,11 @@ export interface ChartProp {
   type: string;
   required: boolean;
   description: string;
+  /**
+   * `true` ⇒ this prop exists only on the `…/interactive` entry (callbacks,
+   * date/announce config). The static default component does not accept it.
+   */
+  interactive?: boolean;
 }
 
 export interface ChartEntry {

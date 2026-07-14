@@ -70,6 +70,23 @@ describe("<MiniBar>", () => {
     expect(valenced.querySelector('[data-mc-ink="negative"]')).not.toBeNull();
   });
 
+  it("data-mc-origin follows true geometric sign (honest growth edge)", () => {
+    const signed: MiniBarDatum[] = [
+      { label: "a", value: 5 },
+      { label: "b", value: -3 },
+    ];
+    const vert = [...draw(<MiniBar data={signed} />).container.querySelectorAll("rect")];
+    expect(vert[0]!.getAttribute("data-mc-origin")).toBe("bottom"); // above zero
+    expect(vert[1]!.getAttribute("data-mc-origin")).toBe("top"); // below zero
+    const horiz = [
+      ...draw(<MiniBar data={signed} orientation="horizontal" />).container.querySelectorAll(
+        "rect",
+      ),
+    ];
+    expect(horiz[0]!.getAttribute("data-mc-origin")).toBe("left");
+    expect(horiz[1]!.getAttribute("data-mc-origin")).toBe("right");
+  });
+
   it("> 8 categories → dev warning (cell chart)", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const many = Array.from({ length: 9 }, (_, i) => ({ label: `c${i}`, value: i }));

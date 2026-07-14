@@ -1,5 +1,4 @@
 "use client";
-// oxlint-disable react/no-array-index-key -- tiles are positional; the inner span keys on `nonce` to remount on swap
 import "@microcharts/react/motion"; // enables `animate` entrance on the live hero cluster
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -124,25 +123,22 @@ export function LivingCatalog({ total }: { total: number }) {
         </div>
 
         <ul className="grid grid-cols-2 gap-2.5 sm:gap-3">
-          {board.map((cell, i) => {
+          {board.map((cell) => {
             const mod = CHART_MODULES[cell.slug];
             const entry = getChart(cell.slug);
-            if (!mod || !entry) return <li key={i} aria-hidden />;
+            if (!mod || !entry) return <li key={cell.nonce} aria-hidden />;
             // Once live (mounted, motion allowed) render the interactive
             // twin so the entrance animates on load + on each swap; reduced-motion
             // visitors never flip `live` on, so they keep the static Preview.
             const Preview = live && mod.PreviewLive ? mod.PreviewLive : mod.Preview;
             return (
-              <li key={i}>
+              <li key={cell.nonce}>
                 <Link
                   href={`/docs/charts/${cell.slug}`}
                   aria-label={`${entry.name}: ${entry.tagline}`}
                   className="hx-tile group flex flex-col items-center justify-center gap-2 rounded-[14px] px-3 py-4 no-underline"
                 >
-                  <span
-                    key={cell.nonce}
-                    className="hx-slot hx-swap flex min-h-[4.75rem] w-full items-center justify-center"
-                  >
+                  <span className="hx-slot hx-swap flex min-h-[4.75rem] w-full items-center justify-center">
                     <Preview />
                   </span>
                   <span className="hx-slot-name mono-label truncate text-[0.58rem] tracking-[0.12em] opacity-55 group-hover:text-fd-primary group-hover:opacity-100">

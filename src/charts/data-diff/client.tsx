@@ -43,11 +43,17 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   // Rows are never merged — each row draws its own removed/added rects (plus
   // an occasional 0/0 placeholder or opt-in net tick), all sharing that row's
-  // y — so "trail" + order "y" lands them row by row, top to bottom, instead
-  // of one whole-chart pop. `rect[data-mc-ink]` covers every row mark
-  // (negative/positive/neutral) and nothing else (the zero hairline is a
-  // <line>, tags are <text>).
-  useEntrance(hostRef, "trail", animate, { selector: "rect[data-mc-ink]", order: "y" });
+  // y. Diverging bars are anchored at the zero axis, so they must GROW FROM
+  // ZERO, not pop from their own center: "sweep" + origin "signed" pins each
+  // mark's growth edge to the axis (negative ink extends leftward from centerX,
+  // positive rightward). "order: y" still lands them row by row, top to bottom.
+  // `rect[data-mc-ink]` covers every row mark (negative/positive/neutral) and
+  // nothing else (the zero hairline is a <line>, tags are <text>).
+  useEntrance(hostRef, "sweep", animate, {
+    selector: "rect[data-mc-ink]",
+    origin: "signed",
+    order: "y",
+  });
 
   const geo = useMemo(
     () => dataDiffGeometry({ width, height, data, sort, domain, max }),

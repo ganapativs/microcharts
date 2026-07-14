@@ -69,6 +69,13 @@ export const entry: ChartEntry = {
       required: false,
       description: "BCP 47 locale(s) for the endpoint label and summary.",
     },
+    {
+      name: "onPointFocus",
+      type: "(index: number | null) => void",
+      required: false,
+      interactive: true,
+      description: "Fires as hover/keyboard focus moves; `null` on blur.",
+    },
   ],
   demo: [4, 6, 2, 8, 5, 9, 3, 7],
   example: {

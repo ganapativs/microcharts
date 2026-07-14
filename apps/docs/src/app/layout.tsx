@@ -26,7 +26,7 @@ const mono = JetBrains_Mono({
 // Apply saved accent + chart preset before first paint.
 const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem("mc-accent");if(a&&a!=="cobalt")d.dataset.accent=a;var p=localStorage.getItem("mc-preset");if(p&&p!=="modern")d.dataset.mcPreset=p}catch(e){}`;
 
-const CONSOLE_SCRIPT = `try{console.log("%c${SITE.name}%c\\n${SITE.tagline}\\nZero dependencies, ~1 kB gzip per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#2f52d4;font-weight:700;font-size:13px","color:#8a8a8a;font-size:11px;line-height:1.6")}catch(e){}`;
+const CONSOLE_SCRIPT = `try{console.log("%c${SITE.name}%c\\n${SITE.tagline}\\nZero dependencies, ~1 kB gzip per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#2f52d4;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.6")}catch(e){}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -89,14 +89,8 @@ export default function Layout({ children }: LayoutProps<"/">) {
       <body className="flex flex-col min-h-screen font-sans antialiased">
         <script dangerouslySetInnerHTML={{ __html: ACCENT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CONSOLE_SCRIPT }} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLdScript(softwareSourceCodeJsonLd()) }}
-        />
+        <script type="application/ld+json">{jsonLdScript(websiteJsonLd())}</script>
+        <script type="application/ld+json">{jsonLdScript(softwareSourceCodeJsonLd())}</script>
         <Provider>{children}</Provider>
       </body>
     </html>

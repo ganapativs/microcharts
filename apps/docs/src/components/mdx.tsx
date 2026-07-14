@@ -129,6 +129,7 @@ import { StreamDemo } from "@/components/charts/stream-demo";
 import { GrammarExplorer, AgentCheatSheet } from "@/components/charts/ai-guide";
 import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
 import { CatalogStrip } from "@/components/charts/catalog-strip";
+import { TokenSwatches, PresetDeltas } from "@/components/charts/token-swatches";
 import { Snippet } from "@/components/ui/snippet";
 import { AgentPromptCopy } from "@/components/ui/agent-prompt-copy";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
@@ -289,6 +290,8 @@ export function getMDXComponents(components?: MDXComponents) {
     GrammarExplorer,
     AgentCheatSheet,
     CatalogStrip,
+    TokenSwatches,
+    PresetDeltas,
     ProviderWall,
     SurfaceCards,
     Snippet,
