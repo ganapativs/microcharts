@@ -57,7 +57,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
       {/* Calm fade + lift on navigation. Wraps only the article content — never
           the DocsPage grid-area siblings (toc/sidebar), which must stay direct
           grid children of the layout. Keyed on pathname; reduced-motion gated. */}
-      <RouteTransition>
+      <RouteTransition className="flex flex-1 flex-col gap-4">
         <DocsTitle className="font-display text-[2.15em] font-medium tracking-[-0.025em]">
           {page.data.title}
         </DocsTitle>
