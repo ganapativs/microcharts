@@ -27,7 +27,16 @@ const BLOCK_W = 236;
 
 type Seg =
   | { id: string; kind: "text"; text: string }
-  | { id: string; kind: "chart"; raw: string; block?: boolean; node: ReactNode };
+  | {
+      id: string;
+      kind: "chart";
+      raw: string;
+      block?: boolean;
+      /** true = no .mc-inline wrapper — Delta is a text metric and owns its
+       *  baseline; the inline optical lift would ride it high (docs/ai rule). */
+      bare?: boolean;
+      node: ReactNode;
+    };
 
 interface Scenario {
   id: string;
@@ -74,6 +83,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "r-delta",
         kind: "chart",
+        bare: true,
         raw: "`chart delta +0.184`",
         node: <Delta value={0.184} summary={false} />,
       },
@@ -264,7 +274,7 @@ function FinishedReply({ segs }: { segs: Seg[] }) {
             {s.node}
           </div>
         ) : (
-          <span key={s.id} className="mc-inline">
+          <span key={s.id} className={s.bare ? undefined : "mc-inline"}>
             {s.node}
           </span>
         ),
@@ -383,7 +393,7 @@ export function StreamVignette({
         );
       else
         view.push(
-          <span key={s.id} className="hx-morph-in mc-inline">
+          <span key={s.id} className={s.bare ? "hx-morph-in" : "hx-morph-in mc-inline"}>
             {s.node}
           </span>,
         );

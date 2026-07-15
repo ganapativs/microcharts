@@ -33,11 +33,7 @@
 }
 
 /* --accent drives chrome + chart emphasis; [data-accent] swaps it. Default Cobalt. */
-/* `html.dark .hv-invert` re-adopts the LIGHT tokens: the homepage "made for
-   models" band is the page's one inverted movement — dark on light, light on
-   dark. One source of truth; the extra selector just widens the scope. */
-:root,
-html.dark .hv-invert {
+:root {
   /* accent — Cobalt default (light) */
   --accent: #2f52d4;
   --accent-strong: #2543b8;
@@ -2384,10 +2380,8 @@ div:where(
     --mc-inline-nudge: -0.26em;
   }
 
-  /* 05 · the inverted band — the page's one counter-movement. In light mode
-     the section's `dark` class makes it the real dark field; in dark mode
-     `html.dark .hv-invert` (see the token block) re-adopts the light tokens,
-     so it flips light. Same section, opposite key, both themes. */
+  /* 05 · the dark band — dark in BOTH site themes (an inverted light band on
+     the dark site was tried and rejected; the section keeps one identity). */
   .hv-band {
     background-color: var(--color-fd-background);
   }

@@ -44,7 +44,7 @@ const PROVIDER_COUNT = PROVIDER_GROUPS.reduce((n, g) => n + g.names.length, 0);
 
 export function HomeModelsSection({ catalogTotal }: { catalogTotal: number }) {
   return (
-    <section className="dark hv-invert hv-band py-14 text-fd-foreground">
+    <section className="dark hv-band py-14 text-fd-foreground">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionMark n="05">made for models</SectionMark>
         <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
