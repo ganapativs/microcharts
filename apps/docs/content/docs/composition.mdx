@@ -43,19 +43,8 @@ drops its axis-labels and endpoint dots so it reads as one glyph, not a widget. 
     — trending down.
   </p>`}
 >
-  <p className="max-w-md text-[0.95rem] leading-relaxed">
-    p95 latency this week{" "}
-    <span className="mc-inline">
-      <Sparkline
-        data={[48, 45, 44, 40, 38, 36, 33, 31]}
-        dots="none"
-        summary={false}
-        width={64}
-        height={16}
-      />
-    </span>{" "}
-    — trending down.
-  </p>
+  {/* Single line: MDX blockifies multiline text inside a JSX <p> into nested <p>s (hydration error). */}
+  <p className="max-w-md text-[0.95rem] leading-relaxed">p95 latency this week{" "}<span className="mc-inline"><Sparkline data={[48, 45, 44, 40, 38, 36, 33, 31]} dots="none" summary={false} width={64} height={16} /></span>{" "}— trending down.</p>
 </LiveDemo>
 
 See [Sizing](/docs/sizing#inline-in-a-sentence) for the `em`-based variant that scales with the
