@@ -1,5 +1,46 @@
 # @microcharts/react
 
+## 0.3.0
+
+### Minor Changes
+
+- [#23](https://github.com/ganapativs/microcharts/pull/23) [`c5854a0`](https://github.com/ganapativs/microcharts/commit/c5854a05d5360ec189f7dbb283efbb9e8e8a4852) Thanks [@ganapativs](https://github.com/ganapativs)! - Deepen the theming surface — all additive, backward-compatible, and identity at
+  their defaults (no visual change to existing charts):
+
+  - **`defineTheme()`** — a new opt-in `@microcharts/react/theme` subpath (zero
+    runtime deps, ~2 kB gzip, tree-shaken when unused). Give it one brand accent
+    and it derives a harmonized, colour-blind-safe categorical palette and
+    hand-tuned-style dark twins in-house in OKLCH — never moving the
+    positive/negative hues off their CVD-safe split. Extend a preset, pin any
+    token, pass an explicit palette, or `extend()` a variant; returns
+    `vars` / `style` / `css(selector)` (with a `prefers-color-scheme: dark` block).
+  - **New tokens** — `--mc-font-numeric` (a dedicated face for figures, tracks
+    `--mc-font` by default), `--mc-label-weight`, and `--mc-density` (one scalar
+    that scales stroke weight, label size, and small-multiple gap together for
+    compact vs comfortable layouts; the plot box is untouched).
+  - **`colors` prop** — per-instance series colours on the categorical charts
+    (`SegmentedBar`, `StackedArea`, `PartitionStrip`, `Hypnogram`, `MicroDonut`),
+    overriding `--mc-cat-*` just there.
+  - **`print` and `eink` presets** — output-context token bundles for paper and
+    grayscale e-paper, answering `data-mc-theme` / `data-mc-preset` like the rest.
+
+  The `MicrochartCommonProps` shared-grammar type is now enforced as a single
+  source of truth: a guard test holds every chart's shared props to its canonical
+  types.
+
+### Patch Changes
+
+- [#23](https://github.com/ganapativs/microcharts/pull/23) [`c5854a0`](https://github.com/ganapativs/microcharts/commit/c5854a05d5360ec189f7dbb283efbb9e8e8a4852) Thanks [@ganapativs](https://github.com/ganapativs)! - Ship a **minified** `styles.css`. `@microcharts/react/styles.css` (and the
+  per-chart `styles/*.css` escape-hatch files) now resolve to minified copies in
+  `dist/` — the shared stylesheet drops from ~8.7 kB to ~2.8 kB gzip. The
+  minifier only strips comments and whitespace (no rule merging), so `@layer`
+  membership and cascade order are unchanged. The repo-root `styles.css` stays the
+  unminified source of truth; no API or visual changes.
+
+- [#23](https://github.com/ganapativs/microcharts/pull/23) [`c5854a0`](https://github.com/ganapativs/microcharts/commit/c5854a05d5360ec189f7dbb283efbb9e8e8a4852) Thanks [@ganapativs](https://github.com/ganapativs)! - Improve npm and search discoverability: expand `keywords`, add a `funding` link
+  (GitHub Sponsors), and a structured `author` (name/email/url). Metadata only — no
+  API, runtime, or visual changes.
+
 ## 0.2.1
 
 ### Patch Changes
