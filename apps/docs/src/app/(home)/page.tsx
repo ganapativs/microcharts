@@ -4,6 +4,8 @@ import { HomeGrammarSection } from "@/components/home/home-grammar-section";
 import { HomeCatalogSection } from "@/components/home/home-catalog-section";
 import { HomePrinciplesSection } from "@/components/home/home-principles-section";
 import { HomeModelsSection } from "@/components/home/home-models-section";
+import { HomeRobustnessSection } from "@/components/home/home-robustness-section";
+import { HomeSurfacesSection } from "@/components/home/home-surfaces-section";
 import { HomeReceiptsSection } from "@/components/home/home-receipts-section";
 import { HomeThemingSection } from "@/components/home/home-theming-section";
 import { HomeCtaSection } from "@/components/home/home-cta-section";
@@ -26,6 +28,8 @@ export default function HomePage() {
       <HomeCatalogSection />
       <HomePrinciplesSection />
       <HomeModelsSection catalogTotal={total} />
+      <HomeRobustnessSection />
+      <HomeSurfacesSection />
       <HomeReceiptsSection />
       <HomeThemingSection />
       <HomeCtaSection />
