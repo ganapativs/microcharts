@@ -107,25 +107,25 @@ export function HomeRobustnessSection() {
                 return (
                   <li
                     key={c.mode}
-                    className="hx-stagger grid grid-cols-[minmax(7rem,auto)_4.5rem_minmax(0,1fr)] items-center gap-x-4 gap-y-1 border-t border-hairline px-5 py-3.5 first:border-t-0 max-sm:grid-cols-[1fr_4.5rem]"
+                    className="hx-stagger grid grid-cols-[minmax(6.5rem,auto)_4rem_7rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5 border-t border-hairline px-5 py-3 first:border-t-0 max-sm:grid-cols-[1fr_4rem]"
                     style={{ "--i": i } as React.CSSProperties}
                   >
                     <code className="font-mono text-[0.8rem] leading-tight text-fd-foreground">
                       {c.literal}
                     </code>
-                    <span className="flex h-[24px] items-center justify-center">
+                    <span className="flex h-[22px] items-center justify-center">
                       <Sparkline
                         data={c.data}
-                        width={64}
-                        height={24}
+                        width={56}
+                        height={22}
                         dots="minmax"
                         summary={summary}
                       />
                     </span>
-                    <span className="text-[0.86rem] leading-snug text-fd-muted-foreground max-sm:col-span-2 max-sm:mt-0.5">
-                      <span className="mono-label mr-2 align-middle text-[0.62rem] opacity-55">
-                        {c.mode}
-                      </span>
+                    <span className="mono-label text-[0.62rem] opacity-55 max-sm:col-span-2 max-sm:mt-1">
+                      {c.mode}
+                    </span>
+                    <span className="text-[0.86rem] leading-snug text-fd-muted-foreground max-sm:col-span-2">
                       &ldquo;{summary}&rdquo;
                     </span>
                   </li>
