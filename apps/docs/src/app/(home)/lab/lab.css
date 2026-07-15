@@ -1,0 +1,144 @@
+/* Design-lab prototypes only — merged into global.css if a direction wins.
+   All classes are lab-* prefixed; nothing here leaks into shipped pages by
+   convention (CSS is technically global once a lab route loads). */
+
+.lab-root {
+  --font-serif: var(--font-serif-src), "Georgia", serif;
+}
+
+/* ---- Direction A · Silk & Ink ------------------------------------------- */
+
+.lab-silk {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* No-WebGL / pre-init ground: a static silk-toned gradient. */
+.lab-silk-fallback {
+  background:
+    radial-gradient(90% 80% at 18% 10%, #bcc7ef 0%, transparent 55%),
+    radial-gradient(70% 60% at 80% 22%, #d9cfef 0%, transparent 58%),
+    radial-gradient(80% 70% at 55% 65%, #cbdff0 0%, transparent 60%), #eef1f7;
+}
+
+/* Contrast veil: lifts toward paper where the copy sits. */
+.lab-veil {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--color-fd-background) 6%, transparent),
+    color-mix(in oklab, var(--color-fd-background) 38%, transparent) 82%
+  );
+}
+
+/* The streamed reply reads in a serif — the demo is about reading. */
+.lab-serif-reply .panel {
+  background-color: color-mix(in oklab, var(--color-fd-card) 88%, transparent);
+}
+.lab-serif-reply .panel > div:last-child {
+  font-family: var(--font-serif);
+  font-size: 1.02rem;
+}
+
+.dark .lab-silk,
+.dark .lab-silk-fallback {
+  filter: brightness(0.32) saturate(0.8);
+}
+
+/* ---- Direction B · The Living Field -------------------------------------- */
+
+.lab-field {
+  color: var(--color-fd-foreground);
+}
+.lab-field svg {
+  display: block;
+}
+.lab-field-far {
+  opacity: 0.05;
+  animation: lab-drift 90s linear infinite alternate;
+}
+.lab-field-mid {
+  opacity: 0.08;
+  animation: lab-drift 64s linear infinite alternate-reverse;
+}
+.lab-field-near {
+  opacity: 0.12;
+  animation: lab-drift 46s linear infinite alternate;
+}
+@keyframes lab-drift {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 2.5% 1.5%;
+  }
+}
+
+/* keep text ahead of the field */
+.lab-b-veil {
+  background: radial-gradient(
+    75% 60% at 50% 42%,
+    color-mix(in oklab, var(--color-fd-background) 78%, transparent) 0%,
+    transparent 100%
+  );
+}
+.lab-b-headline {
+  font-weight: 700;
+}
+
+/* ---- Direction C · Inside the Sentence ------------------------------------ */
+
+.lab-c-w {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.35em);
+  animation: lab-settle 0.55s var(--ease-out-expo) forwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+  white-space: pre-wrap;
+}
+.lab-c-settled .lab-c-w {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+@keyframes lab-settle {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.lab-c-em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* Chart is always in the layout (SSR-visible, zero shift); before its stage
+   it is merely invisible, then remounts with `animate` to draw in. */
+.lab-c-slot[data-staged="false"] svg {
+  visibility: hidden;
+}
+
+/* At display scale the streaming caret is a thin insertion bar, not a block. */
+.lab-c-caret {
+  margin-left: 0.14em;
+  width: 0.045em;
+  height: 0.68em;
+  border-radius: 2px;
+  vertical-align: baseline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-c-w {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .lab-field-far,
+  .lab-field-mid,
+  .lab-field-near {
+    animation: none;
+  }
+}
