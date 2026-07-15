@@ -500,10 +500,16 @@ body {
       border-color 0.32s var(--ease-out-quint),
       transform 0.32s var(--ease-out-quint);
   }
-  .glass-lift:hover {
-    border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline));
-    box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
-    transform: translateY(-2px);
+  /* Gate the hover lift behind a real pointer — a touch tap fires :hover and
+     would leave the card lifted mid-navigation (matches .hx-tile, which is
+     already gated). Colour/shadow-only hover is fine on touch; the transform
+     is the part that must not fire without a hovering cursor. */
+  @media (hover: hover) and (pointer: fine) {
+    .glass-lift:hover {
+      border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline));
+      box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
+      transform: translateY(-2px);
+    }
   }
 
   /* In-panel dividers — gallery .g2-meta shelf parity. */
