@@ -25,7 +25,7 @@ function SectionMark({ n, children }: { n: string; children: React.ReactNode }) 
 
 export function HomeA11ySection() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <SectionMark n="02">Reads itself aloud</SectionMark>
       <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
         <Reveal>

@@ -7,7 +7,7 @@ import { SectionMark } from "@/components/brand/shared";
 
 export function BrandNameSection() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <SectionMark n="07">The name</SectionMark>
       <Reveal className="mb-8 max-w-2xl">
         <h2 className="display text-[length:var(--text-fluid-h2)]">One lowercase word.</h2>

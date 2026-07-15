@@ -62,7 +62,7 @@ export function SiteNav() {
 
   return (
     <header className="glass-rail sticky top-0 z-40" data-scrolled={scrolled || undefined}>
-      <nav className="mx-auto flex h-14 max-w-6xl items-center gap-5 px-4 sm:px-6">
+      <nav className="mx-auto flex h-14 max-w-shell items-center gap-5 px-4 sm:px-6">
         <Wordmark />
         <div className="hidden items-center gap-0.5 md:flex">
           {links.map((l) => {
