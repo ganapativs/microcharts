@@ -65,7 +65,9 @@ export function gradeProfileGeometry(opts: {
   const { data, width, height, bins, topPad } = opts;
   const pad = 1;
   const collapsed = width < 72;
-  const yBase = round2(height - pad);
+  // Baseline seats flush with the box bottom so the profile aligns on the text
+  // baseline inline; the base is a flat fill edge, so it bleeds nothing.
+  const yBase = round2(height);
   const n = data.length;
 
   const pts = data.map((p) => ({

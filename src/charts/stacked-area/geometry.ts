@@ -44,7 +44,10 @@ export function stackedAreaGeometry(opts: {
   const x0 = pad;
   const x1 = width - pad - gutter;
   const y0 = pad;
-  const y1 = height - pad;
+  // Bottom seats flush (y = height) so the stacked bands align on the text
+  // baseline when rendered inline; the floor is a flat fill edge (no stroke,
+  // no dot), so filling to the box bottom bleeds nothing. Top pad is kept.
+  const y1 = height;
 
   const stacked = stackSeries(series);
   const n = stacked.totals.length;
