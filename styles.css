@@ -45,9 +45,10 @@
     --mc-font-numeric: var(--mc-font);
     --mc-label-size: 0.75em;
     --mc-label-weight: 400;
-    /* Optical lift for `.mc-inline` beside digits ("+3.8%"). VA-middle alone
-       seats SVG marks ~1.4px low; override per face if needed. */
-    --mc-inline-nudge: -0.14em;
+    /* Extra optical shift for `.mc-inline` marks on top of the baseline seat
+       (see .mc-inline). 0 by default — the seat is font-independent; override
+       per face only if a typeface wants marks a hair off the line. */
+    --mc-inline-nudge: 0em;
 
     /* interactive readout chip surface — a tooltip needs a legible backing, so
        this is the one place a mark sits on an opaque plane. Defaults to the
@@ -176,17 +177,27 @@
   }
   /* Word-sized chart in running prose. Wraps any SVG mark next to digits;
      leave <Delta> bare — it owns baseline. Ships in styles.css so hosts only
-     add className="mc-inline". */
+     add className="mc-inline".
+
+     Alignment is a baseline SEAT, not a middle+nudge: an inline-flex box whose
+     only child is an SVG takes its baseline from the SVG's bottom edge, so
+     `vertical-align: baseline` stands the mark ON the text baseline exactly
+     like a glyph — bars sit where letters sit. Metric-independent: the old
+     `vertical-align: middle` + fixed nudge drifted with every typeface
+     (x-height decides where "middle" is; serif vs sans marks landed on
+     different lines). --mc-inline-nudge remains as a pure optical extra. */
   :where(.mc-inline) {
     display: inline-flex;
     align-items: center;
-    vertical-align: middle;
+    vertical-align: baseline;
     margin-inline: 0.2em;
     translate: 0 var(--mc-inline-nudge);
   }
-  :where(.mc-inline > .mc-root),
+  /* the status dot reads like a bullet, not a period — centre it on the
+     x-height rather than seating it on the baseline */
   :where(.mc-inline > .mc-status) {
-    vertical-align: middle;
+    align-self: center;
+    translate: 0 -0.18em;
   }
   :where(.mc-inline > .mc-trend) {
     width: 0.95em;

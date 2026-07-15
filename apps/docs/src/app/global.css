@@ -2374,10 +2374,14 @@ div:where(
   .hv-reply-body {
     font-family: var(--font-serif);
     --hv-reply-size: 1.05rem;
-    /* Newsreader sits higher on its line than Hanken — the library's default
-       .mc-inline optical lift (-0.14em) leaves marks hanging low beside serif
-       digits; retune per face, exactly what the token is for. */
-    --mc-inline-nudge: -0.26em;
+    /* No --mc-inline-nudge override: the library seats inline marks on the
+       text baseline, which is font-independent — serif needs nothing extra. */
+  }
+  /* Delta's glyph-vs-digit optical centering is tuned for the default sans;
+     Newsreader's digits sit taller, so the triangle reads ~2px low beside
+     them. Serif-scoped lift only — the library default stays. */
+  .hv-reply-body .mc-delta-glyph {
+    transform: translateY(-0.05em);
   }
 
   /* 05 · the dark band — dark in BOTH site themes (an inverted light band on
