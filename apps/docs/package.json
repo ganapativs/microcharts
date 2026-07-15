@@ -1,6 +1,6 @@
 {
   "name": "@microcharts/docs",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": true,
   "description": "microcharts documentation site — Fumadocs + Next.js, static-export, deploy anywhere.",
   "type": "module",
@@ -35,8 +35,8 @@
     "@tailwindcss/postcss": "^4.3.2",
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.1.1",
-    "@types/react": "^19.2.0",
-    "@types/react-dom": "^19.2.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "ajv": "^8.20.0",
     "postcss": "^8.5.19",
     "serve": "^14.2.6",

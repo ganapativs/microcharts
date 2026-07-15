@@ -1,5 +1,87 @@
 # @microcharts/react
 
+## 0.4.0
+
+### Minor Changes
+
+- [#38](https://github.com/ganapativs/microcharts/pull/38) [`0796194`](https://github.com/ganapativs/microcharts/commit/0796194d9ae0658ed98bfe9d3aa4f93e50e9e8ee) Thanks [@ganapativs](https://github.com/ganapativs)! - Pre-launch quality pass — expanded annotation hosting, correctness fixes, and internal
+  consolidation. All changes are backward-compatible at their defaults; existing charts render
+  identically.
+
+  **Annotations on 17 value-series charts (was 2).** `Threshold`, `TargetZone`, `Marker`, and
+  `Callout` (from `@microcharts/react/annotations`) can now be passed as children to Sparkline,
+  SparkBar, MiniBar, CyclePlot, CitySkyline, ChangePoint, DualSparkline, SpreadBand, ForecastCone,
+  ControlStrip, QueueDepth, BurnChart, Waterfall, PercentileTrace, RetentionCurve, WinProbWorm, and
+  ErrorBudget. Every host resolves annotation coordinates through the same shared path, so label
+  sizing and containment are identical across charts.
+
+  **Correctness fixes:**
+
+  - `weekGrid` no longer crashes on a `NaN` week count or hangs on `Infinity` — non-finite inputs
+    clamp to a single row.
+  - `divergingStack` no longer emits `NaN` segments when `neutralIndex` is out of range — an
+    out-of-range index is treated as "no neutral".
+  - `stepOpacity` no longer divides by zero at `steps === 1` (was `Infinity`).
+  - The interactive MinimapStrip slider always has an accessible name, even when `summary={false}`
+    and no `title` is given (falls back to the localized viewport sentence).
+  - Consumer-supplied annotation labels are now truncated to fit the chart's box, closing the one
+    text path that could paint outside the viewBox.
+  - The trend-percentage in generated summaries now routes through the locale formatter, so
+    non-ASCII-digit locales no longer mix numeral systems in one sentence.
+
+  **Summary strings (i18n):**
+
+  - TokenConfidence's empty-state string moved from the shared `noData` key to its own `noTokens`
+    key on `SummaryStrings`, so it is no longer silently overridden by other charts' `noData`. If
+    you supply custom `strings` to TokenConfidence, rename `noData` → `noTokens`. Rendered output is
+    unchanged ("No tokens.").
+  - `compass8` is now canonically lowercase across WindBarb and StationGlyph (WindBarb capitalizes
+    its sentence-initial octant in its own template), fixing lowercase sentence starts when both
+    charts' strings were merged. Standalone output is unchanged.
+  - `heartbeatWindow` now reports clean multiples of an hour as hours ("2 hours") instead of minutes
+    ("120 minutes").
+
+  Internally, duplicated label-sizing, live-region, gutter, and summary-resolution logic was
+  consolidated into shared helpers, and several unused internal exports were removed. No public
+  export, prop, or chart was added or removed.
+
+- [#38](https://github.com/ganapativs/microcharts/pull/38) [`0796194`](https://github.com/ganapativs/microcharts/commit/0796194d9ae0658ed98bfe9d3aa4f93e50e9e8ee) Thanks [@ganapativs](https://github.com/ganapativs)! - Deepen the theming surface — all additive, backward-compatible, and identity at
+  their defaults (no visual change to existing charts):
+
+  - **`defineTheme()`** — a new opt-in `@microcharts/react/theme` subpath (zero
+    runtime deps, ~2 kB gzip, tree-shaken when unused). Give it one brand accent
+    and it derives a harmonized, colour-blind-safe categorical palette and
+    hand-tuned-style dark twins in-house in OKLCH — never moving the
+    positive/negative hues off their CVD-safe split. Extend a preset, pin any
+    token, pass an explicit palette, or `extend()` a variant; returns
+    `vars` / `style` / `css(selector)` (with a `prefers-color-scheme: dark` block).
+  - **New tokens** — `--mc-font-numeric` (a dedicated face for figures, tracks
+    `--mc-font` by default), `--mc-label-weight`, and `--mc-density` (one scalar
+    that scales stroke weight, label size, and small-multiple gap together for
+    compact vs comfortable layouts; the plot box is untouched).
+  - **`colors` prop** — per-instance series colours on the categorical charts
+    (`SegmentedBar`, `StackedArea`, `PartitionStrip`, `Hypnogram`, `MicroDonut`),
+    overriding `--mc-cat-*` just there.
+  - **`print` and `eink` presets** — output-context token bundles for paper and
+    grayscale e-paper, answering `data-mc-theme` / `data-mc-preset` like the rest.
+
+  The `MicrochartCommonProps` shared-grammar type is now enforced as a single
+  source of truth: a guard test holds every chart's shared props to its canonical
+  types.
+
+### Patch Changes
+
+- [#38](https://github.com/ganapativs/microcharts/pull/38) [`0796194`](https://github.com/ganapativs/microcharts/commit/0796194d9ae0658ed98bfe9d3aa4f93e50e9e8ee) Thanks [@ganapativs](https://github.com/ganapativs)! - Ship a **minified** `styles.css`. `@microcharts/react/styles.css` (and the
+  per-chart `styles/*.css` escape-hatch files) now resolve to minified copies in
+  `dist/` — the shared stylesheet drops from ~8.7 kB to ~2.8 kB gzip. The
+  minifier only strips comments and whitespace (no rule merging), so `@layer`
+  membership and cascade order are unchanged. The repo-root `styles.css` stays the
+  unminified source of truth; no API or visual changes.
+
+- [#38](https://github.com/ganapativs/microcharts/pull/38) [`0796194`](https://github.com/ganapativs/microcharts/commit/0796194d9ae0658ed98bfe9d3aa4f93e50e9e8ee) Thanks [@ganapativs](https://github.com/ganapativs)! - Improve npm and search discoverability: expand `keywords`, add a `funding` link
+  (GitHub Sponsors), and a structured `author` (name/email/url). Metadata only — no
+  API, runtime, or visual changes.
+
 ## 0.3.0
 
 ### Minor Changes
