@@ -38,32 +38,39 @@ export function HomeProblemSection() {
         <Reveal delay={80}>
           <div className="panel p-6">
             <p className="mono-label mb-4">what a chart costs, to scale</p>
+            {/* minmax(0,1fr) + a shrink-to-fill bar wrapper: the Progress SVG
+                carries a fixed viewBox width, so without this the grid can't
+                shrink below it and the panel overflows the mobile viewport. */}
             <div className="space-y-3">
-              <div className="grid grid-cols-[6.5rem_1fr_auto] items-center gap-3">
+              <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]">
                 <span className="text-sm text-fd-muted-foreground">chart stack</span>
-                <Progress
-                  value={RECHARTS_KB}
-                  max={RECHARTS_KB}
-                  label="none"
-                  color="var(--mc-neutral)"
-                  width={280}
-                  height={10}
-                  summary={`A typical charting stack: ${RECHARTS_KB} kB gzip: the full bar.`}
-                />
+                <span className="min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
+                  <Progress
+                    value={RECHARTS_KB}
+                    max={RECHARTS_KB}
+                    label="none"
+                    color="var(--mc-neutral)"
+                    width={280}
+                    height={10}
+                    summary={`A typical charting stack: ${RECHARTS_KB} kB gzip: the full bar.`}
+                  />
+                </span>
                 <span className="font-medium tabular-nums text-fd-foreground">
                   {RECHARTS_KB} kB
                 </span>
               </div>
-              <div className="grid grid-cols-[6.5rem_1fr_auto] items-center gap-3">
+              <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]">
                 <span className="text-sm text-fd-muted-foreground">one microchart</span>
-                <Progress
-                  value={SIZE.median}
-                  max={RECHARTS_KB}
-                  label="none"
-                  width={280}
-                  height={10}
-                  summary={`One microchart: ${SIZE.median} kB gzip on the same scale, ${Math.round(RECHARTS_KB / SIZE.median)} times smaller.`}
-                />
+                <span className="min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
+                  <Progress
+                    value={SIZE.median}
+                    max={RECHARTS_KB}
+                    label="none"
+                    width={280}
+                    height={10}
+                    summary={`One microchart: ${SIZE.median} kB gzip on the same scale, ${Math.round(RECHARTS_KB / SIZE.median)} times smaller.`}
+                  />
+                </span>
                 <span className="font-medium tabular-nums text-fd-foreground">
                   {SIZE.median} kB
                 </span>
