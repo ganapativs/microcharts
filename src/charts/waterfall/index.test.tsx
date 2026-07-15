@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import { Waterfall } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -91,3 +92,17 @@ describe("<Waterfall>", () => {
 seriesEdgeSuite("Waterfall", (data) => (
   <Waterfall data={data.map((v, i) => ({ label: `s${i}`, value: v }))} title="Edge" />
 ));
+
+describe("<Waterfall> annotations", () => {
+  it("hosts annotations, clamped to the value plot (not the label band)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <Waterfall data={PL} width={70} height={18} summary={false}>
+          {children}
+        </Waterfall>
+      ),
+      70,
+      18,
+    );
+  });
+});

@@ -6,6 +6,7 @@
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { linePath } from "../../core/path.js";
 import { isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 /** One paired reading: `a` = the subject, `b` = the reference it is judged against. */
 export interface SpreadDatum {
@@ -48,6 +49,8 @@ export interface SpreadBandGeometry {
   /** True when every present pair has a === b (identical series → one line). */
   coincident: boolean;
   plot: { x0: number; x1: number; y0: number; y1: number };
+  /** Resolved shared value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
 }
 
 export function spreadBandGeometry(opts: {
@@ -60,7 +63,7 @@ export function spreadBandGeometry(opts: {
 }): SpreadBandGeometry {
   const { width, height, data, gutterCh, fontSize } = opts;
   const pad = 2;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 4 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;
   const x0 = pad;
   const x1 = width - pad - gutter;
   const y0 = pad;
@@ -155,5 +158,6 @@ export function spreadBandGeometry(opts: {
     last,
     coincident,
     plot: { x0, x1, y0, y1 },
+    domain,
   };
 }

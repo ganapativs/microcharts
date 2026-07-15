@@ -12,6 +12,7 @@ import {
   type PointerEvent,
 } from "react";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CONFUSION } from "../../core/strings-confusion.js";
 import { confusionGridGeometry } from "./geometry.js";
 import {
@@ -159,19 +160,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
           />
         ) : null}
       </StaticConfusionGrid>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {cell ? (
         <span
           className="mc-spark-readout"

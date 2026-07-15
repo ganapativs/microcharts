@@ -4,7 +4,7 @@
 // unknown regions (absence ≠ zero) and the unknown share disclosed in the name.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_MINIMAP, type MinimapStrings } from "../../core/strings-minimap.js";
 import { hatchPath, minimapDomain, minimapGeometry, type MinimapInput } from "./geometry.js";
 
@@ -19,7 +19,7 @@ export interface MinimapStripProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: MinimapStrings | undefined;
   title?: string | undefined;

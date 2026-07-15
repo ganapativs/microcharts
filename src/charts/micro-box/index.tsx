@@ -7,7 +7,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import type { FiveNumber } from "../../core/quantile.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
@@ -41,7 +41,7 @@ export interface MicroBoxProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: DistStrings | undefined;
   title?: string | undefined;

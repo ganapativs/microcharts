@@ -82,6 +82,46 @@ than truncated bar length.
   />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="no data" code={`<DotPlot data={[]} />`}>
+  <DotPlot data={[]} title="No data" width={100} height={16} />
+</LiveDemo>
+
+<LiveDemo label="single category" code={`<DotPlot data={[{ label: "Only", value: 42 }]} />`}>
+  <DotPlot data={[{ label: "Only", value: 42 }]} title="Single" width={100} height={16} />
+</LiveDemo>
+
+<LiveDemo
+  label="null keeps its row"
+  code={`// a missing value draws no dot (and no label) but the row still holds its
+// slot, so the rows around it don't drift together
+<DotPlot data={[
+  { label: "Ada", value: 96 },
+  { label: "Kim", value: null },
+  { label: "Sam", value: 88 },
+]} />`}
+>
+  <DotPlot
+    data={[
+      { label: "Ada", value: 96 },
+      { label: "Kim", value: null },
+      { label: "Sam", value: 88 },
+    ]}
+    title="Gap preserved"
+    width={180}
+    height={66}
+  />
+</LiveDemo>
+
+An empty series has nothing to compare, so no dots draw and the accessible name reads **"No
+data."** A single category still renders normally — one dot, one label — with the summary's
+"category"/"categories" wording matching the count (**"1 category. Highest Only 42, lowest
+Only 42."**). A `null` value draws no dot and no label for its row, but the row still occupies
+its slot in the vertical rhythm — the real values around it keep the same spacing they'd have
+in a fully populated set — and it's excluded from the category count in the summary, not
+counted as a comparison with nothing.
+
 ## Four homes
 
 <FourContexts slug="dot-plot" />

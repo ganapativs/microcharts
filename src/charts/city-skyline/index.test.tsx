@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { CitySkyline } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const TEAMS = [
@@ -61,5 +62,18 @@ describe("<CitySkyline>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<CitySkyline data={TEAMS} title="Team sizes" />);
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    // width derives from geometry: 5 buildings, bw=9 gap=3 pad=2 → 61
+    expectHostsAnnotations(
+      (children) => (
+        <CitySkyline data={TEAMS} bw={9} gap={3} height={24} summary={false}>
+          {children}
+        </CitySkyline>
+      ),
+      61,
+      24,
+    );
   });
 });

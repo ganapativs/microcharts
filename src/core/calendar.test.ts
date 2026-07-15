@@ -1,7 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 import { parseUTCDay } from "./calendar.js";
-import { isoDate, weekGrid, dayOfYear, daysInYear, monthStartDays } from "./calendar-grid.js";
+import { isoDate, weekGrid, dayOfYear, monthStartDays } from "./calendar-grid.js";
+
+// Leap-year day count — a test-only helper for the dayOfYear/monthStartDays
+// invariants below (not shipped: no chart consumes it).
+function daysInYear(year: number): 365 | 366 {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
+}
 
 // arbitrary UTC day in a wide window (1990–2090)
 const utcDay = fc
@@ -43,6 +49,15 @@ describe("weekGrid (edge matrix)", () => {
   it("weeks clamped to ≥ 1", () => {
     expect(weekGrid({ end: "2026-07-08", weeks: 0 })!.rows).toBe(1);
     expect(weekGrid({ end: "2026-07-08", weeks: -3 })!.rows).toBe(1);
+  });
+
+  it("non-finite weeks → single row (no crash / no OOM)", () => {
+    for (const weeks of [NaN, Infinity, -Infinity]) {
+      const g = weekGrid({ end: "2026-07-08", weeks })!;
+      expect(g.rows).toBe(1);
+      expect(g.days).toHaveLength(7);
+      expect(g.start).toBe(g.days[0]!.date);
+    }
   });
 
   it("Monday start (default): 2026-07-08 is a Wednesday → col 2", () => {

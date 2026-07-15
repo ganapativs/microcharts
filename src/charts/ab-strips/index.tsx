@@ -5,10 +5,11 @@
 // bar. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
 import { abStripsGeometry, type ABStripsGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Signed percent (or absolute when the base is 0) delta of B vs A. */
 export function abDelta(geo: ABStripsGeometry, fmt: (n: number) => string): string {
@@ -51,7 +52,7 @@ export interface ABStripsProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ABStrings | undefined;
   title?: string | undefined;
@@ -121,7 +122,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -131,7 +132,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
     );
   }
 
-  const accName = summary === false ? false : (summary ?? abSummary(geo, fmt, labels, strings));
+  const accName = resolveSummary(summary, () => abSummary(geo, fmt, labels, strings));
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   // delta valence: which direction is good (sign is also in the text) — B always

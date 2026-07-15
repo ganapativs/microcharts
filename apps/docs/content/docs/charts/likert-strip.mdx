@@ -78,6 +78,56 @@ line is the question; everything else is the answer.
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="no responses"
+  code={`// every level at 0 (or empty data) — nothing to stack, nothing to say
+<LikertStrip data={[
+  { label: "Disagree", value: 0 },
+  { label: "Agree", value: 0 },
+]} />`}
+>
+  <LikertStrip
+    data={[
+      { label: "Disagree", value: 0 },
+      { label: "Agree", value: 0 },
+    ]}
+    title="No responses"
+    width={160}
+    height={20}
+  />
+</LiveDemo>
+
+<LiveDemo
+  label="all neutral"
+  code={`// every response landed on the neutral level — no lean to report
+<LikertStrip data={[
+  { label: "Disagree", value: 0 },
+  { label: "Neutral", value: 10 },
+  { label: "Agree", value: 0 },
+]} />`}
+>
+  <LikertStrip
+    data={[
+      { label: "Disagree", value: 0 },
+      { label: "Neutral", value: 10 },
+      { label: "Agree", value: 0 },
+    ]}
+    title="All neutral"
+    width={160}
+    height={20}
+  />
+</LiveDemo>
+
+Empty data, or data whose values all resolve to 0, has nothing to divide into a diverging
+read — no bar draws, and the accessible name says so plainly: **"No responses."** When every
+non-zero response lands on the neutral level, the bar is entirely the center segment and the
+summary reads **"All responses neutral."** instead of forcing a lean out of no signal.
+Negative counts are treated as 0 rather than pushed the wrong direction across the center
+line — a chart that lies about which side a count is on is worse than one that drops it — and
+the static entry logs a dev warning when it happens.
+
 ## Four homes
 
 <FourContexts slug="likert-strip" />

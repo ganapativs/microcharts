@@ -3,6 +3,7 @@
 // standalone. Implements the S1 (single trend series) shape; S2–S4 land with
 // their chart types.
 import { seriesStats } from "./stats.js";
+import { makeFormatter as cachedFormatter } from "./format.js";
 import type { Value } from "./types.js";
 
 /** Swappable string templates (en shipped; structure is the locale contract). */
@@ -256,10 +257,12 @@ export interface SummaryStrings {
   waterfallStep: (label: string, delta: string, level: string) => string;
   /** Waterfall summary, e.g. "From 1,200 to 1,540 over 5 steps: +480 gains, −140 losses." */
   waterfall: (start: string, end: string, steps: number, gains: string, losses: string) => string;
-  /** Rank announcement, e.g. "Week 4 of 12: #3." */
-  rankAt: (period: number, total: number, rank: number) => string;
-  /** Rank run, e.g. "From #5 to #2 over 12 weeks; best #1." */
-  rankRun: (from: number, to: number, best: number, periods: number) => string;
+  /** Rank announcement, e.g. "Week 4 of 12: #3." `unit` names the period
+   *  (default "Week"). */
+  rankAt: (period: number, total: number, rank: number, unit?: string) => string;
+  /** Rank run, e.g. "From #5 to #2 over 12 weeks; best #1." `unit` names the
+   *  period, plural (default "weeks"). */
+  rankRun: (from: number, to: number, best: number, periods: number, unit?: string) => string;
   /** Dual point, e.g. "Point 9 of 12: 17 vs 15." */
   vsAt: (position: number, total: number, value: string, ref: string) => string;
   /** Dual summary, e.g. "Trending up 12% vs benchmark up 4%. Last 17 vs 15." */
@@ -632,6 +635,9 @@ export interface SummaryStrings {
   rubric: (n: number, hi: string, hiScore: string, lo: string, loScore: string) => string;
   /** Interactive criterion announce, e.g. "Correctness: 0.92, weight 40% of total." */
   rubricRow: (label: string, score: string, weightPct: string) => string;
+  /** TokenConfidence empty state, e.g. "No tokens." — a distinct key from the
+   *  series `noData` so the aggregate EN dictionary keeps both (spread order). */
+  noTokens: string;
   /** TokenConfidence overview, e.g. "42 tokens: 33 confident, 6 unsure, 3 guessing." */
   tokenConfidence: (n: number, confident: number, unsure: number, guessing: number) => string;
   /** Tier display names, indexed confident → unsure → guessing. */
@@ -642,7 +648,9 @@ export interface SummaryStrings {
   windBarb: (compass: string, deg: string, value: string) => string;
   /** Calm state, e.g. "Calm." (wind-barb). */
   windBarbCalm: string;
-  /** Compass octant names, indexed N, NE, E, SE, S, SW, W, NW. */
+  /** Compass octant names, indexed N, NE, E, SE, S, SW, W, NW. Canonically
+   *  lowercase (used sentence-medially by station-glyph); templates that open a
+   *  sentence with an octant capitalize it themselves. */
   compass8: readonly [string, string, string, string, string, string, string, string];
   /** StarSpoke overview, e.g. "5 metrics; highest Speed (0.9), lowest Cost (0.3)." */
   starSpoke: (n: number, hi: string, hiValue: string, lo: string, loValue: string) => string;
@@ -669,8 +677,9 @@ export interface SummaryStrings {
   /** DepthWedge overview, e.g.
    *  "Demand outweighs supply 1.8× within the shown range; spread 0.25." */
   depthWedge: (leadSide: string, laggSide: string, ratio: string, spread: string) => string;
-  /** Balanced book, e.g. "Demand and supply are balanced; spread 0.25." */
-  depthWedgeBalanced: (spread: string) => string;
+  /** Balanced book, e.g. "Demand and supply are balanced; spread 0.25." Side
+   *  names default to `depthWedgeSides` (sentence-initial casing). */
+  depthWedgeBalanced: (spread: string, sideA?: string, sideB?: string) => string;
   /** Side names, indexed demand, supply. */
   depthWedgeSides: readonly [string, string];
   /** Interactive depth announce, e.g. "demand: 1,240 within 0.20 of mid." */
@@ -910,12 +919,6 @@ export interface DescribeOptions {
   strings?: SeriesStrings | undefined;
 }
 
-import { makeFormatter as cachedFormatter } from "./format.js";
-
-function makeFormatter(opts: DescribeOptions): (n: number) => string {
-  return cachedFormatter(opts.format, opts.locale);
-}
-
 /**
  * "Trending up 12%. Range 3 to 18. Last value 17." — the default accessible
  * name for a chart. Degenerate series produce honest short forms:
@@ -928,7 +931,7 @@ export function describeSeries(values: readonly Value[], opts: DescribeOptions =
   const t = opts.strings ?? EN_SERIES;
   if (!s) return t.noData;
 
-  const fmt = makeFormatter(opts);
+  const fmt = cachedFormatter(opts.format, opts.locale);
   if (s.count === 1) return t.single(fmt(s.last));
   if (s.min === s.max) return t.flat(fmt(s.min));
 
@@ -940,10 +943,28 @@ export function describeSeries(values: readonly Value[], opts: DescribeOptions =
     if (s.first === 0) {
       parts.push(t.trendAbs(dir, fmt(Math.abs(s.delta))));
     } else {
-      parts.push(t.trendPct(dir, String(Math.round(Math.abs(s.deltaRatio) * 100))));
+      // Percent as a plain integer, but routed through the locale formatter so
+      // digits match the rest of the sentence (never String() — that pins ASCII
+      // digits, mixing scripts in e.g. Arabic/Devanagari locales).
+      const pctFmt = cachedFormatter({ maximumFractionDigits: 0 }, opts.locale);
+      parts.push(t.trendPct(dir, pctFmt(Math.round(Math.abs(s.deltaRatio) * 100))));
     }
   }
   parts.push(t.range(fmt(s.min), fmt(s.max)));
   parts.push(t.last(fmt(s.last)));
   return parts.join(" ");
+}
+
+/**
+ * Resolve a chart's `summary` prop to its rendered accessible description.
+ * `false` stays `false` (decorative, T0 opt-out); an explicit string wins; only
+ * when omitted is the default generated. `generate` is a callback so the (often
+ * formatter-heavy) default is computed lazily — decorative charts never pay for
+ * a summary they won't render.
+ */
+export function resolveSummary(
+  summary: string | false | undefined,
+  generate: () => string,
+): string | false {
+  return summary === false ? false : (summary ?? generate());
 }

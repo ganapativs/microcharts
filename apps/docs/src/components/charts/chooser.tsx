@@ -1,11 +1,12 @@
-"use client";
-import { useState } from "react";
 import Link from "next/link";
 import { getChart } from "@/lib/catalog";
 import { getModule } from "@/lib/charts/registry";
-import { cn } from "@/lib/cn";
+import { ChooserFilter } from "./chooser-filter";
 
-/** Chart chooser by decision question. Partition coverage asserted in tests. */
+/** Chart chooser by decision question. Partition coverage asserted in tests.
+ *  Server component: the per-chart glyphs (Mark) render on the server so the
+ *  106-chart component graph never reaches the client — only the tiny chip
+ *  filter is a client island. */
 
 interface Job {
   id: string;
@@ -191,6 +192,7 @@ function Row({ slug, first }: { slug: string; first: boolean }) {
   return (
     <li className="border-b border-hairline/60 last:border-0">
       <Link
+        prefetch={false}
         href={`/docs/charts/${slug}`}
         className="group flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 no-underline"
       >
@@ -215,69 +217,28 @@ function Row({ slug, first }: { slug: string; first: boolean }) {
 }
 
 export function ChartChooser() {
-  const [active, setActive] = useState<string | null>(null);
-  const shown = active ? JOBS.filter((j) => j.id === active) : JOBS;
+  const sections = JOBS.map((j) => ({
+    id: j.id,
+    q: j.q,
+    body: (
+      <section>
+        <div className="mb-1 flex items-baseline justify-between gap-4">
+          <h3 className="display text-lg text-fd-foreground">{j.q}</h3>
+          <span className="mono-label shrink-0 tabular-nums opacity-55">
+            {j.slugs.length.toString().padStart(2, "0")}
+          </span>
+        </div>
+        <p className="mb-3 border-b border-hairline pb-3 text-sm text-fd-muted-foreground">
+          {j.when}
+        </p>
+        <ul className="grid grid-cols-1 gap-x-10">
+          {j.slugs.map((slug, i) => (
+            <Row key={slug} slug={slug} first={i === 0} />
+          ))}
+        </ul>
+      </section>
+    ),
+  }));
 
-  return (
-    <div className="not-prose my-8">
-      <div className="mb-8 flex flex-wrap gap-2">
-        <Chip label="All charts" activeState={active === null} onClick={() => setActive(null)} />
-        {JOBS.map((j) => (
-          <Chip
-            key={j.id}
-            label={j.q}
-            activeState={active === j.id}
-            onClick={() => setActive((a) => (a === j.id ? null : j.id))}
-          />
-        ))}
-      </div>
-
-      <div className="flex flex-col gap-10">
-        {shown.map((j) => (
-          <section key={j.id}>
-            <div className="mb-1 flex items-baseline justify-between gap-4">
-              <h3 className="display text-lg text-fd-foreground">{j.q}</h3>
-              <span className="mono-label shrink-0 tabular-nums opacity-55">
-                {j.slugs.length.toString().padStart(2, "0")}
-              </span>
-            </div>
-            <p className="mb-3 border-b border-hairline pb-3 text-sm text-fd-muted-foreground">
-              {j.when}
-            </p>
-            <ul className="grid grid-cols-1 gap-x-10">
-              {j.slugs.map((slug, i) => (
-                <Row key={slug} slug={slug} first={i === 0} />
-              ))}
-            </ul>
-          </section>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Chip({
-  label,
-  activeState,
-  onClick,
-}: {
-  label: string;
-  activeState: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      data-active={activeState}
-      className={cn(
-        "rounded-full border px-3 py-1.5 text-sm transition-colors",
-        activeState
-          ? "border-fd-primary/50 bg-fd-primary/10 text-fd-foreground"
-          : "border-hairline text-fd-muted-foreground hover:border-fd-primary/30 hover:text-fd-foreground",
-      )}
-    >
-      {label}
-    </button>
-  );
+  return <ChooserFilter sections={sections} />;
 }

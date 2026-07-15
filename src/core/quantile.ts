@@ -61,7 +61,7 @@ export function fiveNumber(values: readonly Value[]): FiveNumber | null {
 }
 
 /** One dotplot dot: its true quantile value + grid position (column, row). */
-export interface DotplotDot {
+interface DotplotDot {
   /** The underlying quantile value — threshold counts use this, not the bin. */
   value: number;
   /** Column index, 0-based from `x0`. */

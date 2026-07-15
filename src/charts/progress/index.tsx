@@ -5,9 +5,10 @@
 // ("112%") — the number and the bar only disagree in that documented case.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { progressGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Resolved Progress model — shared by the static and interactive entries. */
 export interface ProgressModel {
@@ -75,7 +76,7 @@ export interface ProgressProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ScalarStrings | undefined;
   title?: string | undefined;
@@ -111,7 +112,7 @@ export function Progress(props: ProgressProps): ReactNode {
     fontSize,
   });
 
-  const accName = summary === false ? false : (summary ?? model.summary);
+  const accName = resolveSummary(summary, () => model.summary);
   const fillStyle = color ? { fill: color } : undefined;
 
   return (

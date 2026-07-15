@@ -6,6 +6,7 @@ import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { computeFive, microBoxGeometry } from "./geometry.js";
 import { MicroBox as StaticMicroBox, microBoxSummary, type MicroBoxProps } from "./index.js";
 
@@ -172,19 +173,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticMicroBox>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {active && geo && resolved ? (
         <span
           className="mc-spark-readout"

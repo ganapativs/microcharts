@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TAPE_GAUGE } from "../../core/strings-tape-gauge.js";
 import { autoSpan } from "./index.js";
 import { TapeGauge as StaticTapeGauge, tapeGaugeSummary, type TapeGaugeProps } from "./index.js";
@@ -98,19 +99,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
         summary={false}
         style={FILL}
       />
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

@@ -8,7 +8,7 @@ import {
   ViewOptionsPopover,
 } from "fumadocs-ui/layouts/docs/page";
 import { notFound } from "next/navigation";
-import { getMDXComponents } from "@/components/mdx";
+import { getGuideMDXComponents } from "@/components/mdx-guide";
 import type { Metadata } from "next";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { gitConfig } from "@/lib/shared";
@@ -20,6 +20,10 @@ import { RouteTransition } from "@/components/route-transition";
 
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const params = await props.params;
+  // Chart pages (/docs/charts, /docs/charts/*) are served by the dedicated chart
+  // route so this guide route never imports the chart registry. Defense in depth:
+  // generateStaticParams already excludes them, so this only guards dev requests.
+  if (params.slug?.[0] === "charts") notFound();
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
@@ -68,7 +72,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
           />
         </div>
         <DocsBody>
-          <MDX components={getMDXComponents({ a: createRelativeLink(source, page) })} />
+          <MDX components={getGuideMDXComponents({ a: createRelativeLink(source, page) })} />
         </DocsBody>
       </RouteTransition>
     </DocsPage>
@@ -76,11 +80,14 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 }
 
 export async function generateStaticParams() {
-  return source.generateParams();
+  // Exclude chart pages — the chart route owns /docs/charts and /docs/charts/*.
+  // Two routes emitting the same static path would collide under `output: export`.
+  return source.generateParams().filter((p) => p.slug?.[0] !== "charts");
 }
 
 export async function generateMetadata(props: PageProps<"/docs/[[...slug]]">): Promise<Metadata> {
   const params = await props.params;
+  if (params.slug?.[0] === "charts") notFound();
   const page = source.getPage(params.slug);
   if (!page) notFound();
 

@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { ErrorBudget } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
@@ -53,6 +54,18 @@ describe("<ErrorBudget>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<ErrorBudget data={OBSERVED} window={30} title="Checkout SLO" />);
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <ErrorBudget data={OBSERVED} width={80} height={20} label="none" summary={false}>
+          {children}
+        </ErrorBudget>
+      ),
+      80,
+      20,
+    );
   });
 });
 

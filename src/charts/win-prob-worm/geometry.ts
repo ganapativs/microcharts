@@ -7,6 +7,7 @@
 import { round2, isFiniteValue } from "../../core/types.js";
 import { clamp } from "../../core/scale.js";
 import type { WinProbWormStrings } from "../../core/strings-win-prob-worm.js";
+import { textGutter } from "../../core/labels.js";
 
 /** Symmetric inset (viewBox units) — the plot never touches the frame edge. */
 export const PAD = 2;
@@ -158,7 +159,7 @@ export function winProbWormGeometry(opts: {
 
 /** Reserve a right gutter for the endpoint "last" label (shared with the client). */
 export function wormGutter(text: string, font: number): number {
-  return Math.ceil(text.length * font * 0.6) + 5;
+  return textGutter(text.length, font, 5);
 }
 
 /**

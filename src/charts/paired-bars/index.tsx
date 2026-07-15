@@ -6,10 +6,11 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { isFiniteValue } from "../../core/types.js";
 import { pairedBarsGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface PairedBarsDatum {
   label: string;
@@ -47,7 +48,7 @@ export interface PairedBarsProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: PairedStrings | undefined;
   title?: string | undefined;
@@ -95,7 +96,7 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
     orientation,
   });
   const fmt = makeFormatter(format, locale);
-  const accName = summary === false ? false : (summary ?? pairedBarsSummary(data, fmt, strings));
+  const accName = resolveSummary(summary, () => pairedBarsSummary(data, fmt, strings));
 
   const goodOver = positive !== "down";
 

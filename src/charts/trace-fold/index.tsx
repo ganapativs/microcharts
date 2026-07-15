@@ -5,9 +5,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TRACE_FOLD, type TraceFoldStrings } from "../../core/strings-trace-fold.js";
 import { traceFoldGeometry, type Span } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type TraceFoldDatum = Span;
 
@@ -19,7 +20,7 @@ export interface TraceFoldProps {
   labels?: boolean | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: TraceFoldStrings | undefined;
   title?: string | undefined;
@@ -72,7 +73,7 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
   const fontSize = labelFont(height / depthCount, 0.6);
 
   const geo = traceFoldGeometry({ data, width, height, rowGap });
-  const accName = summary === false ? false : (summary ?? traceFoldSummary(geo, strings, fmt));
+  const accName = resolveSummary(summary, () => traceFoldSummary(geo, strings, fmt));
 
   return (
     <Chart

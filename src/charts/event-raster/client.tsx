@@ -12,6 +12,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_EVENT_RASTER } from "../../core/strings-event-raster.js";
 import { LANE_CAP, rasterDomain } from "./geometry.js";
 import {
@@ -207,19 +208,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
         ) : null}
         {rest.children}
       </StaticEventRaster>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {t !== undefined ? (
         <span
           className="mc-spark-readout"

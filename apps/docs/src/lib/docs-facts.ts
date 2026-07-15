@@ -7,7 +7,10 @@
  * `docs-facts.test.ts` re-checks the derivations; `docs-claims.test.ts` greps
  * the MDX for stale literals.
  */
-import { CHARTS, STABLE_CHARTS } from "./charts/registry";
+// Data-only catalog (generated JSON snapshot) — never the component `registry`,
+// so guide shells that quote these figures (perf tables, catalog facts) don't
+// drag the 106-chart interactive graph into a text page's route bundle.
+import { CHARTS, STABLE_CHARTS } from "./charts/entries";
 import { CHART_GZIP } from "./stats";
 import bench from "./bench-summary.json";
 

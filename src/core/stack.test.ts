@@ -178,6 +178,20 @@ describe("divergingStack (edge matrix)", () => {
     expect(d.neutral).toBe(0);
     expect(d.segments.filter((s) => s.side === 0)).toHaveLength(0);
   });
+
+  it("out-of-range neutralIndex → treated as no neutral, no NaN segments", () => {
+    for (const neutralIndex of [10, -1, 3]) {
+      const d = divergingStack([1, 2, 1], { neutralIndex })!;
+      expect(d.neutral).toBe(0);
+      expect(d.segments).toHaveLength(3);
+      for (const s of d.segments) {
+        expect(Number.isFinite(s.x0)).toBe(true);
+        expect(Number.isFinite(s.x1)).toBe(true);
+        expect(Number.isFinite(s.share)).toBe(true);
+      }
+      expect(d.negative + d.positive + d.neutral).toBeCloseTo(1, 9);
+    }
+  });
 });
 
 describe("divergingStack (invariants)", () => {

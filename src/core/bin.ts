@@ -3,7 +3,7 @@
 // Outputs are data-space (charts scale + round to viewBox).
 import { isFiniteValue, type Value } from "./types.js";
 
-export interface Bin {
+interface Bin {
   /** Inclusive lower edge. */
   x0: number;
   /** Upper edge — exclusive except for the last bin, which is closed. */

@@ -6,10 +6,11 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { valueStepOpacity, type CellShape } from "../../shared/cell.js";
 import { heatCellGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual S4 summary — value + calibrated level. Shared with the interactive
  *  entry (one wording, no drift; ActivityGrid announcement parity). */
@@ -36,7 +37,7 @@ export interface HeatCellProps {
   /** `"value"` renders the number centered in the cell (wider table cells). */
   label?: "value" | "none" | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ScalarStrings | undefined;
   title?: string | undefined;
@@ -74,8 +75,9 @@ export function HeatCell(props: HeatCellProps): ReactNode {
 
   const geo = heatCellGeometry({ width: SIZE, height: SIZE, value, domain, steps, shape });
   const fmt = makeFormatter(format, locale);
-  const accName =
-    summary === false ? false : (summary ?? heatCellSummary(value, geo.step, steps, fmt, strings));
+  const accName = resolveSummary(summary, () =>
+    heatCellSummary(value, geo.step, steps, fmt, strings),
+  );
 
   const fontSize = 6;
   const text = geo.step !== null && label === "value" ? fmt(value) : undefined;

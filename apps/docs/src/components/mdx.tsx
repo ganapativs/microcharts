@@ -1,4 +1,5 @@
 import defaultMdxComponents from "fumadocs-ui/mdx";
+import FdLink from "fumadocs-core/link";
 import type { MDXComponents } from "mdx/types";
 import type { ComponentProps } from "react";
 import { Sparkline } from "@microcharts/react/sparkline";
@@ -117,15 +118,9 @@ import { PercentileTrace } from "@microcharts/react/percentile-trace";
 import { SparkGroup } from "@microcharts/react";
 import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
+import { AnnotationHostGallery, AnnotationHostShowcase } from "@/components/annotation-hosts";
 import { InstallCommand } from "@/components/ui/copy";
-import { FourContexts } from "@/components/charts/contexts";
-import { Sizing } from "@/components/charts/sizing";
-import { Playground } from "@/components/charts/playground";
-import { Usage } from "@/components/charts/usage";
-import { PropTable } from "@/components/charts/prop-table";
-import { ChartChooser } from "@/components/charts/chooser";
 import { PackageTabs } from "@/components/ui/package-tabs";
-import { StreamDemo } from "@/components/charts/stream-demo";
 import { GrammarExplorer, AgentCheatSheet } from "@/components/charts/ai-guide";
 import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
 import { CatalogStrip } from "@/components/charts/catalog-strip";
@@ -143,6 +138,20 @@ import {
   ThroughputSummary,
   CatalogFacts,
 } from "@/components/ui/perf";
+import dynamic from "next/dynamic";
+import type { FC } from "react";
+
+// The stream demo is chart-heavy but registry-free (it imports a fixed handful
+// of static charts directly), so it stays in the shared base for ai.mdx.
+// `Playground` and `FourContexts` pull the full chart registry via `getModule`,
+// so they live ONLY in the route-specific maps: `mdx-charts.tsx` gets the full
+// versions; the guide map (`mdx-guide.tsx`) gets a narrow, registry-free
+// `FourContexts`. Turbopack eager-bundles even `next/dynamic` targets referenced
+// by the map, so a registry-dragging entry here would ship the 106-chart graph
+// to every text guide — keep them out.
+const StreamDemo = dynamic(() =>
+  import("@/components/charts/stream-demo").then((m) => m.StreamDemo),
+) as FC;
 
 // `<Callout>` is overloaded: the microcharts chart annotation (`x`/`y`/`label`,
 // nested inside a chart) and the Fumadocs doc callout (`type` + text). Dispatch
@@ -159,10 +168,44 @@ function Callout({
   }
   return <DocCallout {...props} />;
 }
+// A chart host resolves annotation children by a static brand on the child's
+// *type*. This dispatcher is a different function than ChartCallout, so without
+// forwarding the brand a `<Callout x y>` inside a chart isn't recognized as an
+// annotation — it falls through and renders standalone (dev-warns). Copy the
+// brand (ChartCallout's only own enumerable static) onto the wrapper.
+Object.assign(Callout, ChartCallout);
 
+/**
+ * Shared, guide-safe MDX base map. Contains every component a text guide page
+ * can render — the static (RSC-safe) chart primitives, annotations, doc building
+ * blocks, the registry-free `CatalogStrip` teaser, and the registry-free
+ * `StreamDemo` (it imports a fixed handful of static charts directly).
+ *
+ * It deliberately OMITS every component that pulls the 106-chart component
+ * `registry` into a route's bundle: `Sizing`, `ChartChooser`, `Usage`,
+ * `PropTable`, `Playground`, and the full `FourContexts`. The chart route re-adds
+ * all of those via `mdx-charts.tsx#getChartMDXComponents`; the guide route
+ * (`mdx-guide.tsx`) adds only a narrow, registry-free `FourContexts`. Keeping the
+ * registry out here is what lets a pure-text guide (e.g. /docs/quickstart) ship
+ * without the chart graph — Turbopack eager-bundles even `next/dynamic` targets
+ * referenced by the map, so a registry-dragging entry could not hide behind lazy
+ * loading.
+ */
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
+    // No eager prefetch on in-content links: a guide that mentions a few chart
+    // pages would otherwise pull each target route's whole chunk graph on load.
+    // Next still prefetches on hover/press, so navigation stays fast. Machine
+    // surfaces (/catalog.json, /llms.txt, …) are files, not app routes — the
+    // client router would 404 fetching route metadata for them, so they get a
+    // plain anchor.
+    a: (props: ComponentProps<"a">) =>
+      /\.(json|txt|xml|md)$/.test(props.href ?? "") ? (
+        <a {...props} />
+      ) : (
+        <FdLink prefetch={false} {...props} />
+      ),
     // microcharts primitives — usable directly in any .mdx page
     Sparkline,
     SparkBar,
@@ -278,13 +321,9 @@ export function getMDXComponents(components?: MDXComponents) {
     // docs building blocks
     Instrument,
     LiveDemo,
+    AnnotationHostGallery,
+    AnnotationHostShowcase,
     InstallCommand,
-    FourContexts,
-    Sizing,
-    Playground,
-    Usage,
-    PropTable,
-    ChartChooser,
     PackageTabs,
     StreamDemo,
     GrammarExplorer,
@@ -313,7 +352,3 @@ export function getMDXComponents(components?: MDXComponents) {
 }
 
 export const useMDXComponents = getMDXComponents;
-
-declare global {
-  type MDXProvidedComponents = ReturnType<typeof getMDXComponents>;
-}

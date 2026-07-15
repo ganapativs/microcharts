@@ -6,10 +6,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUEUE_DEPTH, type QueueDepthStrings } from "../../core/strings-queue-depth.js";
 import { queueDepthGeometry, type QueueDepthGeometry } from "./geometry.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 import type { Value } from "../../core/types.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual backlog summary. Shared with the interactive entry. */
 export function queueSummary(
@@ -47,7 +50,7 @@ export interface QueueDepthProps {
   height?: number | undefined;
   /** Series color override (any CSS color); `prop > CSS var > preset`. */
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QueueDepthStrings | undefined;
   title?: string | undefined;
@@ -90,7 +93,7 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -113,7 +116,21 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
   const gutterCh = Math.max(showEnd ? endText.length : 0, showCap ? capText.length : 0);
   const totalWidth = width + (gutterCh > 0 ? Math.ceil(gutterCh * FONT * 0.72) + 4 : 0);
 
-  const accName = summary === false ? false : (summary ?? queueSummary(geo, fmt, strings));
+  const accName = resolveSummary(summary, () => queueSummary(geo, fmt, strings));
+
+  // annotations host contract: Marker x = data INDEX, Threshold/TargetZone y =
+  // data values on the shared (zero-anchored) value scale. The frame width is
+  // the `width` prop (the plot basis the points use), not the label-gutter
+  // totalWidth.
+  const xForIndex = scaleLinear([0, Math.max(1, data.length - 1)], [2, width - 2]);
+  const ann = resolveAnnotations(children, {
+    x: (i) => xForIndex(i),
+    y: scaleLinear(geo.domain, [height - 2, 2]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
+
   const lineColor = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
   // breach valence: red is the story, so the endpoint label + dot flip to it —
@@ -130,6 +147,7 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {ann.under}
       {/* stock area — accent, zero-anchored, lowest z */}
       <path d={geo.area} fill={lineColor} fillOpacity={0.22} stroke="none" />
       {/* capacity hairline — muted, dashed */}
@@ -197,7 +215,8 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
           {endText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

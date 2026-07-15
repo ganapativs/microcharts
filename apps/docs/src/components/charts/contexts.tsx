@@ -1,71 +1,13 @@
 "use client";
-import { useState, type ReactNode } from "react";
-import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
-import { buildMarkContexts, inferMarkContextSpec, markInput } from "@/lib/charts/contexts-factory";
 import { getModule } from "@/lib/charts/registry";
-import type { ChartContexts, ChartModule } from "@/lib/charts/types";
+import { FourContextsView } from "./contexts-view";
 
-const HOMES = [
-  { key: "sentence", label: "In a sentence" },
-  { key: "cell", label: "In a table cell" },
-  { key: "kpi", label: "In a KPI card" },
-  { key: "tab", label: "In a tab header" },
-] as const;
-
-/** Fallback when a chart hasn't authored `contexts` yet. */
-function genericContexts(mod: ChartModule): ChartContexts {
-  const data = markInput(mod.entry);
-  return buildMarkContexts(mod.Mark, mod.markCode, inferMarkContextSpec(mod.entry), data);
-}
-
-/** Chart in four placements: sentence, cell, KPI, tab. */
+/** Chart in four placements: sentence, cell, KPI, tab. Chart-route version —
+ *  resolves any slug from the full registry. The registry-free presentational
+ *  core lives in `contexts-view.tsx`; the guide route uses `contexts-guide.tsx`
+ *  with a narrow module map so a text page never ships all 106 charts. */
 export function FourContexts({ slug }: { slug: string }) {
   const mod = getModule(slug);
-  const [tab, setTab] = useState<"preview" | "code">("preview");
   if (!mod) return null;
-  const ctx = mod.contexts ?? genericContexts(mod);
-
-  return (
-    <div className="not-prose my-6">
-      <div className="mb-3 flex justify-end">
-        <div role="tablist" aria-label="Four homes view" className="seg">
-          {(["preview", "code"] as const).map((t) => (
-            <button
-              key={t}
-              role="tab"
-              aria-selected={tab === t}
-              data-active={tab === t}
-              type="button"
-              onClick={() => setTab(t)}
-              className="seg-opt uppercase"
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {HOMES.map(({ key, label }) => {
-          const home = ctx[key];
-          return (
-            <div key={key} className="panel flex flex-col overflow-hidden">
-              <div className="border-b border-hairline px-4 py-2">
-                <span className="mono-label">{label}</span>
-              </div>
-              {tab === "code" ? (
-                <div className="code-inset code-fill h-36 overflow-hidden">
-                  <DynamicCodeBlock lang="tsx" code={home.code} />
-                </div>
-              ) : (
-                <div className="flex min-h-36 flex-1 flex-col justify-center gap-2 p-4">
-                  {home.render() as ReactNode}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+  return <FourContextsView mod={mod} />;
 }

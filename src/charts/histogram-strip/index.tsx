@@ -4,10 +4,11 @@
 // not supported (docs steer to SparkBar). Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import type { Value } from "../../core/types.js";
 import { histogramGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual distribution summary — count + the modal bin. Shared with client. */
 export function histogramSummary(
@@ -32,7 +33,7 @@ export interface HistogramStripProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: DistStrings | undefined;
   title?: string | undefined;
@@ -66,8 +67,7 @@ export function HistogramStrip(props: HistogramStripProps): ReactNode {
   const geo = histogramGeometry({ width, height, values: data, domain, bins, markValue });
   const fmt = makeFormatter(format, locale);
   const modal = geo.modalBin >= 0 ? geo.bars[geo.modalBin] : undefined;
-  const accName =
-    summary === false ? false : (summary ?? histogramSummary(geo.total, modal, fmt, strings));
+  const accName = resolveSummary(summary, () => histogramSummary(geo.total, modal, fmt, strings));
   const hasMark = geo.markBin >= 0;
 
   return (

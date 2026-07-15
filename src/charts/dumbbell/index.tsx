@@ -6,11 +6,12 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { dumbbellGeometry } from "./geometry.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface DumbbellDatum {
   label?: string | undefined;
@@ -66,7 +67,7 @@ export interface DumbbellProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: PairedStrings | undefined;
   title?: string | undefined;
@@ -119,7 +120,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
     fontSize,
   });
   const fmt = makeFormatter(format, locale);
-  const accName = summary === false ? false : (summary ?? dumbbellSummary(data, fmt, strings));
+  const accName = resolveSummary(summary, () => dumbbellSummary(data, fmt, strings));
 
   const goodDir = positive === "down" ? -1 : 1;
 

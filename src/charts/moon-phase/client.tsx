@@ -5,6 +5,7 @@
 // Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { MoonPhase as StaticMoonPhase, moonPhaseSummary, type MoonPhaseProps } from "./index.js";
 
 export interface InteractiveMoonPhaseProps extends MoonPhaseProps {
@@ -81,21 +82,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
       onBlur={() => setHover(false)}
     >
       <StaticMoonPhase {...rest} value={value} mode={mode} strings={strings} summary={false} />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
       {hover ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {pct}

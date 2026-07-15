@@ -8,6 +8,7 @@ import { EN_BUBBLE, type BubbleStrings } from "../../core/strings-bubble.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { bubbleRowGeometry, type BubbleAlign } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface BubbleDatum {
   label: string;
@@ -112,8 +113,9 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
     labelBand,
     labelWidths,
   });
-  const accName =
-    summary === false ? false : (summary ?? bubbleRowSummary(data, { strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    bubbleRowSummary(data, { strings, format, locale }),
+  );
 
   const placed = geo.bubbles
     .map((b) => {

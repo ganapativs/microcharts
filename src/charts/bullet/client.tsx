@@ -4,13 +4,10 @@
 // on hover or focus. The wrapper owns the accessible name (role=img); the inner
 // static chart is decorative so the reading isn't announced twice.
 import { useRef, useState, type CSSProperties } from "react";
+import { FILL } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
-
-// The static SVG fills the focusable wrapper so its box coincides with the
-// wrapper's — the readout anchors to the real chart edge, and it scales fluidly.
-const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 // The measure bar shares the "bar" ink with the background bands; it's always
 // the LAST `rect` sibling (bands render first, then the measure) so `:last-of-

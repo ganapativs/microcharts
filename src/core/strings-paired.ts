@@ -16,20 +16,17 @@ export type PairedStrings = Pick<
   | "slopeIncomplete"
 >;
 
-const dir = (d: "up" | "down") => (d === "up" ? "up" : "down");
-
 export const EN_PAIRED: PairedStrings = {
   noData: "No data.",
-  fromTo: (from, to, direction, pct) => `From ${from} to ${to}, ${dir(direction)} ${pct}.`,
+  fromTo: (from, to, direction, pct) => `From ${from} to ${to}, ${direction} ${pct}.`,
   flatPair: (value) => `No change at ${value}.`,
   rows: (count, topLabel, topDirection, topPct) =>
-    `${count} rows. Largest change ${topLabel}, ${dir(topDirection)} ${topPct}.`,
+    `${count} rows. Largest change ${topLabel}, ${topDirection} ${topPct}.`,
   pairAt: (label, value, ref) => `${label}: ${value} vs ${ref}.`,
   pairs: (count, gapLabel, value, ref) =>
     `${count} ${count === 1 ? "pair" : "pairs"}. Largest gap ${gapLabel}: ${value} vs ${ref}.`,
-  slopeAt: (label, from, to, direction, pct) =>
-    `${label}: ${from} to ${to}, ${dir(direction)} ${pct}.`,
+  slopeAt: (label, from, to, direction, pct) => `${label}: ${from} to ${to}, ${direction} ${pct}.`,
   slopes: (count, up, down, topLabel, topDirection, topPct) =>
-    `${count} categories: ${up} up, ${down} down. Largest change ${topLabel}, ${dir(topDirection)} ${topPct}.`,
+    `${count} categories: ${up} up, ${down} down. Largest change ${topLabel}, ${topDirection} ${topPct}.`,
   slopeIncomplete: (label, value) => `${label}: ${value}, incomplete.`,
 };

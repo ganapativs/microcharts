@@ -25,7 +25,7 @@ export function HomeEngineeringSection() {
   const c = CATALOG.collections;
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <SectionMark n="06">Honest by construction</SectionMark>
       <div className="grid items-start gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
         <Reveal>

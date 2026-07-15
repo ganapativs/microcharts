@@ -8,10 +8,15 @@ export default function Layout({ children }: LayoutProps<"/docs">) {
     <DocsLayout
       tree={source.getPageTree()}
       {...baseOptions()}
-      sidebar={{ tabs: false, footer: <DocsSidebarChrome /> }}
+      // prefetch=false: with 100+ sidebar links, Link prefetch floods first load
+      // with every route's flight payload + chunk graph (~1 MB before idle).
+      sidebar={{ tabs: false, prefetch: false, footer: <DocsSidebarChrome /> }}
       themeSwitch={{ enabled: false }}
     >
-      {children}
+      {/* Landmark + skip-link target; `contents` keeps Fumadocs' layout intact. */}
+      <main id="main-content" className="contents">
+        {children}
+      </main>
     </DocsLayout>
   );
 }

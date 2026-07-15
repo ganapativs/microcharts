@@ -4,6 +4,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { isFiniteValue } from "../../core/types.js";
 import { bumpGeometry } from "./geometry.js";
 import { BumpStrip as StaticBumpStrip, bumpSummary, type BumpStripProps } from "./index.js";
@@ -154,19 +155,7 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticBumpStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {point ? (
         <span
           className="mc-spark-readout"

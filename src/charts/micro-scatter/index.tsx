@@ -6,8 +6,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
+import type { Format } from "../../core/format.js";
 import { EN_SCATTER, type ScatterStrings } from "../../core/strings-scatter.js";
 import { microScatterGeometry, relationshipTier } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface ScatterPoint {
   x: number;
@@ -42,7 +44,7 @@ export interface MicroScatterProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ScatterStrings | undefined;
   title?: string | undefined;
@@ -88,8 +90,9 @@ export function MicroScatter(props: MicroScatterProps): ReactNode {
     trend,
     r: rad,
   });
-  const accName =
-    summary === false ? false : (summary ?? microScatterSummary(geo.dots.length, geo.r, strings));
+  const accName = resolveSummary(summary, () =>
+    microScatterSummary(geo.dots.length, geo.r, strings),
+  );
 
   return (
     <Chart

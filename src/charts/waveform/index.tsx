@@ -4,10 +4,11 @@
 // peak-normalized honestly (the peak is disclosed in the summary).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_WAVEFORM, type WaveformStrings } from "../../core/strings-waveform.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
 import { barsPath, bucketCount, envelopePath, waveformGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface WaveformProps {
   data: readonly Value[];
@@ -21,7 +22,7 @@ export interface WaveformProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: WaveformStrings | undefined;
   title?: string | undefined;
@@ -77,7 +78,7 @@ export function Waveform(props: WaveformProps): ReactNode {
   const buckets = bucketCount(width, Math.max(1, data.length));
   const geo = waveformGeometry({ data, width, height, buckets, domain: domain ?? null, mirror });
   const cy = height / 2;
-  const accName = summary === false ? false : (summary ?? waveformSummary(data, strings, fmt));
+  const accName = resolveSummary(summary, () => waveformSummary(data, strings, fmt));
 
   const hasProgress = progress != null && Number.isFinite(progress);
   const playedIdx = hasProgress ? Math.round(Math.max(0, Math.min(1, progress)) * buckets) : 0;

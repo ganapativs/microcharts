@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { gradedBandGeometry } from "./geometry.js";
 import {
@@ -181,19 +182,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
           {`${band.p}% ${fmt(band.lo)}–${fmt(band.hi)}`}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

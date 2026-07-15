@@ -10,6 +10,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { orbitStatusGeometry } from "./geometry.js";
 import {
   OrbitStatus as StaticOrbitStatus,
@@ -109,19 +110,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
         strings={strings}
         summary={false}
       />
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

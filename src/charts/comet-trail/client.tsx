@@ -10,6 +10,7 @@ import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_COMET_TRAIL, type CometTrailStrings } from "../../core/strings-comet-trail.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { cometTrailGeometry } from "./geometry.js";
 import {
   CometTrail as StaticCometTrail,
@@ -151,19 +152,7 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticCometTrail>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

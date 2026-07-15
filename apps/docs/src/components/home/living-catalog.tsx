@@ -3,7 +3,7 @@ import "@microcharts/react/motion"; // enables `animate` entrance on the live he
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { CHART_MODULES, getChart } from "@/lib/charts/registry";
+import { HERO_MODULES } from "./hero-modules";
 
 /** Hero chart cluster: gallery Previews, shuffle on load, one-tile crossfade. */
 
@@ -124,8 +124,8 @@ export function LivingCatalog({ total }: { total: number }) {
 
         <ul className="grid grid-cols-2 gap-2.5 sm:gap-3">
           {board.map((cell) => {
-            const mod = CHART_MODULES[cell.slug];
-            const entry = getChart(cell.slug);
+            const mod = HERO_MODULES[cell.slug];
+            const entry = mod?.entry;
             if (!mod || !entry) return <li key={cell.nonce} aria-hidden />;
             // Once live (mounted, motion allowed) render the interactive
             // twin so the entrance animates on load + on each swap; reduced-motion
@@ -134,6 +134,7 @@ export function LivingCatalog({ total }: { total: number }) {
             return (
               <li key={cell.nonce}>
                 <Link
+                  prefetch={false}
                   href={`/docs/charts/${cell.slug}`}
                   aria-label={`${entry.name}: ${entry.tagline}`}
                   className="hx-tile group flex flex-col items-center justify-center gap-2 rounded-[14px] px-3 py-4 no-underline"
@@ -161,6 +162,7 @@ export function LivingCatalog({ total }: { total: number }) {
             the catalog, live
           </span>
           <Link
+            prefetch={false}
             href="/gallery"
             aria-label={`Browse all ${total} chart types in the gallery`}
             className="cta-ghost group inline-flex h-8 items-center gap-2 py-0 pl-3 pr-1.5 text-[0.8rem] font-medium leading-none text-fd-foreground no-underline"

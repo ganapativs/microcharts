@@ -7,6 +7,7 @@
 import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 interface LadderTick {
   p: number;
@@ -67,7 +68,7 @@ export function percentileLadderGeometry(opts: {
   const log = opts.scale === "log" && finite.every((v) => v > 0) && dataMax > 0;
   // left gutter for the "log" tag, sized to the tag width ("log" ≈ 3 ch) so it
   // never collides with the p50 tick/label at any font size
-  const lead = log ? Math.ceil(3 * font * 0.62) + 6 : 0;
+  const lead = log ? textGutter(3, font, 6) : 0;
 
   const y = round2(height * 0.35); // track sits upper — labels get room below
   const x0 = pad + lead;

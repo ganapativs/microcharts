@@ -7,6 +7,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUADRANT, type QuadrantStrings } from "../../core/strings-quadrant.js";
 import { quadrantDotGeometry } from "./geometry.js";
 import {
@@ -202,19 +203,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
           {`${fmt(g.vx)}, ${fmt(g.vy)}`}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

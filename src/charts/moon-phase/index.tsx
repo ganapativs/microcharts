@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
 import { moonGeometry, type MoonMode } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface MoonPhaseProps {
   /** Fraction 0–1 (clamped). */
@@ -53,7 +54,7 @@ export function MoonPhase(props: MoonPhaseProps): ReactNode {
   } = props;
 
   const geo = moonGeometry({ value, mode, size, pad: PAD });
-  const accName = summary === false ? false : (summary ?? moonPhaseSummary(value, mode, strings));
+  const accName = resolveSummary(summary, () => moonPhaseSummary(value, mode, strings));
 
   return (
     <Chart

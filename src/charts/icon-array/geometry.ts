@@ -6,6 +6,7 @@
 // counting chart). Coords 2-dp.
 import { round2 } from "../../core/types.js";
 import { cellMetrics, type CellShape } from "../../shared/cell.js";
+import { textGutter } from "../../core/labels.js";
 
 export type IconArrayN = 10 | 20 | 100;
 
@@ -51,7 +52,7 @@ export function iconArrayGeometry(opts: {
   const { width, height, value, total: n, shape } = opts;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 4 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;
 
   const [cols, rows] = GRID_DIMS[n];
   const k = resolveK(value, n);

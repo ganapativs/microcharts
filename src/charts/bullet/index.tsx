@@ -5,7 +5,7 @@
 // on color alone.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { bulletGeometry } from "./geometry.js";
 
 /** Factual S4 summary — value, target, and where the value lands. Shared with
@@ -24,7 +24,7 @@ export interface BulletProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;

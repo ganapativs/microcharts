@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { paretoGeometry } from "./geometry.js";
 import { ParetoStrip as StaticParetoStrip, paretoSummary, type ParetoStripProps } from "./index.js";
 
@@ -174,19 +175,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
           {`${pct(b.share)} · ${pct(b.cum)}`}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

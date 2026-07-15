@@ -11,6 +11,7 @@ import {
   type PointerEvent,
 } from "react";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TIME_IN_RANGE } from "../../core/strings-time-in-range.js";
 import { timeInRangeGeometry } from "./geometry.js";
 import {
@@ -178,19 +179,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
         ) : null}
         {rest.children}
       </StaticTimeInRange>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {zone ? (
         <span className="mc-spark-readout" style={chipPos}>
           {`${nameByKey[zone.key]} ${pct[zone.key]}%`}

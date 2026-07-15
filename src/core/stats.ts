@@ -21,12 +21,6 @@ export interface SeriesStats {
   trend: -1 | 0 | 1;
 }
 
-/**
- * Reduces a series to its summary stats, ignoring null/NaN/±Infinity. Returns
- * null when no finite value exists (empty / all-null) — the documented
- * degenerate case. Indices point back into
- * the original array so marks land on the right x position even with gaps.
- */
 /** Last finite value in the series, or undefined. Single reverse loop — no
  * array copy, no ES2023 APIs. */
 export function lastFinite(values: readonly Value[]): number | undefined {
@@ -37,6 +31,12 @@ export function lastFinite(values: readonly Value[]): number | undefined {
   return undefined;
 }
 
+/**
+ * Reduces a series to its summary stats, ignoring null/NaN/±Infinity. Returns
+ * null when no finite value exists (empty / all-null) — the documented
+ * degenerate case. Indices point back into
+ * the original array so marks land on the right x position even with gaps.
+ */
 export function seriesStats(values: readonly Value[]): SeriesStats | null {
   let count = 0;
   let min = Infinity;

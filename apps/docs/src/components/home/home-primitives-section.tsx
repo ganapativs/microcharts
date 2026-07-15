@@ -53,7 +53,7 @@ function SectionMark({ n, children }: { n: string; children: React.ReactNode }) 
 
 export function HomePrimitivesSection({ catalogTotal }: { catalogTotal: number }) {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <SectionMark n="04">Five marks, one hundred instruments</SectionMark>
       <Reveal className="mb-8 max-w-2xl">
         <h2 className="display text-[length:var(--text-fluid-h2)]">
@@ -81,6 +81,7 @@ export function HomePrimitivesSection({ catalogTotal }: { catalogTotal: number }
       </div>
       <Reveal delay={80}>
         <Link
+          prefetch={false}
           href="/gallery"
           className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-fd-primary link-underline"
         >

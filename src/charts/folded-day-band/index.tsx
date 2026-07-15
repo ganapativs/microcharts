@@ -4,9 +4,10 @@
 // with an optional "today" overlay. Envelopes are real per-bin quantiles.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_FOLDED_BAND, type FoldedBandStrings } from "../../core/strings-folded-band.js";
 import { foldedBandGeometry, type FoldedBandResult, type TP } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface FoldedDayBandProps {
   data: readonly TP[];
@@ -20,7 +21,7 @@ export interface FoldedDayBandProps {
   bins?: number | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: FoldedBandStrings | undefined;
   title?: string | undefined;
@@ -89,8 +90,7 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
     width,
     height,
   });
-  const accName =
-    summary === false ? false : (summary ?? foldedBandSummary(geo, period, strings, fmt));
+  const accName = resolveSummary(summary, () => foldedBandSummary(geo, period, strings, fmt));
 
   // outer band faintest → drawn first; opacity by index (outermost last in bands)
   const order = geo.bandPaths.map((_p, i) => i).reverse();

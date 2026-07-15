@@ -7,6 +7,7 @@ import { makeFormatter } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { waterfallGeometry } from "./geometry.js";
 import { Waterfall as StaticWaterfall, waterfallSummary, type WaterfallProps } from "./index.js";
 
@@ -168,19 +169,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticWaterfall>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {active !== null ? (
         <span
           className="mc-spark-readout"

@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { breathingDotGeometry } from "./geometry.js";
 import {
   BreathingDot as StaticBreathingDot,
@@ -111,19 +112,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
         strings={strings}
         summary={false}
       />
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

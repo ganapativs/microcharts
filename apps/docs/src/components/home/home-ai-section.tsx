@@ -35,7 +35,7 @@ function SectionMark({ n, children }: { n: string; children: React.ReactNode }) 
 
 export function HomeAiSection({ catalogTotal }: { catalogTotal: number }) {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <SectionMark n="01">Made for machines and people</SectionMark>
       <Reveal className="mb-8 max-w-2xl">
         <h2 className="display text-[length:var(--text-fluid-h2)]">
@@ -64,6 +64,7 @@ export function HomeAiSection({ catalogTotal }: { catalogTotal: number }) {
             ))}
           </ul>
           <Link
+            prefetch={false}
             href="/docs/ai"
             className="inline-flex items-center gap-1.5 self-start text-sm font-medium text-fd-primary link-underline"
           >

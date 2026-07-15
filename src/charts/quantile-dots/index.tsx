@@ -6,9 +6,11 @@
 // hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-quantile-dots.js";
 import { quantileDotsGeometry, type QuantileDotsGeometry, type ThresholdSide } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual quantile-dots summary. Shared with the interactive entry. */
 export function quantileDotsSummary(
@@ -38,7 +40,7 @@ export interface QuantileDotsProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QuantileDotsStrings | undefined;
   title?: string | undefined;
@@ -71,7 +73,7 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
     children,
   } = props;
 
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.55)));
+  const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-quantile-dots ${className}` : "mc-quantile-dots";
   const hasThreshold = threshold !== undefined && Number.isFinite(threshold);
@@ -99,7 +101,7 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}

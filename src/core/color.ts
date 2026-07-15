@@ -6,7 +6,9 @@
  * vermillion split, lightness-ordered blues) deepened to an editorial, matte
  * finish. Every tone reads richer and less "poppy" than the source Okabe-Ito
  * hues while clearing ≥ 3:1 on the default white surface. Mirror of the light
- * `--mc-*` tokens in styles.css; dark values are hand-tuned there. */
+ * `--mc-*` tokens in styles.css; dark values are hand-tuned there.
+ * @knipignore — canonical hex source-of-truth for the stylesheet + non-CSS
+ *   renderers; intentionally exported though nothing imports it yet (2026-07). */
 export const PALETTE = {
   gold: "#D2982F",
   azure: "#5B9FD4",
@@ -28,7 +30,9 @@ export const SEMANTIC = {
 /** Categorical order — gold leads (true yellow is too low-contrast on light).
  * Lightness-ordered for grayscale/CVD separation; the two blues (azure light,
  * sapphire deep) split cleanly. Dark twins are hand-tuned in styles.css. Micro
- * charts rarely need > 3 series. */
+ * charts rarely need > 3 series.
+ * @knipignore — canonical hex source-of-truth (see PALETTE); intentionally
+ *   exported though nothing imports it yet (2026-07). */
 export const CATEGORICAL = [
   PALETTE.gold,
   PALETTE.azure,
@@ -42,9 +46,3 @@ export const CATEGORICAL = [
  *  Near-white with a hair of translucency so it reads on any --mc-cat-* fill
  *  in light and dark; the one sanctioned literal for this job. */
 export const ON_FILL_INK = "rgba(255,255,255,0.96)";
-
-/** The `--mc-cat-N` CSS variable for a series index (1-based, cycles). */
-export function categoricalToken(index: number): string {
-  const n = (((index % CATEGORICAL.length) + CATEGORICAL.length) % CATEGORICAL.length) + 1;
-  return `var(--mc-cat-${n})`;
-}

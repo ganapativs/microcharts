@@ -6,8 +6,11 @@
 // color-alone). An in-control process should look boring.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 import { EN_CONTROL, type ControlStrings } from "../../core/strings-control.js";
+import { resolveSummary } from "../../core/summary.js";
 import {
   controlGeometry,
   type ControlGeometry,
@@ -45,7 +48,7 @@ export interface ControlStripProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ControlStrings | undefined;
   title?: string | undefined;
@@ -88,7 +91,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -98,8 +101,18 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
     );
   }
 
-  const accName = summary === false ? false : (summary ?? controlSummary(geo, fmt, strings));
+  const accName = resolveSummary(summary, () => controlSummary(geo, fmt, strings));
   const flagIdx = new Set(geo.violations.filter((v) => v.rule !== "we1").map((v) => v.index));
+
+  // annotations host contract: Marker x = data INDEX (point position),
+  // Threshold/TargetZone y = data values on the shared value scale.
+  const ann = resolveAnnotations(children, {
+    x: (i) => geo.points[Math.round(i)]?.x ?? NaN,
+    y: scaleLinear(geo.domain, [height - 2, 2]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
 
   return (
     <Chart
@@ -111,6 +124,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
       className={cls}
       style={style}
     >
+      {ann.under}
       {/* control band — the in-control zone */}
       {geo.degenerate ? null : (
         <rect x={0} y={geo.band.y} width={width} height={geo.band.height} data-mc-ink="band" />
@@ -199,7 +213,8 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
               ]
             : [],
       )}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

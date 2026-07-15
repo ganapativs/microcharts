@@ -6,10 +6,11 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
 import { round2 } from "../../core/types.js";
 import { ohlcGeometry, type OhlcInput } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type OhlcDatum = OhlcInput;
 
@@ -57,7 +58,7 @@ export interface OhlcProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: OhlcStrings | undefined;
   title?: string | undefined;
@@ -113,7 +114,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
     );
   }
 
-  const accName = summary === false ? false : (summary ?? ohlcSummary(data, fmt, pctFmt, strings));
+  const accName = resolveSummary(summary, () => ohlcSummary(data, fmt, pctFmt, strings));
   const lastMark = geo.marks.at(-1);
 
   return (

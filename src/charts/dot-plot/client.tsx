@@ -5,6 +5,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
 import { miniBarSummary } from "../mini-bar/index.js";
@@ -181,19 +182,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticDotPlot>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeRow && activeDatum && isFiniteValue(activeDatum.value) && activeRow.x !== null ? (
         <span
           className="mc-spark-readout"

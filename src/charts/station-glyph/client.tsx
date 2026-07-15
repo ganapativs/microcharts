@@ -7,6 +7,7 @@
 import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STATION_GLYPH } from "../../core/strings-station-glyph.js";
 import { octant } from "../../core/strings-wind-barb.js";
 import {
@@ -131,19 +132,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         summary={false}
         style={FILL}
       />
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {msg}
-      </span>
+      <LiveRegion>{msg}</LiveRegion>
     </span>
   );
 }

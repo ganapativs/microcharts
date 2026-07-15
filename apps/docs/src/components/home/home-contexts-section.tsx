@@ -15,7 +15,7 @@ function SectionMark({ n, children }: { n: string; children: React.ReactNode }) 
 export function HomeContextsSection() {
   return (
     <>
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+      <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
         <SectionMark n="05">One chart, four homes</SectionMark>
         <Reveal className="mb-2 max-w-2xl">
           <h2 className="display text-[length:var(--text-fluid-h2)]">
@@ -30,7 +30,7 @@ export function HomeContextsSection() {
         </Reveal>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+      <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
         <SectionMark n="05b">One chart, every surface</SectionMark>
         <div className="grid items-start gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-12">
           <Reveal>

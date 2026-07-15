@@ -23,6 +23,12 @@ export interface AnnotationBrand {
   render: (props: unknown, frame: AnnotationFrame, key: string) => ReactNode;
 }
 
+/** The one annotation font-size ramp, shared by every host so label sizing can't
+ *  drift chart-to-chart: ~22% of height, clamped to a legible 5–9 viewBox units. */
+export function annotationFontSize(height: number): number {
+  return Math.max(5, Math.min(Math.round(height * 0.22), 9));
+}
+
 export interface ResolvedAnnotations {
   /** Marks that sit BELOW the data ink (TargetZone). */
   under: ReactNode;

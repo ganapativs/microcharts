@@ -4,6 +4,7 @@
 // (magnitude read) — the prop flips the honesty regime. Coords 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 interface DotRow {
   /** Row center on the category axis. */
@@ -44,7 +45,7 @@ export function dotPlotGeometry(opts: {
   const n = values.length;
   const r = 2;
 
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 3 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 3) : 0;
   const x0 = gutter + r;
   const x1 = width - r;
 

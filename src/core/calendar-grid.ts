@@ -15,7 +15,7 @@ export function isoDate(time: number): string {
 const DAY = 86_400_000;
 
 /** One grid cell. `date`/`time` identify the UTC day; `row`/`col` place it. */
-export interface CalendarDay {
+interface CalendarDay {
   /** ISO `yyyy-mm-dd`. */
   date: string;
   /** UTC-midnight timestamp — cheap comparisons (`time > endTime` = future). */
@@ -60,7 +60,7 @@ export function weekGrid(opts: {
   const endTime = parseUTCDay(opts.end);
   if (endTime === null) return null;
   const weekStart = opts.weekStart ?? 1;
-  const rows = Math.max(1, Math.floor(opts.weeks));
+  const rows = Number.isFinite(opts.weeks) ? Math.max(1, Math.floor(opts.weeks)) : 1;
 
   const endCol = (new Date(endTime).getUTCDay() - weekStart + 7) % 7;
   const startTime = endTime - endCol * DAY - (rows - 1) * 7 * DAY;
@@ -89,10 +89,6 @@ export function dayOfYear(input: string | Date): number | null {
   if (t === null) return null;
   const jan1 = Date.UTC(new Date(t).getUTCFullYear(), 0, 1);
   return (t - jan1) / DAY + 1;
-}
-
-export function daysInYear(year: number): 365 | 366 {
-  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
 }
 
 /** 1-based day-of-year of each month's first day (12 entries) — month

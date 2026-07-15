@@ -13,7 +13,7 @@ export const EN_FLOW: FlowStrings = {
   waterfallStep: (label, delta, level) => `${label}: ${delta}, running ${level}.`,
   waterfall: (start, end, steps, gains, losses) =>
     `From ${start} to ${end} over ${steps} steps: ${gains} gains, ${losses} losses.`,
-  rankAt: (period, total, rank) => `Week ${period} of ${total}: #${rank}.`,
-  rankRun: (from, to, best, periods) =>
-    `From #${from} to #${to} over ${periods} weeks; best #${best}.`,
+  rankAt: (period, total, rank, unit = "Week") => `${unit} ${period} of ${total}: #${rank}.`,
+  rankRun: (from, to, best, periods, unit = "weeks") =>
+    `From #${from} to #${to} over ${periods} ${unit}; best #${best}.`,
 };

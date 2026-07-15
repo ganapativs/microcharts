@@ -10,6 +10,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_TALLY, type TallyStrings } from "../../core/strings-tally.js";
 import { tallyGeometry, type TallyOverflow, type TallyPen } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface TallyMarksProps {
   /** The count. Floored to an integer; negatives clamp to 0 (documented). */
@@ -57,7 +58,7 @@ export function TallyMarks(props: TallyMarksProps): ReactNode {
   } = props;
 
   const geo = tallyGeometry({ value, total, height, pad: PAD, pen, overflow, fontSize: FONT });
-  const accName = summary === false ? false : (summary ?? tallySummary(value, strings));
+  const accName = resolveSummary(summary, () => tallySummary(value, strings));
 
   return (
     <Chart

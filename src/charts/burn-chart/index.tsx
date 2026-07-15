@@ -4,9 +4,13 @@
 // smoothed or optimistic curve. Static, hook-free, RSC-safe. Y zero-anchored.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_BURN, type BurnStrings } from "../../core/strings-burn.js";
 import { burnGeometry, type BurnGeometry, type BurnMode } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual burn summary. Shared with the interactive entry. */
 export function burnSummary(
@@ -51,7 +55,7 @@ export interface BurnChartProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: BurnStrings | undefined;
   title?: string | undefined;
@@ -85,7 +89,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
     children,
   } = props;
 
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.55)));
+  const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-burn-chart ${className}` : "mc-burn-chart";
   const { plan, actual } = data;
@@ -114,7 +118,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -145,6 +149,17 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         ? "var(--mc-positive)"
         : "var(--mc-neutral)";
 
+  // annotations host contract: Marker x = period index, Threshold/TargetZone y =
+  // data values on the zero-anchored burn scale. Frame width is the plot `width`
+  // (NOT geo.totalWidth) so overlays clamp to the plot, above the label gutter.
+  const ann = resolveAnnotations(children, {
+    x: scaleLinear([0, geo.spanEnd], [geo.pad, width - geo.pad]),
+    y: scaleLinear(geo.domain, [height - geo.pad, geo.pad]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
+
   return (
     <Chart
       width={geo.totalWidth}
@@ -155,6 +170,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {ann.under}
       {/* plan line — dashed, muted, full length (the deadline is its end) */}
       {geo.plan.d ? (
         <path
@@ -213,7 +229,8 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

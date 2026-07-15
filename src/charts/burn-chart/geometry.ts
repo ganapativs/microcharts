@@ -38,6 +38,12 @@ export interface BurnGeometry {
   labelX: number;
   labelY: number;
   totalWidth: number;
+  /** Zero-anchored value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
+  /** Period index the x-scale spans to (`[0, spanEnd]`). */
+  spanEnd: number;
+  /** Plot inset (viewBox units) shared by both scales. */
+  pad: number;
 }
 
 // least-squares slope of y over consecutive integer x (per-period burn rate)
@@ -163,5 +169,8 @@ export function burnGeometry(opts: {
         ? round2(clamp(Y(nowActual), fontSize * 0.7, height - fontSize * 0.3))
         : Y(nowActual),
     totalWidth: width + gutter,
+    domain: [yMin, yMax],
+    spanEnd: Math.max(1, spanEnd),
+    pad,
   };
 }

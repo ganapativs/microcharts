@@ -7,11 +7,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.js";
 import { valueStepOpacity, type CellShape } from "../../shared/cell.js";
 import type { Value } from "../../core/types.js";
+import { labelFont } from "../../core/labels.js";
 import { coverageGeometry, type CoverageStripGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual coverage summary. Shared with the interactive entry. */
 export function coverageSummary(
@@ -42,7 +44,7 @@ export interface CoverageStripProps {
   height?: number | undefined;
   color?: string | undefined;
   /** Formats measured values in the interactive announce. */
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CoverageStrings | undefined;
   title?: string | undefined;
@@ -81,7 +83,7 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
 
   // label size in viewBox units — ~0.62·height, clamped 7–11 to match the rest
   // of the catalog at any chart size
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.62)));
+  const FONT = labelFont(height, 0.62);
 
   const pctFmt = makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale);
   const showLabel = label === "percent";
@@ -98,7 +100,7 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
     fontSize: FONT,
   });
 
-  const accName = summary === false ? false : (summary ?? coverageSummary(geo, pctFmt, strings));
+  const accName = resolveSummary(summary, () => coverageSummary(geo, pctFmt, strings));
   // pin the label size to viewBox units (the shared 0.75em default is ambient —
   // it would render labels ~2× and break the reserved gutter).
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;

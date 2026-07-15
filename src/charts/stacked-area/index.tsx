@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import type { Curve } from "../../core/path.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
@@ -54,7 +54,7 @@ export interface StackedAreaProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: StackStrings | undefined;
   title?: string | undefined;

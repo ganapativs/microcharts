@@ -229,6 +229,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <IconArray
       value={(props.data[0] ?? 3) / 20}
       total={20}
+      label="none"
       summary={false}
       width={props.width ?? 100}
       height={props.height ?? 24}

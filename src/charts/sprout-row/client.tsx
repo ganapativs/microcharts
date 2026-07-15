@@ -5,6 +5,7 @@
 import { useMemo, useRef, useState } from "react";
 import { labelFont } from "../../core/labels.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { sproutRowGeometry } from "./geometry.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
 import { SproutRow as StaticSproutRow, sproutRowSummary, type SproutRowProps } from "./index.js";
@@ -122,19 +123,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
           />
         ) : null}
       </StaticSproutRow>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announce(active)}
-      </span>
+      <LiveRegion>{announce(active)}</LiveRegion>
       {slot ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {announce(active)}

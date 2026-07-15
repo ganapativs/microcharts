@@ -47,10 +47,11 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
 export function SiteFooter() {
   return (
     <footer className="relative overflow-hidden">
-      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-4 pt-14 sm:px-6">
+      <div className="relative z-10 mx-auto max-w-shell px-4 pb-4 pt-14 sm:px-6">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           <div className="col-span-2 sm:col-span-1">
             <Link
+              prefetch={false}
               href="/"
               className="inline-block text-[0.95rem] font-semibold tracking-tight transition-colors hover:text-fd-primary"
             >
@@ -76,6 +77,7 @@ export function SiteFooter() {
                   ) : (
                     <li key={l.href}>
                       <Link
+                        prefetch={false}
                         href={l.href}
                         className="text-fd-muted-foreground link-underline hover:text-fd-foreground"
                       >
@@ -92,7 +94,7 @@ export function SiteFooter() {
 
       <FooterMark />
 
-      <div className="absolute inset-x-0 bottom-3 z-10 mx-auto max-w-6xl px-4 sm:bottom-4 sm:px-6">
+      <div className="absolute inset-x-0 bottom-3 z-10 mx-auto max-w-shell px-4 sm:bottom-4 sm:px-6">
         <div className="flex flex-col gap-3 text-fd-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span className="mono-label flex items-center gap-1.5">
             <span>© 2026</span>
@@ -115,7 +117,11 @@ export function SiteFooter() {
             </a>
           </span>
           <div className="flex gap-4 text-sm">
-            <Link href="/brand" className="link-underline hover:text-fd-foreground">
+            <Link
+              prefetch={false}
+              href="/brand"
+              className="link-underline hover:text-fd-foreground"
+            >
               Brand
             </Link>
             <a href={SITE.repo} className="link-underline hover:text-fd-foreground">

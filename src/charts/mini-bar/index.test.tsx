@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import { MiniBar, type MiniBarDatum } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -109,3 +110,17 @@ describe("<MiniBar>", () => {
 seriesEdgeSuite("MiniBar", (data) => (
   <MiniBar data={data.map((v, i) => ({ label: `c${i}`, value: v }))} title="Edge" />
 ));
+
+describe("<MiniBar> annotations", () => {
+  it("vertical bars host annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <MiniBar data={DATA} width={60} height={24} summary={false}>
+          {children}
+        </MiniBar>
+      ),
+      60,
+      24,
+    );
+  });
+});

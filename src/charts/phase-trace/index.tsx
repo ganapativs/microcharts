@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_PHASE_TRACE, type PhaseTraceStrings } from "../../core/strings-phase-trace.js";
 import { isFiniteValue } from "../../core/types.js";
 import { phaseTraceGeometry, type Heading, type Pt } from "./geometry.js";
@@ -26,7 +26,7 @@ export interface PhaseTraceProps {
   grid?: boolean | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: PhaseTraceStrings | undefined;
   title?: string | undefined;

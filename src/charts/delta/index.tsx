@@ -3,7 +3,7 @@
 // accessible inline HTML (not a tiny SVG viewBox) so the number flows and wraps
 // like text; the glyph is an inline SVG. Direction is ALWAYS double-encoded —
 // triangle shape (up/down/flat) AND color — never color alone.
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import type { CSSProperties, ReactNode } from "react";
 
 // viewBox is 0 0 10 10 (y grows downward). Each mark is vertically CENTERED in
@@ -59,7 +59,7 @@ export interface DeltaProps {
   /** Which direction is "good" — flips only the color, never the glyph. */
   positive?: "up" | "down" | undefined;
   /** Number formatting; defaults to a locale-aware percent. */
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   /** Accessible name override; `false` = decorative (redundant with nearby text). */
   summary?: string | false | undefined;

@@ -7,6 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { ON_FILL_INK } from "../../core/color.js";
 import { EN_TIME_IN_RANGE, type TimeInRangeStrings } from "../../core/strings-time-in-range.js";
+import { resolveSummary } from "../../core/summary.js";
 import {
   timeInRangeGeometry,
   zonePercents,
@@ -95,7 +96,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
   const geo = timeInRangeGeometry({ data, width, height, orientation });
   const pct = zonePercentMap(data);
   const fontSize = labelFont(Math.min(width, height), 0.55);
-  const accName = summary === false ? false : (summary ?? timeInRangeSummary(data, strings));
+  const accName = resolveSummary(summary, () => timeInRangeSummary(data, strings));
   const horizontal = orientation !== "vertical";
 
   return (
