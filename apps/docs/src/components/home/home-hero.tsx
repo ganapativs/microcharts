@@ -15,7 +15,10 @@ import { Reveal } from "@/components/ui/reveal";
  */
 export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
   return (
-    <section className="relative overflow-hidden">
+    // -mt-14/pt-14: the fold's ground extends up UNDER the transparent sticky
+    // nav (h-14), so the silk meets the top of the viewport with no seam; the
+    // nav frosts itself only after scroll.
+    <section className="relative -mt-14 overflow-hidden pt-14">
       <div aria-hidden className="hv-silk-fallback pointer-events-none absolute inset-0 -z-30" />
       <HeroSilk className="pointer-events-none absolute inset-0 -z-20" />
       <div

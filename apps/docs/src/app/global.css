@@ -2378,12 +2378,18 @@ div:where(
     height: 100%;
     display: block;
     opacity: 0.6;
+    /* dissolve into the page field well before the section ends — the fold's
+       ground must blend into 01, never cut */
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
   }
   .hv-silk-fallback {
     background:
       radial-gradient(90% 80% at 18% 8%, #b1bfec33 0%, transparent 55%),
       radial-gradient(70% 60% at 82% 20%, #cfc2ec2e 0%, transparent 58%),
       radial-gradient(80% 70% at 55% 60%, #bcd8ee2e 0%, transparent 60%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
   }
   .dark .hv-silk {
     opacity: 0.5;
