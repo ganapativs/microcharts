@@ -13,11 +13,6 @@ const config = {
   trailingSlash: true,
   reactStrictMode: true,
   images: { unoptimized: true },
-  // The repo builds on TypeScript 7 (the native `tsc`), whose package exposes no
-  // JS compiler API — so Next's build-time type-check can't load it and would try
-  // to reinstall TypeScript mid-build. Types are enforced separately by the
-  // `typecheck` script (`tsc --noEmit`); skip the redundant in-build pass.
-  typescript: { ignoreBuildErrors: true },
 };
 
 export default withMDX(config);
