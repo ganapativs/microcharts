@@ -84,29 +84,30 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
               </Link>
               <InstallCommand />
             </div>
-            <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
+            <div className="mono-label mt-4 flex flex-wrap items-center gap-x-3.5 gap-y-2 text-fd-muted-foreground">
               <Link
                 prefetch={false}
                 href="/gallery"
-                className="group inline-flex items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+                className="group inline-flex items-center gap-1.5 transition-colors hover:text-fd-foreground"
               >
-                <span className="mono-label">
-                  {catalogTotal} charts <span className="text-hairline">·</span>{" "}
+                <span>
+                  browse{" "}
                   <span className="underline decoration-1 underline-offset-[5px] [text-decoration-color:color-mix(in_oklab,var(--accent)_45%,transparent)] transition-[text-decoration-color] group-hover:[text-decoration-color:var(--accent)]">
-                    browse
+                    {catalogTotal} charts
                   </span>
                 </span>
                 <ArrowRight className="size-3.5 text-fd-primary transition-transform group-hover:translate-x-0.5" />
               </Link>
+              <span className="text-hairline">·</span>
               <Link
                 prefetch={false}
                 href="/docs"
-                className="group inline-flex items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+                className="group inline-flex items-center gap-1.5 transition-colors hover:text-fd-foreground"
               >
-                <span className="mono-label">
-                  full docs <span className="text-hairline">·</span>{" "}
+                <span>
+                  read{" "}
                   <span className="underline decoration-1 underline-offset-[5px] [text-decoration-color:color-mix(in_oklab,var(--accent)_45%,transparent)] transition-[text-decoration-color] group-hover:[text-decoration-color:var(--accent)]">
-                    read
+                    the docs
                   </span>
                 </span>
                 <ArrowRight className="size-3.5 text-fd-primary transition-transform group-hover:translate-x-0.5" />
