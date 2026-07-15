@@ -211,51 +211,46 @@ function PlacementQuad() {
   );
 }
 
-/* ── Surface 4 · a chat reply (full-width closing band: message left, the
-      categorical chart it emitted mid-answer on the right) ─────────────────── */
+/* ── Surface 4 · a chat reply (compact card: the answer reads in serif, the
+      categorical chart it emitted sits under it with a legend) ─────────────── */
 function ChatSurface() {
   return (
-    <div className="grid gap-x-8 gap-y-4 sm:grid-cols-[1.15fr_1fr] sm:items-center">
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <span
-            aria-hidden
-            className="grid size-6 place-items-center rounded-md bg-[color:var(--accent)]/12 text-[0.7rem] font-semibold text-[color:var(--accent)]"
-          >
-            AI
-          </span>
-          <span className="mono-label opacity-70">assistant</span>
-        </div>
-        <p className="hv-reply-body text-[1rem] leading-relaxed text-fd-foreground">
-          Traffic split fairly evenly across sources last week, with direct still in the lead and
-          referral the long tail.
-        </p>
+    <div className="flex flex-col gap-2.5">
+      <div className="flex items-center gap-2">
+        <span
+          aria-hidden
+          className="grid size-6 place-items-center rounded-md bg-[color:var(--accent)]/12 text-[0.7rem] font-semibold text-[color:var(--accent)]"
+        >
+          AI
+        </span>
+        <span className="mono-label opacity-70">assistant</span>
       </div>
-      <div className="flex flex-col gap-2">
-        <SegmentedBar
-          data={[
-            { label: "direct", value: 42 },
-            { label: "search", value: 31 },
-            { label: "social", value: 15 },
-            { label: "referral", value: 12 },
-          ]}
-          width={340}
-          height={16}
-          className="w-full"
-          summary={false}
-        />
-        <div className="flex flex-wrap gap-x-3.5 gap-y-1 text-[0.76rem] text-fd-muted-foreground">
-          {[
-            ["direct", "42%"],
-            ["search", "31%"],
-            ["social", "15%"],
-            ["referral", "12%"],
-          ].map(([k, v]) => (
-            <span key={k}>
-              {k} {v}
-            </span>
-          ))}
-        </div>
+      <p className="hv-reply-body text-[0.98rem] leading-relaxed text-fd-foreground">
+        Traffic split fairly evenly last week, with direct in the lead:
+      </p>
+      <SegmentedBar
+        data={[
+          { label: "direct", value: 42 },
+          { label: "search", value: 31 },
+          { label: "social", value: 15 },
+          { label: "referral", value: 12 },
+        ]}
+        width={340}
+        height={16}
+        className="w-full"
+        summary={false}
+      />
+      <div className="flex flex-wrap gap-x-3.5 gap-y-1 text-[0.76rem] text-fd-muted-foreground">
+        {[
+          ["direct", "42%"],
+          ["search", "31%"],
+          ["social", "15%"],
+          ["referral", "12%"],
+        ].map(([k, v]) => (
+          <span key={k}>
+            {k} {v}
+          </span>
+        ))}
       </div>
     </div>
   );
@@ -267,11 +262,11 @@ export function HomeSurfacesSection() {
       <SectionMark n="07">where they live</SectionMark>
 
       {/* One bento, no separate header band: the heading is the top-left cell so
-          the flagship product surface fills what was dead space top-right. The
-          two columns are height-matched (header+placements ≈ product+report),
-          then the chat reply closes full-width so no corner is left blank.
-          Shows every surface at once — a carousel would hide all but one, a
-          weaker proof that the charts live everywhere. Mobile stacks. */}
+          the flagship product surface fills what was dead space top-right. Two
+          height-matched masonry columns (header+report+chat ≈ product+placements),
+          each packing independently so no corner is left blank. Every surface
+          shows at once — a carousel would hide all but one, a weaker proof that
+          the charts live everywhere. Mobile stacks. */}
       <div className="grid items-start gap-4 lg:grid-cols-2">
         <div className="grid items-start gap-4">
           <Reveal className="flex flex-col gap-3 lg:pr-6 lg:pt-1">
@@ -285,8 +280,12 @@ export function HomeSurfacesSection() {
             </p>
           </Reveal>
           <Reveal className="panel flex flex-col gap-3 p-4" delay={140}>
-            <span className="mono-label opacity-60">the small placements</span>
-            <PlacementQuad />
+            <Where>rendered report</Where>
+            <ReportSurface />
+          </Reveal>
+          <Reveal className="panel flex flex-col gap-3 p-4" delay={210}>
+            <Where>chat reply</Where>
+            <ChatSurface />
           </Reveal>
         </div>
 
@@ -296,16 +295,11 @@ export function HomeSurfacesSection() {
             <ProductSurface />
           </Reveal>
           <Reveal className="panel flex flex-col gap-3 p-4" delay={180}>
-            <Where>rendered report</Where>
-            <ReportSurface />
+            <span className="mono-label opacity-60">the small placements</span>
+            <PlacementQuad />
           </Reveal>
         </div>
       </div>
-
-      <Reveal className="panel mt-4 flex flex-col gap-3 p-4" delay={120}>
-        <Where>chat reply</Where>
-        <ChatSurface />
-      </Reveal>
     </section>
   );
 }

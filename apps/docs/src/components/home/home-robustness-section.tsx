@@ -5,7 +5,10 @@ import { SectionMark } from "@/components/home/section-mark";
 import { Reveal } from "@/components/ui/reveal";
 
 /**
- * 06 · Safe on any data — the live proof behind §05's "safe to emit" claim.
+ * 06 · Safe on any data — dark band, paired with §05 into one machine-facing
+ * chapter (made for models + safe to emit are the same thesis). Reuses §05's
+ * `dark hv-band` so it's the real hand-tuned dark theme, not a tinted box.
+ * The live proof behind §05's "safe to emit" claim.
  * A model streaming a reply cannot promise clean numbers, so the grammar has
  * to survive the hostile ones. Each row feeds a genuinely malformed input to
  * the SAME component, renders whatever it produces, and prints the summary
@@ -73,70 +76,73 @@ const CASES: readonly Case[] = [
 
 export function HomeRobustnessSection() {
   return (
-    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="06">safe on any data</SectionMark>
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1fr)] lg:gap-12">
-        <Reveal>
-          <h2 className="display text-[length:var(--text-fluid-h2)]">
-            Hand it broken data. It degrades, it never crashes.
-          </h2>
-          <p className="mt-4 max-w-md text-fd-muted-foreground">
-            A model streaming a reply can&rsquo;t promise clean numbers. Empty arrays, single
-            points, flat series, negatives, even <code className="font-mono text-[0.9em]">NaN</code>{" "}
-            and <code className="font-mono text-[0.9em]">Infinity</code>: every one renders
-            something correct and writes an honest sentence about itself.
-          </p>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-fd-muted-foreground">
-            No <code className="font-mono text-[0.85em]">try/catch</code> guards this page. The
-            chart and the summary below are computed live from the library, so what you read is
-            exactly what a screen reader hears and a model can quote back.
-          </p>
-        </Reveal>
+    <section className="dark hv-band py-14 text-fd-foreground">
+      <div className="mx-auto max-w-shell px-4 sm:px-6">
+        <SectionMark n="06">safe on any data</SectionMark>
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1fr)] lg:gap-12">
+          <Reveal>
+            <h2 className="display text-[length:var(--text-fluid-h2)]">
+              Hand it broken data. It degrades, it never crashes.
+            </h2>
+            <p className="mt-4 max-w-md text-fd-muted-foreground">
+              A model streaming a reply can&rsquo;t promise clean numbers. Empty arrays, single
+              points, flat series, negatives, even{" "}
+              <code className="font-mono text-[0.9em]">NaN</code> and{" "}
+              <code className="font-mono text-[0.9em]">Infinity</code>: every one renders something
+              correct and writes an honest sentence about itself.
+            </p>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-fd-muted-foreground">
+              No <code className="font-mono text-[0.85em]">try/catch</code> guards this page. The
+              chart and the summary below are computed live from the library, so what you read is
+              exactly what a screen reader hears and a model can quote back.
+            </p>
+          </Reveal>
 
-        <Reveal delay={80}>
-          <div className="panel overflow-hidden">
-            <div className="flex items-center justify-between border-b border-hairline px-5 py-2.5">
-              <span className="mono-label">malformed in · rendered + described out</span>
-              <span className="mono-label opacity-60">describeSeries</span>
+          <Reveal delay={80}>
+            <div className="panel overflow-hidden">
+              <div className="flex items-center justify-between border-b border-hairline px-5 py-2.5">
+                <span className="mono-label">malformed in · rendered + described out</span>
+                <span className="mono-label opacity-60">describeSeries</span>
+              </div>
+              <ul>
+                {CASES.map((c, i) => {
+                  // The one honest source of truth: the chart's default accessible
+                  // name and the visible sentence are the SAME call, by construction.
+                  const summary = describeSeries(c.data);
+                  return (
+                    <li
+                      key={c.mode}
+                      className="hx-stagger grid grid-cols-[minmax(6.5rem,auto)_4rem_7rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5 border-t border-hairline px-5 py-3 first:border-t-0 max-sm:grid-cols-[1fr_4rem]"
+                      style={{ "--i": i } as React.CSSProperties}
+                    >
+                      <code className="font-mono text-[0.8rem] leading-tight text-fd-foreground">
+                        {c.literal}
+                      </code>
+                      <span className="flex h-[22px] items-center justify-center">
+                        <Sparkline
+                          data={c.data}
+                          width={56}
+                          height={22}
+                          dots="minmax"
+                          summary={summary}
+                        />
+                      </span>
+                      <span className="mono-label text-[0.62rem] opacity-55 max-sm:col-span-2 max-sm:mt-1">
+                        {c.mode}
+                      </span>
+                      <span className="text-[0.86rem] leading-snug text-fd-muted-foreground max-sm:col-span-2">
+                        &ldquo;{summary}&rdquo;
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-            <ul>
-              {CASES.map((c, i) => {
-                // The one honest source of truth: the chart's default accessible
-                // name and the visible sentence are the SAME call, by construction.
-                const summary = describeSeries(c.data);
-                return (
-                  <li
-                    key={c.mode}
-                    className="hx-stagger grid grid-cols-[minmax(6.5rem,auto)_4rem_7rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5 border-t border-hairline px-5 py-3 first:border-t-0 max-sm:grid-cols-[1fr_4rem]"
-                    style={{ "--i": i } as React.CSSProperties}
-                  >
-                    <code className="font-mono text-[0.8rem] leading-tight text-fd-foreground">
-                      {c.literal}
-                    </code>
-                    <span className="flex h-[22px] items-center justify-center">
-                      <Sparkline
-                        data={c.data}
-                        width={56}
-                        height={22}
-                        dots="minmax"
-                        summary={summary}
-                      />
-                    </span>
-                    <span className="mono-label text-[0.62rem] opacity-55 max-sm:col-span-2 max-sm:mt-1">
-                      {c.mode}
-                    </span>
-                    <span className="text-[0.86rem] leading-snug text-fd-muted-foreground max-sm:col-span-2">
-                      &ldquo;{summary}&rdquo;
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <p className="mono-label mt-3 opacity-60">
-            each row is a documented edge case, verified in the test suite
-          </p>
-        </Reveal>
+            <p className="mono-label mt-3 opacity-60">
+              each row is a documented edge case, verified in the test suite
+            </p>
+          </Reveal>
+        </div>
       </div>
     </section>
   );
