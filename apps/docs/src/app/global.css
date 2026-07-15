@@ -2371,23 +2371,28 @@ div:where(
     }
   }
 
-  /* Thin insertion caret at display scale — self-contained (never composed
-     with .mc-caret: the bundler hoists layered rules above it, so its
-     `animation` shorthand would stomp the delayed appear). Appears on the
-     --at clock, then blinks. */
-  .hv-caret {
-    display: inline-block;
-    margin-left: 0.14em;
-    width: 0.045em;
-    height: 0.68em;
-    border-radius: 2px;
-    vertical-align: baseline;
-    background: var(--accent);
-    opacity: 0;
-    animation:
-      hv-appear 0.45s var(--ease-out-expo) both,
-      mc-caret-blink 1.1s steps(1) infinite;
-    animation-delay: var(--at, 0ms), var(--at, 0ms);
+  /* Hero silk — the WebGL canvas plus its no-WebGL/pre-init CSS ground.
+     Sits UNDER the graph paper: ambience behind the instrument. */
+  .hv-silk {
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0.6;
+  }
+  .hv-silk-fallback {
+    background:
+      radial-gradient(90% 80% at 18% 8%, #b1bfec33 0%, transparent 55%),
+      radial-gradient(70% 60% at 82% 20%, #cfc2ec2e 0%, transparent 58%),
+      radial-gradient(80% 70% at 55% 60%, #bcd8ee2e 0%, transparent 60%);
+  }
+  .dark .hv-silk {
+    opacity: 0.5;
+  }
+  .dark .hv-silk-fallback {
+    background:
+      radial-gradient(90% 80% at 18% 8%, #232c5240 0%, transparent 55%),
+      radial-gradient(70% 60% at 82% 20%, #312a4e38 0%, transparent 58%),
+      radial-gradient(80% 70% at 55% 60%, #1b2f4538 0%, transparent 60%);
   }
 
   /* The streamed reply reads in the serif; grammar stays mono via .mono-label
@@ -2398,38 +2403,48 @@ div:where(
     --hv-reply-size: 1.05rem;
   }
 
-  /* Scroll cue — a quiet descending tick under the fold. */
-  .hv-cue {
-    width: 1px;
-    height: 34px;
-    background: color-mix(in oklab, var(--hairline) 80%, transparent);
-    position: relative;
-    overflow: hidden;
+  /* 05 · the dark band. In light mode it's the real dark field; when the
+     whole site is already dark it lifts one step instead, so the band still
+     reads as a distinct movement, not a missing section. */
+  .hv-band {
+    background-color: var(--color-fd-background);
   }
-  .hv-cue::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      color-mix(in oklab, var(--accent) 85%, transparent),
-      transparent
-    );
-    background-size: 100% 45%;
-    background-repeat: no-repeat;
-    animation: hv-cue 2.6s ease-in-out infinite;
-  }
-  @keyframes hv-cue {
-    0% {
-      background-position: 0 -50%;
-    }
-    100% {
-      background-position: 0 160%;
-    }
+  html.dark .hv-band {
+    background-color: color-mix(in oklab, var(--color-fd-card) 55%, var(--color-fd-background));
   }
 
-  /* 02 · grammar demo: typed JSX. */
+  /* 03 · catalog tile tagline — one reserved line so hover never shifts. */
+  .hv-tile-tag {
+    max-width: 100%;
+    font-size: 0.72rem;
+    line-height: 1.3;
+    height: 0.94rem;
+    color: var(--color-fd-muted-foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 0.25s var(--ease-out-quint);
+  }
+  .hx-tile:hover .hv-tile-tag,
+  .hx-tile:focus-visible .hv-tile-tag {
+    opacity: 0.75;
+  }
+
+  /* 02 · grammar demo: typed JSX, lightly highlighted. Token colors ride the
+     theme (accent for tags, positive ink for strings) so both modes read. */
+  .hv-tok-tag {
+    color: var(--accent);
+  }
+  .hv-tok-attr {
+    color: var(--color-fd-muted-foreground);
+  }
+  .hv-tok-str {
+    color: var(--mc-positive);
+  }
+  .hv-tok-num {
+    color: var(--mc-negative);
+  }
   .hv-code-caret {
     display: inline-block;
     width: 0.55ch;
@@ -2475,13 +2490,8 @@ div:where(
     opacity: 1;
     transform: none;
   }
-  .hv-caret,
-  .hv-code-caret,
-  .hv-cue::after {
+  .hv-code-caret {
     animation: none;
-  }
-  .hv-cue {
-    display: none;
   }
   [data-reveal] .hv-term-line {
     animation: none;

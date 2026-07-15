@@ -98,22 +98,25 @@ export function HomePrinciplesSection() {
 
       <Reveal delay={120} className="hv-refusal mt-8 p-6">
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <h3 className="font-medium text-fd-foreground">Not shipping, on purpose.</h3>
+          <h3 className="font-medium text-fd-foreground">Traded up, on purpose.</h3>
           <p className="text-sm text-fd-muted-foreground">
-            Some shapes fail at micro scale no matter how carefully they're drawn.
+            Five shapes that fail at word size — and the honest chart each one became.
           </p>
         </div>
-        <ul className="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-5">
+        <ul className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-5">
           {REFUSALS.map((r) => (
-            <li key={r.name} className="flex flex-col gap-1.5">
-              <span className="hv-refusal-name font-mono text-[0.8rem] text-fd-muted-foreground">
-                {r.name}
+            <li key={r.name} className="flex flex-col gap-2">
+              <span className="flex items-baseline gap-2 font-mono text-[0.8rem] leading-none">
+                <s className="hv-refusal-name text-fd-muted-foreground">{r.name}</s>
+                <span aria-hidden className="text-hairline">
+                  →
+                </span>
+                <span className="font-medium text-fd-primary">{r.fix}</span>
+              </span>
+              <span aria-hidden className="flex h-7 items-center">
+                {r.node}
               </span>
               <span className="text-[0.8rem] leading-snug text-fd-muted-foreground">{r.why}</span>
-              <span className="mt-1.5 flex items-center gap-2">
-                <span aria-hidden>{r.node}</span>
-                <span className="mono-label text-fd-primary">{r.fix}</span>
-              </span>
             </li>
           ))}
         </ul>

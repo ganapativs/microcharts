@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "next-themes";
 import { defineTheme, type ThemePreset } from "@microcharts/react/theme";
 import { Sparkline } from "@microcharts/react/sparkline";
@@ -26,6 +26,17 @@ const ACCENTS = [
 
 const PRESETS: ThemePreset[] = ["modern", "editorial", "mono", "vivid", "print", "eink"];
 
+/** Presets whose whole point is a fixed ink set — the accent seed would
+ *  clobber them (this was a real bug: eink kept the swatch's colors). The
+ *  library presets deliberately leave `--mc-cat-*` alone (categorical data
+ *  still needs distinction), so the demo hands each one a matching `cat`
+ *  ramp — greys for greyscale output, print's own restrained inks for print. */
+const INK_PRESET_CATS: Partial<Record<ThemePreset, readonly string[]>> = {
+  mono: ["#111111", "#555555", "#8c8c8c", "#bfbfbf", "#dedede", "#737373"],
+  eink: ["#000000", "#4d4d4d", "#8c8c8c", "#c4c4c4", "#e0e0e0", "#666666"],
+  print: ["#14507a", "#0c6249", "#a33f22", "#7a5a12", "#666666", "#1a1a1a"],
+};
+
 const REVENUE = [132, 148, 141, 165, 159, 182, 176, 203];
 const MIX = [
   { label: "Chrome", value: 620 },
@@ -43,23 +54,40 @@ export function ThemingDemo() {
   const [accent, setAccent] = useState<string>(ACCENTS[0].hex);
   const [preset, setPreset] = useState<ThemePreset>("modern");
   const { resolvedTheme } = useTheme();
+  // resolvedTheme is already "dark" during hydration on a dark client, but the
+  // server rendered light vars — gate the dark twins on mounted or the style
+  // attribute mismatches (a real hydration error we hit).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  const theme = useMemo(
-    () => defineTheme(preset === "modern" ? { accent } : { extends: preset, accent }),
-    [accent, preset],
-  );
-  const vars = resolvedTheme === "dark" ? theme.darkVars : theme.vars;
+  const inkCats = INK_PRESET_CATS[preset];
+  const inkPreset = inkCats !== undefined;
+  const theme = useMemo(() => {
+    if (inkCats) return defineTheme({ extends: preset, cat: inkCats }); // preset owns every ink
+    return defineTheme(preset === "modern" ? { accent } : { extends: preset, accent });
+  }, [accent, preset, inkCats]);
+  const vars = mounted && resolvedTheme === "dark" ? theme.darkVars : theme.vars;
 
   return (
     <div className="panel overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-hairline px-5 py-3.5">
         <code className="font-mono text-[0.8rem] text-fd-foreground">
-          defineTheme({"{"} accent: <span className="text-fd-primary">&quot;{accent}&quot;</span>
-          {preset !== "modern" ? (
+          defineTheme({"{"}{" "}
+          {inkPreset ? (
             <>
-              , extends: <span className="text-fd-primary">&quot;{preset}&quot;</span>
+              extends: <span className="text-fd-primary">&quot;{preset}&quot;</span>, cat:{" "}
+              <span className="text-fd-primary">{preset}Inks</span>
             </>
-          ) : null}{" "}
+          ) : (
+            <>
+              accent: <span className="text-fd-primary">&quot;{accent}&quot;</span>
+              {preset !== "modern" ? (
+                <>
+                  , extends: <span className="text-fd-primary">&quot;{preset}&quot;</span>
+                </>
+              ) : null}
+            </>
+          )}{" "}
           {"}"})
         </code>
         <div className="flex gap-1.5" role="group" aria-label="Accent color">
@@ -68,14 +96,19 @@ export function ThemingDemo() {
               key={a.name}
               type="button"
               aria-label={`Accent ${a.name}`}
-              aria-pressed={accent === a.hex}
-              onClick={() => setAccent(a.hex)}
-              className="ghost-ctrl size-8 shrink-0"
+              aria-pressed={!inkPreset && accent === a.hex}
+              aria-disabled={inkPreset}
+              title={inkPreset ? `${preset} uses fixed inks — accent doesn't apply` : a.name}
+              onClick={() => {
+                if (inkPreset) return;
+                setAccent(a.hex);
+              }}
+              className={`ghost-ctrl size-8 shrink-0 transition-opacity ${inkPreset ? "opacity-35" : ""}`}
             >
               <span
                 aria-hidden
                 className={`block size-4 rounded-full transition-shadow ${
-                  accent === a.hex ? "ring-2 ring-offset-2 ring-offset-fd-card" : ""
+                  !inkPreset && accent === a.hex ? "ring-2 ring-offset-2 ring-offset-fd-card" : ""
                 }`}
                 style={{ background: a.hex, "--tw-ring-color": a.hex } as React.CSSProperties}
               />

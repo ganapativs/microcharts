@@ -1,10 +1,10 @@
-import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { Progress } from "@microcharts/react/progress";
 import { SectionMark } from "@/components/home/section-mark";
 import { Reveal } from "@/components/ui/reveal";
-import { CATALOG, SIZE, STATIC_SIZES } from "@/lib/docs-facts";
+import { ReceiptsSizeHistogram } from "@/components/home/receipts-size-histogram";
+import { CATALOG, SIZE } from "@/lib/docs-facts";
 
 /**
  * 06 · The receipts — every stat is illustrated by a microchart OF ITSELF:
@@ -21,14 +21,7 @@ export function HomeReceiptsSection() {
       label: "gzip per chart",
       note: `median ${SIZE.median} kB across all ${SIZE.count} static entries`,
       source: ".size-limit.json · CI-enforced",
-      chart: (
-        <HistogramStrip
-          data={[...STATIC_SIZES]}
-          width={150}
-          height={30}
-          summary={`Distribution of measured static gzip sizes across ${SIZE.count} charts, from ${SIZE.min} to ${SIZE.max} kB.`}
-        />
-      ),
+      chart: <ReceiptsSizeHistogram />,
     },
     {
       big: "0",

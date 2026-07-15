@@ -2,23 +2,27 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { TypesetHeadline } from "@/components/home/typeset-headline";
 import { StreamVignette } from "@/components/home/stream-vignette";
+import { HeroSilk } from "@/components/home/hero-silk";
 import { InstallCommand } from "@/components/ui/copy";
 import { Reveal } from "@/components/ui/reveal";
 
 /**
  * The first fold — "The Typeset Answer". One choreography in reading order:
- * the sentence typesets itself (words settle, inline charts draw, a caret
- * blinks at the full stop), then the assistant reply streams in a reading
- * serif and its grammar morphs into shipped components. See DESIGN.md.
+ * the sentence typesets itself (words settle, inline charts draw once), then
+ * the assistant reply streams in a reading serif and its grammar morphs into
+ * shipped components. Ground: silk shader under the graph paper — ambience
+ * behind the instrument, faded out before the fold ends. See DESIGN.md.
  */
 export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
   return (
     <section className="relative overflow-hidden">
+      <div aria-hidden className="hv-silk-fallback pointer-events-none absolute inset-0 -z-30" />
+      <HeroSilk className="pointer-events-none absolute inset-0 -z-20" />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 grid-paper opacity-60"
       />
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-10 pt-16 sm:px-6 sm:pt-18 lg:grid-cols-[1.06fr_0.94fr] lg:gap-14">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pt-18 lg:grid-cols-[1.06fr_0.94fr] lg:gap-14">
         <div>
           <Reveal className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {["Zero dependencies", "AI-native", "Accessible by default", "RSC-safe"].map((t, i) => (
@@ -53,7 +57,20 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
               </Link>
               <InstallCommand />
             </div>
-            <div className="mt-4">
+            <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
+              <Link
+                prefetch={false}
+                href="/gallery"
+                className="group inline-flex items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+              >
+                <span className="mono-label">
+                  all {catalogTotal} types <span className="text-hairline">·</span>{" "}
+                  <span className="underline decoration-1 underline-offset-[5px] [text-decoration-color:color-mix(in_oklab,var(--accent)_45%,transparent)] transition-[text-decoration-color] group-hover:[text-decoration-color:var(--accent)]">
+                    browse the gallery
+                  </span>
+                </span>
+                <ArrowRight className="size-3.5 text-fd-primary transition-transform group-hover:translate-x-0.5" />
+              </Link>
               <Link
                 prefetch={false}
                 href="/docs"
@@ -77,10 +94,6 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
             what a model writes <span className="text-hairline">·</span> what a person reads
           </p>
         </Reveal>
-      </div>
-
-      <div aria-hidden className="flex justify-center pb-6 pt-2">
-        <span className="hv-cue" />
       </div>
     </section>
   );

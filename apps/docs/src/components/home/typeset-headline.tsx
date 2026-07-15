@@ -6,23 +6,21 @@ import { SparkBar } from "@microcharts/react/sparkbar/interactive";
 
 /**
  * The hero sentence typesets itself: words settle in reading order (pure CSS,
- * SSR-visible), then each inline chart draws where the type pauses — the
+ * SSR-visible), then each inline chart draws ONCE where the type pauses — the
  * library's own `animate` entrance, remounted on a JS clock that matches the
- * CSS `--at` schedule — then a caret blinks at the full stop. Ambient: the
- * "write" sparkline re-plots a fresh series every few seconds; the sentence
- * keeps being written. Reduced motion renders everything settled.
+ * CSS `--at` schedule. After the sequence the sentence holds still: the
+ * ambient motion budget belongs to the reply card. Reduced motion renders
+ * everything settled.
  *
  * Timing map (one schedule, two clocks):
  *   0–1.0 s  words (CSS --i * 60 ms)
  *   1.05 s   sparkline appears (CSS --at) + draws (JS remount)
  *   1.6 s    sparkbar appears + draws
- *   2.05 s   caret
  */
 
 const TREND = [3, 5, 4, 8, 6, 9, 7, 11];
 const AT_SPARK = 1050;
 const AT_BARS = 1600;
-const AT_CARET = 2050;
 
 function Words({ text, from }: { text: string; from: number }) {
   const words = text.split(" ");
@@ -41,17 +39,9 @@ function Words({ text, from }: { text: string; from: number }) {
   );
 }
 
-function nextSeries(prev: number[]): number[] {
-  const last = prev[prev.length - 1] ?? 7;
-  const v = Math.max(1, Math.min(14, last + (Math.random() - 0.42) * 4));
-  return [...prev.slice(1), Math.round(v * 10) / 10];
-}
-
 export function TypesetHeadline() {
   const [reduced, setReduced] = useState(false);
   const [stage, setStage] = useState(0); // 0 ssr/words · 1 spark drawn · 2 bars drawn
-  const [series, setSeries] = useState<number[]>(TREND);
-  const [plotNonce, setPlotNonce] = useState(0);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -67,17 +57,6 @@ export function TypesetHeadline() {
     };
   }, []);
 
-  // Ambient re-plot — paused while the tab is hidden.
-  useEffect(() => {
-    if (reduced || stage < 2) return;
-    const id = window.setInterval(() => {
-      if (document.visibilityState !== "visible") return;
-      setSeries((s) => nextSeries(s));
-      setPlotNonce((n) => n + 1);
-    }, 6800);
-    return () => window.clearInterval(id);
-  }, [reduced, stage]);
-
   return (
     <h1 className="display text-balance text-[2.3rem] leading-[1.05] text-fd-foreground sm:text-[3rem] lg:text-[3.65rem] xl:text-[3.9rem]">
       <Words text="Small enough for a model to" from={0} />
@@ -92,8 +71,8 @@ export function TypesetHeadline() {
           style={{ "--at": `${AT_SPARK}ms` } as React.CSSProperties}
         >
           <Sparkline
-            key={`s${stage >= 1 ? 1 : 0}-${plotNonce}`}
-            data={series}
+            key={`s${stage >= 1 ? 1 : 0}`}
+            data={TREND}
             curve="smooth"
             width={60}
             height={20}
@@ -128,13 +107,6 @@ export function TypesetHeadline() {
         <span className="hv-w" style={{ "--i": 15 } as React.CSSProperties}>
           .
         </span>
-        {!reduced && (
-          <span
-            aria-hidden
-            className="hv-caret"
-            style={{ "--at": `${AT_CARET}ms` } as React.CSSProperties}
-          />
-        )}
       </span>
     </h1>
   );

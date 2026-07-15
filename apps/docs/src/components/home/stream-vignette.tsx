@@ -412,10 +412,10 @@ export function StreamVignette({
 
   return (
     <div ref={hostRef} className="panel overflow-hidden">
-      <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
-        <span className="flex items-center gap-2">
-          <span className="mono-label">assistant reply</span>
-          <span className="mono-label opacity-50">· {active.hint}</span>
+      <div className="flex min-h-11 items-center justify-between border-b border-hairline py-1.5 pl-4 pr-2">
+        <span className="flex items-baseline gap-2 leading-none">
+          <span className="mono-label leading-none">assistant reply</span>
+          <span className="mono-label leading-none opacity-50">· {active.hint}</span>
         </span>
         <button
           type="button"

@@ -21,49 +21,45 @@ export function HomeCatalogSection() {
     <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <SectionMark n="03">the catalog</SectionMark>
       <Reveal>
-        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-          <h2 className="display max-w-xl text-[length:var(--text-fluid-h2)]">
-            {CATALOG.total} answers, word-sized.
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {TIERS.map((t) => (
+        <h2 className="display max-w-xl text-[length:var(--text-fluid-h2)]">
+          {CATALOG.total} answers, word-sized.
+        </h2>
+        <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2">
+          {TIERS.map((t) => (
+            <span
+              key={t.key}
+              title={t.blurb}
+              className="inline-flex items-center gap-2 rounded-full border border-hairline px-3 py-1.5 font-mono text-[0.68rem] uppercase leading-none tracking-[0.12em] text-fd-muted-foreground"
+            >
               <span
-                key={t.key}
-                title={t.blurb}
-                className="inline-flex items-center gap-2 rounded-full border border-hairline px-3 py-1.5 font-mono text-[0.68rem] uppercase tracking-[0.12em] text-fd-muted-foreground"
-              >
-                <span
-                  aria-hidden
-                  className="size-1.5 rounded-full"
-                  style={{ background: `var(--mc-cat-${t.cat})` }}
-                />
-                {t.key} {CATALOG.collections[t.key]}
-              </span>
-            ))}
-          </div>
+                aria-hidden
+                className="size-1.5 rounded-full"
+                style={{ background: `var(--mc-cat-${t.cat})` }}
+              />
+              {t.key} {CATALOG.collections[t.key]}
+            </span>
+          ))}
+          <span className="mono-label ml-1 inline-flex items-center gap-2 leading-none">
+            <span aria-hidden className="hx-pulse size-1.5 shrink-0 rounded-full bg-fd-primary" />
+            live — every tile is the shipped component
+          </span>
         </div>
       </Reveal>
 
       <Reveal delay={80} className="mt-8">
-        <CatalogGrid />
+        <CatalogGrid total={CATALOG.total} />
       </Reveal>
 
       <Reveal delay={120}>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
-          <span className="mono-label inline-flex h-8 items-center gap-2 leading-none text-fd-muted-foreground">
-            <span aria-hidden className="hx-pulse size-1.5 shrink-0 rounded-full bg-fd-primary" />
-            the catalog, live
-          </span>
+        <div className="mt-8 flex justify-center">
           <Link
             prefetch={false}
             href="/gallery"
             aria-label={`Browse all ${CATALOG.total} chart types in the gallery`}
-            className="cta-ghost group inline-flex h-8 items-center gap-2 py-0 pl-3 pr-1.5 text-[0.8rem] font-medium leading-none text-fd-foreground no-underline"
+            className="cta-accent group inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
           >
-            Browse all {CATALOG.total}
-            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-fd-primary text-fd-primary-foreground transition-transform group-hover:translate-x-0.5">
-              <ArrowRight className="size-3" />
-            </span>
+            Browse all {CATALOG.total} types
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
       </Reveal>

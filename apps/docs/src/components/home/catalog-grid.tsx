@@ -8,9 +8,13 @@ import { CHART_MODULES, getChart } from "@/lib/charts/registry";
  * 03 · the catalog, live — a grid of real gallery Previews (the same
  * components `/gallery` renders). Shuffles per reload, one tile cross-fades
  * to a new type every couple of seconds (paused on hover/focus and in hidden
- * tabs), and any tile replays its draw entrance on hover. Reduced motion:
- * a still, shuffled board.
+ * tabs). Hover reveals the tagline (space reserved — nothing shifts); the
+ * final cell is the "+N more" door to the gallery. Reduced motion: a still,
+ * shuffled board.
  */
+
+/** Tier → categorical token index; must match the section chips. */
+const CAT: Record<string, number> = { core: 1, decision: 2, expressive: 3, frontier: 4 };
 
 const POOL = [
   "sparkline",
@@ -47,7 +51,7 @@ const POOL = [
   "win-prob-worm",
 ] as const;
 
-const COUNT = 24;
+const COUNT = 23; // 23 charts + the "+N more" gallery tile = a 24-cell board
 
 type Cell = { slug: string; nonce: number };
 
@@ -61,7 +65,7 @@ function pickSlug(exclude: Set<string>): string {
   return choices[Math.floor(Math.random() * choices.length)] ?? POOL[0];
 }
 
-export function CatalogGrid() {
+export function CatalogGrid({ total }: { total: number }) {
   const [board, setBoard] = useState<Cell[]>(initialBoard);
   const [live, setLive] = useState(false);
   const nonce = useRef(COUNT);
@@ -105,15 +109,6 @@ export function CatalogGrid() {
     paused.current = false;
   };
 
-  const replay = (index: number) => {
-    if (!live) return;
-    setBoard((prev) => {
-      const next = prev.slice();
-      next[index] = { slug: prev[index]!.slug, nonce: (nonce.current += 1) };
-      return next;
-    });
-  };
-
   return (
     <ul
       className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4"
@@ -130,15 +125,14 @@ export function CatalogGrid() {
         return (
           <li
             key={cell.nonce}
-            className={`hx-stagger ${i >= 12 ? "hidden sm:block" : ""}`}
+            className={`hx-stagger ${i >= 11 ? "hidden sm:block" : ""}`}
             style={{ "--i": i % 12 } as React.CSSProperties}
           >
             <Link
               prefetch={false}
               href={`/docs/charts/${cell.slug}`}
               aria-label={`${entry.name}: ${entry.tagline}`}
-              onMouseEnter={() => replay(i)}
-              className="hx-tile group flex flex-col items-center justify-center gap-2 rounded-[14px] px-3 py-4 no-underline"
+              className="hx-tile group flex h-full flex-col items-center justify-center gap-1.5 rounded-[14px] px-3 pb-3 pt-4 no-underline"
             >
               <span
                 inert
@@ -146,13 +140,42 @@ export function CatalogGrid() {
               >
                 <Preview />
               </span>
-              <span className="hx-slot-name mono-label truncate text-[0.58rem] tracking-[0.12em] opacity-55 group-hover:text-fd-primary group-hover:opacity-100">
-                {entry.name}
+              <span className="flex max-w-full items-center gap-1.5">
+                <span
+                  aria-hidden
+                  className="size-1 shrink-0 rounded-full opacity-70"
+                  style={{ background: `var(--mc-cat-${CAT[entry.collection] ?? 1})` }}
+                />
+                <span className="hx-slot-name mono-label truncate text-[0.58rem] tracking-[0.12em] opacity-55 group-hover:text-fd-primary group-hover:opacity-100">
+                  {entry.name}
+                </span>
+              </span>
+              {/* tagline — one reserved line, fades in on hover, never shifts */}
+              <span className="hv-tile-tag" aria-hidden>
+                {entry.tagline}
               </span>
             </Link>
           </li>
         );
       })}
+      <li className="hx-stagger" style={{ "--i": 11 } as React.CSSProperties}>
+        <Link
+          prefetch={false}
+          href="/gallery"
+          aria-label={`Browse all ${total} chart types in the gallery`}
+          className="hx-tile group flex h-full flex-col items-center justify-center gap-1.5 rounded-[14px] border border-dashed border-hairline px-3 pb-3 pt-4 no-underline"
+        >
+          <span className="display text-[1.6rem] leading-none text-fd-foreground transition-colors group-hover:text-fd-primary">
+            +{total - COUNT}
+          </span>
+          <span className="mono-label text-[0.58rem] tracking-[0.12em] opacity-55 transition-opacity group-hover:text-fd-primary group-hover:opacity-100">
+            more in the gallery
+          </span>
+          <span className="hv-tile-tag" aria-hidden>
+            every type, live, with its props
+          </span>
+        </Link>
+      </li>
     </ul>
   );
 }

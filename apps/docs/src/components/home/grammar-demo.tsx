@@ -122,7 +122,7 @@ const TABS: Tab[] = [
     label: "+ Annotations",
     code: `<Sparkline title="p95 latency (ms)" data={p95}>
   <Threshold y={200} label="SLO" />
-  <Marker x={7} label="under SLO" celebrate />
+  <Marker x={4} label="deploy" celebrate />
 </Sparkline>`,
     node: (drawn) => (
       <Sparkline
@@ -134,11 +134,60 @@ const TABS: Tab[] = [
         animate={drawn}
       >
         <Threshold y={200} label="SLO" />
-        <Marker x={7} label="under SLO" celebrate />
+        <Marker x={4} label="deploy" celebrate />
       </Sparkline>
     ),
   },
 ];
+
+/** Tiny JSX lexer — enough color for these snippets, zero deps. */
+interface Tok {
+  text: string;
+  cls?: string;
+}
+const TOK_RE = /(<\/?[A-Z]\w*|\/>|>|[A-Za-z][\w-]*|"[^"]*"|\s+|.)/g;
+
+function lex(code: string): Tok[] {
+  const out: Tok[] = [];
+  for (const m of code.matchAll(TOK_RE)) {
+    const t = m[0];
+    let cls: string | undefined;
+    if (/^<\/?[A-Z]/.test(t) || t === "/>" || t === ">") cls = "hv-tok-tag";
+    else if (/^[A-Za-z]/.test(t) && code[(m.index ?? 0) + t.length] === "=") cls = "hv-tok-attr";
+    else if (t.startsWith('"')) cls = "hv-tok-str";
+    // merge single default chars so we don't emit a span per character
+    if (!cls && out.length && !out[out.length - 1].cls) {
+      out[out.length - 1] = { text: out[out.length - 1].text + t };
+      continue;
+    }
+    out.push(cls ? { text: t, cls } : { text: t });
+  }
+  return out;
+}
+
+const TAB_TOKENS = TABS.map((t) => lex(t.code));
+
+/** Render the first `n` characters of a token stream, colors intact. */
+function TypedCode({ tokens, n }: { tokens: Tok[]; n: number }) {
+  const out: React.ReactNode[] = [];
+  let used = 0;
+  for (let i = 0; i < tokens.length && used < n; i++) {
+    const t = tokens[i];
+    const take = Math.min(t.text.length, n - used);
+    const text = take === t.text.length ? t.text : t.text.slice(0, take);
+    out.push(
+      t.cls ? (
+        <span key={i} className={t.cls}>
+          {text}
+        </span>
+      ) : (
+        text
+      ),
+    );
+    used += take;
+  }
+  return <>{out}</>;
+}
 
 export function GrammarDemo() {
   const [tab, setTab] = useState(0);
@@ -230,7 +279,7 @@ export function GrammarDemo() {
             aria-hidden
             className="min-h-[14rem] whitespace-pre-wrap font-mono text-[0.8rem] leading-relaxed text-fd-foreground"
           >
-            {reduced ? active.code : active.code.slice(0, chars)}
+            <TypedCode tokens={TAB_TOKENS[tab]} n={reduced ? active.code.length : chars} />
             {!done && started && <span className="hv-code-caret" />}
           </pre>
           <pre className="sr-only">{active.code}</pre>
@@ -247,19 +296,19 @@ export function GrammarDemo() {
       </div>
 
       <div className="border-t border-hairline px-5 py-4">
-        <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
-          <span className="mono-label mt-1 shrink-0 rounded-md bg-fd-primary/10 px-1.5 py-0.5 text-fd-primary">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+          <span className="mono-label shrink-0 rounded-md bg-fd-primary/10 px-1.5 py-1 leading-none text-fd-primary">
             role=&quot;img&quot;
           </span>
           <p
             aria-live="polite"
-            className="hv-serif min-h-[3.25rem] flex-1 text-[0.98rem] leading-relaxed text-fd-foreground"
+            className="hv-serif min-h-[3.25rem] flex-1 basis-64 text-[0.98rem] leading-relaxed text-fd-foreground"
           >
             {sentence ? `“${sentence}”` : ""}
           </p>
         </div>
-        <p className="mono-label mt-2 opacity-60">
-          the generated accessible name, read from the live DOM — what a screen reader speaks
+        <p className="mono-label opacity-60">
+          the generated accessible name, read live from the DOM — what a screen reader speaks
         </p>
       </div>
     </div>

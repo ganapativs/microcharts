@@ -2,10 +2,11 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { InstallCommand } from "@/components/ui/copy";
 
-/** Final CTA — the quiet close, on the dark field. */
+/** Final CTA — the quiet close, on the page's own field (the dark band
+ *  stays section 05's move; twice would make it wallpaper). */
 export function HomeCtaSection() {
   return (
-    <section className="dark bg-fd-background py-14 text-fd-foreground">
+    <section className="py-14">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="panel grid-paper flex flex-col items-center gap-6 px-6 py-16 text-center">
           <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">
