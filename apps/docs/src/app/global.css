@@ -2324,3 +2324,167 @@ div:where(
     transition: none;
   }
 }
+
+/* ---- Home v2: "The Typeset Answer" ---------------------------------------- */
+@layer components {
+  /* The reading serif — the streamed reply + the italic emphasis words. */
+  .hv-serif {
+    font-family: var(--font-serif);
+  }
+  .hv-em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  /* Headline words settle in reading order — pure CSS, SSR-visible, no JS
+     required. Set --i per word. */
+  .hv-w {
+    display: inline-block;
+    /* 0.011, not 0: keeps the headline an LCP candidate at first paint —
+       visually identical, but the metric doesn't wait for the settle. */
+    opacity: 0.011;
+    transform: translateY(0.35em);
+    animation: hv-settle 0.55s var(--ease-out-expo) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+    white-space: pre-wrap;
+  }
+  @keyframes hv-settle {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Inline chart slots appear on the same CSS clock (--at, ms) the JS uses to
+     remount them with the library's draw entrance — if JS never runs, the
+     chart still fades in on schedule. */
+  .hv-slot {
+    opacity: 0;
+    animation: hv-appear 0.45s var(--ease-out-expo) both;
+    animation-delay: var(--at, 0ms);
+  }
+  @keyframes hv-appear {
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Thin insertion caret at display scale — self-contained (never composed
+     with .mc-caret: the bundler hoists layered rules above it, so its
+     `animation` shorthand would stomp the delayed appear). Appears on the
+     --at clock, then blinks. */
+  .hv-caret {
+    display: inline-block;
+    margin-left: 0.14em;
+    width: 0.045em;
+    height: 0.68em;
+    border-radius: 2px;
+    vertical-align: baseline;
+    background: var(--accent);
+    opacity: 0;
+    animation:
+      hv-appear 0.45s var(--ease-out-expo) both,
+      mc-caret-blink 1.1s steps(1) infinite;
+    animation-delay: var(--at, 0ms), var(--at, 0ms);
+  }
+
+  /* The streamed reply reads in the serif; grammar stays mono via .mono-label
+     and <code> rules. Applied to the reply container so the height-reserving
+     ghosts and the live overlay share metrics (zero CLS holds). */
+  .hv-reply-body {
+    font-family: var(--font-serif);
+    --hv-reply-size: 1.05rem;
+  }
+
+  /* Scroll cue — a quiet descending tick under the fold. */
+  .hv-cue {
+    width: 1px;
+    height: 34px;
+    background: color-mix(in oklab, var(--hairline) 80%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+  .hv-cue::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in oklab, var(--accent) 85%, transparent),
+      transparent
+    );
+    background-size: 100% 45%;
+    background-repeat: no-repeat;
+    animation: hv-cue 2.6s ease-in-out infinite;
+  }
+  @keyframes hv-cue {
+    0% {
+      background-position: 0 -50%;
+    }
+    100% {
+      background-position: 0 160%;
+    }
+  }
+
+  /* 02 · grammar demo: typed JSX. */
+  .hv-code-caret {
+    display: inline-block;
+    width: 0.55ch;
+    height: 1.05em;
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    background: var(--accent);
+    border-radius: 1px;
+    animation: mc-caret-blink 1.1s steps(1) infinite;
+  }
+
+  /* 05 · machine-surfaces terminal: lines land one by one on reveal. */
+  [data-reveal="pending"] .hv-term-line {
+    opacity: 0;
+  }
+  [data-reveal="in"] .hv-term-line {
+    animation: hv-term 0.4s var(--ease-out-quint) both;
+    animation-delay: calc(var(--i, 0) * 160ms);
+  }
+  @keyframes hv-term {
+    from {
+      opacity: 0;
+      translate: 0 5px;
+    }
+  }
+
+  /* 04 · the refusals — struck through, dashed, quietly confident. */
+  .hv-refusal {
+    border: 1px dashed color-mix(in oklab, var(--hairline) 85%, transparent);
+    border-radius: var(--radius-panel);
+  }
+  .hv-refusal-name {
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: color-mix(in oklab, var(--mc-negative) 70%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hv-w,
+  .hv-slot {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .hv-caret,
+  .hv-code-caret,
+  .hv-cue::after {
+    animation: none;
+  }
+  .hv-cue {
+    display: none;
+  }
+  [data-reveal] .hv-term-line {
+    animation: none;
+    opacity: 1;
+  }
+}

@@ -273,7 +273,15 @@ function FinishedReply({ segs }: { segs: Seg[] }) {
   );
 }
 
-export function StreamVignette() {
+export function StreamVignette({
+  serif = false,
+  startDelay = 0,
+}: {
+  /** Reading-serif reply text (the hero treatment). */
+  serif?: boolean;
+  /** ms after viewport entry before the first token — lets the headline finish. */
+  startDelay?: number;
+} = {}) {
   const [idx, setIdx] = useState(0);
   const active = SCENARIOS[idx];
   const total = useMemo(() => active.segs.reduce((a, s) => a + atomCount(s), 0), [active]);
@@ -293,19 +301,23 @@ export function StreamVignette() {
       setPos(total);
       return;
     }
+    let delayTimer = 0;
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting) && !started.current) {
           started.current = true;
-          setRunning(true);
+          delayTimer = window.setTimeout(() => setRunning(true), startDelay);
           io.disconnect();
         }
       },
       { threshold: 0.3 },
     );
     io.observe(host);
-    return () => io.disconnect();
-  }, [total]);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(delayTimer);
+    };
+  }, [total, startDelay]);
 
   // Advance one atom at a time with human-feel pacing.
   useEffect(() => {
@@ -415,17 +427,20 @@ export function StreamVignette() {
           <RotateCcw className="size-3.5" />
         </button>
       </div>
-      <div className="relative px-5 py-5">
+      <div className={`relative px-5 py-5 ${serif ? "hv-reply-body" : ""}`}>
         {/* every scenario's finished reply is stacked in one grid cell, so the
             panel reserves the tallest — the stream paints over it, no CLS. */}
-        <div aria-hidden className="grid text-[0.95rem] leading-relaxed">
+        <div
+          aria-hidden
+          className="grid text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed"
+        >
           {SCENARIOS.map((s) => (
             <div key={s.id} className="invisible [grid-area:1/1]">
               <FinishedReply segs={s.segs} />
             </div>
           ))}
         </div>
-        <div className="absolute inset-x-5 top-5 text-[0.95rem] leading-relaxed text-fd-foreground">
+        <div className="absolute inset-x-5 top-5 text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
           {view}
           {streaming && started.current && <span className="mc-caret" aria-hidden />}
         </div>

@@ -1,21 +1,16 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { Sparkline } from "@microcharts/react/sparkline";
-import { SparkBar } from "@microcharts/react/sparkbar";
-import { LivingCatalog } from "@/components/home/living-catalog";
+import { TypesetHeadline } from "@/components/home/typeset-headline";
+import { StreamVignette } from "@/components/home/stream-vignette";
 import { InstallCommand } from "@/components/ui/copy";
 import { Reveal } from "@/components/ui/reveal";
 
-const TREND = [3, 5, 4, 8, 6, 9, 7, 11];
-
-function Word({ band, children }: { band?: boolean; children: React.ReactNode }) {
-  return (
-    <span aria-hidden className={band ? "hx-word hx-word--band" : "hx-word"}>
-      {children}
-    </span>
-  );
-}
-
+/**
+ * The first fold — "The Typeset Answer". One choreography in reading order:
+ * the sentence typesets itself (words settle, inline charts draw, a caret
+ * blinks at the full stop), then the assistant reply streams in a reading
+ * serif and its grammar morphs into shipped components. See DESIGN.md.
+ */
 export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
   return (
     <section className="relative overflow-hidden">
@@ -23,7 +18,7 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 grid-paper opacity-60"
       />
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-18 lg:grid-cols-[1.06fr_0.94fr] lg:gap-14">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-10 pt-16 sm:px-6 sm:pt-18 lg:grid-cols-[1.06fr_0.94fr] lg:gap-14">
         <div>
           <Reveal className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {["Zero dependencies", "AI-native", "Accessible by default", "RSC-safe"].map((t, i) => (
@@ -34,26 +29,9 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
             ))}
           </Reveal>
 
-          <Reveal delay={60}>
-            <h1 className="display mt-5 text-balance text-[2.3rem] leading-[1.05] text-fd-foreground sm:text-[3rem] lg:text-[3.65rem] xl:text-[3.9rem]">
-              Small enough for a model to{" "}
-              <span className="whitespace-nowrap">
-                write
-                <Word>
-                  <Sparkline data={TREND} curve="smooth" width={60} height={20} summary={false} />
-                </Word>
-                ,
-              </span>{" "}
-              sharp enough for a person to{" "}
-              <span className="whitespace-nowrap">
-                trust
-                <Word>
-                  <SparkBar data={TREND} width={52} height={20} summary={false} />
-                </Word>
-                .
-              </span>
-            </h1>
-          </Reveal>
+          <div className="mt-5">
+            <TypesetHeadline />
+          </div>
 
           <Reveal delay={120}>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
@@ -65,6 +43,7 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
           <Reveal delay={180} className="mt-8">
             <div className="flex flex-wrap items-center gap-3">
               <Link
+                prefetch={false}
                 href="/docs/quickstart#set-up-with-an-ai-agent"
                 className="cta-accent group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
               >
@@ -76,8 +55,8 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
             </div>
             <div className="mt-4">
               <Link
+                prefetch={false}
                 href="/docs"
-                aria-label="Read the docs — introduction"
                 className="group inline-flex items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
               >
                 <span className="mono-label">
@@ -93,8 +72,15 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
         </div>
 
         <Reveal delay={140}>
-          <LivingCatalog total={catalogTotal} />
+          <StreamVignette serif startDelay={1900} />
+          <p className="mono-label mt-3 text-center opacity-70">
+            what a model writes <span className="text-hairline">·</span> what a person reads
+          </p>
         </Reveal>
+      </div>
+
+      <div aria-hidden className="flex justify-center pb-6 pt-2">
+        <span className="hv-cue" />
       </div>
     </section>
   );

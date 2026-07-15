@@ -1,0 +1,136 @@
+"use client";
+import { useMemo, useState } from "react";
+import { useTheme } from "next-themes";
+import { defineTheme, type ThemePreset } from "@microcharts/react/theme";
+import { Sparkline } from "@microcharts/react/sparkline";
+import { SegmentedBar } from "@microcharts/react/segmented-bar";
+import { Bullet } from "@microcharts/react/bullet";
+import { Delta } from "@microcharts/react/delta";
+import { StackedArea } from "@microcharts/react/stacked-area";
+
+/**
+ * 07 · Theming, live — the swatches call the REAL `defineTheme` and spread
+ * `theme.vars` / `theme.darkVars` (following the site theme) onto the demo
+ * scope. The page is its own theming documentation: what you click is what
+ * ships. Valence colors hold still on purpose — delight never lies.
+ */
+
+const ACCENTS = [
+  { name: "cobalt", hex: "#2f52d4" },
+  { name: "violet", hex: "#6d28d9" },
+  { name: "ember", hex: "#c2410c" },
+  { name: "moss", hex: "#4d7c1e" },
+  { name: "teal", hex: "#0f766e" },
+  { name: "rose", hex: "#be123c" },
+] as const;
+
+const PRESETS: ThemePreset[] = ["modern", "editorial", "mono", "vivid", "print", "eink"];
+
+const REVENUE = [132, 148, 141, 165, 159, 182, 176, 203];
+const MIX = [
+  { label: "Chrome", value: 620 },
+  { label: "Safari", value: 240 },
+  { label: "Firefox", value: 90 },
+  { label: "Edge", value: 30 },
+];
+const AREAS = [
+  { label: "api", values: [4, 5, 6, 6, 7, 8, 9, 9] },
+  { label: "web", values: [3, 3, 4, 5, 5, 6, 6, 7] },
+  { label: "jobs", values: [2, 2, 2, 3, 3, 3, 4, 4] },
+];
+
+export function ThemingDemo() {
+  const [accent, setAccent] = useState<string>(ACCENTS[0].hex);
+  const [preset, setPreset] = useState<ThemePreset>("modern");
+  const { resolvedTheme } = useTheme();
+
+  const theme = useMemo(
+    () => defineTheme(preset === "modern" ? { accent } : { extends: preset, accent }),
+    [accent, preset],
+  );
+  const vars = resolvedTheme === "dark" ? theme.darkVars : theme.vars;
+
+  return (
+    <div className="panel overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-hairline px-5 py-3.5">
+        <code className="font-mono text-[0.8rem] text-fd-foreground">
+          defineTheme({"{"} accent: <span className="text-fd-primary">&quot;{accent}&quot;</span>
+          {preset !== "modern" ? (
+            <>
+              , extends: <span className="text-fd-primary">&quot;{preset}&quot;</span>
+            </>
+          ) : null}{" "}
+          {"}"})
+        </code>
+        <div className="flex gap-1.5" role="group" aria-label="Accent color">
+          {ACCENTS.map((a) => (
+            <button
+              key={a.name}
+              type="button"
+              aria-label={`Accent ${a.name}`}
+              aria-pressed={accent === a.hex}
+              onClick={() => setAccent(a.hex)}
+              className="ghost-ctrl size-8 shrink-0"
+            >
+              <span
+                aria-hidden
+                className={`block size-4 rounded-full transition-shadow ${
+                  accent === a.hex ? "ring-2 ring-offset-2 ring-offset-fd-card" : ""
+                }`}
+                style={{ background: a.hex, "--tw-ring-color": a.hex } as React.CSSProperties}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={vars as React.CSSProperties} className="grid gap-x-8 gap-y-6 p-6 sm:grid-cols-2">
+        <figure className="flex flex-col gap-1.5">
+          <figcaption className="mono-label opacity-55">accent takes the emphasis ink</figcaption>
+          <Sparkline
+            data={REVENUE}
+            curve="smooth"
+            color="var(--mc-accent)"
+            width={220}
+            height={40}
+            summary={false}
+          />
+        </figure>
+        <figure className="flex flex-col gap-1.5">
+          <figcaption className="mono-label opacity-55">categories derive from it</figcaption>
+          <SegmentedBar data={MIX} width={220} height={16} summary={false} />
+        </figure>
+        <figure className="flex flex-col gap-1.5">
+          <figcaption className="mono-label opacity-55">layers stay harmonized</figcaption>
+          <StackedArea data={AREAS} width={220} height={40} summary={false} />
+        </figure>
+        <figure className="flex flex-col gap-1.5">
+          <figcaption className="mono-label opacity-55">
+            good and bad never move <Delta value={0.12} summary={false} />{" "}
+            <Delta value={-0.08} summary={false} />
+          </figcaption>
+          <Bullet value={72} target={80} bands={[50, 90]} width={220} height={16} summary={false} />
+        </figure>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1.5 border-t border-hairline px-5 py-3.5">
+        <span className="mono-label mr-2">presets</span>
+        {PRESETS.map((p) => (
+          <button
+            key={p}
+            type="button"
+            aria-pressed={preset === p}
+            onClick={() => setPreset(p)}
+            className={`rounded-full border px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.1em] transition-colors ${
+              preset === p
+                ? "border-fd-primary/50 bg-fd-primary/10 text-fd-primary"
+                : "border-hairline text-fd-muted-foreground hover:text-fd-foreground"
+            }`}
+          >
+            {p}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
