@@ -117,7 +117,10 @@ export function ThemingDemo() {
         </div>
       </div>
 
-      <div style={vars as React.CSSProperties} className="grid gap-x-8 gap-y-6 p-6 sm:grid-cols-2">
+      <div
+        style={vars as React.CSSProperties}
+        className="hv-theme-stage grid gap-x-8 gap-y-6 p-6 sm:grid-cols-2"
+      >
         <figure className="flex flex-col gap-1.5">
           <figcaption className="mono-label opacity-55">accent takes the emphasis ink</figcaption>
           <Sparkline

@@ -2390,6 +2390,18 @@ div:where(
     transform: translateY(-0.05em);
   }
 
+  /* 07 · theming demo: when a swatch/preset changes the --mc-* vars, ease the
+     chart marks from the old palette to the new one so the live re-theme reads
+     as an intentional state change, not a hard flip. Scoped to the demo only.
+     Valence marks (Delta) don't change colour with the accent, so they stay
+     put while everything else eases — motion that says "good and bad never
+     move". Static entries here, so no conflict with WAAPI draw entrances. */
+  .hv-theme-stage svg :is(path, rect, circle, line, polyline, polygon) {
+    transition:
+      fill 0.4s var(--ease-out-quint),
+      stroke 0.4s var(--ease-out-quint);
+  }
+
   /* 05 · the dark band — dark in BOTH site themes (an inverted light band on
      the dark site was tried and rejected; the section keeps one identity). */
   .hv-band {
@@ -2469,6 +2481,9 @@ div:where(
 @media (prefers-reduced-motion: reduce) {
   .hv-code-caret {
     animation: none;
+  }
+  .hv-theme-stage svg :is(path, rect, circle, line, polyline, polygon) {
+    transition: none;
   }
   [data-reveal] .hv-term-line {
     animation: none;
