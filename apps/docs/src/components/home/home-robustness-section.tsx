@@ -33,6 +33,10 @@ function Bad({ children }: { children: ReactNode }) {
   return <span className="text-[color:var(--mc-negative)]">{children}</span>;
 }
 
+// Four maximally-distinct rows (one summary shape each): non-finite → filtered,
+// empty → no data, single → one value, flat-negative → covers flat AND minus in
+// one line. All-null ("No data.") and all-equal ("Flat at …") were dropped as
+// duplicates of the summaries already shown. Prose still names the wider set.
 const CASES: readonly Case[] = [
   {
     literal: (
@@ -54,23 +58,9 @@ const CASES: readonly Case[] = [
     mode: "single point",
   },
   {
-    literal: <>[5, 5, 5, 5]</>,
-    data: [5, 5, 5, 5],
-    mode: "all equal",
-  },
-  {
     literal: <>[-4, -4]</>,
     data: [-4, -4],
     mode: "negative",
-  },
-  {
-    literal: (
-      <>
-        [<Bad>null</Bad>, <Bad>null</Bad>, <Bad>null</Bad>]
-      </>
-    ),
-    data: [null, null, null],
-    mode: "all null",
   },
 ];
 
@@ -102,7 +92,7 @@ export function HomeRobustnessSection() {
             <div className="panel overflow-hidden">
               <div className="flex items-center justify-between border-b border-hairline px-5 py-2.5">
                 <span className="mono-label">malformed in · rendered + described out</span>
-                <span className="mono-label opacity-60">describeSeries</span>
+                <span className="mono-label opacity-60 max-sm:hidden">describeSeries</span>
               </div>
               <ul>
                 {CASES.map((c, i) => {
@@ -112,13 +102,13 @@ export function HomeRobustnessSection() {
                   return (
                     <li
                       key={c.mode}
-                      className="hx-stagger grid grid-cols-[minmax(6.5rem,auto)_4rem_7rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5 border-t border-hairline px-5 py-3 first:border-t-0 max-sm:grid-cols-[1fr_4rem]"
+                      className="hx-stagger grid grid-cols-[9.5rem_4rem_7rem_minmax(0,1fr)] items-center gap-x-5 gap-y-1 border-t border-hairline px-5 py-3.5 first:border-t-0 max-sm:grid-cols-[1fr_4rem]"
                       style={{ "--i": i } as React.CSSProperties}
                     >
                       <code className="font-mono text-[0.8rem] leading-tight text-fd-foreground">
                         {c.literal}
                       </code>
-                      <span className="flex h-[22px] items-center justify-center">
+                      <span className="flex h-[22px] items-center justify-start">
                         <Sparkline
                           data={c.data}
                           width={56}
