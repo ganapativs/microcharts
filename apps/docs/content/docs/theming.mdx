@@ -278,8 +278,10 @@ and readout-surface tokens — ready to paste and override:
   /* Direct-label weight. */
   --mc-label-weight: 400;
 
-  /* Baseline nudge for `.mc-inline` marks beside text; tune per font. */
-  --mc-inline-nudge: -0.14em;
+  /* `.mc-inline` seats marks on the text baseline (font-independent). This is
+     an optional extra optical shift on top — 0 by default; set it only if a
+     particular face wants marks a hair off the line. */
+  --mc-inline-nudge: 0em;
 
   /* Motion & type */
 

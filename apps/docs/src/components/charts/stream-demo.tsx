@@ -411,9 +411,8 @@ function renderStream(type: string, body: string, block: boolean): ReactNode {
 }
 
 // Text metrics (Delta) keep their own baseline so the number sits on the
-// sentence line. Every other inline SVG mark gets `.mc-inline` — measured:
-// VA-middle alone seats marks ~1.4px below adjacent digit mid; the wrap's
-// --mc-inline-nudge (-0.14em) corrects it.
+// sentence line. Every other inline SVG mark gets `.mc-inline`, which seats
+// the mark on the text baseline (font-independent — see styles.css).
 const TEXT_GLYPH = new Set(["delta"]);
 
 // Standalone block chart (fenced form). Info string is `<type> [title…]`. Memoized:

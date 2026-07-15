@@ -70,9 +70,9 @@ An inline chart is decorative — the sentence describes it, so pass `summary={f
 standalone chart keeps its summary; give it a `title`.
 
 Wrap every inline SVG mark in `className="mc-inline"` — the class ships in
-`@microcharts/react/styles.css` (imported once in the Quickstart). Leave `Delta` bare; it
-is a text metric and owns its baseline. Override `--mc-inline-nudge` only if your type face
-needs a different optical lift.
+`@microcharts/react/styles.css` (imported once in the Quickstart). It seats the mark on the
+text baseline, so it rides the line like a word in any font. Leave `Delta` bare; it is a
+text metric and owns its own baseline already.
 
 ```tsx
 NVDA closed +3.8%{" "}
