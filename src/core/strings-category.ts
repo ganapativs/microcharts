@@ -3,6 +3,8 @@
 // lives only in core string modules (canon). Aggregate: core/strings.ts `EN`.
 import type { SummaryStrings } from "./summary.js";
 
+// Duplicated in strings-dist/strings-quantile by design — each string module is
+// its own chunk, so sharing a helper would tax every consumer's bundle.
 const ordinal = (n: number): string => {
   const rem10 = n % 10;
   const rem100 = n % 100;

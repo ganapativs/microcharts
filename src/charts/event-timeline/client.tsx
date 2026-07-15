@@ -6,6 +6,7 @@
 import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
 import { eventTimelineGeometry } from "./geometry.js";
 import {
@@ -208,19 +209,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
         ) : null}
         {rest.children}
       </StaticEventTimeline>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeItem && item ? (
         <span
           className="mc-spark-readout"

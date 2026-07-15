@@ -64,6 +64,7 @@ export function HomeAiSection({ catalogTotal }: { catalogTotal: number }) {
             ))}
           </ul>
           <Link
+            prefetch={false}
             href="/docs/ai"
             className="inline-flex items-center gap-1.5 self-start text-sm font-medium text-fd-primary link-underline"
           >

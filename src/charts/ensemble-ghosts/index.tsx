@@ -10,6 +10,7 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_ENSEMBLE, type EnsembleStrings } from "../../core/strings-ensemble.js";
 import { ensembleGeometry, type EnsembleGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual ensemble summary. Shared with the interactive entry. */
 export function ensembleSummary(
@@ -86,7 +87,7 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -96,7 +97,7 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
     );
   }
 
-  const accName = summary === false ? false : (summary ?? ensembleSummary(geo, fmt, strings));
+  const accName = resolveSummary(summary, () => ensembleSummary(geo, fmt, strings));
   const accent = color ?? "var(--mc-accent)";
 
   return (

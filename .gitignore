@@ -32,3 +32,6 @@ audit/
 # private-workspace changelogs (the published package keeps its root CHANGELOG.md)
 apps/docs/CHANGELOG.md
 fixtures/next/CHANGELOG.md
+
+# Local scratch work (never committed)
+/scratchpad/

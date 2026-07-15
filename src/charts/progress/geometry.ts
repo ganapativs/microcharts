@@ -5,6 +5,7 @@
 // comparable). `fraction` arrives pre-clamped to [0, 1]; overflow truth lives
 // in the label/summary, never in the bar. All coords 2-dp.
 import { round2 } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 interface Rect {
   x: number;
@@ -35,7 +36,7 @@ export function progressGeometry(opts: {
   const { width, height, fraction, segments, gutterCh, fontSize } = opts;
   // gutter from the char estimate (0.62em/char) + a 5-unit gap to the bar so
   // the value reads as separate from the fill, not stuck to it
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 5 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 5) : 0;
   const barH = Math.max(2, round2(height * 0.5));
   const y = round2((height - barH) / 2);
 

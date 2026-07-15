@@ -12,6 +12,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TRACE_FOLD } from "../../core/strings-trace-fold.js";
 import { traceFoldGeometry, type SpanRect } from "./geometry.js";
 import { TraceFold as StaticTraceFold, traceFoldSummary, type TraceFoldProps } from "./index.js";
@@ -186,19 +187,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticTraceFold>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {span ? (
         <span
           className="mc-spark-readout"

@@ -8,6 +8,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
+import { usePrefersReducedMotion } from "../../shared/motion.js";
 import { EN_ENSEMBLE, type EnsembleStrings } from "../../core/strings-ensemble.js";
 import { ensembleGeometry } from "./geometry.js";
 import {
@@ -54,15 +56,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
   const [active, setActive] = useState<number | null>(null);
   const [announce, setAnnounce] = useState("");
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [reduced, setReduced] = useState(false);
-
-  useEffect(() => {
-    const mq = matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const h = (): void => setReduced(mq.matches);
-    mq.addEventListener("change", h);
-    return () => mq.removeEventListener("change", h);
-  }, []);
+  const reduced = usePrefersReducedMotion();
 
   const paths = useMemo(() => geo?.ghostPaths ?? [], [geo]);
   const stop = useCallback(() => {
@@ -182,19 +176,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
         ) : null}
         {rest.children}
       </StaticEnsembleGhosts>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announce}
-      </span>
+      <LiveRegion>{announce}</LiveRegion>
     </span>
   );
 }

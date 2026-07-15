@@ -4,6 +4,7 @@
 // fontSize × 1.1 drop their labels (count × height, no measurement). 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 interface SlopeLine {
   x0: number;
@@ -38,8 +39,8 @@ export function slopeGeometry(opts: {
 }): SlopeGeometry {
   const { width, height, pairs, gutterLeftCh, gutterRightCh, fontSize } = opts;
   const r = 1.5;
-  const gutterL = gutterLeftCh > 0 ? Math.ceil(gutterLeftCh * fontSize * 0.62) + 3 : 0;
-  const gutterR = gutterRightCh > 0 ? Math.ceil(gutterRightCh * fontSize * 0.62) + 3 : 0;
+  const gutterL = gutterLeftCh > 0 ? textGutter(gutterLeftCh, fontSize, 3) : 0;
+  const gutterR = gutterRightCh > 0 ? textGutter(gutterRightCh, fontSize, 3) : 0;
   const colX0 = round2(gutterL + r);
   const colX1 = round2(width - gutterR - r);
 

@@ -1,0 +1,4 @@
+# Cloudflare Workers Static Assets headers (parsed by wrangler at deploy).
+# Next content-hashes everything under /_next/static — safe to cache forever.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable

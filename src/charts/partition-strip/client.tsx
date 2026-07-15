@@ -11,6 +11,7 @@ import {
   type PointerEvent,
 } from "react";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PARTITION } from "../../core/strings-partition.js";
 import { partitionStripGeometry, type PartitionSegment } from "./geometry.js";
 import {
@@ -165,19 +166,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
           />
         ) : null}
       </StaticPartitionStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {seg ? (
         <span
           className="mc-spark-readout"

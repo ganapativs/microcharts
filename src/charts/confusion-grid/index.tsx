@@ -7,8 +7,10 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
+import type { Format } from "../../core/format.js";
 import { EN_CONFUSION, type ConfusionStrings } from "../../core/strings-confusion.js";
 import { confusionGridGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface ConfusionGridDatum {
   labels: readonly string[];
@@ -26,7 +28,7 @@ export interface ConfusionGridProps {
   /** Cell shape (shared vocabulary). */
   shape?: "square" | "round" | undefined;
   size?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ConfusionStrings | undefined;
   title?: string | undefined;
@@ -105,7 +107,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
     normalize,
     gutterCh,
   });
-  const accName = summary === false ? false : (summary ?? confusionSummary(data, strings));
+  const accName = resolveSummary(summary, () => confusionSummary(data, strings));
 
   return (
     <Chart

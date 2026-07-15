@@ -7,9 +7,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.js";
 import { forecastConeGeometry, type ForecastConeGeometry, type ForecastInput } from "./geometry.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
+import { labelFont } from "../../core/labels.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual forecast summary. Shared with the interactive entry. */
 export function forecastSummary(
@@ -51,7 +55,7 @@ export interface ForecastConeProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ForecastStrings | undefined;
   title?: string | undefined;
@@ -86,7 +90,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
     children,
   } = props;
 
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.55)));
+  const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-forecast-cone ${className}` : "mc-forecast-cone";
   const at = data.length + forecast.mid.length;
@@ -113,7 +117,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -136,6 +140,18 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
   const accent = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
+  // annotations host contract: Marker x = period INDEX across history+forecast
+  // (geo.points span the whole axis), Threshold/TargetZone y = data values on
+  // the shared value scale. The frame width is the `width` prop (the plot basis
+  // the points use), not the gutter-extended totalWidth.
+  const ann = resolveAnnotations(children, {
+    x: (i) => geo.points[Math.round(i)]?.x ?? NaN,
+    y: scaleLinear(geo.domain, [height - 2, 2]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
+
   return (
     <Chart
       width={geo.totalWidth}
@@ -146,6 +162,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {ann.under}
       {/* fan bands — faintest (80) first. This is the uncertainty ENCODING, not
           a neutral reference zone, so it takes an accent tint via inline style
           rather than `data-mc-ink="band"` (that role means the muted
@@ -219,7 +236,8 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

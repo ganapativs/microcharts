@@ -5,6 +5,8 @@
 import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
+import { FILL } from "../../shared/interactive.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
 import { cellMetrics } from "../../shared/cell.js";
 import { calendarStripGeometry } from "./geometry.js";
@@ -16,11 +18,6 @@ import {
   CALENDAR_GAP,
   type CalendarStripProps,
 } from "./index.js";
-
-// The composed static SVG must fill the focusable wrapper, or pointer math
-// (which divides by the wrapper width) drifts off the cells when a demo sizes
-// the wrapper wider than the grid's intrinsic viewBox. See the shared FILL rule.
-const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveCalendarStripProps extends CalendarStripProps {
   strings?: CalendarStrings;
@@ -203,19 +200,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
           : null}
         {rest.children}
       </StaticCalendarStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeCell ? (
         <span
           className="mc-spark-readout"

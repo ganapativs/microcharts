@@ -65,6 +65,7 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
           <Reveal delay={180} className="mt-8">
             <div className="flex flex-wrap items-center gap-3">
               <Link
+                prefetch={false}
                 href="/docs/quickstart#set-up-with-an-ai-agent"
                 className="cta-accent group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
               >
@@ -76,6 +77,7 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
             </div>
             <div className="mt-4">
               <Link
+                prefetch={false}
                 href="/docs"
                 aria-label="Read the docs — introduction"
                 className="group inline-flex items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"

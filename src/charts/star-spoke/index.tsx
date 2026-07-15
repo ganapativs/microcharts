@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_STAR_SPOKE, type StarSpokeStrings } from "../../core/strings-star-spoke.js";
 import { starSpokeGeometry } from "./geometry.js";
 
@@ -28,7 +28,7 @@ export interface StarSpokeProps {
   labels?: boolean | undefined;
   domain?: readonly [number, number] | undefined;
   size?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: StarSpokeStrings | undefined;
   title?: string | undefined;

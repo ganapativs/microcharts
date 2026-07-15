@@ -6,6 +6,7 @@
 import { extent } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 import { cellMetrics, stepIndex, type CellShape } from "../../shared/cell.js";
+import { textGutter } from "../../core/labels.js";
 
 interface CoverageCell {
   x: number;
@@ -53,7 +54,7 @@ export function coverageGeometry(opts: {
   const { width, height, data, mode = "binary", steps = 5, shape } = opts;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 4 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;
 
   // NaN is measured-but-unreadable: present cell, value omitted. null is a gap.
   const slots = data.map((v) => ({

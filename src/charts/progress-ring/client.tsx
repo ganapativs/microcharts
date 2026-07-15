@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { ProgressRing as StaticProgressRing, type ProgressRingProps } from "./index.js";
 
@@ -66,21 +67,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
       aria-label={label}
     >
       <StaticProgressRing {...rest} strings={strings} summary={false} />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );
 }

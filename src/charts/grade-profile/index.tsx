@@ -6,10 +6,11 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { clamp } from "../../core/scale.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_GRADE_PROFILE, type GradeProfileStrings } from "../../core/strings-grade-profile.js";
 import { gradeLayout, gradeProfileGeometry, type GradePoint } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type { GradePoint } from "./geometry.js";
 
@@ -21,7 +22,7 @@ export interface GradeProfileProps {
   label?: "max" | "none" | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: GradeProfileStrings | undefined;
   title?: string | undefined;
@@ -88,8 +89,7 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
   const geo = gradeProfileGeometry({ data, width, height, bins, topPad });
   const fmt = makeFormatter(format, locale);
   const pct = gradePercent(locale);
-  const accName =
-    summary === false ? false : (summary ?? gradeProfileSummary(geo, strings, fmt, pct));
+  const accName = resolveSummary(summary, () => gradeProfileSummary(geo, strings, fmt, pct));
 
   // seat the summit label: enabled, a real climb, room in the top gutter, and
   // width to hold the text — otherwise it drops out and the profile reads clean.

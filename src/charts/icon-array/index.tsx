@@ -10,6 +10,7 @@ import { makeFormatter } from "../../core/format.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
 import type { Polarity } from "../../core/types.js";
 import { iconArrayGeometry, type IconArrayGeometry, type IconArrayN } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual icon-array summary. Shared with the interactive entry. */
 export function iconArraySummary(
@@ -81,7 +82,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
   }
 
   const pctFmt = makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale);
-  const accName = summary === false ? false : (summary ?? iconArraySummary(geo, pctFmt, strings));
+  const accName = resolveSummary(summary, () => iconArraySummary(geo, pctFmt, strings));
 
   // no custom color: the fill role token IS the ink role (bound in
   // styles.css, retunes with presets); a custom color stays inline since it

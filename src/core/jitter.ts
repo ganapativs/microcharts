@@ -6,8 +6,9 @@
 // spec-deterministic (String(number) is identical on every engine).
 import { round2 } from "./types.js";
 
-/** 32-bit FNV-1a over the string form of each part (NUL-separated so
- *  `("a", "b")` and `("ab")` hash apart). Always a non-negative int. */
+/** 32-bit FNV-1a over the string form of each part, with an extra mix round
+ *  between parts so `("a", "b")` and `("ab")` hash apart. Always a non-negative
+ *  int. */
 export function hashSeed(...parts: readonly (number | string)[]): number {
   let h = 0x811c9dc5;
   for (const part of parts) {
@@ -16,7 +17,7 @@ export function hashSeed(...parts: readonly (number | string)[]): number {
       h ^= s.charCodeAt(i);
       h = Math.imul(h, 0x01000193);
     }
-    h ^= 0;
+    // extra FNV round between parts is the separator (no NUL byte needed)
     h = Math.imul(h, 0x01000193);
   }
   return h >>> 0;

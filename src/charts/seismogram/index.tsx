@@ -4,10 +4,11 @@
 // the summary is always computed from the RAW values, never the buckets.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
 import { seismogramGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual event summary from RAW values (pre-downsample) — shared with the
  *  interactive entry. Count = non-zero finite slots; peak = |max| magnitude. */
@@ -41,7 +42,7 @@ export interface SeismogramProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: DistStrings | undefined;
   title?: string | undefined;
@@ -75,7 +76,7 @@ export function Seismogram(props: SeismogramProps): ReactNode {
 
   const geo = seismogramGeometry({ width, height, values: data, domain, mode, anomaly });
   const fmt = makeFormatter(format, locale);
-  const accName = summary === false ? false : (summary ?? seismogramSummary(data, fmt, strings));
+  const accName = resolveSummary(summary, () => seismogramSummary(data, fmt, strings));
 
   const goodDown = positive === "down";
   const baseStroke = color ? { stroke: color } : null;

@@ -4,7 +4,7 @@
 // position encodes level, and the two never blend. NASA-studied instrument.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TAPE_GAUGE, type TapeGaugeStrings } from "../../core/strings-tape-gauge.js";
 import {
   chevronTier,
@@ -29,7 +29,7 @@ export interface TapeGaugeProps {
   label?: "value" | "none" | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: TapeGaugeStrings | undefined;
   title?: string | undefined;

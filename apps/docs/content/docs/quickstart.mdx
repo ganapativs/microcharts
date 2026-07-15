@@ -6,45 +6,52 @@ description: Install @microcharts/react, import the stylesheet once, and render 
 ## Set up with an AI agent
 
 Prefer to automate it? Hand this prompt to your coding agent — **Cursor, Claude Code, GitHub
-Copilot, Codex**, or any frontier model. It installs the package, wires the stylesheet, reads the
-live docs and machine catalog, records the conventions in your repo's agent-rules file, and
+Copilot, Codex**, or any model, large or small. It installs the package, wires the stylesheet,
+pulls just the doc pages it needs, records the conventions in your repo's agent-rules file, and
 renders a first chart to verify. Works on a fresh repo or an existing one.
 
 <div className="agent-prompt">
 
 ```md title="Paste into your agent"
-Set up **@microcharts/react** in this repo — word-sized, zero-dependency React charts. Work through every step; don't stop to ask.
+Set up **@microcharts/react** in this repo — word-sized, zero-dependency React charts (React 18 or 19 peer, ESM-only). Complete every step in order; don't stop to ask.
 
 ## 1 · Install
 
-- Add `@microcharts/react` (peer dependency: React 18 or 19; no other runtime deps).
-- Import the stylesheet once, at your app root: `import "@microcharts/react/styles.css"`
+- Install `@microcharts/react` with this repo's package manager.
+- Import the stylesheet once, at the app root — Next.js: `app/layout.tsx`; Vite or other React apps: the entry file (e.g. `src/main.tsx`):
+  `import "@microcharts/react/styles.css"`
 
-## 2 · Learn the API
+## 2 · Docs — fetch small, on demand
 
-Read the live docs before writing any chart code:
+- https://microcharts.dev/llms.txt — the index: every chart with a one-line "when to use", plus guide links. Read this one now.
+- https://microcharts.dev/docs/charts/<slug>.md — one chart's full page (exact import path, props, edge cases). Fetch only for charts you actually use — pick the slug from the index.
+- https://microcharts.dev/docs/quickstart.md — setup + the shared grammar, if you need more than the rules below.
+- https://microcharts.dev/catalog.json — the whole API as JSON. Large; for programmatic use, don't read it whole.
 
-- Full docs → https://microcharts.dev/llms-full.txt
-- Catalog → https://microcharts.dev/catalog.json
-
-Pick a chart by the decision it must show, then copy its exact import path and props from the catalog.
+If you can't fetch URLs, skip this step — the rules below are enough to render correct charts.
 
 ## 3 · Record the conventions
 
-Add a `## microcharts` section to `AGENTS.md` (create it if missing — Cursor, Copilot and Codex read it; for Claude Code, run `ln -s AGENTS.md CLAUDE.md`). Capture these rules:
+Append the rules below as a `## microcharts` section in `AGENTS.md` (create the file if missing — Cursor, Copilot, and Codex read it). If this repo uses Claude Code, mirror it: `ln -s AGENTS.md CLAUDE.md` on macOS/Linux, or copy the section into `CLAUDE.md` on Windows.
 
-- Import per subpath, e.g. `@microcharts/react/sparkline`. The default export is static — RSC-safe, zero client JS. Use the `/interactive` subpath only for hover or keyboard.
-- `data` alone always renders. One grammar on every chart: `data`, `domain`, `color`, `title`, `summary`, `format`, `positive`, `label`, `dots`. Chart-specific props are in `catalog.json`.
-- Accessibility is automatic (`role="img"` + a generated summary). Inline in a sentence: wrap the mark in `<span className="mc-inline">` and pass `summary={false}`.
-- Theme with `--mc-*` variables or a preset attribute `data-mc-theme="editorial | mono | vivid | dark | print | eink"` (or `defineTheme` from `@microcharts/react/theme` for a derived palette). Never hardcode colors; charts paint no background — place them on a surface with contrast.
+- One chart = one import, e.g. `import { Sparkline } from "@microcharts/react/sparkline"`. The default export is static — RSC-safe, zero client JS. Add `/interactive` to the path only when hover or keyboard is needed (that entry is a client component).
+- `data` alone always renders. The same props mean the same thing on every chart: `data`, `domain`, `color`, `title`, `summary`, `format`, `positive`, `label`, `dots`. Chart-specific props live on each chart's `.md` page.
+- `null` or `NaN` in `data` is a gap, never a zero.
+- Accessibility is automatic (`role="img"` + a summary generated from the data). Inline in a sentence: wrap the mark in `<span className="mc-inline">` and pass `summary={false}`.
+- Theme with `--mc-*` variables or a preset attribute `data-mc-theme="modern | editorial | mono | vivid | dark | print | eink"` (or `defineTheme` from `@microcharts/react/theme` for a derived palette). Never hardcode colors; charts paint no background — place them on a surface with contrast.
 - `width` and `height` are viewBox units; fill a container with `style={{ width: "100%", height: "auto" }}`.
 - Format numbers with one `format` prop (`Intl.NumberFormatOptions` or `(n) => string`) plus `locale`. Fix the scale with `domain={[min, max]}`. Share one scale across small multiples with `SparkGroup`.
 - Annotations are children: `Threshold`, `TargetZone`, `Marker`, `Callout` from `@microcharts/react/annotations`.
-- Never add a runtime dependency to render a chart. No pie or gauge — use `Bullet`, `SegmentedBar`, or `MicroDonut`.
+- Never add another charting dependency. No pie or gauge — use `Bullet`, `SegmentedBar`, or `MicroDonut`.
 
 ## 4 · Verify
 
-Render `<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />` in a real page, run the app or build, and confirm it appears with styles applied.
+Render `<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />` in a real page, then run the dev server or build. Self-check:
+
+- Chart missing or unstyled → the styles.css import isn't at the root (step 1).
+- Labels render in a serif font → the page sets no `font-family`; add `:root { --mc-font: system-ui, sans-serif; }`.
+
+Finish with a short report: the installed version, the file importing styles.css, the file holding the conventions, and the page rendering the test chart.
 ```
 
 <AgentPromptCopy />
@@ -52,9 +59,10 @@ Render `<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />` in a rea
 </div>
 
 <Callout type="info">
-  The prompt reads the always-current [`/llms-full.txt`](/llms-full.txt) and
-  [`/catalog.json`](/catalog.json), so your agent works from today's real API — props, data shapes,
-  and import paths — instead of a memorized guess.
+  The prompt fetches small, targeted files — the [`/llms.txt`](/llms.txt) index first, then one
+  chart's `.md` page at a time — so it stays inside the context window of smaller models and
+  works from today's real API instead of a memorized guess. The rules are inlined too, so it
+  still works when the agent can't reach the network.
 </Callout>
 
 That's the whole setup: the agent adds `@microcharts/react`, imports the stylesheet, and writes
@@ -70,11 +78,28 @@ your conventions file — nothing left for you to wire up. Skip straight to
 <PackageTabs />
 
 **2 · Import the stylesheet once** at the root of your app — it carries every theming token and
-chart style in a low-specificity cascade layer, so your own styles always win.
+chart style in a low-specificity cascade layer, so your own styles always win. Where "root" means
+depends on your framework — anywhere that runs once, before any chart renders:
+
+<Tabs items={["Next.js", "Vite / CRA / other React apps"]}>
+
+<Tab value="Next.js">
 
 ```tsx title="app/layout.tsx"
 import "@microcharts/react/styles.css";
 ```
+
+</Tab>
+
+<Tab value="Vite / CRA / other React apps">
+
+```tsx title="src/main.tsx"
+import "@microcharts/react/styles.css";
+```
+
+</Tab>
+
+</Tabs>
 
 <Callout type="warn">
   Charts **inherit your page's font**. If the surrounding page never sets a `font-family` (some
@@ -145,9 +170,13 @@ charts in real UI — or render several on one shared scale with `SparkGroup` �
 
 Need hover, keyboard navigation, or live announcements? Import the same chart from its
 `/interactive` entry. Everything else — props, output, accessibility — is identical; you just
-opt into the client component where it matters.
+opt into the client component where it matters. The interactive entry **is** a client
+component: in a Next.js App Router page, render it from a file with `"use client"` at the top
+(or anywhere inside one).
 
 ```tsx
+"use client";
+
 import { Sparkline } from "@microcharts/react/sparkline/interactive";
 
 <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
@@ -171,8 +200,9 @@ finished chart, never the entrance.
 
 ## Import paths
 
-Import each chart from its own subpath so you only ship what you use. Every chart in the catalog
-follows the same two-entry pattern — a static default and an `/interactive` twin:
+Import each chart from its own subpath so you only ship what you use. Nearly every chart follows
+the same two-entry pattern — a static default and an `/interactive` twin (WindBarb is the lone
+static-only exception):
 
 | Chart        | Static                             | Interactive                                    |
 | ------------ | ---------------------------------- | ---------------------------------------------- |
@@ -182,8 +212,20 @@ follows the same two-entry pattern — a static default and an `/interactive` tw
 | Bullet       | `@microcharts/react/bullet`        | `@microcharts/react/bullet/interactive`        |
 | ActivityGrid | `@microcharts/react/activity-grid` | `@microcharts/react/activity-grid/interactive` |
 
-Every other chart uses the same shape — see [All charts](/docs/charts) for the full catalog,
-each page listing its own import path and props.
+Every other chart uses the same shape (WindBarb ships static-only, with no `/interactive` twin) —
+see [All charts](/docs/charts) for the full catalog, each page listing its own import path and props.
+
+## Compatibility
+
+- **React 18 or 19** as a peer dependency — no other runtime dependencies, ever
+  (`dependencies: {}`, CI-enforced).
+- **ESM-only.** The package ships `"type": "module"`; there's no CommonJS build.
+- **Server-component and SSR-safe.** Static entries are hook-free and listener-free, so they
+  render to plain SVG on the server with zero client JavaScript — no `"use client"` needed unless
+  you import from `/interactive`.
+- **Browser floor: evergreen, ES2022.** That includes Safari from version 16.4 — a couple of
+  ES2022 array methods used internally crash on older Safari, so that's the practical minimum,
+  not just a `tsconfig` setting.
 
 ## Next steps
 
@@ -192,3 +234,4 @@ each page listing its own import path and props.
 - **[AI-native](/docs/ai)** — render charts straight from a model stream, agent, or tool call.
 - **[Theming](/docs/theming)** — rebind one CSS variable and every chart follows your brand.
 - **[Accessibility](/docs/accessibility)** — how the generated summaries and keyboard support work.
+- **[Troubleshooting](/docs/troubleshooting)** — the most common setup surprises, each with its one-line fix.

@@ -5,6 +5,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import { rugGeometry } from "./geometry.js";
 import { RugStrip as StaticRugStrip, rugSummary, type RugStripProps } from "./index.js";
@@ -179,19 +180,7 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticRugStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeTick ? (
         <span
           className="mc-spark-readout"

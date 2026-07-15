@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
 import { round2 } from "../../core/types.js";
 import { eventTimelineGeometry } from "./geometry.js";
@@ -99,7 +99,7 @@ export interface EventTimelineProps {
   label?: "none" | "spans" | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: TimelineStrings | undefined;
   title?: string | undefined;

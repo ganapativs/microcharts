@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
 import { hourglassGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface HourglassProps {
   /** Elapsed fraction 0–1 (consistent with Progress; clamped). */
@@ -63,7 +64,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
   const width = boxW + gutter;
 
   const geo = hourglassGeometry({ value, width: boxW, height, pad: PAD });
-  const accName = summary === false ? false : (summary ?? hourglassSummary(value, strings));
+  const accName = resolveSummary(summary, () => hourglassSummary(value, strings));
 
   return (
     <Chart

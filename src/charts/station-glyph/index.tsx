@@ -7,10 +7,11 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_STATION_GLYPH, type StationGlyphStrings } from "../../core/strings-station-glyph.js";
 import { octant } from "../../core/strings-wind-barb.js";
 import { stationGlyphGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface Wind {
   /** Degrees, from-direction (0 = north, clockwise). */
@@ -34,7 +35,7 @@ export interface StationGlyphProps {
   station?: string | undefined;
   /** Disc + barb square edge in viewBox units. */
   size?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: StationGlyphStrings | undefined;
   title?: string | undefined;
@@ -139,7 +140,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     // a compact barb that stays near the disc rather than reaching into the numerals
     barbBox: size * 0.64,
   });
-  const accName = summary === false ? false : (summary ?? stationGlyphSummary(props, strings, fmt));
+  const accName = resolveSummary(summary, () => stationGlyphSummary(props, strings, fmt));
   const barb = geo.barb;
 
   return (

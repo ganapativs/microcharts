@@ -4,26 +4,17 @@
 // Composes the static component (canon) — the crosshair + readout chip are
 // overlay children, the worm/midline/dots come from the static so the two
 // entries can never drift.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
+import { FILL } from "../../shared/interactive.js";
 import { isFiniteValue } from "../../core/types.js";
 import { clamp } from "../../core/scale.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_WIN_PROB_WORM, type WinProbWormStrings } from "../../core/strings-win-prob-worm.js";
 import { PAD, leaderProb, resolveWormGeo, winProbWormSummary } from "./geometry.js";
 import { WinProbWorm as StaticWinProbWorm, type WinProbWormProps } from "./index.js";
-
-// The SVG fills the focusable wrapper so its box coincides with the wrapper's —
-// the %-positioned readout + pointer math map 1:1 and the chart scales fluidly.
-const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveWinProbWormProps extends WinProbWormProps {
   strings?: WinProbWormStrings;
@@ -187,19 +178,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
           {pct(leaderProb(clampedActive), fmt)}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

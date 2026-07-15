@@ -4,6 +4,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STAR_SPOKE } from "../../core/strings-star-spoke.js";
 import { starSpokeGeometry } from "./geometry.js";
 import { StarSpoke as StaticStarSpoke, starSpokeSummary, type StarSpokeProps } from "./index.js";
@@ -152,19 +153,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticStarSpoke>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {spoke && datum ? (
         <span
           className="mc-spark-readout"

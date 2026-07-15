@@ -22,6 +22,8 @@ export interface MiniBarGeometry {
   baseline: number;
   /** Band size along the category axis (for interactive x-band lookup). */
   band: number;
+  /** Zero-anchored value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
 }
 
 export function miniBarGeometry(opts: {
@@ -34,7 +36,7 @@ export function miniBarGeometry(opts: {
 }): MiniBarGeometry {
   const { width, height, values, gap = 1, orientation } = opts;
   const n = values.length;
-  if (n === 0) return { bars: [], baseline: 0, band: 0 };
+  if (n === 0) return { bars: [], baseline: 0, band: 0, domain: [0, 0] };
 
   // category axis length / value axis length
   const catLen = orientation === "vertical" ? width : height;
@@ -78,5 +80,5 @@ export function miniBarGeometry(opts: {
     return { x, y: pos, w, h: bw, sign, index: i, empty: false };
   });
 
-  return { bars, baseline: zero, band: band + gap };
+  return { bars, baseline: zero, band: band + gap, domain };
 }

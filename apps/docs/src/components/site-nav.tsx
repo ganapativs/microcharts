@@ -26,7 +26,12 @@ const links = [
 
 function Wordmark() {
   return (
-    <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} home`}>
+    <Link
+      prefetch={false}
+      href="/"
+      className="group flex items-center gap-2.5"
+      aria-label={`${SITE.name} home`}
+    >
       <Brandmark size={28} className="shrink-0 transition-transform group-hover:-translate-y-px" />
       <span className="text-[0.98rem] font-semibold tracking-[-0.01em] text-fd-foreground">
         microcharts
@@ -65,6 +70,7 @@ export function SiteNav() {
               pathname === l.href || (l.href !== "/docs" && pathname.startsWith(l.href));
             return (
               <Link
+                prefetch={false}
                 key={l.href}
                 href={l.href}
                 className={cn(

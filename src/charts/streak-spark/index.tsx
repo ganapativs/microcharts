@@ -12,6 +12,7 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_STREAK_SPARK, type StreakSparkStrings } from "../../core/strings-streak-spark.js";
 import { round2 } from "../../core/types.js";
 import { streakSparkGeometry, type StreakDatum, type StreakSparkGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface StreakSparkProps {
   data: readonly StreakDatum[];
@@ -79,7 +80,7 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
     devWarn(
       "<StreakSpark> more than 40 runs — the oldest collapse into an ellipsis slot; pre-aggregate or window the data.",
     );
-  const accName = summary === false ? false : (summary ?? streakSparkSummary(geo, strings, fmt));
+  const accName = resolveSummary(summary, () => streakSparkSummary(geo, strings, fmt));
 
   const fontSize = labelFont(height, 0.4);
   const currentRun = geo.runs.find((r) => r.current);

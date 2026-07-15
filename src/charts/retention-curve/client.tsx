@@ -6,15 +6,15 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
 import { retentionGeometry } from "./geometry.js";
 import {
   RetentionCurve as StaticRetentionCurve,
   retentionSummary,
+  PCT,
   type RetentionCurveProps,
 } from "./index.js";
-
-const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits: 0 };
 
 export interface InteractiveRetentionCurveProps extends RetentionCurveProps {
   strings?: RetentionStrings;
@@ -191,19 +191,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
           {p.bench === null ? fmt(p.value) : `${fmt(p.value)} · ${fmt(p.bench)}`}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

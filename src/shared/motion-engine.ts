@@ -101,6 +101,16 @@ const VOICE_INK =
 
 const STAGGER_CAP = 180;
 
+// Archetypes that animate the whole SVG as one unit — they carry no per-mark
+// set (checked before and after a no-marks/dense fallback flips `kind` to wipe).
+const WHOLE_SVG: ReadonlySet<EntranceArchetype> = new Set<EntranceArchetype>([
+  "pop",
+  "fade",
+  "wipe",
+  "spin",
+  "grow",
+]);
+
 // One observer for every entrance on the page; fires each chart once.
 let io: IntersectionObserver | null = null;
 const pending = new WeakMap<Element, () => void>();
@@ -246,8 +256,7 @@ export function runEntrance(
     // 365 tracks, and a selector that matches nothing must not degrade to
     // nothing — both fall back to the O(1) clip reveal, which still MOVES.
     // (whole-svg archetypes carry no mark set by design.)
-    const wholeSvg =
-      kind === "pop" || kind === "fade" || kind === "wipe" || kind === "spin" || kind === "grow";
+    const wholeSvg = WHOLE_SVG.has(kind);
     if (marks.length > (options.maxMarks ?? 80) || (marks.length === 0 && !wholeSvg)) {
       if (
         marks.length === 0 &&
@@ -262,8 +271,7 @@ export function runEntrance(
     }
     const ease = EASE[kind];
     const dur = DUR[kind];
-    const wholeSvgFinal =
-      kind === "pop" || kind === "fade" || kind === "wipe" || kind === "spin" || kind === "grow";
+    const wholeSvgFinal = WHOLE_SVG.has(kind);
     const storyStart = wholeSvgFinal ? 0 : BEAT;
     svg.style.opacity = "";
 

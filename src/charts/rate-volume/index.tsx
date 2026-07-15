@@ -5,8 +5,10 @@
 // without its volume.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
+import { resolveSummary } from "../../core/summary.js";
 import {
   rateVolumeGeometry,
   type RateCurve,
@@ -62,7 +64,7 @@ export interface RateVolumeProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: RateVolumeStrings | undefined;
   title?: string | undefined;
@@ -99,7 +101,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
   } = props;
 
   // label size in viewBox units (~0.62·height, clamped 7–11) — see graded-band
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.62)));
+  const FONT = labelFont(height, 0.62);
   const fmt = makeFormatter(format, locale);
   const fmtVol = makeFormatter(volumeFormat, locale);
   const cls = className ? `mc-rate-volume ${className}` : "mc-rate-volume";
@@ -128,7 +130,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -138,8 +140,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false ? false : (summary ?? rateVolumeSummary(geo, fmt, fmtVol, unit, strings));
+  const accName = resolveSummary(summary, () => rateVolumeSummary(geo, fmt, fmtVol, unit, strings));
   const lineColor = color ?? "var(--mc-accent)";
   // endpoint dot only when it isn't already a hollow low ring
   const showEndDot = dots !== "none" && geo.last != null && !geo.last.low;

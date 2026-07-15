@@ -5,6 +5,7 @@
 // wrapper is focusable, nothing more. Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { TrendArrow as StaticTrendArrow, trendArrowModel, type TrendArrowProps } from "./index.js";
 
@@ -52,21 +53,7 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
       aria-label={label}
     >
       <StaticTrendArrow {...rest} strings={strings} summary={false} />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {model.summary}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{model.summary}</LiveRegion> : null}
     </span>
   );
 }

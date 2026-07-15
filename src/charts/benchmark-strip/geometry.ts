@@ -6,6 +6,7 @@
 import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 export interface BenchmarkStripGeometry {
   /** Outer band (p5–95 or min–max) in viewBox x. */
@@ -62,7 +63,7 @@ export function benchmarkStripGeometry(opts: {
   const pad = 3;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 4 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;
 
   const finite = opts.data.filter(isFiniteValue);
   const n = finite.length;

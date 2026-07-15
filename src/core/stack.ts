@@ -3,7 +3,7 @@
 // balance the picture. Outputs are data-space (charts scale + round).
 import { isFiniteValue, type Value } from "./types.js";
 
-export interface StackLayer {
+interface StackLayer {
   /** Cumulative lower edge per x position. */
   y0: readonly number[];
   /** Cumulative upper edge per x position (y0 + this layer's value). */
@@ -83,7 +83,7 @@ export function normalizeShares(
 /** Segment coordinates never emit -0 (ugly in SVG output + test assertions). */
 const z = (v: number): number => (v === 0 ? 0 : v);
 
-export interface DivergingSegment {
+interface DivergingSegment {
   /** Index into the input array. */
   index: number;
   /** Segment extent in share units (total mass = 1), center at 0; x0 ≤ x1. */
@@ -122,8 +122,13 @@ export function divergingStack(
   opts: { neutralIndex?: number | null; neutral?: "split" | "omit" } = {},
 ): DivergingStack | null {
   const n = values.length;
-  const neutralIndex =
+  const rawNeutral =
     opts.neutralIndex !== undefined ? opts.neutralIndex : n % 2 === 1 ? (n - 1) / 2 : null;
+  // Normalize out-of-range indices to null (no neutral) up front — the pole
+  // loops below index `counts` unguarded, so an out-of-range `split` would
+  // otherwise read undefined and emit NaN segments (matches the file's
+  // null-means-no-neutral convention).
+  const neutralIndex = rawNeutral !== null && rawNeutral >= 0 && rawNeutral < n ? rawNeutral : null;
   const mode = opts.neutral ?? "split";
 
   const counts = values.map((v) => (isFiniteValue(v) && v > 0 ? v : 0));
@@ -131,9 +136,9 @@ export function divergingStack(
   for (const c of counts) total += c;
   if (total === 0) return null;
 
-  const split = neutralIndex;
+  const split = neutralIndex; // null or a valid in-range index (normalized above)
   const splitAt = split ?? n / 2; // even count: halves meet at center exactly
-  const neutralShare = split !== null && split >= 0 && split < n ? counts[split]! / total : 0;
+  const neutralShare = split !== null ? counts[split]! / total : 0;
 
   let negative = 0;
   let positive = 0;
@@ -157,7 +162,7 @@ export function divergingStack(
     edge -= share;
   }
 
-  if (split !== null && split >= 0 && split < n && mode === "split") {
+  if (split !== null && mode === "split") {
     segments.push({ index: split, x0: z(-half), x1: half, side: 0, share: neutralShare });
   }
 

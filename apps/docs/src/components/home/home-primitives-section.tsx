@@ -81,6 +81,7 @@ export function HomePrimitivesSection({ catalogTotal }: { catalogTotal: number }
       </div>
       <Reveal delay={80}>
         <Link
+          prefetch={false}
           href="/gallery"
           className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-fd-primary link-underline"
         >

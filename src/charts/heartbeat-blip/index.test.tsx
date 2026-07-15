@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { HeartbeatBlip, heartbeatSummary } from "./index.js";
+import { EN_HEARTBEAT } from "../../core/strings-heartbeat.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
@@ -18,6 +19,16 @@ describe("<HeartbeatBlip>", () => {
 
   it("no events → the flat (down) summary — distinct from no-data", () => {
     expect(heartbeatSummary([], { now: 100_000 })).toBe("No events in the last minute.");
+  });
+
+  it("window label: singular units, and clean hour multiples read as hours", () => {
+    const w = EN_HEARTBEAT.heartbeatWindow;
+    expect(w(60_000)).toBe("minute");
+    expect(w(3_600_000)).toBe("hour");
+    expect(w(30_000)).toBe("30 seconds");
+    expect(w(90_000)).toBe("2 minutes"); // not a clean hour → minutes
+    expect(w(7_200_000)).toBe("2 hours"); // was "120 minutes"
+    expect(w(10_800_000)).toBe("3 hours");
   });
 
   it("renders a spike per event + the now dot", () => {

@@ -21,7 +21,8 @@ export function cellMetrics(
 /** Discrete intensity ramp shared by every stepped-color chart — level 0 is the
  *  faint empty track; levels 1..n spread 0.25 → 1. One ramp, one calibration. */
 export function stepOpacity(step: number, steps: number): number {
-  return step === 0 ? 0.06 : 0.25 + (step / (steps - 1)) * 0.75;
+  if (step === 0) return 0.06;
+  return steps <= 1 ? 1 : 0.25 + (step / (steps - 1)) * 0.75;
 }
 
 /** Ramp for calibrated VALUE cells (HeatCell/HeatStrip): every step stays

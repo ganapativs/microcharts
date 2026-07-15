@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
 import { abStripsGeometry } from "./geometry.js";
 import { ABStrips as StaticABStrips, abSummary, type ABStripsProps } from "./index.js";
@@ -167,19 +168,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
           {active.p === 50 ? fmt(active.value) : `p${active.p} ${fmt(active.value)}`}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

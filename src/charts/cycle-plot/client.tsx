@@ -7,6 +7,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CYCLE, type CycleStrings } from "../../core/strings-cycle.js";
 import { cycleGeometry } from "./geometry.js";
 import { CyclePlot as StaticCyclePlot, cycleSummary, type CyclePlotProps } from "./index.js";
@@ -202,19 +203,7 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
           {readout}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

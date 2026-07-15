@@ -11,6 +11,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_HYPNOGRAM } from "../../core/strings-hypnogram.js";
 import { firstAppearance, hypnogramGeometry } from "./geometry.js";
 import {
@@ -160,19 +161,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticHypnogram>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {run ? (
         <span
           className="mc-spark-readout"

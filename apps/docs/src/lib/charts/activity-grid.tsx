@@ -318,8 +318,12 @@ export const contexts: ChartContexts = {
   },
 };
 
-export function Mark({ data }: { data: number[]; width?: number; height?: number }) {
-  return <ActivityGrid data={data} layout="strip" cell={7} summary={false} />;
+export function Mark(_props: { data: number[]; width?: number; height?: number }) {
+  // a landscape 7-row contribution grid (the shape the tagline promises) reads at
+  // favicon scale; the full-width strip collapses to a hairline when fit to the box.
+  // ~14 weeks gives a 2:1 matrix that fills the glyph box instead of a sliver.
+  const cells = Array.from({ length: 98 }, (_, i) => Math.round(Math.abs(Math.sin(i * 0.7)) * 4));
+  return <ActivityGrid data={cells} layout="grid" cell={3} summary={false} />;
 }
 
 export function markCode(): string {

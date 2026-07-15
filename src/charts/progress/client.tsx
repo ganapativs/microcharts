@@ -5,6 +5,7 @@
 // mark). Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { Progress as StaticProgress, progressModel, type ProgressProps } from "./index.js";
 
@@ -51,21 +52,7 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
       aria-label={label}
     >
       <StaticProgress {...rest} strings={strings} summary={false} />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );
 }

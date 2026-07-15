@@ -119,13 +119,6 @@ export function annulusSector(
   return `M${ox} ${oy} ${cwArcs(cx, cy, rOuter, a0, a0 + sweep)} L${ix} ${iy} ${ccwArcs(cx, cy, ri, a0, a0 + sweep)} Z`;
 }
 
-/** Circular arc length for the sweep (clamped to one turn), 2-dp — feeds
- *  stroke-dasharray so dash math is exact at any radius. 0 when degenerate. */
-export function arcLength(r: number, a0: number, a1: number): number {
-  const sweep = sweepOf(r, a0, a1);
-  return Number.isNaN(sweep) ? 0 : r2(r * sweep);
-}
-
 /**
  * `[dash, gap]` for exactly `count` dashes around a full circle of radius `r`
  * (`duty` = lit fraction of each segment). Derived from the true circumference

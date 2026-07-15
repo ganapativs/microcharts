@@ -5,7 +5,9 @@
 // Aggregate dictionary: core/strings.ts `EN`.
 import type { SummaryStrings } from "./summary.js";
 
-/** English ordinal ("68th"). Shared by the percentile phrasing. */
+/** English ordinal ("68th"). Shared by the percentile phrasing. Duplicated in
+ *  strings-category/strings-dist by design — each string module is its own
+ *  chunk, so sharing a helper would tax every consumer's bundle. */
 const ordinal = (n: number): string => {
   const rem10 = n % 10;
   const rem100 = n % 100;

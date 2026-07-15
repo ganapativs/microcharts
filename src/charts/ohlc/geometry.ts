@@ -5,6 +5,7 @@
 // component dev-warns (averaging OHLC lies). 2-dp.
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 export interface OhlcInput {
   open: number;
@@ -65,7 +66,7 @@ export function ohlcGeometry(opts: {
   if (n === 0) return { marks: [], truncated, pitch: 0, invalid };
 
   // +5 gap so the last-close value reads as separate from the final candle
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 5 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 5) : 0;
   const x0 = 1;
   const x1 = width - 1 - gutter;
 

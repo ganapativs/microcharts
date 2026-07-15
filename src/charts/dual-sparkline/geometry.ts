@@ -5,6 +5,7 @@
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { linePath, smoothPath, type Curve } from "../../core/path.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 type XY = readonly [number, number];
 
@@ -21,6 +22,8 @@ export interface DualGeometry {
   /** Band rect (shared grammar) or null. */
   band: { x: number; y: number; width: number; height: number } | null;
   plot: { x0: number; x1: number; y0: number; y1: number };
+  /** Resolved shared value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
 }
 
 // step is intentionally absent: on a two-line benchmark strip it reads as
@@ -44,7 +47,7 @@ export function dualSparklineGeometry(opts: {
 }): DualGeometry {
   const { width, height, primary, compare, curve = "linear", gutterCh, fontSize } = opts;
   const pad = 2;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 4 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;
   const x0 = pad;
   const x1 = width - pad - gutter;
   const y0 = pad;
@@ -107,5 +110,6 @@ export function dualSparklineGeometry(opts: {
     coincident,
     band,
     plot: { x0, x1, y0, y1 },
+    domain,
   };
 }

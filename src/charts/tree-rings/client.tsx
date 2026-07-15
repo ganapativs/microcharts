@@ -5,6 +5,7 @@
 import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { treeRingsGeometry } from "./geometry.js";
 import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import { TreeRings as StaticTreeRings, treeRingsSummary, type TreeRingsProps } from "./index.js";
@@ -123,19 +124,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticTreeRings>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {ring ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {announced}

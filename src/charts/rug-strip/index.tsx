@@ -5,11 +5,12 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { quantiles } from "../../core/quantile.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import type { Value } from "../../core/types.js";
 import { rugGeometry, type RugTick } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual distribution summary — shared with the interactive entry. */
 export function rugSummary(
@@ -41,7 +42,7 @@ export interface RugStripProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: DistStrings | undefined;
   title?: string | undefined;
@@ -87,7 +88,7 @@ export function RugStrip(props: RugStripProps): ReactNode {
     orientation,
   });
   const fmt = makeFormatter(format, locale);
-  const accName = summary === false ? false : (summary ?? rugSummary(geo.ticks, fmt, strings));
+  const accName = resolveSummary(summary, () => rugSummary(geo.ticks, fmt, strings));
 
   // highlight tick: full opacity, accent, slightly wider stroke
   const hl =

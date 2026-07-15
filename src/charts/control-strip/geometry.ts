@@ -29,6 +29,8 @@ export interface ControlGeometry {
   /** MR̄ = 0 → band collapses to the center hairline. */
   degenerate: boolean;
   n: number;
+  /** Resolved value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
 }
 
 export function controlGeometry(opts: {
@@ -132,5 +134,6 @@ export function controlGeometry(opts: {
     reliable: n >= 10,
     degenerate,
     n,
+    domain: dom,
   };
 }

@@ -5,7 +5,7 @@
 // never look authoritative. No single-number calibration score is ever shown.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_CALIBRATION, type CalibrationStrings } from "../../core/strings-calibration.js";
 import {
   calibrationGeometry,
@@ -28,7 +28,7 @@ export interface CalibrationStripProps {
   variant?: "dots" | "bars" | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CalibrationStrings | undefined;
   title?: string | undefined;

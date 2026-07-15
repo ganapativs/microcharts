@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
 import { dicePipsGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface DicePipsProps {
   /** Integer 0–6 (rounded). Above 6 renders a centered numeral. */
@@ -46,7 +47,7 @@ export function DicePips(props: DicePipsProps): ReactNode {
   } = props;
 
   const geo = dicePipsGeometry({ value, size, pad: size * PAD_DIVISOR });
-  const accName = summary === false ? false : (summary ?? dicePipsSummary(value, strings));
+  const accName = resolveSummary(summary, () => dicePipsSummary(value, strings));
 
   return (
     <Chart

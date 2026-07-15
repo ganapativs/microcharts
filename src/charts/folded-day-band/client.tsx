@@ -11,6 +11,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FOLDED_BAND } from "../../core/strings-folded-band.js";
 import { foldedBandGeometry } from "./geometry.js";
 import {
@@ -169,19 +170,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
           />
         ) : null}
       </StaticFoldedDayBand>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {s ? (
         <span
           className="mc-spark-readout"

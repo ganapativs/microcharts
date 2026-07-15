@@ -6,9 +6,13 @@ import type { SummaryStrings } from "./summary.js";
 export type WindBarbStrings = Pick<SummaryStrings, "windBarb" | "windBarbCalm" | "compass8">;
 
 export const EN_WIND_BARB: WindBarbStrings = {
-  windBarb: (compass, deg, value) => `${compass} (${deg}°), magnitude ${value}.`,
+  // `compass8` is canonically lowercase (shared key, used sentence-medially by
+  // station-glyph); this template opens a sentence so it capitalizes the first
+  // character itself — each locale owns its own casing.
+  windBarb: (compass, deg, value) =>
+    `${compass.charAt(0).toUpperCase() + compass.slice(1)} (${deg}°), magnitude ${value}.`,
   windBarbCalm: "Calm.",
-  compass8: ["North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest"],
+  compass8: ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"],
 };
 
 /** Compass octant index (0 = N, clockwise) for a bearing in degrees. */

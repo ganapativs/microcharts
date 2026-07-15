@@ -5,10 +5,12 @@
 // percentile uses the documented mid-rank rule.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { round2, type Polarity, type Value } from "../../core/types.js";
+import { labelFont } from "../../core/labels.js";
 import { benchmarkStripGeometry, type BenchmarkStripGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual benchmark summary. Shared with the interactive entry. */
 export function benchmarkSummary(
@@ -37,7 +39,7 @@ export interface BenchmarkStripProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QuantileStrings | undefined;
   title?: string | undefined;
@@ -72,7 +74,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
   } = props;
 
   // label size in viewBox units (~0.62·height, clamped 7–11) — see coverage-strip
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.62)));
+  const FONT = labelFont(height, 0.62);
   const fmt = makeFormatter(format, locale);
   const showLabel = label !== "none";
   const geo = benchmarkStripGeometry({
@@ -94,7 +96,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -104,7 +106,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
     );
   }
 
-  const accName = summary === false ? false : (summary ?? benchmarkSummary(geo, fmt, strings));
+  const accName = resolveSummary(summary, () => benchmarkSummary(geo, fmt, strings));
 
   // dot color: default accent; with polarity, the "good" side reads positive.
   // The label <text> takes the same color as an ink ROLE (the base `.mc-root

@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import { QueueDepth } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const DATA = [42, 55, 70, 88, 96, 120, 150, 182, 214];
@@ -66,6 +67,20 @@ describe("<QueueDepth>", () => {
   it("empty data → renders the empty frame, no crash", () => {
     const { container } = draw(<QueueDepth data={[]} title="Empty" />);
     expect(container.querySelector("svg")).not.toBeNull();
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    // label="none" + no capacity keeps totalWidth == width, so the containment
+    // frame matches the viewBox (value labels legitimately live in a gutter).
+    expectHostsAnnotations(
+      (children) => (
+        <QueueDepth data={DATA} label="none" width={80} height={20} summary={false}>
+          {children}
+        </QueueDepth>
+      ),
+      80,
+      20,
+    );
   });
 });
 

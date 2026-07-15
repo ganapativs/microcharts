@@ -5,9 +5,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_DEPTH_WEDGE, type DepthWedgeStrings } from "../../core/strings-depth-wedge.js";
 import { depthWedgeGeometry, type DepthWedgeResult, type Level } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface DepthWedgeDatum {
   demand: readonly Level[];
@@ -24,7 +25,7 @@ export interface DepthWedgeProps {
   normalize?: boolean | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: DepthWedgeStrings | undefined;
   title?: string | undefined;
@@ -43,8 +44,8 @@ export function depthWedgeSummary(
 ): string {
   if (geo.demandTotal === 0 && geo.supplyTotal === 0) return strings.noData;
   const spread = fmt(geo.spread);
-  if (geo.lead === 0) return strings.depthWedgeBalanced(spread);
   const [demandName, supplyName] = strings.depthWedgeSides;
+  if (geo.lead === 0) return strings.depthWedgeBalanced(spread, demandName, supplyName);
   const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   const low = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
   const leadSide = geo.lead > 0 ? demandName : cap(supplyName);
@@ -81,7 +82,7 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
     width,
     height,
   });
-  const accName = summary === false ? false : (summary ?? depthWedgeSummary(geo, strings, fmt));
+  const accName = resolveSummary(summary, () => depthWedgeSummary(geo, strings, fmt));
   const showSpread = label === "spread" && data.demand.length > 0 && data.supply.length > 0;
 
   return (

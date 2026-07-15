@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { statusDotGeometry, type StatusGlyph } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface StatusState {
   glyph: StatusGlyph;
@@ -73,7 +74,7 @@ export function StatusDot(props: StatusDotProps): ReactNode {
   const state = resolveStatus(status, states);
   const mark = statusDotGeometry({ width: SIZE, height: SIZE, glyph: state.glyph });
   const fill = color ?? `var(${state.token})`;
-  const accName = summary === false ? false : (summary ?? strings.status(state.label));
+  const accName = resolveSummary(summary, () => strings.status(state.label));
 
   return (
     <Chart

@@ -16,6 +16,8 @@ export const EN_HEARTBEAT: HeartbeatStrings = {
     if (ms === 60_000) return "minute";
     if (ms === 3_600_000) return "hour";
     if (ms < 60_000) return `${Math.round(ms / 1000)} seconds`;
+    // clean multiples of an hour (≥ 2h) read as hours, not "120 minutes"
+    if (ms % 3_600_000 === 0) return `${ms / 3_600_000} hours`;
     return `${Math.round(ms / 60_000)} minutes`;
   },
   heartbeatAgo: (ms) => (ms < 60_000 ? `${Math.round(ms / 1000)}s` : `${Math.round(ms / 60_000)}m`),

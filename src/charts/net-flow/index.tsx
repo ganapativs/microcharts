@@ -5,8 +5,10 @@
 // at zero both ways; the net sign is stated in TEXT (never color-alone).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js";
+import { resolveSummary } from "../../core/summary.js";
 import {
   netFlowGeometry,
   type NetFlowGeometry,
@@ -50,7 +52,7 @@ export interface NetFlowProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: NetFlowStrings | undefined;
   title?: string | undefined;
@@ -84,7 +86,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
     children,
   } = props;
 
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.55)));
+  const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-net-flow ${className}` : "mc-net-flow";
 
@@ -102,7 +104,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -112,7 +114,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
     );
   }
 
-  const accName = summary === false ? false : (summary ?? netFlowSummary(geo, fmt, strings));
+  const accName = resolveSummary(summary, () => netFlowSummary(geo, fmt, strings));
   // color encodes valence (which direction is good), position encodes identity
   // (in always above, out always below) — the two channels are independent
   const inRole = positive === "down" ? "negative" : "positive";

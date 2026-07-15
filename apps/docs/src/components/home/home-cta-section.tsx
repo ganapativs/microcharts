@@ -10,6 +10,7 @@ export function HomeCtaSection() {
         </h2>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
+            prefetch={false}
             href="/docs/quickstart"
             className="cta-accent inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
           >

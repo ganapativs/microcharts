@@ -8,6 +8,7 @@ import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_PARTITION, type PartitionStrings } from "../../core/strings-partition.js";
 import { partitionStripGeometry, parentValue, type PartitionNode } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type PartitionStripDatum = PartitionNode;
 
@@ -94,7 +95,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
   const fontSize = labelFont(height, 0.42);
   const inset = 0.5;
   const rowH = (height - inset * 2 - 1) / 2;
-  const accName = summary === false ? false : (summary ?? partitionStripSummary(data, strings));
+  const accName = resolveSummary(summary, () => partitionStripSummary(data, strings));
 
   const emphGroup = emphasis ? geo.segments.find((s) => s.label === emphasis)?.group : undefined;
 

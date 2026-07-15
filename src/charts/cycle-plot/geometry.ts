@@ -32,6 +32,10 @@ export interface CycleGeometry {
   /** Per-slot raw values in time order — for cycle stepping. */
   values: number[][];
   degenerate: boolean;
+  /** Resolved value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
+  /** Vertical inset (viewBox units) the value scale is padded by. */
+  pad: number;
 }
 
 // Saturate the slot count. `period` is a caller prop; a non-physical value
@@ -153,5 +157,7 @@ export function cycleGeometry(opts: {
     centers,
     values,
     degenerate,
+    domain: dom,
+    pad,
   };
 }

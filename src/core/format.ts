@@ -57,8 +57,10 @@ function cachedDateFormat(
 
 /**
  * Resolves date-format props into a formatter. Calendar charts pass UTC-day
- * timestamps, so `timeZone: "UTC"` is forced for option-based formatting —
- * the same input must render identically in any host timezone.
+ * timestamps, so `timeZone: "UTC"` is the default for option-based formatting —
+ * the same input renders identically in any host timezone. A caller can still
+ * override it (e.g. `{ timeZone: "America/New_York" }`) via the format options,
+ * which spread after the default.
  */
 export function makeDateFormatter(
   format: DateFormat | undefined,

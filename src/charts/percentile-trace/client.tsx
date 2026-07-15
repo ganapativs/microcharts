@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import {
   EN_PERCENTILE_TRACE,
   type PercentileTraceStrings,
@@ -14,10 +15,9 @@ import { percentileGeometry } from "./geometry.js";
 import {
   PercentileTrace as StaticPercentileTrace,
   percentileSummary,
+  INT,
   type PercentileTraceProps,
 } from "./index.js";
-
-const INT: Intl.NumberFormatOptions = { maximumFractionDigits: 0 };
 
 export interface InteractivePercentileTraceProps extends PercentileTraceProps {
   strings?: PercentileTraceStrings;
@@ -170,19 +170,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
           {pStr(p.value)}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { CyclePlot } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -57,5 +58,17 @@ describe("<CyclePlot>", () => {
       <CyclePlot data={WEEKS} period={7} slots={DAYS} title="Weekly shape" />,
     );
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <CyclePlot data={WEEKS} period={7} slots={DAYS} width={80} height={20} summary={false}>
+          {children}
+        </CyclePlot>
+      ),
+      80,
+      20,
+    );
   });
 });

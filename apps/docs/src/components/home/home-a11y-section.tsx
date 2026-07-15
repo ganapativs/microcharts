@@ -49,6 +49,7 @@ export function HomeA11ySection() {
             </p>
           </div>
           <Link
+            prefetch={false}
             href="/docs/accessibility"
             className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-fd-primary link-underline"
           >

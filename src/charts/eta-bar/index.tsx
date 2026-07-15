@@ -4,7 +4,7 @@
 // remainder is sized by the observed rate — the download bar, told truthfully.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_ETA_BAR, type EtaBarStrings } from "../../core/strings-eta-bar.js";
 import { etaBarGeometry, hatchPath } from "./geometry.js";
@@ -22,7 +22,7 @@ export interface EtaBarProps {
   formatEta?: ((t: number) => string) | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: EtaBarStrings | undefined;
   title?: string | undefined;

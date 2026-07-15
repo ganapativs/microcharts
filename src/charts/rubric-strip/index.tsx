@@ -6,9 +6,10 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_RUBRIC, type RubricStrings } from "../../core/strings-rubric.js";
 import { rubricStripGeometry, type RubricInput } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface RubricStripDatum {
   label: string;
@@ -25,7 +26,7 @@ export interface RubricStripProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: RubricStrings | undefined;
   title?: string | undefined;
@@ -97,7 +98,7 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
       : 0;
 
   const geo = rubricStripGeometry({ data: toInputs(data), domain, width, height, gutter, gap: 1 });
-  const accName = summary === false ? false : (summary ?? rubricStripSummary(data, strings, fmt));
+  const accName = resolveSummary(summary, () => rubricStripSummary(data, strings, fmt));
 
   return (
     <Chart

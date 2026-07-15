@@ -5,11 +5,12 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import { funnelGeometry } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type FunnelDatum = MiniBarDatum;
 
@@ -51,7 +52,7 @@ export interface FunnelProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CompositionStrings | undefined;
   title?: string | undefined;
@@ -98,8 +99,7 @@ export function Funnel(props: FunnelProps): ReactNode {
   });
   const fmt = makeFormatter(format, locale);
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
-  const accName =
-    summary === false ? false : (summary ?? funnelSummary(data, fmt, pctFmt, strings));
+  const accName = resolveSummary(summary, () => funnelSummary(data, fmt, pctFmt, strings));
 
   return (
     <Chart

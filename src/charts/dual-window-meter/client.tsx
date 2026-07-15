@@ -12,6 +12,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DUAL_WINDOW } from "../../core/strings-dual-window.js";
 import { rollingMean } from "./geometry.js";
 import {
@@ -160,19 +161,7 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
           />
         ) : null}
       </StaticDualWindowMeter>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {active != null ? (
         <span
           className="mc-spark-readout"

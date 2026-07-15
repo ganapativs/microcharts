@@ -5,6 +5,7 @@
 // (documented skip). Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { resolveStatus, StatusDot as StaticStatusDot, type StatusDotProps } from "./index.js";
 
@@ -45,21 +46,7 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
   return (
     <span ref={hostRef} className="mc-status-live" tabIndex={0} role="img" aria-label={label}>
       <StaticStatusDot {...rest} strings={strings} summary={false} />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );
 }

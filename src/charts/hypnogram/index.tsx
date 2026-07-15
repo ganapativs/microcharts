@@ -9,6 +9,7 @@ import { round2 } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_HYPNOGRAM, type HypnogramStrings } from "../../core/strings-hypnogram.js";
 import { firstAppearance, hypnogramGeometry, mergeRuns, type HypnoEntry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type HypnogramDatum = HypnoEntry;
 
@@ -128,8 +129,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
     style: variant,
     gutter,
   });
-  const accName =
-    summary === false ? false : (summary ?? hypnogramSummary(data, rowStates, domain, strings));
+  const accName = resolveSummary(summary, () => hypnogramSummary(data, rowStates, domain, strings));
 
   const normalRuns = geo.runs.filter((r) => r.state !== emphasis);
   const emphRuns = emphasis ? geo.runs.filter((r) => r.state === emphasis) : [];

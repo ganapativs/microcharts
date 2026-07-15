@@ -5,12 +5,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
 import { dotPlotGeometry, truncateLabel } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
 import { miniBarSummary } from "../mini-bar/index.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type DotPlotDatum = MiniBarDatum;
 
@@ -27,7 +28,7 @@ export interface DotPlotProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CategoryStrings | undefined;
   title?: string | undefined;
@@ -78,7 +79,7 @@ export function DotPlot(props: DotPlotProps): ReactNode {
     stem,
   });
   const fmt = makeFormatter(format, locale);
-  const accName = summary === false ? false : (summary ?? miniBarSummary(data, fmt, strings));
+  const accName = resolveSummary(summary, () => miniBarSummary(data, fmt, strings));
 
   // labels drop deterministically with density: category text needs
   // fontSize × 1.25 of row pitch, value text a full 8-unit row

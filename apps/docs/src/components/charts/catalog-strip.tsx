@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { STABLE_CHARTS, getChart } from "@/lib/catalog";
-import { getModule } from "@/lib/charts/registry";
+import { CATALOG_STRIP_MODULES } from "./catalog-strip-modules";
 import { CATALOG } from "@/lib/docs-facts";
 
 /** Even sample across the registry (core → frontier). Deterministic. */
@@ -20,11 +20,12 @@ export function CatalogStrip({ count = 12 }: { count?: number }) {
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         {sample(count).map((slug) => {
           const c = getChart(slug);
-          const mod = getModule(slug);
+          const mod = CATALOG_STRIP_MODULES[slug];
           if (!c || !mod) return null;
           const { Mark } = mod;
           return (
             <Link
+              prefetch={false}
               key={slug}
               href={`/docs/charts/${slug}`}
               className="panel group flex items-center gap-3 px-3 py-2.5 no-underline"
@@ -45,6 +46,7 @@ export function CatalogStrip({ count = 12 }: { count?: number }) {
         })}
       </div>
       <Link
+        prefetch={false}
         href="/docs/charts"
         className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-fd-primary link-underline"
       >

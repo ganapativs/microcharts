@@ -6,11 +6,14 @@
 // of one dataset, kept visually separate. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_CYCLE, type CycleStrings } from "../../core/strings-cycle.js";
 import type { Value } from "../../core/types.js";
 import { cycleGeometry, type CycleGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 const slotName = (slots: readonly string[] | undefined, i: number): string =>
   slots?.[i] ?? `slot ${i + 1}`;
@@ -120,7 +123,7 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -130,9 +133,20 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false ? false : (summary ?? cycleSummary(geo, { slots, cycleUnit }, fmt, strings));
+  const accName = resolveSummary(summary, () =>
+    cycleSummary(geo, { slots, cycleUnit }, fmt, strings),
+  );
   const accent = color ?? "var(--mc-accent)";
+
+  // annotations host contract: Marker x = slot index (slot center),
+  // Threshold/TargetZone y = data values on the shared value scale.
+  const ann = resolveAnnotations(children, {
+    x: (i) => geo.slots[Math.round(i)]?.center.x ?? NaN,
+    y: scaleLinear(geo.domain, [height - geo.pad, geo.pad]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
 
   return (
     <Chart
@@ -144,6 +158,7 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
       className={cls}
       style={style}
     >
+      {ann.under}
       {/* within-slot polylines — raw values in time order, muted, never smoothed */}
       {trend === "line"
         ? geo.slots.map((sl) =>
@@ -178,7 +193,8 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
           <circle key={sl.x0} cx={sl.center.x} cy={sl.center.y} r={1.3} style={{ fill: accent }} />
         ) : null,
       )}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

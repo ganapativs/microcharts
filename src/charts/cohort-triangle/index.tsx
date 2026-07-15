@@ -8,8 +8,9 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { valueStepOpacity } from "../../shared/cell.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
+import { resolveSummary } from "../../core/summary.js";
 import {
   EN_COHORT_TRIANGLE,
   type CohortTriangleStrings,
@@ -68,7 +69,7 @@ export interface CohortTriangleProps {
   /** Age-column noun for the summary (default "period"). */
   unit?: string | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CohortTriangleStrings | undefined;
   title?: string | undefined;
@@ -105,8 +106,7 @@ export function CohortTriangle(props: CohortTriangleProps): ReactNode {
 
   const geo = cohortTriangleGeometry(data, { cell, gap, labels, highlight });
   const fmt = makeFormatter(format, locale);
-  const accName =
-    summary === false ? false : (summary ?? cohortTriangleSummary(geo, strings, fmt, unit));
+  const accName = resolveSummary(summary, () => cohortTriangleSummary(geo, strings, fmt, unit));
 
   const w = Math.max(geo.width, 1);
   const h = Math.max(geo.height, 1);

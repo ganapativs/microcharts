@@ -1,15 +1,12 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": [
-    "src/core/index.ts",
-    "src/shared/index.ts",
-    "src/theme.ts",
-    "src/charts/*/index.tsx",
-    "src/charts/*/client.tsx",
-    "src/test/**/*.ts"
-  ],
-  "project": ["src/**/*.{ts,tsx}"],
-  "ignore": ["fixtures/**", "apps/**"],
   "ignoreWorkspaces": ["fixtures/*", "apps/*"],
-  "ignoreDependencies": ["@vitest/browser", "fast-check", "@axe-core/playwright", "esbuild"]
+  "workspaces": {
+    ".": {
+      "entry": ["src/charts/*/index.tsx", "src/charts/*/client.tsx", "src/test/**/*.ts"],
+      "project": ["src/**/*.{ts,tsx}"]
+    }
+  },
+  "ignoreDependencies": ["fast-check", "@axe-core/playwright"],
+  "tags": ["-knipignore"]
 }

@@ -5,6 +5,8 @@
 // variation — height, roof, and ground are constants. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 import { EN_SKYLINE, type SkylineStrings } from "../../core/strings-skyline.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
@@ -90,12 +92,13 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
   // keeps the buildings tall even when the label font is large.
   const botPad = labels ? fontSize + 4 : PAD;
   const groundY = height - botPad;
+  const maxH = groundY - topPad;
   const geo = citySkylineGeometry({
     data,
     bw,
     height,
     groundY,
-    maxH: groundY - topPad,
+    maxH,
     gap,
     domain,
     pad: PAD,
@@ -105,6 +108,22 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
       ? false
       : (summary ?? citySkylineSummary(data, { unit, strings, format, locale }));
   const fmt = makeFormatter(format, locale);
+
+  // annotations host: Marker x = building index (bar center),
+  // Threshold/TargetZone y = data values on the shared zero-anchored scale
+  // (mirror of the geometry: y(v) = groundY − (v / maxV) · maxH).
+  const skylineValues = data.map((d) => (Number.isFinite(d.value) && d.value > 0 ? d.value : 0));
+  const maxV = domain ? domain[1] : Math.max(1, ...skylineValues);
+  const ann = resolveAnnotations(children, {
+    x: (i) => {
+      const b = geo.buildings[Math.round(i)];
+      return b ? b.x + b.w / 2 : NaN;
+    },
+    y: scaleLinear([0, maxV], [groundY, groundY - maxH]),
+    width: geo.width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
 
   return (
     <Chart
@@ -116,6 +135,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
       className={className ? `mc-skyline ${className}` : "mc-skyline"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
+      {ann.under}
       {ground ? (
         <line
           x1={geo.ground.x1}
@@ -182,7 +202,8 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
             );
           })
         : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }
