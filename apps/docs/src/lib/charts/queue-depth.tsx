@@ -214,7 +214,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
   return (
     <QueueDepth
       data={depth}
-      capacity={110}
+      label="none"
       summary={false}
       width={props.width ?? 70}
       height={props.height ?? 18}

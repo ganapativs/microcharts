@@ -246,6 +246,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
       <SpreadBand
         data={PAIRS}
         labels={LABELS}
+        label="none"
         summary={false}
         width={props.width ?? 60}
         height={props.height ?? 14}
@@ -256,6 +257,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <SpreadBand
       data={props.data.map((v, i) => ({ a: v, b: v * 0.82 + i * 0.4 }))}
       labels={LABELS}
+      label="none"
       summary={false}
       width={props.width ?? 60}
       height={props.height ?? 14}

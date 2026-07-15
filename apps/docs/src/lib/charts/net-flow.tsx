@@ -300,12 +300,19 @@ export const contexts: ChartContexts = {
 export function Mark(props: { data: number[]; width?: number; height?: number }) {
   if (!props.data.length) {
     return (
-      <NetFlow data={DEMO} summary={false} width={props.width ?? 70} height={props.height ?? 18} />
+      <NetFlow
+        data={DEMO}
+        label="none"
+        summary={false}
+        width={props.width ?? 70}
+        height={props.height ?? 18}
+      />
     );
   }
   return (
     <NetFlow
       data={props.data.map((v, j) => ({ in: Math.abs(v) + 4, out: Math.abs(v) * 0.7 + (j % 4) }))}
+      label="none"
       summary={false}
       width={props.width ?? 70}
       height={props.height ?? 18}

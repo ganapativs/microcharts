@@ -225,6 +225,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <WinProbWorm
       data={props.data.length ? props.data : GAME}
       sides={SIDES}
+      label="none"
       summary={false}
       width={props.width ?? 90}
       height={props.height ?? 16}

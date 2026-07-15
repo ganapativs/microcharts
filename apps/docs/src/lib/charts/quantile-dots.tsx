@@ -286,6 +286,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
         data={WAITS}
         threshold={15}
         count={16}
+        label="none"
         summary={false}
         width={props.width ?? 70}
         height={props.height ?? 18}
@@ -297,6 +298,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
       data={props.data.map((v) => 4 + (Math.abs(v) % 20))}
       threshold={14}
       count={16}
+      label="none"
       summary={false}
       width={props.width ?? 70}
       height={props.height ?? 18}

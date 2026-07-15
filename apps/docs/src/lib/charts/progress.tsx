@@ -241,7 +241,7 @@ export const contexts: ChartContexts = {
 };
 
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
-  return <Progress value={0.68} summary={false} width={64} height={10} />;
+  return <Progress value={0.68} label="none" summary={false} width={64} height={10} />;
 }
 
 export function markCode(): string {

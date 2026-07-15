@@ -297,6 +297,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <ForecastCone
       data={hist}
       forecast={{ mid, p80 }}
+      label="none"
       summary={false}
       width={props.width ?? 70}
       height={props.height ?? 18}

@@ -8,15 +8,15 @@ import { describe, expect, it } from "vitest";
 const outDir = resolve(process.cwd(), "out") + "/";
 const hasBuild = existsSync(outDir);
 
-// Static export emits `<route>/index.html` (trailingSlash: true).
+// Static export emits `<route>.html` (trailingSlash: false); root stays index.html.
 const routes = [
   "index.html",
-  "docs/index.html",
-  "docs/quickstart/index.html",
-  "docs/charts/sparkline/index.html",
-  "docs/accessibility/index.html",
-  "docs/performance/index.html",
-  "gallery/index.html",
+  "docs.html",
+  "docs/quickstart.html",
+  "docs/charts/sparkline.html",
+  "docs/accessibility.html",
+  "docs/performance.html",
+  "gallery.html",
 ];
 
 describe.skipIf(!hasBuild)("built docs metadata", () => {
