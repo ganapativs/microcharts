@@ -40,7 +40,11 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
           </Reveal>
 
           <Reveal delay={60}>
-            <h1 className="display mt-5 text-balance text-[2.3rem] leading-[1.05] text-fd-foreground sm:text-[3rem] lg:text-[3.65rem] xl:text-[3.9rem]">
+            {/* Optical tracking: the hero is the largest type on the page, so
+                it tracks tighter than the .display baseline (-0.021em) tuned
+                for section heads — negative tracking grows with display size
+                (Apple type craft). */}
+            <h1 className="display mt-5 text-balance text-[2.3rem] leading-[1.05] tracking-[-0.03em] text-fd-foreground sm:text-[3rem] lg:text-[3.65rem] xl:text-[3.9rem]">
               Small enough for a model to{" "}
               <span className="whitespace-nowrap">
                 <em className="hv-em">write</em>
