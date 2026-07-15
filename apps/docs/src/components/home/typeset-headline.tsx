@@ -5,22 +5,32 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 import { SparkBar } from "@microcharts/react/sparkbar/interactive";
 
 /**
- * The hero sentence typesets itself: words settle in reading order (pure CSS,
- * SSR-visible), then each inline chart draws ONCE where the type pauses — the
- * library's own `animate` entrance, remounted on a JS clock that matches the
- * CSS `--at` schedule. After the sequence the sentence holds still: the
- * ambient motion budget belongs to the reply card. Reduced motion renders
- * everything settled.
+ * The hero sentence typesets itself in strict reading order: words settle,
+ * each inline chart draws where the type pauses, and the punctuation that
+ * follows a chart waits for it — "write" never sits next to an empty slot
+ * and a floating comma.
  *
- * Timing map (one schedule, two clocks):
- *   0–1.0 s  words (CSS --i * 60 ms)
- *   1.05 s   sparkline appears (CSS --at) + draws (JS remount)
- *   1.6 s    sparkbar appears + draws
+ * ONE clock. Words and chart slots are revealed by CSS animations anchored to
+ * the document timeline (first paint), so the choreography runs identically
+ * with or without JS. The JS draw (the library's `animate` remount) schedules
+ * itself against `document.timeline.currentTime` — the same clock — and fires
+ * only if it can land BEFORE the slot becomes visible. If hydration is too
+ * late for the rendezvous, the chart simply fades in settled: it never paints
+ * and then re-draws (the double-animation bug this replaces).
+ *
+ * Schedule (ms from first paint):
+ *   0–360    "Small enough for a model to write"
+ *   780      sparkline reveals + draws · the comma lands with it
+ *   840–1200 "sharp enough for a person to trust"
+ *   1560     sparkbar reveals + draws · the full stop lands with it
+ *   1900     the reply card starts streaming (StreamVignette startDelay)
  */
 
 const TREND = [3, 5, 4, 8, 6, 9, 7, 11];
-const AT_SPARK = 1050;
-const AT_BARS = 1600;
+const AT_SPARK = 780;
+const AT_BARS = 1560;
+/** JS must beat the slot reveal by this margin to be allowed to draw. */
+const GRACE = 140;
 
 function Words({ text, from }: { text: string; from: number }) {
   const words = text.split(" ");
@@ -41,20 +51,25 @@ function Words({ text, from }: { text: string; from: number }) {
 
 export function TypesetHeadline() {
   const [reduced, setReduced] = useState(false);
-  const [stage, setStage] = useState(0); // 0 ssr/words · 1 spark drawn · 2 bars drawn
+  const [stage, setStage] = useState(0); // 0 ssr/static · 1 spark draws · 2 bars draw
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setReduced(true);
-      setStage(2);
       return;
     }
-    const t1 = window.setTimeout(() => setStage(1), AT_SPARK);
-    const t2 = window.setTimeout(() => setStage(2), AT_BARS);
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-    };
+    // Where is the CSS choreography right now? (ms since first paint)
+    const now = Number(document.timeline?.currentTime ?? performance.now());
+    const timers: number[] = [];
+    // Only draw a chart whose slot is still hidden — a chart that already
+    // faded in stays put. Never animate something the user has seen.
+    if (AT_SPARK - now > GRACE) {
+      timers.push(window.setTimeout(() => setStage((s) => Math.max(s, 1)), AT_SPARK - now));
+    }
+    if (AT_BARS - now > GRACE) {
+      timers.push(window.setTimeout(() => setStage((s) => Math.max(s, 2)), AT_BARS - now));
+    }
+    return () => timers.forEach((t) => window.clearTimeout(t));
   }, []);
 
   return (
@@ -80,13 +95,14 @@ export function TypesetHeadline() {
             summary={false}
           />
         </span>
-        <span className="hv-w" style={{ "--i": 7 } as React.CSSProperties}>
+        {/* the comma belongs to the chart's beat, not the word stagger */}
+        <span className="hv-w" style={{ "--i": 13 } as React.CSSProperties}>
           ,{" "}
         </span>
       </span>
-      <Words text="sharp enough for a person to" from={8} />
+      <Words text="sharp enough for a person to" from={14} />
       <span className="whitespace-nowrap">
-        <em className="hv-em hv-w" style={{ "--i": 14 } as React.CSSProperties}>
+        <em className="hv-em hv-w" style={{ "--i": 20 } as React.CSSProperties}>
           trust
         </em>
         <span
@@ -104,7 +120,7 @@ export function TypesetHeadline() {
             summary={false}
           />
         </span>
-        <span className="hv-w" style={{ "--i": 15 } as React.CSSProperties}>
+        <span className="hv-w" style={{ "--i": 26 } as React.CSSProperties}>
           .
         </span>
       </span>
