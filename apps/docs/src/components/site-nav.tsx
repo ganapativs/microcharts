@@ -33,7 +33,10 @@ function Wordmark() {
       aria-label={`${SITE.name} home`}
     >
       <Brandmark size={28} className="shrink-0 transition-transform group-hover:-translate-y-px" />
-      <span className="text-[0.98rem] font-semibold tracking-[-0.01em] text-fd-foreground">
+      {/* Optical baseline: the wordmark is larger than the nav links and set
+          all-lowercase, so line-box centering leaves its baseline ~1px below
+          theirs. Lift it a hair to seat both text rows on one baseline. */}
+      <span className="-translate-y-px text-[0.98rem] font-semibold tracking-[-0.01em] text-fd-foreground">
         microcharts
       </span>
     </Link>

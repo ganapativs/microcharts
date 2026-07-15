@@ -8,8 +8,9 @@ existing charts):
 - **`defineTheme()`** — a new opt-in `@microcharts/react/theme` subpath (zero runtime deps, ~2 kB gzip, tree-shaken when
   unused). Give it one brand accent and it derives a harmonized, colour-blind-safe categorical palette and
   hand-tuned-style dark twins in-house in OKLCH — never moving the positive/negative hues off their CVD-safe split.
-  Extend a preset, pin any token, pass an explicit palette, or `extend()` a variant; returns `vars` / `style` /
-  `css(selector)` (with a `prefers-color-scheme: dark` block).
+  Extend a preset, pin any token (colours plus geometry/type — `strokeWidth`, `gap`, `labelSize`, `labelWeight`,
+  `density`), pass an explicit palette, or `extend()` a variant; returns `vars` / `style` / `css(selector)` (with a
+  `prefers-color-scheme: dark` block).
 - **New tokens** — `--mc-font-numeric` (a dedicated face for figures, tracks `--mc-font` by default),
   `--mc-label-weight`, and `--mc-density` (one scalar that scales stroke weight, label size, and small-multiple gap
   together for compact vs comfortable layouts; the plot box is untouched).

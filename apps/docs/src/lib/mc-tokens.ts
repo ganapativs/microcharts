@@ -42,7 +42,12 @@ export const SEMANTIC_TOKENS: ColorToken[] = [
     light: "#bd4b2d",
     dark: "#df7856",
   },
-  { cssVar: "--mc-neutral", role: "No-signal marks, baselines", light: "#8a8986", dark: "#9a9a97" },
+  {
+    cssVar: "--mc-neutral",
+    role: "No-signal marks, baselines",
+    light: "#8a8986",
+    dark: "#9a9a97",
+  },
   {
     cssVar: "--mc-accent",
     role: "Emphasis — rebind to your brand",
@@ -66,12 +71,48 @@ export const SEMANTIC_TOKENS: ColorToken[] = [
 
 // Categorical palette — matte jewel tones, lightness-ordered, multi-series only.
 export const CATEGORICAL_TOKENS: ColorToken[] = [
-  { cssVar: "--mc-cat-1", role: "", tone: "Gold", light: "#d2982f", dark: "#e2b45c" },
-  { cssVar: "--mc-cat-2", role: "", tone: "Azure", light: "#5b9fd4", dark: "#6fb0e0" },
-  { cssVar: "--mc-cat-3", role: "", tone: "Emerald", light: "#2e8c66", dark: "#4fb08d" },
-  { cssVar: "--mc-cat-4", role: "", tone: "Sapphire", light: "#285788", dark: "#6e9bd1" },
-  { cssVar: "--mc-cat-5", role: "", tone: "Terracotta", light: "#c2543a", dark: "#e07e5e" },
-  { cssVar: "--mc-cat-6", role: "", tone: "Mauve", light: "#a85c8c", dark: "#c486b0" },
+  {
+    cssVar: "--mc-cat-1",
+    role: "",
+    tone: "Gold",
+    light: "#d2982f",
+    dark: "#e2b45c",
+  },
+  {
+    cssVar: "--mc-cat-2",
+    role: "",
+    tone: "Azure",
+    light: "#5b9fd4",
+    dark: "#6fb0e0",
+  },
+  {
+    cssVar: "--mc-cat-3",
+    role: "",
+    tone: "Emerald",
+    light: "#2e8c66",
+    dark: "#4fb08d",
+  },
+  {
+    cssVar: "--mc-cat-4",
+    role: "",
+    tone: "Sapphire",
+    light: "#285788",
+    dark: "#6e9bd1",
+  },
+  {
+    cssVar: "--mc-cat-5",
+    role: "",
+    tone: "Terracotta",
+    light: "#c2543a",
+    dark: "#e07e5e",
+  },
+  {
+    cssVar: "--mc-cat-6",
+    role: "",
+    tone: "Mauve",
+    light: "#a85c8c",
+    dark: "#c486b0",
+  },
 ];
 
 export type Preset = {
@@ -86,7 +127,12 @@ export type Preset = {
 // Presets are token bundles applied with `data-mc-theme` / `data-mc-preset`.
 // modern is the default (no attribute). These mirror the library preset blocks.
 export const PRESETS: Preset[] = [
-  { id: "modern", label: "Modern", note: "The default — nothing to override.", changes: [] },
+  {
+    id: "modern",
+    label: "Modern",
+    note: "The default — nothing to override.",
+    changes: [],
+  },
   {
     id: "editorial",
     label: "Editorial",
@@ -105,6 +151,7 @@ export const PRESETS: Preset[] = [
       { cssVar: "--mc-negative", value: "var(--mc-stroke)" },
       { cssVar: "--mc-accent", value: "var(--mc-stroke)" },
       { cssVar: "--mc-neutral", value: "var(--mc-stroke)" },
+      { cssVar: "--mc-moon", value: "var(--mc-stroke)" },
     ],
   },
   {
@@ -128,7 +175,10 @@ export const PRESETS: Preset[] = [
       { cssVar: "--mc-negative", value: "#a33f22" },
       { cssVar: "--mc-accent", value: "#14507a" },
       { cssVar: "--mc-moon", value: "#7a5a12" },
-      { cssVar: "--mc-band", value: "color-mix(in oklab, #1a1a1a 9%, transparent)" },
+      {
+        cssVar: "--mc-band",
+        value: "color-mix(in oklab, #1a1a1a 9%, transparent)",
+      },
       { cssVar: "--mc-stroke-width", value: "1.25" },
     ],
   },
@@ -143,7 +193,10 @@ export const PRESETS: Preset[] = [
       { cssVar: "--mc-neutral", value: "#8c8c8c" },
       { cssVar: "--mc-accent", value: "#000000" },
       { cssVar: "--mc-moon", value: "#000000" },
-      { cssVar: "--mc-band", value: "color-mix(in oklab, #000000 14%, transparent)" },
+      {
+        cssVar: "--mc-band",
+        value: "color-mix(in oklab, #000000 14%, transparent)",
+      },
       { cssVar: "--mc-stroke-width", value: "2" },
     ],
   },

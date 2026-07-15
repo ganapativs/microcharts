@@ -59,6 +59,13 @@ describe("mc-tokens mirrors the library stylesheet", () => {
       for (const change of p.changes) {
         expect(block[change.cssVar], `${p.id} ${change.cssVar}`).toBe(change.value);
       }
+      // Bidirectional: every delta the library declares must be documented, so a
+      // preset that quietly retunes an extra token (e.g. mono → --mc-moon) can't
+      // slip past the swatch table. Guards the under-reporting direction the
+      // per-change loop above can't see.
+      expect(Object.keys(block).sort(), `${p.id} documented deltas match styles.css`).toEqual(
+        p.changes.map((c) => c.cssVar).sort(),
+      );
     },
   );
 });

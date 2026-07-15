@@ -494,7 +494,11 @@ body {
    beside the light stock, whatever the reader's own mode. */
 .preset-ink {
   background-color: #17161a;
-  background-image: radial-gradient(circle at 1px 1px, rgba(240, 240, 245, 0.06) 1px, transparent 0);
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(240, 240, 245, 0.06) 1px,
+    transparent 0
+  );
   background-size: 11px 11px;
 }
 

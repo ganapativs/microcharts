@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { MiniBar } from "@microcharts/react/mini-bar";
@@ -78,8 +78,19 @@ function Segmented<T extends string>({
   );
 }
 
+// The roles the preview names, painted from the resolved tokens so each swatch
+// tracks the current style + accent live. Keyed to the marks above them.
+const LEGEND = [
+  { name: "Ink", token: "--mc-stroke" },
+  { name: "Accent", token: "--mc-accent" },
+  { name: "Up", token: "--mc-positive" },
+  { name: "Down", token: "--mc-negative" },
+] as const;
+
 // One theme preview pane — real charts painted under a resolved token map, on a
 // fixed light or ink "page" so the mode reads truthfully whatever the reader's.
+// The sparkline shows ink + band + accent endpoint; the bars show valence with a
+// single accent-highlighted peak, so a brand-accent choice is unmistakable.
 function PreviewPane({
   tone,
   style,
@@ -89,10 +100,11 @@ function PreviewPane({
   style: CSSProperties;
   label: string;
 }) {
+  const dim = tone === "light" ? "text-black/55" : "text-white/60";
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center justify-center gap-2 overflow-hidden rounded-lg px-4 pb-4 pt-6",
+        "relative flex flex-col items-center gap-2 overflow-hidden rounded-lg px-4 pb-3 pt-6",
         // Fluid charts: the viewBox sets the aspect, CSS scales the SVG to the
         // pane so a fixed width can never spill past the rounded edge.
         "[&_svg]:!h-auto [&_svg]:!w-full",
@@ -100,24 +112,42 @@ function PreviewPane({
       )}
       style={style}
     >
-      <span
-        className={cn(
-          "mono-label absolute left-2.5 top-2 text-[0.5rem]",
-          tone === "light" ? "!text-black/45" : "!text-white/50",
-        )}
-      >
+      <span className={cn("mono-label absolute left-2.5 top-2 text-[0.5rem] !text-current", dim)}>
         {label}
       </span>
-      <Sparkline
-        data={PREVIEW_SERIES}
-        width={200}
-        height={30}
-        curve="smooth"
-        fill
-        dots="minmax"
-        summary={false}
-      />
-      <MiniBar data={PREVIEW_BARS} positive="up" width={200} height={18} summary={false} />
+      <div className="flex w-full flex-1 flex-col justify-center gap-2">
+        <Sparkline
+          data={PREVIEW_SERIES}
+          width={200}
+          height={30}
+          curve="smooth"
+          fill
+          dots="minmax"
+          summary={false}
+        />
+        <MiniBar
+          data={PREVIEW_BARS}
+          positive="up"
+          highlight="f"
+          width={200}
+          height={18}
+          summary={false}
+        />
+      </div>
+      {/* role legend — tiny swatches that repaint with the tokens, so "Accent"
+          visibly changes the moment a brand accent is picked. */}
+      <div className={cn("mt-1 grid w-full max-w-[9rem] grid-cols-2 gap-x-3 gap-y-1", dim)}>
+        {LEGEND.map((r) => (
+          <span key={r.token} className="inline-flex items-center gap-1 text-[0.56rem]">
+            <span
+              aria-hidden
+              className="size-2 shrink-0 rounded-[2px] ring-1 ring-inset ring-black/10 dark:ring-white/10"
+              style={{ background: `var(${r.token})` }}
+            />
+            {r.name}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -138,7 +168,15 @@ export function TokenStudio() {
 
   const code = useMemo(
     () =>
-      serializeTokens({ preset, accent, mode, include, scope: scope || ":root", format, annotate }),
+      serializeTokens({
+        preset,
+        accent,
+        mode,
+        include,
+        scope: scope || ":root",
+        format,
+        annotate,
+      }),
     [preset, accent, mode, include, scope, format, annotate],
   );
 
@@ -152,66 +190,49 @@ export function TokenStudio() {
   const lightStyle = styleFrom(previewTokens.light);
   const darkStyle = styleFrom(previewTokens.dark);
 
-  const fileName =
-    format === "js" ? "theme.ts" : mode === "dark" ? "theme.dark.css" : "theme.css";
+  const fileName = format === "js" ? "theme.ts" : mode === "dark" ? "theme.dark.css" : "theme.css";
 
   return (
     <div className="not-prose my-6 overflow-hidden rounded-2xl border border-fd-border/70 bg-fd-card/30">
-      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-        {/* ── controls ─────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-4 border-b border-fd-border/60 p-4 lg:border-b-0 lg:border-r">
-          <div>
-            <div className="mono-label mb-1.5 text-[0.56rem]">Style</div>
-            <div className="flex flex-wrap gap-1.5">
-              {PRESET_OPTS.map((p) => {
-                const active = p.id === preset;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    aria-pressed={active}
-                    onClick={() => setPreset(p.id)}
-                    className={cn(
-                      "rounded-lg border px-2.5 py-1.5 text-[0.72rem] transition-all duration-200 hover:-translate-y-px",
-                      active
-                        ? "border-fd-primary/50 bg-fd-primary/10 text-fd-foreground"
-                        : "border-fd-border text-fd-muted-foreground hover:border-fd-primary/30 hover:text-fd-foreground",
-                    )}
-                  >
-                    {p.label}
-                  </button>
-                );
-              })}
-            </div>
+      {/* ── controls: a full-width strip, labels left, choices right ── */}
+      <div className="flex flex-col gap-3.5 border-b border-fd-border/60 p-4 sm:p-5">
+        <FieldRow label="Style">
+          <div className="flex flex-wrap gap-1.5">
+            {PRESET_OPTS.map((p) => (
+              <Choice key={p.id} active={p.id === preset} onSelect={() => setPreset(p.id)}>
+                {p.label}
+              </Choice>
+            ))}
           </div>
+        </FieldRow>
 
-          <div>
-            <div className="mono-label mb-1.5 text-[0.56rem]">Brand accent</div>
-            <div className="flex flex-wrap gap-1.5">
+        <FieldRow label="Accent">
+          <div className="flex flex-wrap gap-1.5">
+            <AccentDot
+              label="None"
+              swatch={null}
+              active={accent === null}
+              onSelect={() => setAccent(null)}
+            />
+            {ACCENTS.map((a) => (
               <AccentDot
-                label="None"
-                swatch={null}
-                active={accent === null}
-                onSelect={() => setAccent(null)}
+                key={a.id}
+                label={a.label}
+                swatch={a.light}
+                active={accent === a.id}
+                onSelect={() => setAccent(a.id)}
               />
-              {ACCENTS.map((a) => (
-                <AccentDot
-                  key={a.id}
-                  label={a.label}
-                  swatch={a.light}
-                  active={accent === a.id}
-                  onSelect={() => setAccent(a.id)}
-                />
-              ))}
-            </div>
-            {accent && presetPinsAccent(preset) && (
-              <p className="mt-1.5 text-[0.68rem] leading-snug text-fd-muted-foreground">
-                Heads up — <code className="text-[0.66rem]">{preset}</code> pins its own accent, so
-                this override is what makes yours win.
-              </p>
-            )}
+            ))}
           </div>
+          {accent && presetPinsAccent(preset) && (
+            <p className="mt-1.5 text-[0.68rem] leading-snug text-fd-muted-foreground">
+              Heads up — <code className="text-[0.66rem]">{preset}</code> pins its own accent, so
+              this override is what makes yours win.
+            </p>
+          )}
+        </FieldRow>
 
+        <FieldRow label="Output">
           <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
             <Segmented
               label="Mode"
@@ -241,47 +262,87 @@ export function TokenStudio() {
                 { id: "js", label: "JS object" },
               ]}
             />
+            {format === "css" && (
+              <>
+                <label className="flex flex-col gap-1.5">
+                  <span className="mono-label text-[0.56rem]">Scope</span>
+                  <input
+                    value={scope}
+                    onChange={(e) => setScope(e.target.value)}
+                    spellCheck={false}
+                    aria-label="CSS selector scope"
+                    className="h-[1.85rem] w-32 rounded-lg border border-fd-border/70 bg-fd-background/60 px-2.5 font-mono text-[0.72rem] text-fd-foreground outline-none focus:border-fd-primary/50"
+                  />
+                </label>
+                <label className="flex h-[1.85rem] cursor-pointer items-center gap-1.5 text-[0.72rem] text-fd-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={annotate}
+                    onChange={(e) => setAnnotate(e.target.checked)}
+                    className="size-3.5 accent-fd-primary"
+                  />
+                  Comment tokens
+                </label>
+              </>
+            )}
           </div>
+        </FieldRow>
+      </div>
 
-          {format === "css" && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <label className="flex items-center gap-2">
-                <span className="mono-label text-[0.56rem]">Scope</span>
-                <input
-                  value={scope}
-                  onChange={(e) => setScope(e.target.value)}
-                  spellCheck={false}
-                  aria-label="CSS selector scope"
-                  className="w-28 rounded-md border border-fd-border/70 bg-fd-background/60 px-2 py-1 font-mono text-[0.72rem] text-fd-foreground outline-none focus:border-fd-primary/50"
-                />
-              </label>
-              <label className="flex cursor-pointer items-center gap-1.5 text-[0.72rem] text-fd-muted-foreground">
-                <input
-                  type="checkbox"
-                  checked={annotate}
-                  onChange={(e) => setAnnotate(e.target.checked)}
-                  className="size-3.5 accent-fd-primary"
-                />
-                Comment each token
-              </label>
-            </div>
-          )}
-        </div>
+      {/* ── preview: a full-width banner, both modes side by side ───── */}
+      <div className="grid gap-3 border-b border-fd-border/60 p-4 sm:grid-cols-2 sm:p-5">
+        <PreviewPane tone="light" style={lightStyle} label="Light" />
+        <PreviewPane tone="dark" style={darkStyle} label="Dark" />
+      </div>
 
-        {/* ── preview + output ─────────────────────────────────────── */}
-        <div className="flex flex-col gap-3 p-4">
-          <div className="grid grid-cols-2 gap-2">
-            <PreviewPane tone="light" style={lightStyle} label="Light" />
-            <PreviewPane tone="dark" style={darkStyle} label="Dark" />
-          </div>
-          <DynamicCodeBlock
-            lang={format === "js" ? "ts" : "css"}
-            code={code}
-            codeblock={{ title: fileName, keepBackground: false }}
-          />
-        </div>
+      {/* ── output: full width, no inner scroll cap, and long lines wrap
+           (annotated "All" lines) so the block never scrolls sideways ── */}
+      <div className="token-code p-4 sm:p-5 [&_.fd-scroll-container]:!max-h-none [&_.line]:whitespace-pre-wrap [&_.line]:break-words [&_figure]:!my-0 [&_pre]:!w-full">
+        <DynamicCodeBlock
+          lang={format === "js" ? "ts" : "css"}
+          code={code}
+          codeblock={{ title: fileName, keepBackground: false }}
+        />
       </div>
     </div>
+  );
+}
+
+// A labelled control row — mono label on the left (or stacked on mobile), the
+// choices filling the rest. Keeps the strip dense and the eye on one column.
+function FieldRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+      <div className="mono-label shrink-0 pt-1.5 text-[0.56rem] sm:w-[5.5rem]">{label}</div>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
+
+// A preset/style pill — the one button shape shared across the strip.
+function Choice({
+  active,
+  onSelect,
+  children,
+}: {
+  active: boolean;
+  onSelect: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onSelect}
+      className={cn(
+        "rounded-lg border px-2.5 py-1.5 text-[0.72rem] transition-all duration-200 hover:-translate-y-px",
+        active
+          ? "border-fd-primary/50 bg-fd-primary/10 text-fd-foreground"
+          : "border-fd-border text-fd-muted-foreground hover:border-fd-primary/30 hover:text-fd-foreground",
+      )}
+    >
+      {children}
+    </button>
   );
 }
 

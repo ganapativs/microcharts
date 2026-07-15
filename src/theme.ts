@@ -51,6 +51,8 @@ export interface ThemeSpec {
   labelSize?: string;
   /** Label weight. */
   labelWeight?: number | string;
+  /** Base data stroke weight (maps to `--mc-stroke-width`). */
+  strokeWidth?: number | string;
   /** Uniform density scalar — compact (`< 1`) vs comfortable (`> 1`). */
   density?: number;
   /** Small-multiple gap (a CSS length). */
@@ -249,6 +251,7 @@ function directVars(spec: ThemeSpec): Vars {
   set("--mc-font-numeric", spec.fontNumeric);
   set("--mc-label-size", spec.labelSize);
   set("--mc-label-weight", spec.labelWeight);
+  set("--mc-stroke-width", spec.strokeWidth);
   set("--mc-density", spec.density);
   set("--mc-gap", spec.gap);
   set("--mc-duration", spec.duration);

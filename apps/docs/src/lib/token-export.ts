@@ -36,26 +36,87 @@ export const BASE_TOKENS: BaseToken[] = [
   { cssVar: "--mc-band", light: "color-mix(in oklab, var(--mc-stroke) 8%, transparent)", category: "ink", note: "Normal-range shading, derived from ink" }, // prettier-ignore
   { cssVar: "--mc-moon", light: "#c1922f", dark: "#e0be6f", category: "ink", note: "MoonPhase lit area — warm amber" }, // prettier-ignore
   // categorical — multi-series only, lightness-ordered
-  { cssVar: "--mc-cat-1", light: "#d2982f", dark: "#e2b45c", category: "cat", note: "Gold" },
-  { cssVar: "--mc-cat-2", light: "#5b9fd4", dark: "#6fb0e0", category: "cat", note: "Azure" },
-  { cssVar: "--mc-cat-3", light: "#2e8c66", dark: "#4fb08d", category: "cat", note: "Emerald" },
-  { cssVar: "--mc-cat-4", light: "#285788", dark: "#6e9bd1", category: "cat", note: "Sapphire" },
-  { cssVar: "--mc-cat-5", light: "#c2543a", dark: "#e07e5e", category: "cat", note: "Terracotta" },
-  { cssVar: "--mc-cat-6", light: "#a85c8c", dark: "#c486b0", category: "cat", note: "Mauve" },
+  {
+    cssVar: "--mc-cat-1",
+    light: "#d2982f",
+    dark: "#e2b45c",
+    category: "cat",
+    note: "Gold",
+  },
+  {
+    cssVar: "--mc-cat-2",
+    light: "#5b9fd4",
+    dark: "#6fb0e0",
+    category: "cat",
+    note: "Azure",
+  },
+  {
+    cssVar: "--mc-cat-3",
+    light: "#2e8c66",
+    dark: "#4fb08d",
+    category: "cat",
+    note: "Emerald",
+  },
+  {
+    cssVar: "--mc-cat-4",
+    light: "#285788",
+    dark: "#6e9bd1",
+    category: "cat",
+    note: "Sapphire",
+  },
+  {
+    cssVar: "--mc-cat-5",
+    light: "#c2543a",
+    dark: "#e07e5e",
+    category: "cat",
+    note: "Terracotta",
+  },
+  {
+    cssVar: "--mc-cat-6",
+    light: "#a85c8c",
+    dark: "#c486b0",
+    category: "cat",
+    note: "Mauve",
+  },
   // geometry
   { cssVar: "--mc-stroke-width", light: "1.5", category: "geometry", note: "Stroke weight (~2 standalone)" }, // prettier-ignore
-  { cssVar: "--mc-gap", light: "0.25em", category: "geometry", note: "Gap between grouped marks" },
+  {
+    cssVar: "--mc-gap",
+    light: "0.25em",
+    category: "geometry",
+    note: "Gap between grouped marks",
+  },
   { cssVar: "--mc-density", light: "1", category: "geometry", note: "Uniform density scale (<1 compact)" }, // prettier-ignore
   // type
-  { cssVar: "--mc-font", light: "inherit", category: "type", note: "Adopts the host UI font" },
+  {
+    cssVar: "--mc-font",
+    light: "inherit",
+    category: "type",
+    note: "Adopts the host UI font",
+  },
   { cssVar: "--mc-font-numeric", light: "var(--mc-font)", category: "type", note: "Figures + labels face" }, // prettier-ignore
   { cssVar: "--mc-label-size", light: "0.75em", category: "type", note: "Direct-label text size" }, // prettier-ignore
-  { cssVar: "--mc-label-weight", light: "400", category: "type", note: "Direct-label weight" },
+  {
+    cssVar: "--mc-label-weight",
+    light: "400",
+    category: "type",
+    note: "Direct-label weight",
+  },
   { cssVar: "--mc-inline-nudge", light: "0em", category: "type", note: "Optional inline optical shift" }, // prettier-ignore
   { cssVar: "--mc-glyph-nudge", light: "-0.04em", category: "type", note: "Centred-glyph optical lift" }, // prettier-ignore
   // interactive readout surface
-  { cssVar: "--mc-surface", light: "Canvas", category: "surface", note: "Readout chip backing" },
-  { cssVar: "--mc-surface-ink", light: "CanvasText", category: "surface", note: "Readout chip ink" },
+  {
+    cssVar: "--mc-surface",
+    light: "Canvas",
+    category: "surface",
+    note: "Readout chip backing",
+  },
+  {
+    cssVar: "--mc-surface-ink",
+    light: "CanvasText",
+    category: "surface",
+    note: "Readout chip ink",
+  },
   { cssVar: "--mc-surface-edge", light: "color-mix(in oklab, CanvasText 16%, transparent)", category: "surface", note: "Readout chip edge" }, // prettier-ignore
   // motion
   { cssVar: "--mc-duration", light: "300ms", category: "motion", note: "Entrance timing (interactive only)" }, // prettier-ignore
@@ -118,8 +179,7 @@ export type ExportOptions = {
   annotate: boolean;
 };
 
-const presetById = (id: string): Preset =>
-  PRESETS.find((p) => p.id === id) ?? PRESETS[0]!;
+const presetById = (id: string): Preset => PRESETS.find((p) => p.id === id) ?? PRESETS[0]!;
 
 const inInclude = (cat: TokenCategory, include: "color" | "all") =>
   include === "all" || cat === "ink" || cat === "cat";
@@ -133,7 +193,7 @@ const inInclude = (cat: TokenCategory, include: "color" | "all") =>
 export function resolveTokens(opts: Pick<ExportOptions, "preset" | "accent" | "include">) {
   const preset = presetById(opts.preset);
   const twin = PRESET_DARK_TWINS[preset.id] ?? {};
-  const accent = opts.accent ? ACCENTS.find((a) => a.id === opts.accent) ?? null : null;
+  const accent = opts.accent ? (ACCENTS.find((a) => a.id === opts.accent) ?? null) : null;
   const presetDelta = Object.fromEntries(preset.changes.map((c) => [c.cssVar, c.value]));
 
   const light: { cssVar: string; value: string; note: string }[] = [];
@@ -158,13 +218,12 @@ export function resolveTokens(opts: Pick<ExportOptions, "preset" | "accent" | "i
   return { light, dark };
 }
 
-const cssLine = (
-  e: { cssVar: string; value: string; note: string },
-  annotate: boolean,
-  pad = 0,
-) => {
+// One declaration line. The optional comment follows a single space — never
+// column-padded: alignment would push comments far right on the long color-mix
+// lines, which then wrap badly in the fixed-width copy block.
+const cssLine = (e: { cssVar: string; value: string; note: string }, annotate: boolean) => {
   const decl = `  ${e.cssVar}: ${e.value};`;
-  return annotate ? `${decl.padEnd(pad)} /* ${e.note} */` : decl;
+  return annotate ? `${decl} /* ${e.note} */` : decl;
 };
 
 function emitCss(opts: ExportOptions): string {
@@ -173,24 +232,17 @@ function emitCss(opts: ExportOptions): string {
   // exactly like the library's `@media` block.
   const darkDelta = dark.filter((d, i) => d.value !== light[i]!.value);
 
-  const pad = opts.annotate
-    ? Math.max(...light.map((e) => `  ${e.cssVar}: ${e.value};`.length)) + 1
-    : 0;
-
   if (opts.mode === "dark") {
     // Flatten the resolved dark values under the scope — for hardcoding a dark UI.
-    const body = dark.map((e) => cssLine(e, opts.annotate, pad)).join("\n");
+    const body = dark.map((e) => cssLine(e, opts.annotate)).join("\n");
     return `${opts.scope} {\n${body}\n}`;
   }
 
-  const lightBody = light.map((e) => cssLine(e, opts.annotate, pad)).join("\n");
+  const lightBody = light.map((e) => cssLine(e, opts.annotate)).join("\n");
   const root = `${opts.scope} {\n${lightBody}\n}`;
   if (opts.mode === "light" || darkDelta.length === 0) return root;
 
-  const dpad = opts.annotate
-    ? Math.max(...darkDelta.map((e) => `  ${e.cssVar}: ${e.value};`.length)) + 1
-    : 0;
-  const darkBody = darkDelta.map((e) => `  ${cssLine(e, opts.annotate, dpad)}`).join("\n");
+  const darkBody = darkDelta.map((e) => `  ${cssLine(e, opts.annotate)}`).join("\n");
   return `${root}\n\n@media (prefers-color-scheme: dark) {\n  ${opts.scope} {\n${darkBody}\n  }\n}`;
 }
 

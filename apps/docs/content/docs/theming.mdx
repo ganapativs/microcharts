@@ -11,6 +11,10 @@ Tailwind requirement — set a `--mc-*` variable at any scope and every chart in
 no build step. (Prefer a React component to a raw attribute? [`MicroProvider`](#a-component-api-if-you-prefer) wraps the
 same contract.)
 
+Two ideas carry the whole system: **a token** is one variable you set, and **a scope** is where you set it. Learn those
+two and the rest of this page is just the vocabulary — every colour, weight, and timing you can reach for, and a studio
+that hands you any combination as ready-to-paste CSS.
+
 ## Override a token
 
 ```css
@@ -52,10 +56,141 @@ chart. Set a token high and every chart below inherits it; override it lower and
 Bind `--mc-accent` to your existing brand variable and the charts follow your design system automatically — no per-chart
 props, no duplicated color values.
 
+## The token set
+
+That's the whole mechanism. What's left is the vocabulary: about two dozen custom properties cover the entire surface,
+and setting any of them at any scope retunes every chart inside. Here are the colour tokens with their built-in light
+and dark values — every chip is the real shipped default, click to copy the hex:
+
+<TokenSwatches />
+
+Below is the same set as raw CSS — the colours plus the geometry, motion, and readout-surface tokens — ready to paste
+and override. (Want a specific style or accent instead of the bare defaults? The [studio](#copy-tokens) a little further
+down builds any combination for you.)
+
+```css
+:root {
+  /* Semantic colour */
+
+  /* Default ink: lines, bars, labels. Dark mode is hand-tuned, not inverted. */
+  --mc-stroke: #1a1917;
+
+  /* Good direction — colour-blind-safe viridian; pair with ▲. */
+  --mc-positive: #0e7a5f;
+
+  /* Bad direction — colour-blind-safe terracotta; pair with ▼. */
+  --mc-negative: #bd4b2d;
+
+  /* No-signal marks: baselines, inactive points, empty cells. */
+  --mc-neutral: #8a8986;
+
+  /* Emphasis colour — rebind to your brand. */
+  --mc-accent: #1f6091;
+
+  /* Normal-range shading, derived from the ink. */
+  --mc-band: color-mix(in oklab, var(--mc-stroke) 8%, transparent);
+
+  /* MoonPhase lit area — warm amber; mono/print/eink retune it with the ink. */
+  --mc-moon: #c1922f;
+
+  /* Categorical palette — matte jewel tones; multi-series only, lightness-ordered.
+     Each has a hand-tuned brighter twin on dark surfaces (same hue, lifted). */
+  --mc-cat-1: #d2982f;
+  --mc-cat-2: #5b9fd4;
+  --mc-cat-3: #2e8c66;
+  --mc-cat-4: #285788;
+  --mc-cat-5: #c2543a;
+  --mc-cat-6: #a85c8c;
+
+  /* Geometry */
+
+  /* Light by default for inline use; bump to ~2 when standalone. */
+  --mc-stroke-width: 1.5;
+
+  /* Spacing between grouped marks; em-based so it scales with the font. */
+  --mc-gap: 0.25em;
+
+  /* Uniform density scale — compact (<1) vs comfortable (>1). Tunes stroke
+     weight, label size, and small-multiple gap together; the box set by
+     width/height is untouched. */
+  --mc-density: 1;
+
+  /* Direct-label text size, relative to the chart's font. */
+  --mc-label-size: 0.75em;
+
+  /* Direct-label weight. */
+  --mc-label-weight: 400;
+
+  /* `.mc-inline` seats marks on the text baseline (font-independent). This is
+     an optional extra optical shift on top — 0 by default; set it only if a
+     particular face wants marks a hair off the line. */
+  --mc-inline-nudge: 0em;
+
+  /* Optical lift for centred glyph marks (arrow, dot, moon…) that sit on the
+     x-height seat instead of the baseline — font-relative. 0em to centre exactly
+     on the x-height; the default nudges toward the cap-height midpoint. */
+  --mc-glyph-nudge: -0.04em;
+
+  /* Motion & type */
+
+  /* Entrance timing for interactive entries; static charts never animate. */
+  --mc-duration: 300ms;
+
+  /* Ease-out entrance; no bounce or loop. */
+  --mc-easing: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Inherits the host UI font + tabular numerals by default. */
+  --mc-font: inherit;
+
+  /* Face for figures + labels — tracks --mc-font; point at a brand or mono
+     face to give numbers their own typeface without touching the page font. */
+  --mc-font-numeric: var(--mc-font);
+
+  /* Interactive readout chip (hover/focus). Defaults to system canvas. */
+  --mc-surface: Canvas;
+  --mc-surface-ink: CanvasText;
+  --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);
+}
+```
+
+## Semantic vs categorical color
+
+The colour tokens split into two groups, and knowing which is which is what keeps a theme honest.
+
+**Semantic tokens keep their meaning.** Swapping `--mc-accent` retints the one emphasis color, but
+`--mc-positive`/`--mc-negative` still mean up and down — so a preset can restyle a chart without ever changing what it
+says. Color encodes; it never merely decorates.
+
+**Categorical colors are a last resort.** Most microcharts show one series and never touch the palette. When a chart
+genuinely needs several, the six `--mc-cat-*` hues are ordered high-contrast-first and chosen to survive color-vision
+differences _and_ grayscale print — so a two-series chart automatically reaches for the most separable pair.
+
+To recolour the series on _one_ instance without touching the global palette, the categorical charts (`SegmentedBar`,
+`StackedArea`, `PartitionStrip`, `Hypnogram`, `MicroDonut`) take a `colors` array — cycled per series, overriding
+`--mc-cat-*` just there. A rolled-up "Other" or an emphasised node keeps its neutral/accent role.
+
+<LiveDemo
+  label="Per-instance colors[]"
+  code={`<SegmentedBar data={mix} colors={["#2563eb", "#db2777", "#65a30d", "#f59e0b"]} />`}
+>
+  <SegmentedBar
+    data={[
+      { label: "A", value: 34 },
+      { label: "B", value: 26 },
+      { label: "C", value: 22 },
+      { label: "D", value: 18 },
+    ]}
+    colors={["#2563eb", "#db2777", "#65a30d", "#f59e0b"]}
+    width={220}
+    height={16}
+    title="Custom series colours"
+  />
+</LiveDemo>
+
 ## Presets
 
-Presets are bundled token sets, applied with a `data-mc-theme` attribute — pure CSS, zero JavaScript. They change how
-charts _look_, never what the data _means_.
+Setting tokens by hand is one path; a **preset** is a whole look bundled under one name, applied with a `data-mc-theme`
+attribute — pure CSS, zero JavaScript. They change how charts _look_, never what the data _means_.
 
 <LiveDemo
   label="Presets"
@@ -88,9 +223,23 @@ gray) with heavier strokes for a low-refresh e-paper panel. Apply them the same 
 region you're about to render.
 
 <Callout type="info">
-  This site's appearance menu (the palette icon in the nav) previews these presets and accents live — every chart on
-  every page retunes as you switch, because it's the same token contract you'd use in your own app.
+  Every preset above carries a **Copy tokens** button, and the [studio below](#copy-tokens) lets you pair any preset
+  with your own accent and copy the result for both modes. This site's appearance menu (the palette icon in the nav)
+  previews the same bundles live across every page — it's the exact token contract you'd use in your own app.
 </Callout>
+
+## Copy the tokens [#copy-tokens]
+
+Everything above, in one place. Pick a style, add your brand accent, choose a mode, and copy the exact `--mc-*` block —
+light and hand-tuned dark together — ready to paste into your app. The preview renders real charts in both modes and
+names each role it paints, so an accent choice shows up the instant you make it. What you copy is the same contract the
+library ships, never an approximation.
+
+<TokenStudio />
+
+Paste the CSS into any stylesheet and every chart in scope retunes. Prefer the component API? Switch the format to a
+tokens object and spread it onto [`MicroProvider`](#a-component-api-if-you-prefer) — or, to derive a whole matched
+palette from one accent instead of copying fixed values, reach for [`defineTheme`](#build-a-theme-from-one-colour).
 
 ## A component API, if you prefer
 
@@ -189,6 +338,9 @@ defineTheme({
 
 // compose a compact variant off an existing theme
 defineTheme({ density: 0.85 }).extend({ labelWeight: 500 });
+
+// pin geometry directly — strokeWidth, gap, labelSize, labelWeight, density
+defineTheme({ accent: "#6d28d9", strokeWidth: 2 });
 ```
 
 It's pure, dependency-free, and tree-shaken out of any bundle that never imports it.
@@ -205,107 +357,6 @@ still comes from `width`/`height`, so nothing reflows unexpectedly.
   --mc-density: 0.85;
 }
 ```
-
-## The token set
-
-About two dozen custom properties cover the whole surface. Set any of them at any scope and every chart inside retunes.
-Here are the colour tokens with their built-in light and dark values — every chip is the real shipped default, click to
-copy the hex:
-
-<TokenSwatches />
-
-Semantic tokens keep their meaning across themes; the six categorical hues are a last resort for genuine multi-series
-charts. Below is the same set as raw CSS — including the geometry, motion, and readout-surface tokens — ready to paste
-and override:
-
-```css
-:root {
-  /* Semantic colour */
-
-  /* Default ink: lines, bars, labels. Dark mode is hand-tuned, not inverted. */
-  --mc-stroke: #1a1917;
-
-  /* Good direction — colour-blind-safe viridian; pair with ▲. */
-  --mc-positive: #0e7a5f;
-
-  /* Bad direction — colour-blind-safe terracotta; pair with ▼. */
-  --mc-negative: #bd4b2d;
-
-  /* No-signal marks: baselines, inactive points, empty cells. */
-  --mc-neutral: #8a8986;
-
-  /* Emphasis colour — rebind to your brand. */
-  --mc-accent: #1f6091;
-
-  /* Normal-range shading, derived from the ink. */
-  --mc-band: color-mix(in oklab, var(--mc-stroke) 8%, transparent);
-
-  /* Categorical palette — matte jewel tones; multi-series only, lightness-ordered.
-     Each has a hand-tuned brighter twin on dark surfaces (same hue, lifted). */
-  --mc-cat-1: #d2982f;
-  --mc-cat-2: #5b9fd4;
-  --mc-cat-3: #2e8c66;
-  --mc-cat-4: #285788;
-  --mc-cat-5: #c2543a;
-  --mc-cat-6: #a85c8c;
-
-  /* Geometry */
-
-  /* Light by default for inline use; bump to ~2 when standalone. */
-  --mc-stroke-width: 1.5;
-
-  /* Spacing between grouped marks; em-based so it scales with the font. */
-  --mc-gap: 0.25em;
-
-  /* Uniform density scale — compact (<1) vs comfortable (>1). Tunes stroke
-     weight, label size, and small-multiple gap together; the box set by
-     width/height is untouched. */
-  --mc-density: 1;
-
-  /* Direct-label text size, relative to the chart's font. */
-  --mc-label-size: 0.75em;
-
-  /* Direct-label weight. */
-  --mc-label-weight: 400;
-
-  /* `.mc-inline` seats marks on the text baseline (font-independent). This is
-     an optional extra optical shift on top — 0 by default; set it only if a
-     particular face wants marks a hair off the line. */
-  --mc-inline-nudge: 0em;
-
-  /* Motion & type */
-
-  /* Entrance timing for interactive entries; static charts never animate. */
-  --mc-duration: 300ms;
-
-  /* Ease-out entrance; no bounce or loop. */
-  --mc-easing: cubic-bezier(0.22, 1, 0.36, 1);
-
-  /* Inherits the host UI font + tabular numerals by default. */
-  --mc-font: inherit;
-
-  /* Face for figures + labels — tracks --mc-font; point at a brand or mono
-     face to give numbers their own typeface without touching the page font. */
-  --mc-font-numeric: var(--mc-font);
-
-  /* Interactive readout chip (hover/focus). Defaults to system canvas. */
-  --mc-surface: Canvas;
-  --mc-surface-ink: CanvasText;
-  --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);
-}
-```
-
-## Copy the tokens [#copy-tokens]
-
-Everything on this page in one place: pick a style, add your brand accent, choose a mode, and copy the exact `--mc-*`
-block — light and hand-tuned dark together — ready to paste into your app. The preview shows the real charts in both
-modes, and what you copy is the same contract the library ships, not an approximation.
-
-<TokenStudio />
-
-Paste the CSS into any stylesheet and every chart in scope retunes. Prefer the component API? Switch the format to a
-tokens object and spread it onto [`MicroProvider`](#a-component-api-if-you-prefer) — or, to derive a whole matched
-palette from one accent instead of copying fixed values, reach for [`defineTheme`](#build-a-theme-from-one-colour).
 
 ## The font
 
@@ -335,40 +386,6 @@ in a dedicated face — a tabular numeric font, or a mono for a data-dense KPI �
   --mc-font-numeric: "IBM Plex Mono", monospace; /* figures */
 }
 ```
-
-## Semantic vs categorical color
-
-Two rules make theming predictable and keep it honest.
-
-**Semantic tokens keep their meaning.** Swapping `--mc-accent` retints the one emphasis color, but
-`--mc-positive`/`--mc-negative` still mean up and down — so a preset can restyle a chart without ever changing what it
-says. Color encodes; it never merely decorates.
-
-**Categorical colors are a last resort.** Most microcharts show one series and never touch the palette. When a chart
-genuinely needs several, the six `--mc-cat-*` hues are ordered high-contrast-first and chosen to survive color-vision
-differences _and_ grayscale print — so a two-series chart automatically reaches for the most separable pair.
-
-To recolour the series on _one_ instance without touching the global palette, the categorical charts (`SegmentedBar`,
-`StackedArea`, `PartitionStrip`, `Hypnogram`, `MicroDonut`) take a `colors` array — cycled per series, overriding
-`--mc-cat-*` just there. A rolled-up "Other" or an emphasised node keeps its neutral/accent role.
-
-<LiveDemo
-  label="Per-instance colors[]"
-  code={`<SegmentedBar data={mix} colors={["#2563eb", "#db2777", "#65a30d", "#f59e0b"]} />`}
->
-  <SegmentedBar
-    data={[
-      { label: "A", value: 34 },
-      { label: "B", value: 26 },
-      { label: "C", value: 22 },
-      { label: "D", value: 18 },
-    ]}
-    colors={["#2563eb", "#db2777", "#65a30d", "#f59e0b"]}
-    width={220}
-    height={16}
-    title="Custom series colours"
-  />
-</LiveDemo>
 
 ## The readout surface
 

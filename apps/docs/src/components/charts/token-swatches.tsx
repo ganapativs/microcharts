@@ -173,11 +173,7 @@ function CopyPresetTokens({ preset }: { preset: string }) {
       aria-label={`Copy ${preset} tokens for light and dark`}
       className="inline-flex items-center gap-1 rounded-md border border-fd-border/70 px-1.5 py-0.5 text-[0.62rem] font-medium text-fd-muted-foreground transition-colors hover:border-fd-primary/40 hover:text-fd-foreground"
     >
-      {copied ? (
-        <Check className="size-3 text-fd-primary" />
-      ) : (
-        <Copy className="size-3" />
-      )}
+      {copied ? <Check className="size-3 text-fd-primary" /> : <Copy className="size-3" />}
       {copied ? "Copied" : "Copy tokens"}
     </button>
   );

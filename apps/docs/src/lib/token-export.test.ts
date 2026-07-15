@@ -64,9 +64,9 @@ describe("ACCENTS mirror the docs accent bundles", () => {
     expect(accentDecl(docs, new RegExp(`:root\\[data-accent="${a.id}"\\]\\s*\\{([^}]*)\\}`))).toBe(
       a.light,
     );
-    expect(accentDecl(docs, new RegExp(`\\.dark\\[data-accent="${a.id}"\\]\\s*\\{([^}]*)\\}`))).toBe(
-      a.dark,
-    );
+    expect(
+      accentDecl(docs, new RegExp(`\\.dark\\[data-accent="${a.id}"\\]\\s*\\{([^}]*)\\}`)),
+    ).toBe(a.dark);
   });
   it("cobalt matches the default (unscoped) accent in global.css", () => {
     expect(accentDecl(docs, /:root\s*\{([\s\S]*?--accent:[\s\S]*?)\n\}/)).toBe("#2f52d4");
