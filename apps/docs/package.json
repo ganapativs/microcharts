@@ -35,14 +35,14 @@
     "@tailwindcss/postcss": "^4.3.2",
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.1.1",
-    "@types/react": "^19.2.0",
-    "@types/react-dom": "^19.2.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "ajv": "^8.20.0",
     "postcss": "^8.5.19",
     "serve": "^14.2.6",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
-    "wrangler": "^4.110.0"
+    "wrangler": "^4.111.0"
   }
 }
