@@ -79,7 +79,7 @@ const REFUSALS = [
 
 export function HomePrinciplesSection() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <SectionMark n="04">the principles</SectionMark>
       <Reveal>
         <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">

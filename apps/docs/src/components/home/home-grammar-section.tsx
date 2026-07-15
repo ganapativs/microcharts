@@ -5,7 +5,7 @@ import { Reveal } from "@/components/ui/reveal";
 /** 02 · The grammar — plain text in, shipped components out. */
 export function HomeGrammarSection({ catalogTotal }: { catalogTotal: number }) {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <SectionMark n="02">the grammar</SectionMark>
       <div className="grid items-start gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
         <Reveal>

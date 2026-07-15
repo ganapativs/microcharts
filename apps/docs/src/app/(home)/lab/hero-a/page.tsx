@@ -30,7 +30,7 @@ export default function HeroALab() {
       {/* ink veil — guarantees copy contrast over the brightest silk */}
       <div aria-hidden className="lab-veil pointer-events-none absolute inset-0 -z-10" />
 
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-18 lg:grid-cols-[1.06fr_0.94fr] lg:gap-14">
+      <div className="relative mx-auto grid max-w-shell items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-18 lg:grid-cols-[1.06fr_0.94fr] lg:gap-14">
         <div>
           <LabEyebrow />
           <h1 className="display mt-5 text-balance text-[2.3rem] leading-[1.05] text-fd-foreground sm:text-[3rem] lg:text-[3.65rem] xl:text-[3.9rem]">

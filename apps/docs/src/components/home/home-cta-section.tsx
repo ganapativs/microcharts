@@ -7,7 +7,7 @@ import { InstallCommand } from "@/components/ui/copy";
 export function HomeCtaSection() {
   return (
     <section className="py-14">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="mx-auto max-w-shell px-4 sm:px-6">
         <div className="panel grid-paper flex flex-col items-center gap-6 px-6 py-16 text-center">
           <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">
             Give your interface a quieter voice.
