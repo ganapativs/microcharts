@@ -7,6 +7,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
+import type { Format } from "../../core/format.js";
 import { parseUTCDay } from "../../core/calendar.js";
 import { isoDate } from "../../core/calendar-grid.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
@@ -70,7 +71,7 @@ export interface CalendarStripProps {
   cell?: number | undefined;
   gap?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CalendarStrings | undefined;
   title?: string | undefined;

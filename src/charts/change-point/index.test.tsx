@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { ChangePoint } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 // 34 points at 32, then 20 at 48 → a clean +50% step at index 34
@@ -52,5 +53,17 @@ describe("<ChangePoint>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<ChangePoint data={STEP} title="Error rate" />);
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <ChangePoint data={STEP} width={80} height={16} summary={false}>
+          {children}
+        </ChangePoint>
+      ),
+      80,
+      16,
+    );
   });
 });

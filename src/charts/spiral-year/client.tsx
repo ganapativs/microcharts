@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { dayOfYear } from "../../core/calendar-grid.js";
 import { EN_SPIRAL_YEAR, type SpiralYearStrings } from "../../core/strings-spiral-year.js";
 import { spiralYearGeometry } from "./geometry.js";
@@ -176,19 +177,7 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticSpiralYear>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeMark && readout ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {readout}

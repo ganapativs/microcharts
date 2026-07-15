@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -15,6 +15,7 @@ import {
   type RolledDatum,
 } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type SegmentedBarDatum = MiniBarDatum;
 
@@ -40,7 +41,7 @@ export interface SegmentedBarProps {
   colors?: readonly string[] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CompositionStrings | undefined;
   title?: string | undefined;
@@ -94,7 +95,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
   });
   const fmt = makeFormatter(format, locale);
   const pcts = largestRemainderPercents(geo.segments.map((s) => s.share));
-  const accName = summary === false ? false : (summary ?? sharesSummary(rolled, strings));
+  const accName = resolveSummary(summary, () => sharesSummary(rolled, strings));
 
   return (
     <Chart

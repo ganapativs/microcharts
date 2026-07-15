@@ -3,7 +3,7 @@ import { SITE } from "@/lib/site";
 
 export function BrandPermission() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <div className="panel relative flex flex-col gap-4 overflow-hidden px-6 py-12 sm:px-10">
         <div
           aria-hidden

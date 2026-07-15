@@ -4,6 +4,7 @@
 // three-state win/loss/tie glyph (tie = thin mid-line dash). Coords 2-dp via the kernel.
 import { niceDomain, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 export type SparkBarMode = "bar" | "winloss";
 
@@ -16,7 +17,7 @@ export function labelMetrics(
   height: number,
 ): { fontSize: number; gutter: number } {
   const fontSize = Math.max(6, Math.min(Math.round(height * 0.5), 11));
-  const gutter = Math.min(Math.ceil(text.length * fontSize * 0.62) + 6, Math.floor(width * 0.45));
+  const gutter = Math.min(textGutter(text.length, fontSize, 6), Math.floor(width * 0.45));
   return { fontSize, gutter };
 }
 

@@ -102,6 +102,8 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
       : typeof summary === "string"
         ? summary
         : minimapSummary(liveData, domain, 0, strings, fmt);
+  // `label` doubles as the aria-label fallback below: a slider must always have
+  // a name, even when the summary is opted out and no title is given.
   const label = [title, strings.minimapView(fmt(win[0]), fmt(win[1]), fmt(span))]
     .filter(Boolean)
     .join(". ");
@@ -119,7 +121,7 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
       }}
       tabIndex={0}
       role="slider"
-      aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
+      aria-label={[title, accName].filter(Boolean).join(". ") || label}
       aria-valuemin={domain[0]}
       aria-valuemax={domain[1]}
       aria-valuenow={Math.round((win[0] + win[1]) / 2)}

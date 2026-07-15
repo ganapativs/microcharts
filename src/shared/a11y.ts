@@ -66,6 +66,11 @@ export function accessibleNaming(
   }
 
   const label = [title, hasDesc ? summary : undefined].filter(Boolean).join(". ");
+  // "Chart" is the sole hardcoded-English string in a static bundle. It's the
+  // last-resort name when a chart has neither title nor summary (summary={false}
+  // + no title) — rare and decorative. Pulling it from the EN dictionary would
+  // drag the whole aggregate `strings` module into every static chart bundle
+  // (kilobytes, per the size budget), so this one literal stays inline.
   return {
     rootAttrs: { role: "img", "aria-label": label || "Chart" },
     titleId: undefined,

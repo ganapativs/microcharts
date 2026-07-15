@@ -5,11 +5,15 @@
 // hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 import { waterfallGeometry, placeWaterfallLabels } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
+import { textGutter } from "../../core/labels.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type WaterfallDatum = MiniBarDatum;
 
@@ -48,7 +52,7 @@ export interface WaterfallProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: FlowStrings | undefined;
   title?: string | undefined;
@@ -89,8 +93,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
     domain,
   });
   const fmt = makeFormatter(format, locale);
-  const accName =
-    summary === false ? false : (summary ?? waterfallSummary(data, start, fmt, strings));
+  const accName = resolveSummary(summary, () => waterfallSummary(data, start, fmt, strings));
   const goodSign = positive === "down" ? -1 : 1;
 
   // Direct value labels sit in a reserved band BELOW the plot (like the endpoint
@@ -108,7 +111,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
               index: b.index,
               cx: b.x + b.w / 2,
               // 0.62·em/char over-estimate + the sign glyph and a little air
-              w: Math.ceil(labelText(v as number).length * FONT * 0.62) + 2,
+              w: textGutter(labelText(v as number).length, FONT, 2),
               priority: Math.abs(v as number),
             })),
           width,
@@ -117,6 +120,20 @@ export function Waterfall(props: WaterfallProps): ReactNode {
   const band = labels.length > 0 ? FONT + 4 : 0;
   const viewH = height + band;
   const labelY = round2(height + FONT);
+
+  // annotations host contract: Marker x = step index (bar center), Threshold/
+  // TargetZone y = data values. The frame height is the value-plot `height`
+  // (NOT viewH) so overlays stay in y∈[0,height], above the label band.
+  const ann = resolveAnnotations(children, {
+    x: (i) => {
+      const b = geo.bars[Math.round(i)];
+      return b ? b.x + b.w / 2 : NaN;
+    },
+    y: scaleLinear(geo.domain, [height - 0.5, 0.5]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
 
   return (
     <Chart
@@ -128,6 +145,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
       className={className ? `mc-waterfall ${className}` : "mc-waterfall"}
       style={style}
     >
+      {ann.under}
       {geo.connectors.map((c, i) => (
         <line
           key={`c${i}`}
@@ -175,7 +193,8 @@ export function Waterfall(props: WaterfallProps): ReactNode {
           {labelText(data[l.index]!.value as number)}
         </text>
       ))}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

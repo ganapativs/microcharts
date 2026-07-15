@@ -7,6 +7,7 @@ import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react
 import { makeFormatter } from "../../core/format.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { rateVolumeGeometry } from "./geometry.js";
 import {
   RateVolume as StaticRateVolume,
@@ -212,19 +213,7 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
             : "no events"}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

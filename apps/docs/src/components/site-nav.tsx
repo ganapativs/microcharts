@@ -26,7 +26,12 @@ const links = [
 
 function Wordmark() {
   return (
-    <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} home`}>
+    <Link
+      prefetch={false}
+      href="/"
+      className="group flex items-center gap-2.5"
+      aria-label={`${SITE.name} home`}
+    >
       <Brandmark size={28} className="shrink-0 transition-transform group-hover:-translate-y-px" />
       <span className="text-[0.98rem] font-semibold tracking-[-0.01em] text-fd-foreground">
         microcharts
@@ -57,7 +62,7 @@ export function SiteNav() {
 
   return (
     <header className="glass-rail sticky top-0 z-40" data-scrolled={scrolled || undefined}>
-      <nav className="mx-auto flex h-14 max-w-6xl items-center gap-5 px-4 sm:px-6">
+      <nav className="mx-auto flex h-14 max-w-shell items-center gap-5 px-4 sm:px-6">
         <Wordmark />
         <div className="hidden items-center gap-0.5 md:flex">
           {links.map((l) => {
@@ -65,6 +70,7 @@ export function SiteNav() {
               pathname === l.href || (l.href !== "/docs" && pathname.startsWith(l.href));
             return (
               <Link
+                prefetch={false}
                 key={l.href}
                 href={l.href}
                 className={cn(

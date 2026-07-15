@@ -26,13 +26,27 @@ describe("docs-facts derivations", () => {
     }
   });
 
-  // performance.mdx prose names these explicitly ("Just one chart sits above the
-  // 3 kB reference line — Sparkline — with Station Glyph … landing right on it").
-  // If the measured sizes shift, the prose is stale — fail here so it gets revisited.
+  // performance.mdx prose names these explicitly ("Eight charts sit above the 3 kB
+  // reference line. Sparkline … is the largest; the rest are the value-series charts
+  // that can host annotations … plus Station Glyph"). If the measured sizes shift,
+  // the prose is stale — fail here so it gets revisited.
   it("matches the performance.mdx claim about the 3 kB line", () => {
-    expect(SIZE.over3).toHaveLength(1);
+    expect(SIZE.over3).toHaveLength(8);
+    // over3 is largest-first — Sparkline leads, the annotation hosts + Station Glyph follow.
     expect(SIZE.over3[0]?.slug).toBe("sparkline");
-    expect(CHART_GZIP["station-glyph"]?.static).toBe(3);
+    const over3Slugs = SIZE.over3.map((c) => c.slug).sort();
+    expect(over3Slugs).toEqual(
+      [
+        "burn-chart",
+        "change-point",
+        "dual-sparkline",
+        "forecast-cone",
+        "spread-band",
+        "sparkline",
+        "station-glyph",
+        "win-prob-worm",
+      ].sort(),
+    );
   });
 
   // The perf-page size table shows the catalog span, not a hand-picked few.

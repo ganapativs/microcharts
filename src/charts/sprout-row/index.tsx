@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
 import { labelFont } from "../../core/labels.js";
 import { sproutRowGeometry, stageGlyph } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface SproutDatum {
   label: string;
@@ -92,7 +93,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     padX,
     bottomReserve: labelBand,
   });
-  const accName = summary === false ? false : (summary ?? sproutRowSummary(data, strings));
+  const accName = resolveSummary(summary, () => sproutRowSummary(data, strings));
   const paint = color;
 
   return (

@@ -5,9 +5,12 @@
 // rendered as faint region context, never data ink). Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
 import { errorBudgetGeometry, type ErrorBudgetGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual error-budget summary. Shared with the interactive entry. */
 export function errorBudgetSummary(
@@ -43,7 +46,7 @@ export interface ErrorBudgetProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ErrorBudgetStrings | undefined;
   title?: string | undefined;
@@ -54,7 +57,8 @@ export interface ErrorBudgetProps {
   children?: ReactNode | undefined;
 }
 
-const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits: 0 };
+/** Percent formatting shared with the interactive entry. */
+export const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits: 0 };
 /** Burn multiple → 1-dp string (shared with the interactive entry). */
 export const RATE_FMT = (n: number): string => `${Math.round(n * 10) / 10}`;
 
@@ -79,7 +83,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
     children,
   } = props;
 
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.55)));
+  const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-error-budget ${className}` : "mc-error-budget";
 
@@ -96,7 +100,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -124,6 +128,17 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
   const endColor = danger ? "var(--mc-negative)" : lineColor;
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
+  // annotations host contract: Marker x = step position on the elapsed axis,
+  // Threshold/TargetZone y = budget-remaining fractions (1 top → 0 bottom).
+  const pad = 2;
+  const ann = resolveAnnotations(children, {
+    x: (i) => geo.points[Math.round(i)]?.x ?? NaN,
+    y: (v) => pad + (1 - v) * (height - 2 * pad),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
+
   return (
     <Chart
       width={geo.totalWidth}
@@ -134,6 +149,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {ann.under}
       {/* faster burn-rate reference lines — faint policy context (region ink) */}
       {geo.wedges.map((w) => (
         <path
@@ -209,7 +225,8 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

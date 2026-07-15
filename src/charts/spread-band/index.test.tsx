@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import { SpreadBand } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -69,6 +70,24 @@ describe("<SpreadBand>", () => {
       <SpreadBand data={PAIRS} labels={["Organic", "Paid"]} title="Organic vs paid" />,
     );
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <SpreadBand
+          data={PAIRS}
+          labels={["Organic", "Paid"]}
+          width={80}
+          height={20}
+          summary={false}
+        >
+          {children}
+        </SpreadBand>
+      ),
+      80,
+      20,
+    );
   });
 });
 

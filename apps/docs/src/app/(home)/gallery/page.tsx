@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { docsMeta } from "@/lib/metadata";
-import { STABLE_CHARTS } from "@/lib/charts/registry";
+import { getModule, STABLE_CHARTS } from "@/lib/charts/registry";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
 import { GalleryDock } from "./gallery-dock";
 import { GalleryStage } from "./gallery-stage";
@@ -60,6 +60,10 @@ export default function GalleryPage() {
           {charts.map((c, i) => {
             const newGroup = i === 0 || charts[i - 1].collection !== c.collection;
             const group = COLLECTIONS.find((g) => g.key === c.collection);
+            // Render the static preview on the SERVER (pure SVG, zero client JS)
+            // and pass it as children — the client stage upgrades to the live
+            // twin lazily, per-chart, only when live mode is on.
+            const Preview = getModule(c.slug)?.Preview;
             return (
               <Fragment key={c.slug}>
                 {newGroup && group && (
@@ -76,15 +80,14 @@ export default function GalleryPage() {
                   data-name={c.name}
                   data-keywords={keywords(c)}
                 >
-                  <Link
-                    href={`/docs/charts/${c.slug}`}
-                    className="g2-card"
-                    aria-label={`${c.name} — ${c.tagline}`}
-                  >
+                  <Link prefetch={false} href={`/docs/charts/${c.slug}`} className="g2-card">
                     <span className="g2-spot" aria-hidden />
                     <ArrowUpRight className="g2-arrow size-4" aria-hidden />
-                    <div className="g2-stage">
-                      <GalleryStage slug={c.slug} />
+                    {/* Previews are decorative on the card — `inert` keeps the live
+                        charts animating but out of the tab order and a11y tree, so
+                        no interactive control ever nests inside the link. */}
+                    <div className="g2-stage" inert>
+                      <GalleryStage slug={c.slug}>{Preview ? <Preview /> : null}</GalleryStage>
                     </div>
                     <div className="g2-meta">
                       {/* name owns its own full-width line so it never truncates

@@ -5,6 +5,7 @@
 import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 interface StripRow {
   y: number;
@@ -79,7 +80,7 @@ export function abStripsGeometry(opts: {
   const gutterCh = opts.gutterCh ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
   // left gutter for the A/B row tags (≈ 2 ch)
-  const lead = Math.ceil((opts.labelChars ?? 2) * fontSize * 0.62) + 3;
+  const lead = textGutter(opts.labelChars ?? 2, fontSize, 3);
 
   const domain: readonly [number, number] =
     opts.domain && opts.domain.every((d) => Number.isFinite(d))

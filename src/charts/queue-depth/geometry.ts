@@ -43,6 +43,8 @@ export interface QueueDepthGeometry {
   labelY: number;
   /** Clamped y for the capacity value label (null = no capacity). */
   capLabelY: number | null;
+  /** Resolved (zero-anchored) value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
 }
 
 // least-squares slope of y over consecutive integer x (per-step drift)
@@ -171,5 +173,6 @@ export function queueDepthGeometry(opts: {
     labelX: round2(width + 3),
     labelY: fontSize > 0 ? clampY(end.y) : end.y,
     capLabelY: capacityY !== null && fontSize > 0 ? clampY(capacityY) : capacityY,
+    domain: [yMin, yMax],
   };
 }

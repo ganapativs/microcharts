@@ -6,6 +6,7 @@
 import { useCallback, useId, useMemo, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_TOKEN_CONFIDENCE } from "../../core/strings-token-confidence.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { tokenTiers, type Tier } from "./geometry.js";
 import { tokenConfidenceSummary, type TokenConfidenceProps } from "./index.js";
 
@@ -161,19 +162,7 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
           {" ― unsure · ⋯ guessing"}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

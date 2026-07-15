@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import { ControlStrip } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const SAMPLE = [10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16];
@@ -60,6 +61,18 @@ describe("<ControlStrip>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<ControlStrip data={SAMPLE} title="Line 3 fill weight" />);
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <ControlStrip data={SAMPLE} width={80} height={20} summary={false}>
+          {children}
+        </ControlStrip>
+      ),
+      80,
+      20,
+    );
   });
 });
 

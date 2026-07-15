@@ -17,6 +17,8 @@ import { makeFormatter } from "../../core/format.js";
 import { describeSeries } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
+import { FILL } from "../../shared/interactive.js";
 import { labelMetrics, sparkBarGeometry } from "./geometry.js";
 import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
 
@@ -24,10 +26,6 @@ import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
 // the default `rise` selector only matches "bar", so every ink role is listed.
 const BAR_SELECTOR =
   'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"], rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]';
-
-// The SVG fills the focusable wrapper so its box coincides with the wrapper's —
-// the %-positioned hit zones + readout map 1:1 and the chart scales fluidly.
-const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveSparkBarProps extends SparkBarProps {
   onPointFocus?: (index: number | null) => void;
@@ -208,19 +206,9 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
           />
         ) : null}
       </StaticSparkBar>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <LiveRegion>
         {activeValue !== null ? `Bar ${active! + 1}: ${fmt(activeValue)}` : ""}
-      </span>
+      </LiveRegion>
       {activeBar && activeValue !== null ? (
         <span
           className="mc-spark-readout"

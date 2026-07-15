@@ -23,6 +23,13 @@
   /* One radius for every interactive control (buttons, command, icon buttons)
      so nothing looks hand-placed. Panels use the larger --radius-panel. */
   --radius-control: 12px;
+
+  /* One marketing/brand shell width for nav, hero, every section, and the
+     footer (`max-w-shell`). A touch roomier than the old 1152px cap, but held
+     well below Fumadocs' 1400px docs width: at 1400 the two-column grids and
+     the size histogram stretched into sparse voids. 1240 keeps mark density
+     and reading measure intact while giving wide screens a little more air. */
+  --container-shell: 1240px;
 }
 
 /* Expose the ONE border token to Tailwind (`border-hairline`, `divide-hairline`)

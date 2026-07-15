@@ -6,12 +6,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { spreadLabels } from "../../core/labels.js";
 import { pairChange, type DumbbellDatum } from "../dumbbell/index.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
 import { slopeGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type SlopeDatum = DumbbellDatum & { label: string };
 
@@ -42,7 +43,7 @@ export interface SlopeProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: PairedStrings | undefined;
   title?: string | undefined;
@@ -122,7 +123,7 @@ export function Slope(props: SlopeProps): ReactNode {
       fontSize,
     });
   }
-  const accName = summary === false ? false : (summary ?? slopeSummary(data, strings));
+  const accName = resolveSummary(summary, () => slopeSummary(data, strings));
 
   const goodDir = positive === "down" ? -1 : 1;
   const showLabels = label !== "none" && !labelsDropped;

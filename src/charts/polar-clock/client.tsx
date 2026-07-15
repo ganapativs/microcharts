@@ -8,6 +8,7 @@ import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { annulusSector } from "../../core/arc.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
 import { polarClockGeometry } from "./geometry.js";
 import {
@@ -187,19 +188,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         {overlayPath ? <path d={overlayPath} data-mc-ink="accent" /> : null}
         {rest.children}
       </StaticPolarClock>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeSeg !== undefined ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {readout}

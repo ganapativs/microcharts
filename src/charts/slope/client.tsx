@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { pairChange } from "../dumbbell/index.js";
 import { slopeGeometry } from "./geometry.js";
@@ -181,19 +182,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
         summary={false}
         highlight={active ?? rest.highlight}
       />
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeDatum && activeLine ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {Number.isFinite(activeDatum.from) && Number.isFinite(activeDatum.to)

@@ -7,6 +7,7 @@
 import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 interface GradedBandLevel {
   p: number;
@@ -50,7 +51,7 @@ export function gradedBandGeometry(opts: {
   const pad = 3;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 4 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;
 
   const finite = opts.data.filter(isFiniteValue);
   if (finite.length === 0) return null;

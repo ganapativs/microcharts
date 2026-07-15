@@ -9,6 +9,7 @@ import { devWarn } from "../../core/dev.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
 import { bumpGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual rank-run summary. Shared with the interactive entry. */
 export function bumpSummary(ranks: readonly Value[], strings: FlowStrings): string {
@@ -82,7 +83,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
     gutterRightCh: label !== "none" ? maxLabelChars : 0,
     fontSize,
   });
-  const accName = summary === false ? false : (summary ?? bumpSummary(data, strings));
+  const accName = resolveSummary(summary, () => bumpSummary(data, strings));
 
   return (
     <Chart

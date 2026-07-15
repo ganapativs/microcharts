@@ -6,11 +6,10 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
 import { errorBudgetGeometry } from "./geometry.js";
-import { ErrorBudget as StaticErrorBudget, RATE_FMT, type ErrorBudgetProps } from "./index.js";
-
-const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits: 0 };
+import { ErrorBudget as StaticErrorBudget, RATE_FMT, PCT, type ErrorBudgetProps } from "./index.js";
 
 export interface InteractiveErrorBudgetProps extends ErrorBudgetProps {
   strings?: ErrorBudgetStrings;
@@ -181,19 +180,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
           {`${fmt(p.value)} · ${RATE_FMT(p.rate)}×`}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

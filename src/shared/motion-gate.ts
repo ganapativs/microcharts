@@ -48,7 +48,7 @@ export interface EntranceOptions {
    * (away from the zero line), everything else from the bottom.
    */
   origin?: "bottom" | "top" | "left" | "right" | "center" | "signed";
-  /** Per-item stagger in ms (default 30, total capped at 240). */
+  /** Per-item stagger in ms (default 30, total capped at 180). */
   stagger?: number;
   /**
    * Sequence marks along real geometry ("x": left→right, "y": top→down) or
@@ -56,7 +56,7 @@ export interface EntranceOptions {
    * `window` instead of the fixed stagger.
    */
   order?: "index" | "x" | "y";
-  /** Total span (ms) of an ordered sequence (default 520 trail / 400 others). */
+  /** Total span (ms) of an ordered sequence (default 380 trail / 300 others). */
   window?: number;
   /**
    * `draw` only: draw the stroked marks as ONE continuous sweep at constant

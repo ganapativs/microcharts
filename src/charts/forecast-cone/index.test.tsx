@@ -5,6 +5,7 @@ import { ForecastCone } from "./index.js";
 import type { ForecastInput } from "./geometry.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -95,6 +96,20 @@ describe("<ForecastCone>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<ForecastCone data={HIST} forecast={FC} title="Q4 revenue" />);
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    // label="none" keeps totalWidth == width, so the containment frame matches
+    // the viewBox (the landing label legitimately lives in a right gutter).
+    expectHostsAnnotations(
+      (children) => (
+        <ForecastCone data={HIST} forecast={FC} label="none" width={80} height={20} summary={false}>
+          {children}
+        </ForecastCone>
+      ),
+      80,
+      20,
+    );
   });
 });
 

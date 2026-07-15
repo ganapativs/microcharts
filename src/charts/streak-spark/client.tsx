@@ -14,6 +14,8 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
+import { FILL } from "../../shared/interactive.js";
 import { EN_STREAK_SPARK } from "../../core/strings-streak-spark.js";
 import { streakSparkGeometry } from "./geometry.js";
 import {
@@ -21,10 +23,6 @@ import {
   streakSparkSummary,
   type StreakSparkProps,
 } from "./index.js";
-
-// The SVG fills the focusable wrapper so its box coincides with the wrapper's —
-// the %-positioned readout maps 1:1 and the chart scales fluidly.
-const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveStreakSparkProps extends StreakSparkProps {
   onRunFocus?: (index: number | null) => void;
@@ -198,19 +196,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
           />
         ) : null}
       </StaticStreakSpark>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeRun ? (
         <span
           className="mc-spark-readout"

@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { balanceBeamGeometry } from "./geometry.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
 import { BalanceBeam as StaticBeam, balanceBeamSummary, type BalanceBeamProps } from "./index.js";
@@ -119,21 +120,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
         strings={strings}
         summary={false}
       />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
       {datum ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {`${datum.label} ${fmt(datum.value)}`}

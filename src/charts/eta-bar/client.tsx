@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ETA_BAR } from "../../core/strings-eta-bar.js";
 import { EtaBar as StaticEtaBar, etaBarSummary, type EtaBarProps } from "./index.js";
 
@@ -89,19 +90,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
         summary={false}
         style={FILL}
       />
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {focused && full ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {full}

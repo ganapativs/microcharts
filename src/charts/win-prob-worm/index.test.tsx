@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { WinProbWorm } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
@@ -74,6 +75,18 @@ describe("<WinProbWorm>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<WinProbWorm data={GAME} sides={SIDES} title="Win probability" />);
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <WinProbWorm data={GAME} width={80} height={20} label="none" summary={false}>
+          {children}
+        </WinProbWorm>
+      ),
+      80,
+      20,
+    );
   });
 });
 

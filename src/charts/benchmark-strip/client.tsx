@@ -5,7 +5,9 @@
 // component (canon); the crosshair tick is an overlay child re-using geometry.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { benchmarkStripGeometry } from "./geometry.js";
 import {
@@ -47,7 +49,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
   });
 
   // must match the static's viewBox (the label gutter widens totalWidth)
-  const font = Math.min(11, Math.max(7, Math.round(height * 0.62)));
+  const font = labelFont(height, 0.62);
   const geo = useMemo(
     () =>
       benchmarkStripGeometry({
@@ -167,19 +169,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
         ) : null}
         {rest.children}
       </StaticBenchmarkStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {edge ? (
         <span
           className="mc-spark-readout"

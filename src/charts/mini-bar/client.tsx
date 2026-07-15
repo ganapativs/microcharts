@@ -7,6 +7,7 @@ import { makeFormatter } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { miniBarGeometry } from "./geometry.js";
 import { MiniBar as StaticMiniBar, miniBarSummary, sortData, type MiniBarProps } from "./index.js";
 
@@ -193,19 +194,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticMiniBar>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeBar && activeDatum && isFiniteValue(activeDatum.value) ? (
         <span
           className="mc-spark-readout"

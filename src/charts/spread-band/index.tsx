@@ -5,10 +5,12 @@
 // is carried by fill sign + text, never color alone. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { clamp } from "../../core/scale.js";
-import { makeFormatter } from "../../core/format.js";
+import { clamp, scaleLinear } from "../../core/scale.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import type { Polarity } from "../../core/types.js";
 import { EN_SPREAD_BAND, type SpreadBandStrings } from "../../core/strings-spread-band.js";
+import { resolveSummary } from "../../core/summary.js";
 import {
   gutterFont,
   lastGap,
@@ -54,7 +56,7 @@ export interface SpreadBandProps {
   height?: number | undefined;
   /** Overrides the subject line stroke only. */
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: SpreadBandStrings | undefined;
   title?: string | undefined;
@@ -103,8 +105,21 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
     fontSize,
   });
 
-  const accName =
-    summary === false ? false : (summary ?? spreadBandSummary(geo, labels, fmt, strings));
+  const accName = resolveSummary(summary, () => spreadBandSummary(geo, labels, fmt, strings));
+
+  // annotations host contract: Marker x = data INDEX, Threshold/TargetZone y =
+  // data values on the shared value scale.
+  const n = data.length;
+  const ann = resolveAnnotations(children, {
+    x: (i) =>
+      n > 1
+        ? geo.plot.x0 + (i * (geo.plot.x1 - geo.plot.x0)) / (n - 1)
+        : (geo.plot.x0 + geo.plot.x1) / 2,
+    y: scaleLinear(geo.domain, [geo.plot.y1, geo.plot.y0]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
 
   // color encodes valence (which lead is good); position/sign encode who leads.
   // The two signed bands differ only in ink + opacity; render them from one list.
@@ -125,6 +140,7 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
       className={className ? `mc-spread ${className}` : "mc-spread"}
       style={style}
     >
+      {ann.under}
       {!geo.coincident ? (
         <>
           {bands.map((band) =>
@@ -180,7 +196,8 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

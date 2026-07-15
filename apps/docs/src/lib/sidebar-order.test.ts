@@ -15,7 +15,7 @@ describe("sidebar order ↔ gallery order parity", () => {
     const meta = JSON.parse(
       readFileSync(resolve(process.cwd(), "content/docs/charts/meta.json"), "utf8"),
     ) as { pages: string[] };
-    const entries = meta.pages.filter((p) => p !== "index" && p !== "annotations");
+    const entries = meta.pages.filter((p) => p !== "index");
     const sidebarCharts = entries.filter((p) => !p.startsWith("---"));
     const galleryOrder = [...STABLE_CHARTS]
       .sort((a, b) => RANK[a.collection] - RANK[b.collection])

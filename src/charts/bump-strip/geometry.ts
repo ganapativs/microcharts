@@ -3,6 +3,7 @@
 // Step line only — a rank cannot be 2.4, and skipped periods stay gaps, never
 // diagonal interpolation. 2-dp.
 import { round2, type Value } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 interface BumpPoint {
   x: number;
@@ -35,8 +36,8 @@ export function bumpGeometry(opts: {
 }): BumpGeometry {
   const { width, height, ranks, gutterLeftCh, gutterRightCh, fontSize } = opts;
   const n = ranks.length;
-  const gutterL = gutterLeftCh > 0 ? Math.ceil(gutterLeftCh * fontSize * 0.62) + 5 : 0;
-  const gutterR = gutterRightCh > 0 ? Math.ceil(gutterRightCh * fontSize * 0.62) + 5 : 0;
+  const gutterL = gutterLeftCh > 0 ? textGutter(gutterLeftCh, fontSize, 5) : 0;
+  const gutterR = gutterRightCh > 0 ? textGutter(gutterRightCh, fontSize, 5) : 0;
   const x0 = gutterL + 1.5;
   const x1 = width - gutterR - 1.5;
 

@@ -8,6 +8,7 @@ import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { makeFormatter } from "../../core/format.js";
 import { progressModel, type ProgressProps } from "../progress/index.js";
 import { ringGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface ProgressRingProps extends Pick<
   ProgressProps,
@@ -65,7 +66,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
     : sweep
       ? strings.remaining(pctFmt(Math.max(0, 1 - model.fraction)))
       : model.summary;
-  const accName = summary === false ? false : (summary ?? auto);
+  const accName = resolveSummary(summary, () => auto);
 
   return (
     <Chart

@@ -26,6 +26,8 @@ export interface WaterfallGeometry {
   levels: number[];
   /** Column pitch for interactive band lookup (total bar occupies the last). */
   pitch: number;
+  /** Resolved value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
 }
 
 export function waterfallGeometry(opts: {
@@ -42,7 +44,15 @@ export function waterfallGeometry(opts: {
   const deltas = opts.deltas.map((d) => (isFiniteValue(d) ? d : 0));
   const n = deltas.length;
   if (n === 0) {
-    return { bars: [], connectors: [], totalBar: null, zeroY: height - 1, levels: [], pitch: 0 };
+    return {
+      bars: [],
+      connectors: [],
+      totalBar: null,
+      zeroY: height - 1,
+      levels: [],
+      pitch: 0,
+      domain: [0, 0],
+    };
   }
 
   const levels: number[] = [];
@@ -101,7 +111,7 @@ export function waterfallGeometry(opts: {
     };
   }
 
-  return { bars, connectors, totalBar, zeroY, levels, pitch };
+  return { bars, connectors, totalBar, zeroY, levels, pitch, domain };
 }
 
 /** One label the caller wants placed under its column. `w` is an over-estimate

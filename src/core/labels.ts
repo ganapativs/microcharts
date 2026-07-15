@@ -16,6 +16,21 @@ export function labelFont(height: number, factor = 0.55): number {
   return Math.min(11, Math.max(7, Math.round(height * factor)));
 }
 
+/**
+ * Reserved gutter width (viewBox units) for a `chars`-long label at `fontSize`,
+ * plus a fixed `pad` of breathing room. The `0.62 × fontSize` per-character
+ * estimate is a deliberate slight over-estimate for the tabular-nums figures the
+ * library renders — wide enough that a reserved gutter never clips — and
+ * `Math.ceil` snaps the gutter onto integer viewBox coords. This is the one
+ * source of truth for the per-char label estimate; never hardcode `* 0.62`
+ * inline for a gutter. (The exact `Math.ceil(chars * fontSize * 0.62) + pad`
+ * expression is preserved verbatim so migrated call sites stay bit-identical
+ * regardless of whether `fontSize` is integer.)
+ */
+export function textGutter(chars: number, fontSize: number, pad: number): number {
+  return Math.ceil(chars * fontSize * 0.62) + pad;
+}
+
 export function spreadLabels(
   desired: readonly number[],
   pitch: number,

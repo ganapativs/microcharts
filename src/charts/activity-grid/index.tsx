@@ -7,10 +7,11 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { seriesStats } from "../../core/stats.js";
 import type { Value } from "../../core/types.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { parseUTCDay } from "../../core/calendar.js";
 import { cellMetrics, stepOpacity, type CellShape } from "../../shared/cell.js";
 import { activityGridGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export const LEVELS = 5;
 
@@ -54,7 +55,7 @@ export interface ActivityGridProps {
   /** Explicit `[min, max]` for level bucketing; auto-fit when omitted. */
   domain?: readonly [number, number] | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -95,7 +96,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
   });
   const mark = cellMetrics(cell, shape);
   const fmt = makeFormatter(format, locale);
-  const accName = summary === false ? false : (summary ?? activitySummary(data, fmt));
+  const accName = resolveSummary(summary, () => activitySummary(data, fmt));
 
   const w = Math.max(geo.width, 1);
   const h = Math.max(geo.height, 1);

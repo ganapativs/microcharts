@@ -12,6 +12,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DEPTH_WEDGE } from "../../core/strings-depth-wedge.js";
 import { depthWedgeGeometry } from "./geometry.js";
 import {
@@ -171,19 +172,7 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticDepthWedge>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {step ? (
         <span
           className="mc-spark-readout"

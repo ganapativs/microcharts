@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { BurnChart } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const PLAN = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];
@@ -59,5 +60,23 @@ describe("<BurnChart>", () => {
   it("empty data → renders the empty frame, no crash", () => {
     const { container } = draw(<BurnChart data={{ plan: [], actual: [] }} title="Empty" />);
     expect(container.querySelector("svg")).not.toBeNull();
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <BurnChart
+          data={{ plan: PLAN, actual: ACTUAL }}
+          label="none"
+          width={90}
+          height={28}
+          summary={false}
+        >
+          {children}
+        </BurnChart>
+      ),
+      90,
+      28,
+    );
   });
 });

@@ -69,6 +69,37 @@ describe("resolveAnnotations", () => {
     expect(at(6)).toBe("end");
   });
 
+  it("long author labels truncate with … to stay inside the frame; short pass through", () => {
+    const textOf = (node: React.ReactNode) =>
+      draw(<svg>{node}</svg>).container.querySelector("text")!.textContent!;
+    const perChar = FRAME.fontSize * 0.62;
+
+    // Threshold + TargetZone end-anchor at width-1 → available run = width - 1
+    const longThresh = textOf(
+      resolveAnnotations(<Threshold y={10} label={"x".repeat(40)} />, FRAME).over,
+    );
+    expect(longThresh.endsWith("…")).toBe(true);
+    expect(longThresh.length).toBeLessThan(40);
+    expect(longThresh.length * perChar).toBeLessThanOrEqual(FRAME.width - 1);
+
+    const longZone = textOf(
+      resolveAnnotations(<TargetZone y={[5, 15]} label={"y".repeat(40)} />, FRAME).under,
+    );
+    expect(longZone.endsWith("…")).toBe(true);
+    expect(longZone.length * perChar).toBeLessThanOrEqual(FRAME.width - 1);
+
+    // Callout runs toward the wider half from its anchor tx
+    const longCallout = textOf(
+      resolveAnnotations(<Callout x={0} label={"z".repeat(40)} />, FRAME).over,
+    );
+    expect(longCallout.endsWith("…")).toBe(true);
+    expect(longCallout.length).toBeLessThan(40);
+
+    // short labels are byte-identical (truncation never engages)
+    expect(textOf(resolveAnnotations(<Threshold y={10} label="SLA" />, FRAME).over)).toBe("SLA");
+    expect(textOf(resolveAnnotations(<Callout x={0} label="dip" />, FRAME).over)).toBe("dip");
+  });
+
   it("standalone annotation renders nothing + dev-warns", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { container } = draw(<Threshold y={5} />);

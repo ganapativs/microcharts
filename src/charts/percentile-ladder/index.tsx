@@ -5,10 +5,11 @@
 // transform is never silent — an in-chart `log` tag renders when it applies.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { round2, type Value } from "../../core/types.js";
 import { percentileLadderGeometry, type PercentileLadderGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual ladder summary. Shared with the interactive entry. */
 export function ladderSummary(
@@ -40,7 +41,7 @@ export interface PercentileLadderProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QuantileStrings | undefined;
   title?: string | undefined;
@@ -124,7 +125,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -134,8 +135,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false ? false : (summary ?? ladderSummary(geo, fmt, ratioFmt, strings));
+  const accName = resolveSummary(summary, () => ladderSummary(geo, fmt, ratioFmt, strings));
 
   const k = geo.ticks.length;
   const rendered = geo.collapsed ? geo.ticks.slice(0, 1) : geo.ticks;

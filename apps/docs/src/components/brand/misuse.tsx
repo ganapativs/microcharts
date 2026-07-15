@@ -76,7 +76,7 @@ const MISUSE = [
 
 export function BrandMisuse() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <SectionMark n="04">Don’t</SectionMark>
       <Reveal className="mb-8 max-w-2xl">
         <h2 className="display text-[length:var(--text-fluid-h2)]">Protect the read.</h2>

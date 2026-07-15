@@ -8,9 +8,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_BIAS_STRIP, type BiasStripStrings } from "../../core/strings-bias-strip.js";
 import { biasLayout, biasStripGeometry, type BiasGeometry, type BiasPair } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type { BiasPair };
 
@@ -37,7 +38,7 @@ export interface BiasStripProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: BiasStripStrings | undefined;
   title?: string | undefined;
@@ -74,8 +75,7 @@ export function BiasStrip(props: BiasStripProps): ReactNode {
 
   const geo = biasStripGeometry({ width, height, data, limits, rad: outlierRad, captionPad });
   const fmtSigned = makeFormatter(format, locale, { signDisplay: "exceptZero" });
-  const accName =
-    summary === false ? false : (summary ?? biasStripSummary(geo, strings, fmtSigned));
+  const accName = resolveSummary(summary, () => biasStripSummary(geo, strings, fmtSigned));
 
   // seat-gate: the bias caption sits in the reserved top gutter (never on a dot)
   // and only when it fits horizontally beside the right edge.

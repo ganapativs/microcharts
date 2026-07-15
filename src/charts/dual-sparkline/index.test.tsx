@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import { DualSparkline } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -41,6 +42,18 @@ describe("<DualSparkline>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<DualSparkline data={YOU} compare={PLAN} title="You vs plan" />);
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <DualSparkline data={YOU} compare={PLAN} width={80} height={20} summary={false}>
+          {children}
+        </DualSparkline>
+      ),
+      80,
+      20,
+    );
   });
 });
 

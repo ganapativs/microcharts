@@ -11,6 +11,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RUBRIC } from "../../core/strings-rubric.js";
 import { rubricStripGeometry } from "./geometry.js";
 import {
@@ -169,19 +170,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
         ) : null}
         {rest.children}
       </StaticRubricStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {row ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {`${row.label} ${fmt(row.score)}`}

@@ -6,10 +6,11 @@
 // hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
 import { shiftHistogramGeometry, type ShiftHistogramGeometry, type ShiftMode } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Signed median shift string (sign in text). */
 export function shiftDelta(geo: ShiftHistogramGeometry, fmt: (n: number) => string): string {
@@ -49,7 +50,7 @@ export interface ShiftHistogramProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ShiftStrings | undefined;
   title?: string | undefined;
@@ -117,7 +118,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -127,7 +128,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
     );
   }
 
-  const accName = summary === false ? false : (summary ?? shiftSummary(geo, fmt, labels, strings));
+  const accName = resolveSummary(summary, () => shiftSummary(geo, fmt, labels, strings));
   const afterFill = color ?? "var(--mc-accent)";
   const overlay = mode === "overlay";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;

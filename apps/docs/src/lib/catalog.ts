@@ -4,4 +4,6 @@
  * doc shells import from here; component consumers use `lib/charts/registry`.
  */
 export type { ChartEntry, ChartProp, ChartStatus, ChartCollection } from "./charts/types";
-export { CHARTS, STABLE_CHARTS, getChart } from "./charts/registry";
+// Data-only source (no React component graph) — keeps the full 106-chart bundle
+// out of every client component that only needs catalog metadata.
+export { CHARTS, STABLE_CHARTS, getChart } from "./charts/entries";

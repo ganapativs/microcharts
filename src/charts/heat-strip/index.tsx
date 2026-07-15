@@ -4,9 +4,9 @@
 // with no record renders a hairline outline, visibly different from value 0.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { describeSeries } from "../../core/summary.js";
+import { describeSeries, resolveSummary } from "../../core/summary.js";
 import type { SeriesStrings } from "../../core/summary.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import type { Value } from "../../core/types.js";
 import { valueStepOpacity, type CellShape } from "../../shared/cell.js";
 import { heatStripGeometry } from "./geometry.js";
@@ -22,7 +22,7 @@ export interface HeatStripProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: SeriesStrings | undefined;
   title?: string | undefined;
@@ -56,8 +56,7 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
   const geo = heatStripGeometry({ width, height, values: data, domain, steps, shape });
   const fmt = makeFormatter(format, locale);
   // S1 summary — reuses describeSeries verbatim
-  const accName =
-    summary === false ? false : (summary ?? describeSeries(data, { format: fmt, strings }));
+  const accName = resolveSummary(summary, () => describeSeries(data, { format: fmt, strings }));
 
   return (
     <Chart

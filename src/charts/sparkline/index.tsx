@@ -6,11 +6,11 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { linePath, smoothPath, stepPath, areaPath, type Curve } from "../../core/path.js";
-import { describeSeries, type DescribeOptions } from "../../core/summary.js";
+import { describeSeries, type DescribeOptions, resolveSummary } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { type Value } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
-import { resolveAnnotations } from "../../shared/annotations-host.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
 import { makeFormatter } from "../../core/format.js";
 
@@ -123,10 +123,10 @@ export function Sparkline(props: SparklineProps): ReactNode {
     y: yScale,
     width,
     height,
-    fontSize: Math.max(5, Math.min(Math.round(height * 0.22), 9)),
+    fontSize: annotationFontSize(height),
   });
 
-  const accName = summary === false ? false : (summary ?? describeSeries(data, { format, locale }));
+  const accName = resolveSummary(summary, () => describeSeries(data, { format, locale }));
 
   const strokeStyle = color ? { stroke: color } : undefined;
   const fillStyle = color ? { fill: color } : undefined;

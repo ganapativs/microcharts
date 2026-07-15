@@ -13,6 +13,7 @@ import {
 import { maxPerBucket } from "../../core/downsample.js";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_WAVEFORM } from "../../core/strings-waveform.js";
 import { bucketCount, waveformGeometry } from "./geometry.js";
 import { Waveform as StaticWaveform, waveformSummary, type WaveformProps } from "./index.js";
@@ -177,19 +178,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticWaveform>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {bar ? (
         <span
           className="mc-spark-readout"

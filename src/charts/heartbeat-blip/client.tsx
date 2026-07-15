@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import {
   HeartbeatBlip as StaticHeartbeatBlip,
   heartbeatSummary,
@@ -115,19 +116,7 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
         strings={strings}
         summary={false}
       />
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

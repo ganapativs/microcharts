@@ -7,7 +7,7 @@
 // share, never a continuous illusion; a measured-but-missing slot is a gap, not a
 // zero. Coords 2-dp, integer viewBox.
 import { stepIndex } from "../../shared/cell.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, textGutter } from "../../core/labels.js";
 import { clamp } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
@@ -106,7 +106,7 @@ export function cohortTriangleGeometry(
   // gutter is then sized to the widest label (deterministic 0.62·em/char).
   const showLabels = opts.labels === true && nRows > 0 && cell >= fontSize + 0.8;
   const gutter = showLabels
-    ? Math.ceil(Math.max(...rows.map((r) => r.label.length)) * fontSize * 0.62) + 3
+    ? textGutter(Math.max(...rows.map((r) => r.label.length)), fontSize, 3)
     : 0;
 
   const cols = nRows === 0 ? 0 : Math.min(MAX_AGES, Math.max(...rows.map((r) => r.values.length)));

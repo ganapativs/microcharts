@@ -71,6 +71,18 @@ function edgeFlip(
   return "middle";
 }
 
+/** Consumer labels are the one text path the containment rule can't place with a
+ *  reserved gutter (they're author-supplied, arbitrary length). Truncate with a
+ *  trailing "…" only when the label's estimated extent (0.62 viewBox units per
+ *  char — the library's over-estimate, matching `edgeFlip`) would overrun the
+ *  available horizontal run. Short labels are returned unchanged (byte-identical
+ *  output); this only ever engages on a label that would otherwise spill. */
+function fit(label: string, fontSize: number, avail: number): string {
+  const maxChars = Math.floor(avail / (fontSize * 0.62));
+  if (label.length <= maxChars) return label;
+  return maxChars <= 1 ? "…" : `${label.slice(0, maxChars - 1)}…`;
+}
+
 type Branded = { [ANNOTATION]: AnnotationBrand };
 
 export function Threshold(_props: ThresholdProps): ReactNode {
@@ -93,6 +105,7 @@ export function Threshold(_props: ThresholdProps): ReactNode {
           strokeOpacity={0.7}
           strokeDasharray="2 2"
           vectorEffect="non-scaling-stroke"
+          // reference hairline: fixed 1-unit ink, deliberately exempt from --mc-density
           style={{ strokeWidth: 1 }}
         />
         {p.label ? (
@@ -103,7 +116,7 @@ export function Threshold(_props: ThresholdProps): ReactNode {
             textAnchor="end"
             data-mc-ink="label"
           >
-            {p.label}
+            {fit(p.label, fontSize, width - 1)}
           </text>
         ) : null}
       </g>
@@ -143,7 +156,7 @@ export function TargetZone(_props: TargetZoneProps): ReactNode {
             textAnchor="end"
             data-mc-ink="label"
           >
-            {p.label}
+            {fit(p.label, fontSize, width - 1)}
           </text>
         ) : null}
       </g>
@@ -170,6 +183,7 @@ export function Marker(_props: MarkerProps): ReactNode {
           stroke={p.color ?? "var(--mc-neutral)"}
           strokeOpacity={0.7}
           vectorEffect="non-scaling-stroke"
+          // reference hairline: fixed 1-unit ink, deliberately exempt from --mc-density
           style={{ strokeWidth: 1 }}
         />
         {p.label ? (
@@ -234,6 +248,10 @@ export function Callout(_props: CalloutProps): ReactNode {
     const elbow = Math.min(5, fontSize);
     const ex = round2(x + (goRight ? elbow : -elbow));
     const ey = round2(Math.max(fontSize * 0.8, y - elbow));
+    // label anchors at `tx` and runs toward the wider half; truncate if it would
+    // overrun that side's remaining width (author labels can't reserve a gutter)
+    const tx = round2(ex + (goRight ? 1 : -1));
+    const label = fit(p.label, fontSize, goRight ? width - tx : tx);
     return (
       <g key={key} opacity={offX || offY ? 0.4 : undefined}>
         <circle
@@ -254,13 +272,13 @@ export function Callout(_props: CalloutProps): ReactNode {
           style={{ strokeWidth: 0.75 }}
         />
         <text
-          x={round2(ex + (goRight ? 1 : -1))}
+          x={tx}
           y={ey}
           fontSize={fontSize}
           textAnchor={goRight ? "start" : "end"}
           data-mc-ink="label"
         >
-          {p.label}
+          {label}
         </text>
       </g>
     );

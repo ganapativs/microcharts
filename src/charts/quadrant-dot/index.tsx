@@ -9,6 +9,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUADRANT, type QuadrantStrings } from "../../core/strings-quadrant.js";
 import { quadrantDotGeometry, type QuadrantDotGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type QuadrantNames = readonly [string, string, string, string];
 
@@ -106,7 +107,7 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}

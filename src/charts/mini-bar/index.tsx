@@ -5,11 +5,14 @@
 // category text at cell size: labels live in the summary + interactive readout.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
 import { miniBarGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface MiniBarDatum {
   label: string;
@@ -61,7 +64,7 @@ export interface MiniBarProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CategoryStrings | undefined;
   title?: string | undefined;
@@ -109,10 +112,28 @@ export function MiniBar(props: MiniBarProps): ReactNode {
     orientation,
   });
   const fmt = makeFormatter(format, locale);
-  const accName = summary === false ? false : (summary ?? miniBarSummary(data, fmt, strings));
+  const accName = resolveSummary(summary, () => miniBarSummary(data, fmt, strings));
 
   const hasNegative = sorted.some((d) => isFiniteValue(d.value) && d.value < 0);
   const goodSign = positive === "down" ? -1 : 1;
+
+  // annotations host contract: Marker x = category slot (bar center), Threshold/
+  // TargetZone y = data values. Only VERTICAL bars carry value on the y-axis;
+  // horizontal flips the axes, so an annotation's y would be meaningless there —
+  // pass those children straight through untouched (they'd dev-warn if annotations).
+  const ann =
+    orientation === "vertical"
+      ? resolveAnnotations(children, {
+          x: (i) => {
+            const b = geo.bars[Math.round(i)];
+            return b ? b.x + b.w / 2 : NaN;
+          },
+          y: scaleLinear(geo.domain, [height, 0]),
+          width,
+          height,
+          fontSize: annotationFontSize(height),
+        })
+      : { under: null, over: null, rest: children };
 
   return (
     <Chart
@@ -124,6 +145,7 @@ export function MiniBar(props: MiniBarProps): ReactNode {
       className={className ? `mc-minibar ${className}` : "mc-minibar"}
       style={style}
     >
+      {ann.under}
       {geo.bars.map((b, i) => {
         if (b.empty || (b.w === 0 && b.h === 0)) return null;
         const d = sorted[i]!;
@@ -164,7 +186,8 @@ export function MiniBar(props: MiniBarProps): ReactNode {
           />
         );
       })}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

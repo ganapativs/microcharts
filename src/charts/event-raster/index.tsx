@@ -5,9 +5,11 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
+import type { Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_EVENT_RASTER, type EventRasterStrings } from "../../core/strings-event-raster.js";
 import { eventRasterGeometry, LANE_CAP, rasterDomain, type RasterLaneInput } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export type EventRasterDatum = RasterLaneInput;
 
@@ -22,7 +24,7 @@ export interface EventRasterProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: EventRasterStrings | undefined;
   title?: string | undefined;
@@ -95,8 +97,7 @@ export function EventRaster(props: EventRasterProps): ReactNode {
   const domain = domainProp ?? rasterDomain(data);
   const geo = eventRasterGeometry({ data, domain, width, height, gutter, overflow });
   const binnedLabels = geo.lanes.filter((l) => l.binned).map((l) => l.label);
-  const accName =
-    summary === false ? false : (summary ?? eventRasterSummary(data, binnedLabels, strings));
+  const accName = resolveSummary(summary, () => eventRasterSummary(data, binnedLabels, strings));
 
   return (
     <Chart

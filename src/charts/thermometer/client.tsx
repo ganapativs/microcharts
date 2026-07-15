@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_THERMOMETER, type ThermometerStrings } from "../../core/strings-thermometer.js";
 import {
   Thermometer as StaticThermometer,
@@ -90,21 +91,7 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
         strings={strings}
         summary={false}
       />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
       {hover && readout ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {readout}

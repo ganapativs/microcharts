@@ -5,6 +5,7 @@
 // Wrapper focus only (one value). Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FILL_WORD, type FillWordStrings } from "../../core/strings-fill-word.js";
 import { FillWord as StaticFillWord, fillWordSummary, type FillWordProps } from "./index.js";
 
@@ -83,21 +84,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
         strings={strings}
         summary={false}
       />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );
 }

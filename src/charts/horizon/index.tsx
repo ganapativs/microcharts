@@ -5,8 +5,8 @@
 // identically across rows). Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { describeSeries, type SeriesStrings } from "../../core/summary.js";
-import { makeFormatter } from "../../core/format.js";
+import { describeSeries, type SeriesStrings, resolveSummary } from "../../core/summary.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import type { Value } from "../../core/types.js";
 import { horizonGeometry } from "./geometry.js";
 
@@ -22,7 +22,7 @@ export interface HorizonProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: SeriesStrings | undefined;
   title?: string | undefined;
@@ -57,8 +57,7 @@ export function Horizon(props: HorizonProps): ReactNode {
   const geo = horizonGeometry({ width, height, values: data, domain, baseline, folds, mode });
   const fmt = makeFormatter(format, locale);
   // values are ordinary S1 data; folding is presentation (spec)
-  const accName =
-    summary === false ? false : (summary ?? describeSeries(data, { format: fmt, strings }));
+  const accName = resolveSummary(summary, () => describeSeries(data, { format: fmt, strings }));
 
   return (
     <Chart

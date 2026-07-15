@@ -6,6 +6,7 @@ import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { funnelGeometry } from "./geometry.js";
 import { Funnel as StaticFunnel, funnelSummary, type FunnelProps } from "./index.js";
 
@@ -165,19 +166,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticFunnel>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {st && datum && isFiniteValue(datum.value) ? (
         <span
           className="mc-spark-readout"

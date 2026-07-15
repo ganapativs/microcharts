@@ -5,6 +5,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { gardenGridGeometry } from "./geometry.js";
 import { EN_GARDEN, type GardenStrings } from "../../core/strings-garden.js";
 import {
@@ -161,19 +162,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticGardenGrid>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {c ? (
         <span
           className="mc-spark-readout"

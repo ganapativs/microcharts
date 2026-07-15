@@ -10,6 +10,7 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
 import { dataDiffGeometry, type DataDiffGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 const signed = (n: number, fmt: (v: number) => string): string =>
   `${n > 0 ? "+" : n < 0 ? "−" : ""}${fmt(Math.abs(n))}`;
@@ -120,7 +121,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -130,7 +131,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
     );
   }
 
-  const accName = summary === false ? false : (summary ?? dataDiffSummary(geo, fmt, strings));
+  const accName = resolveSummary(summary, () => dataDiffSummary(geo, fmt, strings));
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (

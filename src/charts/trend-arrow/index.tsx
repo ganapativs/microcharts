@@ -5,9 +5,10 @@
 // `showValue` and the summary — the glyph never scales with it.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { trendArrowGeometry, type TrendDirection, type TrendGlyph } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Resolved TrendArrow model — shared by the static and interactive entries. */
 export interface TrendArrowModel {
@@ -60,7 +61,7 @@ export interface TrendArrowProps {
   showValue?: boolean | undefined;
   /** Which direction is "good" — flips only the color, never the glyph. */
   positive?: "up" | "down" | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   /** Swappable summary templates (defaults to EN). */
   strings?: ScalarStrings | undefined;
@@ -95,7 +96,7 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
     ? Math.ceil(geo.labelX + model.display.length * geo.fontSize * 0.62 + 1)
     : SIZE;
 
-  const accName = summary === false ? false : (summary ?? model.summary);
+  const accName = resolveSummary(summary, () => model.summary);
   const ink =
     model.valence === "pos" ? "positive" : model.valence === "neg" ? "negative" : "neutral";
 

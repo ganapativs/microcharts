@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_FILL_WORD, type FillWordStrings } from "../../core/strings-fill-word.js";
 import { fillWordGeometry, type FillMode } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 export interface FillWordProps {
   /** The text that is the chart. */
@@ -65,8 +66,7 @@ export function FillWord(props: FillWordProps): ReactNode {
   } = props;
 
   const geo = fillWordGeometry({ value, word, fontSize, pad: PAD, mode, label: label === "value" });
-  const accName =
-    summary === false ? false : (summary ?? fillWordSummary(value, word, mode, strings));
+  const accName = resolveSummary(summary, () => fillWordSummary(value, word, mode, strings));
   // The word renders at its NATURAL width — no textLength/lengthAdjust, which
   // distort the glyphs (the 0.62 estimate never matches a proportional font, so
   // pinning the extent stretches or squeezes the letters). The estimate still

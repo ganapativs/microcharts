@@ -14,6 +14,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_BIAS_STRIP } from "../../core/strings-bias-strip.js";
 import { biasLayout, biasStripGeometry } from "./geometry.js";
 import { BiasStrip as StaticBiasStrip, biasStripSummary, type BiasStripProps } from "./index.js";
@@ -180,19 +181,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticBiasStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {activeDot && activePair ? (
         <span
           className="mc-spark-readout"

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VOLUME_PROFILE } from "../../core/strings-volume-profile.js";
 import { binMass, volumeProfileGeometry } from "./geometry.js";
 import {
@@ -157,19 +158,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
           />
         ) : null}
       </StaticVolumeProfile>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {bar ? (
         /* Pinned to the bars' base edge: level labels + the poc flag sit at
            the bar TIPS, so the base side is the one spot the chip can never

@@ -15,21 +15,21 @@ never competes with its context.
   code={`import { Sparkline } from "@microcharts/react/sparkline";
 import { Threshold, TargetZone, Marker } from "@microcharts/react/annotations";
 
-<Sparkline data={latency} title="p95 latency" width={160} height={40}>
+<Sparkline data={latency} title="p95 latency" width={200} height={48}>
   <TargetZone y={[40, 60]} />
   <Threshold y={65} label="SLA" />
-  <Marker x={8} label="deploy" />
+  <Marker x={3} label="deploy" />
 </Sparkline>`}
 >
   <Sparkline
     data={[48, 52, 45, 58, 51, 47, 55, 49, 71, 64, 57, 52]}
     title="p95 latency"
-    width={160}
-    height={40}
+    width={200}
+    height={48}
   >
     <TargetZone y={[40, 60]} />
     <Threshold y={65} label="SLA" />
-    <Marker x={8} label="deploy" />
+    <Marker x={3} label="deploy" />
   </Sparkline>
 </LiveDemo>
 
@@ -110,8 +110,22 @@ same data-space, unchanged.
   </SparkBar>
 </LiveDemo>
 
-Every S1/S2 chart hosts annotations. Scalar and structured charts — Progress, StatusDot,
-MicroDonut, the timelines — don't take them in v1.
+## Every value-series host
+
+Every **value-series** chart hosts annotations — the charts with a continuous value axis and an
+index / slot / time x-axis, so a data-space `x` and `y` map cleanly onto the frame. That's
+Sparkline, SparkBar, MiniBar, CyclePlot, CitySkyline, ChangePoint, DualSparkline, SpreadBand,
+ForecastCone, ControlStrip, QueueDepth, BurnChart, Waterfall, PercentileTrace, RetentionCurve,
+WinProbWorm, and ErrorBudget. The same `<Threshold>` or `<Marker>` lands in each chart's own
+data-space, unchanged. (MiniBar hosts in its default **vertical** orientation, where value lives on
+the y-axis; a horizontal MiniBar flips the axes, so it passes annotation children straight through.)
+
+Charts without a single continuous value-y don't host them, by design: scalar readouts (Delta,
+FatDigits, StatusDot, Thermometer), part-to-whole (MicroDonut, SegmentedBar, Funnel), color-encoded
+value (HeatStrip, ActivityGrid, the calendars), value-by-value scatters (QuadrantDot, MicroScatter,
+BiasStrip), and the pure timelines. An annotation placed inside one renders nothing and warns in dev.
+
+<AnnotationHostShowcase />
 
 ## Honesty rules
 

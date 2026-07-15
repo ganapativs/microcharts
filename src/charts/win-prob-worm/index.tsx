@@ -7,8 +7,9 @@
 // model". Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { round2, isFiniteValue } from "../../core/types.js";
-import { clamp } from "../../core/scale.js";
+import { clamp, scaleLinear } from "../../core/scale.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
@@ -98,6 +99,18 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
   const swing = swingMark(geo!, markSwing, FONT, fmt);
   const end = geo!.end!;
 
+  // annotations host contract: Marker x = point index across the (gutter-shrunk)
+  // plot, Threshold/TargetZone y = win probabilities on the fixed 0–100 axis.
+  const plotW = Math.max(0, width - 2 * PAD - gutter);
+  const lastX = Math.max(1, data.length - 1);
+  const ann = resolveAnnotations(children, {
+    x: (i) => round2(PAD + (i / lastX) * plotW),
+    y: scaleLinear([0, 100], [height - PAD, PAD]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
+
   return (
     <Chart
       width={width}
@@ -108,6 +121,7 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {ann.under}
       {/* 50% midline — the decision boundary */}
       <line
         x1={PAD}
@@ -185,7 +199,8 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
           {lastText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

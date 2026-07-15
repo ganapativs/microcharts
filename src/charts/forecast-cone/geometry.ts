@@ -46,6 +46,8 @@ export interface ForecastConeGeometry {
   labelX: number;
   labelY: number;
   totalWidth: number;
+  /** Resolved value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
 }
 
 // normalize a [lo,hi] pair (swap if reversed)
@@ -177,5 +179,6 @@ export function forecastConeGeometry(opts: {
     labelY:
       fontSize > 0 ? round2(clamp(landing.y, fontSize * 0.7, height - fontSize * 0.6)) : landing.y,
     totalWidth: width + gutter,
+    domain: dom,
   };
 }

@@ -58,7 +58,7 @@ export function PropTable({ slug }: { slug: string }) {
         <code className="text-xs">className</code>, <code className="text-xs">style</code>) that
         every chart accepts. Interactive entries also share <code className="text-xs">animate</code>{" "}
         and <code className="text-xs">live</code>. See{" "}
-        <Link href="/docs/quickstart#the-shared-grammar" className="underline">
+        <Link prefetch={false} href="/docs/quickstart#the-shared-grammar" className="underline">
           the shared grammar
         </Link>
         .

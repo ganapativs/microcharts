@@ -15,6 +15,7 @@ import {
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
@@ -180,19 +181,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticSeismogram>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {active !== null ? (
         <span
           className="mc-spark-readout"

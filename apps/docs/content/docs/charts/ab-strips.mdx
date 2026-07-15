@@ -75,6 +75,40 @@ const test = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
   </span>
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo
+  label="no data"
+  code={`// an empty (or all-non-finite) arm renders no strips and announces "No data."
+<ABStrips data={{ a: [], b: [110, 120, 130] }} />`}
+>
+  <ABStrips data={{ a: [], b: [110, 120, 130] }} title="No data" width={220} height={22} />
+</LiveDemo>
+
+<LiveDemo
+  label="small sample"
+  code={`// fewer than 8 points in an arm: that row's outer band falls back to the
+// observed min–max instead of p5–95 — tail quantiles are fiction at n < 8
+<ABStrips data={{ a: [100, 130, 145], b: control80 }} />`}
+>
+  <ABStrips
+    data={{
+      a: [100, 130, 145],
+      b: Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22),
+    }}
+    format={(n) => `${Math.round(n)} ms`}
+    title="Small A arm"
+    width={220}
+    height={26}
+  />
+</LiveDemo>
+
+Either arm with zero finite values makes the whole comparison unanswerable — no strips draw,
+and the accessible name reads plainly **"No data."** rather than a comparison against nothing.
+An arm with fewer than 8 points still draws (a small sample is still the honest sample you
+have); only its outer band changes meaning, from the 5th–95th percentile to the plain
+min–max, because percentile estimates need more than a handful of points to mean anything.
+
 ## Four homes
 
 <FourContexts slug="ab-strips" />

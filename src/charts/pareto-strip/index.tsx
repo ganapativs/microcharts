@@ -7,8 +7,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { round2 } from "../../core/types.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
 import { paretoGeometry, type ParetoGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 const pct = (frac: number): string => `${Math.round(frac * 100)}%`;
 
@@ -68,7 +70,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
     children,
   } = props;
 
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.55)));
+  const FONT = labelFont(height);
   const cls = className ? `mc-pareto-strip ${className}` : "mc-pareto-strip";
 
   const probe = paretoGeometry({ width, height, data, threshold, max });
@@ -86,7 +88,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -96,8 +98,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false ? false : (summary ?? paretoSummary(geo, { unit, metric }, strings));
+  const accName = resolveSummary(summary, () => paretoSummary(geo, { unit, metric }, strings));
   const accent = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 

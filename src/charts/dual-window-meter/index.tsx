@@ -6,7 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_DUAL_WINDOW, type DualWindowStrings } from "../../core/strings-dual-window.js";
 import { clamp } from "../../core/scale.js";
 import { round2, type Value } from "../../core/types.js";
@@ -27,7 +27,7 @@ export interface DualWindowMeterProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: DualWindowStrings | undefined;
   title?: string | undefined;

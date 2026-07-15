@@ -5,6 +5,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VS, type VsStrings } from "../../core/strings-vs.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -200,19 +201,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
         ) : null}
         {rest.children}
       </StaticDualSparkline>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {active !== null && crossX !== undefined ? (
         <span
           className="mc-spark-readout"

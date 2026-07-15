@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { PercentileTrace } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
@@ -62,6 +63,18 @@ describe("<PercentileTrace>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<PercentileTrace data={SAMPLE} title="W12 percentile" />);
     await expectNoA11yViolations(container);
+  });
+
+  it("hosts annotations (marks drawn + clamped in frame)", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <PercentileTrace data={SAMPLE} width={80} height={20} label="none" summary={false}>
+          {children}
+        </PercentileTrace>
+      ),
+      80,
+      20,
+    );
   });
 });
 

@@ -1,15 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { test, fc } from "@fast-check/vitest";
-import {
-  TAU,
-  polarPoint,
-  arcTo,
-  arcPath,
-  sector,
-  annulusSector,
-  arcLength,
-  evenDashes,
-} from "./arc.js";
+import { TAU, polarPoint, arcTo, arcPath, sector, annulusSector, evenDashes } from "./arc.js";
 
 const angle = fc.double({ noNaN: true, min: -TAU, max: TAU });
 const radius = fc.double({ noNaN: true, min: 0.5, max: 500 });
@@ -119,15 +110,7 @@ describe("arc builders (invariants)", () => {
   });
 });
 
-describe("arcLength / evenDashes", () => {
-  it("quarter turn", () => expect(arcLength(10, 0, TAU / 4)).toBeCloseTo(15.71, 2));
-  it("degenerate → 0", () => {
-    expect(arcLength(0, 0, 1)).toBe(0);
-    expect(arcLength(10, 1, 1)).toBe(0);
-    expect(arcLength(NaN, 0, 1)).toBe(0);
-  });
-  it("clamps to one turn", () => expect(arcLength(1, 0, 5 * TAU)).toBeCloseTo(TAU, 2));
-
+describe("evenDashes", () => {
   it("dash + gap × count ≈ circumference", () => {
     const [dash, gap] = evenDashes(10, 8);
     expect((dash + gap) * 8).toBeCloseTo(TAU * 10, 0);

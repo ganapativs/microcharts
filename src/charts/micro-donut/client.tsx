@@ -3,8 +3,9 @@
 // lookup (pure); ←/→ rove wedges. Disabled entirely when `decorative` — an
 // aria-hidden chart must not be a tab stop. Composes the static component.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { largestRemainderPercents, rollup } from "../segmented-bar/geometry.js";
 import { sharesSummary } from "../segmented-bar/index.js";
@@ -13,7 +14,7 @@ import { MicroDonut as StaticMicroDonut, type MicroDonutProps } from "./index.js
 
 export interface InteractiveMicroDonutProps extends MicroDonutProps {
   strings?: CompositionStrings;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   /**
    * Opt-in entrance motion (default `false`): the wedges fade in, staggered,
@@ -167,19 +168,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticMicroDonut>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {wedge && datum ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {`${datum.label} ${pcts[active!]}%`}

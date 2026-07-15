@@ -6,10 +6,11 @@
 // the color is a redundant cue, never the sole signal.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { clamp } from "../../core/scale.js";
+import { clamp, scaleLinear } from "../../core/scale.js";
 import {
   EN_PERCENTILE_TRACE,
   type PercentileTraceStrings,
@@ -46,7 +47,7 @@ export interface PercentileTraceProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: PercentileTraceStrings | undefined;
   title?: string | undefined;
@@ -57,7 +58,8 @@ export interface PercentileTraceProps {
   children?: ReactNode | undefined;
 }
 
-const INT: Intl.NumberFormatOptions = { maximumFractionDigits: 0 };
+/** Integer formatting shared with the interactive entry. */
+export const INT: Intl.NumberFormatOptions = { maximumFractionDigits: 0 };
 
 export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   const {
@@ -123,6 +125,16 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   // label y clamped by font ascent so the number never spills the viewBox
   const labelY = round2(clamp(geo.last.y, FONT * 0.7, height - FONT * 0.3));
 
+  // annotations host contract: Marker x = reading index on the locked scale,
+  // Threshold/TargetZone y = percentile ranks on the fixed [0,100] axis.
+  const ann = resolveAnnotations(children, {
+    x: scaleLinear([0, Math.max(1, data.length - 1)], [2, width - 2]),
+    y: scaleLinear([0, 100], [height - 2, 2]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
+
   return (
     <Chart
       width={width + gutter}
@@ -133,6 +145,7 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
       className={cls}
       style={{ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties}
     >
+      {ann.under}
       {/* outer p5–95 field (faintest, half the band token) then the inner
           p25–75 middle half painted full-strength on top */}
       {bands
@@ -167,7 +180,8 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

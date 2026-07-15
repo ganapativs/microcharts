@@ -7,6 +7,7 @@ import { clamp, scaleLinear } from "../../core/scale.js";
 import { stackSeries } from "../../core/stack.js";
 import { normalizeShares } from "../../core/stack.js";
 import { round2, type Value } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 type XY = readonly [number, number];
 
@@ -40,7 +41,7 @@ export function stackedAreaGeometry(opts: {
 }): StackedAreaGeometry {
   const { width, height, series, curve, gutterCh, fontSize } = opts;
   const pad = 1;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.62) + 3 : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 3) : 0;
   const x0 = pad;
   const x1 = width - pad - gutter;
   const y0 = pad;

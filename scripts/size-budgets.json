@@ -1,6 +1,6 @@
 {
-  "$comment": "Per-subpath gzip budgets (plan/21 \u00a71, budget model v2). Keys are export subpaths without './'. Every chart needs an entry \u2014 gen-size-limits.mjs fails on a missing one, so adding a chart forces a budget decision. Hard ceilings: static \u2264 3 kB (target 2 kB, Delta-class 1.5 kB), interactive \u2264 static + 1 kB. `.size-limit.json` is GENERATED from this file + package.json#exports \u2014 never hand-edit it.",
-  "$exception": "Sparkline 3.35/4.35 kB was USER-APPROVED (2026-07-08) as a flagship exception to the 3/4 kB hard caps (long-series guard + label=minmax; trims exhausted first \u2014 plan/12). Batch 1 W4 raised it to 3.65/4.65 kB PENDING user sign-off at the batch gate: the plan/22 #28 annotations HOST contract adds the children walker + scale frame (~0.29 kB) to every S1/S2 host \u2014 the annotation MARK renderers ship in ./annotations (1.46 kB), which consumers import separately, so hosts only pay the walker. Not a precedent for other charts.",
+  "$comment": "Per-subpath gzip budgets (plan/21 §1, budget model v2). Keys are export subpaths without './'. Every chart needs an entry — gen-size-limits.mjs fails on a missing one, so adding a chart forces a budget decision. Hard ceilings: static ≤ 3 kB (target 2 kB, Delta-class 1.5 kB), interactive ≤ static + 1 kB. `.size-limit.json` is GENERATED from this file + package.json#exports — never hand-edit it.",
+  "$exception": "Sparkline 3.35/4.35 kB was USER-APPROVED (2026-07-08) as a flagship exception to the 3/4 kB hard caps (long-series guard + label=minmax; trims exhausted first — plan/12). Batch 1 W4 raised it to 3.65/4.65 kB PENDING user sign-off at the batch gate: the plan/22 #28 annotations HOST contract adds the children walker + scale frame (~0.29 kB) to every S1/S2 host — the annotation MARK renderers ship in ./annotations (1.46 kB), which consumers import separately, so hosts only pay the walker. Not a precedent for other charts. ANNOTATION-HOST RETROFIT (2026-07-15, USER-APPROVED full value-series family, plan/22 #28): resolveAnnotations walker + scale frame added to 15 value-series hosts. 5 cross the 3 kB static ceiling as approved exceptions (all < Sparkline 3.65): change-point 3.45, win-prob-worm 3.4, forecast-cone/dual-sparkline 3.35, burn-chart 3.25. The other 10 stay < 3 kB.",
   "styles": "12 kB",
   "charts": {
     "sparkline": {
@@ -44,8 +44,8 @@
       "interactive": "3.55 kB"
     },
     "mini-bar": {
-      "static": "2.25 kB",
-      "interactive": "3.65 kB"
+      "static": "2.6 kB",
+      "interactive": "4 kB"
     },
     "pictogram-row": {
       "static": "1.95 kB",
@@ -80,7 +80,7 @@
       "interactive": "3.5 kB"
     },
     "annotations": {
-      "static": "1.5 kB"
+      "static": "1.55 kB"
     },
     "theme": {
       "static": "2.5 kB"
@@ -118,15 +118,15 @@
     },
     "waterfall": {
       "static": "2.8 kB",
-      "interactive": "3.6 kB"
+      "interactive": "3.95 kB"
     },
     "bump-strip": {
       "static": "2.4 kB",
       "interactive": "3.2 kB"
     },
     "dual-sparkline": {
-      "static": "3 kB",
-      "interactive": "4.25 kB"
+      "static": "3.35 kB",
+      "interactive": "4.55 kB"
     },
     "stacked-area": {
       "static": "2.9 kB",
@@ -177,24 +177,24 @@
       "interactive": "3.85 kB"
     },
     "retention-curve": {
-      "static": "2.8 kB",
-      "interactive": "3.95 kB"
+      "static": "3.05 kB",
+      "interactive": "4.25 kB"
     },
     "burn-chart": {
-      "static": "2.9 kB",
-      "interactive": "4.15 kB"
+      "static": "3.25 kB",
+      "interactive": "4.5 kB"
     },
     "error-budget": {
-      "static": "2.5 kB",
-      "interactive": "3.65 kB"
+      "static": "2.85 kB",
+      "interactive": "4 kB"
     },
     "control-strip": {
-      "static": "2.8 kB",
-      "interactive": "4.05 kB"
+      "static": "3.1 kB",
+      "interactive": "4.3 kB"
     },
     "forecast-cone": {
-      "static": "3 kB",
-      "interactive": "4.2 kB"
+      "static": "3.35 kB",
+      "interactive": "4.55 kB"
     },
     "quantile-dots": {
       "static": "2.6 kB",
@@ -221,12 +221,12 @@
       "interactive": "3.65 kB"
     },
     "cycle-plot": {
-      "static": "2.5 kB",
-      "interactive": "3.85 kB"
+      "static": "2.85 kB",
+      "interactive": "4.2 kB"
     },
     "change-point": {
-      "static": "2.98 kB",
-      "interactive": "4.33 kB"
+      "static": "3.45 kB",
+      "interactive": "4.75 kB"
     },
     "ensemble-ghosts": {
       "static": "2.5 kB",
@@ -285,8 +285,8 @@
       "interactive": "3.15 kB"
     },
     "city-skyline": {
-      "static": "2.1 kB",
-      "interactive": "3.25 kB"
+      "static": "2.45 kB",
+      "interactive": "3.6 kB"
     },
     "honeycomb": {
       "static": "1.8 kB",
@@ -416,24 +416,24 @@
       "interactive": "3.75 kB"
     },
     "win-prob-worm": {
-      "static": "3 kB",
-      "interactive": "4.25 kB"
+      "static": "3.4 kB",
+      "interactive": "4.6 kB"
     },
     "queue-depth": {
-      "static": "2.7 kB",
-      "interactive": "3.9 kB"
+      "static": "3.05 kB",
+      "interactive": "4.2 kB"
     },
     "spread-band": {
-      "static": "2.8 kB",
-      "interactive": "4.1 kB"
+      "static": "3.15 kB",
+      "interactive": "4.4 kB"
     },
     "bias-strip": {
       "static": "2.45 kB",
       "interactive": "3.75 kB"
     },
     "percentile-trace": {
-      "static": "2.4 kB",
-      "interactive": "3.6 kB"
+      "static": "2.7 kB",
+      "interactive": "3.9 kB"
     }
   }
 }

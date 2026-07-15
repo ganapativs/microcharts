@@ -21,11 +21,6 @@ read; for an exact figure reach for `Progress` or `Sparkline`.
 
 <Playground chart="breathing-dot" />
 
-## When to use it
-
-- **Good for** — an ambient "how strained is it right now" read, a live status dot in a header or KPI card, or per-node load in a dense table.
-- **Avoid for** — an exact load figure (`Progress`, `Sparkline`), discrete events (`HeartbeatBlip`), or a trend over time (`Sparkline`).
-
 ## Motion, and reduced motion
 
 The pulse **is** the encoding — its rate and amplitude are snapped to three named bands (calm, elevated,
@@ -35,6 +30,11 @@ animation is gated on two things: it pauses when the dot scrolls off-screen (a s
 never runs at all under `prefers-reduced-motion` — reduced-motion readers get exactly the static frame,
 where the ring's distance from the core already carries the level. The band is announced through a
 polite live region only when it changes, never on every pulse.
+
+## When to use it
+
+- **Good for** — an ambient "how strained is it right now" read, a live status dot in a header or KPI card, or per-node load in a dense table.
+- **Avoid for** — an exact load figure (`Progress`, `Sparkline`), discrete events (`HeartbeatBlip`), or a trend over time (`Sparkline`).
 
 ## Variants
 

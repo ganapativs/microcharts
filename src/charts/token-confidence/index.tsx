@@ -5,6 +5,7 @@
 // never color-alone); confident tokens get NO mark so reading stays primary.
 import type { CSSProperties, ReactNode } from "react";
 import { devWarn } from "../../core/dev.js";
+import type { Format } from "../../core/format.js";
 import {
   EN_TOKEN_CONFIDENCE,
   type TokenConfidenceStrings,
@@ -21,7 +22,7 @@ export interface TokenConfidenceProps {
   show?: "flagged" | "all" | undefined;
   /** Appends the 1-line inline key ("― unsure · ⋯ guessing"). */
   legend?: boolean | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: TokenConfidenceStrings | undefined;
   title?: string | undefined;
@@ -37,7 +38,7 @@ export function tokenConfidenceSummary(
   tokens: readonly TieredToken[],
   strings: TokenConfidenceStrings,
 ): string {
-  if (tokens.length === 0) return strings.noData;
+  if (tokens.length === 0) return strings.noTokens;
   const c = tokenTierCounts(tokens);
   return strings.tokenConfidence(tokens.length, c.confident, c.unsure, c.guessing);
 }

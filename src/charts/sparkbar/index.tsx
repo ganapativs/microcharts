@@ -6,10 +6,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter } from "../../core/format.js";
-import { describeSeries, type DescribeOptions } from "../../core/summary.js";
+import { describeSeries, type DescribeOptions, resolveSummary } from "../../core/summary.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 import { labelMetrics, sparkBarGeometry, type Bar, type SparkBarMode } from "./geometry.js";
-import { resolveAnnotations } from "../../shared/annotations-host.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
 
 /** Ink role for a bar: valence color in win-loss / negatives, else neutral or
@@ -63,7 +63,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     children,
   } = props;
 
-  const accName = summary === false ? false : (summary ?? describeSeries(data, { format, locale }));
+  const accName = resolveSummary(summary, () => describeSeries(data, { format, locale }));
   const fmt = makeFormatter(format, locale);
 
   // The endpoint label reserves a deterministic right gutter BEFORE geometry, so
@@ -96,7 +96,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     y: scaleLinear(geo.domain, [height - 1, 1]),
     width,
     height,
-    fontSize: Math.max(5, Math.min(Math.round(height * 0.22), 9)),
+    fontSize: annotationFontSize(height),
   });
 
   return (

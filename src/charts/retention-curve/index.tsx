@@ -5,9 +5,13 @@
 // RSC-safe. Non-monotone bumps render as-is (never sorted/smoothed away).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
 import { retentionGeometry, type RetentionCurveType, type RetentionGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual retention summary. Shared with the interactive entry. */
 export function retentionSummary(
@@ -41,7 +45,7 @@ export interface RetentionCurveProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: RetentionStrings | undefined;
   title?: string | undefined;
@@ -52,7 +56,8 @@ export interface RetentionCurveProps {
   children?: ReactNode | undefined;
 }
 
-const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits: 0 };
+/** Percent formatting shared with the interactive entry. */
+export const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits: 0 };
 
 export function RetentionCurve(props: RetentionCurveProps): ReactNode {
   const {
@@ -77,7 +82,7 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
     children,
   } = props;
 
-  const FONT = Math.min(11, Math.max(7, Math.round(height * 0.55)));
+  const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-retention-curve ${className}` : "mc-retention-curve";
 
@@ -104,7 +109,7 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -114,10 +119,24 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false ? false : (summary ?? retentionSummary(geo, fmt, unit, data.length, strings));
+  const accName = resolveSummary(summary, () =>
+    retentionSummary(geo, fmt, unit, data.length, strings),
+  );
   const lineColor = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+
+  // annotations host contract: Marker x = period index across the shared span
+  // (data ∪ benchmark), Threshold/TargetZone y = retained fractions on the frame.
+  const yDomain: readonly [number, number] =
+    domain && domain.every((d) => Number.isFinite(d)) ? domain : [0, 1];
+  const span = Math.max(data.length, benchmark?.length ?? 0);
+  const ann = resolveAnnotations(children, {
+    x: scaleLinear([0, Math.max(1, span - 1)], [2, width - 2]),
+    y: scaleLinear(yDomain, [height - 2, 2]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
 
   return (
     <Chart
@@ -129,6 +148,7 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {ann.under}
       {/* benchmark ghost — dashed + muted, subordinate by construction */}
       {geo.ghost ? (
         <path
@@ -175,7 +195,8 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

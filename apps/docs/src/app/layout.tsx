@@ -63,9 +63,13 @@ export const metadata: Metadata = {
     canonical: "/",
     types: { "application/atom+xml": [{ url: "/rss.xml", title: `${SITE.name} releases` }] },
   },
-  // Crisp env-aware SVG favicon (app/brand/icon.svg); apple-touch icon is the
-  // generated PNG (app/apple-icon.tsx) via its file convention.
-  icons: { icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }] },
+  // Crisp env-aware SVG favicon (app/brand/icon.svg). The apple-touch icon must
+  // be listed explicitly — an `icons` object suppresses the app/apple-icon.tsx
+  // file convention's automatic <link> tag.
+  icons: {
+    icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     siteName: SITE.name,
@@ -99,6 +103,12 @@ export default function Layout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen font-sans antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-fd-background focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-fd-foreground focus:shadow-md focus:ring-2 focus:ring-fd-primary"
+        >
+          Skip to content
+        </a>
         <script dangerouslySetInnerHTML={{ __html: ACCENT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CONSOLE_SCRIPT }} />
         <script type="application/ld+json">{jsonLdScript(websiteJsonLd())}</script>

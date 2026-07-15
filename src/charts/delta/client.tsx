@@ -5,6 +5,7 @@
 // gated on reduced-motion in CSS; the announcement always fires.
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { Delta as StaticDelta, deltaModel, type DeltaProps } from "./index.js";
 
 // Fresh-client-mount detector, mirroring the motion gate's hydration latch: the
@@ -65,21 +66,7 @@ export function Delta({
       data-enter={enter ? "1" : undefined}
     >
       <StaticDelta {...props} />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {summary}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{summary}</LiveRegion> : null}
     </span>
   );
 }

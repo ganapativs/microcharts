@@ -16,15 +16,25 @@ function GithubMark() {
 export function DocsSidebarChrome() {
   return (
     <div className="flex items-center justify-between gap-1 pt-1">
-      <a
-        href={SITE.repo}
-        target="_blank"
-        rel="noreferrer noopener"
-        aria-label="GitHub repository"
-        className="ghost-ctrl size-8"
-      >
-        <GithubMark />
-      </a>
+      <div className="flex items-center gap-2">
+        <a
+          href={SITE.repo}
+          target="_blank"
+          rel="noreferrer noopener"
+          aria-label="GitHub repository"
+          className="ghost-ctrl size-8"
+        >
+          <GithubMark />
+        </a>
+        <a
+          href={`${SITE.repo}/releases`}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="mono-label link-underline"
+        >
+          Releases
+        </a>
+      </div>
       <AppearanceMenu />
     </div>
   );

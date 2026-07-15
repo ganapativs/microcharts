@@ -6,10 +6,13 @@
 // hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear, extent } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-change-point.js";
 import { changePointGeometry, type ChangePointGeometry } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 // signed=false for the summary, where the direction word already carries the sign
 const pct = (frac: number, signed = true): string =>
@@ -101,7 +104,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
         width={width}
         height={height}
         title={title}
-        summary={summary === false ? false : (summary ?? strings.noData)}
+        summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         className={cls}
         style={style}
@@ -111,11 +114,22 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
     );
   }
 
-  const accName = summary === false ? false : (summary ?? changePointSummary(geo, fmt, strings));
+  const accName = resolveSummary(summary, () => changePointSummary(geo, fmt, strings));
   const accent = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
   const totalWidth = width + gutter;
   const lastBreak = geo.breaks[geo.breaks.length - 1];
+
+  // annotations host: Marker x = data index (mirror of the geometry's sx),
+  // Threshold/TargetZone y = data values on the shared value scale (props.domain
+  // ?? data extent, mapped to [height − pad, pad] with the geometry's pad = 2).
+  const ann = resolveAnnotations(children, {
+    x: (i) => 2 + (i / Math.max(1, geo.n - 1)) * (width - 4),
+    y: scaleLinear(domain ?? extent(data) ?? [0, 1], [height - 2, 2]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
 
   return (
     <Chart
@@ -127,6 +141,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {ann.under}
       {/* regime shading — only the ODD regimes are tinted (identity, not valence);
           adjacent regimes therefore always contrast (bare vs tinted) at ONE
           opacity that reads on light and dark. Tiles gap-free break→break. */}
@@ -213,7 +228,8 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

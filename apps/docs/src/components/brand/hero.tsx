@@ -9,7 +9,7 @@ export function BrandHero() {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 grid-paper opacity-60"
       />
-      <div className="relative z-0 mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-18 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14">
+      <div className="relative z-0 mx-auto grid max-w-shell items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-18 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14">
         <div>
           <span className="mono-label text-fd-primary">Brand kit</span>
           <h1 className="display mt-3 text-balance text-[length:var(--text-fluid-h2)] text-fd-foreground">

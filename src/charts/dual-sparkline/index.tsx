@@ -6,13 +6,15 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import type { Curve } from "../../core/path.js";
 import { seriesStats } from "../../core/stats.js";
 import { EN_VS, type VsStrings } from "../../core/strings-vs.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import type { Value } from "../../core/types.js";
 import { dualSparklineGeometry } from "./geometry.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 
 /** Trend clause ("up 12%" / "down 4%" / "flat") for one series. */
 function trendClause(values: readonly Value[], strings: SeriesStrings): string {
@@ -64,7 +66,7 @@ export interface DualSparklineProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: VsStrings | undefined;
   seriesStrings?: SeriesStrings | undefined;
@@ -125,6 +127,20 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
       ? false
       : (summary ?? dualSummary(data, compare, fmt, strings, seriesStrings));
 
+  // annotations host contract: Marker x = data INDEX (over the shared x-range),
+  // Threshold/TargetZone y = data values on the shared value scale.
+  const n = Math.max(data.length, compare.length);
+  const ann = resolveAnnotations(children, {
+    x: (i) =>
+      n > 1
+        ? geo.plot.x0 + (i * (geo.plot.x1 - geo.plot.x0)) / (n - 1)
+        : (geo.plot.x0 + geo.plot.x1) / 2,
+    y: scaleLinear(geo.domain, [geo.plot.y1, geo.plot.y0]),
+    width,
+    height,
+    fontSize: annotationFontSize(height),
+  });
+
   return (
     <Chart
       width={width}
@@ -144,6 +160,7 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
           data-mc-ink="band"
         />
       ) : null}
+      {ann.under}
       {geo.dCompare ? (
         <path
           d={geo.dCompare}
@@ -185,7 +202,8 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
           {fmt(geo.lastPrimary.value)}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

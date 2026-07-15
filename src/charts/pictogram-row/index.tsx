@@ -5,9 +5,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { pictogramGeometry, type PictogramUnit } from "./geometry.js";
+import { resolveSummary } from "../../core/summary.js";
 
 /** Factual S3 summary — true numbers even on overflow ("9 of 8."). */
 export function pictogramSummary(
@@ -34,7 +35,7 @@ export interface PictogramRowProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ScalarStrings | undefined;
   title?: string | undefined;
@@ -77,8 +78,7 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
 
   const geo = pictogramGeometry({ width, height, value, total, shape, fractional });
   const fmt = makeFormatter(format, locale);
-  const accName =
-    summary === false ? false : (summary ?? pictogramSummary(value, total, fmt, strings));
+  const accName = resolveSummary(summary, () => pictogramSummary(value, total, fmt, strings));
   // no custom color: the fill IS the accent ink role (bound in styles.css,
   // retunes with presets); a custom color has no token and stays inline
   const fillRole = color ? undefined : "accent";

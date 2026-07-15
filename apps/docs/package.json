@@ -8,6 +8,8 @@
     "postinstall": "fumadocs-mdx",
     "predev": "fumadocs-mdx && node scripts/gen-md.ts",
     "dev": "next dev",
+    "gen:entries": "tsx scripts/gen-entries.ts",
+    "gen:preview-live": "tsx scripts/gen-preview-live.ts",
     "prebuild": "node scripts/gen-md.ts",
     "build": "next build",
     "start": "serve out -l 3001",
@@ -20,10 +22,10 @@
     "@microcharts/react": "workspace:*",
     "@orama/orama": "^3.1.18",
     "cnfast": "^0.0.8",
-    "fumadocs-core": "16.10.7",
-    "fumadocs-mdx": "15.0.13",
-    "fumadocs-ui": "16.10.7",
-    "lucide-react": "^1.21.0",
+    "fumadocs-core": "16.11.4",
+    "fumadocs-mdx": "15.1.1",
+    "fumadocs-ui": "16.11.4",
+    "lucide-react": "^1.24.0",
     "next": "^16.2.10",
     "next-themes": "^0.4.6",
     "react": "^19.2.0",
@@ -32,15 +34,15 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.2",
     "@types/mdx": "^2.0.14",
-    "@types/node": "^26.0.0",
+    "@types/node": "^26.1.1",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "ajv": "^8.20.0",
-    "postcss": "^8.5.15",
+    "postcss": "^8.5.19",
     "serve": "^14.2.6",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
-    "wrangler": "^4.107.0"
+    "wrangler": "^4.110.0"
   }
 }

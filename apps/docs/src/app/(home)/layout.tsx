@@ -23,7 +23,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       className={`${serif.variable} flex min-h-screen flex-col [--font-serif:var(--font-serif-src),Georgia,serif]`}
     >
       <SiteNav />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <RouteTransition>{children}</RouteTransition>
       </main>
       <SiteFooter />
