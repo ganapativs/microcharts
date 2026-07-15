@@ -27,7 +27,7 @@ export function HomeProblemSection() {
           <p className="mt-4 max-w-md text-fd-muted-foreground">
             An assistant answers in a paragraph. A table cell has room for one word. A KPI card
             wants a number and a shape, not a toolbar. The chart libraries we have were built for
-            pages that were mostly chart — not for interfaces that are mostly words.
+            pages that were mostly chart, not for interfaces that are mostly words.
           </p>
           <p className="mt-3 max-w-md text-fd-muted-foreground">
             So numbers travel as prose, and readers parse trends out of sentences by hand. The
@@ -48,7 +48,7 @@ export function HomeProblemSection() {
                   color="var(--mc-neutral)"
                   width={280}
                   height={10}
-                  summary={`A typical charting stack: ${RECHARTS_KB} kB gzip — the full bar.`}
+                  summary={`A typical charting stack: ${RECHARTS_KB} kB gzip: the full bar.`}
                 />
                 <span className="font-medium tabular-nums text-fd-foreground">
                   {RECHARTS_KB} kB
@@ -62,7 +62,7 @@ export function HomeProblemSection() {
                   label="none"
                   width={280}
                   height={10}
-                  summary={`One microchart: ${SIZE.median} kB gzip on the same scale — ${Math.round(RECHARTS_KB / SIZE.median)} times smaller.`}
+                  summary={`One microchart: ${SIZE.median} kB gzip on the same scale, ${Math.round(RECHARTS_KB / SIZE.median)} times smaller.`}
                 />
                 <span className="font-medium tabular-nums text-fd-foreground">
                   {SIZE.median} kB
@@ -70,7 +70,7 @@ export function HomeProblemSection() {
               </div>
             </div>
             <p className="mt-3 text-[0.8rem] text-fd-muted-foreground">
-              Same scale, on purpose — the second bar being hard to see is the argument.
+              Same scale, on purpose. The second bar being hard to see is the argument.
             </p>
             <div className="mt-4 grid gap-x-6 gap-y-2 text-sm text-fd-muted-foreground sm:grid-cols-2">
               <p>
@@ -79,7 +79,7 @@ export function HomeProblemSection() {
               </p>
               <p>
                 <span className="font-medium text-fd-foreground">{SIZE.median} kB</span> median per
-                chart, zero dependencies — and 0 kB of client JS when it renders statically.
+                chart, zero dependencies, and 0 kB of client JS when it renders statically.
               </p>
             </div>
             <p className="mono-label mt-4 opacity-60">

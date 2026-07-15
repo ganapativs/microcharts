@@ -15,7 +15,7 @@ import { Reveal } from "@/components/ui/reveal";
 const PRINCIPLES = [
   {
     title: "Honest encoding",
-    body: "Every chart has one documented primary channel and a precision rating. Lie factor = 1 — motion and texture may delight, but never change what the data means.",
+    body: "Every chart has one documented primary channel and a precision rating. Lie factor = 1. Motion and texture may delight, but they never change what the data means.",
   },
   {
     title: "Accessible by default",
@@ -23,11 +23,11 @@ const PRINCIPLES = [
   },
   {
     title: "Server-first",
-    body: "Static charts are hook-free, listener-free pure SVG — zero client JS in RSC. Interactivity is a separate entry you opt into, never a tax you pay by default.",
+    body: "Static charts are hook-free, listener-free pure SVG, with zero client JS in RSC. Interactivity is a separate entry you opt into, never a tax you pay by default.",
   },
   {
     title: "Budget-gated",
-    body: "Every subpath's gzip size is a CI gate, forever. A chart that gets heavier than its budget fails the build — the numbers on this page are the enforced ones.",
+    body: "Every subpath's gzip size is a CI gate, forever. A chart that gets heavier than its budget fails the build. The numbers on this page are the enforced ones.",
   },
 ] as const;
 
@@ -100,7 +100,7 @@ export function HomePrinciplesSection() {
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h3 className="font-medium text-fd-foreground">Traded up, on purpose.</h3>
           <p className="text-sm text-fd-muted-foreground">
-            Five shapes that fail at word size — and the honest chart each one became.
+            Five shapes that fail at word size, and the honest chart each one became.
           </p>
         </div>
         <ul className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-5">

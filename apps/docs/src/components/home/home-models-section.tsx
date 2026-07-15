@@ -17,7 +17,7 @@ const SURFACES = [
   },
   {
     path: "/llms-full.txt",
-    note: "every doc page, one file — paste it into a system prompt",
+    note: "every doc page, one file, ready to paste into a system prompt",
   },
   {
     path: "/catalog.json",
@@ -36,7 +36,7 @@ const CLAIMS = [
   },
   {
     title: "Safe to emit",
-    body: "data alone renders something correct — bad values degrade to documented behavior, never to a crash in the reply.",
+    body: "data alone renders something correct. Bad values degrade to documented behavior, never to a crash in the reply.",
   },
 ] as const;
 

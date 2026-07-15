@@ -26,7 +26,7 @@ export function HomeReceiptsSection() {
     {
       big: "0",
       label: "runtime dependencies",
-      note: "dependencies: {} forever — React is a peer",
+      note: "dependencies: {} forever; React is a peer",
       source: "package.json · CI-enforced",
       chart: (
         <Sparkline
@@ -59,7 +59,7 @@ export function HomeReceiptsSection() {
     {
       big: "0 kB",
       label: "client JS for static charts",
-      note: "pure SVG out of an RSC — nothing hydrates",
+      note: "pure SVG out of an RSC; nothing hydrates",
       source: "static entries are hook-free by contract",
       chart: (
         <Progress

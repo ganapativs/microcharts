@@ -41,7 +41,7 @@ export function HomeCatalogSection() {
           ))}
           <span className="mono-label ml-1 inline-flex items-center gap-2 leading-none">
             <span aria-hidden className="hx-pulse size-1.5 shrink-0 rounded-full bg-fd-primary" />
-            live — every tile is the shipped component
+            live: every tile is the shipped component
           </span>
         </div>
       </Reveal>

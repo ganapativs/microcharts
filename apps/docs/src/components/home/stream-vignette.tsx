@@ -90,7 +90,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "r2",
         kind: "text",
-        text: " on Q2 — and growth was broad, not one deal carrying it:",
+        text: " on Q2, and growth was broad, not one deal carrying it:",
       },
       {
         id: "r-mini",
@@ -124,7 +124,7 @@ const SCENARIOS: Scenario[] = [
           <Bullet value={72} target={80} bands={[50, 90]} width={66} height={12} summary={false} />
         ),
       },
-      { id: "r4", kind: "text", text: " to target. A clean quarter — clear to raise for Q4." },
+      { id: "r4", kind: "text", text: " to target. A clean quarter, clear to raise for Q4." },
     ],
   },
   {
@@ -178,7 +178,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "i3",
         kind: "text",
-        text: ", green by 14:11 — inside the error budget, no SLO breach. Adding a write-path smoke test to the canary.",
+        text: ", green by 14:11, inside the error budget, no SLO breach. Adding a write-path smoke test to the canary.",
       },
     ],
   },
@@ -196,7 +196,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "m1",
         kind: "text",
-        text: " on the session — a steady grind into the bell. Intraday returns stayed tight, no fat tails:",
+        text: " on the session, a steady grind into the bell. Intraday returns stayed tight, no fat tails:",
       },
       {
         id: "m-hist",
@@ -242,7 +242,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "m4",
         kind: "text",
-        text: " over its benchmark weight — trimming into strength on Monday.",
+        text: " over its benchmark weight, trimming into strength on Monday.",
       },
     ],
   },

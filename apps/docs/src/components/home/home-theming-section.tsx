@@ -17,7 +17,7 @@ export function HomeThemingSection() {
           </h2>
           <p className="mt-4 max-w-md text-fd-muted-foreground">
             <code className="text-sm">defineTheme</code> derives a color-blind-safe categorical
-            palette and hand-tuned-style dark twins from a single brand color — in OKLCH, with zero
+            palette and hand-tuned-style dark twins from a single brand color, in OKLCH, with zero
             dependencies. Pick a swatch: every chart in the panel re-themes through the same two
             dozen CSS custom properties your app would use.
           </p>
