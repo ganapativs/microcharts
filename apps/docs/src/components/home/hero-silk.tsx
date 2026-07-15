@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { useTheme } from "next-themes";
 
 /**
  * Hero silk — a slow domain-warped fbm gradient behind the fold. Hand-written
- * WebGL1, zero deps, ~2 kB. Theme-aware tone sets (hand-tuned dark, never an
- * inverted filter); DPR capped at 1.5; rAF pauses off-screen and in hidden
- * tabs; reduced motion renders one settled frame; no-WebGL leaves the CSS
- * fallback gradient showing through.
+ * WebGL1, zero deps, ~2 kB. The silk tones are DERIVED from the live `--accent`
+ * (so the picker recolours it, not just cobalt) as a ±30° hue sweep at a fixed
+ * lightness/saturation profile per theme — reproducing the original periwinkle
+ * → lilac → ice sweep when the accent is cobalt, and rotating it for ember,
+ * moss, teal, rose, etc. Retunes live on accent/theme change. DPR capped at
+ * 1.5; rAF pauses off-screen and in hidden tabs; reduced motion renders one
+ * settled frame; no-WebGL leaves the CSS fallback gradient showing through.
  */
 
 const VERT = `attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`;
@@ -32,32 +34,86 @@ void main(){
  col=mix(col,cP,smoothstep(.4,1.,uv.y)*.7);
  gl_FragColor=vec4(col,1.);}`;
 
-/** Tone sets per theme — dark is tuned, not filtered. */
 interface ToneSet {
   paper: readonly number[];
   a: readonly number[];
   b: readonly number[];
   c: readonly number[];
 }
-const TONES: Record<"light" | "dark", ToneSet> = {
+
+// [hueOffset°, saturation, lightness] per silk band, per theme. The offsets +
+// S/L reproduce the original cobalt periwinkle/lilac/ice sweep; keeping them
+// fixed and only rotating the hue to the accent preserves the look for any
+// accent. Paper stays the neutral field colour so copy contrast never drifts.
+const PROFILE = {
   light: {
-    paper: [0.933, 0.945, 0.968],
-    a: [0.694, 0.745, 0.933], // periwinkle
-    b: [0.812, 0.761, 0.925], // lilac
-    c: [0.757, 0.859, 0.937], // ice
+    paper: [0.933, 0.945, 0.968] as const,
+    a: [0, 0.62, 0.81],
+    b: [30, 0.52, 0.84],
+    c: [-21, 0.59, 0.85],
   },
   dark: {
-    paper: [0.039, 0.043, 0.059], // the dark field #0a0b0f
-    a: [0.137, 0.169, 0.322], // deep periwinkle
-    b: [0.192, 0.157, 0.302], // deep lilac
-    c: [0.106, 0.184, 0.271], // deep ice
+    paper: [0.039, 0.043, 0.059] as const,
+    a: [0, 0.42, 0.22],
+    b: [26, 0.34, 0.21],
+    c: [-19, 0.44, 0.18],
   },
 } as const;
 
+/** Resolve any CSS colour string to [r,g,b] 0..1 via the browser (handles hex,
+ *  rgb(), oklch(), named — whatever the accent token holds). */
+function resolveRgb(colorStr: string): [number, number, number] {
+  const el = document.createElement("span");
+  el.style.cssText = "color:" + colorStr + ";display:none";
+  document.body.appendChild(el);
+  const m = getComputedStyle(el).color.match(/[\d.]+/g);
+  el.remove();
+  return m ? [+m[0] / 255, +m[1] / 255, +m[2] / 255] : [0.184, 0.322, 0.831];
+}
+
+function rgbToHue([r, g, b]: readonly number[]): number {
+  const max = Math.max(r, g, b);
+  const d = max - Math.min(r, g, b);
+  if (d === 0) return 0;
+  let hue: number;
+  if (max === r) hue = ((g - b) / d) % 6;
+  else if (max === g) hue = (b - r) / d + 2;
+  else hue = (r - g) / d + 4;
+  hue *= 60;
+  return hue < 0 ? hue + 360 : hue;
+}
+
+function hslToRgb(h: number, s: number, l: number): number[] {
+  h = ((h % 360) + 360) % 360;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  const [r, g, b] =
+    h < 60
+      ? [c, x, 0]
+      : h < 120
+        ? [x, c, 0]
+        : h < 180
+          ? [0, c, x]
+          : h < 240
+            ? [0, x, c]
+            : h < 300
+              ? [x, 0, c]
+              : [c, 0, x];
+  return [r + m, g + m, b + m];
+}
+
+/** Read the live `--accent` + theme, build the silk tone set. */
+function readTones(): ToneSet {
+  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+  const hue = rgbToHue(resolveRgb(accent || "#2f52d4"));
+  const P = document.documentElement.classList.contains("dark") ? PROFILE.dark : PROFILE.light;
+  const tone = ([dh, s, l]: readonly number[]) => hslToRgb(hue + dh, s, l);
+  return { paper: P.paper, a: tone(P.a), b: tone(P.b), c: tone(P.c) };
+}
+
 export function HeroSilk({ className = "" }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const { resolvedTheme } = useTheme();
-  const toneRef = useRef<((tones: ToneSet) => void) | null>(null);
 
   useEffect(() => {
     const canvas = ref.current;
@@ -92,14 +148,14 @@ export function HeroSilk({ className = "" }: { className?: string }) {
 
     const uR = gl.getUniformLocation(prog, "r");
     const uT = gl.getUniformLocation(prog, "t");
-    const setTones = (tones: ToneSet) => {
+    const applyTones = () => {
+      const tones = readTones();
       gl.uniform3fv(gl.getUniformLocation(prog, "cA"), [...tones.a]);
       gl.uniform3fv(gl.getUniformLocation(prog, "cB"), [...tones.b]);
       gl.uniform3fv(gl.getUniformLocation(prog, "cC"), [...tones.c]);
       gl.uniform3fv(gl.getUniformLocation(prog, "cP"), [...tones.paper]);
     };
-    toneRef.current = setTones;
-    setTones(document.documentElement.classList.contains("dark") ? TONES.dark : TONES.light);
+    applyTones();
 
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const resize = () => {
@@ -118,6 +174,19 @@ export function HeroSilk({ className = "" }: { className?: string }) {
     let raf = 0;
     let visible = true;
     const t0 = performance.now();
+    // Retune the palette when the accent picker or theme class changes.
+    const mo = new MutationObserver(() => {
+      applyTones();
+      if (reduced || !visible || document.visibilityState !== "visible") {
+        resize();
+        gl.drawArrays(gl.TRIANGLES, 0, 3); // paused: force a single repaint
+      }
+    });
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-accent"],
+    });
+
     const frame = () => {
       resize();
       gl.uniform1f(uT, (performance.now() - t0) / 1000);
@@ -129,17 +198,15 @@ export function HeroSilk({ className = "" }: { className?: string }) {
     if (reduced) {
       gl.uniform1f(uT, 40);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      // still repaint on theme change / resize
       const ro = new ResizeObserver(() => {
         resize();
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       });
       ro.observe(canvas);
-      toneRef.current = (tones) => {
-        setTones(tones);
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      return () => {
+        ro.disconnect();
+        mo.disconnect();
       };
-      return () => ro.disconnect();
     }
     const io = new IntersectionObserver(
       (entries) => {
@@ -165,14 +232,10 @@ export function HeroSilk({ className = "" }: { className?: string }) {
       cancelAnimationFrame(raf);
       io.disconnect();
       ro.disconnect();
+      mo.disconnect();
       document.removeEventListener("visibilitychange", onVis);
     };
   }, []);
-
-  // retune tones when the site theme flips
-  useEffect(() => {
-    toneRef.current?.(resolvedTheme === "dark" ? TONES.dark : TONES.light);
-  }, [resolvedTheme]);
 
   return <canvas ref={ref} aria-hidden className={`hv-silk ${className}`} />;
 }

@@ -240,9 +240,6 @@
        glyph must not participate or the taller svg drags the baseline up and the
        whole delta rides high in a sentence. Center it on the number instead. */
     align-self: center;
-    /* optical: the digits' ink centre sits a hair below the line-box centre —
-       nudge the mark down to match so glyph + number share one midline. */
-    transform: translateY(0.055em);
   }
   :where(.mc-delta .mc-delta-num) {
     font-weight: 600;

@@ -270,7 +270,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <EventTimeline
       data={props.data.slice(0, 6).map((v, i) => ({
         start: i * 10,
-        end: i % 2 === 0 ? i * 10 + Math.abs(v) : undefined,
+        end: i % 2 === 0 && Math.abs(v) > 0 ? i * 10 + Math.abs(v) : undefined,
       }))}
       domain={[0, 60]}
       summary={false}

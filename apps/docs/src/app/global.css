@@ -2356,11 +2356,25 @@ div:where(
     -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
     mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
   }
+  /* No-WebGL / pre-init ground — tinted from --accent (via color-mix) so it
+     honours the picker like the shader does, not a fixed blue. */
   .hv-silk-fallback {
     background:
-      radial-gradient(90% 80% at 18% 8%, #b1bfec33 0%, transparent 55%),
-      radial-gradient(70% 60% at 82% 20%, #cfc2ec2e 0%, transparent 58%),
-      radial-gradient(80% 70% at 55% 60%, #bcd8ee2e 0%, transparent 60%);
+      radial-gradient(
+        90% 80% at 18% 8%,
+        color-mix(in oklab, var(--accent) 20%, transparent) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        70% 60% at 82% 20%,
+        color-mix(in oklab, var(--accent) 15%, transparent) 0%,
+        transparent 58%
+      ),
+      radial-gradient(
+        80% 70% at 55% 60%,
+        color-mix(in oklab, var(--accent) 14%, transparent) 0%,
+        transparent 60%
+      );
     -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
     mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
   }
@@ -2369,9 +2383,21 @@ div:where(
   }
   .dark .hv-silk-fallback {
     background:
-      radial-gradient(90% 80% at 18% 8%, #232c5240 0%, transparent 55%),
-      radial-gradient(70% 60% at 82% 20%, #312a4e38 0%, transparent 58%),
-      radial-gradient(80% 70% at 55% 60%, #1b2f4538 0%, transparent 60%);
+      radial-gradient(
+        90% 80% at 18% 8%,
+        color-mix(in oklab, var(--accent) 26%, transparent) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        70% 60% at 82% 20%,
+        color-mix(in oklab, var(--accent) 22%, transparent) 0%,
+        transparent 58%
+      ),
+      radial-gradient(
+        80% 70% at 55% 60%,
+        color-mix(in oklab, var(--accent) 20%, transparent) 0%,
+        transparent 60%
+      );
   }
 
   /* The streamed reply reads in the serif; grammar stays mono via .mono-label
@@ -2380,9 +2406,6 @@ div:where(
   .hv-reply-body {
     font-family: var(--font-serif);
     --hv-reply-size: 1.05rem;
-    /* Newsreader's baseline sits a hair high for these marks — nudge them
-       down (positive = down) so inline charts sit on the reading line. */
-    --mc-inline-nudge: 0.12em;
   }
   /* Delta's glyph-vs-digit optical centering is tuned for the default sans;
      Newsreader's digits sit taller, so the triangle reads ~2px low beside

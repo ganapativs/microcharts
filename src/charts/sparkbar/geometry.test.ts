@@ -78,7 +78,7 @@ describe("sparkBarGeometry (invariants)", () => {
       expect(b.x).toBeGreaterThanOrEqual(1 - 1e-6);
       expect(b.x + b.width).toBeLessThanOrEqual(79 + 1e-6);
       expect(b.y).toBeGreaterThanOrEqual(1 - 1e-6);
-      expect(b.y + b.height).toBeLessThanOrEqual(19 + 1e-6);
+      expect(b.y + b.height).toBeLessThanOrEqual(H + 1e-6);
       expect(b.width).toBeGreaterThan(0);
       expect(b.height).toBeGreaterThan(0);
     }
