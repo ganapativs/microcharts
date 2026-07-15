@@ -1,13 +1,14 @@
 ---
 title: QueueDepth
-description: A backlog-depth microchart for React — a zero-anchored stock area against a capacity hairline, with above-capacity spans re-stroked in the negative ink and a last-quarter trend glyph.
+description:
+  A backlog-depth microchart for React — a zero-anchored stock area against a capacity hairline, with above-capacity
+  spans re-stroked in the negative ink and a last-quarter trend glyph.
 ---
 
-QueueDepth answers "is the backlog draining or growing?". It draws the queue **depth** as a
-zero-anchored area — a stock, not a rate — against a dashed **capacity** hairline. Wherever the
-depth runs above capacity, the top edge is re-stroked in the negative ink, so a breach is a
-change in _shape_ as well as color. The endpoint carries the current value and a trend glyph
-(▴/▾) fit over the last quarter of the window.
+QueueDepth answers "is the backlog draining or growing?". It draws the queue **depth** as a zero-anchored area — a
+stock, not a rate — against a dashed **capacity** hairline. Wherever the depth runs above capacity, the top edge is
+re-stroked in the negative ink, so a breach is a change in _shape_ as well as color. The endpoint carries the current
+value and a trend glyph (▴/▾) fit over the last quarter of the window.
 
 <LiveDemo label="QueueDepth" sizeOf="queue-depth">
   <QueueDepth
@@ -29,7 +30,8 @@ change in _shape_ as well as color. The endpoint carries the current value and a
 
 ## When to use it
 
-- **Good for** — a support-queue backlog in a KPI card, a work-in-progress stock against its WIP limit, will-it-drain in a tab header.
+- **Good for** — a support-queue backlog in a KPI card, a work-in-progress stock against its WIP limit, will-it-drain in
+  a tab header.
 - **Avoid for** — a rate rather than a stock (Sparkline) or a single count (Delta).
 
 ## Sizing
@@ -89,9 +91,9 @@ change in _shape_ as well as color. The endpoint carries the current value and a
   />
 </LiveDemo>
 
-With a `locale`, both the endpoint label and the accessible summary's numbers follow that
-locale's own grouping — the summary reads **"2.140 queued, 2,1× capacity, growing over the last
-quarter."** in German, not "2,140 queued, 2.1× capacity".
+With a `locale`, both the endpoint label and the accessible summary's numbers follow that locale's own grouping — the
+summary reads **"2.140 queued, 2,1× capacity, growing over the last quarter."** in German, not "2,140 queued, 2.1×
+capacity".
 
 ## Edge cases
 
@@ -101,18 +103,10 @@ quarter."** in German, not "2,140 queued, 2.1× capacity".
 // the summary reports depth and trend without a capacity clause
 <QueueDepth data={[42, 55, 70, 88, 96, 120, 150, 182, 214]} />`}
 >
-  <QueueDepth
-    data={[42, 55, 70, 88, 96, 120, 150, 182, 214]}
-    title="No capacity"
-    width={220}
-    height={28}
-  />
+  <QueueDepth data={[42, 55, 70, 88, 96, 120, 150, 182, 214]} title="No capacity" width={220} height={28} />
 </LiveDemo>
 
-<LiveDemo
-  label="draining below capacity"
-  code={`<QueueDepth data={[90, 70, 50, 30]} capacity={100} />`}
->
+<LiveDemo label="draining below capacity" code={`<QueueDepth data={[90, 70, 50, 30]} capacity={100} />`}>
   <QueueDepth data={[90, 70, 50, 30]} capacity={100} title="Draining" width={220} height={28} />
 </LiveDemo>
 
@@ -122,20 +116,13 @@ quarter."** in German, not "2,140 queued, 2.1× capacity".
 // gap, never interpolated across
 <QueueDepth data={[10, null, 40, null, 80, 120]} capacity={100} />`}
 >
-  <QueueDepth
-    data={[10, null, 40, null, 80, 120]}
-    capacity={100}
-    title="Gaps"
-    width={220}
-    height={28}
-  />
+  <QueueDepth data={[10, null, 40, null, 80, 120]} capacity={100} title="Gaps" width={220} height={28} />
 </LiveDemo>
 
-With no `capacity`, the area still draws and the summary reads **"214 queued, growing over the
-last quarter."** — no capacity clause, because there's nothing to compare against. A queue that
-stays under capacity reports **"30 queued, within capacity, draining over the last quarter."**
-and never re-strokes the edge. Gaps (`null`/`NaN`/`±Infinity`) split the area into separate
-runs rather than drawing a line across missing periods.
+With no `capacity`, the area still draws and the summary reads **"214 queued, growing over the last quarter."** — no
+capacity clause, because there's nothing to compare against. A queue that stays under capacity reports **"30 queued,
+within capacity, draining over the last quarter."** and never re-strokes the edge. Gaps (`null`/`NaN`/`±Infinity`) split
+the area into separate runs rather than drawing a line across missing periods.
 
 ## Four homes
 
@@ -143,19 +130,17 @@ runs rather than drawing a line across missing periods.
 
 ## Why this default
 
-The capacity hairline plus the negative re-stroke, because "are we keeping up?" is a threshold
-question — a breach should read instantly and survive greyscale, so it changes the edge's
-_shape_, not only its color. The trend glyph is deliberately low-precision: it's fit over the
-last quarter of the window as a direction cue, and the summary states that window in words
-("over the last quarter") rather than implying a forecast the data can't support.
+The capacity hairline plus the negative re-stroke, because "are we keeping up?" is a threshold question — a breach
+should read instantly and survive greyscale, so it changes the edge's _shape_, not only its color. The trend glyph is
+deliberately low-precision: it's fit over the last quarter of the window as a direction cue, and the summary states that
+window in words ("over the last quarter") rather than implying a forecast the data can't support.
 
 ## Accessibility
 
-The accessible name states the current depth, the capacity relationship, and the trend —
-**"214 queued, 2.1× capacity, growing over the last quarter."**. When the depth stays under
-capacity the middle clause becomes "within capacity"; with no `capacity` it drops entirely. The
-interactive entry steps the periods, announcing each depth and whether it's above capacity
-(**"t8: 214 queued, above capacity."**).
+The accessible name states the current depth, the capacity relationship, and the trend — **"214 queued, 2.1× capacity,
+growing over the last quarter."**. When the depth stays under capacity the middle clause becomes "within capacity"; with
+no `capacity` it drops entirely. The interactive entry steps the periods, announcing each depth and whether it's above
+capacity (**"t8: 214 queued, above capacity."**).
 
 ## Props
 

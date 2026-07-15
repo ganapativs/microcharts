@@ -1,12 +1,14 @@
 ---
 title: BubbleRow
-description: A bubble-row chart for React — circle area for a few magnitudes, the catalog's honest low-precision exemplar. For a precise comparison, use MiniBar.
+description:
+  A bubble-row chart for React — circle area for a few magnitudes, the catalog's honest low-precision exemplar. For a
+  precise comparison, use MiniBar.
 ---
 
-BubbleRow answers "roughly how do these few magnitudes compare?" with physical presence — a row of
-circles whose **area** (not width) is proportional to value. Area is the weakest common channel, so
-this is the catalog's honest low-precision exemplar: **for a precise comparison, use `MiniBar`.** The
-value numerals are on by default, because a low-precision channel owes the reader the number.
+BubbleRow answers "roughly how do these few magnitudes compare?" with physical presence — a row of circles whose
+**area** (not width) is proportional to value. Area is the weakest common channel, so this is the catalog's honest
+low-precision exemplar: **for a precise comparison, use `MiniBar`.** The value numerals are on by default, because a
+low-precision channel owes the reader the number.
 
 <LiveDemo label="BubbleRow" sizeOf="bubble-row">
   <BubbleRow
@@ -31,7 +33,8 @@ value numerals are on by default, because a low-precision channel owes the reade
 
 ## When to use it
 
-- **Good for** — a few magnitudes with physical presence in a sentence, a market-size or segment impression in a KPI card, or an editorial callout where the number is printed too.
+- **Good for** — a few magnitudes with physical presence in a sentence, a market-size or segment impression in a KPI
+  card, or an editorial callout where the number is printed too.
 - **Avoid for** — precise comparison (that's `MiniBar`), trends (Sparkline), or more than about eight items.
 
 ## Sizing
@@ -89,10 +92,9 @@ value numerals are on by default, because a low-precision channel owes the reade
   />
 </LiveDemo>
 
-Empty data draws just the frame with "No data." as the summary. A `null` value still
-holds its place with a small presence ring (never a zero-radius void, and never
-skipped from the row) but drops its numeral — a missing figure is visibly present yet
-explicitly unlabeled, never faked as a zero.
+Empty data draws just the frame with "No data." as the summary. A `null` value still holds its place with a small
+presence ring (never a zero-radius void, and never skipped from the row) but drops its numeral — a missing figure is
+visibly present yet explicitly unlabeled, never faked as a zero.
 
 ## Four homes
 
@@ -100,19 +102,18 @@ explicitly unlabeled, never faked as a zero.
 
 ## Why this default
 
-Value numerals are on by default because area lies quietly — a bubble twice the diameter is four
-times the area, and the eye can't reliably invert that, so the number keeps the read honest. The
-radius is always `r ∝ √value` with no exceptions; a linear-radius map would be a roughly squared lie.
-There is no sorting prop: the order is your data's order, because reordering is your statement, not
-the chart's. The LOW precision rating and the MiniBar steer are printed in the catalog, the machine
-`/catalog.json`, and this page's header — BubbleRow is the catalog's worked example of an honest
-low-precision admission.
+Value numerals are on by default because area lies quietly — a bubble twice the diameter is four times the area, and the
+eye can't reliably invert that, so the number keeps the read honest. The radius is always `r ∝ √value` with no
+exceptions; a linear-radius map would be a roughly squared lie. There is no sorting prop: the order is your data's
+order, because reordering is your statement, not the chart's. The LOW precision rating and the MiniBar steer are printed
+in the catalog, the machine `/catalog.json`, and this page's header — BubbleRow is the catalog's worked example of an
+honest low-precision admission.
 
 ## Accessibility
 
-The accessible name names the extremes — **"4 items; largest EMEA at 1,240, smallest LATAM at
-210."** The interactive entry roves the bubbles with ←/→ (or hover), announcing each one's exact
-value — **"EMEA: 1,240."** — the number the area itself can't carry.
+The accessible name names the extremes — **"4 items; largest EMEA at 1,240, smallest LATAM at 210."** The interactive
+entry roves the bubbles with ←/→ (or hover), announcing each one's exact value — **"EMEA: 1,240."** — the number the
+area itself can't carry.
 
 ## Props
 

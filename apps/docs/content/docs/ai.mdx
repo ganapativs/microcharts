@@ -1,38 +1,37 @@
 ---
 title: AI-native
-description: microcharts is built to be read and written by machines as well as people — a stream-friendly chart grammar, inline word-sized charts, a generated catalog, Markdown mirrors, and llms.txt so LLMs and agents get the API right the first time.
+description:
+  microcharts is built to be read and written by machines as well as people — a stream-friendly chart grammar, inline
+  word-sized charts, a generated catalog, Markdown mirrors, and llms.txt so LLMs and agents get the API right the first
+  time.
 ---
 
-Most chart libraries are written for a human with a mouse. microcharts is written so a **model**
-can draw a chart mid-sentence and a **person** can trust it. Two properties make that work: every
-chart renders from plain `data`, and every chart carries a generated, human-readable summary —
-the same sentence a screen reader speaks, a crawler indexes, and a model can quote back. Nothing
-is hidden in pixels, so a few tokens of text become a real, accessible instrument.
+Most chart libraries are written for a human with a mouse. microcharts is written so a **model** can draw a chart
+mid-sentence and a **person** can trust it. Two properties make that work: every chart renders from plain `data`, and
+every chart carries a generated, human-readable summary — the same sentence a screen reader speaks, a crawler indexes,
+and a model can quote back. Nothing is hidden in pixels, so a few tokens of text become a real, accessible instrument.
 
 <StreamDemo />
 
 <Callout type="info">
-  Above is the real thing, not a video: a scripted reply streams in, and the chart syntax it emits
-  becomes shipped microcharts the instant each fence closes. Everything below is the contract behind
-  it.
+  Above is the real thing, not a video: a scripted reply streams in, and the chart syntax it emits becomes shipped
+  microcharts the instant each fence closes. Everything below is the contract behind it.
 </Callout>
 
-The AI reply is the newest home for a word-sized chart, not the only one — the same component
-lives in a product UI, a rendered report, and inline in docs like these. This page is the
-model-facing contract; [Where they live](/docs#where-they-live) shows the rest.
+The AI reply is the newest home for a word-sized chart, not the only one — the same component lives in a product UI, a
+rendered report, and inline in docs like these. This page is the model-facing contract;
+[Where they live](/docs#where-they-live) shows the rest.
 
 ## The grammar
 
-A model emits a chart in one of two forms — both deliberately forgiving, the kind of thing a
-model produces reliably mid-stream. Pick a type and a form to see exactly what it writes, what it
-renders, and the React it's equivalent to:
+A model emits a chart in one of two forms — both deliberately forgiving, the kind of thing a model produces reliably
+mid-stream. Pick a type and a form to see exactly what it writes, what it renders, and the React it's equivalent to:
 
 <GrammarExplorer />
 
-The body is whitespace- or comma-separated numbers for series charts, or `key=value` pairs for
-composites. These five cover the questions an assistant answers most — _trend, magnitude, change,
-attainment, cadence_ — but the same pattern extends to [any chart in the catalog](/docs/charts):
-name a type, pick a body convention, map it to that chart's import.
+The body is whitespace- or comma-separated numbers for series charts, or `key=value` pairs for composites. These five
+cover the questions an assistant answers most — _trend, magnitude, change, attainment, cadence_ — but the same pattern
+extends to [any chart in the catalog](/docs/charts): name a type, pick a body convention, map it to that chart's import.
 
 ## Wire it up
 
@@ -44,8 +43,8 @@ Turning the grammar into components is a parser and a `switch` — no framework,
 
 ### Parse the stream
 
-Pull fenced blocks and inline spans out of partially-streamed Markdown. A fence that hasn't
-closed yet stays raw, then morphs the moment it does.
+Pull fenced blocks and inline spans out of partially-streamed Markdown. A fence that hasn't closed yet stays raw, then
+morphs the moment it does.
 
 <Snippet id="parse" />
 
@@ -55,8 +54,8 @@ closed yet stays raw, then morphs the moment it does.
 
 ### Map type → component
 
-One `switch`. Because geometry is pure and charts render from `data` alone, the model's chart is
-identical to one you'd write by hand.
+One `switch`. Because geometry is pure and charts render from `data` alone, the model's chart is identical to one you'd
+write by hand.
 
 <Snippet id="map" />
 
@@ -66,13 +65,12 @@ identical to one you'd write by hand.
 
 ### Render inline vs block
 
-An inline chart is decorative — the sentence describes it, so pass `summary={false}`. A
-standalone chart keeps its summary; give it a `title`.
+An inline chart is decorative — the sentence describes it, so pass `summary={false}`. A standalone chart keeps its
+summary; give it a `title`.
 
-Wrap every inline SVG mark in `className="mc-inline"` — the class ships in
-`@microcharts/react/styles.css` (imported once in the Quickstart). It seats the mark on the
-text baseline, so it rides the line like a word in any font. Leave `Delta` bare; it is a
-text metric and owns its own baseline already.
+Wrap every inline SVG mark in `className="mc-inline"` — the class ships in `@microcharts/react/styles.css` (imported
+once in the Quickstart). It seats the mark on the text baseline, so it rides the line like a word in any font. Leave
+`Delta` bare; it is a text metric and owns its own baseline already.
 
 ```tsx
 NVDA closed +3.8%{" "}
@@ -88,15 +86,15 @@ on the session — up <Delta value={0.038} summary={false} /> week over week.
 
 ## Prompt the model
 
-A few lines teach the grammar. Reach for the technique that matches how the model is driven —
-structured output and tool calls first, since that's how most agents run today:
+A few lines teach the grammar. Reach for the technique that matches how the model is driven — structured output and tool
+calls first, since that's how most agents run today:
 
 <Tabs items={["Structured JSON", "Tool use", "System prompt", "Few-shot", "Guardrails"]}>
 
 <Tab value="Structured JSON">
 
-The default for anything production. Have the model return JSON and map it yourself — no parsing
-of prose. Constrain `type` to an enum and the output is always renderable.
+The default for anything production. Have the model return JSON and map it yourself — no parsing of prose. Constrain
+`type` to an enum and the output is always renderable.
 
 <Snippet id="structured" />
 
@@ -104,8 +102,8 @@ of prose. Constrain `type` to an enum and the output is always renderable.
 
 <Tab value="Tool use">
 
-Expose a single tool the model calls when a chart helps. Its arguments _are_ the chart spec, so
-there's nothing to parse and the schema enforces the shape.
+Expose a single tool the model calls when a chart helps. Its arguments _are_ the chart spec, so there's nothing to parse
+and the schema enforces the shape.
 
 <Snippet id="tool" />
 
@@ -113,8 +111,7 @@ there's nothing to parse and the schema enforces the shape.
 
 <Tab value="System prompt">
 
-For free-form chat, drop this into the system message — enough for a capable model to emit valid
-blocks unprompted.
+For free-form chat, drop this into the system message — enough for a capable model to emit valid blocks unprompted.
 
 <Snippet id="systemPrompt" />
 
@@ -130,8 +127,8 @@ When you want a specific house style, show one exchange. Models mirror the shape
 
 <Tab value="Guardrails">
 
-Never trust generated data blindly. Validate the type, coerce the numbers, and fall back to text
-when a block is malformed — the summary makes a graceful fallback trivial.
+Never trust generated data blindly. Validate the type, coerce the numbers, and fall back to text when a block is
+malformed — the summary makes a graceful fallback trivial.
 
 <Snippet id="guardrails" />
 
@@ -141,12 +138,11 @@ when a block is malformed — the summary makes a graceful fallback trivial.
 
 ## Where it runs
 
-A chart is plain text and JSON, so anything that reads or writes text can emit one and render it
-back — no SDK, no partnership, no island bridge. That spans the whole stack a model runs in
-today: the **chat assistants** that answer in prose, the **coding agents and IDEs** that scaffold
-the components from the typed catalog, and the **frameworks and SDKs** that wire tool-call output
-straight to charts. None of these is an integration we built — they work because the output is
-just text.
+A chart is plain text and JSON, so anything that reads or writes text can emit one and render it back — no SDK, no
+partnership, no island bridge. That spans the whole stack a model runs in today: the **chat assistants** that answer in
+prose, the **coding agents and IDEs** that scaffold the components from the typed catalog, and the **frameworks and
+SDKs** that wire tool-call output straight to charts. None of these is an integration we built — they work because the
+output is just text.
 
 <ProviderWall />
 
@@ -158,9 +154,9 @@ Every path from model output to a rendered chart, with the one thing each needs.
 
 <Accordion title="Streaming chat reply — morph blocks as they close">
 
-Parse the partial Markdown on every token; render a fence as raw text until it closes, then swap
-in the chart. Word-sized charts land inside the sentence, standalone ones below it. The live demo
-at the top of this page is exactly this, and it's about forty lines.
+Parse the partial Markdown on every token; render a fence as raw text until it closes, then swap in the chart.
+Word-sized charts land inside the sentence, standalone ones below it. The live demo at the top of this page is exactly
+this, and it's about forty lines.
 
 <Snippet id="streaming" />
 
@@ -168,9 +164,8 @@ at the top of this page is exactly this, and it's about forty lines.
 
 <Accordion title="React Server Components — zero client JavaScript">
 
-Static entries are hook-free, so an RSC assistant renders the model's charts to HTML on the
-server. Nothing hydrates; the chart ships as markup. Add `/interactive` only where you need hover
-or keyboard.
+Static entries are hook-free, so an RSC assistant renders the model's charts to HTML on the server. Nothing hydrates;
+the chart ships as markup. Add `/interactive` only where you need hover or keyboard.
 
 <Snippet id="rsc" />
 
@@ -178,8 +173,8 @@ or keyboard.
 
 <Accordion title="Tool / function-call output — rows straight to charts">
 
-When a tool returns rows, render them instead of asking the model to describe them in prose — a
-`Sparkline` per row, a `Bullet` for a KPI against target.
+When a tool returns rows, render them instead of asking the model to describe them in prose — a `Sparkline` per row, a
+`Bullet` for a KPI against target.
 
 <Snippet id="toolOutput" />
 
@@ -187,9 +182,9 @@ When a tool returns rows, render them instead of asking the model to describe th
 
 <Accordion title="Programmatic & React-free — outside a component tree">
 
-Need a chart in a README, an email, or a non-React runtime? Today, render the static component to
-a string on the server. A first-class JSON spec and a React-free string renderer are on the
-roadmap for rendering to SVG with no React at all.
+Need a chart in a README, an email, or a non-React runtime? Today, render the static component to a string on the
+server. A first-class JSON spec and a React-free string renderer are on the roadmap for rendering to SVG with no React
+at all.
 
 <Snippet id="programmatic" />
 
@@ -197,9 +192,9 @@ roadmap for rendering to SVG with no React at all.
 
 <Accordion title="Validation & safety — malformed data never breaks a render">
 
-Every chart already handles the degenerate cases — empty, single value, all-equal, nulls, NaN,
-±Infinity — with an honest short summary instead of a broken chart. Layer the type/coercion
-guardrails above and a bad block downgrades to plain text, never a crash.
+Every chart already handles the degenerate cases — empty, single value, all-equal, nulls, NaN, ±Infinity — with an
+honest short summary instead of a broken chart. Layer the type/coercion guardrails above and a bad block downgrades to
+plain text, never a crash.
 
 </Accordion>
 
@@ -207,20 +202,20 @@ guardrails above and a bad block downgrades to plain text, never a crash.
 
 ## Machine-readable surfaces
 
-Real, generated routes — the substance behind "AI-native", not a slogan. Point an agent here and
-it reads the true API instead of guessing.
+Real, generated routes — the substance behind "AI-native", not a slogan. Point an agent here and it reads the true API
+instead of guessing.
 
 <SurfaceCards />
 
 ## The whole contract, on one card
 
-Don't make a model memorize the catalog — [All charts](/docs/charts) files every type by the
-question it answers, and the [gallery](/gallery) shows them at a glance. Everything an agent
-needs to emit correct microcharts fits on one card — copy it straight into a system prompt:
+Don't make a model memorize the catalog — [All charts](/docs/charts) files every type by the question it answers, and
+the [gallery](/gallery) shows them at a glance. Everything an agent needs to emit correct microcharts fits on one card —
+copy it straight into a system prompt:
 
 <AgentCheatSheet />
 
-That's the entire surface area: a grammar a model already knows how to write, and charts a
-person can trust on sight. Point an assistant at [`/llms.txt`](/llms.txt) — or the fuller
-[`/llms-full.txt`](/llms-full.txt) and the machine-readable [`/catalog.json`](/catalog.json) —
-or start from the [Quickstart](/docs/quickstart) and render your first chart in minutes.
+That's the entire surface area: a grammar a model already knows how to write, and charts a person can trust on sight.
+Point an assistant at [`/llms.txt`](/llms.txt) — or the fuller [`/llms-full.txt`](/llms-full.txt) and the
+machine-readable [`/catalog.json`](/catalog.json) — or start from the [Quickstart](/docs/quickstart) and render your
+first chart in minutes.

@@ -155,6 +155,54 @@
     --mc-band: color-mix(in oklab, #000000 14%, transparent);
     --mc-stroke-width: 2;
   }
+  /* print/eink pin a fixed light-surface ink — right for paper, but on a dark
+     viewer that ink sinks into the field. Give them hand-tuned dark twins: eink
+     flips to true night-mode (light ink on black — a real e-paper mode), print
+     lifts to a "dark paper" ink. Weight + band identity (set above) carry over;
+     only the pinned colours are re-tuned. mono/vivid/editorial already leave ink
+     to the active theme, so they need no twin. Both dark signals are covered —
+     @media(prefers-color-scheme) and an explicit [data-mc-theme="dark"] scope —
+     and each sits AFTER its light block so it wins at equal (zero) specificity. */
+  @media (prefers-color-scheme: dark) {
+    :where([data-mc-theme="print"], [data-mc-preset="print"]) {
+      --mc-stroke: #e8e6e1;
+      --mc-neutral: #9a958c;
+      --mc-positive: #4aa588;
+      --mc-negative: #e08a63;
+      --mc-accent: #6aa9d3;
+      --mc-moon: #e0be6f;
+      --mc-band: color-mix(in oklab, #e8e6e1 9%, transparent);
+    }
+    :where([data-mc-theme="eink"], [data-mc-preset="eink"]) {
+      --mc-stroke: #ffffff;
+      --mc-positive: #ffffff;
+      --mc-negative: #b0b0b0;
+      --mc-neutral: #808080;
+      --mc-accent: #ffffff;
+      --mc-moon: #ffffff;
+      --mc-band: color-mix(in oklab, #ffffff 14%, transparent);
+    }
+  }
+  :where([data-mc-theme="dark"]) :where([data-mc-theme="print"], [data-mc-preset="print"]),
+  :where([data-mc-theme="dark"][data-mc-preset="print"]) {
+    --mc-stroke: #e8e6e1;
+    --mc-neutral: #9a958c;
+    --mc-positive: #4aa588;
+    --mc-negative: #e08a63;
+    --mc-accent: #6aa9d3;
+    --mc-moon: #e0be6f;
+    --mc-band: color-mix(in oklab, #e8e6e1 9%, transparent);
+  }
+  :where([data-mc-theme="dark"]) :where([data-mc-theme="eink"], [data-mc-preset="eink"]),
+  :where([data-mc-theme="dark"][data-mc-preset="eink"]) {
+    --mc-stroke: #ffffff;
+    --mc-positive: #ffffff;
+    --mc-negative: #b0b0b0;
+    --mc-neutral: #808080;
+    --mc-accent: #ffffff;
+    --mc-moon: #ffffff;
+    --mc-band: color-mix(in oklab, #ffffff 14%, transparent);
+  }
 }
 
 @layer microcharts.base {

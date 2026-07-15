@@ -1,19 +1,15 @@
 ---
 title: MicroBox
-description: A box plot in a table row for React — median, IQR, and honest whiskers, with the violin's documented replacement role.
+description:
+  A box plot in a table row for React — median, IQR, and honest whiskers, with the violin's documented replacement role.
 ---
 
-MicroBox answers "what are the p50 and spread of this metric?" — the five-number summary
-in a table row. Min-max whiskers by default (Tukey fences imply a normality assumption
-most product data doesn't meet); `tukey` mode exposes fence-breakers as dots.
+MicroBox answers "what are the p50 and spread of this metric?" — the five-number summary in a table row. Min-max
+whiskers by default (Tukey fences imply a normality assumption most product data doesn't meet); `tukey` mode exposes
+fence-breakers as dots.
 
 <LiveDemo label="MicroBox" sizeOf="micro-box">
-  <MicroBox
-    stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }}
-    title="p95 latency"
-    width={220}
-    height={32}
-  />
+  <MicroBox stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }} title="p95 latency" width={220} height={32} />
 </LiveDemo>
 
 ## Install
@@ -26,7 +22,8 @@ most product data doesn't meet); `tukey` mode exposes fence-breakers as dots.
 
 ## When to use it
 
-- **Good for** — latency percentile rows (p50/p95/p99), spread beside a stat — precomputed `stats` is the production path.
+- **Good for** — latency percentile rows (p50/p95/p99), spread beside a stat — precomputed `stats` is the production
+  path.
 - **Avoid for** — distribution shape (HistogramStrip) or fewer than 5 observations (renders honest dots).
 
 ## Sizing
@@ -74,16 +71,14 @@ most product data doesn't meet); `tukey` mode exposes fence-breakers as dots.
 
 ## Why this default
 
-Never a box from fewer than 5 observations — dots at the raw values instead. Precomputed
-`stats` with non-monotonic values are refused with a dev warning: garbage in must not
-render a plausible-looking lie. Outlier dots cap at 3 per side (the furthest); the
-clipped count rides the announcements.
+Never a box from fewer than 5 observations — dots at the raw values instead. Precomputed `stats` with non-monotonic
+values are refused with a dev warning: garbage in must not render a plausible-looking lie. Outlier dots cap at 3 per
+side (the furthest); the clipped count rides the announcements.
 
 ## Accessibility
 
-The accessible name is the five-number reading — **"Median 42, middle half 35 to 51,
-range 12 to 96."** The interactive entry roves a fixed 5-stop model (min → Q1 → median →
-Q3 → max), announcing each stat (**"Median: 42."**).
+The accessible name is the five-number reading — **"Median 42, middle half 35 to 51, range 12 to 96."** The interactive
+entry roves a fixed 5-stop model (min → Q1 → median → Q3 → max), announcing each stat (**"Median: 42."**).
 
 ## Props
 

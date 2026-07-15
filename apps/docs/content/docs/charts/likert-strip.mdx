@@ -1,11 +1,12 @@
 ---
 title: LikertStrip
-description: A diverging Likert strip for React — valence and balance from a center line, with both neutral conventions supported honestly.
+description:
+  A diverging Likert strip for React — valence and balance from a center line, with both neutral conventions supported
+  honestly.
 ---
 
-LikertStrip answers "does the response lean agree or disagree — and how hard?" — the
-valence + balance read that SegmentedBar (unvalenced composition) cannot say. The center
-line is the question; everything else is the answer.
+LikertStrip answers "does the response lean agree or disagree — and how hard?" — the valence + balance read that
+SegmentedBar (unvalenced composition) cannot say. The center line is the question; everything else is the answer.
 
 <LiveDemo label="LikertStrip" sizeOf="likert-strip">
   <LikertStrip
@@ -120,13 +121,12 @@ line is the question; everything else is the answer.
   />
 </LiveDemo>
 
-Empty data, or data whose values all resolve to 0, has nothing to divide into a diverging
-read — no bar draws, and the accessible name says so plainly: **"No responses."** When every
-non-zero response lands on the neutral level, the bar is entirely the center segment and the
-summary reads **"All responses neutral."** instead of forcing a lean out of no signal.
-Negative counts are treated as 0 rather than pushed the wrong direction across the center
-line — a chart that lies about which side a count is on is worse than one that drops it — and
-the static entry logs a dev warning when it happens.
+Empty data, or data whose values all resolve to 0, has nothing to divide into a diverging read — no bar draws, and the
+accessible name says so plainly: **"No responses."** When every non-zero response lands on the neutral level, the bar is
+entirely the center segment and the summary reads **"All responses neutral."** instead of forcing a lean out of no
+signal. Negative counts are treated as 0 rather than pushed the wrong direction across the center line — a chart that
+lies about which side a count is on is worse than one that drops it — and the static entry logs a dev warning when it
+happens.
 
 ## Four homes
 
@@ -134,16 +134,14 @@ the static entry logs a dev warning when it happens.
 
 ## Why this default
 
-Both neutral conventions are supported honestly: `split` straddles the center (the
-canonical placement), `omit` removes neutral from the bar for cleaner pole comparison —
-but its share is ALWAYS labeled and spoken; neutral is never silently dropped. Graded
-opacity encodes ordinal distance from neutral, never magnitude.
+Both neutral conventions are supported honestly: `split` straddles the center (the canonical placement), `omit` removes
+neutral from the bar for cleaner pole comparison — but its share is ALWAYS labeled and spoken; neutral is never silently
+dropped. Graded opacity encodes ordinal distance from neutral, never magnitude.
 
 ## Accessibility
 
-The accessible name is the full valence read — **"62% agree, 24% disagree, 14% neutral.
-Leans positive."** A |net| under 5 points reads "Balanced." The interactive entry steps
-levels in data order (**"Disagree: 14%, level 2 of 5."**).
+The accessible name is the full valence read — **"62% agree, 24% disagree, 14% neutral. Leans positive."** A |net| under
+5 points reads "Balanced." The interactive entry steps levels in data order (**"Disagree: 14%, level 2 of 5."**).
 
 ## Props
 

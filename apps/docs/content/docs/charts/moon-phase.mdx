@@ -1,13 +1,14 @@
 ---
 title: MoonPhase
-description: A moon-phase chart for React — the illuminated area of a disc encodes a 0–1 fraction, area-true and readable across cultures.
+description:
+  A moon-phase chart for React — the illuminated area of a disc encodes a 0–1 fraction, area-true and readable across
+  cultures.
 ---
 
-MoonPhase answers "how far through the cycle or period are we?" with a form almost everyone reads
-without a legend: the illuminated fraction of a disc. The lit **area** equals the value exactly — a
-closed-form terminator, not the phase-angle approximation that under-lights mid-cycle — so 50%
-genuinely lights half the disc. Progress mode fills monotonically; cycle mode maps the real lunar
-sequence.
+MoonPhase answers "how far through the cycle or period are we?" with a form almost everyone reads without a legend: the
+illuminated fraction of a disc. The lit **area** equals the value exactly — a closed-form terminator, not the
+phase-angle approximation that under-lights mid-cycle — so 50% genuinely lights half the disc. Progress mode fills
+monotonically; cycle mode maps the real lunar sequence.
 
 <LiveDemo label="MoonPhase" sizeOf="moon-phase">
   <span className="inline-flex gap-3 items-center">
@@ -29,7 +30,8 @@ sequence.
 
 ## When to use it
 
-- **Good for** — sprint or quota progress in a sentence, a billing-period or release-cycle marker, or any 0–1 completion that reads at a glance.
+- **Good for** — sprint or quota progress in a sentence, a billing-period or release-cycle marker, or any 0–1 completion
+  that reads at a glance.
 - **Avoid for** — exact percentages (Progress), trends (Sparkline), or comparisons (MiniBar).
 
 ## Sizing
@@ -70,18 +72,17 @@ sequence.
 
 ## Why this default
 
-Progress mode is the default because period-progress is the common need — a sprint or quota filling
-from new to full, monotonically. Pretending the real lunar cycle is monotonic would lie (it waxes
-then wanes), so `mode="cycle"` is a separate, explicit data-semantic switch, not a preset. The lit
-area is always exactly the value via the closed form — never the phase-angle shortcut. Because area
-comparison reads to about ±10%, steer exact reads to `Progress`; MoonPhase is for the glance.
+Progress mode is the default because period-progress is the common need — a sprint or quota filling from new to full,
+monotonically. Pretending the real lunar cycle is monotonic would lie (it waxes then wanes), so `mode="cycle"` is a
+separate, explicit data-semantic switch, not a preset. The lit area is always exactly the value via the closed form —
+never the phase-angle shortcut. Because area comparison reads to about ±10%, steer exact reads to `Progress`; MoonPhase
+is for the glance.
 
 ## Accessibility
 
-The accessible name states the fraction — **"50% of the cycle complete."** in progress mode, or
-"50% through the cycle." in cycle mode. The interactive entry cross-fades the lit region on change
-(an opacity swap, never a path interpolation), reveals the exact percent on hover or focus, and
-announces changes through a polite live region.
+The accessible name states the fraction — **"50% of the cycle complete."** in progress mode, or "50% through the cycle."
+in cycle mode. The interactive entry cross-fades the lit region on change (an opacity swap, never a path interpolation),
+reveals the exact percent on hover or focus, and announces changes through a polite live region.
 
 ## Props
 

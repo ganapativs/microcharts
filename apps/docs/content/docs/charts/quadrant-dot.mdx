@@ -1,12 +1,14 @@
 ---
 title: QuadrantDot
-description: A 2×2 quadrant chart for React — a focal dot placed against a peer field, with a split cross and axis-relative summaries. A position read, not a scatter plot.
+description:
+  A 2×2 quadrant chart for React — a focal dot placed against a peer field, with a split cross and axis-relative
+  summaries. A position read, not a scatter plot.
 ---
 
-QuadrantDot answers "where does this item sit in the 2×2 — against the field?". A focal dot is
-placed by 2-D position, a hairline cross marks the split (the domain midpoints by default, always
-overridable but **never hidden**), and the peers show as tiny muted ghosts. The read is quadrant
-**membership** first; exact position is the second read — which is why it lives at glyph scale.
+QuadrantDot answers "where does this item sit in the 2×2 — against the field?". A focal dot is placed by 2-D position, a
+hairline cross marks the split (the domain midpoints by default, always overridable but **never hidden**), and the peers
+show as tiny muted ghosts. The read is quadrant **membership** first; exact position is the second read — which is why
+it lives at glyph scale.
 
 <LiveDemo label="QuadrantDot" sizeOf="quadrant-dot">
   <QuadrantDot
@@ -47,7 +49,8 @@ overridable but **never hidden**), and the peers show as tiny muted ghosts. The 
 
 ## When to use it
 
-- **Good for** — the classic prioritization 2×2 (one cell per initiative in a table), an effort-vs-impact read in a KPI card, any "which quadrant, against the field" decision.
+- **Good for** — the classic prioritization 2×2 (one cell per initiative in a table), an effort-vs-impact read in a KPI
+  card, any "which quadrant, against the field" decision.
 - **Avoid for** — a full scatter plot (MicroScatter) or a single ranked list (MiniBar).
 
 ## Sizing
@@ -131,19 +134,15 @@ overridable but **never hidden**), and the peers show as tiny muted ghosts. The 
   />
 </LiveDemo>
 
-<LiveDemo
-  label="non-finite focal"
-  code={`<QuadrantDot data={{ x: NaN, y: 5 }} title="Bad input" />`}
->
+<LiveDemo label="non-finite focal" code={`<QuadrantDot data={{ x: NaN, y: 5 }} title="Bad input" />`}>
   <QuadrantDot data={{ x: Number.NaN, y: 5 }} title="Bad input" width={72} height={72} />
 </LiveDemo>
 
-When every field value on one axis equals the focal's, that axis's domain collapses to a
-point — the split line on that axis is dropped rather than drawn at an arbitrary spot,
-while the other axis's split still renders. A peer exactly on top of the focal is still
-counted (distance 0) and sorts first in the interactive entry's nearest-first order. A
-non-finite focal position renders nothing but the frame, with the "No data." summary —
-the same degenerate path an empty series takes elsewhere in the library.
+When every field value on one axis equals the focal's, that axis's domain collapses to a point — the split line on that
+axis is dropped rather than drawn at an arbitrary spot, while the other axis's split still renders. A peer exactly on
+top of the focal is still counted (distance 0) and sorts first in the interactive entry's nearest-first order. A
+non-finite focal position renders nothing but the frame, with the "No data." summary — the same degenerate path an empty
+series takes elsewhere in the library.
 
 ## Four homes
 
@@ -151,18 +150,18 @@ the same degenerate path an empty series takes elsewhere in the library.
 
 ## Why this default
 
-24×24, because the 2×2 is a **position** read, not a scatter plot — you want to know the quadrant at
-a glance, and the exact coordinates only when you look closer. The split is data, not decoration: it
-renders wherever the split truly is and is always overridable, never invisible. With the axes
-unlabeled at glyph size, the `title` and `summary` are load-bearing — skipping them is the one named
-anti-pattern for this chart, so always pass `xLabel`, `yLabel`, and a `title`.
+24×24, because the 2×2 is a **position** read, not a scatter plot — you want to know the quadrant at a glance, and the
+exact coordinates only when you look closer. The split is data, not decoration: it renders wherever the split truly is
+and is always overridable, never invisible. With the axes unlabeled at glyph size, the `title` and `summary` are
+load-bearing — skipping them is the one named anti-pattern for this chart, so always pass `xLabel`, `yLabel`, and a
+`title`.
 
 ## Accessibility
 
-The accessible name states the focal position, the axis-relative quadrant, and how crowded that
-quadrant is — **"Impact 9, effort 3 — in the high-impact, low-effort quadrant (2 of 14 peers)."** —
-or your own words via `quadrants={["quick win", …]}`. The interactive entry cycles the peers
-nearest-first, each announced with its coordinates and quadrant.
+The accessible name states the focal position, the axis-relative quadrant, and how crowded that quadrant is — **"Impact
+9, effort 3 — in the high-impact, low-effort quadrant (2 of 14 peers)."** — or your own words via
+`quadrants={["quick win", …]}`. The interactive entry cycles the peers nearest-first, each announced with its
+coordinates and quadrant.
 
 ## Props
 

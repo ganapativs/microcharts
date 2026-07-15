@@ -294,6 +294,30 @@
   --mc-band: color-mix(in oklab, #000000 14%, transparent);
   --mc-stroke-width: 2;
 }
+/* Dark twins for the two light-surface output presets — MIRROR the library's
+   dark-preset bundles in styles.css (parity test-enforced). The docs force the
+   theme via the .dark class, so these are keyed off :root.dark[data-mc-preset]
+   (specificity beats the base :root[data-mc-preset] above). eink → night-mode
+   (light ink on black); print → lifted "dark paper" ink. Weight + band carry
+   from the base block; only the pinned colours re-tune. */
+:root.dark[data-mc-preset="print"] {
+  --mc-stroke: #e8e6e1;
+  --mc-neutral: #9a958c;
+  --mc-positive: #4aa588;
+  --mc-negative: #e08a63;
+  --mc-accent: #6aa9d3;
+  --mc-moon: #e0be6f;
+  --mc-band: color-mix(in oklab, #e8e6e1 9%, transparent);
+}
+:root.dark[data-mc-preset="eink"] {
+  --mc-stroke: #ffffff;
+  --mc-positive: #ffffff;
+  --mc-negative: #b0b0b0;
+  --mc-neutral: #808080;
+  --mc-accent: #ffffff;
+  --mc-moon: #ffffff;
+  --mc-band: color-mix(in oklab, #ffffff 14%, transparent);
+}
 
 /* ---- Accent presets — the global picker sets [data-accent] on <html>.
    All tasteful, all non-AI: warm and cool, none neon-on-dark. --------------- */
@@ -462,6 +486,15 @@ body {
 .preset-paper {
   background-color: #f7f6f3;
   background-image: radial-gradient(circle at 1px 1px, rgba(20, 18, 15, 0.06) 1px, transparent 0);
+  background-size: 11px 11px;
+}
+
+/* Ink surface — the dark twin of .preset-paper. A fixed near-black "page" (never
+   follows the docs theme) so a theme's hand-tuned dark values preview truthfully
+   beside the light stock, whatever the reader's own mode. */
+.preset-ink {
+  background-color: #17161a;
+  background-image: radial-gradient(circle at 1px 1px, rgba(240, 240, 245, 0.06) 1px, transparent 0);
   background-size: 11px 11px;
 }
 

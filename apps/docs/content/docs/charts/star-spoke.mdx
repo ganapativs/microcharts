@@ -1,12 +1,14 @@
 ---
 title: StarSpoke
-description: A star glyph for React — spokes radiate from a center, length is value, and there is deliberately no connecting polygon, so profiles compare honestly.
+description:
+  A star glyph for React — spokes radiate from a center, length is value, and there is deliberately no connecting
+  polygon, so profiles compare honestly.
 ---
 
-StarSpoke answers "what is this entity's profile across a few metrics — and which entity in a set is
-the odd one out?". Spokes radiate from the center and their length encodes each value. There is no
-connecting polygon, ever: the enclosed area of a radar chart lies about magnitude and axis order,
-and the research is clear that contour-free wins for spotting outliers.
+StarSpoke answers "what is this entity's profile across a few metrics — and which entity in a set is the odd one out?".
+Spokes radiate from the center and their length encodes each value. There is no connecting polygon, ever: the enclosed
+area of a radar chart lies about magnitude and axis order, and the research is clear that contour-free wins for spotting
+outliers.
 
 <LiveDemo label="StarSpoke" sizeOf="star-spoke">
   <StarSpoke
@@ -70,8 +72,8 @@ const baseline = [0.5, 0.5, 0.5, 0.5, 0.5];
   />
 </LiveDemo>
 
-`locale` doesn't change any in-chart mark — tip labels are metric names, never formatted numbers —
-but it does localize the extremes named in the accessible summary:
+`locale` doesn't change any in-chart mark — tip labels are metric names, never formatted numbers — but it does localize
+the extremes named in the accessible summary:
 
 <LiveDemo
   label="locale — the accessible summary follows it (no visible mark changes)"
@@ -98,16 +100,16 @@ but it does localize the extremes named in the accessible summary:
 
 ## Why this default
 
-Contour-free is the point: a connecting polygon is decoration that changes the read, exaggerating
-area for high-variance profiles and hiding the individual spoke lengths that actually matter for
-comparison. One shared domain governs every spoke in a glyph — mixed-domain metrics are the caller's
-normalization to state, so a set of small multiples stays honestly comparable.
+Contour-free is the point: a connecting polygon is decoration that changes the read, exaggerating area for high-variance
+profiles and hiding the individual spoke lengths that actually matter for comparison. One shared domain governs every
+spoke in a glyph — mixed-domain metrics are the caller's normalization to state, so a set of small multiples stays
+honestly comparable.
 
-Every spoke sits at a fixed clock position (first at 12 o'clock, clockwise), so the axis order never
-shifts between instances — that fixed order, plus the always-on guide spokes, is what keeps a profile
-readable even where a metric's label doesn't seat. Tip labels use the same fit-or-drop rule as the
-rest of the library: each one only renders if it clears its side of the glyph without heavy clamping,
-so a long metric name never gets squeezed into an overlap — it drops cleanly and the shape still reads.
+Every spoke sits at a fixed clock position (first at 12 o'clock, clockwise), so the axis order never shifts between
+instances — that fixed order, plus the always-on guide spokes, is what keeps a profile readable even where a metric's
+label doesn't seat. Tip labels use the same fit-or-drop rule as the rest of the library: each one only renders if it
+clears its side of the glyph without heavy clamping, so a long metric name never gets squeezed into an overlap — it
+drops cleanly and the shape still reads.
 
 ## Edge cases
 
@@ -143,8 +145,8 @@ so a long metric name never gets squeezed into an overlap — it drops cleanly a
 
 ## Accessibility
 
-The accessible name names the extremes — **"5 metrics; highest Speed (0.9), lowest Cost (0.3)."**
-The interactive entry rotates focus through the spokes with ←/→, announcing each metric and value.
+The accessible name names the extremes — **"5 metrics; highest Speed (0.9), lowest Cost (0.3)."** The interactive entry
+rotates focus through the spokes with ←/→, announcing each metric and value.
 
 ## Props
 

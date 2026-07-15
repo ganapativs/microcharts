@@ -1,12 +1,13 @@
 ---
 title: Honeycomb
-description: A honeycomb chart for React — filled cells of a hex grid for occupancy of a capacity, countable up to about sixty.
+description:
+  A honeycomb chart for React — filled cells of a hex grid for occupancy of a capacity, countable up to about sixty.
 ---
 
-Honeycomb answers "how many of the available slots are taken?" as filled cells in an area-filling hex
-grid. The unit is the cell, so the count is genuinely countable — this is occupancy of a capacity, not
-a magnitude. It fills row-major from the top-left, so occupancy reads as a sweep, and the whole grid
-is exactly two SVG paths (filled and empty) no matter how large the total.
+Honeycomb answers "how many of the available slots are taken?" as filled cells in an area-filling hex grid. The unit is
+the cell, so the count is genuinely countable — this is occupancy of a capacity, not a magnitude. It fills row-major
+from the top-left, so occupancy reads as a sweep, and the whole grid is exactly two SVG paths (filled and empty) no
+matter how large the total.
 
 <LiveDemo label="Honeycomb" sizeOf="honeycomb">
   <Honeycomb value={34} total={40} unit="seats" title="Occupancy" cell={6} />
@@ -22,7 +23,8 @@ is exactly two SVG paths (filled and empty) no matter how large the total.
 
 ## When to use it
 
-- **Good for** — seats or licenses taken of a capacity, an occupancy read in a KPI card, or a countable of-total in a cell.
+- **Good for** — seats or licenses taken of a capacity, an occupancy read in a KPI card, or a countable of-total in a
+  cell.
 - **Avoid for** — a capacity over about sixty (that's `Progress`), a magnitude with no total (MiniBar), or trends.
 
 ## Sizing
@@ -65,22 +67,19 @@ is exactly two SVG paths (filled and empty) no matter how large the total.
 
 ## Why this default
 
-Outline empties are the default because takenness must survive grayscale — a filled cell versus an
-outlined cell reads without color. `empty="blank"` drops the empty cells entirely instead of dimming
-them, for surfaces where the outline reads as noise. Auto packing is the default because a near-square
-honeycomb is the recognizable form. The unit is the cell, and its size never changes with value — the
-count varies, the geometry doesn't — which is what keeps this honest area-filling _occupancy_, distinct
-from a `PictogramRow` counting unlike things. Above sixty cells, unit counting stops being countable, so
-the chart emits a dev warning and the docs steer to `Progress`. A value past the total
-fills every cell, but the accessible name still states the true number — occupancy is never silently
-clipped.
+Outline empties are the default because takenness must survive grayscale — a filled cell versus an outlined cell reads
+without color. `empty="blank"` drops the empty cells entirely instead of dimming them, for surfaces where the outline
+reads as noise. Auto packing is the default because a near-square honeycomb is the recognizable form. The unit is the
+cell, and its size never changes with value — the count varies, the geometry doesn't — which is what keeps this honest
+area-filling _occupancy_, distinct from a `PictogramRow` counting unlike things. Above sixty cells, unit counting stops
+being countable, so the chart emits a dev warning and the docs steer to `Progress`. A value past the total fills every
+cell, but the accessible name still states the true number — occupancy is never silently clipped.
 
 ## Accessibility
 
-The accessible name is the exact occupancy — **"34 of 40 seats filled."** — always the true value,
-even when it exceeds the total. The interactive entry announces the count on change through a polite
-live region and reveals the value / total on hover; the cells are anonymous units, so there is no
-per-cell cursor to move.
+The accessible name is the exact occupancy — **"34 of 40 seats filled."** — always the true value, even when it exceeds
+the total. The interactive entry announces the count on change through a polite live region and reveals the value /
+total on hover; the cells are anonymous units, so there is no per-cell cursor to move.
 
 ## Props
 

@@ -1,12 +1,12 @@
 ---
 title: PairedBars
-description: Actual vs expected per category for React tables — grouped or overlay bars on one shared zero-anchored scale.
+description:
+  Actual vs expected per category for React tables — grouped or overlay bars on one shared zero-anchored scale.
 ---
 
-PairedBars answers "how does actual compare to expected, category by category?". Value
-and reference always share one zero-anchored domain — comparing bars on different scales
-is the cardinal grouped-bar lie — and the reference is muted by two structural cues
-(opacity _and_ width), never color alone.
+PairedBars answers "how does actual compare to expected, category by category?". Value and reference always share one
+zero-anchored domain — comparing bars on different scales is the cardinal grouped-bar lie — and the reference is muted
+by two structural cues (opacity _and_ width), never color alone.
 
 <LiveDemo
   label="PairedBars"
@@ -110,8 +110,8 @@ is the cardinal grouped-bar lie — and the reference is muted by two structural
   />
 </LiveDemo>
 
-The gap named in the summary follows `format`/`locale` — 12000 reads "12.000" under `de-DE`
-rather than the English "12,000".
+The gap named in the summary follows `format`/`locale` — 12000 reads "12.000" under `de-DE` rather than the English
+"12,000".
 
 ## Edge cases
 
@@ -120,30 +120,17 @@ rather than the English "12,000".
   code={`// value bar alone; the interactive entry announces "no reference"
 <PairedBars data={[{ label: "East", value: 940, ref: null }]} />`}
 >
-  <PairedBars
-    data={[{ label: "East", value: 940, ref: null }]}
-    title="No plan yet"
-    width={100}
-    height={44}
-  />
+  <PairedBars data={[{ label: "East", value: 940, ref: null }]} title="No plan yet" width={100} height={44} />
 </LiveDemo>
 
-<LiveDemo
-  label="single pair"
-  code={`<PairedBars data={[{ label: "East", value: 940, ref: 1200 }]} />`}
->
-  <PairedBars
-    data={[{ label: "East", value: 940, ref: 1200 }]}
-    title="Single pair"
-    width={80}
-    height={44}
-  />
+<LiveDemo label="single pair" code={`<PairedBars data={[{ label: "East", value: 940, ref: 1200 }]} />`}>
+  <PairedBars data={[{ label: "East", value: 940, ref: 1200 }]} title="Single pair" width={80} height={44} />
 </LiveDemo>
 
-A pair whose `ref` is `null` draws its value bar alone — no ghost, no zero-width placeholder —
-and the interactive entry announces it as **"East: 940, no reference."** rather than pretending
-a comparison exists. Past 5 pairs the grouped read blurs into noise, so the component still
-renders every pair but logs a dev warning steering toward a table or a full bar chart.
+A pair whose `ref` is `null` draws its value bar alone — no ghost, no zero-width placeholder — and the interactive entry
+announces it as **"East: 940, no reference."** rather than pretending a comparison exists. Past 5 pairs the grouped read
+blurs into noise, so the component still renders every pair but logs a dev warning steering toward a table or a full bar
+chart.
 
 ## Four homes
 
@@ -151,16 +138,14 @@ renders every pair but logs a dev warning steering toward a table or a full bar 
 
 ## Why this default
 
-Grouped over overlay by default — overlap hides small over-shoots, so the denser overlay
-form is the variant you choose for tight cells, not the analytical default. A pair with a
-missing reference renders the value bar alone and announces "no reference"; a chart where
-_every_ reference is missing dev-warns and steers to MiniBar.
+Grouped over overlay by default — overlap hides small over-shoots, so the denser overlay form is the variant you choose
+for tight cells, not the analytical default. A pair with a missing reference renders the value bar alone and announces
+"no reference"; a chart where _every_ reference is missing dev-warns and steers to MiniBar.
 
 ## Accessibility
 
-The accessible name leads with the largest gap — **"4 pairs. Largest gap East: 940 vs
-1,200."** The interactive entry roves pairs and announces each as value vs reference
-(**"East: 940 vs 1,200."**).
+The accessible name leads with the largest gap — **"4 pairs. Largest gap East: 940 vs 1,200."** The interactive entry
+roves pairs and announces each as value vs reference (**"East: 940 vs 1,200."**).
 
 ## Props
 

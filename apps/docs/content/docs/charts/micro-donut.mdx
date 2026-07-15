@@ -1,11 +1,11 @@
 ---
 title: MicroDonut
-description: An honest micro donut for React — capped at 4 wedges + Other, with a sanctioned decorative mode beside printed values.
+description:
+  An honest micro donut for React — capped at 4 wedges + Other, with a sanctioned decorative mode beside printed values.
 ---
 
-MicroDonut answers "roughly what is this made of?" at icon size — an honest, capped
-concession to a ubiquitous demand. For any comparative read, use
-[SegmentedBar](/docs/charts/segmented-bar): a flat bar beats a donut of the same data at
+MicroDonut answers "roughly what is this made of?" at icon size — an honest, capped concession to a ubiquitous demand.
+For any comparative read, use [SegmentedBar](/docs/charts/segmented-bar): a flat bar beats a donut of the same data at
 every size we ship. The wedge cap and labeled rollup are non-optional.
 
 <LiveDemo label="MicroDonut" sizeOf="micro-donut">
@@ -73,12 +73,7 @@ const mix = [
   label="a single category — a full annulus, disambiguated by the summary"
   code={`<MicroDonut data={[{ label: "Chrome", value: 620 }]} title="All Chrome" />`}
 >
-  <MicroDonut
-    data={[{ label: "Chrome", value: 620 }]}
-    title="All Chrome"
-    size={40}
-    style={{ width: 40, height: 40 }}
-  />
+  <MicroDonut data={[{ label: "Chrome", value: 620 }]} title="All Chrome" size={40} style={{ width: 40, height: 40 }} />
 </LiveDemo>
 
 <LiveDemo label="no data yet" code={`<MicroDonut data={[]} title="Empty" />`}>
@@ -91,16 +86,15 @@ const mix = [
 
 ## Why this default
 
-The hole is mandatory — the donut's angle + arc-length double encoding beats the pie's
-area read, which is why pie stays unshipped. Never exploded, tilted, or shadowed. A
-single category renders a full annulus that looks like a 100% ProgressRing — the summary
-disambiguates.
+The hole is mandatory — the donut's angle + arc-length double encoding beats the pie's area read, which is why pie stays
+unshipped. Never exploded, tilted, or shadowed. A single category renders a full annulus that looks like a 100%
+ProgressRing — the summary disambiguates.
 
 ## Accessibility
 
-The accessible name is the full composition (same wording as SegmentedBar). `decorative`
-marks the chart aria-hidden for the one sanctioned ornamental use — beside a printed
-value — and the interactive entry refuses to make a decorative donut a tab stop.
+The accessible name is the full composition (same wording as SegmentedBar). `decorative` marks the chart aria-hidden for
+the one sanctioned ornamental use — beside a printed value — and the interactive entry refuses to make a decorative
+donut a tab stop.
 
 ## Props
 

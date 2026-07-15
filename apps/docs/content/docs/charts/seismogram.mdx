@@ -3,10 +3,9 @@ title: Seismogram
 description: An event-density strip for React — when things happened and how hard, with spike-preserving downsampling.
 ---
 
-Seismogram answers "when did things happen, and how hard?". Ticks read as a seismograph
-trace — centered on a midline and flaring symmetrically: presence is density texture,
-length is intensity. Long series collapse via max-per-bucket only — the spike is the
-chart's whole job, so it always survives, and the summary is always computed from the raw
+Seismogram answers "when did things happen, and how hard?". Ticks read as a seismograph trace — centered on a midline
+and flaring symmetrically: presence is density texture, length is intensity. Long series collapse via max-per-bucket
+only — the spike is the chart's whole job, so it always survives, and the summary is always computed from the raw
 values, never the buckets.
 
 <LiveDemo
@@ -86,10 +85,7 @@ values, never the buckets.
 <Seismogram data={burstsPerMinute} anomaly={6} />`}
 >
   <Seismogram
-    data={[
-      1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2, 0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1, 2,
-      1,
-    ]}
+    data={[1, 2, 1, 3, 2, 6, 2, 1, 0, 2, 1, 4, 9, 3, 1, 2, 0, 1, 3, 2, 7, 2, 1, 0, 2, 1, 5, 11, 3, 1, 2, 1]}
     anomaly={6}
     title="Error bursts"
     width={240}
@@ -117,9 +113,9 @@ values, never the buckets.
   />
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's
-peak number follows that locale's own grouping ("12.500" in German, not "12,500"). Tick
-positions and lengths are unaffected; only the announced peak is localized.
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's peak number follows that
+locale's own grouping ("12.500" in German, not "12,500"). Tick positions and lengths are unaffected; only the announced
+peak is localized.
 
 ## Edge cases
 
@@ -153,18 +149,17 @@ positions and lengths are unaffected; only the announced peak is localized.
 
 ## Why this default
 
-A centered seismograph trace over bottom-anchored bars: the symmetric flare reads as event
-intensity rather than inviting the bar-to-bar magnitude comparison the strip is too small to
-support — and it stays visually distinct from SparkBar. Barcode mode is documented as
-presence-only — a uniform tick is not intensity. `anomaly` flags spikes at or above a
-threshold in the alert token; the flag is redundant with tick length, never color alone. A
-quiet strip renders its baseline at rest, never a blank hole.
+A centered seismograph trace over bottom-anchored bars: the symmetric flare reads as event intensity rather than
+inviting the bar-to-bar magnitude comparison the strip is too small to support — and it stays visually distinct from
+SparkBar. Barcode mode is documented as presence-only — a uniform tick is not intensity. `anomaly` flags spikes at or
+above a threshold in the alert token; the flag is redundant with tick length, never color alone. A quiet strip renders
+its baseline at rest, never a blank hole.
 
 ## Accessibility
 
-The accessible name counts the events — **"27 events, peak 11."**, or **"No events."** for
-a quiet strip. The interactive entry steps slots with position readouts ("Point 2 of 5:
-3."), announces quiet slots as "no data", and Home/End jump to the first/last event.
+The accessible name counts the events — **"27 events, peak 11."**, or **"No events."** for a quiet strip. The
+interactive entry steps slots with position readouts ("Point 2 of 5: 3."), announces quiet slots as "no data", and
+Home/End jump to the first/last event.
 
 ## Props
 

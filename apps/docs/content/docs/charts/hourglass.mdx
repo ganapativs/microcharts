@@ -1,13 +1,15 @@
 ---
 title: Hourglass
-description: An hourglass chart for React — sand area splits elapsed and remaining, area-true, for the two-sided time story Progress can't tell.
+description:
+  An hourglass chart for React — sand area splits elapsed and remaining, area-true, for the two-sided time story
+  Progress can't tell.
 ---
 
-Hourglass answers "how much time is gone _and_ how much remains?" — the two-sided story a progress
-bar can't tell. Sand fills the top chamber (remaining) and the bottom (elapsed), and both areas are
-**area-true**: a naive linear-height fill in a triangular bulb would overstate early progress by up
-to 2×, so the geometry solves for true proportional area. A thin stream at the neck marks "running";
-it disappears at both ends, because finished and not-started are shape-distinct states.
+Hourglass answers "how much time is gone _and_ how much remains?" — the two-sided story a progress bar can't tell. Sand
+fills the top chamber (remaining) and the bottom (elapsed), and both areas are **area-true**: a naive linear-height fill
+in a triangular bulb would overstate early progress by up to 2×, so the geometry solves for true proportional area. A
+thin stream at the neck marks "running"; it disappears at both ends, because finished and not-started are shape-distinct
+states.
 
 <LiveDemo label="Hourglass" sizeOf="hourglass">
   <span className="inline-flex gap-4 items-center">
@@ -27,7 +29,8 @@ it disappears at both ends, because finished and not-started are shape-distinct 
 
 ## When to use it
 
-- **Good for** — a deadline or session-expiry read in a sentence, a TTL cell where remaining is the story, or a time-boxed tab or countdown.
+- **Good for** — a deadline or session-expiry read in a sentence, a TTL cell where remaining is the story, or a
+  time-boxed tab or countdown.
 - **Avoid for** — exact percentages (Progress), trends (Sparkline), or non-time fractions.
 
 ## Sizing
@@ -49,17 +52,11 @@ it disappears at both ends, because finished and not-started are shape-distinct 
 
 ## Edge cases
 
-<LiveDemo
-  label="zero — not started, no stream"
-  code={`<Hourglass value={0} title="Not started" />`}
->
+<LiveDemo label="zero — not started, no stream" code={`<Hourglass value={0} title="Not started" />`}>
   <Hourglass value={0} title="Not started" height={36} />
 </LiveDemo>
 
-<LiveDemo
-  label="finished — no stream, all sand settled"
-  code={`<Hourglass value={1} title="Finished" />`}
->
+<LiveDemo label="finished — no stream, all sand settled" code={`<Hourglass value={1} title="Finished" />`}>
   <Hourglass value={1} title="Finished" height={36} />
 </LiveDemo>
 
@@ -72,10 +69,7 @@ it disappears at both ends, because finished and not-started are shape-distinct 
   <Hourglass value={1.4} title="Overrun" height={36} />
 </LiveDemo>
 
-<LiveDemo
-  label="NaN — treated as 0 elapsed (documented)"
-  code={`<Hourglass value={Number.NaN} title="Invalid" />`}
->
+<LiveDemo label="NaN — treated as 0 elapsed (documented)" code={`<Hourglass value={Number.NaN} title="Invalid" />`}>
   <Hourglass value={Number.NaN} title="Invalid" height={36} />
 </LiveDemo>
 
@@ -85,17 +79,16 @@ it disappears at both ends, because finished and not-started are shape-distinct 
 
 ## Why this default
 
-`value` is the elapsed fraction — the same polarity as `Progress` — so the two compose in one product
-without re-learning which way is which. The area-true solve is the load-bearing honesty rule: in an
-inherently nonlinear container, the sand areas are exactly proportional to elapsed and remaining. The stream is a binary state mark, not decoration, and is never
-animated in the static entry — it simply renders while `0 < value < 1`.
+`value` is the elapsed fraction — the same polarity as `Progress` — so the two compose in one product without
+re-learning which way is which. The area-true solve is the load-bearing honesty rule: in an inherently nonlinear
+container, the sand areas are exactly proportional to elapsed and remaining. The stream is a binary state mark, not
+decoration, and is never animated in the static entry — it simply renders while `0 < value < 1`.
 
 ## Accessibility
 
-The accessible name carries both sides — **"75% elapsed, 25% remaining."** The interactive entry
-cross-fades the sand levels on change (an opacity swap, never a path interpolation) and announces
-only when the total crosses a documented threshold (50 / 90 / 100%), so a streaming value never
-spams.
+The accessible name carries both sides — **"75% elapsed, 25% remaining."** The interactive entry cross-fades the sand
+levels on change (an opacity swap, never a path interpolation) and announces only when the total crosses a documented
+threshold (50 / 90 / 100%), so a streaming value never spams.
 
 ## Props
 

@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { useTheme } from "next-themes";
-import { Check, Monitor, Moon, Palette, Sun } from "lucide-react";
+import { ArrowUpRight, Check, Copy, Monitor, Moon, Palette, Sun } from "lucide-react";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { cn } from "@/lib/cn";
+import { serializeTokens } from "@/lib/token-export";
 
 // Accent palette — Cobalt default. Charts bind `--mc-accent` to the choice.
 const SOLIDS = [
@@ -80,6 +82,7 @@ export function AppearanceMenu() {
   const [pos, setPos] = useState<CSSProperties>({});
   const [accent, setAccentState] = useState<string>("cobalt");
   const [preset, setPresetState] = useState<string>("modern");
+  const [copied, setCopied] = useState(false);
   const { theme, setTheme } = useTheme();
   const ref = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -92,7 +95,7 @@ export function AppearanceMenu() {
       const r = ref.current.getBoundingClientRect();
       // approximate popover height (preview + theme + accent + chart-style rows)
       // so the up/down flip keeps it on-screen; err tall to avoid clipping.
-      const PANEL_H = 510;
+      const PANEL_H = 570;
       const openUp = r.bottom + PANEL_H > window.innerHeight && r.top > PANEL_H;
       const vertical: CSSProperties = openUp
         ? { bottom: window.innerHeight - r.top + 10 }
@@ -144,6 +147,24 @@ export function AppearanceMenu() {
       localStorage.setItem("mc-preset", id);
     } catch {}
     setPresetState(id);
+  }
+
+  // Copy the exact look the preview is showing — chosen accent + chart style,
+  // light and hand-tuned dark together — as paste-ready CSS.
+  function copyTokens() {
+    const css = serializeTokens({
+      preset,
+      accent,
+      mode: "both",
+      include: "color",
+      scope: ":root",
+      format: "css",
+      annotate: false,
+    });
+    void navigator.clipboard.writeText(css).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    });
   }
 
   const current = SOLIDS.find((a) => a.id === accent) ?? SOLIDS[0];
@@ -246,6 +267,32 @@ export function AppearanceMenu() {
                     </button>
                   );
                 })}
+              </div>
+
+              {/* Copy the live look, or jump to the full token studio. Turns the
+                  preview into something you can paste into your own app. */}
+              <div className="mt-4 flex items-center gap-2 border-t border-hairline pt-3">
+                <button
+                  type="button"
+                  onClick={copyTokens}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-fd-border py-1.5 text-[0.72rem] font-medium text-fd-muted-foreground transition-colors hover:border-fd-primary/40 hover:text-fd-foreground"
+                >
+                  {copied ? (
+                    <Check className="size-3.5 text-fd-primary" />
+                  ) : (
+                    <Copy className="size-3.5" />
+                  )}
+                  {copied ? "Copied CSS" : "Copy tokens"}
+                </button>
+                <Link
+                  href="/docs/theming#copy-tokens"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-1 rounded-lg border border-fd-border px-2.5 py-1.5 text-[0.72rem] font-medium text-fd-muted-foreground transition-colors hover:border-fd-primary/40 hover:text-fd-foreground"
+                  title="Open the full token studio — every style, accent, and mode"
+                >
+                  All tokens
+                  <ArrowUpRight className="size-3.5" />
+                </Link>
               </div>
             </div>
           </div>,

@@ -1,12 +1,13 @@
 ---
 title: Annotations
-description: Declarative reference context for React microcharts — thresholds, target zones, moment markers, and callouts, written as children and rendered identically inside every host.
+description:
+  Declarative reference context for React microcharts — thresholds, target zones, moment markers, and callouts, written
+  as children and rendered identically inside every host.
 ---
 
-Annotations answer "what should the reader compare this against?". They're plain
-children — `<Threshold>`, `<TargetZone>`, `<Marker>`, `<Callout>` — that the host chart
-draws in its own coordinate space, so the same child lands identically on any chart that
-accepts it. Reference ink whispers: everything sits at 0.7 opacity or below, and the data
+Annotations answer "what should the reader compare this against?". They're plain children — `<Threshold>`,
+`<TargetZone>`, `<Marker>`, `<Callout>` — that the host chart draws in its own coordinate space, so the same child lands
+identically on any chart that accepts it. Reference ink whispers: everything sits at 0.7 opacity or below, and the data
 never competes with its context.
 
 <LiveDemo
@@ -35,8 +36,8 @@ import { Threshold, TargetZone, Marker } from "@microcharts/react/annotations";
 
 ## Install
 
-The annotation layer is its own ~1.5 kB entry. A host that renders no annotations pays
-only a tiny children walker; the mark renderers ship with this import.
+The annotation layer is its own ~1.5 kB entry. A host that renders no annotations pays only a tiny children walker; the
+mark renderers ship with this import.
 
 ```tsx
 import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annotations";
@@ -46,55 +47,40 @@ import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annot
 
 - **`<Threshold y={65} label="SLA" />`** — a dashed reference hairline at a data-space `y`.
 - **`<TargetZone y={[40, 60]} />`** — a normal-range band, always drawn _beneath_ the data ink.
-- **`<Marker x={8} label="deploy" />`** — a vertical moment mark; `x` addresses the host's
-  primary axis (the data **index** on S1 charts like Sparkline and SparkBar).
-- **`<Marker x={8} celebrate />`** — six deterministic particles burst once on entrance, for
-  milestone crossings only; under reduced motion they rest as a quiet starburst.
+- **`<Marker x={8} label="deploy" />`** — a vertical moment mark; `x` addresses the host's primary axis (the data
+  **index** on S1 charts like Sparkline and SparkBar).
+- **`<Marker x={8} celebrate />`** — six deterministic particles burst once on entrance, for milestone crossings only;
+  under reduced motion they rest as a quiet starburst.
 - **`<Callout x={5} y={45} label="dip" />`** — one narrated point on an elbow hairline.
 
 <LiveDemo
   label="celebrate — a milestone crossing"
-  sampleData={[
-    { name: "signups", code: "const signups = [3, 4, 5, 5, 6, 8, 9, 11, 12, 14, 15, 17];" },
-  ]}
+  sampleData={[{ name: "signups", code: "const signups = [3, 4, 5, 5, 6, 8, 9, 11, 12, 14, 15, 17];" }]}
   code={`<Sparkline data={signups} width={160} height={36}>
   <Marker x={9} celebrate label="10k!" />
 </Sparkline>`}
 >
-  <Sparkline
-    data={[3, 4, 5, 5, 6, 8, 9, 11, 12, 14, 15, 17]}
-    title="Signups"
-    width={160}
-    height={36}
-  >
+  <Sparkline data={[3, 4, 5, 5, 6, 8, 9, 11, 12, 14, 15, 17]} title="Signups" width={160} height={36}>
     <Marker x={9} celebrate label="10k!" />
   </Sparkline>
 </LiveDemo>
 
 <LiveDemo
   label="callout — one narrated point"
-  sampleData={[
-    { name: "latency", code: "const latency = [48, 52, 45, 58, 51, 47, 55, 49, 51, 46];" },
-  ]}
+  sampleData={[{ name: "latency", code: "const latency = [48, 52, 45, 58, 51, 47, 55, 49, 51, 46];" }]}
   code={`<Sparkline data={latency} width={160} height={40}>
   <Callout x={3} y={58} label="cache miss" />
 </Sparkline>`}
 >
-  <Sparkline
-    data={[48, 52, 45, 58, 51, 47, 55, 49, 51, 46]}
-    title="Latency"
-    width={160}
-    height={40}
-  >
+  <Sparkline data={[48, 52, 45, 58, 51, 47, 55, 49, 51, 46]} title="Latency" width={160} height={40}>
     <Callout x={3} y={58} label="cache miss" />
   </Sparkline>
 </LiveDemo>
 
 ## The same child, any host
 
-The children don't know which chart drew them — they resolve against the host's scale.
-Move the exact `<TargetZone>` and `<Threshold>` from a line onto bars and they land in the
-same data-space, unchanged.
+The children don't know which chart drew them — they resolve against the host's scale. Move the exact `<TargetZone>` and
+`<Threshold>` from a line onto bars and they land in the same data-space, unchanged.
 
 <LiveDemo
   label="identical annotations on SparkBar"
@@ -112,26 +98,24 @@ same data-space, unchanged.
 
 ## Every value-series host
 
-Every **value-series** chart hosts annotations — the charts with a continuous value axis and an
-index / slot / time x-axis, so a data-space `x` and `y` map cleanly onto the frame. That's
-Sparkline, SparkBar, MiniBar, CyclePlot, CitySkyline, ChangePoint, DualSparkline, SpreadBand,
-ForecastCone, ControlStrip, QueueDepth, BurnChart, Waterfall, PercentileTrace, RetentionCurve,
-WinProbWorm, and ErrorBudget. The same `<Threshold>` or `<Marker>` lands in each chart's own
-data-space, unchanged. (MiniBar hosts in its default **vertical** orientation, where value lives on
-the y-axis; a horizontal MiniBar flips the axes, so it passes annotation children straight through.)
+Every **value-series** chart hosts annotations — the charts with a continuous value axis and an index / slot / time
+x-axis, so a data-space `x` and `y` map cleanly onto the frame. That's Sparkline, SparkBar, MiniBar, CyclePlot,
+CitySkyline, ChangePoint, DualSparkline, SpreadBand, ForecastCone, ControlStrip, QueueDepth, BurnChart, Waterfall,
+PercentileTrace, RetentionCurve, WinProbWorm, and ErrorBudget. The same `<Threshold>` or `<Marker>` lands in each
+chart's own data-space, unchanged. (MiniBar hosts in its default **vertical** orientation, where value lives on the
+y-axis; a horizontal MiniBar flips the axes, so it passes annotation children straight through.)
 
-Charts without a single continuous value-y don't host them, by design: scalar readouts (Delta,
-FatDigits, StatusDot, Thermometer), part-to-whole (MicroDonut, SegmentedBar, Funnel), color-encoded
-value (HeatStrip, ActivityGrid, the calendars), value-by-value scatters (QuadrantDot, MicroScatter,
-BiasStrip), and the pure timelines. An annotation placed inside one renders nothing and warns in dev.
+Charts without a single continuous value-y don't host them, by design: scalar readouts (Delta, FatDigits, StatusDot,
+Thermometer), part-to-whole (MicroDonut, SegmentedBar, Funnel), color-encoded value (HeatStrip, ActivityGrid, the
+calendars), value-by-value scatters (QuadrantDot, MicroScatter, BiasStrip), and the pure timelines. An annotation placed
+inside one renders nothing and warns in dev.
 
 <AnnotationHostShowcase />
 
 ## Honesty rules
 
-- A coordinate outside the host's domain **clamps to the edge at 0.4 opacity** — visibly
-  off-scale, never silently dropped.
-- Annotations never touch the auto summary: the data description stays pure. To narrate an
-  annotation on a static chart, pass an explicit `summary` string.
-- `celebrate` particles are seeded from the data, never `Math.random`, so server and client
-  render the same burst.
+- A coordinate outside the host's domain **clamps to the edge at 0.4 opacity** — visibly off-scale, never silently
+  dropped.
+- Annotations never touch the auto summary: the data description stays pure. To narrate an annotation on a static chart,
+  pass an explicit `summary` string.
+- `celebrate` particles are seeded from the data, never `Math.random`, so server and client render the same burst.

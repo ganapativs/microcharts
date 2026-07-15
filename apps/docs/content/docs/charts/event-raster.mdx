@@ -1,12 +1,13 @@
 ---
 title: EventRaster
-description: A spike raster for React — one lane per source, one tick per event, so vertical banding reveals synchronization and sparse rows reveal silence.
+description:
+  A spike raster for React — one lane per source, one tick per event, so vertical banding reveals synchronization and
+  sparse rows reveal silence.
 ---
 
-EventRaster answers "when did each source fire — and do sources fire together, in sequence, or not
-at all?". Vertical bands reveal synchronization, diagonals reveal propagation, and sparse rows
-reveal silence. One tick is always one event — the only exception is the disclosed `overflow="bin"`
-mode for aliasing lanes.
+EventRaster answers "when did each source fire — and do sources fire together, in sequence, or not at all?". Vertical
+bands reveal synchronization, diagonals reveal propagation, and sparse rows reveal silence. One tick is always one event
+— the only exception is the disclosed `overflow="bin"` mode for aliasing lanes.
 
 <LiveDemo label="EventRaster" sizeOf="event-raster">
   <EventRaster
@@ -88,16 +89,8 @@ mode for aliasing lanes.
   />
 </LiveDemo>
 
-<LiveDemo
-  label="single lane, single event"
-  code={`<EventRaster data={[{ label: "boot", events: [0] }]} />`}
->
-  <EventRaster
-    data={[{ label: "boot", events: [0] }]}
-    title="Single event"
-    width={160}
-    height={16}
-  />
+<LiveDemo label="single lane, single event" code={`<EventRaster data={[{ label: "boot", events: [0] }]} />`}>
+  <EventRaster data={[{ label: "boot", events: [0] }]} title="Single event" width={160} height={16} />
 </LiveDemo>
 
 ## Four homes
@@ -106,17 +99,15 @@ mode for aliasing lanes.
 
 ## Why this default
 
-Lanes stay aligned to a shared time domain because vertical banding — several sources firing at the
-same instant — is the phenomenon the chart exists to reveal. An empty lane is kept, not dropped:
-silence is signal. When a lane is so dense that ticks would alias into a solid smear, `overflow="bin"`
-switches it to per-bucket counts shown as opacity and the summary says which lanes were binned —
-the encoding change never hides.
+Lanes stay aligned to a shared time domain because vertical banding — several sources firing at the same instant — is
+the phenomenon the chart exists to reveal. An empty lane is kept, not dropped: silence is signal. When a lane is so
+dense that ticks would alias into a solid smear, `overflow="bin"` switches it to per-bucket counts shown as opacity and
+the summary says which lanes were binned — the encoding change never hides.
 
 ## Accessibility
 
-The accessible name summarises the field — **"4 lanes, 25 events; busiest api (11)."** The
-interactive entry roves lanes with ↑/↓ and events with ←/→, announcing each event's lane, time, and
-position within the lane.
+The accessible name summarises the field — **"4 lanes, 25 events; busiest api (11)."** The interactive entry roves lanes
+with ↑/↓ and events with ←/→, announcing each event's lane, time, and position within the lane.
 
 ## Props
 

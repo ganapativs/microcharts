@@ -1,24 +1,22 @@
 ---
 title: BenchmarkStrip
-description: A peer-band strip for React — one value positioned against its cohort's empirical quantiles, with the percentile stated.
+description:
+  A peer-band strip for React — one value positioned against its cohort's empirical quantiles, with the percentile
+  stated.
 ---
 
-BenchmarkStrip answers "is this value normal for its peer group?". A focal dot sits on a
-common scale against the peers' own **empirical** quantile bands — never a fitted
-distribution. There is no axis: the band is the reference frame. Small samples fall back
-to min–max so tail quantiles are never fiction.
+BenchmarkStrip answers "is this value normal for its peer group?". A focal dot sits on a common scale against the peers'
+own **empirical** quantile bands — never a fitted distribution. There is no axis: the band is the reference frame. Small
+samples fall back to min–max so tail quantiles are never fiction.
 
 <LiveDemo
   label="BenchmarkStrip"
   sizeOf="benchmark-strip"
   code={`import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
 
-// 42 peer latencies (ms)
-const peerLatencies = [
-180, 201, 237, 286, 341, 396, 443, 394, 412, 413, 398, 372, 340, 310, 205,
-196, 205, 230, 271, 322, 378, 347, 391, 421, 434, 430, 412, 383, 268, 239,
-221, 218, 231, 261, 306, 275, 331, 382, 422, 447, 455, 447,
-];
+// 42 peer latencies (ms) const peerLatencies = [ 180, 201, 237, 286, 341, 396, 443, 394, 412, 413, 398, 372, 340, 310,
+205, 196, 205, 230, 271, 322, 378, 347, 391, 421, 434, 430, 412, 383, 268, 239, 221, 218, 231, 261, 306, 275, 331, 382,
+422, 447, 455, 447, ];
 
 <BenchmarkStrip data={peerLatencies} value={312} title="Latency vs peers" />`}
 >
@@ -57,12 +55,9 @@ const peerLatencies = [
   label="range + label"
   code={`<BenchmarkStrip data={[210, 260, 300, 340, 410]} value={300} range="minmax" />
 
-// 42 peer latencies (ms)
-const peerLatencies = [
-180, 201, 237, 286, 341, 396, 443, 394, 412, 413, 398, 372, 340, 310, 205,
-196, 205, 230, 271, 322, 378, 347, 391, 421, 434, 430, 412, 383, 268, 239,
-221, 218, 231, 261, 306, 275, 331, 382, 422, 447, 455, 447,
-];
+// 42 peer latencies (ms) const peerLatencies = [ 180, 201, 237, 286, 341, 396, 443, 394, 412, 413, 398, 372, 340, 310,
+205, 196, 205, 230, 271, 322, 378, 347, 391, 421, 434, 430, 412, 383, 268, 239, 221, 218, 231, 261, 306, 275, 331, 382,
+422, 447, 455, 447, ];
 
 <BenchmarkStrip data={peerLatencies} value={312} label="value" />`}
 >
@@ -112,9 +107,9 @@ const peerLatencies = [
   />
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — with a `locale`, both the right-gutter label and
-the accessible summary's numbers follow that locale's own grouping and decimal marks: the value
-above reads "1.240" in German, not "1,240".
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, both the right-gutter label and the accessible
+summary's numbers follow that locale's own grouping and decimal marks: the value above reads "1.240" in German, not
+"1,240".
 
 ## Edge cases
 
@@ -124,26 +119,11 @@ above reads "1.240" in German, not "1,240".
 // switches to min–max automatically, even with the default range prop
 <BenchmarkStrip data={[210, 260, 300, 340, 410]} value={300} />`}
 >
-  <BenchmarkStrip
-    data={[210, 260, 300, 340, 410]}
-    value={300}
-    title="5 peers"
-    width={200}
-    height={16}
-  />
+  <BenchmarkStrip data={[210, 260, 300, 340, 410]} value={300} title="5 peers" width={200} height={16} />
 </LiveDemo>
 
-<LiveDemo
-  label="all peers equal"
-  code={`<BenchmarkStrip data={[50, 50, 50, 50, 50, 50, 50, 50]} value={52} />`}
->
-  <BenchmarkStrip
-    data={[50, 50, 50, 50, 50, 50, 50, 50]}
-    value={52}
-    title="Flat cohort"
-    width={200}
-    height={16}
-  />
+<LiveDemo label="all peers equal" code={`<BenchmarkStrip data={[50, 50, 50, 50, 50, 50, 50, 50]} value={52} />`}>
+  <BenchmarkStrip data={[50, 50, 50, 50, 50, 50, 50, 50]} value={52} title="Flat cohort" width={200} height={16} />
 </LiveDemo>
 
 <LiveDemo
@@ -172,20 +152,19 @@ above reads "1.240" in German, not "1,240".
 
 ## Why this default
 
-Bands come from the peers' own empirical quantiles, never a fitted distribution — the strip
-never implies a normal curve that the data doesn't back up. There is no axis: the band itself
-is the reference frame, so the focal dot's position against it is the whole read. Below 8 peers,
-tail quantiles (p5/p95) are statistically unreliable, so the outer band falls back to the
-observed min–max automatically — a deliberate honesty trade the `range` prop can also force at
-any sample size. A value that falls outside the plotted domain clamps to the edge and draws a
-small wedge rather than silently disappearing.
+Bands come from the peers' own empirical quantiles, never a fitted distribution — the strip never implies a normal curve
+that the data doesn't back up. There is no axis: the band itself is the reference frame, so the focal dot's position
+against it is the whole read. Below 8 peers, tail quantiles (p5/p95) are statistically unreliable, so the outer band
+falls back to the observed min–max automatically — a deliberate honesty trade the `range` prop can also force at any
+sample size. A value that falls outside the plotted domain clamps to the edge and draws a small wedge rather than
+silently disappearing.
 
 ## Accessibility
 
-The accessible name states the value, its percentile, the peer count, and the middle-half
-interval — **"312 — 43rd percentile of 42 peers (middle half 244.5–408.5)."** A flat cohort
-states it plainly instead: "52 — all 8 peers at 50." The interactive entry roves the five
-quantile edges with ←/→, announcing each edge's name and value (e.g. "p75: 408.5.").
+The accessible name states the value, its percentile, the peer count, and the middle-half interval — **"312 — 43rd
+percentile of 42 peers (middle half 244.5–408.5)."** A flat cohort states it plainly instead: "52 — all 8 peers at 50."
+The interactive entry roves the five quantile edges with ←/→, announcing each edge's name and value (e.g. "p75:
+408.5.").
 
 ## Props
 

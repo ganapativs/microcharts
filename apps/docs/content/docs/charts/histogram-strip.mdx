@@ -3,15 +3,12 @@ title: HistogramStrip
 description: A micro histogram for React — mode, spread, and skew in a cell, from raw observations with uniform bins.
 ---
 
-HistogramStrip answers "what does the distribution look like?". Raw observations in,
-≤ 12 uniform bins out — counts zero-anchored, never density-smoothed. Pre-aggregated
-counts are not supported; that's SparkBar's contract.
+HistogramStrip answers "what does the distribution look like?". Raw observations in, ≤ 12 uniform bins out — counts
+zero-anchored, never density-smoothed. Pre-aggregated counts are not supported; that's SparkBar's contract.
 
 <LiveDemo label="HistogramStrip" sizeOf="histogram-strip">
   <HistogramStrip
-    data={Array.from({ length: 120 }, (_, i) =>
-      i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
-    )}
+    data={Array.from({ length: 120 }, (_, i) => (i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60)))}
     title="Response times"
     style={{ width: 220, height: 56 }}
   />
@@ -69,9 +66,8 @@ counts are not supported; that's SparkBar's contract.
   />
 </LiveDemo>
 
-The accessible summary states the modal bin's edges through `format`/`locale` — under `de-DE`
-a value like 24000 reads "24.000" (period as the thousands separator) instead of the English
-"24,000".
+The accessible summary states the modal bin's edges through `format`/`locale` — under `de-DE` a value like 24000 reads
+"24.000" (period as the thousands separator) instead of the English "24,000".
 
 ## Edge cases
 
@@ -79,16 +75,13 @@ a value like 24000 reads "24.000" (period as the thousands separator) instead of
   <HistogramStrip data={[]} title="No observations yet" style={{ width: 160, height: 40 }} />
 </LiveDemo>
 
-<LiveDemo
-  label="all values equal"
-  code={`<HistogramStrip data={[4, 4, 4, 4, 4]} title="Constant" />`}
->
+<LiveDemo label="all values equal" code={`<HistogramStrip data={[4, 4, 4, 4, 4]} title="Constant" />`}>
   <HistogramStrip data={[4, 4, 4, 4, 4]} title="Constant" style={{ width: 160, height: 40 }} />
 </LiveDemo>
 
-An empty series renders zero bars — an empty accessible name ("No data.") rather than a
-misleading flat line. A constant series collapses to ONE full-height bin instead of the
-usual up-to-12 slivers a naive equal-width binner would draw for a zero-span domain.
+An empty series renders zero bars — an empty accessible name ("No data.") rather than a misleading flat line. A constant
+series collapses to ONE full-height bin instead of the usual up-to-12 slivers a naive equal-width binner would draw for
+a zero-span domain.
 
 ## Four homes
 
@@ -96,15 +89,14 @@ usual up-to-12 slivers a naive equal-width binner would draw for a zero-span dom
 
 ## Why this default
 
-Auto bin count is √n capped at 12 — enough shape to see skew, few enough bars to survive
-60 px. All values identical collapse to ONE bin (never twelve slivers); explicit bin
-counts collapse to the observation count. `markValue` marks the bin of a value and never
-re-bins around it.
+Auto bin count is √n capped at 12 — enough shape to see skew, few enough bars to survive 60 px. All values identical
+collapse to ONE bin (never twelve slivers); explicit bin counts collapse to the observation count. `markValue` marks the
+bin of a value and never re-bins around it.
 
 ## Accessibility
 
-The accessible name names the modal bin — **"120 values, most between 42.09 and 47.36."** The
-interactive entry roves bins with range announcements (**"42.09 to 47.36: 26 values."**).
+The accessible name names the modal bin — **"120 values, most between 42.09 and 47.36."** The interactive entry roves
+bins with range announcements (**"42.09 to 47.36: 26 values."**).
 
 ## Props
 

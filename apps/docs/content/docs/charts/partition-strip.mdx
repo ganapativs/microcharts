@@ -1,13 +1,14 @@
 ---
 title: PartitionStrip
-description: A two-level icicle strip for React — parent shares on top, children aligned exactly underneath, so a hierarchy stays legible at 24px where a treemap loses alignment.
+description:
+  A two-level icicle strip for React — parent shares on top, children aligned exactly underneath, so a hierarchy stays
+  legible at 24px where a treemap loses alignment.
 ---
 
-PartitionStrip answers "what is the whole made of — and what are the big parts made of — with
-parentage visible?". Parents sit on the top row with widths proportional to their share of the whole,
-and each parent's children tile the exact x-range beneath it. Two aligned rows beat a treemap because
-alignment is the comparison channel — and two levels is a hard limit, because deeper hierarchies
-become unreadable texture at this size.
+PartitionStrip answers "what is the whole made of — and what are the big parts made of — with parentage visible?".
+Parents sit on the top row with widths proportional to their share of the whole, and each parent's children tile the
+exact x-range beneath it. Two aligned rows beat a treemap because alignment is the comparison channel — and two levels
+is a hard limit, because deeper hierarchies become unreadable texture at this size.
 
 <LiveDemo
   label="PartitionStrip"
@@ -188,16 +189,15 @@ become unreadable texture at this size.
 
 ## Why this default
 
-Two aligned rows because alignment is the comparison — you can see at a glance that a child sits
-under its parent and how much of it that child is. A treemap discards that alignment and a flat
-SegmentedBar discards the hierarchy entirely. Grandchildren are ignored with a dev warning, on
-purpose: three levels of nesting at 24px is texture, not information.
+Two aligned rows because alignment is the comparison — you can see at a glance that a child sits under its parent and
+how much of it that child is. A treemap discards that alignment and a flat SegmentedBar discards the hierarchy entirely.
+Grandchildren are ignored with a dev warning, on purpose: three levels of nesting at 24px is texture, not information.
 
 ## Accessibility
 
-The accessible name names the biggest leaf and its parent — **"4 groups, 5 parts; largest JS →
-react (28% of the whole)."** The interactive entry roves within a row with ←/→ and moves between a
-parent and its children with ↑/↓, announcing each node's share of the whole and of its parent.
+The accessible name names the biggest leaf and its parent — **"4 groups, 5 parts; largest JS → react (28% of the
+whole)."** The interactive entry roves within a row with ←/→ and moves between a parent and its children with ↑/↓,
+announcing each node's share of the whole and of its parent.
 
 ## Props
 

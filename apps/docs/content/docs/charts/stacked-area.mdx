@@ -1,11 +1,12 @@
 ---
 title: StackedArea
-description: A word-sized stacked area chart for React — how the composition shifts over time, capped at three series, with an optional ridge skin.
+description:
+  A word-sized stacked area chart for React — how the composition shifts over time, capped at three series, with an
+  optional ridge skin.
 ---
 
-StackedArea answers "how is the composition shifting over time?" Layer thickness is
-share; the stack always sums to 100%. Three series is the hard cap — beyond that,
-thickness at 16 px stops being readable.
+StackedArea answers "how is the composition shifting over time?" Layer thickness is share; the stack always sums to
+100%. Three series is the hard cap — beyond that, thickness at 16 px stops being readable.
 
 <LiveDemo label="StackedArea" sizeOf="stacked-area">
   <StackedArea
@@ -90,9 +91,9 @@ const mix = [
   </span>
 </LiveDemo>
 
-`format`/`locale` control the share numbers — the accessible summary and endpoint labels follow
-the locale's own percent formatting ("66 %" in German, with a space before the sign, not "66%").
-The stack itself never changes shape; only the announced and printed numbers localize.
+`format`/`locale` control the share numbers — the accessible summary and endpoint labels follow the locale's own percent
+formatting ("66 %" in German, with a space before the sign, not "66%"). The stack itself never changes shape; only the
+announced and printed numbers localize.
 
 ## Edge cases
 
@@ -131,9 +132,9 @@ The stack itself never changes shape; only the announced and printed numbers loc
   />
 </LiveDemo>
 
-A single column still stacks normally — share is well-defined from one point, it's just a
-vertical slice with no width to run across. A series pinned at zero collapses to a zero-height
-layer rather than distorting the others: the remaining series still sum to 100% of what's left.
+A single column still stacks normally — share is well-defined from one point, it's just a vertical slice with no width
+to run across. A series pinned at zero collapses to a zero-height layer rather than distorting the others: the remaining
+series still sum to 100% of what's left.
 
 ## Four homes
 
@@ -141,15 +142,13 @@ layer rather than distorting the others: the remaining series still sum to 100% 
 
 ## Why this default
 
-Values are normalized to shares before stacking, so the stack reads composition — not
-magnitude and composition tangled together. `order="asc"` puts the smallest series on
-top, where curvature distorts thickness the least.
+Values are normalized to shares before stacking, so the stack reads composition — not magnitude and composition tangled
+together. `order="asc"` puts the smallest series on top, where curvature distorts thickness the least.
 
 ## Accessibility
 
-The accessible name is the share-shift read — **"3 series over 12 points; Mobile leads
-at 66% share."** The interactive entry announces every layer at once (**"Point 8 of 12:
-Mobile 56%, Web 36%, API 8%."**).
+The accessible name is the share-shift read — **"3 series over 12 points; Mobile leads at 66% share."** The interactive
+entry announces every layer at once (**"Point 8 of 12: Mobile 56%, Web 36%, API 8%."**).
 
 ## Props
 

@@ -1,11 +1,12 @@
 ---
 title: Sparkline
-description: Render a tiny accessible trend line in React — RSC-safe static SVG, or an interactive entry with hover and keyboard navigation.
+description:
+  Render a tiny accessible trend line in React — RSC-safe static SVG, or an interactive entry with hover and keyboard
+  navigation.
 ---
 
-Sparkline draws a compact trend over ordered values. Reach for it when direction and
-shape matter more than exact points — inline in a sentence, inside a table cell, or as
-the quiet backbone of a KPI card.
+Sparkline draws a compact trend over ordered values. Reach for it when direction and shape matter more than exact points
+— inline in a sentence, inside a table cell, or as the quiet backbone of a KPI card.
 
 <LiveDemo label="Sparkline" sizeOf="sparkline">
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} title="Weekly revenue" />
@@ -22,31 +23,22 @@ the quiet backbone of a KPI card.
 ## When to use it
 
 - **Good for** — an inline trend, a table-cell trend, a KPI sparkline, dense dashboards.
-- **Avoid for** — part-to-whole comparisons or reading exact category values. Use
-  [SparkBar](/docs/charts/sparkbar) for discrete magnitudes, or [Bullet](/docs/charts/bullet)
-  for a value against a target.
+- **Avoid for** — part-to-whole comparisons or reading exact category values. Use [SparkBar](/docs/charts/sparkbar) for
+  discrete magnitudes, or [Bullet](/docs/charts/bullet) for a value against a target.
 
 ## Sizing
 
-`width` and `height` are viewBox units that also set the rendered pixel box. Omit them and
-drive the width from CSS for a chart that fills its container — the viewBox keeps the
-aspect ratio.
+`width` and `height` are viewBox units that also set the rendered pixel box. Omit them and drive the width from CSS for
+a chart that fills its container — the viewBox keeps the aspect ratio.
 
 <Sizing chart="sparkline" />
 
 ## Variants
 
-Shape, fill, a normal-range band, and dots are all props — same data, different read.
-Flip any of them to the Code tab.
+Shape, fill, a normal-range band, and dots are all props — same data, different read. Flip any of them to the Code tab.
 
 <LiveDemo label="curve" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} curve="smooth" />`}>
-  <Sparkline
-    data={[3, 5, 4, 8, 6, 9]}
-    width={120}
-    height={32}
-    curve="smooth"
-    title="Smooth curve"
-  />
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} curve="smooth" title="Smooth curve" />
 </LiveDemo>
 
 <LiveDemo label="fill" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} fill />`}>
@@ -54,27 +46,11 @@ Flip any of them to the Code tab.
 </LiveDemo>
 
 <LiveDemo label="band" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} band={[4, 8]} />`}>
-  <Sparkline
-    data={[3, 5, 4, 8, 6, 9]}
-    width={120}
-    height={32}
-    band={[4, 8]}
-    title="Normal-range band"
-  />
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} band={[4, 8]} title="Normal-range band" />
 </LiveDemo>
 
-<LiveDemo
-  label="dots + label"
-  code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} dots="minmax" label="last" />`}
->
-  <Sparkline
-    data={[3, 5, 4, 8, 6, 9]}
-    width={130}
-    height={32}
-    dots="minmax"
-    label="last"
-    title="Min/max dots"
-  />
+<LiveDemo label="dots + label" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} dots="minmax" label="last" />`}>
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={130} height={32} dots="minmax" label="last" title="Min/max dots" />
 </LiveDemo>
 
 <LiveDemo
@@ -99,12 +75,7 @@ Flip any of them to the Code tab.
   code={`// null = "no measurement here" — the line breaks, never interpolates
 <Sparkline data={[3, 5, null, null, 6, 9, 4, 7]} />`}
 >
-  <Sparkline
-    data={[3, 5, null, null, 6, 9, 4, 7]}
-    width={130}
-    height={32}
-    title="Series with gaps"
-  />
+  <Sparkline data={[3, 5, null, null, 6, 9, 4, 7]} width={130} height={32} title="Series with gaps" />
 </LiveDemo>
 
 <LiveDemo label="single point" code={`<Sparkline data={[7]} />`}>
@@ -115,16 +86,14 @@ Flip any of them to the Code tab.
   <Sparkline data={[5, 5, 5, 5, 5, 5]} width={130} height={32} title="Flat series" />
 </LiveDemo>
 
-A `null` means "no measurement here" — the line breaks at the gap and never interpolates
-across it, so an outage can't masquerade as a smooth trend. A single point has no line to
-draw; it sits centered in the plot, visible as the default endpoint dot. An all-equal
-series renders on the vertical mid-line — a zero-span domain maps to the middle of the
-range, so flat data reads as level, not as bottomed-out.
+A `null` means "no measurement here" — the line breaks at the gap and never interpolates across it, so an outage can't
+masquerade as a smooth trend. A single point has no line to draw; it sits centered in the plot, visible as the default
+endpoint dot. An all-equal series renders on the vertical mid-line — a zero-span domain maps to the middle of the range,
+so flat data reads as level, not as bottomed-out.
 
-Past `maxPoints` (default 200) the drawn line decimates to a min/max-preserving
-envelope: every spike keeps its true position and height, gaps stay gaps, and the
-summary, dots, and hover values still come from the raw data — only the path gets
-lighter. Pass `maxPoints={Infinity}` to opt out.
+Past `maxPoints` (default 200) the drawn line decimates to a min/max-preserving envelope: every spike keeps its true
+position and height, gaps stay gaps, and the summary, dots, and hover values still come from the raw data — only the
+path gets lighter. Pass `maxPoints={Infinity}` to opt out.
 
 <LiveDemo
   label="2,000 points"
@@ -136,9 +105,7 @@ lighter. Pass `maxPoints={Infinity}` to opt out.
 />`}
 >
   <Sparkline
-    data={Array.from({ length: 2000 }, (_, i) =>
-      i === 1500 ? 98 : 50 + Math.sin(i / 40) * 24 + ((i * 13) % 7),
-    )}
+    data={Array.from({ length: 2000 }, (_, i) => (i === 1500 ? 98 : 50 + Math.sin(i / 40) * 24 + ((i * 13) % 7)))}
     width={220}
     height={40}
     title="Two thousand points, one spike"
@@ -153,24 +120,21 @@ The same chart, sized for four real contexts.
 
 ## Why this default
 
-A bare line, no dots, no fill, no band — the shape of the series is the whole story until you
-ask for more. Dots and fill are opt-in because at word size they compete with the line for the
-same few pixels; adding them by default would make every sparkline noisier for the common case
-that only needs direction and range. Long series decimate to a min/max-preserving envelope
-rather than a naive stride sample, so a single spike at point 1,500 of 2,000 still shows up —
-silently dropping it would be the more common bug in a naive implementation, and a chart that
-hides its own spikes is dishonest by construction.
+A bare line, no dots, no fill, no band — the shape of the series is the whole story until you ask for more. Dots and
+fill are opt-in because at word size they compete with the line for the same few pixels; adding them by default would
+make every sparkline noisier for the common case that only needs direction and range. Long series decimate to a
+min/max-preserving envelope rather than a naive stride sample, so a single spike at point 1,500 of 2,000 still shows up
+— silently dropping it would be the more common bug in a naive implementation, and a chart that hides its own spikes is
+dishonest by construction.
 
 ## Accessibility
 
-By default the chart is an `img` whose accessible name is generated from the data. The
-example above is announced as:
+By default the chart is an `img` whose accessible name is generated from the data. The example above is announced as:
 
 > Weekly revenue. Trending up 200%. Range 3 to 9. Last value 9.
 
-Pass a `title` to name it, or `summary={false}` to make it decorative when the surrounding
-text already says what it shows. The interactive entry adds a polite live region that reads
-each focused point as you arrow through it.
+Pass a `title` to name it, or `summary={false}` to make it decorative when the surrounding text already says what it
+shows. The interactive entry adds a polite live region that reads each focused point as you arrow through it.
 
 ## Props
 

@@ -1,13 +1,14 @@
 ---
 title: BurnChart
-description: A sprint burndown chart for React — plan vs actual with a dotted, honestly-provisional projection to the deadline and a signed landing gap.
+description:
+  A sprint burndown chart for React — plan vs actual with a dotted, honestly-provisional projection to the deadline and
+  a signed landing gap.
 ---
 
-BurnChart answers "will we finish on time?". It draws the **plan** line (dashed, full length
-to the deadline), the **actual** line to today, and a **dotted projection** whose slope is a
-plain linear fit over the last few actual points — provisional by construction, never a
-smoothed or optimistic curve. The gap label states the signed schedule landing, because
-"will we finish" is a number, not a vibe.
+BurnChart answers "will we finish on time?". It draws the **plan** line (dashed, full length to the deadline), the
+**actual** line to today, and a **dotted projection** whose slope is a plain linear fit over the last few actual points
+— provisional by construction, never a smoothed or optimistic curve. The gap label states the signed schedule landing,
+because "will we finish" is a number, not a vibe.
 
 <LiveDemo
   label="BurnChart"
@@ -40,7 +41,8 @@ smoothed or optimistic curve. The gap label states the signed schedule landing, 
 
 ## When to use it
 
-- **Good for** — a sprint burndown in a tab header, will-we-finish in a KPI card, plan vs actual with a projected landing.
+- **Good for** — a sprint burndown in a tab header, will-we-finish in a KPI card, plan vs actual with a projected
+  landing.
 - **Avoid for** — a single progress number (Progress) or a plain series (Sparkline).
 
 ## Sizing
@@ -94,8 +96,8 @@ smoothed or optimistic curve. The gap label states the signed schedule landing, 
   />
 </LiveDemo>
 
-With a `locale`, both the gap label and the accessible summary's numbers follow that locale's
-own grouping — "2.300" in German, not "2,300".
+With a `locale`, both the gap label and the accessible summary's numbers follow that locale's own grouping — "2.300" in
+German, not "2,300".
 
 ## Edge cases
 
@@ -105,12 +107,7 @@ own grouping — "2.300" in German, not "2,300".
 // summary reports it without a "vs planned" comparison
 <BurnChart data={{ plan: [], actual: [40, 35, 31, 27, 24, 21] }} />`}
 >
-  <BurnChart
-    data={{ plan: [], actual: [40, 35, 31, 27, 24, 21] }}
-    title="No plan recorded"
-    width={220}
-    height={28}
-  />
+  <BurnChart data={{ plan: [], actual: [40, 35, 31, 27, 24, 21] }} title="No plan recorded" width={220} height={28} />
 </LiveDemo>
 
 <LiveDemo
@@ -127,23 +124,14 @@ own grouping — "2.300" in German, not "2,300".
   />
 </LiveDemo>
 
-<LiveDemo
-  label="day one"
-  code={`<BurnChart data={{ plan: [40, 36, 32, 28, 24, 20], actual: [40] }} />`}
->
-  <BurnChart
-    data={{ plan: [40, 36, 32, 28, 24, 20], actual: [40] }}
-    title="Day one"
-    width={220}
-    height={28}
-  />
+<LiveDemo label="day one" code={`<BurnChart data={{ plan: [40, 36, 32, 28, 24, 20], actual: [40] }} />`}>
+  <BurnChart data={{ plan: [40, 36, 32, 28, 24, 20], actual: [40] }} title="Day one" width={220} height={28} />
 </LiveDemo>
 
-With no plan (`plan: []`), the projection still runs — the fitted slope only needs `actual` —
-but there's nothing to compare it to, so the label and summary drop the "vs planned" clause. A
-stalled burn (`actual` flat) never reaches zero, so `finishes` is `false` and the summary states
-that plainly rather than extrapolating a fake landing. A single `actual` point draws no
-projection at all (the fit needs at least two).
+With no plan (`plan: []`), the projection still runs — the fitted slope only needs `actual` — but there's nothing to
+compare it to, so the label and summary drop the "vs planned" clause. A stalled burn (`actual` flat) never reaches zero,
+so `finishes` is `false` and the summary states that plainly rather than extrapolating a fake landing. A single `actual`
+point draws no projection at all (the fit needs at least two).
 
 ## Four homes
 
@@ -151,19 +139,16 @@ projection at all (the fit needs at least two).
 
 ## Why this default
 
-The gap label, because "will we finish" is a number, not a vibe. History is drawn solid and
-exact; the projection is dotted, muted, and computed as a linear fit over the last
-`max(2, ⌈actual/3⌉)` actual points — a stated method, never an optimistic hand-drawn curve.
-When the recent burn flattens, the projection never reaches zero and the summary says so
-outright ("not finishing at the current pace"), rather than implying a landing that isn't
-coming.
+The gap label, because "will we finish" is a number, not a vibe. History is drawn solid and exact; the projection is
+dotted, muted, and computed as a linear fit over the last `max(2, ⌈actual/3⌉)` actual points — a stated method, never an
+optimistic hand-drawn curve. When the recent burn flattens, the projection never reaches zero and the summary says so
+outright ("not finishing at the current pace"), rather than implying a landing that isn't coming.
 
 ## Accessibility
 
-The accessible name states progress against the plan and the projected landing — **"6 of 11
-days in: 21 points remain vs 20 planned — projected to finish 2 days late."**. The interactive
-entry steps the days; history announces actual vs plan, and the dotted region announces the
-projection.
+The accessible name states progress against the plan and the projected landing — **"6 of 11 days in: 21 points remain vs
+20 planned — projected to finish 2 days late."**. The interactive entry steps the days; history announces actual vs
+plan, and the dotted region announces the projection.
 
 ## Props
 

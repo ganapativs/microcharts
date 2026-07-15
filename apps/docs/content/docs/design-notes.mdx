@@ -1,107 +1,98 @@
 ---
 title: Design notes
-description: The reasoning behind microcharts' defaults — direct labels over chrome, static-first architecture, one grammar, summaries as a first-class feature, budgets as build gates, and a strict bar for admitting a new chart type.
+description:
+  The reasoning behind microcharts' defaults — direct labels over chrome, static-first architecture, one grammar,
+  summaries as a first-class feature, budgets as build gates, and a strict bar for admitting a new chart type.
 ---
 
-microcharts has opinions, and they're baked into the defaults so you rarely have to think about
-them. Here's the reasoning behind the ones that shaped the library, in case you're curious.
+microcharts has opinions, and they're baked into the defaults so you rarely have to think about them. Here's the
+reasoning behind the ones that shaped the library, in case you're curious.
 
 ## Direct labels beat chrome
 
-At this size, an axis, a legend, and a gridline all cost more ink than they return — so there
-are none. A value sits at the end of the line; a min and max mark themselves. The chart is
-almost all data, which is exactly what you want a reader to spend their attention on.
+At this size, an axis, a legend, and a gridline all cost more ink than they return — so there are none. A value sits at
+the end of the line; a min and max mark themselves. The chart is almost all data, which is exactly what you want a
+reader to spend their attention on.
 
 ## Areas anchor at zero
 
-A filled Sparkline always measures from zero, because an area floating on an arbitrary baseline
-exaggerates change. Length should mean magnitude, honestly — the chart never says more than the
-numbers do.
+A filled Sparkline always measures from zero, because an area floating on an arbitrary baseline exaggerates change.
+Length should mean magnitude, honestly — the chart never says more than the numbers do.
 
 ## Color encodes, never decorates
 
-There's one accent per context, and a color change always means a change in meaning. Positive
-and negative come from a color-blind-safe pair, and they're always doubled by a glyph or a
-position, so the chart survives with no color at all. A preset can restyle a chart without ever
-changing what it says.
+There's one accent per context, and a color change always means a change in meaning. Positive and negative come from a
+color-blind-safe pair, and they're always doubled by a glyph or a position, so the chart survives with no color at all.
+A preset can restyle a chart without ever changing what it says.
 
 ## Static first, interactivity opt-in
 
-Nearly every chart ships as two entries (WindBarb is static-only). The default is pure SVG — hook-free, listener-free, safe
-inside a React Server Component, and it renders to HTML with zero client JavaScript. Hover,
-keyboard navigation, and live announcements live in a separate `/interactive` subpath you import
-only where you need them. The line between the two is never blurred, so you never pay for
-interactivity you didn't ask for, and a static chart can never accidentally drag a listener into
-your server bundle.
+Nearly every chart ships as two entries (WindBarb is static-only). The default is pure SVG — hook-free, listener-free,
+safe inside a React Server Component, and it renders to HTML with zero client JavaScript. Hover, keyboard navigation,
+and live announcements live in a separate `/interactive` subpath you import only where you need them. The line between
+the two is never blurred, so you never pay for interactivity you didn't ask for, and a static chart can never
+accidentally drag a listener into your server bundle.
 
 ## One grammar, not an options bag
 
-`data` alone always renders something correct. A prop name means the same thing on every chart —
-`title`, `color`, `domain`, `format`, `summary` — so what you learn on one chart transfers to
-all of them. Variants are props; a genuinely different data shape is a different component rather
-than a deeper options object. Annotations — a threshold, a target zone, a marker — are children
-you nest, not configuration you pass. The result is an API you can mostly guess.
+`data` alone always renders something correct. A prop name means the same thing on every chart — `title`, `color`,
+`domain`, `format`, `summary` — so what you learn on one chart transfers to all of them. Variants are props; a genuinely
+different data shape is a different component rather than a deeper options object. Annotations — a threshold, a target
+zone, a marker — are children you nest, not configuration you pass. The result is an API you can mostly guess.
 
 ## Summaries are a feature, not an afterthought
 
-The natural-language sentence each chart generates from its data is the product, not a
-compliance checkbox. It's the accessible name a screen reader speaks, the text a crawler
-indexes, and the string a model can quote — one deterministic sentence doing all three jobs. It
-degrades honestly on empty, single, and flat data instead of describing a chart that isn't
-there. See [Accessibility](/docs/accessibility) for the details.
+The natural-language sentence each chart generates from its data is the product, not a compliance checkbox. It's the
+accessible name a screen reader speaks, the text a crawler indexes, and the string a model can quote — one deterministic
+sentence doing all three jobs. It degrades honestly on empty, single, and flat data instead of describing a chart that
+isn't there. See [Accessibility](/docs/accessibility) for the details.
 
 ## Small is a material, not a limit
 
-Composition, contrast, and the auto-summary all have to survive the smallest supported size.
-That constraint is what makes the charts calm: there's no room for anything that isn't carrying
-information, so nothing decorative gets in.
+Composition, contrast, and the auto-summary all have to survive the smallest supported size. That constraint is what
+makes the charts calm: there's no room for anything that isn't carrying information, so nothing decorative gets in.
 
 ## Motion lives in the interactive build, not on every chart
 
-Static charts don't move at all — there's nothing to animate and no `animate` prop to pass. Only
-the `/interactive` entries can play an entrance, and only when you opt in with `animate`
-(off by default). It runs through CSS, gated on `prefers-reduced-motion`. Every entrance follows
-the logic of the data it draws: a line draws left-to-right along its time axis, bars grow from the
-baseline, a donut fills clockwise from twelve o'clock, and labels arrive last — they annotate marks
-that already exist. Marks decelerate into place; they never bounce, loop, or draw the eye away from
-the data. Motion is a property of the interactive build, not a knob bolted onto the static one, so
-it can't leak into a server render or turn into decoration.
+Static charts don't move at all — there's nothing to animate and no `animate` prop to pass. Only the `/interactive`
+entries can play an entrance, and only when you opt in with `animate` (off by default). It runs through CSS, gated on
+`prefers-reduced-motion`. Every entrance follows the logic of the data it draws: a line draws left-to-right along its
+time axis, bars grow from the baseline, a donut fills clockwise from twelve o'clock, and labels arrive last — they
+annotate marks that already exist. Marks decelerate into place; they never bounce, loop, or draw the eye away from the
+data. Motion is a property of the interactive build, not a knob bolted onto the static one, so it can't leak into a
+server render or turn into decoration.
 
 ## Budgets are build gates
 
-Size and speed aren't aspirations here — they're CI gates. A chart that grows past its gzip
-budget or drops below its render floor fails the build, the same way a failing test does. The
-numbers on the [Performance](/docs/performance) page are regenerated from the real build on
-every release, so they can't quietly rot.
+Size and speed aren't aspirations here — they're CI gates. A chart that grows past its gzip budget or drops below its
+render floor fails the build, the same way a failing test does. The numbers on the [Performance](/docs/performance) page
+are regenerated from the real build on every release, so they can't quietly rot.
 
 ## One package
 
-All the chart types ship from a single package, `@microcharts/react`, each behind its own
-subpath so you only bundle what you import. The catalog's collections — core, decision,
-expressive, frontier — are just metadata for browsing; they're never package or import
-boundaries. There's no plugin to install, no engine to configure.
+All the chart types ship from a single package, `@microcharts/react`, each behind its own subpath so you only bundle
+what you import. The catalog's collections — core, decision, expressive, frontier — are just metadata for browsing;
+they're never package or import boundaries. There's no plugin to install, no engine to configure.
 
-The root barrel (`@microcharts/react`, no subpath) carries only the shared pieces, so importing
-it pulls in no chart code: the `Chart` root wrapper every chart composes — a `role="img"` `<svg>`
-with the viewBox, `title`, and generated `summary` already wired, there if you ever need to build
-a custom mark — plus [`SparkGroup`](/docs/composition#small-multiples-one-shared-scale) for
-shared-scale small multiples, [`MicroProvider`](/docs/theming#a-component-api-if-you-prefer) for
-theming, and the `describeSeries` / `makeFormatter` / `EN` helpers documented under
-[Formatting](/docs/formatting) and [Accessibility](/docs/accessibility).
+The root barrel (`@microcharts/react`, no subpath) carries only the shared pieces, so importing it pulls in no chart
+code: the `Chart` root wrapper every chart composes — a `role="img"` `<svg>` with the viewBox, `title`, and generated
+`summary` already wired, there if you ever need to build a custom mark — plus
+[`SparkGroup`](/docs/composition#small-multiples-one-shared-scale) for shared-scale small multiples,
+[`MicroProvider`](/docs/theming#a-component-api-if-you-prefer) for theming, and the `describeSeries` / `makeFormatter` /
+`EN` helpers documented under [Formatting](/docs/formatting) and [Accessibility](/docs/accessibility).
 
 ## The bar for a new chart type
 
-A new chart earns its place only if it clears a real bar: it reads at word size (roughly
-200×60 px), it tells a data story the catalog can't already tell well, it has one honest primary
-encoding channel, and a first-time reader can read it back without training. "It looks cool"
-isn't a reason. This is why the catalog prefers uncommon _questions_ over uncommon _shapes_.
+A new chart earns its place only if it clears a real bar: it reads at word size (roughly 200×60 px), it tells a data
+story the catalog can't already tell well, it has one honest primary encoding channel, and a first-time reader can read
+it back without training. "It looks cool" isn't a reason. This is why the catalog prefers uncommon _questions_ over
+uncommon _shapes_.
 
 ## What we don't ship
 
-No pie, no needle gauge, no battery, no waffle, no violin, no 3-D, no gradients-as-decoration, no
-drop shadows on data, no looping animation. These aren't theme options you can switch on — they're
-designed out, because at a glance they mislead more than they inform. Where a rejected chart
-answered a real question, the catalog ships a faster replacement: [Bullet](/docs/charts/bullet) or
-[TapeGauge](/docs/charts/tape-gauge) instead of a speedometer, [SegmentedBar](/docs/charts/segmented-bar)
-for comparative part-to-whole, [MicroDonut](/docs/charts/micro-donut) as a capped icon-size mix when a
-glyph is specifically wanted, [MicroBox](/docs/charts/micro-box) instead of a violin.
+No pie, no needle gauge, no battery, no waffle, no violin, no 3-D, no gradients-as-decoration, no drop shadows on data,
+no looping animation. These aren't theme options you can switch on — they're designed out, because at a glance they
+mislead more than they inform. Where a rejected chart answered a real question, the catalog ships a faster replacement:
+[Bullet](/docs/charts/bullet) or [TapeGauge](/docs/charts/tape-gauge) instead of a speedometer,
+[SegmentedBar](/docs/charts/segmented-bar) for comparative part-to-whole, [MicroDonut](/docs/charts/micro-donut) as a
+capped icon-size mix when a glyph is specifically wanted, [MicroBox](/docs/charts/micro-box) instead of a violin.

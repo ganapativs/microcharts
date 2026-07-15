@@ -3,10 +3,9 @@ title: Slope
 description: A slope chart for React — who rose and who fell between two moments, crossings readable at a glance.
 ---
 
-Slope answers "who rose and who fell between two moments — and did the order change?".
-Lines stay neutral until you declare `positive`: a rank change is not automatically good
-or bad. Both columns share one y-domain — per-column normalization would fake
-convergence.
+Slope answers "who rose and who fell between two moments — and did the order change?". Lines stay neutral until you
+declare `positive`: a rank change is not automatically good or bad. Both columns share one y-domain — per-column
+normalization would fake convergence.
 
 <LiveDemo
   label="Slope"
@@ -139,10 +138,9 @@ convergence.
   />
 </LiveDemo>
 
-A row missing one side (`from` or `to` as `NaN`) draws a short dashed stub toward the end it
-does have, rather than a full line — there's no second point to connect to, so nothing is
-interpolated. With a `locale`, both column labels and the announced values follow that
-locale's own grouping.
+A row missing one side (`from` or `to` as `NaN`) draws a short dashed stub toward the end it does have, rather than a
+full line — there's no second point to connect to, so nothing is interpolated. With a `locale`, both column labels and
+the announced values follow that locale's own grouping.
 
 ## Four homes
 
@@ -150,18 +148,16 @@ locale's own grouping.
 
 ## Why this default
 
-A two-point line implies nothing about the path between — the docs steer to Sparkline
-when the journey matters. End labels drop deterministically twice over: when rows are too
-dense (count × height) and when endpoints collide within a font-height (greedy per-column
-dedup) — pure arithmetic, nothing measured. A missing end renders a dashed stub and is
+A two-point line implies nothing about the path between — the docs steer to Sparkline when the journey matters. End
+labels drop deterministically twice over: when rows are too dense (count × height) and when endpoints collide within a
+font-height (greedy per-column dedup) — pure arithmetic, nothing measured. A missing end renders a dashed stub and is
 announced "incomplete", never interpolated.
 
 ## Accessibility
 
-The accessible name counts directions and leads with the biggest mover — **"3 categories:
-2 up, 1 down. Largest change West, down 25%."** The interactive entry finds the nearest line
-under the pointer and roves categories ordered by their after-value, announcing each
-slope (**"East: 40 to 47, up 18%."**).
+The accessible name counts directions and leads with the biggest mover — **"3 categories: 2 up, 1 down. Largest change
+West, down 25%."** The interactive entry finds the nearest line under the pointer and roves categories ordered by their
+after-value, announcing each slope (**"East: 40 to 47, up 18%."**).
 
 ## Props
 

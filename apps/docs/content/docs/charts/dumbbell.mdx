@@ -1,18 +1,14 @@
 ---
 title: Dumbbell
-description: A dumbbell chart for React — where each row started and ended, hollow-to-filled direction with no legend needed.
+description:
+  A dumbbell chart for React — where each row started and ended, hollow-to-filled direction with no legend needed.
 ---
 
-Dumbbell answers "where did each row start and end?". The hollow dot is _before_, the
-filled dot is _after_ — direction is shape-coded, so it never relies on color alone.
-With `positive` the connector takes the valence token by direction.
+Dumbbell answers "where did each row start and end?". The hollow dot is _before_, the filled dot is _after_ — direction
+is shape-coded, so it never relies on color alone. With `positive` the connector takes the valence token by direction.
 
 <LiveDemo label="Dumbbell" sizeOf="dumbbell">
-  <Dumbbell
-    data={[{ from: 62000, to: 84000 }]}
-    title="Band move"
-    style={{ width: 200, height: 28 }}
-  />
+  <Dumbbell data={[{ from: 62000, to: 84000 }]} title="Band move" style={{ width: 200, height: 28 }} />
 </LiveDemo>
 
 ## Install
@@ -26,8 +22,7 @@ With `positive` the connector takes the valence token by direction.
 ## When to use it
 
 - **Good for** — salary bands, before/after per table row, ranges.
-- **Avoid for** — many categories where crossings matter (Slope) or the path between
-  (Sparkline).
+- **Avoid for** — many categories where crossings matter (Slope) or the path between (Sparkline).
 
 ## Sizing
 
@@ -56,10 +51,7 @@ With `positive` the connector takes the valence token by direction.
   />
 </LiveDemo>
 
-<LiveDemo
-  label="values"
-  code={`<Dumbbell data={[{ from: 40, to: 60 }]} label="value" domain={[0, 100]} />`}
->
+<LiveDemo label="values" code={`<Dumbbell data={[{ from: 40, to: 60 }]} label="value" domain={[0, 100]} />`}>
   <Dumbbell
     data={[{ from: 40, to: 60 }]}
     label="value"
@@ -79,9 +71,9 @@ With `positive` the connector takes the valence token by direction.
   <Dumbbell data={[{ from: 55, to: 55 }]} title="Flat" style={{ width: 200, height: 24 }} />
 </LiveDemo>
 
-When a row's `from` equals its `to`, the connector is dropped and only one filled dot is drawn —
-never a hollow-and-filled pair sitting on top of each other pretending to be two points. The
-summary says **"No change at 55."** for a single row.
+When a row's `from` equals its `to`, the connector is dropped and only one filled dot is drawn — never a
+hollow-and-filled pair sitting on top of each other pretending to be two points. The summary says **"No change at 55."**
+for a single row.
 
 ## Four homes
 
@@ -89,17 +81,15 @@ summary says **"No change at 55."** for a single row.
 
 ## Why this default
 
-Hollow → filled reads as before → after without a legend, and renders identically
-whichever way the data runs — direction comes from the values, not the array order. For
-_ranges_ (min→max, confidence spans) the docs require dropping `positive`: a range has
-no valence, and coloring it green or red would invent one.
+Hollow → filled reads as before → after without a legend, and renders identically whichever way the data runs —
+direction comes from the values, not the array order. For _ranges_ (min→max, confidence spans) the docs require dropping
+`positive`: a range has no valence, and coloring it green or red would invent one.
 
 ## Accessibility
 
-Single row: **"From 62,000 to 84,000, up 35%."**; a degenerate pair says **"No change at
-62,000."**; multi-row leads with the largest change (**"2 rows. Largest change Berlin,
-up 42%."**). The interactive entry roves rows with ↑/↓ and inspects either end with ←/→
-("From: 48." / "To: 68.").
+Single row: **"From 62,000 to 84,000, up 35%."**; a degenerate pair says **"No change at 62,000."**; multi-row leads
+with the largest change (**"2 rows. Largest change Berlin, up 42%."**). The interactive entry roves rows with ↑/↓ and
+inspects either end with ←/→ ("From: 48." / "To: 68.").
 
 ## Props
 

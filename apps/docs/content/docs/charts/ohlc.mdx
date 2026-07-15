@@ -1,23 +1,21 @@
 ---
 title: Ohlc
-description: A word-sized OHLC/candlestick chart for React — per-period price action in a table cell, capped at 20 periods, never averaged.
+description:
+  A word-sized OHLC/candlestick chart for React — per-period price action in a table cell, capped at 20 periods, never
+  averaged.
 ---
 
-Ohlc answers "what was the price action per period?" — open, high, low, close, in a
-cell. Direction is encoded by valence color AND body geometry, never color alone.
+Ohlc answers "what was the price action per period?" — open, high, low, close, in a cell. Direction is encoded by
+valence color AND body geometry, never color alone.
 
 <LiveDemo
   label="Ohlc"
   sizeOf="ohlc"
   code={`import { Ohlc } from "@microcharts/react/ohlc";
 
-const sessions = [
-{ open: 140.1, high: 143.4, low: 137.2, close: 142.3 },
-{ open: 142.6, high: 146.8, low: 141.0, close: 144.9 },
-{ open: 144.5, high: 145.2, low: 140.1, close: 141.4 },
-{ open: 141.1, high: 144.7, low: 139.5, close: 143.8 },
-{ open: 143.9, high: 148.2, low: 142.8, close: 147.5 },
-{ open: 147.2, high: 149.9, low: 144.6, close: 145.9 },
+const sessions = [ { open: 140.1, high: 143.4, low: 137.2, close: 142.3 }, { open: 142.6, high: 146.8, low: 141.0,
+close: 144.9 }, { open: 144.5, high: 145.2, low: 140.1, close: 141.4 }, { open: 141.1, high: 144.7, low: 139.5, close:
+143.8 }, { open: 143.9, high: 148.2, low: 142.8, close: 147.5 }, { open: 147.2, high: 149.9, low: 144.6, close: 145.9 },
 ];
 
 <Ohlc data={sessions} title="ACME sessions" />`}
@@ -132,16 +130,8 @@ const sessions = [
   />
 </LiveDemo>
 
-<LiveDemo
-  label="single period"
-  code={`<Ohlc data={[{ open: 100, high: 104, low: 97, close: 103 }]} />`}
->
-  <Ohlc
-    data={[{ open: 100, high: 104, low: 97, close: 103 }]}
-    title="Single period"
-    width={60}
-    height={26}
-  />
+<LiveDemo label="single period" code={`<Ohlc data={[{ open: 100, high: 104, low: 97, close: 103 }]} />`}>
+  <Ohlc data={[{ open: 100, high: 104, low: 97, close: 103 }]} title="Single period" width={60} height={26} />
 </LiveDemo>
 
 ## Four homes
@@ -150,15 +140,13 @@ const sessions = [
 
 ## Why this default
 
-`maxPeriods` renders the most recent N sessions and warns in development past it — data
-is truncated visibly, never averaged into fake candles. Bodies keep a minimum 1-unit
-height so doji sessions stay visible.
+`maxPeriods` renders the most recent N sessions and warns in development past it — data is truncated visibly, never
+averaged into fake candles. Bodies keep a minimum 1-unit height so doji sessions stay visible.
 
 ## Accessibility
 
-The accessible name is the run read — **"20 periods. Last close 150.3, up 7.4%; range
-136.4 to 156."** The interactive entry announces each session's four prices (**"Period
-18 of 20: open 145.6, high 150.6, low 141.6, close 144.1."**).
+The accessible name is the run read — **"20 periods. Last close 150.3, up 7.4%; range 136.4 to 156."** The interactive
+entry announces each session's four prices (**"Period 18 of 20: open 145.6, high 150.6, low 141.6, close 144.1."**).
 
 ## Props
 

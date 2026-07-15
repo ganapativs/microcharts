@@ -1,12 +1,14 @@
 ---
 title: RubricStrip
-description: A weighted scorecard for React — bar length is the score, bar thickness is the criterion's weight, and there is deliberately no composite total.
+description:
+  A weighted scorecard for React — bar length is the score, bar thickness is the criterion's weight, and there is
+  deliberately no composite total.
 ---
 
-RubricStrip answers "how did this thing score per criterion — with each criterion's importance
-visible — without a fake composite number?". Each bar's length is its score and its thickness is
-its weight share, so the things that matter most are literally the biggest marks. There is no total
-bar, and none may be added — the type exists to resist collapsing quality into one number.
+RubricStrip answers "how did this thing score per criterion — with each criterion's importance visible — without a fake
+composite number?". Each bar's length is its score and its thickness is its weight share, so the things that matter most
+are literally the biggest marks. There is no total bar, and none may be added — the type exists to resist collapsing
+quality into one number.
 
 <LiveDemo
   label="RubricStrip"
@@ -89,24 +91,11 @@ bar, and none may be added — the type exists to resist collapsing quality into
 // overflowing the track
 <RubricStrip data={[{ label: "Bonus", score: 2, weight: 1 }]} />`}
 >
-  <RubricStrip
-    data={[{ label: "Bonus", score: 2, weight: 1 }]}
-    title="Clamped"
-    width={200}
-    height={16}
-  />
+  <RubricStrip data={[{ label: "Bonus", score: 2, weight: 1 }]} title="Clamped" width={200} height={16} />
 </LiveDemo>
 
-<LiveDemo
-  label="one criterion"
-  code={`<RubricStrip data={[{ label: "Overall fit", score: 0.83 }]} />`}
->
-  <RubricStrip
-    data={[{ label: "Overall fit", score: 0.83 }]}
-    title="Single criterion"
-    width={200}
-    height={16}
-  />
+<LiveDemo label="one criterion" code={`<RubricStrip data={[{ label: "Overall fit", score: 0.83 }]} />`}>
+  <RubricStrip data={[{ label: "Overall fit", score: 0.83 }]} title="Single criterion" width={200} height={16} />
 </LiveDemo>
 
 ## Four homes
@@ -115,16 +104,16 @@ bar, and none may be added — the type exists to resist collapsing quality into
 
 ## Why this default
 
-Weight-as-thickness keeps "importance" visible where a table hides it — a light criterion that
-scores well can't visually outweigh a heavy one that scores poorly. The summary names the extremes,
-never a weighted average, because the whole point is that a single number throws away the structure.
-A `target` draws one honest pass line across every row instead.
+Weight-as-thickness keeps "importance" visible where a table hides it — a light criterion that scores well can't
+visually outweigh a heavy one that scores poorly. The summary names the extremes, never a weighted average, because the
+whole point is that a single number throws away the structure. A `target` draws one honest pass line across every row
+instead.
 
 ## Accessibility
 
-The accessible name names the extremes — **"4 criteria; highest Correctness (0.92), lowest Style
-(0.41)."** The interactive entry roves the criteria, announcing each one's score and its weight
-share of the total (**"Coverage: 0.78, weight 29% of total."**).
+The accessible name names the extremes — **"4 criteria; highest Correctness (0.92), lowest Style (0.41)."** The
+interactive entry roves the criteria, announcing each one's score and its weight share of the total (**"Coverage: 0.78,
+weight 29% of total."**).
 
 ## Props
 

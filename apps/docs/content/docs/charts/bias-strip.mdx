@@ -1,26 +1,21 @@
 ---
 title: BiasStrip
-description: A word-sized Bland–Altman plot for React — the systematic offset between two ways of measuring the same thing, with honest limits of agreement.
+description:
+  A word-sized Bland–Altman plot for React — the systematic offset between two ways of measuring the same thing, with
+  honest limits of agreement.
 ---
 
-BiasStrip answers "do two ways of measuring the same thing systematically disagree?" — the
-agreement story a scatter can't tell. Each dot is one pair placed at its mean and its
-difference; the dashed line is perfect agreement, the accent line is the measured bias, and
-the faint band is the limits of agreement. Dots render at 75% opacity so overplot reads as
-density, and pairs beyond the limits are enlarged and re-inked so outliers read on shape,
-not color alone.
+BiasStrip answers "do two ways of measuring the same thing systematically disagree?" — the agreement story a scatter
+can't tell. Each dot is one pair placed at its mean and its difference; the dashed line is perfect agreement, the accent
+line is the measured bias, and the faint band is the limits of agreement. Dots render at 75% opacity so overplot reads
+as density, and pairs beyond the limits are enlarged and re-inked so outliers read on shape, not color alone.
 
 <LiveDemo label="BiasStrip" sizeOf="bias-strip">
   <span className="text-lg">
     {"Device and reference "}
     <BiasStrip
       data={Array.from({ length: 20 }, (_, i) => ({
-        a:
-          i +
-          [
-            1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5,
-            1.6, 2.7, 2.0,
-          ][i],
+        a: i + [1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6, 2.7, 2.0][i],
         b: i,
       }))}
       title="Device vs reference"
@@ -40,12 +35,13 @@ not color alone.
 
 ## When to use it
 
-- **Good for** — checking whether a new instrument, method, or model agrees with a reference; instrument drift in a KPI card.
+- **Good for** — checking whether a new instrument, method, or model agrees with a reference; instrument drift in a KPI
+  card.
 - **Avoid for** — unpaired samples (use MicroScatter) or a single time series (Sparkline).
 
-A correlation plot answers "do these move together?" — but two methods can correlate perfectly
-and still disagree by a constant offset. BiasStrip is built for that offset: it plots the
-difference, so a bias jumps off the zero line where a scatter would hide it on the diagonal.
+A correlation plot answers "do these move together?" — but two methods can correlate perfectly and still disagree by a
+constant offset. BiasStrip is built for that offset: it plots the difference, so a bias jumps off the zero line where a
+scatter would hide it on the diagonal.
 
 ## Sizing
 
@@ -60,12 +56,7 @@ difference, so a bias jumps off the zero line where a scatter would hide it on t
 >
   <BiasStrip
     data={Array.from({ length: 20 }, (_, i) => ({
-      a:
-        i +
-        [
-          1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6,
-          2.7, 2.0,
-        ][i],
+      a: i + [1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6, 2.7, 2.0][i],
       b: i,
     }))}
     limits={2.58}
@@ -77,12 +68,7 @@ difference, so a bias jumps off the zero line where a scatter would hide it on t
 <LiveDemo label="no caption" code={`<BiasStrip data={pairs} label="none" />`}>
   <BiasStrip
     data={Array.from({ length: 20 }, (_, i) => ({
-      a:
-        i +
-        [
-          1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6,
-          2.7, 2.0,
-        ][i],
+      a: i + [1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6, 2.7, 2.0][i],
       b: i,
     }))}
     label="none"
@@ -94,12 +80,7 @@ difference, so a bias jumps off the zero line where a scatter would hide it on t
 <LiveDemo label="bigger dots" code={`<BiasStrip data={pairs} r={2.5} />`}>
   <BiasStrip
     data={Array.from({ length: 20 }, (_, i) => ({
-      a:
-        i +
-        [
-          1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6,
-          2.7, 2.0,
-        ][i],
+      a: i + [1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6, 2.7, 2.0][i],
       b: i,
     }))}
     r={2.5}
@@ -148,13 +129,12 @@ difference, so a bias jumps off the zero line where a scatter would hide it on t
   />
 </LiveDemo>
 
-Empty data draws just the frame with "No data." as the summary. Under 5 pairs the limits
-aren't meaningful, so the band and bias line drop out and only the dots and the zero
-reference remain — the mean difference is still stated in the summary. When the two methods
-agree perfectly the band collapses to a hair around the zero line rather than vanishing, so
-"nothing to see" still reads as a deliberate, measured result. Pairs with a non-finite value
-are dropped before the stats and the count; past 40 pairs the dots are uniformly downsampled for display while
-the bias and limits still use every pair.
+Empty data draws just the frame with "No data." as the summary. Under 5 pairs the limits aren't meaningful, so the band
+and bias line drop out and only the dots and the zero reference remain — the mean difference is still stated in the
+summary. When the two methods agree perfectly the band collapses to a hair around the zero line rather than vanishing,
+so "nothing to see" still reads as a deliberate, measured result. Pairs with a non-finite value are dropped before the
+stats and the count; past 40 pairs the dots are uniformly downsampled for display while the bias and limits still use
+every pair.
 
 ## Four homes
 
@@ -162,21 +142,18 @@ the bias and limits still use every pair.
 
 ## Why this default
 
-The y-axis is symmetric about zero so perfect agreement is always the visual center: a
-systematic offset then reads as the whole cloud drifting up or down, which is exactly the
-decision the chart exists to surface. The band is the classic ±1.96σ limits of agreement,
-and `limits` widens or tightens it (2.58 for ~99%) without ever redefining what the marks
-mean. Under five pairs the chart makes no interval claim at all — too little evidence to
-draw one honestly.
+The y-axis is symmetric about zero so perfect agreement is always the visual center: a systematic offset then reads as
+the whole cloud drifting up or down, which is exactly the decision the chart exists to surface. The band is the classic
+±1.96σ limits of agreement, and `limits` widens or tightens it (2.58 for ~99%) without ever redefining what the marks
+mean. Under five pairs the chart makes no interval claim at all — too little evidence to draw one honestly.
 
 ## Accessibility
 
-The accessible name is the bias plus the evidence-backed agreement share — **"Bias +2.21
-across 20 pairs; 90% within the limits of agreement."** — or the shorter **"Bias +2 across 4
-pairs."** when there are too few pairs to draw limits. Localizing carries the number format
-through: with `locale="de-DE"` the same chart reads **"Bias +2,21 across 20 pairs; 90%
-within the limits of agreement."** The interactive entry steps pairs ordered by mean and
-announces each pair's mean, difference, and whether it clears the limits.
+The accessible name is the bias plus the evidence-backed agreement share — **"Bias +2.21 across 20 pairs; 90% within the
+limits of agreement."** — or the shorter **"Bias +2 across 4 pairs."** when there are too few pairs to draw limits.
+Localizing carries the number format through: with `locale="de-DE"` the same chart reads **"Bias +2,21 across 20 pairs;
+90% within the limits of agreement."** The interactive entry steps pairs ordered by mean and announces each pair's mean,
+difference, and whether it clears the limits.
 
 ## Props
 

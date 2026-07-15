@@ -1,13 +1,14 @@
 ---
 title: SproutRow
-description: A sprout-row chart for React — an ordinal growth-stage glyph per item, seed to bloom, with height strictly monotonic so the ordering reads untrained.
+description:
+  A sprout-row chart for React — an ordinal growth-stage glyph per item, seed to bloom, with height strictly monotonic
+  so the ordering reads untrained.
 ---
 
-SproutRow answers "how mature or healthy is each item in a small set?" Each item is one of four
-growth stages — **seed → sprout → leaf → bloom** — and the glyph height is strictly monotonic, so
-taller always means further along and the ordering reads without the legend. The stages are discrete
-and there are exactly four; there are no half-stages, because a growth metaphor must not fake
-continuity.
+SproutRow answers "how mature or healthy is each item in a small set?" Each item is one of four growth stages — **seed →
+sprout → leaf → bloom** — and the glyph height is strictly monotonic, so taller always means further along and the
+ordering reads without the legend. The stages are discrete and there are exactly four; there are no half-stages, because
+a growth metaphor must not fake continuity.
 
 <LiveDemo label="SproutRow" sizeOf="sprout-row">
   <SproutRow
@@ -38,7 +39,8 @@ The key, shown once: **seed → sprout → leaf → bloom**.
 
 ## When to use it
 
-- **Good for** — account or project maturity across a small set, a health column in a portfolio table, or per-item lifecycle in a KPI card.
+- **Good for** — account or project maturity across a small set, a health column in a portfolio table, or per-item
+  lifecycle in a KPI card.
 - **Avoid for** — continuous values (MiniBar), trends (Sparkline), or more than about twelve items.
 
 ## Sizing
@@ -112,10 +114,9 @@ The key, shown once: **seed → sprout → leaf → bloom**.
   />
 </LiveDemo>
 
-Empty data draws just the frame. A `null` value renders only the soil tick — visibly
-distinct from a seed, which is stage 0 and gets its own glyph. Values outside `[0, 3]`
-round and clamp to the nearest real stage (seed or bloom) rather than drawing an
-out-of-bounds or fractional glyph.
+Empty data draws just the frame. A `null` value renders only the soil tick — visibly distinct from a seed, which is
+stage 0 and gets its own glyph. Values outside `[0, 3]` round and clamp to the nearest real stage (seed or bloom) rather
+than drawing an out-of-bounds or fractional glyph.
 
 ## Four homes
 
@@ -123,18 +124,17 @@ out-of-bounds or fractional glyph.
 
 ## Why this default
 
-Labels are off by default because the row usually sits beside its own row label, and at micro scale
-the glyphs alone carry the ordering. The one-line key — seed → sprout → leaf → bloom — appears once
-above the demos, and after that the height does the work. A `null` value is a real gap: it draws only
-the soil tick, distinct from a seed, because "no data yet" is not "just planted". Presets recolor the
-glyphs but never reshape a stage; the four stages are fixed and never interpolated.
+Labels are off by default because the row usually sits beside its own row label, and at micro scale the glyphs alone
+carry the ordering. The one-line key — seed → sprout → leaf → bloom — appears once above the demos, and after that the
+height does the work. A `null` value is a real gap: it draws only the soil tick, distinct from a seed, because "no data
+yet" is not "just planted". Presets recolor the glyphs but never reshape a stage; the four stages are fixed and never
+interpolated.
 
 ## Accessibility
 
-The accessible name summarizes the row — **"6 items; 2 at bloom, 1 at seed."** The interactive
-entry roves the items with ←/→ (or hover), announcing each as **"Acme: bloom, stage 4 of 4."** — the
-stage name plus a 1-of-4 index — and reads "…: no data." for a missing item. A ring lifts the focused
-glyph.
+The accessible name summarizes the row — **"6 items; 2 at bloom, 1 at seed."** The interactive entry roves the items
+with ←/→ (or hover), announcing each as **"Acme: bloom, stage 4 of 4."** — the stage name plus a 1-of-4 index — and
+reads "…: no data." for a missing item. A ring lifts the focused glyph.
 
 ## Props
 

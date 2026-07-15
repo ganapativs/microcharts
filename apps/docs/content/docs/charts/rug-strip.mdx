@@ -1,12 +1,13 @@
 ---
 title: RugStrip
-description: A rug plot for React — every raw observation as a tick, density by ink accumulation, with a marked value for "you are here".
+description:
+  A rug plot for React — every raw observation as a tick, density by ink accumulation, with a marked value for "you are
+  here".
 ---
 
-RugStrip answers "where do the raw observations actually sit?". Every tick is one real
-observation — no binning, no jitter, no thinning. Stacked duplicates darken (tiered
-opacity), and `markValue` tells the chart's strongest single story: one raw value against
-the field.
+RugStrip answers "where do the raw observations actually sit?". Every tick is one real observation — no binning, no
+jitter, no thinning. Stacked duplicates darken (tiered opacity), and `markValue` tells the chart's strongest single
+story: one raw value against the field.
 
 <LiveDemo
   label="RugStrip"
@@ -37,10 +38,9 @@ the field.
 
 ## When to use it
 
-- **Good for** — "you are here" in a pay band, raw spread beside a stat, margin
-  composition under a Sparkline.
-- **Avoid for** — more than ~400 observations (a rug promises raw marks and never
-  downsamples; use HistogramStrip) or trends over time (Sparkline).
+- **Good for** — "you are here" in a pay band, raw spread beside a stat, margin composition under a Sparkline.
+- **Avoid for** — more than ~400 observations (a rug promises raw marks and never downsamples; use HistogramStrip) or
+  trends over time (Sparkline).
 
 ## Sizing
 
@@ -66,12 +66,7 @@ the field.
 </LiveDemo>
 
 <LiveDemo label="vertical" code={`<RugStrip data={field} orientation="vertical" />`}>
-  <RugStrip
-    data={[42, 48, 55, 61, 71]}
-    orientation="vertical"
-    title="Vertical rug"
-    style={{ width: 14, height: 80 }}
-  />
+  <RugStrip data={[42, 48, 55, 61, 71]} orientation="vertical" title="Vertical rug" style={{ width: 14, height: 80 }} />
 </LiveDemo>
 
 ## Edge cases
@@ -80,30 +75,22 @@ the field.
   <RugStrip data={[]} title="No observations" style={{ width: 140, height: 14 }} />
 </LiveDemo>
 
-Empty data draws a quiet centered axis line — not a blank hole — so the strip still reads
-as "a rug with nothing on it" rather than a layout gap.
+Empty data draws a quiet centered axis line — not a blank hole — so the strip still reads as "a rug with nothing on it"
+rather than a layout gap.
 
 <LiveDemo label="single observation" code={`<RugStrip data={[52]} title="One observation" />`}>
   <RugStrip data={[52]} title="One observation" style={{ width: 140, height: 14 }} />
 </LiveDemo>
 
-A single value (or an all-equal field) has a zero-span domain; the tick renders at the
-strip's midpoint instead of dividing by zero.
+A single value (or an all-equal field) has a zero-span domain; the tick renders at the strip's midpoint instead of
+dividing by zero.
 
-<LiveDemo
-  label="markValue outside the domain"
-  code={`<RugStrip data={[42, 48, 55, 61, 71]} markValue={120} />`}
->
-  <RugStrip
-    data={[42, 48, 55, 61, 71]}
-    markValue={120}
-    title="Above the field"
-    style={{ width: 140, height: 14 }}
-  />
+<LiveDemo label="markValue outside the domain" code={`<RugStrip data={[42, 48, 55, 61, 71]} markValue={120} />`}>
+  <RugStrip data={[42, 48, 55, 61, 71]} markValue={120} title="Above the field" style={{ width: 140, height: 14 }} />
 </LiveDemo>
 
-A `markValue` outside the observed domain clamps to the nearest edge — it never escapes
-the box or silently rescales the field around it.
+A `markValue` outside the observed domain clamps to the nearest edge — it never escapes the box or silently rescales the
+field around it.
 
 ## Four homes
 
@@ -111,17 +98,15 @@ the box or silently rescales the field around it.
 
 ## Why this default
 
-Ticks sit at 35% opacity — singles stay visible while stacks read as density. Because a
-browser paints one path's stroke as a single operation, coincident ticks are bucketed
-into opacity tiers (35% / 60% / 85%) rather than relying on overlap compositing that
-never happens. Regular ticks are inset one unit so the full-height accent highlight
-reads "taller" without escaping the box.
+Ticks sit at 35% opacity — singles stay visible while stacks read as density. Because a browser paints one path's stroke
+as a single operation, coincident ticks are bucketed into opacity tiers (35% / 60% / 85%) rather than relying on overlap
+compositing that never happens. Regular ticks are inset one unit so the full-height accent highlight reads "taller"
+without escaping the box.
 
 ## Accessibility
 
-The accessible name is the distribution — **"6 values from 3.1 to 9.7, median 5.2."**
-The interactive entry walks observations in sorted order and announces each with its
-rank: **"5.2 — 2nd of 6."**
+The accessible name is the distribution — **"6 values from 3.1 to 9.7, median 5.2."** The interactive entry walks
+observations in sorted order and announces each with its rank: **"5.2 — 2nd of 6."**
 
 ## Props
 

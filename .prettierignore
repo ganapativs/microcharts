@@ -1,7 +1,15 @@
-# oxfmt reads this. Docs/generated assets are hand-formatted — keep formatter off them.
-*.md
-*.mdx
+# Shared by oxfmt (code) and prettier (md/mdx).
+# oxfmt additionally skips md/mdx/html via .oxfmtrc.json ignorePatterns, so those
+# stay code-formatter-free while prettier owns the docs prose.
 *.html
 dist/
 plan/
 pnpm-lock.yaml
+
+# Generated / vendored markdown — keep prettier off these
+CHANGELOG.md
+**/CHANGELOG.md
+apps/docs/public/docs/
+apps/docs/out/
+**/*.original.md
+social-media/

@@ -1,25 +1,27 @@
 ---
 title: Formatting & scale
-description: Control how a chart shows numbers and dates, and what value range it's drawn against — one format prop (Intl options or a function) feeds both the direct labels and the accessible summary, locale handles separators and language, and domain fixes the scale. Formatting is cached, so it stays cheap across hundreds of charts.
+description:
+  Control how a chart shows numbers and dates, and what value range it's drawn against — one format prop (Intl options
+  or a function) feeds both the direct labels and the accessible summary, locale handles separators and language, and
+  domain fixes the scale. Formatting is cached, so it stays cheap across hundreds of charts.
 ---
 
-Two orthogonal decisions live here: **how numbers are written** (`format` + `locale`) and **what
-range they're drawn against** (`domain`). Both are part of the one grammar — the same prop name
-means the same thing on every chart — and both are documented per chart, but this page is the
-whole story in one place, since it's easy to assume a default you didn't actually get.
+Two orthogonal decisions live here: **how numbers are written** (`format` + `locale`) and **what range they're drawn
+against** (`domain`). Both are part of the one grammar — the same prop name means the same thing on every chart — and
+both are documented per chart, but this page is the whole story in one place, since it's easy to assume a default you
+didn't actually get.
 
 ## One formatter, two places
 
-A chart shows numbers in two spots: the **direct labels** it draws, and the **accessible
-summary** a screen reader announces. `format` feeds _both_ from a single definition — so a currency
-chart's spoken summary says "$1,240", not "1240". You never format the same number twice.
+A chart shows numbers in two spots: the **direct labels** it draws, and the **accessible summary** a screen reader
+announces. `format` feeds _both_ from a single definition — so a currency chart's spoken summary says "$1,240", not
+"1240". You never format the same number twice.
 
-`format` takes either **`Intl.NumberFormatOptions`** or a **plain function** `(n) => string`.
-Formatters are cached (`Intl.NumberFormat` construction is expensive), so passing options costs
-nothing across hundreds of instances — never build your own `new Intl.NumberFormat` in a component.
-Need the same formatting _outside_ a chart (a matching KPI label, a table cell)? Import the
-exported `makeFormatter` helper — `const fmt = makeFormatter(format, locale); fmt(42)` — so your
-prose numbers line up with the chart's exactly, from the same cache.
+`format` takes either **`Intl.NumberFormatOptions`** or a **plain function** `(n) => string`. Formatters are cached
+(`Intl.NumberFormat` construction is expensive), so passing options costs nothing across hundreds of instances — never
+build your own `new Intl.NumberFormat` in a component. Need the same formatting _outside_ a chart (a matching KPI label,
+a table cell)? Import the exported `makeFormatter` helper — `const fmt = makeFormatter(format, locale); fmt(42)` — so
+your prose numbers line up with the chart's exactly, from the same cache.
 
 <LiveDemo
   label="Currency label"
@@ -37,9 +39,8 @@ prose numbers line up with the chart's exactly, from the same cache.
 
 ## Percent, compact, decimals
 
-Anything `Intl.NumberFormat` supports works — percent, compact notation, fixed decimals, sign
-display. `Delta` even defaults to a locale-aware percent, so a raw ratio reads as a change with no
-config:
+Anything `Intl.NumberFormat` supports works — percent, compact notation, fixed decimals, sign display. `Delta` even
+defaults to a locale-aware percent, so a raw ratio reads as a change with no config:
 
 <LiveDemo
   label="Delta formats"
@@ -50,18 +51,14 @@ config:
   <div className="flex flex-wrap items-center gap-6 text-lg">
     <Delta value={0.128} summary={false} />
     <Delta value={4200} format={{ notation: "compact" }} summary={false} />
-    <Delta
-      value={4200}
-      format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
-      summary={false}
-    />
+    <Delta value={4200} format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }} summary={false} />
   </div>
 </LiveDemo>
 
 ## A custom function
 
-When `Intl` can't express the unit — milliseconds, "×" multipliers, a domain-specific symbol —
-pass a function. It receives the raw number and returns the exact string to render.
+When `Intl` can't express the unit — milliseconds, "×" multipliers, a domain-specific symbol — pass a function. It
+receives the raw number and returns the exact string to render.
 
 <LiveDemo
   label="Custom units"
@@ -79,9 +76,8 @@ pass a function. It receives the raw number and returns the exact string to rend
 
 ## Locale: separators, not language
 
-`locale` is a BCP-47 tag (`"de-DE"`, `"ja-JP"`, or an array of fallbacks). It controls how numbers
-and dates are _written_ — the thousands separator, decimal mark, currency placement — matching the
-reader's conventions.
+`locale` is a BCP-47 tag (`"de-DE"`, `"ja-JP"`, or an array of fallbacks). It controls how numbers and dates are
+_written_ — the thousands separator, decimal mark, currency placement — matching the reader's conventions.
 
 <LiveDemo
   label="Same data, two locales"
@@ -109,17 +105,16 @@ reader's conventions.
 </LiveDemo>
 
 <Callout type="info">
-  `locale` sets number/date **formatting**. It does not translate the summary _sentence_ ("Trending
-  up 200%…") — that's the `strings` contract on
-  [Accessibility](/docs/accessibility#internationalization-and-rtl). Pick both for a fully localized
-  chart: `locale` for the figures, translated `strings` for the prose.
+  `locale` sets number/date **formatting**. It does not translate the summary _sentence_ ("Trending up 200%…") — that's
+  the `strings` contract on [Accessibility](/docs/accessibility#internationalization-and-rtl). Pick both for a fully
+  localized chart: `locale` for the figures, translated `strings` for the prose.
 </Callout>
 
 ## Scale: the `domain` decision
 
-`domain` sets the value range the geometry is drawn against — the vertical frame. Omit it and the
-chart **auto-fits to its own data** (every pixel of height used). Pass `[min, max]` to pin a fixed
-frame instead — so a 40–60% reading looks like 40–60% of a 0–100 scale, not a full-height line.
+`domain` sets the value range the geometry is drawn against — the vertical frame. Omit it and the chart **auto-fits to
+its own data** (every pixel of height used). Pass `[min, max]` to pin a fixed frame instead — so a 40–60% reading looks
+like 40–60% of a 0–100 scale, not a full-height line.
 
 <LiveDemo
   label="Auto-fit vs. fixed frame"
@@ -127,13 +122,7 @@ frame instead — so a 40–60% reading looks like 40–60% of a 0–100 scale, 
 <Sparkline data={cpu} domain={[0, 100]} /> // fixed 0–100% frame`}
 >
   <div className="flex flex-wrap items-center gap-8">
-    <Sparkline
-      data={[48, 52, 49, 55, 53, 58, 54, 60]}
-      width={150}
-      height={44}
-      dots="minmax"
-      title="Auto-fit"
-    />
+    <Sparkline data={[48, 52, 49, 55, 53, 58, 54, 60]} width={150} height={44} dots="minmax" title="Auto-fit" />
     <Sparkline
       data={[48, 52, 49, 55, 53, 58, 54, 60]}
       width={150}
@@ -146,16 +135,16 @@ frame instead — so a 40–60% reading looks like 40–60% of a 0–100 scale, 
   </div>
 </LiveDemo>
 
-This is an **honesty decision**, not cosmetics: auto-fit maximizes detail for a single series, but
-a fixed domain is what makes two charts comparable. To share one scale across several charts at
-once, use `SparkGroup` — see [Composition](/docs/composition#small-multiples-one-shared-scale).
+This is an **honesty decision**, not cosmetics: auto-fit maximizes detail for a single series, but a fixed domain is
+what makes two charts comparable. To share one scale across several charts at once, use `SparkGroup` — see
+[Composition](/docs/composition#small-multiples-one-shared-scale).
 
 ## Dates and times
 
-Calendar and time charts (`CalendarStrip`, `EventTimeline`, and friends) take the same `format`
-prop as **`Intl.DateTimeFormatOptions`** or a `(date) => string` function, with `locale` applied
-the same way. Timestamps are normalized to **UTC** so the same input renders identically in any host
-timezone — a chart never shifts a day because the viewer is in a different region.
+Calendar and time charts (`CalendarStrip`, `EventTimeline`, and friends) take the same `format` prop as
+**`Intl.DateTimeFormatOptions`** or a `(date) => string` function, with `locale` applied the same way. Timestamps are
+normalized to **UTC** so the same input renders identically in any host timezone — a chart never shifts a day because
+the viewer is in a different region.
 
 ## Next steps
 

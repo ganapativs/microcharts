@@ -1,11 +1,13 @@
 ---
 title: SparkBar
-description: Compact bars for discrete magnitudes in React, or a win–loss–tie streak of outcomes — static SVG and an interactive entry.
+description:
+  Compact bars for discrete magnitudes in React, or a win–loss–tie streak of outcomes — static SVG and an interactive
+  entry.
 ---
 
-SparkBar renders discrete values as compact bars from a zero baseline. In `winloss`
-mode it collapses each value to its sign — a streak you can read at a glance: wins
-above the mid-line, losses below, and a tie (`0`) as a thin neutral dash on it.
+SparkBar renders discrete values as compact bars from a zero baseline. In `winloss` mode it collapses each value to its
+sign — a streak you can read at a glance: wins above the mid-line, losses below, and a tie (`0`) as a thin neutral dash
+on it.
 
 <LiveDemo label="SparkBar" sizeOf="sparkbar">
   <SparkBar data={[4, 6, 2, 8, 5, 9]} width={120} height={32} title="Deploys per day" />
@@ -22,14 +24,13 @@ above the mid-line, losses below, and a tie (`0`) as a thin neutral dash on it.
 ## When to use it
 
 - **Good for** — discrete magnitudes, win–loss streaks, period-over-period counts.
-- **Avoid for** — a continuous trend shape (use [Sparkline](/docs/charts/sparkline)) or
-  hundreds of points, where bars become noise.
+- **Avoid for** — a continuous trend shape (use [Sparkline](/docs/charts/sparkline)) or hundreds of points, where bars
+  become noise.
 
 ## Sizing
 
-`width` and `height` are viewBox units that also set the rendered pixel box. Omit them and
-drive the width from CSS for a chart that fills its container — the viewBox keeps the
-aspect ratio.
+`width` and `height` are viewBox units that also set the rendered pixel box. Omit them and drive the width from CSS for
+a chart that fills its container — the viewBox keeps the aspect ratio.
 
 <Sizing chart="sparkbar" />
 
@@ -40,13 +41,7 @@ aspect ratio.
 </LiveDemo>
 
 <LiveDemo label="winloss" code={`<SparkBar data={[1, -1, 1, 1, -1, 1, -1]} mode="winloss" />`}>
-  <SparkBar
-    data={[1, -1, 1, 1, -1, 1, -1]}
-    width={130}
-    height={32}
-    mode="winloss"
-    title="Win–loss streak"
-  />
+  <SparkBar data={[1, -1, 1, 1, -1, 1, -1]} width={130} height={32} mode="winloss" title="Win–loss streak" />
 </LiveDemo>
 
 <LiveDemo
@@ -54,41 +49,19 @@ aspect ratio.
   code={`// a 0 is a tie — a neutral dash on the mid-line, never a win or a loss
 <SparkBar data={[1, -1, 0, 1, 0, -1, 1]} mode="winloss" />`}
 >
-  <SparkBar
-    data={[1, -1, 0, 1, 0, -1, 1]}
-    width={130}
-    height={32}
-    mode="winloss"
-    title="Win–loss–tie streak"
-  />
+  <SparkBar data={[1, -1, 0, 1, 0, -1, 1]} width={130} height={32} mode="winloss" title="Win–loss–tie streak" />
 </LiveDemo>
 
 <LiveDemo label="label" code={`<SparkBar data={[4, 6, 2, 8, 5, 9]} label="last" />`}>
-  <SparkBar
-    data={[4, 6, 2, 8, 5, 9]}
-    width={130}
-    height={32}
-    label="last"
-    title="With endpoint label"
-  />
+  <SparkBar data={[4, 6, 2, 8, 5, 9]} width={130} height={32} label="last" title="With endpoint label" />
 </LiveDemo>
 
-<LiveDemo
-  label="locale"
-  code={`<SparkBar data={[4200, 6100, 2800, 8600]} label="last" locale="de-DE" />`}
->
-  <SparkBar
-    data={[4200, 6100, 2800, 8600]}
-    width={130}
-    height={32}
-    label="last"
-    locale="de-DE"
-    title="Localized"
-  />
+<LiveDemo label="locale" code={`<SparkBar data={[4200, 6100, 2800, 8600]} label="last" locale="de-DE" />`}>
+  <SparkBar data={[4200, 6100, 2800, 8600]} width={130} height={32} label="last" locale="de-DE" title="Localized" />
 </LiveDemo>
 
-The endpoint label and accessible summary both follow `format`/`locale` — 8600 reads "8.600"
-under `de-DE` rather than the English "8,600".
+The endpoint label and accessible summary both follow `format`/`locale` — 8600 reads "8.600" under `de-DE` rather than
+the English "8,600".
 
 ## Edge cases
 
@@ -100,9 +73,9 @@ under `de-DE` rather than the English "8,600".
   <SparkBar data={[6]} title="One deploy" width={40} height={32} />
 </LiveDemo>
 
-An empty series renders no bars and an accessible name that says so, rather than a flat or
-invented baseline. A single value still renders as one zero-anchored bar — `winloss` mode
-treats it the same way a longer streak would: a lone win, loss, or tie.
+An empty series renders no bars and an accessible name that says so, rather than a flat or invented baseline. A single
+value still renders as one zero-anchored bar — `winloss` mode treats it the same way a longer streak would: a lone win,
+loss, or tie.
 
 ## Four homes
 
@@ -110,14 +83,12 @@ treats it the same way a longer streak would: a lone win, loss, or tie.
 
 ## Why this default
 
-Bars, not a line, because SparkBar's job is discrete magnitudes — deploy counts, daily
-totals — where each period is its own thing, not a sampled point on a continuous curve.
-Zero-anchored always: a bar whose length doesn't start at zero misstates its magnitude.
-`winloss` mode goes further and discards magnitude entirely on purpose, collapsing each
-value to a three-state streak (win above the mid-line, loss below, tie a thin dash on it)
-because for a streak, sign is the whole story and a magnitude axis would just be noise.
-Sign is doubled by position AND color everywhere signed data appears, so direction survives
-forced-colors and never depends on color alone. The endpoint bar gets accent emphasis by
+Bars, not a line, because SparkBar's job is discrete magnitudes — deploy counts, daily totals — where each period is its
+own thing, not a sampled point on a continuous curve. Zero-anchored always: a bar whose length doesn't start at zero
+misstates its magnitude. `winloss` mode goes further and discards magnitude entirely on purpose, collapsing each value
+to a three-state streak (win above the mid-line, loss below, tie a thin dash on it) because for a streak, sign is the
+whole story and a magnitude axis would just be noise. Sign is doubled by position AND color everywhere signed data
+appears, so direction survives forced-colors and never depends on color alone. The endpoint bar gets accent emphasis by
 default — "how did the run end" is usually the first question a streak answers.
 
 ## Accessibility
@@ -126,8 +97,8 @@ Announced from the data — the example above reads:
 
 > Deploys per day. Trending up 125%. Range 2 to 9. Last value 9.
 
-Sign is doubled by position (above or below the baseline), never by color alone, so the
-chart survives forced-colors and color-blind viewing.
+Sign is doubled by position (above or below the baseline), never by color alone, so the chart survives forced-colors and
+color-blind viewing.
 
 ## Props
 

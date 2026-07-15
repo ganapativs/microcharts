@@ -1,12 +1,13 @@
 ---
 title: CohortTriangle
-description: A cohort-retention heatmap for React — vintages as rows, age as columns, shaded by discrete retention levels, so the worst-decaying cohort reads at equal maturity.
+description:
+  A cohort-retention heatmap for React — vintages as rows, age as columns, shaded by discrete retention levels, so the
+  worst-decaying cohort reads at equal maturity.
 ---
 
-CohortTriangle stacks retention cohorts as rows and ages as columns, shading each cell by a
-discrete retention level. Because newer vintages have been observed for fewer ages, the block
-takes the classic **triangle** shape — and reading down a column compares every cohort at the
-**same maturity**, which is where "who retains worst" actually lives.
+CohortTriangle stacks retention cohorts as rows and ages as columns, shading each cell by a discrete retention level.
+Because newer vintages have been observed for fewer ages, the block takes the classic **triangle** shape — and reading
+down a column compares every cohort at the **same maturity**, which is where "who retains worst" actually lives.
 
 <LiveDemo label="CohortTriangle" sizeOf="cohort-triangle">
   <CohortTriangle
@@ -33,24 +34,24 @@ takes the classic **triangle** shape — and reading down a column compares ever
 
 ## When to use it
 
-- **Good for** — monthly or weekly cohorts side by side, spotting which vintage decays worst,
-  reading retention at equal maturity in a KPI card.
-- **Avoid for** — exact per-cell values (color intensity is deliberately approximate; pair it
-  with a number when precision matters), or a single cohort's decay, where
-  [RetentionCurve](/docs/charts/retention-curve) draws the curve directly.
+- **Good for** — monthly or weekly cohorts side by side, spotting which vintage decays worst, reading retention at equal
+  maturity in a KPI card.
+- **Avoid for** — exact per-cell values (color intensity is deliberately approximate; pair it with a number when
+  precision matters), or a single cohort's decay, where [RetentionCurve](/docs/charts/retention-curve) draws the curve
+  directly.
 
 ## Sizing
 
-CohortTriangle sizes from `cell` — the edge length of one square in viewBox units. Bump it to
-scale the whole grid; the viewBox keeps the aspect ratio when CSS drives the width. Row labels
-seat automatically and drop out cleanly below roughly an 8-unit cell.
+CohortTriangle sizes from `cell` — the edge length of one square in viewBox units. Bump it to scale the whole grid; the
+viewBox keeps the aspect ratio when CSS drives the width. Row labels seat automatically and drop out cleanly below
+roughly an 8-unit cell.
 
 <Sizing chart="cohort-triangle" />
 
 ## Variants
 
-Row labels are on by default. Turn them off for a dense, glanceable block, or `highlight` one
-vintage to anchor the equal-maturity comparison.
+Row labels are on by default. Turn them off for a dense, glanceable block, or `highlight` one vintage to anchor the
+equal-maturity comparison.
 
 <LiveDemo
   label="highlight a vintage vs dense, no labels"
@@ -87,8 +88,8 @@ vintage to anchor the equal-maturity comparison.
   </span>
 </LiveDemo>
 
-The `unit` prop renames the age columns in the summary and announcements — `"month"`,
-`"week"`, `"day"`, whatever the cohort period is.
+The `unit` prop renames the age columns in the summary and announcements — `"month"`, `"week"`, `"day"`, whatever the
+cohort period is.
 
 ## Edge cases
 
@@ -96,12 +97,7 @@ The `unit` prop renames the age columns in the summary and announcements — `"m
   label="single cohort"
   code={`<CohortTriangle data={[{ label: "Jan", values: [1, 0.6, 0.45, 0.4] }]} unit="month" />`}
 >
-  <CohortTriangle
-    data={[{ label: "Jan", values: [1, 0.6, 0.45, 0.4] }]}
-    unit="month"
-    cell={16}
-    title="One cohort"
-  />
+  <CohortTriangle data={[{ label: "Jan", values: [1, 0.6, 0.45, 0.4] }]} unit="month" cell={16} title="One cohort" />
 </LiveDemo>
 
 <LiveDemo
@@ -109,11 +105,7 @@ The `unit` prop renames the age columns in the summary and announcements — `"m
   code={`// a null / non-finite value is a measured-nothing slot: outlined, never shaded as 0%
 <CohortTriangle data={[{ label: "Jan", values: [1, 0.6, null, 0.4] }]} />`}
 >
-  <CohortTriangle
-    data={[{ label: "Jan", values: [1, 0.6, null, 0.4] }]}
-    cell={16}
-    title="Gap slot"
-  />
+  <CohortTriangle data={[{ label: "Jan", values: [1, 0.6, null, 0.4] }]} cell={16} title="Gap slot" />
 </LiveDemo>
 
 <LiveDemo
@@ -152,11 +144,10 @@ The `unit` prop renames the age columns in the summary and announcements — `"m
   />
 </LiveDemo>
 
-A single cohort skips the comparison and just states its first reading. A `null` (or any
-non-finite) value renders as an outlined **gap** slot — a "measured nothing here" cell, never a
-shaded 0%. `data` accepts either a 0–1 fraction or a 0–100 percent series — whichever the max
-value implies — so a raw percent export renders identically to its fraction form. With a
-`locale`, every announced number follows that locale's own formatting.
+A single cohort skips the comparison and just states its first reading. A `null` (or any non-finite) value renders as an
+outlined **gap** slot — a "measured nothing here" cell, never a shaded 0%. `data` accepts either a 0–1 fraction or a
+0–100 percent series — whichever the max value implies — so a raw percent export renders identically to its fraction
+form. With a `locale`, every announced number follows that locale's own formatting.
 
 ## Four homes
 
@@ -164,19 +155,17 @@ value implies — so a raw percent export renders identically to its fraction fo
 
 ## Why this default
 
-Rows are cohorts in input order and columns are age, because the decision — _which vintage
-retains worst_ — is a **vertical** read at a fixed age, and the ragged right edge falls out
-naturally from newer cohorts simply having fewer observed ages. Intensity is quantized to five
-discrete levels (never a continuous ramp): a smooth gradient would imply a precision a handful
-of pixels cannot deliver. A worst-vintage flag is **off** by default — the marks stay honest
-and the summary names the laggard in words instead of painting a verdict onto the grid.
+Rows are cohorts in input order and columns are age, because the decision — _which vintage retains worst_ — is a
+**vertical** read at a fixed age, and the ragged right edge falls out naturally from newer cohorts simply having fewer
+observed ages. Intensity is quantized to five discrete levels (never a continuous ramp): a smooth gradient would imply a
+precision a handful of pixels cannot deliver. A worst-vintage flag is **off** by default — the marks stay honest and the
+summary names the laggard in words instead of painting a verdict onto the grid.
 
 ## Accessibility
 
-Intensity is a color channel, so CohortTriangle always pairs it with a numeric summary that
-compares at equal maturity — **"5 cohorts; at month 1, Mar retains worst (47%); newest May
-starts at 100%."**. Direction is stated in words, never by color alone, so it survives
-forced-colors and color-blind viewing. The interactive entry adds 2-D arrow-key navigation,
+Intensity is a color channel, so CohortTriangle always pairs it with a numeric summary that compares at equal maturity —
+**"5 cohorts; at month 1, Mar retains worst (47%); newest May starts at 100%."**. Direction is stated in words, never by
+color alone, so it survives forced-colors and color-blind viewing. The interactive entry adds 2-D arrow-key navigation,
 announcing each cell as _"Feb cohort, month 1: 58%"_ as you move.
 
 ## Props

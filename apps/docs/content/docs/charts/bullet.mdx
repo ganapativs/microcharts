@@ -1,21 +1,15 @@
 ---
 title: Bullet
-description: A compact bullet chart for React — a measured value against a target tick and qualitative bands, static SVG or interactive.
+description:
+  A compact bullet chart for React — a measured value against a target tick and qualitative bands, static SVG or
+  interactive.
 ---
 
-Bullet compares one measured value to a target, against a backdrop of qualitative bands
-(poor / okay / good). It answers "are we there yet?" in a single row — ideal for progress,
-SLAs, budgets, and quotas.
+Bullet compares one measured value to a target, against a backdrop of qualitative bands (poor / okay / good). It answers
+"are we there yet?" in a single row — ideal for progress, SLAs, budgets, and quotas.
 
 <LiveDemo label="Bullet" sizeOf="bullet">
-  <Bullet
-    value={72}
-    target={80}
-    bands={[50, 90]}
-    width={200}
-    height={22}
-    title="Quota attainment"
-  />
+  <Bullet value={72} target={80} bands={[50, 90]} width={200} height={22} title="Quota attainment" />
 </LiveDemo>
 
 ## Install
@@ -29,14 +23,12 @@ SLAs, budgets, and quotas.
 ## When to use it
 
 - **Good for** — progress to a goal, a value against a target, KPIs with thresholds.
-- **Avoid for** — trends over time (use [Sparkline](/docs/charts/sparkline)) or
-  distributions.
+- **Avoid for** — trends over time (use [Sparkline](/docs/charts/sparkline)) or distributions.
 
 ## Sizing
 
-`width` and `height` are viewBox units that also set the rendered pixel box — a bullet
-reads best wide and short. Omit them and drive the width from CSS to fill a table cell or
-card column; the viewBox keeps the aspect ratio.
+`width` and `height` are viewBox units that also set the rendered pixel box — a bullet reads best wide and short. Omit
+them and drive the width from CSS to fill a table cell or card column; the viewBox keeps the aspect ratio.
 
 <Sizing chart="bullet" />
 
@@ -61,14 +53,7 @@ card column; the viewBox keeps the aspect ratio.
   code={`// the measure clamps at the track end; the summary keeps the real number
 <Bullet value={120} target={80} domain={[0, 100]} />`}
 >
-  <Bullet
-    value={120}
-    target={80}
-    domain={[0, 100]}
-    width={220}
-    height={22}
-    title="Over the domain"
-  />
+  <Bullet value={120} target={80} domain={[0, 100]} width={220} height={22} title="Over the domain" />
 </LiveDemo>
 
 <LiveDemo
@@ -86,18 +71,17 @@ card column; the viewBox keeps the aspect ratio.
 
 ## Why this default
 
-The qualitative bands sit lowest and graduate in shade by step, because they are context, not the
-answer — the measure bar has to read as the loudest mark on the row. The target is a tick, not a
-second bar: a distinct shape at a distinct position so "value vs target" survives grayscale print
-and never depends on the two colors staying apart. The measure bar itself is a thin band centered in
-the track (Few's proportion, not a full-height fill) so the bands stay legible on both sides of it.
+The qualitative bands sit lowest and graduate in shade by step, because they are context, not the answer — the measure
+bar has to read as the loudest mark on the row. The target is a tick, not a second bar: a distinct shape at a distinct
+position so "value vs target" survives grayscale print and never depends on the two colors staying apart. The measure
+bar itself is a thin band centered in the track (Few's proportion, not a full-height fill) so the bands stay legible on
+both sides of it.
 
 ## Accessibility
 
-Bullet announces its value against its target — **"72 of 80 target."**. No color is required to
-read whether the target was met: the measure's length and the target tick encode it by position,
-and the qualitative bands sit behind them. The interactive entry reads the value and target on
-hover and focus.
+Bullet announces its value against its target — **"72 of 80 target."**. No color is required to read whether the target
+was met: the measure's length and the target tick encode it by position, and the qualitative bands sit behind them. The
+interactive entry reads the value and target on hover and focus.
 
 ## Props
 

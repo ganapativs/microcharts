@@ -3,9 +3,9 @@ title: ProgressRing
 description: A progress ring for React — fixed 12-o'clock start, butt caps, and a countdown sweep mode; never a gauge.
 ---
 
-ProgressRing answers "how complete is this?" at icon size, where a linear bar doesn't
-fit. The start angle is fixed at 12 o'clock and the caps are butt-cut — the two quiet
-ways rings inflate progress, both removed. It is never a gauge: no needle, no red zone.
+ProgressRing answers "how complete is this?" at icon size, where a linear bar doesn't fit. The start angle is fixed at
+12 o'clock and the caps are butt-cut — the two quiet ways rings inflate progress, both removed. It is never a gauge: no
+needle, no red zone.
 
 <LiveDemo
   label="ProgressRing"
@@ -45,13 +45,7 @@ ways rings inflate progress, both removed. It is never a gauge: no needle, no re
 </LiveDemo>
 
 <LiveDemo label="weight" code={`<ProgressRing value={0.68} weight={6} />`}>
-  <ProgressRing
-    value={0.68}
-    weight={6}
-    size={40}
-    title="Thick ring"
-    style={{ width: 56, height: 56 }}
-  />
+  <ProgressRing value={0.68} weight={6} size={40} title="Thick ring" style={{ width: 56, height: 56 }} />
 </LiveDemo>
 
 <LiveDemo
@@ -74,23 +68,11 @@ ways rings inflate progress, both removed. It is never a gauge: no needle, no re
   label="past 100% — the ring clamps full, the label carries the true percent"
   code={`<ProgressRing value={1.4} label="percent" title="Over budget" />`}
 >
-  <ProgressRing
-    value={1.4}
-    label="percent"
-    title="Over budget"
-    size={40}
-    style={{ width: 56, height: 56 }}
-  />
+  <ProgressRing value={1.4} label="percent" title="Over budget" size={40} style={{ width: 56, height: 56 }} />
 </LiveDemo>
 
 <LiveDemo label="no data" code={`<ProgressRing value={NaN} label="percent" title="Unknown" />`}>
-  <ProgressRing
-    value={Number.NaN}
-    label="percent"
-    title="Unknown"
-    size={40}
-    style={{ width: 56, height: 56 }}
-  />
+  <ProgressRing value={Number.NaN} label="percent" title="Unknown" size={40} style={{ width: 56, height: 56 }} />
 </LiveDemo>
 
 ## Four homes
@@ -99,16 +81,14 @@ ways rings inflate progress, both removed. It is never a gauge: no needle, no re
 
 ## Why this default
 
-Butt caps and a fixed start: rounded caps overstate small fractions, and variable start
-angles make identical fractions look different. Past 100% the ring clamps while the
-center label carries the true percent — same contract as Progress. A full circle is
-drawn as two half-arcs (SVG cannot draw a single 360° arc).
+Butt caps and a fixed start: rounded caps overstate small fractions, and variable start angles make identical fractions
+look different. Past 100% the ring clamps while the center label carries the true percent — same contract as Progress. A
+full circle is drawn as two half-arcs (SVG cannot draw a single 360° arc).
 
 ## Accessibility
 
-The accessible name reuses the progress wording — **"68% complete."**, or **"32%
-remaining."** in sweep mode. The interactive entry announces only at 25/50/75/100%
-threshold crossings — a streaming value never spams the screen reader.
+The accessible name reuses the progress wording — **"68% complete."**, or **"32% remaining."** in sweep mode. The
+interactive entry announces only at 25/50/75/100% threshold crossings — a streaming value never spams the screen reader.
 
 ## Props
 

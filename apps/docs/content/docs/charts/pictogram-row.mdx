@@ -1,22 +1,17 @@
 ---
 title: PictogramRow
-description: A unit pictogram for React — filled vs hollow units a reader can count, with honest fractional units and no size lies.
+description:
+  A unit pictogram for React — filled vs hollow units a reader can count, with honest fractional units and no size lies.
 ---
 
-PictogramRow answers "how many of the N units are filled?" — ●●●○○ — counts a human can
-verify by counting. Filled vs hollow is a shape difference too, never opacity alone, and
-unit size is constant: scaling glyphs with value is the classic pictogram lie this
-component refuses to tell.
+PictogramRow answers "how many of the N units are filled?" — ●●●○○ — counts a human can verify by counting. Filled vs
+hollow is a shape difference too, never opacity alone, and unit size is constant: scaling glyphs with value is the
+classic pictogram lie this component refuses to tell.
 
 <LiveDemo label="PictogramRow" sizeOf="pictogram-row">
   <span className="text-lg">
     {"The coalition holds "}
-    <PictogramRow
-      value={5}
-      total={8}
-      title="Committee seats held"
-      style={{ width: "4.5em", height: "0.9em" }}
-    />
+    <PictogramRow value={5} total={8} title="Committee seats held" style={{ width: "4.5em", height: "0.9em" }} />
     {" of the seats."}
   </span>
 </LiveDemo>
@@ -32,8 +27,7 @@ component refuses to tell.
 ## When to use it
 
 - **Good for** — seats, slots, and ratings in a sentence; capacity rows in tables.
-- **Avoid for** — more than 20 units (counting fails; use Progress) or continuous
-  ratios (Progress).
+- **Avoid for** — more than 20 units (counting fails; use Progress) or continuous ratios (Progress).
 
 ## Sizing
 
@@ -54,14 +48,7 @@ component refuses to tell.
   code={`// seats can't be fractional — declare it
 <PictogramRow value={2.5} total={4} fractional="round" />`}
 >
-  <PictogramRow
-    value={2.5}
-    total={4}
-    fractional="round"
-    title="Whole seats"
-    width={90}
-    height={18}
-  />
+  <PictogramRow value={2.5} total={4} fractional="round" title="Whole seats" width={90} height={18} />
 </LiveDemo>
 
 <LiveDemo label="squares" code={`<PictogramRow value={3} total={5} shape="square" />`}>
@@ -78,18 +65,14 @@ component refuses to tell.
   <PictogramRow value={-2} total={4} title="Deficit" width={90} height={18} />
 </LiveDemo>
 
-<LiveDemo
-  label="overflow — value past the total"
-  code={`<PictogramRow value={9} total={8} title="Over capacity" />`}
->
+<LiveDemo label="overflow — value past the total" code={`<PictogramRow value={9} total={8} title="Over capacity" />`}>
   <PictogramRow value={9} total={8} title="Over capacity" width={90} height={18} />
 </LiveDemo>
 
-A `total` of 0 (or non-finite) draws nothing and the summary is "No data." — there is no
-meaningful row to count. A negative value renders every unit hollow, and the summary
-still states the true number ("-2 of 4.") rather than clamping to 0. A value past the
-total fills every unit — never more than `total` units drawn — but the summary keeps the
-honest count ("9 of 8.") with a dev-time warning, so the overflow is never hidden.
+A `total` of 0 (or non-finite) draws nothing and the summary is "No data." — there is no meaningful row to count. A
+negative value renders every unit hollow, and the summary still states the true number ("-2 of 4.") rather than clamping
+to 0. A value past the total fills every unit — never more than `total` units drawn — but the summary keeps the honest
+count ("9 of 8.") with a dev-time warning, so the overflow is never hidden.
 
 ## Four homes
 
@@ -97,17 +80,15 @@ honest count ("9 of 8.") with a dev-time warning, so the overflow is never hidde
 
 ## Why this default
 
-Clip over round — the partial unit is real data, drawn as a true circular segment (not a
-`clipPath`, which would need generated ids that break server rendering determinism).
-Overflow renders all units filled but the summary keeps the true numbers ("9 of 8.") with
-a dev warning; the chart never silently caps the figure.
+Clip over round — the partial unit is real data, drawn as a true circular segment (not a `clipPath`, which would need
+generated ids that break server rendering determinism). Overflow renders all units filled but the summary keeps the true
+numbers ("9 of 8.") with a dev warning; the chart never silently caps the figure.
 
 ## Accessibility
 
-The accessible name is the count — **"5 of 8."** — with the context noun coming from your
-`title` ("Committee seats held. 5 of 8."). The interactive entry re-announces on value
-changes. There are no per-unit pointer targets: the units are one datum, so hovering
-unit 4 of 8 has no distinct meaning.
+The accessible name is the count — **"5 of 8."** — with the context noun coming from your `title` ("Committee seats
+held. 5 of 8."). The interactive entry re-announces on value changes. There are no per-unit pointer targets: the units
+are one datum, so hovering unit 4 of 8 has no distinct meaning.
 
 ## Props
 
