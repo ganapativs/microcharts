@@ -251,7 +251,11 @@
   :where(.mc-delta-live) {
     position: relative;
     display: inline-flex;
-    vertical-align: middle;
+    /* MUST match the static .mc-delta (baseline, not middle): the inline-flex
+       takes its baseline from the inner .mc-delta's number, so this seats the
+       live Delta on the same line as the static one — otherwise toggling
+       interactive/animated shifts it vertically. */
+    vertical-align: baseline;
   }
   /* interactive TrendArrow wrapper — same live/pulse pattern at glyph size */
   :where(.mc-trend-live) {
