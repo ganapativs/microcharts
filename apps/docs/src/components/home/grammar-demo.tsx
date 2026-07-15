@@ -295,20 +295,22 @@ export function GrammarDemo() {
         </div>
       </div>
 
+      {/* stacked, not side-by-side: the sentence wraps to two lines on most
+          tabs, and a tall paragraph beside a small chip reads broken */}
       <div className="border-t border-hairline px-5 py-4">
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-          <span className="mono-label shrink-0 rounded-md bg-fd-primary/10 px-1.5 py-1 leading-none text-fd-primary">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+          <span className="mono-label rounded-md bg-fd-primary/10 px-1.5 py-1 leading-none text-fd-primary">
             role=&quot;img&quot;
           </span>
-          <p
-            aria-live="polite"
-            className="hv-serif min-h-[3.25rem] flex-1 basis-64 text-[0.98rem] leading-relaxed text-fd-foreground"
-          >
-            {sentence ? `“${sentence}”` : ""}
-          </p>
+          <span className="mono-label opacity-60">
+            the generated accessible name, read live from the DOM
+          </span>
         </div>
-        <p className="mono-label opacity-60">
-          the generated accessible name, read live from the DOM — what a screen reader speaks
+        <p
+          aria-live="polite"
+          className="hv-serif mt-2 min-h-[3.1rem] text-[0.98rem] leading-relaxed text-fd-foreground"
+        >
+          {sentence ? `“${sentence}”` : ""}
         </p>
       </div>
     </div>

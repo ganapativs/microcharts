@@ -1,18 +1,21 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { TypesetHeadline } from "@/components/home/typeset-headline";
+import { Sparkline } from "@microcharts/react/sparkline";
+import { SparkBar } from "@microcharts/react/sparkbar";
 import { StreamVignette } from "@/components/home/stream-vignette";
 import { HeroSilk } from "@/components/home/hero-silk";
 import { InstallCommand } from "@/components/ui/copy";
 import { Reveal } from "@/components/ui/reveal";
 
 /**
- * The first fold — "The Typeset Answer". One choreography in reading order:
- * the sentence typesets itself (words settle, inline charts draw once), then
- * the assistant reply streams in a reading serif and its grammar morphs into
- * shipped components. Ground: silk shader under the graph paper — ambience
- * behind the instrument, faded out before the fold ends. See DESIGN.md.
+ * The first fold. The headline is STATIC — server-rendered inline charts, one
+ * gentle reveal with everything else (a line-by-line word stagger was tried
+ * and cut: it lagged the rest of the fold and read as broken). The motion
+ * budget belongs to the reply card: the assistant reply streams in a reading
+ * serif and its grammar morphs into shipped components. Ground: silk shader
+ * under the graph paper, faded out before the fold ends. See DESIGN.md.
  */
+const TREND = [3, 5, 4, 8, 6, 9, 7, 11];
 export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
   return (
     // -mt-14/pt-14: the fold's ground extends up UNDER the transparent sticky
@@ -36,9 +39,26 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
             ))}
           </Reveal>
 
-          <div className="mt-5">
-            <TypesetHeadline />
-          </div>
+          <Reveal delay={60}>
+            <h1 className="display mt-5 text-balance text-[2.3rem] leading-[1.05] text-fd-foreground sm:text-[3rem] lg:text-[3.65rem] xl:text-[3.9rem]">
+              Small enough for a model to{" "}
+              <span className="whitespace-nowrap">
+                <em className="hv-em">write</em>
+                <span aria-hidden className="hx-word">
+                  <Sparkline data={TREND} curve="smooth" width={60} height={20} summary={false} />
+                </span>
+                ,
+              </span>{" "}
+              sharp enough for a person to{" "}
+              <span className="whitespace-nowrap">
+                <em className="hv-em">trust</em>
+                <span aria-hidden className="hx-word">
+                  <SparkBar data={TREND} width={52} height={20} summary={false} />
+                </span>
+                .
+              </span>
+            </h1>
+          </Reveal>
 
           <Reveal delay={120}>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
@@ -92,7 +112,7 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
         </div>
 
         <Reveal delay={140}>
-          <StreamVignette serif startDelay={1900} />
+          <StreamVignette serif startDelay={900} />
           <p className="mono-label mt-3 text-center opacity-70">
             what a model writes <span className="text-hairline">·</span> what a person reads
           </p>

@@ -33,7 +33,11 @@
 }
 
 /* --accent drives chrome + chart emphasis; [data-accent] swaps it. Default Cobalt. */
-:root {
+/* `html.dark .hv-invert` re-adopts the LIGHT tokens: the homepage "made for
+   models" band is the page's one inverted movement — dark on light, light on
+   dark. One source of truth; the extra selector just widens the scope. */
+:root,
+html.dark .hv-invert {
   /* accent — Cobalt default (light) */
   --accent: #2f52d4;
   --accent-strong: #2543b8;
@@ -2338,39 +2342,6 @@ div:where(
     letter-spacing: 0;
   }
 
-  /* Headline words settle in reading order — pure CSS, SSR-visible, no JS
-     required. Set --i per word. */
-  .hv-w {
-    display: inline-block;
-    /* 0.011, not 0: keeps the headline an LCP candidate at first paint —
-       visually identical, but the metric doesn't wait for the settle. */
-    opacity: 0.011;
-    transform: translateY(0.35em);
-    animation: hv-settle 0.55s var(--ease-out-expo) both;
-    animation-delay: calc(var(--i, 0) * 60ms);
-    white-space: pre-wrap;
-  }
-  @keyframes hv-settle {
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  /* Inline chart slots appear on the same CSS clock (--at, ms) the JS uses to
-     remount them with the library's draw entrance — if JS never runs, the
-     chart still fades in on schedule. */
-  .hv-slot {
-    opacity: 0;
-    animation: hv-appear 0.45s var(--ease-out-expo) both;
-    animation-delay: var(--at, 0ms);
-  }
-  @keyframes hv-appear {
-    to {
-      opacity: 1;
-    }
-  }
-
   /* Hero silk — the WebGL canvas plus its no-WebGL/pre-init CSS ground.
      Sits UNDER the graph paper: ambience behind the instrument. */
   .hv-silk {
@@ -2407,16 +2378,18 @@ div:where(
   .hv-reply-body {
     font-family: var(--font-serif);
     --hv-reply-size: 1.05rem;
+    /* Newsreader sits higher on its line than Hanken — the library's default
+       .mc-inline optical lift (-0.14em) leaves marks hanging low beside serif
+       digits; retune per face, exactly what the token is for. */
+    --mc-inline-nudge: -0.26em;
   }
 
-  /* 05 · the dark band. In light mode it's the real dark field; when the
-     whole site is already dark it lifts one step instead, so the band still
-     reads as a distinct movement, not a missing section. */
+  /* 05 · the inverted band — the page's one counter-movement. In light mode
+     the section's `dark` class makes it the real dark field; in dark mode
+     `html.dark .hv-invert` (see the token block) re-adopts the light tokens,
+     so it flips light. Same section, opposite key, both themes. */
   .hv-band {
     background-color: var(--color-fd-background);
-  }
-  html.dark .hv-band {
-    background-color: color-mix(in oklab, var(--color-fd-card) 55%, var(--color-fd-background));
   }
 
   /* 03 · catalog tile tagline — one reserved line so hover never shifts. */
@@ -2490,12 +2463,6 @@ div:where(
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hv-w,
-  .hv-slot {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
   .hv-code-caret {
     animation: none;
   }
