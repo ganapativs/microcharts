@@ -9,6 +9,11 @@ const config = {
   // mirrors (`/docs/<slug>.md`) are generated as real static files into
   // `public/docs/` by `scripts/gen-md.mjs` (pre-dev / pre-build), so they work
   // in dev and export alike with no rewrites, middleware, or runtime.
+  //
+  // On Cloudflare only, a thin Worker (`worker.ts`, wired in `wrangler.jsonc`)
+  // adds `Accept: text/markdown` content negotiation on `/docs/*`, streaming
+  // those same mirrors inline from one URL. It's additive: the `.md` URLs stay
+  // the host-agnostic fallback everywhere else.
   output: "export",
   trailingSlash: false,
   reactStrictMode: true,
