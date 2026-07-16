@@ -25,7 +25,7 @@ export const entry: ChartEntry = {
   slug: "net-flow",
   status: "stable",
   collection: "decision",
-  tagline: "In versus out — and where does that leave us net?",
+  tagline: "In versus out, and where does that leave us net?",
   staticImport: `${PKG}/net-flow`,
   interactiveImport: `${PKG}/net-flow/interactive`,
   dataShape: "{ in, out }[] per period, oldest first",

@@ -15,7 +15,7 @@ export const entry: ChartEntry = {
   slug: "spiral-year",
   status: "stable",
   collection: "expressive",
-  tagline: "How the year breathed — seasonality at a glance.",
+  tagline: "How the year breathed: seasonality at a glance.",
   staticImport: `${PKG}/spiral-year`,
   interactiveImport: `${PKG}/spiral-year/interactive`,
   dataShape: "(number | null)[]",

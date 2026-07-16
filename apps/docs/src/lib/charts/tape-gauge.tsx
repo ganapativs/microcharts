@@ -15,7 +15,7 @@ export const entry: ChartEntry = {
   status: "stable",
   collection: "frontier",
   tagline:
-    "The level now, the zone it's in, and how fast it's moving — with the eye parked in one place.",
+    "The level now, the zone it's in, and how fast it's moving, with the eye parked in one place.",
   staticImport: `${PKG}/tape-gauge`,
   interactiveImport: `${PKG}/tape-gauge/interactive`,
   dataShape: "value: number, rate?: number, zones?: { from, to, tone }[]",

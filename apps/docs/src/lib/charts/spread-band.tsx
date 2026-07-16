@@ -16,7 +16,7 @@ export const entry: ChartEntry = {
   tagline: "Which of two series leads, by how much, and since when.",
   staticImport: `${PKG}/spread-band`,
   interactiveImport: `${PKG}/spread-band/interactive`,
-  dataShape: "data: { a, b }[] — a = subject, b = reference (null in either = gap in both)",
+  dataShape: "data: { a, b }[], a = subject, b = reference (null in either = gap in both)",
   encoding: {
     channel: "signed area between two lines on ONE shared scale, split at crossings",
     precision: "medium — the filled gap is the read; hover for the exact lead",

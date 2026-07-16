@@ -14,7 +14,7 @@ export const entry: ChartEntry = {
   slug: "phase-trace",
   status: "stable",
   collection: "frontier",
-  tagline: "How two coupled signals move together — loops, regimes, and where the system is now.",
+  tagline: "How two coupled signals move together: loops, regimes, and where the system is now.",
   staticImport: `${PKG}/phase-trace`,
   interactiveImport: `${PKG}/phase-trace/interactive`,
   dataShape: "{ x, y }[] (two synchronized signals as one trajectory)",

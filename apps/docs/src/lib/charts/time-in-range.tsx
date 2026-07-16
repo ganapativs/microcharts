@@ -10,7 +10,7 @@ export const entry: ChartEntry = {
   slug: "time-in-range",
   status: "stable",
   collection: "frontier",
-  tagline: "How much of the period stayed inside the corridor — and which side it missed on.",
+  tagline: "How much of the period stayed inside the corridor, and which side it missed on.",
   staticImport: `${PKG}/time-in-range`,
   interactiveImport: `${PKG}/time-in-range/interactive`,
   dataShape: "{ severeBelow?, below, in, above, severeAbove? } (counts or fractions)",

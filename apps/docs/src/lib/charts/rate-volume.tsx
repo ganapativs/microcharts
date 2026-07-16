@@ -24,7 +24,7 @@ export const entry: ChartEntry = {
   slug: "rate-volume",
   status: "stable",
   collection: "decision",
-  tagline: "The rate moved — on what volume?",
+  tagline: "The rate moved, but on what volume?",
   staticImport: `${PKG}/rate-volume`,
   interactiveImport: `${PKG}/rate-volume/interactive`,
   dataShape: "{ rate, volume }[] per period, oldest first",

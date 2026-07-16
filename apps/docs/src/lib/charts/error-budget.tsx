@@ -18,7 +18,7 @@ export const entry: ChartEntry = {
   tagline: "Are we burning the error budget too fast to survive the window?",
   staticImport: `${PKG}/error-budget`,
   interactiveImport: `${PKG}/error-budget/interactive`,
-  dataShape: "number[] — budget remaining (0–1) per elapsed step; index 0 = 1.0",
+  dataShape: "number[], budget remaining (0–1) per elapsed step; index 0 = 1.0",
   encoding: {
     channel: "remaining-line position vs the steady-burn diagonal",
     precision: "high — position against the pace that exactly spends the window",

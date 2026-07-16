@@ -12,8 +12,8 @@ export function BrandNameSection() {
       <Reveal className="mb-8 max-w-2xl">
         <h2 className="display text-[length:var(--text-fluid-h2)]">One lowercase word.</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
-          Always “microcharts” — even at the start of a sentence. Never MicroCharts, micro charts,
-          or µcharts.
+          Always “microcharts,” even at the start of a sentence. Never MicroCharts, micro charts, or
+          µcharts.
         </p>
       </Reveal>
       <div className="grid items-stretch gap-3 lg:grid-cols-2">
@@ -26,7 +26,7 @@ export function BrandNameSection() {
           </div>
           <ul className="space-y-2.5 text-sm text-fd-muted-foreground">
             <li>The mark may pair with the wordmark or stand alone.</li>
-            <li>Don’t redraw the wordmark — use the shipped lockup.</li>
+            <li>Don’t redraw the wordmark. Use the shipped lockup.</li>
           </ul>
         </Reveal>
         <Reveal delay={80} className="panel flex h-full flex-col overflow-hidden p-0">

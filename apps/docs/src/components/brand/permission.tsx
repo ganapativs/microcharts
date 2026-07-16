@@ -13,7 +13,7 @@ export function BrandPermission() {
           Use it to point at the work.
         </h2>
         <p className="relative max-w-2xl text-sm leading-relaxed text-fd-muted-foreground">
-          Link to or reference microcharts — a “built with,” a talk slide, an integration. Don’t
+          Link to or reference microcharts: a “built with,” a talk slide, an integration. Don’t
           modify the mark, use it as your own product’s mark, or imply endorsement. The code is{" "}
           <a
             href={SITE.repo}

@@ -14,10 +14,10 @@ export const entry: ChartEntry = {
   slug: "control-strip",
   status: "stable",
   collection: "decision",
-  tagline: "Is the process in control — or did something leave the band?",
+  tagline: "Is the process in control, or did something leave the band?",
   staticImport: `${PKG}/control-strip`,
   interactiveImport: `${PKG}/control-strip/interactive`,
-  dataShape: "number[] — sequential process measurements",
+  dataShape: "number[], sequential process measurements",
   encoding: {
     channel: "point position vs the ±3σ̂ control band",
     precision: "high — the σ̂ estimator is the moving-range one, stated",

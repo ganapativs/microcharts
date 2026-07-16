@@ -13,8 +13,7 @@ export const entry: ChartEntry = {
   slug: "dual-window-meter",
   status: "stable",
   collection: "frontier",
-  tagline:
-    "Is the level compliant against its target — right now and on average — spikes vs drift.",
+  tagline: "Is the level compliant against its target, right now and on average: spikes vs drift.",
   staticImport: `${PKG}/dual-window-meter`,
   interactiveImport: `${PKG}/dual-window-meter/interactive`,
   dataShape: "number[] raw series + target",

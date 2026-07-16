@@ -16,7 +16,7 @@ export function BrandHero() {
             The mark, and how to use it.
           </h1>
           <p className="mt-4 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
-            Logo variants, colors, and type — the same small instrument that sits in the nav. Three
+            Logo variants, colors, and type: the same small instrument that sits in the nav. Three
             data cells climb a diagonal, graded faint to solid.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">

@@ -20,7 +20,7 @@ export const entry: ChartEntry = {
   slug: "folded-day-band",
   status: "stable",
   collection: "frontier",
-  tagline: "What a typical period looks like — and whether the current one is typical.",
+  tagline: "What a typical period looks like, and whether the current one is typical.",
   staticImport: `${PKG}/folded-day-band`,
   interactiveImport: `${PKG}/folded-day-band/interactive`,
   dataShape: "{ t, value }[] (raw observations folded by t mod period)",

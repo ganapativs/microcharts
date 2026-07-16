@@ -25,7 +25,7 @@ export const entry: ChartEntry = {
   slug: "confusion-grid",
   status: "stable",
   collection: "frontier",
-  tagline: "Where the errors go — the one thing accuracy-as-a-number hides.",
+  tagline: "Where the errors go: the one thing accuracy-as-a-number hides.",
   staticImport: `${PKG}/confusion-grid`,
   interactiveImport: `${PKG}/confusion-grid/interactive`,
   dataShape: "{ labels: string[], counts: number[][] } (k×k, k ∈ [2,4])",

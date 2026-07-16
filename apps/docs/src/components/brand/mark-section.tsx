@@ -9,7 +9,7 @@ export function BrandMarkSection() {
         <h2 className="display text-[length:var(--text-fluid-h2)]">ActivityGrid DNA, owned.</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
           The three cells climb bottom-left to top-right, fill grading faint to solid. That grade is
-          the same honest encoding the charts use — value carried by weight, not decoration.
+          the same honest encoding the charts use: value carried by weight, not decoration.
         </p>
       </Reveal>
       <Reveal delay={60}>

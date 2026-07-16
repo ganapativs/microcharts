@@ -15,8 +15,7 @@ export const entry: ChartEntry = {
   slug: "rubric-strip",
   status: "stable",
   collection: "frontier",
-  tagline:
-    "How a thing scored per criterion, with each criterion's weight visible — no fake total.",
+  tagline: "How a thing scored per criterion, with each criterion's weight visible, no fake total.",
   staticImport: `${PKG}/rubric-strip`,
   interactiveImport: `${PKG}/rubric-strip/interactive`,
   dataShape: "{ label, score, weight? }[]",

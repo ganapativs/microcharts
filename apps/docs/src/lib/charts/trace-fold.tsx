@@ -21,7 +21,7 @@ export const entry: ChartEntry = {
   slug: "trace-fold",
   status: "stable",
   collection: "frontier",
-  tagline: "Where the latency went — which spans, at which depth, on the path that set the total.",
+  tagline: "Where the latency went: which spans, at which depth, on the path that set the total.",
   staticImport: `${PKG}/trace-fold`,
   interactiveImport: `${PKG}/trace-fold/interactive`,
   dataShape: "{ label, start, duration, depth, parent?, critical? }[]",

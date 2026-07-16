@@ -21,10 +21,10 @@ export const entry: ChartEntry = {
   slug: "event-timeline",
   status: "stable",
   collection: "core",
-  tagline: "What happened when, and for how long — spans and instants on one row.",
+  tagline: "What happened when, and for how long: spans and instants on one row.",
   staticImport: `${PKG}/event-timeline`,
   interactiveImport: `${PKG}/event-timeline/interactive`,
-  dataShape: "{ start, end?, label?, kind? }[] — end present = span, absent = point event",
+  dataShape: "{ start, end?, label?, kind? }[], end present = span, absent = point event",
   encoding: {
     channel: "span extent on a linear time axis; points as position marks",
     precision: "high",

@@ -24,7 +24,7 @@ export function BrandLogoVariants() {
               <div className="bk-stage" data-tile={a.tile}>
                 <Image
                   src={`/brand/${a.file}`}
-                  alt={`microcharts mark — ${a.name}`}
+                  alt={`microcharts mark, ${a.name}`}
                   width={72}
                   height={72}
                 />

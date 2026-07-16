@@ -21,7 +21,7 @@ export const entry: ChartEntry = {
   tagline: "How is this series doing against its benchmark.",
   staticImport: `${PKG}/dual-sparkline`,
   interactiveImport: `${PKG}/dual-sparkline/interactive`,
-  dataShape: "data: (number | null)[] + compare: (number | null)[] — exactly two series",
+  dataShape: "data: (number | null)[] + compare: (number | null)[], exactly two series",
   encoding: {
     channel: "two line positions on ONE shared scale",
     precision: "medium — the gap between the lines is the read; hover for exact pairs",

@@ -30,7 +30,7 @@ export const entry: ChartEntry = {
   slug: "token-confidence",
   status: "stable",
   collection: "frontier",
-  tagline: "Which parts of generated text you should double-check — the text is the chart.",
+  tagline: "Which parts of generated text you should double-check: the text is the chart.",
   staticImport: `${PKG}/token-confidence`,
   interactiveImport: `${PKG}/token-confidence/interactive`,
   dataShape: "{ token, confidence }[] (confidence 0–1)",

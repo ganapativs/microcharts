@@ -9,7 +9,7 @@ export const entry: ChartEntry = {
   slug: "icon-array",
   status: "stable",
   collection: "decision",
-  tagline: "How likely is this, really? — one rate, made countable.",
+  tagline: "How likely is this, really? One rate, made countable.",
   staticImport: `${PKG}/icon-array`,
   interactiveImport: `${PKG}/icon-array/interactive`,
   dataShape: "value (0–1)",

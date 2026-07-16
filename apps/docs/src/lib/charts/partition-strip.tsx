@@ -28,8 +28,7 @@ export const entry: ChartEntry = {
   slug: "partition-strip",
   status: "stable",
   collection: "frontier",
-  tagline:
-    "What the whole is made of — and what the big parts are made of — with parentage visible.",
+  tagline: "What the whole is made of, and what the big parts are made of, with parentage visible.",
   staticImport: `${PKG}/partition-strip`,
   interactiveImport: `${PKG}/partition-strip/interactive`,
   dataShape: "{ label, value?, children? }[] (two levels)",

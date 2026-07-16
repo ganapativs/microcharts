@@ -9,7 +9,7 @@ export const entry: ChartEntry = {
   slug: "progress",
   status: "stable",
   collection: "core",
-  tagline: "How far along, exactly — bar plus the percent that is the datum.",
+  tagline: "How far along, exactly: bar plus the percent that is the datum.",
   staticImport: `${PKG}/progress`,
   interactiveImport: `${PKG}/progress/interactive`,
   dataShape: "number of max (optionally segmented)",

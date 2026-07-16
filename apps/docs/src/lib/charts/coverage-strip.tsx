@@ -12,7 +12,7 @@ export const entry: ChartEntry = {
   slug: "coverage-strip",
   status: "stable",
   collection: "decision",
-  tagline: "Can I trust this data — where was nothing measured?",
+  tagline: "Can I trust this data, and where was nothing measured?",
   staticImport: `${PKG}/coverage-strip`,
   interactiveImport: `${PKG}/coverage-strip/interactive`,
   dataShape: "(number | null)[]",

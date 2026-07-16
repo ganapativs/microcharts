@@ -10,7 +10,7 @@ export const entry: ChartEntry = {
   slug: "rug-strip",
   status: "stable",
   collection: "core",
-  tagline: "Where the raw observations actually sit — distribution without binning.",
+  tagline: "Where the raw observations actually sit: distribution without binning.",
   staticImport: `${PKG}/rug-strip`,
   interactiveImport: `${PKG}/rug-strip/interactive`,
   dataShape: "number[] (raw observations)",

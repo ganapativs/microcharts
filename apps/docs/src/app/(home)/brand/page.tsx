@@ -13,7 +13,7 @@ import { BrandTypeSection } from "@/components/brand/type-section";
 export const metadata: Metadata = docsMeta({
   title: "Brand",
   description:
-    "The microcharts mark, logo variants, colors, and type — with clear-space rules, usage guidance, and downloadable SVG assets.",
+    "The microcharts mark, logo variants, colors, and type, with clear-space rules, usage guidance, and downloadable SVG assets.",
   path: "/brand",
 });
 

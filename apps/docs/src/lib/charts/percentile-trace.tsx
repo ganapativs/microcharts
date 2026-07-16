@@ -16,7 +16,7 @@ export const entry: ChartEntry = {
   tagline: "Is this entity's standing rising or slipping inside the pack?",
   staticImport: `${PKG}/percentile-trace`,
   interactiveImport: `${PKG}/percentile-trace/interactive`,
-  dataShape: "number[] — percentile ranks 0–100, one per reading",
+  dataShape: "number[], percentile ranks 0–100, one per reading",
   encoding: {
     channel: "line position on a locked 0–100 percentile scale",
     precision: "high — rank is the axis, so the population bands are exact by definition",

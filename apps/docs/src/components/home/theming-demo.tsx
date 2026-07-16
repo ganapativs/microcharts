@@ -88,7 +88,7 @@ export function ThemingDemo() {
               aria-label={`Accent ${a.name}`}
               aria-pressed={!inkPreset && accent === a.hex}
               aria-disabled={inkPreset}
-              title={inkPreset ? `${preset} uses fixed inks — accent doesn't apply` : a.name}
+              title={inkPreset ? `${preset} uses fixed inks, so accent doesn't apply` : a.name}
               onClick={() => {
                 if (inkPreset) return;
                 setAccent(a.hex);
@@ -147,7 +147,7 @@ export function ThemingDemo() {
             type="button"
             aria-pressed={preset === p}
             onClick={() => setPreset(p)}
-            className={`rounded-full border px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.1em] transition-colors ${
+            className={`rounded-full border px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.1em] transition-colors active:scale-95 ${
               preset === p
                 ? "border-fd-primary/50 bg-fd-primary/10 text-fd-primary"
                 : "border-hairline text-fd-muted-foreground hover:text-fd-foreground"

@@ -21,7 +21,7 @@ export const entry: ChartEntry = {
   slug: "funnel",
   status: "stable",
   collection: "core",
-  tagline: "Where does the pipeline leak — stage-to-stage conversion in a cell.",
+  tagline: "Where does the pipeline leak? Stage-to-stage conversion in a cell.",
   staticImport: `${PKG}/funnel`,
   interactiveImport: `${PKG}/funnel/interactive`,
   dataShape: "{ label, value }[] (ordered stages)",

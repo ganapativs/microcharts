@@ -34,7 +34,7 @@ export function BrandColorSection() {
           </div>
         </Reveal>
         <Reveal delay={60}>
-          <div className="mono-label mb-3">Semantic — never color alone</div>
+          <div className="mono-label mb-3">Semantic, never color alone</div>
           <div className="grid grid-cols-2 gap-2">
             <ColorSwatch hex="#077353" name="Positive" role="Light" />
             <ColorSwatch hex="#45a385" name="Positive" role="Dark" />

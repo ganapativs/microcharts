@@ -28,7 +28,7 @@ export const entry: ChartEntry = {
   slug: "micro-donut",
   status: "stable",
   collection: "core",
-  tagline: "Roughly what is this made of — an honest, capped concession at icon size.",
+  tagline: "Roughly what is this made of? An honest, capped concession at icon size.",
   staticImport: `${PKG}/micro-donut`,
   interactiveImport: `${PKG}/micro-donut/interactive`,
   dataShape: "{ label, value }[]",

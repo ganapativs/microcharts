@@ -23,7 +23,7 @@ export const entry: ChartEntry = {
   status: "stable",
   collection: "frontier",
   tagline:
-    "When a model says 70%, does it happen 70% of the time — and is there enough data to ask.",
+    "When a model says 70%, does it happen 70% of the time, and is there enough data to ask.",
   staticImport: `${PKG}/calibration-strip`,
   interactiveImport: `${PKG}/calibration-strip/interactive`,
   dataShape: "{ p, outcome }[] raw, or { predicted, observed, count }[] pre-binned",

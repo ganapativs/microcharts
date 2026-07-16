@@ -16,7 +16,7 @@ export const SITE = {
   authorX: "https://x.com/ganapativs",
   authorXHandle: "@ganapativs",
   authorGithub: "https://github.com/ganapativs",
-  ogImageAlt: "microcharts — tiny accessible React charts rendered inline",
+  ogImageAlt: "microcharts: tiny accessible React charts rendered inline",
 } as const;
 
 /** Build an absolute URL for a site-relative path. */

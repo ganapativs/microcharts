@@ -14,10 +14,10 @@ export const entry: ChartEntry = {
   slug: "quantile-dots",
   status: "stable",
   collection: "decision",
-  tagline: "What are the odds — in countable form?",
+  tagline: "What are the odds, in countable form?",
   staticImport: `${PKG}/quantile-dots`,
   interactiveImport: `${PKG}/quantile-dots/interactive`,
-  dataShape: "number[] — raw sample or posterior draws",
+  dataShape: "number[], raw sample or posterior draws",
   encoding: {
     channel: "countable dot frequency past a threshold",
     precision: "high for the count, medium for shape",

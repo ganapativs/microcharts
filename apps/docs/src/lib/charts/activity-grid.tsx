@@ -30,7 +30,7 @@ export const entry: ChartEntry = {
   slug: "activity-grid",
   status: "stable",
   collection: "core",
-  tagline: "Calendar or matrix intensity — the contribution-graph shape.",
+  tagline: "Calendar or matrix intensity: the contribution-graph shape.",
   staticImport: `${PKG}/activity-grid`,
   interactiveImport: `${PKG}/activity-grid/interactive`,
   dataShape: "number[]",

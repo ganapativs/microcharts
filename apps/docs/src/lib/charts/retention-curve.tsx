@@ -13,10 +13,10 @@ export const entry: ChartEntry = {
   slug: "retention-curve",
   status: "stable",
   collection: "decision",
-  tagline: "Do they stay — and does the curve plateau?",
+  tagline: "Do they stay, and does the curve plateau?",
   staticImport: `${PKG}/retention-curve`,
   interactiveImport: `${PKG}/retention-curve/interactive`,
-  dataShape: "number[] — fraction retained per period (period 0 ≈ 1.0)",
+  dataShape: "number[], fraction retained per period (period 0 ≈ 1.0)",
   encoding: {
     channel: "step-line position on a locked [0,1] scale",
     precision: "high — the full range is the honest frame for a share",

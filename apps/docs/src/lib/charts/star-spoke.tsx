@@ -16,7 +16,7 @@ export const entry: ChartEntry = {
   slug: "star-spoke",
   status: "stable",
   collection: "frontier",
-  tagline: "An entity's profile across a few metrics — and which one in a set is the odd one out.",
+  tagline: "An entity's profile across a few metrics, and which one in a set is the odd one out.",
   staticImport: `${PKG}/star-spoke`,
   interactiveImport: `${PKG}/star-spoke/interactive`,
   dataShape: "{ label, value }[] (3–8 metrics)",

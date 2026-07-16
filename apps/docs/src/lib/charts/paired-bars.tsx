@@ -16,7 +16,7 @@ export const entry: ChartEntry = {
   slug: "paired-bars",
   status: "stable",
   collection: "core",
-  tagline: "Actual vs expected, category by category — one shared scale.",
+  tagline: "Actual vs expected, category by category: one shared scale.",
   staticImport: `${PKG}/paired-bars`,
   interactiveImport: `${PKG}/paired-bars/interactive`,
   dataShape: "{ label, value, ref }[]",

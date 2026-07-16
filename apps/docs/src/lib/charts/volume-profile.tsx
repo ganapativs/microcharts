@@ -20,7 +20,7 @@ export const entry: ChartEntry = {
   slug: "volume-profile",
   status: "stable",
   collection: "frontier",
-  tagline: "At which level did activity concentrate — not when.",
+  tagline: "At which level did activity concentrate, not when.",
   staticImport: `${PKG}/volume-profile`,
   interactiveImport: `${PKG}/volume-profile/interactive`,
   dataShape: "{ level, weight }[] or raw levels: number[]",

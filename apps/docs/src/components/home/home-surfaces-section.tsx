@@ -295,7 +295,7 @@ export function HomeSurfacesSection() {
             <ProductSurface />
           </Reveal>
           <Reveal className="panel flex flex-col gap-3 p-4" delay={180}>
-            <span className="mono-label opacity-60">the small placements</span>
+            <Where>the small placements</Where>
             <PlacementQuad />
           </Reveal>
         </div>

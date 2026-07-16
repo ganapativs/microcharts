@@ -11,7 +11,7 @@ export const entry: ChartEntry = {
   slug: "garden-grid",
   status: "stable",
   collection: "expressive",
-  tagline: "The rhythm of activity over time — legible in grayscale and print.",
+  tagline: "The rhythm of activity over time: legible in grayscale and print.",
   staticImport: `${PKG}/garden-grid`,
   interactiveImport: `${PKG}/garden-grid/interactive`,
   dataShape: "(number | null)[]",
