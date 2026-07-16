@@ -1,29 +1,22 @@
 ---
 title: FoldedDayBand
-description: A modal-day profile for React — many periods folded onto one axis as median and percentile envelopes, with an optional "today" overlay to ask how typical now is.
+description:
+  A modal-day profile for React — many periods folded onto one axis as median and percentile envelopes, with an optional
+  "today" overlay to ask how typical now is.
 ---
 
-FoldedDayBand answers "what does a typical period look like — and is the current one typical?". It
-folds many days (or weeks, or any cycle) onto a single period axis and shows the median with 25–75
-and 5–95 percentile envelopes. Drop in a `today` overlay and the chart answers the second question:
-is right now inside the usual band, or an outlier?
+FoldedDayBand answers "what does a typical period look like — and is the current one typical?". It folds many days (or
+weeks, or any cycle) onto a single period axis and shows the median with 25–75 and 5–95 percentile envelopes. Drop in a
+`today` overlay and the chart answers the second question: is right now inside the usual band, or an outlier?
 
 <LiveDemo
   label="FoldedDayBand"
   sizeOf="folded-day-band"
   code={`import { FoldedDayBand } from "@microcharts/react/folded-day-band";
 
-const curve = (h) => 40 + 42 _ Math.max(0, 1 - Math.abs(h - 14) / 10);
-const observations = Array.from({ length: 14 }, (\_d, d) =>
-Array.from({ length: 24 }, (\_h, h) => ({
-t: d _ 24 + h,
-value: Math.round(curve(h) + Math.sin(d + h) \* 8),
-})),
-).flat();
-const today = Array.from({ length: 24 }, (\_h, h) => ({
-t: h,
-value: Math.round(curve(h) + 14),
-}));
+const curve = (h) => 40 + 42 _ Math.max(0, 1 - Math.abs(h - 14) / 10); const observations = Array.from({ length: 14 },
+(\_d, d) => Array.from({ length: 24 }, (\_h, h) => ({ t: d _ 24 + h, value: Math.round(curve(h) + Math.sin(d + h) \* 8),
+})), ).flat(); const today = Array.from({ length: 24 }, (\_h, h) => ({ t: h, value: Math.round(curve(h) + 14), }));
 
 <FoldedDayBand data={observations} today={today} title="Typical day" />`}
 >
@@ -94,16 +87,13 @@ value: Math.round(curve(h) + 14),
   </span>
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's fold
-position and peak value follow that locale's own decimal mark ("14,0" in German, not "14.0"). The
-band and median line themselves don't change shape; only the announced numbers are localized.
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's fold position and peak value
+follow that locale's own decimal mark ("14,0" in German, not "14.0"). The band and median line themselves don't change
+shape; only the announced numbers are localized.
 
 ## Edge cases
 
-<LiveDemo
-  label="single observation"
-  code={`<FoldedDayBand data={[{ t: 3, value: 10 }]} title="Single observation" />`}
->
+<LiveDemo label="single observation" code={`<FoldedDayBand data={[{ t: 3, value: 10 }]} title="Single observation" />`}>
   <FoldedDayBand data={[{ t: 3, value: 10 }]} title="Single observation" width={160} height={32} />
 </LiveDemo>
 
@@ -123,10 +113,10 @@ band and median line themselves don't change shape; only the announced numbers a
   />
 </LiveDemo>
 
-A single observation reports a real accessible name (median and peak both equal that one value)
-but has no width to fold across, so nothing visibly paints — the chart is accessible-first even
-when there's too little data to draw. Identical values across every bin still render as a flat
-line, distinct from the empty state below, which renders nothing and announces "No data."
+A single observation reports a real accessible name (median and peak both equal that one value) but has no width to fold
+across, so nothing visibly paints — the chart is accessible-first even when there's too little data to draw. Identical
+values across every bin still render as a flat line, distinct from the empty state below, which renders nothing and
+announces "No data."
 
 ## Four homes
 
@@ -134,18 +124,16 @@ line, distinct from the empty state below, which renders nothing and announces "
 
 ## Why this default
 
-Two envelopes plus a median is the typical-day grammar that clinical glucose profiles
-standardized on. The envelopes come from
-real per-bin quantiles — never smoothed across bins into a shape the data doesn't support — and the
-outer boundary fades so 5–95 doesn't read as a hard limit. When a bin has too few observations the
-band collapses to the median there rather than inventing a width, and the number of folded periods
-backs the claim.
+Two envelopes plus a median is the typical-day grammar that clinical glucose profiles standardized on. The envelopes
+come from real per-bin quantiles — never smoothed across bins into a shape the data doesn't support — and the outer
+boundary fades so 5–95 doesn't read as a hard limit. When a bin has too few observations the band collapses to the
+median there rather than inventing a width, and the number of folded periods backs the claim.
 
 ## Accessibility
 
-The accessible name reports the peak and how today compares — **"Median peaks at 14 (82.5); today is
-above the 75th percentile."** The interactive entry roves the folded axis with ←/→, announcing the
-median and middle-half at each position.
+The accessible name reports the peak and how today compares — **"Median peaks at 14 (82.5); today is above the 75th
+percentile."** The interactive entry roves the folded axis with ←/→, announcing the median and middle-half at each
+position.
 
 ## Props
 

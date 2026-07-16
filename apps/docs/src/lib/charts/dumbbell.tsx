@@ -20,7 +20,7 @@ export const entry: ChartEntry = {
   slug: "dumbbell",
   status: "stable",
   collection: "core",
-  tagline: "Where each row started and ended — hollow to filled, no legend.",
+  tagline: "Where each row started and ended: hollow to filled, no legend.",
   staticImport: `${PKG}/dumbbell`,
   interactiveImport: `${PKG}/dumbbell/interactive`,
   dataShape: "{ label?, from, to }[]",

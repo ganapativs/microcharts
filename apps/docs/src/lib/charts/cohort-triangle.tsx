@@ -22,7 +22,7 @@ export const entry: ChartEntry = {
   tagline: "Which vintage retains worst, compared at equal maturity.",
   staticImport: `${PKG}/cohort-triangle`,
   interactiveImport: `${PKG}/cohort-triangle/interactive`,
-  dataShape: "{ label, values }[] — retention per age (ragged rows)",
+  dataShape: "{ label, values }[], retention per age (ragged rows)",
   encoding: {
     channel: "color intensity (discrete levels) over an age × cohort grid",
     precision: "low — steer to a table when exact per-cell values matter",

@@ -1,10 +1,11 @@
 "use client";
 import { useState, type CSSProperties } from "react";
-import { Check } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { MiniBar } from "@microcharts/react/mini-bar";
 import { cn } from "@/lib/cn";
 import { SEMANTIC_TOKENS, CATEGORICAL_TOKENS, PRESETS, type ColorToken } from "@/lib/mc-tokens";
+import { serializeTokens } from "@/lib/token-export";
 
 /**
  * Visual reference for the library `--mc-*` colour tokens on the theming page.
@@ -147,6 +148,37 @@ function DeltaChip({ cssVar, value }: { cssVar: string; value: string }) {
   );
 }
 
+// Copy a preset's full token block (light + hand-tuned dark) as ready CSS —
+// the quick path next to each card; the studio below is the full instrument.
+function CopyPresetTokens({ preset }: { preset: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        const css = serializeTokens({
+          preset,
+          accent: null,
+          mode: "both",
+          include: "color",
+          scope: ":root",
+          format: "css",
+          annotate: false,
+        });
+        void navigator.clipboard.writeText(css).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1400);
+        });
+      }}
+      aria-label={`Copy ${preset} tokens for light and dark`}
+      className="inline-flex items-center gap-1 rounded-md border border-fd-border/70 px-1.5 py-0.5 text-[0.62rem] font-medium text-fd-muted-foreground transition-colors hover:border-fd-primary/40 hover:text-fd-foreground"
+    >
+      {copied ? <Check className="size-3 text-fd-primary" /> : <Copy className="size-3" />}
+      {copied ? "Copied" : "Copy tokens"}
+    </button>
+  );
+}
+
 /**
  * What each preset retunes — shown, not just told. Each card renders real charts
  * (a line + valence bars) under that preset's own tokens on a paper surface,
@@ -190,6 +222,9 @@ export function PresetDeltas() {
                 {p.id === "modern" && (
                   <span className="mono-label text-[0.5rem] uppercase opacity-55">default</span>
                 )}
+                <span className="ml-auto opacity-70 transition-opacity group-hover/preset:opacity-100 focus-within:opacity-100">
+                  <CopyPresetTokens preset={p.id} />
+                </span>
               </div>
               <p className="text-[0.78rem] leading-snug text-fd-muted-foreground">{p.note}</p>
               {p.changes.length > 0 && (

@@ -1,11 +1,12 @@
 ---
 title: DualSparkline
-description: A word-sized comparison sparkline for React — your series against its benchmark on one shared scale, never dual axes.
+description:
+  A word-sized comparison sparkline for React — your series against its benchmark on one shared scale, never dual axes.
 ---
 
-DualSparkline answers "how is this series doing against its benchmark?" Exactly two
-series, ever — three overlapped lines at 16 px are unreadable (SparkGroup for that). The
-benchmark whispers: dashed, thinner, neutral — never distinguished by color alone.
+DualSparkline answers "how is this series doing against its benchmark?" Exactly two series, ever — three overlapped
+lines at 16 px are unreadable (SparkGroup for that). The benchmark whispers: dashed, thinner, neutral — never
+distinguished by color alone.
 
 <LiveDemo label="DualSparkline" sizeOf="dual-sparkline">
   <DualSparkline
@@ -112,10 +113,9 @@ benchmark whispers: dashed, thinner, neutral — never distinguished by color al
   />
 </LiveDemo>
 
-Each series carries its own gaps independently — a `null` in `data` breaks only the primary
-line at that index, a `null` in `compare` only the benchmark, and the nearest-x hover still
-reports both values (or "no data" for whichever side is missing). With a `locale`, the
-endpoint label and both hover values follow that locale's grouping.
+Each series carries its own gaps independently — a `null` in `data` breaks only the primary line at that index, a `null`
+in `compare` only the benchmark, and the nearest-x hover still reports both values (or "no data" for whichever side is
+missing). With a `locale`, the endpoint label and both hover values follow that locale's grouping.
 
 ## Four homes
 
@@ -123,15 +123,14 @@ endpoint label and both hover values follow that locale's grouping.
 
 ## Why this default
 
-One shared domain across both series — the entire point is comparability, so there are
-no dual axes and no per-series normalization. A shorter benchmark simply ends; stretching
-it would fake correlation. Coincident endpoints dedupe to one dot so ink never doubles.
+One shared domain across both series — the entire point is comparability, so there are no dual axes and no per-series
+normalization. A shorter benchmark simply ends; stretching it would fake correlation. Coincident endpoints dedupe to one
+dot so ink never doubles.
 
 ## Accessibility
 
-The accessible name reads both trends and both endpoints — **"Trending up 75% vs
-benchmark up 33%. Last 21 vs 16."** Identical series read "Matching benchmark." The
-interactive entry announces pairs (**"Point 9 of 12: 17 vs 15."**).
+The accessible name reads both trends and both endpoints — **"Trending up 75% vs benchmark up 33%. Last 21 vs 16."**
+Identical series read "Matching benchmark." The interactive entry announces pairs (**"Point 9 of 12: 17 vs 15."**).
 
 ## Props
 

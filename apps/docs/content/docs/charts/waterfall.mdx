@@ -1,11 +1,12 @@
 ---
 title: Waterfall
-description: A word-sized waterfall chart for React — signed deltas composing into a total, with a zero-anchored total bar keeping the bridge honest.
+description:
+  A word-sized waterfall chart for React — signed deltas composing into a total, with a zero-anchored total bar keeping
+  the bridge honest.
 ---
 
-Waterfall answers "how did the deltas compose into the total?" — the P&L bridge, in a
-cell. Sign is encoded by vertical direction from the running level AND by valence color,
-never color alone.
+Waterfall answers "how did the deltas compose into the total?" — the P&L bridge, in a cell. Sign is encoded by vertical
+direction from the running level AND by valence color, never color alone.
 
 <LiveDemo label="Waterfall" sizeOf="waterfall">
   <Waterfall
@@ -172,15 +173,13 @@ never color alone.
 
 ## Why this default
 
-The zero-anchored total bar stays on by default: a waterfall without a grounded total is
-unverifiable — floating bars alone can't be checked against reality. Hairline connectors
-carry the running level between steps without adding ink.
+The zero-anchored total bar stays on by default: a waterfall without a grounded total is unverifiable — floating bars
+alone can't be checked against reality. Hairline connectors carry the running level between steps without adding ink.
 
 ## Accessibility
 
-The accessible name states the endpoints and the split — **"From 60 to 87 over 5 steps:
-+65 gains, −38 losses."** The interactive entry steps through the bridge (**"Refunds:
-−12, running 108."**).
+The accessible name states the endpoints and the split — **"From 60 to 87 over 5 steps: +65 gains, −38 losses."** The
+interactive entry steps through the bridge (**"Refunds: −12, running 108."**).
 
 ## Props
 

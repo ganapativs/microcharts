@@ -29,7 +29,7 @@ export const entry: ChartEntry = {
   slug: "histogram-strip",
   status: "stable",
   collection: "core",
-  tagline: "What does the distribution look like — mode, spread, skew in a cell.",
+  tagline: "What does the distribution look like? Mode, spread, skew in a cell.",
   staticImport: `${PKG}/histogram-strip`,
   interactiveImport: `${PKG}/histogram-strip/interactive`,
   dataShape: "number[] (raw observations, binned internally)",

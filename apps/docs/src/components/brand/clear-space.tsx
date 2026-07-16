@@ -11,8 +11,8 @@ export function BrandClearSpace() {
           One cell of air. Sixteen pixels floor.
         </h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
-          Keep clear space of at least one cell-width on every side. Below 16 px the grade collapses
-          — never go smaller.
+          Keep clear space of at least one cell-width on every side. Below 16 px the grade
+          collapses. Never go smaller.
         </p>
       </Reveal>
       <div className="grid gap-3 lg:grid-cols-2">

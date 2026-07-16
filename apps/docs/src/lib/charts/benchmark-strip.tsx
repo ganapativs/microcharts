@@ -251,6 +251,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <BenchmarkStrip
       data={props.data}
       value={props.data[Math.floor(props.data.length / 2)] ?? 0}
+      label="none"
       summary={false}
       width={props.width ?? 70}
       height={props.height ?? 12}

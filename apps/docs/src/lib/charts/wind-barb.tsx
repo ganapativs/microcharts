@@ -8,7 +8,7 @@ export const entry: ChartEntry = {
   slug: "wind-barb",
   status: "stable",
   collection: "frontier",
-  tagline: "Which way it's flowing and roughly how hard — in one character.",
+  tagline: "Which way it's flowing and roughly how hard, in one character.",
   staticImport: `${PKG}/wind-barb`,
   dataShape: "{ direction, magnitude }",
   encoding: { channel: "shaft angle + quantized barb count", precision: "medium" },

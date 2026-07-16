@@ -19,7 +19,7 @@ export const entry: ChartEntry = {
   slug: "heat-strip",
   status: "stable",
   collection: "core",
-  tagline: "How intensity evolved, glanceably — the 1×N sibling of ActivityGrid.",
+  tagline: "How intensity evolved, glanceably: the 1×N sibling of ActivityGrid.",
   staticImport: `${PKG}/heat-strip`,
   interactiveImport: `${PKG}/heat-strip/interactive`,
   dataShape: "(number | null)[]",

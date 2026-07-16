@@ -1,12 +1,13 @@
 ---
 title: DepthWedge
-description: An order-book depth glyph for React — two cumulative step-wedges meeting at the spread, showing supply vs demand posture on a linear scale.
+description:
+  An order-book depth glyph for React — two cumulative step-wedges meeting at the spread, showing supply vs demand
+  posture on a linear scale.
 ---
 
-DepthWedge answers "how much pressure is stacked on each side of the current level, and how wide is
-the gap between them?". Demand accumulates leftward from the spread and supply rightward, so the two
-filled wedges show the book's posture in a glyph. The y-scale is linear, full stop — log-depth
-reading belongs to full-size tools.
+DepthWedge answers "how much pressure is stacked on each side of the current level, and how wide is the gap between
+them?". Demand accumulates leftward from the spread and supply rightward, so the two filled wedges show the book's
+posture in a glyph. The y-scale is linear, full stop — log-depth reading belongs to full-size tools.
 
 <LiveDemo
   label="DepthWedge"
@@ -131,12 +132,7 @@ reading belongs to full-size tools.
 // to measure without both a best bid and a best ask)
 <DepthWedge data={{ demand: [{ level: 99.5, amount: 200 }], supply: [] }} />`}
 >
-  <DepthWedge
-    data={{ demand: [{ level: 99.5, amount: 200 }], supply: [] }}
-    title="One-sided"
-    width={300}
-    height={30}
-  />
+  <DepthWedge data={{ demand: [{ level: 99.5, amount: 200 }], supply: [] }} title="One-sided" width={300} height={30} />
 </LiveDemo>
 
 ## Four homes
@@ -145,16 +141,16 @@ reading belongs to full-size tools.
 
 ## Why this default
 
-Linear scale plus a stated `levels` span because a wedge you can't interrogate must not editorialize
-— a silent log axis would exaggerate near-spread depth and flatter thin books. The visible range is
-part of the claim, so the summary always carries "within the shown range", and the spread — the gap
-between the best bid and best ask — is the headline number above the mid line.
+Linear scale plus a stated `levels` span because a wedge you can't interrogate must not editorialize — a silent log axis
+would exaggerate near-spread depth and flatter thin books. The visible range is part of the claim, so the summary always
+carries "within the shown range", and the spread — the gap between the best bid and best ask — is the headline number
+above the mid line.
 
 ## Accessibility
 
-The accessible name states the posture, range-scoped — **"Demand outweighs supply 1.75× within the
-shown range; spread 0.5."** (the hero demo's order book). The interactive entry walks the levels
-with ←/→, announcing the cumulative depth on each side and its distance from the mid.
+The accessible name states the posture, range-scoped — **"Demand outweighs supply 1.75× within the shown range; spread
+0.5."** (the hero demo's order book). The interactive entry walks the levels with ←/→, announcing the cumulative depth
+on each side and its distance from the mid.
 
 ## Props
 

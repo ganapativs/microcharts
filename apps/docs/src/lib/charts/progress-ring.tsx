@@ -9,7 +9,7 @@ export const entry: ChartEntry = {
   slug: "progress-ring",
   status: "stable",
   collection: "core",
-  tagline: "How complete is this — at icon size, where a bar doesn't fit.",
+  tagline: "How complete is this? At icon size, where a bar doesn't fit.",
   staticImport: `${PKG}/progress-ring`,
   interactiveImport: `${PKG}/progress-ring/interactive`,
   dataShape: "value of max",

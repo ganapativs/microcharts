@@ -23,8 +23,7 @@ export const entry: ChartEntry = {
   slug: "hypnogram",
   status: "stable",
   collection: "frontier",
-  tagline:
-    "Which discrete state the system was in over time — and how choppy the transitions were.",
+  tagline: "Which discrete state the system was in over time, and how choppy the transitions were.",
   staticImport: `${PKG}/hypnogram`,
   interactiveImport: `${PKG}/hypnogram/interactive`,
   dataShape: "{ t, state }[] (state holds until the next entry)",

@@ -411,9 +411,8 @@ function renderStream(type: string, body: string, block: boolean): ReactNode {
 }
 
 // Text metrics (Delta) keep their own baseline so the number sits on the
-// sentence line. Every other inline SVG mark gets `.mc-inline` — measured:
-// VA-middle alone seats marks ~1.4px below adjacent digit mid; the wrap's
-// --mc-inline-nudge (-0.14em) corrects it.
+// sentence line. Every other inline SVG mark gets `.mc-inline`, which seats
+// the mark on the text baseline (font-independent — see styles.css).
 const TEXT_GLYPH = new Set(["delta"]);
 
 // Standalone block chart (fenced form). Info string is `<type> [title…]`. Memoized:
@@ -470,30 +469,32 @@ function Inline({ text }: { text: string }) {
   );
 }
 
-function nodeKey(n: Node): string {
-  return n.t === "text" ? `text:${n.v}` : `code:${n.type}:${n.closed}:${n.body}`;
-}
-
 // One rendered message body. `animate` adds the settle on block charts; the ghost
 // copy passes false. `caret` shows the typing cursor at the tail.
+//
+// Nodes are keyed by POSITION (index), never by content. parse() only ever
+// extends the last node or appends a new one as the stream grows, so index i
+// keeps the same semantic node throughout — React updates its text in place
+// instead of remounting the span. Content-derived keys grew every token, which
+// remounted each text span AND re-mounted the inline charts inside it, replaying
+// their entrance animation on every tick (the visible flicker). A fenced block
+// flipping open→closed does change the element type at its index, so THAT node
+// remounts once and morphs in — which is exactly what we want.
 function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; caret: boolean }) {
   return (
     <div className="max-w-xl text-[0.98rem] leading-relaxed text-fd-foreground/85">
-      {nodes.map((n) =>
+      {nodes.map((n, i) =>
         n.t === "text" ? (
-          <span key={nodeKey(n)} className="whitespace-pre-wrap">
+          <span key={i} className="whitespace-pre-wrap">
             <Inline text={n.v} />
           </span>
         ) : n.closed ? (
-          <span
-            key={nodeKey(n)}
-            className={`my-2 flex justify-start${animate ? " mc-stream-chart" : ""}`}
-          >
+          <span key={i} className={`my-2 flex justify-start${animate ? " mc-stream-chart" : ""}`}>
             <BlockChart info={n.type} body={n.body} />
           </span>
         ) : (
           <code
-            key={nodeKey(n)}
+            key={i}
             className="code-inset my-3 block whitespace-pre px-4 py-3 font-mono text-[0.8rem] text-fd-muted-foreground"
           >
             {"```chart " + n.type + "\n" + n.body}

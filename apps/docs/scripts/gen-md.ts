@@ -12,12 +12,25 @@
  */
 import { readdirSync, statSync, readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
-import { expandComponents } from "../src/lib/md-transform.ts";
+import { expandComponents, type ResolveChart } from "../src/lib/md-transform.ts";
 
 const root = resolve(import.meta.dirname, "..");
 const contentDir = join(root, "content", "docs");
 const publicDir = join(root, "public");
 const outDir = join(publicDir, "docs");
+
+/**
+ * Resolve a chart's prop metadata from the committed registry snapshot, read
+ * directly as JSON so this stays on Node's native TypeScript (the catalog
+ * facade's extensionless / attribute-less imports are bundler-only). Same
+ * source the app's `getChart` compiles from, so both surfaces agree.
+ */
+type ChartRow = { slug: string } & NonNullable<ReturnType<ResolveChart>>;
+const chartEntries = JSON.parse(
+  readFileSync(join(root, "src", "lib", "charts", "entries.generated.json"), "utf8"),
+) as ChartRow[];
+const chartBySlug = new Map(chartEntries.map((c) => [c.slug, c]));
+const resolveChart: ResolveChart = (slug) => chartBySlug.get(slug);
 
 /** Collect every .mdx under content/docs. */
 function walk(dir: string, acc: string[] = []): string[] {
@@ -66,7 +79,7 @@ function generate(): number {
     const target = join(publicDir, targetRel);
 
     const { title, body } = parse(readFileSync(file, "utf8"));
-    const md = `# ${title} (${url})\n\n${expandComponents(body)}\n`;
+    const md = `# ${title} (${url})\n\n${expandComponents(body, resolveChart)}\n`;
 
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, md);

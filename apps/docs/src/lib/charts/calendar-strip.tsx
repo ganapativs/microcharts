@@ -18,10 +18,10 @@ export const entry: ChartEntry = {
   slug: "calendar-strip",
   status: "stable",
   collection: "core",
-  tagline: "The last few weeks, day by day — real calendar position.",
+  tagline: "The last few weeks, day by day: real calendar position.",
   staticImport: `${PKG}/calendar-strip`,
   interactiveImport: `${PKG}/calendar-strip/interactive`,
-  dataShape: "{ date: ISO string | Date, value }[] — date-indexed, not slot-indexed",
+  dataShape: "{ date: ISO string | Date, value }[], date-indexed, not slot-indexed",
   encoding: {
     channel: "discrete color step per real calendar day",
     precision: "low per day, high for rhythm — ActivityGrid for longer histories",

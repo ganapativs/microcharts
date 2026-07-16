@@ -1,11 +1,11 @@
 ---
 title: DotPlot
-description: A tiny dot plot for React — named values on one shared scale, with optional zero-anchored stems and value labels.
+description:
+  A tiny dot plot for React — named values on one shared scale, with optional zero-anchored stems and value labels.
 ---
 
-DotPlot answers "how do a few named values compare on one scale?" with the minimum ink
-per comparison. Dots over bars when the scale doesn't start at zero — position lies less
-than truncated bar length.
+DotPlot answers "how do a few named values compare on one scale?" with the minimum ink per comparison. Dots over bars
+when the scale doesn't start at zero — position lies less than truncated bar length.
 
 <LiveDemo
   label="DotPlot"
@@ -39,8 +39,7 @@ than truncated bar length.
 
 ## When to use it
 
-- **Good for** — KPI leaderboards, named comparisons in cards, rows where a truncated
-  bar would lie.
+- **Good for** — KPI leaderboards, named comparisons in cards, rows where a truncated bar would lie.
 - **Avoid for** — more than 7 rows or time series (Sparkline).
 
 ## Sizing
@@ -114,13 +113,11 @@ than truncated bar length.
   />
 </LiveDemo>
 
-An empty series has nothing to compare, so no dots draw and the accessible name reads **"No
-data."** A single category still renders normally — one dot, one label — with the summary's
-"category"/"categories" wording matching the count (**"1 category. Highest Only 42, lowest
-Only 42."**). A `null` value draws no dot and no label for its row, but the row still occupies
-its slot in the vertical rhythm — the real values around it keep the same spacing they'd have
-in a fully populated set — and it's excluded from the category count in the summary, not
-counted as a comparison with nothing.
+An empty series has nothing to compare, so no dots draw and the accessible name reads **"No data."** A single category
+still renders normally — one dot, one label — with the summary's "category"/"categories" wording matching the count
+(**"1 category. Highest Only 42, lowest Only 42."**). A `null` value draws no dot and no label for its row, but the row
+still occupies its slot in the vertical rhythm — the real values around it keep the same spacing they'd have in a fully
+populated set — and it's excluded from the category count in the summary, not counted as a comparison with nothing.
 
 ## Four homes
 
@@ -128,17 +125,15 @@ counted as a comparison with nothing.
 
 ## Why this default
 
-Without `stem` the domain fits the data (a position read); with `stem` the domain is
-forced through zero (a magnitude read) — the prop flips the honesty regime, and the docs
-say so. Coincident dots on adjacent rows de-overlap by half a unit; labels truncate by
-character count and drop entirely when rows get too dense — all pure arithmetic, nothing
+Without `stem` the domain fits the data (a position read); with `stem` the domain is forced through zero (a magnitude
+read) — the prop flips the honesty regime, and the docs say so. Coincident dots on adjacent rows de-overlap by half a
+unit; labels truncate by character count and drop entirely when rows get too dense — all pure arithmetic, nothing
 measured.
 
 ## Accessibility
 
-The accessible name carries count and extremes — **"3 categories. Highest Ada 96, lowest
-Kim 41."** The interactive entry roves rows and announces each with its rank
-(**"Ada: 96 — 1st of 3."**).
+The accessible name carries count and extremes — **"3 categories. Highest Ada 96, lowest Kim 41."** The interactive
+entry roves rows and announces each with its rank (**"Ada: 96 — 1st of 3."**).
 
 ## Props
 

@@ -2,6 +2,7 @@ import { docs } from "collections/server";
 import { loader } from "fumadocs-core/source";
 import { docsImageRoute, docsRoute } from "./shared";
 import { expandComponents } from "./md-transform";
+import { getChart } from "./catalog";
 
 // https://fumadocs.dev/docs/headless/source-api
 export const source = loader({
@@ -34,5 +35,5 @@ export function markdownRouteSegments(page: (typeof source)["$inferPage"]) {
 
 export async function getLLMText(page: (typeof source)["$inferPage"]) {
   const processed = await page.data.getText("processed");
-  return `# ${page.data.title} (${page.url})\n\n${expandComponents(processed)}`;
+  return `# ${page.data.title} (${page.url})\n\n${expandComponents(processed, getChart)}`;
 }

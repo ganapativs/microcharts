@@ -16,7 +16,7 @@ export const entry: ChartEntry = {
   tagline: "Will we finish on time?",
   staticImport: `${PKG}/burn-chart`,
   interactiveImport: `${PKG}/burn-chart/interactive`,
-  dataShape: "{ plan: number[]; actual: number[] } — remaining work per period",
+  dataShape: "{ plan: number[]; actual: number[] }, remaining work per period",
   encoding: {
     channel: "actual line vs the plan line + projected landing gap",
     precision: "high for history, low-deliberate for the dotted projection",
@@ -271,6 +271,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
   return (
     <BurnChart
       data={{ plan, actual }}
+      label="none"
       summary={false}
       width={props.width ?? 70}
       height={props.height ?? 18}

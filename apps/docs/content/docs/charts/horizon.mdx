@@ -1,22 +1,19 @@
 ---
 title: Horizon
-description: A word-sized horizon chart for React — a wide-range series folded into a slim band, dozens of rows glanceable at once.
+description:
+  A word-sized horizon chart for React — a wide-range series folded into a slim band, dozens of rows glanceable at once.
 ---
 
-Horizon answers "what happened across this wide-range series — in a 14-pixel row?" The
-series is cut into bands and folded: layer opacity carries magnitude, so extremes stay
-visible at heights where a sparkline would flatten into noise.
+Horizon answers "what happened across this wide-range series — in a 14-pixel row?" The series is cut into bands and
+folded: layer opacity carries magnitude, so extremes stay visible at heights where a sparkline would flatten into noise.
 
-**How to read it** — every band rises from the row's bottom edge, positive or negative; darker
-means farther from the baseline, not which direction. Above-baseline values shade in the accent
-color, below-baseline in the negative color, so direction is never color-alone even though both
-fold upward the same way.
+**How to read it** — every band rises from the row's bottom edge, positive or negative; darker means farther from the
+baseline, not which direction. Above-baseline values shade in the accent color, below-baseline in the negative color, so
+direction is never color-alone even though both fold upward the same way.
 
 <LiveDemo label="Horizon" sizeOf="horizon">
   <Horizon
-    data={[
-      2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
-    ]}
+    data={[2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20]}
     title="Cluster load"
     width={220}
     height={22}
@@ -49,9 +46,7 @@ fold upward the same way.
 <Horizon data={cpuLoad} folds={3} />`}
 >
   <Horizon
-    data={[
-      2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
-    ]}
+    data={[2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20]}
     folds={3}
     title="Three folds"
     width={220}
@@ -94,9 +89,9 @@ fold upward the same way.
   />
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's range
-and last-value numbers follow that locale's own grouping ("4.500" in German, not "4,500"). The
-interactive readout's per-point values localize the same way; the folded geometry never changes.
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's range and last-value numbers
+follow that locale's own grouping ("4.500" in German, not "4,500"). The interactive readout's per-point values localize
+the same way; the folded geometry never changes.
 
 ## Edge cases
 
@@ -114,18 +109,14 @@ interactive readout's per-point values localize the same way; the folded geometr
   />
 </LiveDemo>
 
-<LiveDemo
-  label="identical values → a flat block, not empty"
-  code={`<Horizon data={[5, 5, 5, 5, 5]} title="Flat" />`}
->
+<LiveDemo label="identical values → a flat block, not empty" code={`<Horizon data={[5, 5, 5, 5, 5]} title="Flat" />`}>
   <Horizon data={[5, 5, 5, 5, 5]} title="Flat" width={160} height={22} />
 </LiveDemo>
 
-Negative values take the negative token and fold from the same bottom edge as positive values
-(the default `mode="mirror"`) — both directions get darker as they move away from the baseline,
-so "denser" always means "farther from typical," never "which sign." Identical values across the
-whole row still render as a solid block rather than vanishing, keeping "flat" visibly distinct
-from "no data."
+Negative values take the negative token and fold from the same bottom edge as positive values (the default
+`mode="mirror"`) — both directions get darker as they move away from the baseline, so "denser" always means "farther
+from typical," never "which sign." Identical values across the whole row still render as a solid block rather than
+vanishing, keeping "flat" visibly distinct from "no data."
 
 ## Four homes
 
@@ -133,16 +124,14 @@ from "no data."
 
 ## Why this default
 
-Two folds is the default because it needs no training to read approximately; three folds
-trade learnability for density and should be reserved for ranges that genuinely span
-them. The `baseline` is authored, never inferred — a fold origin is a claim about what
-"normal" means.
+Two folds is the default because it needs no training to read approximately; three folds trade learnability for density
+and should be reserved for ranges that genuinely span them. The `baseline` is authored, never inferred — a fold origin
+is a claim about what "normal" means.
 
 ## Accessibility
 
-The accessible name reads the unfolded series — **"Trending up 900%. Range 2 to 45. Last
-value 20."** — so screen-reader users get the true values, not the folded geometry. The
-interactive readout announces unfolded values per point.
+The accessible name reads the unfolded series — **"Trending up 900%. Range 2 to 45. Last value 20."** — so screen-reader
+users get the true values, not the folded geometry. The interactive readout announces unfolded values per point.
 
 ## Props
 

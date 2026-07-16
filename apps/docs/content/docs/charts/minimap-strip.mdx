@@ -1,20 +1,19 @@
 ---
 title: MinimapStrip
-description: A minimap for React — a content thumbnail with a draggable viewport window, an annotation-tick lane, and fog over unknown regions, so absence never reads as zero.
+description:
+  A minimap for React — a content thumbnail with a draggable viewport window, an annotation-tick lane, and fog over
+  unknown regions, so absence never reads as zero.
 ---
 
-MinimapStrip answers "where am I in the whole — and where in the whole is everything else I care
-about?". A content thumbnail sits under a viewport window and a lane of annotation ticks, and any
-region you haven't loaded or crawled is drawn as fog rather than blank — because absence is not the
-same as zero. The unknown share travels with the accessible name.
+MinimapStrip answers "where am I in the whole — and where in the whole is everything else I care about?". A content
+thumbnail sits under a viewport window and a lane of annotation ticks, and any region you haven't loaded or crawled is
+drawn as fog rather than blank — because absence is not the same as zero. The unknown share travels with the accessible
+name.
 
 <LiveDemo label="MinimapStrip" sizeOf="minimap-strip">
   <MinimapStrip
     data={{
-      content: Array.from(
-        { length: 1200 },
-        (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6,
-      ),
+      content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6),
       window: [520, 660],
       marks: [100, 600, 1100],
       known: [[0, 1104]],
@@ -60,10 +59,7 @@ same as zero. The unknown share travels with the accessible name.
 >
   <MinimapStrip
     data={{
-      content: Array.from(
-        { length: 1200 },
-        (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6,
-      ),
+      content: Array.from({ length: 1200 }, (_, i) => Math.abs(Math.sin(i / 40)) + Math.abs(Math.sin(i / 150)) * 0.6),
       window: [300, 440],
       marks: [600, 1000],
     }}
@@ -105,16 +101,15 @@ same as zero. The unknown share travels with the accessible name.
 
 ## Why this default
 
-Bars plus a separate mark lane keep "where am I" and "where are the annotations" as two clean reads
-instead of one muddle. Fog-of-war is a first-class state — unknown regions get a hatched texture,
-never a blank stretch that would read as empty content, and the unknown share is disclosed in the
-summary. The window maps linearly to the domain; there is no fisheye to distort where you are.
+Bars plus a separate mark lane keep "where am I" and "where are the annotations" as two clean reads instead of one
+muddle. Fog-of-war is a first-class state — unknown regions get a hatched texture, never a blank stretch that would read
+as empty content, and the unknown share is disclosed in the summary. The window maps linearly to the domain; there is no
+fisheye to distort where you are.
 
 ## Accessibility
 
-The accessible name places you in the whole — **"Viewing 12% of the whole (520–660 of 1,200); 3
-marks; 8% unknown."** The interactive entry is a slider: drag or click to move the window, or nudge
-it with ←/→ (Shift for a bigger jump).
+The accessible name places you in the whole — **"Viewing 12% of the whole (520–660 of 1,200); 3 marks; 8% unknown."**
+The interactive entry is a slider: drag or click to move the window, or nudge it with ←/→ (Shift for a bigger jump).
 
 ## Props
 

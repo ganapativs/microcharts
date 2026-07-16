@@ -30,7 +30,7 @@ export const entry: ChartEntry = {
   slug: "status-dot",
   status: "stable",
   collection: "core",
-  tagline: "What state is this thing in — shape and color paired, never color alone.",
+  tagline: "What state is this thing in: shape and color paired, never color alone.",
   staticImport: `${PKG}/status-dot`,
   interactiveImport: `${PKG}/status-dot/interactive`,
   dataShape: '"ok" | "warn" | "error" | "off" | "busy" (extensible)',

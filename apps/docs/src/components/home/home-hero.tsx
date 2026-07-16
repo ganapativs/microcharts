@@ -2,28 +2,33 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SparkBar } from "@microcharts/react/sparkbar";
-import { LivingCatalog } from "@/components/home/living-catalog";
+import { StreamVignette } from "@/components/home/stream-vignette";
+import { HeroSilk } from "@/components/home/hero-silk";
 import { InstallCommand } from "@/components/ui/copy";
 import { Reveal } from "@/components/ui/reveal";
 
+/**
+ * The first fold. The headline is STATIC — server-rendered inline charts, one
+ * gentle reveal with everything else (a line-by-line word stagger was tried
+ * and cut: it lagged the rest of the fold and read as broken). The motion
+ * budget belongs to the reply card: the assistant reply streams in a reading
+ * serif and its grammar morphs into shipped components. Ground: silk shader
+ * under the graph paper, faded out before the fold ends. See DESIGN.md.
+ */
 const TREND = [3, 5, 4, 8, 6, 9, 7, 11];
-
-function Word({ band, children }: { band?: boolean; children: React.ReactNode }) {
-  return (
-    <span aria-hidden className={band ? "hx-word hx-word--band" : "hx-word"}>
-      {children}
-    </span>
-  );
-}
-
 export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
   return (
-    <section className="relative overflow-hidden">
+    // -mt-14/pt-14: the fold's ground extends up UNDER the transparent sticky
+    // nav (h-14), so the silk meets the top of the viewport with no seam; the
+    // nav frosts itself only after scroll.
+    <section className="relative -mt-14 overflow-hidden pt-14">
+      <div aria-hidden className="hv-silk-fallback pointer-events-none absolute inset-0 -z-30" />
+      <HeroSilk className="pointer-events-none absolute inset-0 -z-20" />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 grid-paper opacity-60"
       />
-      <div className="relative mx-auto grid max-w-shell items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-18 lg:grid-cols-[1.06fr_0.94fr] lg:gap-14">
+      <div className="relative mx-auto grid max-w-shell items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pt-18 lg:grid-cols-[1.06fr_0.94fr] lg:gap-14">
         <div>
           <Reveal className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {["Zero dependencies", "AI-native", "Accessible by default", "RSC-safe"].map((t, i) => (
@@ -35,21 +40,25 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
           </Reveal>
 
           <Reveal delay={60}>
-            <h1 className="display mt-5 text-balance text-[2.3rem] leading-[1.05] text-fd-foreground sm:text-[3rem] lg:text-[3.65rem] xl:text-[3.9rem]">
+            {/* Optical tracking: the hero is the largest type on the page, so
+                it tracks tighter than the .display baseline (-0.021em) tuned
+                for section heads — negative tracking grows with display size
+                (Apple type craft). */}
+            <h1 className="display mt-5 text-balance text-[2.3rem] leading-[1.05] tracking-[-0.03em] text-fd-foreground sm:text-[3rem] lg:text-[3.65rem] xl:text-[3.9rem]">
               Small enough for a model to{" "}
               <span className="whitespace-nowrap">
-                write
-                <Word>
+                <em className="hv-em">write</em>
+                <span aria-hidden className="hx-word">
                   <Sparkline data={TREND} curve="smooth" width={60} height={20} summary={false} />
-                </Word>
+                </span>
                 ,
               </span>{" "}
               sharp enough for a person to{" "}
               <span className="whitespace-nowrap">
-                trust
-                <Word>
+                <em className="hv-em">trust</em>
+                <span aria-hidden className="hx-word">
                   <SparkBar data={TREND} width={52} height={20} summary={false} />
-                </Word>
+                </span>
                 .
               </span>
             </h1>
@@ -75,17 +84,30 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
               </Link>
               <InstallCommand />
             </div>
-            <div className="mt-4">
+            <div className="mono-label mt-4 flex flex-wrap items-center gap-x-3.5 gap-y-2 text-fd-muted-foreground">
+              <Link
+                prefetch={false}
+                href="/gallery"
+                className="group inline-flex items-center gap-1.5 transition-colors hover:text-fd-foreground"
+              >
+                <span>
+                  browse{" "}
+                  <span className="underline decoration-1 underline-offset-[5px] [text-decoration-color:color-mix(in_oklab,var(--accent)_45%,transparent)] transition-[text-decoration-color] group-hover:[text-decoration-color:var(--accent)]">
+                    {catalogTotal} charts
+                  </span>
+                </span>
+                <ArrowRight className="size-3.5 text-fd-primary transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <span className="text-hairline">·</span>
               <Link
                 prefetch={false}
                 href="/docs"
-                aria-label="Read the docs — introduction"
-                className="group inline-flex items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+                className="group inline-flex items-center gap-1.5 transition-colors hover:text-fd-foreground"
               >
-                <span className="mono-label">
-                  the full story <span className="text-hairline">·</span>{" "}
+                <span>
+                  read{" "}
                   <span className="underline decoration-1 underline-offset-[5px] [text-decoration-color:color-mix(in_oklab,var(--accent)_45%,transparent)] transition-[text-decoration-color] group-hover:[text-decoration-color:var(--accent)]">
-                    read the docs
+                    the docs
                   </span>
                 </span>
                 <ArrowRight className="size-3.5 text-fd-primary transition-transform group-hover:translate-x-0.5" />
@@ -95,7 +117,10 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
         </div>
 
         <Reveal delay={140}>
-          <LivingCatalog total={catalogTotal} />
+          <StreamVignette serif startDelay={900} />
+          <p className="mono-label mt-3 text-center opacity-70">
+            what a model writes <span className="text-hairline">·</span> what a person reads
+          </p>
         </Reveal>
       </div>
     </section>

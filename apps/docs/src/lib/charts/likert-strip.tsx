@@ -16,7 +16,7 @@ export const entry: ChartEntry = {
   slug: "likert-strip",
   status: "stable",
   collection: "core",
-  tagline: "Does the response lean agree or disagree — and how hard.",
+  tagline: "Does the response lean agree or disagree, and how hard.",
   staticImport: `${PKG}/likert-strip`,
   interactiveImport: `${PKG}/likert-strip/interactive`,
   dataShape: "{ label, value }[] ordered most-negative → most-positive (2–7 levels)",

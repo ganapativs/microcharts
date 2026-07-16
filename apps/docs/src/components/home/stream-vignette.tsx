@@ -27,7 +27,16 @@ const BLOCK_W = 236;
 
 type Seg =
   | { id: string; kind: "text"; text: string }
-  | { id: string; kind: "chart"; raw: string; block?: boolean; node: ReactNode };
+  | {
+      id: string;
+      kind: "chart";
+      raw: string;
+      block?: boolean;
+      /** true = no .mc-inline wrapper — Delta is a text metric and owns its
+       *  baseline; the inline optical lift would ride it high (docs/ai rule). */
+      bare?: boolean;
+      node: ReactNode;
+    };
 
 interface Scenario {
   id: string;
@@ -74,13 +83,14 @@ const SCENARIOS: Scenario[] = [
       {
         id: "r-delta",
         kind: "chart",
+        bare: true,
         raw: "`chart delta +0.184`",
         node: <Delta value={0.184} summary={false} />,
       },
       {
         id: "r2",
         kind: "text",
-        text: " on Q2 — and growth was broad, not one deal carrying it:",
+        text: " on Q2, and growth was broad, not one deal carrying it:",
       },
       {
         id: "r-mini",
@@ -114,7 +124,7 @@ const SCENARIOS: Scenario[] = [
           <Bullet value={72} target={80} bands={[50, 90]} width={66} height={12} summary={false} />
         ),
       },
-      { id: "r4", kind: "text", text: " to target. A clean quarter — clear to raise for Q4." },
+      { id: "r4", kind: "text", text: " to target. A clean quarter, clear to raise for Q4." },
     ],
   },
   {
@@ -168,7 +178,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "i3",
         kind: "text",
-        text: ", green by 14:11 — inside the error budget, no SLO breach. Adding a write-path smoke test to the canary.",
+        text: ", green by 14:11, inside the error budget, no SLO breach. Adding a write-path smoke test to the canary.",
       },
     ],
   },
@@ -186,7 +196,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "m1",
         kind: "text",
-        text: " on the session — a steady grind into the bell. Intraday returns stayed tight, no fat tails:",
+        text: " on the session, a steady grind into the bell. Intraday returns stayed tight, no fat tails:",
       },
       {
         id: "m-hist",
@@ -232,7 +242,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "m4",
         kind: "text",
-        text: " over its benchmark weight — trimming into strength on Monday.",
+        text: " over its benchmark weight, trimming into strength on Monday.",
       },
     ],
   },
@@ -264,7 +274,7 @@ function FinishedReply({ segs }: { segs: Seg[] }) {
             {s.node}
           </div>
         ) : (
-          <span key={s.id} className="mc-inline">
+          <span key={s.id} className={s.bare ? undefined : "mc-inline"}>
             {s.node}
           </span>
         ),
@@ -273,7 +283,15 @@ function FinishedReply({ segs }: { segs: Seg[] }) {
   );
 }
 
-export function StreamVignette() {
+export function StreamVignette({
+  serif = false,
+  startDelay = 0,
+}: {
+  /** Reading-serif reply text (the hero treatment). */
+  serif?: boolean;
+  /** ms after viewport entry before the first token — lets the headline finish. */
+  startDelay?: number;
+} = {}) {
   const [idx, setIdx] = useState(0);
   const active = SCENARIOS[idx];
   const total = useMemo(() => active.segs.reduce((a, s) => a + atomCount(s), 0), [active]);
@@ -293,19 +311,23 @@ export function StreamVignette() {
       setPos(total);
       return;
     }
+    let delayTimer = 0;
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting) && !started.current) {
           started.current = true;
-          setRunning(true);
+          delayTimer = window.setTimeout(() => setRunning(true), startDelay);
           io.disconnect();
         }
       },
       { threshold: 0.3 },
     );
     io.observe(host);
-    return () => io.disconnect();
-  }, [total]);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(delayTimer);
+    };
+  }, [total, startDelay]);
 
   // Advance one atom at a time with human-feel pacing.
   useEffect(() => {
@@ -371,7 +393,7 @@ export function StreamVignette() {
         );
       else
         view.push(
-          <span key={s.id} className="hx-morph-in mc-inline">
+          <span key={s.id} className={s.bare ? "hx-morph-in" : "hx-morph-in mc-inline"}>
             {s.node}
           </span>,
         );
@@ -400,10 +422,10 @@ export function StreamVignette() {
 
   return (
     <div ref={hostRef} className="panel overflow-hidden">
-      <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
-        <span className="flex items-center gap-2">
-          <span className="mono-label">assistant reply</span>
-          <span className="mono-label opacity-50">· {active.hint}</span>
+      <div className="flex min-h-11 items-center justify-between border-b border-hairline py-1.5 pl-4 pr-2">
+        <span className="flex items-baseline gap-2 leading-none">
+          <span className="mono-label leading-none">assistant reply</span>
+          <span className="mono-label leading-none opacity-50">· {active.hint}</span>
         </span>
         <button
           type="button"
@@ -415,17 +437,20 @@ export function StreamVignette() {
           <RotateCcw className="size-3.5" />
         </button>
       </div>
-      <div className="relative px-5 py-5">
+      <div className={`relative px-5 py-5 ${serif ? "hv-reply-body" : ""}`}>
         {/* every scenario's finished reply is stacked in one grid cell, so the
             panel reserves the tallest — the stream paints over it, no CLS. */}
-        <div aria-hidden className="grid text-[0.95rem] leading-relaxed">
+        <div
+          aria-hidden
+          className="grid text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed"
+        >
           {SCENARIOS.map((s) => (
             <div key={s.id} className="invisible [grid-area:1/1]">
               <FinishedReply segs={s.segs} />
             </div>
           ))}
         </div>
-        <div className="absolute inset-x-5 top-5 text-[0.95rem] leading-relaxed text-fd-foreground">
+        <div className="absolute inset-x-5 top-5 text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
           {view}
           {streaming && started.current && <span className="mc-caret" aria-hidden />}
         </div>

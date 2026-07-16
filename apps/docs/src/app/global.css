@@ -39,12 +39,12 @@
   --color-hairline: var(--hairline);
 }
 
-/* --accent drives chrome + chart emphasis; [data-accent] swaps it. Default Cobalt. */
+/* --accent drives chrome + chart emphasis; [data-accent] swaps it. Default Ember. */
 :root {
-  /* accent — Cobalt default (light) */
-  --accent: #2f52d4;
-  --accent-strong: #2543b8;
-  --accent-fg: #fdfdff;
+  /* accent — Ember default (light): deep burnt orange, matte, editorial */
+  --accent: #c2410c;
+  --accent-strong: #9a330a;
+  --accent-fg: #fffaf5;
 
   /* Light field: cool blue-grey so frosted glass separates. */
   --color-fd-background: #e9edf4;
@@ -110,12 +110,12 @@
     ),
     radial-gradient(
       52% 52% at 100% 2%,
-      color-mix(in oklab, #86a2e6 24%, transparent),
+      color-mix(in oklab, #e6a866 24%, transparent),
       transparent 62%
     ),
     radial-gradient(
       82% 72% at 50% 122%,
-      color-mix(in oklab, #9fb1de 32%, transparent),
+      color-mix(in oklab, #e8c4a4 32%, transparent),
       transparent 64%
     ),
     radial-gradient(
@@ -138,6 +138,18 @@
   --mc-negative: #ad4713;
   --mc-accent: var(--accent);
   --mc-neutral: #616773;
+  /* Categorical palette (light) — the site's default accent is Ember, so its
+     categories are the real defineTheme output for the ember accent, leading
+     with warm terracotta like every other accent leads its own hue. [data-accent]
+     swaps the whole set; gated by accent-palettes.test.ts. (The library's curated
+     gold-led default still ships in styles.css and is documented in the token
+     table above — this is the ember-branded site dogfooding derivation.) */
+  --mc-cat-1: #c07157;
+  --mc-cat-2: #7c6c05;
+  --mc-cat-3: #479d70;
+  --mc-cat-4: #007891;
+  --mc-cat-5: #7b82ca;
+  --mc-cat-6: #935181;
   /* interactive readout chip → site popover surface so it matches the theme */
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
@@ -149,10 +161,10 @@
 /* ---- Dark: graphite optical field — no pure black, no neon glow. Glass sings
    here: rich on AMOLED/XDR, cool hairline, faint accent bloom. ------------- */
 .dark {
-  /* accent — Cobalt (dark): soft cornflower, matte, NOT cyan */
-  --accent: #7f9cf5;
-  --accent-strong: #93abff;
-  --accent-fg: #0a0c14;
+  /* accent — Ember (dark): warm lifted amber, matte, not neon */
+  --accent: #f7924e;
+  --accent-strong: #ffa869;
+  --accent-fg: #180a03;
 
   --color-fd-background: #0a0b0f;
   --color-fd-foreground: #e9e8e3;
@@ -185,12 +197,12 @@
   --glass-sat: 1.7;
   --glass-bright: 1.12;
   --grain-opacity: 0.05;
-  /* border token (dark) — cool near-white line; keep it readable on chrome rims. */
-  --hairline: color-mix(in oklab, #cdd8f5 16%, transparent);
+  /* border token (dark) — warm near-white line; keep it readable on chrome rims. */
+  --hairline: color-mix(in oklab, #ece0cf 16%, transparent);
   --glass-edge:
     inset 0 1px 0.5px color-mix(in oklab, #ffffff 16%, transparent),
     inset 0 -1px 1.5px color-mix(in oklab, #ffffff 4%, transparent),
-    inset 0 0 0 1px color-mix(in oklab, #cdd8f5 10%, transparent);
+    inset 0 0 0 1px color-mix(in oklab, #ece0cf 10%, transparent);
   --glass-edge-lift:
     inset 0 1.5px 0.5px color-mix(in oklab, #ffffff 17%, transparent),
     inset 0 -1px 2px color-mix(in oklab, #ffffff 4.5%, transparent),
@@ -208,12 +220,12 @@
     ),
     radial-gradient(
       52% 48% at 100% 0%,
-      color-mix(in oklab, #2bb3a6 16%, transparent),
+      color-mix(in oklab, #b5652e 16%, transparent),
       transparent 62%
     ),
     radial-gradient(
       88% 78% at 50% 124%,
-      color-mix(in oklab, #16365f 46%, transparent),
+      color-mix(in oklab, #3d1f0c 46%, transparent),
       transparent 64%
     ),
     radial-gradient(
@@ -229,16 +241,15 @@
   --mc-negative: #df7856;
   --mc-accent: var(--accent);
   --mc-neutral: #8f8a80;
-  /* Categorical must be re-declared here: the library keys its dark cats off
-     @media(prefers-color-scheme)/[data-mc-theme], but the docs force theme via
-     the .dark class — so without this the light cats would paint on dark. Same
-     lifted hues as the library dark set. */
-  --mc-cat-1: #e2b45c;
-  --mc-cat-2: #6fb0e0;
-  --mc-cat-3: #4fb08d;
-  --mc-cat-4: #6e9bd1;
-  --mc-cat-5: #e07e5e;
-  --mc-cat-6: #c486b0;
+  /* Categorical (dark) — ember-derived dark twins (`defineTheme` .darkVars),
+     the site default. Must be re-declared here because the docs force theme via
+     the .dark class, not @media/[data-mc-theme]. Gated by accent-palettes.test. */
+  --mc-cat-1: #f09c81;
+  --mc-cat-2: #a69640;
+  --mc-cat-3: #74c99a;
+  --mc-cat-4: #30a5c2;
+  --mc-cat-5: #a4adf8;
+  --mc-cat-6: #c07aac;
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
   --mc-surface-edge: var(--color-fd-border);
@@ -294,62 +305,213 @@
   --mc-band: color-mix(in oklab, #000000 14%, transparent);
   --mc-stroke-width: 2;
 }
+/* Dark twins for the two light-surface output presets — MIRROR the library's
+   dark-preset bundles in styles.css (parity test-enforced). The docs force the
+   theme via the .dark class, so these are keyed off :root.dark[data-mc-preset]
+   (specificity beats the base :root[data-mc-preset] above). eink → night-mode
+   (light ink on black); print → lifted "dark paper" ink. Weight + band carry
+   from the base block; only the pinned colours re-tune. */
+:root.dark[data-mc-preset="print"] {
+  --mc-stroke: #e8e6e1;
+  --mc-neutral: #9a958c;
+  --mc-positive: #4aa588;
+  --mc-negative: #e08a63;
+  --mc-accent: #6aa9d3;
+  --mc-moon: #e0be6f;
+  --mc-band: color-mix(in oklab, #e8e6e1 9%, transparent);
+}
+:root.dark[data-mc-preset="eink"] {
+  --mc-stroke: #ffffff;
+  --mc-positive: #ffffff;
+  --mc-negative: #b0b0b0;
+  --mc-neutral: #808080;
+  --mc-accent: #ffffff;
+  --mc-moon: #ffffff;
+  --mc-band: color-mix(in oklab, #ffffff 14%, transparent);
+}
 
 /* ---- Accent presets — the global picker sets [data-accent] on <html>.
-   All tasteful, all non-AI: warm and cool, none neon-on-dark. --------------- */
-:root[data-accent="ember"] {
-  --accent: #c2410c;
-  --accent-strong: #9a330a;
-  --accent-fg: #fffaf5;
+   All tasteful, all non-AI: warm and cool, none neon-on-dark.
+
+   Each bundle drives the site chrome (--accent*) AND a full matched
+   CATEGORICAL palette (--mc-cat-*), so picking a brand accent re-hues every
+   multi-series chart on the site — exactly what the home theming widget shows.
+   The --mc-cat-* values are the real `defineTheme({ accent })` output (light =
+   .vars, dark = .darkVars), seeded from each accent's light hex; they are NOT
+   hand-picked. `accent-palettes.test.ts` recomputes them from the library and
+   fails on any drift. Valence (positive/negative) and the default ink never
+   move — only emphasis + categoricals follow the brand. The default "ember"
+   writes no attribute (it lives in the base :root / .dark above); Cobalt is
+   now just a sibling, carried here like the rest. ------------------------- */
+:root[data-accent="cobalt"] {
+  --accent: #2f52d4;
+  --accent-strong: #2543b8;
+  --accent-fg: #fdfdff;
+  --mc-cat-1: #6b87cb;
+  --mc-cat-2: #8c548c;
+  --mc-cat-3: #c26e65;
+  --mc-cat-4: #876701;
+  --mc-cat-5: #5a9b62;
+  --mc-cat-6: #007a86;
 }
-.dark[data-accent="ember"] {
-  --accent: #f7924e;
-  --accent-strong: #ffa869;
-  --accent-fg: #180a03;
+.dark[data-accent="cobalt"] {
+  --accent: #7f9cf5;
+  --accent-strong: #93abff;
+  --accent-fg: #0a0c14;
+  --mc-cat-1: #95b2fa;
+  --mc-cat-2: #b87db8;
+  --mc-cat-3: #f1998f;
+  --mc-cat-4: #b2903e;
+  --mc-cat-5: #85c78c;
+  --mc-cat-6: #23a8b7;
 }
 
 :root[data-accent="moss"] {
   --accent: #4d7c1e;
   --accent-strong: #3f6717;
   --accent-fg: #fbfdf6;
+  --mc-cat-1: #6f9750;
+  --mc-cat-2: #007c7a;
+  --mc-cat-3: #578cc9;
+  --mc-cat-4: #815898;
+  --mc-cat-5: #c16c77;
+  --mc-cat-6: #91600f;
 }
 .dark[data-accent="moss"] {
   --accent: #a3c46a;
   --accent-strong: #b6d47f;
   --accent-fg: #0c1206;
+  --mc-cat-1: #9ac37b;
+  --mc-cat-2: #23aaa7;
+  --mc-cat-3: #81b8f8;
+  --mc-cat-4: #ac81c5;
+  --mc-cat-5: #f097a1;
+  --mc-cat-6: #be8a43;
 }
 
 :root[data-accent="clay"] {
   --accent: #a14a34;
   --accent-strong: #863c2a;
   --accent-fg: #fff8f4;
+  --mc-cat-1: #c1705b;
+  --mc-cat-2: #7f6a03;
+  --mc-cat-3: #4c9c6c;
+  --mc-cat-4: #00798e;
+  --mc-cat-5: #7783ca;
+  --mc-cat-6: #925284;
 }
 .dark[data-accent="clay"] {
   --accent: #e08e73;
   --accent-strong: #f0a288;
   --accent-fg: #180a05;
+  --mc-cat-1: #f09b85;
+  --mc-cat-2: #aa943f;
+  --mc-cat-3: #78c996;
+  --mc-cat-4: #2ca6bf;
+  --mc-cat-5: #a0aff9;
+  --mc-cat-6: #be7baf;
 }
 
 :root[data-accent="rose"] {
   --accent: #be123c;
   --accent-strong: #9f0f33;
   --accent-fg: #fff5f6;
+  --mc-cat-1: #c26d72;
+  --mc-cat-2: #8e6209;
+  --mc-cat-3: #699855;
+  --mc-cat-4: #007b7e;
+  --mc-cat-5: #5d8bca;
+  --mc-cat-6: #855795;
 }
 .dark[data-accent="rose"] {
   --accent: #fb6f89;
   --accent-strong: #ff8299;
   --accent-fg: #1a060a;
+  --mc-cat-1: #f1979c;
+  --mc-cat-2: #ba8c41;
+  --mc-cat-3: #93c47f;
+  --mc-cat-4: #21a9ac;
+  --mc-cat-5: #87b6f9;
+  --mc-cat-6: #b080c1;
 }
 
 :root[data-accent="teal"] {
   --accent: #0f766e;
   --accent-strong: #0c5f58;
   --accent-fg: #f2fdfb;
+  --mc-cat-1: #0f9e93;
+  --mc-cat-2: #2e70a6;
+  --mc-cat-3: #9a77bd;
+  --mc-cat-4: #9f4f62;
+  --mc-cat-5: #b57b3b;
+  --mc-cat-6: #5c772a;
 }
 .dark[data-accent="teal"] {
   --accent: #55c2b3;
   --accent-strong: #6fd4c6;
   --accent-fg: #04120f;
+  --mc-cat-1: #53cabf;
+  --mc-cat-2: #5a9bd4;
+  --mc-cat-3: #c6a2eb;
+  --mc-cat-4: #cd788a;
+  --mc-cat-5: #e3a666;
+  --mc-cat-6: #84a155;
+}
+
+/* ---- Ink-preset categorical ramps — mono/print/eink own their whole ink set,
+   so when one is active its categoricals must stay in-family even if a brand
+   accent is ALSO picked (the picker's two rows are independent). These are the
+   real `defineTheme({ extends, cat })` output (light = .vars, dark = .darkVars),
+   also gated by accent-palettes.test.ts. The doubled [data-mc-preset] selector
+   is a deliberate specificity bump so these beat the equal-specificity
+   [data-accent] cat blocks above regardless of source order. --------------- */
+:root[data-mc-preset="mono"][data-mc-preset="mono"] {
+  --mc-cat-1: #111111;
+  --mc-cat-2: #555555;
+  --mc-cat-3: #8c8c8c;
+  --mc-cat-4: #bfbfbf;
+  --mc-cat-5: #dedede;
+  --mc-cat-6: #737373;
+}
+.dark[data-mc-preset="mono"][data-mc-preset="mono"] {
+  --mc-cat-1: #e4e4e4;
+  --mc-cat-2: #898989;
+  --mc-cat-3: #c4c4c4;
+  --mc-cat-4: #c4c4c4;
+  --mc-cat-5: #c4c4c4;
+  --mc-cat-6: #a9a9a9;
+}
+:root[data-mc-preset="eink"][data-mc-preset="eink"] {
+  --mc-cat-1: #000000;
+  --mc-cat-2: #4d4d4d;
+  --mc-cat-3: #8c8c8c;
+  --mc-cat-4: #c4c4c4;
+  --mc-cat-5: #e0e0e0;
+  --mc-cat-6: #666666;
+}
+.dark[data-mc-preset="eink"][data-mc-preset="eink"] {
+  --mc-cat-1: #ebebeb;
+  --mc-cat-2: #808080;
+  --mc-cat-3: #c4c4c4;
+  --mc-cat-4: #c4c4c4;
+  --mc-cat-5: #c4c4c4;
+  --mc-cat-6: #9b9b9b;
+}
+:root[data-mc-preset="print"][data-mc-preset="print"] {
+  --mc-cat-1: #14507a;
+  --mc-cat-2: #0c6249;
+  --mc-cat-3: #a33f22;
+  --mc-cat-4: #7a5a12;
+  --mc-cat-5: #666666;
+  --mc-cat-6: #1a1a1a;
+}
+.dark[data-mc-preset="print"][data-mc-preset="print"] {
+  --mc-cat-1: #5084af;
+  --mc-cat-2: #52977d;
+  --mc-cat-3: #dc795d;
+  --mc-cat-4: #b09053;
+  --mc-cat-5: #9b9b9b;
+  --mc-cat-6: #e2e2e2;
 }
 
 /* ---- Base ---------------------------------------------------------------- */
@@ -465,6 +627,19 @@ body {
   background-size: 11px 11px;
 }
 
+/* Ink surface — the dark twin of .preset-paper. A fixed near-black "page" (never
+   follows the docs theme) so a theme's hand-tuned dark values preview truthfully
+   beside the light stock, whatever the reader's own mode. */
+.preset-ink {
+  background-color: #17161a;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(240, 240, 245, 0.06) 1px,
+    transparent 0
+  );
+  background-size: 11px 11px;
+}
+
 /* Draw-in underline on hover for text links. */
 .link-underline {
   background-image: linear-gradient(currentColor, currentColor);
@@ -507,10 +682,24 @@ body {
       border-color 0.32s var(--ease-out-quint),
       transform 0.32s var(--ease-out-quint);
   }
-  .glass-lift:hover {
-    border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline));
-    box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
-    transform: translateY(-2px);
+  /* Gate the hover lift behind a real pointer — a touch tap fires :hover and
+     would leave the card lifted mid-navigation (matches .hx-tile, which is
+     already gated). Colour/shadow-only hover is fine on touch; the transform
+     is the part that must not fire without a hovering cursor. */
+  @media (hover: hover) and (pointer: fine) {
+    .glass-lift:hover {
+      border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline));
+      box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
+      transform: translateY(-2px);
+    }
+  }
+  /* Press feedback for the interactive lift cards (copyable colour chips, link
+     cards): the raised card presses down + in on pointer-down, fast, then
+     settles back up via the base 0.32s curve on release. Not hover-gated —
+     touch presses too. */
+  .glass-lift:active {
+    transform: scale(0.98);
+    transition-duration: 0.12s;
   }
 
   /* In-panel dividers — gallery .g2-meta shelf parity. */
@@ -1021,6 +1210,14 @@ body {
     color: var(--color-fd-primary);
     background-color: color-mix(in oklab, var(--accent) 16%, transparent);
   }
+  /* Tactile press for every dock control — instant scale on pointer-down (the
+     dock is the gallery's most-clicked surface), matching .ghost-ctrl. Color
+     keeps easing via each control's own transition; the scale is deliberately
+     un-transitioned so the press registers now, not over a curve. */
+  .g2-pill:not(:disabled):active,
+  .g2-icon-btn:active {
+    transform: scale(0.94);
+  }
   /* Fingers need bigger targets than a cursor — grow the dock controls to the
      44px minimum on touch/coarse pointers, without bloating the mouse layout. */
   @media (pointer: coarse) {
@@ -1248,6 +1445,10 @@ body {
    utility on the buttons that carry one (same specificity, later layer). */
 .cta-accent:active {
   transform: scale(0.97) !important;
+  /* Press must register instantly (Apple: feedback on press, ~100ms), not ease
+     in over the base 0.3s hover-lift curve. Only the press-down is fast; on
+     release the base transition resumes so the button settles back gracefully. */
+  transition-duration: 0.1s;
 }
 
 /* Secondary action — quiet frost at button scale. Every small text/icon action
@@ -1846,7 +2047,11 @@ div:where(
   opacity: 0;
   transform: translateY(16px);
   filter: blur(6px);
-  will-change: opacity, transform, filter;
+  /* No will-change here: pending is the idle rest state held (for every
+     below-fold reveal) until the observer fires at the viewport edge, so the
+     hint buys ~no lead time while pinning a GPU layer per element — the blur
+     backing store worst of all. The one-shot rise-in still composites fine
+     (transform/opacity/filter are all compositor properties). */
 }
 [data-reveal="in"] {
   animation: rise-in 0.72s var(--ease-out-quint) both;
@@ -2329,5 +2534,202 @@ div:where(
   }
   .hx-word svg {
     transition: none;
+  }
+}
+
+/* ---- Home v2: "The Typeset Answer" ---------------------------------------- */
+@layer components {
+  /* The reading serif — the streamed reply + the italic emphasis words. */
+  .hv-serif {
+    font-family: var(--font-serif);
+  }
+  .hv-em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  /* Hero silk — the WebGL canvas plus its no-WebGL/pre-init CSS ground.
+     Sits UNDER the graph paper: ambience behind the instrument. */
+  .hv-silk {
+    width: 100%;
+    height: 100%;
+    display: block;
+    /* Start invisible so the blank pre-compile canvas never pops over the grid
+       + fallback ground. The script flips [data-ready] after the FIRST drawn
+       frame, cross-fading the shader up over the fallback. No WebGL → stays 0,
+       fallback + grid remain the ground. */
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    /* dissolve into the page field well before the section ends — the fold's
+       ground must blend into 01, never cut */
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+  }
+  .hv-silk[data-ready] {
+    opacity: 0.6;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hv-silk {
+      transition: none;
+    }
+  }
+  /* No-WebGL / pre-init ground — tinted from --accent (via color-mix) so it
+     honours the picker like the shader does, not a fixed blue. */
+  .hv-silk-fallback {
+    background:
+      radial-gradient(
+        90% 80% at 18% 8%,
+        color-mix(in oklab, var(--accent) 20%, transparent) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        70% 60% at 82% 20%,
+        color-mix(in oklab, var(--accent) 15%, transparent) 0%,
+        transparent 58%
+      ),
+      radial-gradient(
+        80% 70% at 55% 60%,
+        color-mix(in oklab, var(--accent) 14%, transparent) 0%,
+        transparent 60%
+      );
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+  }
+  .dark .hv-silk[data-ready] {
+    opacity: 0.5;
+  }
+  .dark .hv-silk-fallback {
+    background:
+      radial-gradient(
+        90% 80% at 18% 8%,
+        color-mix(in oklab, var(--accent) 26%, transparent) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        70% 60% at 82% 20%,
+        color-mix(in oklab, var(--accent) 22%, transparent) 0%,
+        transparent 58%
+      ),
+      radial-gradient(
+        80% 70% at 55% 60%,
+        color-mix(in oklab, var(--accent) 20%, transparent) 0%,
+        transparent 60%
+      );
+  }
+
+  /* The streamed reply reads in the serif; grammar stays mono via .mono-label
+     and <code> rules. Applied to the reply container so the height-reserving
+     ghosts and the live overlay share metrics (zero CLS holds). */
+  .hv-reply-body {
+    font-family: var(--font-serif);
+    --hv-reply-size: 1.05rem;
+  }
+  /* Delta's glyph-vs-digit optical centering is tuned for the default sans;
+     Newsreader's digits sit taller, so the triangle reads ~2px low beside
+     them. Serif-scoped lift only — the library default stays. */
+  .hv-reply-body .mc-delta-glyph {
+    transform: translateY(-0.05em);
+  }
+
+  /* 07 · theming demo: when a swatch/preset changes the --mc-* vars, ease the
+     chart marks from the old palette to the new one so the live re-theme reads
+     as an intentional state change, not a hard flip. Scoped to the demo only.
+     Valence marks (Delta) don't change colour with the accent, so they stay
+     put while everything else eases — motion that says "good and bad never
+     move". Static entries here, so no conflict with WAAPI draw entrances. */
+  .hv-theme-stage svg :is(path, rect, circle, line, polyline, polygon) {
+    transition:
+      fill 0.4s var(--ease-out-quint),
+      stroke 0.4s var(--ease-out-quint);
+  }
+
+  /* 05 · the dark band — dark in BOTH site themes (an inverted light band on
+     the dark site was tried and rejected; the section keeps one identity). */
+  .hv-band {
+    background-color: var(--color-fd-background);
+  }
+
+  /* 03 · catalog tile tagline — one reserved line so hover never shifts. */
+  .hv-tile-tag {
+    max-width: 100%;
+    font-size: 0.72rem;
+    line-height: 1.3;
+    height: 0.94rem;
+    color: var(--color-fd-muted-foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 0.25s var(--ease-out-quint);
+  }
+  .hx-tile:hover .hv-tile-tag,
+  .hx-tile:focus-visible .hv-tile-tag {
+    opacity: 0.75;
+  }
+
+  /* 02 · grammar demo: typed JSX, lightly highlighted. Token colors ride the
+     theme (accent for tags, positive ink for strings) so both modes read. */
+  .hv-tok-tag {
+    color: var(--accent);
+  }
+  .hv-tok-attr {
+    color: var(--color-fd-muted-foreground);
+  }
+  .hv-tok-str {
+    color: var(--mc-positive);
+  }
+  .hv-tok-num {
+    color: var(--mc-negative);
+  }
+  .hv-code-caret {
+    display: inline-block;
+    width: 0.55ch;
+    height: 1.05em;
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    background: var(--accent);
+    border-radius: 1px;
+    animation: mc-caret-blink 1.1s steps(1) infinite;
+  }
+
+  /* 05 · machine-surfaces terminal: lines land one by one on reveal. */
+  [data-reveal="pending"] .hv-term-line {
+    opacity: 0;
+  }
+  [data-reveal="in"] .hv-term-line {
+    animation: hv-term 0.4s var(--ease-out-quint) both;
+    animation-delay: calc(var(--i, 0) * 160ms);
+  }
+  @keyframes hv-term {
+    from {
+      opacity: 0;
+      translate: 0 5px;
+    }
+  }
+
+  /* 04 · the refusals — struck through, dashed, quietly confident. */
+  .hv-refusal {
+    border: 1px dashed color-mix(in oklab, var(--hairline) 85%, transparent);
+    border-radius: var(--radius-panel);
+  }
+  .hv-refusal-name {
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: color-mix(in oklab, var(--mc-negative) 70%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hv-code-caret {
+    animation: none;
+  }
+  .hv-theme-stage svg :is(path, rect, circle, line, polyline, polygon) {
+    transition: none;
+  }
+  [data-reveal] .hv-term-line {
+    animation: none;
+    opacity: 1;
   }
 }

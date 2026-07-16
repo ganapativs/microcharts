@@ -1,11 +1,13 @@
 ---
 title: Waveform
-description: An amplitude strip for React — the shape of a high-frequency signal at word width, compressed by max-per-bucket so a spike can never be averaged away.
+description:
+  An amplitude strip for React — the shape of a high-frequency signal at word width, compressed by max-per-bucket so a
+  spike can never be averaged away.
 ---
 
-Waveform answers "what is the shape of a high-frequency signal — where are its spikes and
-silences — at word width?". It compresses with max-per-bucket, never a mean, so a single spike
-survives the squeeze to a sparkline width. The peak is disclosed in the accessible summary.
+Waveform answers "what is the shape of a high-frequency signal — where are its spikes and silences — at word width?". It
+compresses with max-per-bucket, never a mean, so a single spike survives the squeeze to a sparkline width. The peak is
+disclosed in the accessible summary.
 
 <LiveDemo
   label="Waveform"
@@ -58,10 +60,7 @@ survives the squeeze to a sparkline width. The peak is disclosed in the accessib
 />`}
 >
   <Waveform
-    data={Array.from(
-      { length: 200 },
-      (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220),
-    )}
+    data={Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220))}
     variant="envelope"
     title="Envelope"
     width={280}
@@ -70,17 +69,10 @@ survives the squeeze to a sparkline width. The peak is disclosed in the accessib
 </LiveDemo>
 
 <LiveDemo label="locale" code={`<Waveform data={[0.2, 0.5, 0.82, 0.4, 0.1]} locale="de-DE" />`}>
-  <Waveform
-    data={[0.2, 0.5, 0.82, 0.4, 0.1]}
-    locale="de-DE"
-    title="Localized peak"
-    width={90}
-    height={22}
-  />
+  <Waveform data={[0.2, 0.5, 0.82, 0.4, 0.1]} locale="de-DE" title="Localized peak" width={90} height={22} />
 </LiveDemo>
 
-With a `locale`, the announced peak follows that locale's own decimal mark — "0,82" in German,
-not "0.82".
+With a `locale`, the announced peak follows that locale's own decimal mark — "0,82" in German, not "0.82".
 
 ## Edge cases
 
@@ -92,12 +84,11 @@ not "0.82".
   <Waveform data={[0, 0, 0, 0, 0, 0, 0, 0]} title="Silent" width={100} height={20} />
 </LiveDemo>
 
-A single sample renders as one bucket, top-to-bottom. All-zero data renders every bucket at
-the shared 0.4-unit "silent" tick height, and the accessible summary says **"Silent."** rather
-than reporting a zero peak. A `null` in the data behaves the same as a true zero for any
-bucket where it's the only sample — `maxPerBucket` skips non-finite values when picking the
-bucket's peak, and a bucket with nothing finite in it falls back to that same silence tick, so
-a genuine gap and real silence render identically here (unlike Sparkline's line break).
+A single sample renders as one bucket, top-to-bottom. All-zero data renders every bucket at the shared 0.4-unit "silent"
+tick height, and the accessible summary says **"Silent."** rather than reporting a zero peak. A `null` in the data
+behaves the same as a true zero for any bucket where it's the only sample — `maxPerBucket` skips non-finite values when
+picking the bucket's peak, and a bucket with nothing finite in it falls back to that same silence tick, so a genuine gap
+and real silence render identically here (unlike Sparkline's line break).
 
 ## Four homes
 
@@ -105,16 +96,15 @@ a genuine gap and real silence render identically here (unlike Sparkline's line 
 
 ## Why this default
 
-Bars with max-per-bucket are the only compression that can't hide an incident — averaging a bucket
-would erase the very spike someone is looking for. The auto domain is symmetric ±max|data|, which
-reads shape honestly and discloses the peak in the summary; for absolute loudness comparison across
-rows, pass an explicit shared `domain` so quiet data is never silently rescaled to look loud.
+Bars with max-per-bucket are the only compression that can't hide an incident — averaging a bucket would erase the very
+spike someone is looking for. The auto domain is symmetric ±max|data|, which reads shape honestly and discloses the peak
+in the summary; for absolute loudness comparison across rows, pass an explicit shared `domain` so quiet data is never
+silently rescaled to look loud.
 
 ## Accessibility
 
-The accessible name discloses the peak — **"Peak 0.738 at 63% through 200 samples."** Pure silence
-reads **"Silent."** rather than blank. The interactive entry roves the buckets, announcing each
-bucket's position and peak amplitude.
+The accessible name discloses the peak — **"Peak 0.738 at 63% through 200 samples."** Pure silence reads **"Silent."**
+rather than blank. The interactive entry roves the buckets, announcing each bucket's position and peak amplitude.
 
 ## Props
 

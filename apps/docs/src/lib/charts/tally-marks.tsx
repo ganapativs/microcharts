@@ -9,7 +9,7 @@ export const entry: ChartEntry = {
   slug: "tally-marks",
   status: "stable",
   collection: "expressive",
-  tagline: "How many — counted the way a human counts.",
+  tagline: "How many, counted the way a human counts.",
   staticImport: `${PKG}/tally-marks`,
   interactiveImport: `${PKG}/tally-marks/interactive`,
   // Marks already draw in on every value change (one-shot stroke-dashoffset

@@ -21,10 +21,10 @@ export const entry: ChartEntry = {
   slug: "event-timeline",
   status: "stable",
   collection: "core",
-  tagline: "What happened when, and for how long — spans and instants on one row.",
+  tagline: "What happened when, and for how long: spans and instants on one row.",
   staticImport: `${PKG}/event-timeline`,
   interactiveImport: `${PKG}/event-timeline/interactive`,
-  dataShape: "{ start, end?, label?, kind? }[] — end present = span, absent = point event",
+  dataShape: "{ start, end?, label?, kind? }[], end present = span, absent = point event",
   encoding: {
     channel: "span extent on a linear time axis; points as position marks",
     precision: "high",
@@ -270,7 +270,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     <EventTimeline
       data={props.data.slice(0, 6).map((v, i) => ({
         start: i * 10,
-        end: i % 2 === 0 ? i * 10 + Math.abs(v) : undefined,
+        end: i % 2 === 0 && Math.abs(v) > 0 ? i * 10 + Math.abs(v) : undefined,
       }))}
       domain={[0, 60]}
       summary={false}

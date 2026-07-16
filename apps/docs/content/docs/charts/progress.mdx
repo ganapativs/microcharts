@@ -1,11 +1,13 @@
 ---
 title: Progress
-description: A zero-anchored progress bar for React — the percent label is the datum, with segments for step counts and honest >100% handling.
+description:
+  A zero-anchored progress bar for React — the percent label is the datum, with segments for step counts and honest
+  >100% handling.
 ---
 
-Progress answers "how far along is this, exactly?". The bar gives the instant read; the
-percent label _is_ the datum — a bare bar is decoration. The track never shrinks for the
-label (the viewBox widens instead), so fractions stay comparable down a table column.
+Progress answers "how far along is this, exactly?". The bar gives the instant read; the percent label _is_ the datum — a
+bare bar is decoration. The track never shrinks for the label (the viewBox widens instead), so fractions stay comparable
+down a table column.
 
 <LiveDemo label="Progress" sizeOf="progress">
   <Progress value={0.68} title="Onboarding" width={160} height={22} />
@@ -58,19 +60,11 @@ label (the viewBox widens instead), so fractions stay comparable down a table co
 </LiveDemo>
 
 <LiveDemo label="locale" code={`<Progress value={34} max={50} label="value" locale="de-DE" />`}>
-  <Progress
-    value={34}
-    max={50}
-    label="value"
-    locale="de-DE"
-    title="Localized"
-    width={140}
-    height={22}
-  />
+  <Progress value={34} max={50} label="value" locale="de-DE" title="Localized" width={140} height={22} />
 </LiveDemo>
 
-With `label="percent"` (the default) the accessible name follows `format`/`locale` too —
-"68 %" under `de-DE` rather than the English "68%".
+With `label="percent"` (the default) the accessible name follows `format`/`locale` too — "68 %" under `de-DE` rather
+than the English "68%".
 
 ## Edge cases
 
@@ -95,10 +89,9 @@ With `label="percent"` (the default) the accessible name follows `format`/`local
   <Progress value={5} max={0} title="Unknown goal" width={160} height={22} />
 </LiveDemo>
 
-`max <= 0` (or a non-finite `value`/`max`) renders an empty track with no fill and no
-percent label — the accessible name says "No data." instead of computing a meaningless
-ratio. A `value` of `0` renders a real, empty-but-present bar (not the no-data state),
-so "not started" and "unmeasurable" stay visually distinct.
+`max <= 0` (or a non-finite `value`/`max`) renders an empty track with no fill and no percent label — the accessible
+name says "No data." instead of computing a meaningless ratio. A `value` of `0` renders a real, empty-but-present bar
+(not the no-data state), so "not started" and "unmeasurable" stay visually distinct.
 
 ## Four homes
 
@@ -106,23 +99,19 @@ so "not started" and "unmeasurable" stay visually distinct.
 
 ## Why this default
 
-The percent label is on by default because it is the datum — the bar alone can't say
-"68%". Past 100% the bar clamps at full but the label carries the true figure ("112%"):
-the number and the bar only ever disagree in that one documented case, and the number
-wins. `max <= 0` renders an empty track and says "No data." rather than inventing a
-fraction.
+The percent label is on by default because it is the datum — the bar alone can't say "68%". Past 100% the bar clamps at
+full but the label carries the true figure ("112%"): the number and the bar only ever disagree in that one documented
+case, and the number wins. `max <= 0` renders an empty track and says "No data." rather than inventing a fraction.
 
-`max` — not `total` — is the deliberate exception across the library: every other
-denominator prop names a discrete count (`total` on IconArray, TallyMarks, Honeycomb…),
-but Progress tracks a continuous goal that can be overshot, so it keeps the word that
-says "ceiling," not "count."
+`max` — not `total` — is the deliberate exception across the library: every other denominator prop names a discrete
+count (`total` on IconArray, TallyMarks, Honeycomb…), but Progress tracks a continuous goal that can be overshot, so it
+keeps the word that says "ceiling," not "count."
 
 ## Accessibility
 
-The accessible name is the completion — **"68% complete."**, or **"3 of 5 steps."** when
-segmented, or **"32% remaining."** with `positive="down"`. The interactive entry
-re-announces through a polite live region, throttled to whole-percent changes so a
-streaming value doesn't spam screen readers, and the fill-width transition is gated on
+The accessible name is the completion — **"68% complete."**, or **"3 of 5 steps."** when segmented, or **"32%
+remaining."** with `positive="down"`. The interactive entry re-announces through a polite live region, throttled to
+whole-percent changes so a streaming value doesn't spam screen readers, and the fill-width transition is gated on
 reduced motion.
 
 ## Props

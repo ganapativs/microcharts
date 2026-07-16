@@ -16,7 +16,7 @@ export const entry: ChartEntry = {
   slug: "waterfall",
   status: "stable",
   collection: "core",
-  tagline: "How the deltas compose into the total — P&L in a cell.",
+  tagline: "How the deltas compose into the total: P&L in a cell.",
   staticImport: `${PKG}/waterfall`,
   interactiveImport: `${PKG}/waterfall/interactive`,
   dataShape: "{ label, value }[] of signed deltas, in order",

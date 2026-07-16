@@ -21,7 +21,7 @@ export const entry: ChartEntry = {
   slug: "slope",
   status: "stable",
   collection: "core",
-  tagline: "Who rose and who fell between two moments — crossings read instantly.",
+  tagline: "Who rose and who fell between two moments: crossings read instantly.",
   staticImport: `${PKG}/slope`,
   interactiveImport: `${PKG}/slope/interactive`,
   dataShape: "{ label, from, to }[]",

@@ -1,17 +1,17 @@
 ---
 title: GradeProfile
-description: A word-sized route profile for React — elevation ridge with pitches coloured by grade, so the hard climbs read at a glance.
+description:
+  A word-sized route profile for React — elevation ridge with pitches coloured by grade, so the hard climbs read at a
+  glance.
 ---
 
-GradeProfile answers "how hard is this route, and where does it bite?" Each segment between two
-points is filled from the baseline and coloured by its grade — gentle to brutal — with the
-elevation ridge riding on top. The steepest pitch is called out, so the wall in the route is the
-first thing you see.
+GradeProfile answers "how hard is this route, and where does it bite?" Each segment between two points is filled from
+the baseline and coloured by its grade — gentle to brutal — with the elevation ridge riding on top. The steepest pitch
+is called out, so the wall in the route is the first thing you see.
 
-**How to read it** — colour is a _quantized_ grade bin, never a smooth ramp: flats and every
-descent take the faint band, then a mid tone, the negative colour, and the darkest fill for the
-brutal pitches. Height is the elevation ridge for shape; the encoded channel is the colour, and
-the interactive readout gives the exact grade.
+**How to read it** — colour is a _quantized_ grade bin, never a smooth ramp: flats and every descent take the faint
+band, then a mid tone, the negative colour, and the darkest fill for the brutal pitches. Height is the elevation ridge
+for shape; the encoded channel is the colour, and the interactive readout gives the exact grade.
 
 <LiveDemo label="GradeProfile" sizeOf="grade-profile">
   <GradeProfile
@@ -31,8 +31,8 @@ the interactive readout gives the exact grade.
   />
 </LiveDemo>
 
-`d` and `elev` must share a unit (both metres, say) so that grade — rise ÷ run — is a true
-percent. Distance need only be monotonic; the values themselves can be any scale.
+`d` and `elev` must share a unit (both metres, say) so that grade — rise ÷ run — is a true percent. Distance need only
+be monotonic; the values themselves can be any scale.
 
 ## Install
 
@@ -128,10 +128,9 @@ const trail = [
   />
 </LiveDemo>
 
-`format` accepts `Intl.NumberFormatOptions` (with a `locale`) or a formatting function, and
-applies to the distance and elevation numbers in the summary and readout. Grades carry their own
-percent formatting, so the locale still decides the decimal mark: the alpine profile above reads
-**"12.000, 1.250 gain; steepest 12,3% at 3.500."** in German.
+`format` accepts `Intl.NumberFormatOptions` (with a `locale`) or a formatting function, and applies to the distance and
+elevation numbers in the summary and readout. Grades carry their own percent formatting, so the locale still decides the
+decimal mark: the alpine profile above reads **"12.000, 1.250 gain; steepest 12,3% at 3.500."** in German.
 
 ## Edge cases
 
@@ -176,11 +175,10 @@ percent formatting, so the locale still decides the decimal mark: the alpine pro
   />
 </LiveDemo>
 
-A descent-only route has no climb to grade, so no pitch is emphasised and the summary reports
-**"600 m, no real climb."** — climbing difficulty is the whole story, so descents always take the
-gentlest colour rather than borrowing a climb's. A non-finite elevation breaks the profile into a
-gap: the segments touching it drop out and the ridge splits, so a missing reading never invents a
-grade. Flat routes and single points behave the same honest way.
+A descent-only route has no climb to grade, so no pitch is emphasised and the summary reports **"600 m, no real
+climb."** — climbing difficulty is the whole story, so descents always take the gentlest colour rather than borrowing a
+climb's. A non-finite elevation breaks the profile into a gap: the segments touching it drop out and the ridge splits,
+so a missing reading never invents a grade. Flat routes and single points behave the same honest way.
 
 ## Four homes
 
@@ -188,19 +186,18 @@ grade. Flat routes and single points behave the same honest way.
 
 ## Why this default
 
-Two decisions carry the chart. Grade is **quantized** into bins, not drawn as a continuous colour
-ramp — a route reads as "gentle / rolling / steep / wall", categories a rider can act on, instead
-of a gradient nobody can decode at a glance. And the default `bins` of `[3, 6, 10]` percent match
-how climbs are actually described, with the steepest pitch labelled so the hardest moment is never
-buried. Below 72 pixels wide the four bins collapse to a simple flat-versus-climb read, because
-the finer classes stop being separable there.
+Two decisions carry the chart. Grade is **quantized** into bins, not drawn as a continuous colour ramp — a route reads
+as "gentle / rolling / steep / wall", categories a rider can act on, instead of a gradient nobody can decode at a
+glance. And the default `bins` of `[3, 6, 10]` percent match how climbs are actually described, with the steepest pitch
+labelled so the hardest moment is never buried. Below 72 pixels wide the four bins collapse to a simple
+flat-versus-climb read, because the finer classes stop being separable there.
 
 ## Accessibility
 
-The accessible name states the route's shape in words — **"900 m, 67 m gain; steepest 16% at 800
-m."** — distance, total climb, and where the hardest pitch falls, none of it dependent on colour.
-The interactive entry announces each pitch as you rove it (`←`/`→`), giving the true grade and the
-cumulative climb, so the encoding never has to be learned to be used.
+The accessible name states the route's shape in words — **"900 m, 67 m gain; steepest 16% at 800 m."** — distance, total
+climb, and where the hardest pitch falls, none of it dependent on colour. The interactive entry announces each pitch as
+you rove it (`←`/`→`), giving the true grade and the cumulative climb, so the encoding never has to be learned to be
+used.
 
 ## Props
 

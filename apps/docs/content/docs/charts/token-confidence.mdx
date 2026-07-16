@@ -1,12 +1,13 @@
 ---
 title: TokenConfidence
-description: A confidence display for React where the text is the chart — tinted underlines beneath generated tokens flag which parts to double-check, in three discrete tiers.
+description:
+  A confidence display for React where the text is the chart — tinted underlines beneath generated tokens flag which
+  parts to double-check, in three discrete tiers.
 ---
 
-TokenConfidence answers "which parts of this generated text should I double-check?". The text
-itself is the chart: confidence becomes a typographic underline beneath each token, in three
-discrete tiers — confident tokens get no mark at all, so reading stays primary and only the
-uncertain words draw the eye.
+TokenConfidence answers "which parts of this generated text should I double-check?". The text itself is the chart:
+confidence becomes a typographic underline beneath each token, in three discrete tiers — confident tokens get no mark at
+all, so reading stays primary and only the uncertain words draw the eye.
 
 <LiveDemo
   label="TokenConfidence"
@@ -121,9 +122,8 @@ The text is the chart, so it inherits the surrounding font size — there is no 
   />
 </LiveDemo>
 
-Every token clears the `hi` threshold, so nothing is flagged — the sentence renders as
-plain, unmarked text. That absence of marks is the finding: nothing here needs a second
-look.
+Every token clears the `hi` threshold, so nothing is flagged — the sentence renders as plain, unmarked text. That
+absence of marks is the finding: nothing here needs a second look.
 
 <LiveDemo label="empty data" code={`<TokenConfidence data={[]} />`}>
   <TokenConfidence data={[]} style={{ fontSize: "1.05rem" }} />
@@ -137,17 +137,17 @@ An empty `data` array renders nothing and reports **"No tokens."** to assistive 
 
 ## Why this default
 
-The tiers are discrete — confident, unsure, guessing — never a continuous gradient, because people
-calibrate categorically: a smooth colour ramp reads as noise, but "double-check this word" reads
-instantly. Confident tokens carry no mark at all, and each tier is distinguished
-by colour **and** underline thickness **and** stroke style, so it never depends on colour alone. For
-auditing exact probabilities, reach for [CalibrationStrip](/docs/charts/calibration-strip) instead.
+The tiers are discrete — confident, unsure, guessing — never a continuous gradient, because people calibrate
+categorically: a smooth colour ramp reads as noise, but "double-check this word" reads instantly. Confident tokens carry
+no mark at all, and each tier is distinguished by colour **and** underline thickness **and** stroke style, so it never
+depends on colour alone. For auditing exact probabilities, reach for [CalibrationStrip](/docs/charts/calibration-strip)
+instead.
 
 ## Accessibility
 
-The accessible name is the tier tally — **"13 tokens: 8 confident, 2 unsure, 3 guessing."** The
-interactive entry gives each flagged token a roving tab stop; ←/→ move between them (skipping
-confident tokens), announcing each one's tier and confidence.
+The accessible name is the tier tally — **"13 tokens: 8 confident, 2 unsure, 3 guessing."** The interactive entry gives
+each flagged token a roving tab stop; ←/→ move between them (skipping confident tokens), announcing each one's tier and
+confidence.
 
 ## Props
 

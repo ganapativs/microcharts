@@ -1,13 +1,14 @@
 ---
 title: RetentionCurve
-description: A cohort retention chart for React — a step curve on a locked 0–100% scale, with plateau detection and an optional industry-benchmark ghost.
+description:
+  A cohort retention chart for React — a step curve on a locked 0–100% scale, with plateau detection and an optional
+  industry-benchmark ghost.
 ---
 
-RetentionCurve answers "do they stay — and does the curve plateau?". It draws a **step**
-line (cohort periods are discrete) on a scale **locked to 0–100%** — the full range is the
-honest frame for a share, so the floor is never truncated to manufacture drama. When the
-curve flattens, a dotted plateau marker appears; a peer curve can ride behind as a
-subordinate ghost.
+RetentionCurve answers "do they stay — and does the curve plateau?". It draws a **step** line (cohort periods are
+discrete) on a scale **locked to 0–100%** — the full range is the honest frame for a share, so the floor is never
+truncated to manufacture drama. When the curve flattens, a dotted plateau marker appears; a peer curve can ride behind
+as a subordinate ghost.
 
 <LiveDemo
   label="RetentionCurve"
@@ -39,7 +40,8 @@ subordinate ghost.
 
 ## When to use it
 
-- **Good for** — a cohort retention curve in a KPI card, your decay vs an industry benchmark, spotting whether retention plateaus (or keeps leaking).
+- **Good for** — a cohort retention curve in a KPI card, your decay vs an industry benchmark, spotting whether retention
+  plateaus (or keeps leaking).
 - **Avoid for** — a continuous signal (Sparkline) or one-number retention (Progress / Delta).
 
 ## Sizing
@@ -119,11 +121,10 @@ subordinate ghost.
   />
 </LiveDemo>
 
-A single period is too short for plateau detection (the window needs at least four finite
-points) and renders as a single step with no visible line. `data` accepts either a 0–1
-fraction or a 0–100 percent series — whichever the max value implies — so a raw percent
-export renders identically to its fraction form without a manual divide. With a `locale`, the
-percent label and every announced number follow that locale's own formatting.
+A single period is too short for plateau detection (the window needs at least four finite points) and renders as a
+single step with no visible line. `data` accepts either a 0–1 fraction or a 0–100 percent series — whichever the max
+value implies — so a raw percent export renders identically to its fraction form without a manual divide. With a
+`locale`, the percent label and every announced number follow that locale's own formatting.
 
 ## Four homes
 
@@ -131,17 +132,16 @@ percent label and every announced number follow that locale's own formatting.
 
 ## Why this default
 
-Step line plus the full 0–100% range, because retention is a discrete share, not a
-continuous signal — a smoothed curve implies between-period values that never existed, and a
-truncated floor exaggerates or hides the drop. The plateau marker appears **only** when the
-mean period-over-period change over the tail falls below half a point — never as decoration —
-and the benchmark stays a subordinate dashed ghost, never a second competing line.
+Step line plus the full 0–100% range, because retention is a discrete share, not a continuous signal — a smoothed curve
+implies between-period values that never existed, and a truncated floor exaggerates or hides the drop. The plateau
+marker appears **only** when the mean period-over-period change over the tail falls below half a point — never as
+decoration — and the benchmark stays a subordinate dashed ghost, never a second competing line.
 
 ## Accessibility
 
-The accessible name states the final retention and, when detected, the plateau — **"38%
-retained after 12 weeks; curve plateaus from week 8."**. The interactive entry steps the
-periods and announces each period's retention alongside the benchmark's.
+The accessible name states the final retention and, when detected, the plateau — **"38% retained after 12 weeks; curve
+plateaus from week 8."**. The interactive entry steps the periods and announces each period's retention alongside the
+benchmark's.
 
 ## Props
 

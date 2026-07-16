@@ -1,38 +1,38 @@
 ---
 title: Troubleshooting
-description: The predictable failures — unstyled charts, a chart invisible on a dark panel, a 'use client' error from the /interactive entry, a chart that won't fill its container, and fonts that look wrong — each with its one-line fix.
+description:
+  The predictable failures — unstyled charts, a chart invisible on a dark panel, a 'use client' error from the
+  /interactive entry, a chart that won't fill its container, and fonts that look wrong — each with its one-line fix.
 ---
 
-Most issues trace back to one of a handful of causes. This page is the fast path to each fix;
-the full explanation for each one lives on its own guide page, linked below.
+Most issues trace back to one of a handful of causes. This page is the fast path to each fix; the full explanation for
+each one lives on its own guide page, linked below.
 
 ## Charts render with no color, no strokes, just plain shapes
 
-The stylesheet isn't loaded. Every visual property — color, stroke weight, label size, the
-whole theme — comes from `styles.css`, imported once:
+The stylesheet isn't loaded. Every visual property — color, stroke weight, label size, the whole theme — comes from
+`styles.css`, imported once:
 
 ```tsx
 import "@microcharts/react/styles.css";
 ```
 
-Without it, a chart is still valid, accessible SVG (the markup and the accessible name are both
-there), it just has no styling applied — geometry with no ink. See
-[Quickstart](/docs/quickstart#compatibility) for where to put the import in your framework.
+Without it, a chart is still valid, accessible SVG (the markup and the accessible name are both there), it just has no
+styling applied — geometry with no ink. See [Quickstart](/docs/quickstart#compatibility) for where to put the import in
+your framework.
 
 ## A chart is invisible (or nearly) on a colored or dark panel
 
-Charts never paint their own background — they're transparent SVG, always. On a plain light or
-dark page this is invisible because the built-in light/dark tokens track
-`prefers-color-scheme`. It breaks when a chart sits on a surface whose color doesn't match the
-*page's* color scheme — a dark-branded card on an otherwise light page, or a colored KPI tile —
-because the tokens don't know that scope looks dark; they only know what the OS/browser reports.
+Charts never paint their own background — they're transparent SVG, always. On a plain light or dark page this is
+invisible because the built-in light/dark tokens track `prefers-color-scheme`. It breaks when a chart sits on a surface
+whose color doesn't match the _page's_ color scheme — a dark-branded card on an otherwise light page, or a colored KPI
+tile — because the tokens don't know that scope looks dark; they only know what the OS/browser reports.
 
 Fix it by rebinding the token scope to match the surface, not the page:
 
 ```css
 .dark-panel {
-  --mc-ink: #f5f5f5;
-  --mc-stroke: #f5f5f5;
+  --mc-stroke: #f5f5f5; /* text + data strokes; add --mc-neutral for muted labels */
 }
 ```
 
@@ -44,8 +44,7 @@ or force the whole preset for that scope:
 </div>
 ```
 
-See [Theming](/docs/theming) for the full token set and how scope, preset, and prop precedence
-works.
+See [Theming](/docs/theming) for the full token set and how scope, preset, and prop precedence works.
 
 ## `Error: ... 'use client' ...` when importing a chart
 
@@ -56,37 +55,34 @@ You imported a chart's `/interactive` entry into a Server Component:
 import { Sparkline } from "@microcharts/react/sparkline/interactive";
 ```
 
-Two ways out: render the static default entry instead if you don't actually need hover or
-keyboard —
+Two ways out: render the static default entry instead if you don't actually need hover or keyboard —
 
 ```tsx
 import { Sparkline } from "@microcharts/react/sparkline";
 ```
 
-— or, if you do need interactivity, move the import into a component marked `"use client"` and
-render that component from your server tree. See [Quickstart](/docs/quickstart#add-interactivity)
-for the static-vs-interactive split.
+— or, if you do need interactivity, move the import into a component marked `"use client"` and render that component
+from your server tree. See [Quickstart](/docs/quickstart#add-interactivity) for the static-vs-interactive split.
 
 ## The chart won't stretch to fill its container
 
-`.mc-root` — the chart's own `<svg>` — is `display: inline-block` by default, so it flows next
-to text instead of stretching. Give it fluid sizing explicitly:
+`.mc-root` — the chart's own `<svg>` — is `display: inline-block` by default, so it flows next to text instead of
+stretching. Give it fluid sizing explicitly:
 
 ```tsx
 <Sparkline data={data} style={{ width: "100%", height: "auto" }} />
 ```
 
-and make sure the *parent* is block-level (a flex or grid item, or a `div`) — a chart can't grow
-past an inline parent no matter what you set on the chart itself. Full recipes, including the
-inline-in-a-sentence case, are on [Sizing & scaling](/docs/sizing).
+and make sure the _parent_ is block-level (a flex or grid item, or a `div`) — a chart can't grow past an inline parent
+no matter what you set on the chart itself. Full recipes, including the inline-in-a-sentence case, are on
+[Sizing & scaling](/docs/sizing).
 
 ## A chart stacks on its own line instead of sitting inline with text
 
-This is usually a CSS reset, not a microcharts bug. `.mc-root`'s `display: inline-block` is
-declared inside a zero-specificity `:where()` so your styles always win — including ones you
-didn't mean to apply. Tailwind's Preflight sets a plain `svg { display: block; ... }` rule,
-which has *higher* specificity than any `:where()` selector and so overrides it, dropping the
-chart onto its own block-level line. Re-assert the layout you want at the call site:
+This is usually a CSS reset, not a microcharts bug. `.mc-root`'s `display: inline-block` is declared inside a
+zero-specificity `:where()` so your styles always win — including ones you didn't mean to apply. Tailwind's Preflight
+sets a plain `svg { display: block; ... }` rule, which has _higher_ specificity than any `:where()` selector and so
+overrides it, dropping the chart onto its own block-level line. Re-assert the layout you want at the call site:
 
 ```tsx
 <Sparkline data={data} className="inline-block" />
@@ -97,7 +93,6 @@ or wrap it in `className="mc-inline"` for text-flow placement — see
 
 ## Chart labels look wrong — a serif fallback, or mismatched with the page
 
-Charts inherit `font-family` from the page; they don't set one of their own. If the surrounding
-page never declares a font (a bare sandbox, a minimal starter), SVG text falls back to the
-browser's default serif. See [Theming → The font](/docs/theming#the-font) for why it inherits
-and how to set it per-scope.
+Charts inherit `font-family` from the page; they don't set one of their own. If the surrounding page never declares a
+font (a bare sandbox, a minimal starter), SVG text falls back to the browser's default serif. See
+[Theming → The font](/docs/theming#the-font) for why it inherits and how to set it per-scope.

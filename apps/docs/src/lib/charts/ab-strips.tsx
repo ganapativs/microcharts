@@ -14,10 +14,10 @@ export const entry: ChartEntry = {
   slug: "ab-strips",
   status: "stable",
   collection: "decision",
-  tagline: "Did B beat A — and by more than the overlap?",
+  tagline: "Did B beat A, and by more than the overlap?",
   staticImport: `${PKG}/ab-strips`,
   interactiveImport: `${PKG}/ab-strips/interactive`,
-  dataShape: "{ a: number[]; b: number[] } — the two arms",
+  dataShape: "{ a: number[]; b: number[] }, the two arms",
   encoding: {
     channel: "two graded quantile strips on one scale; the overlap is the answer",
     precision: "medium — interval read; the delta label restores a number",

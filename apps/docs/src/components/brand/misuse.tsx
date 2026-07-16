@@ -81,7 +81,7 @@ export function BrandMisuse() {
       <Reveal className="mb-8 max-w-2xl">
         <h2 className="display text-[length:var(--text-fluid-h2)]">Protect the read.</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
-          Recolor cells, invert fills, rotate, stretch, add effects, or reflow the grid — each
+          Recolor cells, invert fills, rotate, stretch, add effects, or reflow the grid. Each one
           breaks the encoding the mark shares with the charts.
         </p>
       </Reveal>

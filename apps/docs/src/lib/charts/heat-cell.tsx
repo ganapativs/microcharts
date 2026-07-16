@@ -18,7 +18,7 @@ export const entry: ChartEntry = {
   slug: "heat-cell",
   status: "stable",
   collection: "core",
-  tagline: "One calibrated color step — the building block for host-owned grids.",
+  tagline: "One calibrated color step: the building block for host-owned grids.",
   staticImport: `${PKG}/heat-cell`,
   interactiveImport: `${PKG}/heat-cell/interactive`,
   dataShape: "number (+ shared domain)",

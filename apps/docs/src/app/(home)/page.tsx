@@ -1,25 +1,37 @@
-import { HomeAiSection } from "@/components/home/home-ai-section";
-import { HomeA11ySection } from "@/components/home/home-a11y-section";
-import { HomeContextsSection } from "@/components/home/home-contexts-section";
-import { HomeCtaSection } from "@/components/home/home-cta-section";
-import { HomeEngineeringSection } from "@/components/home/home-engineering-section";
 import { HomeHero } from "@/components/home/home-hero";
-import { HomePerformanceSection } from "@/components/home/home-performance-section";
-import { HomePrimitivesSection } from "@/components/home/home-primitives-section";
+import { HomeProblemSection } from "@/components/home/home-problem-section";
+import { HomeGrammarSection } from "@/components/home/home-grammar-section";
+import { HomeCatalogSection } from "@/components/home/home-catalog-section";
+import { HomePrinciplesSection } from "@/components/home/home-principles-section";
+import { HomeModelsSection } from "@/components/home/home-models-section";
+import { HomeRobustnessSection } from "@/components/home/home-robustness-section";
+import { HomeSurfacesSection } from "@/components/home/home-surfaces-section";
+import { HomeReceiptsSection } from "@/components/home/home-receipts-section";
+import { HomeThemingSection } from "@/components/home/home-theming-section";
+import { HomeCtaSection } from "@/components/home/home-cta-section";
 import { CATALOG } from "@/lib/docs-facts";
 
+/**
+ * The homepage tells one story: interfaces now answer in sentences; charts
+ * never came along; microcharts is the missing typography of data. Every
+ * visual on the page is a real library component doing its actual job —
+ * see apps/docs/DESIGN.md for the direction rationale.
+ */
 export default function HomePage() {
   const total = CATALOG.total;
 
   return (
     <>
       <HomeHero catalogTotal={total} />
-      <HomeAiSection catalogTotal={total} />
-      <HomeA11ySection />
-      <HomePerformanceSection />
-      <HomePrimitivesSection catalogTotal={total} />
-      <HomeContextsSection />
-      <HomeEngineeringSection />
+      <HomeProblemSection />
+      <HomeGrammarSection catalogTotal={total} />
+      <HomeCatalogSection />
+      <HomePrinciplesSection />
+      <HomeModelsSection catalogTotal={total} />
+      <HomeRobustnessSection />
+      <HomeSurfacesSection />
+      <HomeReceiptsSection />
+      <HomeThemingSection />
       <HomeCtaSection />
     </>
   );

@@ -1,13 +1,14 @@
 ---
 title: ErrorBudget
-description: An SLO error-budget chart for React — budget remaining against the steady-burn diagonal, with Google-SRE burn-rate reference lines and exhaustion marking.
+description:
+  An SLO error-budget chart for React — budget remaining against the steady-burn diagonal, with Google-SRE burn-rate
+  reference lines and exhaustion marking.
 ---
 
-ErrorBudget answers "are we burning the error budget too fast to survive the window?". The
-budget remaining rides against the **steady-burn diagonal** — the pace that exactly spends
-the window — so "too fast" is legible at a glance: below the diagonal means you're outrunning
-your budget. Faster burn-rate reference lines (the Google-SRE 1×/6×/14.4× **convention**, not
-physics) sit below it as faint policy context.
+ErrorBudget answers "are we burning the error budget too fast to survive the window?". The budget remaining rides
+against the **steady-burn diagonal** — the pace that exactly spends the window — so "too fast" is legible at a glance:
+below the diagonal means you're outrunning your budget. Faster burn-rate reference lines (the Google-SRE 1×/6×/14.4×
+**convention**, not physics) sit below it as faint policy context.
 
 <LiveDemo label="ErrorBudget" sizeOf="error-budget">
   <ErrorBudget
@@ -31,7 +32,8 @@ physics) sit below it as faint policy context.
 
 ## When to use it
 
-- **Good for** — an SLO error budget in a KPI card, a service list where each row is a budget, spotting a fast-burn before it exhausts the window.
+- **Good for** — an SLO error budget in a KPI card, a service list where each row is a budget, spotting a fast-burn
+  before it exhausts the window.
 - **Avoid for** — a plain uptime series (Sparkline) or a one-number budget (Progress).
 
 ## Sizing
@@ -67,11 +69,7 @@ physics) sit below it as faint policy context.
   </span>
 </LiveDemo>
 
-<LiveDemo
-  label="locale"
-  dataOf="error-budget"
-  code={`<ErrorBudget data={remaining} window={30} locale="de-DE" />`}
->
+<LiveDemo label="locale" dataOf="error-budget" code={`<ErrorBudget data={remaining} window={30} locale="de-DE" />`}>
   <ErrorBudget
     data={[1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62]}
     window={30}
@@ -83,9 +81,8 @@ physics) sit below it as faint policy context.
   />
 </LiveDemo>
 
-`format` defaults to a percent formatter; with `locale` it follows that locale's own
-conventions for the remaining-budget label — "62 %" (space before the sign) under `de-DE`
-rather than the English "62%".
+`format` defaults to a percent formatter; with `locale` it follows that locale's own conventions for the
+remaining-budget label — "62 %" (space before the sign) under `de-DE` rather than the English "62%".
 
 ## Edge cases
 
@@ -111,12 +108,11 @@ rather than the English "62%".
   />
 </LiveDemo>
 
-With no data the chart renders an empty root and the accessible name says **"No data."**; a
-single point still draws the diagonal, wedges, and endpoint, though
-`currentRate` (which needs a prior step) reads `0`. Once the remaining line reaches zero before
-`window` elapses, the line stops at that step and an ✕ replaces the endpoint dot — no further
-steps are drawn, extrapolated, or implied, and the summary reads **"Budget exhausted at day 7
-of 20."** instead of the normal remaining/rate sentence.
+With no data the chart renders an empty root and the accessible name says **"No data."**; a single point still draws the
+diagonal, wedges, and endpoint, though `currentRate` (which needs a prior step) reads `0`. Once the remaining line
+reaches zero before `window` elapses, the line stops at that step and an ✕ replaces the endpoint dot — no further steps
+are drawn, extrapolated, or implied, and the summary reads **"Budget exhausted at day 7 of 20."** instead of the normal
+remaining/rate sentence.
 
 ## Four homes
 
@@ -124,19 +120,17 @@ of 20."** instead of the normal remaining/rate sentence.
 
 ## Why this default
 
-Remaining-vs-diagonal, because "too fast" is only legible against the pace that exactly spends
-the window. The 1×/6×/14.4× reference lines are the SRE Workbook's multiwindow burn-rate alert
-**convention** — a policy default, never universal law — so `rates` is configurable and the
-lines render as faint background context, never data-colored. `currentRate` is the observed
-burn slope over the last `max(2, ⌈n/6⌉)` steps ÷ the steady slope; when the budget hits zero
-before the window ends, the line stops at an ✕ and the summary says so.
+Remaining-vs-diagonal, because "too fast" is only legible against the pace that exactly spends the window. The
+1×/6×/14.4× reference lines are the SRE Workbook's multiwindow burn-rate alert **convention** — a policy default, never
+universal law — so `rates` is configurable and the lines render as faint background context, never data-colored.
+`currentRate` is the observed burn slope over the last `max(2, ⌈n/6⌉)` steps ÷ the steady slope; when the budget hits
+zero before the window ends, the line stops at an ✕ and the summary says so.
 
 ## Accessibility
 
-The accessible name states the budget, the elapsed window, and the burn rate — **"62% of error
-budget remains at day 12 of 30 — burning at 0.6× the steady rate."**; an exhausted window
-reads "Budget exhausted at day N of M." The interactive entry steps the days and announces
-each step's remaining and local burn rate.
+The accessible name states the budget, the elapsed window, and the burn rate — **"62% of error budget remains at day 12
+of 30 — burning at 0.6× the steady rate."**; an exhausted window reads "Budget exhausted at day N of M." The interactive
+entry steps the days and announces each step's remaining and local burn rate.
 
 ## Props
 

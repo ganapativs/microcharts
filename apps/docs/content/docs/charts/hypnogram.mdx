@@ -1,11 +1,13 @@
 ---
 title: Hypnogram
-description: A categorical step strip for React — which discrete state the system was in over time, drawn with right angles only because a state is a fact, not a sample.
+description:
+  A categorical step strip for React — which discrete state the system was in over time, drawn with right angles only
+  because a state is a fact, not a sample.
 ---
 
-Hypnogram answers "which discrete state was the system in over time, and how choppy were the
-transitions?". It refuses interpolation — there are no diagonals, ever — because a state is a
-fact that holds until the next one, not a sample of a continuum a line chart can slope between.
+Hypnogram answers "which discrete state was the system in over time, and how choppy were the transitions?". It refuses
+interpolation — there are no diagonals, ever — because a state is a fact that holds until the next one, not a sample of
+a continuum a line chart can slope between.
 
 <LiveDemo
   label="Hypnogram"
@@ -131,17 +133,8 @@ fact that holds until the next one, not a sample of a continuum a line chart can
 
 ## Edge cases
 
-<LiveDemo
-  label="one state, whole domain"
-  code={`<Hypnogram data={[{ t: 0, state: "Deep" }]} domain={[0, 120]} />`}
->
-  <Hypnogram
-    data={[{ t: 0, state: "Deep" }]}
-    domain={[0, 120]}
-    title="Deep sleep throughout"
-    width={220}
-    height={40}
-  />
+<LiveDemo label="one state, whole domain" code={`<Hypnogram data={[{ t: 0, state: "Deep" }]} domain={[0, 120]} />`}>
+  <Hypnogram data={[{ t: 0, state: "Deep" }]} domain={[0, 120]} title="Deep sleep throughout" width={220} height={40} />
 </LiveDemo>
 
 <LiveDemo
@@ -169,10 +162,9 @@ fact that holds until the next one, not a sample of a continuum a line chart can
   />
 </LiveDemo>
 
-A single entry holds its state across the whole domain — one flat run, and the summary
-names it directly — **"1 state, no transitions; Deep throughout."** — rather than describing
-a one-point chart. A state present in the data but missing from an explicit `states` order
-is never dropped: it's appended as its own row (with a dev-only console warning), so the
+A single entry holds its state across the whole domain — one flat run, and the summary names it directly — **"1 state,
+no transitions; Deep throughout."** — rather than describing a one-point chart. A state present in the data but missing
+from an explicit `states` order is never dropped: it's appended as its own row (with a dev-only console warning), so the
 strip always accounts for every state it's given.
 
 ## Four homes
@@ -181,16 +173,15 @@ strip always accounts for every state it's given.
 
 ## Why this default
 
-Right-angle steps with an explicit `states` order are the clinically proven read. Order is
-meaningful — for ordinal states (sleep depth, incident severity) pass it explicitly; for nominal
-states with no rank, use `variant="lanes"` so the vertical axis never implies one. Any smoothing or
-easing of the step corners would be a lie about the data, so entrance animation is opacity only.
+Right-angle steps with an explicit `states` order are the clinically proven read. Order is meaningful — for ordinal
+states (sleep depth, incident severity) pass it explicitly; for nominal states with no rank, use `variant="lanes"` so
+the vertical axis never implies one. Any smoothing or easing of the step corners would be a lie about the data, so
+entrance animation is opacity only.
 
 ## Accessibility
 
-The accessible name summarises the shape — **"9 transitions across 4 states; longest run Deep."**
-The interactive entry roves the runs; each announces its state and span (**"Light, from 8 to
-22."**).
+The accessible name summarises the shape — **"9 transitions across 4 states; longest run Deep."** The interactive entry
+roves the runs; each announces its state and span (**"Light, from 8 to 22."**).
 
 ## Props
 

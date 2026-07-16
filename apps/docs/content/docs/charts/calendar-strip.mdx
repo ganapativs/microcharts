@@ -1,11 +1,12 @@
 ---
 title: CalendarStrip
-description: A word-sized calendar heatmap for React — the last few weeks day by day, real calendar position, no-record days honestly distinct from zeros.
+description:
+  A word-sized calendar heatmap for React — the last few weeks day by day, real calendar position, no-record days
+  honestly distinct from zeros.
 ---
 
-CalendarStrip answers "what did the last few weeks actually look like, day by day?" —
-week-aligned recent activity where real calendar position matters. Weekday rhythm is the
-read; for longer ordinal histories, use ActivityGrid.
+CalendarStrip answers "what did the last few weeks actually look like, day by day?" — week-aligned recent activity where
+real calendar position matters. Weekday rhythm is the read; for longer ordinal histories, use ActivityGrid.
 
 <LiveDemo label="CalendarStrip" sizeOf="calendar-strip">
   <CalendarStrip
@@ -51,10 +52,7 @@ read; for longer ordinal histories, use ActivityGrid.
   />
 </LiveDemo>
 
-<LiveDemo
-  label="Sunday weeks"
-  code={`<CalendarStrip data={days} end="2026-07-01" weekStart={0} />`}
->
+<LiveDemo label="Sunday weeks" code={`<CalendarStrip data={days} end="2026-07-01" weekStart={0} />`}>
   <CalendarStrip
     data={Array.from({ length: 18 }, (_, i) => ({
       date: `2026-06-${String(4 + i).padStart(2, "0")}`,
@@ -67,13 +65,9 @@ read; for longer ordinal histories, use ActivityGrid.
   />
 </LiveDemo>
 
-`cell`/`gap` bump the edge length and spacing directly — grid-sibling parity with
-ActivityGrid and GardenGrid.
+`cell`/`gap` bump the edge length and spacing directly — grid-sibling parity with ActivityGrid and GardenGrid.
 
-<LiveDemo
-  label="larger cells"
-  code={`<CalendarStrip data={days} end="2026-07-01" cell={10} gap={2} />`}
->
+<LiveDemo label="larger cells" code={`<CalendarStrip data={days} end="2026-07-01" cell={10} gap={2} />`}>
   <CalendarStrip
     data={Array.from({ length: 18 }, (_, i) => ({
       date: `2026-06-${String(4 + i).padStart(2, "0")}`,
@@ -89,10 +83,7 @@ ActivityGrid and GardenGrid.
 
 ## Edge cases
 
-<LiveDemo
-  label="empty data — window still renders"
-  code={`<CalendarStrip data={[]} end="2026-07-01" />`}
->
+<LiveDemo label="empty data — window still renders" code={`<CalendarStrip data={[]} end="2026-07-01" />`}>
   <CalendarStrip data={[]} end="2026-07-01" title="No records" style={{ width: 150, height: 84 }} />
 </LiveDemo>
 
@@ -118,20 +109,17 @@ ActivityGrid and GardenGrid.
 
 ## Why this default
 
-Monday start + 4 weeks: one glance covers a month of weekday rhythm without scrolling
-history. All date math is UTC — the same input renders identically in any host timezone,
-so SSR output never depends on where the server runs. `end` defaults to today but should
-be pinned wherever determinism matters.
+Monday start + 4 weeks: one glance covers a month of weekday rhythm without scrolling history. All date math is UTC —
+the same input renders identically in any host timezone, so SSR output never depends on where the server runs. `end`
+defaults to today but should be pinned wherever determinism matters.
 
-Empty ≠ zero: a day with no record renders as a faint outline, a day with value 0 as a
-filled track cell — a feed gap never masquerades as a quiet day. Future days are blank,
-never extrapolated.
+Empty ≠ zero: a day with no record renders as a faint outline, a day with value 0 as a filled track cell — a feed gap
+never masquerades as a quiet day. Future days are blank, never extrapolated.
 
 ## Accessibility
 
-The accessible name counts real days — **"Active 11 of 24 days over 4 weeks."** The
-interactive entry walks the grid in 2-D and announces real calendar days (**"Thursday,
-June 11: 0."**, **"Tuesday, June 23: no data."**).
+The accessible name counts real days — **"Active 11 of 24 days over 4 weeks."** The interactive entry walks the grid in
+2-D and announces real calendar days (**"Thursday, June 11: 0."**, **"Tuesday, June 23: no data."**).
 
 ## Props
 

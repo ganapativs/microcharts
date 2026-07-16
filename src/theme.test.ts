@@ -32,6 +32,7 @@ describe("defineTheme — basics", () => {
       font: "Inter",
       fontNumeric: "IBM Plex Mono",
       labelSize: "0.8em",
+      strokeWidth: 2,
       gap: "0.3em",
       duration: "200ms",
       easing: "linear",
@@ -42,6 +43,7 @@ describe("defineTheme — basics", () => {
     });
     expect(t.vars["--mc-font-numeric"]).toBe("IBM Plex Mono");
     expect(t.vars["--mc-label-size"]).toBe("0.8em");
+    expect(t.vars["--mc-stroke-width"]).toBe("2"); // number stringified, not twinned
     expect(t.vars["--mc-duration"]).toBe("200ms");
     expect(t.darkVars).toEqual({});
   });

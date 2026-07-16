@@ -1,23 +1,18 @@
 ---
 title: OrbitStatus
-description: An orbit status chart for React — a dependency's latency as orbit radius and its call rate as dash density and satellite speed.
+description:
+  An orbit status chart for React — a dependency's latency as orbit radius and its call rate as dash density and
+  satellite speed.
 ---
 
-OrbitStatus answers "how slow and how busy is this dependency right now?" in one small mark. The orbit
-radius is latency — a wider orbit is a slower service — and the orbit's dash density is the call rate,
-denser dashes meaning more calls. In the interactive entry the satellite orbits at a speed that mirrors
-that rate, so a busy service visibly spins faster. Both channels are deliberately low-precision ambient
-reads; for exact numbers, use a `Sparkline` for latency and a `Delta` or `MiniBar` for rate.
+OrbitStatus answers "how slow and how busy is this dependency right now?" in one small mark. The orbit radius is latency
+— a wider orbit is a slower service — and the orbit's dash density is the call rate, denser dashes meaning more calls.
+In the interactive entry the satellite orbits at a speed that mirrors that rate, so a busy service visibly spins faster.
+Both channels are deliberately low-precision ambient reads; for exact numbers, use a `Sparkline` for latency and a
+`Delta` or `MiniBar` for rate.
 
 <LiveDemo label="OrbitStatus" sizeOf="orbit-status">
-  <OrbitStatus
-    latency={240}
-    rate={12}
-    latencyDomain={[0, 500]}
-    rateDomain={[0, 20]}
-    title="Payments API"
-    size={40}
-  />
+  <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} title="Payments API" size={40} />
 </LiveDemo>
 
 ## Install
@@ -30,16 +25,16 @@ reads; for exact numbers, use a `Sparkline` for latency and a `Delta` or `MiniBa
 
 ## Motion, and reduced motion
 
-The satellite's angular speed is quantized to the same five steps as the static dash density, so the
-motion and the still frame decode identically — you learn nothing extra from watching, you just feel the
-rate. This is the deliberate idle-loop exception, allowed because the loop rate is the datum. It pauses
-off-screen and, under `prefers-reduced-motion`, does not spin at all: the dash density already carries
-the rate. The satellite's angular _position_ never means anything — only its speed does — so the docs
-say plainly not to read the angle.
+The satellite's angular speed is quantized to the same five steps as the static dash density, so the motion and the
+still frame decode identically — you learn nothing extra from watching, you just feel the rate. This is the deliberate
+idle-loop exception, allowed because the loop rate is the datum. It pauses off-screen and, under
+`prefers-reduced-motion`, does not spin at all: the dash density already carries the rate. The satellite's angular
+_position_ never means anything — only its speed does — so the docs say plainly not to read the angle.
 
 ## When to use it
 
-- **Good for** — a live dependency health dot in a service table, latency and rate together in one small mark, or an infra status glance.
+- **Good for** — a live dependency health dot in a service table, latency and rate together in one small mark, or an
+  infra status glance.
 - **Avoid for** — exact latency (`Sparkline`), exact rate (`Delta`, `MiniBar`), or a trend over time (`Sparkline`).
 
 ## Variants
@@ -59,14 +54,7 @@ say plainly not to read the angle.
       size={40}
       summary={false}
     />
-    <OrbitStatus
-      latency={100}
-      rate={0}
-      latencyDomain={[0, 500]}
-      rateDomain={[0, 20]}
-      size={40}
-      summary={false}
-    />
+    <OrbitStatus latency={100} rate={0} latencyDomain={[0, 500]} rateDomain={[0, 20]} size={40} summary={false} />
   </span>
 </LiveDemo>
 
@@ -115,20 +103,20 @@ say plainly not to read the angle.
 
 ## Why this default
 
-The dash-density static encoding exists because a paused satellite says nothing — the still frame had to
-carry both variables or the chart would fail the survivor test, so rate lives in the dashes as well as
-the spin. Both channels are quantized to five ordinal steps and documented as such; radius and speed
-always come from the same domains in the static and interactive frames, so nothing drifts. A lone orbit
-radius is meaningless, so the docs insist on explicit `latencyDomain` and `rateDomain` — the same steer
-as `FatDigits`. An alert doubles the satellite's size and flags the summary, never relying on color
-alone. Unknown latency or rate goes gray and stops the spin: an unknown dependency must not look healthy.
+The dash-density static encoding exists because a paused satellite says nothing — the still frame had to carry both
+variables or the chart would fail the survivor test, so rate lives in the dashes as well as the spin. Both channels are
+quantized to five ordinal steps and documented as such; radius and speed always come from the same domains in the static
+and interactive frames, so nothing drifts. A lone orbit radius is meaningless, so the docs insist on explicit
+`latencyDomain` and `rateDomain` — the same steer as `FatDigits`. An alert doubles the satellite's size and flags the
+summary, never relying on color alone. Unknown latency or rate goes gray and stops the spin: an unknown dependency must
+not look healthy.
 
 ## Accessibility
 
-The accessible name is both variables with units — **"240ms latency at 12 calls/s."** — plus
-"— above alert threshold" when the latency crosses `alert`, or **"Latency unknown."** when a value is
-missing. The alert state is carried by the satellite's size and the summary, never color alone; motion is
-gated on `prefers-reduced-motion`; and the live region announces threshold crossings only.
+The accessible name is both variables with units — **"240ms latency at 12 calls/s."** — plus "— above alert threshold"
+when the latency crosses `alert`, or **"Latency unknown."** when a value is missing. The alert state is carried by the
+satellite's size and the summary, never color alone; motion is gated on `prefers-reduced-motion`; and the live region
+announces threshold crossings only.
 
 ## Props
 

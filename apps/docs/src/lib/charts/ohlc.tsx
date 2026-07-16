@@ -18,7 +18,7 @@ export const entry: ChartEntry = {
   slug: "ohlc",
   status: "stable",
   collection: "core",
-  tagline: "Price action per period — open, high, low, close in a cell.",
+  tagline: "Price action per period: open, high, low, close in a cell.",
   staticImport: `${PKG}/ohlc`,
   interactiveImport: `${PKG}/ohlc/interactive`,
   dataShape: "{ open, high, low, close }[] per period, oldest first",

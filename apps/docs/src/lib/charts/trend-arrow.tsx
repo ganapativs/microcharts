@@ -21,7 +21,7 @@ export const entry: ChartEntry = {
   slug: "trend-arrow",
   status: "stable",
   collection: "core",
-  tagline: "Which way is this moving — at glyph size, before any number.",
+  tagline: "Which way is this moving? At glyph size, before any number.",
   staticImport: `${PKG}/trend-arrow`,
   interactiveImport: `${PKG}/trend-arrow/interactive`,
   dataShape: "number (signed change)",

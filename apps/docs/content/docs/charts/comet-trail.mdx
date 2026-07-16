@@ -1,20 +1,16 @@
 ---
 title: CometTrail
-description: A comet trail chart for React — a live value's head dot plus an opacity-fading trail of where it has just been.
+description:
+  A comet trail chart for React — a live value's head dot plus an opacity-fading trail of where it has just been.
 ---
 
-CometTrail answers "where is the value now, and where has it just been?" A bright head dot marks the
-current value; behind it, a trail of recent points fades out with age, like a comet. In the interactive
-entry the head eases to each new value and the old head decays into the trail, so a live stream draws a
-comet and a stall goes still. Opacity encodes **age only** — the y position does the value — so the
-trail is recency context, never data you have to decode.
+CometTrail answers "where is the value now, and where has it just been?" A bright head dot marks the current value;
+behind it, a trail of recent points fades out with age, like a comet. In the interactive entry the head eases to each
+new value and the old head decays into the trail, so a live stream draws a comet and a stall goes still. Opacity encodes
+**age only** — the y position does the value — so the trail is recency context, never data you have to decode.
 
 <LiveDemo label="CometTrail" sizeOf="comet-trail">
-  <CometTrail
-    data={[40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87]}
-    title="Latency"
-    width={90}
-  />
+  <CometTrail data={[40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87]} title="Latency" width={90} />
 </LiveDemo>
 
 ## Install
@@ -27,18 +23,19 @@ trail is recency context, never data you have to decode.
 
 ## Motion, and reduced motion
 
-Motion happens **only on a data change** — there is no idle loop. When a new value arrives the head
-eases (~200 ms, the library's canonical strong ease-out) from its old position to the new one and the
-previous head steps down into the trail; a
-continuous stream produces the comet, a stalled stream simply goes still, which is itself the signal
-(staleness reads as stillness). The dot jumps to the truth, eased — it never simulates phantom positions
-between updates. Under `prefers-reduced-motion` the head repositions instantly (the static encoding is
-already complete), and the sweep pauses off-screen.
+Motion happens **only on a data change** — there is no idle loop. When a new value arrives the head eases (~200 ms, the
+library's canonical strong ease-out) from its old position to the new one and the previous head steps down into the
+trail; a continuous stream produces the comet, a stalled stream simply goes still, which is itself the signal (staleness
+reads as stillness). The dot jumps to the truth, eased — it never simulates phantom positions between updates. Under
+`prefers-reduced-motion` the head repositions instantly (the static encoding is already complete), and the sweep pauses
+off-screen.
 
 ## When to use it
 
-- **Good for** — a live price or metric with a little recency context, a realtime KPI that should show momentum, or per-stream "where is it now" in a table.
-- **Avoid for** — the full history (`Sparkline`), an exact multi-point comparison (`Sparkline`, `DotPlot`), or discrete events (`HeartbeatBlip`).
+- **Good for** — a live price or metric with a little recency context, a realtime KPI that should show momentum, or
+  per-stream "where is it now" in a table.
+- **Avoid for** — the full history (`Sparkline`), an exact multi-point comparison (`Sparkline`, `DotPlot`), or discrete
+  events (`HeartbeatBlip`).
 
 ## Variants
 
@@ -48,18 +45,8 @@ already complete), and the sweep pauses off-screen.
 <CometTrail data={window} label="none" />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <CometTrail
-      data={[40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87]}
-      trail={6}
-      width={100}
-      summary={false}
-    />
-    <CometTrail
-      data={[40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87]}
-      label="none"
-      width={100}
-      summary={false}
-    />
+    <CometTrail data={[40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87]} trail={6} width={100} summary={false} />
+    <CometTrail data={[40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87]} label="none" width={100} summary={false} />
   </span>
 </LiveDemo>
 
@@ -81,9 +68,8 @@ already complete), and the sweep pauses off-screen.
   <CometTrail data={[40, 55, 48, 62]} trail={20} title="Short stream" width={90} />
 </LiveDemo>
 
-Empty data draws just the frame, with "No data." as the summary. A single point has no
-trail to fade — just the head and "Now 52." A `trail` larger than the data never
-backfills or pads: the trail simply shows every point there is.
+Empty data draws just the frame, with "No data." as the summary. A single point has no trail to fade — just the head and
+"Now 52." A `trail` larger than the data never backfills or pads: the trail simply shows every point there is.
 
 ## Four homes
 
@@ -91,17 +77,16 @@ backfills or pads: the trail simply shows every point there is.
 
 ## Why this default
 
-`label="last"` is on because a live value without its number is a mood, not a measurement — the whole
-point is knowing where it is now. Opacity encodes age and nothing else, so changing `trail` gives you
-more or less recency context without ever changing the head read. The trail is capped at 20 points: past
-that it stops being a trail and becomes a sparkline, which is the better tool for the full history.
+`label="last"` is on because a live value without its number is a mood, not a measurement — the whole point is knowing
+where it is now. Opacity encodes age and nothing else, so changing `trail` gives you more or less recency context
+without ever changing the head read. The trail is capped at 20 points: past that it stops being a trail and becomes a
+sparkline, which is the better tool for the full history.
 
 ## Accessibility
 
-The accessible name is the now-value and the recent trend — **"Now 87, rising over the last 12
-updates."** — or **"Now 87."** for a single point. Arrow keys step back through the trail
-("3 updates ago: 78.") and return toward now; motion is gated on `prefers-reduced-motion`, and the trail
-opacity is age, never a value you must read from fading.
+The accessible name is the now-value and the recent trend — **"Now 87, rising over the last 12 updates."** — or **"Now
+87."** for a single point. Arrow keys step back through the trail ("3 updates ago: 78.") and return toward now; motion
+is gated on `prefers-reduced-motion`, and the trail opacity is age, never a value you must read from fading.
 
 ## Props
 

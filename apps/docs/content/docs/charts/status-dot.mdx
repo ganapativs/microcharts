@@ -1,12 +1,12 @@
 ---
 title: StatusDot
-description: A categorical state mark for React — five paired shape+color states that survive grayscale, print, and forced-colors.
+description:
+  A categorical state mark for React — five paired shape+color states that survive grayscale, print, and forced-colors.
 ---
 
-StatusDot answers "what state is this thing in right now?". Every state pairs a distinct
-silhouette with a semantic color — filled circle, triangle, diamond, hollow ring,
-half-filled circle — so two states can never collapse into the same mark for the 1-in-12
-colorblind readers a colored disc fails.
+StatusDot answers "what state is this thing in right now?". Every state pairs a distinct silhouette with a semantic
+color — filled circle, triangle, diamond, hollow ring, half-filled circle — so two states can never collapse into the
+same mark for the 1-in-12 colorblind readers a colored disc fails.
 
 <LiveDemo label="StatusDot" sizeOf="status-dot">
   <span className="text-lg">
@@ -27,8 +27,7 @@ colorblind readers a colored disc fails.
 ## When to use it
 
 - **Good for** — service lists, inline state in a sentence, monitoring rows.
-- **Avoid for** — quantities, trends, or vocabularies past ~6 states (marks stop being
-  memorable).
+- **Avoid for** — quantities, trends, or vocabularies past ~6 states (marks stop being memorable).
 
 ## The state contract
 
@@ -40,8 +39,8 @@ colorblind readers a colored disc fails.
 | `off`   | hollow ring        | `--mc-neutral`  |
 | `busy`  | half-filled circle | `--mc-accent`   |
 
-The pairing is a contract: `color` recolors a state but never reshapes it, and a theme
-must never let two states share a silhouette.
+The pairing is a contract: `color` recolors a state but never reshapes it, and a theme must never let two states share a
+silhouette.
 
 ## Sizing
 
@@ -88,17 +87,15 @@ must never let two states share a silhouette.
 
 ## Why this default
 
-Shape+color pairing beats a colored disc: the five silhouettes stay distinct in
-grayscale, print, and forced-colors, where color-only status dots all become the same
-gray circle. An unknown status key renders the `off` ring with a dev warning — never a
-plausible-looking wrong state.
+Shape+color pairing beats a colored disc: the five silhouettes stay distinct in grayscale, print, and forced-colors,
+where color-only status dots all become the same gray circle. An unknown status key renders the `off` ring with a dev
+warning — never a plausible-looking wrong state.
 
 ## Accessibility
 
-The accessible name is the state's label — **"Status: warning."** — composed with your
-`title` ("Deploys. Status: warning."). The interactive entry announces state changes
-through a polite live region and stays quiet on mount. `pulse` is a CSS halo that
-disappears entirely under `prefers-reduced-motion`.
+The accessible name is the state's label — **"Status: warning."** — composed with your `title` ("Deploys. Status:
+warning."). The interactive entry announces state changes through a polite live region and stays quiet on mount. `pulse`
+is a CSS halo that disappears entirely under `prefers-reduced-motion`.
 
 ## Props
 

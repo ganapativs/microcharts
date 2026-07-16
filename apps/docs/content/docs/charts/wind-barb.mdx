@@ -1,12 +1,14 @@
 ---
 title: WindBarb
-description: A direction-and-magnitude glyph for React — shaft angle is the bearing, quantized WMO barbs are the strength, all in one character.
+description:
+  A direction-and-magnitude glyph for React — shaft angle is the bearing, quantized WMO barbs are the strength, all in
+  one character.
 ---
 
-WindBarb answers "which way is it flowing and roughly how hard — in one character?". The shaft
-points along the bearing and the barbs count the magnitude: a half barb, a full barb, and a pennant
-are fixed quanta, so the glyph reads at a glance without a scale. Quantization is the honesty here,
-not a limitation — the per-barb quantum is stated next to every example.
+WindBarb answers "which way is it flowing and roughly how hard — in one character?". The shaft points along the bearing
+and the barbs count the magnitude: a half barb, a full barb, and a pennant are fixed quanta, so the glyph reads at a
+glance without a scale. Quantization is the honesty here, not a limitation — the per-barb quantum is stated next to
+every example.
 
 <LiveDemo label="WindBarb" sizeOf="wind-barb">
   <WindBarb direction={225} magnitude={32} step={10} label="value" title="Wind" size={64} />
@@ -22,17 +24,12 @@ not a limitation — the per-barb quantum is stated next to every example.
 
 ## Reading the barb
 
-WindBarb has no interactive mode — a single glyph carries the whole reading, so its accessible name
-is the full sentence. This gallery is the read-back key: each full barb is one `step`, a half barb
-is half a `step`, and a pennant is five.
+WindBarb has no interactive mode — a single glyph carries the whole reading, so its accessible name is the full
+sentence. This gallery is the read-back key: each full barb is one `step`, a half barb is half a `step`, and a pennant
+is five.
 
-<LiveDemo
-  label="compass — the same magnitude at eight bearings"
-  code={`<WindBarb direction={45} magnitude={35} />`}
->
-  <span
-    style={{ display: "inline-flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}
-  >
+<LiveDemo label="compass — the same magnitude at eight bearings" code={`<WindBarb direction={45} magnitude={35} />`}>
+  <span style={{ display: "inline-flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}>
     <WindBarb direction={0} magnitude={35} title="0°" size={40} summary={false} />
     <WindBarb direction={45} magnitude={35} title="45°" size={40} summary={false} />
     <WindBarb direction={90} magnitude={35} title="90°" size={40} summary={false} />
@@ -84,10 +81,7 @@ is half a `step`, and a pennant is five.
   <WindBarb direction={45} magnitude={25} variant="arrow" title="Arrow" size={44} />
 </LiveDemo>
 
-<LiveDemo
-  label="label"
-  code={`<WindBarb direction={225} magnitude={32} step={10} label="value" />`}
->
+<LiveDemo label="label" code={`<WindBarb direction={225} magnitude={32} step={10} label="value" />`}>
   <WindBarb direction={225} magnitude={32} step={10} label="value" title="Wind" size={44} />
 </LiveDemo>
 
@@ -130,8 +124,8 @@ is half a `step`, and a pennant is five.
   />
 </LiveDemo>
 
-`format`/`locale` reach the `label="value"` numeral and the accessible summary's magnitude
-together — the component builds one formatter and reuses it for both.
+`format`/`locale` reach the `label="value"` numeral and the accessible summary's magnitude together — the component
+builds one formatter and reuses it for both.
 
 ## Four homes
 
@@ -139,16 +133,15 @@ together — the component builds one formatter and reuses it for both.
 
 ## Why this default
 
-Quantized barbs read faster and more honestly than a scaled arrow whose length you'd have to measure
-against a legend — the glyph is calibrated to its `step`, so counting barbs gives the magnitude
-directly. A near-zero magnitude renders the conventional open circle for calm rather than a
-zero-length shaft, and a negative magnitude flips the bearing 180° with a dev warning.
+Quantized barbs read faster and more honestly than a scaled arrow whose length you'd have to measure against a legend —
+the glyph is calibrated to its `step`, so counting barbs gives the magnitude directly. A near-zero magnitude renders the
+conventional open circle for calm rather than a zero-length shaft, and a negative magnitude flips the bearing 180° with
+a dev warning.
 
 ## Accessibility
 
-The accessible name is the full reading — **"Southwest (225°), magnitude 32."** Calm renders as
-**"Calm."** Because the glyph is self-describing, rows of barbs get their interaction from the host
-table or list, not from the mark.
+The accessible name is the full reading — **"Southwest (225°), magnitude 32."** Calm renders as **"Calm."** Because the
+glyph is self-describing, rows of barbs get their interaction from the host table or list, not from the mark.
 
 ## Props
 

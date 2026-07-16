@@ -1,13 +1,14 @@
 ---
 title: BreathingDot
-description: A breathing dot chart for React — an ambient load indicator whose pulse rate encodes the level, with a static ring-offset frame.
+description:
+  A breathing dot chart for React — an ambient load indicator whose pulse rate encodes the level, with a static
+  ring-offset frame.
 ---
 
-BreathingDot answers "how loaded is the system right now?" as an ambient signal. In the interactive
-entry the dot **pulses** — slow and small when calm, fast and large when strained — so you feel the
-state without reading a number. The static frame is a real chart with zero JavaScript: a core dot
-colored by band, and a ring whose distance from the core is the level. This is a low-precision ambient
-read; for an exact figure reach for `Progress` or `Sparkline`.
+BreathingDot answers "how loaded is the system right now?" as an ambient signal. In the interactive entry the dot
+**pulses** — slow and small when calm, fast and large when strained — so you feel the state without reading a number.
+The static frame is a real chart with zero JavaScript: a core dot colored by band, and a ring whose distance from the
+core is the level. This is a low-precision ambient read; for an exact figure reach for `Progress` or `Sparkline`.
 
 <LiveDemo label="BreathingDot" sizeOf="breathing-dot">
   <BreathingDot value={0.42} title="Load" size={40} />
@@ -23,18 +24,19 @@ read; for an exact figure reach for `Progress` or `Sparkline`.
 
 ## Motion, and reduced motion
 
-The pulse **is** the encoding — its rate and amplitude are snapped to three named bands (calm, elevated,
-strained), so the motion is readable, not decorative. This is the deliberate exception to the
-no-looping-animation rule, allowed only because the loop parameter (the rate) is the datum. The
-animation is gated on two things: it pauses when the dot scrolls off-screen (a shared observer), and it
-never runs at all under `prefers-reduced-motion` — reduced-motion readers get exactly the static frame,
-where the ring's distance from the core already carries the level. The band is announced through a
-polite live region only when it changes, never on every pulse.
+The pulse **is** the encoding — its rate and amplitude are snapped to three named bands (calm, elevated, strained), so
+the motion is readable, not decorative. This is the deliberate exception to the no-looping-animation rule, allowed only
+because the loop parameter (the rate) is the datum. The animation is gated on two things: it pauses when the dot scrolls
+off-screen (a shared observer), and it never runs at all under `prefers-reduced-motion` — reduced-motion readers get
+exactly the static frame, where the ring's distance from the core already carries the level. The band is announced
+through a polite live region only when it changes, never on every pulse.
 
 ## When to use it
 
-- **Good for** — an ambient "how strained is it right now" read, a live status dot in a header or KPI card, or per-node load in a dense table.
-- **Avoid for** — an exact load figure (`Progress`, `Sparkline`), discrete events (`HeartbeatBlip`), or a trend over time (`Sparkline`).
+- **Good for** — an ambient "how strained is it right now" read, a live status dot in a header or KPI card, or per-node
+  load in a dense table.
+- **Avoid for** — an exact load figure (`Progress`, `Sparkline`), discrete events (`HeartbeatBlip`), or a trend over
+  time (`Sparkline`).
 
 ## Variants
 
@@ -57,10 +59,7 @@ polite live region only when it changes, never on every pulse.
   <BreathingDot value={null} size={28} />
 </LiveDemo>
 
-<LiveDemo
-  label="out-of-range clamps to the calm/strained edge"
-  code={`<BreathingDot value={1.4} label="value" />`}
->
+<LiveDemo label="out-of-range clamps to the calm/strained edge" code={`<BreathingDot value={1.4} label="value" />`}>
   <BreathingDot value={1.4} label="value" size={28} />
 </LiveDemo>
 
@@ -72,10 +71,9 @@ polite live region only when it changes, never on every pulse.
   <BreathingDot value={0.723} label="value" locale="de-DE" size={28} />
 </LiveDemo>
 
-`format`/`locale` reach the `label="value"` percent numeral — always a whole percent, so a
-locale mostly changes digit shapes here, not grouping or decimals. The band words in the
-accessible summary ("calm" / "elevated" / "strained") stay in `strings`
-(`BreathingDotStrings`), not the number formatter.
+`format`/`locale` reach the `label="value"` percent numeral — always a whole percent, so a locale mostly changes digit
+shapes here, not grouping or decimals. The band words in the accessible summary ("calm" / "elevated" / "strained") stay
+in `strings` (`BreathingDotStrings`), not the number formatter.
 
 ## Four homes
 
@@ -83,17 +81,17 @@ accessible summary ("calm" / "elevated" / "strained") stay in `strings`
 
 ## Why this default
 
-Three bands, because ambient motion supports about three discriminable states — more would be false
-precision. The band color is always doubled: by the ring offset in the static frame and by the pulse
-rate in motion, so the state never rests on color alone. When the value is unknown (`null` or `NaN`) the
-dot goes gray, drops its ring, and **never pulses** — an unknown system must not look calm. The boundary
-with `HeartbeatBlip`: a continuous level is a BreathingDot; discrete arriving events are a HeartbeatBlip.
+Three bands, because ambient motion supports about three discriminable states — more would be false precision. The band
+color is always doubled: by the ring offset in the static frame and by the pulse rate in motion, so the state never
+rests on color alone. When the value is unknown (`null` or `NaN`) the dot goes gray, drops its ring, and **never
+pulses** — an unknown system must not look calm. The boundary with `HeartbeatBlip`: a continuous level is a
+BreathingDot; discrete arriving events are a HeartbeatBlip.
 
 ## Accessibility
 
-The accessible name is the level and its band word — **"Load 42% — calm."** — or **"Load unknown."**
-when the value is missing. The band color is never the only signal (ring offset and pulse rate double
-it), motion is fully gated on `prefers-reduced-motion`, and the live region announces band changes only.
+The accessible name is the level and its band word — **"Load 42% — calm."** — or **"Load unknown."** when the value is
+missing. The band color is never the only signal (ring offset and pulse rate double it), motion is fully gated on
+`prefers-reduced-motion`, and the live region announces band changes only.
 
 ## Props
 

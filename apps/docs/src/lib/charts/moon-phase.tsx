@@ -9,7 +9,7 @@ export const entry: ChartEntry = {
   slug: "moon-phase",
   status: "stable",
   collection: "expressive",
-  tagline: "How far through a cycle or period — readable across cultures.",
+  tagline: "How far through a cycle or period: readable across cultures.",
   staticImport: `${PKG}/moon-phase`,
   interactiveImport: `${PKG}/moon-phase/interactive`,
   // The lit region already cross-fades on value change (one-shot WAAPI

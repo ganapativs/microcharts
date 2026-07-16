@@ -3,9 +3,14 @@ pre-commit:
   parallel: true
   commands:
     format:
-      # match what CI's `oxfmt --check` covers (incl. .mjs/.cjs/.mts + .mdx docs)
-      glob: "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,json,css,mdx}"
+      # oxfmt owns code (.mjs/.cjs/.mts incl.); prettier owns md/mdx (see `format-docs`)
+      glob: "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,json,css}"
       run: pnpm oxfmt --check {staged_files}
+    format-docs:
+      # prettier formats markdown/mdx prose (proseWrap), auto-fixes and re-stages
+      glob: "*.{md,mdx}"
+      run: pnpm exec prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
     lint:
       glob: "*.{ts,tsx}"
       # tolerate an all-ignored set (e.g. only fixtures/** staged)

@@ -1,15 +1,18 @@
 "use client";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { useTheme } from "next-themes";
-import { Check, Monitor, Moon, Palette, Sun } from "lucide-react";
+import { ArrowUpRight, Check, Copy, Monitor, Moon, Palette, Sun } from "lucide-react";
 import { Sparkline } from "@microcharts/react/sparkline";
+import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { cn } from "@/lib/cn";
+import { serializeTokens } from "@/lib/token-export";
 
-// Accent palette — Cobalt default. Charts bind `--mc-accent` to the choice.
+// Accent palette — Ember default. Charts bind `--mc-accent` to the choice.
 const SOLIDS = [
-  { id: "cobalt", label: "Cobalt", swatch: "#2f52d4" },
   { id: "ember", label: "Ember", swatch: "#c2410c" },
+  { id: "cobalt", label: "Cobalt", swatch: "#2f52d4" },
   { id: "clay", label: "Clay", swatch: "#a14a34" },
   { id: "moss", label: "Moss", swatch: "#4d7c1e" },
   { id: "teal", label: "Teal", swatch: "#0f766e" },
@@ -78,8 +81,9 @@ export function AppearanceMenu() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState<CSSProperties>({});
-  const [accent, setAccentState] = useState<string>("cobalt");
+  const [accent, setAccentState] = useState<string>("ember");
   const [preset, setPresetState] = useState<string>("modern");
+  const [copied, setCopied] = useState(false);
   const { theme, setTheme } = useTheme();
   const ref = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -92,7 +96,7 @@ export function AppearanceMenu() {
       const r = ref.current.getBoundingClientRect();
       // approximate popover height (preview + theme + accent + chart-style rows)
       // so the up/down flip keeps it on-screen; err tall to avoid clipping.
-      const PANEL_H = 510;
+      const PANEL_H = 570;
       const openUp = r.bottom + PANEL_H > window.innerHeight && r.top > PANEL_H;
       const vertical: CSSProperties = openUp
         ? { bottom: window.innerHeight - r.top + 10 }
@@ -108,7 +112,7 @@ export function AppearanceMenu() {
 
   useEffect(() => {
     setMounted(true);
-    setAccentState(document.documentElement.dataset.accent ?? "cobalt");
+    setAccentState(document.documentElement.dataset.accent ?? "ember");
     setPresetState(document.documentElement.dataset.mcPreset ?? "modern");
   }, []);
 
@@ -129,7 +133,7 @@ export function AppearanceMenu() {
   }, [open]);
 
   function setAccent(id: string) {
-    if (id === "cobalt") delete document.documentElement.dataset.accent;
+    if (id === "ember") delete document.documentElement.dataset.accent;
     else document.documentElement.dataset.accent = id;
     try {
       localStorage.setItem("mc-accent", id);
@@ -144,6 +148,27 @@ export function AppearanceMenu() {
       localStorage.setItem("mc-preset", id);
     } catch {}
     setPresetState(id);
+  }
+
+  // Copy the exact look the preview is showing — chosen accent + chart style,
+  // light and hand-tuned dark together — as paste-ready CSS.
+  function copyTokens() {
+    const css = serializeTokens({
+      preset,
+      // Every accent derives its own matched categorical palette, so passing the
+      // chosen accent through emits exactly what the site paints (Ember is the
+      // default; the others swap in via [data-accent]).
+      accent,
+      mode: "both",
+      include: "color",
+      scope: ":root",
+      format: "css",
+      annotate: false,
+    });
+    void navigator.clipboard.writeText(css).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    });
   }
 
   const current = SOLIDS.find((a) => a.id === accent) ?? SOLIDS[0];
@@ -177,15 +202,33 @@ export function AppearanceMenu() {
                 <span className="mono-label text-[0.56rem]">Preview</span>
                 <span className="mono-label text-[0.56rem] text-fd-primary">{current.label}</span>
               </div>
-              <div className="grid-paper flex items-center justify-center px-5 pb-5 pt-1">
-                <div key={accent + preset} className="mc-morph flex justify-center">
+              <div className="grid-paper flex items-center justify-center px-5 pb-4 pt-1">
+                {/* Both marks re-theme live off the [data-accent] the buttons set
+                    on <html>: the line takes the emphasis accent, the segmented
+                    bar the DERIVED categorical palette — so the picker shows the
+                    whole matched theme, not just the accent. */}
+                <div
+                  key={accent + preset}
+                  className="mc-morph hv-theme-stage flex w-full flex-col items-center gap-2"
+                >
                   <Sparkline
                     data={[6, 9, 7, 12, 10, 15, 13, 18, 16, 22]}
                     width={240}
-                    height={48}
+                    height={40}
                     curve="smooth"
                     dots="minmax"
                     color="var(--accent)"
+                    summary={false}
+                  />
+                  <SegmentedBar
+                    data={[
+                      { label: "A", value: 52 },
+                      { label: "B", value: 24 },
+                      { label: "C", value: 14 },
+                      { label: "D", value: 10 },
+                    ]}
+                    width={240}
+                    height={12}
                     summary={false}
                   />
                 </div>
@@ -246,6 +289,41 @@ export function AppearanceMenu() {
                     </button>
                   );
                 })}
+              </div>
+
+              {/* Copy the live look, or jump to the full token studio. Turns the
+                  preview into something you can paste into your own app. */}
+              {/* A hairline that fades at both ends — calmer than an edge-to-edge
+                  rule; never a hard line across the panel. */}
+              <div
+                aria-hidden
+                className="mx-1 mt-4 h-px"
+                style={{
+                  background: "linear-gradient(90deg, transparent, var(--hairline), transparent)",
+                }}
+              />
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={copyTokens}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-fd-border py-1.5 text-[0.72rem] font-medium text-fd-muted-foreground transition-colors hover:border-fd-primary/40 hover:text-fd-foreground"
+                >
+                  {copied ? (
+                    <Check className="size-3.5 text-fd-primary" />
+                  ) : (
+                    <Copy className="size-3.5" />
+                  )}
+                  {copied ? "Copied CSS" : "Copy tokens"}
+                </button>
+                <Link
+                  href="/docs/theming#copy-tokens"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-1 rounded-lg border border-fd-border px-2.5 py-1.5 text-[0.72rem] font-medium text-fd-muted-foreground transition-colors hover:border-fd-primary/40 hover:text-fd-foreground"
+                  title="Open the full token studio — every style, accent, and mode"
+                >
+                  All tokens
+                  <ArrowUpRight className="size-3.5" />
+                </Link>
               </div>
             </div>
           </div>,

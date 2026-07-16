@@ -1,14 +1,15 @@
 ---
 title: ForecastCone
-description: A fan chart for React — history plus a widening prediction cone with a dashed median, at most two bands, and an optional target line to clear.
+description:
+  A fan chart for React — history plus a widening prediction cone with a dashed median, at most two bands, and an
+  optional target line to clear.
 ---
 
-ForecastCone answers "will we land where we need to?". History is a solid line; the forecast
-is a fan of prediction bands that **widen over the horizon**, with a **dashed** median —
-because an estimate should never render as fact. The whole point of a fan chart is visible
-confidence decay, so three rules are not style options: at most two bands (50/80 — a 95% band
-reads as false tail confidence at micro scale), the median is always dashed, and a cone that
-fails to widen is flagged, never quietly inflated.
+ForecastCone answers "will we land where we need to?". History is a solid line; the forecast is a fan of prediction
+bands that **widen over the horizon**, with a **dashed** median — because an estimate should never render as fact. The
+whole point of a fan chart is visible confidence decay, so three rules are not style options: at most two bands (50/80 —
+a 95% band reads as false tail confidence at micro scale), the median is always dashed, and a cone that fails to widen
+is flagged, never quietly inflated.
 
 <LiveDemo label="ForecastCone" sizeOf="forecast-cone">
   <ForecastCone
@@ -46,7 +47,8 @@ fails to widen is flagged, never quietly inflated.
 
 ## When to use it
 
-- **Good for** — a "will we hit Q4?" forecast in a KPI card, a projection with honest uncertainty in a sentence, band-vs-target landing reads.
+- **Good for** — a "will we hit Q4?" forecast in a KPI card, a projection with honest uncertainty in a sentence,
+  band-vs-target landing reads.
 - **Avoid for** — a forecast with no uncertainty (Sparkline) or one estimate's spread (GradedBand).
 
 ## Sizing
@@ -137,10 +139,9 @@ const forecast = {
   />
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's
-median, interval, and target numbers follow that locale's own grouping and currency placement
-("4.200 €" in German, not "€4,200"). The in-chart landing label stays the plain formatted
-number either way; only the announced numbers change shape.
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the accessible summary's median, interval, and target
+numbers follow that locale's own grouping and currency placement ("4.200 €" in German, not "€4,200"). The in-chart
+landing label stays the plain formatted number either way; only the announced numbers change shape.
 
 ## Edge cases
 
@@ -193,11 +194,10 @@ number either way; only the announced numbers change shape.
   />
 </LiveDemo>
 
-With no history the cone still draws from the first forecast point, and the accessible summary
-quietly drops its "from N today" clause instead of naming a value that doesn't exist. A cone
-whose bands narrow instead of widen is an input-honesty failure — it renders exactly as supplied
-(never auto-inflated to look right) and logs a one-time dev warning so the mistake surfaces in
-development rather than silently misleading a reader.
+With no history the cone still draws from the first forecast point, and the accessible summary quietly drops its "from N
+today" clause instead of naming a value that doesn't exist. A cone whose bands narrow instead of widen is an
+input-honesty failure — it renders exactly as supplied (never auto-inflated to look right) and logs a one-time dev
+warning so the mistake surfaces in development rather than silently misleading a reader.
 
 ## Four homes
 
@@ -205,18 +205,17 @@ development rather than silently misleading a reader.
 
 ## Why this default
 
-50/80 bands, not 95, because micro-scale tails invite overreading — a 95% band paints false
-confidence about the extremes. The median is dashed so it never reads as a committed number,
-and the cone must visibly widen: if the supplied bands don't (they narrow, or stay flat), that
-is an input-honesty failure the component surfaces rather than papering over — a forecast whose
-uncertainty doesn't grow with the horizon is misrepresenting confidence decay.
+50/80 bands, not 95, because micro-scale tails invite overreading — a 95% band paints false confidence about the
+extremes. The median is dashed so it never reads as a committed number, and the cone must visibly widen: if the supplied
+bands don't (they narrow, or stay flat), that is an input-honesty failure the component surfaces rather than papering
+over — a forecast whose uncertainty doesn't grow with the horizon is misrepresenting confidence decay.
 
 ## Accessibility
 
-The accessible name states the median, the horizon interval, today's actual, and — with a
-target — whether the band clears it: **"Median forecast 42 by week 11 (80% between 33 and 55),
-from 38 today. The 80% band straddles the 45 target."**. The interactive entry is region-aware:
-history points announce a value, forecast points announce the median and 80% interval.
+The accessible name states the median, the horizon interval, today's actual, and — with a target — whether the band
+clears it: **"Median forecast 42 by week 11 (80% between 33 and 55), from 38 today. The 80% band straddles the 45
+target."**. The interactive entry is region-aware: history points announce a value, forecast points announce the median
+and 80% interval.
 
 ## Props
 

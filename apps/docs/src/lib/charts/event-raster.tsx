@@ -15,8 +15,7 @@ export const entry: ChartEntry = {
   slug: "event-raster",
   status: "stable",
   collection: "frontier",
-  tagline:
-    "When each source fired — and whether sources fire together, in sequence, or not at all.",
+  tagline: "When each source fired, and whether sources fire together, in sequence, or not at all.",
   staticImport: `${PKG}/event-raster`,
   interactiveImport: `${PKG}/event-raster/interactive`,
   dataShape: "{ label, events: number[] }[] (one lane per source)",

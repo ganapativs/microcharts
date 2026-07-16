@@ -1,13 +1,14 @@
 ---
 title: QuantileDots
-description: A quantile dotplot for React — odds you can count. Each dot is a 1-in-N chance; a threshold turns the plot from shape into a "N in 20" read.
+description:
+  A quantile dotplot for React — odds you can count. Each dot is a 1-in-N chance; a threshold turns the plot from shape
+  into a "N in 20" read.
 ---
 
-QuantileDots answers "what are the odds?" — in **countable** form. It's a quantile dotplot:
-each dot is an equal-probability quantile, so a dot is roughly a **1-in-N chance**, not a raw
-observation. Add a `threshold` and the plot turns from shape into odds: the dots past the line
-are re-inked and ringed, and the summary reads **"N in 20"** — because odds you can count beat
-odds you must trust, and a frequency reads truer than a bare percentage.
+QuantileDots answers "what are the odds?" — in **countable** form. It's a quantile dotplot: each dot is an
+equal-probability quantile, so a dot is roughly a **1-in-N chance**, not a raw observation. Add a `threshold` and the
+plot turns from shape into odds: the dots past the line are re-inked and ringed, and the summary reads **"N in 20"** —
+because odds you can count beat odds you must trust, and a frequency reads truer than a bare percentage.
 
 <LiveDemo label="QuantileDots" sizeOf="quantile-dots">
   <QuantileDots
@@ -32,7 +33,8 @@ odds you must trust, and a frequency reads truer than a bare percentage.
 
 ## When to use it
 
-- **Good for** — a "will we miss the SLA?" read in a sentence, odds you can count in a KPI card, a posterior communicated as frequency rather than percent.
+- **Good for** — a "will we miss the SLA?" read in a sentence, odds you can count in a KPI card, a posterior
+  communicated as frequency rather than percent.
 - **Avoid for** — a precise distribution shape (HistogramStrip) or one estimate's interval (GradedBand).
 
 ## Sizing
@@ -72,8 +74,8 @@ odds you must trust, and a frequency reads truer than a bare percentage.
   </span>
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the announced threshold
-follows that locale's own grouping and decimal marks.
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the announced threshold follows that locale's own
+grouping and decimal marks.
 
 <LiveDemo
   label="locale"
@@ -103,21 +105,13 @@ follows that locale's own grouping and decimal marks.
   <QuantileDots data={[]} title="No samples" width={140} height={20} />
 </LiveDemo>
 
-<LiveDemo
-  label="all-equal sample (certainty)"
-  code={`<QuantileDots data={[7, 7, 7, 7, 7]} title="Certain outcome" />`}
->
+<LiveDemo label="all-equal sample (certainty)" code={`<QuantileDots data={[7, 7, 7, 7, 7]} title="Certain outcome" />`}>
   <QuantileDots data={[7, 7, 7, 7, 7]} title="Certain outcome" width={140} height={20} />
 </LiveDemo>
 
-<LiveDemo
-  label="threshold outside the data range"
-  code={`<QuantileDots data={waits} threshold={9999} side="above" />`}
->
+<LiveDemo label="threshold outside the data range" code={`<QuantileDots data={waits} threshold={9999} side="above" />`}>
   <QuantileDots
-    data={Array.from({ length: 200 }, (_, i) =>
-      Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1),
-    )}
+    data={Array.from({ length: 200 }, (_, i) => Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1))}
     threshold={9999}
     side="above"
     title="Threshold past the max"
@@ -126,10 +120,9 @@ follows that locale's own grouping and decimal marks.
   />
 </LiveDemo>
 
-Empty data draws nothing and the summary says so plainly. An all-equal sample collapses
-every dot into one column — genuine certainty, not a rendering glitch. A threshold
-outside the observed range reads as 0 in N (or N in N) — the count is always honest
-about what fraction of the field it's actually catching.
+Empty data draws nothing and the summary says so plainly. An all-equal sample collapses every dot into one column —
+genuine certainty, not a rendering glitch. A threshold outside the observed range reads as 0 in N (or N in N) — the
+count is always honest about what fraction of the field it's actually catching.
 
 ## Four homes
 
@@ -137,17 +130,16 @@ about what fraction of the field it's actually catching.
 
 ## Why this default
 
-20 dots, because odds you can count beat odds you must trust — a reader subitizes a handful of
-highlighted dots faster than they parse "48%". Each dot is an equal-probability quantile, **not**
-a raw observation, and the summary always frames the answer as a frequency ("10 in 20"), never a
-bare percentage. Dots past the threshold are re-inked **and** ringed, so the count survives
-grayscale, print, and forced-colors.
+20 dots, because odds you can count beat odds you must trust — a reader subitizes a handful of highlighted dots faster
+than they parse "48%". Each dot is an equal-probability quantile, **not** a raw observation, and the summary always
+frames the answer as a frequency ("10 in 20"), never a bare percentage. Dots past the threshold are re-inked **and**
+ringed, so the count survives grayscale, print, and forced-colors.
 
 ## Accessibility
 
-The accessible name states the odds in frequency form — **"10 in 20 chances above 15 min."** —
-or, without a threshold, "Most likely …; range …". The interactive entry is a probe: hovering or
-arrowing moves a live threshold and the count past it recomputes as you go.
+The accessible name states the odds in frequency form — **"10 in 20 chances above 15 min."** — or, without a threshold,
+"Most likely …; range …". The interactive entry is a probe: hovering or arrowing moves a live threshold and the count
+past it recomputes as you go.
 
 ## Props
 

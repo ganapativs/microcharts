@@ -12,7 +12,7 @@ export const entry: ChartEntry = {
   slug: "heartbeat-blip",
   status: "stable",
   collection: "expressive",
-  tagline: "Is it alive, and how busy — instantly.",
+  tagline: "Is it alive, and how busy? Instantly.",
   staticImport: `${PKG}/heartbeat-blip`,
   interactiveImport: `${PKG}/heartbeat-blip/interactive`,
   // The sweep IS the encoding (the trace's own left-sweeping motion carries

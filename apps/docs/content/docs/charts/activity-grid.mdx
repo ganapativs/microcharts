@@ -1,19 +1,19 @@
 ---
 title: ActivityGrid
-description: A calendar or matrix intensity chart for React — the contribution-graph shape, static SVG or an interactive 2-D keyboard grid.
+description:
+  A calendar or matrix intensity chart for React — the contribution-graph shape, static SVG or an interactive 2-D
+  keyboard grid.
 ---
 
-ActivityGrid maps ordered values onto a grid of cells, each shaded by intensity. It's the
-contribution-graph shape: cadence, streaks, and seasonality, readable at a glance.
+ActivityGrid maps ordered values onto a grid of cells, each shaded by intensity. It's the contribution-graph shape:
+cadence, streaks, and seasonality, readable at a glance.
 
 <LiveDemo
   label="ActivityGrid"
   sizeOf="activity-grid"
   code={`import { ActivityGrid } from "@microcharts/react/activity-grid";
 
-const commitCounts = [
-0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3, 0, 2, 3, 4, 1, 2, 0,
-];
+const commitCounts = [ 0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3, 0, 2, 3, 4, 1, 2, 0, ];
 
 <ActivityGrid data={commitCounts} title="Commit activity" />`}
 >
@@ -35,14 +35,13 @@ const commitCounts = [
 ## When to use it
 
 - **Good for** — daily activity, streaks and cadence, seasonality at a glance.
-- **Avoid for** — exact values, or precise comparison between two individual cells. Color
-  intensity is deliberately approximate; pair it with a number when precision matters.
+- **Avoid for** — exact values, or precise comparison between two individual cells. Color intensity is deliberately
+  approximate; pair it with a number when precision matters.
 
 ## Sizing
 
-ActivityGrid sizes from `cell` — the edge length of one square in viewBox units. Bump it to
-scale the whole grid, or drive the width from CSS to fill a container; the viewBox keeps the
-grid's aspect ratio.
+ActivityGrid sizes from `cell` — the edge length of one square in viewBox units. Bump it to scale the whole grid, or
+drive the width from CSS to fill a container; the viewBox keeps the grid's aspect ratio.
 
 <Sizing chart="activity-grid" />
 
@@ -72,8 +71,8 @@ grid's aspect ratio.
   </span>
 </LiveDemo>
 
-`shape` swaps the cell mark — same data, same levels, different voice: `"round"` for
-friendlier product surfaces, `"dot"` adds breathing room in dense strips.
+`shape` swaps the cell mark — same data, same levels, different voice: `"round"` for friendlier product surfaces,
+`"dot"` adds breathing room in dense strips.
 
 <LiveDemo
   label="round vs dot"
@@ -99,9 +98,8 @@ friendlier product surfaces, `"dot"` adds breathing room in dense strips.
   </span>
 </LiveDemo>
 
-`start` aligns the grid to the real calendar: the first column pads down to the weekday
-of the given day (UTC), so rows read as weekdays — Monday first by default
-(`weekStart={0}` for Sunday).
+`start` aligns the grid to the real calendar: the first column pads down to the weekday of the given day (UTC), so rows
+read as weekdays — Monday first by default (`weekStart={0}` for Sunday).
 
 <LiveDemo
   label="calendar-aligned"
@@ -125,10 +123,7 @@ of the given day (UTC), so rows read as weekdays — Monday first by default
   <ActivityGrid data={[]} title="No history" cell={12} />
 </LiveDemo>
 
-<LiveDemo
-  label="all-zero (present, quiet)"
-  code={`<ActivityGrid data={[0, 0, 0, 0, 0, 0, 0]} title="Quiet week" />`}
->
+<LiveDemo label="all-zero (present, quiet)" code={`<ActivityGrid data={[0, 0, 0, 0, 0, 0, 0]} title="Quiet week" />`}>
   <ActivityGrid data={[0, 0, 0, 0, 0, 0, 0]} title="Quiet week" cell={12} />
 </LiveDemo>
 
@@ -142,20 +137,19 @@ of the given day (UTC), so rows read as weekdays — Monday first by default
 
 ## Why this default
 
-Five levels (the empty track plus four intensity steps) is the same discrete ramp HeatCell and
-HeatStrip use — one calibration means "how intense" reads the same across the library, and a
-reader never has to relearn a color scale per chart. Levels are discrete, never a continuous
-gradient: a continuous ramp implies precision a handful of pixels can't actually deliver, and
-discrete bins are honest about that. Monday-first weeks (`weekStart={1}`) match the ISO calendar
-most teams already track cadence against; `weekStart={0}` switches to Sunday-first without
-touching the data. Column-major fill (each column is a week, top-to-bottom) is what makes the
-grid read as a calendar instead of an arbitrary sequence of cells.
+Five levels (the empty track plus four intensity steps) is the same discrete ramp HeatCell and HeatStrip use — one
+calibration means "how intense" reads the same across the library, and a reader never has to relearn a color scale per
+chart. Levels are discrete, never a continuous gradient: a continuous ramp implies precision a handful of pixels can't
+actually deliver, and discrete bins are honest about that. Monday-first weeks (`weekStart={1}`) match the ISO calendar
+most teams already track cadence against; `weekStart={0}` switches to Sunday-first without touching the data.
+Column-major fill (each column is a week, top-to-bottom) is what makes the grid read as a calendar instead of an
+arbitrary sequence of cells.
 
 ## Accessibility
 
-Intensity is a color channel, so ActivityGrid always pairs it with a numeric summary of
-its total and peak — the information survives forced-colors and color-blind viewing. The
-interactive entry adds 2-D arrow-key navigation, announcing each cell's value as you move.
+Intensity is a color channel, so ActivityGrid always pairs it with a numeric summary of its total and peak — the
+information survives forced-colors and color-blind viewing. The interactive entry adds 2-D arrow-key navigation,
+announcing each cell's value as you move.
 
 ## Props
 

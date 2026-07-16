@@ -11,7 +11,7 @@ import { GalleryStage } from "./gallery-stage";
 export const metadata: Metadata = docsMeta({
   title: "Gallery",
   description:
-    "Every shipped microcharts chart at true word-size — searchable, filterable, and browsable as one grid.",
+    "Every shipped microcharts chart at true word-size: searchable, filterable, and browsable as one grid.",
   path: "/gallery",
 });
 
@@ -51,7 +51,7 @@ export default function GalleryPage() {
             {STABLE_CHARTS.length} charts, at true size.
           </h1>
           <p className="mt-4 text-fd-muted-foreground">
-            Every chart at the size it lives — in a sentence, a table cell, a KPI card — beside the
+            Every chart at the size it lives (in a sentence, a table cell, a KPI card), beside the
             decision it answers. Search or filter to the one you need.
           </p>
         </header>
@@ -114,7 +114,7 @@ export default function GalleryPage() {
             <span data-empty-q className="text-fd-foreground">
               that
             </span>{" "}
-            yet — try another term, or clear the filter.
+            yet. Try another term, or clear the filter.
           </p>
         </div>
       </div>

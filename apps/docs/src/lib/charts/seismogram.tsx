@@ -29,7 +29,7 @@ export const entry: ChartEntry = {
   slug: "seismogram",
   status: "stable",
   collection: "core",
-  tagline: "When did things happen, and how hard — event density over time.",
+  tagline: "When did things happen, and how hard: event density over time.",
   staticImport: `${PKG}/seismogram`,
   interactiveImport: `${PKG}/seismogram/interactive`,
   dataShape: "(number | null)[] (per-slot intensity; 0 = quiet)",

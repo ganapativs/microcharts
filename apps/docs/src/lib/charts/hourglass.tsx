@@ -9,7 +9,7 @@ export const entry: ChartEntry = {
   slug: "hourglass",
   status: "stable",
   collection: "expressive",
-  tagline: "How much time is gone and how much remains — both at once.",
+  tagline: "How much time is gone and how much remains, both at once.",
   staticImport: `${PKG}/hourglass`,
   interactiveImport: `${PKG}/hourglass/interactive`,
   // The sand levels already cross-fade on value change (one-shot WAAPI

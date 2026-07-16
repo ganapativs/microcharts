@@ -18,7 +18,7 @@ export const entry: ChartEntry = {
   status: "stable",
   collection: "frontier",
   tagline:
-    "A whole weather observation in one character — sky, wind, temperature, dew point, pressure.",
+    "A whole weather observation in one character: sky, wind, temperature, dew point, pressure.",
   staticImport: `${PKG}/station-glyph`,
   interactiveImport: `${PKG}/station-glyph/interactive`,
   dataShape: "cloud, wind{ direction, magnitude }, temp, dewpoint, pressure, station",

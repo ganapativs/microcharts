@@ -288,6 +288,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     return (
       <ShiftHistogram
         data={{ before: BEFORE, after: AFTER }}
+        label="none"
         summary={false}
         width={props.width ?? 70}
         height={props.height ?? 18}
@@ -299,6 +300,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
   return (
     <ShiftHistogram
       data={{ before, after }}
+      label="none"
       summary={false}
       width={props.width ?? 70}
       height={props.height ?? 18}

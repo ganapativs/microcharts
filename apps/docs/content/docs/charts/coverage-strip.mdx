@@ -1,13 +1,12 @@
 ---
 title: CoverageStrip
-description: A presence strip for React tables — where data was measured versus missing, so 0 never masquerades as "no reading".
+description:
+  A presence strip for React tables — where data was measured versus missing, so 0 never masquerades as "no reading".
 ---
 
-CoverageStrip answers "can I trust this data — where was nothing measured?". Measured
-slots are filled; gaps are hollow with a hairline outline. The distinction between
-`null` (no measurement) and `0` (a measured zero) is the whole chart, and it is carried
-by **shape**, so it survives forced-colors and print. Nothing is ever interpolated
-across a gap.
+CoverageStrip answers "can I trust this data — where was nothing measured?". Measured slots are filled; gaps are hollow
+with a hairline outline. The distinction between `null` (no measurement) and `0` (a measured zero) is the whole chart,
+and it is carried by **shape**, so it survives forced-colors and print. Nothing is ever interpolated across a gap.
 
 <LiveDemo label="CoverageStrip" sizeOf="coverage-strip">
   <CoverageStrip
@@ -85,9 +84,8 @@ across a gap.
   />
 </LiveDemo>
 
-`locale` formats the coverage percentage in the gutter and the accessible summary — the strip
-above reads "56 %" (German percent spacing) instead of "56%". `format` shapes the measured
-values the interactive entry announces.
+`locale` formats the coverage percentage in the gutter and the accessible summary — the strip above reads "56 %" (German
+percent spacing) instead of "56%". `format` shapes the measured values the interactive entry announces.
 
 ## Edge cases
 
@@ -97,14 +95,7 @@ values the interactive entry announces.
 // data.length pads the tail with hollow "no measurement" slots
 <CoverageStrip data={[1, 1, 1]} expected={8} label="percent" />`}
 >
-  <CoverageStrip
-    data={[1, 1, 1]}
-    expected={8}
-    label="percent"
-    title="Trailing gap"
-    width={180}
-    height={16}
-  />
+  <CoverageStrip data={[1, 1, 1]} expected={8} label="percent" title="Trailing gap" width={180} height={16} />
 </LiveDemo>
 
 <LiveDemo label="a measured zero is not a gap" code={`<CoverageStrip data={[3, 0, null, 5]} />`}>
@@ -121,19 +112,17 @@ values the interactive entry announces.
 
 ## Why this default
 
-Shape carries the presence/absence distinction, not just color, so it survives forced-colors
-and print. A measured `0` is a filled cell like any other value; only `null` (no record) is
-hollow — the two never look the same. `expected` lets a trailing shortfall count as coverage
-loss: a feed that simply stops reporting is the worst gap of all, so it isn't silently dropped
-from the denominator. Nothing is ever interpolated across a gap — a missing slot stays visibly
-empty rather than being smoothed into its neighbors.
+Shape carries the presence/absence distinction, not just color, so it survives forced-colors and print. A measured `0`
+is a filled cell like any other value; only `null` (no record) is hollow — the two never look the same. `expected` lets
+a trailing shortfall count as coverage loss: a feed that simply stops reporting is the worst gap of all, so it isn't
+silently dropped from the denominator. Nothing is ever interpolated across a gap — a missing slot stays visibly empty
+rather than being smoothed into its neighbors.
 
 ## Accessibility
 
-The accessible name states how many slots were measured, the coverage percentage, and the
-longest gap — **"10 of 18 slots measured (56%); longest gap 4 slots."** An empty series states
-"No data." instead. The interactive entry roves slots with ←/→, announcing each one as a
-measured value or "no measurement".
+The accessible name states how many slots were measured, the coverage percentage, and the longest gap — **"10 of 18
+slots measured (56%); longest gap 4 slots."** An empty series states "No data." instead. The interactive entry roves
+slots with ←/→, announcing each one as a measured value or "no measurement".
 
 ## Props
 

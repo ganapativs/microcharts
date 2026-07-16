@@ -1,13 +1,14 @@
 ---
 title: PercentileTrace
-description: A percentile-rank chart for React — one entity's standing traced on a locked 0–100 scale, over fixed p25–75 and p5–95 population bands.
+description:
+  A percentile-rank chart for React — one entity's standing traced on a locked 0–100 scale, over fixed p25–75 and p5–95
+  population bands.
 ---
 
-PercentileTrace answers "is this entity's standing rising or slipping inside the pack?". It
-traces one **percentile rank** over time on a scale **locked to 0–100**. Because the axis _is_
-rank, the population is constant by definition — the middle-half (**p25–75**) and near-full
-(**p5–95**) bands are fixed fields, not estimates — so the only line on the chart is the entity
-itself, drifting through a known landscape.
+PercentileTrace answers "is this entity's standing rising or slipping inside the pack?". It traces one **percentile
+rank** over time on a scale **locked to 0–100**. Because the axis _is_ rank, the population is constant by definition —
+the middle-half (**p25–75**) and near-full (**p5–95**) bands are fixed fields, not estimates — so the only line on the
+chart is the entity itself, drifting through a known landscape.
 
 <LiveDemo
   label="PercentileTrace"
@@ -39,7 +40,8 @@ itself, drifting through a known landscape.
 
 ## When to use it
 
-- **Good for** — one player's or product's rank drifting over time, whether a standing has crossed into the top or bottom of the pack, a percentile KPI where the population context matters.
+- **Good for** — one player's or product's rank drifting over time, whether a standing has crossed into the top or
+  bottom of the pack, a percentile KPI where the population context matters.
 - **Avoid for** — a raw value over time (Sparkline) or one absolute number vs a target (Bullet / Delta).
 
 ## Sizing
@@ -72,10 +74,9 @@ itself, drifting through a known landscape.
   </span>
 </LiveDemo>
 
-The endpoint dot carries **valence**: by default a rising standing is good, so it turns
-positive; set `positive="down"` when slipping _down_ the pack is the win (a support ticket's
-backlog rank, say). The line already encodes the direction, so the color is only a redundant
-cue — never the sole signal.
+The endpoint dot carries **valence**: by default a rising standing is good, so it turns positive; set `positive="down"`
+when slipping _down_ the pack is the win (a support ticket's backlog rank, say). The line already encodes the direction,
+so the color is only a redundant cue — never the sole signal.
 
 <LiveDemo
   label="positive='down'"
@@ -129,11 +130,10 @@ cue — never the sole signal.
   />
 </LiveDemo>
 
-A single reading is a lone endpoint with no line to draw — it still reports its standing and
-holds the accessible-name contract. Ranks outside 0–100 are clamped to the axis (a value of
-`102` reads as `p100`) and warn once in development. With a `locale`, the percentile label and
-every announced number follow that locale's own formatting — `de-DE` renders `p81,5` with a
-comma.
+A single reading is a lone endpoint with no line to draw — it still reports its standing and holds the accessible-name
+contract. Ranks outside 0–100 are clamped to the axis (a value of `102` reads as `p100`) and warn once in development.
+With a `locale`, the percentile label and every announced number follow that locale's own formatting — `de-DE` renders
+`p81,5` with a comma.
 
 ## Four homes
 
@@ -141,18 +141,16 @@ comma.
 
 ## Why this default
 
-The full 0–100 axis with fixed bands, because a percentile is a standing _within a population_
-— truncating the axis would hide how much headroom or floor is left, and re-estimating the
-bands from the single traced series would be a fiction. The middle-half and near-full fields
-are exact by construction, so the chart shows one honest line over a landscape you can trust,
-never a thicket of competing series.
+The full 0–100 axis with fixed bands, because a percentile is a standing _within a population_ — truncating the axis
+would hide how much headroom or floor is left, and re-estimating the bands from the single traced series would be a
+fiction. The middle-half and near-full fields are exact by construction, so the chart shows one honest line over a
+landscape you can trust, never a thicket of competing series.
 
 ## Accessibility
 
-The accessible name states the current percentile, the change from the first reading, and how
-the standing moved relative to the middle half — **"p81 now, up 41 points from the first
-reading; moved above the middle half."** The interactive entry steps the readings and
-announces each one's percentile.
+The accessible name states the current percentile, the change from the first reading, and how the standing moved
+relative to the middle half — **"p81 now, up 41 points from the first reading; moved above the middle half."** The
+interactive entry steps the readings and announces each one's percentile.
 
 ## Props
 

@@ -21,7 +21,7 @@ export const entry: ChartEntry = {
   slug: "dot-plot",
   status: "stable",
   collection: "core",
-  tagline: "A few named values on one scale — minimum ink per comparison.",
+  tagline: "A few named values on one scale: minimum ink per comparison.",
   staticImport: `${PKG}/dot-plot`,
   interactiveImport: `${PKG}/dot-plot/interactive`,
   dataShape: "{ label, value }[]",

@@ -9,7 +9,7 @@ export const entry: ChartEntry = {
   slug: "pictogram-row",
   status: "stable",
   collection: "core",
-  tagline: "Counts a human can verify by counting — ●●●○○.",
+  tagline: "Counts a human can verify by counting: ●●●○○.",
   staticImport: `${PKG}/pictogram-row`,
   interactiveImport: `${PKG}/pictogram-row/interactive`,
   dataShape: "value of total (units)",

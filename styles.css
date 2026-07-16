@@ -45,9 +45,16 @@
     --mc-font-numeric: var(--mc-font);
     --mc-label-size: 0.75em;
     --mc-label-weight: 400;
-    /* Optical lift for `.mc-inline` beside digits ("+3.8%"). VA-middle alone
-       seats SVG marks ~1.4px low; override per face if needed. */
-    --mc-inline-nudge: -0.14em;
+    /* Extra optical shift for `.mc-inline` marks on top of the baseline seat
+       (see .mc-inline). 0 by default — the seat is font-independent; override
+       per face only if a typeface wants marks a hair off the line. */
+    --mc-inline-nudge: 0em;
+    /* Optical lift for centred glyph marks (arrow/dot/…) on top of the
+       `vertical-align: middle` seat. Pure middle centres on the x-height, which
+       reads a touch low beside cap-height digits (e.g. a Delta "+3.8%"); this
+       lifts the glyph toward the x-height↔cap-height midpoint. Font-relative
+       (em) so it tracks size. Set 0em for exact x-height centring. */
+    --mc-glyph-nudge: -0.04em;
 
     /* interactive readout chip surface — a tooltip needs a legible backing, so
        this is the one place a mark sits on an opaque plane. Defaults to the
@@ -148,6 +155,54 @@
     --mc-band: color-mix(in oklab, #000000 14%, transparent);
     --mc-stroke-width: 2;
   }
+  /* print/eink pin a fixed light-surface ink — right for paper, but on a dark
+     viewer that ink sinks into the field. Give them hand-tuned dark twins: eink
+     flips to true night-mode (light ink on black — a real e-paper mode), print
+     lifts to a "dark paper" ink. Weight + band identity (set above) carry over;
+     only the pinned colours are re-tuned. mono/vivid/editorial already leave ink
+     to the active theme, so they need no twin. Both dark signals are covered —
+     @media(prefers-color-scheme) and an explicit [data-mc-theme="dark"] scope —
+     and each sits AFTER its light block so it wins at equal (zero) specificity. */
+  @media (prefers-color-scheme: dark) {
+    :where([data-mc-theme="print"], [data-mc-preset="print"]) {
+      --mc-stroke: #e8e6e1;
+      --mc-neutral: #9a958c;
+      --mc-positive: #4aa588;
+      --mc-negative: #e08a63;
+      --mc-accent: #6aa9d3;
+      --mc-moon: #e0be6f;
+      --mc-band: color-mix(in oklab, #e8e6e1 9%, transparent);
+    }
+    :where([data-mc-theme="eink"], [data-mc-preset="eink"]) {
+      --mc-stroke: #ffffff;
+      --mc-positive: #ffffff;
+      --mc-negative: #b0b0b0;
+      --mc-neutral: #808080;
+      --mc-accent: #ffffff;
+      --mc-moon: #ffffff;
+      --mc-band: color-mix(in oklab, #ffffff 14%, transparent);
+    }
+  }
+  :where([data-mc-theme="dark"]) :where([data-mc-theme="print"], [data-mc-preset="print"]),
+  :where([data-mc-theme="dark"][data-mc-preset="print"]) {
+    --mc-stroke: #e8e6e1;
+    --mc-neutral: #9a958c;
+    --mc-positive: #4aa588;
+    --mc-negative: #e08a63;
+    --mc-accent: #6aa9d3;
+    --mc-moon: #e0be6f;
+    --mc-band: color-mix(in oklab, #e8e6e1 9%, transparent);
+  }
+  :where([data-mc-theme="dark"]) :where([data-mc-theme="eink"], [data-mc-preset="eink"]),
+  :where([data-mc-theme="dark"][data-mc-preset="eink"]) {
+    --mc-stroke: #ffffff;
+    --mc-positive: #ffffff;
+    --mc-negative: #b0b0b0;
+    --mc-neutral: #808080;
+    --mc-accent: #ffffff;
+    --mc-moon: #ffffff;
+    --mc-band: color-mix(in oklab, #ffffff 14%, transparent);
+  }
 }
 
 @layer microcharts.base {
@@ -176,17 +231,62 @@
   }
   /* Word-sized chart in running prose. Wraps any SVG mark next to digits;
      leave <Delta> bare — it owns baseline. Ships in styles.css so hosts only
-     add className="mc-inline". */
+     add className="mc-inline".
+
+     Alignment is a baseline SEAT, not a middle+nudge: an inline-flex box whose
+     only child is an SVG takes its baseline from the SVG's bottom edge, so
+     `vertical-align: baseline` stands the mark ON the text baseline exactly
+     like a glyph — bars sit where letters sit. Metric-independent: the old
+     `vertical-align: middle` + fixed nudge drifted with every typeface
+     (x-height decides where "middle" is; serif vs sans marks landed on
+     different lines). --mc-inline-nudge remains as a pure optical extra. */
   :where(.mc-inline) {
     display: inline-flex;
     align-items: center;
-    vertical-align: middle;
+    vertical-align: baseline;
     margin-inline: 0.2em;
     translate: 0 var(--mc-inline-nudge);
   }
-  :where(.mc-inline > .mc-root),
-  :where(.mc-inline > .mc-status) {
+  /* Symmetric glyph marks (arrow/triangle, dot, moon, dice, radial dials, …)
+     have no bottom baseline to sit on: a baseline seat makes them ride ~4px
+     high on the line. Centre them on the text instead — `vertical-align: middle`
+     aligns the box middle with the x-height midpoint, so the glyph sits like an
+     icon in running prose. Pure middle reads a hair low next to cap-height
+     digits, so `--mc-glyph-nudge` lifts it toward the x-height↔cap-height
+     midpoint — a font-relative middle ground, not a typeface-fragile px hack.
+     Floor-anchored data marks (bars, areas, lines) keep the baseline seat. */
+  :where(
+    .mc-inline:has(
+      > :is(
+        .mc-trend,
+        .mc-status,
+        .mc-breathing,
+        .mc-moon,
+        .mc-dice,
+        .mc-windbarb,
+        .mc-donut,
+        .mc-ring,
+        .mc-orbit,
+        .mc-star,
+        .mc-heartbeat,
+        .mc-hourglass,
+        .mc-wave,
+        .mc-constellation,
+        .mc-spiral,
+        .mc-polar,
+        .mc-tree
+      )
+    )
+  ) {
     vertical-align: middle;
+    translate: 0 var(--mc-glyph-nudge);
+  }
+  /* The status dot reads like a bullet, not a period — the `middle` seat +
+     `--mc-glyph-nudge` above land it on the x-height midpoint, so the old
+     hard-coded `translate: 0 -0.18em` is gone (it double-counted the shift and
+     rode the dot high). align-self just keeps it centred in its own box. */
+  :where(.mc-inline > .mc-status) {
+    align-self: center;
   }
   :where(.mc-inline > .mc-trend) {
     width: 0.95em;
@@ -229,9 +329,6 @@
        glyph must not participate or the taller svg drags the baseline up and the
        whole delta rides high in a sentence. Center it on the number instead. */
     align-self: center;
-    /* optical: the digits' ink centre sits a hair below the line-box centre —
-       nudge the mark down to match so glyph + number share one midline. */
-    transform: translateY(0.055em);
   }
   :where(.mc-delta .mc-delta-num) {
     font-weight: 600;
@@ -240,7 +337,11 @@
   :where(.mc-delta-live) {
     position: relative;
     display: inline-flex;
-    vertical-align: middle;
+    /* MUST match the static .mc-delta (baseline, not middle): the inline-flex
+       takes its baseline from the inner .mc-delta's number, so this seats the
+       live Delta on the same line as the static one — otherwise toggling
+       interactive/animated shifts it vertically. */
+    vertical-align: baseline;
   }
   /* interactive TrendArrow wrapper — same live/pulse pattern at glyph size */
   :where(.mc-trend-live) {

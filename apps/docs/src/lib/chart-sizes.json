@@ -5,7 +5,7 @@
   },
   "sparkbar": {
     "static": 2.82,
-    "interactive": 4.15
+    "interactive": 4.16
   },
   "delta": {
     "static": 0.91,
@@ -352,7 +352,7 @@
   },
   "depth-wedge": {
     "static": 2.12,
-    "interactive": 3.29
+    "interactive": 3.28
   },
   "partition-strip": {
     "static": 2.07,
@@ -426,7 +426,7 @@
     "static": 1.52
   },
   "theme": {
-    "static": 2.05
+    "static": 2.06
   },
   "motion": {
     "static": 2.94

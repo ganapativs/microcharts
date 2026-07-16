@@ -15,7 +15,7 @@ export const entry: ChartEntry = {
   tagline: "Is the backlog draining or growing?",
   staticImport: `${PKG}/queue-depth`,
   interactiveImport: `${PKG}/queue-depth/interactive`,
-  dataShape: "number[] — backlog depth per period (≥ 0)",
+  dataShape: "number[], backlog depth per period (≥ 0)",
   encoding: {
     channel: "zero-anchored area (stock) + above-capacity spans re-stroked negative",
     precision: "high for the depth; the trend glyph is a low-precision direction cue",
@@ -214,7 +214,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
   return (
     <QueueDepth
       data={depth}
-      capacity={110}
+      label="none"
       summary={false}
       width={props.width ?? 70}
       height={props.height ?? 18}

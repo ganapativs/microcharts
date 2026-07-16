@@ -22,7 +22,7 @@ export const entry: ChartEntry = {
   slug: "micro-box",
   status: "stable",
   collection: "core",
-  tagline: "The p50 and spread of a metric — a five-number summary in a row.",
+  tagline: "The p50 and spread of a metric: a five-number summary in a row.",
   staticImport: `${PKG}/micro-box`,
   interactiveImport: `${PKG}/micro-box/interactive`,
   dataShape: "number[] OR { min, q1, median, q3, max }",

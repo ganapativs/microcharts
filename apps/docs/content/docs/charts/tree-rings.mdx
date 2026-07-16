@@ -1,13 +1,14 @@
 ---
 title: TreeRings
-description: A tree-rings chart for React — radial ring thickness per period, oldest at the centre, for a growth-over-time story at a glance.
+description:
+  A tree-rings chart for React — radial ring thickness per period, oldest at the centre, for a growth-over-time story at
+  a glance.
 ---
 
-TreeRings answers "how did growth accumulate, period over period?" like the rings of a tree: the
-oldest period is at the centre and each new period adds a ring outward, whose **thickness** is that
-period's value. The channel is thickness, not area — equal thickness at a larger radius spans more
-area (the ring illusion), so read the thicknesses, not the wedges; exact per-period reads steer to
-`SparkBar`.
+TreeRings answers "how did growth accumulate, period over period?" like the rings of a tree: the oldest period is at the
+centre and each new period adds a ring outward, whose **thickness** is that period's value. The channel is thickness,
+not area — equal thickness at a larger radius spans more area (the ring illusion), so read the thicknesses, not the
+wedges; exact per-period reads steer to `SparkBar`.
 
 <LiveDemo label="TreeRings" sizeOf="tree-rings">
   <TreeRings
@@ -30,7 +31,8 @@ area (the ring illusion), so read the thicknesses, not the wedges; exact per-per
 
 ## When to use it
 
-- **Good for** — account or company age at a glance, a cohort-age marker in a table cell, or a per-period growth story in a KPI card.
+- **Good for** — account or company age at a glance, a cohort-age marker in a table cell, or a per-period growth story
+  in a KPI card.
 - **Avoid for** — exact per-period reads (SparkBar), many periods (over twenty-four), or non-cumulative series.
 
 ## Sizing
@@ -56,13 +58,7 @@ area (the ring illusion), so read the thicknesses, not the wedges; exact per-per
   label="locale — the last-value label and the summary both follow it"
   code={`<TreeRings data={[820, 1240, 990, 1810]} label="last" locale="de-DE" />`}
 >
-  <TreeRings
-    data={[820, 1240, 990, 1810]}
-    label="last"
-    locale="de-DE"
-    title="Localized growth"
-    size={44}
-  />
+  <TreeRings data={[820, 1240, 990, 1810]} label="last" locale="de-DE" title="Localized growth" size={44} />
 </LiveDemo>
 
 ## Edge cases
@@ -84,19 +80,17 @@ area (the ring illusion), so read the thicknesses, not the wedges; exact per-per
 
 ## Why this default
 
-Stroke rings are the default because at twenty-four pixels hairlines keep the disc quiet and let the
-accent ring — the current period, drawn 1.5× heavier in the accent color (weight and color, never
-color alone) — stay loud. The channel is radial **thickness**, and the docs say so explicitly, because
-equal thickness at a larger radius spans more area. TreeRings never enforces a minimum visual
-thickness: a near-zero period looks near-zero, and a zero-value period collapses its two boundaries
-onto each other. Pass `total` for the cohort-age story — the disc then fills only Σdata/total of the
-radius, so a young account reads as part-grown.
+Stroke rings are the default because at twenty-four pixels hairlines keep the disc quiet and let the accent ring — the
+current period, drawn 1.5× heavier in the accent color (weight and color, never color alone) — stay loud. The channel is
+radial **thickness**, and the docs say so explicitly, because equal thickness at a larger radius spans more area.
+TreeRings never enforces a minimum visual thickness: a near-zero period looks near-zero, and a zero-value period
+collapses its two boundaries onto each other. Pass `total` for the cohort-age story — the disc then fills only
+Σdata/total of the radius, so a young account reads as part-grown.
 
 ## Accessibility
 
-The accessible name summarizes the growth — **"8 years; latest 14, biggest 22 in year 5."** The
-interactive entry steps the rings from the centre out with ←/→ (or hover), announcing each period as
-"Year 5: 22."
+The accessible name summarizes the growth — **"8 years; latest 14, biggest 22 in year 5."** The interactive entry steps
+the rings from the centre out with ←/→ (or hover), announcing each period as "Year 5: 22."
 
 ## Props
 

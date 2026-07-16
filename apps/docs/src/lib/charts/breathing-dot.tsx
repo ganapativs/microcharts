@@ -9,7 +9,7 @@ export const entry: ChartEntry = {
   slug: "breathing-dot",
   status: "stable",
   collection: "expressive",
-  tagline: "How loaded the system is, right now — ambiently.",
+  tagline: "How loaded the system is right now, ambiently.",
   staticImport: `${PKG}/breathing-dot`,
   interactiveImport: `${PKG}/breathing-dot/interactive`,
   // The pulse rate/amplitude IS the encoding (the continuous breathing

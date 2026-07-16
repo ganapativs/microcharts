@@ -44,4 +44,25 @@ describe("preset parity — docs mirrors the library bundles", () => {
       );
     }
   });
+
+  // print/eink are light-surface output contexts; both files carry a dark twin
+  // that re-tunes the pinned ink so they stay legible on dark viewers. Keep the
+  // twins in lockstep too. The library's same-element dark selector
+  // `:where([data-mc-theme="dark"][data-mc-preset="X"])` is unique to the twin
+  // block (its @media copy shares the twin's exact body), so anchor on it — the
+  // light block's selector text would otherwise collide.
+  const DARK_TWINS = ["print", "eink"] as const;
+  it.each(DARK_TWINS)("%s dark twin declares identical --mc-* tokens in both files", (preset) => {
+    const libTwin = declarations(
+      lib,
+      new RegExp(
+        `:where\\(\\[data-mc-theme="dark"\\]\\[data-mc-preset="${preset}"\\]\\)\\s*\\{([^}]*)\\}`,
+      ),
+    );
+    const docsTwin = declarations(
+      docs,
+      new RegExp(`:root\\.dark\\[data-mc-preset="${preset}"\\]\\s*\\{([^}]*)\\}`),
+    );
+    expect(docsTwin).toEqual(libTwin);
+  });
 });

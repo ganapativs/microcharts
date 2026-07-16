@@ -1,12 +1,13 @@
 ---
 title: EtaBar
-description: A progress bar for React that re-forecasts honestly — the remainder is sized by the observed rate, not linear interpolation, so a stalling transfer shows it.
+description:
+  A progress bar for React that re-forecasts honestly — the remainder is sized by the observed rate, not linear
+  interpolation, so a stalling transfer shows it.
 ---
 
-EtaBar answers "how long is this actually going to take, given how it has actually been going?".
-Its x-axis is time, not fraction: the solid part is the elapsed share of the predicted total, and
-the muted remainder is sized by the observed rate. When the rate drops, the remainder honestly
-grows — the download bar, told truthfully.
+EtaBar answers "how long is this actually going to take, given how it has actually been going?". Its x-axis is time, not
+fraction: the solid part is the elapsed share of the predicted total, and the muted remainder is sized by the observed
+rate. When the rate drops, the remainder honestly grows — the download bar, told truthfully.
 
 <LiveDemo label="EtaBar" sizeOf="eta-bar">
   <EtaBar
@@ -39,30 +40,18 @@ grows — the download bar, told truthfully.
 
 ## Motion, and reduced motion
 
-The interactive entry eases the elapsed/remainder split (SVG `x`/`width`) to its new geometry
-whenever `progress`, `elapsed`, or `rate` change — the split only ever moves to a value computed
-from data you passed in on that render; it never interpolates ahead of an as-yet-unseen future
-frame. The transition lives in shared CSS (`.mc-eta-live rect`), so it inherits the shared
-`:where(.mc-root *) { transition: none }` reduced-motion block: with `prefers-reduced-motion:
-reduce` the bar snaps straight to each new split instead of easing. The live region re-announces
-the forecast on a throttle (`announceEvery`, default 10 s) so a fast-updating value doesn't spam
-a screen reader.
+The interactive entry eases the elapsed/remainder split (SVG `x`/`width`) to its new geometry whenever `progress`,
+`elapsed`, or `rate` change — the split only ever moves to a value computed from data you passed in on that render; it
+never interpolates ahead of an as-yet-unseen future frame. The transition lives in shared CSS (`.mc-eta-live rect`), so
+it inherits the shared `:where(.mc-root *) { transition: none }` reduced-motion block: with
+`prefers-reduced-motion: reduce` the bar snaps straight to each new split instead of easing. The live region
+re-announces the forecast on a throttle (`announceEvery`, default 10 s) so a fast-updating value doesn't spam a screen
+reader.
 
 ## Variants
 
-<LiveDemo
-  label="percent"
-  code={`<EtaBar progress={0.42} elapsed={10} rate={0.05} label="percent" />`}
->
-  <EtaBar
-    progress={0.42}
-    elapsed={10}
-    rate={0.05}
-    label="percent"
-    title="Percent"
-    width={280}
-    height={16}
-  />
+<LiveDemo label="percent" code={`<EtaBar progress={0.42} elapsed={10} rate={0.05} label="percent" />`}>
+  <EtaBar progress={0.42} elapsed={10} rate={0.05} label="percent" title="Percent" width={280} height={16} />
 </LiveDemo>
 
 <LiveDemo
@@ -70,21 +59,12 @@ a screen reader.
   code={`// no formatEta → the remaining-time NUMBER (not a unit string) follows locale
 <EtaBar progress={0.42} elapsed={10} rate={0.05} locale="de-DE" />`}
 >
-  <EtaBar
-    progress={0.42}
-    elapsed={10}
-    rate={0.05}
-    locale="de-DE"
-    title="Localized ETA"
-    width={280}
-    height={16}
-  />
+  <EtaBar progress={0.42} elapsed={10} rate={0.05} locale="de-DE" title="Localized ETA" width={280} height={16} />
 </LiveDemo>
 
-Without a `formatEta`, the remaining-time figure falls back to `format`/`locale` — under
-`de-DE` that's a decimal comma ("11,6") rather than the English decimal point ("11.6"). Pass
-`formatEta` (as the hero example does) to add a unit; it always receives the raw number, so it
-can format the unit itself in whatever locale-aware way the caller needs.
+Without a `formatEta`, the remaining-time figure falls back to `format`/`locale` — under `de-DE` that's a decimal comma
+("11,6") rather than the English decimal point ("11.6"). Pass `formatEta` (as the hero example does) to add a unit; it
+always receives the raw number, so it can format the unit itself in whatever locale-aware way the caller needs.
 
 ## Edge cases
 
@@ -98,26 +78,18 @@ can format the unit itself in whatever locale-aware way the caller needs.
 // sliver plus a chevron, instead of shrinking to an unreadable hairline
 <EtaBar progress={0.08} elapsed={30} rate={0.001} />`}
 >
-  <EtaBar
-    progress={0.08}
-    elapsed={30}
-    rate={0.001}
-    title="Barely started"
-    width={280}
-    height={16}
-  />
+  <EtaBar progress={0.08} elapsed={30} rate={0.001} title="Barely started" width={280} height={16} />
 </LiveDemo>
 
 <LiveDemo label="done" code={`<EtaBar progress={1} elapsed={12} rate={0.1} />`}>
   <EtaBar progress={1} elapsed={12} rate={0.1} title="Complete" width={280} height={16} />
 </LiveDemo>
 
-An explicit `rate` of `0`, or an absent `rate` from which no positive average can be derived from
-`elapsed`, renders the remainder as a diagonal-hatched texture instead of a solid bar — "unknown,"
-not a hidden guess — and the summary says **"stalled"** rather than naming a duration. When the predicted remainder is far
-larger than the elapsed time, the done segment would round to an unreadable sliver, so the
-geometry clamps it to a visible 10% and adds a chevron marking the clamp as approximate. At
-`progress >= 1` the bar fills completely regardless of `rate`.
+An explicit `rate` of `0`, or an absent `rate` from which no positive average can be derived from `elapsed`, renders the
+remainder as a diagonal-hatched texture instead of a solid bar — "unknown," not a hidden guess — and the summary says
+**"stalled"** rather than naming a duration. When the predicted remainder is far larger than the elapsed time, the done
+segment would round to an unreadable sliver, so the geometry clamps it to a visible 10% and adds a chevron marking the
+clamp as approximate. At `progress >= 1` the bar fills completely regardless of `rate`.
 
 ## Four homes
 
@@ -125,17 +97,16 @@ geometry clamps it to a visible 10% and adds a chevron marking the clamp as appr
 
 ## Why this default
 
-The ETA label is the default because "how long?" is the question a plain progress bar pretends to
-answer. The remainder is sized by the observed rate, never linear interpolation — so a stalling
-transfer looks stalled instead of marching to a fake finish. When the rate is unknown or zero the
-remainder becomes an indeterminate texture and the summary says so, rather than inventing a
-countdown.
+The ETA label is the default because "how long?" is the question a plain progress bar pretends to answer. The remainder
+is sized by the observed rate, never linear interpolation — so a stalling transfer looks stalled instead of marching to
+a fake finish. When the rate is unknown or zero the remainder becomes an indeterminate texture and the summary says so,
+rather than inventing a countdown.
 
 ## Accessibility
 
-The accessible name is the honest forecast — **"64% done; about 2 min remaining at the current
-rate."** A stalled transfer reads **"30% done; stalled."** and a finished one **"Done."** The
-interactive entry re-announces on a throttle as the forecast changes.
+The accessible name is the honest forecast — **"64% done; about 2 min remaining at the current rate."** A stalled
+transfer reads **"30% done; stalled."** and a finished one **"Done."** The interactive entry re-announces on a throttle
+as the forecast changes.
 
 ## Props
 

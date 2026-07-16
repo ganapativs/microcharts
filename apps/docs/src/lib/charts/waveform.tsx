@@ -23,7 +23,7 @@ export const entry: ChartEntry = {
   status: "stable",
   collection: "frontier",
   tagline:
-    "The shape of a high-frequency signal — where its spikes and silences are — at word width.",
+    "The shape of a high-frequency signal, where its spikes and silences are, at word width.",
   staticImport: `${PKG}/waveform`,
   interactiveImport: `${PKG}/waveform/interactive`,
   dataShape: "number[] (amplitude samples, may be long)",

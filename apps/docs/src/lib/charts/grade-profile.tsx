@@ -19,10 +19,10 @@ export const entry: ChartEntry = {
   slug: "grade-profile",
   status: "stable",
   collection: "expressive",
-  tagline: "How hard the route is, and where — pitches coloured by grade, the steepest called out.",
+  tagline: "How hard the route is, and where: pitches coloured by grade, the steepest called out.",
   staticImport: `${PKG}/grade-profile`,
   interactiveImport: `${PKG}/grade-profile/interactive`,
-  dataShape: "{ d, elev }[] — distance + elevation in the same unit",
+  dataShape: "{ d, elev }[], distance + elevation in the same unit",
   encoding: {
     channel: "colour = quantized grade bin; area = elevation ridge; x = distance",
     precision: "medium — a difficulty read; the readout gives the exact grade",

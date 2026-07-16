@@ -16,6 +16,81 @@ import { AI_LOGOS } from "./ai-logos.ts";
 
 const fence = (lang: string, code: string) => `\`\`\`${lang}\n${code}\n\`\`\``;
 
+/** Minimal chart shape a `<PropTable>` needs — satisfied by the catalog entry
+ *  (`getChart`) in Next and by the raw `entries.generated.json` row in Node. */
+type PropLike = {
+  name: string;
+  type: string;
+  required?: boolean;
+  description?: string;
+  interactive?: boolean;
+};
+type ChartLike = {
+  props: PropLike[];
+  interactiveImport?: string;
+  animates?: boolean;
+  example?: { code: string };
+};
+export type ResolveChart = (slug: string) => ChartLike | undefined;
+
+const ANIMATE_ROW_NOTE =
+  '(interactive) Opt-in entrance motion when the chart mounts client-side — add `import "@microcharts/react/motion"` once. Inert on the server, on hydrated server HTML, and under `prefers-reduced-motion`.';
+
+const SHARED_GRAMMAR_NOTE =
+  "Plus the shared grammar — `data`, `domain`, `color`, `title`, `summary`, `format` — and the layout props (`width`, `height`, `className`, `style`) that every chart accepts. Interactive entries also share `animate` and `live`. See [the shared grammar](/docs/quickstart#the-shared-grammar).";
+
+/** Escape `|` so a type/description never breaks the GFM table row. */
+const cell = (s: string) => s.replace(/\|/g, "\\|");
+
+/**
+ * Render a chart's props as a GFM table — the textual equivalent of the
+ * `<PropTable>` component, from the same registry data, so the `.md` mirror and
+ * `/llms-full.txt` carry the real prop reference instead of an empty heading.
+ */
+function propTableMarkdown(chart: ChartLike): string {
+  const rows = chart.props.map((p) => {
+    const name = `\`${p.name}\`${p.required ? " (required)" : ""}`;
+    const desc = (p.interactive ? "(interactive) " : "") + (p.description ?? "");
+    return `| ${name} | \`${cell(p.type)}\` | ${cell(desc)} |`;
+  });
+  if (chart.interactiveImport && chart.animates !== false) {
+    rows.push(`| \`animate\` | \`boolean\` | ${ANIMATE_ROW_NOTE} |`);
+  }
+  const table = `| Prop | Type | Description |\n| --- | --- | --- |\n${rows.join("\n")}`;
+  return `${table}\n\n${SHARED_GRAMMAR_NOTE}`;
+}
+
+/** Render a chart's `<Usage>` panel — the canonical import + usage snippet plus
+ *  the install command — as text, so the mirror keeps the "how to use it" block. */
+function usageMarkdown(chart: ChartLike): string {
+  const code = chart.example?.code?.trim();
+  if (!code) return "";
+  return `${fence("tsx", code)}\n\nInstall: \`pnpm add @microcharts/react\``;
+}
+
+const headingLevel = (line: string): number => line.match(/^(#{1,6})\s/)?.[1].length ?? 0;
+
+/**
+ * Drop headings left empty once their only child was a stripped visual-only
+ * component (e.g. `## Try it` over a `<Playground>`), so the mirror never reads
+ * as truncated. A heading is empty only when it has no body *and* no deeper
+ * subsection — i.e. the next non-blank line is a heading of the same or higher
+ * rank, or end-of-text. A heading followed by a deeper subheading is kept.
+ */
+function dropEmptyHeadings(md: string): string {
+  const lines = md.split("\n");
+  const keep: boolean[] = lines.map(() => true);
+  for (let i = 0; i < lines.length; i++) {
+    const level = headingLevel(lines[i]);
+    if (level === 0) continue;
+    let j = i + 1;
+    while (j < lines.length && lines[j].trim() === "") j++;
+    const nextLevel = j < lines.length ? headingLevel(lines[j]) : 1; // EOF acts as top-level
+    if (nextLevel > 0 && nextLevel <= level) keep[i] = false;
+  }
+  return lines.filter((_, i) => keep[i]).join("\n");
+}
+
 function grammarText(): string {
   const rows = GRAMMAR.map(
     (g) =>
@@ -56,16 +131,27 @@ const VISUAL_ONLY = [
   "PackageTabs",
   "Playground",
   "Instrument",
-  "PropTable",
-  "Usage",
   "Sizing",
   "ChartChooser",
   "Reveal",
   "Showcase",
 ];
 
-export function expandComponents(md: string): string {
+export function expandComponents(md: string, resolveChart?: ResolveChart): string {
   let out = md;
+
+  // <PropTable slug="x" /> → the real prop table (dropped when unresolved, e.g.
+  // a caller with no registry access — never leave the tag behind).
+  out = out.replace(/<PropTable\s+slug=["']([^"']+)["']\s*\/>/g, (_m, slug) => {
+    const chart = resolveChart?.(slug);
+    return chart ? propTableMarkdown(chart) : "";
+  });
+
+  // <Usage chart="x" /> → the canonical import + usage snippet.
+  out = out.replace(/<Usage\s+chart=["']([^"']+)["']\s*\/>/g, (_m, slug) => {
+    const chart = resolveChart?.(slug);
+    return chart ? usageMarkdown(chart) : "";
+  });
 
   // <Snippet id="x" /> → the real code block
   out = out.replace(/<Snippet\s+id=["']([^"']+)["']\s*\/>/g, (_m, id) => {
@@ -91,6 +177,11 @@ export function expandComponents(md: string): string {
   out = out.replace(/<LiveDemo\b[^>]*?\bcode=\{`([\s\S]*?)`\}[^>]*?\/>/g, (_m, code) =>
     fence("tsx", unescapeTemplate(code)),
   );
+  // no-code variant (e.g. the per-chart hero) — the JSX children *are* the demo.
+  out = out.replace(/<LiveDemo\b[^>]*>([\s\S]*?)<\/LiveDemo>/g, (_m, inner) => {
+    const jsx = dedent(inner);
+    return jsx ? fence("tsx", jsx) : "";
+  });
 
   // <DynamicCodeBlock lang="x" code={`…`} /> → a fenced block
   out = out.replace(
@@ -125,10 +216,21 @@ export function expandComponents(md: string): string {
 
   // Tidy: collapse 3+ blank lines to one blank line
   out = out.replace(/\n{3,}/g, "\n\n");
+  // Remove headings whose section was emptied by a stripped visual component.
+  out = dropEmptyHeadings(out);
   return out.trim();
 }
 
 /** Turn an MDX template-literal body back into literal text. */
 function unescapeTemplate(s: string): string {
   return s.replace(/\\`/g, "`").replace(/\\\$/g, "$");
+}
+
+/** Trim blank edge lines and strip the common leading indentation from a block. */
+function dedent(s: string): string {
+  const lines = s.replace(/^\n+|\s+$/g, "").split("\n");
+  const indent = Math.min(
+    ...lines.filter((l) => l.trim() !== "").map((l) => l.match(/^ */)?.[0].length ?? 0),
+  );
+  return lines.map((l) => l.slice(indent)).join("\n");
 }

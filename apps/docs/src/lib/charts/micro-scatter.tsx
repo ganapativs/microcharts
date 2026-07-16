@@ -13,7 +13,7 @@ export const entry: ChartEntry = {
   slug: "micro-scatter",
   status: "stable",
   collection: "core",
-  tagline: "Are these two variables related — the relationship no other type tells.",
+  tagline: "Are these two variables related? The relationship no other type tells.",
   staticImport: `${PKG}/micro-scatter`,
   interactiveImport: `${PKG}/micro-scatter/interactive`,
   dataShape: "{ x, y }[] (unordered pairs)",

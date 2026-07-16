@@ -65,7 +65,11 @@ export function sparkBarGeometry(
   const { width, height, mode = "bar", gap = 0.25, pad = 1, gutterRight = 0 } = opts;
   const x0 = pad;
   const y0 = pad;
-  const y1 = height - pad;
+  // Bar mode seats its zero baseline flush with the box bottom (y = height) so
+  // the chart aligns on the text baseline when rendered inline — bars are
+  // crispEdges rects with no stroke, so filling to the edge bleeds nothing.
+  // Win-loss keeps a symmetric mid-line, so it retains the bottom inset.
+  const y1 = mode === "winloss" ? height - pad : height;
   const n = data.length;
   const slot = n > 0 ? Math.max(0, width - pad * 2 - gutterRight) / n : 0;
   const barW = round2(Math.max(0.5, slot * (1 - gap)));

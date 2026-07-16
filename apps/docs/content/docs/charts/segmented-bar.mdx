@@ -1,11 +1,13 @@
 ---
 title: SegmentedBar
-description: A composition bar for React — parts of a whole as segment lengths, with a labeled Other rollup and largest-remainder percents.
+description:
+  A composition bar for React — parts of a whole as segment lengths, with a labeled Other rollup and largest-remainder
+  percents.
 ---
 
-SegmentedBar answers "what is this made of, and in what proportions?". Segments always
-sum to the full bar; past `maxSegments` the tail rolls into a labeled "Other" — nothing
-is silently dropped. A flat bar beats a donut of the same data at every size we ship.
+SegmentedBar answers "what is this made of, and in what proportions?". Segments always sum to the full bar; past
+`maxSegments` the tail rolls into a labeled "Other" — nothing is silently dropped. A flat bar beats a donut of the same
+data at every size we ship.
 
 <LiveDemo label="SegmentedBar" sizeOf="segmented-bar">
   <SegmentedBar
@@ -113,9 +115,9 @@ is silently dropped. A flat bar beats a donut of the same data at every size we 
   />
 </LiveDemo>
 
-`label="value"` follows `format`/`locale` — 12400 reads "12.400" under `de-DE` rather than the
-English "12,400". `label="percent"` is unaffected: the largest-remainder shares are always
-plain integers, never locale-formatted, because a percent point is the same everywhere.
+`label="value"` follows `format`/`locale` — 12400 reads "12.400" under `de-DE` rather than the English "12,400".
+`label="percent"` is unaffected: the largest-remainder shares are always plain integers, never locale-formatted, because
+a percent point is the same everywhere.
 
 ## Edge cases
 
@@ -156,11 +158,10 @@ plain integers, never locale-formatted, because a percent point is the same ever
   />
 </LiveDemo>
 
-Past `maxSegments` (default 5) the smallest categories merge into a labeled "Other" — nothing
-is dropped, only rolled up, and the interactive entry announces its member count. A single
-category still renders as one full-width, 100% segment rather than a special-cased bare bar.
-Negative values can't exist in a part-to-whole, so they're excluded from the bar entirely (not
-clamped to zero) and the component logs a dev warning steering toward Waterfall.
+Past `maxSegments` (default 5) the smallest categories merge into a labeled "Other" — nothing is dropped, only rolled
+up, and the interactive entry announces its member count. A single category still renders as one full-width, 100%
+segment rather than a special-cased bare bar. Negative values can't exist in a part-to-whole, so they're excluded from
+the bar entirely (not clamped to zero) and the component logs a dev warning steering toward Waterfall.
 
 ## Four homes
 
@@ -168,16 +169,14 @@ clamped to zero) and the component logs a dev warning steering toward Waterfall.
 
 ## Why this default
 
-Data order is the default — inherent sequences (funnel-like stages, weekday mixes) carry
-meaning that ranking destroys. Summary percents use largest-remainder rounding so they
-always sum to exactly 100; negative values are excluded with a dev warning (a
-part-to-whole cannot contain negative parts — use Waterfall).
+Data order is the default — inherent sequences (funnel-like stages, weekday mixes) carry meaning that ranking destroys.
+Summary percents use largest-remainder rounding so they always sum to exactly 100; negative values are excluded with a
+dev warning (a part-to-whole cannot contain negative parts — use Waterfall).
 
 ## Accessibility
 
-The accessible name is the full composition — **"Chrome 62%, Safari 24%, Firefox 9%,
-Edge 3%, Other 2%."** The interactive entry roves segments; the Other segment announces
-its member count (**"Other: 2%, 2 categories."**).
+The accessible name is the full composition — **"Chrome 62%, Safari 24%, Firefox 9%, Edge 3%, Other 2%."** The
+interactive entry roves segments; the Other segment announces its member count (**"Other: 2%, 2 categories."**).
 
 ## Props
 

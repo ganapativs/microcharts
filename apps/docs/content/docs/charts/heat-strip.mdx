@@ -1,12 +1,12 @@
 ---
 title: HeatStrip
-description: A 1×N intensity strip for React tables — value-by-time as calibrated color steps, sharing ActivityGrid's scale.
+description:
+  A 1×N intensity strip for React tables — value-by-time as calibrated color steps, sharing ActivityGrid's scale.
 ---
 
-HeatStrip answers "how did intensity evolve, glanceably?". It is the 1×N sibling of
-ActivityGrid: the same discrete step scale, the same cell vocabulary, laid on a single
-timeline. Empty is not zero — a slot with no record renders a hairline outline, visibly
-different from a low value.
+HeatStrip answers "how did intensity evolve, glanceably?". It is the 1×N sibling of ActivityGrid: the same discrete step
+scale, the same cell vocabulary, laid on a single timeline. Empty is not zero — a slot with no record renders a hairline
+outline, visibly different from a low value.
 
 <LiveDemo label="HeatStrip" sizeOf="heat-strip">
   <HeatStrip
@@ -76,18 +76,16 @@ different from a low value.
 
 ## Why this default
 
-Square cells with a density-adaptive gap keep boundaries legible where round shapes blur
-at 10 px. Every real value renders at a visible opacity (0.25–1); the faint track look is
-reserved for truly-empty slots. Three ways a heat strip lies — continuous ramps, per-row
-autoscale, mean-based downsampling — are all closed: discrete steps, shared `domain`,
+Square cells with a density-adaptive gap keep boundaries legible where round shapes blur at 10 px. Every real value
+renders at a visible opacity (0.25–1); the faint track look is reserved for truly-empty slots. Three ways a heat strip
+lies — continuous ramps, per-row autoscale, mean-based downsampling — are all closed: discrete steps, shared `domain`,
 max-per-bucket only.
 
 ## Accessibility
 
-The summary reuses `describeSeries` verbatim — for the load strip above that's **"Trending
-up 192%. Range 12 to 90. Last value 35."** — so a color ramp is never the only channel. The
-interactive entry roves cells with ActivityGrid-parity announcements
-(**"Point 8 of 20: 90."**, empty slots as "no data").
+The summary reuses `describeSeries` verbatim — for the load strip above that's **"Trending up 192%. Range 12 to 90. Last
+value 35."** — so a color ramp is never the only channel. The interactive entry roves cells with ActivityGrid-parity
+announcements (**"Point 8 of 20: 90."**, empty slots as "no data").
 
 ## Props
 

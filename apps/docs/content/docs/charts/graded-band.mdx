@@ -1,19 +1,16 @@
 ---
 title: GradedBand
-description: A nested-interval strip for React — how sure we are about one number, graded by opacity, never a bar from zero.
+description:
+  A nested-interval strip for React — how sure we are about one number, graded by opacity, never a bar from zero.
 ---
 
-GradedBand answers "how sure are we about this one number?". Nested central intervals are
-graded by opacity, with a median tick. It is **never** a bar from zero — a bar with an
-error bar induces edge-literalism bias, so this form exists precisely to avoid it. Opacity
-maps to probability level and nothing else.
+GradedBand answers "how sure are we about this one number?". Nested central intervals are graded by opacity, with a
+median tick. It is **never** a bar from zero — a bar with an error bar induces edge-literalism bias, so this form exists
+precisely to avoid it. Opacity maps to probability level and nothing else.
 
 <LiveDemo label="GradedBand" sizeOf="graded-band">
   <GradedBand
-    data={Array.from(
-      { length: 160 },
-      (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
-    )}
+    data={Array.from({ length: 160 }, (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)))}
     label="median"
     title="Forecast estimate"
     width={240}
@@ -96,8 +93,8 @@ maps to probability level and nothing else.
   />
 </LiveDemo>
 
-With a `locale`, the median label and the accessible summary follow that locale's decimal mark —
-the label above renders "2,2", not "2.2".
+With a `locale`, the median label and the accessible summary follow that locale's decimal mark — the label above renders
+"2,2", not "2.2".
 
 ## Edge cases
 
@@ -110,8 +107,8 @@ the label above renders "2,2", not "2.2".
   <GradedBand data={[42, 42, 42, 42, 42, 42]} title="No spread" width={200} height={14} />
 </LiveDemo>
 
-The accessible name for that strip is **"Point value 42, no interval."** — a degenerate sample is
-announced as a point estimate, never dressed up as certainty about a range.
+The accessible name for that strip is **"Point value 42, no interval."** — a degenerate sample is announced as a point
+estimate, never dressed up as certainty about a range.
 
 <LiveDemo
   label="actual far outside the forecast"
@@ -137,16 +134,16 @@ announced as a point estimate, never dressed up as certainty about a range.
 
 ## Why this default
 
-Nested central intervals graded by opacity — never a bar from zero. A bar with an error
-whisker invites reading the bar's end as "the answer" and the whisker as noise; the graded
-band has no endpoint to over-read, so opacity maps to probability and nothing else. Inner
-intervals are clipped inside their outer, so quantile rounding can never invert the nesting.
+Nested central intervals graded by opacity — never a bar from zero. A bar with an error whisker invites reading the
+bar's end as "the answer" and the whisker as noise; the graded band has no endpoint to over-read, so opacity maps to
+probability and nothing else. Inner intervals are clipped inside their outer, so quantile rounding can never invert the
+nesting.
 
 ## Accessibility
 
-The accessible name states the median and the innermost + outermost intervals — for example,
-**"Median 50; 50% within 25–75, 95% within 2.5–97.5."** The interactive entry roves the band edges
-and announces each interval's coverage and bounds.
+The accessible name states the median and the innermost + outermost intervals — for example, **"Median 50; 50% within
+25–75, 95% within 2.5–97.5."** The interactive entry roves the band edges and announces each interval's coverage and
+bounds.
 
 ## Props
 

@@ -49,7 +49,9 @@ export function depthWedgeGeometry(opts: {
 
   const pad = 1;
   const midX = round2(width / 2);
-  const yBase = height - pad;
+  // Baseline seats flush with the box bottom (flat fill edge → no bleed) so the
+  // wedge aligns on the text baseline inline; plotH keeps the top pad intact.
+  const yBase = height;
   const plotH = height - pad * 2;
 
   const highestBid = demand.length > 0 ? demand[0]!.level : 0;

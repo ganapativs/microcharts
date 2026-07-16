@@ -3,11 +3,10 @@ title: BalanceBeam
 description: A balance-beam chart for React — a tilting beam shows which of two sides outweighs, with area-true weights.
 ---
 
-BalanceBeam answers "which of two sides outweighs, and roughly by how much?" A beam tilts toward the
-heavier side; the direction is instant and the angle grows with the imbalance, but it **saturates** —
-read it as direction plus rough magnitude, not an exact ratio. The two weights are area-true (their
-area, not their width, is proportional to value). For a precise comparison, reach for `PairedBars` or
-`Delta`; this is for the glance.
+BalanceBeam answers "which of two sides outweighs, and roughly by how much?" A beam tilts toward the heavier side; the
+direction is instant and the angle grows with the imbalance, but it **saturates** — read it as direction plus rough
+magnitude, not an exact ratio. The two weights are area-true (their area, not their width, is proportional to value).
+For a precise comparison, reach for `PairedBars` or `Delta`; this is for the glance.
 
 <LiveDemo label="BalanceBeam" sizeOf="balance-beam">
   <BalanceBeam
@@ -32,7 +31,8 @@ area, not their width, is proportional to value). For a precise comparison, reac
 
 ## When to use it
 
-- **Good for** — a buy vs sell or in vs out read in a sentence, a pro vs con weight in a KPI card, or an A-vs-B pair where direction is the story.
+- **Good for** — a buy vs sell or in vs out read in a sentence, a pro vs con weight in a KPI card, or an A-vs-B pair
+  where direction is the story.
 - **Avoid for** — exact ratios (PairedBars / Delta), more than two items (MiniBar), or trends.
 
 ## Sizing
@@ -72,8 +72,8 @@ area, not their width, is proportional to value). For a precise comparison, reac
   </span>
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — with a `locale`, both the announced values and
-the in-chart numerals (`label="values"`) follow that locale's own grouping and decimal marks.
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, both the announced values and the in-chart numerals
+(`label="values"`) follow that locale's own grouping and decimal marks.
 
 <LiveDemo
   label="locale"
@@ -127,9 +127,8 @@ the in-chart numerals (`label="values"`) follow that locale's own grouping and d
   />
 </LiveDemo>
 
-Equal values level the beam and report **"balanced"** rather than picking an arbitrary heavier
-side. Two zeros are the same case — the beam stays level and both weights shrink to nothing, which
-is honest: there is nothing to weigh.
+Equal values level the beam and report **"balanced"** rather than picking an arbitrary heavier side. Two zeros are the
+same case — the beam stays level and both weights shrink to nothing, which is honest: there is nothing to weigh.
 
 ## Four homes
 
@@ -137,18 +136,17 @@ is honest: there is nothing to weigh.
 
 ## Why this default
 
-Ratio mode is the default because most two-sided comparisons are share-of-whole questions, and square
-weights are the default because circles under-read area at this size. The tilt saturates at `maxTilt`
-degrees — a deliberate honesty choice: past a point, a steeper beam would imply a precision the eye
-can't extract, so the angle levels off. Direction and rough
-magnitude always agree, and the two channels (tilt and weight area) never disagree. For same-scale
-rows that should tilt comparably, `mode="difference"` scales the imbalance by a shared `domain`.
+Ratio mode is the default because most two-sided comparisons are share-of-whole questions, and square weights are the
+default because circles under-read area at this size. The tilt saturates at `maxTilt` degrees — a deliberate honesty
+choice: past a point, a steeper beam would imply a precision the eye can't extract, so the angle levels off. Direction
+and rough magnitude always agree, and the two channels (tilt and weight area) never disagree. For same-scale rows that
+should tilt comparably, `mode="difference"` scales the imbalance by a shared `domain`.
 
 ## Accessibility
 
-The accessible name states both sides and the winner — **"Inflow 620 vs Outflow 480; Inflow
-heavier."** — or "…; balanced." when they match. The interactive entry eases the beam to its new tilt,
-reveals a side's value on hover or ←/→, and announces when the heavier side flips.
+The accessible name states both sides and the winner — **"Inflow 620 vs Outflow 480; Inflow heavier."** — or "…;
+balanced." when they match. The interactive entry eases the beam to its new tilt, reveals a side's value on hover or
+←/→, and announces when the heavier side flips.
 
 ## Props
 

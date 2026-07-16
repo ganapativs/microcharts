@@ -16,7 +16,7 @@ export const entry: ChartEntry = {
   slug: "bubble-row",
   status: "stable",
   collection: "expressive",
-  tagline: "Roughly how a few magnitudes compare — for precise comparison, use MiniBar.",
+  tagline: "Roughly how a few magnitudes compare. For precise comparison, use MiniBar.",
   staticImport: `${PKG}/bubble-row`,
   interactiveImport: `${PKG}/bubble-row/interactive`,
   dataShape: "{ label: string; value: number }[]",

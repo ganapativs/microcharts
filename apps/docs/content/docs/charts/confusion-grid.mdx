@@ -1,27 +1,21 @@
 ---
 title: ConfusionGrid
-description: A k×k agreement matrix for React at glyph scale — rows are actual, columns predicted, cell ink is the row-normalized share, and the diagonal is accented by shape.
+description:
+  A k×k agreement matrix for React at glyph scale — rows are actual, columns predicted, cell ink is the row-normalized
+  share, and the diagonal is accented by shape.
 ---
 
-ConfusionGrid answers "where do the errors go?" — the one thing accuracy-as-a-number hides. Rows
-are the actual class, columns the predicted class, and each cell's ink is the row-normalized share:
-of the actual X, where did the predictions go? The diagonal (agreement) is accented by shape, never
-by colour, so good and bad are positions on the grid, not hues. The one-line key — rows actual,
-columns predicted — belongs next to every example.
+ConfusionGrid answers "where do the errors go?" — the one thing accuracy-as-a-number hides. Rows are the actual class,
+columns the predicted class, and each cell's ink is the row-normalized share: of the actual X, where did the predictions
+go? The diagonal (agreement) is accented by shape, never by colour, so good and bad are positions on the grid, not hues.
+The one-line key — rows actual, columns predicted — belongs next to every example.
 
 <LiveDemo
   label="ConfusionGrid"
   sizeOf="confusion-grid"
   code={`import { ConfusionGrid } from "@microcharts/react/confusion-grid";
 
-const counts = {
-labels: ["A", "B", "C"],
-counts: [
-[70, 8, 2],
-[6, 62, 12],
-[3, 9, 58],
-],
-};
+const counts = { labels: ["A", "B", "C"], counts: [ [70, 8, 2], [6, 62, 12], [3, 9, 58], ], };
 
 <ConfusionGrid data={counts} label="accuracy" title="Classifier" />`}
 >
@@ -43,7 +37,8 @@ counts: [
 
 ## When to use it
 
-- **Good for** — classifier evaluation, and any paired-classification agreement (triage vs outcome, plan vs actual, rater A vs rater B).
+- **Good for** — classifier evaluation, and any paired-classification agreement (triage vs outcome, plan vs actual,
+  rater A vs rater B).
 - **Avoid for** — a single accuracy number (Delta) or more than four classes (use a full-size heatmap).
 
 ## Sizing
@@ -102,10 +97,10 @@ counts: [
   />
 </LiveDemo>
 
-A fifth class doesn't grow the grid — legibility caps at 4×4, so a `k` of 5 or more clamps to
-the first four labels and rows/columns, with a dev warning steering to a full-size heatmap.
-The grid never silently drops classes in production (the warning is dev-only), but the render
-itself does truncate; pass pre-filtered `labels`/`counts` if you need a specific four.
+A fifth class doesn't grow the grid — legibility caps at 4×4, so a `k` of 5 or more clamps to the first four labels and
+rows/columns, with a dev warning steering to a full-size heatmap. The grid never silently drops classes in production
+(the warning is dev-only), but the render itself does truncate; pass pre-filtered `labels`/`counts` if you need a
+specific four.
 
 <LiveDemo
   label="an all-zero row (a class with no samples)"
@@ -139,19 +134,18 @@ itself does truncate; pass pre-filtered `labels`/`counts` if you need a specific
 
 ## Why this default
 
-The row view answers the question practitioners actually ask — "of the real cats, how many did we
-call dogs?" — so row-normalization is stated in the summary phrasing ("% of cats") and the
-denominator travels with every number. Accuracy is off by default and never rendered without the
-grid: the number may not leave its context. The diagonal accent is a shape (an inset stroke), and
-the ink ramp is identical for agreement and error cells — good and bad are positions, not colours,
-which is what keeps it readable under forced colours.
+The row view answers the question practitioners actually ask — "of the real cats, how many did we call dogs?" — so
+row-normalization is stated in the summary phrasing ("% of cats") and the denominator travels with every number.
+Accuracy is off by default and never rendered without the grid: the number may not leave its context. The diagonal
+accent is a shape (an inset stroke), and the ink ramp is identical for agreement and error cells — good and bad are
+positions, not colours, which is what keeps it readable under forced colours.
 
 ## Accessibility
 
-The accessible name states accuracy and the worst confusion — **"Accuracy 87%. Most confused: cat
-predicted as dog (12% of cats)."** A perfect classifier reads **"Accuracy 100%. No confusion."** The
-interactive entry roves the cells with the arrow keys (Home/End jump the diagonal), announcing each
-cell's actual and predicted class as a share of the actual class.
+The accessible name states accuracy and the worst confusion — **"Accuracy 87%. Most confused: cat predicted as dog (12%
+of cats)."** A perfect classifier reads **"Accuracy 100%. No confusion."** The interactive entry roves the cells with
+the arrow keys (Home/End jump the diagonal), announcing each cell's actual and predicted class as a share of the actual
+class.
 
 ## Props
 

@@ -269,6 +269,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
       elapsed={3.6}
       rate={0.18}
       formatEta={min}
+      label="none"
       summary={false}
       width={props.width ?? 60}
       height={props.height ?? 8}

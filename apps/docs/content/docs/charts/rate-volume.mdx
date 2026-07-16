@@ -1,12 +1,13 @@
 ---
 title: RateVolume
-description: A rate line over ghost volume bars for React — the rate moved, but on what volume? The denominator is always in the picture.
+description:
+  A rate line over ghost volume bars for React — the rate moved, but on what volume? The denominator is always in the
+  picture.
 ---
 
-RateVolume answers "the rate moved — on what volume?". A precise rate line rides over
-deliberately low-precision **ghost volume bars** — the denominator. There is no prop to
-remove the bars: a rate without its denominator is the lie this type exists to prevent. A
-4.1% conversion rate reads very differently on 38 events than on 3,800.
+RateVolume answers "the rate moved — on what volume?". A precise rate line rides over deliberately low-precision **ghost
+volume bars** — the denominator. There is no prop to remove the bars: a rate without its denominator is the lie this
+type exists to prevent. A 4.1% conversion rate reads very differently on 38 events than on 3,800.
 
 <LiveDemo label="RateVolume" sizeOf="rate-volume">
   <RateVolume
@@ -39,7 +40,8 @@ remove the bars: a rate without its denominator is the lie this type exists to p
 
 ## When to use it
 
-- **Good for** — a conversion / error rate with its denominator, a KPI card where the rate is the headline, spotting a big rate move on thin volume.
+- **Good for** — a conversion / error rate with its denominator, a KPI card where the rate is the headline, spotting a
+  big rate move on thin volume.
 - **Avoid for** — volume itself needing a precise read (pair a SparkBar) or a plain series (Sparkline).
 
 ## Sizing
@@ -119,9 +121,9 @@ remove the bars: a rate without its denominator is the lie this type exists to p
   />
 </LiveDemo>
 
-`format` and `volumeFormat` both take `Intl.NumberFormatOptions` and share the same `locale` —
-the rate label reads "4,1 %" and volumes group with a period ("3.800") under `de-DE`, matching
-that locale's own conventions rather than a hardcoded English format.
+`format` and `volumeFormat` both take `Intl.NumberFormatOptions` and share the same `locale` — the rate label reads "4,1
+%" and volumes group with a period ("3.800") under `de-DE`, matching that locale's own conventions rather than a
+hardcoded English format.
 
 ## Edge cases
 
@@ -152,10 +154,9 @@ that locale's own conventions rather than a hardcoded English format.
   <RateVolume data={[]} title="No periods yet" width={140} height={26} />
 </LiveDemo>
 
-A period with zero (or non-finite) volume renders no bar and no rate mark, and the line
-gaps across it instead of interpolating through a period nothing was measured on — the
-interactive entry announces that period as **"no events"** rather than a rate. With no data
-at all, the chart renders an empty root and the accessible name says **"No data."**
+A period with zero (or non-finite) volume renders no bar and no rate mark, and the line gaps across it instead of
+interpolating through a period nothing was measured on — the interactive entry announces that period as **"no events"**
+rather than a rate. With no data at all, the chart renders an empty root and the accessible name says **"No data."**
 
 ## Four homes
 
@@ -163,18 +164,16 @@ at all, the chart renders an empty root and the accessible name says **"No data.
 
 ## Why this default
 
-The volume bars are muted and unlabeled because they answer "enough?", not "how many?". A
-rate on **zero** volume is undefined regardless of the input — the line breaks and no mark
-is drawn, because a rate nobody generated should never be plotted. `minVolume` makes a thin
-denominator visible right at the mark: below it the rate point renders hollow, a shape cue
-that survives forced-colors and print.
+The volume bars are muted and unlabeled because they answer "enough?", not "how many?". A rate on **zero** volume is
+undefined regardless of the input — the line breaks and no mark is drawn, because a rate nobody generated should never
+be plotted. `minVolume` makes a thin denominator visible right at the mark: below it the rate point renders hollow, a
+shape cue that survives forced-colors and print.
 
 ## Accessibility
 
-The accessible name always pairs the rate with its volume — **"4.1% on 38 events (low
-volume); up from 2.3% across 8 periods."**. The interactive entry steps the periods and its
-live region never states a rate without the volume it stands on, announcing "no events" for
-a zero-volume period.
+The accessible name always pairs the rate with its volume — **"4.1% on 38 events (low volume); up from 2.3% across 8
+periods."**. The interactive entry steps the periods and its live region never states a rate without the volume it
+stands on, announcing "no events" for a zero-volume period.
 
 ## Props
 

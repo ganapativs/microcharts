@@ -31,7 +31,7 @@ export function GET() {
             width: 44,
             height: 44,
             borderRadius: 12,
-            background: "#2f52d4",
+            background: "#c2410c",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -64,12 +64,12 @@ export function GET() {
           <polyline
             points="0,96 120,80 240,88 360,52 480,64 600,30 720,44 840,14 960,26 1056,4"
             fill="none"
-            stroke="#2f52d4"
+            stroke="#c2410c"
             strokeWidth="5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <circle cx="1056" cy="4" r="9" fill="#2f52d4" />
+          <circle cx="1056" cy="4" r="9" fill="#c2410c" />
         </svg>
       </div>
 

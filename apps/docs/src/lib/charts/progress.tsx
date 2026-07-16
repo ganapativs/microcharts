@@ -9,7 +9,7 @@ export const entry: ChartEntry = {
   slug: "progress",
   status: "stable",
   collection: "core",
-  tagline: "How far along, exactly — bar plus the percent that is the datum.",
+  tagline: "How far along, exactly: bar plus the percent that is the datum.",
   staticImport: `${PKG}/progress`,
   interactiveImport: `${PKG}/progress/interactive`,
   dataShape: "number of max (optionally segmented)",
@@ -241,7 +241,7 @@ export const contexts: ChartContexts = {
 };
 
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {
-  return <Progress value={0.68} summary={false} width={64} height={10} />;
+  return <Progress value={0.68} label="none" summary={false} width={64} height={10} />;
 }
 
 export function markCode(): string {

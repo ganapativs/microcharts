@@ -17,7 +17,7 @@ export const entry: ChartEntry = {
   tagline: "How the composition is shifting over time.",
   staticImport: `${PKG}/stacked-area`,
   interactiveImport: `${PKG}/stacked-area/interactive`,
-  dataShape: "{ label, values }[] — at most 3 series, stacked to 100%",
+  dataShape: "{ label, values }[], at most 3 series, stacked to 100%",
   encoding: {
     channel: "layer thickness (share) over time",
     precision: "low — thickness reads approximately; hover for exact shares",

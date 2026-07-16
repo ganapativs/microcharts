@@ -19,7 +19,7 @@ export const entry: ChartEntry = {
   slug: "minimap-strip",
   status: "stable",
   collection: "frontier",
-  tagline: "Where am I in the whole — and where in the whole is everything else I care about.",
+  tagline: "Where am I in the whole, and where in the whole is everything else I care about.",
   staticImport: `${PKG}/minimap-strip`,
   interactiveImport: `${PKG}/minimap-strip/interactive`,
   dataShape: "{ content, window, marks?, known? }",

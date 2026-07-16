@@ -30,7 +30,7 @@ export const entry: ChartEntry = {
   slug: "percentile-ladder",
   status: "stable",
   collection: "decision",
-  tagline: "What does the tail look like — not just the median?",
+  tagline: "What does the tail look like, not just the median?",
   staticImport: `${PKG}/percentile-ladder`,
   interactiveImport: `${PKG}/percentile-ladder/interactive`,
   dataShape: "number[]",

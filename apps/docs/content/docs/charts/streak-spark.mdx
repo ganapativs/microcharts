@@ -1,13 +1,14 @@
 ---
 title: StreakSpark
-description: A run-length streak strip for React — pass/fail outcomes collapse into runs sized by length, with the current run accented against the record so "how are we doing, versus our best" reads at a glance.
+description:
+  A run-length streak strip for React — pass/fail outcomes collapse into runs sized by length, with the current run
+  accented against the record so "how are we doing, versus our best" reads at a glance.
 ---
 
-StreakSpark answers "how long is the current run, and how does it compare to the record?". A
-sequence of pass/fail outcomes collapses into **runs** — each run a bar whose width is its length on
-one shared scale. Streak runs sit low and translucent, breaks sit thin and saturated, and the
-**current** run is the loud accent bar at the right. The record streak wears a small triangle tick,
-so "are we near our best" reads without counting.
+StreakSpark answers "how long is the current run, and how does it compare to the record?". A sequence of pass/fail
+outcomes collapses into **runs** — each run a bar whose width is its length on one shared scale. Streak runs sit low and
+translucent, breaks sit thin and saturated, and the **current** run is the loud accent bar at the right. The record
+streak wears a small triangle tick, so "are we near our best" reads without counting.
 
 <LiveDemo
   label="StreakSpark"
@@ -50,8 +51,8 @@ so "are we near our best" reads without counting.
 
 ## Variants
 
-`data` accepts booleans, `0`/`1`, or any numbers (they pass on `> 0`, or on `>= threshold`). A
-`null` is a gap: it breaks the run and starts a fresh one. Everything else is a prop.
+`data` accepts booleans, `0`/`1`, or any numbers (they pass on `> 0`, or on `>= threshold`). A `null` is a gap: it
+breaks the run and starts a fresh one. Everything else is a prop.
 
 <LiveDemo
   label="both labels"
@@ -128,9 +129,8 @@ so "are we near our best" reads without counting.
   />
 </LiveDemo>
 
-With a `locale`, the count label and the accessible summary follow that locale's own grouping — a
-1,204-build streak reads **"1.204"** in German. The outcome words come from `strings`, so the whole
-summary localizes together.
+With a `locale`, the count label and the accessible summary follow that locale's own grouping — a 1,204-build streak
+reads **"1.204"** in German. The outcome words come from `strings`, so the whole summary localizes together.
 
 ## Edge cases
 
@@ -138,15 +138,15 @@ summary localizes together.
   <StreakSpark data={[1]} title="One build" width={160} height={24} />
 </LiveDemo>
 
-A lone outcome is one current run of length 1, and it is trivially its own record — the summary reads
-**"Current run 1 passing, unbroken."**
+A lone outcome is one current run of length 1, and it is trivially its own record — the summary reads **"Current run 1
+passing, unbroken."**
 
 <LiveDemo label="all failing" code={`<StreakSpark data={[0, 0, 0, 0, 0]} title="Rough week" />`}>
   <StreakSpark data={[0, 0, 0, 0, 0]} title="Rough week" width={200} height={24} />
 </LiveDemo>
 
-When nothing passes there is no completed streak: the strip is one saturated break run, no triangle
-tick, and the summary reads **"Current run 5 failing; no completed streak."**
+When nothing passes there is no completed streak: the strip is one saturated break run, no triangle tick, and the
+summary reads **"Current run 5 failing; no completed streak."**
 
 ## Four homes
 
@@ -154,18 +154,18 @@ tick, and the summary reads **"Current run 5 failing; no completed streak."**
 
 ## Why this default
 
-Runs, not per-outcome ticks, because the decision is about _length_ — "how long have we held" and
-"how does that compare to our best". Width encodes run length on one shared scale, so a wide bar is a
-genuinely long run and the eye compares them honestly. Height and opacity encode run _type_ (streak,
-break, current) — never magnitude — so the ribbon never implies a size it doesn't have. The record
-tick and the accented current bar answer the two questions the raw list can't, at a glance.
+Runs, not per-outcome ticks, because the decision is about _length_ — "how long have we held" and "how does that compare
+to our best". Width encodes run length on one shared scale, so a wide bar is a genuinely long run and the eye compares
+them honestly. Height and opacity encode run _type_ (streak, break, current) — never magnitude — so the ribbon never
+implies a size it doesn't have. The record tick and the accented current bar answer the two questions the raw list
+can't, at a glance.
 
 ## Accessibility
 
-The accessible name states the current run, the record, and how often the streak broke — **"Current
-run 3 passing; record 9; broke 2 times."** The interactive entry roves runs with ← →, announcing
-each run's length, outcome, and whether it is the record (**"Run 3 of 5: 4 passing."**). Direction is
-carried by height, opacity, and color together, never color alone.
+The accessible name states the current run, the record, and how often the streak broke — **"Current run 3 passing;
+record 9; broke 2 times."** The interactive entry roves runs with ← →, announcing each run's length, outcome, and
+whether it is the record (**"Run 3 of 5: 4 passing."**). Direction is carried by height, opacity, and color together,
+never color alone.
 
 ## Props
 

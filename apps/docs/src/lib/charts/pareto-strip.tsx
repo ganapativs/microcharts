@@ -314,6 +314,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
   return (
     <ParetoStrip
       data={data}
+      label="none"
       summary={false}
       width={props.width ?? 70}
       height={props.height ?? 18}
