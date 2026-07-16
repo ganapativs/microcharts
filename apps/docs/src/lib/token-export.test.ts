@@ -60,7 +60,7 @@ describe("PRESET_DARK_TWINS mirror the library dark twins", () => {
 });
 
 describe("ACCENTS mirror the docs accent bundles", () => {
-  it.each(ACCENTS.filter((a) => a.id !== "cobalt"))("$id light/dark match global.css", (a) => {
+  it.each(ACCENTS.filter((a) => a.id !== "ember"))("$id light/dark match global.css", (a) => {
     expect(accentDecl(docs, new RegExp(`:root\\[data-accent="${a.id}"\\]\\s*\\{([^}]*)\\}`))).toBe(
       a.light,
     );
@@ -68,8 +68,9 @@ describe("ACCENTS mirror the docs accent bundles", () => {
       accentDecl(docs, new RegExp(`\\.dark\\[data-accent="${a.id}"\\]\\s*\\{([^}]*)\\}`)),
     ).toBe(a.dark);
   });
-  it("cobalt matches the default (unscoped) accent in global.css", () => {
-    expect(accentDecl(docs, /:root\s*\{([\s\S]*?--accent:[\s\S]*?)\n\}/)).toBe("#2f52d4");
+  it("ember matches the default (unscoped) accent in global.css", () => {
+    expect(accentDecl(docs, /:root\s*\{([\s\S]*?--accent:[\s\S]*?)\n\}/)).toBe("#c2410c");
+    expect(accentDecl(docs, /\.dark\s*\{([\s\S]*?--accent:[\s\S]*?)\n\}/)).toBe("#f7924e");
   });
 });
 

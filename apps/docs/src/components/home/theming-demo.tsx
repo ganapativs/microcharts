@@ -7,6 +7,7 @@ import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { Bullet } from "@microcharts/react/bullet";
 import { Delta } from "@microcharts/react/delta";
 import { StackedArea } from "@microcharts/react/stacked-area";
+import { INK_PRESET_CATS } from "@/lib/token-export";
 
 /**
  * 07 · Theming, live — the swatches call the REAL `defineTheme` and spread
@@ -16,26 +17,15 @@ import { StackedArea } from "@microcharts/react/stacked-area";
  */
 
 const ACCENTS = [
+  { name: "ember", hex: "#c2410c" },
   { name: "cobalt", hex: "#2f52d4" },
   { name: "violet", hex: "#6d28d9" },
-  { name: "ember", hex: "#c2410c" },
   { name: "moss", hex: "#4d7c1e" },
   { name: "teal", hex: "#0f766e" },
   { name: "rose", hex: "#be123c" },
 ] as const;
 
 const PRESETS: ThemePreset[] = ["modern", "editorial", "mono", "vivid", "print", "eink"];
-
-/** Presets whose whole point is a fixed ink set — the accent seed would
- *  clobber them (this was a real bug: eink kept the swatch's colors). The
- *  library presets deliberately leave `--mc-cat-*` alone (categorical data
- *  still needs distinction), so the demo hands each one a matching `cat`
- *  ramp — greys for greyscale output, print's own restrained inks for print. */
-const INK_PRESET_CATS: Partial<Record<ThemePreset, readonly string[]>> = {
-  mono: ["#111111", "#555555", "#8c8c8c", "#bfbfbf", "#dedede", "#737373"],
-  eink: ["#000000", "#4d4d4d", "#8c8c8c", "#c4c4c4", "#e0e0e0", "#666666"],
-  print: ["#14507a", "#0c6249", "#a33f22", "#7a5a12", "#666666", "#1a1a1a"],
-};
 
 const REVENUE = [132, 148, 141, 165, 159, 182, 176, 203];
 const MIX = [

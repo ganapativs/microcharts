@@ -106,7 +106,7 @@ function hslToRgb(h: number, s: number, l: number): number[] {
 /** Read the live `--accent` + theme, build the silk tone set. */
 function readTones(): ToneSet {
   const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
-  const hue = rgbToHue(resolveRgb(accent || "#2f52d4"));
+  const hue = rgbToHue(resolveRgb(accent || "#c2410c"));
   const P = document.documentElement.classList.contains("dark") ? PROFILE.dark : PROFILE.light;
   const tone = ([dh, s, l]: readonly number[]) => hslToRgb(hue + dh, s, l);
   return { paper: P.paper, a: tone(P.a), b: tone(P.b), c: tone(P.c) };
@@ -187,10 +187,20 @@ export function HeroSilk({ className = "" }: { className?: string }) {
       attributeFilter: ["class", "data-accent"],
     });
 
+    // Flip [data-ready] once, after the first frame has actually painted, so
+    // CSS can cross-fade the shader up over the grid + fallback ground.
+    let ready = false;
+    const markReady = () => {
+      if (ready) return;
+      ready = true;
+      canvas.dataset.ready = "";
+    };
+
     const frame = () => {
       resize();
       gl.uniform1f(uT, (performance.now() - t0) / 1000);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
+      markReady();
       if (!reduced && visible && document.visibilityState === "visible") {
         raf = requestAnimationFrame(frame);
       }
@@ -198,6 +208,7 @@ export function HeroSilk({ className = "" }: { className?: string }) {
     if (reduced) {
       gl.uniform1f(uT, 40);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
+      markReady();
       const ro = new ResizeObserver(() => {
         resize();
         gl.drawArrays(gl.TRIANGLES, 0, 3);

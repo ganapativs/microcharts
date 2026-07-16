@@ -225,21 +225,25 @@ region you're about to render.
 <Callout type="info">
   Every preset above carries a **Copy tokens** button, and the [studio below](#copy-tokens) lets you pair any preset
   with your own accent and copy the result for both modes. This site's appearance menu (the palette icon in the nav)
-  previews the same bundles live across every page — it's the exact token contract you'd use in your own app.
+  applies the same bundles live across every page — and picking an accent there re-hues every chart on the site,
+  including the categorical palette, because it derives one with [`defineTheme`](#build-a-theme-from-one-colour) exactly
+  like the studio does. It's the exact token contract you'd use in your own app.
 </Callout>
 
 ## Copy the tokens [#copy-tokens]
 
-Everything above, in one place. Pick a style, add your brand accent, choose a mode, and copy the exact `--mc-*` block —
-light and hand-tuned dark together — ready to paste into your app. The preview renders real charts in both modes and
-names each role it paints, so an accent choice shows up the instant you make it. What you copy is the same contract the
-library ships, never an approximation.
+Everything above, in one place — the live studio. Pick a style, add your brand accent, choose a mode, and copy the exact
+`--mc-*` block, light and hand-tuned dark together, ready to paste into your app. The preview renders real charts in
+both modes and names each role it paints, so a choice shows up the instant you make it: the emphasis line takes your
+accent _and_ the categorical bars re-hue to a matched palette **derived from it** by
+[`defineTheme`](#build-a-theme-from-one-colour) — the same engine the nav's appearance menu uses to re-theme the whole
+site. What you preview is exactly what you copy, and exactly what the library ships — never an approximation.
 
 <TokenStudio />
 
 Paste the CSS into any stylesheet and every chart in scope retunes. Prefer the component API? Switch the format to a
-tokens object and spread it onto [`MicroProvider`](#a-component-api-if-you-prefer) — or, to derive a whole matched
-palette from one accent instead of copying fixed values, reach for [`defineTheme`](#build-a-theme-from-one-colour).
+tokens object and spread it onto [`MicroProvider`](#a-component-api-if-you-prefer) — or reach for
+[`defineTheme`](#build-a-theme-from-one-colour) directly to derive that matched palette in code.
 
 ## A component API, if you prefer
 

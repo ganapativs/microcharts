@@ -8,9 +8,70 @@
 // files and fails the moment any value here drifts, so a copied theme is always
 // the real contract, never an approximation.
 
+import { defineTheme, type ThemePreset } from "@microcharts/react/theme";
 import { PRESETS, type Preset } from "./mc-tokens";
 
 export type TokenCategory = "ink" | "cat" | "geometry" | "type" | "surface" | "motion";
+
+// The six categorical slots, in order — the only tokens the accent-seeded
+// derivation touches.
+export const CAT_VARS = [
+  "--mc-cat-1",
+  "--mc-cat-2",
+  "--mc-cat-3",
+  "--mc-cat-4",
+  "--mc-cat-5",
+  "--mc-cat-6",
+] as const;
+
+// mono/print/eink own their whole ink set, so they carry a fixed categorical
+// ramp in their own family rather than an accent-derived one. `defineTheme`
+// takes these verbatim for light and derives the dark twins. One source for the
+// site CSS (global.css), the studio, the home widget, and the drift tests.
+export const INK_PRESET_CATS: Record<string, readonly string[]> = {
+  mono: ["#111111", "#555555", "#8c8c8c", "#bfbfbf", "#dedede", "#737373"],
+  eink: ["#000000", "#4d4d4d", "#8c8c8c", "#c4c4c4", "#e0e0e0", "#666666"],
+  print: ["#14507a", "#0c6249", "#a33f22", "#7a5a12", "#666666", "#1a1a1a"],
+};
+
+const isInkPreset = (preset: string): preset is "mono" | "eink" | "print" =>
+  preset in INK_PRESET_CATS;
+
+/**
+ * The real `defineTheme` output for a (preset, accent) selection, reduced to the
+ * categorical slots — the exact contract the site's [data-accent] /
+ * [data-mc-preset] CSS bakes. Returns `null` when nothing is derived (no accent
+ * on a non-ink preset → the curated default palette stands).
+ *
+ * This is THE shared engine: the global picker (baked to CSS), the theming
+ * studio's preview + copy, and the home widget all resolve categoricals through
+ * it, so a brand accent looks identical everywhere and matches what you copy.
+ */
+export function deriveCatPalette(
+  preset: string,
+  accent: string | null,
+): { light: Record<string, string>; dark: Record<string, string> } | null {
+  const pick = (vars: Readonly<Record<string, string>>) =>
+    Object.fromEntries(CAT_VARS.filter((v) => v in vars).map((v) => [v, vars[v]!]));
+
+  if (isInkPreset(preset)) {
+    const t = defineTheme({ extends: preset, cat: INK_PRESET_CATS[preset] });
+    return { light: pick(t.vars), dark: pick(t.darkVars) };
+  }
+  // Every brand accent — cobalt included — derives its own matched categorical
+  // palette, so the categories always lead with the accent's own hue (cobalt →
+  // blue, ember → warm, …). Consistent across the studio, appearance menu, site,
+  // and home widget. `null` only when no accent at all (bare library defaults).
+  if (!accent) return null;
+  const seed = ACCENTS.find((a) => a.id === accent);
+  if (!seed) return null;
+  const t = defineTheme(
+    preset === "modern"
+      ? { accent: seed.light }
+      : { extends: preset as ThemePreset, accent: seed.light },
+  );
+  return { light: pick(t.vars), dark: pick(t.darkVars) };
+}
 
 type BaseToken = {
   cssVar: string;
@@ -150,11 +211,12 @@ export const PRESET_DARK_TWINS: Record<string, Record<string, string>> = {
 export type Accent = { id: string; label: string; light: string; dark: string };
 
 // Docs accent bundles (global.css) expressed as the one library token they
-// drive: `--mc-accent`. "cobalt" is the docs default; picking it emits an
-// explicit override to that hue. Mirrors `:root[data-accent]` / `.dark[…]`.
+// drive: `--mc-accent`. "ember" is the docs default (base :root); picking any
+// accent emits an explicit override to that hue. Mirrors `:root[data-accent]` /
+// `.dark[…]`, with Ember also the unscoped base.
 export const ACCENTS: Accent[] = [
-  { id: "cobalt", label: "Cobalt", light: "#2f52d4", dark: "#7f9cf5" },
   { id: "ember", label: "Ember", light: "#c2410c", dark: "#f7924e" },
+  { id: "cobalt", label: "Cobalt", light: "#2f52d4", dark: "#7f9cf5" },
   { id: "clay", label: "Clay", light: "#a14a34", dark: "#e08e73" },
   { id: "moss", label: "Moss", light: "#4d7c1e", dark: "#a3c46a" },
   { id: "teal", label: "Teal", light: "#0f766e", dark: "#55c2b3" },
@@ -195,6 +257,9 @@ export function resolveTokens(opts: Pick<ExportOptions, "preset" | "accent" | "i
   const twin = PRESET_DARK_TWINS[preset.id] ?? {};
   const accent = opts.accent ? (ACCENTS.find((a) => a.id === opts.accent) ?? null) : null;
   const presetDelta = Object.fromEntries(preset.changes.map((c) => [c.cssVar, c.value]));
+  // Accent-seeded / ink-preset categorical palette from the real defineTheme —
+  // the same values the site's [data-accent] CSS bakes, so preview = copy = site.
+  const cats = deriveCatPalette(opts.preset, opts.accent);
 
   const light: { cssVar: string; value: string; note: string }[] = [];
   const dark: { cssVar: string; value: string; note: string }[] = [];
@@ -202,16 +267,18 @@ export function resolveTokens(opts: Pick<ExportOptions, "preset" | "accent" | "i
   for (const t of BASE_TOKENS) {
     if (!inInclude(t.category, opts.include)) continue;
 
-    // light = base → preset → accent
+    // light = base → preset → derived cat → accent
     let lv = t.light;
     if (t.cssVar in presetDelta) lv = presetDelta[t.cssVar]!;
+    if (cats && t.cssVar in cats.light) lv = cats.light[t.cssVar]!;
     if (accent && t.cssVar === "--mc-accent") lv = accent.light;
     light.push({ cssVar: t.cssVar, value: lv, note: t.note });
 
-    // dark = base-dark → preset → twin → accent
+    // dark = base-dark → preset → twin → derived cat → accent
     let dv = t.dark ?? t.light;
     if (t.cssVar in presetDelta) dv = presetDelta[t.cssVar]!;
     if (t.cssVar in twin) dv = twin[t.cssVar]!;
+    if (cats && t.cssVar in cats.dark) dv = cats.dark[t.cssVar]!;
     if (accent && t.cssVar === "--mc-accent") dv = accent.dark;
     dark.push({ cssVar: t.cssVar, value: dv, note: t.note });
   }

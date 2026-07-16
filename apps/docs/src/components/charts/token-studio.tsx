@@ -3,10 +3,12 @@ import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { MiniBar } from "@microcharts/react/mini-bar";
+import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { cn } from "@/lib/cn";
 import { PRESETS } from "@/lib/mc-tokens";
 import {
   ACCENTS,
+  INK_PRESET_CATS,
   resolveTokens,
   serializeTokens,
   type Mode,
@@ -31,6 +33,14 @@ const PREVIEW_BARS = [
   { label: "e", value: 3 },
   { label: "f", value: 7 },
   { label: "g", value: -4 },
+];
+// Multi-series mix — the one preview mark that reads the categorical palette, so
+// a brand accent's DERIVED categories (not just the emphasis ink) are visible.
+const PREVIEW_MIX = [
+  { label: "Chrome", value: 62 },
+  { label: "Safari", value: 24 },
+  { label: "Firefox", value: 9 },
+  { label: "Edge", value: 5 },
 ];
 
 // A compact segmented control — the studio's workhorse toggle.
@@ -115,22 +125,26 @@ function PreviewPane({
       <span className={cn("mono-label absolute left-2.5 top-2 text-[0.5rem] !text-current", dim)}>
         {label}
       </span>
-      <div className="flex w-full flex-1 flex-col justify-center gap-2">
+      {/* hv-theme-stage eases fill/stroke between palettes, so a swatch change
+          reads as an intentional re-theme, not a hard flip (shared with the
+          home widget). Three marks: accent line, derived categories, valence. */}
+      <div className="hv-theme-stage flex w-full flex-1 flex-col justify-center gap-2">
         <Sparkline
           data={PREVIEW_SERIES}
           width={200}
-          height={30}
+          height={28}
           curve="smooth"
           fill
           dots="minmax"
           summary={false}
         />
+        <SegmentedBar data={PREVIEW_MIX} width={200} height={14} summary={false} />
         <MiniBar
           data={PREVIEW_BARS}
           positive="up"
           highlight="f"
           width={200}
-          height={18}
+          height={16}
           summary={false}
         />
       </div>
@@ -159,12 +173,20 @@ const PRESET_OPTS = PRESETS.map((p) => ({ id: p.id, label: p.label }));
 
 export function TokenStudio() {
   const [preset, setPreset] = useState("modern");
-  const [accent, setAccent] = useState<string | null>(null);
+  // Ember is the default, mirroring the site + appearance menu.
+  const [accentChoice, setAccent] = useState<string | null>("ember");
   const [mode, setMode] = useState<Mode>("both");
   const [include, setInclude] = useState<"color" | "all">("color");
   const [format, setFormat] = useState<Format>("css");
   const [scope, setScope] = useState(":root");
   const [annotate, setAnnotate] = useState(false);
+
+  // mono/print/eink own their entire ink set including the categorical ramp, so
+  // a brand accent has nothing to attach to — mirror the home widget and ignore
+  // the accent while one is active (the swatch stays remembered for when you
+  // switch back). Everything below reads `accent` so preview = copy.
+  const inkPreset = preset in INK_PRESET_CATS;
+  const accent = inkPreset ? null : accentChoice;
 
   const code = useMemo(
     () =>
@@ -207,28 +229,32 @@ export function TokenStudio() {
         </FieldRow>
 
         <FieldRow label="Accent">
-          <div className="flex flex-wrap gap-1.5">
-            <AccentDot
-              label="None"
-              swatch={null}
-              active={accent === null}
-              onSelect={() => setAccent(null)}
-            />
+          <div
+            className={cn("flex flex-wrap gap-1.5", inkPreset && "pointer-events-none opacity-40")}
+          >
             {ACCENTS.map((a) => (
               <AccentDot
                 key={a.id}
                 label={a.label}
                 swatch={a.light}
-                active={accent === a.id}
+                active={accentChoice === a.id}
                 onSelect={() => setAccent(a.id)}
               />
             ))}
           </div>
-          {accent && presetPinsAccent(preset) && (
+          {inkPreset ? (
             <p className="mt-1.5 text-[0.68rem] leading-snug text-fd-muted-foreground">
-              Heads up — <code className="text-[0.66rem]">{preset}</code> pins its own accent, so
-              this override is what makes yours win.
+              <code className="text-[0.66rem]">{preset}</code> owns its whole ink set — accent,
+              valence, and categories — so a brand accent doesn&apos;t apply here.
             </p>
+          ) : (
+            accentChoice &&
+            presetPinsAccent(preset) && (
+              <p className="mt-1.5 text-[0.68rem] leading-snug text-fd-muted-foreground">
+                Heads up — <code className="text-[0.66rem]">{preset}</code> pins its own accent, so
+                this override is what makes yours win. Its categories derive from your accent.
+              </p>
+            )
           )}
         </FieldRow>
 
