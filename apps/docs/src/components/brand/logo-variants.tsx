@@ -11,7 +11,7 @@ export function BrandLogoVariants() {
       <Reveal className="mb-8 max-w-2xl">
         <h2 className="display text-[length:var(--text-fluid-h2)]">Six SVGs. Copy or download.</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
-          Primary Cobalt, adaptive for light/dark hosts, mono inks, and two accent siblings. Each
+          Primary Ember, adaptive for light/dark hosts, mono inks, and two accent siblings. Each
           file is the shipped asset under{" "}
           <span className="font-mono text-fd-foreground">/brand</span>.
         </p>

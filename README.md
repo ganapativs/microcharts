@@ -9,10 +9,10 @@ server-component safe.
 
 <br>
 
-[![npm](https://img.shields.io/npm/v/@microcharts/react?color=2f52d4&label=npm)](https://www.npmjs.com/package/@microcharts/react)
-[![gzip per chart](https://img.shields.io/badge/per_chart-0.91–3.61_kB_gz-2f52d4)](https://microcharts.dev/docs/performance)
+[![npm](https://img.shields.io/npm/v/@microcharts/react?color=c2410c&label=npm)](https://www.npmjs.com/package/@microcharts/react)
+[![gzip per chart](https://img.shields.io/badge/per_chart-0.91–3.61_kB_gz-c2410c)](https://microcharts.dev/docs/performance)
 [![zero dependencies](https://img.shields.io/badge/dependencies-0-077353)](https://microcharts.dev)
-[![types](https://img.shields.io/npm/types/@microcharts/react?color=2f52d4)](https://microcharts.dev)
+[![types](https://img.shields.io/npm/types/@microcharts/react?color=c2410c)](https://microcharts.dev)
 [![React 18 · 19](https://img.shields.io/badge/React-18_·_19-077353)](https://microcharts.dev/docs/quickstart)
 [![MIT](https://img.shields.io/npm/l/@microcharts/react?color=666)](./LICENSE)
 [![Reviewed with Argos](https://argos-ci.com/badge.svg)](https://argos-ci.com?utm_source=ganapativs/microcharts&utm_campaign=oss)
