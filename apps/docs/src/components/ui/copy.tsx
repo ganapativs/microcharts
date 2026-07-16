@@ -29,7 +29,13 @@ export function CopyButton({
       }}
       className={cn("ghost-ctrl", SIZE[size], className)}
     >
-      {copied ? <Check className="size-4 text-fd-primary" /> : <Copy className="size-4" />}
+      {copied ? (
+        // The check pops in on success — a small, satisfying beat on the page's
+        // most-copied moment (the install command). .pop-in is reduced-motion gated.
+        <Check className="size-4 text-fd-primary pop-in" />
+      ) : (
+        <Copy className="size-4" />
+      )}
     </button>
   );
 }

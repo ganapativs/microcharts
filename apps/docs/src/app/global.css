@@ -693,6 +693,14 @@ body {
       transform: translateY(-2px);
     }
   }
+  /* Press feedback for the interactive lift cards (copyable colour chips, link
+     cards): the raised card presses down + in on pointer-down, fast, then
+     settles back up via the base 0.32s curve on release. Not hover-gated —
+     touch presses too. */
+  .glass-lift:active {
+    transform: scale(0.98);
+    transition-duration: 0.12s;
+  }
 
   /* In-panel dividers — gallery .g2-meta shelf parity. */
   .panel :where([class*="border-hairline"]),
@@ -1202,6 +1210,14 @@ body {
     color: var(--color-fd-primary);
     background-color: color-mix(in oklab, var(--accent) 16%, transparent);
   }
+  /* Tactile press for every dock control — instant scale on pointer-down (the
+     dock is the gallery's most-clicked surface), matching .ghost-ctrl. Color
+     keeps easing via each control's own transition; the scale is deliberately
+     un-transitioned so the press registers now, not over a curve. */
+  .g2-pill:not(:disabled):active,
+  .g2-icon-btn:active {
+    transform: scale(0.94);
+  }
   /* Fingers need bigger targets than a cursor — grow the dock controls to the
      44px minimum on touch/coarse pointers, without bloating the mouse layout. */
   @media (pointer: coarse) {
@@ -1429,6 +1445,10 @@ body {
    utility on the buttons that carry one (same specificity, later layer). */
 .cta-accent:active {
   transform: scale(0.97) !important;
+  /* Press must register instantly (Apple: feedback on press, ~100ms), not ease
+     in over the base 0.3s hover-lift curve. Only the press-down is fast; on
+     release the base transition resumes so the button settles back gracefully. */
+  transition-duration: 0.1s;
 }
 
 /* Secondary action — quiet frost at button scale. Every small text/icon action
@@ -2027,7 +2047,11 @@ div:where(
   opacity: 0;
   transform: translateY(16px);
   filter: blur(6px);
-  will-change: opacity, transform, filter;
+  /* No will-change here: pending is the idle rest state held (for every
+     below-fold reveal) until the observer fires at the viewport edge, so the
+     hint buys ~no lead time while pinning a GPU layer per element — the blur
+     backing store worst of all. The one-shot rise-in still composites fine
+     (transform/opacity/filter are all compositor properties). */
 }
 [data-reveal="in"] {
   animation: rise-in 0.72s var(--ease-out-quint) both;
