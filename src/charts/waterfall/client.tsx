@@ -2,18 +2,11 @@
 // Interactive <Waterfall>. One pointer listener; step by x-band.
 // ←/→ rove steps ("Refunds: −140, running 1,410."); End focuses the total.
 // Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue } from "../../core/types.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { waterfallGeometry } from "./geometry.js";
@@ -47,13 +40,6 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     style,
     ...rest
   } = props;
-
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Waterfall bars float between running totals rather than sharing a zero
@@ -149,8 +135,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-waterfall-live ${className}` : "mc-waterfall-live"}
-      style={wrapStyle}
+      {...wrap("mc-waterfall-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

@@ -4,17 +4,10 @@
 // (not slot — quiet slots are skippable context). Announces via the shared
 // point template; quiet slots use the pointEmpty wording (ActivityGrid
 // parity). Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -141,18 +134,10 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
 
   const slotW = rendered.length > 0 ? width / rendered.length : 0;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-seismo-live ${className}` : "mc-seismo-live"}
-      style={wrapStyle}
+      {...wrap("mc-seismo-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

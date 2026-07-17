@@ -3,17 +3,10 @@
 // nearest-x: history points announce a value, forecast points announce the
 // median + 80% interval. ←/→ step; Home/End jump the ends. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.js";
@@ -159,18 +152,10 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
       : `${fmt(p.value)} · ${fmt(p.lo!)}–${fmt(p.hi!)}`
     : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-forecast-cone-live ${className}` : "mc-forecast-cone-live"}
-      style={wrapStyle}
+      {...wrap("mc-forecast-cone-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

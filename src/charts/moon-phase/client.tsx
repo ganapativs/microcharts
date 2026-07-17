@@ -3,9 +3,9 @@
 // change the lit region cross-fades (opacity, NOT d: interpolation — );
 // announces through a polite region, throttled to ≥1 s. Wrapper focus only.
 // Composes the static component.
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap as wrapAttrs } from "../../shared/interactive.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { MoonPhase as StaticMoonPhase, moonPhaseSummary, type MoonPhaseProps } from "./index.js";
 
@@ -78,18 +78,10 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
   const pct = `${Math.round(Math.min(1, Math.max(0, value)) * 100)}%`;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={wrap}
-      className={className ? `mc-moon-live ${className}` : "mc-moon-live"}
-      style={wrapStyle}
+      {...wrapAttrs("mc-moon-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

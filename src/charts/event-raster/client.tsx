@@ -2,16 +2,9 @@
 // Interactive <EventRaster>. One pointer listener; lane from y,
 // nearest event from x. ↑/↓ lanes, ←/→ events within a lane (2-D keyboard,
 // ActivityGrid model). Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_EVENT_RASTER } from "../../core/strings-event-raster.js";
@@ -158,18 +151,10 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
       ? strings.eventRasterAt(lanes[pos.lane]!.label, fmt(t), pos.ev + 1, evs.length)
       : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-raster-live ${className}` : "mc-raster-live"}
-      style={wrapStyle}
+      {...wrap("mc-raster-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

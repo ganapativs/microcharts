@@ -2,16 +2,9 @@
 // Interactive <LikertStrip>. One pointer listener; segment by
 // x-band lookup. ←/→ step levels in DATA order ("Agree: 34%, level 4 of 5.").
 // Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { likertStripGeometry } from "./geometry.js";
@@ -129,18 +122,10 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
       ? strings.likertAt(datum.label, pctFmt(seg.share), seg.level + 1, data.length)
       : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-likert-live ${className}` : "mc-likert-live"}
-      style={wrapStyle}
+      {...wrap("mc-likert-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

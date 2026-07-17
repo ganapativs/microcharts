@@ -3,17 +3,10 @@
 // math across history AND the projection region. ←/→ step days, Home/End jump
 // start/deadline. Composes the static component (canon); the crosshair + marker
 // are overlay children.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_BURN, type BurnStrings } from "../../core/strings-burn.js";
@@ -172,18 +165,10 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
           : ""
     : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-burn-chart-live ${className}` : "mc-burn-chart-live"}
-      style={wrapStyle}
+      {...wrap("mc-burn-chart-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

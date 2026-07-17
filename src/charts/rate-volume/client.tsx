@@ -3,18 +3,11 @@
 // math. ←/→ step periods; the live region ALWAYS pairs both numbers — a rate is
 // never announced without its volume. Composes the static component (canon); the
 // crosshair + bar highlight are overlay children re-using geometry.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { rateVolumeGeometry } from "./geometry.js";
@@ -171,18 +164,10 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
           )
         : strings.rateVolumeNoEvents(active + 1, total);
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-rate-volume-live ${className}` : "mc-rate-volume-live"}
-      style={wrapStyle}
+      {...wrap("mc-rate-volume-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

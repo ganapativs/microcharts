@@ -3,8 +3,8 @@
 // visual, wrapped focusable, with a readout of the exact value vs target revealed
 // on hover or focus. The wrapper owns the accessible name (role=img); the inner
 // static chart is decorative so the reading isn't announced twice.
-import { useRef, useState, type CSSProperties } from "react";
-import { FILL } from "../../shared/interactive.js";
+import { useRef, useState } from "react";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
@@ -54,18 +54,10 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
             : ""
         }`;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-bullet-interactive ${className}` : "mc-bullet-interactive"}
-      style={wrapStyle}
+      {...wrap("mc-bullet-interactive", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

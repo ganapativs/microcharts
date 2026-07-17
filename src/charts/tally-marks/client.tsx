@@ -4,8 +4,8 @@
 // stroke-dashoffset sweep (≤200 ms, reduced-motion → instant). No pointer or
 // keyboard model beyond wrapper focus — a count has no sub-parts to navigate.
 // Composes the static component (canon); geometry is never re-implemented.
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { FILL } from "../../shared/interactive.js";
+import { useEffect, useRef, useState } from "react";
+import { FILL, wrap as wrapAttrs } from "../../shared/interactive.js";
 import { EN_TALLY, type TallyStrings } from "../../core/strings-tally.js";
 import { TallyMarks as StaticTallyMarks, tallySummary, type TallyMarksProps } from "./index.js";
 
@@ -18,12 +18,6 @@ export interface InteractiveTallyMarksProps extends TallyMarksProps {
 export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
   const { live = true, strings = EN_TALLY, title, value, pen, className, style, ...rest } = props;
   const summary = tallySummary(value, strings);
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
   const wrap = useRef<HTMLSpanElement>(null);
   const prev = useRef(value);
   // length of the path at the previous count — lets a +1 draw ONLY the newly
@@ -72,8 +66,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
   return (
     <span
       ref={wrap}
-      className={className ? `mc-tally-live ${className}` : "mc-tally-live"}
-      style={wrapStyle}
+      {...wrapAttrs("mc-tally-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

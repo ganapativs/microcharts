@@ -4,16 +4,9 @@
 // trapping it to cycle violations would break keyboard escape; the violations
 // are visible as rings.) Composes the static component (canon); the crosshair +
 // readout chip are overlay children.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CONTROL, type ControlStrings } from "../../core/strings-control.js";
@@ -136,18 +129,10 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
         )
       : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-control-strip-live ${className}` : "mc-control-strip-live"}
-      style={wrapStyle}
+      {...wrap("mc-control-strip-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

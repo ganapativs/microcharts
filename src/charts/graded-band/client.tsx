@@ -3,16 +3,9 @@
 // edge math. ←/→ step levels outward/inward from the median; each announces its
 // interval ("80% interval: 17 to 26."). Composes the static component (canon);
 // the edge ticks are overlay children re-using geometry.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
@@ -131,18 +124,10 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
   const band = active !== null ? stops[active] : undefined;
   const announced = band ? strings.bandEdge(band.p, fmt(band.lo), fmt(band.hi)) : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-graded-band-live ${className}` : "mc-graded-band-live"}
-      style={wrapStyle}
+      {...wrap("mc-graded-band-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

@@ -1,16 +1,9 @@
 "use client";
 // Interactive <FoldedDayBand>. One pointer listener; nearest fold
 // bin by x. ←/→ rove bins. Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FOLDED_BAND } from "../../core/strings-folded-band.js";
@@ -131,18 +124,10 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
       )
     : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-folded-live ${className}` : "mc-folded-live"}
-      style={wrapStyle}
+      {...wrap("mc-folded-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

@@ -2,16 +2,9 @@
 // Interactive <DualWindowMeter>. One pointer listener; nearest
 // sample by x reveals both window values against the target. ←/→ rove points.
 // Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DUAL_WINDOW } from "../../core/strings-dual-window.js";
@@ -123,18 +116,10 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
       : "";
   const crossX = active != null ? xOf(active) : 0;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-dualwin-live ${className}` : "mc-dualwin-live"}
-      style={wrapStyle}
+      {...wrap("mc-dualwin-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={labelText}

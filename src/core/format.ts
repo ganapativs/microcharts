@@ -35,17 +35,16 @@ export function makeFormatter(
   locale: string | string[] | undefined,
   defaults?: Intl.NumberFormatOptions,
 ): (n: number) => string {
+  // Snap the number to 12 significant digits first (`toPrecision` passes
+  // ±Infinity/NaN through unchanged) — far more than any label shows, yet inside
+  // the ~15–17 digits where binary-float noise appears.
+  const clean = (n: number) => Number(n.toPrecision(12));
   if (typeof format === "function") {
     const fn = format;
-    return (n) => fn(cleanFloat(n));
+    return (n) => fn(clean(n));
   }
   const nf = cachedNumberFormat(locale, format ?? defaults);
-  return (n) => nf.format(cleanFloat(n));
-}
-
-/** Snap IEEE arithmetic noise to a human-readable value without touching real precision. */
-function cleanFloat(n: number): number {
-  return Number.isFinite(n) ? Number(n.toPrecision(12)) : n;
+  return (n) => nf.format(clean(n));
 }
 
 // Cached date/time formatting — same caching

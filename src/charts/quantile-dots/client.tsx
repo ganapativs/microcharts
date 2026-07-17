@@ -3,16 +3,9 @@
 // threshold; the count past it recomputes purely. ←/→ nudge the probe one bin,
 // Enter announces, Esc returns to the prop threshold. Composes the static
 // component with the live threshold (canon); the readout chip reports the odds.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-quantile-dots.js";
@@ -167,18 +160,10 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
       ? strings.quantileDots(geo.past, geo.count, side, fmt(activeThreshold))
       : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-quantile-dots-live ${className}` : "mc-quantile-dots-live"}
-      style={wrapStyle}
+      {...wrap("mc-quantile-dots-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

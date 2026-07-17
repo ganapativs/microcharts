@@ -2,15 +2,8 @@
 // Interactive <TimeInRange>. One pointer listener; zone by x/y
 // lookup. ←/→ (or ↑/↓ vertical) rove zones, each announcing "{zone}: {pct}".
 // Composes the static component (canon) — overlays ride as children.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
-import { FILL } from "../../shared/interactive.js";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TIME_IN_RANGE } from "../../core/strings-time-in-range.js";
@@ -46,13 +39,6 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
     ...rest
   } = props;
   const horizontal = orientation !== "vertical";
-
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // A composition bar should ASSEMBLE, not fade in place: each zone grows from
@@ -153,8 +139,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-tir-live ${className}` : "mc-tir-live"}
-      style={wrapStyle}
+      {...wrap("mc-tir-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

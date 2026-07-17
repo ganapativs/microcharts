@@ -2,15 +2,8 @@
 // Interactive <PartitionStrip>. One pointer listener; segment by
 // row (y) + x lookup. ←/→ within a row, ↑/↓ between a parent and its first child
 // (2-D keyboard, ActivityGrid model). Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
-import { FILL } from "../../shared/interactive.js";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PARTITION } from "../../core/strings-partition.js";
@@ -131,18 +124,10 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
   const announced = seg ? strings.partitionAt(seg.label, pctOf(seg.share), parentClause) : "";
   const y = seg ? (seg.row === 0 ? inset : inset + rowH + 1) : 0;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-partition-live ${className}` : "mc-partition-live"}
-      style={wrapStyle}
+      {...wrap("mc-partition-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

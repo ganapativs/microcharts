@@ -4,9 +4,9 @@
 // user can step field-by-field (station, wind, sky, temp, dew, pressure) instead
 // of hearing one long string. Focus reads the whole observation; Home returns to
 // it. Composes the static entry (canon) — no re-implemented SVG.
-import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STATION_GLYPH } from "../../core/strings-station-glyph.js";
@@ -49,13 +49,6 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
   const fmt = makeFormatter(format, locale);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
-
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
 
   const full =
     summary === false
@@ -117,8 +110,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-station-live ${className}` : "mc-station-live"}
-      style={wrapStyle}
+      {...wrap("mc-station-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

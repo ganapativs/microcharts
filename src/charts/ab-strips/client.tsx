@@ -3,16 +3,9 @@
 // x snaps to the nearest quantile edge. ↑/↓ switch rows, ←/→ step edges. The
 // median edge announces the row median + delta vs the other arm; other edges
 // announce the percentile. Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
@@ -153,18 +146,10 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
         : strings.abEdge(labels[activeRow]!, active.p, fmt(active.value))
       : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-ab-strips-live ${className}` : "mc-ab-strips-live"}
-      style={wrapStyle}
+      {...wrap("mc-ab-strips-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

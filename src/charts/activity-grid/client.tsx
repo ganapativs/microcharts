@@ -3,20 +3,13 @@
 // hover a cell for its value, or roving-focus the grid and walk it in 2-D with
 // the arrow keys. Composes the static component (summary={false}, focus ring as its child),
 // one pointer listener on the wrapper, announcements via SummaryStrings.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { activityGridGeometry } from "./geometry.js";
 import {
   ActivityGrid as StaticActivityGrid,
@@ -151,18 +144,10 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         ? strings.pointEmpty(activeCell.index + 1, geo.cells.length)
         : strings.point(activeCell.index + 1, geo.cells.length, fmt(activeCell.value));
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-activity-interactive ${className}` : "mc-activity-interactive"}
-      style={wrapStyle}
+      {...wrap("mc-activity-interactive", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

@@ -5,16 +5,9 @@
 // measured value, or "no measurement" (the honest distinction). Composes the
 // static component (canon); the focus ring is an overlay child re-using the
 // same geometry.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.js";
 import { coverageGeometry } from "./geometry.js";
@@ -151,18 +144,10 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
       : strings.coverageSlot(active! + 1, cell.value === null ? "—" : fmt(cell.value));
   }
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-coverage-strip-live ${className}` : "mc-coverage-strip-live"}
-      style={wrapStyle}
+      {...wrap("mc-coverage-strip-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

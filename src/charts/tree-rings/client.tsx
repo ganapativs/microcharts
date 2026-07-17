@@ -2,9 +2,9 @@
 // Interactive <TreeRings>. Radial pointer lookup (distance from
 // centre → ring index) + ←/→ stepping inner→outer; the focused ring is ringed
 // and its period announced. Composes the static component.
-import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { treeRingsGeometry } from "./geometry.js";
@@ -40,13 +40,6 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     style,
     ...rest
   } = props;
-
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "grow", animate);
@@ -96,8 +89,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-tree-live ${className}` : "mc-tree-live"}
-      style={wrapStyle}
+      {...wrap("mc-tree-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

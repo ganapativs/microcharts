@@ -2,10 +2,10 @@
 // Interactive <CitySkyline>. x-band pointer lookup → highlight the
 // building + announce it; ←/→ roving; the lit fraction is announced as a percent
 // (secondary channel). Composes the static component.
-import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { citySkylineGeometry } from "./geometry.js";
@@ -115,18 +115,10 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
           )
       : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-skyline-live ${className}` : "mc-skyline-live"}
-      style={wrapStyle}
+      {...wrap("mc-skyline-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

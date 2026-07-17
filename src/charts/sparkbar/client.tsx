@@ -5,20 +5,13 @@
 // colors, endpoint label AND annotation children — the client only overlays a
 // focus outline + readout and owns interaction. Re-implementing the SVG here
 // used to mis-color win-loss ties and drop annotations/labels.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { describeSeries } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { labelMetrics, sparkBarGeometry } from "./geometry.js";
 import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
 
@@ -155,18 +148,10 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
   const activeBar = active !== null ? geo.bars.find((b) => b.index === active) : undefined;
   const activeValue = activeBar && isFiniteValue(activeBar.value) ? activeBar.value : null;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-sparkbar-interactive ${className}` : "mc-sparkbar-interactive"}
-      style={wrapStyle}
+      {...wrap("mc-sparkbar-interactive", className, style)}
       tabIndex={0}
       role="img"
       aria-label={[title, accName].filter(Boolean).join(". ") || undefined}

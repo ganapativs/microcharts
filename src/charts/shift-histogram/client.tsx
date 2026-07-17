@@ -3,17 +3,10 @@
 // (pointer x → bin). ←/→ step bins, M jumps to the two median bins. The live
 // region states each bin's before/after proportions. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { shiftHistogramGeometry } from "./geometry.js";
@@ -176,18 +169,10 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
     ? strings.shiftBin(fmt(b.x0), fmt(b.x1), pct(b.beforeShare), pct(b.afterShare))
     : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-shift-histogram-live ${className}` : "mc-shift-histogram-live"}
-      style={wrapStyle}
+      {...wrap("mc-shift-histogram-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

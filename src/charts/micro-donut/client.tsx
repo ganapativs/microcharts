@@ -2,16 +2,9 @@
 // Interactive <MicroDonut>. Pointer → wedge by atan2 angle
 // lookup (pure); ←/→ rove wedges. Disabled entirely when `decorative` — an
 // aria-hidden chart must not be a tab stop. Composes the static component.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
@@ -104,13 +97,6 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         : sharesSummary(rolled, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   const onPointerMove = useCallback(
     (e: PointerEvent<HTMLElement>) => {
       if (geo.wedges.length === 0) return;
@@ -159,8 +145,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-donut-live ${className}` : "mc-donut-live"}
-      style={wrapStyle}
+      {...wrap("mc-donut-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

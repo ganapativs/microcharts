@@ -3,16 +3,9 @@
 // reading math; ←/→ step readings and the live region states the percentile at
 // that reading. Composes the static component (canon) — the crosshair + focus
 // ring are overlay children, never a re-implemented SVG.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
@@ -124,18 +117,10 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
   const p = active !== null && geo ? geo.points[active] : undefined;
   const announced = p ? strings.percentileTraceAt(unit, p.index, pStr(p.value)) : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-percentile-trace-live ${className}` : "mc-percentile-trace-live"}
-      style={wrapStyle}
+      {...wrap("mc-percentile-trace-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

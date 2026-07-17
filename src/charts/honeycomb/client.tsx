@@ -2,9 +2,9 @@
 // Interactive <Honeycomb>. Announces the count on change; hover
 // reveals the "value of total" readout. No per-cell keyboard nav — cells are
 // anonymous units, not addressable data points. Composes the static component.
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
@@ -55,18 +55,10 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
   const fmt = makeFormatter(format, locale);
   const readout = `${fmt(Math.max(0, Math.round(value)))} / ${fmt(Math.floor(total))}`;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-honeycomb-live ${className}` : "mc-honeycomb-live"}
-      style={wrapStyle}
+      {...wrap("mc-honeycomb-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

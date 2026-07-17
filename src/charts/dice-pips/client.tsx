@@ -2,9 +2,9 @@
 // Interactive <DicePips>. Announces the new face through a polite
 // region on change; the pip set cross-fades (opacity, reduced-motion → instant).
 // No sub-part navigation — the pips are one value. Composes the static component.
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap as wrapAttrs } from "../../shared/interactive.js";
 import { DicePips as StaticDicePips, dicePipsSummary, type DicePipsProps } from "./index.js";
 
 export interface InteractiveDicePipsProps extends DicePipsProps {
@@ -49,18 +49,10 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={wrap}
-      className={className ? `mc-dice-live ${className}` : "mc-dice-live"}
-      style={wrapStyle}
+      {...wrapAttrs("mc-dice-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

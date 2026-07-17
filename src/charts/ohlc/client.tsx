@@ -2,17 +2,10 @@
 // Interactive <Ohlc>. Nearest-x lookup; ←/→ steps the RENDERED
 // periods ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close
 // 148.20."). Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { ohlcGeometry } from "./geometry.js";
@@ -161,18 +154,10 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
         )
       : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-ohlc-live ${className}` : "mc-ohlc-live"}
-      style={wrapStyle}
+      {...wrap("mc-ohlc-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

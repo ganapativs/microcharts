@@ -6,10 +6,10 @@
 // reduced-motion (→ the static frame; dash density already carries rate) and
 // on-screen (paused off-viewport). Composes the static component (canon); a polite
 // live region announces threshold crossings only.
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { orbitStatusGeometry } from "./geometry.js";
@@ -91,18 +91,10 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     else setAnnounced(orbitStatusSummary(latency, rate, { alert, strings, format, locale }));
   }, [geo.satellite.alerted, latency, rate, alert, strings, fmt, format, locale]);
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={wrapRef}
-      className={className ? `mc-orbit-live ${className}` : "mc-orbit-live"}
-      style={wrapStyle}
+      {...wrap("mc-orbit-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

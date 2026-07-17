@@ -2,16 +2,9 @@
 // Interactive <RugStrip>. One pointer listener; nearest tick by
 // binary search over the sorted positions. ←/→ step through the SORTED
 // observations ("5.2 — 19th of 38."). Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
@@ -139,18 +132,10 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
     ? strings.observation(fmt(activeTick.value), (active ?? 0) + 1, geo.ticks.length)
     : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-rug-live ${className}` : "mc-rug-live"}
-      style={wrapStyle}
+      {...wrap("mc-rug-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

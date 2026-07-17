@@ -4,21 +4,26 @@
 //
 //   1. destructure `className` + `style` from props (so they DON'T leak to the
 //      composed static via `...rest`),
-//   2. forward `className` onto the focusable wrapper (`mc-…-live ${className}`),
-//   3. spread `...style` into the wrapper style, and
-//   4. put `style={FILL}` on the composed <Static…> so the inner SVG always
+//   2. spread the shared `wrap("mc-…-live", className, style)` helper onto the
+//      focusable wrapper — it composes the consumer className after the base
+//      class and merges the consumer style over the wrapper base, and
+//   3. put `style={FILL}` on the composed <Static…> so the inner SVG always
 //      fills the wrapper.
 //
-// Break any one and the wrapper's box decouples from the rendered SVG: a
-// consumer that stretches the chart (`style={{ width: "100%" }}`, a flex/grid
-// cell) gets a chart that won't fill, or — worse — one whose pointer→SVG map
-// and highlight land in different places (the activity-grid hover-drift bug).
+// The wrapper className/style logic lives in ONE place (shared/interactive.ts)
+// so every entry pays for it once and it can't drift chart-to-chart; the unit
+// test at the bottom pins that helper's behavior. Break the delegation and the
+// wrapper's box decouples from the rendered SVG: a consumer that stretches the
+// chart (`style={{ width: "100%" }}`, a flex/grid cell) gets a chart that won't
+// fill, or — worse — one whose pointer→SVG map and highlight land in different
+// places (the activity-grid hover-drift bug).
 //
 // This guard is a static-analysis gate so a NEW interactive chart can't quietly
 // regress the contract the way activity-grid diverged from calendar-strip.
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it, expect } from "vitest";
+import { wrap } from "../shared/interactive.js";
 
 const CHARTS_DIR = join(import.meta.dirname, "..", "charts");
 
@@ -61,14 +66,14 @@ describe("interactive fill contract", () => {
     if (!composesStatic || !hasWrapper) continue;
 
     describe(name, () => {
-      it("forwards `className` onto the wrapper (not the composed SVG)", () => {
-        expect(src, `${name}: wrapper className must interpolate the consumer className`).toMatch(
-          /className=\{[^}]*\$\{className\}/,
+      it("delegates wrapper className + style to the shared `wrap` helper", () => {
+        // The focusable wrapper spreads `wrap("mc-…-live", className, style)` (or
+        // the `wrapAttrs` alias where a local `wrap` ref exists), routing BOTH
+        // the consumer className and style through the one shared composer — so
+        // neither can reach the composed SVG and the merge can't drift per chart.
+        expect(src, `${name}: wrapper must spread wrap(base, className, style)`).toMatch(
+          /\{\.\.\.wrap(?:Attrs)?\(\s*"[^"]+",\s*className,\s*style\s*\)\}/,
         );
-      });
-
-      it("spreads consumer `style` into the wrapper", () => {
-        expect(src, `${name}: wrapper style must spread ...style`).toMatch(/\.\.\.style\b/);
       });
 
       it("fills the wrapper with FILL on the composed static", () => {
@@ -86,4 +91,19 @@ describe("interactive fill contract", () => {
       });
     });
   }
+
+  describe("shared wrap() helper", () => {
+    it("composes className after the base class", () => {
+      expect(wrap("mc-x", "user", undefined).className).toBe("mc-x user");
+      expect(wrap("mc-x", undefined, undefined).className).toBe("mc-x");
+    });
+
+    it("merges consumer style over the wrapper base (base wins nothing it sets)", () => {
+      const base = wrap("mc-x", undefined, undefined).style;
+      expect(base).toMatchObject({ display: "inline-block", position: "relative", lineHeight: 0 });
+      const merged = wrap("mc-x", undefined, { width: "100%", display: "block" }).style;
+      // consumer overrides win; untouched base keys survive.
+      expect(merged).toMatchObject({ display: "block", width: "100%", position: "relative" });
+    });
+  });
 });

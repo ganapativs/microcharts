@@ -6,8 +6,8 @@
 // reduced-motion (→ the static frame) and on-screen (→ paused off-viewport).
 // Composes the static component (canon); a polite live region announces BAND
 // changes only, never per tick.
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { FILL } from "../../shared/interactive.js";
+import { useEffect, useRef, useState } from "react";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -96,18 +96,10 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     return () => anim.cancel();
   }, [reduced, inView, geo.band, geo.unknown, wrapRef]);
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={wrapRef}
-      className={className ? `mc-breathing-live ${className}` : "mc-breathing-live"}
-      style={wrapStyle}
+      {...wrap("mc-breathing-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

@@ -3,9 +3,9 @@
 // width transitions (CSS, reduced-motion → snap) and a polite live region
 // re-announces at most every 10 s. No pointer scrub — there is no series.
 // Composes the static entry (canon).
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ETA_BAR } from "../../core/strings-eta-bar.js";
@@ -68,18 +68,10 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     }
   }, [full, announceEvery]);
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-eta-live ${className}` : "mc-eta-live"}
-      style={wrapStyle}
+      {...wrap("mc-eta-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

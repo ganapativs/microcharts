@@ -4,18 +4,11 @@
 // entry (component canon): the static renders the run bars, triangle tick and
 // count labels; the client only overlays a focus outline + readout and owns
 // interaction — the SVG is never re-implemented here.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { EN_STREAK_SPARK } from "../../core/strings-streak-spark.js";
 import { streakSparkGeometry } from "./geometry.js";
 import {
@@ -145,18 +138,10 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
       )
     : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-streak-interactive ${className}` : "mc-streak-interactive"}
-      style={wrapStyle}
+      {...wrap("mc-streak-interactive", className, style)}
       tabIndex={0}
       role="img"
       aria-label={[title, accName].filter(Boolean).join(". ") || undefined}

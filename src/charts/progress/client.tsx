@@ -3,8 +3,8 @@
 // region, throttled to whole-percent changes (no spam while a value streams).
 // Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
 // mark). Composes the static component (canon).
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { FILL } from "../../shared/interactive.js";
+import { useEffect, useRef, useState } from "react";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -51,18 +51,10 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
 
   const label = [title, model.summary].filter(Boolean).join(". ") || undefined;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-progress-live ${className}` : "mc-progress-live"}
-      style={wrapStyle}
+      {...wrap("mc-progress-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

@@ -10,3 +10,28 @@ import type { CSSProperties } from "react";
  * entry that hit-tests against the wrapper spreads this on its inner `<svg>`.
  */
 export const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
+
+/**
+ * Base style for a hit-testing interactive wrapper: an inline, positioned,
+ * line-height-collapsed box that hugs the composed SVG (so absolute overlay
+ * marks anchor to it and pointer→viewBox math stays exact).
+ */
+const WRAP: CSSProperties = { display: "inline-block", position: "relative", lineHeight: 0 };
+
+/**
+ * Compose the interactive wrapper's `className`/`style` from the chart's base
+ * class and the consumer's overrides. Centralized so every `…/interactive`
+ * entry costs one call instead of six inline lines (per-subpath size budgets):
+ * spread the result onto the focusable `<span>`. Consumer `style` merges over
+ * the base; `className` composes after the base class.
+ */
+export function wrap(
+  base: string,
+  className: string | undefined,
+  style: CSSProperties | undefined,
+): { className: string; style: CSSProperties } {
+  return {
+    className: className ? `${base} ${className}` : base,
+    style: style ? { ...WRAP, ...style } : WRAP,
+  };
+}

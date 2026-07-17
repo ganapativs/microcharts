@@ -2,11 +2,11 @@
 // Interactive <CalendarStrip>. Hover a day or walk the grid in
 // 2-D (←/→ day, ↑/↓ week — ActivityGrid parity). Announces the real calendar
 // day: "Tuesday, June 24: 12." Composes the static component (canon).
-import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
 import { cellMetrics } from "../../shared/cell.js";
 import { calendarStripGeometry } from "./geometry.js";
@@ -145,18 +145,10 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         ? strings.dayEmpty(dayLabel)
         : strings.dayAt(dayLabel, fmt(activeCell.value));
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-calendar-live ${className}` : "mc-calendar-live"}
-      style={wrapStyle}
+      {...wrap("mc-calendar-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

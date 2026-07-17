@@ -3,18 +3,11 @@
 // cell for its retention, or roving-focus the block and walk it in 2-D with the
 // arrow keys. Composes the static component (summary={false}, focus ring as its
 // child), one pointer listener on the wrapper, announcements via CohortTriangleStrings.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import {
   EN_COHORT_TRIANGLE,
   type CohortTriangleStrings,
@@ -142,18 +135,10 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
         ? strings.cohortTriangleEmpty(cohortLabel, unit, activeCell.col)
         : strings.cohortTriangleAt(cohortLabel, unit, activeCell.col, fmt(activeCell.value));
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-cohort-interactive ${className}` : "mc-cohort-interactive"}
-      style={wrapStyle}
+      {...wrap("mc-cohort-interactive", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

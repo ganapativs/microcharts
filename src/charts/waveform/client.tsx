@@ -2,17 +2,10 @@
 // Interactive <Waveform>. One pointer listener; bucket by x lookup.
 // Hover shows the bucket peak + crosshair; ←/→ rove buckets. Composes the static
 // component (canon). onPointFocus supports scrub-to-seek recipes.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { maxPerBucket } from "../../core/downsample.js";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_WAVEFORM } from "../../core/strings-waveform.js";
@@ -47,13 +40,6 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
     style,
     ...rest
   } = props;
-
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The bars are ONE merged path (node budget), so they can't scale per-bar.
@@ -150,8 +136,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-wave-live ${className}` : "mc-wave-live"}
-      style={wrapStyle}
+      {...wrap("mc-wave-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

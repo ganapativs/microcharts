@@ -2,16 +2,9 @@
 // Interactive <SpreadBand>. Nearest-x lookup announces the lead at
 // that point ("Point 6 of 12: organic +11 over paid."); the crosshair touches
 // both lines. ←/→ steps x. Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -54,13 +47,6 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
-
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const fontSize = gutterFont(height);
@@ -156,8 +142,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-spread-live ${className}` : "mc-spread-live"}
-      style={wrapStyle}
+      {...wrap("mc-spread-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

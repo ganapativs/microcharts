@@ -2,16 +2,15 @@
 // Interactive <MusicStaff>. Sparkline model: one pointer listener
 // + nearest-note lookup, ←/→ roving, a ring on the focused note, EN.point
 // announcements. Composes the static component (ring as its child).
-import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
 import { musicStaffGeometry } from "./geometry.js";
 import { MusicStaff as StaticMusicStaff, type MusicStaffProps } from "./index.js";
-
-const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveMusicStaffProps extends MusicStaffProps {
   strings?: SeriesStrings;
@@ -119,8 +118,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-staff-live ${className}` : "mc-staff-live"}
-      style={{ display: "inline-block", position: "relative", lineHeight: 0, ...style }}
+      {...wrap("mc-staff-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={[title, accName].filter(Boolean).join(". ") || undefined}

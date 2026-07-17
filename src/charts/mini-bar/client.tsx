@@ -2,18 +2,11 @@
 // Interactive <MiniBar>. One pointer listener; bar index by
 // category-band lookup. ←/→ rove across bars ("East: 940 — 1st of 4."), focus
 // ring overlay on the active bar. Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { miniBarGeometry } from "./geometry.js";
@@ -167,18 +160,10 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         : { x: -0.5, y: activeBar.y - 0.5, width: width + 1, height: activeBar.h + 1 }
       : null;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-minibar-live ${className}` : "mc-minibar-live"}
-      style={wrapStyle}
+      {...wrap("mc-minibar-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

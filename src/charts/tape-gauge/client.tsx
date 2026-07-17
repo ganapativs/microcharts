@@ -3,9 +3,9 @@
 // update as `value`/`rate` change, and a polite live region re-announces the
 // full reading, throttled (≥ 5 s). No pointer scrubbing — there is no series.
 // Composes the static entry (canon); the scale window stays centered on value.
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TAPE_GAUGE } from "../../core/strings-tape-gauge.js";
@@ -52,13 +52,6 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   const span = spanProp && spanProp > 0 ? spanProp : autoSpan(value, zones, rate);
   const tiers = tiersProp ?? [span / 60, span / 15];
   const fmt = makeFormatter(format, locale);
@@ -85,8 +78,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-tape-live ${className}` : "mc-tape-live"}
-      style={wrapStyle}
+      {...wrap("mc-tape-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

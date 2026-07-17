@@ -2,16 +2,9 @@
 // Interactive <SegmentedBar>. One pointer listener; segment by
 // x lookup. ←/→ rove segments incl. "Other", which announces its member count
 // ("Other: 5%, 3 categories."). Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
@@ -139,18 +132,10 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
         : strings.shareAt(datum.label, `${pcts[active!]}%`, fmt(datum.value))
       : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-segbar-live ${className}` : "mc-segbar-live"}
-      style={wrapStyle}
+      {...wrap("mc-segbar-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

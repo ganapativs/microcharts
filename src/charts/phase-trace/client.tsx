@@ -2,16 +2,9 @@
 // Interactive <PhaseTrace>. Hover snaps to the nearest DATA point
 // (which carries a definite time index — spatial interpolation would lie at
 // crossings); ←/→ step time. Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PHASE_TRACE } from "../../core/strings-phase-trace.js";
@@ -138,18 +131,10 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     ? strings.phaseAt(active! + 1, geo.points.length, xLabel, fmt(pt.dataX), yLabel, fmt(pt.dataY))
     : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-phase-live ${className}` : "mc-phase-live"}
-      style={wrapStyle}
+      {...wrap("mc-phase-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

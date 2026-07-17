@@ -2,7 +2,7 @@
 title: Performance
 description:
   Zero dependencies, budget-gated sizes, and server rendering with no client JavaScript — 106 chart types measured at
-  0.9–3.6 kB gzip (median 2.3) and rendered to SVG at about 0.035 ms each. Every number here is reproducible from one
+  0.9–3.7 kB gzip (median 2.3) and rendered to SVG at about 0.035 ms each. Every number here is reproducible from one
   command.
 ---
 
@@ -20,8 +20,8 @@ build.
 
 <SizeDistribution />
 
-The whole catalog lands between **0.91 kB and 3.64 kB** gzip, with a **median of 2.3 kB** — and that's the _static_
-entry. Interactivity is opt-in from a separate `/interactive` subpath and adds roughly a kilobyte (median 3.57 kB), so a
+The whole catalog lands between **0.94 kB and 3.67 kB** gzip, with a **median of 2.33 kB** — and that's the _static_
+entry. Interactivity is opt-in from a separate `/interactive` subpath and adds roughly a kilobyte (median 3.65 kB), so a
 page pays for hover and keyboard only where it actually uses them.
 
 <SizeTable />

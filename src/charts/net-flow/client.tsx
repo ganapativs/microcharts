@@ -3,17 +3,10 @@
 // math. ←/→ step periods; the live region states in, out, AND signed net — the
 // full picture, never a net without its gross. Composes the static component
 // (canon); the crosshair + in/out value ticks are overlay children.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js";
 import { netFlowGeometry } from "./geometry.js";
@@ -134,18 +127,10 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
     ? strings.netFlowAt(active! + 1, total, fmt(p.in), fmt(p.out), signedNet(p.net, fmt))
     : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-net-flow-live ${className}` : "mc-net-flow-live"}
-      style={wrapStyle}
+      {...wrap("mc-net-flow-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

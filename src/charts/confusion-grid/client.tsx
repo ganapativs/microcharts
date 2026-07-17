@@ -3,15 +3,8 @@
 // lookup. 2-D arrow roving (ActivityGrid model); Home/End jump the diagonal. The
 // live region reuses the FULL row/column labels — this entry is the full-label
 // read-back path. Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
-import { FILL } from "../../shared/interactive.js";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CONFUSION } from "../../core/strings-confusion.js";
@@ -125,18 +118,10 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   const announced =
     cell && active ? strings.confusionAt(labels[active.row]!, labels[active.col]!, pct) : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-confusion-live ${className}` : "mc-confusion-live"}
-      style={wrapStyle}
+      {...wrap("mc-confusion-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

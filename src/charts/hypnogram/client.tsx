@@ -1,16 +1,9 @@
 "use client";
 // Interactive <Hypnogram>. One pointer listener; run lookup by x.
 // ←/→ rove runs, Home/End jump. Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_HYPNOGRAM } from "../../core/strings-hypnogram.js";
@@ -123,18 +116,10 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
   const run = active !== null ? geo.runs[active] : undefined;
   const announced = run ? strings.hypnogramRun(run.state, fmt(run.t0), fmt(run.t1)) : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-hypno-live ${className}` : "mc-hypno-live"}
-      style={wrapStyle}
+      {...wrap("mc-hypno-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

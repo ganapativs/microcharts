@@ -1,16 +1,9 @@
 "use client";
 // Interactive <BumpStrip>. Nearest-x pointer lookup; ←/→ step
 // periods ("Week 4 of 12: #3."). Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -129,18 +122,10 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
   const point = active !== null ? geo.points[active] : undefined;
   const announced = point ? strings.rankAt(point.index + 1, data.length, point.rank) : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-bump-live ${className}` : "mc-bump-live"}
-      style={wrapStyle}
+      {...wrap("mc-bump-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

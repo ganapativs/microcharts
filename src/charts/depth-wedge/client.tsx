@@ -2,16 +2,9 @@
 // Interactive <DepthWedge>. One pointer listener; nearest level by
 // x reveals the cumulative depth on that side. ←/→ walk levels across the book.
 // Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DEPTH_WEDGE } from "../../core/strings-depth-wedge.js";
@@ -134,18 +127,10 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
   const sideName = step ? strings.depthWedgeSides[step.side].toLowerCase() : "";
   const announced = step ? strings.depthWedgeAt(sideName, fmt(step.cum), fmt(step.dist)) : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-depth-live ${className}` : "mc-depth-live"}
-      style={wrapStyle}
+      {...wrap("mc-depth-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

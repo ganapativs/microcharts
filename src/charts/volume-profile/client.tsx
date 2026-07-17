@@ -1,16 +1,9 @@
 "use client";
 // Interactive <VolumeProfile>. One pointer listener; nearest level
 // bin by y. ↑/↓ rove bins. Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VOLUME_PROFILE } from "../../core/strings-volume-profile.js";
@@ -52,13 +45,6 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
     style,
     ...rest
   } = props;
-
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "sweep", animate, {
@@ -128,8 +114,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-volprofile-live ${className}` : "mc-volprofile-live"}
-      style={wrapStyle}
+      {...wrap("mc-volprofile-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

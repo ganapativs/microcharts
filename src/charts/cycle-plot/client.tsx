@@ -4,16 +4,9 @@
 // (announcing individual observations). A pointer picks the slot under the
 // cursor. Composes the static component (canon); the focus band + readout chip
 // are overlay children.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CYCLE, type CycleStrings } from "../../core/strings-cycle.js";
@@ -162,18 +155,10 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
       : "";
   const readout = sl ? (obs !== undefined ? fmt(obs) : fmt(sl.center.value)) : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-cycle-plot-live ${className}` : "mc-cycle-plot-live"}
-      style={wrapStyle}
+      {...wrap("mc-cycle-plot-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

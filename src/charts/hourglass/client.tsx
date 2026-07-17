@@ -2,9 +2,9 @@
 // Interactive <Hourglass>. Sand levels cross-fade on change (opacity
 // swap — not d: interpolation); announces at documented thresholds (50 / 90 /
 // 100%), not on every tick. Wrapper focus only. Composes the static component.
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap as wrapAttrs } from "../../shared/interactive.js";
 import { Hourglass as StaticHourglass, hourglassSummary, type HourglassProps } from "./index.js";
 
 export interface InteractiveHourglassProps extends HourglassProps {
@@ -48,18 +48,10 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={wrap}
-      className={className ? `mc-hourglass-live ${className}` : "mc-hourglass-live"}
-      style={wrapStyle}
+      {...wrapAttrs("mc-hourglass-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={label}

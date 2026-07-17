@@ -2,16 +2,9 @@
 // Interactive <QueueDepth>. One pointer listener + nearest-x math
 // across the finite points; ←/→ step periods, Home/End jump ends. Composes the
 // static component (canon); the crosshair + focus ring are overlay children.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL } from "../../shared/interactive.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUEUE_DEPTH, type QueueDepthStrings } from "../../core/strings-queue-depth.js";
@@ -120,18 +113,10 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
     ? strings.queueAt(p.index, fmt(p.value), p.above ? strings.queueAbove : "")
     : "";
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-queue-depth-live ${className}` : "mc-queue-depth-live"}
-      style={wrapStyle}
+      {...wrap("mc-queue-depth-live", className, style)}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

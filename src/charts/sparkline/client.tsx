@@ -9,26 +9,15 @@
 //   3. The wrapper owns the accessible name (role=img + aria-label) and the
 //      roving keyboard; announcements go through a polite live region using
 //      the i18n-able SummaryStrings.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
 import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
-
-// The composed static SVG fills the focusable wrapper so the wrapper's box and
-// the SVG's box coincide — pointer→viewBox math and overlay marks stay exact,
-// and the chart scales fluidly with its container.
-const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
 export interface InteractiveSparklineProps extends SparklineProps {
   /** Called with the index of the focused point (or `null` when cleared). */
@@ -164,18 +153,10 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   const activePoint = active !== null ? geo.points[active] : null;
   const activePos = active !== null ? stops.indexOf(active) + 1 : 0;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
-
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-spark-interactive ${className}` : "mc-spark-interactive"}
-      style={wrapStyle}
+      {...wrap("mc-spark-interactive", className, style)}
       tabIndex={0}
       role="img"
       aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
