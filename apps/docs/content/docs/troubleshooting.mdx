@@ -74,7 +74,9 @@ stretching. Give it fluid sizing explicitly:
 ```
 
 and make sure the _parent_ is block-level (a flex or grid item, or a `div`) — a chart can't grow past an inline parent
-no matter what you set on the chart itself. Full recipes, including the inline-in-a-sentence case, are on
+no matter what you set on the chart itself. This is identical for `…/interactive` entries: `style`, `className`, and
+`width`/`height` size an interactive chart exactly the way they size its static twin, and the hover crosshair stays
+locked to the cursor at any size. Full recipes, including the inline-in-a-sentence case, are on
 [Sizing & scaling](/docs/sizing).
 
 ## A chart stacks on its own line instead of sitting inline with text

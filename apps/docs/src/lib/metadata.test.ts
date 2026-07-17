@@ -16,7 +16,7 @@ const routes = [
   "docs/charts/sparkline.html",
   "docs/accessibility.html",
   "docs/performance.html",
-  "gallery.html",
+  "charts.html",
 ];
 
 describe.skipIf(!hasBuild)("built docs metadata", () => {

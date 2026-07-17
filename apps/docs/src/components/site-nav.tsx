@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 import { SearchTrigger } from "fumadocs-ui/layouts/shared/slots/search-trigger";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/cn";
@@ -16,13 +17,23 @@ function GithubMark() {
   );
 }
 
+// One door per intent: "Charts" is the visual index (/charts — every card opens
+// that chart's reference page), the word people scan for on a charts site.
+// "Documentation" owns everything under /docs; the per-chart API pages live in
+// the sidebar's "Reference" section — so the visible label "Charts" is unique
+// and never collides with a second "Charts" in the docs tree.
 const links = [
   { href: "/docs", label: "Documentation" },
-  { href: "/docs/charts", label: "Charts" },
-  { href: "/gallery", label: "Gallery" },
-  { href: "/docs/ai", label: "AI" },
+  { href: "/charts", label: "Charts" },
+  { href: "/docs/ai", label: "AI-native" },
   { href: "/brand", label: "Brand" },
 ];
+
+/** Documentation claims all of /docs except /docs/ai, which the AI entry owns. */
+function isActive(href: string, pathname: string): boolean {
+  if (href === "/docs") return pathname.startsWith("/docs") && !pathname.startsWith("/docs/ai");
+  return pathname === href || pathname.startsWith(href);
+}
 
 function Wordmark() {
   return (
@@ -48,6 +59,20 @@ const ctrl = "ghost-ctrl size-8";
 export function SiteNav() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  // The mobile sheet never survives a navigation or an Escape.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   useEffect(() => {
     let raf = 0;
@@ -64,13 +89,16 @@ export function SiteNav() {
   }, []);
 
   return (
-    <header className="glass-rail sticky top-0 z-40" data-scrolled={scrolled || undefined}>
+    <header
+      className="glass-rail sticky top-0 z-40"
+      data-scrolled={scrolled || undefined}
+      data-menu-open={open || undefined}
+    >
       <nav className="mx-auto flex h-14 max-w-shell items-center gap-5 px-4 sm:px-6">
         <Wordmark />
         <div className="hidden items-center gap-0.5 md:flex">
           {links.map((l) => {
-            const active =
-              pathname === l.href || (l.href !== "/docs" && pathname.startsWith(l.href));
+            const active = isActive(l.href, pathname);
             return (
               <Link
                 prefetch={false}
@@ -92,7 +120,7 @@ export function SiteNav() {
           })}
         </div>
 
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="site-nav-ctrls ml-auto flex items-center gap-1.5">
           {/* Fumadocs' SearchTrigger renders its own icon (ignores children), so
               style it as a clean square icon button matching GitHub + palette. */}
           <SearchTrigger aria-label="Search" className="ghost-ctrl size-8" />
@@ -106,8 +134,51 @@ export function SiteNav() {
             <GithubMark />
           </a>
           <AppearanceMenu />
+          {/* !: .ghost-ctrl's unlayered display:inline-flex outranks layered
+              Tailwind utilities, so plain md:hidden loses. */}
+          <button
+            type="button"
+            className={cn(ctrl, "md:!hidden")}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="site-nav-menu"
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X className="size-[17px]" /> : <Menu className="size-[17px]" />}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile sheet — the small-screen twin of the desktop link row. Lives
+          inside the sticky header (absolute under the rail), so it needs no
+          portal; closes on navigate/Escape. */}
+      {open && (
+        <div
+          id="site-nav-menu"
+          className="site-nav-sheet absolute inset-x-0 top-full border-b border-hairline md:hidden"
+        >
+          <div className="mx-auto flex max-w-shell flex-col px-4 py-2 sm:px-6">
+            {links.map((l) => {
+              const active = isActive(l.href, pathname);
+              return (
+                <Link
+                  prefetch={false}
+                  key={l.href}
+                  href={l.href}
+                  className={cn(
+                    "rounded-md px-2.5 py-2.5 text-[0.95rem] font-medium transition-colors",
+                    active
+                      ? "text-fd-foreground"
+                      : "text-fd-muted-foreground hover:text-fd-foreground",
+                  )}
+                >
+                  {l.label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

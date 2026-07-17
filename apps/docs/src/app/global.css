@@ -719,6 +719,112 @@ body {
     background-color: color-mix(in oklab, var(--glass-surface-strong) 50%, transparent);
   }
 
+  /* 08 · in the wild — example-app field specimens. One external link per
+     card: a slim live-chrome strip, the app's hero screenshot (theme-swapped
+     via --shot-l / --shot-d so only the active scheme's image ever loads),
+     and a meta shelf. Cards rest at a slight pin-board tilt (--tilt) and
+     square up + lift on hover — same accent-rim hover language as .glass-lift. */
+  /* Offscreen small cards don't render (or fetch their screenshot
+     backgrounds) until scrolled near — ~40 kB × 6 saved from first load.
+     NOT on the marquee: its layout containment inflates the auto-sized
+     grid track's max-content width and spills the 375px viewport. */
+  .wild-card--defer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 320px;
+  }
+  .wild-card {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: clip;
+    background-color: var(--glass-surface);
+    border: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--glass-shadow);
+    transform: rotate(var(--tilt, 0deg));
+    transition:
+      border-color 0.32s var(--ease-out-quint),
+      box-shadow 0.32s var(--ease-out-quint),
+      transform 0.32s var(--ease-out-quint);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .wild-card:hover {
+      border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline));
+      box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
+      transform: rotate(0deg) translateY(-3px);
+    }
+    .wild-card:hover .wild-shot {
+      scale: 1.02;
+      transition-duration: 0.5s;
+    }
+    .wild-card:hover .wild-arrow {
+      translate: 2px -2px;
+      color: var(--accent);
+    }
+    /* the dashed "your slot" door becomes solid as you reach for it */
+    .wild-door:hover {
+      border-style: solid;
+    }
+  }
+  .wild-card:active {
+    transform: rotate(var(--tilt, 0deg)) scale(0.985);
+    transition-duration: 0.12s;
+  }
+  .wild-chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-bottom: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+  }
+  .wild-arrow {
+    margin-left: auto;
+    color: var(--color-fd-muted-foreground);
+    transition:
+      translate 0.32s var(--ease-out-quint),
+      color 0.32s var(--ease-out-quint);
+  }
+  .wild-shot {
+    display: block;
+    aspect-ratio: 16 / 10;
+    background-image: var(--shot-l);
+    background-size: cover;
+    background-position: top center;
+    transform-origin: top center;
+    /* exit (rest state) faster than the hover-side 0.5s enter */
+    transition: scale 0.32s var(--ease-out-quint);
+  }
+  html.dark .wild-shot {
+    background-image: var(--shot-d);
+  }
+  .wild-meta {
+    border-top: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+  }
+  /* Marquee variant: chrome strip up top, then screenshot beside the meta
+     column on wide viewports — the flagship reads as a product window. */
+  @media (min-width: 1024px) {
+    .wild-card--wide {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      grid-template-rows: auto 1fr;
+    }
+    .wild-card--wide .wild-chrome {
+      grid-column: 1 / -1;
+    }
+    .wild-card--wide .wild-shot {
+      aspect-ratio: auto;
+      height: 100%;
+      min-height: 340px;
+      border-right: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+    }
+    .wild-card--wide .wild-meta {
+      border-top: 0;
+      justify-content: center;
+    }
+  }
+
   /* Gallery plane: full-bleed grid, floating dock, pointer tilt. Reuses site tokens. */
 
   /* nav auto-hide — only while a gallery-2 page is mounted (the client sets
@@ -1558,10 +1664,48 @@ body {
     backdrop-filter 200ms ease-out,
     -webkit-backdrop-filter 200ms ease-out;
 }
+/* The mobile menu sheet is SOLID page ink, not frost: it's a child of the
+   rail, and the rail's own backdrop-filter (forced on while the sheet is
+   open) becomes the backdrop root — a child's backdrop-filter can no longer
+   sample the page behind, so any translucency ghosts the hero type straight
+   through the tap targets. */
+.site-nav-sheet {
+  background-color: var(--color-fd-background);
+}
+/* The sheet materializes (short settle from under the rail); closing stays
+   instant — response, not theater. */
+@media (prefers-reduced-motion: no-preference) {
+  .site-nav-sheet {
+    animation: site-nav-sheet-in 0.24s var(--ease-out-quint);
+  }
+  @keyframes site-nav-sheet-in {
+    from {
+      opacity: 0;
+      translate: 0 -6px;
+    }
+  }
+}
 .glass-rail[data-scrolled] {
   background-color: color-mix(in oklab, var(--color-fd-background) 72%, transparent);
   -webkit-backdrop-filter: blur(16px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
   backdrop-filter: blur(16px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+}
+/* While the mobile sheet is open the WHOLE header is solid page ink — rail and
+   sheet must read as one seamless surface (the sheet can't frost, see above),
+   so the rail drops its translucency instead of the sheet faking one. Wins
+   over [data-scrolled] by source order. */
+.glass-rail[data-menu-open] {
+  background-color: var(--color-fd-background);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* Open sheet = one focused surface: the rail keeps only the close button on
+   small screens (search/GitHub/appearance would compete with the menu). The
+   burger is the row's last child. */
+@media (max-width: 767px) {
+  .glass-rail[data-menu-open] .site-nav-ctrls > :not(:last-child) {
+    display: none;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .glass-rail {
@@ -1768,29 +1912,42 @@ figure:has(> pre) .shiki,
   padding-bottom: 1rem;
 }
 
-/* Floating accent "copy prompt" button, centred at the bottom of the block —
-   the primary action for the whole prompt. The top-right copy button keeps its
-   default quiet styling. A scrim fades the last lines under it. */
+/* Floating actions, centred at the bottom of the block. Primary (accent) copies
+   the full self-contained prompt — the default for any agent. Secondary (quiet)
+   copies a one-line pointer to /agent-setup.md for fetch-capable agents. The
+   top-right copy button keeps its default quiet styling. A scrim fades the last
+   lines under them. */
 .agent-prompt::after {
   content: "";
   position: absolute;
   inset: auto 1px 1px 1px;
-  height: 5rem;
+  height: 5.5rem;
   border-radius: 0 0 var(--radius-panel) var(--radius-panel);
-  background: linear-gradient(to top, var(--glass-surface-strong) 30%, transparent);
+  background: linear-gradient(to top, var(--glass-surface-strong) 35%, transparent);
   pointer-events: none;
   z-index: 1;
 }
-.agent-prompt-copy {
+.agent-prompt-actions {
   position: absolute;
   left: 50%;
   bottom: 0.9rem;
   transform: translateX(-50%);
   z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  /* size to content so both buttons share one row when there's room; the
+     max-width caps it so a narrow panel wraps them instead of spilling. */
+  width: max-content;
+  max-width: calc(100% - 1.5rem);
+}
+.agent-prompt-copy {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* fixed width so swapping "Copy setup prompt" ↔ "Copied" never re-centres */
+  /* fixed width so swapping "Copy setup prompt" ↔ "Copied" never re-flows the row */
   min-width: 12rem;
   gap: 0.45rem;
   padding: 0.5rem 1.05rem;
@@ -1811,11 +1968,40 @@ figure:has(> pre) .shiki,
     background 0.2s var(--ease-out-quint);
 }
 .agent-prompt-copy:hover {
-  transform: translateX(-50%) translateY(-1px);
+  transform: translateY(-1px);
   background: color-mix(in oklab, var(--accent) 90%, #000);
 }
 .agent-prompt-copy:active {
-  transform: translateX(-50%) scale(0.97);
+  transform: scale(0.97);
+}
+.agent-prompt-copy-alt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* fixed width so "Copy short version" ↔ "Copied" never re-flows the row */
+  min-width: 10.5rem;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-fd-muted-foreground);
+  background: var(--glass-surface-strong);
+  border: 1px solid color-mix(in oklab, var(--hairline) 60%, transparent);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition:
+    transform 0.15s var(--ease-out-quint),
+    color 0.2s var(--ease-out-quint),
+    background 0.2s var(--ease-out-quint);
+}
+.agent-prompt-copy-alt:hover {
+  transform: translateY(-1px);
+  color: var(--color-fd-foreground);
+  background: color-mix(in oklab, var(--glass-surface-strong) 80%, var(--color-fd-foreground) 8%);
+}
+.agent-prompt-copy-alt:active {
+  transform: scale(0.97);
 }
 
 /* Inline code chips — markdown inline code only (classless <code>). Component
@@ -2106,6 +2292,9 @@ div:where(
   .chip-pop,
   .ghost-ctrl,
   .glass-lift,
+  .wild-card,
+  .wild-shot,
+  .wild-arrow,
   .link-underline {
     animation: none !important;
     transition: none !important;

@@ -87,23 +87,25 @@ export function HomePrinciplesSection() {
         </h2>
       </Reveal>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {PRINCIPLES.map((p, i) => (
-          <Reveal key={p.title} delay={i * 60} className="panel p-5">
-            <h3 className="font-medium text-fd-foreground">{p.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-fd-muted-foreground">{p.body}</p>
+          <Reveal key={p.title} delay={i * 60} className="panel p-4">
+            <h3 className="text-[0.95rem] font-medium text-fd-foreground">{p.title}</h3>
+            <p className="mt-1.5 text-[0.82rem] leading-normal text-fd-muted-foreground">
+              {p.body}
+            </p>
           </Reveal>
         ))}
       </div>
 
-      <Reveal delay={120} className="hv-refusal mt-8 p-6">
+      <Reveal delay={120} className="hv-refusal mt-5 p-5">
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h3 className="font-medium text-fd-foreground">Traded up, on purpose.</h3>
           <p className="text-sm text-fd-muted-foreground">
             Five shapes that fail at word size, and the honest chart each one became.
           </p>
         </div>
-        <ul className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-5">
+        <ul className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-5">
           {REFUSALS.map((r) => (
             <li key={r.name} className="flex flex-col gap-2">
               <span className="flex items-baseline gap-2 font-mono text-[0.8rem] leading-none">

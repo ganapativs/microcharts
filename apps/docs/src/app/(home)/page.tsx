@@ -6,6 +6,7 @@ import { HomePrinciplesSection } from "@/components/home/home-principles-section
 import { HomeModelsSection } from "@/components/home/home-models-section";
 import { HomeRobustnessSection } from "@/components/home/home-robustness-section";
 import { HomeSurfacesSection } from "@/components/home/home-surfaces-section";
+import { HomeWildSection } from "@/components/home/home-wild-section";
 import { HomeReceiptsSection } from "@/components/home/home-receipts-section";
 import { HomeThemingSection } from "@/components/home/home-theming-section";
 import { HomeCtaSection } from "@/components/home/home-cta-section";
@@ -30,6 +31,7 @@ export default function HomePage() {
       <HomeModelsSection catalogTotal={total} />
       <HomeRobustnessSection />
       <HomeSurfacesSection />
+      <HomeWildSection />
       <HomeReceiptsSection />
       <HomeThemingSection />
       <HomeCtaSection />

@@ -31,7 +31,7 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
     title: "Charts",
     links: [
       ...featured.map((c) => ({ href: `/docs/charts/${c.slug}`, label: c.name })),
-      { href: "/gallery", label: `All ${STABLE_CHARTS.length} charts →` },
+      { href: "/charts", label: `All ${STABLE_CHARTS.length} charts →` },
     ],
   },
   {

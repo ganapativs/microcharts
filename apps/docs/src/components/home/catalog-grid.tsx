@@ -5,12 +5,12 @@ import Link from "next/link";
 import { CHART_MODULES, getChart } from "@/lib/charts/registry";
 
 /**
- * 03 · the catalog, live — a grid of real gallery Previews (the same
- * components `/gallery` renders). Shuffles per reload, one tile cross-fades
+ * 03 · the catalog, live — a grid of real chart Previews (the same
+ * components `/charts` renders). Shuffles per reload, one tile cross-fades
  * to a new type every couple of seconds (paused on hover/focus and in hidden
  * tabs). Hover reveals the tagline (space reserved — nothing shifts); the
- * final cell is the "+N more" door to the gallery. Reduced motion: a still,
- * shuffled board.
+ * final cell is the "+N more" door to the Charts index. Reduced motion: a
+ * still, shuffled board.
  */
 
 /** Tier → categorical token index; must match the section chips. */
@@ -51,7 +51,10 @@ const POOL = [
   "win-prob-worm",
 ] as const;
 
-const COUNT = 23; // 23 charts + the "+N more" gallery tile = a 24-cell board
+// 11 charts + the "+N more" tile = a 12-cell board — fills 2/3/4
+// columns exactly and keeps the section to three rows on desktop (breadth
+// lives in /charts; this board is a taste, not the catalog).
+const COUNT = 11;
 
 type Cell = { slug: string; nonce: number };
 
@@ -125,7 +128,7 @@ export function CatalogGrid({ total }: { total: number }) {
         return (
           <li
             key={cell.nonce}
-            className={`hx-stagger ${i >= 11 ? "hidden sm:block" : ""}`}
+            className="hx-stagger"
             style={{ "--i": i % 12 } as React.CSSProperties}
           >
             <Link
@@ -161,15 +164,15 @@ export function CatalogGrid({ total }: { total: number }) {
       <li className="hx-stagger" style={{ "--i": 11 } as React.CSSProperties}>
         <Link
           prefetch={false}
-          href="/gallery"
-          aria-label={`Browse all ${total} chart types in the gallery`}
+          href="/charts"
+          aria-label={`Browse all ${total} chart types`}
           className="hx-tile group flex h-full flex-col items-center justify-center gap-1.5 rounded-[14px] border border-dashed border-hairline px-3 pb-3 pt-4 no-underline"
         >
           <span className="display text-[1.6rem] leading-none text-fd-foreground transition-colors group-hover:text-fd-primary">
             +{total - COUNT}
           </span>
           <span className="mono-label text-[0.58rem] tracking-[0.12em] opacity-55 transition-opacity group-hover:text-fd-primary group-hover:opacity-100">
-            more in the gallery
+            more in Charts
           </span>
           <span className="hv-tile-tag" aria-hidden>
             every type, live, with its props

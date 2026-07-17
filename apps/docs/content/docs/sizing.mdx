@@ -81,6 +81,25 @@ before CSS overrides the width. If you use a utility framework, the equivalent c
   block` or a flex/grid parent.
 </Callout>
 
+## Interactive charts size the same way
+
+Everything above applies **unchanged** to the `…/interactive` entries. An interactive chart wraps its SVG in a focusable
+element (for hover and keyboard), but that wrapper and the SVG are always the **same box** — so the same recipe fills
+it, and `width` / `height` / `style` / `className` mean exactly what they do on the static entry:
+
+```tsx
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
+
+// identical to the static entry — fills its container
+<Sparkline data={data} style={{ width: "100%", height: "auto" }} />;
+```
+
+<Callout type="info">
+  Because the wrapper and the SVG share one box, the hover crosshair, highlight, and readout always land under the
+  cursor — at any size, in any flex or grid cell. An interactive chart is its static twin plus interaction, never a
+  different size.
+</Callout>
+
 ## Inline in a sentence
 
 A word-sized chart in running prose should scale with the **font**, not a pixel box. Wrap it in `className="mc-inline"`

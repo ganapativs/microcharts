@@ -1,16 +1,24 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { RotateCcw } from "lucide-react";
+import { ArrowUp, RotateCcw } from "lucide-react";
+// Inline marks stay STATIC — a word-sized sparkline/delta reads at a glance and
+// needs no interaction. The four STANDALONE (fenced) charts are INTERACTIVE:
+// hovering/focusing reveals the per-item labels + values a block chart can't
+// show at rest. Same everywhere — the scripted tour and the live reply both
+// use these, so a visitor without on-device AI gets the same affordance.
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SparkBar } from "@microcharts/react/sparkbar";
 import { Delta } from "@microcharts/react/delta";
 import { Bullet } from "@microcharts/react/bullet";
-import { MiniBar } from "@microcharts/react/mini-bar";
-import { Seismogram } from "@microcharts/react/seismogram";
 import { StatusDot } from "@microcharts/react/status-dot";
 import { TrendArrow } from "@microcharts/react/trend-arrow";
-import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { RugStrip } from "@microcharts/react/rug-strip";
+import { MiniBar } from "@microcharts/react/mini-bar/interactive";
+import { Seismogram } from "@microcharts/react/seismogram/interactive";
+import { HistogramStrip } from "@microcharts/react/histogram-strip/interactive";
+import { SegmentedBar } from "@microcharts/react/segmented-bar/interactive";
+import { LIVE_SAMPLES, parseLiveReply, type ChartSpec } from "@/lib/live-grammar";
+import { useLiveModel } from "@/components/home/use-live-model";
 
 /**
  * Home hero stream — chart grammar → real components, mid-sentence. Three
@@ -20,6 +28,12 @@ import { RugStrip } from "@microcharts/react/rug-strip";
  * that already encode meaning by colour (delta, trend, status, bullet) keep
  * their own semantics. Ghosts of every scenario are grid-stacked so the panel
  * reserves the tallest reply — nothing below shifts as scenarios swap.
+ *
+ * When Chrome's built-in model is already installed (Prompt API reports
+ * `available`), the panel ALSO offers live mode: sample chips + a free input,
+ * and the reply is generated on-device by Gemini Nano, streamed through the
+ * same raw-grammar → morph pipeline. The scripted tour stays the default and
+ * the fallback — live complements it, never replaces it.
  */
 
 const ACCENT = "var(--mc-accent)";
@@ -44,10 +58,13 @@ interface Scenario {
   segs: Seg[];
 }
 
-/** A captioned standalone chart (fenced form). */
+/** A captioned standalone chart (fenced form). Width is pinned to BLOCK_W: the
+ *  interactive entries fill their container (SVG width:100% via FILL), so
+ *  without this the block chart would stretch to the full reply width instead
+ *  of the size its geometry was tuned for. */
 function Block({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <figure className="not-prose flex flex-col gap-1">
+    <figure className="not-prose flex flex-col gap-1" style={{ width: BLOCK_W }}>
       <figcaption className="mono-label opacity-55">{title}</figcaption>
       {children}
     </figure>
@@ -96,10 +113,11 @@ const SCENARIOS: Scenario[] = [
         id: "r-mini",
         kind: "chart",
         block: true,
-        raw: "```chart mini-bar Net-new by region ($k)\n48 39 27 22 18\n```",
+        raw: "```chart mini-bar Net-new by region ($k)\nNA 48\nEU 39\nUK 27\nAPAC 22\nLATAM 18\n```",
         node: (
           <Block title="Net-new by region ($k)">
             <MiniBar
+              title="Net-new by region ($k)"
               data={[
                 { label: "NA", value: 48 },
                 { label: "EU", value: 39 },
@@ -159,6 +177,7 @@ const SCENARIOS: Scenario[] = [
         node: (
           <Block title="Errors per minute">
             <Seismogram
+              title="Errors per minute"
               data={[2, 1, 3, 2, 18, 24, 9, 4, 2, 1, 2, 3]}
               width={BLOCK_W}
               height={44}
@@ -206,6 +225,7 @@ const SCENARIOS: Scenario[] = [
         node: (
           <Block title="1-min returns (bps)">
             <HistogramStrip
+              title="1-min returns (bps)"
               data={[-2, -1, 0, 1, -1, 2, 1, 0, 3, 1, -1, 0, 2, 1, 4, -2, 1, 0]}
               width={BLOCK_W}
               height={44}
@@ -283,6 +303,116 @@ function FinishedReply({ segs }: { segs: Seg[] }) {
   );
 }
 
+/** A validated live-grammar spec → the real component, same sizes and accent
+ *  discipline as the scripted scenarios. Live charts keep their DEFAULT
+ *  summaries — this is real content, so it gets the real accessible names. */
+function renderSpec(spec: ChartSpec): ReactNode {
+  switch (spec.type) {
+    case "sparkline":
+      return <Sparkline data={spec.values} width={58} height={15} curve="smooth" color={ACCENT} />;
+    case "sparkbar":
+      return <SparkBar data={spec.values} width={48} height={15} color={ACCENT} />;
+    case "rug-strip":
+      return <RugStrip data={spec.values} width={58} height={13} color={ACCENT} />;
+    case "delta":
+      return <Delta value={spec.value} />;
+    case "trend-arrow":
+      return <TrendArrow value={spec.value} />;
+    case "bullet":
+      return (
+        <Bullet value={spec.value} target={spec.target} bands={spec.bands} width={66} height={12} />
+      );
+    case "status-dot":
+      return <StatusDot status={spec.status} style={{ width: 11, height: 11 }} />;
+    case "mini-bar": {
+      const title = spec.title || "breakdown";
+      return (
+        <Block title={title}>
+          <MiniBar
+            title={title}
+            data={spec.items}
+            width={BLOCK_W}
+            height={Math.max(24, spec.items.length * 10)}
+            color={ACCENT}
+          />
+        </Block>
+      );
+    }
+    case "segmented": {
+      const title = spec.title || "mix";
+      return (
+        <Block title={title}>
+          <SegmentedBar title={title} data={spec.items} width={BLOCK_W} height={14} />
+        </Block>
+      );
+    }
+    case "histogram": {
+      const title = spec.title || "distribution";
+      return (
+        <Block title={title}>
+          <HistogramStrip
+            title={title}
+            data={spec.values}
+            width={BLOCK_W}
+            height={44}
+            color={ACCENT}
+          />
+        </Block>
+      );
+    }
+    case "seismogram": {
+      const title = spec.title || "activity";
+      return (
+        <Block title={title}>
+          <Seismogram title={title} data={spec.values} width={BLOCK_W} height={44} color={ACCENT} />
+        </Block>
+      );
+    }
+  }
+}
+
+const RAW_CODE = "font-mono text-[0.82em] text-fd-muted-foreground";
+
+/** The live Nano reply, re-parsed from the full text on every chunk. Segment
+ *  order is append-only during a stream, so index keys are stable; a segment
+ *  flipping in-flight → complete swaps <code> for the chart and the same
+ *  hx-morph-in plays as in the scripted tour. */
+function LiveReply({ text, streaming }: { text: string; streaming: boolean }) {
+  const segs = parseLiveReply(text);
+  return (
+    <div className="whitespace-pre-wrap">
+      {segs.map((s, i) => {
+        if (s.kind === "text") return <span key={i}>{s.text}</span>;
+        if (s.kind === "code")
+          return (
+            <code key={i} className={RAW_CODE}>
+              {s.text}
+            </code>
+          );
+        if (!s.complete || !s.spec)
+          return (
+            <code key={i} className={`${RAW_CODE} ${s.block ? "my-1 block" : ""}`}>
+              {s.raw}
+            </code>
+          );
+        if (s.block)
+          return (
+            <div key={i} className="hx-morph-in my-3 whitespace-normal">
+              {renderSpec(s.spec)}
+            </div>
+          );
+        const bare = s.spec.type === "delta" || s.spec.type === "trend-arrow";
+        return (
+          <span key={i} className={bare ? "hx-morph-in" : "hx-morph-in mc-inline"}>
+            {renderSpec(s.spec)}
+          </span>
+        );
+      })}
+      {streaming && <span className="mc-caret" aria-hidden />}
+    </div>
+  );
+}
+
 export function StreamVignette({
   serif = false,
   startDelay = 0,
@@ -300,6 +430,22 @@ export function StreamVignette({
   const hostRef = useRef<HTMLDivElement>(null);
   const started = useRef(false);
   const reduced = useRef(false);
+
+  // Live mode — Chrome's on-device model, when it's already installed. The
+  // scripted tour stays the default; live complements it, never replaces it.
+  const live = useLiveModel();
+  const [mode, setMode] = useState<"tour" | "live">("tour");
+  const [asked, setAsked] = useState("");
+  const [query, setQuery] = useState("");
+  const liveScrollRef = useRef<HTMLDivElement>(null);
+  const followRef = useRef(true);
+
+  // The live reply lives in a fixed-height box (the ghost-reserved area); keep
+  // it pinned to the newest line while streaming, unless the reader scrolled up.
+  useEffect(() => {
+    const el = liveScrollRef.current;
+    if (el && followRef.current) el.scrollTop = el.scrollHeight;
+  }, [live.text]);
 
   // Start on viewport entry; reduced motion jumps straight to the finished reply.
   useEffect(() => {
@@ -331,6 +477,7 @@ export function StreamVignette({
 
   // Advance one atom at a time with human-feel pacing.
   useEffect(() => {
+    if (mode !== "tour") return;
     if (!running || pos >= total) {
       if (pos >= total) setRunning(false);
       return;
@@ -357,24 +504,45 @@ export function StreamVignette({
         : 26 + Math.random() * 42;
     const t = window.setTimeout(() => setPos((p) => p + 1), delay);
     return () => window.clearTimeout(t);
-  }, [running, pos, total, active]);
+  }, [running, pos, total, active, mode]);
 
   // When a reply finishes, hold a beat, then roll to the next scenario. Reduced
   // motion stays on the first finished reply — no cycling.
   useEffect(() => {
-    if (reduced.current || !started.current || running || pos < total) return;
+    if (mode !== "tour" || reduced.current || !started.current || running || pos < total) return;
     const t = window.setTimeout(() => {
       setIdx((i) => (i + 1) % SCENARIOS.length);
       setPos(0);
       setRunning(true);
     }, 2600);
     return () => window.clearTimeout(t);
-  }, [running, pos, total]);
+  }, [running, pos, total, mode]);
 
   const replay = () => {
+    if (mode === "live") {
+      // back to the scripted tour
+      live.reset();
+      setMode("tour");
+      if (reduced.current) return;
+      setPos(0);
+      setRunning(true);
+      return;
+    }
     if (reduced.current) return;
     setPos(0);
     setRunning(true);
+  };
+
+  const submit = (q: string) => {
+    const question = q.trim();
+    if (!question || live.phase === "thinking") return;
+    started.current = true;
+    followRef.current = true;
+    setMode("live");
+    setRunning(false);
+    setAsked(question);
+    setQuery("");
+    void live.ask(question);
   };
 
   // Build the visible reply at the current position.
@@ -425,12 +593,14 @@ export function StreamVignette({
       <div className="flex min-h-11 items-center justify-between border-b border-hairline py-1.5 pl-4 pr-2">
         <span className="flex items-baseline gap-2 leading-none">
           <span className="mono-label leading-none">assistant reply</span>
-          <span className="mono-label leading-none opacity-50">· {active.hint}</span>
+          <span className="mono-label leading-none opacity-50">
+            · {mode === "live" ? "live · on-device" : active.hint}
+          </span>
         </span>
         <button
           type="button"
-          aria-label="Replay the stream"
-          title="Replay"
+          aria-label={mode === "live" ? "Back to the tour" : "Replay the stream"}
+          title={mode === "live" ? "Back to the tour" : "Replay"}
           onClick={replay}
           className="ghost-ctrl size-8"
         >
@@ -439,22 +609,104 @@ export function StreamVignette({
       </div>
       <div className={`relative px-5 py-5 ${serif ? "hv-reply-body" : ""}`}>
         {/* every scenario's finished reply is stacked in one grid cell, so the
-            panel reserves the tallest — the stream paints over it, no CLS. */}
+            panel reserves the tallest — this ALONE fixes the panel height. Both
+            the tour stream and a live reply paint over it as absolute overlays,
+            so neither can grow the panel (a long live answer scrolls in place,
+            it never shifts the page). The min-height hands the compact sample
+            chips' reclaimed space to the answer: it holds the reply area (and
+            thus the whole panel) at the height it had with the taller chips, so
+            shrinking the chips grew the answer instead of shrinking the panel. */}
         <div
-          aria-hidden
-          className="grid text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed"
+          className={`grid text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed ${
+            live.supported ? "min-h-[297px]" : ""
+          }`}
         >
           {SCENARIOS.map((s) => (
-            <div key={s.id} className="invisible [grid-area:1/1]">
+            <div key={s.id} aria-hidden className="invisible [grid-area:1/1]">
               <FinishedReply segs={s.segs} />
             </div>
           ))}
         </div>
-        <div className="absolute inset-x-5 top-5 text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
-          {view}
-          {streaming && started.current && <span className="mc-caret" aria-hidden />}
-        </div>
+        {mode === "tour" && (
+          <div className="absolute inset-x-5 top-5 text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
+            {view}
+            {streaming && started.current && <span className="mc-caret" aria-hidden />}
+          </div>
+        )}
+        {mode === "live" && (
+          <div
+            ref={liveScrollRef}
+            onScroll={(e) => {
+              const el = e.currentTarget;
+              followRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+            }}
+            className="absolute inset-x-5 bottom-5 top-5 overflow-y-auto overscroll-contain pr-1 text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground"
+          >
+            <p className="mb-2.5 text-[0.85em] text-fd-muted-foreground">
+              <span className="mono-label mr-1.5 opacity-70">you</span>
+              {asked}
+            </p>
+            {live.phase === "error" ? (
+              <p className="text-fd-muted-foreground">
+                The on-device model didn&rsquo;t answer this time. Ask again, or use the arrow above
+                to resume the tour.
+              </p>
+            ) : (
+              <LiveReply
+                text={live.text}
+                streaming={live.phase === "thinking" || live.phase === "streaming"}
+              />
+            )}
+          </div>
+        )}
       </div>
+      {live.supported && (
+        <div className="border-t border-hairline px-4 pb-3.5 pt-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {LIVE_SAMPLES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => submit(s)}
+                onMouseEnter={live.warm}
+                onFocus={live.warm}
+                className="rounded-full border border-hairline px-2.5 py-1 text-[0.72rem] leading-none text-fd-muted-foreground transition-colors hover:border-fd-primary/45 hover:text-fd-foreground"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          <form
+            className="mt-2.5 flex items-center gap-2 rounded-full border border-hairline bg-fd-card py-1 pl-4 pr-1.5 transition-colors focus-within:border-fd-primary/60"
+            onSubmit={(e) => {
+              e.preventDefault();
+              submit(query);
+            }}
+          >
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={live.warm}
+              maxLength={140}
+              placeholder="ask for a tiny report of your own…"
+              aria-label="Ask the on-device model for a report"
+              className="min-w-0 flex-1 bg-transparent py-1.5 text-sm text-fd-foreground outline-none placeholder:text-fd-muted-foreground/60"
+            />
+            <button
+              type="submit"
+              aria-label="Ask"
+              title="Ask"
+              disabled={!query.trim() || live.phase === "thinking"}
+              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-fd-primary text-fd-primary-foreground transition-transform hover:-translate-y-px disabled:pointer-events-none disabled:opacity-35"
+            >
+              <ArrowUp className="size-3.5" />
+            </button>
+          </form>
+          <p className="mono-label mt-2 opacity-50">
+            live · Gemini Nano in your Chrome · numbers are illustrative
+          </p>
+        </div>
+      )}
     </div>
   );
 }

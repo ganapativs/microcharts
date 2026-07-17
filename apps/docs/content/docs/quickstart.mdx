@@ -81,13 +81,13 @@ the page rendering the test chart.
   guess. The rules are inlined too, so it still works when the agent can't reach the network.
 </Callout>
 
-That's the whole setup: the agent adds `@microcharts/react`, imports the stylesheet, and writes your conventions file —
-nothing left for you to wire up. Skip straight to [your first chart](#your-first-chart). Not using an agent? The same
-setup by hand is two steps:
+That's the whole setup: the agent installs `@microcharts/react`, imports the stylesheet, and writes your conventions
+file — nothing left for you to wire up. Skip straight to [your first chart](#your-first-chart). Not using an agent? The
+same two steps by hand are below.
 
-<Accordions type="single" className="mc-manual-setup">
+## Set up by hand
 
-<Accordion title="Set it up by hand — the two steps the agent runs for you">
+The two steps the agent runs for you — do them once, at your app root, and you're set.
 
 **1 · Install.** React 18 or 19 is a peer dependency; there are no other runtime dependencies.
 
@@ -131,10 +131,6 @@ import "@microcharts/react/styles.css";
 Full detail — why it inherits, and per-scope fonting — in [Theming](/docs/theming#the-font).
 
 </Callout>
-
-</Accordion>
-
-</Accordions>
 
 ## Your first chart
 

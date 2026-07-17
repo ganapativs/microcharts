@@ -17,7 +17,7 @@ export default function NotFound() {
         This page doesn&apos;t exist
       </h1>
       <p className="max-w-md text-fd-muted-foreground">
-        The chart you&apos;re looking for may have moved. Try the catalog, or start from the docs.
+        The chart you&apos;re looking for may have moved. Browse the charts, or start from the docs.
       </p>
       <nav className="flex flex-wrap items-center justify-center gap-4 text-sm font-medium">
         <Link href="/" className="underline underline-offset-4 hover:text-fd-primary">
@@ -26,8 +26,8 @@ export default function NotFound() {
         <Link href="/docs" className="underline underline-offset-4 hover:text-fd-primary">
           Documentation
         </Link>
-        <Link href="/gallery" className="underline underline-offset-4 hover:text-fd-primary">
-          Gallery
+        <Link href="/charts" className="underline underline-offset-4 hover:text-fd-primary">
+          Charts
         </Link>
       </nav>
     </main>

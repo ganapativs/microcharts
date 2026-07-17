@@ -46,16 +46,16 @@ export function HomeCatalogSection() {
         </div>
       </Reveal>
 
-      <Reveal delay={80} className="mt-8">
+      <Reveal delay={80} className="mt-6">
         <CatalogGrid total={CATALOG.total} />
       </Reveal>
 
       <Reveal delay={120}>
-        <div className="mt-8 flex justify-center">
+        <div className="mt-6 flex justify-center">
           <Link
             prefetch={false}
-            href="/gallery"
-            aria-label={`Browse all ${CATALOG.total} chart types in the gallery`}
+            href="/charts"
+            aria-label={`Browse all ${CATALOG.total} chart types`}
             className="cta-accent group inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
           >
             Browse all {CATALOG.total} types
