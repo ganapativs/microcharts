@@ -4,8 +4,16 @@
 // Focus ring on the active event; readout names the time, value, and magnitude.
 // Composes the static component (canon). Vertical jitter (value-less data) stays
 // layout-only — the readout never presents it as data.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";
@@ -42,6 +50,8 @@ export function Constellation(props: InteractiveConstellationProps): React.React
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -156,11 +166,18 @@ export function Constellation(props: InteractiveConstellationProps): React.React
   const readout = activeStar ? `${xFmt(activeStar.x)}: ${detail}` : "";
   const announced = activeStar ? strings.constellationAt(xFmt(activeStar.x), detail) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-constellation-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-constellation-live ${className}` : "mc-constellation-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -171,6 +188,7 @@ export function Constellation(props: InteractiveConstellationProps): React.React
     >
       <StaticConstellation
         {...rest}
+        style={FILL}
         data={data}
         connect={connect}
         domain={domain}

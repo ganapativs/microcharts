@@ -10,6 +10,7 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VOLUME_PROFILE } from "../../core/strings-volume-profile.js";
@@ -19,8 +20,6 @@ import {
   volumeProfileSummary,
   type VolumeProfileProps,
 } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 // Bars are single merged `path`s (one per role), not `rect`s — the default
 // `sweep` selector only matches rects.
@@ -49,8 +48,17 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "sweep", animate, {
@@ -120,8 +128,8 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
   return (
     <span
       ref={hostRef}
-      className="mc-volprofile-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-volprofile-live ${className}` : "mc-volprofile-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

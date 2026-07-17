@@ -4,7 +4,14 @@
 // Composes the static component (canon) — the crosshair + readout chip are
 // overlay children, the worm/midline/dots come from the static so the two
 // entries can never drift.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -41,8 +48,17 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The worm is one line split into below-50 (muted) + above-50 (accent) paths;
@@ -133,8 +149,8 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
   return (
     <span
       ref={hostRef}
-      className="mc-win-prob-worm-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-win-prob-worm-live ${className}` : "mc-win-prob-worm-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

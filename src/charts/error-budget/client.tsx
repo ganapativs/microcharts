@@ -3,11 +3,20 @@
 // math. ←/→ step; End jumps to now. The live region states remaining AND the
 // local burn multiple. Composes the static component (canon); the crosshair +
 // focus ring + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
+import { labelFont } from "../../core/labels.js";
 import { errorBudgetGeometry } from "./geometry.js";
 import { ErrorBudget as StaticErrorBudget, RATE_FMT, PCT, type ErrorBudgetProps } from "./index.js";
 
@@ -35,17 +44,33 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
 
-  const geo = useMemo(
-    () => errorBudgetGeometry({ width, height, data, window, rates }),
-    [width, height, data, window, rates],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox. The composed static reserves a right gutter for the "remaining"
+  // label (widening the viewBox past `width`); without it the pointer map and
+  // readout run at a short scale and the crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = errorBudgetGeometry({ width, height, data, window, rates });
+    const showLabel = (props.label ?? "remaining") === "remaining" && base != null;
+    const gutterCh = showLabel ? fmt(base!.remaining.value).length : 0;
+    return errorBudgetGeometry({
+      width,
+      height,
+      data,
+      window,
+      rates,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, window, rates, props.label, fmt]);
   const [active, setActive] = useState<number | null>(null);
 
   const total = window ?? data.length;
@@ -121,11 +146,18 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
     ? strings.errorBudgetAt(unit, p.index + 1, total, fmt(p.value), RATE_FMT(p.rate))
     : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-error-budget-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-error-budget-live ${className}` : "mc-error-budget-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -136,6 +168,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
     >
       <StaticErrorBudget
         {...rest}
+        style={FILL}
         data={data}
         window={window}
         rates={rates}

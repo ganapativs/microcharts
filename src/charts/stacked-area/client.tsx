@@ -2,9 +2,17 @@
 // Interactive <StackedArea>. Nearest-x lookup announces ALL
 // layers ("Point 8 of 12: Mobile 45%, Web 38%, API 17%."); ←/→ steps x, ↑/↓
 // cycles which layer the crosshair dot highlights. Composes the static.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import type { Curve } from "../../core/path.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
@@ -44,11 +52,20 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const series = useMemo(() => {
     let s = data.slice(0, 3);
@@ -156,8 +173,8 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
   return (
     <span
       ref={hostRef}
-      className="mc-stacked-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-stacked-live ${className}` : "mc-stacked-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -179,6 +196,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         locale={locale}
         strings={strings}
         summary={false}
+        style={FILL}
       >
         {crossX !== undefined ? (
           <line

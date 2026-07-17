@@ -12,13 +12,12 @@ import {
 } from "react";
 import { maxPerBucket } from "../../core/downsample.js";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_WAVEFORM } from "../../core/strings-waveform.js";
 import { bucketCount, waveformGeometry } from "./geometry.js";
 import { Waveform as StaticWaveform, waveformSummary, type WaveformProps } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveWaveformProps extends WaveformProps {
   onPointFocus?: (index: number, fraction: number) => void;
@@ -44,8 +43,17 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
     summary,
     onPointFocus,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The bars are ONE merged path (node budget), so they can't scale per-bar.
@@ -142,8 +150,8 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className="mc-wave-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-wave-live ${className}` : "mc-wave-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

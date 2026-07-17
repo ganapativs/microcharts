@@ -2,8 +2,16 @@
 // Interactive <DotPlot>. One pointer listener; row by y-band
 // lookup (rows are the axis here) — ↑/↓ rove rows, announcing each category
 // with its rank ("Ada: 88 — 2nd of 5."). Composes the static component.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
@@ -34,6 +42,8 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const height = props.height ?? Math.max(16, data.length * 8);
@@ -144,11 +154,18 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
           )
         : `${activeDatum.label}: ${strings.noData}`;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-dotplot-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-dotplot-live ${className}` : "mc-dotplot-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -159,6 +176,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
     >
       <StaticDotPlot
         {...rest}
+        style={FILL}
         data={data}
         stem={stem}
         domain={domain}

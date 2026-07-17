@@ -2,8 +2,9 @@
 // Interactive <Hourglass>. Sand levels cross-fade on change (opacity
 // swap — not d: interpolation); announces at documented thresholds (50 / 90 /
 // 100%), not on every tick. Wrapper focus only. Composes the static component.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
+import { FILL } from "../../shared/interactive.js";
 import { Hourglass as StaticHourglass, hourglassSummary, type HourglassProps } from "./index.js";
 
 export interface InteractiveHourglassProps extends HourglassProps {
@@ -14,7 +15,7 @@ export interface InteractiveHourglassProps extends HourglassProps {
 const THRESHOLDS = [0.5, 0.9, 1];
 
 export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
-  const { live = true, strings = EN_HOURGLASS, title, value, ...rest } = props;
+  const { live = true, strings = EN_HOURGLASS, title, value, className, style, ...rest } = props;
   const summary = hourglassSummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
   const prev = useRef(value);
@@ -47,16 +48,23 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={wrap}
-      className="mc-hourglass-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-hourglass-live ${className}` : "mc-hourglass-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
     >
-      <StaticHourglass {...rest} value={value} strings={strings} summary={false} />
+      <StaticHourglass {...rest} style={FILL} value={value} strings={strings} summary={false} />
       {live ? (
         <span
           aria-live="polite"

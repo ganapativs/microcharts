@@ -2,8 +2,16 @@
 // Interactive <Dumbbell>. One pointer listener; row by y-band.
 // ↑/↓ rove rows; ←/→ within a row toggles the from/to announcement
 // ("From: 62,000." / "To: 84,000."). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
@@ -37,6 +45,8 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const height = props.height ?? data.length * 12;
@@ -147,11 +157,18 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
       : strings.flatPair(fmt(activeDatum.from));
   })();
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-dumbbell-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-dumbbell-live ${className}` : "mc-dumbbell-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -162,6 +179,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     >
       <StaticDumbbell
         {...rest}
+        style={FILL}
         data={data}
         domain={domain}
         width={width}

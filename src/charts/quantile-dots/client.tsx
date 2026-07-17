@@ -3,11 +3,20 @@
 // threshold; the count past it recomputes purely. ←/→ nudge the probe one bin,
 // Enter announces, Esc returns to the prop threshold. Composes the static
 // component with the live threshold (canon); the readout chip reports the odds.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-quantile-dots.js";
+import { labelFont } from "../../core/labels.js";
 import { quantileDotsGeometry } from "./geometry.js";
 import { QuantileDots as StaticQuantileDots, type QuantileDotsProps } from "./index.js";
 
@@ -35,6 +44,8 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -52,19 +63,36 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
   const [probe, setProbe] = useState<number | null>(null);
   const activeThreshold = probe ?? threshold;
 
-  const geo = useMemo(
-    () =>
-      quantileDotsGeometry({
-        width,
-        height,
-        data,
-        count,
-        threshold: activeThreshold,
-        side,
-        domain: props.domain,
-      }),
-    [width, height, data, count, activeThreshold, side, props.domain],
-  );
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox exactly. The composed static reserves a right gutter for the
+  // "N in count" label (widening the viewBox past `width`); if the pointer
+  // map and readout used a gutter-less `totalWidth`, the crosshair line
+  // (drawn at the true viewBox scale) would drift right of the cursor.
+  const geo = useMemo(() => {
+    const base = quantileDotsGeometry({
+      width,
+      height,
+      data,
+      count,
+      threshold: activeThreshold,
+      side,
+      domain: props.domain,
+    });
+    const hasThreshold = activeThreshold !== undefined && Number.isFinite(activeThreshold);
+    const showLabel = (props.label ?? "count") === "count" && hasThreshold && base != null;
+    const gutterCh = showLabel ? `${base!.past} in ${base!.count}`.length : 0;
+    return quantileDotsGeometry({
+      width,
+      height,
+      data,
+      count,
+      threshold: activeThreshold,
+      side,
+      domain: props.domain,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, count, activeThreshold, side, props.domain, props.label]);
 
   // static accessible name reflects the PROP threshold (the documented default)
   const staticName = useMemo(
@@ -139,11 +167,18 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
       ? strings.quantileDots(geo.past, geo.count, side, fmt(activeThreshold))
       : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-quantile-dots-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-quantile-dots-live ${className}` : "mc-quantile-dots-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -154,6 +189,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     >
       <StaticQuantileDots
         {...rest}
+        style={FILL}
         data={data}
         count={count}
         threshold={activeThreshold}

@@ -3,8 +3,9 @@
 // change the lit region cross-fades (opacity, NOT d: interpolation — );
 // announces through a polite region, throttled to ≥1 s. Wrapper focus only.
 // Composes the static component.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
+import { FILL } from "../../shared/interactive.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { MoonPhase as StaticMoonPhase, moonPhaseSummary, type MoonPhaseProps } from "./index.js";
 
@@ -14,7 +15,16 @@ export interface InteractiveMoonPhaseProps extends MoonPhaseProps {
 }
 
 export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
-  const { live = true, strings = EN_MOON, title, value, mode = "progress", ...rest } = props;
+  const {
+    live = true,
+    strings = EN_MOON,
+    title,
+    value,
+    mode = "progress",
+    className,
+    style,
+    ...rest
+  } = props;
   const summary = moonPhaseSummary(value, mode, strings);
   const wrap = useRef<HTMLSpanElement>(null);
   const prev = useRef(value);
@@ -68,11 +78,18 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
   const pct = `${Math.round(Math.min(1, Math.max(0, value)) * 100)}%`;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={wrap}
-      className="mc-moon-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-moon-live ${className}` : "mc-moon-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -81,7 +98,14 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
       onFocus={() => setHover(true)}
       onBlur={() => setHover(false)}
     >
-      <StaticMoonPhase {...rest} value={value} mode={mode} strings={strings} summary={false} />
+      <StaticMoonPhase
+        {...rest}
+        style={FILL}
+        value={value}
+        mode={mode}
+        strings={strings}
+        summary={false}
+      />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
       {hover ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>

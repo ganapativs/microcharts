@@ -3,8 +3,9 @@
 // Left/Right to focus it → readout shows its label + value; the beam eases to a
 // new tilt on data change (CSS geometry transition, reduced-motion-gated);
 // announces when the heavier side flips. Composes the static component.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { balanceBeamGeometry } from "./geometry.js";
@@ -36,6 +37,8 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
     format,
     locale,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const summary = balanceBeamSummary(data, { mode, domain, strings, format, locale });
@@ -96,11 +99,18 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
 
   const datum = active !== null ? data[active] : undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-beam-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-beam-live ${className}` : "mc-beam-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -111,6 +121,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
     >
       <StaticBeam
         {...rest}
+        style={FILL}
         data={data}
         mode={mode}
         domain={domain}

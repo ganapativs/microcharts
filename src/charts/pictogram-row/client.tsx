@@ -3,8 +3,9 @@
 // ("6 of 8."). No per-unit pointer targets — the units are ONE datum; hovering
 // unit 4 of 8 has no distinct meaning (documented skip). Composes the static
 // component (canon).
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -34,6 +35,8 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     title,
     format,
     locale,
+    className,
+    style,
     ...rest
   } = props;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -62,17 +65,25 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
 
   const label = [title, text].filter(Boolean).join(". ") || undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-pictogram-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-pictogram-live ${className}` : "mc-pictogram-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
     >
       <StaticPictogramRow
         {...rest}
+        style={FILL}
         format={format}
         locale={locale}
         strings={strings}

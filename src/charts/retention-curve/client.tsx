@@ -3,8 +3,17 @@
 // period math. ←/→ step periods; the live region states retention and, when a
 // benchmark is present, its value too. Composes the static component (canon);
 // the crosshair + ghost-value tick are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
@@ -41,18 +50,42 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
 
-  const geo = useMemo(
-    () =>
-      retentionGeometry({ width, height, data, benchmark, plateau, curve, domain: props.domain }),
-    [width, height, data, benchmark, plateau, curve, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = retentionGeometry({
+      width,
+      height,
+      data,
+      benchmark,
+      plateau,
+      curve,
+      domain: props.domain,
+    });
+    const showLabel = (props.label ?? "last") === "last" && base != null;
+    const gutterCh = showLabel ? fmt(base!.last.value).length : 0;
+    return retentionGeometry({
+      width,
+      height,
+      data,
+      benchmark,
+      plateau,
+      curve,
+      domain: props.domain,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, benchmark, plateau, curve, props.domain, props.label, fmt]);
   const [active, setActive] = useState<number | null>(null);
 
   const accName =
@@ -119,11 +152,18 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     ? strings.retentionAt(unit, p.period, fmt(p.value), p.bench === null ? null : fmt(p.bench))
     : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-retention-curve-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-retention-curve-live ${className}` : "mc-retention-curve-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -134,6 +174,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     >
       <StaticRetentionCurve
         {...rest}
+        style={FILL}
         data={data}
         benchmark={benchmark}
         plateau={plateau}

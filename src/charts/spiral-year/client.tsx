@@ -3,8 +3,16 @@
 // squared 2-D distance over the precomputed spiral marks. ←/→ step chronologically
 // along the spiral; a polite live region announces the focused period. Composes the
 // static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { dayOfYear } from "../../core/calendar-grid.js";
@@ -46,6 +54,8 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -138,11 +148,18 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
   const readout =
     activeMark && typeof activeVal === "number" ? `${activeLabel}: ${fmt(activeVal)}` : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-spiral-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-spiral-live ${className}` : "mc-spiral-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -153,6 +170,7 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
     >
       <StaticSpiralYear
         {...rest}
+        style={FILL}
         data={data}
         cadence={cadence}
         startDate={startDate}

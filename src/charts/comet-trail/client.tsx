@@ -5,8 +5,9 @@
 // stream goes still, which is itself the signal. The dot jumps to truth, eased,
 // never simulated between updates. Reduced-motion → instant reposition (the static
 // encoding is already complete). Composes the static component (canon).
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
+import { FILL } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_COMET_TRAIL, type CometTrailStrings } from "../../core/strings-comet-trail.js";
@@ -35,6 +36,8 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     strings = EN_COMET_TRAIL,
     title,
     summary,
+    className,
+    style,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height);
@@ -114,11 +117,18 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
 
   const activeMark = active !== null ? geo.trail[active] : (geo.head ?? undefined);
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={wrapRef}
-      className="mc-comet-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-comet-live ${className}` : "mc-comet-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -127,6 +137,7 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     >
       <StaticCometTrail
         {...rest}
+        style={FILL}
         data={data}
         trail={trail}
         label={label}

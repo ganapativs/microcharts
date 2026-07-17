@@ -1,9 +1,17 @@
 "use client";
 // Interactive <HistogramStrip>. One pointer listener; bin by
 // x-band. ←/→ rove bins ("40 to 50: 34 values."). Composes the static entry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { histogramGeometry } from "./geometry.js";
 import {
@@ -36,6 +44,8 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -103,11 +113,18 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
   const bar = active !== null ? geo.bars[active] : undefined;
   const announced = bar ? strings.binAt(fmt(bar.x0), fmt(bar.x1), bar.count) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-histogram-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-histogram-live ${className}` : "mc-histogram-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -118,6 +135,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
     >
       <StaticHistogramStrip
         {...rest}
+        style={FILL}
         data={data}
         bins={bins}
         markValue={markValue}

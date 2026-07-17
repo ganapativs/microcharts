@@ -2,8 +2,16 @@
 // Interactive <DualSparkline>. Nearest-x lookup announces BOTH
 // series ("Point 9 of 12: 17 vs 15."); crosshair touches both lines. ←/→
 // steps x. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VS, type VsStrings } from "../../core/strings-vs.js";
@@ -44,6 +52,8 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -141,11 +151,18 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
       ? (geo.primaryPoints[active]?.[0] ?? geo.comparePoints[active]?.[0])
       : undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-dual-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-dual-live ${className}` : "mc-dual-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -156,6 +173,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
     >
       <StaticDualSparkline
         {...rest}
+        style={FILL}
         data={data}
         compare={compare}
         curve={curve}

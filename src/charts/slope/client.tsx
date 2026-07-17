@@ -3,8 +3,16 @@
 // vertical distance at the pointer's interpolated x (pure point-to-segment
 // math over ≤ 7 lines). ↑/↓ rove categories ordered by their `to` value.
 // Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
@@ -35,6 +43,8 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -156,11 +166,18 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
     return `${activeDatum.label}: ${strings.noData}`;
   })();
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-slope-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-slope-live ${className}` : "mc-slope-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -171,6 +188,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
     >
       <StaticSlope
         {...rest}
+        style={FILL}
         data={data}
         label={label}
         domain={domain}

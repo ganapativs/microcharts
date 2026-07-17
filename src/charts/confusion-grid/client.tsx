@@ -11,6 +11,7 @@ import {
   type CSSProperties,
   type PointerEvent,
 } from "react";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CONFUSION } from "../../core/strings-confusion.js";
@@ -20,8 +21,6 @@ import {
   confusionSummary,
   type ConfusionGridProps,
 } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveConfusionGridProps extends ConfusionGridProps {
   /**
@@ -41,6 +40,8 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -124,11 +125,18 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   const announced =
     cell && active ? strings.confusionAt(labels[active.row]!, labels[active.col]!, pct) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-confusion-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-confusion-live ${className}` : "mc-confusion-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

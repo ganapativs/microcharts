@@ -3,8 +3,16 @@
 // nearest-tick math. ←/→ step ticks; each announces its value and its multiple
 // of the median ("p99: 2.1 s — 17× the median."). Composes the static component
 // (canon); the probe line is an overlay child re-using geometry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
@@ -41,6 +49,8 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -141,11 +151,18 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
       )
     : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-percentile-ladder-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-percentile-ladder-live ${className}` : "mc-percentile-ladder-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -156,6 +173,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     >
       <StaticPercentileLadder
         {...rest}
+        style={FILL}
         data={data}
         ps={ps}
         scale={scale}

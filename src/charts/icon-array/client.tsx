@@ -4,8 +4,16 @@
 // Each unit announces the running count — genuinely useful for a SR user
 // counting. Composes the static component (canon); the focus ring is an overlay
 // child re-using geometry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
@@ -35,6 +43,8 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -135,11 +145,18 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
   const unit = active !== null ? geo.units[active] : undefined;
   const announced = unit ? strings.iconArrayUnit(active! + 1, geo.n, unit.filled, geo.k) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-icon-array-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-icon-array-live ${className}` : "mc-icon-array-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -150,6 +167,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     >
       <StaticIconArray
         {...rest}
+        style={FILL}
         value={value}
         total={total}
         label={label}

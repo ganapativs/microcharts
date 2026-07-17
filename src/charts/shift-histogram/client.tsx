@@ -3,15 +3,24 @@
 // (pointer x → bin). ←/→ step bins, M jumps to the two median bins. The live
 // region states each bin's before/after proportions. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { shiftHistogramGeometry } from "./geometry.js";
 import {
   ShiftHistogram as StaticShiftHistogram,
   shiftSummary,
+  shiftDelta,
   type ShiftHistogramProps,
 } from "./index.js";
 
@@ -42,6 +51,8 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -56,20 +67,34 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
   // other rects live in this chart.
   useEntrance(hostRef, "rise", animate, { selector: "rect", order: "x" });
 
-  const geo = useMemo(
-    () =>
-      shiftHistogramGeometry({
-        width,
-        height,
-        before: data.before,
-        after: data.after,
-        bins,
-        mode,
-        domain: props.domain,
-      }),
-    [width, height, data.before, data.after, bins, mode, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = shiftHistogramGeometry({
+      width,
+      height,
+      before: data.before,
+      after: data.after,
+      bins,
+      mode,
+      domain: props.domain,
+    });
+    const showLabel = (props.label ?? "shift") === "shift" && base != null && base.shift !== null;
+    const gutterCh = showLabel ? shiftDelta(base!, fmt).length : 0;
+    return shiftHistogramGeometry({
+      width,
+      height,
+      before: data.before,
+      after: data.after,
+      bins,
+      mode,
+      domain: props.domain,
+      gutterCh,
+      fontSize: Math.min(9, Math.max(6, Math.round(height * 0.42))),
+    });
+  }, [width, height, data.before, data.after, bins, mode, props.domain, props.label, fmt]);
   const [active, setActive] = useState<number | null>(null);
 
   const accName =
@@ -151,11 +176,18 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
     ? strings.shiftBin(fmt(b.x0), fmt(b.x1), pct(b.beforeShare), pct(b.afterShare))
     : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-shift-histogram-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-shift-histogram-live ${className}` : "mc-shift-histogram-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -166,6 +198,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
     >
       <StaticShiftHistogram
         {...rest}
+        style={FILL}
         data={data}
         bins={bins}
         mode={mode}

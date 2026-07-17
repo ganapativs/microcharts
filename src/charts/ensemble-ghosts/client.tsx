@@ -5,8 +5,9 @@
 // Reduced-motion: NO loop — ←/→ step members discretely (same information,
 // no motion). The live region announces only on a keyboard step or when the
 // loop stops — never per frame. Composes the static component (canon).
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { usePrefersReducedMotion } from "../../shared/motion.js";
@@ -42,6 +43,8 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -136,11 +139,18 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
 
   const activePath = active !== null ? paths[active] : undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-ensemble-ghosts-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-ensemble-ghosts-live ${className}` : "mc-ensemble-ghosts-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -152,6 +162,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     >
       <StaticEnsembleGhosts
         {...rest}
+        style={FILL}
         data={data}
         ghosts={ghosts}
         emphasis={emphasis}

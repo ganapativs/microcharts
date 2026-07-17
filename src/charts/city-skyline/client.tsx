@@ -2,9 +2,10 @@
 // Interactive <CitySkyline>. x-band pointer lookup → highlight the
 // building + announce it; ←/→ roving; the lit fraction is announced as a percent
 // (secondary channel). Composes the static component.
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { citySkylineGeometry } from "./geometry.js";
@@ -48,6 +49,8 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     summary,
     strings = EN_SKYLINE,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.3);
@@ -112,11 +115,18 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
           )
       : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-skyline-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-skyline-live ${className}` : "mc-skyline-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -127,6 +137,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     >
       <StaticCitySkyline
         {...rest}
+        style={FILL}
         data={data}
         bw={bw}
         gap={gap}

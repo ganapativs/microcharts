@@ -3,10 +3,18 @@
 // (atan2, 12 o'clock clockwise) maps to a segment. Hover lifts that sector to the
 // accent and shows its label; ←/→ step segments circularly; a polite live region
 // announces the focused segment. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { annulusSector } from "../../core/arc.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
@@ -56,6 +64,8 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const n = data.length;
@@ -158,11 +168,18 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
       ? `${seg(active!)}: ${typeof activeVal === "number" && Number.isFinite(activeVal) ? fmt(activeVal) : "—"}`
       : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-polar-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-polar-live ${className}` : "mc-polar-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -173,6 +190,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     >
       <StaticPolarClock
         {...rest}
+        style={FILL}
         data={data}
         now={now}
         inner={inner}

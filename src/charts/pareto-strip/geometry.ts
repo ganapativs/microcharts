@@ -78,6 +78,14 @@ export function paretoGeometry(opts: {
   const plotW = width - 2 * pad;
   const plotH = height - 2 * pad;
   const baseline = height - pad;
+  // Bars are crispEdges fills (no stroke), so their floor seats flush with the
+  // box bottom (y = height) — this removes the dead bottom pad so the strip
+  // aligns on the text baseline when rendered inline. The cumulative line and
+  // threshold are STROKED, so they keep the inset frame (baseline / plotH): a
+  // stroke centred on `height` would bleed half its width past the viewBox.
+  // Top pad is preserved for both — the max bar still tops at `pad`.
+  const barFloor = height;
+  const barPlotH = height - pad;
   const k = rows.length;
   const colW = plotW / k;
   const maxVal = Math.max(...rows.map((r) => r.value), 0);
@@ -103,11 +111,11 @@ export function paretoGeometry(opts: {
   const colCenter = (i: number) => round2(pad + i * colW + colW / 2);
 
   const bars: ParetoBar[] = rows.map((r, i) => {
-    const h = maxVal > 0 ? round2((r.value / maxVal) * plotH) : 0;
+    const h = maxVal > 0 ? round2((r.value / maxVal) * barPlotH) : 0;
     return {
       x: round2(pad + i * colW + colW * 0.1),
       width: round2(colW * 0.8),
-      y: round2(baseline - h),
+      y: round2(barFloor - h),
       height: h,
       label: r.label,
       share: round2(degenerate ? 0 : r.value / total),

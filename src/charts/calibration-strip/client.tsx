@@ -10,6 +10,7 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CALIBRATION } from "../../core/strings-calibration.js";
@@ -19,8 +20,6 @@ import {
   calibrationSummary,
   type CalibrationStripProps,
 } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 function defaultMinSupport(data: CalibrationStripProps["data"]): number {
   const total = isBinned(data)
@@ -53,6 +52,8 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -131,11 +132,18 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
       )
     : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-calib-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-calib-live ${className}` : "mc-calib-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

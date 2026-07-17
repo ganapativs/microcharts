@@ -14,6 +14,7 @@ import {
 } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -40,10 +41,6 @@ export interface InteractiveSeismogramProps extends SeismogramProps {
 
 const DEFAULT_SERIES_STRINGS = { ...EN_SERIES, ...EN_SLOTS };
 
-// the inner SVG must fill the wrapper, or the %-positioned readout chip and
-// pointer math drift off-cursor when context CSS resizes the chart
-const FILL: CSSProperties = { width: "100%", height: "auto" };
-
 export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
   const {
     data,
@@ -58,6 +55,8 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -142,11 +141,18 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
 
   const slotW = rendered.length > 0 ? width / rendered.length : 0;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-seismo-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-seismo-live ${className}` : "mc-seismo-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

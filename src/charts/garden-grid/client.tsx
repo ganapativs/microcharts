@@ -2,8 +2,16 @@
 // Interactive <GardenGrid>. Same model as ActivityGrid: one
 // pointer listener + pure grid lookup, 2-D roving keyboard, a ring on the
 // focused cell. Announces the ordinal step, not a false-precise value.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { gardenGridGeometry } from "./geometry.js";
@@ -39,6 +47,8 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
     summary,
     strings = EN_GARDEN,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -122,11 +132,18 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
       ? strings.gardenCellEmpty(c.index + 1, geo.cells.length)
       : strings.gardenCell(c.index + 1, geo.cells.length, fmt(c.value), c.step, steps);
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-garden-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-garden-live ${className}` : "mc-garden-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -137,6 +154,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
     >
       <StaticGardenGrid
         {...rest}
+        style={FILL}
         data={data}
         rows={rows}
         steps={steps}

@@ -3,8 +3,17 @@
 // nearest-x: history points announce a value, forecast points announce the
 // median + 80% interval. ←/→ step; Home/End jump the ends. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.js";
@@ -39,6 +48,8 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -48,11 +59,32 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
   // fan-from-origin grow doesn't exist in the engine yet.
   useEntrance(hostRef, "wipe", animate);
 
-  const geo = useMemo(
-    () => forecastConeGeometry({ width, height, data, forecast, target, domain: props.domain }),
-    [width, height, data, forecast, target, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = forecastConeGeometry({
+      width,
+      height,
+      data,
+      forecast,
+      target,
+      domain: props.domain,
+    });
+    const showLabel = (props.label ?? "landing") === "landing" && base != null;
+    const gutterCh = showLabel ? fmt(base!.landing.value).length : 0;
+    return forecastConeGeometry({
+      width,
+      height,
+      data,
+      forecast,
+      target,
+      domain: props.domain,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, forecast, target, props.domain, props.label, fmt]);
   const [active, setActive] = useState<number | null>(null);
 
   const at = data.length + forecast.mid.length;
@@ -127,11 +159,18 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
       : `${fmt(p.value)} · ${fmt(p.lo!)}–${fmt(p.hi!)}`
     : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-forecast-cone-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-forecast-cone-live ${className}` : "mc-forecast-cone-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -142,6 +181,7 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
     >
       <StaticForecastCone
         {...rest}
+        style={FILL}
         data={data}
         forecast={forecast}
         target={target}

@@ -5,7 +5,8 @@
 // nothing is synthesized on a timer (a fake pulse on a dead service is the one
 // unforgivable lie here). Gated on reduced-motion (→ the static frame, re-rendered
 // on data change) and on-screen (paused off-viewport). Composes the static (canon).
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { FILL } from "../../shared/interactive.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -41,6 +42,8 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     strings = EN_HEARTBEAT,
     title,
     summary,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -99,17 +102,25 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     }
   }, [events, win, now, strings, reduced, inView, wrapRef]);
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={wrapRef}
-      className="mc-heartbeat-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-heartbeat-live ${className}` : "mc-heartbeat-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
     >
       <StaticHeartbeatBlip
         {...rest}
+        style={FILL}
         events={events}
         window={win}
         now={liveNow}

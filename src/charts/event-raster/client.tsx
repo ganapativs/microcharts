@@ -11,6 +11,7 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_EVENT_RASTER } from "../../core/strings-event-raster.js";
@@ -21,7 +22,6 @@ import {
   type EventRasterProps,
 } from "./index.js";
 
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 const LANE_UNIT = 8;
 
 export interface InteractiveEventRasterProps extends EventRasterProps {
@@ -46,6 +46,8 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -156,11 +158,18 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
       ? strings.eventRasterAt(lanes[pos.lane]!.label, fmt(t), pos.ev + 1, evs.length)
       : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-raster-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-raster-live ${className}` : "mc-raster-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

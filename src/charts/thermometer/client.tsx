@@ -3,9 +3,10 @@
 // the fill glides to its new level (CSS, reduced-motion-gated); announces through
 // a polite region on change, and calls out a target crossing. No pointer math —
 // a single value; hover is a reveal, not a lookup. Composes the static component.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_THERMOMETER, type ThermometerStrings } from "../../core/strings-thermometer.js";
@@ -47,9 +48,17 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
     format,
     locale,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const summary = thermometerSummary(value, { domain, target, strings, format, locale });
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
   const [hover, setHover] = useState(false);
   const [announced, setAnnounced] = useState("");
   const prev = useRef(value);
@@ -70,8 +79,8 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
   return (
     <span
       ref={hostRef}
-      className="mc-thermo-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-thermo-live ${className}` : "mc-thermo-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -90,6 +99,7 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
         locale={locale}
         strings={strings}
         summary={false}
+        style={FILL}
       />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
       {hover && readout ? (

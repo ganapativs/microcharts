@@ -18,8 +18,7 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_BIAS_STRIP } from "../../core/strings-bias-strip.js";
 import { biasLayout, biasStripGeometry } from "./geometry.js";
 import { BiasStrip as StaticBiasStrip, biasStripSummary, type BiasStripProps } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
+import { FILL } from "../../shared/interactive.js";
 
 export interface InteractiveBiasStripProps extends BiasStripProps {
   /**
@@ -42,6 +41,8 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const { rad, outlierRad, captionPad } = biasLayout(width, height, props.label ?? "bias", props.r);
@@ -143,11 +144,18 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
         )
       : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-bias-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-bias-live ${className}` : "mc-bias-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

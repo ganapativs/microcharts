@@ -1,8 +1,16 @@
 "use client";
 // Interactive <StarSpoke>. One pointer listener; nearest spoke by
 // angle. ←/→ rotate focus through the spokes. Composes the static component.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STAR_SPOKE } from "../../core/strings-star-spoke.js";
@@ -30,11 +38,20 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const pad = labels && size >= 48 ? Math.max(10, size * 0.2) : 2;
   const geo = useMemo(
@@ -110,8 +127,8 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className="mc-star-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-star-live ${className}` : "mc-star-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -130,6 +147,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
+        style={FILL}
       >
         {spoke ? (
           <line

@@ -11,6 +11,7 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DUAL_WINDOW } from "../../core/strings-dual-window.js";
@@ -20,8 +21,6 @@ import {
   dualWindowSummary,
   type DualWindowMeterProps,
 } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveDualWindowMeterProps extends DualWindowMeterProps {
   /**
@@ -46,6 +45,8 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -122,11 +123,18 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
       : "";
   const crossX = active != null ? xOf(active) : 0;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-dualwin-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-dualwin-live ${className}` : "mc-dualwin-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={labelText}

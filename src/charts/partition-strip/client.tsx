@@ -10,6 +10,7 @@ import {
   type CSSProperties,
   type PointerEvent,
 } from "react";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PARTITION } from "../../core/strings-partition.js";
@@ -19,8 +20,6 @@ import {
   partitionStripSummary,
   type PartitionStripProps,
 } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractivePartitionStripProps extends PartitionStripProps {
   /**
@@ -41,6 +40,8 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -130,11 +131,18 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
   const announced = seg ? strings.partitionAt(seg.label, pctOf(seg.share), parentClause) : "";
   const y = seg ? (seg.row === 0 ? inset : inset + rowH + 1) : 0;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-partition-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-partition-live ${className}` : "mc-partition-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

@@ -24,6 +24,28 @@ describe("interactive <ErrorBudget>", () => {
       .toBe("62% · 0.6×");
   });
 
+  // Regression: the crosshair line and readout chip must share the same
+  // gutter-aware width basis. The static reserves a right gutter for the
+  // "remaining" label (viewBox wider than `width`); if the client recomputes
+  // geometry without that gutter, its `totalWidth` is short and the readout %
+  // runs ahead of the viewBox-drawn crosshair.
+  it("crosshair line and readout chip share the gutter-aware width basis", async () => {
+    const screen = await render(<ErrorBudget data={OBSERVED} window={30} title="SLO" />);
+    const wrap = screen.container.querySelector(".mc-error-budget-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
+    const svg = wrap.querySelector("svg")!;
+    const vbWidth = Number(svg.getAttribute("viewBox")!.split(" ")[2]);
+    const line = [...svg.querySelectorAll("line")].find(
+      (l) => l.getAttribute("x1") === l.getAttribute("x2"),
+    )!; // the vertical crosshair
+    const lineFrac = Number(line.getAttribute("x1")) / vbWidth;
+    const chip = wrap.querySelector(".mc-spark-readout") as HTMLElement;
+    const chipFrac = parseFloat(chip.style.left) / 100;
+    expect(Math.abs(lineFrac - chipFrac)).toBeLessThan(0.01);
+  });
+
   it("rapid arrow presses don't drop (functional updater)", async () => {
     const screen = await render(<ErrorBudget data={OBSERVED} window={30} title="SLO" />);
     const wrap = screen.container.querySelector(".mc-error-budget-live") as HTMLElement;

@@ -3,13 +3,21 @@
 // x snaps to the nearest quantile edge. ↑/↓ switch rows, ←/→ step edges. The
 // median edge announces the row median + delta vs the other arm; other edges
 // announce the percentile. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
 import { abStripsGeometry } from "./geometry.js";
-import { ABStrips as StaticABStrips, abSummary, type ABStripsProps } from "./index.js";
+import { ABStrips as StaticABStrips, abSummary, abDelta, type ABStripsProps } from "./index.js";
 
 export interface InteractiveABStripsProps extends ABStripsProps {
   strings?: ABStrings;
@@ -33,6 +41,8 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -40,12 +50,32 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
   useEntrance(hostRef, "settle", animate, { selector: "circle[data-mc-ink]" });
 
   const labelChars = Math.max(labels[0].length, labels[1].length);
-  const geo = useMemo(
-    () =>
-      abStripsGeometry({ width, height, a: data.a, b: data.b, labelChars, domain: props.domain }),
-    [width, height, data.a, data.b, labelChars, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = abStripsGeometry({
+      width,
+      height,
+      a: data.a,
+      b: data.b,
+      labelChars,
+      domain: props.domain,
+    });
+    const showLabel = (props.label ?? "delta") === "delta" && base != null;
+    const gutterCh = showLabel ? abDelta(base!, fmt).length : 0;
+    return abStripsGeometry({
+      width,
+      height,
+      a: data.a,
+      b: data.b,
+      labelChars,
+      domain: props.domain,
+      gutterCh,
+      fontSize: Math.min(8, Math.max(6, Math.round(height * 0.3))),
+    });
+  }, [width, height, data.a, data.b, labelChars, props.domain, props.label, fmt]);
   const [sel, setSel] = useState<{ row: number; edge: number } | null>(null);
 
   const accName =
@@ -123,11 +153,18 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
         : strings.abEdge(labels[activeRow]!, active.p, fmt(active.value))
       : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-ab-strips-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-ab-strips-live ${className}` : "mc-ab-strips-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -138,6 +175,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
     >
       <StaticABStrips
         {...rest}
+        style={FILL}
         data={data}
         labels={labels}
         width={width}

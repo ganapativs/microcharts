@@ -14,6 +14,7 @@ import {
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
+import { FILL } from "../../shared/interactive.js";
 import {
   EN_COHORT_TRIANGLE,
   type CohortTriangleStrings,
@@ -163,6 +164,7 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
     >
       <StaticCohortTriangle
         {...rest}
+        style={FILL}
         data={data}
         cell={cell}
         gap={gap}

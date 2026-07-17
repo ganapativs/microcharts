@@ -18,6 +18,8 @@ describe("paretoGeometry", () => {
     const geo = paretoGeometry({ ...base, data: shuffled })!;
     expect(geo.bars[0]!.label).toBe("Timeouts"); // largest first
     expect(geo.bars.at(-1)!.cum).toBeCloseTo(1, 2); // ends at 100%
+    // bars seat flush on the box bottom (inline text-baseline alignment)
+    for (const b of geo.bars) expect(b.y + b.height).toBeCloseTo(20, 1);
   });
 
   it("marks bars up to the threshold crossing as vital (accent stops there)", () => {
@@ -84,8 +86,9 @@ describe("paretoGeometry", () => {
     for (const b of geo.bars) {
       expect(b.x).toBeGreaterThanOrEqual(-0.01);
       expect(b.x + b.width).toBeLessThanOrEqual(80.01);
-      expect(b.y).toBeGreaterThanOrEqual(1.99);
-      expect(round(b.y + b.height)).toBeLessThanOrEqual(18.01);
+      expect(b.y).toBeGreaterThanOrEqual(1.99); // top pad preserved
+      // bar fill floor seats flush with the box bottom (y = height)
+      expect(round(b.y + b.height)).toBeLessThanOrEqual(20.01);
     }
   });
 });

@@ -3,8 +3,17 @@
 // math. ←/→ step periods; the live region states in, out, AND signed net — the
 // full picture, never a net without its gross. Composes the static component
 // (canon); the crosshair + in/out value ticks are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js";
 import { netFlowGeometry } from "./geometry.js";
@@ -32,17 +41,33 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
 
-  const geo = useMemo(
-    () => netFlowGeometry({ width, height, data, mode, domain: props.domain }),
-    [width, height, data, mode, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = netFlowGeometry({ width, height, data, mode, domain: props.domain });
+    const showLabel =
+      (props.label ?? "last") === "last" && base != null && !base.degenerate && base.last != null;
+    const gutterCh = showLabel ? signedNet(base!.last!.net, fmt).length : 0;
+    return netFlowGeometry({
+      width,
+      height,
+      data,
+      mode,
+      domain: props.domain,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, mode, props.domain, props.label, fmt]);
   const [active, setActive] = useState<number | null>(null);
 
   const accName =
@@ -109,11 +134,18 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
     ? strings.netFlowAt(active! + 1, total, fmt(p.in), fmt(p.out), signedNet(p.net, fmt))
     : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-net-flow-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-net-flow-live ${className}` : "mc-net-flow-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -124,6 +156,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
     >
       <StaticNetFlow
         {...rest}
+        style={FILL}
         data={data}
         mode={mode}
         width={width}

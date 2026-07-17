@@ -5,14 +5,13 @@
 // Composes the static entry (canon); the scale window stays centered on value.
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TAPE_GAUGE } from "../../core/strings-tape-gauge.js";
 import { autoSpan } from "./index.js";
 import { TapeGauge as StaticTapeGauge, tapeGaugeSummary, type TapeGaugeProps } from "./index.js";
 import { tapeGaugeGeometry } from "./geometry.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveTapeGaugeProps extends TapeGaugeProps {
   /** Minimum ms between live-region announcements (documented throttle). */
@@ -45,11 +44,20 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     summary,
     announceEvery = 5000,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const span = spanProp && spanProp > 0 ? spanProp : autoSpan(value, zones, rate);
   const tiers = tiersProp ?? [span / 60, span / 15];
@@ -77,8 +85,8 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className="mc-tape-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-tape-live ${className}` : "mc-tape-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

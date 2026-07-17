@@ -2,10 +2,18 @@
 // Interactive <PairedBars>. One pointer listener; pair by
 // category-band lookup. ←/→ rove pairs ("East: 940 vs 1,200."). Composes the
 // static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { isFiniteValue } from "../../core/types.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { pairedBarsGeometry } from "./geometry.js";
@@ -45,6 +53,8 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -140,11 +150,18 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
   const ringPos = active !== null ? active * geo.pitch : 0;
   const bandW = geo.pitch > 0 ? geo.pitch - 1.5 : 0;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-paired-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-paired-live ${className}` : "mc-paired-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -155,6 +172,7 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
     >
       <StaticPairedBars
         {...rest}
+        style={FILL}
         data={data}
         mode={mode}
         orientation={orientation}

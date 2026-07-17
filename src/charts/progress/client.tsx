@@ -3,7 +3,8 @@
 // region, throttled to whole-percent changes (no spam while a value streams).
 // Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
 // mark). Composes the static component (canon).
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -26,7 +27,15 @@ export interface InteractiveProgressProps extends ProgressProps {
 }
 
 export function Progress(props: InteractiveProgressProps): React.ReactNode {
-  const { live = true, animate = false, strings = EN_SCALAR, title, ...rest } = props;
+  const {
+    live = true,
+    animate = false,
+    strings = EN_SCALAR,
+    title,
+    className,
+    style,
+    ...rest
+  } = props;
   const model = progressModel({ ...rest, strings });
   const wholePct = Number.isFinite(model.fraction) ? Math.round(model.fraction * 100) : null;
   const hostRef = useRef<HTMLSpanElement>(null);
@@ -42,16 +51,23 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
 
   const label = [title, model.summary].filter(Boolean).join(". ") || undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-progress-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-progress-live ${className}` : "mc-progress-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
     >
-      <StaticProgress {...rest} strings={strings} summary={false} />
+      <StaticProgress {...rest} style={FILL} strings={strings} summary={false} />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );

@@ -3,8 +3,17 @@
 // (pointer x → bar). ←/→ step bars, T jumps to the threshold-crossing bar. The
 // live region states each bar's share + cumulative. Composes the static
 // component (canon); the crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
+import { labelFont } from "../../core/labels.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { paretoGeometry } from "./geometry.js";
@@ -36,6 +45,8 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -53,10 +64,25 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
     link: 'path[data-mc-ink="muted"]',
   });
 
-  const geo = useMemo(
-    () => paretoGeometry({ width, height, data, threshold, max }),
-    [width, height, data, threshold, max],
-  );
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = paretoGeometry({ width, height, data, threshold, max });
+    const showLabel = (props.label ?? "count") === "count" && base != null && base.crossing != null;
+    const gutterCh = showLabel
+      ? `${base!.vitalCount} of ${base!.n} → ${pct(base!.cumAtCrossing)}`.length
+      : 0;
+    return paretoGeometry({
+      width,
+      height,
+      data,
+      threshold,
+      max,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, threshold, max, props.label]);
   const [active, setActive] = useState<number | null>(null);
 
   const accName =
@@ -125,11 +151,18 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   const b = active !== null && geo ? geo.bars[active] : undefined;
   const announced = b ? strings.paretoAt(b.label, pct(b.share), pct(b.cum)) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-pareto-strip-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-pareto-strip-live ${className}` : "mc-pareto-strip-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -140,6 +173,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
     >
       <StaticParetoStrip
         {...rest}
+        style={FILL}
         data={data}
         threshold={threshold}
         max={max}

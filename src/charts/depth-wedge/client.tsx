@@ -11,6 +11,7 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DEPTH_WEDGE } from "../../core/strings-depth-wedge.js";
@@ -20,8 +21,6 @@ import {
   depthWedgeSummary,
   type DepthWedgeProps,
 } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveDepthWedgeProps extends DepthWedgeProps {
   /**
@@ -45,6 +44,8 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -133,11 +134,18 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
   const sideName = step ? strings.depthWedgeSides[step.side].toLowerCase() : "";
   const announced = step ? strings.depthWedgeAt(sideName, fmt(step.cum), fmt(step.dist)) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-depth-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-depth-live ${className}` : "mc-depth-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

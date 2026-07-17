@@ -1,10 +1,18 @@
 "use client";
 // Interactive <Funnel>. One pointer listener; stage by x-band.
 // ←/→ rove stages ("Checkout: 2,730 — 22% of visitors."). Composes the static.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { funnelGeometry } from "./geometry.js";
@@ -38,6 +46,8 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -126,11 +136,18 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         ? `${datum.label}: ${strings.noData}`
         : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-funnel-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-funnel-live ${className}` : "mc-funnel-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -141,6 +158,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     >
       <StaticFunnel
         {...rest}
+        style={FILL}
         data={data}
         mode={mode}
         connectors={connectors}

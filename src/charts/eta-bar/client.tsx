@@ -5,12 +5,11 @@
 // Composes the static entry (canon).
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ETA_BAR } from "../../core/strings-eta-bar.js";
 import { EtaBar as StaticEtaBar, etaBarSummary, type EtaBarProps } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveEtaBarProps extends EtaBarProps {
   /** Minimum ms between live-region announcements (documented throttle). */
@@ -40,6 +39,8 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     summary,
     announceEvery = 10000,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -67,11 +68,18 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     }
   }, [full, announceEvery]);
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-eta-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-eta-live ${className}` : "mc-eta-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

@@ -3,7 +3,8 @@
 // CSS clip-path transition (styles.css, reduced-motion-gated). Announces changes
 // through a polite region, throttled to ≥1 s so a streaming value never spams.
 // Wrapper focus only (one value). Composes the static component.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FILL_WORD, type FillWordStrings } from "../../core/strings-fill-word.js";
@@ -31,6 +32,8 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
     value,
     word,
     mode = "fill",
+    className,
+    style,
     ...rest
   } = props;
   const hostRef = useRef<HTMLSpanElement>(null);
@@ -67,17 +70,25 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-fillword-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-fillword-live ${className}` : "mc-fillword-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
     >
       <StaticFillWord
         {...rest}
+        style={FILL}
         word={word}
         value={value}
         mode={mode}

@@ -10,6 +10,7 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_HYPNOGRAM } from "../../core/strings-hypnogram.js";
@@ -20,8 +21,6 @@ import {
   resolveDomain,
   type HypnogramProps,
 } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveHypnogramProps extends HypnogramProps {
   /**
@@ -46,6 +45,8 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props as InteractiveHypnogramProps & {
     format?: Intl.NumberFormatOptions | ((n: number) => string);
@@ -122,11 +123,18 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
   const run = active !== null ? geo.runs[active] : undefined;
   const announced = run ? strings.hypnogramRun(run.state, fmt(run.t0), fmt(run.t1)) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-hypno-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-hypno-live ${className}` : "mc-hypno-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

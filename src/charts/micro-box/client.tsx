@@ -2,9 +2,17 @@
 // Interactive <MicroBox>. Pointer → nearest of the five stat
 // positions by x; ←/→ steps the fixed 5-stop roving model min → q1 → median →
 // q3 → max ("Median: 42."). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { computeFive, microBoxGeometry } from "./geometry.js";
@@ -48,6 +56,8 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -134,11 +144,18 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
 
   const announced = active && resolved ? strings.boxStat(active, fmt(resolved.five[active])) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-box-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-box-live ${className}` : "mc-box-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -149,6 +166,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
     >
       <StaticMicroBox
         {...rest}
+        style={FILL}
         data={data}
         stats={stats}
         whiskers={whiskers}

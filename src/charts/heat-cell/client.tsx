@@ -2,8 +2,9 @@
 // Interactive <HeatCell>. One target — no pointer lookup needed;
 // focus/hover reveals the formatted value + calibrated level with ActivityGrid
 // announcement parity ("42 — level 3 of 5."). Composes the static entry.
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -32,6 +33,8 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
     summary,
     strings = EN_SCALAR,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -46,11 +49,18 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : text;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-heat-cell-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-heat-cell-live ${className}` : "mc-heat-cell-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -61,6 +71,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
     >
       <StaticHeatCell
         {...rest}
+        style={FILL}
         value={value}
         steps={steps}
         shape={shape}

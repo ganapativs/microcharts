@@ -3,8 +3,16 @@
 // point by squared Euclidean distance over the precomputed dots. ←/→ step
 // points ordered by x, announcing the formatted pair. Focus ring on the
 // active dot. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -43,6 +51,8 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const rad = Math.min(3, Math.max(1, props.r ?? 1.5));
@@ -153,11 +163,18 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
         )
       : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-scatter-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-scatter-live ${className}` : "mc-scatter-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -168,6 +185,7 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
     >
       <StaticMicroScatter
         {...rest}
+        style={FILL}
         data={data}
         trend={trend}
         xDomain={xDomain}

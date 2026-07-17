@@ -3,7 +3,8 @@
 // polite region on change; the weight eases via CSS on variable fonts (snaps
 // otherwise), with no layout shift (tabular-nums). Wrapper focus only — the
 // numeral is one value. Composes the static component.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";
@@ -33,6 +34,8 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
     tiers = 5,
     format,
     locale,
+    className,
+    style,
     ...rest
   } = props;
   const hostRef = useRef<HTMLSpanElement>(null);
@@ -49,17 +52,25 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-fat-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-fat-live ${className}` : "mc-fat-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
     >
       <StaticFatDigits
         {...rest}
+        style={FILL}
         value={value}
         domain={domain}
         encode={encode}

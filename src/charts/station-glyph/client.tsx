@@ -6,6 +6,7 @@
 // it. Composes the static entry (canon) — no re-implemented SVG.
 import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STATION_GLYPH } from "../../core/strings-station-glyph.js";
@@ -16,8 +17,6 @@ import {
   type StationGlyphProps,
 } from "./index.js";
 import { stationGlyphGeometry } from "./geometry.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveStationGlyphProps extends StationGlyphProps {
   /**
@@ -43,11 +42,20 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const fmt = makeFormatter(format, locale);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const full =
     summary === false
@@ -109,8 +117,8 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
   return (
     <span
       ref={hostRef}
-      className="mc-station-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-station-live ${className}` : "mc-station-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

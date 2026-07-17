@@ -12,6 +12,7 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_GRADE_PROFILE } from "../../core/strings-grade-profile.js";
@@ -23,7 +24,6 @@ import {
   type GradeProfileProps,
 } from "./index.js";
 
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 const DEFAULT_BINS = [3, 6, 10] as const;
 
 // Segments quantize into 4 grade bins; bin 1 ("moderate") carries no ink
@@ -56,6 +56,8 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -137,11 +139,18 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
     : "";
   const midX = seg ? (seg.x0 + seg.x1) / 2 : 0;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-grade-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-grade-live ${className}` : "mc-grade-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

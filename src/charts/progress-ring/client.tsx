@@ -2,8 +2,9 @@
 // Interactive <ProgressRing>. `live` announces at 25/50/75/100%
 // threshold crossings only (documented anti-spam rule). No pointer lookup
 // (single mark). Composes the static component (canon).
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -24,7 +25,15 @@ export interface InteractiveProgressRingProps extends ProgressRingProps {
 const THRESHOLDS = [0.25, 0.5, 0.75, 1];
 
 export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNode {
-  const { live = true, animate = false, strings = EN_SCALAR, title, ...rest } = props;
+  const {
+    live = true,
+    animate = false,
+    strings = EN_SCALAR,
+    title,
+    className,
+    style,
+    ...rest
+  } = props;
   const { value, max = 1, sweep = false, format, locale } = rest;
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
@@ -57,16 +66,23 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     : strings.noData;
   const label = [title, summaryText].filter(Boolean).join(". ") || undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-ring-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-ring-live ${className}` : "mc-ring-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
     >
-      <StaticProgressRing {...rest} strings={strings} summary={false} />
+      <StaticProgressRing {...rest} style={FILL} strings={strings} summary={false} />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );

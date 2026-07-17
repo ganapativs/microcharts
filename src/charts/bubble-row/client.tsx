@@ -2,8 +2,9 @@
 // Interactive <BubbleRow>. Nearest-bubble pointer lookup + ←/→
 // roving; announces each bubble's exact value (the number the low-precision area
 // can't carry); the focused bubble gets a thicker ring. Composes the static.
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { labelFont } from "../../core/labels.js";
 import { bubbleRowGeometry } from "./geometry.js";
@@ -33,6 +34,8 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     summary,
     strings = EN_BUBBLE,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.34);
@@ -110,11 +113,18 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
   const announced =
     b && datum && datum.value !== null ? strings.bubbleAt(datum.label, fmt(datum.value)) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-bubble-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-bubble-live ${className}` : "mc-bubble-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label2}
@@ -125,6 +135,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     >
       <StaticBubbleRow
         {...rest}
+        style={FILL}
         data={data}
         align={align}
         label={label}

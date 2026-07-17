@@ -11,13 +11,12 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TRACE_FOLD } from "../../core/strings-trace-fold.js";
 import { traceFoldGeometry, type SpanRect } from "./geometry.js";
 import { TraceFold as StaticTraceFold, traceFoldSummary, type TraceFoldProps } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveTraceFoldProps extends TraceFoldProps {
   /**
@@ -40,8 +39,17 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // A flame graph is a tree, not a filmstrip — a flat L→R wipe slices frames
@@ -152,8 +160,8 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className="mc-trace-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-trace-live ${className}` : "mc-trace-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

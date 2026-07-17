@@ -11,6 +11,7 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -22,8 +23,6 @@ import {
   spreadBandSummary,
   type SpreadBandProps,
 } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveSpreadBandProps extends SpreadBandProps {
   /**
@@ -48,11 +47,20 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const fontSize = gutterFont(height);
@@ -148,8 +156,8 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className="mc-spread-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-spread-live ${className}` : "mc-spread-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}

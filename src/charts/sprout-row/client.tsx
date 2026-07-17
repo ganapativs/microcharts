@@ -2,8 +2,9 @@
 // Interactive <SproutRow>. Roving 1-D keyboard (←/→) + nearest-slot
 // pointer lookup; announces each item's stage; a focus ring lifts the active
 // glyph. Composes the static component (overlay ring as children).
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type CSSProperties } from "react";
 import { labelFont } from "../../core/labels.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { sproutRowGeometry } from "./geometry.js";
@@ -30,9 +31,17 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     height = 20,
     step = 16,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.34);
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
   const summary = sproutRowSummary(data, strings);
   const hostRef = useRef<HTMLSpanElement>(null);
   // "rise" from the soil: each stage glyph (data-mc-ink="point") grows upward
@@ -91,8 +100,8 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className="mc-sprout-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-sprout-live ${className}` : "mc-sprout-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -110,6 +119,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
         fontSize={fontSize}
         strings={strings}
         summary={false}
+        style={FILL}
       >
         {slot ? (
           <circle

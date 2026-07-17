@@ -3,8 +3,16 @@
 // lookup. ←/→ roving cell focus with the ActivityGrid focus-ring style — the
 // 1-D restriction of its 2-D nav, same wording, same overlay. Composes the
 // static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
@@ -39,6 +47,8 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -116,11 +126,18 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
       : strings.point(activeCell.index + 1, geo.cells.length, fmt(activeCell.value))
     : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-heat-strip-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-heat-strip-live ${className}` : "mc-heat-strip-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -131,6 +148,7 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
     >
       <StaticHeatStrip
         {...rest}
+        style={FILL}
         data={data}
         steps={steps}
         shape={shape}

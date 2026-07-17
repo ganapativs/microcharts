@@ -2,8 +2,9 @@
 // Interactive <DicePips>. Announces the new face through a polite
 // region on change; the pip set cross-fades (opacity, reduced-motion → instant).
 // No sub-part navigation — the pips are one value. Composes the static component.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
+import { FILL } from "../../shared/interactive.js";
 import { DicePips as StaticDicePips, dicePipsSummary, type DicePipsProps } from "./index.js";
 
 export interface InteractiveDicePipsProps extends DicePipsProps {
@@ -13,7 +14,7 @@ export interface InteractiveDicePipsProps extends DicePipsProps {
 }
 
 export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
-  const { live = true, strings = EN_DICE, title, value, ...rest } = props;
+  const { live = true, strings = EN_DICE, title, value, className, style, ...rest } = props;
   const summary = dicePipsSummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
   const prev = useRef(value);
@@ -48,16 +49,23 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={wrap}
-      className="mc-dice-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-dice-live ${className}` : "mc-dice-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
     >
-      <StaticDicePips {...rest} value={value} strings={strings} summary={false} />
+      <StaticDicePips {...rest} style={FILL} value={value} strings={strings} summary={false} />
       {live ? (
         <span
           aria-live="polite"

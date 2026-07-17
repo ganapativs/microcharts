@@ -3,8 +3,9 @@
 // (span hit = containment, else nearest edge/point); ←/→ cycle items
 // chronologically; announces "Deploy freeze: Jun 3, 09:00 to 13:30 — 4h 30m."
 // Composes the static component (canon).
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
@@ -44,6 +45,8 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -169,11 +172,18 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
       : "";
   const readoutX = activeItem ? (activeItem.x + activeItem.xEnd) / 2 : 0;
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-timeline-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-timeline-live ${className}` : "mc-timeline-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -184,6 +194,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
     >
       <StaticEventTimeline
         {...rest}
+        style={FILL}
         data={data}
         domain={domain}
         now={now}

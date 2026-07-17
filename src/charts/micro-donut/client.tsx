@@ -2,8 +2,16 @@
 // Interactive <MicroDonut>. Pointer → wedge by atan2 angle
 // lookup (pure); ←/→ rove wedges. Disabled entirely when `decorative` — an
 // aria-hidden chart must not be a tab stop. Composes the static component.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
@@ -39,6 +47,8 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -67,11 +77,15 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   const pcts = useMemo(() => largestRemainderPercents(geo.wedges.map((w) => w.share)), [geo]);
   const [active, setActive] = useState<number | null>(null);
 
-  // decorative = ornament: no naming, no tab stop, no interaction
+  // decorative = ornament: no naming, no tab stop, no interaction. This path
+  // renders the static directly (no focusable wrapper), so `className`/`style`
+  // go straight onto it — exactly as they would on the static entry.
   if (decorative) {
     return (
       <StaticMicroDonut
         {...rest}
+        className={className}
+        style={style}
         data={data}
         maxWedges={maxWedges}
         decorative
@@ -89,6 +103,13 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         ? summary
         : sharesSummary(rolled, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
 
   const onPointerMove = useCallback(
     (e: PointerEvent<HTMLElement>) => {
@@ -138,8 +159,8 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className="mc-donut-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-donut-live ${className}` : "mc-donut-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}
@@ -150,6 +171,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
     >
       <StaticMicroDonut
         {...rest}
+        style={FILL}
         data={data}
         maxWedges={maxWedges}
         weight={weight}

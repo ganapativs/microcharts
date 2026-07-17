@@ -16,6 +16,7 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
+import { FILL } from "../../shared/interactive.js";
 import { activityGridGeometry } from "./geometry.js";
 import {
   ActivityGrid as StaticActivityGrid,
@@ -172,6 +173,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     >
       <StaticActivityGrid
         {...rest}
+        style={FILL}
         data={data}
         layout={layout}
         shape={shape}

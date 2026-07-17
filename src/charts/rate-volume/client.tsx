@@ -3,9 +3,18 @@
 // math. ←/→ step periods; the live region ALWAYS pairs both numbers — a rate is
 // never announced without its volume. Composes the static component (canon); the
 // crosshair + bar highlight are overlay children re-using geometry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { rateVolumeGeometry } from "./geometry.js";
@@ -40,6 +49,8 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -49,20 +60,34 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
   // base svg opacity — no ink role of their own to animate as "marks".
   useEntrance(hostRef, "draw", animate);
 
-  const geo = useMemo(
-    () =>
-      rateVolumeGeometry({
-        width,
-        height,
-        data,
-        minVolume,
-        curve,
-        domain: props.domain,
-        volumeDomain: props.volumeDomain,
-      }),
-    [width, height, data, minVolume, curve, props.domain, props.volumeDomain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = rateVolumeGeometry({
+      width,
+      height,
+      data,
+      minVolume,
+      curve,
+      domain: props.domain,
+      volumeDomain: props.volumeDomain,
+    });
+    const showLabel = (props.label ?? "last") === "last" && base?.last != null;
+    const gutterCh = showLabel ? fmt(base!.last!.rate).length : 0;
+    return rateVolumeGeometry({
+      width,
+      height,
+      data,
+      minVolume,
+      curve,
+      domain: props.domain,
+      volumeDomain: props.volumeDomain,
+      gutterCh,
+      fontSize: labelFont(height, 0.62),
+    });
+  }, [width, height, data, minVolume, curve, props.domain, props.volumeDomain, props.label, fmt]);
   const fmtVol = useMemo(() => makeFormatter(volumeFormat, locale), [volumeFormat, locale]);
   const [active, setActive] = useState<number | null>(null);
 
@@ -146,11 +171,18 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
           )
         : strings.rateVolumeNoEvents(active + 1, total);
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-rate-volume-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-rate-volume-live ${className}` : "mc-rate-volume-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -161,6 +193,7 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
     >
       <StaticRateVolume
         {...rest}
+        style={FILL}
         data={data}
         minVolume={minVolume}
         volumeFormat={volumeFormat}

@@ -11,6 +11,7 @@ import {
   type PointerEvent,
 } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PHASE_TRACE } from "../../core/strings-phase-trace.js";
@@ -21,8 +22,6 @@ import {
   type PhaseTraceProps,
 } from "./index.js";
 import { isFiniteValue } from "../../core/types.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractivePhaseTraceProps extends PhaseTraceProps {
   /**
@@ -61,6 +60,8 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -137,11 +138,18 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     ? strings.phaseAt(active! + 1, geo.points.length, xLabel, fmt(pt.dataX), yLabel, fmt(pt.dataY))
     : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-phase-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-phase-live ${className}` : "mc-phase-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={label}

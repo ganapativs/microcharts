@@ -3,8 +3,16 @@
 // Tab cycles the breaks as first-class stops, each announcing the mean shift.
 // A pointer picks the nearest x. Composes the static component (canon); the
 // crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { makeFormatter } from "../../core/format.js";
+import { FILL } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-change-point.js";
@@ -42,6 +50,8 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     title,
     summary,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -153,11 +163,18 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
   const px = active !== null && geo ? 2 + ((width - 4) * active) / Math.max(1, data.length - 1) : 0;
   const readout = active !== null ? fmt(data[active] as number) : "";
 
+  const wrapStyle: CSSProperties = {
+    display: "inline-block",
+    position: "relative",
+    lineHeight: 0,
+    ...style,
+  };
+
   return (
     <span
       ref={hostRef}
-      className="mc-change-point-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
+      className={className ? `mc-change-point-live ${className}` : "mc-change-point-live"}
+      style={wrapStyle}
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
@@ -168,6 +185,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     >
       <StaticChangePoint
         {...rest}
+        style={FILL}
         data={data}
         breaks={breaks}
         max={max}
