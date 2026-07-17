@@ -1,13 +1,19 @@
 import { Progress } from "@microcharts/react/progress";
+import { Sparkline } from "@microcharts/react/sparkline";
 import { SectionMark } from "@/components/home/section-mark";
+import { ReceiptsSizeHistogram } from "@/components/home/receipts-size-histogram";
 import { Reveal } from "@/components/ui/reveal";
 import { SIZE } from "@/lib/docs-facts";
 
 /**
- * 01 · The problem — charts grew up in dashboards; answers moved into
- * sentences. The weight comparison is drawn by the library itself, to linear
- * scale: honesty is the argument. The microchart bar is nearly invisible —
- * that is the point.
+ * 05 · The cost — the size argument, placed AFTER the product has sold
+ * itself (grammar → catalog → surfaces → models): by now the reader wants
+ * the thing; this section tells them it's nearly free. The weight comparison
+ * is drawn by the library itself, to linear scale: honesty is the argument,
+ * and the microchart bar being nearly invisible is the point. The receipts
+ * strip below is the page's ONE home for the measured numbers (size
+ * distribution, dependencies, client JS) — each stat illustrated by a
+ * microchart of itself, all derived from docs-facts.ts.
  */
 
 // External reference point, pinned + dated (never hand-wave a competitor):
@@ -15,23 +21,61 @@ import { SIZE } from "@/lib/docs-facts";
 const RECHARTS_KB = 145;
 const RECHARTS_VERSION = "3.9.2";
 
-export function HomeProblemSection() {
+export function HomeCostSection() {
+  const receipts = [
+    {
+      big: `${SIZE.min}–${SIZE.max} kB`,
+      label: "gzip per chart",
+      note: `median ${SIZE.median} kB across all ${SIZE.count} static entries`,
+      source: ".size-limit.json · CI-enforced",
+      chart: <ReceiptsSizeHistogram />,
+    },
+    {
+      big: "0",
+      label: "runtime dependencies",
+      note: "dependencies: {} forever; React is a peer",
+      source: "package.json · CI-enforced",
+      chart: (
+        <Sparkline
+          data={[0, 0, 0, 0, 0, 0, 0, 0]}
+          width={150}
+          height={30}
+          summary="Runtime dependency count over time: a flat line at zero."
+        />
+      ),
+    },
+    {
+      big: "0 kB",
+      label: "client JS for static charts",
+      note: "pure SVG out of an RSC; nothing hydrates",
+      source: "static entries are hook-free by contract",
+      chart: (
+        <Progress
+          value={0}
+          width={150}
+          height={12}
+          summary="Client JavaScript required by a static chart: zero percent of anything."
+        />
+      ),
+    },
+  ];
+
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="01">the problem</SectionMark>
+      <SectionMark n="05">the cost</SectionMark>
       <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
         <Reveal>
           <h2 className="display text-[length:var(--text-fluid-h2)]">
-            Charts grew up in dashboards. Answers moved into sentences.
+            Word-sized on screen. Word-sized on the wire.
           </h2>
           <p className="mt-4 max-w-md text-fd-muted-foreground">
-            An assistant answers in a paragraph. A table cell has room for one word. A KPI card
-            wants a number and a shape, not a toolbar. The chart libraries we have were built for
-            pages that were mostly chart, not for interfaces that are mostly words.
+            Chart libraries were built for pages that were mostly chart, so the bill never mattered:{" "}
+            {RECHARTS_KB} kB and 11 dependencies before the first mark renders. Inside a sentence or
+            a table cell, it does.
           </p>
           <p className="mt-3 max-w-md text-fd-muted-foreground">
-            So numbers travel as prose, and readers parse trends out of sentences by hand. The
-            missing piece is a chart the size of the word it replaces.
+            Here, every chart&rsquo;s gzip size is a CI gate: a chart that outgrows its budget fails
+            the build. The numbers on this page are the enforced ones, measured on every commit.
           </p>
         </Reveal>
 
@@ -79,16 +123,6 @@ export function HomeProblemSection() {
             <p className="mt-3 text-[0.8rem] text-fd-muted-foreground">
               Same scale, on purpose. The second bar being hard to see is the argument.
             </p>
-            <div className="mt-4 grid gap-x-6 gap-y-2 text-sm text-fd-muted-foreground sm:grid-cols-2">
-              <p>
-                <span className="font-medium text-fd-foreground">{RECHARTS_KB} kB</span> min+gzip
-                and 11 dependencies before the first chart renders.
-              </p>
-              <p>
-                <span className="font-medium text-fd-foreground">{SIZE.median} kB</span> median per
-                chart, zero dependencies, and 0 kB of client JS when it renders statically.
-              </p>
-            </div>
             <p className="mono-label mt-4 opacity-60">
               recharts {RECHARTS_VERSION} via bundlephobia, 2026-07 · microcharts median from
               .size-limit.json, CI-enforced
@@ -96,6 +130,25 @@ export function HomeProblemSection() {
           </div>
         </Reveal>
       </div>
+
+      {/* The receipts — every figure measured by the build, every stat drawn
+          by a microchart of itself. */}
+      <Reveal delay={140} className="mt-10 border-t border-hairline pt-8">
+        <div className="grid gap-x-8 gap-y-6 sm:grid-cols-3">
+          {receipts.map((s) => (
+            <div key={s.label} className="flex flex-col">
+              <p className="display text-[1.75rem] leading-none text-fd-foreground">{s.big}</p>
+              <p className="mt-1.5 text-sm font-medium text-fd-foreground">{s.label}</p>
+              <p className="mt-1 text-sm leading-snug text-fd-muted-foreground">{s.note}</p>
+              <div className="mt-3 flex flex-1 items-end">{s.chart}</div>
+              <p className="mono-label mt-2.5 opacity-60">{s.source}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mono-label mt-6 opacity-60">
+          numbers the build measured, drawn by the library they describe
+        </p>
+      </Reveal>
     </section>
   );
 }

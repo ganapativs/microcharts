@@ -4,12 +4,12 @@ import { SectionMark } from "@/components/home/section-mark";
 import { ThemingDemo } from "@/components/home/theming-demo";
 import { Reveal } from "@/components/ui/reveal";
 
-/** 10 · Theming — one accent in, a matched palette out; the section re-themes
+/** 07 · Theming — one accent in, a matched palette out; the section re-themes
  *  itself through the real CSS custom properties. */
 export function HomeThemingSection() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="10">theming</SectionMark>
+      <SectionMark n="07">theming</SectionMark>
       <div className="grid items-start gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
         <Reveal>
           <h2 className="display text-[length:var(--text-fluid-h2)]">

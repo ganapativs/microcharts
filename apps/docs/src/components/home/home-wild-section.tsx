@@ -6,7 +6,7 @@ import { SHOWCASE, type ShowcaseApp } from "@/lib/showcase";
 import { CATALOG } from "@/lib/docs-facts";
 
 /**
- * 08 · the examples — seven independent example apps that install the package
+ * 06 · the examples — seven independent example apps that install the package
  * from npm and, between them, exercise the whole catalog. Cards are pinned
  * field specimens: a slight resting tilt, the app's hero screenshot
  * (theme-swapped), squaring up on hover. Pure server markup — zero client JS.
@@ -96,7 +96,7 @@ export function HomeWildSection() {
   const [featured, ...rest] = SHOWCASE;
   return (
     <section id="examples" className="mx-auto max-w-shell scroll-mt-20 px-4 py-14 sm:px-6">
-      <SectionMark n="08">the examples</SectionMark>
+      <SectionMark n="06">the examples</SectionMark>
       <Reveal>
         <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">
           The catalog, put to work.
