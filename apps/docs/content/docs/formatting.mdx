@@ -2,8 +2,9 @@
 title: Formatting & scale
 description:
   Control how a chart shows numbers and dates, and what value range it's drawn against — one format prop (Intl options
-  or a function) feeds both the direct labels and the accessible summary, locale handles separators and language, and
-  domain fixes the scale. Formatting is cached, so it stays cheap across hundreds of charts.
+  or a function) feeds the direct labels, the accessible summary and the interactive readout alike, locale handles
+  separators and language, and domain fixes the scale. Formatting is cached, so it stays cheap across hundreds of
+  charts.
 ---
 
 Two orthogonal decisions live here: **how numbers are written** (`format` + `locale`) and **what range they're drawn
@@ -11,11 +12,12 @@ against** (`domain`). Both are part of the one grammar — the same prop name me
 both are documented per chart, but this page is the whole story in one place, since it's easy to assume a default you
 didn't actually get.
 
-## One formatter, two places
+## One formatter, three places
 
-A chart shows numbers in two spots: the **direct labels** it draws, and the **accessible summary** a screen reader
-announces. `format` feeds _both_ from a single definition — so a currency chart's spoken summary says "$1,240", not
-"1240". You never format the same number twice.
+A chart shows numbers in three spots: the **direct labels** it draws, the **accessible summary** a screen reader
+announces, and — on an interactive entry — the **readout** that follows the pointer. `format` feeds _all three_ from a
+single definition — so a currency chart's spoken summary says "$1,240", not "1240". You never format the same number
+twice.
 
 `format` takes either **`Intl.NumberFormatOptions`** or a **plain function** `(n) => string`. Formatters are cached
 (`Intl.NumberFormat` construction is expensive), so passing options costs nothing across hundreds of instances — never
@@ -46,6 +48,35 @@ The arguments are positional — `makeFormatter(format, locale, defaults?)`. The
     title="Revenue"
   />
 </LiveDemo>
+
+## The interactive readout
+
+Import a chart from its `/interactive` subpath and it gains a readout: a small chip that follows the pointer, or the
+focused datum when you rove with the keyboard. It uses the same `format` and `locale` as everything else, so a currency
+chart's hover value matches its label and its summary exactly.
+
+**It is deliberately terse.** The chip names the datum and its value — `Checkout 62%`, `44 → 28` — and nothing else. It
+does not repeat the axis names, the row label already printed beside it, or the grid position the cell already occupies.
+These are word-sized charts; a chip wider than the chart it annotates is worse than no chip.
+
+The fuller sentence still exists. Everything the chip leaves out — the comparison, the quadrant name, the running total,
+the per-cycle breakdown — is announced in the chart's live region, which is what a screen reader reads. So nothing is
+lost by the chip being short; it is a different audience, not less information.
+
+```tsx
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
+
+// the readout, the endpoint label, and the spoken summary all read "$1,600"
+<Sparkline data={revenue} label="last" format={{ style: "currency", currency: "USD" }} />;
+```
+
+The chip is capped at `max(100%, 14em)` wide and ellipsizes past that, so a long formatted value cannot paint across the
+page. If you see an ellipsis, the value is too long for the chart — shorten it with `format` (`notation: "compact"` is
+usually the answer) rather than widening the chart.
+
+Its prose comes from `strings`, like every other word the library renders, so a localized bundle localizes the readout
+too. Its colors come from `--mc-surface`, `--mc-surface-ink` and `--mc-surface-edge`; see
+[Theming](/docs/theming#tokens-in-full).
 
 ## Percent, compact, decimals
 

@@ -50,7 +50,8 @@ export const entry: ChartEntry = {
       name: "work",
       type: "string",
       required: false,
-      description: "Work-unit noun for the summary (default 'points').",
+      description:
+        "Work-unit noun for the summary and readout. Defaults to `strings.burnWork` ('points' in EN), so a localized bundle replaces it.",
     },
     {
       name: "unit",

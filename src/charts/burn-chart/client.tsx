@@ -48,7 +48,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
     ...rest
   } = props;
 
-  // The workWord noun defaults from `strings`, not from a literal: it is rendered
+  // The work noun defaults from `strings`, not from a literal: it is rendered
   // display text, so an English default here would survive a localized bundle.
   const workWord = work ?? strings.burnWork;
 
