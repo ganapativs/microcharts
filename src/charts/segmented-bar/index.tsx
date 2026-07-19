@@ -97,6 +97,12 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
   const pcts = largestRemainderPercents(geo.segments.map((s) => s.share));
   const accName = resolveSummary(summary, () => sharesSummary(rolled, strings));
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -105,7 +111,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-segbar ${className}` : "mc-segbar"}
-      style={style}
+      style={rootStyle}
     >
       {geo.segments.map((seg, i) => {
         const d = rolled[seg.index]!;

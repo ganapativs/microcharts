@@ -63,6 +63,16 @@ export interface StreakSparkGeometryOptions {
   threshold?: number | undefined;
   /** Which outcome is the streak: `"up"` (pass) or `"down"` (fail) is "ok". */
   positive?: "up" | "down" | undefined;
+  /**
+   * Vertical room reserved ABOVE the runs for the run-length label (and the
+   * record triangle), in viewBox units. 0 when `label="none"`.
+   *
+   * Runs are centred on the remaining band rather than on the full box. Without
+   * this the runs centre on `height / 2`, leaving `height * 0.25` of headroom —
+   * less than the label's own font size at any word-sized height, so the label
+   * silently rendered nothing below ~48 units while the default height is 20.
+   */
+  labelRoom?: number | undefined;
 }
 
 /** Resolve a datum to pass / fail / gap. NaN, ±Infinity and null are gaps. */
@@ -77,9 +87,14 @@ export function streakSparkGeometry(
   data: readonly StreakDatum[],
   opts: StreakSparkGeometryOptions,
 ): StreakSparkGeometry {
-  const { width, height, threshold, positive = "up" } = opts;
+  const { width, height, threshold, positive = "up", labelRoom = 0 } = opts;
   const pad = 1;
-  const mid = round2(height / 2);
+  // The runs live in the band BELOW the reserved label room and centre on it, so
+  // the label always has its own space. Clamped so a caller asking for more room
+  // than the box can give still leaves a usable band.
+  const room = Math.max(0, Math.min(labelRoom, Math.max(0, height - pad * 2 - 1)));
+  const band = Math.max(1, height - room);
+  const mid = round2(room + band / 2);
 
   // 1 — collapse to runs of equal outcome; a gap flushes the current run.
   type Raw = { on: boolean; len: number; start: number };
@@ -136,9 +151,11 @@ export function streakSparkGeometry(
   const currentOn = kept[n - 1]!.on;
 
   // 4 — heights encode run TYPE (not magnitude); centered on the mid-line.
-  const hCurrent = round2(Math.max(1, Math.min(height * 0.5, height - pad * 2)));
-  const hOk = round2(Math.max(1, height * 0.4));
-  const hFail = round2(Math.max(1, height * 0.3));
+  // Proportional to the run BAND, not the full box, so reserving label room
+  // shifts and shrinks the runs together instead of letting them overlap it.
+  const hCurrent = round2(Math.max(1, Math.min(band * 0.5, band - pad * 2)));
+  const hOk = round2(Math.max(1, band * 0.4));
+  const hFail = round2(Math.max(1, band * 0.3));
 
   // 5 — horizontal: runs tile the plot, width ∝ length on one shared scale.
   const ellipsisW = truncated ? round2(Math.min(4, (width - pad * 2) * 0.06)) : 0;

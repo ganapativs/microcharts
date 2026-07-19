@@ -46,15 +46,35 @@ export interface SparkGeometry {
  * of drifting against em-based CSS), and the gutter reserves enough plot width
  * that the text NEVER paints outside the viewBox (containment rule).
  * 0.62em-per-char is a safe over-estimate for tabular digits + separators.
+ *
+ * The label budget is ~45% of the width: past that the endpoint figure has eaten
+ * the series it is annotating. A long value (`1,234,567` on a narrow spark) can
+ * ask for more than the budget, and the two ways to answer are to shrink the
+ * text or to let it paint into the margin. It shrinks — down to a 5-unit floor,
+ * below which the figure stops being legible and the budget yields instead.
+ *
+ * The gutter is then always what the chosen size actually needs. It was
+ * previously clamped to the budget (`Math.min(..., width * 0.45)`) while the
+ * text still rendered at full length, so a long label overhung the viewBox by up
+ * to 8 units — the containment guarantee this comment claims was not held.
  */
 export function labelMetrics(
   text: string,
   width: number,
   height: number,
 ): { fontSize: number; gutter: number } {
-  const fontSize = Math.max(6, Math.min(Math.round(height * 0.5), 11));
-  const gutter = Math.min(Math.ceil(text.length * fontSize * 0.62) + 6, Math.floor(width * 0.45));
-  return { fontSize, gutter };
+  const ideal = Math.max(6, Math.min(Math.round(height * 0.5), 11));
+  const budget = Math.floor(width * 0.45);
+  const needs = (size: number): number => Math.ceil(text.length * size * 0.62) + 6;
+
+  let fontSize = ideal;
+  if (needs(fontSize) > budget && text.length > 0) {
+    // Largest size whose gutter fits the budget, floored so the figure stays
+    // readable and capped at `ideal` so a roomy chart never grows its label.
+    const fitted = Math.floor((budget - 6) / (text.length * 0.62));
+    fontSize = Math.max(5, Math.min(ideal, fitted));
+  }
+  return { fontSize, gutter: needs(fontSize) };
 }
 
 export interface SparkGeometryOptions {

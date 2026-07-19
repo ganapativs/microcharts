@@ -7,7 +7,7 @@
   {
     "name": "@microcharts/react/sparkline (static)",
     "path": "dist/charts/sparkline/index.js",
-    "limit": "3.7 kB",
+    "limit": "3.8 kB",
     "gzip": true
   },
   {
@@ -25,7 +25,7 @@
   {
     "name": "@microcharts/react/sparkbar/interactive",
     "path": "dist/charts/sparkbar/client.js",
-    "limit": "4.85 kB",
+    "limit": "4.89 kB",
     "gzip": true
   },
   {
@@ -67,7 +67,7 @@
   {
     "name": "@microcharts/react/trend-arrow (static)",
     "path": "dist/charts/trend-arrow/index.js",
-    "limit": "1.7 kB",
+    "limit": "1.78 kB",
     "gzip": true
   },
   {
@@ -91,7 +91,7 @@
   {
     "name": "@microcharts/react/heat-cell (static)",
     "path": "dist/charts/heat-cell/index.js",
-    "limit": "1.8 kB",
+    "limit": "1.88 kB",
     "gzip": true
   },
   {
@@ -103,7 +103,7 @@
   {
     "name": "@microcharts/react/progress (static)",
     "path": "dist/charts/progress/index.js",
-    "limit": "1.9 kB",
+    "limit": "1.98 kB",
     "gzip": true
   },
   {
@@ -187,7 +187,7 @@
   {
     "name": "@microcharts/react/dumbbell (static)",
     "path": "dist/charts/dumbbell/index.js",
-    "limit": "2.7 kB",
+    "limit": "2.75 kB",
     "gzip": true
   },
   {
@@ -217,7 +217,7 @@
   {
     "name": "@microcharts/react/slope/interactive",
     "path": "dist/charts/slope/client.js",
-    "limit": "5.14 kB",
+    "limit": "5.22 kB",
     "gzip": true
   },
   {
@@ -235,13 +235,13 @@
   {
     "name": "@microcharts/react/segmented-bar (static)",
     "path": "dist/charts/segmented-bar/index.js",
-    "limit": "2.4 kB",
+    "limit": "2.47 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/segmented-bar/interactive",
     "path": "dist/charts/segmented-bar/client.js",
-    "limit": "4.3 kB",
+    "limit": "4.37 kB",
     "gzip": true
   },
   {
@@ -307,7 +307,7 @@
   {
     "name": "@microcharts/react/likert-strip (static)",
     "path": "dist/charts/likert-strip/index.js",
-    "limit": "2.65 kB",
+    "limit": "2.73 kB",
     "gzip": true
   },
   {
@@ -355,7 +355,7 @@
   {
     "name": "@microcharts/react/stacked-area (static)",
     "path": "dist/charts/stacked-area/index.js",
-    "limit": "2.9 kB",
+    "limit": "2.96 kB",
     "gzip": true
   },
   {
@@ -949,7 +949,7 @@
   {
     "name": "@microcharts/react/hypnogram/interactive",
     "path": "dist/charts/hypnogram/client.js",
-    "limit": "4.48 kB",
+    "limit": "4.49 kB",
     "gzip": true
   },
   {
@@ -1189,13 +1189,13 @@
   {
     "name": "@microcharts/react/streak-spark (static)",
     "path": "dist/charts/streak-spark/index.js",
-    "limit": "2.5 kB",
+    "limit": "2.58 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/streak-spark/interactive",
     "path": "dist/charts/streak-spark/client.js",
-    "limit": "4.25 kB",
+    "limit": "4.33 kB",
     "gzip": true
   },
   {
@@ -1249,7 +1249,7 @@
   {
     "name": "@microcharts/react/bias-strip (static)",
     "path": "dist/charts/bias-strip/index.js",
-    "limit": "2.45 kB",
+    "limit": "2.5 kB",
     "gzip": true
   },
   {

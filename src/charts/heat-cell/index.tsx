@@ -83,6 +83,12 @@ export function HeatCell(props: HeatCellProps): ReactNode {
   const text = geo.step !== null && label === "value" ? fmt(value) : undefined;
   const showLabel = text !== undefined && geo.labelFits(text.length, fontSize);
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={SIZE}
@@ -91,7 +97,7 @@ export function HeatCell(props: HeatCellProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-heat-cell ${className}` : "mc-heat-cell"}
-      style={style}
+      style={rootStyle}
     >
       <rect
         x={geo.x}

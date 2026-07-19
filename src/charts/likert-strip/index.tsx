@@ -116,6 +116,12 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   const barH = Math.max(3, height - 4);
   const net = geo ? (geo.shares.positive - geo.shares.negative) * 100 : 0;
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -124,7 +130,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-likert ${className}` : "mc-likert"}
-      style={style}
+      style={rootStyle}
     >
       {geo ? (
         <>

@@ -75,14 +75,23 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const geo = streakSparkGeometry(data, { width, height, threshold, positive });
+  const fontSize = labelFont(height, 0.4);
+  // Reserve the label's own band before geometry (canon: gutters are reserved,
+  // never measured). One font is enough even for the record run, which carries a
+  // triangle tick between bar and number: runs centre inside the band below the
+  // reservation, so a run's top sits at `room + (band - h) / 2` and `h` is at
+  // most half the band — that centring slack (≥ band / 4) already covers the
+  // tick. Reserving `fontSize + TRIANGLE_H` instead would take 51% of a default
+  // 20-unit box and shrink the current run from 10 units to 4.9, turning a
+  // streak chart into a number with a hairline under it.
+  const labelRoom = label === "none" ? 0 : fontSize;
+  const geo = streakSparkGeometry(data, { width, height, threshold, positive, labelRoom });
   if (geo.truncated)
     devWarn(
       "<StreakSpark> more than 40 runs — the oldest collapse into an ellipsis slot; pre-aggregate or window the data.",
     );
   const accName = resolveSummary(summary, () => streakSparkSummary(geo, strings, fmt));
 
-  const fontSize = labelFont(height, 0.4);
   const currentRun = geo.runs.find((r) => r.current);
   const recordRun = geo.runs.find((r) => r.record);
   const currentIsRecord = !!recordRun && currentRun === recordRun;
@@ -127,6 +136,12 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
     );
   }
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -135,7 +150,7 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-streak ${className}` : "mc-streak"}
-      style={style}
+      style={rootStyle}
     >
       {geo.ellipsis ? (
         <rect

@@ -130,6 +130,12 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
   ] as const;
   const leaderGood = (gap ?? 0) > 0 ? aGood : !aGood;
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -138,7 +144,7 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-spread ${className}` : "mc-spread"}
-      style={style}
+      style={rootStyle}
     >
       {ann.under}
       {!geo.coincident ? (

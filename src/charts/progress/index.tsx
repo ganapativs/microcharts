@@ -115,6 +115,12 @@ export function Progress(props: ProgressProps): ReactNode {
   const accName = resolveSummary(summary, () => model.summary);
   const fillStyle = color ? { fill: color } : undefined;
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={geo.totalWidth}
@@ -123,7 +129,7 @@ export function Progress(props: ProgressProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-progress ${className}` : "mc-progress"}
-      style={style}
+      style={rootStyle}
     >
       {geo.segments ? (
         geo.segments.map((s) => (

@@ -31,6 +31,37 @@ export function textGutter(chars: number, fontSize: number, pad: number): number
   return Math.ceil(chars * fontSize * 0.62) + pad;
 }
 
+/**
+ * Reserved gutter for **caller-supplied category text** — a row name, a series
+ * label, anything the library did not format itself.
+ *
+ * `textGutter`'s 0.62 is calibrated for tabular-nums FIGURES, and for those it
+ * holds with room to spare. It does not hold for arbitrary text, and the gap is
+ * not marginal. Measured per-character advance (fraction of font size), in the
+ * two very different faces this library gets rendered in — Hanken Grotesk on the
+ * docs site and the Times fallback in the test environment:
+ *
+ *   digits `1234567`      0.50 – 0.56    ← what 0.62 was calibrated against
+ *   `1,234,567`           0.44 – 0.49
+ *   mixed case `Northe…`  0.50 – 0.54
+ *   UPPERCASE A–Z         0.635
+ *   `MMMMMM…`             0.84 – 0.91
+ *   `WWWWWW…`             0.95 – 0.96    ← the bound
+ *
+ * So an all-caps row label reserved at 0.62 paints outside its gutter, and
+ * `.mc-root` is `overflow: visible` — it spills into the page rather than
+ * clipping. 0.95 covers the worst case measured in both faces.
+ *
+ * This over-reserves for the common `Rome`/`North` label, and that is the
+ * deliberate trade: the static path may never measure text (it renders on the
+ * server), so the estimate has to hold for the worst input, not the usual one.
+ * A few units of unused gutter is a smaller failure than a label in the margin.
+ * Charts that format their OWN numbers keep using `textGutter`.
+ */
+export function textGutterProse(chars: number, fontSize: number, pad: number): number {
+  return Math.ceil(chars * fontSize * 0.95) + pad;
+}
+
 export function spreadLabels(
   desired: readonly number[],
   pitch: number,

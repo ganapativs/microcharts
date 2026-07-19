@@ -3,7 +3,7 @@
 // shape-coded (hollow from → filled to), never color-alone. Coords 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
-import { textGutter } from "../../core/labels.js";
+import { textGutterProse } from "../../core/labels.js";
 
 interface DumbbellRow {
   y: number;
@@ -32,7 +32,8 @@ export function dumbbellGeometry(opts: {
 }): DumbbellGeometry {
   const { width, height, pairs, gutterCh, fontSize } = opts;
   const r = 2;
-  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 3) : 0;
+  // Caller-supplied row label, not a figure we formatted — see textGutterProse.
+  const gutter = gutterCh > 0 ? textGutterProse(gutterCh, fontSize, 3) : 0;
   const plotX0 = gutter + r;
   const plotX1 = width - r;
 

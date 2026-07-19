@@ -2,7 +2,7 @@
 // Static, hook-free, RSC-safe. Start angle fixed at 12 o'clock, butt caps —
 // never a gauge: no needle, no red zone. `sweep` flips the data meaning from
 // "done grows" to "remaining shrinks" (countdown/cooldown); summary follows.
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { makeFormatter } from "../../core/format.js";
@@ -68,6 +68,12 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
       : model.summary;
   const accName = resolveSummary(summary, () => auto);
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${geo.fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={size}
@@ -76,7 +82,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-ring ${className}` : "mc-ring"}
-      style={style}
+      style={rootStyle}
     >
       <path d={geo.track} data-mc-ink="band" />
       {geo.arc ? (

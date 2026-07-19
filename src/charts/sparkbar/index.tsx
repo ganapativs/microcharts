@@ -99,6 +99,14 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     fontSize: annotationFontSize(height),
   });
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = metrics
+    ? { ...style, "--mc-label-size": `${metrics.fontSize}px` }
+    : (style as CSSProperties);
+
   return (
     <Chart
       width={width}
@@ -107,7 +115,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-sparkbar ${className}` : "mc-sparkbar"}
-      style={style}
+      style={rootStyle}
     >
       {ann.under}
       {geo.bars.map((bar) => (

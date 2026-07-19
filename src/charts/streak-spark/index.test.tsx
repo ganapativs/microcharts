@@ -37,6 +37,24 @@ describe("<StreakSpark> static structure", () => {
     expect(container.querySelectorAll("rect")).toHaveLength(3);
   });
 
+  // Regression: the runs used to centre on the full box, leaving height * 0.25 of
+  // headroom — below the label's own font size at every word-sized height. The
+  // default `label="current"` therefore rendered no text at all until the chart
+  // was ~48 units tall, against a default height of 20. The geometry now reserves
+  // the label band, so the number seats at the default size.
+  it("run-length label seats at the DEFAULT height, not just tall boxes", () => {
+    const { container } = draw(<StreakSpark data={D} title="Deploys" />);
+    expect(container.querySelectorAll("text").length).toBeGreaterThan(0);
+  });
+
+  it("label='none' reclaims the reserved label band for the runs", () => {
+    const withLabel = draw(<StreakSpark data={D} label="current" />).container;
+    const without = draw(<StreakSpark data={D} label="none" />).container;
+    expect(without.querySelectorAll("text")).toHaveLength(0);
+    const h = (c: HTMLElement) => Number(c.querySelector("rect")!.getAttribute("height"));
+    expect(h(without)).toBeGreaterThan(h(withLabel));
+  });
+
   it("current (last) run takes accent ink", () => {
     const { container } = draw(<StreakSpark data={D} />);
     const rects = [...container.querySelectorAll("rect")];

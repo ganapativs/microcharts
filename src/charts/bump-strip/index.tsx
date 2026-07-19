@@ -85,6 +85,12 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
   });
   const accName = resolveSummary(summary, () => bumpSummary(data, strings));
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -93,7 +99,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-bump ${className}` : "mc-bump"}
-      style={style}
+      style={rootStyle}
     >
       {geo.d ? (
         <path

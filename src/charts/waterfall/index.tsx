@@ -135,6 +135,12 @@ export function Waterfall(props: WaterfallProps): ReactNode {
     fontSize: annotationFontSize(height),
   });
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -143,7 +149,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-waterfall ${className}` : "mc-waterfall"}
-      style={style}
+      style={rootStyle}
     >
       {ann.under}
       {geo.connectors.map((c, i) => (

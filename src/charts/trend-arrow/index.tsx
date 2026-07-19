@@ -100,6 +100,12 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
   const ink =
     model.valence === "pos" ? "positive" : model.valence === "neg" ? "negative" : "neutral";
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${geo.fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -108,7 +114,7 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-trend ${className}` : "mc-trend"}
-      style={style}
+      style={rootStyle}
     >
       <path d={geo.d} data-mc-ink={ink} />
       {showValue ? (

@@ -4,7 +4,7 @@
 // fontSize × 1.1 drop their labels (count × height, no measurement). 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
-import { textGutter } from "../../core/labels.js";
+import { textGutter, textGutterProse } from "../../core/labels.js";
 
 interface SlopeLine {
   x0: number;
@@ -74,6 +74,7 @@ export function slopeFrame(opts: {
     domain,
     gutterLeftCh: estLeftCh,
     gutterRightCh: estRightCh,
+    rightIsProse: wantLabel,
     fontSize,
   });
   if (geo.labelsFit) return { geo, labelsDropped: false };
@@ -98,12 +99,23 @@ export function slopeGeometry(opts: {
   domain?: readonly [number, number] | undefined;
   gutterLeftCh: number;
   gutterRightCh: number;
+  /**
+   * Whether the right gutter carries the caller's category label
+   * (`label="label"`/`"both"`) rather than only our own formatted value.
+   * Category text needs the wider prose estimate; a formatted figure does not,
+   * and over-reserving for it costs enough plot width at the default 40-unit
+   * width to push the labels past their own fit threshold and drop them.
+   */
+  rightIsProse?: boolean | undefined;
   fontSize: number;
 }): SlopeGeometry {
-  const { width, height, pairs, gutterLeftCh, gutterRightCh, fontSize } = opts;
+  const { width, height, pairs, gutterLeftCh, gutterRightCh, fontSize, rightIsProse } = opts;
   const r = 1.5;
+  // The left gutter only ever holds our own formatted value, which is what
+  // textGutter's tabular-figure constant is calibrated for.
   const gutterL = gutterLeftCh > 0 ? textGutter(gutterLeftCh, fontSize, 3) : 0;
-  const gutterR = gutterRightCh > 0 ? textGutter(gutterRightCh, fontSize, 3) : 0;
+  const estimateRight = rightIsProse ? textGutterProse : textGutter;
+  const gutterR = gutterRightCh > 0 ? estimateRight(gutterRightCh, fontSize, 3) : 0;
   const colX0 = round2(gutterL + r);
   const colX1 = round2(width - gutterR - r);
 

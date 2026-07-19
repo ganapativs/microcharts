@@ -219,7 +219,18 @@
     font-variant-numeric: tabular-nums;
     font-family: var(--mc-font-numeric);
     font-weight: var(--mc-label-weight);
-    font-size: calc(var(--mc-label-size) * var(--mc-density));
+    /* Density scales the label, but only up to 1.25 — past that the text outgrows
+       the gutter the geometry reserved for it and paints outside the viewBox
+       (`.mc-root` is overflow: visible, so it spills into the page rather than
+       clipping). Gutters are computed server-side from a character-count
+       estimate and cannot see a runtime CSS variable, so the cap is the only
+       place this can be enforced. Measured on the worst case in the catalog
+       (dot-plot, a caller-supplied all-caps row label, whose prose gutter has the
+       least slack): no spill at 0.8 / 1 / 1.25, and 7.5 units of spill at 1.5.
+       Compact density (< 1) is always safe — it shrinks the text inside a gutter
+       already reserved for the larger size. Stroke and gap keep scaling
+       unclamped below; neither is bounded by a reserved text box. */
+    font-size: calc(var(--mc-label-size) * min(1.25, var(--mc-density)));
     fill: var(--mc-stroke);
   }
   /* small-multiples wrapper — layout-neutral by default */

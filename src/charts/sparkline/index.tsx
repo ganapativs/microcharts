@@ -134,6 +134,14 @@ export function Sparkline(props: SparklineProps): ReactNode {
   const showMinMax = dots === "minmax";
   const showEndpoint = dots !== "none";
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = metrics
+    ? { ...style, "--mc-label-size": `${metrics.fontSize}px` }
+    : (style as CSSProperties);
+
   return (
     <Chart
       width={width}
@@ -142,7 +150,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-spark ${className}` : "mc-spark"}
-      style={style}
+      style={rootStyle}
     >
       {geo.band ? (
         <rect

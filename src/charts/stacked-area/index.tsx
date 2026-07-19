@@ -129,6 +129,12 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
   // endpoint labels drop when rows are too dense for the series count
   const labelsFit = height / Math.max(1, series.length) >= fontSize * 1.1;
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -137,7 +143,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-stacked ${className}` : "mc-stacked"}
-      style={style}
+      style={rootStyle}
     >
       {/* back-to-front for ridge (opaque fills), bottom-up for stacked */}
       {(variant === "ridge" ? [...geo.layers].reverse() : geo.layers).map((layer) => (

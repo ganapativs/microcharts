@@ -84,6 +84,12 @@ export function BiasStrip(props: BiasStripProps): ReactNode {
     captionPad > 0 && labelText.length > 0 && labelText.length * fontSize * 0.62 + 2 <= width - 2;
   const labelY = captionPad / 2;
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -92,7 +98,7 @@ export function BiasStrip(props: BiasStripProps): ReactNode {
       summary={accName}
       id={id}
       className={className ? `mc-bias ${className}` : "mc-bias"}
-      style={style}
+      style={rootStyle}
     >
       {geo.band ? (
         <rect x={0} y={geo.band.y} width={width} height={geo.band.height} data-mc-ink="band" />
