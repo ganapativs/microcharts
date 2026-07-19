@@ -189,7 +189,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
             transform: "translateX(-50%)",
           }}
         >
-          {`${seg.label} ${pctOf(seg.share)}`}
+          {`${seg.label} ${pctOf(seg.share)}${parentClause}`}
         </span>
       ) : null}
     </span>

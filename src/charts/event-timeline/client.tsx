@@ -229,8 +229,8 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
           }}
         >
           {item.end !== undefined
-            ? formatDuration(item.end - item.start)
-            : dateFmt(new Date(item.start))}
+            ? `${item.label ?? fallbackLabel(shownItem.i, "span")}: ${formatDuration(item.end - item.start)}`
+            : `${item.label ?? fallbackLabel(shownItem.i, "point")}: ${dateFmt(new Date(item.start))}`}
         </span>
       ) : null}
     </span>

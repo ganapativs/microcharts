@@ -187,7 +187,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
           className="mc-ladder-readout mc-spark-readout"
           style={{ left: `${(tick.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`p${tick.p} ${fmt(tick.value)}`}
+          {`p${tick.p} ${fmt(tick.value)} (${ratioFmt(medianValue === 0 ? 0 : round2(tick.value / medianValue))}×)`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

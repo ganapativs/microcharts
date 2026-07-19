@@ -206,7 +206,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(period.close)}
+          {`O${fmt(period.open)} H${fmt(period.high)} L${fmt(period.low)} C${fmt(period.close)}`}
         </span>
       ) : null}
     </span>

@@ -236,7 +236,11 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {valid(shown!) ? `${fmt(sDatum.rate)} · ${fmtVol(sDatum.volume)}` : "no events"}
+          {valid(shown!)
+            ? `${fmt(sDatum.rate)} · ${fmtVol(sDatum.volume)} ${unit}${
+                minVolume !== undefined && sDatum.volume < minVolume ? " (low)" : ""
+              }`
+            : "no events"}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

@@ -90,7 +90,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
       <LiveRegion>{active ? text : ""}</LiveRegion>
       {active && geo.step !== null ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {fmt(value)}
+          {`${fmt(value)} — level ${geo.step + 1}/${steps}`}
         </span>
       ) : null}
     </span>

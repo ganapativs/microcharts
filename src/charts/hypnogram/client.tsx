@@ -187,7 +187,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {run.state}
+          {`${run.state} ${fmt(run.t0)}–${fmt(run.t1)}`}
         </span>
       ) : null}
     </span>

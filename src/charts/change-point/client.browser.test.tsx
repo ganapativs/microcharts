@@ -20,7 +20,9 @@ describe("interactive <ChangePoint>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toMatch(/^Point 0: 32 — regime 1 of 2, mean 32\.$/);
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("32");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("regime 1/2");
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
     await expect.poll(() => live.textContent).toMatch(/regime 2 of 2, mean 48\.$/);
   });

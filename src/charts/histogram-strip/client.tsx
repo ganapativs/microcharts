@@ -161,7 +161,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
             transform: "translateX(-50%)",
           }}
         >
-          {bar.count}
+          {`${fmt(bar.x0)}–${fmt(bar.x1)}: ${bar.count}`}
         </span>
       ) : null}
     </span>

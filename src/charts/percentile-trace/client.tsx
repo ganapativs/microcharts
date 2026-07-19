@@ -192,7 +192,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
           className="mc-percentile-readout mc-spark-readout"
           style={{ left: `${(p.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {pStr(p.value)}
+          {`${unit} ${p.index}: ${pStr(p.value)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

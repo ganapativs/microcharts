@@ -228,7 +228,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {`${span.label} ${fmt(span.duration)}`}
+          {`${span.label} ${fmt(span.duration)} (${Math.round(span.share * 100)}%, depth ${span.depth}${span.critical ? ", critical" : ""})`}
         </span>
       ) : null}
     </span>

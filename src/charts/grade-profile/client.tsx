@@ -174,7 +174,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
           className="mc-spark-readout"
           style={{ left: `${(midX / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {pct(seg.grade)}
+          {`${fmt(seg.dEnd)}: ${pct(seg.grade)}, ${fmt(seg.cumGain)} gained`}
         </span>
       ) : null}
     </span>

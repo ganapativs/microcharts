@@ -181,7 +181,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(edge.value)}
+          {`${edge.name} ${fmt(edge.value)}`}
         </span>
       ) : null}
     </span>

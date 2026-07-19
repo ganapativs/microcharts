@@ -19,10 +19,10 @@ describe("interactive <DataDiff>", () => {
     key(wrap, "Home");
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("users: +340 added, −120 removed, net +220.");
-    // a VISIBLE readout chip pairs +added · −removed
+    // a VISIBLE readout chip pairs the row key with +added · −removed (net)
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("+340 · −120");
+      .toBe("users: +340 · −120 (+220)");
     key(wrap, "ArrowDown");
     await expect.poll(() => live.textContent).toBe("orders: +88 added, −30 removed, net +58.");
   });

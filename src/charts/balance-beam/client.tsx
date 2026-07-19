@@ -53,7 +53,10 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
     ...rest
   } = props;
   const summary = balanceBeamSummary(data, { mode, domain, strings, format, locale });
-  const [announced, setAnnounced] = useState("");
+  // Data-driven announcement: fires only when the heavier side flips (a prop
+  // change), independent of keyboard/pointer focus — see `panSpoken` below for
+  // the roving announcement, which takes priority whenever a pan is shown.
+  const [changed, setChanged] = useState("");
   const hostRef = useRef<HTMLSpanElement>(null);
   // Only the weights (dots) settle — the beam and fulcrum arrive via the base
   // whole-svg fade, since a scaling line/path would read oddly at this scale.
@@ -82,7 +85,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
   useEffect(() => {
     if (geo.heavier === prevHeavier.current) return;
     prevHeavier.current = geo.heavier;
-    if (live) setAnnounced(summary);
+    if (live) setChanged(summary);
   }, [geo, summary, live]);
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
@@ -156,6 +159,12 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
 
   const shown = active ?? selected;
   const pan = shown !== null ? data[shown] : undefined;
+  // What the live region says while roving: the currently-shown pan (hover or
+  // keyboard focus), read the same way the visible readout chip shows it. This
+  // takes priority over `changed` so arrowing between the two pans is always
+  // announced, not just prop-driven data changes.
+  const panSpoken = pan ? strings.beamPanAt(pan.label, fmt(pan.value)) : "";
+  const announced = shown !== null ? panSpoken : changed;
 
   return (
     <span

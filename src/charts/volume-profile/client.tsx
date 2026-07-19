@@ -175,7 +175,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
             bottom: "auto",
           }}
         >
-          {`${fmt(bar.level)} · ${Math.round(share * 100)}%`}
+          {`${fmt(bar.level)} · ${Math.round(share * 100)}%${bar.poc ? strings.volumePoc : ""}`}
         </span>
       ) : null}
     </span>

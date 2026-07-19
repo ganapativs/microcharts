@@ -20,6 +20,16 @@ describe("interactive <HistogramStrip>", () => {
     await expect.poll(() => live.textContent).toMatch(/^\d+(\.\d+)? to \d+(\.\d+)?: 2 values\.$/);
   });
 
+  it("visible readout chip shows the bin's range and count, not just count", async () => {
+    const screen = await render(<HistogramStrip data={VALUES} bins={3} />);
+    const wrap = screen.container.querySelector(".mc-histogram-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toMatch(/^\d+(\.\d+)?–\d+(\.\d+)?: 3$/);
+  });
+
   it("onActive reports the focused bin (bin index + count); null once cleared", async () => {
     const seen: unknown[] = [];
     const screen = await render(

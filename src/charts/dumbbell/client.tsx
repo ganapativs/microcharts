@@ -192,6 +192,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   const shown = active ?? selected;
   const shownRow = shown !== null ? geo.rows[shown] : undefined;
   const shownDatum = shown !== null ? data[shown] : undefined;
+  const shownChange = shownDatum ? pairChange(shownDatum.from, shownDatum.to) : null;
   const announced = (() => {
     if (!shownDatum) return "";
     const c = pairChange(shownDatum.from, shownDatum.to);
@@ -235,7 +236,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {`${fmt(shownDatum.from)} → ${fmt(shownDatum.to)}`}
+          {`${fmt(shownDatum.from)} → ${fmt(shownDatum.to)}${shownChange ? ` (${shownChange.dir} ${shownChange.pct})` : ""}`}
         </span>
       ) : null}
     </span>

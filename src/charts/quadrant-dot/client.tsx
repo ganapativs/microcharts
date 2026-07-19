@@ -207,7 +207,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
           className="mc-quadrant-dot-readout mc-spark-readout"
           style={{ left: `${(g.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${fmt(g.vx)}, ${fmt(g.vy)}`}
+          {`${xLabel} ${fmt(g.vx)}, ${yLabel} ${fmt(g.vy)} — ${nameOf(g.quadrant, xLabel, yLabel, quadrants, strings)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

@@ -24,8 +24,10 @@ describe("interactive <QuantileDots>", () => {
     );
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toMatch(/^\d+ in 20 chances above /);
-    // the readout chip reports the live odds
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toMatch(/in 20$/);
+    // the readout chip reports the live odds + probe side/threshold
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toMatch(/^\d+ in 20 above \d+/);
   });
 
   // Regression: the crosshair line is drawn inside the static at the true

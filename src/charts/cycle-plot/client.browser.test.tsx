@@ -31,7 +31,9 @@ describe("interactive <CyclePlot>", () => {
     key(wrap, "Home");
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("Sun: mean 38 across 6 weeks, steady.");
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("38");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("Sun: 38 (steady)");
     key(wrap, "ArrowRight");
     await expect.poll(() => live.textContent).toMatch(/^Mon: mean \d+ across 6 weeks, rising\.$/);
   });
@@ -88,11 +90,15 @@ describe("interactive <CyclePlot>", () => {
     key(wrap, "ArrowRight"); // slot 1 = Mon
     key(wrap, "ArrowDown"); // cycle 1
     await expect.poll(() => live.textContent).toBe("Mon, cycle 1 of 6: 40.");
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("40");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("Mon, cycle 1 of 6: 40");
     key(wrap, "ArrowDown");
     key(wrap, "ArrowDown"); // cycle 3
     await expect.poll(() => live.textContent).toBe("Mon, cycle 3 of 6: 44.");
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("44");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("Mon, cycle 3 of 6: 44");
   });
 
   it("↓ stops at the last cycle instead of falling out of the slot", async () => {

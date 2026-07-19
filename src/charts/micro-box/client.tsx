@@ -189,7 +189,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(resolved.five[shownStop])}
+          {strings.boxStat(shownStop, fmt(resolved.five[shownStop])).replace(/\.$/, "")}
         </span>
       ) : null}
     </span>

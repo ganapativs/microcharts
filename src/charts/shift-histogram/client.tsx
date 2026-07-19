@@ -237,7 +237,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
             transform: "translateX(-50%)",
           }}
         >
-          {`${pct(b.beforeShare)} / ${pct(b.afterShare)}`}
+          {`${fmt(b.x0)}–${fmt(b.x1)}: ${pct(b.beforeShare)} / ${pct(b.afterShare)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

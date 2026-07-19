@@ -201,7 +201,7 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
           className="mc-spark-readout"
           style={{ left: `${(pt.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${fmt(pt.predicted)} → ${fmt(pt.observed)}`}
+          {`${fmt(pt.predicted)} → ${fmt(pt.observed)} (n=${pt.count}${pt.lowSupport ? ", low support" : ""})`}
         </span>
       ) : null}
     </span>

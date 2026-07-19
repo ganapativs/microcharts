@@ -69,4 +69,26 @@ describe("interactive <BalanceBeam>", () => {
     const screen = await render(<BalanceBeam data={IN_OUT} selectedIndex={0} />);
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  it("←/→ rove pans with per-pan announcements", async () => {
+    const screen = await render(<BalanceBeam data={IN_OUT} />);
+    const wrap = screen.container.querySelector(".mc-beam-live") as HTMLElement;
+    const live = document.querySelector('[aria-live="polite"]')!;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    await expect.poll(() => live.textContent).toBe("outflow: 480.");
+    key(wrap, "ArrowLeft");
+    await expect.poll(() => live.textContent).toBe("Inflow: 620.");
+  });
+
+  it("clearing the roving falls back to the data-change announcement", async () => {
+    const screen = await render(<BalanceBeam data={IN_OUT} />);
+    const wrap = screen.container.querySelector(".mc-beam-live") as HTMLElement;
+    const live = document.querySelector('[aria-live="polite"]')!;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    await expect.poll(() => live.textContent).toBe("outflow: 480.");
+    key(wrap, "Escape");
+    await expect.poll(() => live.textContent).toBe("");
+  });
 });

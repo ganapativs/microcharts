@@ -38,7 +38,9 @@ describe("interactive <DotPlot>", () => {
         clientY: r.top + 2, // first row
       }),
     );
-    await expect.poll(() => document.querySelector(".mc-spark-readout")?.textContent).toBe("96");
+    await expect
+      .poll(() => document.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("Ada: 96");
   });
 
   it("onActive reports the focused datum (row index + value); null on clear", async () => {

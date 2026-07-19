@@ -19,7 +19,7 @@ describe("interactive <WinProbWorm>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("Point 15: home 98%.");
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("98%");
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("home 98%");
     // step to a trailing point — the loser's side + their probability
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));

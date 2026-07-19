@@ -175,7 +175,7 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
           className="mc-spark-readout"
           style={{ left: `${(step.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${sideName} ${fmt(step.cum)}`}
+          {`${sideName} ${fmt(step.cum)} (± ${fmt(step.dist)})`}
         </span>
       ) : null}
     </span>

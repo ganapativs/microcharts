@@ -185,7 +185,7 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
           className="mc-control-readout mc-spark-readout"
           style={{ left: `${(p.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {fmt(value)}
+          {`${fmt(value)}${side ? ` ${side === "upper" ? "above" : "below"} ${fmt(side === "upper" ? geo!.band.hi : geo!.band.lo)}` : ""}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

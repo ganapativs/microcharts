@@ -8,7 +8,9 @@ describe("interactive <HeatCell>", () => {
     const wrap = screen.container.querySelector(".mc-heat-cell-live") as HTMLElement;
     expect(wrap.getAttribute("aria-label")).toBe("Load. 42 — level 3 of 5.");
     wrap.focus();
-    await expect.poll(() => document.querySelector(".mc-spark-readout")?.textContent).toBe("42");
+    await expect
+      .poll(() => document.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("42 — level 3/5");
     expect(document.querySelector('[aria-live="polite"]')!.textContent).toBe("42 — level 3 of 5.");
   });
 

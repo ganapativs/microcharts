@@ -183,7 +183,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
             transform: "translateX(-50%)",
           }}
         >
-          {`${fmt(shownRun.len)} ${word}`}
+          {`${fmt(shownRun.len)} ${word}${shownRun.record ? strings.streakRecord : ""}`}
         </span>
       ) : null}
     </span>

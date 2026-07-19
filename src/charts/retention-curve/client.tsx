@@ -222,7 +222,9 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
           className="mc-retention-readout mc-spark-readout"
           style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {p.bench === null ? fmt(p.value) : `${fmt(p.value)} · ${fmt(p.bench)}`}
+          {`${unit} ${p.period}: ${
+            p.bench === null ? fmt(p.value) : `${fmt(p.value)} · ${fmt(p.bench)}`
+          }`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

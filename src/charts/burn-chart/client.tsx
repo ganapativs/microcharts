@@ -235,11 +235,11 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
           style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
           {p.actual !== null
-            ? fmt(p.actual)
+            ? `${fmt(p.actual)} ${work}${p.plan !== null ? ` / ${fmt(p.plan)} plan` : ""}`
             : p.projected !== null
-              ? `${fmt(p.projected)}⋯`
+              ? `${fmt(p.projected)}⋯ ${work}`
               : p.plan !== null
-                ? fmt(p.plan)
+                ? `${fmt(p.plan)} ${work} plan`
                 : ""}
         </span>
       ) : null}

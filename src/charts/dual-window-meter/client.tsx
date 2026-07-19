@@ -173,7 +173,7 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
           className="mc-spark-readout"
           style={{ left: `${(shownX / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${f == null ? "—" : fmt(f)} · ${s == null ? "—" : fmt(s)}`}
+          {`${f == null ? "—" : fmt(f)} · ${s == null ? "—" : fmt(s)} · target ${fmt(target)}`}
         </span>
       ) : null}
     </span>

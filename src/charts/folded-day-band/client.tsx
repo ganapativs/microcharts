@@ -193,7 +193,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
           className="mc-spark-readout"
           style={{ left: `${(s.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${fmt(binPosition(s.bin, bins, period))} · ${fmt(s.median)}`}
+          {`${fmt(binPosition(s.bin, bins, period))} · ${fmt(s.median)} (${fmt(s.q1)}–${fmt(s.q3)})`}
         </span>
       ) : null}
     </span>

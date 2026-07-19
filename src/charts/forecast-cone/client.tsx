@@ -167,8 +167,8 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
     : "";
   const readout = p
     ? p.kind === "history"
-      ? fmt(p.value)
-      : `${fmt(p.value)} · ${fmt(p.lo!)}–${fmt(p.hi!)}`
+      ? `${unit} ${p.period}: ${fmt(p.value)}`
+      : `${unit} ${p.period}: ${fmt(p.value)} · ${fmt(p.lo!)}–${fmt(p.hi!)}`
     : "";
 
   return (

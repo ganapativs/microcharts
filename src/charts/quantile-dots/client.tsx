@@ -241,7 +241,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
             transform: "translateX(-50%)",
           }}
         >
-          {`${geo.past} in ${geo.count}`}
+          {`${geo.past} in ${geo.count} ${side} ${fmt(activeThreshold)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

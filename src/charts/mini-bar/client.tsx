@@ -204,7 +204,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(shownDatum.value)}
+          {`${shownDatum.label}: ${fmt(shownDatum.value)}`}
         </span>
       ) : null}
     </span>

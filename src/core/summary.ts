@@ -77,6 +77,8 @@ export interface SummaryStrings {
     rightLabel: string,
     rightValue: string,
   ) => string;
+  /** Interactive pan announcement, e.g. "Inflow: 620." (balance-beam). */
+  beamPanAt: (label: string, value: string) => string;
   /** S2 ordinal growth stages (seed/sprout/leaf/bloom). (sprout-row) */
   sproutStageNames: readonly [string, string, string, string];
   /** S2 sprout summary, e.g. "6 accounts; 2 at bloom, 1 at seed." (sprout-row). */

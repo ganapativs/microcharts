@@ -34,7 +34,7 @@ describe("interactive <ForecastCone>", () => {
     // a VISIBLE readout chip pairs median · interval in the forecast region
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("42 · 33–55");
+      .toBe("week 11: 42 · 33–55");
   });
 
   it("rapid arrow presses don't drop (functional updater)", async () => {

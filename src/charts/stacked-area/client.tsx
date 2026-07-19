@@ -222,7 +222,9 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
             transform: "translateX(-50%)",
           }}
         >
-          {shares.map((s) => pctFmt(s)).join(" · ")}
+          {series
+            .map((s, i) => `${s.label ?? `Series ${i + 1}`} ${pctFmt(shares[i] ?? 0)}`)
+            .join(" · ")}
         </span>
       ) : null}
     </span>

@@ -203,7 +203,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
           className="mc-spark-readout"
           style={{ left: `${(c.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {c.value === null ? "—" : fmt(c.value)}
+          {c.value === null ? "—" : `${fmt(c.value)}, step ${c.step}/${steps}`}
         </span>
       ) : null}
     </span>

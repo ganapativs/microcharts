@@ -24,7 +24,7 @@ describe("interactive <Hypnogram>", () => {
     await expect.poll(() => live.textContent).toBe("Awake, from 0 to 10.");
     key(wrap, "ArrowRight");
     await expect.poll(() => live.textContent).toBe("Light, from 10 to 30.");
-    expect(screen.container.querySelector(".mc-spark-readout")?.textContent).toBe("Light");
+    expect(screen.container.querySelector(".mc-spark-readout")?.textContent).toBe("Light 10–30");
   });
 
   it("onActive reports the focused run (index = run, value = duration)", async () => {

@@ -183,7 +183,15 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {isTotal ? fmt(endLevel) : fmt(geo.levels[shown] ?? start)}
+          {isTotal
+            ? fmt(endLevel)
+            : step
+              ? `${step.label}: ${
+                  isFiniteValue(step.value)
+                    ? `${step.value < 0 ? "−" : "+"}${fmt(Math.abs(step.value))}`
+                    : strings.noData
+                } → ${fmt(geo.levels[shown] ?? start)}`
+              : fmt(geo.levels[shown] ?? start)}
         </span>
       ) : null}
     </span>

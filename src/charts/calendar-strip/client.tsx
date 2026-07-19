@@ -234,7 +234,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         {rest.children}
       </StaticCalendarStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {shownCell ? (
+      {shownCell && shown !== null ? (
         <span
           className="mc-spark-readout"
           style={{
@@ -242,7 +242,9 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
             transform: "translateX(-50%)",
           }}
         >
-          {shownCell.value === null ? "—" : fmt(shownCell.value)}
+          {shownCell.value === null
+            ? `${dayLabelAt(shown)}: —`
+            : `${dayLabelAt(shown)}: ${fmt(shownCell.value)}`}
         </span>
       ) : null}
     </span>

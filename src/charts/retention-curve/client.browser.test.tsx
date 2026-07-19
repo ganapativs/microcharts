@@ -19,7 +19,9 @@ describe("interactive <RetentionCurve>", () => {
     await expect.poll(() => live.textContent).toBe("week 7: 34% retained (benchmark 28%).");
     expect(wrap.querySelectorAll("svg line").length).toBeGreaterThanOrEqual(1);
     // a VISIBLE readout chip shows retention · benchmark at the focused period
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("34% · 28%");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("week 7: 34% · 28%");
   });
 
   it("without a benchmark, no benchmark clause", async () => {

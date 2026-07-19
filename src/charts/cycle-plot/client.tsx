@@ -287,12 +287,14 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
         {active !== null ? band(active, false) : null}
         {rest.children}
       </StaticCyclePlot>
-      {sl && geo ? (
+      {sl && geo && shown !== null ? (
         <span
           className="mc-cycle-plot-readout mc-spark-readout"
           style={{ left: `${(sl.center.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {obs !== undefined ? fmt(obs) : fmt(sl.center.value)}
+          {obs !== undefined
+            ? `${slotName(slots, shown)}, cycle ${cycle + 1} of ${cycleVals.length}: ${fmt(obs)}`
+            : `${slotName(slots, shown)}: ${fmt(sl.center.value)} (${driftDir(sl.drift)})`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

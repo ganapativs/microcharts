@@ -205,7 +205,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {`+${fmt(row.addedValue)} · −${fmt(row.removedValue)}`}
+          {`${row.key}: +${fmt(row.addedValue)} · −${fmt(row.removedValue)} (${signed(row.net, fmt)})`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

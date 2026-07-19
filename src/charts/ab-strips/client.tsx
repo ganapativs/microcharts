@@ -235,7 +235,9 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {at.edge.p === 50 ? fmt(at.edge.value) : `p${at.edge.p} ${fmt(at.edge.value)}`}
+          {at.edge.p === 50
+            ? `${labels[shownRow]!} median ${fmt(at.edge.value)}, ${fmt(Math.abs(geo.deltaMedian))} ${geo.deltaMedian < 0 ? "below" : "above"} ${labels[shownRow === 0 ? 1 : 0]!}`
+            : `${labels[shownRow]!} p${at.edge.p} ${fmt(at.edge.value)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

@@ -213,7 +213,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
             transform: "translateX(-50%)",
           }}
         >
-          {`${pct(b.share)} · ${pct(b.cum)}`}
+          {`${b.label} ${pct(b.share)} · ${pct(b.cum)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

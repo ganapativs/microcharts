@@ -192,7 +192,14 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
   }
 
   const px = shown !== null && geo ? xOf(shown) : 0;
-  const readout = shown !== null ? fmt(data[shown] as number) : "";
+  const readout =
+    shown === null
+      ? ""
+      : atBreak
+        ? `${fmt(atBreak.before)}→${fmt(atBreak.after)} (${pct(atBreak.delta)})`
+        : geo
+          ? `regime ${regimeOf(shown).regime}/${geo.segments.length}`
+          : fmt(data[shown] as number);
 
   return (
     <span

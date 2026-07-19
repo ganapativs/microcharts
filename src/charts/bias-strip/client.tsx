@@ -197,7 +197,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {`${fmt(mean)}, ${fmtSigned(diff)}`}
+          {`${fmt(mean)}, ${fmtSigned(diff)}${shownDot.outside ? " — outside limits" : ""}`}
         </span>
       ) : null}
     </span>

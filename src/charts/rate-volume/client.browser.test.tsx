@@ -26,7 +26,9 @@ describe("interactive <RateVolume>", () => {
     // crosshair rendered for the active period
     expect(wrap.querySelectorAll("svg line").length).toBeGreaterThanOrEqual(1);
     // a VISIBLE readout chip pairs both numbers at the focused point
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("4.1 · 38");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("4.1 · 38 events (low)");
   });
 
   it("rapid arrow presses don't drop (functional updater)", async () => {

@@ -30,10 +30,10 @@ describe("interactive <QuadrantDot>", () => {
     await expect
       .poll(() => live.textContent)
       .toMatch(/^Peer 1 of 4: effort \d+, impact \d+ — (high|low)-impact, (high|low)-effort\.$/);
-    // a VISIBLE readout chip pairs the coords
+    // a VISIBLE readout chip pairs the labeled coords + quadrant name
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toMatch(/^\d+, \d+$/);
+      .toMatch(/^effort \d+, impact \d+ — (high|low)-impact, (high|low)-effort$/);
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     await expect.poll(() => live.textContent).toMatch(/^Peer 2 of 4:/);
   });

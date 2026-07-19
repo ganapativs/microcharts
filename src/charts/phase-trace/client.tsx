@@ -203,7 +203,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
             bottom: "auto",
           }}
         >
-          {`${fmt(pt.dataX)}, ${fmt(pt.dataY)}`}
+          {`${xLabel} ${fmt(pt.dataX)}, ${yLabel} ${fmt(pt.dataY)}`}
         </span>
       ) : null}
     </span>

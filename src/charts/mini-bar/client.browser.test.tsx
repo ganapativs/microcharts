@@ -39,7 +39,9 @@ describe("interactive <MiniBar>", () => {
         clientY: r.top + r.height / 2,
       }),
     );
-    await expect.poll(() => document.querySelector(".mc-spark-readout")?.textContent).toBe("940");
+    await expect
+      .poll(() => document.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("East: 940");
   });
 
   it("onActive reports the focused datum (index + value + label); null on clear", async () => {

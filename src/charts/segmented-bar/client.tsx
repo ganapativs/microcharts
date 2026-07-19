@@ -175,7 +175,9 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
             transform: "translateX(-50%)",
           }}
         >
-          {`${shownDatum.label} ${pcts[shown!]}%`}
+          {shownDatum.members > 1
+            ? `${shownDatum.label} ${pcts[shown!]}% (${shownDatum.members} ${shownDatum.members === 1 ? "category" : "categories"})`
+            : `${shownDatum.label} ${pcts[shown!]}% (${fmt(shownDatum.value)})`}
         </span>
       ) : null}
     </span>

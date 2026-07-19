@@ -26,7 +26,9 @@ describe("interactive <QueueDepth>", () => {
     const wrap = screen.container.querySelector(".mc-queue-depth-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("214");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("t8: 214 queued, above capacity");
   });
 
   it("onActive reports the focused datum (data index + depth); null on clear", async () => {

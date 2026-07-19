@@ -181,7 +181,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {`${stDatum.label} ${pctFmt(st.share)}`}
+          {`${stDatum.label} ${pctFmt(st.share)} (${fmt(stDatum.value)})`}
         </span>
       ) : null}
     </span>

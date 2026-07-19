@@ -173,7 +173,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
       <LiveRegion>{announced}</LiveRegion>
       {row ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {`${row.label} ${fmt(row.score)}`}
+          {`${row.label} ${fmt(row.score)} (${Math.round(row.weightShare * 100)}%)`}
         </span>
       ) : null}
     </span>

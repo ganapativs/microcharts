@@ -222,7 +222,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(shownDatum.value)}
+          {`${shownDatum.label}: ${fmt(shownDatum.value)}`}
         </span>
       ) : null}
     </span>

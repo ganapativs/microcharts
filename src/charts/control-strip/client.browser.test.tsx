@@ -19,8 +19,10 @@ describe("interactive <ControlStrip>", () => {
     await expect
       .poll(() => live.textContent)
       .toBe("Point 12 of 12: 16 — above the upper limit (14.85).");
-    // a VISIBLE readout chip shows the value
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("16");
+    // a VISIBLE readout chip shows the value + which limit was crossed
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("16 above 14.85");
   });
 
   it("rapid arrow presses don't drop", async () => {

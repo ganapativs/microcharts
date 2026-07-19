@@ -16,7 +16,9 @@ describe("interactive <PercentileTrace>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
     await expect.poll(() => live.textContent).toBe("week 7: p81");
     // a VISIBLE readout chip shows the percentile at the focused reading
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("p81");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("week 7: p81");
     expect(wrap.querySelectorAll("svg line").length).toBeGreaterThanOrEqual(1);
   });
 

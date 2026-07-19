@@ -28,7 +28,9 @@ describe("interactive <BurnChart>", () => {
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("day 5: 30 points remain, plan 20.");
     // a VISIBLE readout chip appears at the focused point (not just the a11y region)
-    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("30");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("30 points / 20 plan");
   });
 
   it("onActive reports the focused datum (period + value); null on clear", async () => {

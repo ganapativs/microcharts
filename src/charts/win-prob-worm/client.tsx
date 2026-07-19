@@ -177,7 +177,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
           className="mc-spark-readout"
           style={{ left: `${(px / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {pct(leaderProb(clampedShown), fmt)}
+          {`${clampedShown >= 50 ? sides[0] : sides[1]} ${pct(leaderProb(clampedShown), fmt)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>
