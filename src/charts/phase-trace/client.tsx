@@ -1,10 +1,12 @@
 "use client";
-// Interactive <PhaseTrace>. Hover snaps to the nearest DATA point
-// (which carries a definite time index — spatial interpolation would lie at
-// crossings); ←/→ step time. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <PhaseTrace>. Hover snaps to the nearest DATA point by 2-D
+// distance (which carries a definite time index — spatial interpolation would
+// lie at crossings); arrows step time. useActivePicker owns interaction: one
+// pointer listener + pure nearest-point math, roving keyboard, touch tap-to-pin
+// and the onActive/onSelect contract. Composes the static component (canon).
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PHASE_TRACE } from "../../core/strings-phase-trace.js";
@@ -16,7 +18,7 @@ import {
 } from "./index.js";
 import { isFiniteValue } from "../../core/types.js";
 
-export interface InteractivePhaseTraceProps extends PhaseTraceProps {
+export interface InteractivePhaseTraceProps extends PhaseTraceProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the trail draws on when the
    * chart first mounts client-side. Inert on the server and on hydrated
@@ -55,6 +57,10 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -75,7 +81,6 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     [data, xd, yd, tail, width, height],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
 
   const accName =
     summary === false
@@ -85,50 +90,56 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
         : phaseTraceSummary(data, xLabel, yLabel, geo.heading, strings, fmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.points.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * width;
-      const py = ((e.clientY - r.top) / r.height) * height;
+  // Navigable units are the PLOTTED points, in trajectory (time) order: the
+  // geometry drops non-finite readings and collapses consecutive duplicates, so
+  // this is the point's position along the drawn path, NOT the raw data index.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      if (geo.points.length === 0) return null;
       let best = 0;
       let bestD = Infinity;
       geo.points.forEach((p, i) => {
-        const d = (p.x - px) ** 2 + (p.y - py) ** 2;
+        const d = (p.x - x) ** 2 + (p.y - y) ** 2;
         if (d < bestD) {
           bestD = d;
           best = i;
         }
       });
-      setActive(best);
-    },
-    [geo, width, height],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.points.length === 0) return;
-      setActive((prev) => {
-        const cur = prev ?? geo.points.length - 1;
-        if (e.key === "ArrowRight") {
-          e.preventDefault();
-          return Math.min(geo.points.length - 1, cur + 1);
-        }
-        if (e.key === "ArrowLeft") {
-          e.preventDefault();
-          return Math.max(0, cur - 1);
-        }
-        if (e.key === "Escape") return null;
-        return prev;
-      });
+      return best;
     },
     [geo],
   );
 
-  const pt = active != null ? geo.points[active] : undefined;
+  // A phase point is 2-D, so `value` reports the y channel (the response axis,
+  // named by `yLabel`); `label` carries the paired x reading so the other half
+  // of the observation is still recoverable from the datum.
+  const datum = useCallback(
+    (i: number) => {
+      const p = geo.points[i];
+      return { index: i, value: p?.dataY ?? null, label: p ? fmt(p.dataX) : undefined };
+    },
+    [geo, fmt],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.points.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  // The point shown by the focus ring + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const pt = shown !== null ? geo.points[shown] : undefined;
+  const pinned = selected !== null && selected !== active ? geo.points[selected] : undefined;
   const announced = pt
-    ? strings.phaseAt(active! + 1, geo.points.length, xLabel, fmt(pt.dataX), yLabel, fmt(pt.dataY))
+    ? strings.phaseAt(shown! + 1, geo.points.length, xLabel, fmt(pt.dataX), yLabel, fmt(pt.dataY))
     : "";
 
   return (
@@ -138,10 +149,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticPhaseTrace
         {...rest}
@@ -159,6 +167,18 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
         summary={false}
         style={FILL}
       >
+        {/* Pinned selection persists through pointer-leave; the ring is transient. */}
+        {pinned ? (
+          <circle
+            cx={pinned.x}
+            cy={pinned.y}
+            r={2.4}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {pt ? (
           <circle
             cx={pt.x}
@@ -170,6 +190,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {rest.children}
       </StaticPhaseTrace>
       <LiveRegion>{announced}</LiveRegion>
       {pt ? (

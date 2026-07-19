@@ -26,12 +26,12 @@ describe("docs-facts derivations", () => {
     }
   });
 
-  // performance.mdx prose names these explicitly ("Eight charts sit above the 3 kB
+  // performance.mdx prose names these explicitly ("Nine charts sit above the 3 kB
   // reference line. Sparkline … is the largest; the rest are the value-series charts
-  // that can host annotations … plus Station Glyph"). If the measured sizes shift,
-  // the prose is stale — fail here so it gets revisited.
+  // that can host annotations … plus Station Glyph and Slope"). If the measured sizes
+  // shift, the prose is stale — fail here so it gets revisited.
   it("matches the performance.mdx claim about the 3 kB line", () => {
-    expect(SIZE.over3).toHaveLength(8);
+    expect(SIZE.over3).toHaveLength(9);
     // over3 is largest-first — Sparkline leads, the annotation hosts + Station Glyph follow.
     expect(SIZE.over3[0]?.slug).toBe("sparkline");
     const over3Slugs = SIZE.over3.map((c) => c.slug).sort();
@@ -41,6 +41,10 @@ describe("docs-facts derivations", () => {
         "change-point",
         "dual-sparkline",
         "forecast-cone",
+        // Station Glyph and Slope crossed the line when their layout math moved into
+        // geometry.ts to be shared with the interactive entry — the fix for overlays
+        // being hit-tested against a different box than the one rendered.
+        "slope",
         "spread-band",
         "sparkline",
         "station-glyph",

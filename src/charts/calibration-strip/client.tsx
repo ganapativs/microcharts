@@ -1,9 +1,16 @@
 "use client";
-// Interactive <CalibrationStrip>. One pointer listener; nearest bin
-// by x. ←/→ rove bins. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <CalibrationStrip>. useActivePicker owns interaction: one pointer
+// listener + nearest-bin-by-x math, ←/→ (and ↑/↓) rove bins, click / Enter /
+// Space selects (onSelect). Composes the static component (canon) — the SVG is
+// never re-implemented.
+//
+// Unit = a calibration BIN, so `datum.index` is the bin's position among the
+// PLOTTED bins (the geometry drops empty ones, `count === 0`), which is the data
+// row index whenever every bin has support. `value` is the OBSERVED rate (what
+// actually happened); the bin's predicted rate travels as `label`.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CALIBRATION } from "../../core/strings-calibration.js";
@@ -21,7 +28,7 @@ function defaultMinSupport(data: CalibrationStripProps["data"]): number {
   return Math.max(10, Math.round(total * 0.02));
 }
 
-export interface InteractiveCalibrationStripProps extends CalibrationStripProps {
+export interface InteractiveCalibrationStripProps extends CalibrationStripProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the per-bin points settle onto
    * the diagonal (dots variant) or the deviation columns fade in (bars
@@ -47,6 +54,10 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -58,29 +69,19 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
         : 'circle[data-mc-ink="accent"], circle[data-mc-w="support"]',
   });
 
-  const ms = minSupport ?? defaultMinSupport(data);
+  // `defaultMinSupport` sums the whole series, so it is memoised: the
+  // interactive entry re-renders on every unit crossed during a scrub.
+  const ms = useMemo(() => minSupport ?? defaultMinSupport(data), [minSupport, data]);
   const supportHeight = Math.max(4, Math.round(height * 0.18));
   const geo = useMemo(
     () => calibrationGeometry({ data, bins, minSupport: ms, width, height, supportHeight }),
     [data, bins, ms, width, height, supportHeight],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
 
-  const accName =
-    summary === false
-      ? undefined
-      : typeof summary === "string"
-        ? summary
-        : calibrationSummary(geo.points, geo.maxGap, strings, fmt);
-  const label = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.points.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.points.length === 0) return null;
       let best = 0;
       let bestD = Infinity;
       geo.points.forEach((p, i) => {
@@ -90,32 +91,42 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
           best = i;
         }
       });
-      setActive(best);
-    },
-    [geo, width],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.points.length === 0) return;
-      setActive((prev) => {
-        const cur = prev ?? 0;
-        if (e.key === "ArrowRight") {
-          e.preventDefault();
-          return Math.min(geo.points.length - 1, cur + 1);
-        }
-        if (e.key === "ArrowLeft") {
-          e.preventDefault();
-          return Math.max(0, cur - 1);
-        }
-        if (e.key === "Escape") return null;
-        return prev;
-      });
+      return best;
     },
     [geo],
   );
 
-  const pt = active != null ? geo.points[active] : undefined;
+  const datum = useCallback(
+    (i: number) => {
+      const p = geo.points[i];
+      return { index: i, value: p?.observed ?? null, label: p ? fmt(p.predicted) : undefined };
+    },
+    [geo, fmt],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.points.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : calibrationSummary(geo.points, geo.maxGap, strings, fmt);
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const shown = active ?? selected;
+  const pt = shown !== null ? geo.points[shown] : undefined;
+  const pinned = selected !== null && selected !== active ? geo.points[selected] : undefined;
   const announced = pt
     ? strings.calibrationAt(
         fmt(pt.predicted),
@@ -132,10 +143,7 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticCalibrationStrip
         {...rest}
@@ -151,11 +159,23 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
         summary={false}
         style={FILL}
       >
-        {pt ? (
+        {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
+        {pinned ? (
+          <circle
+            cx={pinned.x}
+            cy={pinned.y}
+            r={2.4}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {active !== null && geo.points[active] ? (
           <>
             <line
-              x1={pt.x}
-              x2={pt.x}
+              x1={geo.points[active]!.x}
+              x2={geo.points[active]!.x}
               y1={0.5}
               y2={height - 0.5}
               data-mc-ink="muted"
@@ -163,8 +183,8 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
               vectorEffect="non-scaling-stroke"
             />
             <circle
-              cx={pt.x}
-              cy={pt.y}
+              cx={geo.points[active]!.x}
+              cy={geo.points[active]!.y}
               r={2.4}
               fill="none"
               stroke="var(--mc-accent)"
@@ -173,6 +193,7 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
             />
           </>
         ) : null}
+        {rest.children}
       </StaticCalibrationStrip>
       <LiveRegion>{announced}</LiveRegion>
       {pt ? (

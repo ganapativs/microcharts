@@ -1,11 +1,12 @@
 "use client";
-// Interactive <ChangePoint>. ←/→ step points (value + regime);
-// Tab cycles the breaks as first-class stops, each announcing the mean shift.
-// A pointer picks the nearest x. Composes the static component (canon); the
-// crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <ChangePoint>. useActivePicker owns interaction: one pointer
+// listener + nearest-x lookup, ←/→ (Home/End) step points (value + regime),
+// Tab cycles the breaks as first-class stops (each announcing the mean shift),
+// click / Enter / Space selects (onSelect). Composes the static component
+// (canon); the crosshair + readout chip are overlay children.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, nav1d, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-change-point.js";
@@ -16,7 +17,7 @@ import {
   type ChangePointProps,
 } from "./index.js";
 
-export interface InteractiveChangePointProps extends ChangePointProps {
+export interface InteractiveChangePointProps extends ChangePointProps, PickerProps {
   strings?: ChangePointStrings;
   /**
    * Opt-in entrance motion (default `false`): the line draws on when the
@@ -45,6 +46,10 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -56,7 +61,17 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     [width, height, data, breaks, max, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // Mirror the static's delta gutter: geometry is laid out in `width`, but the
+  // rendered viewBox is `width + gutter`. Mapping the pointer over `width`
+  // alone drifts the crosshair right of the cursor and mis-places the readout.
+  const FONT = Math.min(10, Math.max(6, Math.round(height * 0.55)));
+  const lastBreak = geo ? geo.breaks[geo.breaks.length - 1] : undefined;
+  const gutter =
+    (props.label ?? "none") === "delta" && lastBreak
+      ? Math.ceil(pct(lastBreak.delta).length * FONT * 0.72) + 4
+      : 0;
+  const totalWidth = width + gutter;
 
   const accName =
     summary === false
@@ -80,60 +95,83 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     return { regime: seg + 1, mean: geo && seg >= 0 ? geo.segments[seg]!.mean : NaN };
   };
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || data.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * (width + 0);
-      const i = Math.round(((px - 2) / (width - 4)) * (data.length - 1));
-      setActive(Math.max(0, Math.min(data.length - 1, i)));
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || data.length === 0) return null;
+      const i = Math.round(((x - 2) / (width - 4)) * (data.length - 1));
+      return Math.max(0, Math.min(data.length - 1, i));
     },
     [geo, data.length, width],
   );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!geo || data.length === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((p) => Math.min(data.length - 1, (p ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((p) => (p === null || p <= 0 ? 0 : p - 1));
-          break;
-        case "Tab": {
-          // Tab / Shift+Tab cycle the breaks as first-class stops
-          if (geo.breaks.length === 0) return;
-          const idxs = geo.breaks.map((b) => b.index);
-          const cur = active;
-          const next = e.shiftKey
-            ? [...idxs].reverse().find((x) => cur === null || x < cur)
-            : idxs.find((x) => cur === null || x > cur);
-          if (next === undefined) return; // let focus leave at the ends
-          setActive(next);
-          break;
-        }
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(data.length - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [geo, data.length, active],
+  // index = the DATA index (points are 1:1 with `data`); value = the series
+  // value there (`null` at a gap).
+  const datum = useCallback(
+    (i: number) => ({
+      index: i,
+      value: Number.isFinite(data[i]) ? (data[i] as number) : null,
+    }),
+    [data],
   );
 
-  const atBreak = active !== null && geo ? geo.breaks.find((b) => b.index === active) : undefined;
+  // The kernel's `step` sees only (current, key), but Shift+Tab must cycle the
+  // breaks BACKWARDS. React runs a capture-phase handler on this same span
+  // before the bubble-phase one the kernel binds, so latching the modifier here
+  // hands `step` the one bit it lacks.
+  const shift = useRef(false);
+  const breakIdx = useMemo(() => (geo ? geo.breaks.map((b) => b.index) : []), [geo]);
+  const step = useCallback(
+    (cur: number, key: string) => {
+      if (key !== "Tab") return nav1d(cur, data.length, key);
+      // Tab / Shift+Tab cycle the breaks as first-class stops; past the last one
+      // we return null so focus leaves the chart.
+      if (breakIdx.length === 0) return null;
+      const next = shift.current
+        ? [...breakIdx].reverse().find((x) => cur < 0 || x < cur)
+        : breakIdx.find((x) => cur < 0 || x > cur);
+      return next ?? null;
+    },
+    [breakIdx, data.length],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo === null ? 0 : data.length,
+    width: totalWidth,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const xOf = (i: number): number => 2 + ((width - 4) * i) / Math.max(1, data.length - 1);
+  const crosshair = (i: number, pinned: boolean) => {
+    if (!Number.isFinite(data[i])) return null;
+    const x = xOf(i);
+    return (
+      <line
+        x1={x}
+        y1={0}
+        x2={x}
+        y2={height}
+        stroke="var(--mc-accent)"
+        // Pin is "support", not the usual "tick": the static break markers are
+        // already line[data-mc-w="tick"], so tick can't identify the pin here.
+        data-mc-w={pinned ? "support" : "tick"}
+        strokeDasharray="1.5 1.5"
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  // The point shown by the crosshair + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const atBreak = shown !== null && geo ? geo.breaks.find((b) => b.index === shown) : undefined;
   let announced = "";
-  if (active !== null && geo) {
+  if (shown !== null && geo) {
     if (atBreak) {
       announced = strings.changePointBreak(
         atBreak.index,
@@ -142,10 +180,10 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         pct(atBreak.delta),
       );
     } else {
-      const { regime, mean } = regimeOf(active);
+      const { regime, mean } = regimeOf(shown);
       announced = strings.changePointAt(
-        active,
-        fmt(data[active] as number),
+        shown,
+        fmt(data[shown] as number),
         regime,
         geo.segments.length,
         fmt(mean),
@@ -153,8 +191,8 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     }
   }
 
-  const px = active !== null && geo ? 2 + ((width - 4) * active) / Math.max(1, data.length - 1) : 0;
-  const readout = active !== null ? fmt(data[active] as number) : "";
+  const px = shown !== null && geo ? xOf(shown) : 0;
+  const readout = shown !== null ? fmt(data[shown] as number) : "";
 
   return (
     <span
@@ -163,10 +201,8 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
+      onKeyDownCapture={(e) => (shift.current = e.shiftKey)}
     >
       <StaticChangePoint
         {...rest}
@@ -182,24 +218,15 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {active !== null && Number.isFinite(data[active]) ? (
-          <line
-            x1={px}
-            y1={0}
-            x2={px}
-            y2={height}
-            stroke="var(--mc-accent)"
-            data-mc-w="tick"
-            strokeDasharray="1.5 1.5"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
+        {selected !== null && selected !== active ? crosshair(selected, true) : null}
+        {active !== null ? crosshair(active, false) : null}
         {rest.children}
       </StaticChangePoint>
-      {active !== null && geo ? (
+      {shown !== null && geo ? (
         <span
           className="mc-change-point-readout mc-spark-readout"
-          style={{ left: `${(px / (width + 0)) * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${(px / totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
           {readout}
         </span>

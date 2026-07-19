@@ -1,9 +1,8 @@
 import { HeatCell } from "@microcharts/react/heat-cell";
-import { HeatCell as HeatCellInteractive } from "@microcharts/react/heat-cell/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const D = [0, 100] as const;
+export const D = [0, 100] as const;
 
 /* Shared shard × hour load matrix (one domain throughout). */
 const HOURS = ["00:00", "06:00", "12:00", "18:00"] as const;
@@ -21,6 +20,7 @@ export const entry: ChartEntry = {
   tagline: "One calibrated color step: the building block for host-owned grids.",
   staticImport: `${PKG}/heat-cell`,
   interactiveImport: `${PKG}/heat-cell/interactive`,
+  picker: false,
   dataShape: "number (+ shared domain)",
   encoding: {
     channel: "discrete color step",
@@ -72,12 +72,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "intensity",
-  Node: () => <HeatCell value={72} domain={D} title="Load" style={{ width: 20, height: 20 }} />,
-};
-
 export const playground: PlaygroundSpec = {
   // the entire point of HeatCell is calibrating against ONE shared domain —
   // letting readers drag it per-cell would demo the anti-pattern the
@@ -113,30 +107,6 @@ export const playground: PlaygroundSpec = {
       s.steps !== 5 && `  steps={${s.steps}}`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       (s.label as boolean) && '  label="value"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <HeatCellInteractive
-      value={s.value as number}
-      domain={D}
-      steps={s.steps as number}
-      shape={s.shape as "square" | "round" | "dot"}
-      label={(s.label as boolean) ? "value" : "none"}
-      animate={ui.animate}
-      style={{ width: 48, height: 48 }}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<HeatCell",
-      `  value={${s.value}}`,
-      "  domain={[0, 100]}",
-      s.steps !== 5 && `  steps={${s.steps}}`,
-      s.shape !== "square" && `  shape="${s.shape}"`,
-      (s.label as boolean) && '  label="value"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -283,32 +253,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<HeatCell value={72} domain={[0, 100]} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      {[12, 35, 58, 79, 96].map((v) => (
-        <HeatCellInteractive
-          key={v}
-          value={v}
-          domain={D}
-          summary={false}
-          style={{ width: 16, height: 16 }}
-          animate
-        />
-      ))}
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

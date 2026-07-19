@@ -4,7 +4,7 @@
 // (single mark). Composes the static component (canon).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -20,6 +20,8 @@ export interface InteractiveProgressRingProps extends ProgressRingProps {
    * HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Click/tap or Enter/Space — `{ index: 0, value: the fraction value/max }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 const THRESHOLDS = [0.25, 0.5, 0.75, 1];
@@ -30,6 +32,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     animate = false,
     strings = EN_SCALAR,
     title,
+    onSelect,
     className,
     style,
     ...rest
@@ -66,6 +69,10 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     : strings.noData;
   const label = [title, summaryText].filter(Boolean).join(". ") || undefined;
 
+  // One arc, one selectable unit (index 0): the fraction it sweeps.
+  const pick = (): void =>
+    onSelect?.({ index: 0, value: Number.isFinite(fraction) ? fraction : null });
+
   return (
     <span
       ref={hostRef}
@@ -73,6 +80,12 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
       tabIndex={0}
       role="img"
       aria-label={label}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
     >
       <StaticProgressRing {...rest} style={FILL} strings={strings} summary={false} />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}

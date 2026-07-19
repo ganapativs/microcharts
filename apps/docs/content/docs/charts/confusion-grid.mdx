@@ -142,10 +142,14 @@ positions, not colours, which is what keeps it readable under forced colours.
 
 ## Accessibility
 
-The accessible name states accuracy and the worst confusion — **"Accuracy 87%. Most confused: cat predicted as dog (12%
-of cats)."** A perfect classifier reads **"Accuracy 100%. No confusion."** The interactive entry roves the cells with
-the arrow keys (Home/End jump the diagonal), announcing each cell's actual and predicted class as a share of the actual
-class.
+The accessible name states accuracy and the worst confusion, with the row-normalized denominator carried in the phrasing
+— the grid at the top of this page reads **"Accuracy 83%. Most confused: B predicted as C (15% of Bs)."** A perfect
+classifier reads **"Accuracy 100%. No confusion."**, and a class with no samples is named rather than hidden — the
+`cat`/`dog` example above reads **"Accuracy 80%. Most confused: cat predicted as dog (20% of cats). No dog samples."**
+The interactive entry roves the cells with the arrow keys (Home and End jump to the two ends of the diagonal),
+announcing each cell's actual and predicted class as a share of the actual class.
+
+<InteractionNote slug="confusion-grid" />
 
 ## Props
 

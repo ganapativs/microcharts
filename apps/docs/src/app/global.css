@@ -1146,12 +1146,16 @@ body {
     }
   }
 
-  /* One-time entrance: opacity only. */
+  /* One-time entrance: opacity only, and OPT-IN. Written as `:not([entered])`
+     it applied on first paint with no JS involved, and `backwards` held the
+     grid at opacity 0 through the 180ms delay — so a cold visit to /charts
+     spent ~0.9s fading in markup the server had already sent. The gallery is
+     marked by the dock hook, which only marks an SPA arrival. */
   @media (prefers-reduced-motion: no-preference) {
-    .g2:not([data-entered]) .g2-head {
+    .g2[data-enter] .g2-head {
       animation: g2-fade 0.55s ease-out backwards;
     }
-    .g2:not([data-entered]) .g2-grid {
+    .g2[data-enter] .g2-grid {
       animation: g2-fade 0.7s ease-out 0.18s backwards;
     }
   }
@@ -1400,7 +1404,7 @@ body {
         box-shadow 0.3s linear;
     }
     .g2-dock,
-    .g2:not([data-entered]) .g2-cell {
+    .g2[data-enter] .g2-cell {
       animation: none;
     }
   }
@@ -2226,9 +2230,16 @@ div:where(
     filter: blur(0);
   }
 }
-/* Scroll-reveal states. `pending` is the hidden rest state rendered on the
-   server + first client paint — so the element never flashes visible before
-   the observer fires. `in` plays the entrance once, in view. */
+/* Scroll-reveal states.
+
+   `static` is what the server renders and what every element keeps until the
+   client decides otherwise: no rule, no animation, fully visible. First paint
+   is never gated on JS — the page is readable the instant the HTML lands, on
+   any connection, and with scripting off entirely.
+
+   `pending` (hidden rest state) is applied by the client only where it cannot
+   be observed: offscreen nodes on a cold load, any node on an SPA navigation
+   (nothing has painted yet). `in` plays the entrance once, in view. */
 [data-reveal="pending"] {
   opacity: 0;
   transform: translateY(16px);
@@ -2241,14 +2252,6 @@ div:where(
 }
 [data-reveal="in"] {
   animation: rise-in 0.72s var(--ease-out-quint) both;
-}
-/* No-JS: the observer never runs, so reveal everything. */
-@media (scripting: none) {
-  [data-reveal] {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
 }
 
 @keyframes pop-in {
@@ -2820,6 +2823,66 @@ div:where(
      them. Serif-scoped lift only — the library default stays. */
   .hv-reply-body .mc-delta-glyph {
     transform: translateY(-0.05em);
+  }
+
+  /* Live mode arriving. `LanguageModel.availability()` settles well after first
+     paint, so on a Chrome that has Nano installed the panel gains two things at
+     once — the composer, and the taller reply floor that hands the chips'
+     reclaimed space back to the answer. Landing both instantly snapped the
+     panel 315px -> 536px and shoved the caption below it (CLS 0.05 in one
+     frame).
+
+     Two layers of defence, in this order:
+
+     1. PREDICT (the real fix). `[data-mc-live]` is set before first paint by
+        app/layout.tsx when this Chrome has the API and Nano was installed on a
+        previous visit. The panel is then born its final height and NOTHING
+        moves — only the content fades in.
+     2. ANIMATE (the fallback). First visit, cleared storage, or a model
+        installed since: the size still has to arrive, so it grows on a curve
+        instead of teleporting. The floor leads by a hair so the box is already
+        opening as the composer shows — one gesture, not two events.
+
+     The composer is always in the DOM (collapsed to 0fr and inert when live is
+     off). That is what makes the reservation exact at any width: `1fr` resolves
+     to the real content height, so there is no magic number to drift. */
+  .hv-reply-floor {
+    transition: min-height 0.52s var(--ease-out-quint);
+  }
+  .hv-reply-floor[data-live],
+  [data-mc-live="1"] .hv-reply-floor {
+    min-height: 297px;
+  }
+
+  .hv-composer {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.46s var(--ease-out-quint) 0.06s,
+      opacity 0.34s ease-out 0.18s;
+  }
+  .hv-composer > * {
+    overflow: hidden;
+    min-height: 0;
+  }
+  .hv-composer[data-open] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  /* Predicted: open from the first frame, so only opacity has anywhere to go.
+     Must follow [data-open] — equal specificity, later wins. If the prediction
+     turns out wrong (Nano uninstalled), use-live-model.ts drops the attribute
+     and this collapses back on the curve above, once. */
+  [data-mc-live="1"] .hv-composer {
+    grid-template-rows: 1fr;
+    transition: opacity 0.34s ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hv-reply-floor,
+    .hv-composer {
+      transition: none;
+    }
   }
 
   /* 07 · theming demo: when a swatch/preset changes the --mc-* vars, ease the

@@ -4,6 +4,7 @@
 // polite region (for updating KPI cards) and gives a one-shot pulse. Motion is
 // gated on reduced-motion in CSS; the announcement always fires.
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { Delta as StaticDelta, deltaModel, type DeltaProps } from "./index.js";
@@ -27,16 +28,19 @@ export interface InteractiveDeltaProps extends DeltaProps {
    * and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Click/tap or Enter/Space on the glyph — `{ index: 0, value: the signed change }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function Delta({
   live = true,
   animate = false,
+  onSelect,
   ...props
 }: InteractiveDeltaProps): React.ReactNode {
   const [pulse, setPulse] = useState(false);
   const prev = useRef(props.value);
-  const { summary } = deltaModel(props);
+  const { summary, shown } = deltaModel(props);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
 
@@ -58,12 +62,31 @@ export function Delta({
     return () => clearTimeout(t);
   }, [props.value, live]);
 
+  // One value, one selectable unit (index 0) — no roving, no hover callback.
+  // The decorative form (`summary={false}`) stays inert: nothing to name, so
+  // nothing to focus or activate either.
+  const pick =
+    onSelect && props.summary !== false
+      ? (): void => onSelect({ index: 0, value: shown })
+      : undefined;
+
   return (
     <span
       ref={hostRef}
       className="mc-delta-live"
       data-pulse={pulse ? "1" : undefined}
       data-enter={enter ? "1" : undefined}
+      tabIndex={pick ? 0 : undefined}
+      onClick={pick}
+      onKeyDown={
+        pick
+          ? (e): void => {
+              if (e.key !== "Enter" && e.key !== " ") return;
+              e.preventDefault();
+              pick();
+            }
+          : undefined
+      }
     >
       <StaticDelta {...props} />
       {live ? <LiveRegion>{summary}</LiveRegion> : null}

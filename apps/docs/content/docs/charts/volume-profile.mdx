@@ -112,9 +112,9 @@ weight: 18 }, { level: 142, weight: 26 }, { level: 144, weight: 20 }, { level: 1
 ## Why this default
 
 A perpendicular histogram because "where" is a different question from "when", and no time-axis chart can answer it. The
-value area is a stated convention — 70% of the mass by default, visible in the docs and the summary — not an implied
-confidence interval. Because `SparkGroup` shares same-axis domains only, pairing this with a trend chart on the opposite
-side uses an explicit shared `domain` passed to both; cross-axis group binding is a v1 follow-up.
+value area is a stated convention — `valueArea` defaults to `0.7`, and the fraction is stated in the summary — not an
+implied confidence interval. The modal bin is the only accented mark, because "where did activity pile up" is the one
+question the shape is built to answer.
 
 ## Accessibility
 
@@ -122,6 +122,8 @@ The accessible name states where activity concentrates — **"Activity concentra
 140–149.33."** (the hero demo's 9-level profile, default 12 bins). An even distribution reads **"Activity is evenly
 spread."** The interactive entry roves the levels with ↑/↓, announcing each level's share of activity and flagging the
 POC.
+
+<InteractionNote slug="volume-profile" />
 
 ## Props
 

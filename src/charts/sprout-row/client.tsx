@@ -1,17 +1,23 @@
 "use client";
-// Interactive <SproutRow>. Roving 1-D keyboard (←/→) + nearest-slot
-// pointer lookup; announces each item's stage; a focus ring lifts the active
-// glyph. Composes the static component (overlay ring as children).
-import { useMemo, useRef, useState } from "react";
+// Interactive <SproutRow>. useActivePicker owns interaction: one pointer
+// listener + slot lookup, ←/→ (and ↑/↓) rove the row, click / Enter / Space
+// selects (onSelect). Announces each item's stage; a focus ring lifts the active
+// glyph. Composes the static component (overlay rings as children).
+import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { sproutRowGeometry } from "./geometry.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
-import { SproutRow as StaticSproutRow, sproutRowSummary, type SproutRowProps } from "./index.js";
+import {
+  SproutRow as StaticSproutRow,
+  sproutLayout,
+  sproutRowSummary,
+  type SproutRowProps,
+} from "./index.js";
 
-export interface InteractiveSproutRowProps extends SproutRowProps {
+export interface InteractiveSproutRowProps extends SproutRowProps, PickerProps {
   strings?: SproutStrings;
   /**
    * Opt-in entrance motion (default `false`): each stage glyph settles into
@@ -26,17 +32,22 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
   const {
     strings = EN_SPROUT,
     title,
+    summary,
     data,
     labels = false,
-    height = 20,
-    step = 16,
+    // Labels stagger onto two tiers below the soil, so the default row is taller
+    // when names are shown — mirror the static default exactly.
+    height = labels ? 40 : 20,
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height, 0.34);
-  const summary = sproutRowSummary(data, strings);
+  const fontSize = props.fontSize ?? labelFont(height, 0.3);
   const hostRef = useRef<HTMLSpanElement>(null);
   // "rise" from the soil: each stage glyph (data-mc-ink="point") grows upward
   // from its baseline, left→right — the row literally sprouts. "trail" scaled
@@ -47,18 +58,51 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     origin: "bottom",
     order: "x",
   });
+  // The SAME label-driven layout the static derives, so the overlay ring lands
+  // on the glyph even when category labels widen the row.
+  const lay = useMemo(
+    () => sproutLayout(data, labels, fontSize, props.step),
+    [data, labels, fontSize, props.step],
+  );
   const geo = useMemo(
     () =>
       sproutRowGeometry({
         stages: data.map((d) => d.value),
         height,
-        step,
+        step: lay.step,
         pad: 2,
-        bottomReserve: labels ? fontSize + 1 : 0,
+        padX: lay.padX,
+        bottomReserve: lay.labelBand,
       }),
-    [data, height, step, labels, fontSize],
+    [data, height, lay],
   );
-  const [active, setActive] = useState<number | null>(null);
+
+  // One slot per datum, so the unit index IS the DATA index.
+  const locate = useCallback(
+    (x: number) => {
+      const i = Math.floor((x - lay.padX) / lay.step);
+      return i >= 0 && i < data.length ? i : null;
+    },
+    [lay, data],
+  );
+  // `value` = the clamped growth STAGE (0–3), the number the glyph encodes;
+  // `null` for a missing item (soil tick only).
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.slots[i]?.stage ?? null, label: data[i]?.label }),
+    [geo, data],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: data.length,
+    width: geo.width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const announce = (i: number | null): string => {
     if (i === null || !data[i]) return "";
@@ -71,25 +115,32 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     );
   };
 
-  const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    if (rect.width === 0) return;
-    const x = ((e.clientX - rect.left) / rect.width) * geo.width;
-    const i = Math.floor((x - 2) / step);
-    setActive(i >= 0 && i < data.length ? i : null);
-  };
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowRight") {
-      setActive((p) => Math.min(data.length - 1, (p ?? -1) + 1));
-      e.preventDefault();
-    } else if (e.key === "ArrowLeft") {
-      setActive((p) => Math.max(0, (p ?? data.length) - 1));
-      e.preventDefault();
-    } else if (e.key === "Escape") setActive(null);
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : sproutRowSummary(data, strings);
+  const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const ring = (i: number, pinned: boolean) => {
+    const slot = geo.slots[i];
+    if (!slot) return null;
+    return (
+      <circle
+        cx={slot.x}
+        cy={slot.baselineY - 5}
+        r={7}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
   };
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
-  const slot = active !== null ? geo.slots[active] : undefined;
+  const shown = active ?? selected;
+  const announced = announce(shown);
 
   return (
     <span
@@ -97,39 +148,29 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
       {...wrap("mc-sprout-live", className, style)}
       tabIndex={0}
       role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      aria-label={ariaLabel}
+      {...bind}
     >
       <StaticSproutRow
         {...rest}
         data={data}
         labels={labels}
         height={height}
-        step={step}
+        step={lay.step}
         fontSize={fontSize}
         strings={strings}
         summary={false}
         style={FILL}
       >
-        {slot ? (
-          <circle
-            cx={slot.x}
-            cy={slot.baselineY - 5}
-            r={7}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
+        {rest.children}
       </StaticSproutRow>
-      <LiveRegion>{announce(active)}</LiveRegion>
-      {slot ? (
+      <LiveRegion>{announced}</LiveRegion>
+      {announced ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {announce(active)}
+          {announced}
         </span>
       ) : null}
     </span>

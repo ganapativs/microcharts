@@ -1,15 +1,14 @@
 import { MiniBar } from "@microcharts/react/mini-bar";
-import { MiniBar as MiniBarInteractive } from "@microcharts/react/mini-bar/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const MIX = [
+export const MIX = [
   { label: "East", value: 940 },
   { label: "West", value: 410 },
   { label: "South", value: 620 },
   { label: "North", value: 120 },
 ];
-const SIGNED = [
+export const SIGNED = [
   { label: "Mon", value: 4 },
   { label: "Tue", value: -2 },
   { label: "Wed", value: 6 },
@@ -124,16 +123,7 @@ export const entry: ChartEntry = {
 
 export function Preview() {
   return <MiniBar data={MIX} summary={false} width={100} height={32} />;
-}
-
-export const showcase = {
-  hint: "categories",
-  Node: () => (
-    <MiniBar data={MIX} highlight="East" title="Sales by region" width={100} height={32} />
-  ),
-};
-
-// domain/color/format/locale/strings/id/className/style/children: styling/
+} // domain/color/format/locale/strings/id/className/style/children: styling/
 // formatting escape hatches, not chart-shape knobs — no interactive control
 
 export const playground: PlaygroundSpec = {
@@ -182,40 +172,6 @@ export const playground: PlaygroundSpec = {
       (s.highlight as boolean) && `  highlight="${target}"`,
       s.orientation === "horizontal" && '  orientation="horizontal"',
       signed && '  positive="up"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n");
-  },
-  renderInteractive: (s, _data, ui) => {
-    const signed = s.positive as boolean;
-    const rows = signed ? SIGNED : MIX;
-    return (
-      <MiniBarInteractive
-        data={rows}
-        sort={s.sort as "none" | "desc" | "asc"}
-        highlight={(s.highlight as boolean) ? rows[0]!.label : undefined}
-        orientation={s.orientation as "horizontal" | "vertical"}
-        positive={signed ? "up" : undefined}
-        animate={ui.animate}
-        summary={false}
-        width={160}
-        height={s.orientation === "horizontal" ? 96 : 52}
-      />
-    );
-  },
-  codeInteractive: (s, _data, ui) => {
-    const signed = s.positive as boolean;
-    const varName = signed ? "signed" : "regions";
-    const target = signed ? "Mon" : "East";
-    return [
-      "<MiniBar",
-      `  data={${varName}}`,
-      s.sort !== "none" && `  sort="${s.sort}"`,
-      (s.highlight as boolean) && `  highlight="${target}"`,
-      s.orientation === "horizontal" && '  orientation="horizontal"',
-      signed && '  positive="up"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -341,19 +297,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<MiniBar data={mix} />`;
 }
-
-export function PreviewLive() {
-  return <MiniBarInteractive data={MIX} summary={false} width={100} height={32} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

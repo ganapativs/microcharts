@@ -1,6 +1,5 @@
 import { FillWord } from "@microcharts/react/fill-word";
-import { FillWord as FillWordInteractive } from "@microcharts/react/fill-word/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -12,6 +11,7 @@ export const entry: ChartEntry = {
   tagline: "Progress on a named task, where the label is the bar.",
   staticImport: `${PKG}/fill-word`,
   interactiveImport: `${PKG}/fill-word/interactive`,
+  picker: false,
   dataShape: "{ word: string; value: number }",
   encoding: { channel: "inked fraction of the word's own glyph extent", precision: "medium" },
   nodeBudget: "2 (+1 numeral)",
@@ -56,12 +56,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "the label is the bar",
-  Node: () => <FillWord word="uploading" value={0.62} title="Upload" fontSize={16} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value %", min: 0, max: 100, step: 1, init: 62 },
@@ -85,29 +79,6 @@ export const playground: PlaygroundSpec = {
       `  value={${((s.value as number) / 100).toFixed(2)}}`,
       s.mode !== "fill" && `  mode="${s.mode}"`,
       s.label && '  label="value"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <FillWordInteractive
-      word={s.mode === "drain" ? "expiring" : "uploading"}
-      value={(s.value as number) / 100}
-      mode={s.mode as "fill" | "drain"}
-      label={s.label ? "value" : "none"}
-      summary={false}
-      animate={ui.animate}
-      fontSize={18}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<FillWord",
-      `  word="${s.mode === "drain" ? "expiring" : "uploading"}"`,
-      `  value={${((s.value as number) / 100).toFixed(2)}}`,
-      s.mode !== "fill" && `  mode="${s.mode}"`,
-      s.label && '  label="value"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -209,24 +180,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<FillWord word="loading" value={0.62} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex items-center gap-4">
-      <FillWordInteractive word="uploading" value={0.62} summary={false} fontSize={13} animate />
-      <FillWord word="expiring" value={0.7} mode="drain" summary={false} fontSize={13} />
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

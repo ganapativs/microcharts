@@ -1,10 +1,9 @@
 import { CometTrail } from "@microcharts/react/comet-trail";
-import { CometTrail as CometTrailInteractive } from "@microcharts/react/comet-trail/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
-const RISING = [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87];
+export const RISING = [40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87];
 
 export const entry: ChartEntry = {
   name: "CometTrail",
@@ -70,12 +69,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <CometTrail data={RISING} summary={false} width={80} />;
 }
-
-export const showcase = {
-  hint: "now, and just before",
-  Node: () => <CometTrail data={RISING} title="Latency" width={90} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "trail", label: "trail", min: 2, max: 20, step: 1, init: 12 },
@@ -91,27 +84,6 @@ export const playground: PlaygroundSpec = {
     />
   ),
   code: (s) =>
-    [
-      "<CometTrail",
-      "  data={rollingWindow}",
-      s.trail !== 12 && `  trail={${s.trail}}`,
-      s.label !== "last" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  // No `animate` prop exists on this chart (see entry.animates) — the head's
-  // own easing motion + fading trail IS the encoding.
-  renderInteractive: (s) => (
-    <CometTrailInteractive
-      data={RISING}
-      trail={s.trail as number}
-      label={s.label as "last" | "none"}
-      summary={false}
-      width={180}
-    />
-  ),
-  codeInteractive: (s) =>
     [
       "<CometTrail",
       "  data={rollingWindow}",
@@ -239,19 +211,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<CometTrail data={rollingWindow} />`;
 }
-
-export function PreviewLive() {
-  return <CometTrailInteractive data={RISING} summary={false} width={80} />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

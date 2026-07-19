@@ -1,7 +1,6 @@
 import { SparkBar } from "@microcharts/react/sparkbar";
-import { SparkBar as SparkBarInteractive } from "@microcharts/react/sparkbar/interactive";
 import { wave } from "./demo-data";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 const DEPLOYS = [4, 6, 2, 8, 5, 9, 3, 7];
@@ -69,13 +68,6 @@ export const entry: ChartEntry = {
       required: false,
       description: "BCP 47 locale(s) for the endpoint label and summary.",
     },
-    {
-      name: "onPointFocus",
-      type: "(index: number | null) => void",
-      required: false,
-      interactive: true,
-      description: "Fires as hover/keyboard focus moves; `null` on blur.",
-    },
   ],
   demo: [4, 6, 2, 8, 5, 9, 3, 7],
   example: {
@@ -92,19 +84,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <SparkBar data={entry.demo} width={180} height={48} summary={false} />;
 }
-
-export const showcase = {
-  hint: "magnitude",
-  Node: () => (
-    <SparkBarInteractive
-      data={[5, 8, 3, 9, 6, 11, 4, 10, 7, 12]}
-      width={150}
-      height={44}
-      title="Deploys per day"
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "mode", options: ["bar", "winloss"], init: "bar" },
@@ -150,40 +129,6 @@ export const playground: PlaygroundSpec = {
       gap !== 0.25 && `  gap={${gap}}`,
       s.label && '  label="last"',
       s.locale !== "en-US" && `  locale="${s.locale}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n");
-  },
-  renderInteractive: (s, data, ui) => {
-    const shown = s.mode === "winloss" ? data.map((n) => (n % 2 === 0 ? 1 : -1)) : data;
-    const gap = Number((s.gap as number).toFixed(2));
-    return (
-      <SparkBarInteractive
-        data={shown}
-        width={340}
-        height={92}
-        mode={s.mode as "bar" | "winloss"}
-        gap={gap}
-        label={s.label ? "last" : "none"}
-        locale={s.locale as string}
-        animate={ui.animate}
-        className="w-full max-w-md"
-        title="Playground"
-      />
-    );
-  },
-  codeInteractive: (s, data, ui) => {
-    const shown = s.mode === "winloss" ? data.map((n) => (n % 2 === 0 ? 1 : -1)) : data;
-    const gap = Number((s.gap as number).toFixed(2));
-    return [
-      "<SparkBar",
-      `  data={[${shown.join(", ")}]}`,
-      `  mode="${s.mode}"`,
-      gap !== 0.25 && `  gap={${gap}}`,
-      s.label && '  label="last"',
-      s.locale !== "en-US" && `  locale="${s.locale}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -300,19 +245,12 @@ export function markCode(width?: number, height?: number): string {
   const size = width && height ? ` width={${width}} height={${height}}` : "";
   return `<SparkBar data={data}${size} />`;
 }
-
-export function PreviewLive() {
-  return <SparkBarInteractive data={entry.demo} width={180} height={48} summary={false} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

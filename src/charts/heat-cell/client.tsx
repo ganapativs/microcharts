@@ -5,6 +5,7 @@
 import { useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { FILL, wrap } from "../../shared/interactive.js";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -19,6 +20,8 @@ export interface InteractiveHeatCellProps extends HeatCellProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** The cell was activated (click, tap, Enter or Space): `{ index: 0, value }` — the cell's value. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
@@ -33,6 +36,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
     summary,
     strings = EN_SCALAR,
     animate = false,
+    onSelect,
     className,
     style,
     ...rest
@@ -49,6 +53,9 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : text;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
+  // Drill-down: the cell's own value (the number the readout shows).
+  const select = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });
+
   return (
     <span
       ref={hostRef}
@@ -60,6 +67,13 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
       onPointerLeave={() => setActive(false)}
       onFocus={() => setActive(true)}
       onBlur={() => setActive(false)}
+      onClick={select}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select();
+        }
+      }}
     >
       <StaticHeatCell
         {...rest}

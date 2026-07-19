@@ -1,4 +1,5 @@
 import { defineConfig } from "tsdown";
+import { versionDefine } from "./scripts/pkg-version.mjs";
 
 // Per-component subpath exports land here as charts ship (Phase 2):
 //   'src/charts/sparkline/index.tsx', 'src/charts/sparkline/client.tsx', ...
@@ -227,6 +228,9 @@ export default defineConfig({
     "src/charts/percentile-trace/client.tsx",
   ],
   format: ["esm"],
+  // `MICROCHARTS_VERSION` compiles to a string literal — package.json stays out
+  // of the module graph (see scripts/pkg-version.mjs).
+  define: versionDefine,
   dts: true,
   clean: true,
   treeshake: true,

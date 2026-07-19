@@ -13,17 +13,55 @@ import {
 import { PREVIEW_LIVE } from "@/lib/charts/preview-live.generated";
 import { getGalleryMode, subscribeGalleryMode } from "./gallery-mode";
 
+// ONE MediaQueryList and one shared IntersectionObserver for the whole plane.
+// The gallery mounts a stage per card — 106 of them — so anything allocated in
+// the component body is allocated 106 times. Both `subscribe` and `getSnapshot`
+// must also be module-level constants: an inline arrow is a new identity every
+// render, which makes React tear down and re-create all 106 subscriptions on
+// every render pass.
+const REDUCE_MQ =
+  typeof window === "undefined" ? null : window.matchMedia("(prefers-reduced-motion: reduce)");
+
+function subscribeReduce(onStoreChange: () => void): () => void {
+  REDUCE_MQ?.addEventListener("change", onStoreChange);
+  return () => REDUCE_MQ?.removeEventListener("change", onStoreChange);
+}
+const getReduce = () => REDUCE_MQ?.matches ?? true;
+const getReduceServer = () => true;
+
 function useReducedMotion(): boolean {
-  return useSyncExternalStore(
-    (onStoreChange) => {
-      if (typeof window === "undefined") return () => {};
-      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-      mq.addEventListener("change", onStoreChange);
-      return () => mq.removeEventListener("change", onStoreChange);
+  return useSyncExternalStore(subscribeReduce, getReduce, getReduceServer);
+}
+
+/** Shared "near the viewport" observer — one instance for all 106 cards. */
+type SeenCb = () => void;
+let sharedIO: IntersectionObserver | null = null;
+const seenCallbacks = new WeakMap<Element, SeenCb>();
+
+function observeOnce(el: Element, cb: SeenCb): () => void {
+  if (typeof IntersectionObserver === "undefined") {
+    cb();
+    return () => {};
+  }
+  sharedIO ??= new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const fn = seenCallbacks.get(e.target);
+        if (!fn) continue;
+        seenCallbacks.delete(e.target);
+        sharedIO?.unobserve(e.target);
+        fn();
+      }
     },
-    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-    () => true,
+    { rootMargin: "200px" },
   );
+  seenCallbacks.set(el, cb);
+  sharedIO.observe(el);
+  return () => {
+    seenCallbacks.delete(el);
+    sharedIO?.unobserve(el);
+  };
 }
 
 /**
@@ -48,14 +86,7 @@ export function GalleryStage({ slug, children }: { slug: string; children: React
   // cards stay pure server SVG until scrolled toward.
   useEffect(() => {
     if (!host || seen) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) setSeen(true);
-      },
-      { rootMargin: "200px" },
-    );
-    io.observe(host);
-    return () => io.disconnect();
+    return observeOnce(host, () => setSeen(true));
   }, [host, seen]);
 
   useEffect(() => {

@@ -1,10 +1,9 @@
 import { PercentileLadder } from "@microcharts/react/percentile-ladder";
-import { PercentileLadder as PercentileLadderInteractive } from "@microcharts/react/percentile-ladder/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a long-tailed latency sample (ms)
-const LATENCY = Array.from({ length: 200 }, (_, i) =>
+export const LATENCY = Array.from({ length: 200 }, (_, i) =>
   i < 130
     ? 90 + (i % 50)
     : i < 180
@@ -89,12 +88,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <PercentileLadder data={LATENCY} summary={false} width={140} height={14} />;
 }
-
-export const showcase = {
-  hint: "tail ladder",
-  Node: () => <PercentileLadder data={LATENCY} title="Request latency" width={150} height={14} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "scale", label: "scale", options: ["linear", "log"], init: "linear" },
@@ -126,30 +119,6 @@ export const playground: PlaygroundSpec = {
       s.scale !== "linear" && `  scale="${s.scale}"`,
       s.label !== "ps" && `  label="${s.label}"`,
       s.marks !== "tick" && `  marks="${s.marks}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <PercentileLadderInteractive
-      data={data}
-      scale={s.scale as "linear" | "log"}
-      label={s.label as "ps" | "values" | "both" | "none"}
-      marks={s.marks as "tick" | "dot"}
-      summary={false}
-      animate={ui.animate}
-      width={280}
-      height={18}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<PercentileLadder",
-      "  data={latencies}",
-      s.scale !== "linear" && `  scale="${s.scale}"`,
-      s.label !== "ps" && `  label="${s.label}"`,
-      s.marks !== "tick" && `  marks="${s.marks}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -263,21 +232,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<PercentileLadder data={latencies} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <PercentileLadderInteractive data={LATENCY} summary={false} width={140} height={14} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

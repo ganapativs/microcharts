@@ -11,7 +11,12 @@ export type GallerySort = "catalog" | "name";
 const DENSITY_KEY = "mc-gallery2-density";
 const TILT_MAX = 3;
 
-function initialState(): { q: string; col: string; density: GalleryDensity; sort: GallerySort } {
+function initialState(): {
+  q: string;
+  col: string;
+  density: GalleryDensity;
+  sort: GallerySort;
+} {
   if (typeof window === "undefined")
     return { q: "", col: "all", density: "comfortable", sort: "catalog" };
   const p = new URLSearchParams(window.location.search);
@@ -32,10 +37,13 @@ function initialState(): { q: string; col: string; density: GalleryDensity; sort
 }
 
 export function useGalleryDock(collections: { key: ChartCollection; label: string }[]) {
-  const [q, setQ] = useState(() => initialState().q);
-  const [col, setCol] = useState<string>(() => initialState().col);
-  const [density, setDensity] = useState<GalleryDensity>(() => initialState().density);
-  const [sort, setSort] = useState<GallerySort>(() => initialState().sort);
+  // Read the URL + localStorage ONCE, not once per state initializer.
+  const init = useRef<ReturnType<typeof initialState>>(undefined as never);
+  init.current ??= initialState();
+  const [q, setQ] = useState(init.current.q);
+  const [col, setCol] = useState<string>(init.current.col);
+  const [density, setDensity] = useState<GalleryDensity>(init.current.density);
+  const [sort, setSort] = useState<GallerySort>(init.current.sort);
   const [shown, setShown] = useState<number | null>(null);
   const [atTop, setAtTop] = useState(true);
   const [dockHidden, setDockHidden] = useState(false);
@@ -48,6 +56,7 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
   const inputRef = useRef<HTMLInputElement>(null);
   const lastCol = useRef<string | null>(null);
   const syncDock = useRef<() => void>(() => {});
+  const remeasure = useRef<() => void>(() => {});
   const domRef = useRef<{
     cards: HTMLElement[];
     empty: HTMLElement | null;
@@ -99,18 +108,18 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
     }
   }, [sort]);
 
+  // The gallery entrance is opt-in (see .g2[data-enter] in global.css) and
+  // plays at most once a session. A cold load never gets it: the grid arrived
+  // painted in the server HTML, so "fading it in" could only mean hiding it
+  // first — the visitor would wait ~0.9s to be shown what they already had.
+  // Landing here from anywhere else in the site is the case where nothing has
+  // painted yet and the fade is free.
   useIsoLayoutEffect(() => {
+    if (hasEntered) return;
+    hasEntered = true;
+    if (document.documentElement.dataset.boot !== "warm") return;
     const el = document.querySelector<HTMLElement>(".g2");
-    if (!el) return;
-    if (hasEntered) {
-      el.dataset.entered = "true";
-      return;
-    }
-    const t = window.setTimeout(() => {
-      el.dataset.entered = "true";
-      hasEntered = true;
-    }, 1100);
-    return () => window.clearTimeout(t);
+    if (el) el.dataset.enter = "1";
   }, []);
 
   useEffect(() => {
@@ -143,21 +152,48 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // The dock retracts once the footer has risen into the viewport. Both inputs
+  // are kept OFF the scroll path: `scrollHeight` and the footer's rect each force
+  // a full document layout, and this used to read both on every scroll frame.
+  // The footer's position becomes an IntersectionObserver (the -56px bottom
+  // margin is exactly the old `top < innerHeight - 56` test), and the overflow
+  // check is re-measured only when the layout can actually have changed.
   useEffect(() => {
     const footer = document.querySelector("footer");
-    syncDock.current = () => {
-      const overflow = document.documentElement.scrollHeight - window.innerHeight;
-      if (overflow <= 80 || window.scrollY < 48) {
-        setDockHidden(false);
-        return;
-      }
-      const reached = footer ? footer.getBoundingClientRect().top < window.innerHeight - 56 : false;
-      setDockHidden(reached);
+    let footerIn = false;
+    let hasOverflow = true;
+
+    const measure = () => {
+      hasOverflow = document.documentElement.scrollHeight - window.innerHeight > 80;
     };
+    syncDock.current = () => {
+      // scrollY is a cheap read — it never forces layout.
+      setDockHidden(hasOverflow && window.scrollY >= 48 && footerIn);
+    };
+    remeasure.current = () => {
+      measure();
+      syncDock.current();
+    };
+
+    const io = footer
+      ? new IntersectionObserver(
+          ([e]) => {
+            footerIn = e.isIntersecting;
+            syncDock.current();
+          },
+          { rootMargin: "0px 0px -56px 0px" },
+        )
+      : null;
+    io?.observe(footer!);
+
+    measure();
     syncDock.current();
-    const onResize = () => syncDock.current();
+    const onResize = () => remeasure.current();
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      io?.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -242,7 +278,10 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
       dom.emptyQ.textContent = trimmed ? `“${trimmed}”` : label ? `${label} charts` : "that";
     }
     setShown(count);
-    requestAnimationFrame(() => requestAnimationFrame(() => syncDock.current()));
+    // Filtering changes the document height, so the overflow test has to be
+    // re-measured here — this is the one place it can actually have changed
+    // without a resize.
+    requestAnimationFrame(() => requestAnimationFrame(() => remeasure.current()));
   }, [q, col, sort, collections]);
 
   useEffect(() => {
@@ -284,7 +323,10 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
     window.scrollTo(0, 0);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const grid = document.querySelector<HTMLElement>(".g2-grid");
-    grid?.animate?.([{ opacity: 0.5 }, { opacity: 1 }], { duration: 260, easing: "ease-out" });
+    grid?.animate?.([{ opacity: 0.5 }, { opacity: 1 }], {
+      duration: 260,
+      easing: "ease-out",
+    });
   }, [col]);
 
   useEffect(() => {

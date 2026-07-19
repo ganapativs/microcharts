@@ -1,18 +1,19 @@
 "use client";
-// Interactive <Waterfall>. One pointer listener; step by x-band.
-// ←/→ rove steps ("Refunds: −140, running 1,410."); End focuses the total.
-// Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Waterfall>. useActivePicker owns interaction: one pointer
+// listener + column-by-x band lookup, ←/→ rove steps ("Refunds: −140, running
+// 1,410."), End focuses the total, click / Enter / Space selects (onSelect).
+// Composes the static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue } from "../../core/types.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { waterfallGeometry } from "./geometry.js";
 import { Waterfall as StaticWaterfall, waterfallSummary, type WaterfallProps } from "./index.js";
 
-export interface InteractiveWaterfallProps extends WaterfallProps {
+export interface InteractiveWaterfallProps extends WaterfallProps, PickerProps {
   strings?: FlowStrings;
   /**
    * Opt-in entrance motion (default `false`): the sequence of steps reveals
@@ -38,6 +39,10 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -64,9 +69,46 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     [width, height, data, start, total, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  /** Active column: 0..n-1 = steps, n = the total bar. */
-  const [active, setActive] = useState<number | null>(null);
+  /** Navigable units = COLUMNS: 0..n-1 = steps (1:1 with `data`), n = the total bar. */
   const cols = data.length + (total ? 1 : 0);
+  const endLevel = geo.levels.length > 0 ? geo.levels[geo.levels.length - 1]! : start;
+
+  // Pointer (viewBox space) → column by x band. `y` is ignored: with
+  // `label="delta"` the static viewBox grows a label band below the plot, so
+  // only the x axis is a reliable shared coordinate here.
+  const locate = useCallback(
+    (x: number) => {
+      if (cols === 0 || geo.pitch === 0) return null;
+      const i = Math.floor(x / geo.pitch);
+      return i >= 0 && i < cols ? i : null;
+    },
+    [cols, geo],
+  );
+
+  // `value` = the step's own DELTA (the bar's encoded length), NOT the running
+  // total — the running level is the readout's job. The total column (index n)
+  // reports the closing level, since that is what its zero-anchored bar encodes.
+  const datum = useCallback(
+    (i: number) => {
+      const d = data[i];
+      // The total column has no i18n-able name, so it carries no `label`.
+      if (!d) return { index: i, value: endLevel };
+      return { index: i, value: isFiniteValue(d.value) ? d.value : null, label: d.label };
+    },
+    [data, endLevel],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: cols,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -76,59 +118,31 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         : waterfallSummary(data, start, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (cols === 0 || geo.pitch === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const i = Math.floor(x / geo.pitch);
-      setActive(i >= 0 && i < cols ? i : null);
-    },
-    [cols, geo, width],
+  const box = (i: number, pinned: boolean) => (
+    <rect
+      x={i * geo.pitch - 0.5}
+      y={-0.5}
+      width={(geo.bars[0]?.w ?? geo.pitch - 1) + 1}
+      height={height + 1}
+      fill="none"
+      stroke="var(--mc-accent)"
+      data-mc-w={pinned ? "tick" : "support"}
+      vectorEffect="non-scaling-stroke"
+    />
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (cols === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(cols - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = cols - 1; // the total (or last step)
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, cols],
-  );
-
-  const isTotal = active !== null && total && active === data.length;
-  const datum = active !== null && !isTotal ? data[active] : undefined;
+  const shown = active ?? selected;
+  const isTotal = shown !== null && total && shown === data.length;
+  const step = shown !== null && !isTotal ? data[shown] : undefined;
   const announced = isTotal
-    ? `Total: ${fmt(geo.levels.at(-1) ?? start)}.`
-    : datum
+    ? `Total: ${fmt(endLevel)}.`
+    : step
       ? strings.waterfallStep(
-          datum.label,
-          isFiniteValue(datum.value)
-            ? `${datum.value < 0 ? "−" : "+"}${fmt(Math.abs(datum.value))}`
+          step.label,
+          isFiniteValue(step.value)
+            ? `${step.value < 0 ? "−" : "+"}${fmt(Math.abs(step.value))}`
             : strings.noData,
-          fmt(geo.levels[active!] ?? start),
+          fmt(geo.levels[shown!] ?? start),
         )
       : "";
 
@@ -139,10 +153,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticWaterfall
         {...rest}
@@ -158,30 +169,21 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         summary={false}
         style={FILL}
       >
-        {active !== null ? (
-          <rect
-            x={active * geo.pitch - 0.5}
-            y={-0.5}
-            width={(geo.bars[0]?.w ?? geo.pitch - 1) + 1}
-            height={height + 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus box is transient. */}
+        {selected !== null && selected !== active ? box(selected, true) : null}
+        {active !== null ? box(active, false) : null}
         {rest.children}
       </StaticWaterfall>
       <LiveRegion>{announced}</LiveRegion>
-      {active !== null ? (
+      {shown !== null ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((active * geo.pitch + geo.pitch / 2) / width) * 100}%`,
+            left: `${((shown * geo.pitch + geo.pitch / 2) / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {isTotal ? fmt(geo.levels.at(-1) ?? start) : fmt(geo.levels[active!] ?? start)}
+          {isTotal ? fmt(endLevel) : fmt(geo.levels[shown] ?? start)}
         </span>
       ) : null}
     </span>

@@ -1,10 +1,9 @@
 import { PairedBars } from "@microcharts/react/paired-bars";
-import { PairedBars as PairedBarsInteractive } from "@microcharts/react/paired-bars/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 type PairRow = { label: string; value: number | null; ref: number | null }[];
-const BUDGET: PairRow = [
+export const BUDGET: PairRow = [
   { label: "East", value: 940, ref: 1200 },
   { label: "West", value: 410, ref: 400 },
   { label: "South", value: 620, ref: 600 },
@@ -85,12 +84,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <PairedBars data={BUDGET} summary={false} width={120} height={40} />;
 }
-
-export const showcase = {
-  hint: "vs reference",
-  Node: () => <PairedBars data={BUDGET} title="Actual vs plan" width={120} height={40} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -141,33 +134,6 @@ export const playground: PlaygroundSpec = {
       (s.positive as boolean) && '  positive="up"',
       s.orientation === "horizontal" && '  orientation="horizontal"',
       s.locale !== "en-US" && `  locale="${s.locale}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <PairedBarsInteractive
-      data={BUDGET}
-      mode={s.mode as "grouped" | "overlay"}
-      positive={(s.positive as boolean) ? "up" : undefined}
-      orientation={s.orientation as "horizontal" | "vertical"}
-      locale={s.locale as string}
-      animate={ui.animate}
-      summary={false}
-      style={
-        s.orientation === "horizontal" ? { width: 200, height: 110 } : { width: 220, height: 72 }
-      }
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<PairedBars",
-      "  data={regions}",
-      s.mode !== "grouped" && `  mode="${s.mode}"`,
-      (s.positive as boolean) && '  positive="up"',
-      s.orientation === "horizontal" && '  orientation="horizontal"',
-      s.locale !== "en-US" && `  locale="${s.locale}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -289,19 +255,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<PairedBars data={pairs} />`;
 }
-
-export function PreviewLive() {
-  return <PairedBarsInteractive data={BUDGET} summary={false} width={120} height={40} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

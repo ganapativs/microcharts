@@ -1,9 +1,8 @@
 import { MicroScatter } from "@microcharts/react/micro-scatter";
-import { MicroScatter as MicroScatterInteractive } from "@microcharts/react/micro-scatter/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const CLOUD = Array.from({ length: 24 }, (_, i) => ({
+export const CLOUD = Array.from({ length: 24 }, (_, i) => ({
   x: i,
   y: i * 3 + ((i * 7) % 5) * 6,
 }));
@@ -89,16 +88,7 @@ export const entry: ChartEntry = {
 
 export function Preview() {
   return <MicroScatter data={CLOUD} summary={false} width={110} height={66} />;
-}
-
-export const showcase = {
-  hint: "correlation",
-  Node: () => (
-    <MicroScatter data={CLOUD} trend title="Spend vs conversions" width={110} height={66} />
-  ),
-};
-
-// data: the whole point cloud, no shuffle button (a scatter's shape only
+} // data: the whole point cloud, no shuffle button (a scatter's shape only
 // reads at n ≈ 24 — a per-click reshuffle would defeat "read it once, trust
 // it"). color, format, locale, id, className, style, children: styling/
 // formatting escape hatches, not chart-shape knobs — no interactive control
@@ -132,34 +122,6 @@ export const playground: PlaygroundSpec = {
       s.r !== 1.5 && `  r={${s.r}}`,
       (s.zoom as boolean) && "  xDomain={[0, 12]}",
       (s.zoom as boolean) && "  domain={[0, 60]}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <MicroScatterInteractive
-      data={CLOUD}
-      trend={s.trend as boolean}
-      focal={(s.focal as boolean) ? 12 : undefined}
-      r={s.r as number}
-      xDomain={(s.zoom as boolean) ? [0, 12] : undefined}
-      domain={(s.zoom as boolean) ? [0, 60] : undefined}
-      summary={false}
-      animate={ui.animate}
-      width={220}
-      height={132}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<MicroScatter",
-      "  data={pairs}",
-      (s.trend as boolean) && "  trend",
-      (s.focal as boolean) && "  focal={12}",
-      s.r !== 1.5 && `  r={${s.r}}`,
-      (s.zoom as boolean) && "  xDomain={[0, 12]}",
-      (s.zoom as boolean) && "  domain={[0, 60]}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -284,19 +246,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<MicroScatter data={pairs} />`;
 }
-
-export function PreviewLive() {
-  return <MicroScatterInteractive data={CLOUD} summary={false} width={110} height={66} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

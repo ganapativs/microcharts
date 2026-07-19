@@ -7,8 +7,9 @@ description:
 
 Annotations answer "what should the reader compare this against?". They're plain children — `<Threshold>`,
 `<TargetZone>`, `<Marker>`, `<Callout>` — that the host chart draws in its own coordinate space, so the same child lands
-identically on any chart that accepts it. Reference ink whispers: everything sits at 0.7 opacity or below, and the data
-never competes with its context.
+identically on any chart that accepts it. Reference ink whispers: the hairlines stroke at 0.7 opacity, labels take the
+muted `--mc-neutral` label ink, and a target band uses the same faint `--mc-band` fill the charts do — so the data never
+competes with its context.
 
 <LiveDemo
   label="Annotations"
@@ -46,12 +47,16 @@ import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annot
 ## The vocabulary
 
 - **`<Threshold y={65} label="SLA" />`** — a dashed reference hairline at a data-space `y`.
-- **`<TargetZone y={[40, 60]} />`** — a normal-range band, always drawn _beneath_ the data ink.
+- **`<TargetZone y={[40, 60]} />`** — a normal-range band, always drawn _beneath_ the data ink. It takes a `label` too.
 - **`<Marker x={8} label="deploy" />`** — a vertical moment mark; `x` addresses the host's primary axis (the data
   **index** on S1 charts like Sparkline and SparkBar).
 - **`<Marker x={8} celebrate />`** — six deterministic particles burst once on entrance, for milestone crossings only;
   under reduced motion they rest as a quiet starburst.
-- **`<Callout x={5} y={45} label="dip" />`** — one narrated point on an elbow hairline.
+- **`<Callout x={5} y={45} label="dip" />`** — one narrated point on an elbow hairline. `label` is required; `y` is
+  optional and defaults to the frame's mid-height.
+
+`label` is optional on the other three, and all four take a `color` to override the reference ink on that one mark. A
+fragment works as a container — `<><Threshold … /><Marker … /></>` — the host's walker unwraps it.
 
 <LiveDemo
   label="celebrate — a milestone crossing"
@@ -107,8 +112,9 @@ y-axis; a horizontal MiniBar flips the axes, so it passes annotation children st
 
 Charts without a single continuous value-y don't host them, by design: scalar readouts (Delta, FatDigits, StatusDot,
 Thermometer), part-to-whole (MicroDonut, SegmentedBar, Funnel), color-encoded value (HeatStrip, ActivityGrid, the
-calendars), value-by-value scatters (QuadrantDot, MicroScatter, BiasStrip), and the pure timelines. An annotation placed
-inside one renders nothing and warns in dev.
+calendars), value-by-value scatters (QuadrantDot, MicroScatter, BiasStrip), and the pure timelines. Most still accept
+children as a plain pass-through, so an annotation placed inside one renders nothing and warns in dev; a few — Delta
+among them — take no children at all, and it's a type error.
 
 <AnnotationHostShowcase />
 
@@ -118,4 +124,9 @@ inside one renders nothing and warns in dev.
   dropped.
 - Annotations never touch the auto summary: the data description stays pure. To narrate an annotation on a static chart,
   pass an explicit `summary` string.
-- `celebrate` particles are seeded from the data, never `Math.random`, so server and client render the same burst.
+- `celebrate` particles are seeded from the marker's `x` and the host's size, never `Math.random`, so server and client
+  render the same burst.
+- A `label` you supply is the one text the containment rule can't pre-reserve a gutter for, so a label that would
+  overrun its available run is truncated with a trailing `…` rather than spilling outside the chart.
+- Reference hairlines draw at a fixed 1-unit weight, deliberately exempt from `--mc-density`, so tightening the density
+  never thickens the context ink along with the data.

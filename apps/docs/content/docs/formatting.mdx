@@ -20,8 +20,18 @@ announces. `format` feeds _both_ from a single definition — so a currency char
 `format` takes either **`Intl.NumberFormatOptions`** or a **plain function** `(n) => string`. Formatters are cached
 (`Intl.NumberFormat` construction is expensive), so passing options costs nothing across hundreds of instances — never
 build your own `new Intl.NumberFormat` in a component. Need the same formatting _outside_ a chart (a matching KPI label,
-a table cell)? Import the exported `makeFormatter` helper — `const fmt = makeFormatter(format, locale); fmt(42)` — so
-your prose numbers line up with the chart's exactly, from the same cache.
+a table cell)? Import the exported `makeFormatter` helper so your prose numbers line up with the chart's exactly, from
+the same cache:
+
+```tsx
+import { makeFormatter } from "@microcharts/react";
+
+const fmt = makeFormatter({ style: "currency", currency: "USD" }, "en-US");
+fmt(42); // "$42.00"
+```
+
+The arguments are positional — `makeFormatter(format, locale, defaults?)`. The third argument is the fallback used when
+`format` is omitted; it's how a chart supplies its own default (see `Delta` below).
 
 <LiveDemo
   label="Currency label"
@@ -58,7 +68,9 @@ defaults to a locale-aware percent, so a raw ratio reads as a change with no con
 ## A custom function
 
 When `Intl` can't express the unit — milliseconds, "×" multipliers, a domain-specific symbol — pass a function. It
-receives the raw number and returns the exact string to render.
+receives the number and returns the exact string to render. The value is snapped to 12 significant digits before it
+reaches your function, so a number a chart derived internally (`value - target`) arrives as `-3.6`, not
+`-3.5999999999999943` — you write for clean data, not for IEEE arithmetic.
 
 <LiveDemo
   label="Custom units"
@@ -113,8 +125,8 @@ _written_ — the thousands separator, decimal mark, currency placement — matc
 ## Scale: the `domain` decision
 
 `domain` sets the value range the geometry is drawn against — the vertical frame. Omit it and the chart **auto-fits to
-its own data** (every pixel of height used). Pass `[min, max]` to pin a fixed frame instead — so a 40–60% reading looks
-like 40–60% of a 0–100 scale, not a full-height line.
+its own data**. Pass `[min, max]` to pin a fixed frame instead — so a 40–60% reading looks like 40–60% of a 0–100 scale,
+not a full-height line.
 
 <LiveDemo
   label="Auto-fit vs. fixed frame"
@@ -135,13 +147,35 @@ like 40–60% of a 0–100 scale, not a full-height line.
   </div>
 </LiveDemo>
 
+Auto-fit is not the same everywhere. Charts whose marks read as magnitude from a baseline — `Sparkbar`, `MiniBar`,
+`PairedBars`, and `Sparkline` once you turn on `fill` — anchor the auto-fitted domain at **zero**, because a bar cut off
+above zero lies about its own length. Line charts without a fill auto-fit to the data alone. Either way, a completely
+flat series is padded so it still has a band to sit in rather than collapsing to a degenerate scale.
+
 This is an **honesty decision**, not cosmetics: auto-fit maximizes detail for a single series, but a fixed domain is
-what makes two charts comparable. To share one scale across several charts at once, use `SparkGroup` — see
-[Composition](/docs/composition#small-multiples-one-shared-scale).
+what makes two charts comparable. To share one scale across several charts at once, use `SparkGroup` — it reads every
+child's `data`, computes one union domain, and injects it into any child that didn't set its own (`zero` anchors that
+shared domain at zero). See [Composition](/docs/composition#small-multiples-one-shared-scale).
 
 ## Dates and times
 
-Calendar and time charts (`CalendarStrip`, `EventTimeline`, and friends) take the same `format` prop as
-**`Intl.DateTimeFormatOptions`** or a `(date) => string` function, with `locale` applied the same way. Timestamps are
-normalized to **UTC** so the same input renders identically in any host timezone — a chart never shifts a day because
-the viewer is in a different region.
+On calendar and time charts, `format` still means what it means everywhere else: it formats the **numbers**. On
+`EventTimeline` that's a share, defaulting to a locale-aware percent. On `CalendarStrip` it's the day's value in the
+hover/focus readout — so it lives on the interactive entry only. The static `CalendarStrip` summary counts days ("Active
+11 of 24 days over 4 weeks."), and a count of days is not a number `format` gets to restyle.
+
+Date and time _strings_ are a separate prop, **`dateFormat`**, taking `Intl.DateTimeFormatOptions` or a
+`(date) => string` function. It lives on the interactive entries (`@microcharts/react/calendar-strip/interactive`,
+`@microcharts/react/event-timeline/interactive`), which are the entries that render a spoken or hovered date at all —
+`locale` applies to it the same way.
+
+```tsx
+import { CalendarStrip } from "@microcharts/react/calendar-strip/interactive";
+
+<CalendarStrip data={days} dateFormat={{ month: "short", day: "numeric" }} locale="de-DE" />;
+```
+
+When you pass options (rather than a function), the formatter defaults to `timeZone: "UTC"`, so the same input renders
+identically in any host timezone — a chart never shifts a day because the viewer is in a different region. Your options
+spread after that default, so `{ timeZone: "America/New_York" }` overrides it deliberately. A `(date) => string`
+function bypasses the default entirely and owns its own timezone handling.

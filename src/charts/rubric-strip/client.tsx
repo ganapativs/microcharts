@@ -1,9 +1,11 @@
 "use client";
-// Interactive <RubricStrip>. One pointer listener; row by y lookup.
-// ↑/↓ rove criteria. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <RubricStrip>. useActivePicker owns interaction: one pointer
+// listener + row-by-y lookup, ↑/↓ rove criteria, click / Enter / Space selects
+// (onSelect). Composes the static component (canon) — never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { labelFont } from "../../core/labels.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RUBRIC } from "../../core/strings-rubric.js";
@@ -14,7 +16,7 @@ import {
   type RubricStripProps,
 } from "./index.js";
 
-export interface InteractiveRubricStripProps extends RubricStripProps {
+export interface InteractiveRubricStripProps extends RubricStripProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): each criterion's bar sweeps in
    * from the left, staggered row by row, on first client-side mount. Inert on
@@ -39,6 +41,10 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -49,12 +55,20 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
   });
 
   const n = Math.max(1, data.length);
-  const height = heightProp ?? Math.min(32, Math.max(12, n * 8));
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const fontSize = Math.max(5, Math.min(7, Math.round((height / n) * 0.6)));
-  const gutter = labels
-    ? Math.min(width * 0.62, Math.max(...data.map((d) => d.label.length), 1) * fontSize * 0.64 + 4)
-    : 0;
+  // Height / font / gutter mirror the static entry EXACTLY (same defaults, same
+  // label-fit rule) — both entries must land on identical geometry or the focus
+  // box drifts off the rows it is meant to frame.
+  const height = heightProp ?? Math.max(14, n * 13);
+  const fontSize = labelFont(height / n, 0.6);
+  const labelsFit = height / n >= fontSize * 1.15;
+  const longestLabel = useMemo(() => {
+    let longest = 1;
+    for (const d of data) if (d.label.length > longest) longest = d.label.length;
+    return longest;
+  }, [data]);
+  const gutter =
+    labels && labelsFit ? Math.min(width * 0.62, longestLabel * fontSize * 0.64 + 4) : 0;
   const geo = useMemo(
     () =>
       rubricStripGeometry({
@@ -67,7 +81,36 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
       }),
     [data, domain, width, height, gutter],
   );
-  const [active, setActive] = useState<number | null>(null);
+
+  // Pointer (viewBox space) → row by y band.
+  const locate = useCallback(
+    (_x: number, y: number) => {
+      const i = geo.rows.findIndex((row) => y >= row.y && y <= row.y + row.height);
+      return i >= 0 ? i : null;
+    },
+    [geo],
+  );
+
+  // 1:1 with `data`: unit = criterion, `value` = its score (the bar's length).
+  const datum = useCallback(
+    (i: number) => {
+      const row = geo.rows[i];
+      return { index: i, value: row?.score ?? null, label: row?.label };
+    },
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.rows.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -77,49 +120,25 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
         : rubricStripSummary(data, strings, fmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.rows.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.height === 0) return;
-      const y = ((e.clientY - r.top) / r.height) * height;
-      const i = geo.rows.findIndex((row) => y >= row.y && y <= row.y + row.height);
-      setActive(i >= 0 ? i : null);
-    },
-    [geo, height],
-  );
+  const box = (i: number, pinned: boolean) => {
+    const row = geo.rows[i];
+    if (!row) return null;
+    return (
+      <rect
+        x={gutter - 0.5}
+        y={row.y - 0.5}
+        width={row.trackWidth + 1}
+        height={row.height + 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.rows.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowDown":
-          next = Math.min(geo.rows.length - 1, cur + 1);
-          break;
-        case "ArrowUp":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.rows.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const row = active != null ? geo.rows[active] : undefined;
+  const shown = active ?? selected;
+  const row = shown !== null ? geo.rows[shown] : undefined;
   const announced = row
     ? strings.rubricRow(row.label, fmt(row.score), `${Math.round(row.weightShare * 100)}%`)
     : "";
@@ -131,10 +150,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticRubricStrip
         {...rest}
@@ -149,18 +165,9 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
         summary={false}
         style={FILL}
       >
-        {row ? (
-          <rect
-            x={gutter - 0.5}
-            y={row.y - 0.5}
-            width={row.trackWidth + 1}
-            height={row.height + 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus box is transient. */}
+        {selected !== null && selected !== active ? box(selected, true) : null}
+        {active !== null ? box(active, false) : null}
         {rest.children}
       </StaticRubricStrip>
       <LiveRegion>{announced}</LiveRegion>

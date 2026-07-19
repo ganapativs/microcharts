@@ -1,13 +1,13 @@
 "use client";
-// Interactive <PolarClock>. One pointer listener; the cursor angle
-// (atan2, 12 o'clock clockwise) maps to a segment. Hover lifts that sector to the
-// accent and shows its label; ←/→ step segments circularly; a polite live region
-// announces the focused segment. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <PolarClock>. useActivePicker owns interaction: one pointer
+// listener + cursor-angle→segment lookup (atan2, 12 o'clock clockwise), ←/→ step
+// segments circularly, click / Enter / Space selects (onSelect). Composes the
+// static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { annulusSector } from "../../core/arc.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
@@ -26,7 +26,7 @@ const TAU = Math.PI * 2;
 // itself is turning): "grow" scales the whole clock concentrically from the
 // center outward, leaving every segment at its true hour.
 
-export interface InteractivePolarClockProps extends PolarClockProps {
+export interface InteractivePolarClockProps extends PolarClockProps, PickerProps {
   strings?: PolarClockStrings;
   /**
    * Opt-in entrance motion (default `false`): the radial segments settle
@@ -59,6 +59,10 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const n = data.length;
@@ -78,7 +82,66 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     (i: number) => (formatSegment ? formatSegment(i, n) : defaultSegmentLabel(strings, i, n)),
     [formatSegment, n, strings],
   );
-  const [active, setActive] = useState<number | null>(null); // data index
+
+  // Pointer (viewBox space) → data index by cursor angle. The clock occupies the
+  // top square; the peak-label gutter (if any) lives below it.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      if (n === 0) return null;
+      const dx = x - geo.size / 2;
+      const dy = y - geo.size / 2;
+      let ang = Math.atan2(dx, -dy); // 0 at 12 o'clock, clockwise
+      if (ang < 0) ang += TAU;
+      const pos = Math.min(n - 1, Math.floor((ang / TAU) * n));
+      return (((pos + start) % n) + n) % n;
+    },
+    [geo, n, start],
+  );
+
+  // Circular roving: ←/→ wrap around the cycle (matches the clock's topology).
+  const step = useCallback(
+    (cur: number, key: string) => {
+      if (n === 0) return null;
+      switch (key) {
+        case "ArrowRight":
+          return (((cur + 1) % n) + n) % n;
+        case "ArrowLeft":
+          return (((cur - 1) % n) + n) % n;
+        case "Home":
+          return 0;
+        case "End":
+          return n - 1;
+      }
+      return null;
+    },
+    [n],
+  );
+
+  // index = data index; value = the segment's number (null when empty); label = its name.
+  const datum = useCallback(
+    (i: number) => {
+      const v = data[i];
+      return {
+        index: i,
+        value: typeof v === "number" && Number.isFinite(v) ? v : null,
+        label: seg(i),
+      };
+    },
+    [data, seg],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: n,
+    width: geo.size,
+    height: vbHeight,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -88,78 +151,27 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         : polarClockSummary(data, { formatSegment, strings, format, locale });
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (n === 0) return;
-      const rct = e.currentTarget.getBoundingClientRect();
-      if (rct.width === 0 || rct.height === 0) return;
-      // Chart height may include a label gutter; the clock occupies the top square.
-      const px = ((e.clientX - rct.left) / rct.width) * geo.size;
-      const py = ((e.clientY - rct.top) / rct.height) * vbHeight;
-      const dx = px - geo.size / 2;
-      const dy = py - geo.size / 2;
-      let ang = Math.atan2(dx, -dy); // 0 at 12 o'clock, clockwise
-      if (ang < 0) ang += TAU;
-      const pos = Math.min(n - 1, Math.floor((ang / TAU) * n));
-      const index = (((pos + start) % n) + n) % n;
-      setActive(index);
-    },
-    [geo, n, start, vbHeight],
-  );
+  const sector = (i: number) => {
+    const s = geo.segments[i];
+    if (!s || s.isNull) return null;
+    return annulusSector(geo.size / 2, geo.size / 2, s.rOuter, geo.guide.r, s.a0, s.a1);
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (n === 0) return;
-      const cur = active ?? -1;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = (((cur + 1) % n) + n) % n;
-          break;
-        case "ArrowLeft":
-          next = (((cur - 1) % n) + n) % n;
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = n - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, n],
-  );
-
-  const activeSeg = active !== null ? geo.segments[active] : undefined;
-  const activeVal = active !== null ? data[active] : undefined;
-  const overlayPath =
-    activeSeg && !activeSeg.isNull
-      ? annulusSector(
-          geo.size / 2,
-          geo.size / 2,
-          activeSeg.rOuter,
-          geo.guide.r,
-          activeSeg.a0,
-          activeSeg.a1,
-        )
-      : "";
+  const shown = active ?? selected;
+  const shownSeg = shown !== null ? geo.segments[shown] : undefined;
+  const shownVal = shown !== null ? data[shown] : undefined;
   const announced =
-    activeSeg !== undefined
-      ? typeof activeVal === "number" && Number.isFinite(activeVal)
-        ? strings.polarClockAt(seg(active!), fmt(activeVal))
-        : strings.polarClockAt(seg(active!), "—")
+    shownSeg !== undefined
+      ? typeof shownVal === "number" && Number.isFinite(shownVal)
+        ? strings.polarClockAt(seg(shown!), fmt(shownVal))
+        : strings.polarClockAt(seg(shown!), "—")
       : "";
   const readout =
-    activeSeg !== undefined
-      ? `${seg(active!)}: ${typeof activeVal === "number" && Number.isFinite(activeVal) ? fmt(activeVal) : "—"}`
+    shownSeg !== undefined
+      ? `${seg(shown!)}: ${typeof shownVal === "number" && Number.isFinite(shownVal) ? fmt(shownVal) : "—"}`
       : "";
+  const pinPath = selected !== null && selected !== active ? sector(selected) : null;
+  const activePath = active !== null ? sector(active) : null;
 
   return (
     <span
@@ -168,10 +180,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticPolarClock
         {...rest}
@@ -188,11 +197,13 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {overlayPath ? <path d={overlayPath} data-mc-ink="accent" /> : null}
+        {/* Pinned selection persists through pointer-leave; focus sector is transient. */}
+        {pinPath ? <path d={pinPath} data-mc-ink="accent" data-mc-w="tick" /> : null}
+        {activePath ? <path d={activePath} data-mc-ink="accent" /> : null}
         {rest.children}
       </StaticPolarClock>
       <LiveRegion>{announced}</LiveRegion>
-      {activeSeg !== undefined ? (
+      {shownSeg !== undefined ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {readout}
         </span>

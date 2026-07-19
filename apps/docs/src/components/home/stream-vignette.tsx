@@ -142,7 +142,11 @@ const SCENARIOS: Scenario[] = [
           <Bullet value={72} target={80} bands={[50, 90]} width={66} height={12} summary={false} />
         ),
       },
-      { id: "r4", kind: "text", text: " to target. A clean quarter, clear to raise for Q4." },
+      {
+        id: "r4",
+        kind: "text",
+        text: " to target. A clean quarter, clear to raise for Q4.",
+      },
     ],
   },
   {
@@ -250,7 +254,11 @@ const SCENARIOS: Scenario[] = [
           />
         ),
       },
-      { id: "m3", kind: "text", text: ", so slippage was minimal. The book now sits " },
+      {
+        id: "m3",
+        kind: "text",
+        text: ", so slippage was minimal. The book now sits ",
+      },
       {
         id: "m-bullet",
         kind: "chart",
@@ -616,10 +624,12 @@ export function StreamVignette({
             chips' reclaimed space to the answer: it holds the reply area (and
             thus the whole panel) at the height it had with the taller chips, so
             shrinking the chips grew the answer instead of shrinking the panel. */}
+        {/* The floor value lives in CSS (.hv-reply-floor[data-live]) so the
+            pre-paint prediction can apply the exact same 297px before React
+            has run — two sources would mean two heights and a shift. */}
         <div
-          className={`grid text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed ${
-            live.supported ? "min-h-[297px]" : ""
-          }`}
+          className="hv-reply-floor grid text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed"
+          data-live={live.supported ? "1" : undefined}
         >
           {SCENARIOS.map((s) => (
             <div key={s.id} aria-hidden className="invisible [grid-area:1/1]">
@@ -660,53 +670,70 @@ export function StreamVignette({
           </div>
         )}
       </div>
-      {live.supported && (
-        <div className="border-t border-hairline px-4 pb-3.5 pt-3">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {LIVE_SAMPLES.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => submit(s)}
-                onMouseEnter={live.warm}
-                onFocus={live.warm}
-                className="rounded-full border border-hairline px-2.5 py-1 text-[0.72rem] leading-none text-fd-muted-foreground transition-colors hover:border-fd-primary/45 hover:text-fd-foreground"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-          <form
-            className="mt-2.5 flex items-center gap-2 rounded-full border border-hairline bg-fd-card py-1 pl-4 pr-1.5 transition-colors focus-within:border-fd-primary/60"
-            onSubmit={(e) => {
-              e.preventDefault();
-              submit(query);
-            }}
-          >
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={live.warm}
-              maxLength={140}
-              placeholder="ask for a tiny report of your own…"
-              aria-label="Ask the on-device model for a report"
-              className="min-w-0 flex-1 bg-transparent py-1.5 text-sm text-fd-foreground outline-none placeholder:text-fd-muted-foreground/60"
-            />
-            <button
-              type="submit"
-              aria-label="Ask"
-              title="Ask"
-              disabled={!query.trim() || live.phase === "thinking"}
-              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-fd-primary text-fd-primary-foreground transition-transform hover:-translate-y-px disabled:pointer-events-none disabled:opacity-35"
+      {/* .hv-composer is the animating row (grid 0fr -> 1fr). It is rendered
+          unconditionally — collapsed and inert when live is off — because that
+          is what lets `1fr` resolve to the composer's REAL height at any width,
+          so the pre-paint prediction reserves an exact box with no magic number
+          to drift.
+
+          THREE levels, all load-bearing: the grid, then a bare clipping item,
+          then the painted content. The middle one cannot be skipped — under
+          border-box sizing a grid item never shrinks below its own padding, so
+          hanging the padding directly on the item leaked its full 27px into
+          every collapsed panel, including for visitors with no Chrome AI. */}
+      <div
+        className="hv-composer"
+        data-open={live.supported ? "1" : undefined}
+        inert={!live.supported}
+      >
+        <div>
+          <div className="border-t border-hairline px-4 pb-3.5 pt-3">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {LIVE_SAMPLES.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => submit(s)}
+                  onMouseEnter={live.warm}
+                  onFocus={live.warm}
+                  className="rounded-full border border-hairline px-2.5 py-1 text-[0.72rem] leading-none text-fd-muted-foreground transition-colors hover:border-fd-primary/45 hover:text-fd-foreground"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            <form
+              className="mt-2.5 flex items-center gap-2 rounded-full border border-hairline bg-fd-card py-1 pl-4 pr-1.5 transition-colors focus-within:border-fd-primary/60"
+              onSubmit={(e) => {
+                e.preventDefault();
+                submit(query);
+              }}
             >
-              <ArrowUp className="size-3.5" />
-            </button>
-          </form>
-          <p className="mono-label mt-2 opacity-50">
-            live · Gemini Nano in your Chrome · numbers are illustrative
-          </p>
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={live.warm}
+                maxLength={140}
+                placeholder="ask for a tiny report of your own…"
+                aria-label="Ask the on-device model for a report"
+                className="min-w-0 flex-1 bg-transparent py-1.5 text-sm text-fd-foreground outline-none placeholder:text-fd-muted-foreground/60"
+              />
+              <button
+                type="submit"
+                aria-label="Ask"
+                title="Ask"
+                disabled={!query.trim() || live.phase === "thinking"}
+                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-fd-primary text-fd-primary-foreground transition-transform hover:-translate-y-px disabled:pointer-events-none disabled:opacity-35"
+              >
+                <ArrowUp className="size-3.5" />
+              </button>
+            </form>
+            <p className="mono-label mt-2 opacity-50">
+              live · Gemini Nano in your Chrome · numbers are illustrative
+            </p>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

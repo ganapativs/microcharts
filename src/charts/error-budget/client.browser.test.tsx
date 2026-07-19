@@ -4,6 +4,9 @@ import { ErrorBudget } from "./client.js";
 
 const OBSERVED = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <ErrorBudget>", () => {
   it("arrow keys step; the live region states remaining + burn rate", async () => {
     const screen = await render(<ErrorBudget data={OBSERVED} window={30} unit="day" title="SLO" />);
@@ -55,5 +58,41 @@ describe("interactive <ErrorBudget>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toContain("day 3 of 30");
+  });
+
+  it("onActive reports the focused datum (step index + remaining fraction); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <ErrorBudget data={OBSERVED} window={30} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-error-budget-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    key(wrap, "ArrowRight");
+    expect(seen.at(-1)).toEqual({ index: 1, value: 0.96 });
+    key(wrap, "Escape");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active step: fires onSelect + pins a persistent ring", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <ErrorBudget data={OBSERVED} window={30} onSelect={(d) => picks.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-error-budget-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    key(wrap, "ArrowRight");
+    key(wrap, "Enter");
+    expect(picks.at(-1)).toEqual({ index: 1, value: 0.96 });
+    // Pin survives blur (it is selection, not hover).
+    wrap.blur();
+    await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring with no interaction", async () => {
+    const screen = await render(<ErrorBudget data={OBSERVED} window={30} selectedIndex={0} />);
+    const wrap = screen.container.querySelector(".mc-error-budget-live") as HTMLElement;
+    expect(wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
 });

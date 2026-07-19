@@ -30,6 +30,7 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
     summary,
     className,
     style,
+    children,
   } = props;
 
   const tokens = useMemo(() => tokenTiers({ data, tiers }), [data, tiers]);
@@ -37,6 +38,14 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
     () => tokens.map((t, i) => (t.tier !== "confident" ? i : -1)).filter((i) => i >= 0),
     [tokens],
   );
+  // token index → its position in `flagged` (a plain `indexOf` inside the token
+  // render loop below is quadratic on a long streamed reply, and that loop runs
+  // again on every arrow key).
+  const flaggedPosOf = useMemo(() => {
+    const m = new Map<number, number>();
+    flagged.forEach((t, pos) => m.set(t, pos));
+    return m;
+  }, [flagged]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const refs = useRef<(HTMLSpanElement | null)[]>([]);
   const [active, setActive] = useState<number | null>(null);
@@ -113,7 +122,7 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
       onKeyDown={onKeyDown}
     >
       {tokens.map((t, i) => {
-        const flaggedPos = flagged.indexOf(i);
+        const flaggedPos = flaggedPosOf.get(i) ?? -1;
         const isFlagged = flaggedPos >= 0;
         const cls = CLASS[t.tier] ?? (show === "all" ? "mc-tc-seen" : undefined);
         // underline the WORD only — whitespace stays outside the marked span
@@ -162,6 +171,7 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
           {" ― unsure · ⋯ guessing"}
         </span>
       ) : null}
+      {children}
       <LiveRegion>{announced}</LiveRegion>
     </span>
   );

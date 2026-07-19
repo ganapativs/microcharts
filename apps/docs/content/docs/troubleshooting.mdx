@@ -2,7 +2,8 @@
 title: Troubleshooting
 description:
   The predictable failures — unstyled charts, a chart invisible on a dark panel, a 'use client' error from the
-  /interactive entry, a chart that won't fill its container, and fonts that look wrong — each with its one-line fix.
+  /interactive entry, the removed onPointFocus callback, an animate prop that does nothing, a chart that won't fill its
+  container, and fonts that look wrong — each with its one-line fix.
 ---
 
 Most issues trace back to one of a handful of causes. This page is the fast path to each fix; the full explanation for
@@ -55,7 +56,7 @@ You imported a chart's `/interactive` entry into a Server Component:
 import { Sparkline } from "@microcharts/react/sparkline/interactive";
 ```
 
-Two ways out: render the static default entry instead if you don't actually need hover or keyboard —
+Two ways out: render the static default entry instead if you don't actually need hover, keyboard, touch, or selection —
 
 ```tsx
 import { Sparkline } from "@microcharts/react/sparkline";
@@ -63,6 +64,40 @@ import { Sparkline } from "@microcharts/react/sparkline";
 
 — or, if you do need interactivity, move the import into a component marked `"use client"` and render that component
 from your server tree. See [Quickstart](/docs/quickstart#add-interactivity) for the static-vs-interactive split.
+
+## `onPointFocus` / `onRunFocus` no longer fire
+
+They were removed when every interactive chart moved onto one shared contract. The replacement is `onActive`, which
+fires for the same reason on every chart in the catalog rather than under a different name per chart:
+
+```tsx
+// ❌ removed
+<Sparkline data={data} onPointFocus={(i) => setHovered(i)} />
+
+// ✅ one name, everywhere
+<Sparkline data={data} onActive={(d) => setHovered(d?.index ?? null)} />
+```
+
+The payload is a `MicroDatum` — `{ index, value, label? }` — or `null` when the chart clears. `onPointFocus` on
+Sparkline and SparkBar and StreakSpark's `onRunFocus` map across directly. Note that `index` identifies the chart's
+_navigable unit_, which isn't always a series index: on Waveform it's a bucket, on Hypnogram a run, on SegmentedBar a
+segment. Each chart's page names its own unit. If you also want click-to-pin, add `onSelect` — see
+[Accessibility](/docs/accessibility#one-interaction-contract).
+
+## `animate` does nothing
+
+The entrance engine isn't loaded. `animate` is a flag; the code that runs the animation ships in a separate side-effect
+import you add once, anywhere in your client bundle:
+
+```tsx
+import "@microcharts/react/motion";
+```
+
+In development the chart logs exactly this to the console when the engine is missing. Three other reasons `animate` is
+correctly inert, none of them bugs: the reader has `prefers-reduced-motion: reduce`, the chart is a static entry
+(`animate` is an `/interactive`-only prop), or the markup came from the server and is being hydrated rather than freshly
+mounted — an entrance would mean animating content the reader can already see. The entrance also runs once per mount by
+design; remount with a changed `key` to replay it.
 
 ## The chart won't stretch to fill its container
 
@@ -75,9 +110,9 @@ stretching. Give it fluid sizing explicitly:
 
 and make sure the _parent_ is block-level (a flex or grid item, or a `div`) — a chart can't grow past an inline parent
 no matter what you set on the chart itself. This is identical for `…/interactive` entries: `style`, `className`, and
-`width`/`height` size an interactive chart exactly the way they size its static twin, and the hover crosshair stays
-locked to the cursor at any size. Full recipes, including the inline-in-a-sentence case, are on
-[Sizing & scaling](/docs/sizing).
+`width`/`height` size an interactive chart exactly the way they size its static twin, and hit-testing stays exact at any
+size — the crosshair tracks the cursor and a touch drag scrubs the unit under the finger. Full recipes, including the
+inline-in-a-sentence case, are on [Sizing & scaling](/docs/sizing).
 
 ## A chart stacks on its own line instead of sitting inline with text
 

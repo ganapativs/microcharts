@@ -1,18 +1,23 @@
 "use client";
-// Interactive <MicroBox>. Pointer → nearest of the five stat
-// positions by x; ←/→ steps the fixed 5-stop roving model min → q1 → median →
-// q3 → max ("Median: 42."). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <MicroBox>. useActivePicker owns interaction: one pointer
+// listener + nearest-stat-by-x math, roving the fixed 5-stop model
+// min → q1 → median → q3 → max ("Median: 42."), click / Enter / Space selects
+// (onSelect). Composes the static component (canon) — the SVG is never
+// re-implemented.
+//
+// Unit = one of the five summary STATS, so `datum.index` is the STAT POSITION
+// (0 = min … 4 = max), not a data index; `value` is that stat's value and
+// `label` its name.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { computeFive, microBoxGeometry } from "./geometry.js";
 import { MicroBox as StaticMicroBox, microBoxSummary, type MicroBoxProps } from "./index.js";
 
 const STOPS = ["min", "q1", "median", "q3", "max"] as const;
-type Stop = (typeof STOPS)[number];
 
 // The CENTRAL marks — box (q1–q3) + median tick — plus the too-few-observations
 // raw dots. Settling them into place as markers fits a floating box-and-whisker
@@ -24,7 +29,7 @@ type Stop = (typeof STOPS)[number];
 const BOX_SELECTOR =
   'rect[data-mc-ink="band"], line[data-mc-ink="data"], circle[data-mc-ink="point"]';
 
-export interface InteractiveMicroBoxProps extends MicroBoxProps {
+export interface InteractiveMicroBoxProps extends MicroBoxProps, PickerProps {
   strings?: DistStrings;
   /**
    * Opt-in entrance motion (default `false`): the whisker, box, median tick
@@ -51,6 +56,10 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -73,7 +82,44 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
     [resolved, width, height, whiskers, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<Stop | null>(null);
+
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo) return null;
+      let best = 0;
+      let bestDist = Infinity;
+      STOPS.forEach((stop, i) => {
+        const dist = Math.abs(geo.statX[stop] - x);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [geo],
+  );
+
+  const datum = useCallback(
+    (i: number) => ({
+      index: i,
+      value: resolved ? resolved.five[STOPS[i]!] : null,
+      label: STOPS[i],
+    }),
+    [resolved],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo ? STOPS.length : 0,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -85,57 +131,26 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
           : strings.noData;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      let best: Stop = "median";
-      let bestDist = Infinity;
-      for (const stop of STOPS) {
-        const dist = Math.abs(geo.statX[stop] - x);
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = stop;
-        }
-      }
-      setActive(best);
-    },
-    [geo, width],
-  );
+  const rule = (i: number, pinned: boolean) => {
+    const stop = STOPS[i];
+    if (!geo || !stop) return null;
+    return (
+      <line
+        x1={geo.statX[stop]}
+        y1={0.5}
+        x2={geo.statX[stop]}
+        y2={height - 0.5}
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!geo) return;
-      const pos = active === null ? -1 : STOPS.indexOf(active);
-      let next = pos;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(STOPS.length - 1, pos + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, pos <= 0 ? 0 : pos - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = STOPS.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(STOPS[next]!);
-    },
-    [active, geo],
-  );
-
-  const announced = active && resolved ? strings.boxStat(active, fmt(resolved.five[active])) : "";
+  const shown = active ?? selected;
+  const shownStop = shown !== null ? STOPS[shown] : undefined;
+  const announced =
+    shownStop && resolved ? strings.boxStat(shownStop, fmt(resolved.five[shownStop])) : "";
 
   return (
     <span
@@ -144,10 +159,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticMicroBox
         {...rest}
@@ -163,29 +175,21 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {active && geo ? (
-          <line
-            x1={geo.statX[active]}
-            y1={0.5}
-            x2={geo.statX[active]}
-            y2={height - 0.5}
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus rule is transient. */}
+        {selected !== null && selected !== active ? rule(selected, true) : null}
+        {active !== null ? rule(active, false) : null}
         {rest.children}
       </StaticMicroBox>
       <LiveRegion>{announced}</LiveRegion>
-      {active && geo && resolved ? (
+      {shownStop && geo && resolved ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(geo.statX[active] / width) * 100}%`,
+            left: `${(geo.statX[shownStop] / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(resolved.five[active])}
+          {fmt(resolved.five[shownStop])}
         </span>
       ) : null}
     </span>

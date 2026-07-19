@@ -32,6 +32,16 @@ describe("interactive <ActivityGrid>", () => {
     expect(live.textContent).toBe("");
   });
 
+  // Kernel contract: with nothing active, the FIRST arrow lands on unit 0 —
+  // it does not step off index 0 into the next column.
+  it("first arrow from nothing lands on cell 0", async () => {
+    const fig = await mount(<ActivityGrid data={DATA} title="Commits" />);
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(live.textContent).toBe("Point 1 of 98: 0.");
+  });
+
   it("focusing a cell rings it (accent outline)", async () => {
     const fig = await mount(<ActivityGrid data={DATA} title="Commits" />);
     fig.focus();

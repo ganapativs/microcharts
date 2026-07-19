@@ -1,16 +1,19 @@
 "use client";
-// Interactive <StarSpoke>. One pointer listener; nearest spoke by
-// angle. ←/→ rotate focus through the spokes. Composes the static component.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <StarSpoke>. useActivePicker owns interaction: one pointer
+// listener + nearest-spoke-by-angle lookup (atan2, pure), ←/→/↑/↓ rotate focus
+// circularly through the spokes, click / Enter / Space selects (onSelect).
+// Composes the static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { labelFont } from "../../core/labels.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STAR_SPOKE } from "../../core/strings-star-spoke.js";
 import { starSpokeGeometry } from "./geometry.js";
 import { StarSpoke as StaticStarSpoke, starSpokeSummary, type StarSpokeProps } from "./index.js";
 
-export interface InteractiveStarSpokeProps extends StarSpokeProps {
+export interface InteractiveStarSpokeProps extends StarSpokeProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the shape draws on when the
    * chart first mounts client-side. Inert on the server and on hydrated
@@ -33,13 +36,20 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
 
-  const pad = labels && size >= 48 ? Math.max(10, size * 0.2) : 2;
+  // Mirror the static entry's label ring EXACTLY — a divergent `pad` shifts
+  // every spoke, and the focus mark would sit off the drawn spoke.
+  const showLabels = labels && size >= 44;
+  const pad = showLabels ? Math.max(labelFont(size, 0.1) * 2, size * 0.22) : 2;
   const geo = useMemo(
     () =>
       starSpokeGeometry({
@@ -53,7 +63,73 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const n = data.length;
-  const [active, setActive] = useState<number | null>(null);
+
+  // Pointer (viewBox space) → spoke index by cursor angle (screen angle; the
+  // geometry seats spoke 0 at 12 o'clock and runs clockwise). The hub is a dead
+  // zone — near the center no spoke direction is meaningful.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      if (n === 0) return null;
+      const px = x - size / 2;
+      const py = y - size / 2;
+      if (Math.hypot(px, py) < size * 0.06) return null;
+      const a = Math.atan2(py, px);
+      let i = Math.round((a + Math.PI / 2) / ((2 * Math.PI) / n)) % n;
+      if (i < 0) i += n;
+      return i;
+    },
+    [n, size],
+  );
+
+  // Circular roving: the spokes are a ring, so all four arrows wrap around it
+  // (as the pre-kernel client did). Nothing active → the first arrow lands on
+  // spoke 0.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      if (n === 0) return null;
+      switch (key) {
+        case "ArrowRight":
+        case "ArrowDown":
+          return cur < 0 ? 0 : (cur + 1) % n;
+        case "ArrowLeft":
+        case "ArrowUp":
+          return cur < 0 ? 0 : (cur - 1 + n) % n;
+        case "Home":
+          return 0;
+        case "End":
+          return n - 1;
+      }
+      return null;
+    },
+    [n],
+  );
+
+  // index = data index (one spoke per metric); value = that spoke's value;
+  // label = the axis/spoke name.
+  const datum = useCallback(
+    (i: number) => {
+      const d = data[i];
+      return {
+        index: i,
+        value: d && Number.isFinite(d.value) ? d.value : null,
+        label: d?.label,
+      };
+    },
+    [data],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: n,
+    width: size,
+    height: size,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -63,52 +139,30 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
         : starSpokeSummary(data, strings, fmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (n === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * size - size / 2;
-      const py = ((e.clientY - r.top) / r.height) * size - size / 2;
-      if (Math.hypot(px, py) < size * 0.06) {
-        setActive(null);
-        return;
-      }
-      const a = Math.atan2(py, px); // screen angle
-      let i = Math.round((a + Math.PI / 2) / ((2 * Math.PI) / n)) % n;
-      if (i < 0) i += n;
-      setActive(i);
-    },
-    [n, size],
-  );
+  const mark = (i: number, pinned: boolean) => {
+    const s = geo.spokes[i];
+    if (!s) return null;
+    return (
+      <>
+        <line
+          x1={s.x1}
+          y1={s.y1}
+          x2={s.x2}
+          y2={s.y2}
+          stroke="var(--mc-accent)"
+          strokeLinecap="round"
+          data-mc-w={pinned ? "tick" : "support"}
+          vectorEffect="non-scaling-stroke"
+        />
+        <circle cx={s.tx} cy={s.ty} r={Math.max(1, size * 0.05)} fill="var(--mc-accent)" />
+      </>
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (n === 0) return;
-      setActive((prev) => {
-        const cur = prev ?? 0;
-        switch (e.key) {
-          case "ArrowRight":
-          case "ArrowDown":
-            e.preventDefault();
-            return (cur + 1) % n;
-          case "ArrowLeft":
-          case "ArrowUp":
-            e.preventDefault();
-            return (cur - 1 + n) % n;
-          case "Escape":
-            return null;
-          default:
-            return prev;
-        }
-      });
-    },
-    [n],
-  );
-
-  const spoke = active != null ? geo.spokes[active] : undefined;
-  const datum = active != null ? data[active] : undefined;
-  const announced = datum ? strings.spokeAt(datum.label, fmt(datum.value)) : "";
+  const shown = active ?? selected;
+  const spoke = shown !== null ? geo.spokes[shown] : undefined;
+  const shownDatum = shown !== null ? data[shown] : undefined;
+  const announced = shownDatum ? strings.spokeAt(shownDatum.label, fmt(shownDatum.value)) : "";
 
   return (
     <span
@@ -117,10 +171,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticStarSpoke
         {...rest}
@@ -134,30 +185,13 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
         summary={false}
         style={FILL}
       >
-        {spoke ? (
-          <line
-            x1={spoke.x1}
-            y1={spoke.y1}
-            x2={spoke.x2}
-            y2={spoke.y2}
-            stroke="var(--mc-accent)"
-            strokeLinecap="round"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
-        {spoke ? (
-          <circle
-            cx={spoke.tx}
-            cy={spoke.ty}
-            r={Math.max(1, size * 0.05)}
-            fill="var(--mc-accent)"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus spoke is transient. */}
+        {selected !== null && selected !== active ? mark(selected, true) : null}
+        {active !== null ? mark(active, false) : null}
         {rest.children}
       </StaticStarSpoke>
       <LiveRegion>{announced}</LiveRegion>
-      {spoke && datum ? (
+      {spoke && shownDatum ? (
         <span
           className="mc-spark-readout"
           style={{
@@ -167,7 +201,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
             bottom: "auto",
           }}
         >
-          {`${datum.label} ${fmt(datum.value)}`}
+          {`${shownDatum.label} ${fmt(shownDatum.value)}`}
         </span>
       ) : null}
     </span>

@@ -21,6 +21,18 @@ export interface LikertGeometry {
   shares: { negative: number; positive: number; neutral: number };
 }
 
+/** Label font size (viewBox units) — shared by both entries. */
+export const LIKERT_FONT = 5;
+
+/**
+ * End-label gutter reserved on BOTH sides before geometry runs ("100%" worst
+ * case = 4 chars). Shared so the static frame and the interactive overlay/
+ * hit-test always resolve against the same plot box.
+ */
+export function likertGutter(labelled: boolean, fontSize: number = LIKERT_FONT): number {
+  return labelled ? Math.ceil(4 * fontSize * 0.62) + 4 : 0;
+}
+
 export function likertStripGeometry(opts: {
   width: number;
   height: number;

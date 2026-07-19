@@ -1,20 +1,21 @@
 "use client";
-// Interactive <PartitionStrip>. One pointer listener; segment by
-// row (y) + x lookup. ←/→ within a row, ↑/↓ between a parent and its first child
-// (2-D keyboard, ActivityGrid model). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
-import { FILL, wrap } from "../../shared/interactive.js";
+// Interactive <PartitionStrip>. useActivePicker owns interaction: one pointer
+// listener + segment lookup by row (y) then x, a custom 2-D `step` (←/→ within
+// a row, ↑/↓ between a parent and its first child — ActivityGrid model), click /
+// Enter / Space selects (onSelect). Composes the static component (canon).
+import { useCallback, useMemo, useRef } from "react";
+import { FILL, nav1d, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PARTITION } from "../../core/strings-partition.js";
-import { partitionStripGeometry, type PartitionSegment } from "./geometry.js";
+import { partitionStripGeometry } from "./geometry.js";
 import {
   PartitionStrip as StaticPartitionStrip,
   partitionStripSummary,
   type PartitionStripProps,
 } from "./index.js";
 
-export interface InteractivePartitionStripProps extends PartitionStripProps {
+export interface InteractivePartitionStripProps extends PartitionStripProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): both rows of segments fade in,
    * staggered, on first client-side mount. Inert on the server and on
@@ -35,6 +36,10 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -51,13 +56,70 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
     () => partitionStripGeometry({ data, width, height, gap: 1 }),
     [data, width, height],
   );
-  const rows = useMemo<[PartitionSegment[], PartitionSegment[]]>(
-    () => [geo.segments.filter((s) => s.row === 0), geo.segments.filter((s) => s.row === 1)],
-    [geo],
-  );
+  const segs = geo.segments;
   const inset = 0.5;
   const rowH = (height - inset * 2 - 1) / 2;
-  const [active, setActive] = useState<{ row: 0 | 1; i: number } | null>(null);
+
+  const locate = useCallback(
+    (x: number, y: number) => {
+      const row = y < inset + rowH + 0.5 ? 0 : 1;
+      const i = segs.findIndex((s) => s.row === row && x >= s.x && x <= s.x + s.width);
+      return i >= 0 ? i : null;
+    },
+    [segs, rowH],
+  );
+  // Unit = flat index into `geo.segments` (parents and children interleaved in
+  // layout order) — the strip rolls a two-level tree into one segment list, so
+  // the unit is the SEGMENT position, not an index into `data`.
+  const datum = useCallback(
+    (i: number) => {
+      const s = segs[i];
+      return { index: i, value: s ? s.share : null, label: s?.label };
+    },
+    [segs],
+  );
+  // 2-D nav: ←/→ stay inside the current row (the comparison channel is
+  // alignment, so crossing rows sideways would be a lie); ↑/↓ walk the
+  // parent↔first-child link. Home/End fall back to the 1-D default.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      if (key !== "ArrowLeft" && key !== "ArrowRight" && key !== "ArrowUp" && key !== "ArrowDown") {
+        return nav1d(cur, segs.length, key);
+      }
+      if (cur < 0) return 0; // first arrow lands on unit 0
+      const s = segs[cur];
+      if (!s) return null;
+      if (key === "ArrowLeft" || key === "ArrowRight") {
+        const dir = key === "ArrowRight" ? 1 : -1;
+        for (let i = cur + dir; i >= 0 && i < segs.length; i += dir) {
+          if (segs[i]!.row === s.row) return i;
+        }
+        return cur; // row boundary: consume the key without moving
+      }
+      if (key === "ArrowDown") {
+        if (s.row === 1) return cur;
+        const i = segs.findIndex((t) => t.row === 1 && t.parent === s.label);
+        return i >= 0 ? i : cur;
+      }
+      if (s.row === 0) return cur;
+      const i = segs.findIndex((t) => t.row === 0 && t.label === s.parent);
+      return i >= 0 ? i : cur;
+    },
+    [segs],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: segs.length,
+    width,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -67,62 +129,32 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
         : partitionStripSummary(data, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const y = ((e.clientY - r.top) / r.height) * height;
-      const row: 0 | 1 = y < inset + rowH + 0.5 ? 0 : 1;
-      const seg = rows[row].findIndex((s) => x >= s.x && x <= s.x + s.width);
-      if (seg >= 0) setActive({ row, i: seg });
-      else setActive(null);
-    },
-    [width, height, rowH, rows],
-  );
+  const outline = (i: number, pinned: boolean) => {
+    const s = segs[i];
+    if (!s) return null;
+    const y = s.row === 0 ? inset : inset + rowH + 1;
+    return (
+      <rect
+        x={s.x - 0.5}
+        y={y - 0.5}
+        width={s.width + 1}
+        height={rowH + 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      setActive((prev) => {
-        const cur = prev ?? { row: 0 as 0 | 1, i: 0 };
-        const seg = rows[cur.row][cur.i];
-        switch (e.key) {
-          case "ArrowRight":
-            e.preventDefault();
-            return { row: cur.row, i: Math.min(rows[cur.row].length - 1, cur.i + 1) };
-          case "ArrowLeft":
-            e.preventDefault();
-            return { row: cur.row, i: Math.max(0, cur.i - 1) };
-          case "ArrowDown": {
-            e.preventDefault();
-            if (cur.row === 1 || !seg) return prev;
-            const firstChild = rows[1].findIndex((s) => s.parent === seg.label);
-            return firstChild >= 0 ? { row: 1, i: firstChild } : prev;
-          }
-          case "ArrowUp": {
-            e.preventDefault();
-            if (cur.row === 0 || !seg) return prev;
-            const parentIdx = rows[0].findIndex((s) => s.label === seg.parent);
-            return parentIdx >= 0 ? { row: 0, i: parentIdx } : prev;
-          }
-          case "Escape":
-            return null;
-          default:
-            return prev;
-        }
-      });
-    },
-    [rows],
-  );
-
-  const seg = active ? rows[active.row][active.i] : undefined;
+  const shown = active ?? selected;
+  const seg = shown !== null ? segs[shown] : undefined;
   const pctOf = (s: number) => `${Math.round(s * 100)}%`;
   const parentClause =
     seg?.parent && seg.parentShare != null
       ? strings.partitionParent(pctOf(seg.parentShare), seg.parent)
       : "";
   const announced = seg ? strings.partitionAt(seg.label, pctOf(seg.share), parentClause) : "";
-  const y = seg ? (seg.row === 0 ? inset : inset + rowH + 1) : 0;
 
   return (
     <span
@@ -131,10 +163,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticPartitionStrip
         {...rest}
@@ -146,18 +175,10 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
         summary={false}
         style={FILL}
       >
-        {seg ? (
-          <rect
-            x={seg.x - 0.5}
-            y={y - 0.5}
-            width={seg.width + 1}
-            height={rowH + 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
+        {rest.children}
       </StaticPartitionStrip>
       <LiveRegion>{announced}</LiveRegion>
       {seg ? (

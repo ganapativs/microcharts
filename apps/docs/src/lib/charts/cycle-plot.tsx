@@ -1,13 +1,11 @@
 import { CyclePlot } from "@microcharts/react/cycle-plot";
-import { CyclePlot as CyclePlotInteractive } from "@microcharts/react/cycle-plot/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+export const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 // 6 weeks of daily traffic — the week has a shape; Mondays are drifting up
 export const WEEKS: number[] = [];
 for (let w = 0; w < 6; w++) WEEKS.push(38, 40 + w * 2, 45, 48, 52, 61, 44);
-export { DAYS };
 
 export const entry: ChartEntry = {
   name: "CyclePlot",
@@ -92,22 +90,6 @@ for (let w = 0; w < 6; w++) daily.push(38, 40 + w * 2, 45, 48, 52, 61, 44);`,
 export function Preview() {
   return <CyclePlot data={WEEKS} period={7} summary={false} width={100} height={24} />;
 }
-
-export const showcase = {
-  hint: "the week has a shape",
-  Node: () => (
-    <CyclePlot
-      data={WEEKS}
-      period={7}
-      slots={DAYS}
-      cycleUnit="weeks"
-      title="Weekly shape"
-      width={160}
-      height={32}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -142,34 +124,6 @@ export const playground: PlaygroundSpec = {
       s.center !== "mean" && `  center="${s.center}"`,
       s.trend !== "line" && `  trend="${s.trend}"`,
       s.spine === false && "  spine={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <CyclePlotInteractive
-      data={WEEKS}
-      period={7}
-      slots={DAYS}
-      cycleUnit="weeks"
-      center={s.center as "mean" | "median"}
-      trend={s.trend as "line" | "none"}
-      spine={s.spine as boolean}
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={40}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<CyclePlot",
-      "  data={daily}",
-      "  period={7}",
-      s.center !== "mean" && `  center="${s.center}"`,
-      s.trend !== "line" && `  trend="${s.trend}"`,
-      s.spine === false && "  spine={false}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -311,21 +265,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<CyclePlot data={daily} period={7} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <CyclePlotInteractive data={WEEKS} period={7} summary={false} width={100} height={24} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

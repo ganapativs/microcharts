@@ -38,6 +38,12 @@ through a polite live region only when it changes, never on every pulse.
 - **Avoid for** — an exact load figure (`Progress`, `Sparkline`), discrete events (`HeartbeatBlip`), or a trend over
   time (`Sparkline`).
 
+## Sizing
+
+One `size` prop, in viewBox units, sets the glyph box — it defaults to `16`, about the height of a line of body text.
+There is no separate `width`/`height`: the dot is square, and the rendered box widens only by the gutter a `label`
+reserves. `fontSize` follows `size` unless you set it.
+
 ## Variants
 
 <LiveDemo
@@ -92,6 +98,8 @@ BreathingDot; discrete arriving events are a HeartbeatBlip.
 The accessible name is the level and its band word — **"Load 42% — calm."** — or **"Load unknown."** when the value is
 missing. The band color is never the only signal (ring offset and pulse rate double it), motion is fully gated on
 `prefers-reduced-motion`, and the live region announces band changes only.
+
+<InteractionNote slug="breathing-dot" />
 
 ## Props
 

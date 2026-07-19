@@ -1,6 +1,5 @@
 import { Progress } from "@microcharts/react/progress";
-import { Progress as ProgressInteractive } from "@microcharts/react/progress/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -12,6 +11,7 @@ export const entry: ChartEntry = {
   tagline: "How far along, exactly: bar plus the percent that is the datum.",
   staticImport: `${PKG}/progress`,
   interactiveImport: `${PKG}/progress/interactive`,
+  picker: false,
   dataShape: "number of max (optionally segmented)",
   encoding: { channel: "zero-anchored bar length + direct % label", precision: "high" },
   nodeBudget: "≤ 4 continuous · ≤ 3 + segments",
@@ -49,12 +49,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <Progress value={0.68} summary={false} width={120} height={20} />;
 }
-
-export const showcase = {
-  hint: "completion",
-  Node: () => <Progress value={0.68} title="Backlog burn" width={120} height={20} />,
-};
-
 export const playground: PlaygroundSpec = {
   // max isn't a separate knob — "value %" already sweeps value/max as one ratio,
   // and a raw max control wouldn't add a distinct visual state; positive only
@@ -90,28 +84,6 @@ export const playground: PlaygroundSpec = {
       `  value={${(s.pct as number) / 100}}`,
       (s.segments as number) >= 2 && `  segments={${s.segments}}`,
       s.label !== "percent" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ProgressInteractive
-      value={(s.pct as number) / 100}
-      segments={(s.segments as number) >= 2 ? (s.segments as number) : undefined}
-      label={s.label as "percent" | "value" | "fraction" | "none"}
-      summary={false}
-      animate={ui.animate}
-      width={200}
-      height={26}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Progress",
-      `  value={${(s.pct as number) / 100}}`,
-      (s.segments as number) >= 2 && `  segments={${s.segments}}`,
-      s.label !== "percent" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -247,19 +219,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<Progress value={0.68} />`;
 }
-
-export function PreviewLive() {
-  return <ProgressInteractive value={0.68} summary={false} width={120} height={20} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

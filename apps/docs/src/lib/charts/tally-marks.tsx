@@ -1,6 +1,5 @@
 import { TallyMarks } from "@microcharts/react/tally-marks";
-import { TallyMarks as TallyMarksInteractive } from "@microcharts/react/tally-marks/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -16,6 +15,7 @@ export const entry: ChartEntry = {
   // sweep, client.tsx) — a mount entrance would fight that existing motion,
   // so this chart has no `animate` prop at all.
   animates: false,
+  picker: false,
   dataShape: "{ value: number }",
   encoding: { channel: "mark count in four-and-strike clusters of five", precision: "high" },
   nodeBudget: "2 (strokes + overflow numeral)",
@@ -66,12 +66,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <TallyMarks value={23} summary={false} height={16} />;
 }
-
-export const showcase = {
-  hint: "counted by hand",
-  Node: () => <TallyMarks value={17} pen="drawn" title="Votes" height={22} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value", min: 0, max: 40, step: 1, init: 23 },
@@ -97,31 +91,6 @@ export const playground: PlaygroundSpec = {
     />
   ),
   code: (s) =>
-    [
-      "<TallyMarks",
-      `  value={${s.value}}`,
-      s.total !== 25 && `  total={${s.total}}`,
-      s.pen !== "ruled" && `  pen="${s.pen}"`,
-      s.overflow !== "numeral" && `  overflow="${s.overflow}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  // No `animate` prop exists on this chart (see entry.animates) — the marks'
-  // own value-transition sweep is the only motion; renderInteractive still
-  // demonstrates the interactive entry itself.
-  renderInteractive: (s) => (
-    <TallyMarksInteractive
-      value={s.value as number}
-      total={s.total as number}
-      pen={s.pen as "ruled" | "drawn"}
-      overflow={s.overflow as "numeral" | "clamp"}
-      title="Count"
-      summary={false}
-      height={28}
-    />
-  ),
-  codeInteractive: (s) =>
     [
       "<TallyMarks",
       `  value={${s.value}}`,
@@ -228,19 +197,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<TallyMarks value={12} />`;
 }
-
-export function PreviewLive() {
-  return <TallyMarksInteractive value={23} summary={false} height={16} />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

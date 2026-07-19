@@ -1,10 +1,12 @@
 "use client";
-// Interactive <DotPlot>. One pointer listener; row by y-band
-// lookup (rows are the axis here) — ↑/↓ rove rows, announcing each category
-// with its rank ("Ada: 88 — 2nd of 5."). Composes the static component.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <DotPlot>. useActivePicker owns interaction: one pointer listener
+// + row-by-y-band lookup (rows are the axis here) — ↑/↓ (or ←/→) rove rows,
+// announcing each category with its rank ("Ada: 88 — 2nd of 5."); click / Enter
+// / Space selects a row (onSelect). Composes the static component (canon) — the
+// SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
@@ -13,7 +15,7 @@ import { miniBarSummary } from "../mini-bar/index.js";
 import { dotPlotGeometry } from "./geometry.js";
 import { DotPlot as StaticDotPlot, type DotPlotProps } from "./index.js";
 
-export interface InteractiveDotPlotProps extends DotPlotProps {
+export interface InteractiveDotPlotProps extends DotPlotProps, PickerProps {
   strings?: CategoryStrings;
   /**
    * Opt-in entrance motion (default `false`): the row dots settle onto the
@@ -37,6 +39,10 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const height = props.height ?? Math.max(16, data.length * 8);
@@ -46,14 +52,18 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
   // magnitude-from-zero channel for each row — it must arrive WITH its dot, not
   // ride the quiet stage ahead of it, so `defer` casts it into the closing act.
   // (No-op when stem is off — its default — since no stem lines exist.)
-  // Dots settle in, then each stem DRAWS from the baseline up to its dot (when
-  // stem=true); the magnitude channel re-enacts itself instead of fading in.
   useEntrance(hostRef, "settle", animate, { link: 'line[data-mc-ink="muted"]' });
 
   const fontSize = 6;
-  const maxLabelChars = Math.min(
-    6,
-    data.reduce((m, d) => Math.max(m, d.label.length), 0),
+  // Label-gutter width, in chars — a full scan of the rows, so it is memoised:
+  // the interactive entry re-renders on every unit crossed during a scrub.
+  const maxLabelChars = useMemo(
+    () =>
+      Math.min(
+        6,
+        data.reduce((m, d) => Math.max(m, d.label.length), 0),
+      ),
+    [data],
   );
   const geo = useMemo(
     () =>
@@ -69,7 +79,6 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
     [width, height, data, domain, maxLabelChars, stem],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
 
   const ranks = useMemo(() => {
     const finite = data
@@ -81,6 +90,61 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
     return map;
   }, [data]);
 
+  // Pointer (viewBox space) → row index by pure y-band math (rows are the axis).
+  const locate = useCallback(
+    (_x: number, y: number) => {
+      if (geo.rows.length === 0 || geo.pitch === 0) return null;
+      const i = Math.floor(y / geo.pitch);
+      return i >= 0 && i < geo.rows.length ? i : null;
+    },
+    [geo],
+  );
+
+  // 1-D roving over rows. The layout is vertical, so ↑/↓ walk rows; ←/→ map to
+  // the same prev/next for pointer-free reach. Boundary keys are consumed.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const n = geo.rows.length;
+      if (n === 0) return null;
+      switch (key) {
+        case "ArrowDown":
+        case "ArrowRight":
+          return Math.min(n - 1, cur + 1);
+        case "ArrowUp":
+        case "ArrowLeft":
+          return cur <= 0 ? 0 : cur - 1;
+        case "Home":
+          return 0;
+        case "End":
+          return n - 1;
+      }
+      return null;
+    },
+    [geo],
+  );
+
+  // index = ROW (category) index; value = the row's dot value (null when empty).
+  const datum = useCallback(
+    (i: number) => {
+      const d = data[i];
+      return { index: i, value: isFiniteValue(d?.value) ? d!.value : null, label: d?.label };
+    },
+    [data],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.rows.length,
+    width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
   const accName =
     summary === false
       ? undefined
@@ -89,63 +153,38 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
         : miniBarSummary(data, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.rows.length === 0 || geo.pitch === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.height === 0) return;
-      const y = ((e.clientY - r.top) / r.height) * height;
-      const i = Math.floor(y / geo.pitch);
-      setActive(i >= 0 && i < geo.rows.length ? i : null);
-    },
-    [geo, height],
-  );
+  // Accent ring hugging a whole row's dot. Transient for hover/focus; a
+  // distinguishing `data-mc-w="tick"` marks the persistent pinned selection.
+  const ring = (i: number, pinned: boolean) => {
+    const row = geo.rows[i];
+    if (!row || row.x === null) return null;
+    return (
+      <circle
+        cx={row.x}
+        cy={row.y}
+        r={3.25}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.rows.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowDown":
-        case "ArrowRight":
-          next = Math.min(geo.rows.length - 1, cur + 1);
-          break;
-        case "ArrowUp":
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.rows.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const activeRow = active !== null ? geo.rows[active] : undefined;
-  const activeDatum = active !== null ? data[active] : undefined;
+  const shown = active ?? selected;
+  const shownRow = shown !== null ? geo.rows[shown] : undefined;
+  const shownDatum = shown !== null ? data[shown] : undefined;
   const announced =
-    activeDatum === undefined
+    shownDatum === undefined
       ? ""
-      : isFiniteValue(activeDatum.value)
+      : isFiniteValue(shownDatum.value)
         ? strings.category(
-            activeDatum.label,
-            fmt(activeDatum.value),
-            ranks.get(active!)?.rank ?? 0,
-            ranks.get(active!)?.of ?? 0,
+            shownDatum.label,
+            fmt(shownDatum.value),
+            ranks.get(shown!)?.rank ?? 0,
+            ranks.get(shown!)?.of ?? 0,
           )
-        : `${activeDatum.label}: ${strings.noData}`;
+        : `${shownDatum.label}: ${strings.noData}`;
 
   return (
     <span
@@ -154,10 +193,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticDotPlot
         {...rest}
@@ -172,29 +208,21 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {activeRow && activeRow.x !== null ? (
-          <circle
-            cx={activeRow.x}
-            cy={activeRow.y}
-            r={3.25}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticDotPlot>
       <LiveRegion>{announced}</LiveRegion>
-      {activeRow && activeDatum && isFiniteValue(activeDatum.value) && activeRow.x !== null ? (
+      {shownRow && shownDatum && isFiniteValue(shownDatum.value) && shownRow.x !== null ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(activeRow.x / width) * 100}%`,
+            left: `${(shownRow.x / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(activeDatum.value)}
+          {fmt(shownDatum.value)}
         </span>
       ) : null}
     </span>

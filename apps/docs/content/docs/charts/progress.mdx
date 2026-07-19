@@ -89,9 +89,10 @@ than the English "68%".
   <Progress value={5} max={0} title="Unknown goal" width={160} height={22} />
 </LiveDemo>
 
-`max <= 0` (or a non-finite `value`/`max`) renders an empty track with no fill and no percent label — the accessible
-name says "No data." instead of computing a meaningless ratio. A `value` of `0` renders a real, empty-but-present bar
-(not the no-data state), so "not started" and "unmeasurable" stay visually distinct.
+`max <= 0` (or a non-finite `value`/`max`) renders an empty track with no fill, and the label becomes an em dash ("—")
+rather than a fabricated number — the accessible name says "No data." instead of computing a meaningless ratio. A
+`value` of `0` renders a real, empty-but-present bar (not the no-data state), so "not started" and "unmeasurable" stay
+visually distinct.
 
 ## Four homes
 
@@ -113,6 +114,8 @@ The accessible name is the completion — **"68% complete."**, or **"3 of 5 step
 remaining."** with `positive="down"`. The interactive entry re-announces through a polite live region, throttled to
 whole-percent changes so a streaming value doesn't spam screen readers, and the fill-width transition is gated on
 reduced motion.
+
+<InteractionNote slug="progress" />
 
 ## Props
 

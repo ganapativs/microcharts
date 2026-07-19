@@ -4,6 +4,9 @@ import { PercentileLadder } from "./client.js";
 
 const SAMPLE = Array.from({ length: 101 }, (_, i) => i);
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <PercentileLadder>", () => {
   it("arrow keys step ticks; each states its multiple of the median", async () => {
     const screen = await render(<PercentileLadder data={SAMPLE} title="Latency" />);
@@ -32,5 +35,36 @@ describe("interactive <PercentileLadder>", () => {
     );
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toContain("p99");
+  });
+
+  it("onActive reports the focused rung; null on Escape", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<PercentileLadder data={SAMPLE} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-percentile-ladder-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    expect(seen.at(-1)).toEqual({ index: 0, value: 50, label: "p50" });
+    key(wrap, "Escape");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active rung: fires onSelect + pins the probe", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<PercentileLadder data={SAMPLE} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-percentile-ladder-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "End");
+    key(wrap, "Enter");
+    expect(picks.at(-1)).toEqual({ index: 2, value: 99, label: "p99" });
+    // Pin survives blur (it is selection, not hover).
+    wrap.blur();
+    await expect
+      .poll(() => screen.container.querySelector('line[data-mc-w="tick"]'))
+      .not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the probe without focus", async () => {
+    const screen = await render(<PercentileLadder data={SAMPLE} selectedIndex={1} />);
+    expect(screen.container.querySelector('line[data-mc-w="tick"]')).not.toBeNull();
   });
 });

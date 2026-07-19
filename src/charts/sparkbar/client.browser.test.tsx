@@ -37,4 +37,33 @@ describe("interactive <SparkBar>", () => {
     await userEvent.keyboard("{Escape}");
     expect(live.textContent).toBe("");
   });
+
+  it("onActive reports the focused datum (data index + value); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<SparkBar data={D} onActive={(d) => seen.push(d)} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}");
+    expect(seen.at(-1)).toEqual({ index: 1, value: 5 });
+    await userEvent.keyboard("{Escape}");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active bar: fires onSelect + pins a persistent outline", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<SparkBar data={D} onSelect={(d) => picks.push(d)} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}{Enter}");
+    expect(picks.at(-1)).toEqual({ index: 1, value: 5 });
+    // Pin survives blur (it is selection, not hover).
+    fig.blur();
+    await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the mark with no interaction", async () => {
+    const screen = await render(<SparkBar data={D} selectedIndex={3} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    expect(fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
+  });
 });

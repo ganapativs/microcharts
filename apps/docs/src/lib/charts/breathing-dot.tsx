@@ -1,6 +1,5 @@
 import { BreathingDot } from "@microcharts/react/breathing-dot";
-import { BreathingDot as BreathingDotInteractive } from "@microcharts/react/breathing-dot/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -17,6 +16,7 @@ export const entry: ChartEntry = {
   // entrance would fight that live motion, so this chart has no `animate`
   // prop at all.
   animates: false,
+  picker: false,
   dataShape: "{ value: number }",
   encoding: { channel: "pulse rate + amplitude (static: ring offset) by level", precision: "low" },
   nodeBudget: "3",
@@ -60,12 +60,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <BreathingDot value={0.42} summary={false} size={20} />;
 }
-
-export const showcase = {
-  hint: "right now",
-  Node: () => <BreathingDot value={0.65} title="Load" size={28} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "level", min: 0, max: 100, step: 1, init: 42 },
@@ -80,25 +74,6 @@ export const playground: PlaygroundSpec = {
     />
   ),
   code: (s) =>
-    [
-      "<BreathingDot",
-      `  value={${((s.value as number) / 100).toFixed(2)}}`,
-      s.label !== "none" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  // No `animate` prop exists on this chart (see entry.animates) — the
-  // continuous breathing pulse IS the encoding.
-  renderInteractive: (s) => (
-    <BreathingDotInteractive
-      value={(s.value as number) / 100}
-      label={s.label as "none" | "value"}
-      summary={false}
-      size={64}
-    />
-  ),
-  codeInteractive: (s) =>
     [
       "<BreathingDot",
       `  value={${((s.value as number) / 100).toFixed(2)}}`,
@@ -203,19 +178,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<BreathingDot value={0.42} />`;
 }
-
-export function PreviewLive() {
-  return <BreathingDotInteractive value={0.42} summary={false} size={20} />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

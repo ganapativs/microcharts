@@ -26,4 +26,29 @@ describe("interactive <HeartbeatBlip>", () => {
     const dot = screen.container.querySelector(".mc-heartbeat-now") as SVGCircleElement;
     await vi.waitFor(() => expect(dot.getAnimations().length).toBeGreaterThan(0));
   });
+
+  it("click fires onSelect with the in-window event count", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <HeartbeatBlip
+        events={[97_000, 90_000, 80_000]}
+        now={100_000}
+        onSelect={(d) => picks.push(d)}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-heartbeat-live") as HTMLElement;
+    wrap.click();
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 3, label: "minute" });
+  });
+
+  it("Enter fires onSelect", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <HeartbeatBlip events={[95_000]} now={100_000} onSelect={(d) => picks.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-heartbeat-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 1, label: "minute" });
+  });
 });

@@ -30,4 +30,41 @@ describe("interactive <BurnChart>", () => {
     // a VISIBLE readout chip appears at the focused point (not just the a11y region)
     await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("30");
   });
+
+  it("onActive reports the focused datum (period + value); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <BurnChart data={{ plan: PLAN, actual: ACTUAL }} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-burn-chart-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    await expect.poll(() => seen.at(-1)).toEqual({ index: 1, value: 38 });
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await expect.poll(() => seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active day: fires onSelect + pins a mark that survives blur", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <BurnChart data={{ plan: PLAN, actual: ACTUAL }} onSelect={(d) => picks.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-burn-chart-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 1, value: 38 });
+    wrap.blur();
+    await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the mark with no interaction", async () => {
+    const screen = await render(
+      <BurnChart data={{ plan: PLAN, actual: ACTUAL }} selectedIndex={0} />,
+    );
+    const wrap = screen.container.querySelector(".mc-burn-chart-live") as HTMLElement;
+    expect(wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
 });

@@ -1,6 +1,5 @@
 import { Delta } from "@microcharts/react/delta";
-import { Delta as DeltaInteractive } from "@microcharts/react/delta/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -12,6 +11,7 @@ export const entry: ChartEntry = {
   tagline: "A signed change, double-encoded by glyph and color.",
   staticImport: `${PKG}/delta`,
   interactiveImport: `${PKG}/delta/interactive`,
+  picker: false,
   dataShape: "number (+ optional from)",
   encoding: { channel: "text + direction glyph (▲/▼)", precision: "high — it is the number" },
   nodeBudget: "2 (glyph + value, HTML)",
@@ -69,16 +69,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "change",
-  Node: () => (
-    <span className="text-lg">
-      <DeltaInteractive value={0.184} title="Growth vs last week" live />
-    </span>
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "pct", label: "change %", min: -50, max: 50, init: 12 },
@@ -149,73 +139,6 @@ export const playground: PlaygroundSpec = {
     }
     if (positive === "down") lines.push('  positive="down"');
     if (locale !== "en-US") lines.push(`  locale="${locale}"`);
-    lines.push("/>");
-    return lines.join("\n");
-  },
-  renderInteractive: (s, _data, ui) => {
-    const pct = s.pct as number;
-    const positive = s.positive as "up" | "down";
-    const mode = s.mode as string;
-    const locale = s.locale as string;
-    if (mode === "from prior") {
-      return (
-        <span className="text-3xl">
-          <DeltaInteractive
-            value={100 + pct}
-            from={100}
-            positive={positive}
-            locale={locale}
-            summary={false}
-            animate={ui.animate}
-          />
-        </span>
-      );
-    }
-    if (mode === "currency") {
-      return (
-        <span className="text-3xl">
-          <DeltaInteractive
-            value={pct * 1000}
-            format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
-            positive={positive}
-            locale={locale}
-            summary={false}
-            animate={ui.animate}
-          />
-        </span>
-      );
-    }
-    return (
-      <span className="text-3xl">
-        <DeltaInteractive
-          value={pct / 100}
-          positive={positive}
-          locale={locale}
-          summary={false}
-          animate={ui.animate}
-        />
-      </span>
-    );
-  },
-  codeInteractive: (s, _data, ui) => {
-    const pct = s.pct as number;
-    const positive = s.positive as "up" | "down";
-    const mode = s.mode as string;
-    const locale = s.locale as string;
-    const lines = ["<Delta"];
-    if (mode === "from prior") {
-      lines.push(`  value={${100 + pct}}`, "  from={100}");
-    } else if (mode === "currency") {
-      lines.push(
-        `  value={${pct * 1000}}`,
-        '  format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}',
-      );
-    } else {
-      lines.push(`  value={${(pct / 100).toFixed(2)}}`);
-    }
-    if (positive === "down") lines.push('  positive="down"');
-    if (locale !== "en-US") lines.push(`  locale="${locale}"`);
-    if (ui.animate) lines.push(" animate");
     lines.push("/>");
     return lines.join("\n");
   },
@@ -325,23 +248,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<Delta value={0.124} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="text-2xl">
-      <DeltaInteractive value={0.184} summary={false} animate />
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

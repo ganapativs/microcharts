@@ -63,7 +63,12 @@ core math + static SVG attribute assertions, and `@vitest/browser` (Playwright p
 interactive entries (jsdom has no SVG layout: `getBBox`/`getScreenCTM`/`getComputedTextLength` return 0) · Playwright
 screenshots + **Argos** for visual review · size-limit as a custom CI step · **knip** (unused deps/exports/files) ·
 publint + arethetypeswrong on release · changesets + npm trusted publishing (OIDC, provenance). Docs: **Fumadocs** +
-Next static export. ESM-only, per-component subpath exports, `sideEffects: false`, types-first export conditions.
+Next static export. ESM-only, per-component subpath exports, types-first export conditions, and a **narrow `sideEffects`
+allowlist — never `false`**: `**/*.css` and `./dist/shared/motion-engine.js` both carry load-bearing side effects (the
+stylesheet is a bare import; the engine self-registers via `registerMotionEngine` at module scope), so `false` would let
+a bundler legally drop them and silently ship unstyled or unanimated charts. Everything outside those two globs still
+tree-shakes. Bundle analyzers that only test `sideEffects === false` will label the package "some side-effects" — that
+badge is a heuristic, not a regression; don't "fix" it.
 
 ## Architecture map
 

@@ -1,6 +1,5 @@
 import { BurnChart } from "@microcharts/react/burn-chart";
-import { BurnChart as BurnChartInteractive } from "@microcharts/react/burn-chart/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 import { burnFromStatus } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
@@ -89,14 +88,6 @@ export function Preview() {
     <BurnChart data={{ plan: PLAN, actual: ACTUAL }} summary={false} width={150} height={26} />
   );
 }
-
-export const showcase = {
-  hint: "plan vs actual",
-  Node: () => (
-    <BurnChart data={{ plan: PLAN, actual: ACTUAL }} title="Sprint 12" width={150} height={26} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "mode", label: "mode", options: ["down", "up"], init: "down" },
@@ -126,35 +117,6 @@ export const playground: PlaygroundSpec = {
       s.mode !== "down" && `  mode="${s.mode}"`,
       s.projection === false && "  projection={false}",
       s.label !== "gap" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => {
-    const up = s.mode === "up";
-    const plan = up ? PLAN.map((v) => 40 - v) : PLAN;
-    const actual = up ? ACTUAL.map((v) => 40 - v) : ACTUAL;
-    return (
-      <BurnChartInteractive
-        data={{ plan, actual }}
-        mode={s.mode as "down" | "up"}
-        projection={s.projection as boolean}
-        label={s.label as "gap" | "none"}
-        animate={ui.animate}
-        summary={false}
-        width={280}
-        height={30}
-      />
-    );
-  },
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<BurnChart",
-      "  data={{ plan, actual }}",
-      s.mode !== "down" && `  mode="${s.mode}"`,
-      s.projection === false && "  projection={false}",
-      s.label !== "gap" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -282,27 +244,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<BurnChart data={{ plan, actual }} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <BurnChartInteractive
-      data={{ plan: PLAN, actual: ACTUAL }}
-      summary={false}
-      width={150}
-      height={26}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -1,6 +1,5 @@
 import { PhaseTrace } from "@microcharts/react/phase-trace";
-import { PhaseTrace as PhaseTraceInteractive } from "@microcharts/react/phase-trace/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a coupled CPU×latency trajectory with a lag loop
@@ -88,22 +87,6 @@ export function Preview() {
     <PhaseTrace data={TRAJ} xLabel="CPU" yLabel="Latency" summary={false} width={44} height={40} />
   );
 }
-
-export const showcase = {
-  hint: "trajectory",
-  Node: () => (
-    <PhaseTrace
-      data={TRAJ}
-      xLabel="CPU"
-      yLabel="Latency"
-      grid
-      title="Phase portrait"
-      width={44}
-      height={40}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "tail", label: "tail %", min: 10, max: 60, step: 5, init: 25 },
@@ -132,34 +115,6 @@ export const playground: PlaygroundSpec = {
       s.tail !== 25 && `  tail={${((s.tail as number) / 100).toFixed(2)}}`,
       s.grid === true && "  grid",
       s.startDot === true && "  startDot",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <PhaseTraceInteractive
-      data={TRAJ}
-      xLabel="CPU"
-      yLabel="Latency"
-      tail={(s.tail as number) / 100}
-      grid={s.grid as boolean}
-      startDot={s.startDot as boolean}
-      animate={ui.animate}
-      summary={false}
-      width={110}
-      height={100}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<PhaseTrace",
-      "  data={trajectory}",
-      '  xLabel="CPU"',
-      '  yLabel="Latency"',
-      s.tail !== 25 && `  tail={${((s.tail as number) / 100).toFixed(2)}}`,
-      s.grid === true && "  grid",
-      s.startDot === true && "  startDot",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -314,29 +269,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" />`;
 }
-
-export function PreviewLive() {
-  return (
-    <PhaseTraceInteractive
-      data={TRAJ}
-      xLabel="CPU"
-      yLabel="Latency"
-      summary={false}
-      width={44}
-      height={40}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

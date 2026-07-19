@@ -1,6 +1,5 @@
 import { FoldedDayBand } from "@microcharts/react/folded-day-band";
-import { FoldedDayBand as FoldedDayBandInteractive } from "@microcharts/react/folded-day-band/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 const curve = (h: number) => 40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10);
@@ -88,14 +87,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <FoldedDayBand data={DATA} summary={false} width={140} height={32} />;
 }
-
-export const showcase = {
-  hint: "typical",
-  Node: () => (
-    <FoldedDayBand data={DATA} today={TODAY} title="Typical day" width={140} height={32} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "today", label: "today overlay", init: true },
@@ -127,37 +118,6 @@ export const playground: PlaygroundSpec = {
       s.today === true && "  today={today}",
       s.single === true && "  bands={[[25, 75]]}",
       s.bins !== 24 && `  bins={${s.bins}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <FoldedDayBandInteractive
-      data={DATA}
-      today={s.today ? TODAY : undefined}
-      bands={
-        s.single
-          ? [[25, 75]]
-          : [
-              [25, 75],
-              [5, 95],
-            ]
-      }
-      bins={s.bins as number}
-      animate={ui.animate}
-      summary={false}
-      width={320}
-      height={40}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<FoldedDayBand",
-      "  data={observations}",
-      s.today === true && "  today={today}",
-      s.single === true && "  bands={[[25, 75]]}",
-      s.bins !== 24 && `  bins={${s.bins}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -271,19 +231,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<FoldedDayBand data={observations} />`;
 }
-
-export function PreviewLive() {
-  return <FoldedDayBandInteractive data={DATA} summary={false} width={140} height={32} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

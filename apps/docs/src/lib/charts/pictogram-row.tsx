@@ -1,6 +1,5 @@
 import { PictogramRow } from "@microcharts/react/pictogram-row";
-import { PictogramRow as PictogramRowInteractive } from "@microcharts/react/pictogram-row/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -54,12 +53,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <PictogramRow value={5} total={8} summary={false} width={110} height={16} />;
 }
-
-export const showcase = {
-  hint: "count",
-  Node: () => <PictogramRow value={6.5} total={8} title="Capacity used" width={110} height={16} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value", min: 0, max: 8, step: 0.5, init: 5 },
@@ -91,30 +84,6 @@ export const playground: PlaygroundSpec = {
       `  total={${s.total}}`,
       s.shape !== "dot" && `  shape="${s.shape}"`,
       s.fractional !== "clip" && `  fractional="${s.fractional}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <PictogramRowInteractive
-      value={s.value as number}
-      total={s.total as number}
-      shape={s.shape as "dot" | "square"}
-      fractional={s.fractional as "clip" | "round"}
-      summary={false}
-      animate={ui.animate}
-      width={240}
-      height={28}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<PictogramRow",
-      `  value={${s.value}}`,
-      `  total={${s.total}}`,
-      s.shape !== "dot" && `  shape="${s.shape}"`,
-      s.fractional !== "clip" && `  fractional="${s.fractional}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -241,21 +210,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<PictogramRow value={3} total={5} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <PictogramRowInteractive value={5} total={8} summary={false} width={110} height={16} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -11,6 +11,9 @@ const SAMPLE: NetFlowPeriod[] = [
   { in: 7, out: 5 },
 ];
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <NetFlow>", () => {
   it("arrow keys step periods; the live region gives in, out, and signed net", async () => {
     const screen = await render(<NetFlow data={SAMPLE} title="Cash flow" />);
@@ -59,5 +62,37 @@ describe("interactive <NetFlow>", () => {
     const chip = wrap.querySelector(".mc-spark-readout") as HTMLElement;
     const chipFrac = parseFloat(chip.style.left) / 100;
     expect(Math.abs(lineFrac - chipFrac)).toBeLessThan(0.01);
+  });
+
+  it("onActive reports the focused datum (period index + signed net); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<NetFlow data={SAMPLE} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-net-flow-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    key(wrap, "ArrowRight");
+    expect(seen.at(-1)).toEqual({ index: 1, value: 1 }); // in 5 − out 4
+    key(wrap, "Escape");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active period: fires onSelect + pins a persistent ring", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<NetFlow data={SAMPLE} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-net-flow-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    key(wrap, "ArrowRight");
+    key(wrap, "Enter");
+    expect(picks.at(-1)).toEqual({ index: 1, value: 1 });
+    // Pin survives blur (it is selection, not hover).
+    wrap.blur();
+    await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring with no interaction", async () => {
+    const screen = await render(<NetFlow data={SAMPLE} selectedIndex={2} />);
+    const wrap = screen.container.querySelector(".mc-net-flow-live") as HTMLElement;
+    expect(wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
 });

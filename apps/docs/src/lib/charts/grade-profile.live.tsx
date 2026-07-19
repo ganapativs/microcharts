@@ -1,0 +1,46 @@
+import type { ChartModule, PlaygroundSpec } from "./types";
+import { GradeProfile as GradeProfileInteractive } from "@microcharts/react/grade-profile/interactive";
+import staticModule, { playground as staticPlayground, TRAIL, m } from "./grade-profile";
+
+/** Interactive half of the grade-profile chart module — the ONLY place that imports
+ *  this chart's `…/interactive` ('use client') entry. Kept out of `./grade-profile`
+ *  so the server-side registry can reach the static module without turning all
+ *  106 interactive twins into eager client references. Reached exclusively
+ *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
+
+export function PreviewLive() {
+  return <GradeProfileInteractive data={TRAIL} summary={false} width={150} height={44} animate />;
+}
+
+export const playground: PlaygroundSpec = {
+  ...staticPlayground,
+  renderInteractive: (s, _data, ui) => (
+    <GradeProfileInteractive
+      data={TRAIL}
+      label={s.label ? "max" : "none"}
+      bins={[3, 6, Number(s.hard)]}
+      format={m}
+      animate={ui.animate}
+      summary={false}
+      width={280}
+      height={48}
+    />
+  ),
+  codeInteractive: (s, _data, ui) =>
+    [
+      "<GradeProfile",
+      "  data={trail}",
+      s.label === false && '  label="none"',
+      s.hard !== 10 && `  bins={[3, 6, ${s.hard}]}`,
+      ui.animate && " animate",
+      "/>",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+};
+
+export default {
+  ...staticModule,
+  PreviewLive,
+  playground,
+} satisfies ChartModule;

@@ -1,12 +1,13 @@
 "use client";
-// Interactive <RetentionCurve>. One pointer listener + nearest-
-// period math. ←/→ step periods; the live region states retention and, when a
-// benchmark is present, its value too. Composes the static component (canon);
-// the crosshair + ghost-value tick are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <RetentionCurve>. useActivePicker owns interaction: one pointer
+// listener + nearest-period math, roving keyboard (←/→ step periods, Home/End
+// ends), touch tap-to-pin, and the onActive/onSelect contract. The live region
+// states retention and, when a benchmark is present, its value too. Composes
+// the static component (canon); the crosshair + ghost-value tick are children.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
@@ -18,7 +19,7 @@ import {
   type RetentionCurveProps,
 } from "./index.js";
 
-export interface InteractiveRetentionCurveProps extends RetentionCurveProps {
+export interface InteractiveRetentionCurveProps extends RetentionCurveProps, PickerProps {
   strings?: RetentionStrings;
   /**
    * Opt-in entrance motion (default `false`): the line draws on when the
@@ -45,6 +46,10 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -79,7 +84,6 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
       fontSize: labelFont(height),
     });
   }, [width, height, data, benchmark, plateau, curve, props.domain, props.label, fmt]);
-  const [active, setActive] = useState<number | null>(null);
 
   const accName =
     summary === false
@@ -93,54 +97,49 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
 
   const count = geo?.points.length ?? 0;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * geo.totalWidth;
+  // Nearest-period hit-test in viewBox space (scaled into `totalWidth`).
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || geo.points.length === 0) return null;
       let best = 0;
       let bestDist = Infinity;
       geo.points.forEach((p, i) => {
-        const d = Math.abs(p.x - px);
+        const d = Math.abs(p.x - x);
         if (d < bestDist) {
           bestDist = d;
           best = i;
         }
       });
-      setActive(best);
+      return best;
     },
-    [geo, count],
+    [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (count === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((prev) => Math.min(count - 1, (prev ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((prev) => (prev === null || prev <= 0 ? 0 : prev - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(count - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
+  // Navigable unit = a finite cohort period; `index` is its original period
+  // (the data index the consumer knows), `value` its retained fraction.
+  const datum = useCallback(
+    (i: number) => {
+      const pt = geo?.points[i];
+      return { index: pt?.period ?? i, value: pt?.value ?? null };
     },
-    [count],
+    [geo],
   );
 
-  const p = active !== null && geo ? geo.points[active] : undefined;
+  const { active, selected, bind } = useActivePicker({
+    count,
+    width: geo?.totalWidth ?? width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const shown = active ?? selected;
+  const p = shown !== null && geo ? geo.points[shown] : undefined;
+  const pin = selected !== null && selected !== active && geo ? geo.points[selected] : undefined;
   const announced = p
     ? strings.retentionAt(unit, p.period, fmt(p.value), p.bench === null ? null : fmt(p.bench))
     : "";
@@ -152,10 +151,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticRetentionCurve
         {...rest}
@@ -172,6 +168,18 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
         strings={strings}
         summary={false}
       >
+        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
+        {pin ? (
+          <circle
+            cx={pin.x}
+            cy={pin.y}
+            r={2.4}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {p ? (
           <>
             <line

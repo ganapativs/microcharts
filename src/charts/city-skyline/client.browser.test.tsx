@@ -9,6 +9,9 @@ const TEAMS = [
   { label: "Web", value: 28 },
 ];
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <CitySkyline>", () => {
   it("arrow keys rove buildings; the lit fraction is announced as a percent", async () => {
     const screen = await render(<CitySkyline data={TEAMS} title="Teams" />);
@@ -28,5 +31,38 @@ describe("interactive <CitySkyline>", () => {
     const wrap = screen.container.querySelector(".mc-skyline-live")!;
     expect(wrap.getAttribute("aria-label")).toBe("Teams. 3 teams; tallest Platform at 46.");
     expect(wrap.querySelector("svg")!.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("onActive reports the focused datum; null once cleared", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<CitySkyline data={TEAMS} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-skyline-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    expect(seen.at(-1)).toEqual({ index: 0, value: 46, label: "Platform" });
+    key(wrap, "End");
+    expect(seen.at(-1)).toEqual({ index: 2, value: 28, label: "Web" });
+    key(wrap, "Escape");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active building: fires onSelect + pins an outline", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<CitySkyline data={TEAMS} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-skyline-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    key(wrap, "Enter");
+    expect(picks.at(-1)).toEqual({ index: 0, value: 46, label: "Platform" });
+    // Pin survives blur (it is selection, not hover).
+    wrap.blur();
+    await expect
+      .poll(() => screen.container.querySelector('rect[data-mc-w="tick"]'))
+      .not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the outline without focus", async () => {
+    const screen = await render(<CitySkyline data={TEAMS} selectedIndex={1} />);
+    expect(screen.container.querySelectorAll('rect[data-mc-w="tick"]')).toHaveLength(1);
   });
 });

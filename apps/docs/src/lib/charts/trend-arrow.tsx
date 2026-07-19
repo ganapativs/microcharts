@@ -1,9 +1,8 @@
 import { TrendArrow } from "@microcharts/react/trend-arrow";
-import { TrendArrow as TrendArrowInteractive } from "@microcharts/react/trend-arrow/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const PCT = { style: "percent", maximumFractionDigits: 0 } as const;
+export const PCT = { style: "percent", maximumFractionDigits: 0 } as const;
 
 const METRICS: { label: string; value: number; positive: "up" | "down" }[] = [
   { label: "P95 latency", value: 0.09, positive: "down" },
@@ -24,6 +23,7 @@ export const entry: ChartEntry = {
   tagline: "Which way is this moving? At glyph size, before any number.",
   staticImport: `${PKG}/trend-arrow`,
   interactiveImport: `${PKG}/trend-arrow/interactive`,
+  picker: false,
   dataShape: "number (signed change)",
   encoding: {
     channel: "glyph orientation (up / down / flat)",
@@ -80,20 +80,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "direction",
-  Node: () => (
-    <TrendArrow
-      value={0.12}
-      showValue
-      format={PCT}
-      title="WAU change"
-      style={{ width: 40, height: 22 }}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "pct", label: "change %", min: -50, max: 50, init: 12 },
@@ -129,33 +115,6 @@ export const playground: PlaygroundSpec = {
       (s.showValue as boolean) && "  showValue",
       s.positive === "down" && '  positive="down"',
       '  format={{ style: "percent", maximumFractionDigits: 0 }}',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <TrendArrowInteractive
-      value={(s.pct as number) / 100}
-      flatBand={(s.flatBand as number) / 100}
-      glyph={s.glyph as "arrow" | "triangle" | "chevron"}
-      showValue={s.showValue as boolean}
-      positive={s.positive as "up" | "down"}
-      format={PCT}
-      summary={false}
-      animate={ui.animate}
-      style={{ width: (s.showValue as boolean) ? 96 : 48, height: 48 }}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<TrendArrow",
-      `  value={${(s.pct as number) / 100}}`,
-      (s.flatBand as number) > 0 && `  flatBand={${(s.flatBand as number) / 100}}`,
-      s.glyph !== "arrow" && `  glyph="${s.glyph}"`,
-      (s.showValue as boolean) && "  showValue",
-      s.positive === "down" && '  positive="down"',
-      '  format={{ style: "percent", maximumFractionDigits: 0 }}',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -289,25 +248,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<TrendArrow value={0.12} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex items-center gap-3">
-      <TrendArrowInteractive value={0.3} summary={false} animate />
-      <TrendArrow value={0} summary={false} />
-      <TrendArrow value={-0.3} summary={false} />
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

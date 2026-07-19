@@ -1,8 +1,8 @@
 ---
 title: Introduction
 description:
-  Word-sized charts for React, made for LLMs and humans — zero dependencies, 0.9–3.7 kB gzip each, accessible by
-  default, and server-component safe. 106 chart types, one grammar.
+  Word-sized charts for React, made for LLMs and humans — zero dependencies, 1–3.7 kB gzip each, accessible by default,
+  and server-component safe. 106 chart types, one grammar.
 ---
 
 microcharts is a set of tiny, handcrafted charts for React — **made for AI first, and for the people reading what it
@@ -38,10 +38,12 @@ that make it pleasant for a human to use.
   across 106 types means an LLM that has seen one chart can write them all.
 - **Zero dependencies.** No chart engine, no D3 — just SVG. CI-enforced, forever.
 - **Server-component safe.** Static charts are hook-free and listener-free; they render to HTML with zero client
-  JavaScript, and add interactivity only from a separate `/interactive` subpath.
+  JavaScript, and add interactivity only from a separate `/interactive` subpath — where one contract covers the catalog:
+  hover, roving arrow keys, touch scrub, and click-to-pin, read back through `onActive` / `onSelect`. Single-unit charts
+  have nothing to rove between and take `onSelect` alone.
 - **Accessible by default.** Each chart is an `img` with a natural-language summary built from your data — nothing to
   remember, nothing to drift.
-- **Tiny.** Static charts span **0.9–3.7 kB gzip** (median 2.3), each imported from its own subpath and budget-gated in
+- **Tiny.** Static charts span **1–3.7 kB gzip** (median 2.3), each imported from its own subpath and budget-gated in
   CI.
 
 ## One catalog, one grammar

@@ -1,13 +1,14 @@
 "use client";
-// Interactive <Seismogram>. One pointer listener; slot by x-band
-// over the rendered series. ←/→ step slots, Home/End jump to first/last EVENT
-// (not slot — quiet slots are skippable context). Announces via the shared
-// point template; quiet slots use the pointEmpty wording (ActivityGrid
-// parity). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Seismogram>. useActivePicker owns interaction: ONE pointer
+// listener + slot-by-x-band over the rendered series, ←/→ step slots, Home/End
+// jump to the first/last EVENT (quiet slots are skippable context), click /
+// Enter / Space selects (onSelect). Announces via the shared point template;
+// quiet slots use the pointEmpty wording (ActivityGrid parity). Composes the
+// static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -20,7 +21,7 @@ import {
   type SeismogramProps,
 } from "./index.js";
 
-export interface InteractiveSeismogramProps extends SeismogramProps {
+export interface InteractiveSeismogramProps extends SeismogramProps, PickerProps {
   strings?: DistStrings;
   /** Slot announcement templates (shared point wording). */
   seriesStrings?: SeriesStrings & SlotStrings;
@@ -50,6 +51,10 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -63,27 +68,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
   }, [data, width]);
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
-
-  const accName =
-    summary === false
-      ? undefined
-      : typeof summary === "string"
-        ? summary
-        : seismogramSummary(data, fmt, strings);
-  const label = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (rendered.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const i = Math.floor(x / (width / rendered.length));
-      setActive(i >= 0 && i < rendered.length ? i : null);
-    },
-    [rendered, width],
-  );
+  const slotW = rendered.length > 0 ? width / rendered.length : 0;
 
   const eventSlots = useMemo(
     () =>
@@ -94,45 +79,76 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
     [rendered],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (rendered.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(rendered.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = eventSlots[0] ?? 0;
-          break;
-        case "End":
-          next = eventSlots[eventSlots.length - 1] ?? rendered.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
+  // Pointer x → slot band over the rendered series. Navigable unit = the SLOT
+  // (index into the rendered, possibly downsampled, series).
+  const locate = useCallback(
+    (x: number) => {
+      if (rendered.length === 0) return null;
+      const i = Math.floor(x / (width / rendered.length));
+      return i >= 0 && i < rendered.length ? i : null;
     },
-    [active, rendered, eventSlots],
+    [rendered, width],
   );
 
-  const activeValue = active !== null ? rendered[active] : undefined;
-  const announced =
-    active === null
-      ? ""
-      : isFiniteValue(activeValue) && activeValue !== 0
-        ? seriesStrings.point(active + 1, rendered.length, fmt(activeValue))
-        : seriesStrings.pointEmpty(active + 1, rendered.length);
+  // ←/→ step slots; Home/End jump to the first/last EVENT (skipping quiet slots).
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const n = rendered.length;
+      if (n === 0) return null;
+      switch (key) {
+        case "ArrowRight":
+          return Math.min(n - 1, cur + 1);
+        case "ArrowLeft":
+          return cur <= 0 ? 0 : cur - 1;
+        case "Home":
+          return eventSlots[0] ?? 0;
+        case "End":
+          return eventSlots[eventSlots.length - 1] ?? n - 1;
+      }
+      return null;
+    },
+    [rendered, eventSlots],
+  );
 
-  const slotW = rendered.length > 0 ? width / rendered.length : 0;
+  // datum index = rendered SLOT index; value = the slot's intensity (0 = quiet),
+  // or `null` for a non-finite slot.
+  const datum = useCallback(
+    (i: number) => {
+      const v = rendered[i];
+      return { index: i, value: isFiniteValue(v) ? v : null };
+    },
+    [rendered],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: rendered.length,
+    width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : seismogramSummary(data, fmt, strings);
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const shown = active ?? selected;
+  const shownValue = shown !== null ? rendered[shown] : undefined;
+  const announced =
+    shown === null
+      ? ""
+      : isFiniteValue(shownValue) && shownValue !== 0
+        ? seriesStrings.point(shown + 1, rendered.length, fmt(shownValue))
+        : seriesStrings.pointEmpty(shown + 1, rendered.length);
 
   return (
     <span
@@ -141,10 +157,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticSeismogram
         {...rest}
@@ -159,11 +172,23 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         summary={false}
         style={FILL}
       >
-        {active !== null ? (
+        {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
+        {selected !== null && selected !== active ? (
           <line
-            x1={slotW * (active + 0.5)}
+            x1={slotW * (selected + 0.5)}
             y1={0}
-            x2={slotW * (active + 0.5)}
+            x2={slotW * (selected + 0.5)}
+            y2={height}
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {shown !== null ? (
+          <line
+            x1={slotW * (shown + 0.5)}
+            y1={0}
+            x2={slotW * (shown + 0.5)}
             y2={height}
             data-mc-ink="muted"
             data-mc-w="support"
@@ -173,15 +198,15 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         {rest.children}
       </StaticSeismogram>
       <LiveRegion>{announced}</LiveRegion>
-      {active !== null ? (
+      {shown !== null ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((slotW * (active + 0.5)) / width) * 100}%`,
+            left: `${((slotW * (shown + 0.5)) / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {isFiniteValue(activeValue) && activeValue !== 0 ? fmt(activeValue) : "—"}
+          {isFiniteValue(shownValue) && shownValue !== 0 ? fmt(shownValue) : "—"}
         </span>
       ) : null}
     </span>

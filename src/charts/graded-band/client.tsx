@@ -1,11 +1,11 @@
 "use client";
-// Interactive <GradedBand>. One pointer listener + pure nearest-
-// edge math. ←/→ step levels outward/inward from the median; each announces its
-// interval ("80% interval: 17 to 26."). Composes the static component (canon);
-// the edge ticks are overlay children re-using geometry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <GradedBand>. One pointer listener + pure nearest-edge math. ←/→
+// step levels outward/inward from the median; each announces its interval ("80%
+// interval: 17 to 26."). Enter/Space/click pins a level (onSelect). Composes the
+// static component (canon); the edge ticks are overlay children re-using geometry.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
@@ -16,7 +16,7 @@ import {
   type GradedBandProps,
 } from "./index.js";
 
-export interface InteractiveGradedBandProps extends GradedBandProps {
+export interface InteractiveGradedBandProps extends GradedBandProps, PickerProps {
   strings?: QuantileStrings;
   /**
    * Opt-in entrance motion (default `false`): the nested bands wipe on when
@@ -42,6 +42,10 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -56,10 +60,41 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
     [width, height, data, levels, value, props.domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
 
   // ascending by level → ←/→ steps from the most-certain (innermost) outward
   const stops = useMemo(() => (geo ? [...geo.bands].sort((a, b) => a.p - b.p) : []), [geo]);
+
+  const locate = useCallback(
+    (x: number) => {
+      if (stops.length === 0) return null;
+      let best = 0;
+      let bestDist = Infinity;
+      stops.forEach((b, i) => {
+        const d = Math.min(Math.abs(b.x - x), Math.abs(b.x + b.width - x));
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [stops],
+  );
+  // index = band index in ascending level order (0 = innermost / most-certain);
+  // value = the band's probability level (p).
+  const datum = useCallback((i: number) => ({ index: i, value: stops[i]?.p ?? null }), [stops]);
+
+  const { active, selected, bind } = useActivePicker({
+    count: stops.length,
+    width: geo?.totalWidth ?? width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -71,57 +106,38 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
           : gradedBandSummary(geo, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (stops.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * geo!.totalWidth;
-      let best = 0;
-      let bestDist = Infinity;
-      stops.forEach((b, i) => {
-        const d = Math.min(Math.abs(b.x - x), Math.abs(b.x + b.width - x));
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [stops, geo],
-  );
+  const edges = (i: number, pinned: boolean) => {
+    const b = stops[i];
+    if (!b) return null;
+    const w = pinned ? "tick" : "support";
+    return (
+      <>
+        <line
+          x1={b.x}
+          y1={0.5}
+          x2={b.x}
+          y2={height - 0.5}
+          data-mc-ink="accent"
+          data-mc-w={w}
+          vectorEffect="non-scaling-stroke"
+        />
+        <line
+          x1={b.x + b.width}
+          y1={0.5}
+          x2={b.x + b.width}
+          y2={height - 0.5}
+          data-mc-ink="accent"
+          data-mc-w={w}
+          vectorEffect="non-scaling-stroke"
+        />
+      </>
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (stops.length === 0) return;
-      const pos = active ?? -1;
-      let next = pos;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(stops.length - 1, pos + 1);
-          break;
-        case "ArrowLeft":
-          next = pos <= 0 ? 0 : pos - 1;
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = stops.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, stops],
-  );
-
-  const band = active !== null ? stops[active] : undefined;
+  // The band shown by the edge ticks + readout: live focus, falling back to a
+  // pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const band = shown !== null ? stops[shown] : undefined;
   const announced = band ? strings.bandEdge(band.p, fmt(band.lo), fmt(band.hi)) : "";
 
   return (
@@ -131,10 +147,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticGradedBand
         {...rest}
@@ -150,35 +163,16 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {band ? (
-          <>
-            <line
-              x1={band.x}
-              y1={0.5}
-              x2={band.x}
-              y2={height - 0.5}
-              data-mc-ink="accent"
-              data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
-            />
-            <line
-              x1={band.x + band.width}
-              y1={0.5}
-              x2={band.x + band.width}
-              y2={height - 0.5}
-              data-mc-ink="accent"
-              data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
-            />
-          </>
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus edges are transient. */}
+        {selected !== null && selected !== active ? edges(selected, true) : null}
+        {active !== null ? edges(active, false) : null}
         {rest.children}
       </StaticGradedBand>
-      {band ? (
+      {band && geo ? (
         <span
           className="mc-graded-band-readout mc-spark-readout"
           style={{
-            left: `${((band.x + band.width / 2) / geo!.totalWidth) * 100}%`,
+            left: `${((band.x + band.width / 2) / geo.totalWidth) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >

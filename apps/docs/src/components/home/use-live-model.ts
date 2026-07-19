@@ -49,7 +49,10 @@ interface LMSession {
 interface LMStatic {
   availability(): Promise<"unavailable" | "downloadable" | "downloading" | "available">;
   create(options?: {
-    initialPrompts?: { role: "system" | "user" | "assistant"; content: string }[];
+    initialPrompts?: {
+      role: "system" | "user" | "assistant";
+      content: string;
+    }[];
     temperature?: number;
     topK?: number;
   }): Promise<LMSession>;
@@ -65,6 +68,10 @@ export type LivePhase = "idle" | "thinking" | "streaming" | "done" | "error";
 /** Nano has no output-token option — a runaway reply is cut here, kept as-is. */
 const MAX_REPLY_CHARS = 1400;
 
+/** Read pre-paint by app/layout.tsx to reserve live mode's height. Kept in
+ *  sync with the real availability answer below — never written elsewhere. */
+const LIVE_HINT_KEY = "mc-live";
+
 export function useLiveModel() {
   const [supported, setSupported] = useState(false);
   const [phase, setPhase] = useState<LivePhase>("idle");
@@ -79,7 +86,22 @@ export function useLiveModel() {
       if (!lm?.availability) return;
       lm.availability().then(
         (a) => {
-          if (on && a === "available") setSupported(true);
+          if (!on) return;
+          if (a === "available") setSupported(true);
+          // Remember the answer for the NEXT load: it is what lets the pre-paint
+          // script in app/layout.tsx reserve live mode's space before anything
+          // renders, so the panel never grows into it. Clearing on a negative
+          // answer is what makes an uninstalled model self-heal — and the
+          // attribute goes too, or this load keeps space nothing will fill.
+          try {
+            if (a === "available") localStorage.setItem(LIVE_HINT_KEY, "1");
+            else {
+              localStorage.removeItem(LIVE_HINT_KEY);
+              delete document.documentElement.dataset.mcLive;
+            }
+          } catch {
+            /* private mode — the prediction is an optimisation, never a need */
+          }
         },
         () => {},
       );

@@ -1,10 +1,11 @@
 "use client";
-// Interactive <DepthWedge>. One pointer listener; nearest level by
-// x reveals the cumulative depth on that side. ←/→ walk levels across the book.
-// Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <DepthWedge>. useActivePicker owns interaction: one pointer
+// listener + nearest-level-by-x math reveals the cumulative depth on that side,
+// ←/→ walk levels across the book, click / Enter / Space selects (onSelect).
+// Composes the static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DEPTH_WEDGE } from "../../core/strings-depth-wedge.js";
@@ -15,7 +16,7 @@ import {
   type DepthWedgeProps,
 } from "./index.js";
 
-export interface InteractiveDepthWedgeProps extends DepthWedgeProps {
+export interface InteractiveDepthWedgeProps extends DepthWedgeProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the bid/ask wedges sweep
    * outward from the mid-price on first client-side mount. Inert on the
@@ -39,6 +40,10 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -73,22 +78,11 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
       ].sort((a, b) => a.x - b.x),
     [geo],
   );
-  const [active, setActive] = useState<number | null>(null);
-
-  const accName =
-    summary === false
-      ? undefined
-      : typeof summary === "string"
-        ? summary
-        : depthWedgeSummary(geo, strings, fmt);
-  const label = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (combined.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
+  // index = position in the two sides MERGED and sorted by x (a unit position,
+  // not an index into `data.demand` / `data.supply`).
+  const locate = useCallback(
+    (x: number) => {
+      if (combined.length === 0) return null;
       let best = 0;
       let bestD = Infinity;
       combined.forEach((s, i) => {
@@ -98,32 +92,53 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
           best = i;
         }
       });
-      setActive(best);
-    },
-    [combined, width],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (combined.length === 0) return;
-      setActive((prev) => {
-        const cur = prev ?? 0;
-        if (e.key === "ArrowRight") {
-          e.preventDefault();
-          return Math.min(combined.length - 1, cur + 1);
-        }
-        if (e.key === "ArrowLeft") {
-          e.preventDefault();
-          return Math.max(0, cur - 1);
-        }
-        if (e.key === "Escape") return null;
-        return prev;
-      });
+      return best;
     },
     [combined],
   );
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: combined[i]?.cum ?? null }),
+    [combined],
+  );
 
-  const step = active != null ? combined[active] : undefined;
+  const { active, selected, bind } = useActivePicker({
+    count: combined.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : depthWedgeSummary(geo, strings, fmt);
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const probe = (i: number, pinned: boolean) => {
+    const s = combined[i];
+    if (!s) return null;
+    return (
+      <line
+        x1={s.x}
+        x2={s.x}
+        y1={0.5}
+        y2={height - 0.5}
+        data-mc-ink={pinned ? "accent" : "muted"}
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const step = shown != null ? combined[shown] : undefined;
   const sideName = step ? strings.depthWedgeSides[step.side].toLowerCase() : "";
   const announced = step ? strings.depthWedgeAt(sideName, fmt(step.cum), fmt(step.dist)) : "";
 
@@ -134,10 +149,7 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticDepthWedge
         {...rest}
@@ -152,17 +164,9 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
         summary={false}
         style={FILL}
       >
-        {step ? (
-          <line
-            x1={step.x}
-            x2={step.x}
-            y1={0.5}
-            y2={height - 0.5}
-            data-mc-ink="muted"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; probe is transient. */}
+        {selected !== null && selected !== active ? probe(selected, true) : null}
+        {active !== null ? probe(active, false) : null}
         {rest.children}
       </StaticDepthWedge>
       <LiveRegion>{announced}</LiveRegion>

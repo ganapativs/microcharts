@@ -34,6 +34,21 @@ export interface ChartEntry {
    * or motion already IS the encoding) — prop table + playground omit it.
    */
   animates?: boolean;
+  /**
+   * `false` ⇒ the interactive entry has NO unit picker, so it does not accept
+   * the shared picker props (`onActive`, `onSelect`, `selectedIndex`,
+   * `defaultSelectedIndex`) and has no roving keyboard navigation. Two reasons a
+   * chart is marked `false`:
+   *  - **lean scalar charts** — one value, nothing to rove between (`delta`,
+   *    `status-dot`, `progress`, `orbit-status`, …). Selection is whole-chart.
+   *  - **deliberate exceptions** — `minimap-strip` is a range/slider primitive
+   *    (`onWindowChange`) and `token-confidence` flows inline in text; both keep
+   *    their own interaction props instead.
+   *
+   * Omitted (⇒ `true`) on every multi-unit chart. Charts with no
+   * `interactiveImport` at all (`wind-barb`) are outside the split entirely.
+   */
+  picker?: false;
   dataShape: string;
   /** Primary encoding channel + precision rating. */
   encoding: { channel: string; precision: string };
@@ -125,18 +140,23 @@ export interface Recipe {
   fluid?: boolean;
 }
 
-export interface ChartModule {
+/**
+ * Static half of a chart module — everything the SERVER needs (gallery
+ * `Preview`, `sizing` recipes, the four-contexts `Mark`).
+ *
+ * Lives in `lib/charts/<slug>.tsx` and MUST NOT import any `…/interactive`
+ * entry. Those are `'use client'` modules: Next registers every one reachable
+ * from a server component's import graph as an eager client reference for that
+ * route — importing is enough, it never has to render, and tree-shaking does
+ * not cross the boundary. `registry.ts` pulls all 106 of these, so a single
+ * interactive import here puts the whole catalog's interactive code on the
+ * critical path of `/charts` and every chart doc page (~100 kB gzip, measured).
+ * The interactive half lives in `<slug>.live.tsx`.
+ */
+export interface ChartModuleStatic {
   entry: ChartEntry;
   /** Static render for the gallery card. */
   Preview: ComponentType;
-  /**
-   * Interactive-entry twin of `Preview` at the SAME size/props, with entrance
-   * `animate` on. Gallery + homepage hero prefer it unless the visitor chooses
-   * static or prefers reduced motion (then they stay on `Preview`).
-   */
-  PreviewLive?: ComponentType;
-  /** Homepage instrument-strip card (interactive entry, fixed size). */
-  showcase: { hint: string; Node: ComponentType };
   playground: PlaygroundSpec;
   recipes: Recipe[];
   /** Chart at context scale, for the four-contexts grid. */
@@ -145,4 +165,19 @@ export interface ChartModule {
   markCode: (width?: number, height?: number) => string;
   /** Authored placements; absent ⇒ generic fallback. */
   contexts?: ChartContexts;
+}
+
+/**
+ * Full chart module — the static half plus its interactive twin. Composed in
+ * `lib/charts/<slug>.live.tsx` and reachable ONLY through the lazy maps
+ * (`modules.generated`, `preview-live.generated`, `home/hero-modules`), so the
+ * interactive entries land in async chunks instead of a route's eager graph.
+ */
+export interface ChartModule extends ChartModuleStatic {
+  /**
+   * Interactive-entry twin of `Preview` at the SAME size/props, with entrance
+   * `animate` on. Gallery + homepage hero prefer it unless the visitor chooses
+   * static or prefers reduced motion (then they stay on `Preview`).
+   */
+  PreviewLive?: ComponentType;
 }

@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { TallyMarks } from "./client.js";
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <TallyMarks>", () => {
   it("announces the new total on change; quiet on mount", async () => {
     const screen = await render(<TallyMarks value={5} />);
@@ -24,5 +27,22 @@ describe("interactive <TallyMarks>", () => {
     const path = screen.container.querySelector<SVGPathElement>('path[data-mc-ink="data"]')!;
     // 7 strokes present after the update (draw-in is transient)
     expect((path.getAttribute("d")!.match(/M/g) ?? []).length).toBe(7);
+  });
+
+  it("click fires onSelect with the count", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<TallyMarks value={23} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-tally-live") as HTMLElement;
+    wrap.click();
+    expect(picks).toEqual([{ index: 0, value: 23 }]);
+  });
+
+  it("Enter fires onSelect from the focused wrapper", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<TallyMarks value={7} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-tally-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Enter");
+    expect(picks).toEqual([{ index: 0, value: 7 }]);
   });
 });

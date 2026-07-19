@@ -1,11 +1,22 @@
 "use client";
-// Interactive <MicroScatter>. One pointer listener; nearest
-// point by squared Euclidean distance over the precomputed dots. ←/→ step
-// points ordered by x, announcing the formatted pair. Focus ring on the
-// active dot. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <MicroScatter>. useActivePicker owns interaction: one pointer
+// listener + nearest-point-by-squared-Euclidean-distance math, ←/→ (and ↑/↓)
+// stepping points ordered by x, click / Enter / Space selects (onSelect).
+// Composes the static component (canon) — the SVG is never re-implemented.
+//
+// Unit = a plotted dot, so `datum.index` is the DOT POSITION in the projected
+// cloud — identical to the data index whenever every pair is finite (non-finite
+// pairs are dropped by the geometry). `value` is the y channel; the x reading
+// travels as `label`.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import {
+  FILL,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -17,7 +28,7 @@ import {
   type MicroScatterProps,
 } from "./index.js";
 
-export interface InteractiveMicroScatterProps extends MicroScatterProps {
+export interface InteractiveMicroScatterProps extends MicroScatterProps, PickerProps {
   strings?: ScatterStrings;
   /** Point announcement templates (shared point wording). */
   seriesStrings?: SeriesStrings;
@@ -46,6 +57,10 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const rad = Math.min(3, Math.max(1, props.r ?? 1.5));
@@ -77,7 +92,6 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
     [width, height, data, xDomain, domain, trend, rad],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null); // index into geo.dots
 
   /** Dots ordered by x for ←/→ stepping. */
   const order = useMemo(() => {
@@ -86,21 +100,9 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
     return idx.map((e) => e.i);
   }, [geo]);
 
-  const accName =
-    summary === false
-      ? undefined
-      : typeof summary === "string"
-        ? summary
-        : microScatterSummary(geo.dots.length, geo.r, strings);
-  const label = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.dots.length === 0) return;
-      const rct = e.currentTarget.getBoundingClientRect();
-      if (rct.width === 0 || rct.height === 0) return;
-      const x = ((e.clientX - rct.left) / rct.width) * width;
-      const y = ((e.clientY - rct.top) / rct.height) * height;
+  const locate = useCallback(
+    (x: number, y: number) => {
+      if (geo.dots.length === 0) return null;
       let best = 0;
       let bestDist = Infinity;
       geo.dots.forEach((d, i) => {
@@ -110,49 +112,68 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
           best = i;
         }
       });
-      setActive(best);
+      return best;
     },
-    [geo, width, height],
+    [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (order.length === 0) return;
-      const pos = active === null ? -1 : order.indexOf(active);
-      let next = pos;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(order.length - 1, pos + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, pos <= 0 ? 0 : pos - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = order.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(order[next]!);
+  // 1-D roving in x-order (not dot order): step in position space, then map back.
+  const step = useCallback((cur: number, key: string) => navOrder(order, cur, key), [order]);
+
+  const datum = useCallback(
+    (i: number) => {
+      const p = geo.dots[i] ? data[geo.dots[i]!.index] : undefined;
+      return { index: i, value: p?.y ?? null, label: p ? fmt(p.x) : undefined };
     },
-    [active, order],
+    [geo, data, fmt],
   );
 
-  const activeDot = active !== null ? geo.dots[active] : undefined;
-  const activePoint = activeDot ? data[activeDot.index] : undefined;
+  const { active, selected, bind } = useActivePicker({
+    count: geo.dots.length,
+    width,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : microScatterSummary(geo.dots.length, geo.r, strings);
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const ring = (i: number, pinned: boolean) => {
+    const d = geo.dots[i];
+    if (!d) return null;
+    return (
+      <circle
+        cx={d.x}
+        cy={d.y}
+        r={rad + 1.25}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const shownDot = shown !== null ? geo.dots[shown] : undefined;
+  const shownPoint = shownDot ? data[shownDot.index] : undefined;
   const announced =
-    activeDot && activePoint
+    shownDot && shownPoint
       ? seriesStrings.point(
-          (order.indexOf(active!) ?? 0) + 1,
+          order.indexOf(shown!) + 1,
           geo.dots.length,
-          `${fmt(activePoint.x)}, ${fmt(activePoint.y)}`,
+          `${fmt(shownPoint.x)}, ${fmt(shownPoint.y)}`,
         )
       : "";
 
@@ -163,10 +184,7 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticMicroScatter
         {...rest}
@@ -182,29 +200,21 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
         strings={strings}
         summary={false}
       >
-        {activeDot ? (
-          <circle
-            cx={activeDot.x}
-            cy={activeDot.y}
-            r={rad + 1.25}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticMicroScatter>
       <LiveRegion>{announced}</LiveRegion>
-      {activeDot && activePoint ? (
+      {shownDot && shownPoint ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(activeDot.x / width) * 100}%`,
+            left: `${(shownDot.x / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {`${fmt(activePoint.x)}, ${fmt(activePoint.y)}`}
+          {`${fmt(shownPoint.x)}, ${fmt(shownPoint.y)}`}
         </span>
       ) : null}
     </span>

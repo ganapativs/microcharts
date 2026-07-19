@@ -42,10 +42,17 @@ Codex read it). If this repo uses Claude Code, mirror it: `ln -s AGENTS.md CLAUD
 section into `CLAUDE.md` on Windows.
 
 - One chart = one import, e.g. `import { Sparkline } from "@microcharts/react/sparkline"`. The default export is static
-  — RSC-safe, zero client JS. Add `/interactive` to the path only when hover or keyboard is needed (that entry is a
-  client component).
-- `data` alone always renders. The same props mean the same thing on every chart: `data`, `domain`, `color`, `title`,
-  `summary`, `format`, `positive`, `label`, `dots`. Chart-specific props live on each chart's `.md` page.
+  — RSC-safe, zero client JS. Add `/interactive` to the path only when hover, keyboard, touch, or selection is needed
+  (that entry is a client component). WindBarb is static-only.
+- `data` alone always renders; single-value charts (Delta, Progress, StatusDot, TrendArrow, …) take `value` instead. The
+  same props mean the same thing on every chart: `data`, `domain`, `color`, `title`, `summary`, `format`, `positive`,
+  `label`, `dots`. Chart-specific props live on each chart's `.md` page.
+- Interactive entries share one interaction contract. Hover or arrows make a unit active; click, tap, Enter or Space
+  selects and pins it; Escape clears; Home/End jump to the ends. Read values with `onActive(datum)` and
+  `onSelect(datum)` — the payload is `{ index, value, label? }` — and control the pin with `selectedIndex` /
+  `defaultSelectedIndex`. Never attach your own per-point handlers or wrap a chart in a click target; the chart owns the
+  whole gesture surface. Single-unit scalar charts (Delta, Progress, StatusDot, Bullet, …) take `onSelect` only.
+  MinimapStrip is a range slider with `onWindowChange([lo, hi])` instead.
 - `null` or `NaN` in `data` is a gap, never a zero.
 - Accessibility is automatic (`role="img"` + a summary generated from the data). Inline in a sentence: wrap the mark in
   `<span className="mc-inline">` and pass `summary={false}`.
@@ -53,7 +60,9 @@ section into `CLAUDE.md` on Windows.
   `data-mc-theme="modern | editorial | mono | vivid | dark | print | eink"` (or `defineTheme` from
   `@microcharts/react/theme` for a derived palette). Never hardcode colors; charts paint no background — place them on a
   surface with contrast.
-- `width` and `height` are viewBox units; fill a container with `style={{ width: "100%", height: "auto" }}`.
+- `width` and `height` are viewBox units on the charts that take them; fill a container with
+  `style={{ width: "100%", height: "auto" }}`. Fixed-glyph charts (Delta, StatusDot, TrendArrow, …) have no `width` —
+  size them with `style` or CSS.
 - Format numbers with one `format` prop (`Intl.NumberFormatOptions` or `(n) => string`) plus `locale`. Fix the scale
   with `domain={[min, max]}`. Share one scale across small multiples with `SparkGroup`.
 - Annotations are children: `Threshold`, `TargetZone`, `Marker`, `Callout` from `@microcharts/react/annotations`.
@@ -134,8 +143,8 @@ Full detail — why it inherits, and per-scope fonting — in [Theming](/docs/th
 
 ## Your first chart
 
-Every chart renders from `data` alone. This works in a React Server Component with **zero client JavaScript** — it's
-pure SVG, and its accessible name is generated from the data.
+Every series chart renders from `data` alone — single-value charts take `value`. Either way it works in a React Server
+Component with **zero client JavaScript** — it's pure SVG, and its accessible name is generated from the data.
 
 <LiveDemo
   label="Static · RSC-safe"
@@ -154,34 +163,42 @@ return <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
 ## The shared grammar
 
 One idea runs through the whole catalog: **the same prop name means the same thing on every chart.** Learn these once
-and they transfer everywhere — a new chart type is a new data shape, never a new vocabulary. `data` alone always renders
-something correct; everything else is opt-in.
+and they transfer everywhere — a new chart type is a new data shape, never a new vocabulary. The data prop alone always
+renders something correct; everything else is opt-in.
 
-| Prop       | Type                                        | What it does                                                                                                                              |
-| ---------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`     | `(number \| null)[]`                        | The series. `null` / `NaN` are gaps, never zeros. The one required prop.                                                                  |
-| `domain`   | `[min, max]`                                | Fix the value range instead of auto-fitting — see [Formatting & scale](/docs/formatting#scale-the-domain-decision).                       |
-| `color`    | `string`                                    | Mark color: any CSS color or a token (`"var(--mc-accent)"`). Semantic tokens keep their meaning — see [Theming](/docs/theming).           |
-| `title`    | `string`                                    | A visible title, wired into the chart's accessible name.                                                                                  |
-| `summary`  | `string \| false`                           | Override the auto-generated accessible sentence, or pass `false` to mark the chart decorative — see [Accessibility](/docs/accessibility). |
-| `format`   | `Intl.NumberFormatOptions \| (n) => string` | How numbers render in labels and summaries — see [Formatting & scale](/docs/formatting).                                                  |
-| `positive` | `"up" \| "down"`                            | Which direction is good, so color and arrows point the honest way (lower latency is `"down"`).                                            |
-| `label`    | _per chart_                                 | A short direct label next to the mark, in a reserved gutter — never an axis or legend.                                                    |
-| `dots`     | _per chart_                                 | Which individual points to emphasize (e.g. `"minmax"` on a line).                                                                         |
+| Prop       | Type                                        | What it does                                                                                                                                    |
+| ---------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`     | `(number \| null)[] \| per-chart shape`     | The series. `null` / `NaN` are gaps, never zeros. The one required prop; each chart documents its own shape when it isn't a plain number array. |
+| `domain`   | `[min, max]`                                | Fix the value range instead of auto-fitting — see [Formatting & scale](/docs/formatting#scale-the-domain-decision).                             |
+| `color`    | `string`                                    | Mark color: any CSS color or a token (`"var(--mc-accent)"`). Semantic tokens keep their meaning — see [Theming](/docs/theming).                 |
+| `title`    | `string`                                    | Names the chart — an SVG `<title>`, so it becomes the accessible name and the hover tooltip, not visible text.                                  |
+| `summary`  | `string \| false`                           | Override the auto-generated accessible sentence, or pass `false` to mark the chart decorative — see [Accessibility](/docs/accessibility).       |
+| `format`   | `Intl.NumberFormatOptions \| (n) => string` | How numbers render in labels and summaries — see [Formatting & scale](/docs/formatting).                                                        |
+| `positive` | `"up" \| "down"`                            | Which direction is good, so color and arrows point the honest way (lower latency is `"down"`).                                                  |
+| `label`    | _per chart_                                 | A short direct label next to the mark, in a reserved gutter — never an axis or legend.                                                          |
+| `dots`     | _per chart_                                 | Which individual points to emphasize (e.g. `"minmax"` on a line).                                                                               |
 
-Not every prop applies to every chart — a bar chart has no `dots` — but wherever a concept exists, its prop name and
-meaning are always these. Each one has a deeper home: [Formatting & scale](/docs/formatting) owns `format` and `domain`,
-[Theming](/docs/theming) owns `color`, and [Accessibility](/docs/accessibility) owns `summary`. Every chart also takes
-the layout props (`width`, `height`, `className`, `style`, `id`; see [Sizing](/docs/sizing)) and a few props specific to
-its own shape, listed in the prop table on each chart's page. To place charts in real UI — or render several on one
-shared scale with `SparkGroup` — see [Composition](/docs/composition).
+Not every prop applies to every chart — a bar chart has no `dots`, and the single-value charts take `value` rather than
+`data` — but wherever a concept exists, its prop name and meaning are always these. Each one has a deeper home:
+[Formatting & scale](/docs/formatting) owns `format` and `domain`, [Theming](/docs/theming) owns `color`, and
+[Accessibility](/docs/accessibility) owns `summary`.
+
+Alongside the grammar sit the layout props — `className` and `style` on every chart, plus `width` and `height` on the
+charts whose geometry is sized that way (the fixed-glyph ones size from `style` or their own `size` / `cell` knob) and
+`id`, which opts into `<title>`/`<desc>` + `aria-labelledby` naming; see [Sizing](/docs/sizing). The i18n props are
+`locale` (BCP-47, for number and date formatting) and `strings` (the summary/label templates), plus `seriesStrings` on
+the multi-series charts — see [Accessibility](/docs/accessibility#internationalization-and-rtl). Everything else is
+specific to a chart's own shape and listed in the prop table on its page. To place charts in real UI — or render several
+on one shared scale with `SparkGroup` — see [Composition](/docs/composition). Annotations are children:
+[`Threshold`, `TargetZone`, `Marker`, `Callout`](/docs/annotations).
 
 ## Add interactivity
 
-Need hover, keyboard navigation, or live announcements? Import the same chart from its `/interactive` entry. Everything
-else — props, output, accessibility — is identical; you just opt into the client component where it matters. The
-interactive entry **is** a client component: in a Next.js App Router page, render it from a file with `"use client"` at
-the top (or anywhere inside one).
+Need hover, keyboard navigation, touch, or live announcements? Import the same chart from its `/interactive` entry. The
+rendered output and the accessible name are identical — the interactive entry composes its static twin rather than
+re-implementing it — and it **adds** props rather than changing any: the interaction callbacks below, plus `animate`.
+The interactive entry **is** a client component: in a Next.js App Router page, render it from a file with `"use client"`
+at the top (or anywhere inside one).
 
 ```tsx
 "use client";
@@ -191,14 +208,42 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
 ```
 
+### One interaction contract
+
+Every interactive chart behaves the same way, so you learn it once. Hover or arrow keys make a unit **active**; a click,
+tap, **Enter**, or **Space** **selects** it and pins the readout so it survives blur. **Escape** clears,
+**Home**/**End** jump to the ends, and arrows rove in both axes (←/↑ previous, →/↓ next). On touch, a tap pins and a
+drag scrubs. What a "unit" is depends on the chart — a point, a bar, a day cell, a segment — and each chart's page names
+its own.
+
+| Prop                   | Type                                  | What it does                                                                 |
+| ---------------------- | ------------------------------------- | ---------------------------------------------------------------------------- |
+| `onActive`             | `(datum: MicroDatum \| null) => void` | The active unit changed (pointer or keyboard). `null` when the chart clears. |
+| `onSelect`             | `(datum: MicroDatum \| null) => void` | A unit was selected or unselected — click, tap, `Enter`, `Space`, `Escape`.  |
+| `selectedIndex`        | `number \| null`                      | Control the selection yourself.                                              |
+| `defaultSelectedIndex` | `number \| null`                      | Seed the selection once, then let the chart own it.                          |
+
+`MicroDatum` is `{ index, value, label? }` — `index` identifies the unit, `value` is its primary encoded number (`null`
+when the unit encodes nothing), `label` its human name where one exists.
+
+Scalar charts with a single unit — Delta, Progress, StatusDot, Bullet and the rest — take `onSelect` only; there's
+nothing to rove between. Those single-value charts also take `live` (default `true`): as the value updates, the new
+reading is announced through a polite live region, throttled so a streaming number never spams a screen reader. Two
+charts opt out of the picker on purpose: `MinimapStrip` is a range slider with its own `onWindowChange([lo, hi])`, and
+`TokenConfidence` moves real focus through inline text spans. Full detail, including the live-region behavior, is on
+[Accessibility](/docs/accessibility#one-interaction-contract).
+
 ## Animate on mount (optional)
 
-Every interactive entry also takes an `animate` prop — the chart draws on instead of appearing instantly. It's off by
+Interactive entries also take an `animate` prop — the chart draws on instead of appearing instantly. It's off by
 default, and inert on the server and on hydrated server HTML, so it never fights SSR or flashes over painted content; a
 fresh client-side mount is what plays it. Wire the engine once, client-side, then opt in per chart:
 
 ```tsx
+"use client";
+
 import "@microcharts/react/motion"; // once, client-side
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
 
 <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" animate />;
 ```

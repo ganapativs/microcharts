@@ -1,18 +1,19 @@
 "use client";
-// Interactive <ABStrips>. One pointer listener: y picks the row,
-// x snaps to the nearest quantile edge. ↑/↓ switch rows, ←/→ step edges. The
-// median edge announces the row median + delta vs the other arm; other edges
-// announce the percentile. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <ABStrips>. useActivePicker owns interaction: y picks the row,
+// x snaps to the nearest quantile edge; ↑/↓ switch rows (keeping the edge), ←/→
+// step edges; click / Enter / Space selects (onSelect). The median edge
+// announces the row median + delta vs the other arm; other edges announce the
+// percentile. Composes the static component (canon).
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
 import { abStripsGeometry } from "./geometry.js";
 import { ABStrips as StaticABStrips, abSummary, abDelta, type ABStripsProps } from "./index.js";
 
-export interface InteractiveABStripsProps extends ABStripsProps {
+export interface InteractiveABStripsProps extends ABStripsProps, PickerProps {
   strings?: ABStrings;
   /**
    * Opt-in entrance motion (default `false`): the two median dots settle onto
@@ -21,6 +22,9 @@ export interface InteractiveABStripsProps extends ABStripsProps {
    */
   animate?: boolean;
 }
+
+/** Quantile edges per row (p5/25/50/75/95) — the navigable stops. */
+const EDGES = 5;
 
 export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
   const {
@@ -36,6 +40,10 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -69,7 +77,87 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
       fontSize: Math.min(8, Math.max(6, Math.round(height * 0.3))),
     });
   }, [width, height, data.a, data.b, labelChars, props.domain, props.label, fmt]);
-  const [sel, setSel] = useState<{ row: number; edge: number } | null>(null);
+
+  // Navigable unit = one quantile edge of one row: index `row * 5 + edge`
+  // (row 0 = arm A, row 1 = arm B; edge 0…4 = p5/p25/p50/p75/p95). The chart
+  // rolls a whole sample up into five edges, so this is NOT a data index.
+  const edgeAt = useCallback(
+    (i: number) => {
+      const r = geo?.rows[Math.floor(i / EDGES)];
+      return r ? { row: r, edge: r.edges[i % EDGES]! } : undefined;
+    },
+    [geo],
+  );
+
+  const locate = useCallback(
+    (x: number, y: number) => {
+      if (!geo) return null;
+      const row = y < height / 2 ? 0 : 1;
+      const edges = geo.rows[row]!.edges;
+      let best = 0;
+      let bestDist = Infinity;
+      edges.forEach((ed, i) => {
+        const d = Math.abs(ed.x - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return row * EDGES + best;
+    },
+    [geo, height],
+  );
+
+  // 2-D roving: ←/→ walk the edges of the current row, ↑/↓ swap arms keeping the
+  // edge. All four arrows are intercepted (a fall-through to nav1d would step
+  // sideways across the row boundary). From nothing, ↑/↓ land on the median.
+  const step = useCallback((cur: number, key: string) => {
+    const row = cur < 0 ? 0 : Math.floor(cur / EDGES);
+    const edge = cur < 0 ? -1 : cur % EDGES;
+    switch (key) {
+      case "ArrowRight":
+        return row * EDGES + Math.min(EDGES - 1, edge + 1);
+      case "ArrowLeft":
+        return row * EDGES + (edge <= 0 ? 0 : edge - 1);
+      case "ArrowUp":
+        return cur < 0 ? 2 : edge;
+      case "ArrowDown":
+        return EDGES + (cur < 0 ? 2 : edge);
+      case "Home":
+        return row * EDGES;
+      case "End":
+        return row * EDGES + EDGES - 1;
+    }
+    return null;
+  }, []);
+
+  // `value` = the quantile value at that edge (the number the strip encodes on
+  // the shared x scale); the arm + percentile ride along in `label`, and the
+  // cross-arm delta stays in the readout/announcement.
+  const datum = useCallback(
+    (i: number) => {
+      const e = edgeAt(i);
+      return {
+        index: i,
+        value: e?.edge.value ?? null,
+        label: e ? `${labels[Math.floor(i / EDGES)]!} p${e.edge.p}` : undefined,
+      };
+    },
+    [edgeAt, labels],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo ? EDGES * 2 : 0,
+    width: geo?.totalWidth ?? width,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -81,69 +169,36 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
           : abSummary(geo, fmt, labels, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * geo.totalWidth;
-      const py = ((e.clientY - r.top) / r.height) * height;
-      const row = py < height / 2 ? 0 : 1;
-      const edges = geo.rows[row]!.edges;
-      let best = 0;
-      let bestDist = Infinity;
-      edges.forEach((ed, i) => {
-        const d = Math.abs(ed.x - px);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setSel({ row, edge: best });
-    },
-    [geo, height],
-  );
+  const dot = (i: number, pinned: boolean) => {
+    const e = edgeAt(i);
+    if (!e) return null;
+    return (
+      <circle
+        cx={e.edge.x}
+        cy={e.row.y}
+        r={2.6}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!geo) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setSel((p) => ({ row: p?.row ?? 0, edge: Math.min(4, (p?.edge ?? -1) + 1) }));
-          break;
-        case "ArrowLeft":
-          setSel((p) => ({ row: p?.row ?? 0, edge: p === null || p.edge <= 0 ? 0 : p.edge - 1 }));
-          break;
-        case "ArrowUp":
-          setSel((p) => ({ row: 0, edge: p?.edge ?? 2 }));
-          break;
-        case "ArrowDown":
-          setSel((p) => ({ row: 1, edge: p?.edge ?? 2 }));
-          break;
-        case "Escape":
-          setSel(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [geo],
-  );
-
-  const active = sel && geo ? geo.rows[sel.row]!.edges[sel.edge]! : undefined;
-  const activeRow = sel?.row ?? 0;
+  const shown = active ?? selected;
+  const at = shown !== null ? edgeAt(shown) : undefined;
+  const shownRow = shown !== null ? Math.floor(shown / EDGES) : 0;
   const announced =
-    active && geo
-      ? active.p === 50
+    at && geo
+      ? at.edge.p === 50
         ? strings.abRow(
-            labels[activeRow]!,
-            fmt(active.value),
+            labels[shownRow]!,
+            fmt(at.edge.value),
             fmt(Math.abs(geo.deltaMedian)),
             geo.deltaMedian < 0 ? "below" : "above",
-            labels[activeRow === 0 ? 1 : 0]!,
+            labels[shownRow === 0 ? 1 : 0]!,
           )
-        : strings.abEdge(labels[activeRow]!, active.p, fmt(active.value))
+        : strings.abEdge(labels[shownRow]!, at.edge.p, fmt(at.edge.value))
       : "";
 
   return (
@@ -153,10 +208,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setSel(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setSel(null)}
+      {...bind}
     >
       <StaticABStrips
         {...rest}
@@ -170,25 +222,20 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {active && geo ? (
-          <circle
-            cx={active.x}
-            cy={geo.rows[activeRow]!.y}
-            r={2.6}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus dot is transient. */}
+        {selected !== null && selected !== active ? dot(selected, true) : null}
+        {active !== null ? dot(active, false) : null}
         {rest.children}
       </StaticABStrips>
-      {active && geo ? (
+      {at && geo ? (
         <span
           className="mc-ab-strips-readout mc-spark-readout"
-          style={{ left: `${(active.x / geo.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={{
+            left: `${(at.edge.x / geo.totalWidth) * 100}%`,
+            transform: "translateX(-50%)",
+          }}
         >
-          {active.p === 50 ? fmt(active.value) : `p${active.p} ${fmt(active.value)}`}
+          {at.edge.p === 50 ? fmt(at.edge.value) : `p${at.edge.p} ${fmt(at.edge.value)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

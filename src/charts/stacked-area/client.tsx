@@ -1,11 +1,13 @@
 "use client";
-// Interactive <StackedArea>. Nearest-x lookup announces ALL
-// layers ("Point 8 of 12: Mobile 45%, Web 38%, API 17%."); ←/→ steps x, ↑/↓
-// cycles which layer the crosshair dot highlights. Composes the static.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <StackedArea>. Nearest-x lookup announces ALL layers ("Point 8 of
+// 12: Mobile 45%, Web 38%, API 17%."); ←/→ step x-columns, Enter/Space/click
+// selects a column (onSelect). useActivePicker owns interaction; the static is
+// composed (summary={false}, crosshair + pin as its children) so the SVG never
+// drifts.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import type { Curve } from "../../core/path.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
@@ -18,7 +20,7 @@ import {
   type StackedAreaProps,
 } from "./index.js";
 
-export interface InteractiveStackedAreaProps extends StackedAreaProps {
+export interface InteractiveStackedAreaProps extends StackedAreaProps, PickerProps {
   strings?: StackStrings;
   seriesStrings?: SeriesStrings;
   /**
@@ -47,6 +49,10 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -66,6 +72,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
   }, [data, order]);
 
   const usedCurve: Curve = variant === "ridge" ? "smooth" : curve;
+  const fontSize = Math.max(5, Math.min(Math.round(height * 0.3), 7));
   const geo = useMemo(
     () =>
       stackedAreaGeometry({
@@ -74,16 +81,59 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         series: series.map((s) => s.values),
         domain,
         curve: usedCurve,
-        gutterCh: 0,
-        fontSize: 6,
+        // MUST mirror the static: the endpoint-label gutter shrinks the plot,
+        // so an overlay computed without it lands off the rendered marks.
+        gutterCh: rest.label === "last" ? 4 : 0,
+        fontSize,
       }),
-    [width, height, series, domain, usedCurve],
+    [width, height, series, domain, usedCurve, rest.label, fontSize],
   );
   const pctFmt = useMemo(
     () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
-  const [active, setActive] = useState<number | null>(null);
+
+  // x-column geometry: the navigable units are the n time-columns (x-samples).
+  const colX = useCallback(
+    (c: number) =>
+      geo.n > 1
+        ? geo.plot.x0 + (c * (geo.plot.x1 - geo.plot.x0)) / (geo.n - 1)
+        : (geo.plot.x0 + geo.plot.x1) / 2,
+    [geo],
+  );
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.n === 0) return null;
+      const span = geo.plot.x1 - geo.plot.x0;
+      const i = Math.round(((x - geo.plot.x0) / Math.max(1, span)) * (geo.n - 1));
+      return Math.min(geo.n - 1, Math.max(0, i));
+    },
+    [geo],
+  );
+  // index = column (x-sample) index; value = the stack total at that column
+  // (series summed, negatives clamped to 0 — matching the drawn stack).
+  const datum = useCallback(
+    (i: number) => ({
+      index: i,
+      value: series.reduce<number>(
+        (t, s) => t + (isFiniteValue(s.values[i]) ? Math.max(0, s.values[i] as number) : 0),
+        0,
+      ),
+    }),
+    [series],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.n,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -93,68 +143,26 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         : stackedAreaSummary(series, geo.sharesAt.at(-1) ?? [], geo.n, pctFmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.n === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const span = geo.plot.x1 - geo.plot.x0;
-      const i = Math.round(((x - geo.plot.x0) / Math.max(1, span)) * (geo.n - 1));
-      setActive(Math.min(geo.n - 1, Math.max(0, i)));
-    },
-    [geo, width],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.n === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.n - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.n - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const shares = active !== null ? geo.sharesAt[active] : undefined;
+  // The column shown by the crosshair + readout: live focus, falling back to a
+  // pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const shares = shown !== null ? geo.sharesAt[shown] : undefined;
   const announced =
-    active !== null && shares
+    shown !== null && shares
       ? strings.stackAt(
-          active + 1,
+          shown + 1,
           geo.n,
           series
             .map((s, i) =>
-              isFiniteValue(s.values[active])
+              isFiniteValue(s.values[shown])
                 ? `${s.label ?? `Series ${i + 1}`} ${pctFmt(shares[i] ?? 0)}`
                 : `${s.label ?? `Series ${i + 1}`}: ${seriesStrings.noData.replace(/\.$/, "").toLowerCase()}`,
             )
             .join(", "),
         )
       : "";
-  const crossX =
-    active !== null && geo.n > 1
-      ? geo.plot.x0 + (active * (geo.plot.x1 - geo.plot.x0)) / (geo.n - 1)
-      : undefined;
+  const shownX = shown !== null && geo.n > 0 ? colX(shown) : undefined;
+  const selX = selected !== null && geo.n > 0 ? colX(selected) : undefined;
 
   return (
     <span
@@ -163,10 +171,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticStackedArea
         {...rest}
@@ -183,11 +188,23 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         summary={false}
         style={FILL}
       >
-        {crossX !== undefined ? (
+        {/* Pinned selection: a persistent crosshair that survives pointer-leave. */}
+        {selX !== undefined && selected !== active ? (
           <line
-            x1={crossX}
+            x1={selX}
             y1={0}
-            x2={crossX}
+            x2={selX}
+            y2={height}
+            data-mc-ink="accent"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {shownX !== undefined ? (
+          <line
+            x1={shownX}
+            y1={0}
+            x2={shownX}
             y2={height}
             data-mc-ink="muted"
             data-mc-w="support"
@@ -197,11 +214,11 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         {rest.children}
       </StaticStackedArea>
       <LiveRegion>{announced}</LiveRegion>
-      {active !== null && shares && crossX !== undefined ? (
+      {shown !== null && shares && shownX !== undefined ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(crossX / width) * 100}%`,
+            left: `${(shownX / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >

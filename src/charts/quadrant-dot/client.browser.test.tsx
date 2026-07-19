@@ -48,4 +48,59 @@ describe("interactive <QuadrantDot>", () => {
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toMatch(/^Peer 4 of 4:/);
   });
+
+  it("onActive reports the focused datum (peer index + y value); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <QuadrantDot
+        data={{ x: 3, y: 9 }}
+        field={FIELD}
+        width={120}
+        height={120}
+        onActive={(d) => seen.push(d)}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-quadrant-dot-live") as HTMLElement;
+    wrap.focus();
+    // Ghosts are nearest-first from the focal: peer 0 is {x:2,y:8} → y = 8.
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 8 });
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await expect.poll(() => seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active peer: fires onSelect + pins a ring that survives blur", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <QuadrantDot
+        data={{ x: 3, y: 9 }}
+        field={FIELD}
+        width={120}
+        height={120}
+        onSelect={(d) => picks.push(d)}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-quadrant-dot-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 8 });
+    wrap.blur();
+    await expect
+      .poll(() => screen.container.querySelector('circle[data-mc-w="tick"]'))
+      .not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring without focus", async () => {
+    const screen = await render(
+      <QuadrantDot
+        data={{ x: 3, y: 9 }}
+        field={FIELD}
+        width={120}
+        height={120}
+        selectedIndex={1}
+      />,
+    );
+    expect(screen.container.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
 });

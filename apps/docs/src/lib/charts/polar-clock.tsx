@@ -1,10 +1,9 @@
 import { PolarClock } from "@microcharts/react/polar-clock";
-import { PolarClock as PolarClockInteractive } from "@microcharts/react/polar-clock/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
-const DAY = Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h));
+export const DAY = Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h));
 const WEEK = [120, 200, 180, 210, 260, 90, 60];
 
 export const entry: ChartEntry = {
@@ -97,12 +96,6 @@ const byHour = [
 export function Preview() {
   return <PolarClock data={DAY} now={14} summary={false} size={40} />;
 }
-
-export const showcase = {
-  hint: "the day cycle",
-  Node: () => <PolarClock data={DAY} now={14} title="Traffic by hour" size={52} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "now", label: "now (hour)", min: 0, max: 23, step: 1, init: 14 },
@@ -132,29 +125,6 @@ export const playground: PlaygroundSpec = {
       `  now={${s.now}}`,
       s.mode !== "length" && `  mode="${s.mode}"`,
       s.labels === "off" && "  labels={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <PolarClockInteractive
-      data={DAY}
-      now={s.now as number}
-      mode={s.mode as "length" | "opacity"}
-      labels={s.labels === "on"}
-      animate={ui.animate}
-      summary={false}
-      size={120}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<PolarClock",
-      "  data={byHour}",
-      `  now={${s.now}}`,
-      s.mode !== "length" && `  mode="${s.mode}"`,
-      s.labels === "off" && "  labels={false}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -254,19 +224,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<PolarClock data={byHour} now={14} />`;
 }
-
-export function PreviewLive() {
-  return <PolarClockInteractive data={DAY} now={14} summary={false} size={40} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

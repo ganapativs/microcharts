@@ -1,18 +1,19 @@
 "use client";
-// Interactive <DataDiff>. One pointer listener + grid lookup
-// (pointer y → row). ↑/↓ step rows, Home/End jump. The live region states each
+// Interactive <DataDiff>. useActivePicker owns interaction: one pointer
+// listener + grid lookup (pointer y → row), ↑/↓ (and ←/→) step rows, Home/End
+// jump, click / Enter / Space selects (onSelect). The live region states each
 // row's added / removed / net. Composes the static component (canon); the focus
 // ring + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
 import { dataDiffGeometry } from "./geometry.js";
 import { DataDiff as StaticDataDiff, dataDiffSummary, type DataDiffProps } from "./index.js";
 
-export interface InteractiveDataDiffProps extends DataDiffProps {
+export interface InteractiveDataDiffProps extends DataDiffProps, PickerProps {
   strings?: DataDiffStrings;
   /**
    * Opt-in entrance motion (default `false`): rows pop in top-to-bottom
@@ -28,6 +29,8 @@ const signed = (n: number, fmt: (v: number) => string): string =>
 export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
   const {
     data,
+    labels = false,
+    label = "none",
     sort = "none",
     domain,
     max = 12,
@@ -41,6 +44,10 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -59,12 +66,72 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
     order: "y",
   });
 
-  const geo = useMemo(
-    () => dataDiffGeometry({ width, height, data, sort, domain, max }),
-    [width, height, data, sort, domain, max],
-  );
+  // Mirror the static's tag gutter + totals footer exactly — they move the row
+  // band and centerX, so omitting them slides the focus ring off the rows.
+  const geo = useMemo(() => {
+    const font = Math.min(10, Math.max(6, Math.round(height * 0.4)));
+    const nRows = Math.min(data.length, Math.max(1, Math.min(12, Math.round(max))));
+    const footer = label === "totals" && height >= 34 ? font + 3 : 0;
+    const rowH = nRows > 0 ? (height - 4 - footer) / nRows : 0;
+    const tags = labels && rowH >= 10;
+    return dataDiffGeometry({
+      width,
+      height,
+      data,
+      sort,
+      domain,
+      max,
+      gutterCh: tags ? Math.max(...data.map((d) => d.key.length), 0) : 0,
+      fontSize: tags ? Math.max(5, Math.min(font, Math.floor(rowH * 0.5))) : font,
+      footer,
+    });
+  }, [width, height, data, sort, domain, max, labels, label]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // Navigable unit = one DISPLAYED row: index into `geo.rows`, i.e. the sorted +
+  // `max`-capped view order, which is the data order only when sort === "none".
+  const count = geo?.rows.length ?? 0;
+
+  const locate = useCallback(
+    (_x: number, y: number) => {
+      if (!geo || count === 0) return null;
+      let best = 0;
+      let bestDist = Infinity;
+      geo.rows.forEach((row, i) => {
+        const d = Math.abs(row.y + row.height / 2 - y);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [geo, count],
+  );
+
+  // `value` = the row's signed net (added − removed) — the one number the
+  // diverging pair resolves to; the two magnitudes stay in the readout chip and
+  // the announcement, which state added / removed / net in full.
+  const datum = useCallback(
+    (i: number) => {
+      const r = geo?.rows[i];
+      return { index: i, value: r?.net ?? null, label: r?.key };
+    },
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count,
+    // The rendered viewBox is the gutter-widened `totalWidth`, not `width`.
+    width: geo?.totalWidth ?? width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -76,56 +143,26 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
           : dataDiffSummary(geo, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const count = geo?.rows.length ?? 0;
+  const ring = (i: number, pinned: boolean) => {
+    const r = geo?.rows[i];
+    if (!r) return null;
+    return (
+      <rect
+        x={0.5}
+        y={r.y - 1}
+        width={geo!.totalWidth - 1}
+        height={r.height + 2}
+        fill="none"
+        stroke="var(--mc-accent)"
+        strokeWidth={0.8}
+        data-mc-w={pinned ? "tick" : undefined}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.height === 0) return;
-      const py = ((e.clientY - r.top) / r.height) * height;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.rows.forEach((row, i) => {
-        const d = Math.abs(row.y + row.height / 2 - py);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, count, height],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (count === 0) return;
-      switch (e.key) {
-        case "ArrowDown":
-          setActive((p) => Math.min(count - 1, (p ?? -1) + 1));
-          break;
-        case "ArrowUp":
-          setActive((p) => (p === null || p <= 0 ? 0 : p - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(count - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [count],
-  );
-
-  const row = active !== null && geo ? geo.rows[active] : undefined;
+  const shown = active ?? selected;
+  const row = shown !== null && geo ? geo.rows[shown] : undefined;
   const announced = row
     ? strings.dataDiffAt(row.key, fmt(row.addedValue), fmt(row.removedValue), signed(row.net, fmt))
     : "";
@@ -137,15 +174,14 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticDataDiff
         {...rest}
         style={FILL}
         data={data}
+        labels={labels}
+        label={label}
         sort={sort}
         domain={domain}
         max={max}
@@ -156,18 +192,9 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {row ? (
-          <rect
-            x={0.5}
-            y={row.y - 1}
-            width={geo!.totalWidth - 1}
-            height={row.height + 2}
-            fill="none"
-            stroke="var(--mc-accent)"
-            strokeWidth={0.8}
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticDataDiff>
       {row && geo ? (

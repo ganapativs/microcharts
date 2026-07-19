@@ -111,13 +111,18 @@ the accessible summary — one formatter, one locale, no per-field overrides.
 Each field rides its own channel, so nothing is inferred from a shared one: sky cover is disc area, wind is the barb
 (direction as angle, speed quantized into barbs so the per-barb quantum is honest), and the numerals are placed where a
 forecaster expects them. Wind speed is quantized rather than drawn to scale for the same reason WindBarb quantizes it —
-a barb count reads exactly, a tiny length does not. Absent fields simply don't render; the glyph never invents a zero.
+a barb count reads exactly, a tiny length does not. Absent fields simply don't render — no barb, no numeral, and no stop
+for the keyboard. The one field with no "absent" state is the disc itself: omitting `cloud` looks and reads exactly like
+a clear sky.
 
 ## Accessibility
 
 The accessible name is the whole observation — **"KSFO, wind southwest 15; sky broken, 16° / 9°, 1,013."** The
-interactive entry roves the fields with ←/→ so a screen-reader user can step through station, wind, sky, temperature,
-dew point, and pressure one at a time, and Home returns to the full reading.
+interactive entry roves the _present_ fields with ←/→ so a screen-reader user can step through station, wind, sky,
+temperature, dew point, and pressure one at a time — an omitted prop is not a stop — and Escape clears the focus back to
+the whole-observation reading.
+
+<InteractionNote slug="station-glyph" />
 
 ## Props
 

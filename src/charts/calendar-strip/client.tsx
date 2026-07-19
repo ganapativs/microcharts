@@ -1,12 +1,18 @@
 "use client";
 // Interactive <CalendarStrip>. Hover a day or walk the grid in
-// 2-D (←/→ day, ↑/↓ week — ActivityGrid parity). Announces the real calendar
-// day: "Tuesday, June 24: 12." Composes the static component (canon).
-import { useMemo, useRef, useState, type PointerEvent } from "react";
-import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
+// 2-D (←/→ day, ↑/↓ week — ActivityGrid parity); click / Enter / Space selects
+// a day (onSelect). Announces the real calendar day: "Tuesday, June 24: 12."
+// useActivePicker owns interaction; the SVG is the composed static component.
+import { useCallback, useMemo, useRef } from "react";
+import {
+  makeFormatter,
+  makeDateFormatter,
+  type DateFormat,
+  type Format,
+} from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
 import { cellMetrics } from "../../shared/cell.js";
 import { calendarStripGeometry } from "./geometry.js";
@@ -19,8 +25,14 @@ import {
   type CalendarStripProps,
 } from "./index.js";
 
-export interface InteractiveCalendarStripProps extends CalendarStripProps {
+export interface InteractiveCalendarStripProps extends CalendarStripProps, PickerProps {
   strings?: CalendarStrings;
+  /**
+   * Number format for the day's value in the hover/focus readout. Interactive-
+   * only: the static summary counts days ("Active 11 of 24 days"), and a count
+   * is not a value to format.
+   */
+  format?: Format;
   /** Announced day label (defaults to weekday + month + day, UTC). */
   dateFormat?: DateFormat;
   /**
@@ -51,6 +63,10 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -77,10 +93,80 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
     () => makeDateFormatter(dateFormat, locale, { weekday: "long", month: "long", day: "numeric" }),
     [dateFormat, locale],
   );
-  const [active, setActive] = useState<number | null>(null);
+
+  const pitch = cell + gap;
+  // past-or-present cells only (future is blank — not focusable)
+  const count = geo ? geo.totalDays : 0;
+  const cells = geo?.cells;
+  const dayLabelAt = useCallback(
+    (i: number): string => {
+      const c = cells?.[i];
+      return c ? dateFmt(new Date(`${c.date}T00:00:00Z`)) : "";
+    },
+    [cells, dateFmt],
+  );
+
+  // Pointer (viewBox space) → day index by pure grid math; `null` off the
+  // 7-column grid or on a future (blank) day.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      const col = Math.floor(x / pitch);
+      const row = Math.floor(y / pitch);
+      const i = row * 7 + col;
+      return col >= 0 && col < 7 && i >= 0 && i < count ? i : null;
+    },
+    [pitch, count],
+  );
+
+  // 2-D roving over the weeks × 7 grid: ←/→ step one DAY (across the week
+  // boundary, as a calendar reads), ↑/↓ step one WEEK (±7). A boundary key is
+  // consumed (returns the current index) rather than ignored.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      if (count === 0) return null;
+      switch (key) {
+        case "Home":
+          return 0;
+        case "End":
+          return count - 1;
+        case "ArrowRight":
+        case "ArrowLeft":
+        case "ArrowDown":
+        case "ArrowUp":
+          break;
+        default:
+          return null;
+      }
+      if (cur < 0) return 0; // first arrow from nothing lands on the first day
+      const d = key === "ArrowRight" ? 1 : key === "ArrowLeft" ? -1 : key === "ArrowDown" ? 7 : -7;
+      const next = cur + d;
+      return next >= 0 && next < count ? next : cur;
+    },
+    [count],
+  );
+
+  // index = day index in reading order over the weeks × 7 grid (0 = the
+  // window's first cell); only past-or-present days are navigable.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: cells?.[i]?.value ?? null, label: dayLabelAt(i) }),
+    [cells, dayLabelAt],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count,
+    width: geo?.width ?? 1,
+    height: geo?.height ?? 1,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
   if (!geo) return null;
 
-  const step = cell + gap;
   const accName =
     summary === false
       ? undefined
@@ -89,61 +175,34 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         : calendarStripSummary(geo.activeDays, geo.totalDays, weeks, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // past-or-present cells only (future is blank — not focusable)
-  const lastIndex = geo.totalDays - 1;
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (lastIndex < 0) return;
-    const cur = active ?? 0;
-    let next = cur;
-    switch (e.key) {
-      case "ArrowRight":
-        next = Math.min(lastIndex, cur + 1);
-        break;
-      case "ArrowLeft":
-        next = Math.max(0, cur - 1);
-        break;
-      case "ArrowDown":
-        next = Math.min(lastIndex, cur + 7);
-        break;
-      case "ArrowUp":
-        next = Math.max(0, cur - 7);
-        break;
-      case "Home":
-        next = 0;
-        break;
-      case "End":
-        next = lastIndex;
-        break;
-      case "Escape":
-        setActive(null);
-        return;
-      default:
-        return;
-    }
-    e.preventDefault();
-    setActive(next);
+  const m = cellMetrics(cell, shape);
+  const ring = (i: number, pinned: boolean) => {
+    const c = geo.cells[i];
+    if (!c) return null;
+    return (
+      <rect
+        x={c.x + m.inset - 0.5}
+        y={c.y + m.inset - 0.5}
+        width={c.size - m.inset * 2 + 1}
+        height={c.size - m.inset * 2 + 1}
+        rx={m.rx + 0.5}
+        fill="none"
+        stroke="var(--mc-accent)"
+        strokeWidth={1.5}
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
   };
 
-  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    if (r.width === 0 || r.height === 0) return;
-    const x = ((e.clientX - r.left) / r.width) * geo.width;
-    const y = ((e.clientY - r.top) / r.height) * geo.height;
-    const col = Math.floor(x / step);
-    const row = Math.floor(y / step);
-    const i = row * 7 + col;
-    setActive(col >= 0 && col < 7 && i >= 0 && i <= lastIndex ? i : null);
-  };
-
-  const activeCell = active !== null ? geo.cells[active] : undefined;
-  const dayLabel = activeCell ? dateFmt(new Date(`${activeCell.date}T00:00:00Z`)) : "";
+  const shown = active ?? selected;
+  const shownCell = shown !== null ? geo.cells[shown] : undefined;
   const announced =
-    activeCell === undefined
+    shownCell === undefined || shown === null
       ? ""
-      : activeCell.value === null
-        ? strings.dayEmpty(dayLabel)
-        : strings.dayAt(dayLabel, fmt(activeCell.value));
+      : shownCell.value === null
+        ? strings.dayEmpty(dayLabelAt(shown))
+        : strings.dayAt(dayLabelAt(shown), fmt(shownCell.value));
 
   return (
     <span
@@ -152,10 +211,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
       tabIndex={0}
       role="img"
       aria-label={label}
-      onKeyDown={onKeyDown}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticCalendarStrip
         {...rest}
@@ -172,36 +228,21 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         summary={false}
         style={FILL}
       >
-        {activeCell
-          ? (() => {
-              const m = cellMetrics(cell, shape);
-              return (
-                <rect
-                  x={activeCell.x + m.inset - 0.5}
-                  y={activeCell.y + m.inset - 0.5}
-                  width={activeCell.size - m.inset * 2 + 1}
-                  height={activeCell.size - m.inset * 2 + 1}
-                  rx={m.rx + 0.5}
-                  fill="none"
-                  stroke="var(--mc-accent)"
-                  strokeWidth={1.5}
-                  vectorEffect="non-scaling-stroke"
-                />
-              );
-            })()
-          : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticCalendarStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {activeCell ? (
+      {shownCell ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((activeCell.x + activeCell.size / 2) / geo.width) * 100}%`,
+            left: `${((shownCell.x + shownCell.size / 2) / geo.width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {activeCell.value === null ? "—" : fmt(activeCell.value)}
+          {shownCell.value === null ? "—" : fmt(shownCell.value)}
         </span>
       ) : null}
     </span>

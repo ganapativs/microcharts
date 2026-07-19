@@ -106,10 +106,10 @@ spoke in a glyph — mixed-domain metrics are the caller's normalization to stat
 honestly comparable.
 
 Every spoke sits at a fixed clock position (first at 12 o'clock, clockwise), so the axis order never shifts between
-instances — that fixed order, plus the always-on guide spokes, is what keeps a profile readable even where a metric's
-label doesn't seat. Tip labels use the same fit-or-drop rule as the rest of the library: each one only renders if it
-clears its side of the glyph without heavy clamping, so a long metric name never gets squeezed into an overlap — it
-drops cleanly and the shape still reads.
+instances — that fixed order, plus the default-on guide spokes, is what keeps a profile readable even where a metric's
+label doesn't seat. Tip labels seat at the rim, not the value tip, so a low-value spoke never drags its label into the
+hub. A label is dropped only when its estimated width exceeds the whole glyph; anything narrower is clamped into the
+reserved label ring instead, which keeps rim labels at distinct angles rather than dropping them.
 
 ## Edge cases
 
@@ -147,6 +147,8 @@ drops cleanly and the shape still reads.
 
 The accessible name names the extremes — **"5 metrics; highest Speed (0.9), lowest Cost (0.3)."** The interactive entry
 rotates focus through the spokes with ←/→, announcing each metric and value.
+
+<InteractionNote slug="star-spoke" />
 
 ## Props
 

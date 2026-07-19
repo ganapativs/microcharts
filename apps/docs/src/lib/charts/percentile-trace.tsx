@@ -1,6 +1,5 @@
 import { PercentileTrace } from "@microcharts/react/percentile-trace";
-import { PercentileTrace as PercentileTraceInteractive } from "@microcharts/react/percentile-trace/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a weekly standing that drifts up from the middle half into the top band
@@ -80,12 +79,6 @@ const ranks = [40, 46, 52, 58, 63, 68, 72, 76, 79, 81];`,
 export function Preview() {
   return <PercentileTrace data={DEMO} summary={false} width={150} height={26} />;
 }
-
-export const showcase = {
-  hint: "rank drift",
-  Node: () => <PercentileTrace data={DEMO} unit="week" title="Standing" width={150} height={26} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "bands", label: "bands", init: true },
@@ -108,29 +101,6 @@ export const playground: PlaygroundSpec = {
       "  data={ranks}",
       s.bands === false && "  bands={false}",
       s.positive !== "up" && `  positive="${s.positive}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <PercentileTraceInteractive
-      data={DEMO}
-      bands={s.bands as boolean}
-      positive={s.positive as "up" | "down"}
-      unit="week"
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<PercentileTrace",
-      "  data={ranks}",
-      s.bands === false && "  bands={false}",
-      s.positive !== "up" && `  positive="${s.positive}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -240,19 +210,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<PercentileTrace data={ranks} />`;
 }
-
-export function PreviewLive() {
-  return <PercentileTraceInteractive data={DEMO} summary={false} width={150} height={26} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

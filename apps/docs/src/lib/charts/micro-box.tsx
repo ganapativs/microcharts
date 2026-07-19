@@ -1,9 +1,8 @@
 import { MicroBox } from "@microcharts/react/micro-box";
-import { MicroBox as MicroBoxInteractive } from "@microcharts/react/micro-box/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const RAW = [12, 30, 35, 38, 42, 45, 48, 51, 60, 96];
+export const RAW = [12, 30, 35, 38, 42, 45, 48, 51, 60, 96];
 
 // Named five-number summaries for the four-homes grid — the production path
 // (`stats`) is precomputed server aggregates per endpoint/environment, ms.
@@ -75,12 +74,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <MicroBox data={RAW} summary={false} width={130} height={22} />;
 }
-
-export const showcase = {
-  hint: "five numbers",
-  Node: () => <MicroBox data={RAW} title="Latency spread" width={130} height={22} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -109,28 +102,6 @@ export const playground: PlaygroundSpec = {
       "  data={latencies}",
       s.whiskers !== "minmax" && `  whiskers="${s.whiskers}"`,
       s.whiskers === "tukey" && s.outliers === false && "  outliers={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <MicroBoxInteractive
-      data={(s.outlier as boolean) ? [...RAW, 400] : RAW}
-      whiskers={s.whiskers as "minmax" | "tukey"}
-      outliers={s.outliers as boolean}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={40}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<MicroBox",
-      "  data={latencies}",
-      s.whiskers !== "minmax" && `  whiskers="${s.whiskers}"`,
-      s.whiskers === "tukey" && s.outliers === false && "  outliers={false}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -247,19 +218,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<MicroBox data={values} />`;
 }
-
-export function PreviewLive() {
-  return <MicroBoxInteractive data={RAW} summary={false} width={130} height={22} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

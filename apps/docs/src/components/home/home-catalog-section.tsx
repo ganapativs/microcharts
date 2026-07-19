@@ -6,7 +6,8 @@ import { MicroBox } from "@microcharts/react/micro-box";
 import { Progress } from "@microcharts/react/progress";
 import { IconArray } from "@microcharts/react/icon-array";
 import { SectionMark } from "@/components/home/section-mark";
-import { CatalogGrid } from "@/components/home/catalog-grid";
+import { CatalogGrid, CatalogTile, type TileMeta } from "@/components/home/catalog-grid";
+import { HERO_MODULES, POOL } from "@/components/home/hero-modules";
 import { Reveal } from "@/components/ui/reveal";
 import { CATALOG } from "@/lib/docs-facts";
 
@@ -70,6 +71,27 @@ const REFUSALS = [
   },
 ] as const;
 
+/** Tier → categorical token index; must match the section chips above. */
+const CAT: Record<string, number> = { core: 1, decision: 2, expressive: 3, frontier: 4 };
+
+/** The board's metadata, resolved on the server — name/tagline/tier only, so the
+ *  client never receives the full catalog just to label twelve tiles. */
+const TILES = POOL.map((slug) => {
+  const { name, tagline, collection } = HERO_MODULES[slug]!.entry;
+  return { slug, name, tagline, cat: CAT[collection] ?? 1 } satisfies TileMeta;
+});
+
+/** The first board, server-rendered as pure SVG. Deterministic (the pool's own
+ *  order) so SSR and hydration agree; the client reshuffles after mount. */
+const FIRST_BOARD = TILES.slice(0, 11).map((entry, i) => {
+  const { Preview } = HERO_MODULES[entry.slug]!;
+  return (
+    <CatalogTile key={entry.slug} i={i} entry={entry}>
+      <Preview />
+    </CatalogTile>
+  );
+});
+
 export function HomeCatalogSection() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
@@ -101,7 +123,11 @@ export function HomeCatalogSection() {
       </Reveal>
 
       <Reveal delay={80} className="mt-6">
-        <CatalogGrid total={CATALOG.total} />
+        {/* The first board is rendered here, on the server: pure SVG, zero client
+            chart JS. The client grid takes over once the pool's modules land. */}
+        <CatalogGrid total={CATALOG.total} tiles={TILES}>
+          {FIRST_BOARD}
+        </CatalogGrid>
       </Reveal>
 
       <Reveal delay={120} className="hv-refusal mt-5 p-5">

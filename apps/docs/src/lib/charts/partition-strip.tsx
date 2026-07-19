@@ -1,6 +1,5 @@
 import { PartitionStrip } from "@microcharts/react/partition-strip";
-import { PartitionStrip as PartitionStripInteractive } from "@microcharts/react/partition-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const TREE = [
@@ -99,12 +98,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <PartitionStrip data={TREE} summary={false} width={140} height={24} />;
 }
-
-export const showcase = {
-  hint: "hierarchy",
-  Node: () => <PartitionStrip data={TREE} title="Bundle composition" width={140} height={24} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "labels", label: "labels", init: true },
@@ -132,28 +125,6 @@ export const playground: PlaygroundSpec = {
       "  data={bundle}",
       s.labels === false && "  labels={false}",
       s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <PartitionStripInteractive
-      data={TREE}
-      labels={s.labels as boolean}
-      emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
-      summary={false}
-      animate={ui.animate}
-      width={320}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<PartitionStrip",
-      "  data={bundle}",
-      s.labels === false && "  labels={false}",
-      s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -324,19 +295,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<PartitionStrip data={bundle} />`;
 }
-
-export function PreviewLive() {
-  return <PartitionStripInteractive data={TREE} summary={false} width={140} height={24} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

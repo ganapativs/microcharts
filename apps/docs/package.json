@@ -8,8 +8,9 @@
     "postinstall": "fumadocs-mdx",
     "predev": "fumadocs-mdx && node scripts/gen-md.ts",
     "dev": "next dev",
-    "gen:entries": "tsx scripts/gen-entries.ts",
-    "gen:preview-live": "tsx scripts/gen-preview-live.ts",
+    "gen:entries": "node scripts/gen-entries.mjs",
+    "gen:preview-live": "node scripts/gen-preview-live.mjs",
+    "gen:chart-modules": "node scripts/gen-chart-modules.mjs",
     "prebuild": "node scripts/gen-md.ts",
     "build": "next build",
     "start": "serve out -l 3001",
@@ -25,14 +26,14 @@
     "fumadocs-core": "16.11.5",
     "fumadocs-mdx": "15.2.0",
     "fumadocs-ui": "16.11.5",
-    "lucide-react": "^1.24.0",
+    "lucide-react": "^1.25.0",
     "next": "^16.2.10",
     "next-themes": "^0.4.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.2",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
@@ -40,9 +41,9 @@
     "ajv": "^8.20.0",
     "postcss": "^8.5.19",
     "serve": "^14.2.6",
-    "tailwindcss": "^4.3.2",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
-    "wrangler": "^4.111.0"
+    "wrangler": "^4.112.0"
   }
 }

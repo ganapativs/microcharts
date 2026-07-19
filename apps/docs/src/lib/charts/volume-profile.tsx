@@ -1,6 +1,5 @@
 import { VolumeProfile } from "@microcharts/react/volume-profile";
-import { VolumeProfile as VolumeProfileInteractive } from "@microcharts/react/volume-profile/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const PROFILE = [
@@ -89,12 +88,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <VolumeProfile data={PROFILE} summary={false} width={60} height={40} />;
 }
-
-export const showcase = {
-  hint: "at-level",
-  Node: () => <VolumeProfile data={PROFILE} title="Volume by price" width={60} height={40} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "align", label: "align", options: ["left", "right"], init: "left" },
@@ -119,30 +112,6 @@ export const playground: PlaygroundSpec = {
       s.align !== "left" && `  align="${s.align}"`,
       s.label !== "poc" && `  label="${s.label}"`,
       s.valueArea !== 70 && `  valueArea={${((s.valueArea as number) / 100).toFixed(2)}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <VolumeProfileInteractive
-      data={PROFILE}
-      align={s.align as "left" | "right"}
-      label={s.label as "poc" | "none"}
-      valueArea={(s.valueArea as number) / 100}
-      animate={ui.animate}
-      summary={false}
-      width={200}
-      height={132}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<VolumeProfile",
-      "  data={profile}",
-      s.align !== "left" && `  align="${s.align}"`,
-      s.label !== "poc" && `  label="${s.label}"`,
-      s.valueArea !== 70 && `  valueArea={${((s.valueArea as number) / 100).toFixed(2)}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -267,19 +236,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<VolumeProfile data={profile} />`;
 }
-
-export function PreviewLive() {
-  return <VolumeProfileInteractive data={PROFILE} summary={false} width={60} height={40} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -96,8 +96,7 @@ because "will we finish" is a number, not a vibe.
   />
 </LiveDemo>
 
-With a `locale`, both the gap label and the accessible summary's numbers follow that locale's own grouping — "2.300" in
-German, not "2,300".
+With a `locale`, the accessible summary's numbers follow that locale's own grouping — "2.300" in German, not "2,300".
 
 ## Edge cases
 
@@ -129,8 +128,8 @@ German, not "2,300".
 </LiveDemo>
 
 With no plan (`plan: []`), the projection still runs — the fitted slope only needs `actual` — but there's nothing to
-compare it to, so the label and summary drop the "vs planned" clause. A stalled burn (`actual` flat) never reaches zero,
-so `finishes` is `false` and the summary states that plainly rather than extrapolating a fake landing. A single `actual`
+compare it to, so the summary drops the "vs planned" clause. A stalled burn (`actual` flat) never reaches zero, so
+`finishes` is `false` and the summary states that plainly rather than extrapolating a fake landing. A single `actual`
 point draws no projection at all (the fit needs at least two).
 
 ## Four homes
@@ -149,6 +148,8 @@ outright ("not finishing at the current pace"), rather than implying a landing t
 The accessible name states progress against the plan and the projected landing — **"6 of 11 days in: 21 points remain vs
 20 planned — projected to finish 2 days late."**. The interactive entry steps the days; history announces actual vs
 plan, and the dotted region announces the projection.
+
+<InteractionNote slug="burn-chart" />
 
 ## Props
 

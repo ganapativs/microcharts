@@ -1,17 +1,19 @@
 "use client";
-// Interactive <Ohlc>. Nearest-x lookup; ←/→ steps the RENDERED
-// periods ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close
-// 148.20."). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Ohlc>. useActivePicker owns interaction: one pointer listener +
+// nearest-x lookup over the rendered periods, ←/→ (Home/End) rove them
+// ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20."),
+// click / Enter / Space selects (onSelect). Composes the static component
+// (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { ohlcGeometry } from "./geometry.js";
 import { Ohlc as StaticOhlc, ohlcSummary, type OhlcProps } from "./index.js";
 
-export interface InteractiveOhlcProps extends OhlcProps {
+export interface InteractiveOhlcProps extends OhlcProps, PickerProps {
   strings?: OhlcStrings;
   /**
    * Opt-in entrance motion (default `false`): periods reveal left-to-right
@@ -38,6 +40,10 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -80,22 +86,10 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     () => (data.length > maxPeriods ? data.slice(-maxPeriods) : [...data]),
     [data, maxPeriods],
   );
-  const [active, setActive] = useState<number | null>(null);
 
-  const accName =
-    summary === false
-      ? undefined
-      : typeof summary === "string"
-        ? summary
-        : ohlcSummary(data, fmt, pctFmt, strings);
-  const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.marks.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.marks.length === 0) return null;
       let best = 0;
       let bestDist = Infinity;
       geo.marks.forEach((m, i) => {
@@ -105,42 +99,62 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
           best = i;
         }
       });
-      setActive(best);
+      return best;
     },
-    [geo, width],
+    [geo],
+  );
+  // index = the RENDERED period (the most recent `maxPeriods`, corrupt periods
+  // skipped); value = that period's close, the settlement price.
+  const datum = useCallback(
+    (i: number) => {
+      const m = geo.marks[i];
+      const p = m ? rendered[m.index] : undefined;
+      return { index: i, value: p ? p.close : null };
+    },
+    [geo, rendered],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.marks.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.marks.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.marks.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
+  const { active, selected, bind } = useActivePicker({
+    count: geo.marks.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
-  const mark = active !== null ? geo.marks[active] : undefined;
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : ohlcSummary(data, fmt, pctFmt, strings);
+  const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const frame = (i: number, pinned: boolean) => {
+    const m = geo.marks[i];
+    if (!m) return null;
+    return (
+      <rect
+        x={m.x - m.bodyW / 2 - 1}
+        y={0.5}
+        width={m.bodyW + 2}
+        height={height - 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  // The unit shown by the frame + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const mark = shown !== null ? geo.marks[shown] : undefined;
   const period = mark ? rendered[mark.index] : undefined;
   const announced =
     mark && period
@@ -161,10 +175,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticOhlc
         {...rest}
@@ -181,18 +192,9 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {mark ? (
-          <rect
-            x={mark.x - mark.bodyW / 2 - 1}
-            y={0.5}
-            width={mark.bodyW + 2}
-            height={height - 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; the focus frame is transient. */}
+        {selected !== null && selected !== active ? frame(selected, true) : null}
+        {active !== null ? frame(active, false) : null}
         {rest.children}
       </StaticOhlc>
       <LiveRegion>{announced}</LiveRegion>

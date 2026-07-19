@@ -4,6 +4,7 @@
 // mark has nothing to reveal on hover that the summary doesn't already say
 // (documented skip). Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -22,10 +23,12 @@ export interface InteractiveStatusDotProps extends StatusDotProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Click/tap or Enter/Space on the dot — `{ index: 0, value: null, label: state }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
-  const { live = true, animate = false, strings = EN_SCALAR, title, ...rest } = props;
+  const { live = true, animate = false, strings = EN_SCALAR, title, onSelect, ...rest } = props;
   const state = resolveStatus(rest.status, rest.states);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
@@ -43,8 +46,24 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
     if (live) setAnnounced(label);
   }, [state.label, label, live]);
 
+  // One state mark, one selectable unit (index 0). A status encodes no number,
+  // so `value` is null and the state's name rides in `label`.
+  const pick = (): void => onSelect?.({ index: 0, value: null, label: state.label });
+
   return (
-    <span ref={hostRef} className="mc-status-live" tabIndex={0} role="img" aria-label={label}>
+    <span
+      ref={hostRef}
+      className="mc-status-live"
+      tabIndex={0}
+      role="img"
+      aria-label={label}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
+    >
       <StaticStatusDot {...rest} strings={strings} summary={false} />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>

@@ -1,11 +1,12 @@
 "use client";
-// Interactive <EventTimeline>. Pointer → nearest item by x
-// (span hit = containment, else nearest edge/point); ←/→ cycle items
-// chronologically; announces "Deploy freeze: Jun 3, 09:00 to 13:30 — 4h 30m."
+// Interactive <EventTimeline>. useActivePicker owns interaction: one pointer
+// listener + nearest-item-by-x math (span hit = containment, else nearest
+// edge/point), ←/→ cycle items chronologically, click / Enter / Space selects
+// (onSelect); announces "Deploy freeze: Jun 3, 09:00 to 13:30 — 4h 30m."
 // Composes the static component (canon).
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
@@ -18,7 +19,7 @@ import {
   type EventTimelineProps,
 } from "./index.js";
 
-export interface InteractiveEventTimelineProps extends EventTimelineProps {
+export interface InteractiveEventTimelineProps extends EventTimelineProps, PickerProps {
   strings?: TimelineStrings;
   /** Announced instant label (defaults to "Jun 3, 11:12" UTC). */
   dateFormat?: DateFormat;
@@ -29,6 +30,10 @@ export interface InteractiveEventTimelineProps extends EventTimelineProps {
    */
   animate?: boolean;
 }
+
+/** Announcement name for an unlabelled item. */
+const fallbackLabel = (i: number, kind: "span" | "point"): string =>
+  kind === "span" ? `Span ${i + 1}` : `Event ${i + 1}`;
 
 export function EventTimeline(props: InteractiveEventTimelineProps): React.ReactNode {
   const {
@@ -47,6 +52,10 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -92,7 +101,48 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
     return list.sort((a, b) => items[a.i]!.start - items[b.i]!.start);
   }, [geo, items]);
 
-  const [active, setActive] = useState<number | null>(null);
+  // Unit = a RENDERED item at its chronological position (not the data index):
+  // invalid items are dropped and items outside the window are excluded, so the
+  // two spaces are not 1:1.
+  const locate = useCallback(
+    (x: number) => {
+      if (ordered.length === 0) return null;
+      let best = 0;
+      let bestDist = Infinity;
+      ordered.forEach((o, k) => {
+        const dist =
+          x >= o.x && x <= o.xEnd ? 0 : Math.min(Math.abs(o.x - x), Math.abs(o.xEnd - x));
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = k;
+        }
+      });
+      return best;
+    },
+    [ordered],
+  );
+
+  // value = the item's DURATION in ms — the number the mark's length encodes.
+  // A point event is an instant, so its duration is 0.
+  const datum = useCallback(
+    (k: number) => {
+      const it = items[ordered[k]!.i]!;
+      return { index: k, value: it.end === undefined ? 0 : it.end - it.start, label: it.label };
+    },
+    [ordered, items],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: ordered.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const pctFmt = useMemo(
     () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
@@ -108,69 +158,38 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
           : strings.timeline(geo.spans.length, geo.points.length, pctFmt(geo.coverage));
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
-    if (ordered.length === 0) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    if (r.width === 0) return;
-    const x = ((e.clientX - r.left) / r.width) * width;
-    let best = 0;
-    let bestDist = Infinity;
-    ordered.forEach((o, k) => {
-      const dist = x >= o.x && x <= o.xEnd ? 0 : Math.min(Math.abs(o.x - x), Math.abs(o.xEnd - x));
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = k;
-      }
-    });
-    setActive(best);
-  };
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (ordered.length === 0) return;
-    const cur = active ?? 0;
-    let next = cur;
-    switch (e.key) {
-      case "ArrowRight":
-        next = Math.min(ordered.length - 1, cur + 1);
-        break;
-      case "ArrowLeft":
-        next = Math.max(0, cur - 1);
-        break;
-      case "Home":
-        next = 0;
-        break;
-      case "End":
-        next = ordered.length - 1;
-        break;
-      case "Escape":
-        setActive(null);
-        return;
-      default:
-        return;
-    }
-    e.preventDefault();
-    setActive(next);
-  };
-
-  const activeItem = active !== null ? ordered[active] : undefined;
-  const item = activeItem ? items[activeItem.i] : undefined;
-  const fallbackLabel = (i: number, kind: "span" | "point") =>
-    kind === "span" ? `Span ${i + 1}` : `Event ${i + 1}`;
+  const shown = active ?? selected;
+  const shownItem = shown !== null ? ordered[shown] : undefined;
+  const item = shownItem ? items[shownItem.i] : undefined;
+  const pinned = selected !== null && selected !== active ? ordered[selected] : undefined;
   const announced =
-    activeItem && item
+    shownItem && item
       ? item.end !== undefined
         ? strings.spanAt(
-            item.label ?? fallbackLabel(activeItem.i, "span"),
+            item.label ?? fallbackLabel(shownItem.i, "span"),
             dateFmt(new Date(item.start)),
             dateFmt(new Date(item.end)),
             formatDuration(item.end - item.start),
           )
         : strings.eventAt(
-            item.label ?? fallbackLabel(activeItem.i, "point"),
+            item.label ?? fallbackLabel(shownItem.i, "point"),
             dateFmt(new Date(item.start)),
           )
       : "";
-  const readoutX = activeItem ? (activeItem.x + activeItem.xEnd) / 2 : 0;
+  const readoutX = shownItem ? (shownItem.x + shownItem.xEnd) / 2 : 0;
+
+  const outline = (o: { x: number; xEnd: number }, isPinned: boolean) => (
+    <rect
+      x={Math.max(0, o.x - 1.5)}
+      y={0.5}
+      width={Math.min(width, o.xEnd - o.x + 3)}
+      height={height - 1}
+      fill="none"
+      stroke="var(--mc-accent)"
+      data-mc-w={isPinned ? "tick" : "support"}
+      vectorEffect="non-scaling-stroke"
+    />
+  );
 
   return (
     <span
@@ -179,10 +198,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticEventTimeline
         {...rest}
@@ -198,22 +214,13 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
         strings={strings}
         summary={false}
       >
-        {activeItem ? (
-          <rect
-            x={Math.max(0, activeItem.x - 1.5)}
-            y={0.5}
-            width={Math.min(width, activeItem.xEnd - activeItem.x + 3)}
-            height={height - 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {pinned ? outline(pinned, true) : null}
+        {active !== null && ordered[active] ? outline(ordered[active]!, false) : null}
         {rest.children}
       </StaticEventTimeline>
       <LiveRegion>{announced}</LiveRegion>
-      {activeItem && item ? (
+      {shownItem && item ? (
         <span
           className="mc-spark-readout"
           style={{

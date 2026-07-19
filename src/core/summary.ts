@@ -111,6 +111,8 @@ export interface SummaryStrings {
   citySkylineAtLit: (label: string, value: string, litPct: string) => string;
   /** S4 occupancy, e.g. "34 of 40 seats filled." (honeycomb). */
   honeycomb: (value: string, total: string, unit: string) => string;
+  /** Honeycomb cell announcement, e.g. "Cell 7 of 40 — filled." (honeycomb). */
+  honeycombCell: (index: number, total: number, filled: boolean) => string;
   /** S1 sparse events, e.g. "4 events between Jan and Jun; largest at Mar." */
   constellation: (n: number, first: string, last: string, largest: string) => string;
   /** Single sparse event, e.g. "1 event at Mar." (constellation). */
@@ -329,6 +331,13 @@ export interface SummaryStrings {
   iconArray: (k: number, n: number, pct: string, note: "none" | "all" | "sub" | null) => string;
   /** Icon-array unit announcement, e.g. "Unit 7 of 20 — filled. 3 of 20 filled." */
   iconArrayUnit: (index: number, n: number, filled: boolean, filledCount: number) => string;
+  /**
+   * Pictogram unit announcement, e.g. "Unit 7 of 8 — 40% filled." (pictogram-row).
+   * Unlike `iconArrayUnit` a pictogram unit may be PARTLY filled (`fractional`),
+   * so fullness is a three-state discriminator plus a preformatted percentage
+   * (only meaningful for `"part"`).
+   */
+  pictogramUnit: (index: number, n: number, fill: "full" | "part" | "none", pct: string) => string;
   /** Quantile-dots with a threshold, e.g. "4 in 20 chances above 15 min." */
   quantileDots: (past: number, count: number, side: string, threshold: string) => string;
   /** Quantile-dots without a threshold, e.g. "Most likely 12–15; range 4 to 38." */

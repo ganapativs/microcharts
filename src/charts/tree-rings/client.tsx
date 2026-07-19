@@ -1,17 +1,18 @@
 "use client";
-// Interactive <TreeRings>. Radial pointer lookup (distance from
-// centre → ring index) + ←/→ stepping inner→outer; the focused ring is ringed
-// and its period announced. Composes the static component.
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <TreeRings>. useActivePicker owns interaction: one pointer
+// listener + radial lookup (distance from centre → ring index), ←/→ (and ↑/↓)
+// step inner→outer, click / Enter / Space selects (onSelect). Composes the
+// static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { treeRingsGeometry } from "./geometry.js";
 import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import { TreeRings as StaticTreeRings, treeRingsSummary, type TreeRingsProps } from "./index.js";
 
-export interface InteractiveTreeRingsProps extends TreeRingsProps {
+export interface InteractiveTreeRingsProps extends TreeRingsProps, PickerProps {
   strings?: TreeStrings;
   /**
    * Opt-in entrance motion (default `false`): the ring disc fades and scales
@@ -38,6 +39,10 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -49,7 +54,63 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     [data, size, total],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+  const periodLabel = useCallback(
+    (i: number) => `${periodWord[0]!.toUpperCase()}${periodWord.slice(1)} ${i + 1}`,
+    [periodWord],
+  );
+
+  // Pointer (viewBox space) → ring index by distance from centre; miss → null.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      const dx = x - geo.center.cx;
+      const dy = y - geo.center.cy;
+      const dist = Math.hypot(dx, dy);
+      const rg = geo.rings.find((r) => r.rOuter > r.rInner && dist >= r.rInner && dist <= r.rOuter);
+      return rg ? rg.index : null;
+    },
+    [geo],
+  );
+
+  // ↑/↓ alias →/← (inner↔outer reads as up/down on a ring stack).
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const n = data.length;
+      if (n === 0) return null;
+      switch (key) {
+        case "ArrowRight":
+        case "ArrowUp":
+          return Math.min(n - 1, cur + 1);
+        case "ArrowLeft":
+        case "ArrowDown":
+          return cur <= 0 ? 0 : cur - 1;
+        case "Home":
+          return 0;
+        case "End":
+          return n - 1;
+      }
+      return null;
+    },
+    [data.length],
+  );
+
+  // Rings are 1:1 with data; index = ring/period index, value = its number.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.rings[i]?.value ?? null, label: periodLabel(i) }),
+    [geo, periodLabel],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: data.length,
+    width: size,
+    height: size,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -58,33 +119,35 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         ? summary
         : treeRingsSummary(data, { unit, periodWord, strings, format, locale });
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
-  const periodLabel = (i: number) =>
-    `${periodWord[0]!.toUpperCase()}${periodWord.slice(1)} ${i + 1}`;
 
-  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    if (r.width === 0 || r.height === 0) return;
-    const px = ((e.clientX - r.left) / r.width) * size - geo.center.cx;
-    const py = ((e.clientY - r.top) / r.height) * size - geo.center.cy;
-    const dist = Math.hypot(px, py);
-    const ring = geo.rings.find(
-      (rg) => rg.rOuter > rg.rInner && dist >= rg.rInner && dist <= rg.rOuter,
+  const halo = (i: number, pinned: boolean) => {
+    const rg = geo.rings[i];
+    if (!rg || rg.rOuter <= rg.rInner) return null;
+    return (
+      <circle
+        cx={geo.center.cx}
+        cy={geo.center.cy}
+        r={(rg.rInner + rg.rOuter) / 2}
+        fill="none"
+        stroke="var(--mc-accent)"
+        // geometric, not a role: this literal IS the ring's own thickness
+        // (the data-encoded channel), so the focus halo matches its width exactly.
+        // Inline style, not the presentation attribute: the `data-mc-w` pin marker
+        // below matches a stylesheet stroke-width rule, and any CSS declaration
+        // beats a presentation attribute — inline style is what actually wins.
+        style={{ strokeWidth: Math.max(1, rg.rOuter - rg.rInner) }}
+        strokeOpacity={pinned ? 0.55 : 0.3}
+        data-mc-w={pinned ? "tick" : undefined}
+        vectorEffect="non-scaling-stroke"
+      />
     );
-    setActive(ring ? ring.index : null);
-  };
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (data.length === 0) return;
-    if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-      setActive((p) => Math.min(data.length - 1, (p ?? -1) + 1));
-      e.preventDefault();
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-      setActive((p) => Math.max(0, (p ?? data.length) - 1));
-      e.preventDefault();
-    } else if (e.key === "Escape") setActive(null);
   };
 
-  const ring = active !== null ? geo.rings[active] : undefined;
-  const announced = ring ? strings.treeRingAt(periodLabel(ring.index), fmt(ring.value)) : "";
+  const shown = active ?? selected;
+  const shownRing = shown !== null ? geo.rings[shown] : undefined;
+  const announced = shownRing
+    ? strings.treeRingAt(periodLabel(shownRing.index), fmt(shownRing.value))
+    : "";
 
   return (
     <span
@@ -93,10 +156,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticTreeRings
         {...rest}
@@ -111,24 +171,13 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         summary={false}
         style={FILL}
       >
-        {ring && ring.rOuter > ring.rInner ? (
-          <circle
-            cx={geo.center.cx}
-            cy={geo.center.cy}
-            r={(ring.rInner + ring.rOuter) / 2}
-            fill="none"
-            stroke="var(--mc-accent)"
-            // geometric, not a role: this literal IS the ring's own thickness
-            // (the data-encoded channel), so the focus halo matches its width exactly
-            strokeWidth={Math.max(1, ring.rOuter - ring.rInner)}
-            strokeOpacity={0.3}
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus halo is transient. */}
+        {selected !== null && selected !== active ? halo(selected, true) : null}
+        {active !== null ? halo(active, false) : null}
         {rest.children}
       </StaticTreeRings>
       <LiveRegion>{announced}</LiveRegion>
-      {ring ? (
+      {shownRing ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {announced}
         </span>

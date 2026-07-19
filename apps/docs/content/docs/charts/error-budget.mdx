@@ -110,9 +110,9 @@ remaining-budget label — "62 %" (space before the sign) under `de-DE` rather t
 
 With no data the chart renders an empty root and the accessible name says **"No data."**; a single point still draws the
 diagonal, wedges, and endpoint, though `currentRate` (which needs a prior step) reads `0`. Once the remaining line
-reaches zero before `window` elapses, the line stops at that step and an ✕ replaces the endpoint dot — no further steps
-are drawn, extrapolated, or implied, and the summary reads **"Budget exhausted at day 7 of 20."** instead of the normal
-remaining/rate sentence.
+reaches zero, an ✕ at that first zero-crossing replaces the endpoint dot, and the summary reads **"Budget exhausted at
+day 7 of 20."** instead of the normal remaining/rate sentence. Values are clamped to `0–1`, so nothing is ever drawn
+below the floor or above a full budget.
 
 ## Four homes
 
@@ -124,13 +124,15 @@ Remaining-vs-diagonal, because "too fast" is only legible against the pace that 
 1×/6×/14.4× reference lines are the SRE Workbook's multiwindow burn-rate alert **convention** — a policy default, never
 universal law — so `rates` is configurable and the lines render as faint background context, never data-colored.
 `currentRate` is the observed burn slope over the last `max(2, ⌈n/6⌉)` steps ÷ the steady slope; when the budget hits
-zero before the window ends, the line stops at an ✕ and the summary says so.
+zero, an ✕ marks the crossing and the summary says so.
 
 ## Accessibility
 
 The accessible name states the budget, the elapsed window, and the burn rate — **"62% of error budget remains at day 12
 of 30 — burning at 0.6× the steady rate."**; an exhausted window reads "Budget exhausted at day N of M." The interactive
 entry steps the days and announces each step's remaining and local burn rate.
+
+<InteractionNote slug="error-budget" />
 
 ## Props
 

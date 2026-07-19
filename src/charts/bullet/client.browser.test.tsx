@@ -24,4 +24,19 @@ describe("interactive <Bullet>", () => {
     fig.blur();
     await expect.poll(() => fig.querySelector(".mc-spark-readout")).toBe(null);
   });
+
+  it("click fires onSelect with the measure (not the target)", async () => {
+    const picks: unknown[] = [];
+    const fig = await mount(<Bullet value={72} target={80} onSelect={(d) => picks.push(d)} />);
+    fig.click();
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 72 });
+  });
+
+  it("Enter fires onSelect", async () => {
+    const picks: unknown[] = [];
+    const fig = await mount(<Bullet value={72} target={80} onSelect={(d) => picks.push(d)} />);
+    fig.focus();
+    fig.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 72 });
+  });
 });

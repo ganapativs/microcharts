@@ -1,19 +1,19 @@
 "use client";
-// Interactive <IconArray>. One pointer listener + pure grid
-// lookup; ←/→/↑/↓ 2-D roving (ActivityGrid keyboard model, row-major here).
-// Each unit announces the running count — genuinely useful for a SR user
-// counting. Composes the static component (canon); the focus ring is an overlay
-// child re-using geometry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <IconArray>. useActivePicker owns interaction: one pointer
+// listener + pure grid lookup, ←/→/↑/↓ 2-D roving (row-major), click / Enter /
+// Space selects (onSelect). Each unit announces the running count — genuinely
+// useful for a SR user counting. Composes the static component (canon); the
+// focus ring + persistent pin are overlay children re-using geometry.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
 import { iconArrayGeometry } from "./geometry.js";
 import { IconArray as StaticIconArray, iconArraySummary, type IconArrayProps } from "./index.js";
 
-export interface InteractiveIconArrayProps extends IconArrayProps {
+export interface InteractiveIconArrayProps extends IconArrayProps, PickerProps {
   strings?: FreqStrings;
   /**
    * Opt-in entrance motion (default `false`): the unit grid fades in,
@@ -38,6 +38,10 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -67,58 +71,12 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     () => makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale),
     [locale],
   );
-  const [active, setActive] = useState<number | null>(null);
 
-  const accName =
-    summary === false
-      ? undefined
-      : typeof summary === "string"
-        ? summary
-        : iconArraySummary(geo, pctFmt, strings);
-  const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const keys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Home", "End", "Escape"];
-      if (!keys.includes(e.key)) return;
-      e.preventDefault();
-      if (e.key === "Escape") {
-        setActive(null);
-        return;
-      }
-      const { cols, rows, n } = geo;
-      // functional update — rapid 2-D roving composes without a stale closure
-      setActive((prev) => {
-        const cur = prev ?? 0;
-        const row = Math.floor(cur / cols);
-        const col = cur % cols;
-        switch (e.key) {
-          case "ArrowRight":
-            return col < cols - 1 ? cur + 1 : cur;
-          case "ArrowLeft":
-            return col > 0 ? cur - 1 : cur;
-          case "ArrowDown":
-            return row < rows - 1 ? Math.min(n - 1, cur + cols) : cur;
-          case "ArrowUp":
-            return row > 0 ? cur - cols : cur;
-          case "Home":
-            return 0;
-          case "End":
-            return n - 1;
-          default:
-            return prev;
-        }
-      });
-    },
-    [geo],
-  );
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * geo.totalWidth;
-      const y = ((e.clientY - r.top) / r.height) * height;
+  // Navigable units are the icons; datum.index is the unit index (0…n-1 in
+  // reading order). value = its filled state (1 filled / 0 empty) — the unit's
+  // primary encoding; the running fill count is in the announcement.
+  const locate = useCallback(
+    (x: number, y: number) => {
       let best: number | null = null;
       let bestDist = Infinity;
       for (const u of geo.units) {
@@ -130,13 +88,84 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
           best = u.index;
         }
       }
-      setActive(best);
+      return best;
     },
-    [geo, height],
+    [geo],
   );
 
-  const unit = active !== null ? geo.units[active] : undefined;
-  const announced = unit ? strings.iconArrayUnit(active! + 1, geo.n, unit.filled, geo.k) : "";
+  // 2-D row-major roving (ActivityGrid keyboard model). Boundary keys consume
+  // (return the current index); a first arrow from nothing focuses unit 0.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const { cols, rows, n } = geo;
+      if ((n as number) === 0) return null;
+      if (key === "Home") return 0;
+      if (key === "End") return n - 1;
+      if (cur < 0) return 0;
+      const row = Math.floor(cur / cols);
+      const col = cur % cols;
+      switch (key) {
+        case "ArrowRight":
+          return col < cols - 1 ? cur + 1 : cur;
+        case "ArrowLeft":
+          return col > 0 ? cur - 1 : cur;
+        case "ArrowDown":
+          return row < rows - 1 ? Math.min(n - 1, cur + cols) : cur;
+        case "ArrowUp":
+          return row > 0 ? cur - cols : cur;
+      }
+      return null;
+    },
+    [geo],
+  );
+
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.units[i]?.filled ? 1 : 0 }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.n,
+    width: geo.totalWidth,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : iconArraySummary(geo, pctFmt, strings);
+  const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const ring = (i: number, pinned: boolean) => {
+    const u = geo.units[i];
+    if (!u) return null;
+    return (
+      <rect
+        x={u.x - 0.75}
+        y={u.y - 0.75}
+        width={geo.cell + 1.5}
+        height={geo.cell + 1.5}
+        rx={geo.rx + 0.75}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "full"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const unit = shown !== null ? geo.units[shown] : undefined;
+  const announced = unit ? strings.iconArrayUnit(shown! + 1, geo.n, unit.filled, geo.k) : "";
 
   return (
     <span
@@ -145,10 +174,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onKeyDown={onKeyDown}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticIconArray
         {...rest}
@@ -163,19 +189,9 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {unit ? (
-          <rect
-            x={unit.x - 0.75}
-            y={unit.y - 0.75}
-            width={geo.cell + 1.5}
-            height={geo.cell + 1.5}
-            rx={geo.rx + 0.75}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="full"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticIconArray>
       <LiveRegion>{announced}</LiveRegion>

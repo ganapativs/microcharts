@@ -1,5 +1,5 @@
 import { WindBarb } from "@microcharts/react/wind-barb";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -57,11 +57,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <WindBarb direction={225} magnitude={32} summary={false} size={32} />;
 }
-
-export const showcase = {
-  hint: "flow",
-  Node: () => <WindBarb direction={225} magnitude={32} label="value" title="Wind" size={32} />,
-};
 
 export const playground: PlaygroundSpec = {
   knobs: [
@@ -202,10 +197,9 @@ export function markCode(): string {
 export default {
   entry,
   Preview,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

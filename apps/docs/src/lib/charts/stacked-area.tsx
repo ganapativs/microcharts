@@ -1,9 +1,8 @@
 import { StackedArea } from "@microcharts/react/stacked-area";
-import { StackedArea as StackedAreaInteractive } from "@microcharts/react/stacked-area/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const MIX = [
+export const MIX = [
   { label: "Mobile", values: [30, 34, 36, 40, 44, 47, 52, 56, 58, 60, 63, 66] },
   { label: "Web", values: [50, 48, 47, 45, 42, 41, 38, 36, 35, 33, 32, 30] },
   { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
@@ -83,12 +82,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <StackedArea data={MIX} summary={false} width={130} height={22} />;
 }
-
-export const showcase = {
-  hint: "mix shift",
-  Node: () => <StackedArea data={MIX} title="Traffic mix" width={130} height={22} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -151,34 +144,6 @@ export const playground: PlaygroundSpec = {
       s.label !== "none" && `  label="${s.label}"`,
       s.curve !== "linear" && `  curve="${s.curve}"`,
       s.locale !== "en-US" && `  locale="${s.locale}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <StackedAreaInteractive
-      data={MIX}
-      variant={s.variant as "stacked" | "ridge"}
-      order={s.order as "data" | "asc"}
-      label={s.label as "last" | "none"}
-      curve={s.curve as "linear" | "smooth"}
-      locale={s.locale as string}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={32}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<StackedArea",
-      "  data={mix}",
-      s.variant !== "stacked" && `  variant="${s.variant}"`,
-      s.order !== "data" && `  order="${s.order}"`,
-      s.label !== "none" && `  label="${s.label}"`,
-      s.curve !== "linear" && `  curve="${s.curve}"`,
-      s.locale !== "en-US" && `  locale="${s.locale}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -319,19 +284,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<StackedArea data={mix} />`;
 }
-
-export function PreviewLive() {
-  return <StackedAreaInteractive data={MIX} summary={false} width={130} height={22} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

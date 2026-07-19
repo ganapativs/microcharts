@@ -51,6 +51,37 @@ export function sproutRowSummary(
   return strings.sproutRow(data.length, bloom, seed);
 }
 
+/**
+ * The label-driven layout numbers (they widen the row when category names are
+ * shown). Exported because the interactive entry must derive the SAME
+ * step/padX/labelBand — computing them independently drifted its overlay ring
+ * off the glyph whenever `labels` was on.
+ *
+ * Category labels render at the library-standard size and never shrink to an
+ * illegible caption. To keep the row compact they STAGGER onto two tiers below
+ * the soil (even slots near, odd slots far), so same-tier neighbours sit two
+ * steps apart — a name only needs to clear 2·step, not one. 0.72 em/char real
+ * extent + a half-em gutter; the row still widens if even 2·step is too tight.
+ */
+export function sproutLayout(
+  data: readonly SproutDatum[],
+  labels: boolean,
+  fontSize: number,
+  step?: number | undefined,
+): { step: number; padX: number; labelBand: number; twoTier: boolean } {
+  const catExtent = labels
+    ? Math.max(0, ...data.map((d) => d.label.length * 0.72 * fontSize + fontSize * 0.5))
+    : 0;
+  const s = Math.max(step ?? 16, Math.ceil(catExtent / 2));
+  // Side gutter so the outermost name (half its extent past its centre) never
+  // clips the viewBox edge.
+  const padX = labels ? Math.max(PAD, Math.ceil(catExtent / 2 - s / 2)) : PAD;
+  const twoTier = labels && data.length > 1;
+  // Two label lines below the soil (+1px gap each) when a second tier is used.
+  const labelBand = labels ? fontSize + 1 + (twoTier ? fontSize + 1 : 0) : 0;
+  return { step: s, padX, labelBand, twoTier };
+}
+
 export function SproutRow(props: SproutRowProps): ReactNode {
   const {
     data,
@@ -69,21 +100,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     children,
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.3);
-  // Category labels render at the library-standard size and never shrink to an
-  // illegible caption. To keep the row compact they STAGGER onto two tiers below
-  // the soil (even slots near, odd slots far), so same-tier neighbours sit two
-  // steps apart — a name only needs to clear 2·step, not one. 0.72 em/char real
-  // extent + a half-em gutter; the row still widens if even 2·step is too tight.
-  const catExtent = labels
-    ? Math.max(0, ...data.map((d) => d.label.length * 0.72 * fontSize + fontSize * 0.5))
-    : 0;
-  const step = Math.max(props.step ?? 16, Math.ceil(catExtent / 2));
-  // Side gutter so the outermost name (half its extent past its centre) never
-  // clips the viewBox edge.
-  const padX = labels ? Math.max(PAD, Math.ceil(catExtent / 2 - step / 2)) : PAD;
-  // Two label lines below the soil (+1px gap each) when a second tier is used.
-  const twoTier = labels && data.length > 1;
-  const labelBand = labels ? fontSize + 1 + (twoTier ? fontSize + 1 : 0) : 0;
+  const { step, padX, labelBand, twoTier } = sproutLayout(data, labels, fontSize, props.step);
 
   const geo = sproutRowGeometry({
     stages: data.map((d) => d.value),

@@ -85,14 +85,16 @@ quiet); a `null` cell is nothing at all, because "missing" is not "zero".
 Rings for zero are the default because print and grayscale lose the zero-versus-missing distinction that color grids get
 for free — this chart exists for exactly that medium, so it makes "present but quiet" visible. The radius is √-quantized
 so **area** carries the ordinal; a linear radius map would exaggerate the highs quadratically. The steps are ordinal,
-not values: the docs say "read rhythm and rank, not numbers", and point at `ActivityGrid` for the color twin with exact
-hover reads.
+not values — the interactive entry announces a cell's step rather than implying a precise read, and `ActivityGrid` is
+the color twin when exact values matter.
 
 ## Accessibility
 
 The accessible name summarizes the rhythm — **"21 weeks; peak 34, 17 active."** The interactive entry walks the grid in
 2-D with the arrow keys (or hover), announcing each cell as its ordinal step — **"3 of 21: 8, step 2 of 5."** — never a
 false-precise value, since dot area reads to a step, not a number.
+
+<InteractionNote slug="garden-grid" />
 
 ## Props
 

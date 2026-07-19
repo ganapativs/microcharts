@@ -1,17 +1,24 @@
 "use client";
-// Interactive <SparkBar>. Keyboard + pointer bar
-// navigation with a polite live readout, roving focus on an HTML overlay.
+// Interactive <SparkBar>. useActivePicker owns interaction: ONE pointer listener
+// + nearest-bar-by-x math, roving keyboard (←/→/Home/End, gaps skipped), touch
+// tap-to-pin, and the onActive/onSelect contract — never a DOM node per bar.
 // COMPOSES the static entry (component canon): the static renders the bars,
 // colors, endpoint label AND annotation children — the client only overlays a
-// focus outline + readout and owns interaction. Re-implementing the SVG here
-// used to mis-color win-loss ties and drop annotations/labels.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// focus outline + a pinned outline + readout and owns interaction. Re-implementing
+// the SVG here used to mis-color win-loss ties and drop annotations/labels.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { describeSeries } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import {
+  FILL,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { labelMetrics, sparkBarGeometry } from "./geometry.js";
 import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
 
@@ -20,8 +27,7 @@ import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
 const BAR_SELECTOR =
   'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"], rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]';
 
-export interface InteractiveSparkBarProps extends SparkBarProps {
-  onPointFocus?: (index: number | null) => void;
+export interface InteractiveSparkBarProps extends SparkBarProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the bars rise from the baseline
    * when the chart first mounts client-side. Inert on the server and on
@@ -44,11 +50,14 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     summary,
     format,
     locale,
-    onPointFocus,
     animate = false,
     className,
     style,
-    children,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+    ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
@@ -80,25 +89,19 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     });
   }, [data, width, height, mode, domain, gap, label, fmt]);
 
+  // Bars only (gaps dropped) — the navigable stops. `index` in the datum is the
+  // DATA index (what the consumer indexes into); we walk finite bars and never
+  // land on a gap.
   const stops = useMemo(() => geo.bars.map((b) => b.index), [geo]);
-  const [active, setActive] = useState<number | null>(null);
+  // data index → bar. `barAt` runs up to three times a render (focus outline,
+  // pin outline, readout) and the bars array is gap-compacted, so a `.find`
+  // scan here is a full pass over the series on every unit crossed.
+  const barAt = useMemo(() => new Map(geo.bars.map((b) => [b.index, b])), [geo]);
 
-  const move = useCallback(
-    (next: number | null) => {
-      setActive(next);
-      onPointFocus?.(next);
-    },
-    [onPointFocus],
-  );
-
-  // ONE listener; nearest bar by x distance to its centre in viewBox space —
-  // never a DOM node per bar. Gaps snap to the closest bar.
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.bars.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
+  // ONE listener; nearest bar by x distance to its centre in viewBox space.
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.bars.length === 0) return null;
       let best = geo.bars[0]!.index;
       let bestDist = Infinity;
       for (const b of geo.bars) {
@@ -108,45 +111,57 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
           best = b.index;
         }
       }
-      if (best !== active) move(best);
+      return best;
     },
-    [geo, width, active, move],
+    [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (stops.length === 0) return;
-      const pos = active === null ? -1 : stops.indexOf(active);
-      let target = pos;
-      switch (e.key) {
-        case "ArrowRight":
-          target = Math.min(stops.length - 1, pos + 1);
-          break;
-        case "ArrowLeft":
-          target = pos <= 0 ? 0 : pos - 1;
-          break;
-        case "Home":
-          target = 0;
-          break;
-        case "End":
-          target = stops.length - 1;
-          break;
-        case "Escape":
-          move(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      move(stops[target]!);
-    },
-    [active, stops, move],
+  const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
+
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: isFiniteValue(data[i]) ? (data[i] as number) : null }),
+    [data],
   );
+
+  const { active, selected, bind } = useActivePicker({
+    count: stops.length,
+    width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false ? undefined : (summary ?? describeSeries(data, { format, locale }));
-  const activeBar = active !== null ? geo.bars.find((b) => b.index === active) : undefined;
-  const activeValue = activeBar && isFiniteValue(activeBar.value) ? activeBar.value : null;
+
+  const outline = (i: number, pinned: boolean) => {
+    const bar = barAt.get(i);
+    if (!bar) return null;
+    // focus / pinned outline over the bar — the static keeps the bar's own
+    // valence color; this reads as "measuring", not a recolor.
+    return (
+      <rect
+        x={bar.x}
+        y={bar.y}
+        width={bar.width}
+        height={bar.height}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+        shapeRendering="crispEdges"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const shownBar = shown !== null ? barAt.get(shown) : undefined;
+  const shownValue = shownBar && isFiniteValue(shownBar.value) ? shownBar.value : null;
 
   return (
     <span
@@ -155,10 +170,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
-      onKeyDown={onKeyDown}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => move(null)}
-      onBlur={() => move(null)}
+      {...bind}
     >
       <StaticSparkBar
         data={data}
@@ -174,35 +186,21 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         summary={false}
         style={FILL}
       >
-        {children}
-        {activeBar ? (
-          // focus outline over the hovered/roved bar — the static keeps the bar's
-          // own valence color; this reads as "measuring", not a recolor.
-          <rect
-            x={activeBar.x}
-            y={activeBar.y}
-            width={activeBar.width}
-            height={activeBar.height}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-            shapeRendering="crispEdges"
-          />
-        ) : null}
+        {rest.children}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
       </StaticSparkBar>
-      <LiveRegion>
-        {activeValue !== null ? `Bar ${active! + 1}: ${fmt(activeValue)}` : ""}
-      </LiveRegion>
-      {activeBar && activeValue !== null ? (
+      <LiveRegion>{shownValue !== null ? `Bar ${shown! + 1}: ${fmt(shownValue)}` : ""}</LiveRegion>
+      {shownBar && shownValue !== null ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((activeBar.x + activeBar.width / 2) / width) * 100}%`,
+            left: `${((shownBar.x + shownBar.width / 2) / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(activeValue)}
+          {fmt(shownValue)}
         </span>
       ) : null}
     </span>

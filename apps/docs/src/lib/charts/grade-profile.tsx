@@ -1,9 +1,8 @@
 import { GradeProfile } from "@microcharts/react/grade-profile";
-import { GradeProfile as GradeProfileInteractive } from "@microcharts/react/grade-profile/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const m = (n: number) => `${n} m`;
+export const m = (n: number) => `${n} m`;
 export const TRAIL = [
   { d: 0, elev: 800 },
   { d: 100, elev: 809 },
@@ -74,12 +73,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <GradeProfile data={TRAIL} summary={false} width={150} height={44} />;
 }
-
-export const showcase = {
-  hint: "steepest pitch",
-  Node: () => <GradeProfile data={TRAIL} format={m} title="Queen stage" width={170} height={48} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "label", label: "summit label", init: true },
@@ -110,29 +103,6 @@ export const playground: PlaygroundSpec = {
       "  data={trail}",
       s.label === false && '  label="none"',
       s.hard !== 10 && `  bins={[3, 6, ${s.hard}]}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <GradeProfileInteractive
-      data={TRAIL}
-      label={s.label ? "max" : "none"}
-      bins={[3, 6, Number(s.hard)]}
-      format={m}
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={48}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<GradeProfile",
-      "  data={trail}",
-      s.label === false && '  label="none"',
-      s.hard !== 10 && `  bins={[3, 6, ${s.hard}]}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -257,19 +227,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<GradeProfile data={trail} />`;
 }
-
-export function PreviewLive() {
-  return <GradeProfileInteractive data={TRAIL} summary={false} width={150} height={44} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

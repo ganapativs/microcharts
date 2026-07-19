@@ -1,9 +1,8 @@
 import { DotPlot } from "@microcharts/react/dot-plot";
-import { DotPlot as DotPlotInteractive } from "@microcharts/react/dot-plot/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const TEAM = [
+export const TEAM = [
   { label: "Ada", value: 96 },
   { label: "Kim", value: 41 },
   { label: "Sam", value: 88 },
@@ -72,12 +71,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <DotPlot data={TEAM} summary={false} width={130} height={70} />;
 }
-
-export const showcase = {
-  hint: "comparison",
-  Node: () => <DotPlot data={TEAM} highlight="Ada" title="Review scores" width={130} height={70} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "stem", label: "stems", init: false },
@@ -102,30 +95,6 @@ export const playground: PlaygroundSpec = {
       (s.stem as boolean) && "  stem",
       (s.values as boolean) && '  label="value"',
       (s.highlight as boolean) && '  highlight="Ada"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <DotPlotInteractive
-      data={TEAM}
-      stem={s.stem as boolean}
-      label={(s.values as boolean) ? "value" : "none"}
-      highlight={(s.highlight as boolean) ? "Ada" : undefined}
-      summary={false}
-      animate={ui.animate}
-      width={220}
-      height={110}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<DotPlot",
-      "  data={team}",
-      (s.stem as boolean) && "  stem",
-      (s.values as boolean) && '  label="value"',
-      (s.highlight as boolean) && '  highlight="Ada"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -254,19 +223,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<DotPlot data={team} />`;
 }
-
-export function PreviewLive() {
-  return <DotPlotInteractive data={TEAM} summary={false} width={130} height={70} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

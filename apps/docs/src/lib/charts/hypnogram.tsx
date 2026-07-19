@@ -1,6 +1,5 @@
 import { Hypnogram } from "@microcharts/react/hypnogram";
-import { Hypnogram as HypnogramInteractive } from "@microcharts/react/hypnogram/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const SLEEP = [
@@ -16,7 +15,7 @@ export const SLEEP = [
   { t: 110, state: "Awake" },
 ];
 export const STATES = ["Awake", "REM", "Light", "Deep"];
-const DOM: [number, number] = [0, 120];
+export const DOM: [number, number] = [0, 120];
 
 export const entry: ChartEntry = {
   name: "Hypnogram",
@@ -104,21 +103,6 @@ export function Preview() {
     <Hypnogram data={SLEEP} states={STATES} domain={DOM} summary={false} width={150} height={64} />
   );
 }
-
-export const showcase = {
-  hint: "states",
-  Node: () => (
-    <Hypnogram
-      data={SLEEP}
-      states={STATES}
-      domain={DOM}
-      title="Sleep stages"
-      width={150}
-      height={64}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -158,33 +142,6 @@ export const playground: PlaygroundSpec = {
       s.variant !== "steps" && `  variant="${s.variant}"`,
       s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
       s.connectors === false && "  connectors={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <HypnogramInteractive
-      data={SLEEP}
-      states={STATES}
-      domain={DOM}
-      variant={s.variant as "steps" | "lanes"}
-      emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
-      connectors={s.connectors as boolean}
-      animate={ui.animate}
-      summary={false}
-      width={300}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Hypnogram",
-      "  data={sleep}",
-      `  states={["Awake", "REM", "Light", "Deep"]}`,
-      s.variant !== "steps" && `  variant="${s.variant}"`,
-      s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
-      s.connectors === false && "  connectors={false}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -356,29 +313,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Hypnogram data={sleep} states={["Awake", "REM", "Light", "Deep"]} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <HypnogramInteractive
-      data={SLEEP}
-      states={STATES}
-      domain={DOM}
-      summary={false}
-      width={150}
-      height={64}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

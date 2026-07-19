@@ -1,17 +1,28 @@
 "use client";
-// Interactive <QueueDepth>. One pointer listener + nearest-x math
-// across the finite points; ←/→ step periods, Home/End jump ends. Composes the
-// static component (canon); the crosshair + focus ring are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <QueueDepth>. useActivePicker owns interaction: one pointer
+// listener + nearest-x math across the finite samples (non-finite gaps are
+// skipped), ←/→ step, Home/End jump ends, click / Enter / Space selects
+// (onSelect). Composes the static component (canon); the crosshair + focus ring
+// + pin are overlay children.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { labelFont } from "../../core/labels.js";
+import {
+  FILL,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUEUE_DEPTH, type QueueDepthStrings } from "../../core/strings-queue-depth.js";
 import { queueDepthGeometry } from "./geometry.js";
 import { QueueDepth as StaticQueueDepth, queueSummary, type QueueDepthProps } from "./index.js";
 
-export interface InteractiveQueueDepthProps extends QueueDepthProps {
+type QueuePoint = NonNullable<ReturnType<typeof queueDepthGeometry>>["points"][number];
+
+export interface InteractiveQueueDepthProps extends QueueDepthProps, PickerProps {
   strings?: QueueDepthStrings;
   /**
    * Opt-in entrance motion (default `false`): the backlog area wipes on when
@@ -36,6 +47,10 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -43,11 +58,67 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
   useEntrance(hostRef, "wipe", animate);
 
   const geo = useMemo(
-    () => queueDepthGeometry({ width, height, data, capacity, domain: props.domain }),
+    () =>
+      queueDepthGeometry({
+        width,
+        height,
+        data,
+        capacity,
+        domain: props.domain,
+        fontSize: labelFont(height),
+      }),
     [width, height, data, capacity, props.domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // The navigable stops are the finite samples, keyed by their DATA index; a
+  // lookup keeps overlay marks + selection addressable by that same index.
+  const ptByIndex = useMemo(() => {
+    const m = new Map<number, QueuePoint>();
+    geo?.points.forEach((p) => m.set(p.index, p));
+    return m;
+  }, [geo]);
+  const stops = useMemo(() => geo?.points.map((p) => p.index) ?? [], [geo]);
+
+  // Pointer (viewBox space) → nearest finite sample; returns its DATA index.
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || geo.points.length === 0) return null;
+      let best = geo.points[0]!.index;
+      let bestDist = Infinity;
+      geo.points.forEach((p) => {
+        const d = Math.abs(p.x - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = p.index;
+        }
+      });
+      return best;
+    },
+    [geo],
+  );
+
+  // Walk finite samples (skip gaps): step in stop-space, land on DATA indices.
+  const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
+
+  // Sample DATA index; `value` is the backlog depth there.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: ptByIndex.get(i)?.value ?? null }),
+    [ptByIndex],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: stops.length,
+    width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -59,58 +130,12 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
           : queueSummary(geo, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const count = geo?.points.length ?? 0;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * width;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.points.forEach((p, i) => {
-        const d = Math.abs(p.x - px);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, count, width],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (count === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((prev) => Math.min(count - 1, (prev ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((prev) => (prev === null || prev <= 0 ? 0 : prev - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(count - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [count],
-  );
-
-  const p = active !== null && geo ? geo.points[active] : undefined;
-  const announced = p
-    ? strings.queueAt(p.index, fmt(p.value), p.above ? strings.queueAbove : "")
+  const shown = active ?? selected;
+  const ap = active !== null ? ptByIndex.get(active) : undefined; // transient focus
+  const sp = selected !== null && selected !== active ? ptByIndex.get(selected) : undefined; // pin
+  const rp = shown !== null ? ptByIndex.get(shown) : undefined; // readout + announce
+  const announced = rp
+    ? strings.queueAt(rp.index, fmt(rp.value), rp.above ? strings.queueAbove : "")
     : "";
 
   return (
@@ -120,10 +145,7 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticQueueDepth
         {...rest}
@@ -138,12 +160,24 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {p ? (
+        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
+        {sp ? (
+          <circle
+            cx={sp.x}
+            cy={sp.y}
+            r={2.4}
+            fill="none"
+            stroke={sp.above ? "var(--mc-negative)" : "var(--mc-accent)"}
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {ap ? (
           <>
             <line
-              x1={p.x}
+              x1={ap.x}
               y1={0.5}
-              x2={p.x}
+              x2={ap.x}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
               data-mc-w="support"
@@ -151,11 +185,11 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
               vectorEffect="non-scaling-stroke"
             />
             <circle
-              cx={p.x}
-              cy={p.y}
+              cx={ap.x}
+              cy={ap.y}
               r={2.4}
               fill="none"
-              stroke={p.above ? "var(--mc-negative)" : "var(--mc-accent)"}
+              stroke={ap.above ? "var(--mc-negative)" : "var(--mc-accent)"}
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
@@ -163,12 +197,12 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticQueueDepth>
-      {p ? (
+      {rp ? (
         <span
           className="mc-queue-readout mc-spark-readout"
-          style={{ left: `${(p.x / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${(rp.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {fmt(p.value)}
+          {fmt(rp.value)}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

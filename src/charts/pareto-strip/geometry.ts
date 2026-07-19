@@ -12,6 +12,8 @@ interface ParetoBar {
   y: number;
   height: number;
   label: string;
+  /** Raw magnitude for this bar (the rolled-up sum for "Other"). */
+  value: number;
   share: number;
   cum: number;
   vital: boolean;
@@ -118,6 +120,7 @@ export function paretoGeometry(opts: {
       y: round2(barFloor - h),
       height: h,
       label: r.label,
+      value: round2(r.value),
       share: round2(degenerate ? 0 : r.value / total),
       cum: round2(cums[i]!),
       // the accent stops at the crossing: every non-Other bar up to it is vital

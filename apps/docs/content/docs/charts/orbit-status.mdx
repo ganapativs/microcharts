@@ -37,6 +37,12 @@ _position_ never means anything — only its speed does — so the docs say plai
   infra status glance.
 - **Avoid for** — exact latency (`Sparkline`), exact rate (`Delta`, `MiniBar`), or a trend over time (`Sparkline`).
 
+## Sizing
+
+One `size` prop, in viewBox units, sets the orbit box — it defaults to `20`. There is no separate `width`/`height`: the
+glyph is square, and the rendered box widens only by the gutter a `label` reserves. `fontSize` follows `size` unless you
+set it.
+
 ## Variants
 
 <LiveDemo
@@ -104,12 +110,12 @@ _position_ never means anything — only its speed does — so the docs say plai
 ## Why this default
 
 The dash-density static encoding exists because a paused satellite says nothing — the still frame had to carry both
-variables or the chart would fail the survivor test, so rate lives in the dashes as well as the spin. Both channels are
-quantized to five ordinal steps and documented as such; radius and speed always come from the same domains in the static
-and interactive frames, so nothing drifts. A lone orbit radius is meaningless, so the docs insist on explicit
-`latencyDomain` and `rateDomain` — the same steer as `FatDigits`. An alert doubles the satellite's size and flags the
-summary, never relying on color alone. Unknown latency or rate goes gray and stops the spin: an unknown dependency must
-not look healthy.
+variables or the chart would fail the survivor test, so rate lives in the dashes as well as the spin. The rate is
+quantized to five ordinal steps in both renderings — five dash counts and five angular periods — and radius and speed
+always come from the same domains in the static and interactive frames, so nothing drifts. A lone orbit radius is
+meaningless, so the docs insist on explicit `latencyDomain` and `rateDomain` — the same steer as `FatDigits`. An alert
+doubles the satellite's size and flags the summary, never relying on color alone. Unknown latency or rate goes gray and
+stops the spin: an unknown dependency must not look healthy.
 
 ## Accessibility
 
@@ -117,6 +123,8 @@ The accessible name is both variables with units — **"240ms latency at 12 call
 when the latency crosses `alert`, or **"Latency unknown."** when a value is missing. The alert state is carried by the
 satellite's size and the summary, never color alone; motion is gated on `prefers-reduced-motion`; and the live region
 announces threshold crossings only.
+
+<InteractionNote slug="orbit-status" />
 
 ## Props
 

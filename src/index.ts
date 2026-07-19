@@ -7,7 +7,11 @@
  * importing it never pulls chart code into a bundle.
  */
 
-export const MICROCHARTS_VERSION = "0.0.1";
+/** Replaced with a string literal at build time — see scripts/pkg-version.mjs. */
+declare const __MC_VERSION__: string;
+
+/** The published package version, injected from package.json at build time. */
+export const MICROCHARTS_VERSION: string = __MC_VERSION__;
 
 // Flagship: standalone natural-language series summary.
 export { describeSeries } from "./core/summary.js";
@@ -43,7 +47,7 @@ export interface MicrochartCommonProps {
   domain?: readonly [number, number];
   /** Mark colour: any CSS colour or token string (`"var(--mc-accent)"`). */
   color?: string;
-  /** Visible title, wired into `aria-labelledby`. */
+  /** Names the chart: an SVG `<title>` (accessible name + native tooltip), not visible text. */
   title?: string;
   /** Accessible name. A string overrides the auto-summary; `false` = decorative. */
   summary?: string | false;

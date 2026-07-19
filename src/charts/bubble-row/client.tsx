@@ -1,17 +1,20 @@
 "use client";
-// Interactive <BubbleRow>. Nearest-bubble pointer lookup + ←/→
-// roving; announces each bubble's exact value (the number the low-precision area
-// can't carry); the focused bubble gets a thicker ring. Composes the static.
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <BubbleRow>. useActivePicker owns interaction: one pointer
+// listener + nearest-bubble lookup, ←/→ (and ↑/↓) rove the row, click / Enter /
+// Space selects (onSelect). Announces each bubble's exact value — the number the
+// low-precision area channel can't carry. Composes the static component (canon)
+// — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { labelFont } from "../../core/labels.js";
 import { bubbleRowGeometry } from "./geometry.js";
 import { EN_BUBBLE, type BubbleStrings } from "../../core/strings-bubble.js";
 import { BubbleRow as StaticBubbleRow, bubbleRowSummary, type BubbleRowProps } from "./index.js";
 
-export interface InteractiveBubbleRowProps extends BubbleRowProps {
+export interface InteractiveBubbleRowProps extends BubbleRowProps, PickerProps {
   strings?: BubbleStrings;
   /**
    * Opt-in entrance motion (default `false`): the bubbles inflate along the
@@ -36,6 +39,10 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.34);
@@ -73,7 +80,40 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
       }),
     [data, height, gap, align, labelBand, labelWidths],
   );
-  const [active, setActive] = useState<number | null>(null);
+
+  // One bubble per datum, so the unit index IS the DATA index.
+  const locate = useCallback(
+    (x: number) => {
+      let best: number | null = null;
+      let bestD = Infinity;
+      for (let i = 0; i < geo.bubbles.length; i++) {
+        const d = Math.abs(geo.bubbles[i]!.cx - x);
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+      }
+      return best;
+    },
+    [geo],
+  );
+  // `value` = the bubble's magnitude (the encoded area), `null` when missing.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: data[i]?.value ?? null, label: data[i]?.label }),
+    [data],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: data.length,
+    width: geo.width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -81,37 +121,31 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
       : typeof summary === "string"
         ? summary
         : bubbleRowSummary(data, { strings, format, locale });
-  const label2 = [title, accName].filter(Boolean).join(". ") || undefined;
+  const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    if (r.width === 0) return;
-    const x = ((e.clientX - r.left) / r.width) * geo.width;
-    let best = 0;
-    let bestD = Infinity;
-    geo.bubbles.forEach((b, i) => {
-      const d = Math.abs(b.cx - x);
-      if (d < bestD) {
-        bestD = d;
-        best = i;
-      }
-    });
-    setActive(best);
-  };
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowRight") {
-      setActive((p) => Math.min(data.length - 1, (p ?? -1) + 1));
-      e.preventDefault();
-    } else if (e.key === "ArrowLeft") {
-      setActive((p) => Math.max(0, (p ?? data.length) - 1));
-      e.preventDefault();
-    } else if (e.key === "Escape") setActive(null);
+  const ring = (i: number, pinned: boolean) => {
+    const b = geo.bubbles[i];
+    if (!b) return null;
+    return (
+      <circle
+        cx={b.cx}
+        cy={b.cy}
+        r={b.r}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "full"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
   };
 
-  const b = active !== null ? geo.bubbles[active] : undefined;
-  const datum = active !== null ? data[active] : undefined;
+  const shown = active ?? selected;
+  const b = shown !== null ? geo.bubbles[shown] : undefined;
+  const shownDatum = shown !== null ? data[shown] : undefined;
   const announced =
-    b && datum && datum.value !== null ? strings.bubbleAt(datum.label, fmt(datum.value)) : "";
+    b && shownDatum && shownDatum.value !== null
+      ? strings.bubbleAt(shownDatum.label, fmt(shownDatum.value))
+      : "";
 
   return (
     <span
@@ -119,11 +153,8 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
       {...wrap("mc-bubble-live", className, style)}
       tabIndex={0}
       role="img"
-      aria-label={label2}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      aria-label={ariaLabel}
+      {...bind}
     >
       <StaticBubbleRow
         {...rest}
@@ -139,32 +170,12 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {b ? (
-          <circle
-            cx={b.cx}
-            cy={b.cy}
-            r={b.r}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="full"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticBubbleRow>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {b && announced ? (
         <span
           className="mc-spark-readout"

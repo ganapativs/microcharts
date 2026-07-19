@@ -5,11 +5,15 @@
 // is allowed because the loop rate IS the call rate. Gated on
 // reduced-motion (→ the static frame; dash density already carries rate) and
 // on-screen (paused off-viewport). Composes the static component (canon); a polite
-// live region announces threshold crossings only.
+// live region announces threshold crossings only. ONE unit (the dependency
+// itself) → the lean scalar contract: `onSelect` for drill-down, no picker
+// kernel, no roving, no selection state to rove between.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { FILL, wrap } from "../../shared/interactive.js";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { orbitStatusGeometry } from "./geometry.js";
@@ -21,6 +25,8 @@ import {
 
 export interface InteractiveOrbitStatusProps extends OrbitStatusProps {
   strings?: OrbitStatusStrings;
+  /** The dependency was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — value is latency. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 // Angular period per rate step 1–5 (busier = faster).
@@ -41,6 +47,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     summary,
     className,
     style,
+    onSelect,
     ...rest
   } = props;
 
@@ -52,6 +59,8 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [announced, setAnnounced] = useState("");
+  // Hover/focus reveals the exact latency numeral — a readout, not a selection.
+  const [open, setOpen] = useState(false);
   const prevAlerted = useRef<boolean | null>(null);
   const mounted = useRef(false);
 
@@ -62,6 +71,29 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
         ? summary
         : orbitStatusSummary(latency, rate, { alert, strings, format, locale });
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  // ONE unit — the dependency itself. There is nothing to rove between and no
+  // angular lookup to do (the satellite's angle encodes nothing; only its speed
+  // does), so this takes the lean scalar contract: drill-down on activation.
+  // value = latency, the chart's primary encoded number (orbit RADIUS). Rate is
+  // the second channel (dash density / orbital speed) and stays in the summary
+  // rather than inventing a second numeric field.
+  const select = (): void =>
+    onSelect?.({
+      index: 0,
+      value: geo.unknown ? null : Math.max(0, latency),
+      label: title,
+    });
+
+  // The Chart viewBox gains a right-hand gutter when the ms numeral is shown;
+  // the orbit still sits in the left square, so anything positioned as a
+  // percentage of the wrapper must divide by the FULL width, not the square
+  // (mirrors the static entry's reservation, verbatim).
+  const labelText =
+    rest.label === "latency" && !geo.unknown ? `${fmt(Math.max(0, latency))}ms` : null;
+  const vbWidth =
+    geo.size +
+    (labelText ? Math.ceil(labelText.length * 0.7 * (rest.fontSize ?? labelFont(size)) + 2) : 0);
 
   // Orbit the satellite (only when motion is allowed and the rate is nonzero).
   useEffect(() => {
@@ -98,6 +130,17 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
+      onPointerEnter={() => setOpen(true)}
+      onPointerLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)}
+      onBlur={() => setOpen(false)}
+      onClick={select}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select();
+        }
+      }}
     >
       <StaticOrbitStatus
         {...rest}
@@ -114,6 +157,18 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
         summary={false}
       />
       <LiveRegion>{announced}</LiveRegion>
+      {open ? (
+        <span
+          className="mc-spark-readout"
+          style={{
+            // centered over the ORBIT square, not the gutter-widened viewBox
+            left: `${(geo.size / 2 / vbWidth) * 100}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {geo.unknown ? "—" : `${fmt(Math.max(0, latency))}ms`}
+        </span>
+      ) : null}
     </span>
   );
 }

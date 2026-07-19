@@ -1,9 +1,12 @@
 "use client";
-// Interactive <TimeInRange>. One pointer listener; zone by x/y
-// lookup. ←/→ (or ↑/↓ vertical) rove zones, each announcing "{zone}: {pct}".
-// Composes the static component (canon) — overlays ride as children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
-import { FILL, wrap } from "../../shared/interactive.js";
+// Interactive <TimeInRange>. useActivePicker owns interaction: one pointer
+// listener + zone-by-x/y lookup, roving keyboard (←/→ horizontal, ↑/↓
+// vertical, Home/End ends), touch tap-to-pin, and the onActive/onSelect
+// contract. Each zone announces "{zone}: {pct}". Composes the static component
+// (canon) — overlays ride as children.
+import { useCallback, useMemo, useRef } from "react";
+import type { ZoneKey } from "./geometry.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TIME_IN_RANGE } from "../../core/strings-time-in-range.js";
@@ -15,7 +18,7 @@ import {
   type TimeInRangeProps,
 } from "./index.js";
 
-export interface InteractiveTimeInRangeProps extends TimeInRangeProps {
+export interface InteractiveTimeInRangeProps extends TimeInRangeProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the zone segments reveal on
    * when the chart first mounts client-side. Inert on the server and on
@@ -36,6 +39,10 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const horizontal = orientation !== "vertical";
@@ -55,7 +62,6 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
     [data, width, height, orientation],
   );
   const pct = useMemo(() => zonePercentMap(data), [data]);
-  const [active, setActive] = useState<number | null>(null);
 
   const accName =
     summary === false
@@ -65,66 +71,98 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
         : timeInRangeSummary(data, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const nameByKey: Record<string, string> = {
-    severeBelow: strings.tirNames[0],
-    below: strings.tirNames[1],
-    in: strings.tirNames[2],
-    above: strings.tirNames[3],
-    severeAbove: strings.tirNames[4],
-  };
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.zones.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const i = horizontal
-        ? geo.zones.findIndex((z) => {
-            const x = ((e.clientX - r.left) / r.width) * width;
-            return x >= z.x && x <= z.x + z.width;
-          })
-        : geo.zones.findIndex((z) => {
-            const y = ((e.clientY - r.top) / r.height) * height;
-            return y >= z.y && y <= z.y + z.height;
-          });
-      setActive(i >= 0 ? i : null);
-    },
-    [geo, width, height, horizontal],
+  const nameByKey = useMemo<Record<ZoneKey, string>>(
+    () => ({
+      severeBelow: strings.tirNames[0]!,
+      below: strings.tirNames[1]!,
+      in: strings.tirNames[2]!,
+      above: strings.tirNames[3]!,
+      severeAbove: strings.tirNames[4]!,
+    }),
+    [strings],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.zones.length === 0) return;
+  // Pointer (viewBox space) → zone index by the zone's own extent.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      const i = horizontal
+        ? geo.zones.findIndex((z) => x >= z.x && x <= z.x + z.width)
+        : geo.zones.findIndex((z) => y >= z.y && y <= z.y + z.height);
+      return i >= 0 ? i : null;
+    },
+    [geo, horizontal],
+  );
+
+  // Roving in zone-index space, but the arrow keys follow the visual axis:
+  // ←/→ when horizontal, ↑/↓ when vertical (↑ advances toward severe-high, the
+  // top). Home/End jump the ends. First arrow from nothing lands on zone 0.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const n = geo.zones.length;
+      if (n === 0) return null;
       const fwd = horizontal ? "ArrowRight" : "ArrowUp";
       const back = horizontal ? "ArrowLeft" : "ArrowDown";
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
+      switch (key) {
         case fwd:
-          next = Math.min(geo.zones.length - 1, cur + 1);
-          break;
+          return cur < 0 ? 0 : Math.min(n - 1, cur + 1);
         case back:
-          next = Math.max(0, cur - 1);
-          break;
+          return cur <= 0 ? 0 : cur - 1;
         case "Home":
-          next = 0;
-          break;
+          return 0;
         case "End":
-          next = geo.zones.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
+          return n - 1;
       }
-      e.preventDefault();
-      setActive(next);
+      return null;
     },
-    [active, geo, horizontal],
+    [geo, horizontal],
   );
 
-  const zone = active !== null ? geo.zones[active] : undefined;
+  // Navigable unit = a zone; `index` its zone index, `value` its integer
+  // percent share (what the strip encodes), `label` the zone's human name.
+  const datum = useCallback(
+    (i: number) => {
+      const z = geo.zones[i];
+      return {
+        index: i,
+        value: z ? (pct[z.key] ?? null) : null,
+        label: z ? nameByKey[z.key] : undefined,
+      };
+    },
+    [geo, pct, nameByKey],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.zones.length,
+    width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const outline = (i: number, pinned: boolean) => {
+    const z = geo.zones[i];
+    if (!z) return null;
+    return (
+      <rect
+        x={z.x - 0.5}
+        y={z.y - 0.5}
+        width={z.width + 1}
+        height={z.height + 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const zone = shown !== null ? geo.zones[shown] : undefined;
   const announced = zone ? strings.tirZone(nameByKey[zone.key]!, `${pct[zone.key]}%`) : "";
   const chipPos = zone
     ? horizontal
@@ -143,10 +181,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticTimeInRange
         {...rest}
@@ -158,18 +193,9 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
         summary={false}
         style={FILL}
       >
-        {zone ? (
-          <rect
-            x={zone.x - 0.5}
-            y={zone.y - 0.5}
-            width={zone.width + 1}
-            height={zone.height + 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticTimeInRange>
       <LiveRegion>{announced}</LiveRegion>

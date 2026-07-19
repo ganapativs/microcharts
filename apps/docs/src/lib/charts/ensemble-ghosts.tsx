@@ -1,6 +1,5 @@
 import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
-import { EnsembleGhosts as EnsembleGhostsInteractive } from "@microcharts/react/ensemble-ghosts/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // 24 simulated futures — a fan of walks with diverse shapes (deterministic)
@@ -75,12 +74,6 @@ const futures = Array.from({ length: 24 }, (_m, i) =>
 export function Preview() {
   return <EnsembleGhosts data={FUTURES} summary={false} width={120} height={28} />;
 }
-
-export const showcase = {
-  hint: "the futures, not the average",
-  Node: () => <EnsembleGhosts data={FUTURES} title="Simulated futures" width={160} height={32} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "ghosts", label: "ghosts", min: 3, max: 12, step: 1, init: 8 },
@@ -111,30 +104,6 @@ export const playground: PlaygroundSpec = {
       s.ghosts !== 8 && `  ghosts={${s.ghosts}}`,
       s.emphasis !== "nearest-median" && `  emphasis="${s.emphasis}"`,
       s.endpoints && "  endpoints",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <EnsembleGhostsInteractive
-      data={FUTURES}
-      ghosts={s.ghosts as number}
-      emphasis={s.emphasis as "nearest-median" | "median"}
-      endpoints={s.endpoints as boolean}
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={44}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<EnsembleGhosts",
-      "  data={futures}",
-      s.ghosts !== 8 && `  ghosts={${s.ghosts}}`,
-      s.emphasis !== "nearest-median" && `  emphasis="${s.emphasis}"`,
-      s.endpoints && "  endpoints",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -257,21 +226,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<EnsembleGhosts data={futures} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <EnsembleGhostsInteractive data={FUTURES} summary={false} width={120} height={28} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

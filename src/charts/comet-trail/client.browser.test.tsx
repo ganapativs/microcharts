@@ -20,12 +20,49 @@ describe("interactive <CometTrail>", () => {
     await vi.waitFor(() => expect(head.getAnimations().length).toBeGreaterThan(0));
   });
 
-  it("Left arrow steps back through the trail", async () => {
+  it("arrows walk the trail left (older) to right (now)", async () => {
     const screen = await render(<CometTrail data={RISING} title="Price" />);
     const fig = screen.getByRole("img").element() as HTMLElement;
     const live = fig.querySelector('[aria-live="polite"]')!;
     fig.focus();
+    // The first arrow lands on unit 0 — the oldest point in the window.
     await userEvent.keyboard("{ArrowLeft}");
-    expect(live.textContent).toBe("1 updates ago: 84.");
+    expect(live.textContent).toBe("12 updates ago: 40.");
+    await userEvent.keyboard("{ArrowRight}");
+    expect(live.textContent).toBe("11 updates ago: 45.");
+    await userEvent.keyboard("{End}");
+    expect(live.textContent).toBe("Now 87.");
+  });
+
+  it("onActive reports the focused point; null once cleared", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<CometTrail data={RISING} onActive={(d) => seen.push(d)} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(seen.at(-1)).toEqual({ index: 0, value: 40 });
+    await userEvent.keyboard("{End}");
+    expect(seen.at(-1)).toEqual({ index: 12, value: 87 });
+    await userEvent.keyboard("{Escape}");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active point: fires onSelect + pins a ring", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<CometTrail data={RISING} onSelect={(d) => picks.push(d)} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await userEvent.keyboard("{Enter}");
+    expect(picks.at(-1)).toEqual({ index: 0, value: 40 });
+    // Pin survives blur (it is selection, not hover).
+    fig.blur();
+    await expect.poll(() => fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring without focus", async () => {
+    const screen = await render(<CometTrail data={RISING} selectedIndex={4} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    expect(fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
 });

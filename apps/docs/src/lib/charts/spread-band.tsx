@@ -1,12 +1,11 @@
 import { SpreadBand } from "@microcharts/react/spread-band";
-import { SpreadBand as SpreadBandInteractive } from "@microcharts/react/spread-band/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 const ORG = [8, 9, 11, 12, 14, 15, 17, 18, 20, 21, 23, 24];
 const PAID = [12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 16, 16];
-const PAIRS = ORG.map((a, i) => ({ a, b: PAID[i]! }));
-const LABELS: [string, string] = ["Organic", "Paid"];
+export const PAIRS = ORG.map((a, i) => ({ a, b: PAID[i]! }));
+export const LABELS: [string, string] = ["Organic", "Paid"];
 
 export const entry: ChartEntry = {
   name: "SpreadBand",
@@ -70,14 +69,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <SpreadBand data={PAIRS} labels={LABELS} summary={false} width={140} height={26} />;
 }
-
-export const showcase = {
-  hint: "lead + flip",
-  Node: () => (
-    <SpreadBand data={PAIRS} labels={LABELS} title="Organic vs paid" width={140} height={26} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "label", label: "label", options: ["gap", "none"], init: "gap" },
@@ -107,30 +98,6 @@ export const playground: PlaygroundSpec = {
       '  labels={["Organic", "Paid"]}',
       s.label !== "gap" && `  label="${s.label}"`,
       s.positive !== "up" && `  positive="${s.positive}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <SpreadBandInteractive
-      data={PAIRS}
-      labels={LABELS}
-      label={s.label as "gap" | "none"}
-      positive={s.positive as "up" | "down"}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={34}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<SpreadBand",
-      "  data={pairs}",
-      '  labels={["Organic", "Paid"]}',
-      s.label !== "gap" && `  label="${s.label}"`,
-      s.positive !== "up" && `  positive="${s.positive}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -268,28 +235,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<SpreadBand data={pairs} labels={["Organic", "Paid"]} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <SpreadBandInteractive
-      data={PAIRS}
-      labels={LABELS}
-      summary={false}
-      width={140}
-      height={26}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

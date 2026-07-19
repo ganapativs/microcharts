@@ -1,10 +1,9 @@
 import { CitySkyline } from "@microcharts/react/city-skyline";
-import { CitySkyline as CitySkylineInteractive } from "@microcharts/react/city-skyline/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 type Team = { label: string; value: number; lit?: number };
-const TEAMS: Team[] = [
+export const TEAMS: Team[] = [
   { label: "Platform", value: 46, lit: 0.7 },
   { label: "Core", value: 32, lit: 0.5 },
   { label: "Web", value: 28, lit: 0.9 },
@@ -92,12 +91,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <CitySkyline data={TEAMS} summary={false} height={26} />;
 }
-
-export const showcase = {
-  hint: "size + activation",
-  Node: () => <CitySkyline data={TEAMS} labels unit="teams" title="Team sizes" height={32} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "labels", label: "labels", init: false },
@@ -124,32 +117,6 @@ export const playground: PlaygroundSpec = {
       s.labels && "  labels",
       s.value && '  label="value"',
       s.ground === false && "  ground={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <CitySkylineInteractive
-      data={TEAMS}
-      labels={s.labels as boolean}
-      label={s.value ? "value" : "none"}
-      ground={s.ground as boolean}
-      unit="teams"
-      animate={ui.animate}
-      summary={false}
-      bw={16}
-      gap={6}
-      height={s.labels || s.value ? 52 : 44}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<CitySkyline",
-      "  data={teams}",
-      s.labels && "  labels",
-      s.value && '  label="value"',
-      s.ground === false && "  ground={false}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -283,19 +250,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<CitySkyline data={teams} />`;
 }
-
-export function PreviewLive() {
-  return <CitySkylineInteractive data={TEAMS} summary={false} height={26} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

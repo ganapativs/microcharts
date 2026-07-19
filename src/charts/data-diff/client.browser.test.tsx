@@ -8,19 +8,22 @@ const DIFF = [
   { key: "items", added: 40, removed: 20 },
 ];
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <DataDiff>", () => {
   it("arrow keys step rows; each announces added / removed / net", async () => {
     const screen = await render(<DataDiff data={DIFF} width={120} height={40} title="Diff" />);
     const wrap = screen.container.querySelector(".mc-data-diff-live") as HTMLElement;
     wrap.focus();
-    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    key(wrap, "Home");
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("users: +340 added, −120 removed, net +220.");
     // a VISIBLE readout chip pairs +added · −removed
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
       .toBe("+340 · −120");
-    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    key(wrap, "ArrowDown");
     await expect.poll(() => live.textContent).toBe("orders: +88 added, −30 removed, net +58.");
   });
 
@@ -28,8 +31,43 @@ describe("interactive <DataDiff>", () => {
     const screen = await render(<DataDiff data={DIFF} width={120} height={40} title="Diff" />);
     const wrap = screen.container.querySelector(".mc-data-diff-live") as HTMLElement;
     wrap.focus();
-    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    key(wrap, "End");
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toMatch(/^items:/);
+  });
+
+  it("onActive reports the focused row (row index + net); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <DataDiff data={DIFF} width={120} height={40} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-data-diff-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    expect(seen.at(-1)).toEqual({ index: 0, value: 220, label: "users" });
+    key(wrap, "Escape");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active row: fires onSelect + pins a persistent ring", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <DataDiff data={DIFF} width={120} height={40} onSelect={(d) => picks.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-data-diff-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    key(wrap, "Enter");
+    expect(picks.at(-1)).toEqual({ index: 0, value: 220, label: "users" });
+    // Pin survives blur (it is selection, not hover).
+    wrap.blur();
+    await expect
+      .poll(() => screen.container.querySelector('rect[data-mc-w="tick"]'))
+      .not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring without focus", async () => {
+    const screen = await render(<DataDiff data={DIFF} width={120} height={40} selectedIndex={1} />);
+    expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
 });

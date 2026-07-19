@@ -1,6 +1,5 @@
 import { Seismogram } from "@microcharts/react/seismogram";
-import { Seismogram as SeismogramInteractive } from "@microcharts/react/seismogram/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // A dense, bursty signal — mostly-live slots with quiet gaps and a few real
@@ -90,14 +89,7 @@ export const entry: ChartEntry = {
 
 export function Preview() {
   return <Seismogram data={BURSTS} summary={false} width={140} height={28} />;
-}
-
-export const showcase = {
-  hint: "events",
-  Node: () => <Seismogram data={BURSTS} title="Error bursts" width={200} height={34} />,
-};
-
-// color, format, locale, id, className, style, children: styling/formatting
+} // color, format, locale, id, className, style, children: styling/formatting
 // escape hatches, not chart-shape knobs — no interactive control (consistent
 // with every other chart's playground; locale is demonstrated live in the
 // mdx variants instead). title/summary stay off here for a clean strip.
@@ -134,32 +126,6 @@ export const playground: PlaygroundSpec = {
       (s.signed as boolean) && '  positive="up"',
       (s.flag as boolean) && "  anomaly={6}",
       (s.domain as boolean) && "  domain={[0, 20]}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <SeismogramInteractive
-      data={(s.signed as boolean) ? BURSTS.map((v, i) => (i % 2 === 0 ? v : -v)) : BURSTS}
-      mode={s.mode as "intensity" | "barcode"}
-      positive={(s.signed as boolean) ? "up" : undefined}
-      anomaly={(s.flag as boolean) ? 6 : undefined}
-      domain={(s.domain as boolean) ? [0, 20] : undefined}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={44}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Seismogram",
-      "  data={burstsPerMinute}",
-      s.mode !== "intensity" && `  mode="${s.mode}"`,
-      (s.signed as boolean) && '  positive="up"',
-      (s.flag as boolean) && "  anomaly={6}",
-      (s.domain as boolean) && "  domain={[0, 20]}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -275,19 +241,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Seismogram data={burstsPerMinute} />`;
 }
-
-export function PreviewLive() {
-  return <SeismogramInteractive data={BURSTS} summary={false} width={140} height={28} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

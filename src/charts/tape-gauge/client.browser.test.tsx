@@ -14,4 +14,25 @@ describe("interactive <TapeGauge>", () => {
     const live = wrap.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toContain("Now 142, rising");
   });
+
+  it("click fires onSelect with the current reading", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <TapeGauge value={142} rate={1} zones={ZONES} span={25} onSelect={(d) => picks.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-tape-live") as HTMLElement;
+    wrap.click();
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 142 });
+  });
+
+  it("Enter fires onSelect", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <TapeGauge value={98} rate={0} span={25} onSelect={(d) => picks.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-tape-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 98 });
+  });
 });

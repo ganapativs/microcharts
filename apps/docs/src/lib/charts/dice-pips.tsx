@@ -1,6 +1,5 @@
 import { DicePips } from "@microcharts/react/dice-pips";
-import { DicePips as DicePipsInteractive } from "@microcharts/react/dice-pips/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -16,6 +15,7 @@ export const entry: ChartEntry = {
   // client.tsx) — a mount entrance would fight that existing motion, so this
   // chart has no `animate` prop at all.
   animates: false,
+  picker: false,
   dataShape: "{ value: number }",
   encoding: { channel: "canonical pip pattern 1–6 (subitized)", precision: "high" },
   nodeBudget: "≤ 7 (face + 6 pips)",
@@ -55,12 +55,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "subitized",
-  Node: () => <DicePips value={5} title="Severity" size={24} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value", min: 0, max: 9, step: 1, init: 4 },
@@ -70,21 +64,6 @@ export const playground: PlaygroundSpec = {
     <DicePips value={s.value as number} face={s.face as boolean} summary={false} size={44} />
   ),
   code: (s) =>
-    ["<DicePips", `  value={${s.value}}`, s.face === false && "  face={false}", "/>"]
-      .filter(Boolean)
-      .join("\n"),
-  // No `animate` prop exists on this chart (see entry.animates) — the pips'
-  // own value-transition cross-fade is the only motion; renderInteractive
-  // still demonstrates the interactive entry itself.
-  renderInteractive: (s) => (
-    <DicePipsInteractive
-      value={s.value as number}
-      face={s.face as boolean}
-      summary={false}
-      size={44}
-    />
-  ),
-  codeInteractive: (s) =>
     ["<DicePips", `  value={${s.value}}`, s.face === false && "  face={false}", "/>"]
       .filter(Boolean)
       .join("\n"),
@@ -184,25 +163,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<DicePips value={4} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex items-center gap-3">
-      {[1, 2, 3, 4, 5, 6].map((v) => (
-        <DicePipsInteractive key={v} value={v} summary={false} size={18} />
-      ))}
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

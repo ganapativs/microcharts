@@ -5,6 +5,7 @@
 // static chart is decorative so the reading isn't announced twice.
 import { useRef, useState } from "react";
 import { FILL, wrap } from "../../shared/interactive.js";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
@@ -21,6 +22,8 @@ export interface InteractiveBulletProps extends BulletProps {
    * on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** The bullet was activated (click, tap, Enter or Space): `{ index: 0, value }` — the measure (never the target or a band). */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function Bullet(props: InteractiveBulletProps): React.ReactNode {
@@ -32,6 +35,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    onSelect,
     className,
     style,
     ...rest
@@ -54,6 +58,10 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
             : ""
         }`;
 
+  // Drill-down: the MEASURE — the one thing the bar encodes. The target and the
+  // qualitative bands are context, not the datum.
+  const select = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });
+
   return (
     <span
       ref={hostRef}
@@ -65,6 +73,13 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
       onPointerLeave={() => setOpen(false)}
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
+      onClick={select}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select();
+        }
+      }}
     >
       <StaticBullet
         {...rest}

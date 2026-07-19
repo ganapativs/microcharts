@@ -6,6 +6,7 @@
 // transform, so containment is honest at generation time. The barb starts at the
 // disc rim, per the real station model. 2-dp.
 import { round2 } from "../../core/types.js";
+import { labelFont } from "../../core/labels.js";
 import { windBarbGeometry, type Seg, type WindBarbGeometry } from "../wind-barb/geometry.js";
 
 const TAU = Math.PI * 2;
@@ -22,6 +23,58 @@ function skyPie(cx: number, cy: number, r: number, f: number): string {
   const ex = round2(cx + r * Math.sin(a));
   const ey = round2(cy - r * Math.cos(a));
   return `M${round2(cx)} ${round2(cy)}L${round2(cx)} ${top}A${r} ${r} 0 ${a > Math.PI ? 1 : 0} 1 ${ex} ${ey}Z`;
+}
+
+/**
+ * Numeral gutters + disc placement, in absolute viewBox coords. Shared by the
+ * static entry (which draws them) and the interactive one (which hit-tests the
+ * fields), so the two can never disagree about where a numeral sits.
+ */
+export interface StationLayout {
+  width: number;
+  height: number;
+  /** Label font size in viewBox units. */
+  font: number;
+  /** Disc center + radius. */
+  cx: number;
+  cy: number;
+  r: number;
+  /** Vertical offset of the temp / dew numerals from the disc center. */
+  yOff: number;
+  /** Gap between the disc rim and a numeral. */
+  gap: number;
+}
+
+/**
+ * Reserve a gutter per side sized to the widest numeral on it (the static path
+ * never measures text — a per-char over-estimate), then place the disc center.
+ */
+export function stationLayout(opts: {
+  size: number;
+  temp: string | null;
+  dew: string | null;
+  pressure: string | null;
+}): StationLayout {
+  const { size } = opts;
+  const font = labelFont(size, 0.24);
+  const gap = 3;
+  const gutW = (s: string | null): number => (s ? 0.62 * font * s.length + gap : 1);
+  const padXL = round2(Math.max(gutW(opts.temp), gutW(opts.dew)) + 0.5);
+  const padXR = round2(gutW(opts.pressure) + 0.5);
+  const padY = round2(font + 2);
+  const r = round2(size * 0.24);
+  return {
+    width: round2(padXL + size + padXR),
+    height: round2(size + padY * 2),
+    font,
+    cx: round2(padXL + size / 2),
+    cy: round2(padY + size / 2),
+    r,
+    // push temp/dew toward the top/bottom of the disc (where it is narrowest and
+    // the radial barb is furthest away), so they clear both disc and barb
+    yOff: round2(r * 0.78),
+    gap,
+  };
 }
 
 export interface StationGlyphGeometry {

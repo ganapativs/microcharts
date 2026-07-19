@@ -25,4 +25,36 @@ describe("interactive <SpiralYear>", () => {
     );
     expect(wrap.querySelector("svg")!.getAttribute("aria-hidden")).toBe("true");
   });
+
+  it("onActive reports the focused datum (data index + value + label); null on Escape", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <SpiralYear data={YEAR} size={64} onActive={(d) => seen.push(d)} />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}{ArrowRight}");
+    expect(seen.at(-1)).toEqual({ index: 1, value: 101, label: "week 2" });
+    await userEvent.keyboard("{Escape}");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active period: fires onSelect + pins a ring that survives blur", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <SpiralYear data={YEAR} size={64} onSelect={(d) => picks.push(d)} />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}{ArrowRight}{Enter}");
+    expect(picks.at(-1)).toEqual({ index: 1, value: 101, label: "week 2" });
+    fig.blur();
+    await expect.poll(() => fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring without focus", async () => {
+    const screen = await render(<SpiralYear data={YEAR} size={64} selectedIndex={3} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    expect(fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
 });

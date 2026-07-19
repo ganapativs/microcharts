@@ -5,7 +5,7 @@
 // keyboard model beyond wrapper focus — a count has no sub-parts to navigate.
 // Composes the static component (canon); geometry is never re-implemented.
 import { useEffect, useRef, useState } from "react";
-import { FILL, wrap as wrapAttrs } from "../../shared/interactive.js";
+import { FILL, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { EN_TALLY, type TallyStrings } from "../../core/strings-tally.js";
 import { TallyMarks as StaticTallyMarks, tallySummary, type TallyMarksProps } from "./index.js";
 
@@ -13,10 +13,22 @@ export interface InteractiveTallyMarksProps extends TallyMarksProps {
   /** Announce count changes through a polite region (default true). */
   live?: boolean;
   strings?: TallyStrings;
+  /** Click/tap or Enter/Space — `{ index: 0, value: the count }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
-  const { live = true, strings = EN_TALLY, title, value, pen, className, style, ...rest } = props;
+  const {
+    live = true,
+    strings = EN_TALLY,
+    title,
+    value,
+    pen,
+    onSelect,
+    className,
+    style,
+    ...rest
+  } = props;
   const summary = tallySummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
   const prev = useRef(value);
@@ -63,6 +75,14 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
+  // The strokes are ONE count, not N navigable marks: a single selectable unit
+  // (index 0) carrying the integer the tally reads back (floored, ≥ 0).
+  const pick = (): void =>
+    onSelect?.({
+      index: 0,
+      value: Number.isFinite(value) ? Math.max(0, Math.floor(value)) : null,
+    });
+
   return (
     <span
       ref={wrap}
@@ -70,6 +90,12 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
     >
       <StaticTallyMarks
         {...rest}

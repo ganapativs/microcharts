@@ -1,6 +1,5 @@
 import { DepthWedge } from "@microcharts/react/depth-wedge";
-import { DepthWedge as DepthWedgeInteractive } from "@microcharts/react/depth-wedge/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const BOOK = {
@@ -90,12 +89,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <DepthWedge data={BOOK} summary={false} width={130} height={24} />;
 }
-
-export const showcase = {
-  hint: "depth",
-  Node: () => <DepthWedge data={BOOK} title="Order book" width={130} height={24} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "normalize", label: "normalize", init: false },
@@ -126,30 +119,6 @@ export const playground: PlaygroundSpec = {
       s.normalize === true && "  normalize",
       s.label !== "spread" && `  label="${s.label}"`,
       s.levels !== 2 && `  levels={${s.levels}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <DepthWedgeInteractive
-      data={BOOK}
-      normalize={s.normalize as boolean}
-      label={s.label as "spread" | "none"}
-      levels={s.levels as number}
-      animate={ui.animate}
-      summary={false}
-      width={320}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<DepthWedge",
-      "  data={{ demand, supply }}",
-      s.normalize === true && "  normalize",
-      s.label !== "spread" && `  label="${s.label}"`,
-      s.levels !== 2 && `  levels={${s.levels}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -286,19 +255,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<DepthWedge data={{ demand, supply }} />`;
 }
-
-export function PreviewLive() {
-  return <DepthWedgeInteractive data={BOOK} summary={false} width={130} height={24} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

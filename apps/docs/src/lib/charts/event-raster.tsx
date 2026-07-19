@@ -1,6 +1,5 @@
 import { EventRaster } from "@microcharts/react/event-raster";
-import { EventRaster as EventRasterInteractive } from "@microcharts/react/event-raster/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const RASTER = [
@@ -70,12 +69,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <EventRaster data={RASTER} summary={false} width={220} height={56} />;
 }
-
-export const showcase = {
-  hint: "sync",
-  Node: () => <EventRaster data={RASTER} title="Service events" width={220} height={56} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -112,30 +105,6 @@ export const playground: PlaygroundSpec = {
       s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
       s.labels === false && "  labels={false}",
       s.overflow !== "bin" && `  overflow="${s.overflow}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <EventRasterInteractive
-      data={RASTER}
-      emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
-      labels={s.labels as boolean}
-      overflow={s.overflow as "bin" | "clip"}
-      summary={false}
-      animate={ui.animate}
-      width={320}
-      height={36}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<EventRaster",
-      "  data={services}",
-      s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
-      s.labels === false && "  labels={false}",
-      s.overflow !== "bin" && `  overflow="${s.overflow}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -260,19 +229,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<EventRaster data={services} />`;
 }
-
-export function PreviewLive() {
-  return <EventRasterInteractive data={RASTER} summary={false} width={220} height={56} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

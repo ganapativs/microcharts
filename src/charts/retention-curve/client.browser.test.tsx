@@ -31,4 +31,35 @@ describe("interactive <RetentionCurve>", () => {
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("week 1: 71% retained.");
   });
+
+  it("onActive reports the focused datum (period + value); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<RetentionCurve data={SAMPLE} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-retention-curve-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    await expect.poll(() => seen.at(-1)).toEqual({ index: 1, value: 0.71 });
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await expect.poll(() => seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active period: fires onSelect + pins a mark that survives blur", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<RetentionCurve data={SAMPLE} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-retention-curve-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 1, value: 0.71 });
+    wrap.blur();
+    await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the mark with no interaction", async () => {
+    const screen = await render(<RetentionCurve data={SAMPLE} selectedIndex={2} />);
+    const wrap = screen.container.querySelector(".mc-retention-curve-live") as HTMLElement;
+    expect(wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
 });

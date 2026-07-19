@@ -1,12 +1,12 @@
 "use client";
-// Interactive <QuadrantDot>. The focal is announced on focus;
-// ←/→ cycle the field ghosts in nearest-first order, each read with its coords
-// and quadrant; a pointer picks the nearest dot within a 3-unit hit radius.
-// Composes the static component (canon); the focus ring + readout chip are
-// overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <QuadrantDot>. useActivePicker owns interaction: one pointer
+// listener + nearest-point (2-D) lookup within a hit radius, ←/→/Home/End cycle
+// the peer field in nearest-first order, click / Enter / Space selects
+// (onSelect). Composes the static component (canon); the focus ring + persistent
+// pin + readout chip are overlay children.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUADRANT, type QuadrantStrings } from "../../core/strings-quadrant.js";
@@ -18,7 +18,7 @@ import {
   type QuadrantNames,
 } from "./index.js";
 
-export interface InteractiveQuadrantDotProps extends QuadrantDotProps {
+export interface InteractiveQuadrantDotProps extends QuadrantDotProps, PickerProps {
   strings?: QuadrantStrings;
   /**
    * Opt-in entrance motion (default `false`): the focal dot and its peer
@@ -60,6 +60,10 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -79,7 +83,49 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
     [width, height, data, field, xDomain, domain, split],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  const count = geo?.ghosts.length ?? 0;
+
+  // Nearest peer to the pointer within a 3-unit (squared 9) hit radius. The
+  // navigable units are the peer ghosts; datum.index is the ghost index in the
+  // chart's nearest-first order (not the input `field` order — field is
+  // re-sorted by distance from the focal, then capped at 30).
+  const locate = useCallback(
+    (x: number, y: number) => {
+      if (!geo) return null;
+      let best = -1;
+      let bestDist = 9;
+      geo.ghosts.forEach((g, i) => {
+        const d = (g.x - x) ** 2 + (g.y - y) ** 2;
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best >= 0 ? best : null;
+    },
+    [geo],
+  );
+
+  // A scatter point has no single "primary" number, so we report the y value
+  // (the conventional dependent axis — `domain` is the y grammar); the readout
+  // still shows both coordinates.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo?.ghosts[i]?.vy ?? null }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -91,61 +137,30 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
           : quadrantSummary(geo, { xLabel, yLabel, quadrants }, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const count = geo?.ghosts.length ?? 0;
+  const focalR = Math.max(1.6, Math.min(width, height) * 0.1);
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * width;
-      const py = ((e.clientY - r.top) / r.height) * height;
-      let best = -1;
-      let bestDist = 9;
-      geo.ghosts.forEach((g, i) => {
-        const d = (g.x - px) ** 2 + (g.y - py) ** 2;
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setActive(best >= 0 ? best : null);
-    },
-    [geo, count, width, height],
-  );
+  const ring = (i: number, pinned: boolean) => {
+    const g = geo?.ghosts[i];
+    if (!g) return null;
+    return (
+      <circle
+        cx={g.x}
+        cy={g.y}
+        r={focalR + 1.4}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (count === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((p) => Math.min(count - 1, (p ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((p) => (p === null || p <= 0 ? 0 : p - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(count - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [count],
-  );
-
-  const g = active !== null && geo ? geo.ghosts[active] : undefined;
+  const shown = active ?? selected;
+  const g = shown !== null && geo ? geo.ghosts[shown] : undefined;
   const announced =
-    g && active !== null
+    g && shown !== null
       ? strings.quadrantAt(
-          active + 1,
+          shown + 1,
           count,
           xLabel,
           fmt(g.vx),
@@ -162,10 +177,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticQuadrantDot
         {...rest}
@@ -185,17 +197,9 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {g ? (
-          <circle
-            cx={g.x}
-            cy={g.y}
-            r={Math.max(1.6, Math.min(width, height) * 0.1) + 1.4}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticQuadrantDot>
       {g && geo ? (

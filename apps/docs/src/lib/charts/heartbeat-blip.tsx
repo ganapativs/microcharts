@@ -1,11 +1,10 @@
 import { HeartbeatBlip } from "@microcharts/react/heartbeat-blip";
-import { HeartbeatBlip as HeartbeatBlipInteractive } from "@microcharts/react/heartbeat-blip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
-const NOW = 100_000;
-const BUSY = [97_000, 92_000, 85_000, 70_000, 55_000, 48_000];
+export const NOW = 100_000;
+export const BUSY = [97_000, 92_000, 85_000, 70_000, 55_000, 48_000];
 
 export const entry: ChartEntry = {
   name: "HeartbeatBlip",
@@ -19,6 +18,7 @@ export const entry: ChartEntry = {
   // the event rate) — a mount entrance would fight that live motion, so this
   // chart has no `animate` prop at all.
   animates: false,
+  picker: false,
   dataShape: "number[]",
   encoding: { channel: "a spike per event across the recent window", precision: "medium" },
   nodeBudget: "3",
@@ -78,12 +78,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <HeartbeatBlip events={BUSY} now={NOW} summary={false} width={80} />;
 }
-
-export const showcase = {
-  hint: "alive?",
-  Node: () => <HeartbeatBlip events={BUSY} now={NOW} title="Requests" width={90} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "count", label: "events", min: 0, max: 12, step: 1, init: 6 },
@@ -99,27 +93,6 @@ export const playground: PlaygroundSpec = {
     />
   ),
   code: (s) =>
-    [
-      "<HeartbeatBlip",
-      "  events={eventTimestamps}",
-      "  now={serverNow}",
-      s.label !== "none" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  // No `animate` prop exists on this chart (see entry.animates) — the
-  // sweeping trace IS the encoding.
-  renderInteractive: (s) => (
-    <HeartbeatBlipInteractive
-      events={Array.from({ length: s.count as number }, (_, k) => NOW - k * 4200 - 2000)}
-      now={NOW}
-      label={s.label as "none" | "count"}
-      summary={false}
-      width={160}
-    />
-  ),
-  codeInteractive: (s) =>
     [
       "<HeartbeatBlip",
       "  events={eventTimestamps}",
@@ -233,19 +206,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<HeartbeatBlip events={eventTimestamps} now={serverNow} />`;
 }
-
-export function PreviewLive() {
-  return <HeartbeatBlipInteractive events={BUSY} now={NOW} summary={false} width={80} />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -8,6 +8,7 @@
 // changes only, never per tick.
 import { useEffect, useRef, useState } from "react";
 import { FILL, wrap } from "../../shared/interactive.js";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -20,6 +21,8 @@ import {
 
 export interface InteractiveBreathingDotProps extends BreathingDotProps {
   strings?: BreathingDotStrings;
+  /** The dot was activated (click, tap, Enter or Space): `{ index: 0, value, label }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 // Per-band pulse parameters (snapped, so the motion is re-readable).
@@ -36,6 +39,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     strings = EN_BREATHING_DOT,
     title,
     summary,
+    onSelect,
     className,
     style,
     ...rest
@@ -96,6 +100,14 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     return () => anim.cancel();
   }, [reduced, inView, geo.band, geo.unknown, wrapRef]);
 
+  // Drill-down: the level the ring + pulse encode, named by its load band.
+  const select = (): void =>
+    onSelect?.({
+      index: 0,
+      value: geo.unknown ? null : geo.level,
+      label: geo.unknown ? undefined : strings.loadBands[geo.band],
+    });
+
   return (
     <span
       ref={wrapRef}
@@ -103,6 +115,13 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
+      onClick={select}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select();
+        }
+      }}
     >
       <StaticBreathingDot
         {...rest}

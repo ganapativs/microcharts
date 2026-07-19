@@ -1,16 +1,18 @@
 "use client";
-// Interactive <Honeycomb>. Announces the count on change; hover
-// reveals the "value of total" readout. No per-cell keyboard nav — cells are
-// anonymous units, not addressable data points. Composes the static component.
-import { useEffect, useRef, useState } from "react";
+// Interactive <Honeycomb>. Announces the count on change; hover reveals the
+// "value of total" readout. useActivePicker adds per-cell picking on top: one
+// wrapper listener + nearest-hex lookup, offset-row keyboard roving, click /
+// Enter / Space selects a cell (onSelect). Composes the static component.
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
+import { hexPath, honeycombGeometry } from "./geometry.js";
 import { Honeycomb as StaticHoneycomb, honeycombSummary, type HoneycombProps } from "./index.js";
 
-export interface InteractiveHoneycombProps extends HoneycombProps {
+export interface InteractiveHoneycombProps extends HoneycombProps, PickerProps {
   live?: boolean;
   strings?: HoneycombStrings;
   /**
@@ -23,6 +25,8 @@ export interface InteractiveHoneycombProps extends HoneycombProps {
   animate?: boolean;
 }
 
+const PAD = 1;
+
 export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
   const {
     live = true,
@@ -30,12 +34,18 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
     title,
     value,
     total = 10,
+    rows = "auto",
+    cell = 4,
     unit = "",
     format,
     locale,
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const summary = honeycombSummary(value, { total, unit, strings, format, locale });
@@ -45,15 +55,133 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "grow", animate);
 
+  const geo = useMemo(
+    () => honeycombGeometry({ total, value, rows, cellR: cell, pad: PAD }),
+    [total, value, rows, cell],
+  );
+  // Cells per row, read back off the laid-out geometry (never re-derived from
+  // the rows/total formula, which could drift from it).
+  const cols = useMemo(() => {
+    const first = geo.cells[0];
+    if (!first) return 0;
+    let n = 0;
+    while (geo.cells[n] && geo.cells[n]!.cy === first.cy) n++;
+    return n;
+  }, [geo]);
+
   useEffect(() => {
     if (prev.current === value) return;
     prev.current = value;
     if (live) setAnnounced(summary);
   }, [value, summary, live]);
 
+  // Pointer (viewBox space) → cell index: nearest hex center within one
+  // circumradius (hexes tile, so the nearest center is the containing cell).
+  const locate = useCallback(
+    (x: number, y: number) => {
+      let best: number | null = null;
+      let bestD = cell * cell;
+      for (let i = 0; i < geo.cells.length; i++) {
+        const c = geo.cells[i]!;
+        const dx = x - c.cx;
+        const dy = y - c.cy;
+        const d = dx * dx + dy * dy;
+        if (d <= bestD) {
+          bestD = d;
+          best = i;
+        }
+      }
+      return best;
+    },
+    [geo, cell],
+  );
+
+  // Offset-row roving. ←/→ walk WITHIN a row (never wrapping into the next);
+  // ↑/↓ hold the column. Odd rows are shifted a half cell, so both candidates in
+  // an adjacent row sit equidistant — holding the column resolves that tie
+  // stably, which keeps ↑ then ↓ a round trip back to the same cell. Boundary
+  // keys are consumed (return the current index) rather than ignored.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const n = geo.cells.length;
+      if (n === 0 || cols === 0) return null;
+      if (key === "Home") return 0;
+      if (key === "End") return n - 1;
+      // Nothing active yet: the first arrow lands on cell 0 (kernel contract).
+      const first = cur < 0;
+      const c = first ? 0 : cur;
+      const row = Math.floor(c / cols);
+      const col = c % cols;
+      const clamp = (i: number) => (i >= 0 && i < n ? i : null);
+      let next: number;
+      switch (key) {
+        case "ArrowRight":
+          next = col < cols - 1 ? (clamp(c + 1) ?? c) : c;
+          break;
+        case "ArrowLeft":
+          next = col > 0 ? c - 1 : c;
+          break;
+        case "ArrowDown":
+          next = clamp((row + 1) * cols + col) ?? c;
+          break;
+        case "ArrowUp":
+          next = clamp((row - 1) * cols + col) ?? c;
+          break;
+        default:
+          return null;
+      }
+      return first ? 0 : next;
+    },
+    [geo, cols],
+  );
+
+  // index = cell index (row-major from the top-left, the fill order); value =
+  // the cell's occupancy — 1 when filled, 0 when empty (a cell has no other
+  // encoded number; the chart's magnitude is the count of filled cells).
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.cells[i] ? (geo.cells[i]!.filled ? 1 : 0) : null }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.cells.length,
+    width: geo.width,
+    height: geo.height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
-  const fmt = makeFormatter(format, locale);
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  const shown = active ?? selected;
+  // The VISUAL chip is numerals only ("7 / 40") — it sits next to the comb, which
+  // supplies the rest. The SPOKEN form can't lean on that context, so it goes
+  // through the strings contract and names the cell's state.
+  const cellReadout = shown === null ? "" : `${fmt(shown + 1)} / ${fmt(geo.cells.length)}`;
+  const cellSpoken =
+    shown === null
+      ? ""
+      : strings.honeycombCell(shown + 1, geo.cells.length, geo.cells[shown]?.filled ?? false);
   const readout = `${fmt(Math.max(0, Math.round(value)))} / ${fmt(Math.floor(total))}`;
+
+  const ring = (i: number, pinned: boolean) => {
+    const c = geo.cells[i];
+    if (!c) return null;
+    return (
+      <path
+        d={hexPath(c.cx, c.cy, cell)}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
   return (
     <span
@@ -62,26 +190,40 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
+      {...bind}
       onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
+      onPointerLeave={() => {
+        bind.onPointerLeave();
+        setHover(false);
+      }}
       onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onBlur={() => {
+        bind.onBlur();
+        setHover(false);
+      }}
     >
       <StaticHoneycomb
         {...rest}
         style={FILL}
         value={value}
         total={total}
+        rows={rows}
+        cell={cell}
         unit={unit}
         format={format}
         locale={locale}
         strings={strings}
         summary={false}
-      />
-      {live ? <LiveRegion>{announced}</LiveRegion> : null}
-      {hover ? (
+      >
+        {/* Pinned selection persists through pointer-leave; focus hex is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
+        {rest.children}
+      </StaticHoneycomb>
+      {live ? <LiveRegion>{shown === null ? announced : cellSpoken}</LiveRegion> : null}
+      {hover || shown !== null ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {readout}
+          {shown === null ? readout : cellReadout}
         </span>
       ) : null}
     </span>

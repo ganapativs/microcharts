@@ -196,8 +196,11 @@ export function HeroSilk({ className = "" }: { className?: string }) {
       canvas.dataset.ready = "";
     };
 
+    // No resize() here: it reads canvas.clientWidth/clientHeight, so calling it
+    // per frame forced two layout reads every tick (~120/s) for a value that
+    // only changes on resize — and a ResizeObserver below already watches this
+    // exact canvas. The `r` uniform is GL state, so it persists between draws.
     const frame = () => {
-      resize();
       gl.uniform1f(uT, (performance.now() - t0) / 1000);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       markReady();

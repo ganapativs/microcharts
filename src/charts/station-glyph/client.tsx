@@ -1,12 +1,21 @@
 "use client";
-// Interactive <StationGlyph>. The glyph packs several fields into
-// one character; the interactive entry roves them with ←/→ so a screen-reader
-// user can step field-by-field (station, wind, sky, temp, dew, pressure) instead
-// of hearing one long string. Focus reads the whole observation; Home returns to
-// it. Composes the static entry (canon) — no re-implemented SVG.
-import { useMemo, useRef, useState, type KeyboardEvent } from "react";
+// Interactive <StationGlyph>. The glyph packs several fields into one character;
+// the interactive entry makes each FIELD a navigable unit (station, wind, sky,
+// temp, dew point, pressure) so a reader can step or point at them one at a time
+// instead of hearing one long string.
+//
+// The unit is the sub-metric, NOT a data point: `index` is the position in the
+// PRESENT fields (absent props are not units — a glyph with no dew point has no
+// dew unit), `value` is that field's encoded number (`null` for the station
+// name, which encodes nothing), `label` is its announced phrase.
+//
+// useActivePicker owns interaction: one pointer listener + nearest-field math
+// over the anchors the STATIC entry draws at (both entries read the same pure
+// `stationLayout`, so the hit boxes cannot drift from the marks). Composes the
+// static entry (canon) — no re-implemented SVG.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STATION_GLYPH } from "../../core/strings-station-glyph.js";
@@ -16,15 +25,23 @@ import {
   stationGlyphSummary,
   type StationGlyphProps,
 } from "./index.js";
-import { stationGlyphGeometry } from "./geometry.js";
+import { stationGlyphGeometry, stationLayout } from "./geometry.js";
 
-export interface InteractiveStationGlyphProps extends StationGlyphProps {
+export interface InteractiveStationGlyphProps extends StationGlyphProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the glyph fades and scales in
    * when the chart first mounts client-side. Inert on the server and on
    * hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+}
+
+/** One navigable sub-metric: what it says, what it encodes, where it is drawn. */
+interface Field {
+  text: string;
+  value: number | null;
+  /** Focus box in absolute viewBox coords, or null when the field has no mark. */
+  box: [number, number, number, number] | null;
 }
 
 export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNode {
@@ -36,6 +53,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
     dewpoint,
     pressure,
     station,
+    size = 48,
     format,
     locale,
     strings = EN_STATION_GLYPH,
@@ -44,9 +62,13 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
-  const fmt = makeFormatter(format, locale);
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
 
@@ -58,54 +80,149 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         : stationGlyphSummary(props, strings, fmt);
   const label = [title, full].filter(Boolean).join(". ") || undefined;
 
-  // field-by-field readouts (skip absent fields)
-  const fields = useMemo(() => {
-    const out: string[] = [];
-    if (station) out.push(station);
+  // The present fields, in reading order, each anchored on the mark that carries
+  // it — same numbers the static entry lays out (shared pure `stationLayout`).
+  const { fields, L } = useMemo(() => {
+    const tempT = temp != null && Number.isFinite(temp) ? `${fmt(temp)}°` : null;
+    const dewT = dewpoint != null && Number.isFinite(dewpoint) ? `${fmt(dewpoint)}°` : null;
+    const presT = pressure != null && Number.isFinite(pressure) ? fmt(pressure) : null;
+    const lay = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT });
+    const { font, cx, cy, r, yOff, gap } = lay;
+    // per-char over-estimate — the static path never measures text either
+    const textBox = (s: string, right: number, y: number): [number, number, number, number] => {
+      const w = 0.62 * font * s.length;
+      return [right - w - 0.5, y - font * 0.7, w + 1, font * 1.4];
+    };
+    const out: Field[] = [];
+    if (station)
+      out.push({
+        text: station,
+        value: null, // a name, not a measurement
+        box: textBox(station, 0.5 + 0.62 * font * station.length, font),
+      });
     if (wind && Number.isFinite(wind.magnitude)) {
-      if (Math.abs(wind.magnitude) < step / 4) out.push(strings.stationFieldWindCalm);
-      else {
-        const dir = wind.magnitude < 0 ? wind.direction + 180 : wind.direction;
-        const deg = Math.round(((dir % 360) + 360) % 360);
-        out.push(
-          strings.stationFieldWind(strings.compass8[octant(deg)]!, fmt(Math.abs(wind.magnitude))),
-        );
-      }
+      const calm = Math.abs(wind.magnitude) < step / 4;
+      const dir = wind.magnitude < 0 ? wind.direction + 180 : wind.direction;
+      const deg = Math.round(((dir % 360) + 360) % 360);
+      const mag = Math.abs(wind.magnitude);
+      const bb = size * 0.64; // the barb's box (see index.tsx)
+      out.push({
+        text: calm
+          ? strings.stationFieldWindCalm
+          : strings.stationFieldWind(strings.compass8[octant(deg)]!, fmt(mag)),
+        // the barb encodes SPEED; a negative magnitude only flips the direction
+        value: mag,
+        // calm draws no barb — a field with no mark is keyboard-only, never a
+        // pointer target (it would steal the disc, which is the sky's mark)
+        box: calm ? null : [cx - bb / 2, cy - bb / 2, bb, bb],
+      });
     }
-    const okta = stationGlyphGeometry({
-      cloud: cloud ?? null,
-      wind: null,
-      step,
-      cx: 0,
-      cy: 0,
-      coreR: 1,
-      barbBox: 30,
-    }).oktaIndex;
-    if (cloud != null && Number.isFinite(cloud))
-      out.push(strings.stationFieldSky(strings.stationSky[okta]!));
-    if (temp != null && Number.isFinite(temp)) out.push(strings.stationFieldTemp(fmt(temp)));
-    if (dewpoint != null && Number.isFinite(dewpoint))
-      out.push(strings.stationFieldDew(fmt(dewpoint)));
-    if (pressure != null && Number.isFinite(pressure))
-      out.push(strings.stationFieldPressure(fmt(pressure)));
-    return out;
-  }, [station, wind, step, cloud, temp, dewpoint, pressure, strings, fmt]);
-
-  const [msg, setMsg] = useState("");
-  const idx = useRef(-1);
-
-  function onKey(e: KeyboardEvent<HTMLSpanElement>): void {
-    if (fields.length === 0) return;
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-      e.preventDefault();
-      idx.current =
-        (idx.current + (e.key === "ArrowRight" ? 1 : -1) + fields.length) % fields.length;
-      setMsg(fields[idx.current]!);
-    } else if (e.key === "Home") {
-      e.preventDefault();
-      setMsg(full);
+    if (cloud != null && Number.isFinite(cloud)) {
+      const okta = stationGlyphGeometry({
+        cloud,
+        wind: null,
+        step,
+        cx: 0,
+        cy: 0,
+        coreR: 1,
+        barbBox: 30,
+      }).oktaIndex;
+      out.push({
+        text: strings.stationFieldSky(strings.stationSky[okta]!),
+        // the fraction of the disc the sector fills (clamped, as drawn)
+        value: Math.max(0, Math.min(1, cloud)),
+        box: [cx - r, cy - r, r * 2, r * 2],
+      });
     }
-  }
+    if (tempT != null)
+      out.push({
+        text: strings.stationFieldTemp(fmt(temp!)),
+        value: temp!,
+        box: textBox(tempT, cx - r - gap, cy - yOff),
+      });
+    if (dewT != null)
+      out.push({
+        text: strings.stationFieldDew(fmt(dewpoint!)),
+        value: dewpoint!,
+        box: textBox(dewT, cx - r - gap, cy + yOff),
+      });
+    if (presT != null)
+      out.push({
+        text: strings.stationFieldPressure(fmt(pressure!)),
+        value: pressure!,
+        box: [
+          cx + r + gap - 0.5,
+          cy - yOff - font * 0.7,
+          0.62 * font * presT.length + 1,
+          font * 1.4,
+        ],
+      });
+    return { fields: out, L: lay };
+  }, [station, wind, step, cloud, temp, dewpoint, pressure, size, strings, fmt]);
+
+  // Nearest drawn field by squared distance to its box center — the glyph's
+  // marks are scattered around the disc, so there is no 1-D ordering to scan.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      let best: number | null = null;
+      let bestDist = Infinity;
+      fields.forEach((f, i) => {
+        if (!f.box) return;
+        const d = (f.box[0] + f.box[2] / 2 - x) ** 2 + (f.box[1] + f.box[3] / 2 - y) ** 2;
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [fields],
+  );
+
+  // index = position among the PRESENT fields (see the file header).
+  const datum = useCallback(
+    (i: number) => {
+      const f = fields[i];
+      return { index: i, value: f?.value ?? null, label: f?.text };
+    },
+    [fields],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: fields.length,
+    width: L.width,
+    height: L.height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const outline = (i: number | null, pinned: boolean) => {
+    const b = i === null ? null : fields[i]?.box;
+    if (!b) return null;
+    // clamp into the viewBox — nothing may paint outside it
+    const x = Math.max(0.25, b[0]);
+    const y = Math.max(0.25, b[1]);
+    return (
+      <rect
+        x={x}
+        y={y}
+        width={Math.min(b[2], L.width - 0.25 - x)}
+        height={Math.min(b[3], L.height - 0.25 - y)}
+        rx={1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const shownField = shown === null ? undefined : fields[shown];
 
   return (
     <span
@@ -114,7 +231,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
       tabIndex={0}
       role="img"
       aria-label={label}
-      onKeyDown={onKey}
+      {...bind}
     >
       <StaticStationGlyph
         {...rest}
@@ -125,14 +242,32 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         dewpoint={dewpoint}
         pressure={pressure}
         station={station}
+        size={size}
         format={format}
         locale={locale}
         strings={strings}
         title={title}
         summary={false}
         style={FILL}
-      />
-      <LiveRegion>{msg}</LiveRegion>
+      >
+        {/* Pinned selection persists through pointer-leave; focus box is transient. */}
+        {selected !== active ? outline(selected, true) : null}
+        {outline(active, false)}
+        {rest.children}
+      </StaticStationGlyph>
+      <LiveRegion>{shownField ? shownField.text : ""}</LiveRegion>
+      {shownField ? (
+        <span
+          className="mc-spark-readout"
+          style={{
+            // a markless field (calm wind) reads out over the glyph's center
+            left: `${((shownField.box ? shownField.box[0] + shownField.box[2] / 2 : L.width / 2) / L.width) * 100}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {shownField.text}
+        </span>
+      ) : null}
     </span>
   );
 }

@@ -1,9 +1,8 @@
 import { BumpStrip } from "@microcharts/react/bump-strip";
-import { BumpStrip as BumpStripInteractive } from "@microcharts/react/bump-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const RANKS = [5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1];
+export const RANKS = [5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1];
 // Tab-home contrast series (Tea falling while Coffee climbs).
 const TEA_RANKS = [2, 3, 3, 4, 4, 5, 5, 6, 5, 6, 7, 7];
 // Cell-home leaderboard — same 12-week window.
@@ -71,12 +70,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <BumpStrip data={RANKS} summary={false} width={130} height={20} />;
 }
-
-export const showcase = {
-  hint: "rank",
-  Node: () => <BumpStrip data={RANKS} title="Category rank" width={130} height={20} />,
-};
-
 export const playground: PlaygroundSpec = {
   // data is the fixed demo series; title/summary/id/className/style/children/strings
   // are chrome, not interactive knobs; color is styling-only (no catalog chart
@@ -116,30 +109,6 @@ export const playground: PlaygroundSpec = {
       s.label !== "ends" && `  label="${s.label}"`,
       s.dots !== "changes" && `  dots="${s.dots}"`,
       s.maxRank !== 5 && `  maxRank={${s.maxRank}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <BumpStripInteractive
-      data={RANKS}
-      label={s.label as "ends" | "last" | "none"}
-      dots={s.dots as "changes" | "none"}
-      maxRank={(s.maxRank as number) === 5 ? undefined : (s.maxRank as number)}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={28}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<BumpStrip",
-      "  data={weeklyRanks}",
-      s.label !== "ends" && `  label="${s.label}"`,
-      s.dots !== "changes" && `  dots="${s.dots}"`,
-      s.maxRank !== 5 && `  maxRank={${s.maxRank}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -261,19 +230,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<BumpStrip data={weeklyRanks} />`;
 }
-
-export function PreviewLive() {
-  return <BumpStripInteractive data={RANKS} summary={false} width={130} height={20} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

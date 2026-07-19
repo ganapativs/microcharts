@@ -128,10 +128,9 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
       style={rootStyle}
     >
       {/* base dots — filled muted (each ≈ a 1-in-count chance) */}
-      {geo.dots.map((d) =>
-        d.past ? null : (
-          <circle key={`${d.x}-${d.y}`} cx={d.x} cy={d.y} r={d.r} data-mc-ink="neutral" />
-        ),
+      {/* keyed by index — coincident dots (all-equal input) share coordinates */}
+      {geo.dots.map((d, i) =>
+        d.past ? null : <circle key={i} cx={d.x} cy={d.y} r={d.r} data-mc-ink="neutral" />,
       )}
       {/* threshold — the decision line */}
       {geo.threshold ? (
@@ -147,10 +146,10 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
         />
       ) : null}
       {/* past-threshold dots — re-inked accent AND ringed (never color-alone) */}
-      {geo.dots.map((d) =>
+      {geo.dots.map((d, i) =>
         d.past ? (
           <circle
-            key={`p${d.x}-${d.y}`}
+            key={i}
             cx={d.x}
             cy={d.y}
             r={d.r}

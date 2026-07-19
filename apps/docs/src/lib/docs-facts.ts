@@ -93,7 +93,9 @@ export const BENCH = {
   medianBytes: bench.agg.medianBytes,
   fastest: bench.agg.fastest,
   slowest: bench.agg.slowest,
-  belowFloor: bench.agg.belowFloor,
+  // Empty in a healthy run, so the JSON widens to `never[]` — name the shape
+  // (`sync-bench.mjs` emits {slug, rowsPerMs, floor}) so consumers still typecheck.
+  belowFloor: bench.agg.belowFloor as readonly { slug: string; rowsPerMs: number; floor: number }[],
   chart: (slug: string) => bench.charts[slug as keyof typeof bench.charts],
   /** `describeSeries` (24 pts), calls/sec — the real `pnpm bench` core measurement. */
   describeSeriesOpsPerSec: bench.core[0]?.opsPerSec,

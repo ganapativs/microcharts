@@ -149,15 +149,18 @@ the announced values follow that locale's own grouping.
 ## Why this default
 
 A two-point line implies nothing about the path between — the docs steer to Sparkline when the journey matters. End
-labels drop deterministically twice over: when rows are too dense (count × height) and when endpoints collide within a
-font-height (greedy per-column dedup) — pure arithmetic, nothing measured. A missing end renders a dashed stub and is
-announced "incomplete", never interpolated.
+labels drop deterministically, never by measurement: when the rows are denser than the label font (height ÷ count), and
+when the reserved label gutters would squeeze the two columns under ~35% of the width — in which case the reclaimed room
+goes back to the lines. Endpoints that would collide inside a column are nudged apart to a full glyph pitch instead of
+overlapping. A missing end renders a dashed stub and is announced "incomplete", never interpolated.
 
 ## Accessibility
 
 The accessible name counts directions and leads with the biggest mover — **"3 categories: 2 up, 1 down. Largest change
 West, down 25%."** The interactive entry finds the nearest line under the pointer and roves categories ordered by their
 after-value, announcing each slope (**"East: 40 to 47, up 18%."**).
+
+<InteractionNote slug="slope" />
 
 ## Props
 

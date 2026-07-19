@@ -1,18 +1,19 @@
 "use client";
-// Interactive <ParetoStrip>. One pointer listener + grid lookup
-// (pointer x → bar). ←/→ step bars, T jumps to the threshold-crossing bar. The
-// live region states each bar's share + cumulative. Composes the static
-// component (canon); the crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <ParetoStrip>. useActivePicker owns interaction: one pointer
+// listener + nearest-bar-by-x lookup, ←/→/Home/End rove bars, T jumps to the
+// threshold-crossing bar, click / Enter / Space selects (onSelect). The live
+// region states each bar's share + cumulative. Composes the static component
+// (canon); the crosshair + persistent pin + readout chip are overlay children.
+import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { paretoGeometry } from "./geometry.js";
 import { ParetoStrip as StaticParetoStrip, paretoSummary, type ParetoStripProps } from "./index.js";
 
-export interface InteractiveParetoStripProps extends ParetoStripProps {
+export interface InteractiveParetoStripProps extends ParetoStripProps, PickerProps {
   strings?: ParetoStrings;
   /**
    * Opt-in entrance motion (default `false`): bars rise from the baseline,
@@ -40,6 +41,10 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -76,7 +81,71 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
       fontSize: labelFont(height),
     });
   }, [width, height, data, threshold, max, props.label]);
-  const [active, setActive] = useState<number | null>(null);
+
+  const count = geo?.bars.length ?? 0;
+  const vbWidth = geo?.totalWidth ?? width;
+
+  // Nearest bar to the pointer x (viewBox space). Bars index 1:1 into the
+  // sorted/rolled-up rows — datum.index is that bar index ("Other" is the last
+  // bar when present, never re-ranked).
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || geo.bars.length === 0) return null;
+      let best = 0;
+      let bestDist = Infinity;
+      geo.bars.forEach((b, i) => {
+        const d = Math.abs(b.x + b.width / 2 - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [geo],
+  );
+
+  // 1-D rove, plus T → the threshold-crossing bar (kept from the old client).
+  const step = useCallback(
+    (cur: number, key: string) => {
+      switch (key) {
+        case "ArrowRight":
+          return Math.min(count - 1, cur + 1);
+        case "ArrowLeft":
+          return cur <= 0 ? 0 : cur - 1;
+        case "Home":
+          return 0;
+        case "End":
+          return count - 1;
+        case "t":
+        case "T":
+          return geo?.crossing ? geo.crossing.index : null;
+      }
+      return null;
+    },
+    [count, geo],
+  );
+
+  const datum = useCallback(
+    (i: number) => {
+      const b = geo?.bars[i];
+      return { index: i, value: b?.value ?? null, label: b?.label };
+    },
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count,
+    width: vbWidth,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -88,60 +157,25 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
           : paretoSummary(geo, { unit, metric }, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const count = geo?.bars.length ?? 0;
+  const outline = (i: number, pinned: boolean) => {
+    const b = geo?.bars[i];
+    if (!b) return null;
+    return (
+      <rect
+        x={b.x - 0.6}
+        y={0.5}
+        width={b.width + 1.2}
+        height={height - 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * geo.totalWidth;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.bars.forEach((b, i) => {
-        const d = Math.abs(b.x + b.width / 2 - px);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, count],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (count === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((p) => Math.min(count - 1, (p ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((p) => (p === null || p <= 0 ? 0 : p - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(count - 1);
-          break;
-        case "t":
-        case "T":
-          if (geo?.crossing) setActive(geo.crossing.index);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [count, geo],
-  );
-
-  const b = active !== null && geo ? geo.bars[active] : undefined;
+  const shown = active ?? selected;
+  const b = shown !== null && geo ? geo.bars[shown] : undefined;
   const announced = b ? strings.paretoAt(b.label, pct(b.share), pct(b.cum)) : "";
 
   return (
@@ -151,10 +185,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticParetoStrip
         {...rest}
@@ -169,18 +200,9 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {b ? (
-          <rect
-            x={b.x - 0.6}
-            y={0.5}
-            width={b.width + 1.2}
-            height={height - 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticParetoStrip>
       {b && geo ? (

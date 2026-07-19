@@ -129,8 +129,7 @@ The gap named in the summary follows `format`/`locale` — 12000 reads "12.000" 
 
 A pair whose `ref` is `null` draws its value bar alone — no ghost, no zero-width placeholder — and the interactive entry
 announces it as **"East: 940, no reference."** rather than pretending a comparison exists. Past 5 pairs the grouped read
-blurs into noise, so the component still renders every pair but logs a dev warning steering toward a table or a full bar
-chart.
+blurs into noise, so the component still renders every pair but logs a dev warning.
 
 ## Four homes
 
@@ -146,6 +145,8 @@ for tight cells, not the analytical default. A pair with a missing reference ren
 
 The accessible name leads with the largest gap — **"4 pairs. Largest gap East: 940 vs 1,200."** The interactive entry
 roves pairs and announces each as value vs reference (**"East: 940 vs 1,200."**).
+
+<InteractionNote slug="paired-bars" />
 
 ## Props
 

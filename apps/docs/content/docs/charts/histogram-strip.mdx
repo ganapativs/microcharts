@@ -79,7 +79,7 @@ The accessible summary states the modal bin's edges through `format`/`locale` �
   <HistogramStrip data={[4, 4, 4, 4, 4]} title="Constant" style={{ width: 160, height: 40 }} />
 </LiveDemo>
 
-An empty series renders zero bars — an empty accessible name ("No data.") rather than a misleading flat line. A constant
+An empty series renders zero bars and an accessible name of "No data." rather than a misleading flat line. A constant
 series collapses to ONE full-height bin instead of the usual up-to-12 slivers a naive equal-width binner would draw for
 a zero-span domain.
 
@@ -97,6 +97,8 @@ bin of a value and never re-bins around it.
 
 The accessible name names the modal bin — **"120 values, most between 42.09 and 47.36."** The interactive entry roves
 bins with range announcements (**"42.09 to 47.36: 26 values."**).
+
+<InteractionNote slug="histogram-strip" />
 
 ## Props
 

@@ -1,6 +1,5 @@
 import { MoonPhase } from "@microcharts/react/moon-phase";
-import { MoonPhase as MoonPhaseInteractive } from "@microcharts/react/moon-phase/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -16,6 +15,7 @@ export const entry: ChartEntry = {
   // value-transition in client.tsx) — a mount entrance would fight that
   // existing motion, so this chart has no `animate` prop at all.
   animates: false,
+  picker: false,
   dataShape: "{ value: number }",
   encoding: { channel: "illuminated area fraction of the disc", precision: "medium" },
   nodeBudget: "3",
@@ -51,12 +51,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "through the cycle",
-  Node: () => <MoonPhase value={0.68} title="Sprint" size={26} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value %", min: 0, max: 100, step: 1, init: 68 },
@@ -77,25 +71,6 @@ export const playground: PlaygroundSpec = {
     />
   ),
   code: (s) =>
-    [
-      "<MoonPhase",
-      `  value={${((s.value as number) / 100).toFixed(2)}}`,
-      s.mode !== "progress" && `  mode="${s.mode}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  // No `animate` prop exists on this chart (see entry.animates) — the lit
-  // region's own value-transition cross-fade is the only motion.
-  renderInteractive: (s) => (
-    <MoonPhaseInteractive
-      value={(s.value as number) / 100}
-      mode={s.mode as "progress" | "cycle"}
-      summary={false}
-      size={44}
-    />
-  ),
-  codeInteractive: (s) =>
     [
       "<MoonPhase",
       `  value={${((s.value as number) / 100).toFixed(2)}}`,
@@ -201,25 +176,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<MoonPhase value={0.68} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex items-center gap-3">
-      {[0.1, 0.35, 0.5, 0.75, 1].map((v) => (
-        <MoonPhaseInteractive key={v} value={v} summary={false} size={20} />
-      ))}
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

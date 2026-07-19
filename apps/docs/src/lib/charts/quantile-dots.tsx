@@ -1,6 +1,5 @@
 import { QuantileDots } from "@microcharts/react/quantile-dots";
-import { QuantileDots as QuantileDotsInteractive } from "@microcharts/react/quantile-dots/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // bus-wait times (minutes): right-skewed, a long tail past the 15-min SLA
@@ -86,21 +85,6 @@ export function Preview() {
     />
   );
 }
-
-export const showcase = {
-  hint: "odds you can count",
-  Node: () => (
-    <QuantileDots
-      data={WAITS}
-      threshold={15}
-      format={MIN_FMT}
-      title="Bus wait"
-      width={150}
-      height={24}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "threshold", label: "threshold", min: 5, max: 30, step: 1, init: 15 },
@@ -126,31 +110,6 @@ export const playground: PlaygroundSpec = {
       `  threshold={${s.threshold}}`,
       s.count !== "20" && `  count={${s.count}}`,
       s.side !== "above" && `  side="${s.side}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <QuantileDotsInteractive
-      data={WAITS}
-      count={Number(s.count)}
-      threshold={s.threshold as number}
-      side={s.side as "above" | "below"}
-      format={MIN_FMT}
-      summary={false}
-      animate={ui.animate}
-      width={280}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<QuantileDots",
-      "  data={waits}",
-      `  threshold={${s.threshold}}`,
-      s.count !== "20" && `  count={${s.count}}`,
-      s.side !== "above" && `  side="${s.side}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -309,29 +268,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<QuantileDots data={waits} threshold={15} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <QuantileDotsInteractive
-      data={WAITS}
-      threshold={15}
-      format={MIN_FMT}
-      summary={false}
-      width={150}
-      height={24}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

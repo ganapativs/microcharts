@@ -1,10 +1,12 @@
 "use client";
-// Interactive <MicroDonut>. Pointer → wedge by atan2 angle
-// lookup (pure); ←/→ rove wedges. Disabled entirely when `decorative` — an
-// aria-hidden chart must not be a tab stop. Composes the static component.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <MicroDonut>. useActivePicker owns interaction: one pointer
+// listener + wedge-by-atan2 angle lookup (pure), ←/→ rove wedges, click / Enter
+// / Space selects (onSelect). Disabled entirely when `decorative` — an
+// aria-hidden chart must not be a tab stop. Composes the static component
+// (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
@@ -13,7 +15,9 @@ import { sharesSummary } from "../segmented-bar/index.js";
 import { microDonutGeometry } from "./geometry.js";
 import { MicroDonut as StaticMicroDonut, type MicroDonutProps } from "./index.js";
 
-export interface InteractiveMicroDonutProps extends MicroDonutProps {
+const TAU = Math.PI * 2;
+
+export interface InteractiveMicroDonutProps extends MicroDonutProps, PickerProps {
   strings?: CompositionStrings;
   format?: Format | undefined;
   locale?: string | string[] | undefined;
@@ -42,6 +46,10 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -68,11 +76,44 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pcts = useMemo(() => largestRemainderPercents(geo.wedges.map((w) => w.share)), [geo]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // Pointer (viewBox space) → wedge index by atan2 angle lookup (0 at 12
+  // o'clock, clockwise — matches core/arc + geometry).
+  const locate = useCallback(
+    (x: number, y: number) => {
+      const dx = x - size / 2;
+      const dy = y - size / 2;
+      const angle = (Math.atan2(dx, -dy) + TAU) % TAU;
+      const i = geo.wedges.findIndex((w) => angle >= w.a0 && angle <= w.a1);
+      return i >= 0 ? i : null;
+    },
+    [geo, size],
+  );
+  // index = wedge index (position in geo.wedges); value/label from its rolled datum.
+  const datum = useCallback(
+    (i: number) => {
+      const d = rolled[geo.wedges[i]!.index];
+      return { index: i, value: d?.value ?? null, label: d?.label };
+    },
+    [geo, rolled],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.wedges.length,
+    width: size,
+    height: size,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   // decorative = ornament: no naming, no tab stop, no interaction. This path
   // renders the static directly (no focusable wrapper), so `className`/`style`
-  // go straight onto it — exactly as they would on the static entry.
+  // go straight onto it — exactly as they would on the static entry. All hooks
+  // above run first (they cannot be conditional); this branch just ignores them.
   if (decorative) {
     return (
       <StaticMicroDonut
@@ -97,49 +138,28 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         : sharesSummary(rolled, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.wedges.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const dx = ((e.clientX - r.left) / r.width) * size - size / 2;
-      const dy = ((e.clientY - r.top) / r.height) * size - size / 2;
-      // angle from 12 o'clock, clockwise (matches core/arc convention)
-      const angle = (Math.atan2(dx, -dy) + Math.PI * 2) % (Math.PI * 2);
-      const i = geo.wedges.findIndex((w) => angle >= w.a0 && angle <= w.a1);
-      setActive(i >= 0 ? i : null);
-    },
-    [geo, size],
-  );
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (geo.wedges.length === 0) return;
-    const cur = active ?? 0;
-    let next = cur;
-    switch (e.key) {
-      case "ArrowRight":
-        next = Math.min(geo.wedges.length - 1, cur + 1);
-        break;
-      case "ArrowLeft":
-        next = Math.max(0, cur - 1);
-        break;
-      case "Escape":
-        setActive(null);
-        return;
-      default:
-        return;
-    }
-    e.preventDefault();
-    setActive(next);
+  const mark = (i: number, pinned: boolean) => {
+    const w = geo.wedges[i];
+    if (!w) return null;
+    return (
+      <path
+        d={w.d}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
   };
 
-  const wedge = active !== null ? geo.wedges[active] : undefined;
-  const datum = wedge ? rolled[wedge.index] : undefined;
+  const shown = active ?? selected;
+  const shownWedge = shown !== null ? geo.wedges[shown] : undefined;
+  const shownDatum = shownWedge ? rolled[shownWedge.index] : undefined;
   const announced =
-    wedge && datum
-      ? datum.members > 1
-        ? strings.shareOther(datum.label, `${pcts[active!]}%`, datum.members)
-        : strings.shareAt(datum.label, `${pcts[active!]}%`, fmt(datum.value))
+    shownWedge && shownDatum
+      ? shownDatum.members > 1
+        ? strings.shareOther(shownDatum.label, `${pcts[shown!]}%`, shownDatum.members)
+        : strings.shareAt(shownDatum.label, `${pcts[shown!]}%`, fmt(shownDatum.value))
       : "";
 
   return (
@@ -149,10 +169,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticMicroDonut
         {...rest}
@@ -164,21 +181,15 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {wedge ? (
-          <path
-            d={wedge.d}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus wedge is transient. */}
+        {selected !== null && selected !== active ? mark(selected, true) : null}
+        {active !== null ? mark(active, false) : null}
         {rest.children}
       </StaticMicroDonut>
       <LiveRegion>{announced}</LiveRegion>
-      {wedge && datum ? (
+      {shownWedge && shownDatum ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {`${datum.label} ${pcts[active!]}%`}
+          {`${shownDatum.label} ${pcts[shown!]}%`}
         </span>
       ) : null}
     </span>

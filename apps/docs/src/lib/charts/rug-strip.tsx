@@ -1,9 +1,10 @@
 import { RugStrip } from "@microcharts/react/rug-strip";
-import { RugStrip as RugStripInteractive } from "@microcharts/react/rug-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const FIELD = [42, 48, 51, 53, 55, 58, 61, 63, 66, 71, 55, 52, 49, 58, 62, 75, 83, 58, 54, 60];
+export const FIELD = [
+  42, 48, 51, 53, 55, 58, 61, 63, 66, 71, 55, 52, 49, 58, 62, 75, 83, 58, 54, 60,
+];
 
 export const entry: ChartEntry = {
   name: "RugStrip",
@@ -67,12 +68,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <RugStrip data={FIELD} markValue={62} summary={false} width={120} height={16} />;
 }
-
-export const showcase = {
-  hint: "distribution",
-  Node: () => <RugStrip data={FIELD} markValue={62} title="Pay band" width={120} height={16} />,
-};
-
 export const playground: PlaygroundSpec = {
   // data is the fixed/shuffled demo series; width/height/color/format/locale/
   // strings/title/summary/id/className/style/children are sizing/styling/
@@ -108,29 +103,6 @@ export const playground: PlaygroundSpec = {
       (s.markValue as boolean) && "  markValue={yourOffer}",
       s.orientation === "vertical" && '  orientation="vertical"',
       (s.domain as boolean) && "  domain={[0, 150]}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <RugStripInteractive
-      data={data}
-      markValue={(s.markValue as boolean) ? data[Math.floor(data.length / 2)] : undefined}
-      orientation={s.orientation as "horizontal" | "vertical"}
-      domain={(s.domain as boolean) ? [0, 150] : undefined}
-      summary={false}
-      animate={ui.animate}
-      style={s.orientation === "vertical" ? { width: 20, height: 140 } : { width: 220, height: 22 }}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<RugStrip",
-      "  data={salaries}",
-      (s.markValue as boolean) && "  markValue={yourOffer}",
-      s.orientation === "vertical" && '  orientation="vertical"',
-      (s.domain as boolean) && "  domain={[0, 150]}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -265,28 +237,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<RugStrip data={data} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <RugStripInteractive
-      data={FIELD}
-      markValue={62}
-      summary={false}
-      width={120}
-      height={16}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

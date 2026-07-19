@@ -5,6 +5,7 @@
 // Wrapper focus only (one value). Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { FILL, wrap } from "../../shared/interactive.js";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FILL_WORD, type FillWordStrings } from "../../core/strings-fill-word.js";
@@ -21,6 +22,8 @@ export interface InteractiveFillWordProps extends FillWordProps {
    * always wins.
    */
   animate?: boolean;
+  /** The word was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — the clamped fill fraction, named by the word. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
@@ -32,6 +35,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
     value,
     word,
     mode = "fill",
+    onSelect,
     className,
     style,
     ...rest
@@ -70,6 +74,14 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
+  // Drill-down: the clamped fraction the ink clips to, named by the word itself.
+  const select = (): void =>
+    onSelect?.({
+      index: 0,
+      value: Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : null,
+      label: word,
+    });
+
   return (
     <span
       ref={hostRef}
@@ -77,6 +89,13 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
+      onClick={select}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select();
+        }
+      }}
     >
       <StaticFillWord
         {...rest}

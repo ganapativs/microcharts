@@ -5,13 +5,15 @@
 // Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
-import { FILL, wrap as wrapAttrs } from "../../shared/interactive.js";
+import { FILL, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { MoonPhase as StaticMoonPhase, moonPhaseSummary, type MoonPhaseProps } from "./index.js";
 
 export interface InteractiveMoonPhaseProps extends MoonPhaseProps {
   live?: boolean;
   strings?: MoonStrings;
+  /** Click/tap or Enter/Space — `{ index: 0, value: the clamped 0–1 fraction }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
@@ -21,6 +23,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     title,
     value,
     mode = "progress",
+    onSelect,
     className,
     style,
     ...rest
@@ -76,7 +79,11 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
   }, [value, summary, live]);
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
-  const pct = `${Math.round(Math.min(1, Math.max(0, value)) * 100)}%`;
+  // The lit AREA is the datum, so the clamped fraction is what both the readout
+  // and `onSelect` report — one disc, one selectable unit (index 0).
+  const frac = Math.min(1, Math.max(0, value));
+  const pct = `${Math.round(frac * 100)}%`;
+  const pick = (): void => onSelect?.({ index: 0, value: Number.isFinite(frac) ? frac : null });
 
   return (
     <span
@@ -89,6 +96,12 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
       onPointerLeave={() => setHover(false)}
       onFocus={() => setHover(true)}
       onBlur={() => setHover(false)}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
     >
       <StaticMoonPhase
         {...rest}

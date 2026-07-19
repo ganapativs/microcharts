@@ -156,7 +156,7 @@ Every path from model output to a rendered chart, with the one thing each needs.
 
 Parse the partial Markdown on every token; render a fence as raw text until it closes, then swap in the chart.
 Word-sized charts land inside the sentence, standalone ones below it. The live demo at the top of this page is exactly
-this, and it's about forty lines.
+this shape.
 
 <Snippet id="streaming" />
 
@@ -165,7 +165,9 @@ this, and it's about forty lines.
 <Accordion title="React Server Components — zero client JavaScript">
 
 Static entries are hook-free, so an RSC assistant renders the model's charts to HTML on the server. Nothing hydrates;
-the chart ships as markup. Add `/interactive` only where you need hover or keyboard.
+the chart ships as markup. Add `/interactive` only where the reader needs to interrogate a value — hover, keyboard,
+touch, or click-to-pin — and read it back with `onActive` / `onSelect`. Every chart but WindBarb has an interactive
+twin; `catalog.json` names it per entry, so an agent never has to guess.
 
 <Snippet id="rsc" />
 
@@ -182,9 +184,8 @@ When a tool returns rows, render them instead of asking the model to describe th
 
 <Accordion title="Programmatic & React-free — outside a component tree">
 
-Need a chart in a README, an email, or a non-React runtime? Today, render the static component to a string on the
-server. A first-class JSON spec and a React-free string renderer are on the roadmap for rendering to SVG with no React
-at all.
+Need a chart in a README, an email, or a non-React runtime? Render the static component to an SVG string on the server.
+Static entries are hook-free and listener-free, so the markup they emit stands on its own.
 
 <Snippet id="programmatic" />
 
@@ -206,6 +207,15 @@ Real, generated routes — the substance behind "AI-native", not a slogan. Point
 instead of guessing.
 
 <SurfaceCards />
+
+The `.md` mirrors are real static files — `/docs/ai` has a sibling `/docs/ai.md` — so they resolve on any host, with no
+runtime, rewrite, or middleware. This site also deploys behind a small Cloudflare Worker that runs on `/docs/*` only:
+send `Accept: text/markdown` and the same doc URL returns the mirror inline, with `Vary: Accept` on both the Markdown
+and the HTML response. That negotiation is a convenience layered on top of the mirrors, never a dependency — appending
+`.md` always works.
+
+`/llms.txt` points at one more surface the cards don't: [`/agent-setup.md`](/agent-setup.md), the paste-and-run setup
+prompt for a coding agent, extracted from the [Quickstart](/docs/quickstart) so the two can't drift.
 
 ## The whole contract, on one card
 

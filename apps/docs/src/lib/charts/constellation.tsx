@@ -1,10 +1,9 @@
 import { Constellation } from "@microcharts/react/constellation";
-import { Constellation as ConstellationInteractive } from "@microcharts/react/constellation/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
-const INCIDENTS = [
+export const INCIDENTS = [
   { x: 0, y: 40, m: 2 },
   { x: 2, y: 90, m: 7 },
   { x: 5, y: 30, m: 3 },
@@ -82,14 +81,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <Constellation data={INCIDENTS} summary={false} width={90} height={26} />;
 }
-
-export const showcase = {
-  hint: "rare events",
-  Node: () => (
-    <Constellation data={INCIDENTS} xFormat={monthFmt} title="Incidents" width={110} height={30} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "spike", label: "biggest", min: 40, max: 100, step: 5, init: 90 },
@@ -117,33 +108,6 @@ export const playground: PlaygroundSpec = {
       "  data={events}",
       s.connect !== "on" && "  connect={false}",
       s.label !== "none" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ConstellationInteractive
-      data={[
-        { x: 0, y: 40, m: 2 },
-        { x: 2, y: s.spike as number, m: 7 },
-        { x: 5, y: 30, m: 3 },
-        { x: 8, y: 65, m: 5 },
-      ]}
-      connect={s.connect === "on"}
-      label={s.label as "none" | "max"}
-      animate={ui.animate}
-      summary={false}
-      width={140}
-      height={44}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Constellation",
-      "  data={events}",
-      s.connect !== "on" && "  connect={false}",
-      s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -276,21 +240,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <ConstellationInteractive data={INCIDENTS} summary={false} width={90} height={26} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

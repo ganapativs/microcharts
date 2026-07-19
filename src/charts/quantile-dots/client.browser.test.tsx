@@ -4,6 +4,9 @@ import { QuantileDots } from "./client.js";
 
 const UNIFORM = Array.from({ length: 20 }, (_, i) => i + 1); // 1..20
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <QuantileDots>", () => {
   it("the probe: hovering recomputes the count past the live threshold", async () => {
     const screen = await render(
@@ -67,9 +70,47 @@ describe("interactive <QuantileDots>", () => {
     const screen = await render(<QuantileDots data={UNIFORM} threshold={15} title="Wait" />);
     const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;
     wrap.focus();
-    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
-    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    key(wrap, "ArrowLeft");
+    key(wrap, "Escape");
     // no crash; static threshold count (5 in 20) still reachable via the label
     expect(wrap.querySelector(".mc-quantile-dots") || wrap.querySelector("svg")).toBeTruthy();
+  });
+
+  it("onActive reports the focused quantile bin (column index + mass); null once cleared", async () => {
+    const seen: { index: number; value: number | null }[] = [];
+    const screen = await render(
+      <QuantileDots data={UNIFORM} threshold={15} onActive={(d) => seen.push(d as never)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    // index is the quantile COLUMN (bin) index; value the dots stacked in it.
+    expect(seen.at(-1)).toMatchObject({ index: 0 });
+    expect(seen.at(-1)!.value).toBeGreaterThan(0);
+    key(wrap, "Escape");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active bin: fires onSelect + pins a threshold line", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <QuantileDots data={UNIFORM} threshold={15} onSelect={(d) => picks.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    key(wrap, "ArrowRight");
+    key(wrap, "Enter");
+    expect(picks.at(-1)).toMatchObject({ index: 1 });
+    // Pin survives blur (it is selection, not hover).
+    wrap.blur();
+    await expect
+      .poll(() => screen.container.querySelector('line[data-mc-ink="accent"]'))
+      .not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the threshold line without focus", async () => {
+    const screen = await render(<QuantileDots data={UNIFORM} threshold={15} selectedIndex={3} />);
+    expect(screen.container.querySelector('line[data-mc-ink="accent"]')).not.toBeNull();
   });
 });

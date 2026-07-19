@@ -1,10 +1,9 @@
 import { FatDigits } from "@microcharts/react/fat-digits";
-import { FatDigits as FatDigitsInteractive } from "@microcharts/react/fat-digits/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const COLUMN = [1204, 318, 76, 942, 2100, 55];
-const DOMAIN: [number, number] = [0, 2100];
+export const COLUMN = [1204, 318, 76, 942, 2100, 55];
+export const DOMAIN: [number, number] = [0, 2100];
 
 export const entry: ChartEntry = {
   name: "FatDigits",
@@ -14,6 +13,7 @@ export const entry: ChartEntry = {
   tagline: "Which numbers in a dense column are big, before you read them.",
   staticImport: `${PKG}/fat-digits`,
   interactiveImport: `${PKG}/fat-digits/interactive`,
+  picker: false,
   dataShape: "{ value: number }",
   encoding: { channel: "the numeral + redundant font-weight tier", precision: "high" },
   nodeBudget: "1 (value) / ≤ len (digit)",
@@ -61,12 +61,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "big numbers pop",
-  Node: () => <FatDigits value={2100} domain={DOMAIN} title="Peak" fontSize={20} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value", min: 0, max: 2100, step: 20, init: 1204 },
@@ -96,29 +90,6 @@ export const playground: PlaygroundSpec = {
       "  domain={[0, 2100]}",
       s.encode !== "value" && `  encode="${s.encode}"`,
       s.tiers !== "5" && `  tiers={${s.tiers}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <FatDigitsInteractive
-      value={s.value as number}
-      domain={DOMAIN}
-      encode={s.encode as "value" | "digit"}
-      tiers={Number(s.tiers) as 3 | 5}
-      summary={false}
-      animate={ui.animate}
-      fontSize={28}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<FatDigits",
-      `  value={${s.value}}`,
-      "  domain={[0, 2100]}",
-      s.encode !== "value" && `  encode="${s.encode}"`,
-      s.tiers !== "5" && `  tiers={${s.tiers}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -228,32 +199,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<FatDigits value={1204} domain={[0, 2100]} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex flex-col items-end gap-1 tabular-nums">
-      {COLUMN.map((v) => (
-        <FatDigitsInteractive
-          key={v}
-          value={v}
-          domain={DOMAIN}
-          summary={false}
-          fontSize={14}
-          animate
-        />
-      ))}
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

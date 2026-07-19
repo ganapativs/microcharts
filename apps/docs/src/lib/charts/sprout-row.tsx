@@ -1,10 +1,9 @@
 import { SproutRow } from "@microcharts/react/sprout-row";
-import { SproutRow as SproutRowInteractive } from "@microcharts/react/sprout-row/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 type Row = { label: string; value: number | null }[];
-const ACCTS: Row = [
+export const ACCTS: Row = [
   { label: "Acme", value: 3 },
   { label: "Beta", value: 2 },
   { label: "Gamma", value: 3 },
@@ -74,12 +73,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <SproutRow data={ACCTS} summary={false} height={22} />;
 }
-
-export const showcase = {
-  hint: "seed → bloom",
-  Node: () => <SproutRow data={ACCTS} labels title="Account health" height={44} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "labels", label: "labels", init: false },
@@ -96,27 +89,6 @@ export const playground: PlaygroundSpec = {
   ),
   code: (s) =>
     ["<SproutRow", "  data={accounts}", s.labels && "  labels", s.value && '  label="value"', "/>"]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <SproutRowInteractive
-      data={ACCTS}
-      labels={s.labels as boolean}
-      label={s.value ? "value" : "none"}
-      summary={false}
-      animate={ui.animate}
-      height={s.labels ? 46 : 26}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<SproutRow",
-      "  data={accounts}",
-      s.labels && "  labels",
-      s.value && '  label="value"',
-      ui.animate && " animate",
-      "/>",
-    ]
       .filter(Boolean)
       .join("\n"),
   interactiveHint:
@@ -239,19 +211,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<SproutRow data={accounts} />`;
 }
-
-export function PreviewLive() {
-  return <SproutRowInteractive data={ACCTS} summary={false} height={22} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

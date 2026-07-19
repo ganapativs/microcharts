@@ -88,8 +88,9 @@ own thing, not a sampled point on a continuous curve. Zero-anchored always: a ba
 misstates its magnitude. `winloss` mode goes further and discards magnitude entirely on purpose, collapsing each value
 to a three-state streak (win above the mid-line, loss below, tie a thin dash on it) because for a streak, sign is the
 whole story and a magnitude axis would just be noise. Sign is doubled by position AND color everywhere signed data
-appears, so direction survives forced-colors and never depends on color alone. The endpoint bar gets accent emphasis by
-default — "how did the run end" is usually the first question a streak answers.
+appears, so direction survives forced-colors and never depends on color alone. In `bar` mode the endpoint bar takes the
+accent — "where did it land" is usually the first question a run of counts answers; in `winloss` mode it keeps its
+win/loss/tie color instead, because there the sign is what matters at every position, endpoint included.
 
 ## Accessibility
 
@@ -99,6 +100,8 @@ Announced from the data — the example above reads:
 
 Sign is doubled by position (above or below the baseline), never by color alone, so the chart survives forced-colors and
 color-blind viewing.
+
+<InteractionNote slug="sparkbar" />
 
 ## Props
 

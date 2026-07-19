@@ -141,8 +141,8 @@ it lives at glyph scale.
 When every field value on one axis equals the focal's, that axis's domain collapses to a point — the split line on that
 axis is dropped rather than drawn at an arbitrary spot, while the other axis's split still renders. A peer exactly on
 top of the focal is still counted (distance 0) and sorts first in the interactive entry's nearest-first order. A
-non-finite focal position renders nothing but the frame, with the "No data." summary — the same degenerate path an empty
-series takes elsewhere in the library.
+non-finite focal position draws no marks at all — no cross, no tint, no peers — and carries the "No data." summary, the
+same degenerate path an empty series takes elsewhere in the library.
 
 ## Four homes
 
@@ -162,6 +162,8 @@ The accessible name states the focal position, the axis-relative quadrant, and h
 9, effort 3 — in the high-impact, low-effort quadrant (2 of 14 peers)."** — or your own words via
 `quadrants={["quick win", …]}`. The interactive entry cycles the peers nearest-first, each announced with its
 coordinates and quadrant.
+
+<InteractionNote slug="quadrant-dot" />
 
 ## Props
 

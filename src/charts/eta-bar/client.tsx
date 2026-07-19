@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { FILL, wrap } from "../../shared/interactive.js";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ETA_BAR } from "../../core/strings-eta-bar.js";
@@ -24,6 +25,8 @@ export interface InteractiveEtaBarProps extends EtaBarProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** The bar was activated (click, tap, Enter or Space): `{ index: 0, value }` — the clamped progress. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
@@ -39,6 +42,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     summary,
     announceEvery = 10000,
     animate = false,
+    onSelect,
     className,
     style,
     ...rest
@@ -68,6 +72,13 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     }
   }, [full, announceEvery]);
 
+  // Drill-down: the clamped progress fraction the done bar encodes.
+  const select = (): void =>
+    onSelect?.({
+      index: 0,
+      value: Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : null,
+    });
+
   return (
     <span
       ref={hostRef}
@@ -77,6 +88,13 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
       aria-label={label}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
+      onClick={select}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select();
+        }
+      }}
     >
       <StaticEtaBar
         {...rest}

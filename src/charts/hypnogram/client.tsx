@@ -1,9 +1,12 @@
 "use client";
-// Interactive <Hypnogram>. One pointer listener; run lookup by x.
-// ←/→ rove runs, Home/End jump. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Hypnogram>. useActivePicker owns interaction: one pointer
+// listener + run-by-x lookup, ←/→ rove runs, Home/End jump, click / Enter /
+// Space selects (onSelect). Composes the static component (canon) — the SVG is
+// never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { labelFont } from "../../core/labels.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_HYPNOGRAM } from "../../core/strings-hypnogram.js";
@@ -15,7 +18,7 @@ import {
   type HypnogramProps,
 } from "./index.js";
 
-export interface InteractiveHypnogramProps extends HypnogramProps {
+export interface InteractiveHypnogramProps extends HypnogramProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the state trace wipes on when
    * the chart first mounts client-side. Inert on the server and on hydrated
@@ -30,8 +33,9 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     states: statesProp,
     variant = "steps",
     domain: domainProp,
-    width = 120,
-    height = 24,
+    width = 140,
+    height: heightProp,
+    labels: labelsProp,
     strings = EN_HYPNOGRAM,
     format,
     locale,
@@ -40,6 +44,10 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props as InteractiveHypnogramProps & {
     format?: Intl.NumberFormatOptions | ((n: number) => string);
@@ -56,12 +64,63 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     return [...statesProp, ...extra];
   }, [statesProp, appearance]);
   const domain = useMemo(() => domainProp ?? resolveDomain(data), [domainProp, data]);
+  // Mirror the static's layout EXACTLY (row-count-driven height + the row-label
+  // gutter it reserves). Deriving either independently shifts every run's x by
+  // the gutter, so the hit-test and the outlines drift off the rendered marks.
+  const rowsN = Math.max(1, rowStates.length);
+  const height = heightProp ?? Math.max(36, rowsN * 13);
+  const labels = labelsProp ?? width >= 96;
+  // Widest row label, in chars. Memoised away from the render path (a scrub
+  // re-renders per unit crossed); the gutter itself is cheap arithmetic on top.
+  const labelCh = useMemo(() => {
+    let max = 1;
+    for (const s of rowStates) max = Math.max(max, s.length);
+    return max;
+  }, [rowStates]);
+  const gutter = labels
+    ? Math.min(width * 0.4, labelCh * labelFont(height / rowsN, 0.62) * 0.6 + 4)
+    : 0;
   const geo = useMemo(
-    () => hypnogramGeometry({ data, states: rowStates, domain, width, height, style: variant }),
-    [data, rowStates, domain, width, height, variant],
+    () =>
+      hypnogramGeometry({ data, states: rowStates, domain, width, height, style: variant, gutter }),
+    [data, rowStates, domain, width, height, variant, gutter],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  const locate = useCallback(
+    (x: number) => {
+      const i = geo.runs.findIndex((run) => x >= run.x0 && x <= run.x1);
+      return i >= 0 ? i : null;
+    },
+    [geo],
+  );
+  // Unit = RUN, not time sample: the chart merges consecutive same-state entries
+  // into one span (geometry.mergeRuns), and both the pointer lookup and the
+  // ←/→ keyboard nav have always addressed runs. `value` is the run's duration
+  // (t1 − t0) — the only number a run encodes; `label` is its state.
+  const datum = useCallback(
+    (i: number) => {
+      const run = geo.runs[i];
+      return {
+        index: i,
+        value: run ? run.t1 - run.t0 : null,
+        label: run?.state,
+      };
+    },
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.runs.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -71,49 +130,25 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
         : hypnogramSummary(data, rowStates, domain, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.runs.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const i = geo.runs.findIndex((run) => x >= run.x0 && x <= run.x1);
-      setActive(i >= 0 ? i : null);
-    },
-    [geo, width],
-  );
+  const outline = (i: number, pinned: boolean) => {
+    const run = geo.runs[i];
+    if (!run) return null;
+    return (
+      <rect
+        x={run.x0 - 0.5}
+        y={0.5}
+        width={Math.max(1, run.x1 - run.x0) + 1}
+        height={height - 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.runs.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.runs.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.runs.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const run = active !== null ? geo.runs[active] : undefined;
+  const shown = active ?? selected;
+  const run = shown !== null ? geo.runs[shown] : undefined;
   const announced = run ? strings.hypnogramRun(run.state, fmt(run.t0), fmt(run.t1)) : "";
 
   return (
@@ -123,10 +158,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticHypnogram
         {...rest}
@@ -135,23 +167,15 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
         variant={variant}
         style={FILL}
         width={width}
-        height={height}
+        height={heightProp}
+        labels={labelsProp}
         domain={domain}
         strings={strings}
         summary={false}
       >
-        {run ? (
-          <rect
-            x={run.x0 - 0.5}
-            y={0.5}
-            width={Math.max(1, run.x1 - run.x0) + 1}
-            height={height - 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticHypnogram>
       <LiveRegion>{announced}</LiveRegion>

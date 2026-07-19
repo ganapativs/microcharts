@@ -130,7 +130,10 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
           </Reveal>
         </div>
 
-        <Reveal delay={140}>
+        {/* deferred: the panel server-renders as an empty frame (the scenario
+            ghosts are stacked to reserve height, not to be read) and only fills
+            once the stream starts. Painting that frame early would just pop. */}
+        <Reveal delay={140} deferred>
           <StreamVignette serif startDelay={900} />
           <p className="mono-label mt-3 text-center opacity-70">
             what a model writes <span className="text-hairline">·</span> what a person reads

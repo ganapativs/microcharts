@@ -1,6 +1,5 @@
 import { DataDiff } from "@microcharts/react/data-diff";
-import { DataDiff as DataDiffInteractive } from "@microcharts/react/data-diff/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a schema migration diff — rows added/removed per table
@@ -95,12 +94,6 @@ const diff = [
 export function Preview() {
   return <DataDiff data={DIFF} summary={false} width={120} height={40} />;
 }
-
-export const showcase = {
-  hint: "added vs removed, per key",
-  Node: () => <DataDiff data={DIFF} labels title="Schema diff" width={160} height={64} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "labels", label: "labels", init: false },
@@ -134,32 +127,6 @@ export const playground: PlaygroundSpec = {
       s.net && "  net",
       s.sort !== "none" && `  sort="${s.sort}"`,
       s.label !== "none" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <DataDiffInteractive
-      data={DIFF}
-      labels={s.labels as boolean}
-      net={s.net as boolean}
-      sort={s.sort as "none" | "net" | "magnitude"}
-      label={s.label as "totals" | "none"}
-      summary={false}
-      animate={ui.animate}
-      width={220}
-      height={80}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<DataDiff",
-      "  data={diff}",
-      s.labels && "  labels",
-      s.net && "  net",
-      s.sort !== "none" && `  sort="${s.sort}"`,
-      s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -285,19 +252,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<DataDiff data={diff} />`;
 }
-
-export function PreviewLive() {
-  return <DataDiffInteractive data={DIFF} summary={false} width={120} height={40} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

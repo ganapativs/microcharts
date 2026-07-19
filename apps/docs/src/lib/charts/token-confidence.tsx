@@ -1,6 +1,5 @@
 import { TokenConfidence } from "@microcharts/react/token-confidence";
-import { TokenConfidence as TokenConfidenceInteractive } from "@microcharts/react/token-confidence/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const ANSWER = [
@@ -33,6 +32,7 @@ export const entry: ChartEntry = {
   tagline: "Which parts of generated text you should double-check: the text is the chart.",
   staticImport: `${PKG}/token-confidence`,
   interactiveImport: `${PKG}/token-confidence/interactive`,
+  picker: false,
   dataShape: "{ token, confidence }[] (confidence 0–1)",
   encoding: {
     channel: "typographic underline tier (color + thickness + style)",
@@ -95,14 +95,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <TokenConfidence data={ANSWER} summary={false} style={{ fontSize: "0.8rem" }} />;
 }
-
-export const showcase = {
-  hint: "confidence",
-  Node: () => (
-    <TokenConfidence data={ANSWER} title="Model answer" style={{ fontSize: "0.85rem" }} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   // HTML host, not SVG (the documented Chart-root exception) — no entrance
   // motion to gate.
@@ -124,27 +116,6 @@ export const playground: PlaygroundSpec = {
     />
   ),
   code: (s) =>
-    [
-      "<TokenConfidence",
-      "  data={tokens}",
-      `  tiers={[${((s.lo as number) / 100).toFixed(2)}, ${((s.hi as number) / 100).toFixed(2)}]}`,
-      s.all === true && '  show="all"',
-      s.legend === true && "  legend",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s) => (
-    <TokenConfidenceInteractive
-      data={ANSWER}
-      tiers={[(s.lo as number) / 100, (s.hi as number) / 100]}
-      show={s.all ? "all" : "flagged"}
-      legend={s.legend as boolean}
-      summary={false}
-      style={{ fontSize: "0.95rem" }}
-    />
-  ),
-  codeInteractive: (s) =>
     [
       "<TokenConfidence",
       "  data={tokens}",
@@ -272,21 +243,12 @@ export function Mark() {
 export function markCode(): string {
   return `<TokenConfidence data={tokens} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <TokenConfidenceInteractive data={ANSWER} summary={false} style={{ fontSize: "0.8rem" }} />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -69,13 +69,6 @@
         "type": "string | false",
         "required": false,
         "description": "Override or disable the auto summary."
-      },
-      {
-        "name": "onPointFocus",
-        "type": "(index: number | null) => void",
-        "required": false,
-        "interactive": true,
-        "description": "Fires as hover/keyboard focus moves; `null` on blur. Wire crosshair or scrub-to-seek recipes."
       }
     ],
     "demo": [3, 5, 4, 8, 6, 9, 7, 11, 10, 14],
@@ -142,13 +135,6 @@
         "type": "string | string[]",
         "required": false,
         "description": "BCP 47 locale(s) for the endpoint label and summary."
-      },
-      {
-        "name": "onPointFocus",
-        "type": "(index: number | null) => void",
-        "required": false,
-        "interactive": true,
-        "description": "Fires as hover/keyboard focus moves; `null` on blur."
       }
     ],
     "demo": [4, 6, 2, 8, 5, 9, 3, 7],
@@ -179,6 +165,7 @@
     "tagline": "A signed change, double-encoded by glyph and color.",
     "staticImport": "@microcharts/react/delta",
     "interactiveImport": "@microcharts/react/delta/interactive",
+    "picker": false,
     "dataShape": "number (+ optional from)",
     "encoding": {
       "channel": "text + direction glyph (▲/▼)",
@@ -239,6 +226,7 @@
     "tagline": "A measure against a target and qualitative bands.",
     "staticImport": "@microcharts/react/bullet",
     "interactiveImport": "@microcharts/react/bullet/interactive",
+    "picker": false,
     "dataShape": "value + target + bands",
     "encoding": {
       "channel": "position (measure length vs a target tick)",
@@ -383,6 +371,7 @@
     "tagline": "Which way is this moving? At glyph size, before any number.",
     "staticImport": "@microcharts/react/trend-arrow",
     "interactiveImport": "@microcharts/react/trend-arrow/interactive",
+    "picker": false,
     "dataShape": "number (signed change)",
     "encoding": {
       "channel": "glyph orientation (up / down / flat)",
@@ -437,6 +426,7 @@
     "tagline": "What state is this thing in: shape and color paired, never color alone.",
     "staticImport": "@microcharts/react/status-dot",
     "interactiveImport": "@microcharts/react/status-dot/interactive",
+    "picker": false,
     "dataShape": "\"ok\" | \"warn\" | \"error\" | \"off\" | \"busy\" (extensible)",
     "encoding": {
       "channel": "paired glyph shape + semantic color",
@@ -485,6 +475,7 @@
     "tagline": "One calibrated color step: the building block for host-owned grids.",
     "staticImport": "@microcharts/react/heat-cell",
     "interactiveImport": "@microcharts/react/heat-cell/interactive",
+    "picker": false,
     "dataShape": "number (+ shared domain)",
     "encoding": {
       "channel": "discrete color step",
@@ -543,6 +534,7 @@
     "tagline": "How far along, exactly: bar plus the percent that is the datum.",
     "staticImport": "@microcharts/react/progress",
     "interactiveImport": "@microcharts/react/progress/interactive",
+    "picker": false,
     "dataShape": "number of max (optionally segmented)",
     "encoding": {
       "channel": "zero-anchored bar length + direct % label",
@@ -1370,6 +1362,7 @@
     "tagline": "How complete is this? At icon size, where a bar doesn't fit.",
     "staticImport": "@microcharts/react/progress-ring",
     "interactiveImport": "@microcharts/react/progress-ring/interactive",
+    "picker": false,
     "dataShape": "value of max",
     "encoding": {
       "channel": "arc sweep (fixed 12-o'clock start)",
@@ -3554,6 +3547,7 @@
     "staticImport": "@microcharts/react/tally-marks",
     "interactiveImport": "@microcharts/react/tally-marks/interactive",
     "animates": false,
+    "picker": false,
     "dataShape": "{ value: number }",
     "encoding": {
       "channel": "mark count in four-and-strike clusters of five",
@@ -3611,6 +3605,7 @@
     "staticImport": "@microcharts/react/dice-pips",
     "interactiveImport": "@microcharts/react/dice-pips/interactive",
     "animates": false,
+    "picker": false,
     "dataShape": "{ value: number }",
     "encoding": {
       "channel": "canonical pip pattern 1–6 (subitized)",
@@ -3651,6 +3646,7 @@
     "tagline": "Progress on a named task, where the label is the bar.",
     "staticImport": "@microcharts/react/fill-word",
     "interactiveImport": "@microcharts/react/fill-word/interactive",
+    "picker": false,
     "dataShape": "{ word: string; value: number }",
     "encoding": {
       "channel": "inked fraction of the word's own glyph extent",
@@ -3707,6 +3703,7 @@
     "tagline": "Which numbers in a dense column are big, before you read them.",
     "staticImport": "@microcharts/react/fat-digits",
     "interactiveImport": "@microcharts/react/fat-digits/interactive",
+    "picker": false,
     "dataShape": "{ value: number }",
     "encoding": {
       "channel": "the numeral + redundant font-weight tier",
@@ -3759,6 +3756,7 @@
     "tagline": "Where a value sits on a calibrated range, and how close to the goal.",
     "staticImport": "@microcharts/react/thermometer",
     "interactiveImport": "@microcharts/react/thermometer/interactive",
+    "picker": false,
     "dataShape": "{ value: number; target?: number }",
     "encoding": {
       "channel": "column extent on a ticked calibrated scale",
@@ -3824,6 +3822,7 @@
     "staticImport": "@microcharts/react/moon-phase",
     "interactiveImport": "@microcharts/react/moon-phase/interactive",
     "animates": false,
+    "picker": false,
     "dataShape": "{ value: number }",
     "encoding": {
       "channel": "illuminated area fraction of the disc",
@@ -3865,6 +3864,7 @@
     "staticImport": "@microcharts/react/hourglass",
     "interactiveImport": "@microcharts/react/hourglass/interactive",
     "animates": false,
+    "picker": false,
     "dataShape": "{ value: number }",
     "encoding": {
       "channel": "sand area split top (remaining) / bottom (elapsed)",
@@ -4629,6 +4629,7 @@
     "staticImport": "@microcharts/react/breathing-dot",
     "interactiveImport": "@microcharts/react/breathing-dot/interactive",
     "animates": false,
+    "picker": false,
     "dataShape": "{ value: number }",
     "encoding": {
       "channel": "pulse rate + amplitude (static: ring offset) by level",
@@ -4680,6 +4681,7 @@
     "staticImport": "@microcharts/react/heartbeat-blip",
     "interactiveImport": "@microcharts/react/heartbeat-blip/interactive",
     "animates": false,
+    "picker": false,
     "dataShape": "number[]",
     "encoding": {
       "channel": "a spike per event across the recent window",
@@ -4804,6 +4806,7 @@
     "staticImport": "@microcharts/react/orbit-status",
     "interactiveImport": "@microcharts/react/orbit-status/interactive",
     "animates": false,
+    "picker": false,
     "dataShape": "{ latency: number; rate: number }",
     "encoding": {
       "channel": "orbit radius = latency, dash density / speed = rate",
@@ -4980,6 +4983,7 @@
     "tagline": "How long this will actually take, given how it has actually been going.",
     "staticImport": "@microcharts/react/eta-bar",
     "interactiveImport": "@microcharts/react/eta-bar/interactive",
+    "picker": false,
     "dataShape": "{ progress, elapsed, rate? }",
     "encoding": {
       "channel": "time axis — elapsed vs predicted-remaining",
@@ -5073,13 +5077,6 @@
         "type": "boolean",
         "required": false,
         "description": "Mirror around center; false for magnitude-only."
-      },
-      {
-        "name": "onPointFocus",
-        "type": "(index: number, fraction: number) => void",
-        "required": false,
-        "interactive": true,
-        "description": "Fires as focus moves, with the position as a 0–1 fraction — wire scrub-to-seek."
       }
     ],
     "demo": [0.82],
@@ -5198,6 +5195,7 @@
     "tagline": "Which parts of generated text you should double-check: the text is the chart.",
     "staticImport": "@microcharts/react/token-confidence",
     "interactiveImport": "@microcharts/react/token-confidence/interactive",
+    "picker": false,
     "dataShape": "{ token, confidence }[] (confidence 0–1)",
     "encoding": {
       "channel": "typographic underline tier (color + thickness + style)",
@@ -5369,6 +5367,7 @@
     "tagline": "Where am I in the whole, and where in the whole is everything else I care about.",
     "staticImport": "@microcharts/react/minimap-strip",
     "interactiveImport": "@microcharts/react/minimap-strip/interactive",
+    "picker": false,
     "dataShape": "{ content, window, marks?, known? }",
     "encoding": {
       "channel": "position (window + marks along the extent)",
@@ -5954,6 +5953,7 @@
     "tagline": "The level now, the zone it's in, and how fast it's moving, with the eye parked in one place.",
     "staticImport": "@microcharts/react/tape-gauge",
     "interactiveImport": "@microcharts/react/tape-gauge/interactive",
+    "picker": false,
     "dataShape": "value: number, rate?: number, zones?: { from, to, tone }[]",
     "encoding": {
       "channel": "position on a moving scale = level; chevron count = rate (a separate channel)",
@@ -6220,13 +6220,6 @@
         "type": "string | false",
         "required": false,
         "description": "Override or disable the auto summary."
-      },
-      {
-        "name": "onRunFocus",
-        "type": "(index: number | null) => void",
-        "required": false,
-        "interactive": true,
-        "description": "Fires as hover/keyboard focus moves across runs; `null` on blur."
       }
     ],
     "demo": [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1],

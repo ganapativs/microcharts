@@ -32,6 +32,8 @@ describe("interactive <CalendarStrip>", () => {
     expect(live.textContent).toBe("Tuesday, June 9: 0.");
     await userEvent.keyboard("{ArrowDown}"); // one week down, same weekday — empty
     expect(live.textContent).toBe("Tuesday, June 16: no data.");
+    await userEvent.keyboard("{ArrowUp}{ArrowUp}"); // above the window → consumed
+    expect(live.textContent).toBe("Tuesday, June 9: 0.");
     await userEvent.keyboard("{End}");
     expect(live.textContent).toBe("Sunday, July 5: no data.");
     await userEvent.keyboard("{Escape}");
@@ -55,5 +57,32 @@ describe("interactive <CalendarStrip>", () => {
     const svgW = svg.getBoundingClientRect().width;
     expect(wrapW).toBeGreaterThan(120); // the demo width took effect
     expect(Math.abs(svgW - wrapW)).toBeLessThan(1); // SVG fills it exactly
+  });
+
+  it("onActive reports the focused day datum (index + value + day name); null on clear", async () => {
+    const seen: unknown[] = [];
+    const fig = await mount(<CalendarStrip data={DATA} end={END} onActive={(d) => seen.push(d)} />);
+    fig.focus();
+    await userEvent.keyboard("{Home}");
+    expect(seen.at(-1)).toEqual({ index: 0, value: 5, label: "Monday, June 8" });
+    await userEvent.keyboard("{Escape}");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active day: fires onSelect + pins a ring that survives blur", async () => {
+    const picks: unknown[] = [];
+    const fig = await mount(
+      <CalendarStrip data={DATA} end={END} onSelect={(d) => picks.push(d)} />,
+    );
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}{Enter}");
+    expect(picks.at(-1)).toEqual({ index: 1, value: 0, label: "Tuesday, June 9" });
+    fig.blur();
+    await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring with no interaction", async () => {
+    const fig = await mount(<CalendarStrip data={DATA} end={END} selectedIndex={23} />);
+    expect(fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
 });

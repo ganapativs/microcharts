@@ -1,11 +1,12 @@
 "use client";
-// Interactive <CitySkyline>. x-band pointer lookup → highlight the
-// building + announce it; ←/→ roving; the lit fraction is announced as a percent
-// (secondary channel). Composes the static component.
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <CitySkyline>. useActivePicker owns interaction: one pointer
+// listener + x-band lookup → highlight the building + announce it, ←/→ roving,
+// click / Enter / Space selects (onSelect). The lit fraction is announced as a
+// percent (secondary channel). Composes the static component.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { citySkylineGeometry } from "./geometry.js";
@@ -23,7 +24,7 @@ import {
 // reading as windows "turning on".
 const SKYLINE_SELECTOR = 'rect[data-mc-ink="bar"]';
 
-export interface InteractiveCitySkylineProps extends CitySkylineProps {
+export interface InteractiveCitySkylineProps extends CitySkylineProps, PickerProps {
   strings?: SkylineStrings;
   /**
    * Opt-in entrance motion (default `false`): buildings rise from the ground
@@ -51,6 +52,10 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.3);
@@ -59,7 +64,10 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
   // instead of every building rising in lockstep.
   useEntrance(hostRef, "rise", animate, { selector: SKYLINE_SELECTOR, order: "x", window: 500 });
 
-  const groundY = height - (labels ? fontSize + 2 : 2);
+  // Pads mirror the static EXACTLY (bottom = fontSize + 4, top = fontSize + 2
+  // when values are labelled) — a smaller pad here drew every building against
+  // a taller plot than the one rendered, so the rings sat off the roofs.
+  const groundY = height - (labels ? fontSize + 4 : 2);
   const geo = useMemo(
     () =>
       citySkylineGeometry({
@@ -67,7 +75,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
         bw,
         height,
         groundY,
-        maxH: groundY - (label === "value" ? fontSize + 1 : 2),
+        maxH: groundY - (label === "value" ? fontSize + 2 : 2),
         gap,
         domain,
         pad: 2,
@@ -75,7 +83,33 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     [data, bw, gap, domain, height, groundY, label, fontSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // One building per datum, so the unit index IS the DATA index.
+  const locate = useCallback(
+    (x: number) => {
+      const i = Math.floor((x - 2) / (bw + gap));
+      return i >= 0 && i < data.length ? i : null;
+    },
+    [bw, gap, data],
+  );
+  // `value` = the building's height value (the primary, zero-anchored channel);
+  // `lit` is the secondary channel and rides in the announcement, not the datum.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: data[i]?.value ?? null, label: data[i]?.label }),
+    [data],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: data.length,
+    width: geo.width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -85,25 +119,26 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
         : citySkylineSummary(data, { unit, strings, format, locale });
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    if (r.width === 0) return;
-    const x = ((e.clientX - r.left) / r.width) * geo.width;
-    const i = Math.floor((x - 2) / (bw + gap));
-    setActive(i >= 0 && i < data.length ? i : null);
-  };
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowRight") {
-      setActive((p) => Math.min(data.length - 1, (p ?? -1) + 1));
-      e.preventDefault();
-    } else if (e.key === "ArrowLeft") {
-      setActive((p) => Math.max(0, (p ?? data.length) - 1));
-      e.preventDefault();
-    } else if (e.key === "Escape") setActive(null);
+  const outline = (i: number, pinned: boolean) => {
+    const bl = geo.buildings[i];
+    if (!bl || bl.h <= 0) return null;
+    return (
+      <rect
+        x={bl.x - 1}
+        y={bl.y - 1}
+        width={bl.w + 2}
+        height={bl.h + 2}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
   };
 
-  const b = active !== null ? geo.buildings[active] : undefined;
-  const d = active !== null ? data[active] : undefined;
+  const shown = active ?? selected;
+  const b = shown !== null ? geo.buildings[shown] : undefined;
+  const d = shown !== null ? data[shown] : undefined;
   const announced =
     b && d
       ? d.lit === undefined
@@ -122,10 +157,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticCitySkyline
         {...rest}
@@ -144,18 +176,9 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {b && b.h > 0 ? (
-          <rect
-            x={b.x - 1}
-            y={b.y - 1}
-            width={b.w + 2}
-            height={b.h + 2}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticCitySkyline>
       <LiveRegion>{announced}</LiveRegion>

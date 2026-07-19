@@ -35,6 +35,14 @@ describe("<QuantileDots>", () => {
     expect(container.querySelectorAll("circle").length).toBe(15);
   });
 
+  it("all-equal → still exactly `count` dots (coincident dots must not collapse)", () => {
+    // one column, and the radius floor overflows the stack — dots share
+    // coordinates, so a coordinate-derived key would silently drop duplicates
+    // and the render would undercount what the summary claims.
+    const { container } = draw(<QuantileDots data={[7, 7, 7, 7, 7]} count={20} />);
+    expect(container.querySelectorAll("circle").length).toBe(20);
+  });
+
   it("past-threshold dots are re-inked (flag) AND ringed (never color-alone)", () => {
     const { container } = draw(<QuantileDots data={UNIFORM} threshold={15} side="above" />);
     const flags = container.querySelectorAll('circle[data-mc-ink="flag"]');

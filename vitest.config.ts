@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import { playwright } from "@vitest/browser-playwright";
+import { versionDefine } from "./scripts/pkg-version.mjs";
 
 // Two projects (see plan/09 §1, plan/18):
 //   node    — pure core math + static SVG attribute assertions (fast, no browser)
@@ -11,6 +12,8 @@ export default defineConfig({
     passWithNoTests: true,
     projects: [
       {
+        // Mirrors the tsdown build so `__MC_VERSION__` resolves under test too.
+        define: versionDefine,
         test: {
           name: "node",
           environment: "jsdom",
@@ -22,6 +25,7 @@ export default defineConfig({
         },
       },
       {
+        define: versionDefine,
         test: {
           name: "browser",
           include: ["src/**/*.browser.test.{ts,tsx}"],

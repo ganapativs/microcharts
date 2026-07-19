@@ -224,7 +224,9 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
   );
 }
 
-function confGeoAccuracy(counts: readonly (readonly number[])[], k: number): number {
+/** Overall accuracy (trace / total). Shared with the interactive entry so both
+ *  size the accuracy gutter — and therefore the plot — identically. */
+export function confGeoAccuracy(counts: readonly (readonly number[])[], k: number): number {
   let trace = 0;
   let total = 0;
   for (let r = 0; r < k; r++)

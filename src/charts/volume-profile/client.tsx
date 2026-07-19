@@ -1,9 +1,11 @@
 "use client";
-// Interactive <VolumeProfile>. One pointer listener; nearest level
-// bin by y. ↑/↓ rove bins. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <VolumeProfile>. useActivePicker owns interaction: one pointer
+// listener + the level band containing y, ↑/↓ rove bins (bottom-up index
+// order), click / Enter / Space selects (onSelect). Composes the static
+// component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VOLUME_PROFILE } from "../../core/strings-volume-profile.js";
@@ -18,7 +20,7 @@ import {
 // `sweep` selector only matches rects.
 const PROFILE_SELECTOR = 'path[data-mc-ink="bar"], path[data-mc-ink="accent"]';
 
-export interface InteractiveVolumeProfileProps extends VolumeProfileProps {
+export interface InteractiveVolumeProfileProps extends VolumeProfileProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): level bars sweep in from the
    * `align` edge when the chart first mounts client-side. Inert on the
@@ -43,6 +45,10 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -59,7 +65,36 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
   const rows = useMemo(() => binMass(data, bins), [data, bins]);
   const total = useMemo(() => rows.reduce((s, r) => s + r.mass, 0), [rows]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // Pointer (viewBox space) → the level band containing y.
+  const locate = useCallback(
+    (_x: number, y: number) => {
+      const i = geo.bars.findIndex((b) => y >= b.y && y <= b.y + b.height);
+      return i >= 0 ? i : null;
+    },
+    [geo],
+  );
+  // index = LEVEL BIN index (ascending level, bin 0 drawn at the bottom) — the
+  // raw `data` rows are binned, so this is a unit position, not a data index.
+  const datum = useCallback(
+    (i: number) => {
+      const b = geo.bars[i];
+      return { index: i, value: rows[i]?.mass ?? null, label: b ? fmt(b.level) : undefined };
+    },
+    [rows, geo, fmt],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.bars.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -69,40 +104,27 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         : volumeProfileSummary(geo, valueArea, strings, fmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.bars.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.height === 0) return;
-      const y = ((e.clientY - r.top) / r.height) * height;
-      const i = geo.bars.findIndex((b) => y >= b.y && y <= b.y + b.height);
-      setActive(i >= 0 ? i : null);
-    },
-    [geo, height],
-  );
+  const band = (i: number, pinned: boolean) => {
+    const b = geo.bars[i];
+    if (!b) return null;
+    return (
+      <rect
+        x={0.5}
+        y={b.y - 0.4}
+        width={width - 1}
+        height={b.height + 0.8}
+        fill="none"
+        stroke="var(--mc-accent)"
+        strokeOpacity={0.6}
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.bars.length === 0) return;
-      setActive((prev) => {
-        const cur = prev ?? geo.bars.length - 1;
-        if (e.key === "ArrowUp") {
-          e.preventDefault();
-          return Math.max(0, cur - 1);
-        }
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          return Math.min(geo.bars.length - 1, cur + 1);
-        }
-        if (e.key === "Escape") return null;
-        return prev;
-      });
-    },
-    [geo],
-  );
-
-  const bar = active != null ? geo.bars[active] : undefined;
-  const share = bar && total > 0 ? (rows[active!]?.mass ?? 0) / total : 0;
+  const shown = active ?? selected;
+  const bar = shown != null ? geo.bars[shown] : undefined;
+  const share = bar && total > 0 ? (rows[shown!]?.mass ?? 0) / total : 0;
   const announced = bar
     ? strings.volumeAt(
         fmt(bar.level),
@@ -118,10 +140,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticVolumeProfile
         {...rest}
@@ -137,19 +156,10 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         summary={false}
         style={FILL}
       >
-        {bar ? (
-          <rect
-            x={0.5}
-            y={bar.y - 0.4}
-            width={width - 1}
-            height={bar.height + 0.8}
-            fill="none"
-            stroke="var(--mc-accent)"
-            strokeOpacity={0.6}
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus band is transient. */}
+        {selected !== null && selected !== active ? band(selected, true) : null}
+        {active !== null ? band(active, false) : null}
+        {rest.children}
       </StaticVolumeProfile>
       <LiveRegion>{announced}</LiveRegion>
       {bar ? (

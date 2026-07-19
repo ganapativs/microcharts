@@ -69,7 +69,11 @@ export function quantileDotsGeometry(opts: {
   const colW = plot.columns > 0 ? plotW / plot.columns : plotW;
   const rFit = Math.min(colW * 0.46, (plotH / plot.maxStack) * 0.46);
   const r = round2(Math.max(FLOOR_R, rFit));
-  const step = 2 * r;
+  // The radius floor can make a tall stack taller than the plot. Tighten the row
+  // step so the column spans the plot (dots touch, then overlap) instead of the
+  // overflow rows piling up on one clamped y — every dot must stay countable.
+  const fitStep = plot.maxStack > 1 ? (plotH - 2 * r) / (plot.maxStack - 1) : 2 * r;
+  const step = Math.max(0.1, Math.min(2 * r, fitStep));
 
   const th = opts.threshold;
   const isPast = (v: number): boolean =>
@@ -77,7 +81,7 @@ export function quantileDotsGeometry(opts: {
 
   const dots = plot.dots.map((d) => ({
     x: round2(colX(d.column)),
-    y: round2(clamp(baseline - (d.row + 0.5) * step, pad, baseline)),
+    y: round2(clamp(baseline - r - d.row * step, pad, baseline)),
     r,
     past: isPast(d.value),
   }));

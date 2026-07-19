@@ -175,13 +175,15 @@ strip always accounts for every state it's given.
 
 Right-angle steps with an explicit `states` order are the clinically proven read. Order is meaningful — for ordinal
 states (sleep depth, incident severity) pass it explicitly; for nominal states with no rank, use `variant="lanes"` so
-the vertical axis never implies one. Any smoothing or easing of the step corners would be a lie about the data, so
-entrance animation is opacity only.
+the vertical axis never implies one. Any smoothing or easing of the step corners would be a lie about the data, so the
+entrance is a left-to-right clip reveal of the finished trace — the steps themselves are never interpolated.
 
 ## Accessibility
 
 The accessible name summarises the shape — **"9 transitions across 4 states; longest run Deep."** The interactive entry
 roves the runs; each announces its state and span (**"Light, from 8 to 22."**).
+
+<InteractionNote slug="hypnogram" />
 
 ## Props
 

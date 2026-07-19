@@ -1,10 +1,12 @@
 "use client";
 // Interactive <SpreadBand>. Nearest-x lookup announces the lead at
 // that point ("Point 6 of 12: organic +11 over paid."); the crosshair touches
-// both lines. ←/→ steps x. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// both lines. useActivePicker owns interaction: one pointer listener + nearest-x
+// math, roving keyboard, touch tap-to-pin, and the onActive/onSelect contract.
+// Composes the static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -17,7 +19,7 @@ import {
   type SpreadBandProps,
 } from "./index.js";
 
-export interface InteractiveSpreadBandProps extends SpreadBandProps {
+export interface InteractiveSpreadBandProps extends SpreadBandProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the signed gap band wipes on
    * when the chart first mounts client-side. Inert on the server and on
@@ -42,6 +44,10 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -60,8 +66,46 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
     [width, height, data, domain, gutterCh, fontSize],
   );
   const n = data.length;
-  const [active, setActive] = useState<number | null>(null);
-  const clear = useCallback(() => setActive(null), []);
+
+  // Navigable units are the paired readings — 1:1 with `data`, so the reported
+  // index IS the data index (a null pair is still a stop; it announces "empty").
+  const locate = useCallback(
+    (x: number) => {
+      if (n === 0) return null;
+      const span = geo.plot.x1 - geo.plot.x0;
+      const i = Math.round(((x - geo.plot.x0) / Math.max(1, span)) * (n - 1));
+      return Math.min(n - 1, Math.max(0, i));
+    },
+    [n, geo],
+  );
+
+  // `value` = the SIGNED GAP a − b at that reading: the band is this chart's
+  // primary encoding (the two lines are its edges, announced in the live region
+  // and the readout chip). `null` when either half of the pair is missing.
+  const datum = useCallback(
+    (i: number) => {
+      const d = data[i];
+      const a = d?.a;
+      const b = d?.b;
+      return {
+        index: i,
+        value: isFiniteValue(a) && isFiniteValue(b) ? a - b : null,
+      };
+    },
+    [data],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: n,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -71,50 +115,10 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         : spreadBandSummary(geo, labels, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (n === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const span = geo.plot.x1 - geo.plot.x0;
-      const i = Math.round(((x - geo.plot.x0) / Math.max(1, span)) * (n - 1));
-      setActive(Math.min(n - 1, Math.max(0, i)));
-    },
-    [n, geo, width],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (n === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(n - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = n - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, n],
-  );
-
-  const d = active !== null ? data[active] : undefined;
+  // The reading shown by the crosshair + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const d = shown !== null ? data[shown] : undefined;
   const av = d?.a;
   const bv = d?.b;
   const bothFinite = isFiniteValue(av) && isFiniteValue(bv);
@@ -124,18 +128,18 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
   const other = aLeads ? labels[1] : labels[0];
 
   const announced =
-    active === null
+    shown === null
       ? ""
       : !bothFinite
-        ? strings.spreadBandAtEmpty(active + 1, n)
+        ? strings.spreadBandAtEmpty(shown + 1, n)
         : gap === 0
-          ? strings.spreadBandAtTie(active + 1, n)
-          : strings.spreadBandAt(active + 1, n, leader, `+${fmt(Math.abs(gap))}`, other);
+          ? strings.spreadBandAtTie(shown + 1, n)
+          : strings.spreadBandAt(shown + 1, n, leader, `+${fmt(Math.abs(gap))}`, other);
 
-  const crossX =
-    active !== null
-      ? (geo.subjectPoints[active]?.[0] ?? geo.referencePoints[active]?.[0])
-      : undefined;
+  const xAt = (i: number): number | undefined =>
+    geo.subjectPoints[i]?.[0] ?? geo.referencePoints[i]?.[0];
+  const crossX = shown !== null ? xAt(shown) : undefined;
+  const pinX = selected !== null && selected !== active ? xAt(selected) : undefined;
 
   const chip = !bothFinite ? "—" : gap === 0 ? "level" : `${leader} +${fmt(Math.abs(gap))}`;
 
@@ -146,10 +150,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={clear}
-      onKeyDown={onKeyDown}
-      onBlur={clear}
+      {...bind}
     >
       <StaticSpreadBand
         {...rest}
@@ -166,6 +167,18 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         summary={false}
         style={FILL}
       >
+        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
+        {pinX !== undefined ? (
+          <line
+            x1={pinX}
+            y1={0}
+            x2={pinX}
+            y2={height}
+            data-mc-ink="accent"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {crossX !== undefined ? (
           <>
             <line
@@ -177,18 +190,18 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
-            {geo.subjectPoints[active!] ? (
+            {geo.subjectPoints[shown!] ? (
               <circle
-                cx={geo.subjectPoints[active!]![0]}
-                cy={geo.subjectPoints[active!]![1]}
+                cx={geo.subjectPoints[shown!]![0]}
+                cy={geo.subjectPoints[shown!]![1]}
                 r={2}
                 data-mc-ink="accent"
               />
             ) : null}
-            {geo.referencePoints[active!] ? (
+            {geo.referencePoints[shown!] ? (
               <circle
-                cx={geo.referencePoints[active!]![0]}
-                cy={geo.referencePoints[active!]![1]}
+                cx={geo.referencePoints[shown!]![0]}
+                cy={geo.referencePoints[shown!]![1]}
                 r={1.5}
                 style={{ fill: "var(--mc-neutral)" }}
               />
@@ -198,7 +211,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         {rest.children}
       </StaticSpreadBand>
       <LiveRegion>{announced}</LiveRegion>
-      {active !== null && crossX !== undefined ? (
+      {shown !== null && crossX !== undefined ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(crossX / width) * 100}%`, transform: "translateX(-50%)" }}

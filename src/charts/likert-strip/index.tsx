@@ -8,7 +8,7 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
-import { likertStripGeometry } from "./geometry.js";
+import { LIKERT_FONT, likertGutter, likertStripGeometry } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
 
 export type LikertDatum = MiniBarDatum;
@@ -76,12 +76,12 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
     devWarn("<LikertStrip> negative counts treated as 0.");
   }
 
-  const fontSize = 5;
+  const fontSize = LIKERT_FONT;
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const hasNeutralLevel = data.length % 2 === 1;
 
   // end labels reserve deterministic ch gutters ("100%" worst case = 4 chars)
-  const gutter = label === "none" ? 0 : Math.ceil(4 * fontSize * 0.62) + 4;
+  const gutter = likertGutter(label !== "none", fontSize);
   const geo = likertStripGeometry({
     width,
     height,

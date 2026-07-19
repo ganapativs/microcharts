@@ -1,6 +1,5 @@
 import { Honeycomb } from "@microcharts/react/honeycomb";
-import { Honeycomb as HoneycombInteractive } from "@microcharts/react/honeycomb/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -63,12 +62,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <Honeycomb value={34} total={40} unit="seats" summary={false} cell={4} />;
 }
-
-export const showcase = {
-  hint: "of capacity",
-  Node: () => <Honeycomb value={34} total={40} unit="seats" title="Occupancy" cell={5} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "filled", min: 0, max: 40, step: 1, init: 28 },
@@ -97,28 +90,6 @@ export const playground: PlaygroundSpec = {
       `  value={${s.value}}`,
       `  total={${s.total}}`,
       s.empty !== "outline" && `  empty="${s.empty}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <HoneycombInteractive
-      value={s.value as number}
-      total={s.total as number}
-      empty={s.empty as "outline" | "blank"}
-      unit="seats"
-      summary={false}
-      animate={ui.animate}
-      cell={7}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Honeycomb",
-      `  value={${s.value}}`,
-      `  total={${s.total}}`,
-      s.empty !== "outline" && `  empty="${s.empty}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -220,21 +191,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Honeycomb value={34} total={40} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <HoneycombInteractive value={34} total={40} unit="seats" summary={false} cell={4} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

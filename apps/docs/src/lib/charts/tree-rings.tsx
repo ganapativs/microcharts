@@ -1,9 +1,8 @@
 import { TreeRings } from "@microcharts/react/tree-rings";
-import { TreeRings as TreeRingsInteractive } from "@microcharts/react/tree-rings/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const YEARS = [8, 12, 10, 18, 22, 15, 20, 14];
+export const YEARS = [8, 12, 10, 18, 22, 15, 20, 14];
 
 export const entry: ChartEntry = {
   name: "TreeRings",
@@ -76,21 +75,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <TreeRings data={YEARS} summary={false} size={28} />;
 }
-
-export const showcase = {
-  hint: "growth, ringed",
-  Node: () => (
-    <TreeRings
-      data={YEARS}
-      label="last"
-      unit="years"
-      periodWord="year"
-      title="Account age"
-      size={32}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -128,31 +112,6 @@ export const playground: PlaygroundSpec = {
       s.rings !== "stroke" && `  rings="${s.rings}"`,
       s.highlight !== "last" && `  highlight="${s.highlight}"`,
       s.label && '  label="last"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <TreeRingsInteractive
-      data={YEARS}
-      rings={s.rings as "stroke" | "fill"}
-      highlight={s.highlight as "last" | "none"}
-      label={s.label ? "last" : "none"}
-      unit="years"
-      periodWord="year"
-      summary={false}
-      animate={ui.animate}
-      size={56}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<TreeRings",
-      "  data={years}",
-      s.rings !== "stroke" && `  rings="${s.rings}"`,
-      s.highlight !== "last" && `  highlight="${s.highlight}"`,
-      s.label && '  label="last"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -280,19 +239,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<TreeRings data={years} />`;
 }
-
-export function PreviewLive() {
-  return <TreeRingsInteractive data={YEARS} summary={false} size={28} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -1,18 +1,20 @@
 "use client";
-// Interactive <BalanceBeam>. Hover a side (nearest-half) or arrow
-// Left/Right to focus it → readout shows its label + value; the beam eases to a
-// new tilt on data change (CSS geometry transition, reduced-motion-gated);
-// announces when the heavier side flips. Composes the static component.
-import { useEffect, useRef, useState } from "react";
+// Interactive <BalanceBeam>. useActivePicker owns interaction: one pointer
+// listener + nearest-half lookup, ←/→ focus a PAN, click / Enter / Space
+// selects it (onSelect); the beam eases to a new tilt on data change (CSS
+// geometry transition, reduced-motion-gated) and announces when the heavier
+// side flips. Composes the static component (canon).
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { labelFont } from "../../core/labels.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { balanceBeamGeometry } from "./geometry.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
 import { BalanceBeam as StaticBeam, balanceBeamSummary, type BalanceBeamProps } from "./index.js";
 
-export interface InteractiveBalanceBeamProps extends BalanceBeamProps {
+export interface InteractiveBalanceBeamProps extends BalanceBeamProps, PickerProps {
   live?: boolean;
   strings?: BeamStrings;
   /**
@@ -25,6 +27,8 @@ export interface InteractiveBalanceBeamProps extends BalanceBeamProps {
   animate?: boolean;
 }
 
+const PAD = 2;
+
 export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode {
   const {
     live = true,
@@ -32,17 +36,23 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
     title,
     data,
     mode = "ratio",
+    shape = "square",
     domain,
     maxTilt = 12,
+    width = 48,
+    height = 20,
     format,
     locale,
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const summary = balanceBeamSummary(data, { mode, domain, strings, format, locale });
-  const [active, setActive] = useState<0 | 1 | null>(null);
   const [announced, setAnnounced] = useState("");
   const hostRef = useRef<HTMLSpanElement>(null);
   // Only the weights (dots) settle — the beam and fulcrum arrive via the base
@@ -50,54 +60,102 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
   useEntrance(hostRef, "settle", animate, {
     selector: '[data-mc-ink="accent"], [data-mc-ink="point"]',
   });
-  const prevHeavier = useRef(
-    balanceBeamGeometry({
-      a: data[0].value,
-      b: data[1].value,
-      width: 48,
-      height: 20,
-      maxTilt,
-      mode,
-      domain,
-      pad: 2,
-    }).heavier,
+
+  // Same inputs as the static render (pure → identical numbers), so the focus
+  // and pin rings sit exactly on the drawn weights.
+  const geo = useMemo(
+    () =>
+      balanceBeamGeometry({
+        a: data[0].value,
+        b: data[1].value,
+        width,
+        height,
+        maxTilt,
+        mode,
+        domain,
+        pad: PAD,
+      }),
+    [data, width, height, maxTilt, mode, domain],
   );
 
+  const prevHeavier = useRef(geo.heavier);
   useEffect(() => {
-    const h = balanceBeamGeometry({
-      a: data[0].value,
-      b: data[1].value,
-      width: 48,
-      height: 20,
-      maxTilt,
-      mode,
-      domain,
-      pad: 2,
-    }).heavier;
-    if (h === prevHeavier.current) return;
-    prevHeavier.current = h;
+    if (geo.heavier === prevHeavier.current) return;
+    prevHeavier.current = geo.heavier;
     if (live) setAnnounced(summary);
-  }, [data, mode, domain, maxTilt, summary, live]);
+  }, [geo, summary, live]);
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
-  const fmt = makeFormatter(format, locale);
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
-  const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    if (rect.width === 0) return;
-    setActive((e.clientX - rect.left) / rect.width < 0.5 ? 0 : 1);
-  };
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowLeft") {
-      setActive(0);
-      e.preventDefault();
-    } else if (e.key === "ArrowRight") {
-      setActive(1);
-      e.preventDefault();
-    } else if (e.key === "Escape") setActive(null);
+  // The navigable unit is the PAN (a side of the beam), 1:1 with `data`:
+  // 0 = left, 1 = right. `value` = that pan's weight (the area-true mark).
+  const locate = useCallback((x: number) => (x < width / 2 ? 0 : 1), [width]);
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: data[i]?.value ?? null, label: data[i]?.label }),
+    [data],
+  );
+  // Two pans read as places, not as a sequence: ← always means the LEFT pan and
+  // → the RIGHT one (the pre-migration behaviour), so the arrows are absolute
+  // rather than relative and never fall through to the 1-D default.
+  const step = useCallback((_cur: number, key: string) => {
+    switch (key) {
+      case "ArrowLeft":
+      case "ArrowUp":
+      case "Home":
+        return 0;
+      case "ArrowRight":
+      case "ArrowDown":
+      case "End":
+        return 1;
+    }
+    return null;
+  }, []);
+
+  // The static reserves a value gutter BELOW the apparatus, so the rendered
+  // viewBox is `height + labelBand` — the pointer map has to use the total.
+  const labelBand =
+    (props.label ?? "none") === "values"
+      ? Math.ceil((props.fontSize ?? labelFont(height, 0.4)) * 1.3)
+      : 0;
+
+  const { active, selected, bind } = useActivePicker({
+    count: 2,
+    width,
+    height: height + labelBand,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const ring = (i: number, pinned: boolean) => {
+    const w = geo.weights[i];
+    if (!w) return null;
+    const common = {
+      fill: "none",
+      stroke: "var(--mc-accent)",
+      "data-mc-w": pinned ? "tick" : "support",
+      vectorEffect: "non-scaling-stroke" as const,
+    };
+    return shape === "round" ? (
+      <circle cx={w.cx} cy={w.cy} r={w.half + 1.5} {...common} />
+    ) : (
+      <rect
+        x={w.cx - w.half - 1.5}
+        y={w.cy - w.half - 1.5}
+        width={w.half * 2 + 3}
+        height={w.half * 2 + 3}
+        {...common}
+      />
+    );
   };
 
-  const datum = active !== null ? data[active] : undefined;
+  const shown = active ?? selected;
+  const pan = shown !== null ? data[shown] : undefined;
 
   return (
     <span
@@ -106,27 +164,32 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticBeam
         {...rest}
         style={FILL}
         data={data}
         mode={mode}
+        shape={shape}
         domain={domain}
         maxTilt={maxTilt}
+        width={width}
+        height={height}
         format={format}
         locale={locale}
         strings={strings}
         summary={false}
-      />
+      >
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
+        {rest.children}
+      </StaticBeam>
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
-      {datum ? (
+      {pan ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {`${datum.label} ${fmt(datum.value)}`}
+          {`${pan.label} ${fmt(pan.value)}`}
         </span>
       ) : null}
     </span>

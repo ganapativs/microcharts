@@ -1,18 +1,21 @@
 "use client";
 // Interactive <HeatStrip>. One pointer listener; cell by x-band
 // lookup. ←/→ roving cell focus with the ActivityGrid focus-ring style — the
-// 1-D restriction of its 2-D nav, same wording, same overlay. Composes the
-// static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// 1-D restriction of its 2-D nav, same wording, same overlay; click / Enter /
+// Space selects a cell (onSelect). useActivePicker owns interaction (the strip
+// is a single row of cells, so the kernel's default 1-D nav applies — no custom
+// `step`), composing the static component (canon).
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import { heatStripGeometry } from "./geometry.js";
 import { HeatStrip as StaticHeatStrip, type HeatStripProps } from "./index.js";
 
-export interface InteractiveHeatStripProps extends HeatStripProps {
+export interface InteractiveHeatStripProps extends HeatStripProps, PickerProps {
   strings?: SeriesStrings & SlotStrings;
   /**
    * Opt-in entrance motion (default `false`): the strip wipes in left to right
@@ -42,6 +45,10 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -60,7 +67,35 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
     [width, height, data, domain, steps, shape],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // Pointer (viewBox space) → cell index by x-band lookup; `null` past the end.
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.cells.length === 0 || geo.pitch === 0) return null;
+      const i = Math.floor(x / geo.pitch);
+      return i >= 0 && i < geo.cells.length ? i : null;
+    },
+    [geo],
+  );
+
+  // index = cell index along the strip. 1:1 with `data` until the series
+  // exceeds HEAT_STRIP_MAX_CELLS, when cells are max-per-bucket rollups.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.cells.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -70,53 +105,31 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
         : describeSeries(data, { format: fmt, strings });
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.cells.length === 0 || geo.pitch === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const i = Math.floor(x / geo.pitch);
-      setActive(i >= 0 && i < geo.cells.length ? i : null);
-    },
-    [geo, width],
-  );
+  const ring = (i: number, pinned: boolean) => {
+    const c = geo.cells[i];
+    if (!c) return null;
+    return (
+      <rect
+        x={c.x - 0.5}
+        y={c.y - 0.5}
+        width={c.w + 1}
+        height={c.h + 1}
+        rx={c.rx + 0.5}
+        fill="none"
+        stroke="var(--mc-accent)"
+        strokeWidth={1.5}
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.cells.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.cells.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.cells.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const activeCell = active !== null ? geo.cells[active] : undefined;
-  const announced = activeCell
-    ? activeCell.value === null
-      ? strings.pointEmpty(activeCell.index + 1, geo.cells.length)
-      : strings.point(activeCell.index + 1, geo.cells.length, fmt(activeCell.value))
+  const shown = active ?? selected;
+  const shownCell = shown !== null ? geo.cells[shown] : undefined;
+  const announced = shownCell
+    ? shownCell.value === null
+      ? strings.pointEmpty(shownCell.index + 1, geo.cells.length)
+      : strings.point(shownCell.index + 1, geo.cells.length, fmt(shownCell.value))
     : "";
 
   return (
@@ -126,10 +139,7 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticHeatStrip
         {...rest}
@@ -145,43 +155,21 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {activeCell ? (
-          <rect
-            x={activeCell.x - 0.5}
-            y={activeCell.y - 0.5}
-            width={activeCell.w + 1}
-            height={activeCell.h + 1}
-            rx={activeCell.rx + 0.5}
-            fill="none"
-            stroke="var(--mc-accent)"
-            strokeWidth={1.5}
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticHeatStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
-      {activeCell ? (
+      <LiveRegion>{announced}</LiveRegion>
+      {shownCell ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((activeCell.x + activeCell.w / 2) / width) * 100}%`,
+            left: `${((shownCell.x + shownCell.w / 2) / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {activeCell.value === null ? "—" : fmt(activeCell.value)}
+          {shownCell.value === null ? "—" : fmt(shownCell.value)}
         </span>
       ) : null}
     </span>

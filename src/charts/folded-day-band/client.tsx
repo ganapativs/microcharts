@@ -1,9 +1,12 @@
 "use client";
-// Interactive <FoldedDayBand>. One pointer listener; nearest fold
-// bin by x. ←/→ rove bins. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <FoldedDayBand>. useActivePicker owns interaction: one pointer
+// listener + nearest-bin-by-x math, ←/→ (and ↑/↓) rove fold bins, click /
+// Enter / Space selects (onSelect). The fold collapses every period onto ONE
+// axis, so the navigable space is 1-D (bins), not day × time-of-day.
+// Composes the static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FOLDED_BAND } from "../../core/strings-folded-band.js";
@@ -15,7 +18,7 @@ import {
   type FoldedDayBandProps,
 } from "./index.js";
 
-export interface InteractiveFoldedDayBandProps extends FoldedDayBandProps {
+export interface InteractiveFoldedDayBandProps extends FoldedDayBandProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the median line draws on when
    * the chart first mounts client-side. Inert on the server and on
@@ -44,6 +47,10 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -55,7 +62,52 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
     [data, today, period, bins, bands, width, height],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // Unit = a POPULATED fold bin, i.e. an index into `geo.binStats` (empty bins
+  // carry no quantiles and are never rendered, so they are not navigable).
+  const locate = useCallback(
+    (x: number) => {
+      const stats = geo.binStats;
+      if (stats.length === 0) return null;
+      let best = 0;
+      let bestD = Infinity;
+      for (let i = 0; i < stats.length; i++) {
+        const d = Math.abs(stats[i]!.x - x);
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+      }
+      return best;
+    },
+    [geo],
+  );
+
+  // value = the bin's MEDIAN (the fold's headline encoded number); label = its
+  // position on the fold axis.
+  const datum = useCallback(
+    (i: number) => {
+      const s = geo.binStats[i];
+      return {
+        index: i,
+        value: s ? s.median : null,
+        label: s ? fmt(binPosition(s.bin, bins, period)) : undefined,
+      };
+    },
+    [geo, fmt, bins, period],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.binStats.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -65,47 +117,9 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         : foldedBandSummary(geo, period, strings, fmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.binStats.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      let best = 0;
-      let bestD = Infinity;
-      geo.binStats.forEach((s, i) => {
-        const d = Math.abs(s.x - x);
-        if (d < bestD) {
-          bestD = d;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, width],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.binStats.length === 0) return;
-      setActive((prev) => {
-        const cur = prev ?? 0;
-        if (e.key === "ArrowRight") {
-          e.preventDefault();
-          return Math.min(geo.binStats.length - 1, cur + 1);
-        }
-        if (e.key === "ArrowLeft") {
-          e.preventDefault();
-          return Math.max(0, cur - 1);
-        }
-        if (e.key === "Escape") return null;
-        return prev;
-      });
-    },
-    [geo],
-  );
-
-  const s = active != null ? geo.binStats[active] : undefined;
+  const shown = active ?? selected;
+  const s = shown !== null ? geo.binStats[shown] : undefined;
+  const pinned = selected !== null && selected !== active ? geo.binStats[selected] : undefined;
   const todayClause =
     geo.todayPercentile == null
       ? ""
@@ -131,10 +145,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
       tabIndex={0}
       role="img"
       aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...bind}
     >
       <StaticFoldedDayBand
         {...rest}
@@ -151,6 +162,18 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         summary={false}
         style={FILL}
       >
+        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
+        {pinned ? (
+          <line
+            x1={pinned.x}
+            x2={pinned.x}
+            y1={0.5}
+            y2={height - 0.5}
+            stroke="var(--mc-accent)"
+            data-mc-w="support"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {s ? (
           <line
             x1={s.x}
@@ -162,6 +185,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {rest.children}
       </StaticFoldedDayBand>
       <LiveRegion>{announced}</LiveRegion>
       {s ? (

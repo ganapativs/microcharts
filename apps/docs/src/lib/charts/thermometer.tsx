@@ -1,6 +1,5 @@
 import { Thermometer } from "@microcharts/react/thermometer";
-import { Thermometer as ThermometerInteractive } from "@microcharts/react/thermometer/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -12,6 +11,7 @@ export const entry: ChartEntry = {
   tagline: "Where a value sits on a calibrated range, and how close to the goal.",
   staticImport: `${PKG}/thermometer`,
   interactiveImport: `${PKG}/thermometer/interactive`,
+  picker: false,
   dataShape: "{ value: number; target?: number }",
   encoding: { channel: "column extent on a ticked calibrated scale", precision: "high" },
   nodeBudget: "≤ 6",
@@ -70,12 +70,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "toward the goal",
-  Node: () => <Thermometer value={72} target={80} title="Fundraiser" height={52} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value", min: 0, max: 100, step: 1, init: 72 },
@@ -106,29 +100,6 @@ export const playground: PlaygroundSpec = {
       `  target={${s.target}}`,
       s.orientation !== "vertical" && `  orientation="${s.orientation}"`,
       s.bulb === false && "  bulb={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ThermometerInteractive
-      value={s.value as number}
-      target={s.target as number}
-      orientation={s.orientation as "vertical" | "horizontal"}
-      bulb={s.bulb as boolean}
-      summary={false}
-      animate={ui.animate}
-      {...(s.orientation === "horizontal" ? { width: 120 } : { height: 72 })}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Thermometer",
-      `  value={${s.value}}`,
-      `  target={${s.target}}`,
-      s.orientation !== "vertical" && `  orientation="${s.orientation}"`,
-      s.bulb === false && "  bulb={false}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -238,25 +209,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Thermometer value={72} target={80} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex items-end gap-3">
-      <ThermometerInteractive value={72} target={80} summary={false} animate />
-      <ThermometerInteractive value={40} summary={false} animate />
-      <ThermometerInteractive value={95} summary={false} animate />
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -10,6 +10,9 @@ const SAMPLE: RateVolumePoint[] = [
   { rate: 4.1, volume: 38 },
 ];
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <RateVolume>", () => {
   it("arrow keys step periods; the live region always pairs both numbers", async () => {
     const screen = await render(<RateVolume data={SAMPLE} minVolume={50} title="Rate" />);
@@ -50,5 +53,37 @@ describe("interactive <RateVolume>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("Period 2 of 3: no events.");
+  });
+
+  it("onActive reports the focused datum (period index + rate); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<RateVolume data={SAMPLE} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-rate-volume-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    key(wrap, "ArrowRight");
+    expect(seen.at(-1)).toEqual({ index: 1, value: 3.1 });
+    key(wrap, "Escape");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active period: fires onSelect + pins a persistent ring", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<RateVolume data={SAMPLE} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-rate-volume-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    key(wrap, "ArrowRight");
+    key(wrap, "Enter");
+    expect(picks.at(-1)).toEqual({ index: 1, value: 3.1 });
+    // Pin survives blur (it is selection, not hover).
+    wrap.blur();
+    await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring with no interaction", async () => {
+    const screen = await render(<RateVolume data={SAMPLE} selectedIndex={0} />);
+    const wrap = screen.container.querySelector(".mc-rate-volume-live") as HTMLElement;
+    expect(wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
 });

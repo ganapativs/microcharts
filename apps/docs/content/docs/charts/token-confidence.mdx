@@ -139,15 +139,17 @@ An empty `data` array renders nothing and reports **"No tokens."** to assistive 
 
 The tiers are discrete — confident, unsure, guessing — never a continuous gradient, because people calibrate
 categorically: a smooth colour ramp reads as noise, but "double-check this word" reads instantly. Confident tokens carry
-no mark at all, and each tier is distinguished by colour **and** underline thickness **and** stroke style, so it never
-depends on colour alone. For auditing exact probabilities, reach for [CalibrationStrip](/docs/charts/calibration-strip)
-instead.
+no mark at all, and the two flagged tiers differ in **stroke style** as well as colour — unsure is a solid underline,
+guessing a dotted one — so the tier never depends on colour alone. For auditing exact probabilities, reach for
+[CalibrationStrip](/docs/charts/calibration-strip) instead.
 
 ## Accessibility
 
 The accessible name is the tier tally — **"13 tokens: 8 confident, 2 unsure, 3 guessing."** The interactive entry gives
 each flagged token a roving tab stop; ←/→ move between them (skipping confident tokens), announcing each one's tier and
 confidence.
+
+<InteractionNote slug="token-confidence" />
 
 ## Props
 

@@ -86,9 +86,11 @@ decoration, and is never animated in the static entry — it simply renders whil
 
 ## Accessibility
 
-The accessible name carries both sides — **"75% elapsed, 25% remaining."** The interactive entry cross-fades the sand
-levels on change (an opacity swap, never a path interpolation) and announces only when the total crosses a documented
-threshold (50 / 90 / 100%), so a streaming value never spams.
+The accessible name carries both sides — the third glyph above reads **"85% elapsed, 15% remaining."** The interactive
+entry cross-fades the sand levels on change (opacity plus a scale-from-the-floor settle, never a path interpolation) and
+announces only when the value crosses a documented threshold (50 / 90 / 100%), so a streaming value never spams.
+
+<InteractionNote slug="hourglass" />
 
 ## Props
 
