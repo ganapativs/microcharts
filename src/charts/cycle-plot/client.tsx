@@ -47,6 +47,12 @@ type Drill = { slot: number; cycle: number } | null;
 const driftDir = (d: number): "rising" | "falling" | "steady" =>
   d > 0 ? "rising" : d < 0 ? "falling" : "steady";
 
+/** Localized drift word. `driftDir` stays: the summary passes the English token
+ *  on as a semantic discriminant, which a translator branches on. What must not
+ *  ship is that token rendered straight into the readout as display text. */
+const driftName = (strings: { cycleDriftNames: readonly [string, string, string] }, d: number) =>
+  strings.cycleDriftNames[d > 0 ? 2 : d < 0 ? 0 : 1];
+
 export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
   const {
     data,
@@ -293,8 +299,8 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
           style={{ left: `${(sl.center.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
           {obs !== undefined
-            ? `${slotName(slots, shown)}, cycle ${cycle + 1} of ${cycleVals.length}: ${fmt(obs)}`
-            : `${slotName(slots, shown)}: ${fmt(sl.center.value)} (${driftDir(sl.drift)})`}
+            ? `${slotName(slots, shown)} ${cycle + 1}/${cycleVals.length}: ${fmt(obs)}`
+            : `${slotName(slots, shown)}: ${fmt(sl.center.value)} (${driftName(strings, sl.drift)})`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

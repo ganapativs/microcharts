@@ -202,7 +202,7 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
           className="mc-queue-readout mc-spark-readout"
           style={{ left: `${(rp.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`t${rp.index}: ${fmt(rp.value)} queued${rp.above ? strings.queueAbove : ""}`}
+          {`${fmt(rp.value)}${rp.above ? strings.queueAbove : ""}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

@@ -21,7 +21,8 @@ describe("interactive <RetentionCurve>", () => {
     // a VISIBLE readout chip shows retention · benchmark at the focused period
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("week 7: 34% · 28%");
+      // The x position IS the period, and `unit` defaulted to the English "week".
+      .toBe("34% · 28%");
   });
 
   it("without a benchmark, no benchmark clause", async () => {

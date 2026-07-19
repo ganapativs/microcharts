@@ -26,9 +26,16 @@ describe("interactive <QueueDepth>", () => {
     const wrap = screen.container.querySelector(".mc-queue-depth-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    // "t8:" repeated the x position and " queued" was hardcoded English — the
+    // chart IS the queue. The capacity flag stays: it is not visible otherwise,
+    // and it already came from `strings`.
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("t8: 214 queued, above capacity");
+      .toBe("214, above capacity");
+    // ...and the period the chip no longer names is still announced. This test
+    // asserted only the chip, so nothing held the announcement in place.
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toMatch(/8/);
   });
 
   it("onActive reports the focused datum (data index + depth); null on clear", async () => {

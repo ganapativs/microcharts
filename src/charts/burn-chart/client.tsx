@@ -29,7 +29,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
     data,
     mode = "down",
     projection = true,
-    work = "points",
+    work,
     unit = "day",
     height = 20,
     width = 80,
@@ -47,6 +47,10 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // The workWord noun defaults from `strings`, not from a literal: it is rendered
+  // display text, so an English default here would survive a localized bundle.
+  const workWord = work ?? strings.burnWork;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The actual line (ink="data") draws as the story; the dotted projection is
@@ -96,7 +100,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
           : burnSummary(
               geo,
               fmt,
-              { unit, work, mode, elapsed: data.actual.length, total: data.plan.length },
+              { unit, work: workWord, mode, elapsed: data.actual.length, total: data.plan.length },
               strings,
             );
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
@@ -157,14 +161,14 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
           unit,
           p.period,
           fmt(p.actual),
-          work,
+          workWord,
           verb,
           p.plan === null ? null : fmt(p.plan),
         )
       : p.projected !== null
-        ? strings.burnAtProjected(unit, p.period, fmt(p.projected), work, verb)
+        ? strings.burnAtProjected(unit, p.period, fmt(p.projected), workWord, verb)
         : p.plan !== null
-          ? strings.burnAt(unit, p.period, fmt(p.plan), work, verb, null)
+          ? strings.burnAt(unit, p.period, fmt(p.plan), workWord, verb, null)
           : ""
     : "";
 
@@ -183,7 +187,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
         data={data}
         mode={mode}
         projection={projection}
-        work={work}
+        work={workWord}
         unit={unit}
         width={width}
         height={height}
@@ -235,11 +239,11 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
           style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
           {p.actual !== null
-            ? `${fmt(p.actual)} ${work}${p.plan !== null ? ` / ${fmt(p.plan)} plan` : ""}`
+            ? `${fmt(p.actual)}${p.plan !== null ? ` / ${fmt(p.plan)}` : ""} ${workWord}`
             : p.projected !== null
-              ? `${fmt(p.projected)}⋯ ${work}`
+              ? `${fmt(p.projected)}⋯ ${workWord}`
               : p.plan !== null
-                ? `${fmt(p.plan)} ${work} plan`
+                ? `${fmt(p.plan)} ${workWord}`
                 : ""}
         </span>
       ) : null}

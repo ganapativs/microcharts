@@ -30,7 +30,9 @@ describe("interactive <BurnChart>", () => {
     // a VISIBLE readout chip appears at the focused point (not just the a11y region)
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("30 points / 20 plan");
+      // The unit noun trails the pair instead of repeating; " plan" was hardcoded
+      // English beside a live region that localizes the same word.
+      .toBe("30 / 20 points");
   });
 
   it("onActive reports the focused datum (period + value); null on clear", async () => {

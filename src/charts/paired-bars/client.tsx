@@ -215,7 +215,7 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
           }}
         >
           {isFiniteValue(shownDatum.ref)
-            ? `${shownDatum.label}: ${fmt(shownDatum.value)} vs ${fmt(shownDatum.ref)}`
+            ? `${shownDatum.label}: ${fmt(shownDatum.value)} / ${fmt(shownDatum.ref)}`
             : `${shownDatum.label}: ${fmt(shownDatum.value)}`}
         </span>
       ) : null}

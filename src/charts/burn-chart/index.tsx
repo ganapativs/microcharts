@@ -39,7 +39,7 @@ export function burnSummary(
 }
 
 export interface BurnChartProps {
-  /** Remaining work per period (`mode="down"`) or completed (`"up"`). */
+  /** Remaining workWord per period (`mode="down"`) or completed (`"up"`). */
   data: { plan: readonly number[]; actual: readonly number[] };
   /** Burn-down (remaining → 0, default) or burn-up (done → scope). */
   mode?: BurnMode | undefined;
@@ -71,7 +71,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
     data,
     mode = "down",
     projection = true,
-    work = "points",
+    work,
     unit = "day",
     label = "gap",
     domain,
@@ -88,6 +88,10 @@ export function BurnChart(props: BurnChartProps): ReactNode {
     style,
     children,
   } = props;
+
+  // The workWord noun defaults from `strings`, not from a literal: it is rendered
+  // display text, so an English default here would survive a localized bundle.
+  const workWord = work ?? strings.burnWork;
 
   const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
@@ -135,7 +139,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         burnSummary(
           geo,
           fmt,
-          { unit, work, mode, elapsed: actual.length, total: plan.length },
+          { unit, work: workWord, mode, elapsed: actual.length, total: plan.length },
           strings,
         ));
   const lineColor = color ?? "var(--mc-accent)";

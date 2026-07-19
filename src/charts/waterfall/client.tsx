@@ -135,7 +135,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
   const isTotal = shown !== null && total && shown === data.length;
   const step = shown !== null && !isTotal ? data[shown] : undefined;
   const announced = isTotal
-    ? `Total: ${fmt(endLevel)}.`
+    ? strings.waterfallTotal(fmt(endLevel))
     : step
       ? strings.waterfallStep(
           step.label,

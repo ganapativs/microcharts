@@ -92,13 +92,15 @@ describe("interactive <CyclePlot>", () => {
     await expect.poll(() => live.textContent).toBe("Mon, cycle 1 of 6: 40.");
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("Mon, cycle 1 of 6: 40");
+      // "cycle N of M" is prose in a chip; the fraction says it in 3 characters
+      // and the live region above still reads the full sentence.
+      .toBe("Mon 1/6: 40");
     key(wrap, "ArrowDown");
     key(wrap, "ArrowDown"); // cycle 3
     await expect.poll(() => live.textContent).toBe("Mon, cycle 3 of 6: 44.");
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("Mon, cycle 3 of 6: 44");
+      .toBe("Mon 3/6: 44");
   });
 
   it("↓ stops at the last cycle instead of falling out of the slot", async () => {

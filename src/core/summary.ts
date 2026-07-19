@@ -259,6 +259,8 @@ export interface SummaryStrings {
   boxStat: (which: "min" | "q1" | "median" | "q3" | "max", value: string) => string;
   /** Waterfall step, e.g. "Refunds: −140, running 1,410." */
   waterfallStep: (label: string, delta: string, level: string) => string;
+  /** Closing-total announcement, e.g. "Total: 1,360." (waterfall) */
+  waterfallTotal: (level: string) => string;
   /** Waterfall summary, e.g. "From 1,200 to 1,540 over 5 steps: +480 gains, −140 losses." */
   waterfall: (start: string, end: string, steps: number, gains: string, losses: string) => string;
   /** Rank announcement, e.g. "Week 4 of 12: #3." `unit` names the period
@@ -418,6 +420,8 @@ export interface SummaryStrings {
   burnFlatlined: string;
   /** Burn "remain" (down) / "done" (up) verb. */
   burnRemain: string;
+  /** Default noun for the work being burned down, e.g. "points". (burn-chart) */
+  burnWork: string;
   burnDone: string;
   /** Burn period announcement, e.g. "day 12: 34 points remain, plan 28." */
   burnAt: (
@@ -573,6 +577,8 @@ export interface SummaryStrings {
   /** CyclePlot summary, no notable drift, e.g. "Peaks Fri (61), dips Sun (38)." */
   cycleNoDrift: (peakSlot: string, peak: string, dipSlot: string, dip: string) => string;
   /** Slot announcement, e.g. "Mondays: mean 42 across 6 weeks, rising." */
+  /** Slot drift direction, indexed by sign+1 (falling, steady, rising). (cycle-plot) */
+  cycleDriftNames: readonly [string, string, string];
   cycleAt: (
     slotName: string,
     center: "mean" | "median",

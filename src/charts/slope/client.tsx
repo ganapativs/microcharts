@@ -149,10 +149,6 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
   const shown = active ?? selected;
   const shownDatum = shown !== null ? data[shown] : undefined;
   const shownLine = shown !== null ? geo.lines.find((l) => l.index === shown) : undefined;
-  const shownChange =
-    shownDatum && Number.isFinite(shownDatum.from) && Number.isFinite(shownDatum.to)
-      ? pairChange(shownDatum.from, shownDatum.to)
-      : null;
   const announced = (() => {
     if (!shownDatum) return "";
     const okFrom = Number.isFinite(shownDatum.from);
@@ -203,7 +199,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
       {shownDatum && shownLine ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {Number.isFinite(shownDatum.from) && Number.isFinite(shownDatum.to)
-            ? `${shownDatum.label}: ${fmt(shownDatum.from)} → ${fmt(shownDatum.to)}${shownChange ? ` (${shownChange.dir} ${shownChange.pct})` : ""}`
+            ? `${shownDatum.label}: ${fmt(shownDatum.from)} → ${fmt(shownDatum.to)}`
             : shownDatum.label}
         </span>
       ) : null}

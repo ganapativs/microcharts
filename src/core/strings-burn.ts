@@ -11,6 +11,7 @@ export type BurnStrings = Pick<
   | "burnLanding"
   | "burnFlatlined"
   | "burnRemain"
+  | "burnWork"
   | "burnDone"
   | "burnAt"
   | "burnAtProjected"
@@ -19,6 +20,7 @@ export type BurnStrings = Pick<
 export const EN_BURN: BurnStrings = {
   noData: "No data.",
   burnRemain: "remain",
+  burnWork: "points",
   burnDone: "done",
   burnFlatlined: "not finishing at the current pace",
   burn: (elapsed, total, unit, nowActual, work, verb, nowPlan, landing) =>

@@ -5,7 +5,7 @@ import type { SummaryStrings } from "./summary.js";
 
 export type CycleStrings = Pick<
   SummaryStrings,
-  "noData" | "cycle" | "cycleNoDrift" | "cycleAt" | "cyclePoint"
+  "noData" | "cycle" | "cycleNoDrift" | "cycleAt" | "cyclePoint" | "cycleDriftNames"
 >;
 
 export const EN_CYCLE: CycleStrings = {
@@ -17,4 +17,5 @@ export const EN_CYCLE: CycleStrings = {
   cycleAt: (slotName, center, value, cycles, cycleUnit, driftDir) =>
     `${slotName}: ${center} ${value} across ${cycles} ${cycleUnit}, ${driftDir}.`,
   cyclePoint: (slotName, pos, total, value) => `${slotName}, cycle ${pos} of ${total}: ${value}.`,
+  cycleDriftNames: ["falling", "steady", "rising"],
 };

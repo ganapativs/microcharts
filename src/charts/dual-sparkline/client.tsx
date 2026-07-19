@@ -228,7 +228,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
             transform: "translateX(-50%)",
           }}
         >
-          {`${isFiniteValue(pv) ? fmt(pv) : "—"} vs ${isFiniteValue(cv) ? fmt(cv) : "—"}`}
+          {`${isFiniteValue(pv) ? fmt(pv) : "—"} / ${isFiniteValue(cv) ? fmt(cv) : "—"}`}
         </span>
       ) : null}
     </span>

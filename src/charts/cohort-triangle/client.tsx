@@ -231,9 +231,7 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
             transform: "translateX(-50%)",
           }}
         >
-          {shownCell.value === null
-            ? `${cohortLabel} cohort, ${unit} ${shownCell.col}: —`
-            : `${cohortLabel} cohort, ${unit} ${shownCell.col}: ${fmt(shownCell.value)}`}
+          {shownCell.value === null ? "—" : fmt(shownCell.value)}
         </span>
       ) : null}
     </span>
