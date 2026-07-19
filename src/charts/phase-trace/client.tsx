@@ -203,7 +203,10 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
             bottom: "auto",
           }}
         >
-          {`${xLabel} ${fmt(pt.dataX)}, ${yLabel} ${fmt(pt.dataY)}`}
+          {/* Same grammar as quadrant-dot: the axis names are chart-constant
+              context, not part of the datum, and repeating them on every hover
+              pushed a two-number readout past its cap on a 40px chart. */}
+          {`${fmt(pt.dataX)}, ${fmt(pt.dataY)}`}
         </span>
       ) : null}
     </span>

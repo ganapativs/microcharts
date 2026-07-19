@@ -155,8 +155,8 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
           series
             .map((s, i) =>
               isFiniteValue(s.values[shown])
-                ? `${s.label ?? `Series ${i + 1}`} ${pctFmt(shares[i] ?? 0)}`
-                : `${s.label ?? `Series ${i + 1}`}: ${seriesStrings.noData.replace(/\.$/, "").toLowerCase()}`,
+                ? `${s.label ?? strings.seriesFallback(i + 1)} ${pctFmt(shares[i] ?? 0)}`
+                : `${s.label ?? strings.seriesFallback(i + 1)}: ${seriesStrings.noData.replace(/\.$/, "").toLowerCase()}`,
             )
             .join(", "),
         )
@@ -222,9 +222,18 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
             transform: "translateX(-50%)",
           }}
         >
-          {series
-            .map((s, i) => `${s.label ?? `Series ${i + 1}`} ${pctFmt(shares[i] ?? 0)}`)
-            .join(" · ")}
+          {/* The LEADER at this column, not the whole stack. Listing every band
+              made the chip grow with the series count — unbounded, and already
+              206px over its cap at three bands. The full breakdown is in the
+              live region, which is where a screen reader wants it anyway. */}
+          {(() => {
+            let top = 0;
+            for (let i = 1; i < series.length; i++) {
+              if ((shares[i] ?? 0) > (shares[top] ?? 0)) top = i;
+            }
+            const name = series[top]?.label ?? strings.seriesFallback(top + 1);
+            return `${name} ${pctFmt(shares[top] ?? 0)}`;
+          })()}
         </span>
       ) : null}
     </span>

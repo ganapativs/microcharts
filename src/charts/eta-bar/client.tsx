@@ -10,6 +10,7 @@ import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ETA_BAR } from "../../core/strings-eta-bar.js";
+import { etaBarGeometry } from "./geometry.js";
 import { EtaBar as StaticEtaBar, etaBarSummary, type EtaBarProps } from "./index.js";
 
 export interface InteractiveEtaBarProps extends EtaBarProps {
@@ -59,6 +60,22 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
         ? summary
         : etaBarSummary({ progress, elapsed, rate: rate ?? null, formatEta, fmt }, strings);
   const label = [title, full].filter(Boolean).join(". ") || undefined;
+  // The chip used to render `full` — the whole accessible sentence ("62% done;
+  // about 294 remaining at the current rate."), 143px past its cap, and a
+  // verbatim duplicate of the aria-label beside it. A caller-supplied `summary`
+  // string of any length landed in it too. The chip now shows the two numbers
+  // the sentence is built from; the sentence stays in the live region.
+  const etaGeo = etaBarGeometry({ progress, elapsed, rate: rate ?? null, width: 80, height: 8 });
+  const etaPct = makeFormatter(undefined, locale, {
+    style: "percent",
+    maximumFractionDigits: 0,
+  })(Math.max(0, Math.min(1, progress || 0)));
+  const chip =
+    summary === false
+      ? undefined
+      : progress >= 1 || etaGeo.indeterminate || etaGeo.remainingTime == null
+        ? etaPct
+        : `${etaPct} · ${formatEta ? formatEta(etaGeo.remainingTime) : fmt(etaGeo.remainingTime)}`;
 
   const [announced, setAnnounced] = useState("");
   const [focused, setFocused] = useState(false);
@@ -109,9 +126,9 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
         style={FILL}
       />
       <LiveRegion>{announced}</LiveRegion>
-      {focused && full ? (
+      {focused && chip ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {full}
+          {chip}
         </span>
       ) : null}
     </span>

@@ -686,6 +686,23 @@
     letter-spacing: 0.01em;
     white-space: nowrap;
     pointer-events: none;
+    /* The chip is nowrap HTML floating over an SVG, so its width is its text's
+       width — unbounded by the chart. Measured before this: a phase-trace
+       readout 217px wide against a 44px chart, and stacked-area's grew with the
+       series count, so it had no bound at all.
+
+       The cap is `max(100%, 14em)`, not `100%`. This is a tooltip: overhanging
+       its trigger is normal and expected, and these charts are word-sized — a
+       40px-wide phase-trace clamped to its own width could not render even
+       "30, 55" without an ellipsis, so `100%` would trade a runaway chip for
+       silent truncation on every small chart. 14em (~28 characters at the chip's
+       own size) bounds the runaway while leaving a terse readout room to render
+       in full. Content is still trimmed per chart — readout-containment.browser
+       .test.tsx fails any readout that ellipsizes at its chart's default size. */
+    box-sizing: border-box;
+    max-width: max(100%, 14em);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

@@ -228,7 +228,11 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {`${span.label} ${fmt(span.duration)} (${Math.round(span.share * 100)}%, depth ${span.depth}${span.critical ? ", critical" : ""})`}
+          {/* Depth is the span's own y-row and share is its own width — both are
+              already on screen, so repeating them cost 31px past the cap to say
+              nothing new. `, critical` was hardcoded English while
+              `strings.traceCritical` was already used for the announcement. */}
+          {`${span.label} ${fmt(span.duration)}${span.critical ? strings.traceCritical : ""}`}
         </span>
       ) : null}
     </span>

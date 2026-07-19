@@ -30,10 +30,14 @@ describe("interactive <QuadrantDot>", () => {
     await expect
       .poll(() => live.textContent)
       .toMatch(/^Peer 1 of 4: effort \d+, impact \d+ — (high|low)-impact, (high|low)-effort\.$/);
-    // a VISIBLE readout chip pairs the labeled coords + quadrant name
+    // The VISIBLE chip carries just the coordinates. It used to repeat both axis
+    // names and then the quadrant name — which contains those same two axis
+    // names again — for a readout 108px past its cap saying what the dot's own
+    // position in the grid already says. The full sentence stays in the live
+    // region asserted just above.
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toMatch(/^effort \d+, impact \d+ — (high|low)-impact, (high|low)-effort$/);
+      .toMatch(/^\d+, \d+$/);
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     await expect.poll(() => live.textContent).toMatch(/^Peer 2 of 4:/);
   });

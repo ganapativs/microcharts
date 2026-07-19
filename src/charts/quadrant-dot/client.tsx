@@ -207,7 +207,11 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
           className="mc-quadrant-dot-readout mc-spark-readout"
           style={{ left: `${(g.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${xLabel} ${fmt(g.vx)}, ${yLabel} ${fmt(g.vy)} — ${nameOf(g.quadrant, xLabel, yLabel, quadrants, strings)}`}
+          {/* Axis names are constant for the whole chart (they are in the title
+              and the summary), and the quadrant IS the dot's position in the
+              grid — naming it here repeated both axis labels a second time. The
+              live region below still announces the full quadrant sentence. */}
+          {`${fmt(g.vx)}, ${fmt(g.vy)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

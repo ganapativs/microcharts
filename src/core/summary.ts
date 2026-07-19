@@ -275,6 +275,8 @@ export interface SummaryStrings {
   vsMatching: string;
   /** Stack point, e.g. "Point 8 of 12: Mobile 45%, Web 38%, API 17%." */
   stackAt: (position: number, total: number, clauses: string) => string;
+  /** Name for a series the caller left unlabelled, e.g. "Series 2". (stacked-area) */
+  seriesFallback: (position: number) => string;
   /** Stack summary, e.g. "3 series over 12 points; Mobile leads at 45% share." */
   shareShift: (count: number, points: number, topLabel: string, topPct: string) => string;
   /** OHLC period, e.g. "Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20." */

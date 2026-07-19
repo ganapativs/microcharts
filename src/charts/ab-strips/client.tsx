@@ -235,9 +235,13 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {at.edge.p === 50
-            ? `${labels[shownRow]!} median ${fmt(at.edge.value)}, ${fmt(Math.abs(geo.deltaMedian))} ${geo.deltaMedian < 0 ? "below" : "above"} ${labels[shownRow === 0 ? 1 : 0]!}`
-            : `${labels[shownRow]!} p${at.edge.p} ${fmt(at.edge.value)}`}
+          {/* One terse form for every edge, median included. The median branch
+              used to spell out the whole cross-arm comparison here — and the
+              comparison words were hardcoded English, unlike the live region
+              beside it, which builds the same sentence through `strings.abRow`.
+              The chip names the edge and its value; the comparison stays in the
+              announcement, already localized. */}
+          {`${labels[shownRow]!} p${at.edge.p} ${fmt(at.edge.value)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

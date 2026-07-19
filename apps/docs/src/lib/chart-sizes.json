@@ -116,8 +116,8 @@
     "interactive": 5.12
   },
   "stacked-area": {
-    "static": 2.9,
-    "interactive": 4.93
+    "static": 2.92,
+    "interactive": 4.98
   },
   "ohlc": {
     "static": 2.48,
@@ -181,7 +181,7 @@
   },
   "ab-strips": {
     "static": 2.82,
-    "interactive": 4.9
+    "interactive": 4.87
   },
   "shift-histogram": {
     "static": 2.93,
@@ -197,7 +197,7 @@
   },
   "quadrant-dot": {
     "static": 2.23,
-    "interactive": 4.07
+    "interactive": 4.06
   },
   "cycle-plot": {
     "static": 2.77,
@@ -317,7 +317,7 @@
   },
   "eta-bar": {
     "static": 2.01,
-    "interactive": 2.93
+    "interactive": 3.01
   },
   "waveform": {
     "static": 2.3,
@@ -380,7 +380,7 @@
   },
   "trace-fold": {
     "static": 2.18,
-    "interactive": 4.36
+    "interactive": 4.35
   },
   "tape-gauge": {
     "static": 2.82,
