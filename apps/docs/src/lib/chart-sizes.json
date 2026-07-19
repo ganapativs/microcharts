@@ -69,7 +69,7 @@
   },
   "slope": {
     "static": 3.12,
-    "interactive": 5.16
+    "interactive": 5.13
   },
   "micro-scatter": {
     "static": 1.9,
@@ -104,12 +104,12 @@
     "interactive": 4.41
   },
   "waterfall": {
-    "static": 2.74,
+    "static": 2.75,
     "interactive": 4.58
   },
   "bump-strip": {
-    "static": 2,
-    "interactive": 3.84
+    "static": 2.01,
+    "interactive": 3.86
   },
   "dual-sparkline": {
     "static": 3.29,
@@ -157,11 +157,11 @@
   },
   "retention-curve": {
     "static": 2.98,
-    "interactive": 4.84
+    "interactive": 4.83
   },
   "burn-chart": {
-    "static": 3.17,
-    "interactive": 5.14
+    "static": 3.19,
+    "interactive": 5.16
   },
   "error-budget": {
     "static": 2.75,
@@ -200,8 +200,8 @@
     "interactive": 4.06
   },
   "cycle-plot": {
-    "static": 2.77,
-    "interactive": 5.01
+    "static": 2.79,
+    "interactive": 5.05
   },
   "change-point": {
     "static": 3.35,
@@ -392,7 +392,7 @@
   },
   "cohort-triangle": {
     "static": 2.43,
-    "interactive": 4.48
+    "interactive": 4.46
   },
   "streak-spark": {
     "static": 2.52,
@@ -408,7 +408,7 @@
   },
   "queue-depth": {
     "static": 2.95,
-    "interactive": 4.82
+    "interactive": 4.81
   },
   "spread-band": {
     "static": 3.08,

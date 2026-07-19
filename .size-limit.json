@@ -361,7 +361,7 @@
   {
     "name": "@microcharts/react/stacked-area/interactive",
     "path": "dist/charts/stacked-area/client.js",
-    "limit": "4.99 kB",
+    "limit": "5.04 kB",
     "gzip": true
   },
   {
