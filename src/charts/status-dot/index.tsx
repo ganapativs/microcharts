@@ -1,5 +1,5 @@
-// <StatusDot> — "what state is this thing in right now?" (, S4
-// categorical). Static, hook-free, RSC-safe. Each state pairs a distinct
+// <StatusDot> — "what state is this thing in right now?" (S4 categorical).
+// Static, hook-free, RSC-safe. Each state pairs a distinct
 // silhouette with a semantic token — never color-alone by construction; the
 // mapping is a contract (`color` recolors, never reshapes). Five built-ins;
 // `states` extends the vocabulary while preserving the pairing invariant.
@@ -83,6 +83,10 @@ export function StatusDot(props: StatusDotProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // All five silhouettes are drawn about the center of the SIZE box (the
+      // triangle's 0.35 nudge is an optical correction, not a floor), so the box
+      // is the plot box and one seat holds for every state.
+      seat={{ mode: "center", top: 0, bottom: SIZE }}
       className={className ? `mc-status ${className}` : "mc-status"}
       style={style}
     >

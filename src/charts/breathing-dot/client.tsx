@@ -7,7 +7,7 @@
 // Composes the static component (canon); a polite live region announces BAND
 // changes only, never per tick.
 import { useEffect, useRef, useState } from "react";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
@@ -112,9 +112,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     <span
       ref={wrapRef}
       {...wrap("mc-breathing-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -125,7 +123,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     >
       <StaticBreathingDot
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         value={value}
         thresholds={thresholds}
         size={size}

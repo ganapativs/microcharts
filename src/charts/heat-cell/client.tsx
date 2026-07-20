@@ -4,7 +4,7 @@
 // announcement parity ("42 — level 3 of 5."). Composes the static entry.
 import { useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -60,9 +60,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-heat-cell-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onPointerEnter={() => setActive(true)}
       onPointerLeave={() => setActive(false)}
       onFocus={() => setActive(true)}
@@ -77,7 +75,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
     >
       <StaticHeatCell
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         value={value}
         steps={steps}
         shape={shape}

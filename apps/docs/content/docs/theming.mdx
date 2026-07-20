@@ -126,10 +126,11 @@ down builds any combination for you.)
      particular face wants marks a hair off the line. */
   --mc-inline-nudge: 0em;
 
-  /* Optical lift for centred glyph marks (arrow, dot, moon…) that sit on the
-     x-height seat instead of the baseline — font-relative. 0em to centre exactly
-     on the x-height; the default nudges toward the cap-height midpoint. */
-  --mc-glyph-nudge: -0.04em;
+  /* Extra optical shift for centred marks (arrow, dot, moon, dials, strips) on
+     top of the cap-band seat — font-relative, negative lifts. 0em by default:
+     the seat already lands on the true cap midpoint, so there is nothing left
+     to correct unless a display face has an unusual cap ratio. */
+  --mc-glyph-nudge: 0em;
 
   /* Motion & type */
 
@@ -191,16 +192,17 @@ To recolour the series on _one_ instance without touching the global palette, th
 ## Presets
 
 Setting tokens by hand is one path; a **preset** is a whole look bundled under one name, applied with a `data-mc-theme`
-attribute — pure CSS, zero JavaScript. They change how charts _look_, never what the data _means_.
+attribute — pure CSS, zero JavaScript. They change how charts _look_, never what the data _means_. `modern` is what you
+get with no attribute at all: it's the base token set, not a bundle layered on top, so there's nothing to apply.
 
 <LiveDemo
   label="Presets"
-  code={`<div data-mc-theme="modern"><Sparkline data={data} dots="minmax" /></div>
+  code={`<div><Sparkline data={data} dots="minmax" /></div> {/* modern — the default, no attribute */}
 <div data-mc-theme="editorial"><Sparkline data={data} dots="minmax" /></div>
 <div data-mc-theme="vivid"><Sparkline data={data} dots="minmax" /></div>
 <div data-mc-theme="mono"><Sparkline data={data} dots="minmax" /></div>`}
 >
-  <div data-mc-theme="modern">
+  <div>
     <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="modern" />
   </div>
   <div data-mc-theme="editorial">
@@ -225,8 +227,10 @@ same way — `data-mc-theme="print"` on the region you're about to render. Both 
 also ship hand-tuned dark twins: on a dark viewer `eink` flips to true night mode (white ink on black) and `print` lifts
 to a dark-paper ink, while the stroke weight and band identity carry over.
 
-Every preset also answers to `data-mc-preset`, the page-global form — set it once on `<html>` for an app shell, and a
-nearer `data-mc-theme` still wins by proximity.
+The look presets — `editorial`, `mono`, `vivid`, `print`, `eink` — also answer to `data-mc-preset`, the page-global
+form: set it once on `<html>` for an app shell, and a nearer `data-mc-theme` still wins by proximity. `dark` is the
+exception, matching `data-mc-theme="dark"` only, because it's a colour-scheme scope rather than a look you'd pin
+app-wide.
 
 <Callout type="info">
   Every preset above carries a **Copy tokens** button, and the [studio below](#copy-tokens) lets you pair any preset
@@ -266,9 +270,10 @@ import { MicroProvider } from "@microcharts/react";
 ```
 
 It renders a single `<div>` that sets `data-mc-theme` (the preset) plus any `tokens` as inline `--mc-*` custom
-properties — identical to writing them by hand. `theme` takes any preset (`modern`, `editorial`, `mono`, `vivid`,
-`dark`, plus the output-context `print` and `eink`); `tokens` takes any `--mc-*` overrides. Reach for whichever reads
-better in your code — it's the same cascade underneath.
+properties — identical to writing them by hand. `theme="modern"` writes no attribute, since modern _is_ the base token
+set. `theme` takes any preset (`modern`, `editorial`, `mono`, `vivid`, `dark`, plus the output-context `print` and
+`eink`); `tokens` takes any `--mc-*` overrides. Reach for whichever reads better in your code — it's the same cascade
+underneath.
 
 ## Build a theme from one colour
 
@@ -379,6 +384,15 @@ still comes from `width`/`height`, so nothing reflows unexpectedly.
   --mc-density: 0.85;
 }
 ```
+
+One asymmetry worth knowing: **stroke and gap scale without limit, but the label stops scaling at 1.25.** Direct labels
+sit in a gutter the chart reserves from a character-count estimate while it draws — server-side, where text cannot be
+measured. That reservation is fixed at render time and cannot see a CSS variable set later, so past about 1.25 the text
+outgrows the space held for it and paints outside the chart. Below `1` there is no such limit: the label shrinks inside
+a gutter already reserved for something bigger, which is always safe.
+
+So `--mc-density: 2` gives you double-weight strokes and double gaps, with labels at 1.25×. If you want genuinely larger
+text, scale the chart — `width`/`height`, or `--mc-label-size` — rather than leaning on density.
 
 ## The font
 

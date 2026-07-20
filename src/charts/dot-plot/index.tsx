@@ -99,6 +99,11 @@ export function DotPlot(props: DotPlotProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A stack of category rows: value runs sideways, so the box bottom is the
+      // last row's band, not a floor anything rests on — it centres on the cap
+      // band. The rows always fill the height (pitch = height / n), so the box
+      // IS the plot box vertically; the label gutter only insets it sideways.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-dotplot ${className}` : "mc-dotplot"}
       style={rootStyle}
     >

@@ -663,8 +663,8 @@
         "description": "Categories in meaningful order."
       },
       {
-        "name": "sort",
-        "type": "\"none\" | \"desc\" | \"asc\"",
+        "name": "order",
+        "type": "\"data\" | \"desc\" | \"asc\"",
         "required": false,
         "description": "Ranking read vs positional read — data-facing, not styling."
       },
@@ -1607,7 +1607,7 @@
         "description": "Opening level (prior-period close)."
       },
       {
-        "name": "total",
+        "name": "totalBar",
         "type": "boolean",
         "required": false,
         "description": "Zero-anchored closing total bar (default on)."
@@ -1721,12 +1721,6 @@
         "description": "The benchmark — dashed, thinner, neutral."
       },
       {
-        "name": "compareLabel",
-        "type": "string",
-        "required": false,
-        "description": "Names the reference in the summary and announcements."
-      },
-      {
         "name": "curve",
         "type": "\"linear\" | \"smooth\" | \"step\"",
         "required": false,
@@ -1791,7 +1785,7 @@
         "description": "≤ 3 series (hard cap)."
       },
       {
-        "name": "variant",
+        "name": "mode",
         "type": "\"stacked\" | \"ridge\"",
         "required": false,
         "description": "Ridge = same stack, overlapping-crest skin."
@@ -1857,7 +1851,7 @@
         "description": "Periods, oldest first."
       },
       {
-        "name": "variant",
+        "name": "mode",
         "type": "\"candle\" | \"bars\"",
         "required": false,
         "description": "Candle bodies or open/close ticks."
@@ -2804,9 +2798,9 @@
       },
       {
         "name": "dots",
-        "type": "\"out\" | \"all\"",
+        "type": "\"out\" | \"all\" | \"none\"",
         "required": false,
-        "description": "Mark only out-of-control points (default) or every point."
+        "description": "Mark only out-of-control points (default), every point, or none."
       }
     ],
     "demo": [
@@ -2994,7 +2988,7 @@
         "description": "The two arms — raw samples, not summaries."
       },
       {
-        "name": "labels",
+        "name": "seriesLabels",
         "type": "[string, string]",
         "required": false,
         "description": "Row identities for the gutter tags + summary (default ['A', 'B'])."
@@ -3064,7 +3058,7 @@
         "description": "Mirror (default) or after-as-outline over before fill."
       },
       {
-        "name": "labels",
+        "name": "seriesLabels",
         "type": "[string, string]",
         "required": false,
         "description": "Side identities for the summary (default ['before', 'after'])."
@@ -3132,10 +3126,10 @@
         "description": "Cumulative reference line % (default 80 — a working reference, not a law)."
       },
       {
-        "name": "max",
+        "name": "maxItems",
         "type": "number",
         "required": false,
-        "description": "Categories beyond max roll up into Other (default 8, always last)."
+        "description": "Categories beyond maxItems roll up into Other (default 8, always last)."
       },
       {
         "name": "unit",
@@ -3208,10 +3202,10 @@
         "description": "A tick at added−removed per row — a summary mark, never the two bars."
       },
       {
-        "name": "sort",
-        "type": "\"none\" | \"net\" | \"magnitude\"",
+        "name": "order",
+        "type": "\"data\" | \"net\" | \"magnitude\"",
         "required": false,
-        "description": "Default 'none' keeps input order (schema order is often meaningful)."
+        "description": "Default 'data' keeps input order (schema order is often meaningful)."
       },
       {
         "name": "label",
@@ -3220,7 +3214,7 @@
         "description": "'totals' prints a +added / −removed footer."
       },
       {
-        "name": "max",
+        "name": "maxItems",
         "type": "number",
         "required": false,
         "description": "Row cap (default 12); rows beyond it are dropped with a dev warning."
@@ -3441,7 +3435,7 @@
         "description": "Explicit indices override the heuristic entirely — the production path."
       },
       {
-        "name": "max",
+        "name": "maxItems",
         "type": "number",
         "required": false,
         "description": "Max detected breaks (1–3). More regimes stop being glanceable."
@@ -4517,7 +4511,7 @@
         "description": "Hairline cardinal ticks at 0/¼/½/¾ — the at-rest orientation cue. Default true."
       },
       {
-        "name": "formatSegment",
+        "name": "segmentFormat",
         "type": "(index, n) => string",
         "required": false,
         "description": "Segment index → label (default: HH:00 for n=24, weekday for n=7, else index)."
@@ -4939,7 +4933,7 @@
         "description": "Accents one state — the decision read."
       },
       {
-        "name": "variant",
+        "name": "mode",
         "type": "\"steps\" | \"lanes\"",
         "required": false,
         "description": "Lanes for nominal states with no rank."
@@ -4960,7 +4954,7 @@
         "name": "colors",
         "type": "string[]",
         "required": false,
-        "description": "Per-state lane colours (lanes variant), cycled; overrides --mc-cat-N."
+        "description": "Per-state lane colours (lanes mode), cycled; overrides --mc-cat-N."
       }
     ],
     "demo": [0, 1, 2, 1, 3, 1, 0],
@@ -5018,7 +5012,7 @@
         "description": "The remaining-time read is the product."
       },
       {
-        "name": "formatEta",
+        "name": "etaFormat",
         "type": "(t: number) => string",
         "required": false,
         "description": "Unit-bearing ETA label (\"2 min\") — the caller owns units."
@@ -5034,7 +5028,7 @@
     "demo": [64],
     "example": {
       "title": "Export progress",
-      "code": "import { EtaBar } from \"@microcharts/react/eta-bar\";\n\n<EtaBar progress={0.64} elapsed={3.6} rate={0.18} formatEta={(t) => `${Math.round(t)} min`} title=\"Export\" />"
+      "code": "import { EtaBar } from \"@microcharts/react/eta-bar\";\n\n<EtaBar progress={0.64} elapsed={3.6} rate={0.18} etaFormat={(t) => `${Math.round(t)} min`} title=\"Export\" />"
     }
   },
   {
@@ -5067,7 +5061,7 @@
         "description": "0–1 played fraction; left buckets tint accent."
       },
       {
-        "name": "variant",
+        "name": "mode",
         "type": "\"bars\" | \"envelope\"",
         "required": false,
         "description": "Envelope draws the min/max area."
@@ -5287,7 +5281,7 @@
         "description": "Numeric magnitude beside the glyph."
       },
       {
-        "name": "variant",
+        "name": "mode",
         "type": "\"barb\" | \"arrow\"",
         "required": false,
         "description": "\"arrow\" swaps quantized barbs for a plain direction arrow + label."
@@ -5384,7 +5378,7 @@
         "description": "Density series, viewport, ticks, covered regions."
       },
       {
-        "name": "variant",
+        "name": "mode",
         "type": "\"bars\" | \"heat\"",
         "required": false,
         "description": "Heat is a calmer opacity strip."
@@ -5449,12 +5443,6 @@
         "type": "[number, number]",
         "required": false,
         "description": "A compliance corridor instead of one line."
-      },
-      {
-        "name": "damping",
-        "type": "number",
-        "required": false,
-        "description": "Ballistics (α) for the live entry's displayed motion only."
       },
       {
         "name": "domain",
@@ -5623,7 +5611,7 @@
         "description": "Below this a bin renders low-confidence."
       },
       {
-        "name": "variant",
+        "name": "mode",
         "type": "\"dots\" | \"bars\"",
         "required": false,
         "description": "Bars draw signed deviation columns."
@@ -5861,7 +5849,7 @@
         "description": "Fix the x-axis range (default: the data's x-extent)."
       },
       {
-        "name": "yDomain",
+        "name": "domain",
         "type": "[number, number]",
         "required": false,
         "description": "Fix the y-axis range (default: the data's y-extent)."
@@ -6404,7 +6392,7 @@
         "description": "Paired readings — a is the subject, b the reference."
       },
       {
-        "name": "labels",
+        "name": "seriesLabels",
         "type": "[string, string]",
         "required": false,
         "description": "Names the two series in the summary and label."
@@ -6425,7 +6413,7 @@
     "demo": [8, 9, 11, 12, 14, 15, 17, 18, 20, 21, 23, 24],
     "example": {
       "title": "Organic vs paid",
-      "code": "import { SpreadBand } from \"@microcharts/react/spread-band\";\n\n<SpreadBand data={pairs} labels={[\"Organic\", \"Paid\"]} title=\"Organic vs paid\" />"
+      "code": "import { SpreadBand } from \"@microcharts/react/spread-band\";\n\n<SpreadBand data={pairs} seriesLabels={[\"Organic\", \"Paid\"]} title=\"Organic vs paid\" />"
     },
     "sampleData": [
       {
@@ -6542,13 +6530,14 @@
         "name": "unit",
         "type": "string",
         "required": false,
-        "description": "Reading noun for the interactive announcement (default 'step')."
+        "description": "Reading noun for the interactive announcement (default 'step').",
+        "interactive": true
       }
     ],
     "demo": [40, 46, 52, 58, 63, 68, 72, 76, 79, 81],
     "example": {
       "title": "Standing",
-      "code": "import { PercentileTrace } from \"@microcharts/react/percentile-trace\";\n\n<PercentileTrace data={ranks} unit=\"week\" title=\"Standing\" />"
+      "code": "import { PercentileTrace } from \"@microcharts/react/percentile-trace\";\n\n<PercentileTrace data={ranks} title=\"Standing\" />"
     },
     "sampleData": [
       {

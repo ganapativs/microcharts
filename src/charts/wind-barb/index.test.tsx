@@ -38,8 +38,8 @@ describe("<WindBarb>", () => {
     expect(warn).toHaveBeenCalled();
   });
 
-  it("arrow variant renders an arrowhead path", () => {
-    const { container } = draw(<WindBarb direction={90} magnitude={25} variant="arrow" />);
+  it("arrow mode renders an arrowhead path", () => {
+    const { container } = draw(<WindBarb direction={90} magnitude={25} mode="arrow" />);
     expect(container.querySelector('path[data-mc-ink="data"]')).not.toBeNull();
   });
 

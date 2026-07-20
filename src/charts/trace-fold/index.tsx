@@ -7,7 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TRACE_FOLD, type TraceFoldStrings } from "../../core/strings-trace-fold.js";
-import { traceFoldGeometry, type Span } from "./geometry.js";
+import { traceFoldGeometry, traceFoldHeight, type Span } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type TraceFoldDatum = Span;
@@ -66,8 +66,7 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
   } = props;
 
   const depthCount = Math.max(1, new Set(data.slice(0, 40).map((s) => s.depth)).size);
-  // rows tall enough to seat a legible in-bar label
-  const height = heightProp ?? Math.min(72, Math.max(24, depthCount * 16));
+  const height = heightProp ?? traceFoldHeight(depthCount);
   const rowGap = 1.2;
   const fmt = makeFormatter(format, locale);
   const fontSize = labelFont(height / depthCount, 0.6);
@@ -82,10 +81,19 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Depth rows are lanes, not columns: the bottom row is the deepest nesting,
+      // not a zero, so there is nothing to stand on. The rows tile the box's
+      // 1-unit inset exactly, which makes the block symmetric and the viewBox
+      // frame the same midpoint the geometry would hand back.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-trace ${className}` : "mc-trace"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {geo.rects.flatMap((r, i) => {
+        // width 0 = the geometry could not place this span on the wall clock.
+        // Drawing nothing is the honest read; a real span always clears the
+        // 1-unit floor.
+        if (r.width <= 0) return [];
         const active = emphasis === "none" ? true : r.critical;
         // fills/shape via ink roles + .mc-trace rules in styles.css — flat
         // siblings, minimal attributes: the span list is this chart's SSR hot

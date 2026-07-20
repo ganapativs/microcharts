@@ -1,6 +1,6 @@
-// <MiniBar> — which category is biggest, and by roughly how much (,
-// S2). Static, hook-free, RSC-safe. Bars are always zero-anchored; the data's
-// own order is the default truth (`sort` never silently defaults to ranking —
+// <MiniBar> — which category is biggest, and by roughly how much (S2).
+// Static, hook-free, RSC-safe. Bars are always zero-anchored; the data's
+// own order is the default truth (`order` never silently defaults to ranking —
 // weekday order, funnel order carry meaning sorting would destroy). No
 // category text at cell size: labels live in the summary + interactive readout.
 import type { CSSProperties, ReactNode } from "react";
@@ -19,17 +19,17 @@ export interface MiniBarDatum {
   value: number | null;
 }
 
-/** Sorted view of the data per the `sort` prop (pure; shared with client). */
+/** Sorted view of the data per the `order` prop (pure; shared with client). */
 export function sortData(
   data: readonly MiniBarDatum[],
-  sort: "none" | "desc" | "asc",
+  order: "data" | "desc" | "asc",
 ): MiniBarDatum[] {
-  if (sort === "none") return [...data];
+  if (order === "data") return [...data];
   const copy = [...data];
   copy.sort((a, b) => {
     const av = isFiniteValue(a.value) ? a.value : Number.NEGATIVE_INFINITY;
     const bv = isFiniteValue(b.value) ? b.value : Number.NEGATIVE_INFINITY;
-    return sort === "desc" ? bv - av : av - bv;
+    return order === "desc" ? bv - av : av - bv;
   });
   return copy;
 }
@@ -54,7 +54,7 @@ export function miniBarSummary(
 export interface MiniBarProps {
   data: readonly MiniBarDatum[];
   /** Data-facing reorder — ranking read vs positional read. */
-  sort?: "none" | "desc" | "asc" | undefined;
+  order?: "data" | "desc" | "asc" | undefined;
   /** Index or label to emphasize ("this row's own category"). */
   highlight?: number | string | undefined;
   orientation?: "horizontal" | "vertical" | undefined;
@@ -78,7 +78,7 @@ export interface MiniBarProps {
 export function MiniBar(props: MiniBarProps): ReactNode {
   const {
     data,
-    sort = "none",
+    order = "data",
     highlight,
     orientation = "vertical",
     positive,
@@ -103,7 +103,7 @@ export function MiniBar(props: MiniBarProps): ReactNode {
     );
   }
 
-  const sorted = sortData(data, sort);
+  const sorted = sortData(data, order);
   const geo = miniBarGeometry({
     width,
     height,
@@ -142,6 +142,15 @@ export function MiniBar(props: MiniBarProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Two seats, one chart. Vertical bars are zero-anchored columns filling the
+      // full box, so the box bottom IS the floor and they stand on the baseline.
+      // Horizontal flips the axes: value runs sideways and the box is a stack of
+      // category rows with no bottom to stand on, so it centres on the cap band.
+      seat={
+        orientation === "vertical"
+          ? { mode: "floor", bottom: height }
+          : { mode: "center", top: 0, bottom: height }
+      }
       className={className ? `mc-minibar ${className}` : "mc-minibar"}
       style={style}
     >

@@ -42,12 +42,6 @@ export const entry: ChartEntry = {
       description: "The benchmark — dashed, thinner, neutral.",
     },
     {
-      name: "compareLabel",
-      type: "string",
-      required: false,
-      description: "Names the reference in the summary and announcements.",
-    },
-    {
       name: "curve",
       type: '"linear" | "smooth" | "step"',
       required: false,

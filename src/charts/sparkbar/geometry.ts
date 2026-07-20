@@ -56,6 +56,10 @@ export interface SparkBarGeometry {
   slot: number;
   /** Left plot inset. */
   x0: number;
+  /** Top edge of the plot box — the inline seat's upper bound. */
+  y0: number;
+  /** Bottom edge of the plot box — where bars land in bar mode. */
+  y1: number;
 }
 
 export interface SparkBarGeometryOptions {
@@ -118,7 +122,7 @@ export function sparkBarGeometry(
         last: i === lastFinite,
       });
     }
-    return { bars, baselineY: mid, domain: [-1, 1], slot, x0 };
+    return { bars, baselineY: mid, domain: [-1, 1], slot, x0, y0, y1 };
   }
 
   const domain = opts.domain ?? niceDomain(data, true);
@@ -147,5 +151,5 @@ export function sparkBarGeometry(
       last: i === lastFinite,
     });
   }
-  return { bars, baselineY, domain, slot, x0 };
+  return { bars, baselineY, domain, slot, x0, y0, y1 };
 }

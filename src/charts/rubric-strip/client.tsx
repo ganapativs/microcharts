@@ -4,8 +4,15 @@
 // (onSelect). Composes the static component (canon) — never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RUBRIC } from "../../core/strings-rubric.js";
@@ -139,19 +146,15 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
 
   const shown = active ?? selected;
   const row = shown !== null ? geo.rows[shown] : undefined;
+  const weightPct = row ? `${Math.round(row.weightShare * 100)}%` : "";
   const announced = row
-    ? strings.rubricRow(row.label, fmt(row.score), `${Math.round(row.weightShare * 100)}%`)
+    ? isFiniteValue(row.score)
+      ? strings.rubricRow(row.label, fmt(row.score), weightPct)
+      : strings.rubricRowEmpty(row.label, weightPct)
     : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-rubric-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-rubric-live", className, style)} {...named(label)} {...bind}>
       <StaticRubricStrip
         {...rest}
         data={data}
@@ -163,7 +166,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus box is transient. */}
         {selected !== null && selected !== active ? box(selected, true) : null}
@@ -173,7 +176,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
       <LiveRegion>{announced}</LiveRegion>
       {row ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {`${row.label} ${fmt(row.score)} (${Math.round(row.weightShare * 100)}%)`}
+          {`${row.label} ${isFiniteValue(row.score) ? fmt(row.score) : "—"} (${weightPct})`}
         </span>
       ) : null}
     </span>

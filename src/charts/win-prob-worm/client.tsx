@@ -9,7 +9,13 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { isFiniteValue } from "../../core/types.js";
 import { clamp } from "../../core/scale.js";
 import { labelFont } from "../../core/labels.js";
@@ -149,9 +155,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
     <span
       ref={hostRef}
       {...wrap("mc-win-prob-worm-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticWinProbWorm
@@ -165,7 +169,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {selected !== null && selected !== active ? crosshair(selected, true) : null}

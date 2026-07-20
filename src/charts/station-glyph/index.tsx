@@ -1,5 +1,5 @@
-// <StationGlyph> — a full weather observation in one character (,
-// F2). Static, hook-free, RSC-safe. Sky cover fills the center disc, a
+// <StationGlyph> — a full weather observation in one character.
+// Static, hook-free, RSC-safe. Sky cover fills the center disc, a
 // wind barb gives direction + quantized speed (reused from WindBarb), and up to
 // three corner numerals carry temperature, dew point, and pressure. One glyph,
 // four channels, no legend — the meteorologist's station model, shrunk to a word.
@@ -122,6 +122,8 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     r,
     yOff,
     gap,
+    y0,
+    y1,
   } = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT });
 
   const geo = stationGlyphGeometry({
@@ -144,6 +146,11 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The disc is the anchor and it has no floor, so the glyph square centres
+      // on the cap band. Seating that square rather than the viewBox keeps the
+      // disc on the line whichever numerals are present — the gutters are
+      // reserved by string length, so the box grows but the center holds.
+      seat={{ mode: "center", top: y0, bottom: y1 }}
       className={className ? `mc-station ${className}` : "mc-station"}
       style={{ ...style, "--mc-label-size": `${font}px` } as CSSProperties}
     >

@@ -38,6 +38,22 @@ describe("interactive <StarSpoke>", () => {
     expect(svgRect.height).toBe(wrapRect.height);
   });
 
+  it("a null-value spoke announces no data without throwing", async () => {
+    // `value` is typed `number`, but bad data reaches the readout at runtime.
+    const gappy = [
+      { label: "Speed", value: 0.9 },
+      { label: "Power", value: null as unknown as number },
+      { label: "Cost", value: 0.3 },
+    ];
+    const screen = await render(<StarSpoke data={gappy} title="Profile" size={64} />);
+    const wrap = screen.container.querySelector(".mc-star-live") as HTMLElement;
+    wrap.focus();
+    const live = document.querySelector('[aria-live="polite"]')!;
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    await expect.poll(() => live.textContent).toBe("Power: no data.");
+  });
+
   it("reports the active spoke to onActive; null when cleared", async () => {
     const onActive = vi.fn();
     const screen = await render(

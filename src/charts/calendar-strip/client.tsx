@@ -12,7 +12,13 @@ import {
 } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
 import { cellMetrics } from "../../shared/cell.js";
 import { calendarStripGeometry } from "./geometry.js";
@@ -35,6 +41,9 @@ export interface InteractiveCalendarStripProps extends CalendarStripProps, Picke
   format?: Format;
   /** Announced day label (defaults to weekday + month + day, UTC). */
   dateFormat?: DateFormat;
+  /** Locale for the readout's number and date formatting. Interactive-only,
+   *  for the same reason as `format`. */
+  locale?: string | string[];
   /**
    * Opt-in entrance motion (default `false`): cells fade in on first
    * client-side mount. Inert on the server and on hydrated server HTML;
@@ -205,14 +214,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         : strings.dayAt(dayLabelAt(shown), fmt(shownCell.value));
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-calendar-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-calendar-live", className, style)} {...named(label)} {...bind}>
       <StaticCalendarStrip
         {...rest}
         data={data}
@@ -226,7 +228,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         gap={gap}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}

@@ -17,7 +17,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <WaveformInteractive
       data={WAVE}
-      variant={s.variant as "bars" | "envelope"}
+      mode={s.mode as "bars" | "envelope"}
       mirror={s.mirror as boolean}
       progress={(s.progress as number) / 100}
       animate={ui.animate}
@@ -30,7 +30,7 @@ export const playground: PlaygroundSpec = {
     [
       "<Waveform",
       "  data={samples}",
-      s.variant !== "bars" && `  variant="${s.variant}"`,
+      s.mode !== "bars" && `  mode="${s.mode}"`,
       s.mirror === false && "  mirror={false}",
       `  progress={${((s.progress as number) / 100).toFixed(2)}}`,
       ui.animate && " animate",

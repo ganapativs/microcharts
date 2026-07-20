@@ -6,6 +6,9 @@
 // Coords 2-dp, integer viewBox.
 import { round2, isFiniteValue } from "../../core/types.js";
 
+/** Frame inset the paths are scaled into — shared with the static entry's seat. */
+export const PAD = 2;
+
 const cleanMember = (m: readonly number[]): boolean => m.length > 0 && m.every(isFiniteValue);
 
 /**
@@ -53,7 +56,7 @@ export function ensembleGeometry(opts: {
   const validIdx = data.map((_, i) => i).filter((i) => cleanMember(data[i]!));
   if (validIdx.length === 0) return null;
 
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? PAD;
   const maxLen = Math.max(...validIdx.map((i) => data[i]!.length));
 
   // y-domain across all valid values (inlined min/max — lean bundle)
@@ -91,7 +94,6 @@ export function ensembleGeometry(opts: {
     median.push(col.length % 2 ? col[mid]! : (col[mid - 1]! + col[mid]!) / 2);
   }
 
-  // resolve the emphasised path
   const emphasis = opts.emphasis ?? "nearest-median";
   let emphasisPath: { d: string; member: number | null };
   if (emphasis === "median") {

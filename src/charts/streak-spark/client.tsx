@@ -9,9 +9,15 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { EN_STREAK_SPARK } from "../../core/strings-streak-spark.js";
-import { streakSparkGeometry } from "./geometry.js";
+import { streakSparkGeometry, streakSparkRoom } from "./geometry.js";
 import {
   StreakSpark as StaticStreakSpark,
   streakSparkSummary,
@@ -60,9 +66,20 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
   useEntrance(hostRef, "reveal", animate, { selector: "rect", order: "x" });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // `labelRoom` is NOT optional here: it moves the midline the runs centre on,
+  // so omitting it placed every run a band too high in this entry's copy of the
+  // geometry — the focus outline was drawn off its bar. Same input as the
+  // static (`streakSparkRoom`), so both entries place runs identically.
   const geo = useMemo(
-    () => streakSparkGeometry(data, { width, height, threshold, positive }),
-    [data, width, height, threshold, positive],
+    () =>
+      streakSparkGeometry(data, {
+        width,
+        height,
+        threshold,
+        positive,
+        labelRoom: streakSparkRoom(height, label),
+      }),
+    [data, width, height, threshold, positive, label],
   );
 
   // nearest run by x-distance to its centre in viewBox space — never a DOM node
@@ -150,9 +167,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
     <span
       ref={hostRef}
       {...wrap("mc-streak-interactive", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
+      {...named([title, accName].filter(Boolean).join(". ") || undefined)}
       {...bind}
     >
       <StaticStreakSpark
@@ -167,7 +182,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {children}
         {/* Pinned selection persists through pointer-leave; focus outline transient. */}

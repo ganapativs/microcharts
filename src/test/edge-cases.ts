@@ -84,8 +84,25 @@ export function seriesEdgeSuite(
   name: string,
   renderChart: (data: readonly Value[]) => ReactElement,
 ): void {
+  mappedEdgeSuite(name, (v) => v, renderChart);
+}
+
+/**
+ * The same matrix for charts whose `data` is NOT a `Value[]` — objects, pairs,
+ * records. `map` lifts each degenerate `Value` into the chart's own datum shape
+ * (put the value on the chart's PRIMARY encoded field; the index is there for
+ * labels/positions), so a `{label, value}[]` chart is held to exactly the floor
+ * a sparkline is. Without this these charts never met the matrix at all, which
+ * is how a formatter got handed a `null` and threw.
+ */
+export function mappedEdgeSuite<T>(
+  name: string,
+  map: (v: Value, i: number) => T,
+  renderChart: (data: readonly T[]) => ReactElement,
+): void {
   describe(`<${name}> shared edge matrix (src/test/edge-cases.ts)`, () => {
-    for (const [label, series] of Object.entries(EDGE_SERIES)) {
+    for (const [label, values] of Object.entries(EDGE_SERIES)) {
+      const series = values.map(map);
       // The "10k points" stress case renders up to 10k marks; per-mark charts
       // (dot-plot, dumbbell, slope, rubric-strip) emit that many DOM nodes, and
       // jsdom's node creation — not the geometry — dominates. A loaded CI runner

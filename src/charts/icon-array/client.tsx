@@ -6,7 +6,13 @@
 // focus ring + persistent pin are overlay children re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
@@ -171,14 +177,12 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-icon-array-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticIconArray
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         value={value}
         total={total}
         label={label}

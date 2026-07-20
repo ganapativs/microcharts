@@ -4,7 +4,7 @@
 // (single mark). Composes the static component (canon).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap, type MicroDatum } from "../../shared/interactive.js";
+import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -77,9 +77,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     <span
       ref={hostRef}
       {...wrap("mc-ring-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
@@ -87,7 +85,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
         pick();
       }}
     >
-      <StaticProgressRing {...rest} style={FILL} strings={strings} summary={false} />
+      <StaticProgressRing {...rest} style={fillFor(style)} strings={strings} summary={false} />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );

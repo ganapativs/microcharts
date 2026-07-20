@@ -65,6 +65,26 @@ describe("interactive <PercentileLadder>", () => {
       .not.toBeNull();
   });
 
+  it("a constant series paints one rung, so only one unit roves", async () => {
+    // p50 = p90 = p99 → geometry collapses to a single painted tick. Three
+    // navigable units would cycle the chip through the percentiles while the
+    // probe line never moved.
+    const seen: unknown[] = [];
+    const screen = await render(
+      <PercentileLadder data={[7, 7, 7, 7, 7]} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-percentile-ladder-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "End");
+    expect(seen.at(-1)).toEqual({ index: 0, value: 7, label: "p50" });
+    key(wrap, "ArrowRight");
+    // Already at the only unit: the rove is a no-op, not a jump to a hidden rung.
+    expect(seen.at(-1)).toEqual({ index: 0, value: 7, label: "p50" });
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("p50 7 (1×)");
+  });
+
   it("controlled selectedIndex pins the probe without focus", async () => {
     const screen = await render(<PercentileLadder data={SAMPLE} selectedIndex={1} />);
     expect(screen.container.querySelector('line[data-mc-w="tick"]')).not.toBeNull();

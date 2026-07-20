@@ -14,6 +14,47 @@ import { CATALOG } from "@/lib/docs-facts";
 
 const TILTS = ["-1.1deg", "0.9deg", "-0.7deg", "1deg", "-0.9deg", "0.8deg"] as const;
 
+/** The reader's slot is one past the showcase, so the copy is derived from
+ *  `SHOWCASE.length` rather than typed — adding an example app can't leave
+ *  "the eighth is yours" sitting next to a count that says nine. */
+const ORDINALS = [
+  "first",
+  "second",
+  "third",
+  "fourth",
+  "fifth",
+  "sixth",
+  "seventh",
+  "eighth",
+  "ninth",
+  "tenth",
+  "eleventh",
+  "twelfth",
+] as const;
+
+function ordinal(n: number): string {
+  return ORDINALS[n - 1] ?? `${n}th`;
+}
+
+const CARDINALS = [
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five",
+  "Six",
+  "Seven",
+  "Eight",
+  "Nine",
+  "Ten",
+  "Eleven",
+  "Twelve",
+] as const;
+
+function cardinal(n: number): string {
+  return CARDINALS[n - 1] ?? String(n);
+}
+
 function WildCard({ app, tilt, wide }: { app: ShowcaseApp; tilt?: string; wide?: boolean }) {
   return (
     <a
@@ -102,7 +143,7 @@ export function HomeWildSection() {
           The catalog, put to work.
         </h2>
         <p className="mt-4 max-w-2xl text-fd-muted-foreground">
-          Seven example apps, each built with{" "}
+          {cardinal(SHOWCASE.length)} example apps, each built with{" "}
           <code className="text-fd-foreground">@microcharts/react</code> installed from npm: a
           trading terminal, a print magazine, an eval console. Between them they exercise all{" "}
           {CATALOG.total} chart types. Every card opens the live example.
@@ -130,7 +171,7 @@ export function HomeWildSection() {
               style={{ "--tilt": "0.5deg" } as React.CSSProperties}
             >
               <span className="display text-[1.5rem] leading-none text-fd-foreground">
-                The eighth is yours.
+                The {ordinal(SHOWCASE.length + 1)} is yours.
               </span>
               <span className="max-w-xs text-sm leading-relaxed text-fd-muted-foreground">
                 Install from npm, pick a chart, ship it inside a sentence.

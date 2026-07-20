@@ -48,7 +48,7 @@ export const entry: ChartEntry = {
       description: "Mirror (default) or after-as-outline over before fill.",
     },
     {
-      name: "labels",
+      name: "seriesLabels",
       type: "[string, string]",
       required: false,
       description: "Side identities for the summary (default ['before', 'after']).",

@@ -34,7 +34,7 @@ export interface Rect {
   height: number;
 }
 
-export interface BinnedProfile {
+interface BinnedProfile {
   rows: { level: number; mass: number }[];
   total: number;
   pocIdx: number;
@@ -74,7 +74,7 @@ export function binMass(
 
 /** Bin the raw data + locate the POC + walk the value area outward from it —
  *  the O(data.length) pass, independent of pixel geometry. */
-export function binProfile(
+function binProfile(
   data: readonly (LevelRow | number)[],
   bins: number,
   valueArea: number,
@@ -115,7 +115,7 @@ export function binProfile(
 
 /** Lay out bars + the value-area band from an already-binned profile — the
  *  O(bins) pass, safe to re-run once the POC-label gutter is known. */
-export function layoutProfile(
+function layoutProfile(
   binned: BinnedProfile,
   opts: { align: "left" | "right"; width: number; height: number; gutter: number },
 ): {
@@ -171,6 +171,39 @@ export function layoutProfile(
     vaLo: round2(rows[loI]!.level),
     vaHi: round2(rows[hiI]!.level),
   };
+}
+
+/**
+ * The full layout both entries must run: bin once, lay out to learn the POC
+ * level, reserve the gutter its label needs, lay out again. Skipping the second
+ * pass leaves every bar width — and, at `align="right"`, every bar x — out of
+ * step with what is painted.
+ */
+export function profileLayout(opts: {
+  data: readonly (LevelRow | number)[];
+  bins: number;
+  valueArea: number;
+  align: "left" | "right";
+  width: number;
+  height: number;
+  label: "poc" | "none";
+  fontSize: number;
+  fmt: (n: number) => string;
+}): ReturnType<typeof layoutProfile> & { pocText: string | undefined } {
+  const { data, bins, valueArea, align, width, height, label, fontSize, fmt } = opts;
+  const binned = binProfile(data, bins, valueArea);
+  const pre = layoutProfile(binned, { align, width, height, gutter: 0 });
+  const wanted = label === "poc" && pre.poc ? fmt(pre.poc.level) : undefined;
+  // Degradation: the POC price is a long string (`142.33`) set beside the bar,
+  // and the gutter it needs does not shrink with the box — on a narrow profile
+  // it asks for MORE than the whole width, collapsing the bars to nothing and
+  // still painting past the left edge. It DROPS once it would cost more than
+  // half the box, and the gutter drops with it so the bars get the width back.
+  // Pure arithmetic on the per-char estimate: never measured.
+  const want = wanted ? wanted.length * fontSize * 0.6 + 2 : 0;
+  const pocText = want > 0 && want <= width * 0.5 ? wanted : undefined;
+  const gutter = pocText ? want : 0;
+  return { ...layoutProfile(binned, { align, width, height, gutter }), pocText };
 }
 
 export function volumeProfileGeometry(opts: {

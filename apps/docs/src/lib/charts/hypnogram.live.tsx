@@ -29,7 +29,7 @@ export const playground: PlaygroundSpec = {
       data={SLEEP}
       states={STATES}
       domain={DOM}
-      variant={s.variant as "steps" | "lanes"}
+      mode={s.mode as "steps" | "lanes"}
       emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
       connectors={s.connectors as boolean}
       animate={ui.animate}
@@ -43,7 +43,7 @@ export const playground: PlaygroundSpec = {
       "<Hypnogram",
       "  data={sleep}",
       `  states={["Awake", "REM", "Light", "Deep"]}`,
-      s.variant !== "steps" && `  variant="${s.variant}"`,
+      s.mode !== "steps" && `  mode="${s.mode}"`,
       s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
       s.connectors === false && "  connectors={false}",
       ui.animate && " animate",

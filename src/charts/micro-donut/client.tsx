@@ -6,7 +6,13 @@
 // (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
@@ -163,17 +169,10 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-donut-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-donut-live", className, style)} {...named(label)} {...bind}>
       <StaticMicroDonut
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         maxWedges={maxWedges}
         weight={weight}

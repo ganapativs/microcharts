@@ -15,5 +15,5 @@
     "unicorn/no-array-sort": "off",
     "unicorn/no-array-reverse": "off"
   },
-  "ignorePatterns": ["dist", "node_modules", "plan", "fixtures"]
+  "ignorePatterns": ["dist", "node_modules", "fixtures", "examples", "scripts/figma-export"]
 }

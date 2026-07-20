@@ -4,7 +4,7 @@
 // ALWAYS-ON support lane (per-bin counts) so tiny bins never look authoritative.
 // 2-dp.
 import { uniformBins } from "../../core/bin.js";
-import { round2 } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 
 export interface RawPair {
   p: number;
@@ -31,6 +31,10 @@ export interface Rect {
   width: number;
   height: number;
 }
+
+/** Frame inset. The support lane's columns stand on `height - PAD`, so it is
+ *  also the whole mark's floor — shared with the static entry's seat. */
+export const PAD = 1;
 
 export function isBinned(data: readonly (RawPair | BinnedRow)[]): data is readonly BinnedRow[] {
   return data.length > 0 && "predicted" in data[0]!;
@@ -78,14 +82,23 @@ export function calibrationGeometry(opts: {
   const { data, bins, minSupport, width, height, supportHeight } = opts;
   const rows = isBinned(data) ? [...data] : binRaw(data as RawPair[], bins);
 
-  const pad = 1;
+  const pad = PAD;
   const plotW = width - pad * 2;
   const supportTop = height - pad - supportHeight;
   const plotH = supportTop - pad - 1;
   const xOf = (p: number): number => round2(pad + Math.max(0, Math.min(1, p)) * plotW);
   const yOf = (o: number): number => round2(pad + (1 - Math.max(0, Math.min(1, o))) * plotH);
 
-  const withCount = rows.filter((r) => r.count > 0);
+  // A bin is only plottable when all three numbers are real: a non-finite count
+  // poisons `count / maxCount` (∞/∞ = NaN) and a non-finite rate has no position
+  // on either lane. Guarded here, where the numbers enter geometry.
+  const withCount = rows.filter(
+    (r) =>
+      isFiniteValue(r.count) &&
+      r.count > 0 &&
+      isFiniteValue(r.predicted) &&
+      isFiniteValue(r.observed),
+  );
   const maxCount = withCount.reduce((m, r) => Math.max(m, r.count), 0) || 1;
 
   const points: CalibrationPoint[] = withCount.map((r) => ({

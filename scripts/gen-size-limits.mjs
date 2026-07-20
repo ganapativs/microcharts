@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generates `.size-limit.json` from `package.json#exports` + the budget table
- * in `scripts/size-budgets.json` (plan/21 §6.0.B). The generated file is
+ * in `scripts/size-budgets.json`. The generated file is
  * committed; CI regenerates and fails on drift, so it can never be hand-edited.
  *
  *   node scripts/gen-size-limits.mjs          # write .size-limit.json
@@ -21,7 +21,7 @@ function importPath(value) {
 }
 
 const entries = [
-  // Whole barrel: tracked + published honestly, never gated (plan/21 §1) — no limit.
+  // Whole barrel: tracked + published honestly, never gated — no limit.
   {
     name: `${pkg.name} (root barrel, tracked not gated)`,
     path: importPath(pkg.exports["."]),
@@ -43,7 +43,7 @@ for (const [subpath, value] of Object.entries(pkg.exports)) {
   const budget = budgets.charts[slug]?.[kind];
   if (!budget) {
     console.error(
-      `size-budgets.json is missing "${slug}".${kind} for export "${subpath}" — every subpath needs an explicit budget (plan/21 §5).`,
+      `size-budgets.json is missing "${slug}".${kind} for export "${subpath}" — every subpath needs an explicit budget.`,
     );
     process.exit(1);
   }

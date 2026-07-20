@@ -8,7 +8,13 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import {
   EN_COHORT_TRIANGLE,
   type CohortTriangleStrings,
@@ -198,14 +204,12 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
     <span
       ref={hostRef}
       {...wrap("mc-cohort-interactive", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       {...bind}
     >
       <StaticCohortTriangle
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         cell={cell}
         gap={gap}

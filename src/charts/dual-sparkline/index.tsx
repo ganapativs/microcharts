@@ -55,8 +55,6 @@ export interface DualSparklineProps {
   data: readonly Value[];
   /** The benchmark series — without it, use Sparkline (enforced by types). */
   compare: readonly Value[];
-  /** Names the reference in summaries/announcements. */
-  compareLabel?: string | undefined;
   curve?: Curve | undefined;
   /** Normal-range band behind both (shared grammar). */
   band?: readonly [number, number] | undefined;
@@ -154,6 +152,10 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Both lines share one domain, so they share one floor: the plot's bottom
+      // edge sits on the text baseline. The right label gutter narrows the plot
+      // but never moves its floor, so this seat holds for every `label` mode.
+      seat={{ mode: "floor", bottom: geo.plot.y1 }}
       className={className ? `mc-dual ${className}` : "mc-dual"}
       style={rootStyle}
     >

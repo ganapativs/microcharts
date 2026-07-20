@@ -13,6 +13,12 @@ export interface BubbleRowGeometry {
   height: number;
   /** y where value/label numerals sit (below the bubbles). */
   labelY: number;
+  /** Top of the bubble band — the frame the circles are laid out in, above the
+   *  numeral band. Deterministic (padding + label reservation), never the
+   *  drawn radii, so an inline seat can't move with the data. */
+  y0: number;
+  /** Bottom of the bubble band: the shelf `align="baseline"` rests on. */
+  y1: number;
 }
 
 export function bubbleRowGeometry(opts: {
@@ -70,5 +76,12 @@ export function bubbleRowGeometry(opts: {
   });
   const width = Math.max(1, Math.ceil(rightEdge + pad));
   const labelY = round2(height - pad);
-  return { bubbles, width, height, labelY };
+  return {
+    bubbles,
+    width,
+    height,
+    labelY,
+    y0: round2(bandTop),
+    y1: round2(bandTop + bandH),
+  };
 }

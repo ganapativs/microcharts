@@ -1,5 +1,5 @@
-// <CometTrail> — where is the value now, and where has it just been? (,
-// S1 rolling window, motion type). The STATIC frame is a decaying dot-sparkline
+// <CometTrail> — where is the value now, and where has it just been? (S1
+// rolling window, motion type). The STATIC frame is a decaying dot-sparkline
 // with zero JS: a fading trail of recent points + a bright head dot at the current
 // value + the now-value numeral. Opacity encodes AGE only; the y position does
 // value, so `trail` length is context, never data. The interactive entry eases
@@ -98,6 +98,10 @@ export function CometTrail(props: CometTrailProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Dots, not a filled shape: the head can sit anywhere in the band and
+      // nothing rests on the bottom, so the band centres on the cap band like a
+      // glyph. The seat tracks `vPad`, which `label="last"` widens.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-comet ${className}` : "mc-comet"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >

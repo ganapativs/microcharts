@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { Ohlc } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
-import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -35,8 +35,8 @@ describe("<Ohlc>", () => {
     );
   });
 
-  it("variant='bars' renders open/close ticks instead of bodies", () => {
-    const { container } = draw(<Ohlc data={PERIODS.slice(0, 3)} variant="bars" />);
+  it("mode='bars' renders open/close ticks instead of bodies", () => {
+    const { container } = draw(<Ohlc data={PERIODS.slice(0, 3)} mode="bars" />);
     expect(container.querySelector("rect")).toBeNull();
     expect(container.querySelectorAll("line").length).toBe(9); // 3 × (wick + 2 ticks)
   });
@@ -67,12 +67,36 @@ describe("<Ohlc>", () => {
   });
 });
 
-seriesEdgeSuite("Ohlc", (data) => (
-  <Ohlc
-    data={data.map((v) => {
-      const b = v ?? Number.NaN;
-      return { open: b, high: b + 2, low: b - 2, close: b + 1 };
-    })}
-    title="Edge"
-  />
-));
+// All four prices are encoded (wick ends + body ends), so the matrix runs once
+// per price with the other three finite and forming a realistic band. The
+// previous spelling derived all four from one value (`b`, `b+2`, `b-2`, `b+1`),
+// so every period stayed internally consistent and the validity check
+// (`high >= low`, open/close inside the range) was never asked a real question —
+// and `?? 0` turned an unquoted period into a period that traded at zero.
+//
+// The band [2, 9] is chosen so a useful share of matrix values land inside it and
+// actually draw, while the rest exercise the refusal path. `label="last"` renders
+// the last close: that gutter is the numeral-leak surface.
+const ohlcCase = (data: readonly { open: number; high: number; low: number; close: number }[]) => (
+  <Ohlc data={data} title="Edge" label="last" width={120} height={24} />
+);
+mappedEdgeSuite(
+  "Ohlc (degenerate open)",
+  (v) => ({ open: v as number, high: 9, low: 2, close: 4 }),
+  ohlcCase,
+);
+mappedEdgeSuite(
+  "Ohlc (degenerate high)",
+  (v) => ({ open: 3, high: v as number, low: 2, close: 4 }),
+  ohlcCase,
+);
+mappedEdgeSuite(
+  "Ohlc (degenerate low)",
+  (v) => ({ open: 3, high: 9, low: v as number, close: 4 }),
+  ohlcCase,
+);
+mappedEdgeSuite(
+  "Ohlc (degenerate close)",
+  (v) => ({ open: 3, high: 9, low: 2, close: v as number }),
+  ohlcCase,
+);

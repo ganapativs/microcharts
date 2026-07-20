@@ -12,6 +12,46 @@ import type { CSSProperties, KeyboardEvent, MouseEvent, PointerEvent } from "rea
  */
 export const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
 
+/** Declarations that size a box rather than decorate it. */
+const SIZING = [
+  "width",
+  "height",
+  "minWidth",
+  "minHeight",
+  "maxWidth",
+  "maxHeight",
+  "aspectRatio",
+] as const;
+
+/**
+ * The style for the composed static SVG, given the consumer's `style`.
+ *
+ * `wrap` puts the consumer's style on the WRAPPER, which is right for the box
+ * but wrong for the mark: `FILL`'s `height: auto` means a consumer `height:
+ * 1.2em` resizes the wrapper while the SVG stays at its authored pixel size and
+ * overflows the line — the static entry, where `style` lands on the `<svg>`
+ * itself, shrinks properly. So any SIZING declaration is passed through to the
+ * SVG too, and `FILL`'s own sizing steps aside so it cannot fight it.
+ *
+ * Decorative declarations (margin, background, border) stay on the wrapper
+ * alone — applying those twice would double the margin and paint the box twice.
+ */
+export function fillFor(style: CSSProperties | undefined): CSSProperties {
+  if (!style) return FILL;
+  let sized: CSSProperties | undefined;
+  for (const k of SIZING) {
+    if (style[k] !== undefined) (sized ??= { display: "block" })[k] = style[k] as never;
+  }
+  if (!sized) return FILL;
+  // Size ONE axis and the other must follow, or the SVG keeps its attribute
+  // size on that axis and `preserveAspectRatio` letterboxes the drawing inside
+  // a box the pointer map still measures in full — the hover ring detaches from
+  // the cursor. `width: 100%` in a fluid container is the common case.
+  if (sized.width === undefined) sized.width = "auto";
+  if (sized.height === undefined) sized.height = "auto";
+  return sized;
+}
+
 /**
  * Base style for a hit-testing interactive wrapper: an inline, positioned,
  * line-height-collapsed box that hugs the composed SVG (so absolute overlay
@@ -35,6 +75,22 @@ export function wrap(
     className: className ? `${base} ${className}` : base,
     style: style ? { ...WRAP, ...style } : WRAP,
   };
+}
+
+/**
+ * Naming attributes for an interactive wrapper, given its resolved name.
+ *
+ * A name of `undefined` means the chart is decorative — the consumer passed
+ * `summary={false}` and no `title`. It must then NOT be a tab stop carrying
+ * `role="img"` with nothing to announce: assistive tech lands on an unnamed
+ * image and reads nothing (WCAG 4.1.2). The static entry already renders
+ * `aria-hidden` for that case, so this keeps both entries telling one story.
+ * `Delta` did this by hand; every other entry shipped the bare tab stop.
+ */
+export function named(
+  name: string | undefined,
+): { role: "img"; tabIndex: 0; "aria-label": string } | { "aria-hidden": true } {
+  return name ? { role: "img", tabIndex: 0, "aria-label": name } : { "aria-hidden": true };
 }
 
 /**
@@ -184,8 +240,17 @@ export function useActivePicker(opts: PickerOptions): Picker {
     onSelect?.(next === null ? null : dat(next));
   };
   // Pointer coords → viewBox space → unit index; `null` before layout.
+  //
+  // Measure the composed SVG, not the wrapper. They coincide in normal flow
+  // (FILL + a line-height-collapsed wrapper), but `.mc-inline` seats a mark by
+  // `translate`ing `.mc-root` — a VISUAL move that leaves the wrapper's layout
+  // box behind. Hit-testing the wrapper there maps the pointer to a unit the
+  // reader isn't over, by the whole seat offset (up to ~60% of a centred chart's
+  // height): hovering the top row highlights the middle one. Reading the painted
+  // box keeps pointer math honest under any transform the seat or the motion
+  // engine applies.
   const at = (e: MouseEvent<HTMLElement>): number | null => {
-    const r = e.currentTarget.getBoundingClientRect();
+    const r = (e.currentTarget.querySelector("svg") ?? e.currentTarget).getBoundingClientRect();
     if (!r.width || !r.height) return null;
     return locate(
       ((e.clientX - r.left) / r.width) * width,

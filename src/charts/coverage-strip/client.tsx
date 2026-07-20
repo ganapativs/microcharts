@@ -7,9 +7,17 @@
 // (canon); the focus ring is an overlay child re-using the same geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.js";
+import { labelFitsBand } from "../../core/labels.js";
 import { coverageGeometry } from "./geometry.js";
 import { CoverageStrip as StaticCoverageStrip, type CoverageStripProps } from "./index.js";
 
@@ -52,6 +60,9 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // no LiveRegion here to host it: seat the wrapper so the readout chip
+  // and the hit box travel with the mark when inline (see seat-hoist).
+  useSeatHoist(hostRef);
   // Time runs along x: each slot lights up in turn, oldest→newest. An explicit
   // `order:"x"` + `window` spreads the cascade across the whole strip (it does
   // NOT collapse under the default stagger cap), so the reveal reads as time
@@ -65,6 +76,10 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
   // must match the static entry's font formula — the label gutter widens
   // totalWidth, and a mismatched fontSize would drift the readout off-cell
   const font = Math.min(11, Math.max(7, Math.round(height * 0.62)));
+  // …and its drop rule: the static drops the percent (and its gutter) once the
+  // box is shorter than one em, so reserving it here would widen totalWidth past
+  // the composed static's and hang the readout off the end of the strip.
+  const showLabel = label === "percent" && labelFitsBand(height, font);
   const geo = useMemo(
     () =>
       coverageGeometry({
@@ -76,10 +91,10 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         steps,
         domain,
         shape,
-        gutterCh: label === "percent" ? 4 : 0,
+        gutterCh: showLabel ? 4 : 0,
         fontSize: font,
       }),
-    [width, height, data, expected, mode, steps, domain, shape, label, font],
+    [width, height, data, expected, mode, steps, domain, shape, showLabel, font],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(
@@ -156,14 +171,12 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
     <span
       ref={hostRef}
       {...wrap("mc-coverage-strip-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticCoverageStrip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         expected={expected}
         mode={mode}

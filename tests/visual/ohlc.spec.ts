@@ -30,7 +30,7 @@ function gallery(): string {
   const tab = `<div class="tab"><span>ACME</span> ${svg({ data: PERIODS, width: 48, height: 10, summary: false })}</div>`;
   const variants = [
     svg({ data: PERIODS, width: 100, title: "candle" }),
-    svg({ data: PERIODS, width: 100, variant: "bars", title: "bars" }),
+    svg({ data: PERIODS, width: 100, mode: "bars", title: "bars" }),
     svg({ data: PERIODS.slice(0, 5), width: 100, title: "few periods" }),
     svg({ data: PERIODS, maxPeriods: 10, width: 100, title: "maxPeriods 10" }),
   ].join(" ");

@@ -7,7 +7,14 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
@@ -18,6 +25,8 @@ import {
   PCT,
   type RetentionCurveProps,
 } from "./index.js";
+
+type RetentionPoint = NonNullable<ReturnType<typeof retentionGeometry>>["points"][number];
 
 export interface InteractiveRetentionCurveProps extends RetentionCurveProps, PickerProps {
   strings?: RetentionStrings;
@@ -95,19 +104,28 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
           : retentionSummary(geo, fmt, unit, data.length, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const count = geo?.points.length ?? 0;
+  // The navigable stops are the finite periods, keyed by their PERIOD index —
+  // the same index `onSelect` emits, so `selectedIndex` round-trips. Gaps make
+  // that space sparse, hence the lookup and `navOrder` below.
+  const ptByPeriod = useMemo(() => {
+    const m = new Map<number, RetentionPoint>();
+    geo?.points.forEach((p) => m.set(p.period, p));
+    return m;
+  }, [geo]);
+  const stops = useMemo(() => geo?.points.map((p) => p.period) ?? [], [geo]);
 
-  // Nearest-period hit-test in viewBox space (scaled into `totalWidth`).
+  // Nearest-period hit-test in viewBox space (scaled into `totalWidth`);
+  // returns the PERIOD index.
   const locate = useCallback(
     (x: number) => {
       if (!geo || geo.points.length === 0) return null;
-      let best = 0;
+      let best = geo.points[0]!.period;
       let bestDist = Infinity;
-      geo.points.forEach((p, i) => {
+      geo.points.forEach((p) => {
         const d = Math.abs(p.x - x);
         if (d < bestDist) {
           bestDist = d;
-          best = i;
+          best = p.period;
         }
       });
       return best;
@@ -115,21 +133,22 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     [geo],
   );
 
+  // Walk finite periods (skip gaps): step in stop-space, land on period indices.
+  const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
+
   // Navigable unit = a finite cohort period; `index` is its original period
   // (the data index the consumer knows), `value` its retained fraction.
   const datum = useCallback(
-    (i: number) => {
-      const pt = geo?.points[i];
-      return { index: pt?.period ?? i, value: pt?.value ?? null };
-    },
-    [geo],
+    (i: number) => ({ index: i, value: ptByPeriod.get(i)?.value ?? null }),
+    [ptByPeriod],
   );
 
   const { active, selected, bind } = useActivePicker({
-    count,
+    count: stops.length,
     width: geo?.totalWidth ?? width,
     height,
     locate,
+    step,
     datum,
     onActive,
     onSelect,
@@ -138,8 +157,8 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
   });
 
   const shown = active ?? selected;
-  const p = shown !== null && geo ? geo.points[shown] : undefined;
-  const pin = selected !== null && selected !== active && geo ? geo.points[selected] : undefined;
+  const p = shown !== null ? ptByPeriod.get(shown) : undefined;
+  const pin = selected !== null && selected !== active ? ptByPeriod.get(selected) : undefined;
   const announced = p
     ? strings.retentionAt(unit, p.period, fmt(p.value), p.bench === null ? null : fmt(p.bench))
     : "";
@@ -148,14 +167,12 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     <span
       ref={hostRef}
       {...wrap("mc-retention-curve-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticRetentionCurve
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         benchmark={benchmark}
         plateau={plateau}

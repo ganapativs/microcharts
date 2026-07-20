@@ -44,6 +44,10 @@ export interface CycleGeometry {
 // still reports the requested period. Beyond this, buckets simply wrap.
 export const CYCLE_MAX_PERIOD = 366;
 
+/** Vertical inset of the plot box: the value scale spans [PAD, height − PAD].
+ *  Exported so the no-data branch can seat the same frame a populated one uses. */
+export const CYCLE_PAD = 2;
+
 const meanOf = (a: readonly number[]): number => a.reduce((s, v) => s + v, 0) / a.length;
 
 function medianOf(a: readonly number[]): number {
@@ -63,7 +67,7 @@ export function cycleGeometry(opts: {
 }): CycleGeometry | null {
   const period = Math.min(Math.max(1, Math.round(opts.period)), CYCLE_MAX_PERIOD);
   const { width, height } = opts;
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? CYCLE_PAD;
 
   // bucket each finite value into its slot, preserving cycle (time) order
   const values: number[][] = Array.from({ length: period }, () => []);

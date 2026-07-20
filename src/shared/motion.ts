@@ -19,9 +19,9 @@ export function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-// One IntersectionObserver shared by every motion chart on the page (:
-// "one shared IntersectionObserver"). Elements register a setter; the observer
-// flips it as they enter/leave the viewport.
+// One IntersectionObserver shared by every motion chart on the page (canon).
+// Elements register a setter; the observer flips it as they enter/leave the
+// viewport.
 let sharedObserver: IntersectionObserver | null = null;
 const callbacks = new WeakMap<Element, (visible: boolean) => void>();
 

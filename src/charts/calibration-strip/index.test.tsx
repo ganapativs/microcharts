@@ -6,8 +6,7 @@ import { calibrationGeometry } from "./geometry.js";
 import { EN_CALIBRATION } from "../../core/strings-calibration.js";
 import { makeFormatter } from "../../core/format.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
-import { seriesEdgeSuite } from "../../test/edge-cases.js";
-import type { Value } from "../../core/types.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const fmt = makeFormatter(undefined, undefined);
@@ -51,8 +50,8 @@ describe("<CalibrationStrip>", () => {
     expect(hollow.length).toBe(2);
   });
 
-  it("bars variant draws deviation columns instead of dots", () => {
-    const { container } = draw(<CalibrationStrip data={BINS} variant="bars" />);
+  it("bars mode draws deviation columns instead of dots", () => {
+    const { container } = draw(<CalibrationStrip data={BINS} mode="bars" />);
     expect(container.querySelectorAll("circle").length).toBe(0);
   });
 
@@ -62,12 +61,26 @@ describe("<CalibrationStrip>", () => {
   });
 });
 
-seriesEdgeSuite("CalibrationStrip", (data: readonly Value[]) => (
-  <CalibrationStrip
-    data={data.map((v, i) => ({
-      p: (i + 0.5) / Math.max(1, data.length),
-      outcome: typeof v === "number" && v > 0 ? 1 : 0,
-    }))}
-    title="Edge"
-  />
-));
+// The matrix is lifted into the chart's OWN datum shapes with null/NaN intact.
+// The previous mapping folded every degenerate value into `outcome: 0` and a
+// synthetic finite `p`, so the binned path — where `count / maxCount` turns
+// ∞/∞ into NaN — was never reached at all.
+mappedEdgeSuite(
+  "CalibrationStrip (binned rows)",
+  (v, i) => ({ predicted: v as number, observed: v as number, count: (i + 1) * 10 }),
+  (data) => <CalibrationStrip data={data} title="Edge" />,
+);
+
+// `count` degenerate too: it is the support lane's scale, so a non-finite one
+// poisons every bar height, and bars mode puts the same numbers on lines.
+mappedEdgeSuite(
+  "CalibrationStrip (degenerate support)",
+  (v, i) => ({ predicted: (i + 0.5) / 10, observed: 0.5, count: v as number }),
+  (data) => <CalibrationStrip data={data} mode="bars" minSupport={20} title="Edge" />,
+);
+
+mappedEdgeSuite(
+  "CalibrationStrip (raw pairs)",
+  (v) => ({ p: v as number, outcome: v as number }),
+  (data) => <CalibrationStrip data={data} bins={10} title="Edge" />,
+);

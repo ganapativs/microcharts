@@ -8,7 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUADRANT, type QuadrantStrings } from "../../core/strings-quadrant.js";
-import { quadrantDotGeometry, type QuadrantDotGeometry } from "./geometry.js";
+import { quadrantDotGeometry, quadrantDotRadii, type QuadrantDotGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type QuadrantNames = readonly [string, string, string, string];
@@ -109,6 +109,9 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        // Same seat as the drawn state, so an unresolvable focal doesn't shift
+        // the line it sits on.
+        seat={{ mode: "center", top: 0, bottom: height }}
         className={cls}
         style={style}
       >
@@ -122,8 +125,7 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
       ? false
       : (summary ?? quadrantSummary(geo, { xLabel, yLabel, quadrants }, fmt, strings));
   const accent = color ?? "var(--mc-accent)";
-  const focalR = Math.max(1.6, Math.min(width, height) * 0.1);
-  const ghostR = Math.max(1, focalR * 0.52);
+  const { focal: focalR, ghost: ghostR } = quadrantDotRadii(width, height);
 
   return (
     <Chart
@@ -132,6 +134,11 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The 2×2 field is the mark: the tint region and the split cross both run
+      // edge to edge, so the whole box is the plot box. Nothing stands on the
+      // bottom — it's the low end of an axis — so the field centres on the cap
+      // band and reads as one square token in prose.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={cls}
       style={style}
     >

@@ -31,10 +31,10 @@ describe("<MiniBar>", () => {
   const heights = (c: HTMLElement) =>
     [...c.querySelectorAll("rect")].map((r) => Number(r.getAttribute("height")));
 
-  it("default keeps data order; sort='desc' ranks", () => {
+  it("default keeps data order; order='desc' ranks", () => {
     const plain = heights(draw(<MiniBar data={DATA} />).container);
     expect(plain[0]!).toBeGreaterThan(plain[1]!); // East then West — data order
-    const sorted = heights(draw(<MiniBar data={DATA} sort="desc" />).container);
+    const sorted = heights(draw(<MiniBar data={DATA} order="desc" />).container);
     expect([...sorted].sort((a, b) => b - a)).toEqual(sorted);
   });
 

@@ -29,6 +29,10 @@ export interface PhaseTraceResult {
   start: { x: number; y: number } | null;
   heading: Heading;
   points: PhasePoint[];
+  /** Plot-box top edge (viewBox units) — the yDomain's max. */
+  y0: number;
+  /** Plot-box bottom edge (viewBox units) — the yDomain's min. */
+  y1: number;
 }
 
 export function phaseTraceGeometry(opts: {
@@ -41,6 +45,8 @@ export function phaseTraceGeometry(opts: {
 }): PhaseTraceResult {
   const { data, xDomain, yDomain, tail, width, height } = opts;
   const pad = 2;
+  const plotY0 = pad;
+  const plotY1 = round2(height - pad);
   const [x0, x1] = xDomain;
   const [y0, y1] = yDomain;
   const xSpan = x1 - x0 || 1;
@@ -67,6 +73,8 @@ export function phaseTraceGeometry(opts: {
       start: null,
       heading: 4,
       points: [],
+      y0: plotY0,
+      y1: plotY1,
     };
   }
 
@@ -118,5 +126,5 @@ export function phaseTraceGeometry(opts: {
     arrow = `M${end.x} ${end.y}L${round2(end.x + Math.cos(a1) * L)} ${round2(end.y + Math.sin(a1) * L)}M${end.x} ${end.y}L${round2(end.x + Math.cos(a2) * L)} ${round2(end.y + Math.sin(a2) * L)}`;
   }
 
-  return { trailPath, tailPath, end, arrow, start, heading, points };
+  return { trailPath, tailPath, end, arrow, start, heading, points, y0: plotY0, y1: plotY1 };
 }

@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
-import { TreeRings } from "./index.js";
+import { TreeRings, treeRingsSummary } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const YEARS = [8, 12, 10, 18, 22, 15, 20, 14];
@@ -51,4 +52,30 @@ describe("<TreeRings>", () => {
     const { container } = draw(<TreeRings data={YEARS} title="Account age" />);
     await expectNoA11yViolations(container);
   });
+
+  describe("degenerate periods", () => {
+    it("a gap period is not 'latest' — the last MEASURED period is", () => {
+      expect(treeRingsSummary([8, 12, null] as unknown as number[])).toBe(
+        "3 periods; latest 12, biggest 12 in period 2.",
+      );
+    });
+
+    it("no measured period reads as no data, never as NaN", () => {
+      expect(treeRingsSummary([null, null] as unknown as number[])).toBe("No data.");
+      expect(treeRingsSummary([Number.NaN, Number.POSITIVE_INFINITY])).toBe("No data.");
+    });
+
+    it("all-null still draws the centre dot — empty is visible, not blank", () => {
+      const { container } = draw(<TreeRings data={[null, null] as unknown as number[]} />);
+      expect(container.querySelectorAll("circle").length).toBeGreaterThan(0);
+    });
+  });
 });
+
+// `data` is typed `number[]`, but the geometry has always treated a gap as
+// no-growth, so the runtime owes the full matrix the same floor as a sparkline.
+mappedEdgeSuite(
+  "TreeRings",
+  (v) => v as number,
+  (data) => <TreeRings data={data} label="last" title="Growth" unit="years" periodWord="year" />,
+);

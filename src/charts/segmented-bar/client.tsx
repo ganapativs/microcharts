@@ -5,7 +5,13 @@
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
@@ -140,17 +146,10 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-segbar-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-segbar-live", className, style)} {...named(label)} {...bind}>
       <StaticSegmentedBar
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         maxSegments={maxSegments}
         order={order}

@@ -6,7 +6,13 @@
 // pin + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
@@ -139,14 +145,12 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
     <span
       ref={hostRef}
       {...wrap("mc-error-budget-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticErrorBudget
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         window={window}
         rates={rates}

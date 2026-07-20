@@ -27,9 +27,18 @@ jobs:
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm build
+      # All three render the built dist/, so they follow the build step.
+      # craft:  text escapes / overlap / text-on-mark collisions across the catalog.
+      # robust: every chart against the degenerate-input matrix — never throw,
+      #         never leak a non-finite number into markup.
+      # floor:  every chart stays legible down to half its default size — no
+      #         overlapping or spilled labels at ordinary in-product sizes.
+      - run: pnpm craft
+      - run: pnpm robust
+      - run: pnpm floor
       - run: pnpm knip
       - run: pnpm size
-      # generated files must match their sources — never hand-edited (plan/21 §6.0.B)
+      # generated files must match their sources — never hand-edited
       - run: node scripts/gen-size-limits.mjs --check
       - run: node scripts/sync-sizes.mjs --check
       - run: node scripts/sync-bench.mjs --check

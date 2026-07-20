@@ -5,7 +5,7 @@
 // Composes the static entry (canon); the scale window stays centered on value.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -38,8 +38,8 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     span: spanProp,
     rateTiers: tiersProp,
     orientation = "vertical",
-    width = 28,
-    height = 48,
+    width = 46,
+    height = 60,
     format,
     locale,
     strings = EN_TAPE_GAUGE,
@@ -92,9 +92,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-tape-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -117,7 +115,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       />
       <LiveRegion>{announced}</LiveRegion>
     </span>

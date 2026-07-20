@@ -67,4 +67,15 @@ describe("interactive <EnsembleGhosts>", () => {
     const { screen } = await mount({ ghosts: 12, selectedIndex: 2 });
     expect(screen.container.querySelector('path[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  it("selecting a member with a non-finite terminal announces no data, not NaN", async () => {
+    // Member 1's series ends non-finite, so it is excluded from the drawn ghost
+    // bundle but is still reachable through controlled selection.
+    const dirty = ENS.map((m, i) => (i === 1 ? [20, 21, Number.NaN] : m));
+    const screen = await render(
+      <EnsembleGhosts data={dirty} width={160} height={40} title="Futures" selectedIndex={1} />,
+    );
+    const live = screen.container.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toMatch(/^Member 2 of \d+; no data\.$/);
+  });
 });

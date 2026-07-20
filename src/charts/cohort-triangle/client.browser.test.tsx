@@ -94,4 +94,20 @@ describe("interactive <CohortTriangle>", () => {
     const fig = await mount(<CohortTriangle data={COHORTS} selectedIndex={2} />);
     expect(fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  // Regression: the picker used to hit-test the WRAPPER's box. `.mc-inline`
+  // seats a mark by `translate`ing `.mc-root` — a visual move that leaves the
+  // layout box behind — so an inline-seated chart resolved the pointer to a
+  // cell rows away from the one under the cursor.
+  it("hovers resolve against the PAINTED box when the seat translates the SVG", async () => {
+    const fig = await mount(<CohortTriangle data={COHORTS} cell={12} gap={2} />);
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    const svg = fig.querySelector("svg")!;
+    svg.style.translate = "0 28px"; // what `.mc-inline .mc-root` does
+
+    // cells are emitted row-major over the ragged triangle: Jan's 5, then Feb's.
+    const cells = svg.querySelectorAll('rect[data-mc-ink="cell"], rect[data-mc-ink="gap"]');
+    await userEvent.hover(cells[6] as Element); // Feb, age 1
+    expect(live.textContent).toBe("Feb cohort, period 1: 50%.");
+  });
 });

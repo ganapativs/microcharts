@@ -69,8 +69,9 @@ the chart decorative with `summary={false}` so screen readers skip the redundanc
 ```
 
 A decorative chart renders `aria-hidden="true"` instead of `role="img"` — it leaves the accessibility tree entirely, and
-no `<title>` or `<desc>` is emitted. On an `/interactive` entry it also stops being focusable: there's nothing to name,
-so there's nothing to tab to or activate.
+no `<title>` or `<desc>` is emitted. On an `/interactive` entry the same call resolves the name: with nothing left to
+announce, the wrapper drops `role="img"` and `tabIndex={0}` and takes `aria-hidden="true"` instead — so there's nothing
+to tab to or activate, and the static and interactive entries tell one story.
 
 ## One interaction contract
 
@@ -104,12 +105,18 @@ controllable with `selectedIndex`, or seeded once with `defaultSelectedIndex`.
 Charts with only **one** unit — Delta, Progress, StatusDot, Bullet, and the rest of the scalar set — have nothing to
 rove between, so they take `onSelect` alone (click, tap, Enter, or Space) and carry no selection state.
 
-**Values that change on their own.** Fifteen single-value charts built for updating KPI cards — Delta, Progress,
-ProgressRing, StatusDot, TrendArrow, Thermometer, MoonPhase, FillWord, Hourglass, FatDigits, TallyMarks, DicePips,
-Honeycomb, PictogramRow, BalanceBeam — take `live` (default `true`): when the value changes, the new reading is
-re-announced through the polite region without anyone touching the chart. Set `live={false}` to silence it. Some of the
-live-value charts throttle that announcement — to whole-percent steps on Progress, to a minimum interval on MoonPhase,
-FillWord, EtaBar, and TapeGauge — so a streaming value never floods the buffer.
+**Values that change on their own.** Fifteen single-value charts built for updating KPI cards take `live` (default
+`true`): when the value changes, the new reading is re-announced through the polite region without anyone touching the
+chart. Set `live={false}` to silence it. A few throttle that announcement so a streaming value never floods the buffer:
+
+| Chart with `live`                                                                                                                         | Announcement throttle         |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Progress                                                                                                                                  | whole-percent steps only      |
+| MoonPhase, FillWord                                                                                                                       | at most once per second       |
+| Delta, ProgressRing, StatusDot, TrendArrow, Thermometer, Hourglass, FatDigits, TallyMarks, DicePips, Honeycomb, PictogramRow, BalanceBeam | none — every change announces |
+
+Two charts throttle without taking `live` at all: **EtaBar** and **TapeGauge** re-announce their reading as it changes,
+but never more often than `announceEvery` milliseconds — 10 s and 5 s by default, and tunable per instance.
 
 Three charts sit outside the contract, deliberately: **MinimapStrip** is a viewport-window slider (`role="slider"`, with
 its own `onWindowChange([lo, hi])` range payload), **TokenConfidence** flows as inline HTML text and moves real focus
@@ -125,8 +132,9 @@ Direction and state are always doubled, so a chart survives with no color at all
 - **SparkBar** encodes sign by _position_ above or below the baseline, not hue.
 - **ActivityGrid** always ships a numeric summary alongside its intensity ramp.
 
-Default strokes clear **4.5:1 contrast** against the page in both light and dark themes, and those dark values are
-hand-tuned per token — never an inversion that could wash out.
+The default stroke tokens are chosen against a **4.5:1 contrast** target on the page backgrounds they're designed for,
+and the dark values are hand-tuned per token rather than inverted, so nothing washes out in dark mode. Contrast against
+_your_ surface is still yours to check — charts paint no background, so a mark inherits whatever you place it on.
 
 ## Internationalization and RTL
 
@@ -143,18 +151,24 @@ Nothing about a chart is hard-coded to English or to left-to-right layout.
   `makeFormatter` helper for matching your prose numbers to a chart's.
 
 - **Localized words.** The summary templates are a swappable contract (`SummaryStrings`; the English set ships as the
-  exported `EN` dictionary). Spread `EN` and override the keys you're translating, then pass the result as `strings` —
-  accepted by static and `/interactive` entries alike, so a server-rendered chart localizes without shipping any client
-  JavaScript — or override the whole sentence with a `summary` string. Either way both the accessible name and the
-  live-region announcements speak your language — as does the readout chip on an interactive entry, whose prose comes
-  from the same dictionary. Six charts don't take `strings` on their static entry — Sparkline, ActivityGrid, and
-  MusicStaff accept it on the `/interactive` entry only; SparkBar, Delta, and Bullet compose their sentence inline, so
-  `summary` is the translation seam there. `summary` and `strings` stay the entire text surface, and that is now
-  enforced rather than asserted: a test renders every chart with a `strings` object of sentinel tokens and fails on any
-  English left in the output. It was written because the claim had quietly stopped being true — readouts had accumulated
-  words like "median", "vs" and "queued" in component code, which is exactly the drift a guard catches and a promise
-  does not. The generator itself is exported too: `import { describeSeries } from "@microcharts/react"` returns the
-  exact sentence for a series, handy for tests, tooltips, or feeding a model.
+  exported `EN` dictionary). Spread `EN`, override the keys you're translating, and pass the result as `strings` —
+  static and `/interactive` entries both accept it, so a server-rendered chart localizes without shipping any client
+  JavaScript. Or override the whole sentence with a `summary` string. Either way the accessible name, the live-region
+  announcements, and the readout chip on an interactive entry all speak your language, because all three read from the
+  same dictionary.
+
+  Six charts don't take `strings` on their static entry: Sparkline, ActivityGrid, and MusicStaff accept it on the
+  `/interactive` entry only, while SparkBar, Delta, and Bullet compose their sentence inline — `summary` is the
+  translation seam there.
+
+  `summary` and `strings` stay the entire text surface, and that is now enforced rather than asserted. A guard renders
+  22 interactive entries — the readouts are where the drift lives, and they only exist in a browser — each with a
+  `strings` object of sentinel tokens, and fails on any English left in the output. It was written because the claim had
+  quietly stopped being true: readouts had accumulated words like "median", "vs" and "queued" in component code, which
+  is exactly the drift a guard catches and a promise does not.
+
+  The generator itself is exported too: `import { describeSeries } from "@microcharts/react"` returns the exact sentence
+  for a series, handy for tests, tooltips, or feeding a model.
 
 - **RTL layouts.** A chart is direction-neutral SVG with a localized text name, so it drops into an RTL document without
   breaking — it's an `img`, not a run of text. Time-ordered charts keep their conventional oldest-to-newest reading
@@ -163,7 +177,8 @@ Nothing about a chart is hard-coded to English or to left-to-right layout.
 ## System preferences, handled
 
 - **`prefers-reduced-motion`** — entrance and update animations resolve instantly to their final state. Static charts
-  never animate at all.
+  have no `animate` prop and run no JavaScript animation; the one thing that moves inside a static host is
+  `<Marker celebrate>`, whose particle burst is a pure-CSS one-shot that reduced motion also stills.
 - **`forced-colors`** — data ink maps to system `CanvasText`, accents to `Highlight`, muted marks to `GrayText`, so a
   Windows High Contrast user sees a correct chart, not a blank box.
 - **`prefers-contrast`** — strokes thicken and bands deepen automatically.

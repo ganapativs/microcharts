@@ -4,7 +4,14 @@
 // a row, ↑/↓ between a parent and its first child — ActivityGrid model), click /
 // Enter / Space selects (onSelect). Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
-import { FILL, nav1d, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  nav1d,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PARTITION } from "../../core/strings-partition.js";
@@ -160,9 +167,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
     <span
       ref={hostRef}
       {...wrap("mc-partition-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       {...bind}
     >
       <StaticPartitionStrip
@@ -173,7 +178,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
         height={height}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}

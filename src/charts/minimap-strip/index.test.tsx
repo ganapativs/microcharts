@@ -33,8 +33,8 @@ describe("<MinimapStrip>", () => {
     expect(container.querySelector('path[data-mc-ink="muted"]')).not.toBeNull();
   });
 
-  it("heat variant renders content as opacity, no bar path", () => {
-    const { container } = draw(<MinimapStrip data={DATA} variant="heat" />);
+  it("heat mode renders content as opacity, no bar path", () => {
+    const { container } = draw(<MinimapStrip data={DATA} mode="heat" />);
     expect(container.querySelector('path[data-mc-ink="bar"]')).toBeNull();
   });
 
@@ -47,3 +47,59 @@ describe("<MinimapStrip>", () => {
 seriesEdgeSuite("MinimapStrip", (data: readonly Value[]) => (
   <MinimapStrip data={{ content: data, window: [0, Math.max(1, data.length) / 2] }} title="Edge" />
 ));
+
+// The window, the marks, the known extents and the `domain` prop are numbers
+// too — and they are where the leaks were: a short or null window reached the
+// formatter, and a non-finite one reached the scale. Drive them from the same
+// matrix rather than pairing degenerate content with a valid window.
+seriesEdgeSuite("MinimapStrip (degenerate window/domain)", (data: readonly Value[]) => (
+  <MinimapStrip
+    data={{
+      content: data,
+      // deliberately unsanitized: a caller CAN hand us these
+      window: [data[0], data[1]] as unknown as [number, number],
+      marks: data.slice(0, 3) as unknown as number[],
+      known: [[data[0], data[data.length - 1]]] as unknown as [number, number][],
+    }}
+    domain={[data[0], data[1]] as unknown as [number, number]}
+    markLane
+    title="Edge"
+  />
+));
+
+describe("<MinimapStrip> degenerate window", () => {
+  it("no measurable window → No data, and the rail frames the whole strip", () => {
+    const { container } = draw(
+      <MinimapStrip
+        data={{ content: [1, 2, 3], window: [null, null] as unknown as [number, number] }}
+      />,
+    );
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("aria-label")).toBe("No data.");
+    // empty ≠ zero: the frame is visible and distinct (hollow + dashed), never a
+    // solid window sitting at the left edge.
+    const rail = [...container.querySelectorAll("rect")].at(-1)!;
+    expect(rail.getAttribute("stroke-dasharray")).toBe("2 2");
+    expect(rail.getAttribute("fill-opacity")).toBe("0");
+    expect(Number(rail.getAttribute("width"))).toBeGreaterThan(1);
+  });
+
+  it("a short window pair is not measurable either", () => {
+    const { container } = draw(
+      <MinimapStrip data={{ content: [1, 2], window: [1] as unknown as [number, number] }} />,
+    );
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
+  });
+
+  it("a non-finite domain prop falls back to the derived domain", () => {
+    const { container } = draw(
+      <MinimapStrip
+        data={{ content: [1, 2, 3, 4], window: [0, 2] }}
+        domain={[Number.NaN, Number.NaN] as unknown as [number, number]}
+      />,
+    );
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "Viewing 50% of the whole (0–2 of 4); 0 marks.",
+    );
+  });
+});

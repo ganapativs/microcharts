@@ -1,6 +1,6 @@
 // <CalibrationStrip> — when a model says 70%, does it happen 70% of the time,
-// and where is there enough data to even ask. Static,
-// hook-free, RSC-safe. Predicted × observed against the identity diagonal, with
+// and where is there enough data to even ask. Static, hook-free, RSC-safe.
+// Predicted × observed against the identity diagonal, with
 // an always-on support lane; low-support bins render open + faded so tiny bins
 // never look authoritative. No single-number calibration score is ever shown.
 import type { CSSProperties, ReactNode } from "react";
@@ -10,6 +10,7 @@ import { EN_CALIBRATION, type CalibrationStrings } from "../../core/strings-cali
 import {
   calibrationGeometry,
   isBinned,
+  PAD,
   type BinnedRow,
   type CalibrationPoint,
   type RawPair,
@@ -25,7 +26,7 @@ export interface CalibrationStripProps {
   minSupport?: number | undefined;
   /** `"bars"` draws signed deviation columns from the diagonal.
    * */
-  variant?: "dots" | "bars" | undefined;
+  mode?: "dots" | "bars" | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Format | undefined;
@@ -65,7 +66,7 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
     data,
     bins = 10,
     minSupport,
-    variant = "dots",
+    mode = "dots",
     width = 100,
     height = 32,
     format,
@@ -96,6 +97,11 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Both lanes have a real bottom: observed = 0 is a true zero for the
+      // scatter, and the support counts below it are zero-anchored columns. The
+      // lowest of those is the mark's floor, so the strip stands on the text
+      // baseline. The lane is always on, so this holds for every input.
+      seat={{ mode: "floor", bottom: height - PAD }}
       className={className ? `mc-calib ${className}` : "mc-calib"}
       style={style}
     >
@@ -122,11 +128,11 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
         vectorEffect="non-scaling-stroke"
       />
 
-      {variant === "bars"
+      {mode === "bars"
         ? geo.points.map((p, i) => {
             const dy = diagY(p.predicted);
             return (
-              // primary bar-mode mark (the only per-point mark in this variant) —
+              // primary bar-mode mark (the only per-point mark in this mode) —
               // inherits full --mc-stroke-width rather than a width role, which
               // is reserved for secondary/decorative strokes
               <line

@@ -1,11 +1,11 @@
 "use client";
 // Interactive <MoonPhase>. Hover/focus reveals the percent; on
-// change the lit region cross-fades (opacity, NOT d: interpolation — );
+// change the lit region cross-fades (opacity, NOT d: interpolation — no Safari);
 // announces through a polite region, throttled to ≥1 s. Wrapper focus only.
 // Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
-import { FILL, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
+import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { MoonPhase as StaticMoonPhase, moonPhaseSummary, type MoonPhaseProps } from "./index.js";
 
@@ -89,9 +89,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     <span
       ref={wrap}
       {...wrapAttrs("mc-moon-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onPointerEnter={() => setHover(true)}
       onPointerLeave={() => setHover(false)}
       onFocus={() => setHover(true)}
@@ -105,7 +103,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     >
       <StaticMoonPhase
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         value={value}
         mode={mode}
         strings={strings}

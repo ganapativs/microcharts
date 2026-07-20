@@ -6,7 +6,7 @@
 // unforgivable lie here). Gated on reduced-motion (→ the static frame, re-rendered
 // on data change) and on-screen (paused off-viewport). Composes the static (canon).
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { heartbeatGeometry } from "./geometry.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
@@ -127,9 +127,7 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     <span
       ref={wrapRef}
       {...wrap("mc-heartbeat-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -140,7 +138,7 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     >
       <StaticHeartbeatBlip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         events={events}
         window={win}
         now={liveNow}

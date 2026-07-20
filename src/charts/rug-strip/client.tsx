@@ -5,7 +5,13 @@
 // Space pins one (onSelect). Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
@@ -155,17 +161,10 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
   };
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-rug-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-rug-live", className, style)} {...named(label)} {...bind}>
       <StaticRugStrip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         markValue={markValue}
         orientation={orientation}

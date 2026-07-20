@@ -70,3 +70,21 @@ describe("<ErrorBudget>", () => {
 });
 
 seriesEdgeSuite("ErrorBudget", (data) => <ErrorBudget data={data as number[]} title="Edge" />);
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("ErrorBudget degradation", () => {
+  it("the remaining-budget readout drops under a 7-unit box, the burn still draws", () => {
+    const big = draw(
+      <ErrorBudget data={OBSERVED} window={30} unit="day" width={240} height={32} />,
+    ).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(
+      <ErrorBudget data={OBSERVED} window={30} unit="day" width={48} height={6} />,
+    ).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+});

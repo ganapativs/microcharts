@@ -7,7 +7,13 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { funnelGeometry } from "./geometry.js";
@@ -148,14 +154,12 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-funnel-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticFunnel
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         mode={mode}
         connectors={connectors}

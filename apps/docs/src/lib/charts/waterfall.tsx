@@ -40,7 +40,7 @@ export const entry: ChartEntry = {
       description: "Opening level (prior-period close).",
     },
     {
-      name: "total",
+      name: "totalBar",
       type: "boolean",
       required: false,
       description: "Zero-anchored closing total bar (default on).",
@@ -85,7 +85,7 @@ export function Preview() {
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "start", label: "start", min: 0, max: 100, step: 5, init: 60 },
-    { kind: "toggle", key: "total", label: "total bar", init: true },
+    { kind: "toggle", key: "totalBar", label: "total bar", init: true },
     { kind: "toggle", key: "delta", label: "delta labels", init: false },
     {
       kind: "segmented",
@@ -99,7 +99,7 @@ export const playground: PlaygroundSpec = {
     <Waterfall
       data={PL}
       start={s.start as number}
-      total={s.total as boolean}
+      totalBar={s.totalBar as boolean}
       label={s.delta ? "delta" : "none"}
       positive={s.positive as "up" | "down"}
       summary={false}
@@ -112,7 +112,7 @@ export const playground: PlaygroundSpec = {
       "<Waterfall",
       "  data={steps}",
       `  start={${s.start}}`,
-      s.total === false && "  total={false}",
+      s.totalBar === false && "  totalBar={false}",
       s.delta && '  label="delta"',
       s.positive !== "up" && `  positive="${s.positive}"`,
       "/>",

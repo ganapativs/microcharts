@@ -6,7 +6,13 @@
 // (canon) — overlays ride as children.
 import { useCallback, useMemo, useRef } from "react";
 import type { ZoneKey } from "./geometry.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TIME_IN_RANGE } from "../../core/strings-time-in-range.js";
@@ -175,14 +181,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
     : undefined;
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-tir-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-tir-live", className, style)} {...named(label)} {...bind}>
       <StaticTimeInRange
         {...rest}
         data={data}
@@ -191,7 +190,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
         height={height}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}

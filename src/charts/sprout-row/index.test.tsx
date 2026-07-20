@@ -80,3 +80,38 @@ describe("<SproutRow>", () => {
     await expectNoA11yViolations(container);
   });
 });
+
+describe("degrades instead of spilling", () => {
+  const NAMED = [
+    { label: "Acme", value: 3 },
+    { label: "Globex", value: 1 },
+    { label: "Initech", value: 2 },
+  ];
+
+  it("shows names and the stage numeral at the default size", () => {
+    const { container } = render(<SproutRow data={NAMED} labels label="value" />);
+    const text = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(text).toContain("Acme");
+    expect(text).toContain("3");
+  });
+
+  it("drops the names — and their band — when the glyph would have no room", () => {
+    const { container } = render(<SproutRow data={NAMED} labels label="value" height={15} />);
+    const text = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(text).not.toContain("Acme");
+    // the row narrows back to its unlabelled width: the band and side gutter go
+    // with the names rather than leaving a hole where the text used to be.
+    const vb = container.querySelector("svg")!.getAttribute("viewBox")!;
+    const bare = render(<SproutRow data={NAMED} height={15} />)
+      .container.querySelector("svg")!
+      .getAttribute("viewBox")!;
+    expect(vb).toBe(bare);
+  });
+
+  it("drops the stage numeral once its descender would clear the floor", () => {
+    const { container } = render(<SproutRow data={NAMED} label="value" height={9} />);
+    expect([...container.querySelectorAll("text")]).toHaveLength(0);
+    // the sprouts themselves still render — degradation sheds text, not data.
+    expect(container.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+});

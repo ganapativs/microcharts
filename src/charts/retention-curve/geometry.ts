@@ -31,6 +31,10 @@ export interface RetentionGeometry {
   labelX: number;
   labelY: number;
   totalWidth: number;
+  /** Top edge of the plot box — full retention on the locked frame. */
+  y0: number;
+  /** Bottom edge of the plot box — zero retention. Also the inline seat's floor. */
+  y1: number;
 }
 
 // share input may arrive as 0–1 or 0–100; a max over 1.001 means percent input
@@ -131,7 +135,12 @@ export function retentionGeometry(opts: {
     last,
     plateau,
     labelX: round2(width + 3),
-    labelY: fontSize > 0 ? round2(clamp(last.y, fontSize * 0.7, height - fontSize * 0.3)) : last.y,
+    // `dominant-baseline: central` straddles y by half a font EACH way, so the
+    // clamp is symmetric. Below `height < fontSize` no clamp exists and the
+    // caller drops the label rather than painting it past the box.
+    labelY: fontSize > 0 ? round2(clamp(last.y, fontSize * 0.5, height - fontSize * 0.5)) : last.y,
     totalWidth: width + gutter,
+    y0: round2(pad),
+    y1: round2(height - pad),
   };
 }

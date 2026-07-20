@@ -80,7 +80,7 @@ a continuum a line chart can slope between.
     { t: 60, state: "Deep" },
     { t: 90, state: "Light" },
   ]}
-  variant="lanes"
+  mode="lanes"
 />`}
 >
   <Hypnogram
@@ -92,7 +92,7 @@ a continuum a line chart can slope between.
     ]}
     states={["Awake", "REM", "Light", "Deep"]}
     domain={[0, 120]}
-    variant="lanes"
+    mode="lanes"
     title="Lanes"
     width={260}
     height={64}
@@ -174,8 +174,8 @@ strip always accounts for every state it's given.
 ## Why this default
 
 Right-angle steps with an explicit `states` order are the clinically proven read. Order is meaningful — for ordinal
-states (sleep depth, incident severity) pass it explicitly; for nominal states with no rank, use `variant="lanes"` so
-the vertical axis never implies one. Any smoothing or easing of the step corners would be a lie about the data, so the
+states (sleep depth, incident severity) pass it explicitly; for nominal states with no rank, use `mode="lanes"` so the
+vertical axis never implies one. Any smoothing or easing of the step corners would be a lie about the data, so the
 entrance is a left-to-right clip reveal of the finished trace — the steps themselves are never interpolated.
 
 ## Accessibility

@@ -15,7 +15,7 @@ export interface WaveformProps {
   /** 0–1 played fraction; buckets left of it tint accent (position-in-media). */
   progress?: number | undefined;
   /** `"envelope"` renders the min/max envelope as one filled area path. */
-  variant?: "bars" | "envelope" | undefined;
+  mode?: "bars" | "envelope" | undefined;
   /** Mirror around the center (default); `false` for magnitude-only series. */
   mirror?: boolean | undefined;
   /** Explicit symmetric domain for HONEST loudness comparison across rows. */
@@ -58,7 +58,7 @@ export function Waveform(props: WaveformProps): ReactNode {
   const {
     data,
     progress,
-    variant = "bars",
+    mode = "bars",
     mirror = true,
     domain,
     width = 120,
@@ -92,6 +92,12 @@ export function Waveform(props: WaveformProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // `mirror` decides the seat: mirrored bars straddle the hairline with no
+      // floor, so the band centres on the cap band like a glyph; unmirrored,
+      // amplitude grows from y1 as a real zero floor and stands on the baseline.
+      seat={
+        mirror ? { mode: "center", top: geo.y0, bottom: geo.y1 } : { mode: "floor", bottom: geo.y1 }
+      }
       className={className ? `mc-wave ${className}` : "mc-wave"}
       style={style}
     >
@@ -109,7 +115,7 @@ export function Waveform(props: WaveformProps): ReactNode {
         />
       ) : null}
 
-      {variant === "envelope" ? (
+      {mode === "envelope" ? (
         // data-mc-ink="bar" enrolls the envelope area in the rise story (the
         // inline fill still wins for color) — without it the selector matches
         // nothing and the entrance drops to the whole-svg wipe fallback.

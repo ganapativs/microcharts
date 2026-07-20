@@ -6,7 +6,13 @@
 // value. Composes the static component (canon) — the SVG never drifts.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { gardenGridGeometry } from "./geometry.js";
@@ -169,17 +175,10 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
       : strings.gardenCell(c.index + 1, geo.cells.length, fmt(c.value), c.step, steps);
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-garden-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-garden-live", className, style)} {...named(label)} {...bind}>
       <StaticGardenGrid
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         rows={rows}
         steps={steps}

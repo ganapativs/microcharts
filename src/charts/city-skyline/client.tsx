@@ -5,8 +5,15 @@
 // percent (secondary channel). Composes the static component.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { citySkylineGeometry } from "./geometry.js";
@@ -139,29 +146,29 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
   const shown = active ?? selected;
   const b = shown !== null ? geo.buildings[shown] : undefined;
   const d = shown !== null ? data[shown] : undefined;
+  // Read the lit fraction off the GEOMETRY, not the raw datum: the geometry has
+  // already resolved "unknown" (absent or non-finite) to null and clamped the
+  // rest. Re-clamping `d.lit` here meant `Math.max(0, NaN)` → "NaN% lit" in the
+  // live region — and it duplicated a clamp that has one home.
   const announced =
     b && d
-      ? d.lit === undefined
-        ? strings.citySkylineAt(d.label, fmt(d.value))
-        : strings.citySkylineAtLit(
-            d.label,
-            fmt(d.value),
-            `${Math.round(Math.min(1, Math.max(0, d.lit)) * 100)}%`,
-          )
+      ? !isFiniteValue(d.value)
+        ? strings.citySkylineEmpty(d.label)
+        : b.lit === null
+          ? strings.citySkylineAt(d.label, fmt(d.value))
+          : strings.citySkylineAtLit(d.label, fmt(d.value), `${Math.round(b.lit * 100)}%`)
       : "";
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-skyline-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticCitySkyline
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         bw={bw}
         gap={gap}

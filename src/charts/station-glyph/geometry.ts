@@ -43,6 +43,11 @@ export interface StationLayout {
   yOff: number;
   /** Gap between the disc rim and a numeral. */
   gap: number;
+  /** Top edge of the plot box — the square holding the disc + barb. The numeral
+   *  gutters sit outside it, one equal band above and below. */
+  y0: number;
+  /** Bottom edge of that square. */
+  y1: number;
 }
 
 /**
@@ -74,6 +79,8 @@ export function stationLayout(opts: {
     // the radial barb is furthest away), so they clear both disc and barb
     yOff: round2(r * 0.78),
     gap,
+    y0: padY,
+    y1: round2(padY + size),
   };
 }
 
@@ -134,6 +141,8 @@ export function stationGlyphGeometry(opts: {
       calm: local.calm,
       counts: local.counts,
       center: { x: cx, y: cy },
+      y0: round2(local.y0 + dy),
+      y1: round2(local.y1 + dy),
     };
   }
 

@@ -92,6 +92,10 @@ export function GardenGrid(props: GardenGridProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Dot area carries the value; the bottom row is the last period, not a
+      // zero line, so the cell block centres on the cap band. `PAD` is the
+      // deterministic inset the grid is laid out inside, top and bottom alike.
+      seat={{ mode: "center", top: PAD, bottom: geo.height - PAD }}
       className={className ? `mc-garden ${className}` : "mc-garden"}
       style={style}
     >

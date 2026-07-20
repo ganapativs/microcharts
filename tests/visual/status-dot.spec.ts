@@ -12,7 +12,7 @@ const svg = (props: Record<string, unknown>) => renderToStaticMarkup(h(StatusDot
 function gallery(): string {
   const sentence = `The API is ${svg({ status: "ok", title: "API" })} operational; batch jobs are ${svg({ status: "warn", title: "Batch jobs" })} degraded.`;
 
-  // service-list table — the hero context (plan/22 #2)
+  // service-list table — the hero context
   const cell = `<table><tbody>
     <tr><td>${svg({ status: "ok", summary: false })}</td><td>gateway</td><td>99.99%</td></tr>
     <tr><td>${svg({ status: "warn", summary: false })}</td><td>search</td><td>98.71%</td></tr>

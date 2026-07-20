@@ -44,7 +44,7 @@ export const entry: ChartEntry = {
       description: "0–1 played fraction; left buckets tint accent.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"bars" | "envelope"',
       required: false,
       description: "Envelope draws the min/max area.",
@@ -81,8 +81,8 @@ export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["bars", "envelope"],
       init: "bars",
     },
@@ -92,7 +92,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <Waveform
       data={WAVE}
-      variant={s.variant as "bars" | "envelope"}
+      mode={s.mode as "bars" | "envelope"}
       mirror={s.mirror as boolean}
       progress={(s.progress as number) / 100}
       summary={false}
@@ -104,7 +104,7 @@ export const playground: PlaygroundSpec = {
     [
       "<Waveform",
       "  data={samples}",
-      s.variant !== "bars" && `  variant="${s.variant}"`,
+      s.mode !== "bars" && `  mode="${s.mode}"`,
       s.mirror === false && "  mirror={false}",
       `  progress={${((s.progress as number) / 100).toFixed(2)}}`,
       "/>",
@@ -123,8 +123,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "envelope",
-    code: `<Waveform data={samples} variant="envelope" />`,
-    node: <Waveform data={WAVE} variant="envelope" summary={false} width={200} height={28} />,
+    code: `<Waveform data={samples} mode="envelope" />`,
+    node: <Waveform data={WAVE} mode="envelope" summary={false} width={200} height={28} />,
   },
 ];
 

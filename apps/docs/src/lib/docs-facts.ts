@@ -102,7 +102,3 @@ export const BENCH = {
   /** Same figure, rounded to the nearest thousand for prose (never hand-typed). */
   describeSeriesOpsPerSecRounded: Math.round((bench.core[0]?.opsPerSec ?? 0) / 1000) * 1000,
 } as const;
-
-/** The headline "N charts on the server in about M ms" line, from the real run. */
-export const SSR_HEADLINE =
-  bench.scenarios.find((s) => s.count === 500) ?? bench.scenarios[bench.scenarios.length - 1];

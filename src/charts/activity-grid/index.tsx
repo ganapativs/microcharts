@@ -108,6 +108,10 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The bottom row is the last weekday, not a zero line — a cell block has
+      // no floor to stand on, so it centres on the cap band. The viewBox is the
+      // grid exactly (no label gutters), so the box is the whole frame.
+      seat={{ mode: "center", top: 0, bottom: h }}
       className={className ? `mc-activity ${className}` : "mc-activity"}
       style={style}
     >

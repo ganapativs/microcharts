@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Syncs measured per-subpath gzip sizes into the docs site (plan/21 §6.0.B):
+ * Syncs measured per-subpath gzip sizes into the docs site:
  * runs `size-limit --json` over the built dist and writes
  * `apps/docs/src/lib/chart-sizes.json`, which `lib/stats.ts` re-exports as
  * `CHART_GZIP`. The docs numbers are therefore always measured, never

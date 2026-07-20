@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { BubbleRow } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const REGIONS = [
@@ -50,4 +51,30 @@ describe("<BubbleRow>", () => {
     const { container } = draw(<BubbleRow data={REGIONS} title="Market size" />);
     await expectNoA11yViolations(container);
   });
+
+  describe("degenerate values", () => {
+    it("a non-finite value prints no numeral — the presence ring stands alone", () => {
+      const { container } = draw(
+        <BubbleRow data={[{ label: "EMEA", value: Number.NaN }, ...REGIONS.slice(1)]} />,
+      );
+      expect([...container.querySelectorAll("text")].map((t) => t.textContent)).toEqual([
+        "890",
+        "560",
+        "210",
+      ]);
+      // …but it still occupies its slot: 4 bubbles, not 3.
+      expect(container.querySelectorAll("circle").length).toBe(4);
+    });
+
+    it("no measured value reads as no data", () => {
+      const { container } = draw(<BubbleRow data={[{ label: "EMEA", value: null }]} />);
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
+    });
+  });
 });
+
+mappedEdgeSuite(
+  "BubbleRow",
+  (v, i) => ({ label: `R${i}`, value: v }),
+  (data) => <BubbleRow data={data} label="both" title="Market size" />,
+);

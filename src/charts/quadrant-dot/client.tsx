@@ -6,11 +6,17 @@
 // pin + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUADRANT, type QuadrantStrings } from "../../core/strings-quadrant.js";
-import { quadrantDotGeometry } from "./geometry.js";
+import { quadrantDotGeometry, quadrantDotRadii } from "./geometry.js";
 import {
   QuadrantDot as StaticQuadrantDot,
   quadrantSummary,
@@ -86,15 +92,21 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
 
   const count = geo?.ghosts.length ?? 0;
 
-  // Nearest peer to the pointer within a 3-unit (squared 9) hit radius. The
-  // navigable units are the peer ghosts; datum.index is the ghost index in the
-  // chart's nearest-first order (not the input `field` order — field is
-  // re-sorted by distance from the focal, then capped at 30).
+  const { focal: focalR, ghost: ghostR } = quadrantDotRadii(width, height);
+  // A forgiving margin of 1 unit around the PAINTED ghost: the whole visible dot
+  // must respond (a fixed radius went dead at the rim once the box passed ~58
+  // units), plus a little slack for imprecise pointers on a word-sized chart.
+  const hitDist = (ghostR + 1) ** 2;
+
+  // Nearest peer to the pointer within the hit radius. The navigable units are
+  // the peer ghosts; datum.index is the ghost index in the chart's nearest-first
+  // order (not the input `field` order — field is re-sorted by distance from the
+  // focal, then capped at 30).
   const locate = useCallback(
     (x: number, y: number) => {
       if (!geo) return null;
       let best = -1;
-      let bestDist = 9;
+      let bestDist = hitDist;
       geo.ghosts.forEach((g, i) => {
         const d = (g.x - x) ** 2 + (g.y - y) ** 2;
         if (d < bestDist) {
@@ -104,7 +116,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
       });
       return best >= 0 ? best : null;
     },
-    [geo],
+    [geo, hitDist],
   );
 
   // A scatter point has no single "primary" number, so we report the y value
@@ -136,8 +148,6 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
           ? strings.noData
           : quadrantSummary(geo, { xLabel, yLabel, quadrants }, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  const focalR = Math.max(1.6, Math.min(width, height) * 0.1);
 
   const ring = (i: number, pinned: boolean) => {
     const g = geo?.ghosts[i];
@@ -174,14 +184,12 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
     <span
       ref={hostRef}
       {...wrap("mc-quadrant-dot-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticQuadrantDot
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         field={field}
         xDomain={xDomain}

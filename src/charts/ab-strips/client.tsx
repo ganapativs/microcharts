@@ -6,11 +6,18 @@
 // percentile. Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
-import { abStripsGeometry } from "./geometry.js";
+import { labelFitsBand } from "../../core/labels.js";
+import { abStripsGeometry, abTagsFit } from "./geometry.js";
 import { ABStrips as StaticABStrips, abSummary, abDelta, type ABStripsProps } from "./index.js";
 
 export interface InteractiveABStripsProps extends ABStripsProps, PickerProps {
@@ -29,7 +36,7 @@ const EDGES = 5;
 export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
   const {
     data,
-    labels = ["A", "B"] as const,
+    seriesLabels = ["A", "B"] as const,
     width = 80,
     height = 20,
     format,
@@ -50,7 +57,14 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "settle", animate, { selector: "circle[data-mc-ink]" });
 
-  const labelChars = Math.max(labels[0].length, labels[1].length);
+  // Mirror the static's drop rules exactly (row tags AND the delta): each one
+  // that drops takes its gutter with it, so a copy that kept reserving would
+  // stretch `totalWidth` past the composed static's viewBox and slide the
+  // pointer map off the marks.
+  const FONT = Math.min(8, Math.max(6, Math.round(height * 0.3)));
+  const labelChars = abTagsFit(height, FONT)
+    ? Math.max(seriesLabels[0].length, seriesLabels[1].length)
+    : 0;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // Mirror the static's label gutter so `totalWidth` matches the rendered
   // viewBox — without it the pointer map and readout run short and the
@@ -64,7 +78,8 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
       labelChars,
       domain: props.domain,
     });
-    const showLabel = (props.label ?? "delta") === "delta" && base != null;
+    const showLabel =
+      (props.label ?? "delta") === "delta" && base != null && labelFitsBand(height, FONT);
     const gutterCh = showLabel ? abDelta(base!, fmt).length : 0;
     return abStripsGeometry({
       width,
@@ -74,9 +89,9 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
       labelChars,
       domain: props.domain,
       gutterCh,
-      fontSize: Math.min(8, Math.max(6, Math.round(height * 0.3))),
+      fontSize: FONT,
     });
-  }, [width, height, data.a, data.b, labelChars, props.domain, props.label, fmt]);
+  }, [width, height, data.a, data.b, labelChars, props.domain, props.label, fmt, FONT]);
 
   // Navigable unit = one quantile edge of one row: index `row * 5 + edge`
   // (row 0 = arm A, row 1 = arm B; edge 0…4 = p5/p25/p50/p75/p95). The chart
@@ -140,10 +155,10 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
       return {
         index: i,
         value: e?.edge.value ?? null,
-        label: e ? `${labels[Math.floor(i / EDGES)]!} p${e.edge.p}` : undefined,
+        label: e ? `${seriesLabels[Math.floor(i / EDGES)]!} p${e.edge.p}` : undefined,
       };
     },
-    [edgeAt, labels],
+    [edgeAt, seriesLabels],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -166,7 +181,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
         ? summary
         : geo === null
           ? strings.noData
-          : abSummary(geo, fmt, labels, strings);
+          : abSummary(geo, fmt, seriesLabels, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const dot = (i: number, pinned: boolean) => {
@@ -192,29 +207,27 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
     at && geo
       ? at.edge.p === 50
         ? strings.abRow(
-            labels[shownRow]!,
+            seriesLabels[shownRow]!,
             fmt(at.edge.value),
             fmt(Math.abs(geo.deltaMedian)),
             geo.deltaMedian < 0 ? "below" : "above",
-            labels[shownRow === 0 ? 1 : 0]!,
+            seriesLabels[shownRow === 0 ? 1 : 0]!,
           )
-        : strings.abEdge(labels[shownRow]!, at.edge.p, fmt(at.edge.value))
+        : strings.abEdge(seriesLabels[shownRow]!, at.edge.p, fmt(at.edge.value))
       : "";
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-ab-strips-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticABStrips
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
-        labels={labels}
+        seriesLabels={seriesLabels}
         width={width}
         height={height}
         format={format}
@@ -241,7 +254,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
               beside it, which builds the same sentence through `strings.abRow`.
               The chip names the edge and its value; the comparison stays in the
               announcement, already localized. */}
-          {`${labels[shownRow]!} p${at.edge.p} ${fmt(at.edge.value)}`}
+          {`${seriesLabels[shownRow]!} p${at.edge.p} ${fmt(at.edge.value)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

@@ -1,4 +1,4 @@
-// Bench suite v2 (plan/07 §3, plan/21 §6.0.D). Reproducible numbers for the
+// Bench suite v2. Reproducible numbers for the
 // core kernel + static SSR render of EVERY chart, measured with perf_hooks
 // (zero deps). Scenarios live in `bench/scenarios.mjs` — batches add one entry
 // per chart; each is checked against its per-scenario SSR floor. Run after

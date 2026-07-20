@@ -4,7 +4,7 @@
 // Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
 // mark). Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
-import { FILL, wrap, type MicroDatum } from "../../shared/interactive.js";
+import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -63,9 +63,7 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-progress-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
@@ -73,7 +71,7 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
         pick();
       }}
     >
-      <StaticProgress {...rest} style={FILL} strings={strings} summary={false} />
+      <StaticProgress {...rest} style={fillFor(style)} strings={strings} summary={false} />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );

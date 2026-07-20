@@ -36,8 +36,8 @@ describe("<Waterfall>", () => {
     expect(container.querySelectorAll('[data-mc-ink="negative"]').length).toBe(3);
   });
 
-  it("total={false} drops the grounded bar (the documented variant)", () => {
-    const { container } = draw(<Waterfall data={PL} total={false} />);
+  it("totalBar={false} drops the grounded bar (the documented variant)", () => {
+    const { container } = draw(<Waterfall data={PL} totalBar={false} />);
     expect(container.querySelectorAll("rect").length).toBe(4);
   });
 
@@ -74,7 +74,7 @@ describe("<Waterfall>", () => {
         ]}
         label="delta"
         width={260}
-        total={false}
+        totalBar={false}
       />,
     );
     const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);

@@ -6,14 +6,21 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_MINIMAP, type MinimapStrings } from "../../core/strings-minimap.js";
-import { hatchPath, minimapDomain, minimapGeometry, type MinimapInput } from "./geometry.js";
+import {
+  hatchPath,
+  minimapDomain,
+  minimapGeometry,
+  minimapWindow,
+  type MinimapInput,
+} from "./geometry.js";
+import { isFiniteValue } from "../../core/types.js";
 
 export type MinimapStripDatum = MinimapInput;
 
 export interface MinimapStripProps {
   data: MinimapStripDatum;
   /** `"heat"` renders content as an opacity strip — calmer under text. */
-  variant?: "bars" | "heat" | undefined;
+  mode?: "bars" | "heat" | undefined;
   /** Dedicated tick lane vs overlaying ticks on content. */
   markLane?: boolean | undefined;
   domain?: readonly [number, number] | undefined;
@@ -38,26 +45,24 @@ export function minimapSummary(
   strings: MinimapStrings,
   fmt: (n: number) => string,
 ): string {
+  // No measurable window = no position to report. Saying "viewing 0%" would be
+  // a claim about a viewport that isn't there.
+  const win = minimapWindow(data.window);
+  if (!win) return strings.noData;
   const span = domain[1] - domain[0] || 1;
-  const viewSpan = Math.abs(data.window[1] - data.window[0]);
+  const viewSpan = Math.abs(win[1] - win[0]);
   const pct = `${Math.round((viewSpan / span) * 100)}%`;
-  const marks = (data.marks ?? []).length;
+  // Count the marks that are actually placed, not the holes between them.
+  const marks = (data.marks ?? []).filter(isFiniteValue).length;
   const unknownClause =
     unknownShare > 0.004 ? strings.minimapUnknown(`${Math.round(unknownShare * 100)}%`) : "";
-  return strings.minimap(
-    pct,
-    fmt(data.window[0]),
-    fmt(data.window[1]),
-    fmt(span),
-    marks,
-    unknownClause,
-  );
+  return strings.minimap(pct, fmt(win[0]), fmt(win[1]), fmt(span), marks, unknownClause);
 }
 
 export function MinimapStrip(props: MinimapStripProps): ReactNode {
   const {
     data,
-    variant = "bars",
+    mode = "bars",
     markLane = true,
     domain: domainProp,
     width = 120,
@@ -74,7 +79,7 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const domain = domainProp ?? minimapDomain(data);
+  const domain = minimapDomain(data, domainProp);
   const geo = minimapGeometry({
     content: data.content,
     window: data.window,
@@ -97,6 +102,11 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A slider track read as one strip, with no bottom the content rises from,
+      // so it centres on the cap band. The band seated is the content lane — the
+      // tick lane above it is chrome for annotations, and the geometry reserves
+      // it whether or not `markLane` puts anything there.
+      seat={{ mode: "center", top: 3, bottom: contentBottom }}
       className={className ? `mc-minimap ${className}` : "mc-minimap"}
       style={style}
     >
@@ -124,7 +134,7 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
 
       {/* content thumbnail — flat siblings, ink role: up to ~60 buckets is
           this chart's SSR hot path (bench floor 8 charts/ms) */}
-      {variant === "heat" ? (
+      {mode === "heat" ? (
         geo.buckets.map((b, i) => (
           <rect
             key={i}
@@ -148,7 +158,6 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
         />
       ) : null}
 
-      {/* annotation tick lane */}
       {geo.markX.length > 0 ? (
         <path
           d={geo.markX.map((x) => `M${round2(x)} 0.5V${markLane ? 3 : height - 1}`).join("")}
@@ -159,7 +168,9 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
       ) : null}
 
       {/* viewport window — fill+stroke combo, so a literal accent var() ref
-          stays (the "accent" ink role zeroes the stroke on rects) */}
+          stays (the "accent" ink role zeroes the stroke on rects). With no
+          measurable window the same rect frames the whole strip, hollow and
+          dashed: the rail is there, the position is unknown — not "all in view". */}
       <rect
         x={geo.windowRect.x}
         y={geo.windowRect.y}
@@ -167,8 +178,9 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
         height={geo.windowRect.height}
         rx={1}
         fill="var(--mc-accent)"
-        fillOpacity={0.12}
+        fillOpacity={geo.windowKnown ? 0.12 : 0}
         stroke="var(--mc-accent)"
+        strokeDasharray={geo.windowKnown ? undefined : "2 2"}
         data-mc-w="support"
         vectorEffect="non-scaling-stroke"
       />

@@ -50,7 +50,7 @@ export const entry: ChartEntry = {
       description: "Below this a bin renders low-confidence.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"dots" | "bars"',
       required: false,
       description: "Bars draw signed deviation columns.",
@@ -87,8 +87,8 @@ export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["dots", "bars"],
       init: "dots",
     },
@@ -97,7 +97,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <CalibrationStrip
       data={BINS}
-      variant={s.variant as "dots" | "bars"}
+      mode={s.mode as "dots" | "bars"}
       minSupport={s.minSupport as number}
       summary={false}
       width={300}
@@ -108,7 +108,7 @@ export const playground: PlaygroundSpec = {
     [
       "<CalibrationStrip",
       "  data={reliability}",
-      s.variant !== "dots" && `  variant="${s.variant}"`,
+      s.mode !== "dots" && `  mode="${s.mode}"`,
       s.minSupport !== 11 && `  minSupport={${s.minSupport}}`,
       "/>",
     ]
@@ -126,8 +126,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "deviation bars",
-    code: `<CalibrationStrip data={reliability} variant="bars" />`,
-    node: <CalibrationStrip data={BINS} variant="bars" summary={false} width={220} height={36} />,
+    code: `<CalibrationStrip data={reliability} mode="bars" />`,
+    node: <CalibrationStrip data={BINS} mode="bars" summary={false} width={220} height={36} />,
   },
 ];
 

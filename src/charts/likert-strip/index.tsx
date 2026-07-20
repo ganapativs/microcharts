@@ -1,5 +1,5 @@
-// <LikertStrip> — does the response lean agree or disagree (,
-// S2-ordinal diverging). The center line is the question; everything else is
+// <LikertStrip> — does the response lean agree or disagree (S2-ordinal
+// diverging). The center line is the question; everything else is
 // the answer. Static, hook-free, RSC-safe. Neutral is NEVER hidden: `omit`
 // removes it from the bar but the labels/summary always carry it.
 import type { CSSProperties, ReactNode } from "react";
@@ -129,6 +129,11 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Seat the BAR, not the box: the center line runs the full height and the
+      // end labels ride the mid-line, so the frame overstates the mark. A
+      // diverging strip is symmetric about that mid-line with no floor, so it
+      // centres on the cap band.
+      seat={{ mode: "center", top: midY - barH / 2, bottom: midY + barH / 2 }}
       className={className ? `mc-likert ${className}` : "mc-likert"}
       style={rootStyle}
     >

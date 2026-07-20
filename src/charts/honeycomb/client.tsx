@@ -5,7 +5,13 @@
 // Enter / Space selects a cell (onSelect). Composes the static component.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
@@ -187,9 +193,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-honeycomb-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       {...bind}
       onPointerEnter={() => setHover(true)}
       onPointerLeave={() => {
@@ -204,7 +208,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
     >
       <StaticHoneycomb
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         value={value}
         total={total}
         rows={rows}

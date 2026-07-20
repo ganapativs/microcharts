@@ -23,6 +23,20 @@ describe("interactive <Dumbbell>", () => {
     await expect.poll(() => live.textContent).toBe("From 48 to 68, up 42%.");
   });
 
+  it("a pair with a non-finite endpoint announces no data without throwing", async () => {
+    const gappy = [
+      { label: "Paris", from: 50, to: 55 },
+      { label: "Berlin", from: 48, to: Number.NaN },
+    ];
+    const screen = await render(<Dumbbell data={gappy} title="Bands" />);
+    const wrap = screen.container.querySelector(".mc-dumbbell-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowDown");
+    key(wrap, "ArrowDown"); // Berlin: NaN endpoint
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toBe("No data.");
+  });
+
   it("onActive reports the focused datum (row index + `to` value); null on clear", async () => {
     const seen: unknown[] = [];
     const screen = await render(<Dumbbell data={DATA} onActive={(d) => seen.push(d)} />);

@@ -1,5 +1,5 @@
-// <TreeRings> — how growth accumulated, period over period (, S1,
-// flagship). Radial ring THICKNESS ∝ per-period value, oldest at the centre. The
+// <TreeRings> — how growth accumulated, period over period (S1, flagship).
+// Radial ring THICKNESS ∝ per-period value, oldest at the centre. The
 // channel is thickness, never area (equal thickness at a larger radius spans more
 // area — the ring illusion). Static, hook-free, RSC-safe.
 //
@@ -43,6 +43,25 @@ export interface TreeRingsProps {
 
 const PAD = 1;
 
+/**
+ * The static's viewBox width: the disc plus the right gutter the `label="last"`
+ * readout sits in. Exported because the interactive entry must scale pointer x
+ * by this same total — using bare `size` compresses the pointer space and
+ * mis-resolves the radial ring lookup around the disc's centre.
+ */
+export function treeRingsWidth(opts: {
+  data: readonly number[];
+  size: number;
+  label: "none" | "last";
+  fontSize?: number | undefined;
+  fmt: (n: number) => string;
+}): number {
+  const last = opts.data[opts.data.length - 1];
+  if (opts.label !== "last" || !isFiniteValue(last)) return opts.size;
+  const font = opts.fontSize ?? labelFont(opts.size);
+  return opts.size + Math.ceil(`${opts.fmt(last)}`.length * 0.62 * font + 5);
+}
+
 export function treeRingsSummary(
   data: readonly number[],
   opts: {
@@ -55,16 +74,22 @@ export function treeRingsSummary(
 ): string {
   const { unit = "periods", periodWord = "period", strings = EN_TREE, format, locale } = opts;
   const fmt = makeFormatter(format, locale);
-  if (data.length === 0) return strings.noData;
-  const last = data[data.length - 1]!;
-  let maxI = 0;
-  data.forEach((v, i) => {
-    if (v > data[maxI]!) maxI = i;
-  });
+  // A period with no value grows no ring, so it is neither the latest nor the
+  // biggest. "Latest" is the last MEASURED period — the same reading
+  // `seriesStats.last` gives every series chart. No finite period → `noData`.
+  let maxI = -1;
+  let lastI = -1;
+  for (let i = 0; i < data.length; i++) {
+    const v = data[i];
+    if (!isFiniteValue(v)) continue;
+    lastI = i;
+    if (maxI < 0 || v > data[maxI]!) maxI = i;
+  }
+  if (maxI < 0 || lastI < 0) return strings.noData;
   return strings.treeRings(
     data.length,
     unit,
-    fmt(last),
+    fmt(data[lastI]!),
     fmt(data[maxI]!),
     `${periodWord} ${maxI + 1}`,
   );
@@ -105,7 +130,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
   // the last-value label sits in a gutter to the RIGHT of the disc (over the
   // concentric rings it would collide), so it needs a wider viewBox
   const showLabel = label === "last" && isFiniteValue(last);
-  const gutter = showLabel ? Math.ceil(`${fmt(last as number)}`.length * 0.62 * fontSize + 5) : 0;
+  const gutter = treeRingsWidth({ data, size, label, fontSize, fmt }) - size;
 
   // SSR hot path (rings="stroke", the default): up to 24 boundary circles all
   // share the same muted style, so they merge into one path — one node instead
@@ -123,6 +148,14 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Concentric rings about one centre — symmetric, no floor — so the disc
+      // centres on the cap band. `maxR` is the outermost radius the disc may
+      // ever reach, so the seat holds however few periods the data fills.
+      seat={{
+        mode: "center",
+        top: geo.center.cy - geo.maxR,
+        bottom: geo.center.cy + geo.maxR,
+      }}
       className={className ? `mc-tree ${className}` : "mc-tree"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
@@ -161,7 +194,6 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
               />
             ) : null,
           ]}
-      {/* centre dot */}
       <circle cx={geo.center.cx} cy={geo.center.cy} r={geo.r0 * 0.5} data-mc-ink="point" />
       {showLabel ? (
         <text

@@ -34,8 +34,8 @@ export function lastFinite(values: readonly Value[]): number | undefined {
 /**
  * Reduces a series to its summary stats, ignoring null/NaN/±Infinity. Returns
  * null when no finite value exists (empty / all-null) — the documented
- * degenerate case. Indices point back into
- * the original array so marks land on the right x position even with gaps.
+ * degenerate case. Indices point back into the original array so marks land on
+ * the right x position even with gaps.
  */
 export function seriesStats(values: readonly Value[]): SeriesStats | null {
   let count = 0;

@@ -7,7 +7,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-quantile-dots.js";
 import { quantileDotsGeometry, type QuantileDotsGeometry, type ThresholdSide } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -79,7 +79,14 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
   const hasThreshold = threshold !== undefined && Number.isFinite(threshold);
 
   const probe = quantileDotsGeometry({ width, height, data, count, threshold, side, domain });
-  const showLabel = label === "count" && hasThreshold && probe != null;
+  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
+  // box a line of text cannot be seated inside the plot at all. The readout
+  // DROPS rather than spilling past the viewBox, and because the gutter is
+  // derived from it the reserved space goes with it — the plot keeps its own
+  // width and simply stops paying for text it no longer draws. Pure arithmetic:
+  // the static path may never measure text.
+  const showLabel =
+    label === "count" && hasThreshold && probe != null && labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? `${probe!.past} in ${probe!.count}` : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
@@ -124,6 +131,11 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The one floor in this set: dots stack UP from a shared baseline, so the
+      // bottom row's rim is a real encoding floor and stands on the text
+      // baseline like a bar. It's the padded frame, not the tallest column —
+      // stack height is data, and seating it would bob the chart as odds shift.
+      seat={{ mode: "floor", bottom: height - geo.pad }}
       className={cls}
       style={rootStyle}
     >
@@ -132,7 +144,6 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
       {geo.dots.map((d, i) =>
         d.past ? null : <circle key={i} cx={d.x} cy={d.y} r={d.r} data-mc-ink="neutral" />,
       )}
-      {/* threshold — the decision line */}
       {geo.threshold ? (
         <line
           x1={geo.threshold.x}

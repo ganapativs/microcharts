@@ -171,10 +171,12 @@ describe("containment", () => {
     const fontSize = Number(text.getAttribute("fontSize") ?? text.getAttribute("font-size"));
     const estimated = text.textContent!.length * fontSize * 0.62;
     expect(x + estimated).toBeLessThanOrEqual(80);
-    // label y is clamped so ascenders/descenders stay inside too
+    // label y is clamped so the glyph box stays inside too. `dominant-baseline:
+    // central` straddles y by HALF a font each way — the same 0.5 model
+    // `labelFitsY` and the craft audit use, so this agrees with the gate.
     const y = Number(text.getAttribute("y"));
-    expect(y - fontSize * 0.55).toBeGreaterThanOrEqual(0);
-    expect(y + fontSize * 0.55).toBeLessThanOrEqual(20);
+    expect(y - fontSize * 0.5).toBeGreaterThanOrEqual(0);
+    expect(y + fontSize * 0.5).toBeLessThanOrEqual(20);
   });
 
   it("minmax labels + estimated extents stay inside the viewBox", () => {
@@ -206,5 +208,25 @@ describe("containment", () => {
       expect(Number(c.getAttribute("cx"))).toBeLessThanOrEqual(60);
       expect(Number(c.getAttribute("cy"))).toBeLessThanOrEqual(16);
     }
+  });
+});
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox — the reserved gutter
+// goes with it, and the line still renders.
+describe("Sparkline degradation", () => {
+  it("the endpoint readout drops below its own font, the line still draws", () => {
+    const big = render(<Sparkline data={D} label="last" width={220} height={32} />).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    // `labelMetrics` floors the figure at 6 units on a short box, so a 5-unit
+    // box cannot seat it at all.
+    const small = render(<Sparkline data={D} label="last" width={44} height={5} />).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelector("path[data-mc-ink='data']")).not.toBeNull();
+    // the gutter went with the label: the line reaches the full width
+    const d = small.querySelector("path[data-mc-ink='data']")!.getAttribute("d")!;
+    const xs = [...d.matchAll(/[ML](-?[\d.]+)/g)].map((m) => Number(m[1]));
+    expect(Math.max(...xs)).toBeGreaterThan(40);
   });
 });

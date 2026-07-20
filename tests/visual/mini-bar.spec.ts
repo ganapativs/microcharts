@@ -42,7 +42,7 @@ function gallery(): string {
 
   const variants = [
     svg({ data: MIX, title: "data order" }),
-    svg({ data: MIX, sort: "desc", title: "ranked" }),
+    svg({ data: MIX, order: "desc", title: "ranked" }),
     svg({ data: MIX, highlight: "South", title: "highlight" }),
     svg({ data: MIX, orientation: "horizontal", width: 40, height: 24, title: "horizontal" }),
     svg({ data: SIGNED, positive: "up", title: "signed" }),

@@ -8,7 +8,13 @@
 // presents it as data.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";
@@ -209,14 +215,12 @@ export function Constellation(props: InteractiveConstellationProps): React.React
     <span
       ref={hostRef}
       {...wrap("mc-constellation-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       {...bind}
     >
       <StaticConstellation
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         connect={connect}
         domain={domain}

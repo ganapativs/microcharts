@@ -4,7 +4,7 @@
 // through a polite region, throttled to ≥1 s so a streaming value never spams.
 // Wrapper focus only (one value). Composes the static component.
 import { useEffect, useRef, useState } from "react";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -86,9 +86,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-fillword-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -99,7 +97,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
     >
       <StaticFillWord
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         word={word}
         value={value}
         mode={mode}

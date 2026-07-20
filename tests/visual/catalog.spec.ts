@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-// The BUILT artifacts — visual baselines double as dist smoke tests (plan/09).
+// The BUILT artifacts — visual baselines double as dist smoke tests.
 import { SparkBar } from "../../dist/charts/sparkbar/index.js";
 import { Delta } from "../../dist/charts/delta/index.js";
 import { Bullet } from "../../dist/charts/bullet/index.js";

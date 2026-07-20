@@ -11,10 +11,16 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { computeFive, microBoxGeometry } from "./geometry.js";
+import { computeFive, microBoxDots, microBoxGeometry } from "./geometry.js";
 import { MicroBox as StaticMicroBox, microBoxSummary, type MicroBoxProps } from "./index.js";
 
 const STOPS = ["min", "q1", "median", "q3", "max"] as const;
@@ -67,29 +73,32 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
   useEntrance(hostRef, "settle", animate, { selector: BOX_SELECTOR });
 
   const resolved = useMemo(() => computeFive(data, stats), [data, stats]);
-  const geo = useMemo(
-    () =>
-      resolved
-        ? microBoxGeometry({
-            width,
-            height,
-            five: resolved.five,
-            raw: resolved.raw,
-            whiskers,
-            domain,
-          })
-        : null,
-    [resolved, width, height, whiskers, domain],
-  );
+  // Only the stat x's matter here (crosshair, nearest-stat picking, readout).
+  // Below 5 observations the static paints raw dots instead of a box, on a
+  // different domain — hit-test the scale that is actually on screen.
+  const statX = useMemo(() => {
+    if (!resolved) return null;
+    if (stats === undefined && resolved.raw.length < 5) {
+      return microBoxDots({ raw: resolved.raw, width, five: resolved.five, domain }).statX;
+    }
+    return microBoxGeometry({
+      width,
+      height,
+      five: resolved.five,
+      raw: resolved.raw,
+      whiskers,
+      domain,
+    }).statX;
+  }, [resolved, stats, width, height, whiskers, domain]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   const locate = useCallback(
     (x: number) => {
-      if (!geo) return null;
+      if (!statX) return null;
       let best = 0;
       let bestDist = Infinity;
       STOPS.forEach((stop, i) => {
-        const dist = Math.abs(geo.statX[stop] - x);
+        const dist = Math.abs(statX[stop] - x);
         if (dist < bestDist) {
           bestDist = dist;
           best = i;
@@ -97,7 +106,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
       });
       return best;
     },
-    [geo],
+    [statX],
   );
 
   const datum = useCallback(
@@ -110,7 +119,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
   );
 
   const { active, selected, bind } = useActivePicker({
-    count: geo ? STOPS.length : 0,
+    count: statX ? STOPS.length : 0,
     width,
     height,
     locate,
@@ -133,12 +142,12 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
 
   const rule = (i: number, pinned: boolean) => {
     const stop = STOPS[i];
-    if (!geo || !stop) return null;
+    if (!statX || !stop) return null;
     return (
       <line
-        x1={geo.statX[stop]}
+        x1={statX[stop]}
         y1={0.5}
-        x2={geo.statX[stop]}
+        x2={statX[stop]}
         y2={height - 0.5}
         stroke="var(--mc-accent)"
         data-mc-w={pinned ? "tick" : "support"}
@@ -153,17 +162,10 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
     shownStop && resolved ? strings.boxStat(shownStop, fmt(resolved.five[shownStop])) : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-box-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-box-live", className, style)} {...named(label)} {...bind}>
       <StaticMicroBox
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         stats={stats}
         whiskers={whiskers}
@@ -181,11 +183,11 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
         {rest.children}
       </StaticMicroBox>
       <LiveRegion>{announced}</LiveRegion>
-      {shownStop && geo && resolved ? (
+      {shownStop && statX && resolved ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(geo.statX[shownStop] / width) * 100}%`,
+            left: `${(statX[shownStop] / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >

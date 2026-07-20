@@ -26,6 +26,22 @@ describe("interactive <CitySkyline>", () => {
     expect(live.textContent).toBe("Web: 28.");
   });
 
+  it("a null-value building announces no data without throwing", async () => {
+    // `value` is typed `number`, but bad data reaches the readout at runtime.
+    const data = [
+      { label: "Platform", value: 46, lit: 0.7 },
+      { label: "Core", value: null as unknown as number },
+      { label: "Web", value: 28 },
+    ];
+    const screen = await render(<CitySkyline data={data} title="Teams" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await userEvent.keyboard("{ArrowRight}"); // Core: null
+    expect(live.textContent).toBe("Core: no data.");
+  });
+
   it("wrapper owns naming; static chart is decorative", async () => {
     const screen = await render(<CitySkyline data={TEAMS} unit="teams" title="Teams" />);
     const wrap = screen.container.querySelector(".mc-skyline-live")!;

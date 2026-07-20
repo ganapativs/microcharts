@@ -93,13 +93,20 @@ export function Seismogram(props: SeismogramProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A trace that flares both ways off a midline has no floor to stand on, so
+      // it centres on the cap band and reads as instrument tape set in the
+      // sentence. The tick band is inset a symmetric half-unit top and bottom, so
+      // its midpoint is the frame's midpoint — the frame gives the same seat for
+      // fewer bytes, and it holds in signed mode too, where the ZERO line moves
+      // but the box the ticks live in does not.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-seismo ${className}` : "mc-seismo"}
       style={style}
     >
       {geo.signed || geo.ticks.length === 0 ? (
         /* zero-reference midline for signed data; for a quiet strip it doubles
-           as the designed empty state — a strip at rest, not a blank hole
-           (§8a.3). Unsigned ticks are centered and imply their own axis. */
+           as the designed empty state — a strip at rest, not a blank hole.
+           Unsigned ticks are centered and imply their own axis. */
         <line
           x1={0}
           y1={geo.baselineY}

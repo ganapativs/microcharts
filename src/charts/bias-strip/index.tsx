@@ -97,6 +97,11 @@ export function BiasStrip(props: BiasStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Pairs hang off the zero-difference line and drift reads either way, so
+      // there is no floor — the scatter centres on the cap band. It must be the
+      // geometry's plot box, not the frame: the caption gutter compresses the
+      // plot from the top, which pushes the zero line below the frame's centre.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-bias ${className}` : "mc-bias"}
       style={rootStyle}
     >

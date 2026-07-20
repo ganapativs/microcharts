@@ -45,7 +45,6 @@ export function musicStaffGeometry(opts: {
   const half = (height - 2 * pad - 2 * ryConst) / (T - 1);
   const posY = (p: number) => round2(bandTop + p * half);
 
-  // the five staff lines
   const staffYs = [0, 1, 2, 3, 4].map((k) => posY(staffOffset + k * 2));
   const topLine = staffOffset;
   const botLine = staffOffset + 8;

@@ -6,7 +6,14 @@
 // — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import { isFiniteValue } from "../../core/types.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { labelFont } from "../../core/labels.js";
@@ -143,22 +150,22 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
   const b = shown !== null ? geo.bubbles[shown] : undefined;
   const shownDatum = shown !== null ? data[shown] : undefined;
   const announced =
-    b && shownDatum && shownDatum.value !== null
-      ? strings.bubbleAt(shownDatum.label, fmt(shownDatum.value))
+    b && shownDatum
+      ? isFiniteValue(shownDatum.value)
+        ? strings.bubbleAt(shownDatum.label, fmt(shownDatum.value))
+        : strings.bubbleEmpty(shownDatum.label)
       : "";
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-bubble-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticBubbleRow
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         align={align}
         label={label}

@@ -136,10 +136,16 @@ proportional wherever the text lands. Alignment is a **baseline seat**, not a fi
 `inline-flex` box whose only child is the SVG, so it takes its baseline from the SVG's bottom edge and the mark stands
 on the text baseline exactly like a glyph. That's typeface-independent — bars sit where letters sit in any font.
 
-Symmetric glyph marks have no bottom edge to stand on, so `mc-inline` centers those on the text instead: `TrendArrow`,
-`StatusDot`, `MoonPhase`, `DicePips`, the radial dials and the other glyph shapes are detected automatically and get
-`vertical-align: middle`. You don't opt in. Two tokens let you nudge the result if a particular typeface needs it —
-`--mc-inline-nudge` for baseline-seated marks and `--mc-glyph-nudge` for centered glyphs.
+Symmetric glyph marks have no bottom edge to stand on, so `mc-inline` centers those on the cap band instead:
+`TrendArrow`, `StatusDot`, `MoonPhase`, `DicePips`, the radial dials and the other glyph shapes read like an icon set in
+running prose. You don't opt in.
+
+Which seat a mark gets isn't guessed from its class name — each chart reports its own plot box, measured in the same
+viewBox units it draws in, and the stylesheet seats the mark from that. So a chart whose padding changes can't drift out
+of alignment, and a chart that changes shape with its props carries the right seat for each: `SparkBar` stands on the
+baseline in bar mode and centers in win-loss, because only one of those has a real floor. Two tokens let you nudge the
+result if a particular typeface needs it — `--mc-inline-nudge` for every mark, and `--mc-glyph-nudge` for centered ones
+only.
 
 <Callout type="info">
   Leave `<Delta>` bare — no `mc-inline` wrapper. It renders as inline text and already owns its own baseline.

@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
-import { FILL, wrap, type MicroDatum } from "../../shared/interactive.js";
+import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_THERMOMETER, type ThermometerStrings } from "../../core/strings-thermometer.js";
@@ -81,9 +81,7 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
     <span
       ref={hostRef}
       {...wrap("mc-thermo-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onPointerEnter={() => setHover(true)}
       onPointerLeave={() => setHover(false)}
       onFocus={() => setHover(true)}
@@ -105,7 +103,7 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
       {hover && readout ? (

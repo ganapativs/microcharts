@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -127,9 +127,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     <span
       ref={wrapRef}
       {...wrap("mc-orbit-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       onPointerEnter={() => setOpen(true)}
       onPointerLeave={() => setOpen(false)}
       onFocus={() => setOpen(true)}
@@ -144,7 +142,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     >
       <StaticOrbitStatus
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         latency={latency}
         rate={rate}
         latencyDomain={latencyDomain}

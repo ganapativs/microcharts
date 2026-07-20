@@ -84,3 +84,17 @@ describe("<NetFlow>", () => {
 seriesEdgeSuite("NetFlow", (data) => (
   <NetFlow data={data.map((v) => ({ in: v as number, out: (v as number) / 2 }))} title="Edge" />
 ));
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("NetFlow degradation", () => {
+  it("the net readout drops under a 7-unit box, both flows still draw", () => {
+    const big = draw(<NetFlow data={SAMPLE} width={240} height={32} />).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(<NetFlow data={SAMPLE} width={48} height={6} />).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+});

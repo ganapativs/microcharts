@@ -17,7 +17,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <ChangePointInteractive
       data={s.preset === "ramp" ? RAMP : ERRORS}
-      max={s.max as number}
+      maxItems={s.maxItems as number}
       means={s.means as boolean}
       label={s.delta ? "delta" : "none"}
       title="Error rate"
@@ -31,7 +31,7 @@ export const playground: PlaygroundSpec = {
     [
       "<ChangePoint",
       "  data={errors}",
-      s.max !== 2 && `  max={${s.max}}`,
+      s.maxItems !== 2 && `  maxItems={${s.maxItems}}`,
       s.means === false && "  means={false}",
       s.delta && '  label="delta"',
       ui.animate && " animate",

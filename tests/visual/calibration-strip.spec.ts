@@ -42,7 +42,7 @@ function gallery(): string {
 
   const variants = [
     svg({ data: BINS, title: "dots (default)" }),
-    svg({ data: BINS, variant: "bars", title: "bars" }),
+    svg({ data: BINS, mode: "bars", title: "bars" }),
     svg({
       data: Array.from({ length: 800 }, (_, i) => ({
         p: ((i * 7) % 100) / 100,

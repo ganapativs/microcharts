@@ -49,10 +49,10 @@ export const entry: ChartEntry = {
       description: "Cumulative reference line % (default 80 — a working reference, not a law).",
     },
     {
-      name: "max",
+      name: "maxItems",
       type: "number",
       required: false,
-      description: "Categories beyond max roll up into Other (default 8, always last).",
+      description: "Categories beyond maxItems roll up into Other (default 8, always last).",
     },
     {
       name: "unit",
@@ -103,14 +103,14 @@ export function Preview() {
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "threshold", label: "threshold", min: 50, max: 95, step: 5, init: 80 },
-    { kind: "segmented", key: "max", label: "max", options: ["4", "6", "8"], init: "8" },
+    { kind: "segmented", key: "maxItems", label: "maxItems", options: ["4", "6", "8"], init: "8" },
     { kind: "segmented", key: "label", label: "label", options: ["none", "count"], init: "count" },
   ],
   render: (s) => (
     <ParetoStrip
       data={CAUSES}
       threshold={s.threshold as number}
-      max={Number(s.max)}
+      maxItems={Number(s.maxItems)}
       unit="causes"
       metric="incidents"
       label={s.label as "count" | "none"}
@@ -124,7 +124,7 @@ export const playground: PlaygroundSpec = {
       "<ParetoStrip",
       "  data={causes}",
       s.threshold !== 80 && `  threshold={${s.threshold}}`,
-      s.max !== "8" && `  max={${s.max}}`,
+      s.maxItems !== "8" && `  maxItems={${s.maxItems}}`,
       s.label !== "count" && `  label="${s.label}"`,
       "/>",
     ]
@@ -137,8 +137,8 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "roll the tail into Other",
-    code: `<ParetoStrip data={causes} max={4} />`,
-    node: <ParetoStrip data={CAUSES} max={4} summary={false} width={180} height={22} />,
+    code: `<ParetoStrip data={causes} maxItems={4} />`,
+    node: <ParetoStrip data={CAUSES} maxItems={4} summary={false} width={180} height={22} />,
   },
   {
     label: "no threshold line",

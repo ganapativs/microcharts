@@ -6,7 +6,13 @@
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FOLDED_BAND } from "../../core/strings-folded-band.js";
@@ -139,14 +145,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
     : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-folded-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-folded-live", className, style)} {...named(label)} {...bind}>
       <StaticFoldedDayBand
         {...rest}
         data={data}
@@ -160,7 +159,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {pinned ? (

@@ -10,10 +10,8 @@ const DEFAULT_OPTIONS: RunOptions = {
   runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] },
 };
 
-export async function runA11y(
-  node: Element | Document,
-  options: RunOptions = {},
-): Promise<AxeResults> {
+/** Local: the only caller is `expectNoA11yViolations` below. */
+async function runA11y(node: Element | Document, options: RunOptions = {}): Promise<AxeResults> {
   return axe.run(node, { ...DEFAULT_OPTIONS, ...options });
 }
 

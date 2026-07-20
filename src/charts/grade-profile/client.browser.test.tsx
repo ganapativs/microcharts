@@ -10,6 +10,16 @@ const TRAIL = [
   { d: 900, elev: 865 },
 ];
 
+// A non-finite elevation drops BOTH segments touching it, leaving a real hole
+// in x: segments run 1→50.5 and 149.5→199 at width 200, with 50.5→149.5 empty.
+const HOLED = [
+  { d: 0, elev: 100 },
+  { d: 200, elev: 120 },
+  { d: 400, elev: NaN },
+  { d: 600, elev: 150 },
+  { d: 800, elev: 160 },
+];
+
 const key = (el: HTMLElement, k: string) =>
   el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
 
@@ -57,6 +67,25 @@ describe("interactive <GradeProfile>", () => {
     await expect
       .poll(() => screen.container.querySelector('line[data-mc-w="tick"]'))
       .not.toBeNull();
+  });
+
+  it("hovering a gap lands on the NEAREST segment, not the last one", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <GradeProfile data={HOLED} width={200} height={40} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-grade-live") as HTMLElement;
+    const r = wrap.getBoundingClientRect();
+    // x ≈ 90: inside the hole, and closer to segment 0's right edge (50.5) than
+    // to segment 1's left edge (149.5).
+    wrap.dispatchEvent(
+      new PointerEvent("pointermove", {
+        bubbles: true,
+        clientX: r.left + r.width * (90 / 200),
+        clientY: r.top + r.height / 2,
+      }),
+    );
+    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 10 });
   });
 
   it("controlled selectedIndex pins the chord without focus", async () => {

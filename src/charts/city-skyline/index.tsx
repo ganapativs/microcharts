@@ -1,5 +1,5 @@
-// <CitySkyline> — how groups compare on size, and how activated each is (
-// #14, structured, flagship). Building HEIGHT (zero-anchored, high precision) is
+// <CitySkyline> — how groups compare on size, and how activated each is
+// (structured, flagship). Building HEIGHT (zero-anchored, high precision) is
 // the primary read; the lit-window FRACTION is a secondary low-precision channel
 // ("mostly lit / half lit / dark", not a number). No roofline/antenna/width
 // variation — height, roof, and ground are constants. Static, hook-free, RSC-safe.
@@ -10,6 +10,7 @@ import { scaleLinear } from "../../core/scale.js";
 import { EN_SKYLINE, type SkylineStrings } from "../../core/strings-skyline.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
+import { isFiniteValue } from "../../core/types.js";
 import { citySkylineGeometry } from "./geometry.js";
 
 export interface SkylineDatum {
@@ -56,10 +57,16 @@ export function citySkylineSummary(
   } = {},
 ): string {
   const { unit = "groups", strings = EN_SKYLINE, format, locale } = opts;
-  if (data.length === 0) return strings.noData;
+  // A group with no value has no building, so it can never be the tallest; with
+  // none measured there is no skyline to describe. The count still names every
+  // group — each keeps its slot on the ground line.
+  let tall: SkylineDatum | null = null;
+  for (const d of data) {
+    if (!isFiniteValue(d.value)) continue;
+    if (tall === null || d.value > tall.value) tall = d;
+  }
+  if (tall === null) return strings.noData;
   const fmt = makeFormatter(format, locale);
-  let tall = data[0]!;
-  for (const d of data) if (d.value > tall.value) tall = d;
   return strings.citySkyline(data.length, unit, tall.label, fmt(tall.value));
 }
 
@@ -132,6 +139,10 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Buildings stand on the ground line, so that — not the viewBox edge — is
+      // the floor: `labels` opens a gutter below the ground for the category
+      // text, and seating the box bottom would push the whole skyline up by it.
+      seat={{ mode: "floor", bottom: groundY }}
       className={className ? `mc-skyline ${className}` : "mc-skyline"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
@@ -170,18 +181,23 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
         ) : null,
       )}
       {label === "value"
-        ? geo.buildings.map((b) => (
-            <text
-              key={`v${b.index}`}
-              x={b.x + b.w / 2}
-              y={b.y - 2}
-              fontSize={fontSize}
-              textAnchor="middle"
-              data-mc-ink="label"
-            >
-              {fmt(b.value)}
-            </text>
-          ))
+        ? // The geometry floors an unmeasured group to a zero-height building so
+          // the row keeps its slot; printing that 0 would state a measurement
+          // nobody made, so the numeral is omitted instead (empty ≠ zero).
+          geo.buildings.map((b) =>
+            isFiniteValue(data[b.index]?.value) ? (
+              <text
+                key={`v${b.index}`}
+                x={b.x + b.w / 2}
+                y={b.y - 2}
+                fontSize={fontSize}
+                textAnchor="middle"
+                data-mc-ink="label"
+              >
+                {fmt(b.value)}
+              </text>
+            ) : null,
+          )
         : null}
       {labels
         ? geo.buildings.map((b) => {

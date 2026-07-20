@@ -40,7 +40,8 @@ export const SHOWCASE: ShowcaseApp[] = [
   {
     slug: "pulse",
     name: "Pulse",
-    blurb: "Product analytics rendered in Server Components. Static routes ship ~137 B of JS.",
+    blurb:
+      "Product analytics rendered in Server Components. Static routes ship no chart JS at all.",
     tag: "RSC · zero client JS",
     url: "https://microcharts-pulse.pages.dev",
     host: "microcharts-pulse.pages.dev",

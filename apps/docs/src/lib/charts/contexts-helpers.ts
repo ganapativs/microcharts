@@ -1,25 +1,5 @@
 /** Shared generators for Four homes placement rows — distinct data per label/meta. */
 
-export function parseContextMeta(meta: string): number {
-  const s = meta.replace(/−/g, "-").replace(/,/g, "").trim();
-  if (s.endsWith("%")) return parseFloat(s) / 100;
-  const m = s.match(/-?\d+(?:\.\d+)?/);
-  if (!m) return 1;
-  let v = parseFloat(m[0]!);
-  if (/k/i.test(s)) v *= 1_000;
-  if (/m/i.test(s) && !/ms/i.test(s)) v *= 1_000_000;
-  return v;
-}
-
-export function trendSeries(end: number, len = 8): number[] {
-  if (len < 2) return [end];
-  const start = end <= 1 ? end * 0.82 : end * 0.72;
-  return Array.from({ length: len }, (_, i) => {
-    const v = start + ((end - start) * i) / (len - 1);
-    return end <= 1 ? Math.round(v * 100) / 100 : Math.round(v);
-  });
-}
-
 export function budgetRemainingCurve(remaining: number, steps = 12): number[] {
   return Array.from(
     { length: steps },
@@ -75,12 +55,4 @@ export function biasPairsFromDrift(drift: number, n = 20) {
     a: i + drift + (i % 3) * 0.3 - 0.4,
     b: i,
   }));
-}
-
-export function scaleSeries(base: readonly number[], target: number): number[] {
-  if (!base.length) return trendSeries(target);
-  const last = base[base.length - 1]!;
-  if (!last) return [...base];
-  const ratio = target / last;
-  return base.map((v) => (v == null ? v : Math.round(v * ratio * 100) / 100)) as number[];
 }

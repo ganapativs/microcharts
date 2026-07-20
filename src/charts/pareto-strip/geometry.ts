@@ -21,6 +21,13 @@ interface ParetoBar {
 
 export interface ParetoGeometry {
   bars: ParetoBar[];
+  /**
+   * Indices of the bars that actually paint (height > 0). A zero-magnitude
+   * category — or every category, on an all-zero dataset — draws nothing, so
+   * this is also the set of navigable units: hover must not outline a bar the
+   * reader cannot see.
+   */
+  painted: number[];
   line: { d: string };
   thresholdY: number | null;
   /** First bar whose cumulative share ≥ threshold. */
@@ -42,7 +49,7 @@ export function paretoGeometry(opts: {
   height: number;
   data: readonly { label: string; value: number }[];
   threshold?: number | false | undefined;
-  max?: number | undefined;
+  maxItems?: number | undefined;
   pad?: number | undefined;
   gutterCh?: number | undefined;
   fontSize?: number | undefined;
@@ -56,16 +63,16 @@ export function paretoGeometry(opts: {
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
-  const max = Math.max(1, Math.min(12, Math.round(opts.max ?? 8)));
+  const cap = Math.max(1, Math.min(12, Math.round(opts.maxItems ?? 8)));
   const threshold = opts.threshold === false ? null : (opts.threshold ?? 80);
 
   // stable descending sort (input order breaks ties)
   const sorted = valid.map((d, i) => ({ ...d, i })).sort((a, b) => b.value - a.value || a.i - b.i);
   const nOriginal = sorted.length;
 
-  // roll everything beyond `max` into Other (always last, never re-ranked)
-  const head = sorted.slice(0, max);
-  const tail = sorted.slice(max);
+  // roll everything beyond `maxItems` into Other (always last, never re-ranked)
+  const head = sorted.slice(0, cap);
+  const tail = sorted.slice(cap);
   const otherValue = tail.reduce((s, d) => s + d.value, 0);
   const rows: { label: string; value: number; isOther: boolean }[] = head.map((d) => ({
     label: d.label,
@@ -127,6 +134,10 @@ export function paretoGeometry(opts: {
       vital: crossingIndex >= 0 && i <= crossingIndex && !r.isOther,
     };
   });
+  const painted: number[] = [];
+  bars.forEach((b, i) => {
+    if (b.height > 0) painted.push(i);
+  });
   const crossing =
     crossingIndex >= 0 ? { index: crossingIndex, x: colCenter(crossingIndex) } : null;
 
@@ -139,6 +150,7 @@ export function paretoGeometry(opts: {
 
   return {
     bars,
+    painted,
     line,
     thresholdY: thFrac === null ? null : round2(baseline - thFrac * plotH),
     crossing,

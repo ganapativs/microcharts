@@ -66,6 +66,34 @@ describe("interactive <ParetoStrip>", () => {
       .not.toBeNull();
   });
 
+  it("an all-zero dataset paints no bars, so there is nothing to hover", async () => {
+    // Every bar has height 0 — the strip renders empty. Roving it would outline
+    // and caption a mark the reader cannot see.
+    const ZEROS = [
+      { label: "A", value: 0 },
+      { label: "B", value: 0 },
+    ];
+    const seen: unknown[] = [];
+    const screen = await render(
+      <ParetoStrip data={ZEROS} width={200} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-pareto-strip-live") as HTMLElement;
+    expect(wrap.querySelectorAll("svg rect").length).toBe(0);
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    const r = wrap.getBoundingClientRect();
+    wrap.dispatchEvent(
+      new PointerEvent("pointermove", {
+        bubbles: true,
+        clientX: r.left + r.width / 2,
+        clientY: r.top + r.height / 2,
+      }),
+    );
+    expect(seen).toEqual([]);
+    expect(wrap.querySelector(".mc-spark-readout")).toBeNull();
+    expect(wrap.querySelector('rect[data-mc-w="support"]')).toBeNull();
+  });
+
   it("controlled selectedIndex pins the outline without focus", async () => {
     const screen = await render(<ParetoStrip data={CAUSES} width={200} selectedIndex={1} />);
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();

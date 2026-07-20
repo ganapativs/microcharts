@@ -7,7 +7,13 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue } from "../../core/types.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { waterfallGeometry } from "./geometry.js";
@@ -27,7 +33,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
   const {
     data,
     start = 0,
-    total = true,
+    totalBar = true,
     domain,
     width = 70,
     height = 18,
@@ -63,14 +69,14 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         height,
         deltas: data.map((d) => d.value),
         start,
-        total,
+        total: totalBar,
         domain,
       }),
-    [width, height, data, start, total, domain],
+    [width, height, data, start, totalBar, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   /** Navigable units = COLUMNS: 0..n-1 = steps (1:1 with `data`), n = the total bar. */
-  const cols = data.length + (total ? 1 : 0);
+  const cols = data.length + (totalBar ? 1 : 0);
   const endLevel = geo.levels.length > 0 ? geo.levels[geo.levels.length - 1]! : start;
 
   // Pointer (viewBox space) → column by x band. `y` is ignored: with
@@ -118,21 +124,29 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         : waterfallSummary(data, start, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const box = (i: number, pinned: boolean) => (
-    <rect
-      x={i * geo.pitch - 0.5}
-      y={-0.5}
-      width={(geo.bars[0]?.w ?? geo.pitch - 1) + 1}
-      height={height + 1}
-      fill="none"
-      stroke="var(--mc-accent)"
-      data-mc-w={pinned ? "tick" : "support"}
-      vectorEffect="non-scaling-stroke"
-    />
-  );
+  // Built from the column this box names — its own painted rect — never from the
+  // band (`i * pitch`, width `bars[0].w`): the band's trailing gap would land
+  // entirely on one side, and the last column's bar is clipped to the box edge,
+  // so bar 0's width is not every column's width.
+  const box = (i: number, pinned: boolean) => {
+    const col = geo.bars[i] ?? geo.totalBar;
+    if (!col) return null;
+    return (
+      <rect
+        x={col.x - 0.5}
+        y={-0.5}
+        width={col.w + 1}
+        height={height + 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
   const shown = active ?? selected;
-  const isTotal = shown !== null && total && shown === data.length;
+  const isTotal = shown !== null && totalBar && shown === data.length;
   const step = shown !== null && !isTotal ? data[shown] : undefined;
   const announced = isTotal
     ? strings.waterfallTotal(fmt(endLevel))
@@ -150,16 +164,14 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-waterfall-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       {...bind}
     >
       <StaticWaterfall
         {...rest}
         data={data}
         start={start}
-        total={total}
+        totalBar={totalBar}
         domain={domain}
         width={width}
         height={height}
@@ -167,7 +179,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus box is transient. */}
         {selected !== null && selected !== active ? box(selected, true) : null}

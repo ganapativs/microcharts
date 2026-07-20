@@ -7,11 +7,17 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { annulusSector } from "../../core/arc.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
-import { polarClockGeometry } from "./geometry.js";
+import { polarClockGeometry, polarStart } from "./geometry.js";
 import {
   PolarClock as StaticPolarClock,
   polarClockSummary,
@@ -49,7 +55,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     inner = 0.35,
     start = 0,
     mode = "length",
-    formatSegment,
+    segmentFormat,
     size = 24,
     format,
     locale,
@@ -79,23 +85,26 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     geo.size + (rest.label === "max" ? Math.ceil((rest.fontSize ?? labelFont(size)) * 1.35) : 0);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const seg = useCallback(
-    (i: number) => (formatSegment ? formatSegment(i, n) : defaultSegmentLabel(strings, i, n)),
-    [formatSegment, n, strings],
+    (i: number) => (segmentFormat ? segmentFormat(i, n) : defaultSegmentLabel(strings, i, n)),
+    [segmentFormat, n, strings],
   );
 
   // Pointer (viewBox space) → data index by cursor angle. The clock occupies the
-  // top square; the peak-label gutter (if any) lives below it.
+  // top square; the peak-label gutter (if any) lives below it. Both the hit
+  // origin and the rotation come from geometry, so the inverse lands on the
+  // segment the reader is actually pointing at.
+  const start0 = polarStart(start, n);
   const locate = useCallback(
     (x: number, y: number) => {
       if (n === 0) return null;
-      const dx = x - geo.size / 2;
-      const dy = y - geo.size / 2;
+      const dx = x - geo.guide.cx;
+      const dy = y - geo.guide.cy;
       let ang = Math.atan2(dx, -dy); // 0 at 12 o'clock, clockwise
       if (ang < 0) ang += TAU;
       const pos = Math.min(n - 1, Math.floor((ang / TAU) * n));
-      return (((pos + start) % n) + n) % n;
+      return (pos + start0) % n;
     },
-    [geo, n, start],
+    [geo, n, start0],
   );
 
   // Circular roving: ←/→ wrap around the cycle (matches the clock's topology).
@@ -148,13 +157,13 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : polarClockSummary(data, { formatSegment, strings, format, locale });
+        : polarClockSummary(data, { segmentFormat, strings, format, locale });
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const sector = (i: number) => {
     const s = geo.segments[i];
     if (!s || s.isNull) return null;
-    return annulusSector(geo.size / 2, geo.size / 2, s.rOuter, geo.guide.r, s.a0, s.a1);
+    return annulusSector(geo.guide.cx, geo.guide.cy, s.rOuter, geo.guide.r, s.a0, s.a1);
   };
 
   const shown = active ?? selected;
@@ -174,23 +183,16 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
   const activePath = active !== null ? sector(active) : null;
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-polar-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-polar-live", className, style)} {...named(label)} {...bind}>
       <StaticPolarClock
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         now={now}
         inner={inner}
         start={start}
         mode={mode}
-        formatSegment={formatSegment}
+        segmentFormat={segmentFormat}
         size={size}
         format={format}
         locale={locale}

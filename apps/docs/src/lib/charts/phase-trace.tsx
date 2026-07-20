@@ -41,7 +41,7 @@ export const entry: ChartEntry = {
       description: "Fix the x-axis range (default: the data's x-extent).",
     },
     {
-      name: "yDomain",
+      name: "domain",
       type: "[number, number]",
       required: false,
       description: "Fix the y-axis range (default: the data's y-extent).",

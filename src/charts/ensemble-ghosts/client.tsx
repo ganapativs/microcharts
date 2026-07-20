@@ -13,7 +13,14 @@
 // plays the loop instead. Everything else in `bind` is wired.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import { isFiniteValue } from "../../core/types.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { usePrefersReducedMotion } from "../../shared/motion.js";
@@ -104,9 +111,12 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
   const say = useCallback(
     (member: number): string => {
       const end = endOf(member);
-      return geo === null || end === null
-        ? ""
-        : strings.ensembleAt(member + 1, geo.memberCount, fmt(end));
+      if (geo === null) return "";
+      // A member's terminal value may be absent or non-finite; never format it —
+      // `end === null` alone would still leak a trailing NaN/±Infinity.
+      return isFiniteValue(end)
+        ? strings.ensembleAt(member + 1, geo.memberCount, fmt(end))
+        : strings.ensembleEmpty(member + 1, geo.memberCount);
     },
     [endOf, geo, strings, fmt],
   );
@@ -238,9 +248,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     <span
       ref={hostRef}
       {...wrap("mc-ensemble-ghosts-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       onPointerEnter={startLoop}
       onFocus={startLoop}
       onPointerDown={bind.onPointerDown}
@@ -268,7 +276,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     >
       <StaticEnsembleGhosts
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         ghosts={ghosts}
         emphasis={emphasis}

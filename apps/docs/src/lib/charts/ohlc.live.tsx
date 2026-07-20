@@ -17,7 +17,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <OhlcInteractive
       data={PERIODS}
-      variant={s.variant as "candle" | "bars"}
+      mode={s.mode as "candle" | "bars"}
       label={s.label as "last" | "none"}
       maxPeriods={s.maxPeriods as number}
       animate={ui.animate}
@@ -30,7 +30,7 @@ export const playground: PlaygroundSpec = {
     [
       "<Ohlc",
       "  data={sessions}",
-      s.variant !== "candle" && `  variant="${s.variant}"`,
+      s.mode !== "candle" && `  mode="${s.mode}"`,
       s.label !== "none" && `  label="${s.label}"`,
       s.maxPeriods !== 20 && `  maxPeriods={${s.maxPeriods}}`,
       ui.animate && " animate",

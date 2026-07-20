@@ -6,7 +6,13 @@
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_GRADE_PROFILE } from "../../core/strings-grade-profile.js";
@@ -84,9 +90,19 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
     (x: number) => {
       const segs = geo.segments;
       if (segs.length === 0) return null;
-      const i = segs.findIndex((s) => x >= s.x0 && x <= s.x1);
-      if (i >= 0) return i;
-      return x <= segs[0]!.x0 ? 0 : segs.length - 1;
+      // Nearest by gap, not by containment: the segments do NOT tile the width —
+      // a non-finite or non-monotone pair leaves a real hole — so a containment
+      // miss must resolve to the closest neighbour, never to the last segment.
+      let best = 0;
+      let bestD = Infinity;
+      segs.forEach((s, i) => {
+        const d = x < s.x0 ? s.x0 - x : x > s.x1 ? x - s.x1 : 0;
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+      });
+      return best;
     },
     [geo],
   );
@@ -145,9 +161,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
     <span
       ref={hostRef}
       {...wrap("mc-grade-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticGradeProfile
@@ -161,7 +175,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus chord is transient. */}
         {selected !== null && selected !== active ? chord(selected, true) : null}

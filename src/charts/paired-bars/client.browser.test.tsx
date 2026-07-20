@@ -49,6 +49,48 @@ describe("interactive <PairedBars>", () => {
     await expect.poll(() => wrap.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
 
+  // Regression: the chip's `left` was `shownPos + bandW / 2`, and `pitch` is a
+  // length on the CATEGORY axis — which is y when horizontal. Roving rows slid
+  // the chip sideways across a chart whose rows all share one x.
+  it("horizontal orientation keeps the readout over the chart, not drifting by row", async () => {
+    const four = [
+      { label: "A", value: 10, ref: 12 },
+      { label: "B", value: 20, ref: 18 },
+      { label: "C", value: 30, ref: 33 },
+      { label: "D", value: 40, ref: 36 },
+    ];
+    const screen = await render(<PairedBars data={four} orientation="horizontal" />);
+    const wrap = screen.container.querySelector(".mc-paired-live") as HTMLElement;
+    wrap.focus();
+    const leftAfter = async (k: string) => {
+      key(wrap, k);
+      await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
+      return (wrap.querySelector(".mc-spark-readout") as HTMLElement).style.left;
+    };
+    const lefts = [
+      await leftAfter("Home"),
+      await leftAfter("ArrowDown"),
+      await leftAfter("ArrowDown"),
+      await leftAfter("ArrowDown"),
+    ];
+    // every row reports at the same x — and that x is the chart's midline
+    expect(new Set(lefts).size).toBe(1);
+    expect(lefts[0]).toBe("50%");
+  });
+
+  it("vertical orientation still tracks the chip to the pair's band", async () => {
+    const screen = await render(<PairedBars data={DATA} />);
+    const wrap = screen.container.querySelector(".mc-paired-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
+    const first = (wrap.querySelector(".mc-spark-readout") as HTMLElement).style.left;
+    key(wrap, "ArrowRight");
+    await expect
+      .poll(() => (wrap.querySelector(".mc-spark-readout") as HTMLElement).style.left)
+      .not.toBe(first);
+  });
+
   it("controlled selectedIndex pins the outline without focus", async () => {
     const screen = await render(<PairedBars data={DATA} selectedIndex={1} />);
     const wrap = screen.container.querySelector(".mc-paired-live") as HTMLElement;

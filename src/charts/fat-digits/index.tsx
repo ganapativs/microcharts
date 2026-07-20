@@ -1,7 +1,8 @@
-// <FatDigits> — which numbers in a dense column are big, before you read them
-// The numeral is the exact value; font-WEIGHT is a redundant
-// preattentive tier (5 or 3 ordinal steps). Adapted from FatFonts to discrete
-// weights on the inherited font (zero-dep — ). Static, hook-free, RSC-safe.
+// <FatDigits> — which numbers in a dense column are big, before you read them.
+// The numeral is the exact value; font-WEIGHT is a redundant preattentive tier
+// (5 or 3 ordinal steps). Adapted from FatFonts to discrete weights on the
+// inherited font, because a custom font would break zero-dep. Static,
+// hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";
@@ -81,6 +82,13 @@ export function FatDigits(props: FatDigitsProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The mark is a numeral, so it has to land where a numeral lands. The box
+      // is 1.4× the font size around a single run centred at its middle, so
+      // unseated the digits float a third of a line above the baseline. Centring
+      // puts the run's own optical middle on the cap band, which is where type of
+      // the same size sits. One centred run makes the box symmetric by
+      // construction, so the frame is the plot box.
+      seat={{ mode: "center", top: 0, bottom: geo.height }}
       className={className ? `mc-fat ${className}` : "mc-fat"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >

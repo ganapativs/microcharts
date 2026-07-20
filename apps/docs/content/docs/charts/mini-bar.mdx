@@ -6,7 +6,7 @@ description:
 ---
 
 MiniBar answers "which category is biggest, and by roughly how much?". Bars are always zero-anchored, and the data's own
-order is the default truth — weekday order or funnel order carries meaning that ranking would destroy, so `sort` is
+order is the default truth — weekday order or funnel order carries meaning that ranking would destroy, so `order` is
 explicit, never silent.
 
 <LiveDemo label="MiniBar" sizeOf="mini-bar">
@@ -46,7 +46,7 @@ explicit, never silent.
   label="ranked vs highlight"
   dataOf="mini-bar"
   code={`// reordering changes what the chart SAYS, so it's a data prop
-<MiniBar data={regions} sort="desc" />
+<MiniBar data={regions} order="desc" />
 <MiniBar data={regions} highlight="South" />`}
 >
   <span className="inline-flex gap-6">
@@ -57,7 +57,7 @@ explicit, never silent.
         { label: "South", value: 620 },
         { label: "North", value: 120 },
       ]}
-      sort="desc"
+      order="desc"
       title="Ranked"
       width={120}
       height={36}

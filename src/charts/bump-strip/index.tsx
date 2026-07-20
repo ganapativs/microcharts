@@ -98,6 +98,11 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Rank space has no floor — the bottom band is the worst rank, not a zero,
+      // and #1 is pinned to the top — so the strip centres like a lane set. The
+      // bands inset symmetrically (1.5 either end), so the viewBox frame lands on
+      // the same midpoint the band geometry would.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-bump ${className}` : "mc-bump"}
       style={rootStyle}
     >

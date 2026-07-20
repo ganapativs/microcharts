@@ -5,12 +5,17 @@
 // never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_HYPNOGRAM } from "../../core/strings-hypnogram.js";
-import { firstAppearance, hypnogramGeometry } from "./geometry.js";
+import { firstAppearance, hypnogramGeometry, hypnogramLabels } from "./geometry.js";
 import {
   Hypnogram as StaticHypnogram,
   hypnogramSummary,
@@ -31,7 +36,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
   const {
     data,
     states: statesProp,
-    variant = "steps",
+    mode = "steps",
     domain: domainProp,
     width = 140,
     height: heightProp,
@@ -69,7 +74,6 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
   // the gutter, so the hit-test and the outlines drift off the rendered marks.
   const rowsN = Math.max(1, rowStates.length);
   const height = heightProp ?? Math.max(36, rowsN * 13);
-  const labels = labelsProp ?? width >= 96;
   // Widest row label, in chars. Memoised away from the render path (a scrub
   // re-renders per unit crossed); the gutter itself is cheap arithmetic on top.
   const labelCh = useMemo(() => {
@@ -77,13 +81,19 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     for (const s of rowStates) max = Math.max(max, s.length);
     return max;
   }, [rowStates]);
-  const gutter = labels
-    ? Math.min(width * 0.4, labelCh * labelFont(height / rowsN, 0.62) * 0.6 + 4)
-    : 0;
+  // Shared with the static entry, drop rule included: at small sizes it hands
+  // the gutter back to the runs, and a copy that didn't would offset every x.
+  const { gutter } = hypnogramLabels({
+    labels: labelsProp ?? width >= 96,
+    width,
+    height,
+    rows: rowsN,
+    maxChars: labelCh,
+  });
   const geo = useMemo(
     () =>
-      hypnogramGeometry({ data, states: rowStates, domain, width, height, style: variant, gutter }),
-    [data, rowStates, domain, width, height, variant, gutter],
+      hypnogramGeometry({ data, states: rowStates, domain, width, height, style: mode, gutter }),
+    [data, rowStates, domain, width, height, mode, gutter],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
@@ -152,20 +162,13 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
   const announced = run ? strings.hypnogramRun(run.state, fmt(run.t0), fmt(run.t1)) : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-hypno-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-hypno-live", className, style)} {...named(label)} {...bind}>
       <StaticHypnogram
         {...rest}
         data={data}
         states={statesProp}
-        variant={variant}
-        style={FILL}
+        mode={mode}
+        style={fillFor(style)}
         width={width}
         height={heightProp}
         labels={labelsProp}

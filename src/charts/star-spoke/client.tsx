@@ -5,8 +5,15 @@
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STAR_SPOKE } from "../../core/strings-star-spoke.js";
@@ -26,8 +33,8 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
   const {
     data,
     domain = [0, 1],
-    size = 32,
-    labels = false,
+    size = 80,
+    labels = true,
     format,
     locale,
     strings = EN_STAR_SPOKE,
@@ -162,17 +169,14 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
   const shown = active ?? selected;
   const spoke = shown !== null ? geo.spokes[shown] : undefined;
   const shownDatum = shown !== null ? data[shown] : undefined;
-  const announced = shownDatum ? strings.spokeAt(shownDatum.label, fmt(shownDatum.value)) : "";
+  const announced = shownDatum
+    ? isFiniteValue(shownDatum.value)
+      ? strings.spokeAt(shownDatum.label, fmt(shownDatum.value))
+      : strings.spokeEmpty(shownDatum.label)
+    : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-star-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-star-live", className, style)} {...named(label)} {...bind}>
       <StaticStarSpoke
         {...rest}
         data={data}
@@ -183,7 +187,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus spoke is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
@@ -201,7 +205,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
             bottom: "auto",
           }}
         >
-          {`${shownDatum.label} ${fmt(shownDatum.value)}`}
+          {`${shownDatum.label} ${isFiniteValue(shownDatum.value) ? fmt(shownDatum.value) : "—"}`}
         </span>
       ) : null}
     </span>

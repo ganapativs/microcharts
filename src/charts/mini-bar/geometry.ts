@@ -1,6 +1,6 @@
-// MiniBar geometry — pure, React-free. Bar length from a
-// zero-anchored domain (: length lies unless anchored). Null
-// values keep their slot (gap — alignment survives). Coords 2-dp.
+// MiniBar geometry — pure, React-free. Bar length from a zero-anchored domain
+// (length lies unless anchored). Null values keep their slot (gap — alignment
+// survives). Coords 2-dp.
 import { clamp, niceDomain, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
@@ -38,7 +38,6 @@ export function miniBarGeometry(opts: {
   const n = values.length;
   if (n === 0) return { bars: [], baseline: 0, band: 0, domain: [0, 0] };
 
-  // category axis length / value axis length
   const catLen = orientation === "vertical" ? width : height;
   const valLen = orientation === "vertical" ? height : width;
 

@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
-import type { Format } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_CONFUSION, type ConfusionStrings } from "../../core/strings-confusion.js";
 import { confusionGridGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -76,6 +76,8 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
     accent = "diagonal",
     label = "none",
     shape = "square",
+    format,
+    locale,
     strings = EN_CONFUSION,
     title,
     summary,
@@ -96,8 +98,12 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
   const size = props.size ?? 54 + (kk - 2) * 8;
   const fontSize = labelFont(size, 0.16);
   const gutterCh = fontSize + 1;
-  const accLabel =
-    label === "accuracy" ? `${Math.round(confGeoAccuracy(counts, kk) * 100)}%` : undefined;
+  // Percent formatting goes through the shared cached formatter (never a
+  // hand-rolled Math.round), so `format`/`locale` reach the one number this
+  // chart renders. The gutter is measured off the produced string, so a
+  // locale that widens it (e.g. a non-breaking space before "%") still fits.
+  const accFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const accLabel = label === "accuracy" ? accFmt(confGeoAccuracy(counts, kk)) : undefined;
   const rightGutter = accLabel ? accLabel.length * fontSize * 0.62 + 2 : 0;
 
   const geo = confusionGridGeometry({
@@ -116,6 +122,10 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Seat the matrix, not the viewBox: the predicted-class labels sit in a
+      // gutter above the grid, and centring the whole frame would hang that
+      // gutter off the line. The block itself is symmetric with no floor.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-confusion ${className}` : "mc-confusion"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >

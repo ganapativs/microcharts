@@ -95,6 +95,40 @@ describe("interactive <QuadrantDot>", () => {
       .not.toBeNull();
   });
 
+  // Regression: the hit radius was a hard-coded 3 units while ghosts are painted
+  // at min(w,h) * 0.052, so above a ~58-unit box the pointer could sit visibly
+  // inside a dot and still pick nothing.
+  it("a pointer inside a large ghost's painted rim still picks it", async () => {
+    const screen = await render(
+      <QuadrantDot
+        data={{ x: 0, y: 0 }}
+        field={[{ x: 5, y: 5 }]}
+        xDomain={[0, 10]}
+        domain={[0, 10]}
+        width={64}
+        height={64}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-quadrant-dot-live") as HTMLElement;
+    const r = wrap.getBoundingClientRect();
+    // The lone ghost lands dead centre (32,32) of the 64-unit viewBox; its
+    // painted radius there is 3.33, so 3.2 units out is inside the visible dot
+    // but was outside the old radius.
+    const at = (ux: number, uy: number) =>
+      wrap.dispatchEvent(
+        new PointerEvent("pointermove", {
+          bubbles: true,
+          clientX: r.left + (ux / 64) * r.width,
+          clientY: r.top + (uy / 64) * r.height,
+        }),
+      );
+    at(35.2, 32);
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("5, 5");
+    // ...and well clear of the dot still picks nothing.
+    at(48, 32);
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")).toBeNull();
+  });
+
   it("controlled selectedIndex pins the ring without focus", async () => {
     const screen = await render(
       <QuadrantDot

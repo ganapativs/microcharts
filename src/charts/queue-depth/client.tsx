@@ -8,7 +8,8 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
@@ -18,7 +19,12 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUEUE_DEPTH, type QueueDepthStrings } from "../../core/strings-queue-depth.js";
 import { queueDepthGeometry } from "./geometry.js";
-import { QueueDepth as StaticQueueDepth, queueSummary, type QueueDepthProps } from "./index.js";
+import {
+  QueueDepth as StaticQueueDepth,
+  queueDepthLabels,
+  queueSummary,
+  type QueueDepthProps,
+} from "./index.js";
 
 type QueuePoint = NonNullable<ReturnType<typeof queueDepthGeometry>>["points"][number];
 
@@ -107,9 +113,17 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
     [ptByIndex],
   );
 
+  // The static reserves a right gutter for the endpoint/capacity labels and
+  // widens its viewBox by it — that total, not bare `width`, is the pointer
+  // basis (otherwise every hit lands right of the cursor and the last readings
+  // are unreachable).
+  const vbWidth = geo
+    ? queueDepthLabels(geo, { width, height, capacity, label, fmt }).totalWidth
+    : width;
+
   const { active, selected, bind } = useActivePicker({
     count: stops.length,
-    width,
+    width: vbWidth,
     height,
     locate,
     step,
@@ -142,14 +156,12 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-queue-depth-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticQueueDepth
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         capacity={capacity}
         label={label}
@@ -200,7 +212,7 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
       {rp ? (
         <span
           className="mc-queue-readout mc-spark-readout"
-          style={{ left: `${(rp.x / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${(rp.x / vbWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
           {`${fmt(rp.value)}${rp.above ? strings.queueAbove : ""}`}
         </span>

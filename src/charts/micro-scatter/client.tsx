@@ -9,9 +9,10 @@
 // pairs are dropped by the geometry). `value` is the y channel; the x reading
 // travels as `label`.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
@@ -32,6 +33,12 @@ export interface InteractiveMicroScatterProps extends MicroScatterProps, PickerP
   strings?: ScatterStrings;
   /** Point announcement templates (shared point wording). */
   seriesStrings?: SeriesStrings;
+  /**
+   * Number format/locale for the hover/focus readout. Interactive-only: the
+   * static entry renders dots and a trend line, never a number.
+   */
+  format?: Format;
+  locale?: string | string[];
   /**
    * Opt-in entrance motion (default `false`): the dots settle onto the plot
    * on first client-side mount. Inert on the server and on hydrated server
@@ -178,25 +185,16 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-scatter-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-scatter-live", className, style)} {...named(label)} {...bind}>
       <StaticMicroScatter
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         trend={trend}
         xDomain={xDomain}
         domain={domain}
         width={width}
         height={height}
-        format={format}
-        locale={locale}
         strings={strings}
         summary={false}
       >

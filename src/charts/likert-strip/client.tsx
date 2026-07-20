@@ -5,8 +5,15 @@
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { LIKERT_FONT, likertGutter, likertStripGeometry } from "./geometry.js";
 import { LikertStrip as StaticLikertStrip, likertSummary, type LikertStripProps } from "./index.js";
@@ -45,6 +52,9 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // no LiveRegion here to host it: seat the wrapper so the readout chip
+  // and the hit box travel with the mark when inline (see seat-hoist).
+  useSeatHoist(hostRef);
   // "sweep" with per-mark signed origin — the diverging composition grows OUT
   // from the center line: negative ink grows leftward (origin right), positive
   // rightward (origin left), echoing the encoding instead of a flat fade.
@@ -144,14 +154,12 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
     <span
       ref={hostRef}
       {...wrap("mc-likert-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticLikertStrip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         neutral={neutral}
         label={label}

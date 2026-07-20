@@ -10,7 +10,13 @@
 // actually happened); the bin's predicted rate travels as `label`.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CALIBRATION } from "../../core/strings-calibration.js";
@@ -31,8 +37,8 @@ function defaultMinSupport(data: CalibrationStripProps["data"]): number {
 export interface InteractiveCalibrationStripProps extends CalibrationStripProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the per-bin points settle onto
-   * the diagonal (dots variant) or the deviation columns fade in (bars
-   * variant) on first client-side mount. Inert on the server and on hydrated
+   * the diagonal (dots mode) or the deviation columns fade in (bars
+   * mode) on first client-side mount. Inert on the server and on hydrated
    * server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
@@ -43,7 +49,7 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
     data,
     bins = 10,
     minSupport,
-    variant = "dots",
+    mode = "dots",
     width = 100,
     height = 32,
     format,
@@ -62,9 +68,9 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, variant === "bars" ? "reveal" : "settle", animate, {
+  useEntrance(hostRef, mode === "bars" ? "reveal" : "settle", animate, {
     selector:
-      variant === "bars"
+      mode === "bars"
         ? 'line[data-mc-ink="accent"]'
         : 'circle[data-mc-ink="accent"], circle[data-mc-w="support"]',
   });
@@ -137,27 +143,20 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
     : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-calib-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-calib-live", className, style)} {...named(label)} {...bind}>
       <StaticCalibrationStrip
         {...rest}
         data={data}
         bins={bins}
         minSupport={minSupport}
-        variant={variant}
+        mode={mode}
         width={width}
         height={height}
         format={format}
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
         {pinned ? (

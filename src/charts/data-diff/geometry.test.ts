@@ -85,17 +85,17 @@ describe("dataDiffGeometry", () => {
     expect(geo.largest).toBeNull();
   });
 
-  it("sort='net' orders by descending net; 'none' keeps input order", () => {
+  it("order='net' orders by descending net; 'data' keeps input order", () => {
     const data = [
       { key: "a", added: 10, removed: 8 }, // net +2
       { key: "b", added: 50, removed: 5 }, // net +45
       { key: "c", added: 5, removed: 30 }, // net −25
     ];
-    const none = dataDiffGeometry({ ...base, data, sort: "none" })!;
+    const none = dataDiffGeometry({ ...base, data, order: "data" })!;
     expect(none.rows.map((r) => r.key)).toEqual(["a", "b", "c"]);
-    const net = dataDiffGeometry({ ...base, data, sort: "net" })!;
+    const net = dataDiffGeometry({ ...base, data, order: "net" })!;
     expect(net.rows.map((r) => r.key)).toEqual(["b", "a", "c"]);
-    const mag = dataDiffGeometry({ ...base, data, sort: "magnitude" })!;
+    const mag = dataDiffGeometry({ ...base, data, order: "magnitude" })!;
     expect(mag.rows.map((r) => r.key)).toEqual(["b", "c", "a"]);
   });
 

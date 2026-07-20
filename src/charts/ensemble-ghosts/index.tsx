@@ -1,6 +1,6 @@
-// <EnsembleGhosts> — what could happen, across the simulated futures? (
-// #20). A faint bundle of member paths + one emphasised representative, because a
-// mean line hides that futures disagree in SHAPE, not just endpoint. Ghost
+// <EnsembleGhosts> — what could happen, across the simulated futures? A faint
+// bundle of member paths + one emphasised representative, because a mean line
+// hides that futures disagree in SHAPE, not just endpoint. Ghost
 // selection + emphasis are DETERMINISTIC (endpoint-rank quantiles) — nothing
 // varies between renders of the same data. A static frame is NOT a HOP (the loop
 // lives only in the interactive entry). Static, hook-free, RSC-safe.
@@ -9,7 +9,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_ENSEMBLE, type EnsembleStrings } from "../../core/strings-ensemble.js";
-import { ensembleGeometry, type EnsembleGeometry } from "./geometry.js";
+import { ensembleGeometry, PAD, type EnsembleGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** Factual ensemble summary. Shared with the interactive entry. */
@@ -89,6 +89,8 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        // Empty stands on the same padded floor a drawn bundle would.
+        seat={{ mode: "floor", bottom: height - PAD }}
         className={cls}
         style={style}
       >
@@ -107,6 +109,10 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A bundle of traces over one fitted domain takes the seat a single
+      // sparkline takes — it stands on the plot's padded floor. The bundle's
+      // own extent is data and changes shape run to run; the frame does not.
+      seat={{ mode: "floor", bottom: height - PAD }}
       className={cls}
       style={style}
     >

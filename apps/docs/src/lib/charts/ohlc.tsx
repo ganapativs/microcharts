@@ -36,7 +36,7 @@ export const entry: ChartEntry = {
       description: "Periods, oldest first.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"candle" | "bars"',
       required: false,
       description: "Candle bodies or open/close ticks.",
@@ -84,8 +84,8 @@ export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["candle", "bars"],
       init: "candle",
     },
@@ -101,7 +101,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <Ohlc
       data={PERIODS}
-      variant={s.variant as "candle" | "bars"}
+      mode={s.mode as "candle" | "bars"}
       label={s.label as "last" | "none"}
       maxPeriods={s.maxPeriods as number}
       summary={false}
@@ -113,7 +113,7 @@ export const playground: PlaygroundSpec = {
     [
       "<Ohlc",
       "  data={sessions}",
-      s.variant !== "candle" && `  variant="${s.variant}"`,
+      s.mode !== "candle" && `  mode="${s.mode}"`,
       s.label !== "none" && `  label="${s.label}"`,
       s.maxPeriods !== 20 && `  maxPeriods={${s.maxPeriods}}`,
       "/>",
@@ -132,10 +132,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "bars with last close",
-    code: `<Ohlc data={sessions} variant="bars" label="last" />`,
-    node: (
-      <Ohlc data={PERIODS} variant="bars" label="last" summary={false} width={170} height={20} />
-    ),
+    code: `<Ohlc data={sessions} mode="bars" label="last" />`,
+    node: <Ohlc data={PERIODS} mode="bars" label="last" summary={false} width={170} height={20} />,
   },
 ];
 

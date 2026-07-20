@@ -4,10 +4,11 @@
 // on hover or focus. The wrapper owns the accessible name (role=img); the inner
 // static chart is decorative so the reading isn't announced twice.
 import { useRef, useState } from "react";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
 
 // The measure bar shares the "bar" ink with the background bands; it's always
@@ -42,6 +43,9 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
   } = props;
   const [open, setOpen] = useState(false);
   const hostRef = useRef<HTMLSpanElement>(null);
+  // no LiveRegion here to host it: seat the wrapper so the readout chip
+  // and the hit box travel with the mark when inline (see seat-hoist).
+  useSeatHoist(hostRef);
   useEntrance(hostRef, "sweep", animate, { selector: MEASURE_SELECTOR });
 
   const fmt = makeFormatter(format, locale);
@@ -66,9 +70,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-bullet-interactive", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onPointerEnter={() => setOpen(true)}
       onPointerLeave={() => setOpen(false)}
       onFocus={() => setOpen(true)}
@@ -88,7 +90,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
         format={format}
         locale={locale}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       />
       {open ? (
         <span className="mc-spark-readout" style={{ right: 0 }}>

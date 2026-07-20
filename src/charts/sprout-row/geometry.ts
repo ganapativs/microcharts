@@ -45,6 +45,43 @@ export function stageGlyph(stage: number, cx: number, by: number, gh: number): s
   return d;
 }
 
+/** The painted extents of `stageGlyph` — what the glyph actually inks, not the
+ *  slot band. A focus ring built from a fixed radius (the old `r=7` puck) sits
+ *  concentric only at one height and one stage; built from this box it is
+ *  concentric always. Mirrors the path above command-for-command: the leaf
+ *  quadratics peak at 0.746·lw (max of `2t − 1.34t²`), and both `a` arcs draw a
+ *  FULL circle centred on their anchor, so the seed straddles the soil and the
+ *  bloom head straddles the stem top. */
+export function stageGlyphBox(
+  stage: number,
+  cx: number,
+  by: number,
+  gh: number,
+): { x0: number; y0: number; x1: number; y1: number } {
+  const r = round2;
+  if (stage <= 0) {
+    const rs = Math.min(1.5, gh * 0.14);
+    return { x0: r(cx - rs), y0: r(by - rs), x1: r(cx + rs), y1: r(by + rs) };
+  }
+  const s = Math.min(stage, 3);
+  // Leaf half-extent. `leaf` is always ≥ 1.04, so it dominates the 0.45 stem
+  // half-width and the ≤ 1.8 bloom head on whichever side a leaf exists.
+  const leaf = 0.746 * Math.max(1.4, gh * 0.2);
+  const head = s >= 3 ? Math.min(1.8, gh * 0.14) : 0;
+  return {
+    // left leaf only from stage 2; before that the left edge is the bare stem
+    x0: r(cx - (s >= 2 ? leaf : 0.45)),
+    // whichever reaches higher: the bloom head above the stem top, or the
+    // topmost leaf (left leaf from stage 2, else the right one)
+    y0: r(
+      Math.min(by - gh * STEM_FRAC[s]! - head, by - gh * (s >= 2 ? 0.46 : 0.28) - leaf / 0.746),
+    ),
+    x1: r(cx + leaf),
+    // the stem foot sits on the soil; nothing in stages 1–3 paints below it
+    y1: r(by),
+  };
+}
+
 export function sproutRowGeometry(opts: {
   stages: readonly (number | null)[];
   height: number;

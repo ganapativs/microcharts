@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { ChartModule } from "@/lib/charts/types";
 
 /**
- * 03 · the catalog, live — a grid of real chart Previews (the same
+ * 02 · the catalog, live — a grid of real chart Previews (the same
  * components `/charts` renders). Shuffles per reload, one tile cross-fades
  * to a new type every couple of seconds (paused on hover/focus and in hidden
  * tabs). Hover reveals the tagline (space reserved — nothing shifts); the

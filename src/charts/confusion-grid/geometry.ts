@@ -28,6 +28,9 @@ export function confusionGridGeometry(opts: {
   rowTotals: number[];
   accuracy: number;
   maxErrorCell: { row: number; col: number } | null;
+  /** Matrix block, top and bottom edges — below the reserved axis-label gutter. */
+  y0: number;
+  y1: number;
 } {
   const { size, k, counts, normalize, gutterCh } = opts;
   const inset = gutterCh; // reserve top + left for axis labels
@@ -75,5 +78,7 @@ export function confusionGridGeometry(opts: {
     rowTotals,
     accuracy: total > 0 ? round2(trace / total) : 0,
     maxErrorCell: maxError > 0 ? maxErrorCell : null,
+    y0: round2(inset),
+    y1: round2(inset + k * cellW),
   };
 }

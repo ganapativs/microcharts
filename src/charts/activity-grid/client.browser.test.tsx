@@ -80,4 +80,32 @@ describe("interactive <ActivityGrid>", () => {
     const cellPx = r.width / 14;
     expect(Math.abs(ringCx - cx)).toBeLessThan(cellPx);
   });
+
+  // Regression: `.mc-inline` seats a mark by translating `.mc-root`, which moves
+  // what is PAINTED but not the wrapper the readout chip is positioned against —
+  // the chip floated a whole seat away from its mark. The seat is hoisted to the
+  // wrapper so one element seats the whole box. (This asserts the hoist itself;
+  // the resulting geometry is measured against the built docs, since the browser
+  // test environment does not load styles.css.)
+  it("hoists the chart's seat from the SVG up to the wrapper when inline", async () => {
+    const screen = await render(
+      <span className="mc-inline">
+        <ActivityGrid data={DATA} />
+      </span>,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const svg = fig.querySelector("svg")!;
+    await vi.waitFor(() => {
+      if (!fig.hasAttribute("data-mc-seated")) throw new Error("not hoisted");
+    });
+    // the wrapper now carries the seat the <Chart> emitted…
+    expect(fig.style.getPropertyValue("--mc-seat")).toBe(svg.style.getPropertyValue("--mc-seat"));
+    expect(fig.style.getPropertyValue("--mc-seat")).not.toBe("");
+  });
+
+  it("does not hoist a seat when the chart is not inline", async () => {
+    const fig = await mount(<ActivityGrid data={DATA} />);
+    await new Promise((r) => setTimeout(r, 20)); // let the effect run
+    expect(fig.hasAttribute("data-mc-seated")).toBe(false);
+  });
 });

@@ -73,6 +73,11 @@ export function Hourglass(props: HourglassProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Both chambers carry data — elapsed piles up from the base, remaining
+      // hangs from the neck — so the bottom cap is frame chrome, not an
+      // encoding floor, and the instrument centres on the cap band like the
+      // other glyphs. The box is the cap plates, the one part `value` can't move.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-hourglass ${className}` : "mc-hourglass"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >

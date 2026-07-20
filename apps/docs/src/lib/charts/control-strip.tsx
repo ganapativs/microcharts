@@ -55,9 +55,9 @@ export const entry: ChartEntry = {
     },
     {
       name: "dots",
-      type: '"out" | "all"',
+      type: '"out" | "all" | "none"',
       required: false,
-      description: "Mark only out-of-control points (default) or every point.",
+      description: "Mark only out-of-control points (default), every point, or none.",
     },
   ],
   demo: DEMO,

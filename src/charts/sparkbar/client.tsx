@@ -13,7 +13,8 @@ import { isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
@@ -167,9 +168,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-sparkbar-interactive", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
+      {...named([title, accName].filter(Boolean).join(". ") || undefined)}
       {...bind}
     >
       <StaticSparkBar
@@ -184,7 +183,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         format={format}
         locale={locale}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {rest.children}
         {/* Pinned selection persists through pointer-leave; focus outline is transient. */}

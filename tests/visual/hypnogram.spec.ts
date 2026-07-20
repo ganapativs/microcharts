@@ -47,7 +47,7 @@ function gallery(): string {
       data: SLEEP,
       states: STATES,
       domain: DOM,
-      variant: "lanes",
+      mode: "lanes",
       width: 200,
       height: 64,
       title: "lanes",

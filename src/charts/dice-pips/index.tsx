@@ -1,5 +1,5 @@
-// <DicePips> — a small count/severity read instantly as a die face (
-// #2, S4). Canonical pip patterns 1–6 only; 0 is an empty face (zero, not
+// <DicePips> — a small count/severity read instantly as a die face (S4).
+// Canonical pip patterns 1–6 only; 0 is an empty face (zero, not
 // missing), and > 6 shows a centered numeral rather than inventing a 7/8/9
 // pattern — the face never pretends. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
@@ -56,6 +56,10 @@ export function DicePips(props: DicePipsProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The die face is a symmetric token, not a bar standing on a floor, so it
+      // centres on the cap band. Seat the face frame even when `face={false}`:
+      // the pip grid is laid out inside it, so the seat survives the switch.
+      seat={{ mode: "center", top: geo.face.y, bottom: geo.face.y + geo.face.height }}
       className={className ? `mc-dice ${className}` : "mc-dice"}
       style={{ "--mc-label-size": `${FONT}px`, ...style } as CSSProperties}
     >

@@ -26,18 +26,16 @@ function cachedNumberFormat(
  * Custom functions pass through; `Intl` options hit the cached instance. Both
  * receive a float-noise-cleaned number: charts compute differences/sums/ratios
  * internally (e.g. `value - target` → `-3.5999999999999943`), and a consumer's
- * `format` function is written for clean data, not for our IEEE arithmetic. We
- * snap the number to 12 significant digits first — far more than any label shows,
- * well inside the ~15–17 digits where binary-float noise appears.
+ * `format` function is written for clean data, not for IEEE arithmetic. The
+ * number is snapped to 12 significant digits first — far more than any label
+ * shows, well inside the ~15–17 digits where binary-float noise appears.
  */
 export function makeFormatter(
   format: Format | undefined,
   locale: string | string[] | undefined,
   defaults?: Intl.NumberFormatOptions,
 ): (n: number) => string {
-  // Snap the number to 12 significant digits first (`toPrecision` passes
-  // ±Infinity/NaN through unchanged) — far more than any label shows, yet inside
-  // the ~15–17 digits where binary-float noise appears.
+  // `toPrecision` passes ±Infinity/NaN through unchanged.
   const clean = (n: number) => Number(n.toPrecision(12));
   if (typeof format === "function") {
     const fn = format;

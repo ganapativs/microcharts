@@ -17,7 +17,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <MinimapStripInteractive
       data={{ ...DATA, window: [s.window as number, (s.window as number) + 140] }}
-      variant={s.variant as "bars" | "heat"}
+      mode={s.mode as "bars" | "heat"}
       markLane={s.markLane as boolean}
       animate={ui.animate}
       summary={false}
@@ -29,7 +29,7 @@ export const playground: PlaygroundSpec = {
     [
       "<MinimapStrip",
       `  data={{ content, window: [${s.window}, ${(s.window as number) + 140}], marks, known }}`,
-      s.variant !== "bars" && `  variant="${s.variant}"`,
+      s.mode !== "bars" && `  mode="${s.mode}"`,
       s.markLane === false && "  markLane={false}",
       ui.animate && " animate",
       "/>",

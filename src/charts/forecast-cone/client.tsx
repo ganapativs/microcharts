@@ -7,7 +7,13 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.js";
@@ -175,14 +181,12 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
     <span
       ref={hostRef}
       {...wrap("mc-forecast-cone-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticForecastCone
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         forecast={forecast}
         target={target}

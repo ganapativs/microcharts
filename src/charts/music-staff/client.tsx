@@ -7,13 +7,15 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -67,14 +69,15 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // no LiveRegion here to host it: seat the wrapper so the readout chip
+  // and the hit box travel with the mark when inline (see seat-hoist).
+  useSeatHoist(hostRef);
   // "trail" ordered by x — notes land left→right along the staff, echoing a
   // melody played in time order rather than a generic staggered settle. The
   // melodic contour connects those notes in time, so it must arrive AFTER them,
   // not fade in during the quiet stage before its own noteheads exist: `defer`
   // casts it into the closing act. (Its `data-mc-w="tick"` uniquely picks the
   // contour; the staff + ledger paths carry data-mc-ink="muted" instead.)
-  // Notes play in left→right, then the melodic contour DRAWS through them in
-  // time order — the line connects the notes it just laid down.
   useEntrance(hostRef, "trail", animate, { order: "x", link: 'path[data-mc-w="tick"]' });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -144,9 +147,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-staff-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
+      {...named([title, accName].filter(Boolean).join(". ") || undefined)}
       {...bind}
     >
       <StaticMusicStaff
@@ -161,7 +162,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
         format={format}
         locale={locale}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selNote && selected !== active ? ring(selNote, true) : null}

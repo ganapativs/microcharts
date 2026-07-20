@@ -31,7 +31,7 @@ export const entry: ChartEntry = {
       description: "Paired readings — a is the subject, b the reference.",
     },
     {
-      name: "labels",
+      name: "seriesLabels",
       type: "[string, string]",
       required: false,
       description: "Names the two series in the summary and label.",
@@ -52,7 +52,7 @@ export const entry: ChartEntry = {
   demo: ORG,
   example: {
     title: "Organic vs paid",
-    code: `import { SpreadBand } from "${PKG}/spread-band";\n\n<SpreadBand data={pairs} labels={["Organic", "Paid"]} title="Organic vs paid" />`,
+    code: `import { SpreadBand } from "${PKG}/spread-band";\n\n<SpreadBand data={pairs} seriesLabels={["Organic", "Paid"]} title="Organic vs paid" />`,
   },
   sampleData: [
     {
@@ -67,7 +67,7 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <SpreadBand data={PAIRS} labels={LABELS} summary={false} width={140} height={26} />;
+  return <SpreadBand data={PAIRS} seriesLabels={LABELS} summary={false} width={140} height={26} />;
 }
 export const playground: PlaygroundSpec = {
   knobs: [
@@ -83,7 +83,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <SpreadBand
       data={PAIRS}
-      labels={LABELS}
+      seriesLabels={LABELS}
       label={s.label as "gap" | "none"}
       positive={s.positive as "up" | "down"}
       summary={false}
@@ -95,7 +95,7 @@ export const playground: PlaygroundSpec = {
     [
       "<SpreadBand",
       "  data={pairs}",
-      '  labels={["Organic", "Paid"]}',
+      '  seriesLabels={["Organic", "Paid"]}',
       s.label !== "gap" && `  label="${s.label}"`,
       s.positive !== "up" && `  positive="${s.positive}"`,
       "/>",
@@ -108,16 +108,16 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "lead vs reference in a cell",
-    code: `{rows.map((r) => (\n  <SpreadBand key={r.id} data={r.pairs} labels={["Us", "Market"]} title={r.name} />\n))}`,
-    node: <SpreadBand data={PAIRS} labels={LABELS} summary={false} width={160} height={16} />,
+    code: `{rows.map((r) => (\n  <SpreadBand key={r.id} data={r.pairs} seriesLabels={["Us", "Market"]} title={r.name} />\n))}`,
+    node: <SpreadBand data={PAIRS} seriesLabels={LABELS} summary={false} width={160} height={16} />,
   },
   {
     label: "actual vs plan with the gap",
-    code: `<SpreadBand data={pairs} labels={["Actual", "Plan"]} label="gap" />`,
+    code: `<SpreadBand data={pairs} seriesLabels={["Actual", "Plan"]} label="gap" />`,
     node: (
       <SpreadBand
         data={PAIRS}
-        labels={LABELS}
+        seriesLabels={LABELS}
         label="gap"
         summary={false}
         width={170}
@@ -149,12 +149,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Organic vs paid{" "}
         <span className="mc-inline">
-          <SpreadBand data={PAIRS} labels={LABELS} height={16} summary={false} />
+          <SpreadBand data={PAIRS} seriesLabels={LABELS} height={16} summary={false} />
         </span>{" "}
         — organic leads by 18% on median.
       </p>
     ),
-    code: '<p>\n  Organic vs paid <SpreadBand data={pairs} labels={["Organic", "Paid"]} /> — organic leads by 18% on median.\n</p>',
+    code: '<p>\n  Organic vs paid <SpreadBand data={pairs} seriesLabels={["Organic", "Paid"]} /> — organic leads by 18% on median.\n</p>',
   },
   cell: {
     render: () => (
@@ -164,7 +164,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <SpreadBand data={row.data} labels={LABELS} height={18} summary={false} />
+                <SpreadBand data={row.data} seriesLabels={LABELS} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -172,7 +172,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: '<td>\n  <SpreadBand data={pairs} labels={["Organic", "Paid"]} />\n</td>',
+    code: '<td>\n  <SpreadBand data={pairs} seriesLabels={["Organic", "Paid"]} />\n</td>',
   },
   kpi: {
     render: () => (
@@ -184,10 +184,10 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">organic vs paid</span>
           </div>
         </div>
-        <SpreadBand data={CTX_ROWS[0]!.data} labels={LABELS} height={36} summary={false} />
+        <SpreadBand data={CTX_ROWS[0]!.data} seriesLabels={LABELS} height={36} summary={false} />
       </>
     ),
-    code: '<div className="kpi">\n  <span className="figure">+18%</span>\n  <span className="unit">organic vs paid</span>\n  <SpreadBand data={pairs} labels={["Organic", "Paid"]} />\n</div>',
+    code: '<div className="kpi">\n  <span className="figure">+18%</span>\n  <span className="unit">organic vs paid</span>\n  <SpreadBand data={pairs} seriesLabels={["Organic", "Paid"]} />\n</div>',
   },
   tab: {
     render: () => (
@@ -198,12 +198,12 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <SpreadBand data={row.data} labels={LABELS} height={14} summary={false} />
+            <SpreadBand data={row.data} seriesLabels={LABELS} height={14} summary={false} />
           </span>
         ))}
       </div>
     ),
-    code: '<button className="tab">\n  Organic <SpreadBand data={pairs} labels={["Organic", "Paid"]} />\n</button>',
+    code: '<button className="tab">\n  Organic <SpreadBand data={pairs} seriesLabels={["Organic", "Paid"]} />\n</button>',
   },
 };
 
@@ -212,7 +212,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
     return (
       <SpreadBand
         data={PAIRS}
-        labels={LABELS}
+        seriesLabels={LABELS}
         label="none"
         summary={false}
         width={props.width ?? 60}
@@ -223,7 +223,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
   return (
     <SpreadBand
       data={props.data.map((v, i) => ({ a: v, b: v * 0.82 + i * 0.4 }))}
-      labels={LABELS}
+      seriesLabels={LABELS}
       label="none"
       summary={false}
       width={props.width ?? 60}
@@ -233,7 +233,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 }
 
 export function markCode(): string {
-  return `<SpreadBand data={pairs} labels={["Organic", "Paid"]} />`;
+  return `<SpreadBand data={pairs} seriesLabels={["Organic", "Paid"]} />`;
 }
 export default {
   entry,

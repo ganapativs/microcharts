@@ -5,7 +5,7 @@
 // Composes the static entry (canon).
 import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, wrap } from "../../shared/interactive.js";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -35,7 +35,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     progress,
     elapsed,
     rate,
-    formatEta,
+    etaFormat,
     format,
     locale,
     strings = EN_ETA_BAR,
@@ -58,13 +58,12 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : etaBarSummary({ progress, elapsed, rate: rate ?? null, formatEta, fmt }, strings);
+        : etaBarSummary({ progress, elapsed, rate: rate ?? null, etaFormat, fmt }, strings);
   const label = [title, full].filter(Boolean).join(". ") || undefined;
-  // The chip used to render `full` — the whole accessible sentence ("62% done;
-  // about 294 remaining at the current rate."), 143px past its cap, and a
-  // verbatim duplicate of the aria-label beside it. A caller-supplied `summary`
-  // string of any length landed in it too. The chip now shows the two numbers
-  // the sentence is built from; the sentence stays in the live region.
+  // The chip shows only the two numbers the summary is built from — never
+  // `full`, whose sentence (or an unbounded caller `summary`) blew past the
+  // chip's width cap and duplicated the aria-label beside it verbatim. The
+  // sentence stays in the live region.
   const etaGeo = etaBarGeometry({ progress, elapsed, rate: rate ?? null, width: 80, height: 8 });
   const etaPct = makeFormatter(undefined, locale, {
     style: "percent",
@@ -75,7 +74,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
       ? undefined
       : progress >= 1 || etaGeo.indeterminate || etaGeo.remainingTime == null
         ? etaPct
-        : `${etaPct} · ${formatEta ? formatEta(etaGeo.remainingTime) : fmt(etaGeo.remainingTime)}`;
+        : `${etaPct} · ${etaFormat ? etaFormat(etaGeo.remainingTime) : fmt(etaGeo.remainingTime)}`;
 
   const [announced, setAnnounced] = useState("");
   const [focused, setFocused] = useState(false);
@@ -100,9 +99,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-eta-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       onClick={select}
@@ -118,12 +115,12 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
         progress={progress}
         elapsed={elapsed}
         rate={rate}
-        formatEta={formatEta}
+        etaFormat={etaFormat}
         format={format}
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       />
       <LiveRegion>{announced}</LiveRegion>
       {focused && chip ? (

@@ -14,7 +14,7 @@ const round1 = (n: number) => Math.round(n * 10) / 10;
 // Literals that were true once and silently rotted. If any reappears, a claim
 // has drifted from the measured catalog again — regenerate, don't hand-edit.
 const FORBIDDEN: { pattern: RegExp; why: string }[] = [
-  { pattern: /~?1\s*kB each/i, why: "false size claim — sizes span ~0.9–3.7 kB" },
+  { pattern: /~?1\s*kB each/i, why: "false size claim — sizes span ~0.95–3.9 kB" },
   { pattern: /\b98\s+charts\b/, why: "stale catalog count" },
   { pattern: /\b100\s+chart(?: type)?s?\b/, why: "stale catalog count" },
   { pattern: /^#+\s+The five\s*$/m, why: "heading mismatched its four-context grid" },

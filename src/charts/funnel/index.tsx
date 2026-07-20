@@ -115,6 +115,10 @@ export function Funnel(props: FunnelProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Stage columns are zero-anchored and every one ends at `height`, slats
+      // included; the label gutter geometry reserves is at the TOP, so nothing
+      // eats into the floor and the columns sit on the baseline.
+      seat={{ mode: "floor", bottom: height }}
       className={className ? `mc-funnel ${className}` : "mc-funnel"}
       style={rootStyle}
     >

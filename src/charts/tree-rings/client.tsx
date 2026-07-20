@@ -5,12 +5,23 @@
 // static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { treeRingsGeometry } from "./geometry.js";
 import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
-import { TreeRings as StaticTreeRings, treeRingsSummary, type TreeRingsProps } from "./index.js";
+import {
+  TreeRings as StaticTreeRings,
+  treeRingsSummary,
+  treeRingsWidth,
+  type TreeRingsProps,
+} from "./index.js";
 
 export interface InteractiveTreeRingsProps extends TreeRingsProps, PickerProps {
   strings?: TreeStrings;
@@ -29,6 +40,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     data,
     total,
     size = 24,
+    label = "none",
     periodWord = "period",
     unit = "periods",
     format,
@@ -99,9 +111,11 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     [geo, periodLabel],
   );
 
+  // `label="last"` widens the static's viewBox by a right gutter; the pointer
+  // basis has to follow it, or every angle is measured in a squeezed x-space.
   const { active, selected, bind } = useActivePicker({
     count: data.length,
-    width: size,
+    width: treeRingsWidth({ data, size, label, fontSize: props.fontSize, fmt }),
     height: size,
     locate,
     datum,
@@ -118,7 +132,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
       : typeof summary === "string"
         ? summary
         : treeRingsSummary(data, { unit, periodWord, strings, format, locale });
-  const label = [title, accName].filter(Boolean).join(". ") || undefined;
+  const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const halo = (i: number, pinned: boolean) => {
     const rg = geo.rings[i];
@@ -150,26 +164,20 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-tree-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-tree-live", className, style)} {...named(ariaLabel)} {...bind}>
       <StaticTreeRings
         {...rest}
         data={data}
         total={total}
         size={size}
+        label={label}
         periodWord={periodWord}
         unit={unit}
         format={format}
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus halo is transient. */}
         {selected !== null && selected !== active ? halo(selected, true) : null}

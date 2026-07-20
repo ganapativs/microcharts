@@ -1,5 +1,5 @@
-// <BreathingDot> — how loaded is the system right now, ambiently? (,
-// S4, motion type). The STATIC frame is a real chart with zero JS: a core dot
+// <BreathingDot> — how loaded is the system right now, ambiently? (S4, motion
+// type). The STATIC frame is a real chart with zero JS: a core dot
 // colored by threshold band, and a level ring whose distance from the core IS the
 // level read. The interactive entry adds a pulse whose rate encodes the level.
 // Band color is always doubled — by ring offset here, by pulse rate in motion —
@@ -86,6 +86,10 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Concentric rings about the box center — no floor, so it centres on the
+      // cap band. The seat is the ring's full travel (the PAD-inset frame), not
+      // the ring it happens to be drawn at, so the dot holds still as load moves.
+      seat={{ mode: "center", top: PAD, bottom: geo.size - PAD }}
       className={className ? `mc-breathing ${className}` : "mc-breathing"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >

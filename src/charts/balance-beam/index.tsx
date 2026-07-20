@@ -1,5 +1,5 @@
-// <BalanceBeam> — which side outweighs, and roughly by how much (, S2
-// exactly two). Tilt direction is instant; the angle SATURATES at maxTilt (read
+// <BalanceBeam> — which side outweighs, and roughly by how much (S2, exactly
+// two). Tilt direction is instant; the angle SATURATES at maxTilt (read
 // direction + rough magnitude, not an exact ratio — docs steer precise ratios to
 // PairedBars/Delta). Weights are area-true. Endpoints are pre-rotated in geometry
 // (no SVG transform → containment provable). Static, hook-free, RSC-safe.
@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
 import { balanceBeamGeometry, type BeamMode, type BeamShape } from "./geometry.js";
 
@@ -54,7 +55,11 @@ export function balanceBeamSummary(
   } = {},
 ): string {
   const { mode = "ratio", domain, strings = EN_BEAM, format, locale } = opts;
-  const [l, r] = data;
+  // Runtime tolerance beyond the type: a short array or a null pan is "no
+  // data", and there is no comparison to state.
+  const l = data[0] as BeamDatum | undefined;
+  const r = data[1] as BeamDatum | undefined;
+  if (!l || !r || !isFiniteValue(l.value) || !isFiniteValue(r.value)) return strings.noData;
   const geo = balanceBeamGeometry({
     a: l.value,
     b: r.value,
@@ -94,13 +99,29 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     children,
   } = props;
   const fontSize = props.fontSize ?? labelFont(height, 0.4);
+  const fmt = makeFormatter(format, locale);
+  // Degradation: the two numerals sit side by side under their own pans, and
+  // `labelX` below clamps each inside the box — so on a narrow beam the clamp
+  // walks them into each other and "620" lands on "480". They DROP together
+  // (one pan's number without the other's is not a comparison), and `labelBand`
+  // drops with them so the box stops reserving a strip of height for text it no
+  // longer draws. Pure arithmetic on the 0.62 em/char estimate: the static path
+  // may never measure text.
+  const numerals = (data as readonly (BeamDatum | undefined)[])
+    .slice(0, 2)
+    .map((d) => (d && Number.isFinite(d.value) ? fmt(d.value) : ""));
+  const showValues =
+    label === "values" && numerals.reduce((w, t) => w + t.length * 0.62 * fontSize, 0) + 2 <= width;
   // value numerals sit in their own gutter below the apparatus (never over the beam)
-  const labelBand = label === "values" ? Math.ceil(fontSize * 1.3) : 0;
+  const labelBand = showValues ? Math.ceil(fontSize * 1.3) : 0;
+  // The numerals' text baseline — also the inline seat's floor when they render.
+  const labelY = height + labelBand - fontSize * 0.32;
 
-  const [l, r] = data;
+  const l = data[0] as BeamDatum | undefined;
+  const r = data[1] as BeamDatum | undefined;
   const geo = balanceBeamGeometry({
-    a: l.value,
-    b: r.value,
+    a: l?.value,
+    b: r?.value,
     width,
     height,
     maxTilt,
@@ -112,7 +133,6 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     summary === false
       ? false
       : (summary ?? balanceBeamSummary(data, { mode, domain, strings, format, locale }));
-  const fmt = makeFormatter(format, locale);
   // keep a centered value numeral inside the box (the beam ends ride the edges)
   const labelX = (cx: number, text: string) => {
     const half = (text.length * 0.62 * fontSize) / 2;
@@ -148,6 +168,14 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A physical apparatus: the fulcrum's base rests at `height - PAD` and
+      // everything else is stacked on top of it, so it stands on the text
+      // baseline. With `label="values"` the numerals get their own band BELOW
+      // that base, and seating the apparatus would hang them a full band under
+      // the baseline and into the next line — so in that mode the floor becomes
+      // the numerals' own text baseline, which lands them on the prose baseline
+      // and keeps the whole mark inside the line box.
+      seat={{ mode: "floor", bottom: labelBand > 0 ? labelY : height - PAD }}
       className={className ? `mc-beam ${className}` : "mc-beam"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
@@ -161,31 +189,28 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
         y2={geo.beam.y2}
         data-mc-ink="data"
       />
-      {/* area-true weights — the heavier pan carries the accent */}
-      {weightMark(geo.weights[0], "wl", geo.heavier === -1)}
-      {weightMark(geo.weights[1], "wr", geo.heavier === 1)}
-      {label === "values" ? (
-        <>
-          <text
-            x={labelX(geo.weights[0].cx, fmt(l.value))}
-            y={height + labelBand - fontSize * 0.32}
-            fontSize={fontSize}
-            textAnchor="middle"
-            data-mc-ink="label"
-          >
-            {fmt(l.value)}
-          </text>
-          <text
-            x={labelX(geo.weights[1].cx, fmt(r.value))}
-            y={height + labelBand - fontSize * 0.32}
-            fontSize={fontSize}
-            textAnchor="middle"
-            data-mc-ink="label"
-          >
-            {fmt(r.value)}
-          </text>
-        </>
-      ) : null}
+      {/* area-true weights — the heavier pan carries the accent. An unknown pan
+          draws NO weight: a missing value is not a weightless one, and the bare
+          fulcrum + level beam read as "nothing to weigh" rather than as zero. */}
+      {geo.known[0] ? weightMark(geo.weights[0], "wl", geo.heavier === -1) : null}
+      {geo.known[1] ? weightMark(geo.weights[1], "wr", geo.heavier === 1) : null}
+      {/* An unknown pan prints no numeral either — there is no value to print. */}
+      {showValues
+        ? ([l, r] as (BeamDatum | undefined)[]).map((d, i) =>
+            geo.known[i] ? (
+              <text
+                key={i}
+                x={labelX(geo.weights[i]!.cx, fmt(d!.value))}
+                y={labelY}
+                fontSize={fontSize}
+                textAnchor="middle"
+                data-mc-ink="label"
+              >
+                {fmt(d!.value)}
+              </text>
+            ) : null,
+          )
+        : null}
       {children}
     </Chart>
   );

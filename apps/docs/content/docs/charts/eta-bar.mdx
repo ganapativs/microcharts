@@ -14,7 +14,7 @@ rate. When the rate drops, the remainder honestly grows — the download bar, to
     progress={0.64}
     elapsed={3.6}
     rate={0.18}
-    formatEta={(t) => `${Math.round(t)} min`}
+    etaFormat={(t) => `${Math.round(t)} min`}
     title="Export"
     width={280}
     height={16}
@@ -56,14 +56,14 @@ reader.
 
 <LiveDemo
   label="locale"
-  code={`// no formatEta → the remaining-time NUMBER (not a unit string) follows locale
+  code={`// no etaFormat → the remaining-time NUMBER (not a unit string) follows locale
 <EtaBar progress={0.42} elapsed={10} rate={0.05} locale="de-DE" />`}
 >
   <EtaBar progress={0.42} elapsed={10} rate={0.05} locale="de-DE" title="Localized ETA" width={280} height={16} />
 </LiveDemo>
 
-Without a `formatEta`, the remaining-time figure falls back to `format`/`locale` — under `de-DE` that's a decimal comma
-("11,6") rather than the English decimal point ("11.6"). Pass `formatEta` (as the hero example does) to add a unit; it
+Without an `etaFormat`, the remaining-time figure falls back to `format`/`locale` — under `de-DE` that's a decimal comma
+("11,6") rather than the English decimal point ("11.6"). Pass `etaFormat` (as the hero example does) to add a unit; it
 always receives the raw number, so it can format the unit itself in whatever locale-aware way the caller needs.
 
 ## Edge cases

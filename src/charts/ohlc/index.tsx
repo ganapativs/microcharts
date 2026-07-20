@@ -50,7 +50,7 @@ export interface OhlcProps {
   data: readonly OhlcDatum[];
   /** `"candle"` (default) | `"bars"` (open tick left, close tick right).
    * */
-  variant?: "candle" | "bars" | undefined;
+  mode?: "candle" | "bars" | undefined;
   /** Renders the most recent N with a dev warning past it (never averaged). */
   maxPeriods?: number | undefined;
   /** `"last"` = last close in a right gutter. */
@@ -72,7 +72,7 @@ export interface OhlcProps {
 export function Ohlc(props: OhlcProps): ReactNode {
   const {
     data,
-    variant = "candle",
+    mode = "candle",
     maxPeriods = 20,
     label = "none",
     domain,
@@ -130,6 +130,11 @@ export function Ohlc(props: OhlcProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The box floor is the range low, not a zero — but that is exactly
+      // Sparkline's fitted-domain case, and candles read as columns standing in a
+      // frame far more than as a symmetric glyph. Centring a 16-unit run of
+      // candles would drop half the wicks below the baseline.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={className ? `mc-ohlc ${className}` : "mc-ohlc"}
       style={rootStyle}
     >
@@ -156,7 +161,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         );
-        if (variant === "candle") {
+        if (mode === "candle") {
           return [
             wick,
             /* hollow up / filled down — the shape code */

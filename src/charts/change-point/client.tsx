@@ -6,7 +6,14 @@
 // (canon); the crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, nav1d, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  nav1d,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-change-point.js";
@@ -34,7 +41,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
   const {
     data,
     breaks = "auto",
-    max = 2,
+    maxItems = 2,
     domain,
     format,
     locale,
@@ -57,8 +64,8 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
   useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
-    () => changePointGeometry({ width, height, data, breaks, max, domain }),
-    [width, height, data, breaks, max, domain],
+    () => changePointGeometry({ width, height, data, breaks, maxItems, domain }),
+    [width, height, data, breaks, maxItems, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
@@ -205,18 +212,16 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     <span
       ref={hostRef}
       {...wrap("mc-change-point-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
       onKeyDownCapture={(e) => (shift.current = e.shiftKey)}
     >
       <StaticChangePoint
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         breaks={breaks}
-        max={max}
+        maxItems={maxItems}
         domain={domain}
         format={format}
         locale={locale}

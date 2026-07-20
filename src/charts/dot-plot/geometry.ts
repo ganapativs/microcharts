@@ -90,7 +90,8 @@ export function dotPlotGeometry(opts: {
   };
 }
 
-/** Truncate a category label by CHARACTER COUNT (never measured — ). */
+/** Truncate a category label by CHARACTER COUNT — text is never measured, so
+ * the static path stays server-renderable. */
 export function truncateLabel(label: string, max = 6): string {
   return label.length <= max ? label : `${label.slice(0, max)}…`;
 }

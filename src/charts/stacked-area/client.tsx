@@ -7,7 +7,13 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import type { Curve } from "../../core/path.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
@@ -34,7 +40,7 @@ export interface InteractiveStackedAreaProps extends StackedAreaProps, PickerPro
 export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode {
   const {
     data,
-    variant = "stacked",
+    mode = "stacked",
     order = "data",
     curve = "linear",
     domain,
@@ -71,7 +77,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     return s;
   }, [data, order]);
 
-  const usedCurve: Curve = variant === "ridge" ? "smooth" : curve;
+  const usedCurve: Curve = mode === "ridge" ? "smooth" : curve;
   const fontSize = Math.max(5, Math.min(Math.round(height * 0.3), 7));
   const geo = useMemo(
     () =>
@@ -168,15 +174,13 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     <span
       ref={hostRef}
       {...wrap("mc-stacked-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticStackedArea
         {...rest}
         data={data}
-        variant={variant}
+        mode={mode}
         order={order}
         curve={curve}
         domain={domain}
@@ -186,7 +190,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection: a persistent crosshair that survives pointer-leave. */}
         {selX !== undefined && selected !== active ? (

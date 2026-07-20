@@ -30,10 +30,10 @@ that's yours: give it a container with real contrast.
 
 ## In a sentence
 
-A word-sized chart in running prose scales with the **font**, aligns to the text baseline, and drops its axis-labels and
-endpoint dots so it reads as one glyph, not a widget. Wrap it in `mc-inline` (shipped in `styles.css`), pass
-`dots="none"`, and mark it decorative with `summary={false}` so a screen reader hears the sentence, not a second
-description.
+A word-sized chart in running prose scales with the **font** and aligns to the text baseline; drop its endpoint dots and
+it reads as one glyph, not a widget. (There are no axes to drop — no chart in the catalog draws one.) Wrap it in
+`mc-inline` (shipped in `styles.css`), pass `dots="none"`, and mark it decorative with `summary={false}` so a screen
+reader hears the sentence, not a second description.
 
 <LiveDemo
   label="Inline in prose"
@@ -192,5 +192,5 @@ You'll notice `summary={false}` on nearly every demo above. That's a deliberate 
   read the same thing many times.
 
 This is the only accessibility lever you routinely touch. Everything else — the `role="img"`, the `<title>`, and the
-whole interaction contract on interactive entries (roving arrow keys, select-to-pin with **Enter**, touch scrub, live
-announcements) — is automatic. See [Accessibility](/docs/accessibility).
+whole interaction contract on interactive entries (roving arrow keys, select-to-pin with **Enter** or **Space**, touch
+scrub, live announcements) — is automatic. See [Accessibility](/docs/accessibility).

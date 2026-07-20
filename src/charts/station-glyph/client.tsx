@@ -15,7 +15,13 @@
 // static entry (canon) — no re-implemented SVG.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STATION_GLYPH } from "../../core/strings-station-glyph.js";
@@ -225,14 +231,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
   const shownField = shown === null ? undefined : fields[shown];
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-station-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-station-live", className, style)} {...named(label)} {...bind}>
       <StaticStationGlyph
         {...rest}
         cloud={cloud}
@@ -248,7 +247,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         strings={strings}
         title={title}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus box is transient. */}
         {selected !== active ? outline(selected, true) : null}

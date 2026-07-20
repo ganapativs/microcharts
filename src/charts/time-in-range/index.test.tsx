@@ -66,3 +66,21 @@ seriesEdgeSuite("TimeInRange", (data: readonly Value[]) => (
     title="Edge"
   />
 ));
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("TimeInRange degradation", () => {
+  it("the zone percents drop under a 7-unit strip, the zones still draw", () => {
+    const big = draw(
+      <TimeInRange data={{ below: 9, in: 72, above: 19 }} width={240} height={22} />,
+    ).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(
+      <TimeInRange data={{ below: 9, in: 72, above: 19 }} width={60} height={6} />,
+    ).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("rect").length).toBe(3);
+  });
+});

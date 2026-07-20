@@ -17,7 +17,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <StackedAreaInteractive
       data={MIX}
-      variant={s.variant as "stacked" | "ridge"}
+      mode={s.mode as "stacked" | "ridge"}
       order={s.order as "data" | "asc"}
       label={s.label as "last" | "none"}
       curve={s.curve as "linear" | "smooth"}
@@ -32,7 +32,7 @@ export const playground: PlaygroundSpec = {
     [
       "<StackedArea",
       "  data={mix}",
-      s.variant !== "stacked" && `  variant="${s.variant}"`,
+      s.mode !== "stacked" && `  mode="${s.mode}"`,
       s.order !== "data" && `  order="${s.order}"`,
       s.label !== "none" && `  label="${s.label}"`,
       s.curve !== "linear" && `  curve="${s.curve}"`,

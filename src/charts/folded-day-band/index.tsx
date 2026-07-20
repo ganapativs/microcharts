@@ -102,6 +102,10 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Not a cell grid — envelopes and a median line over a value range, which
+      // reads as standing on its own floor like any trace. The plot's padded
+      // bottom edge, so the seat matches the frame the quantiles are scaled into.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={className ? `mc-folded ${className}` : "mc-folded"}
       style={style}
     >

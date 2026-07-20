@@ -112,6 +112,11 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Every segment quad is anchored to `yBase`, already flushed to the box
+      // bottom, so the profile stands on the baseline like a skyline. The
+      // summit label lives in the top gutter above the plot and is irrelevant
+      // to a floor seat.
+      seat={{ mode: "floor", bottom: geo.yBase }}
       className={className ? `mc-grade ${className}` : "mc-grade"}
       style={rootStyle}
     >

@@ -50,7 +50,7 @@ direction from the running level AND by valence color, never color alone.
 // When labels would collide, the biggest movers win — a deterministic drop-out,
 // never a random overlap.
 <Waterfall data={steps} start={60} label="delta" />
-<Waterfall data={steps} start={60} total={false} />`}
+<Waterfall data={steps} start={60} totalBar={false} />`}
 >
   <span className="inline-flex flex-col gap-3">
     <Waterfall
@@ -76,7 +76,7 @@ direction from the running level AND by valence color, never color alone.
         { label: "FX", value: 5 },
       ]}
       start={60}
-      total={false}
+      totalBar={false}
       title="Steps only"
       width={220}
       height={30}

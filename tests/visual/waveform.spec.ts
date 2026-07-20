@@ -28,7 +28,7 @@ function gallery(): string {
   const tab = `<div class="tab"><span>Memo</span> ${svg({ data: WAVE, width: 60, height: 14, summary: false })}</div>`;
   const variants = [
     svg({ data: WAVE, width: 220, height: 32, title: "bars (default)" }),
-    svg({ data: WAVE, variant: "envelope", width: 220, height: 32, title: "envelope" }),
+    svg({ data: WAVE, mode: "envelope", width: 220, height: 32, title: "envelope" }),
     svg({ data: WAVE, progress: 0.63, width: 220, height: 32, title: "progress 63%" }),
     svg({ data: WAVE, mirror: false, width: 220, height: 32, title: "no mirror" }),
     svg({ data: [0.4], width: 80, height: 24, title: "single sample" }),

@@ -4,7 +4,7 @@
 // gives the glyph a one-shot pulse (CSS, reduced-motion-gated). Keyboard: the
 // wrapper is focusable, nothing more. Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
-import type { MicroDatum } from "../../shared/interactive.js";
+import { named, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -60,9 +60,7 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
       ref={hostRef}
       className="mc-trend-live"
       data-pulse={pulse ? "1" : undefined}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

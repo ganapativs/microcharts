@@ -41,7 +41,7 @@ export const entry: ChartEntry = {
       description: "Numeric magnitude beside the glyph.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"barb" | "arrow"',
       required: false,
       description: '"arrow" swaps quantized barbs for a plain direction arrow + label.',

@@ -41,6 +41,21 @@ describe("<BenchmarkStrip>", () => {
     const { container } = draw(<BenchmarkStrip data={PEERS} value={20} title="Latency vs peers" />);
     await expectNoA11yViolations(container);
   });
+
+  // Degradation contract: see tests/craft/floor.mjs.
+  it("short box: the percentile readout drops, band + focal dot still render", () => {
+    const peers = [120, 135, 128, 480, 142, 2100, 155, 138, 900, 148];
+    const big = draw(<BenchmarkStrip data={peers} value={155} width={160} height={16} />).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    // labelFont floors at 7 viewBox units — a 6-unit box cannot seat a line
+    const small = draw(<BenchmarkStrip data={peers} value={155} width={56} height={6} />).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("rect").length).toBeGreaterThanOrEqual(2);
+    expect(small.querySelector("circle")).not.toBeNull();
+    // the gutter went with the label: no extra width reserved for absent text
+    expect(small.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 56 6");
+  });
 });
 
 seriesEdgeSuite("BenchmarkStrip", (data) => <BenchmarkStrip data={data} value={5} title="Edge" />);

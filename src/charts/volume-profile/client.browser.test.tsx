@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { VolumeProfile } from "./client.js";
+import { profileLayout } from "./geometry.js";
+import { labelFont } from "../../core/labels.js";
+import { makeFormatter } from "../../core/format.js";
 
 const PROFILE = [
   { level: 138, weight: 8 },
@@ -68,6 +71,31 @@ describe("interactive <VolumeProfile>", () => {
     await expect
       .poll(() => screen.container.querySelector('rect[data-mc-w="tick"]'))
       .not.toBeNull();
+  });
+
+  it("its layout matches the painted bars (the POC-label gutter is reserved)", async () => {
+    const screen = await render(
+      <VolumeProfile data={PROFILE} bins={5} align="right" width={120} height={60} />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    // The same call, with the same args, the client now makes for its own
+    // geometry — so its bars are the painted ones. Dropping the second layout
+    // pass widens every bar and, at align="right", moves every x.
+    const geo = profileLayout({
+      data: PROFILE,
+      bins: 5,
+      valueArea: 0.7,
+      align: "right",
+      width: 120,
+      height: 60,
+      label: "poc",
+      fontSize: labelFont(60, 0.11),
+      fmt: makeFormatter(undefined, undefined),
+    });
+    const bar = geo.bars.find((b) => !b.poc)!;
+    expect(fig.querySelector('path[data-mc-ink="bar"]')?.getAttribute("d")).toContain(
+      `M${bar.x} ${bar.y}h${bar.width}`,
+    );
   });
 
   it("controlled selectedIndex pins the band without focus", async () => {

@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
 import { errorBudgetGeometry, type ErrorBudgetGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -86,9 +86,21 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
   const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-error-budget ${className}` : "mc-error-budget";
+  // matches the geometry's default inset; also the annotation scale below
+  const pad = 2;
+  // Budget remaining is a bounded 1→0 axis and the plot floor IS zero budget —
+  // the exhaustion line — so the trace stands on the text baseline. The floor is
+  // fixed by the pad, so it holds for the empty chart too and both align.
+  const seat = { mode: "floor", bottom: height - pad } as const;
 
   const probe = errorBudgetGeometry({ width, height, data, window, rates });
-  const showLabel = label === "remaining" && probe != null;
+  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
+  // box a line of text cannot be seated inside the plot at all. The readout
+  // DROPS rather than spilling past the viewBox, and because the gutter is
+  // derived from it the reserved space goes with it — the plot keeps its own
+  // width and simply stops paying for text it no longer draws. Pure arithmetic:
+  // the static path may never measure text.
+  const showLabel = label === "remaining" && probe != null && labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? fmt(probe!.remaining.value) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
@@ -102,6 +114,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        seat={seat}
         className={cls}
         style={style}
       >
@@ -130,7 +143,6 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
 
   // annotations host contract: Marker x = step position on the elapsed axis,
   // Threshold/TargetZone y = budget-remaining fractions (1 top → 0 bottom).
-  const pad = 2;
   const ann = resolveAnnotations(children, {
     x: (i) => geo.points[Math.round(i)]?.x ?? NaN,
     y: (v) => pad + (1 - v) * (height - 2 * pad),
@@ -146,6 +158,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      seat={seat}
       className={cls}
       style={rootStyle}
     >

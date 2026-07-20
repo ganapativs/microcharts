@@ -49,7 +49,7 @@ import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annot
 - **`<Threshold y={65} label="SLA" />`** — a dashed reference hairline at a data-space `y`.
 - **`<TargetZone y={[40, 60]} />`** — a normal-range band, always drawn _beneath_ the data ink. It takes a `label` too.
 - **`<Marker x={8} label="deploy" />`** — a vertical moment mark; `x` addresses the host's primary axis (the data
-  **index** on S1 charts like Sparkline and SparkBar).
+  **index** on index-based charts like Sparkline and SparkBar).
 - **`<Marker x={8} celebrate />`** — six deterministic particles burst once on entrance, for milestone crossings only;
   under reduced motion they rest as a quiet starburst.
 - **`<Callout x={5} y={45} label="dip" />`** — one narrated point on an elbow hairline. `label` is required; `y` is
@@ -110,11 +110,19 @@ PercentileTrace, RetentionCurve, WinProbWorm, and ErrorBudget. The same `<Thresh
 chart's own data-space, unchanged. (MiniBar hosts in its default **vertical** orientation, where value lives on the
 y-axis; a horizontal MiniBar flips the axes, so it passes annotation children straight through.)
 
-Charts without a single continuous value-y don't host them, by design: scalar readouts (Delta, FatDigits, StatusDot,
-Thermometer), part-to-whole (MicroDonut, SegmentedBar, Funnel), color-encoded value (HeatStrip, ActivityGrid, the
-calendars), value-by-value scatters (QuadrantDot, MicroScatter, BiasStrip), and the pure timelines. Most still accept
-children as a plain pass-through, so an annotation placed inside one renders nothing and warns in dev; a few — Delta
-among them — take no children at all, and it's a type error.
+Charts without a single continuous value-y don't host them, by design — there's no shared `y` for a `<Threshold>` to
+land on:
+
+| Why it can't host             | Examples                                 |
+| ----------------------------- | ---------------------------------------- |
+| Scalar readout — no axis      | Delta, FatDigits, StatusDot, Thermometer |
+| Part-to-whole — y is a share  | MicroDonut, SegmentedBar, Funnel         |
+| Value encoded as colour       | HeatStrip, ActivityGrid, the calendars   |
+| Value against value           | QuadrantDot, MicroScatter, BiasStrip     |
+| Pure timeline — no value axis | the event/phase timelines                |
+
+Most still accept children as a plain pass-through, so an annotation placed inside one renders nothing and warns in dev;
+a few — Delta among them — take no children at all, and it's a type error.
 
 <AnnotationHostShowcase />
 
@@ -126,7 +134,10 @@ among them — take no children at all, and it's a type error.
   pass an explicit `summary` string.
 - `celebrate` particles are seeded from the marker's `x` and the host's size, never `Math.random`, so server and client
   render the same burst.
-- A `label` you supply is the one text the containment rule can't pre-reserve a gutter for, so a label that would
-  overrun its available run is truncated with a trailing `…` rather than spilling outside the chart.
+- A `label` you supply is the one text the containment rule can't pre-reserve a gutter for, so it's kept inside the
+  chart by one of two mechanisms. `Threshold`, `TargetZone` and `Callout` **truncate**: a label longer than its
+  available run is cut and given a trailing `…`. `Marker` instead **flips its anchor** — a label near the right edge
+  draws leftward from the mark rather than off the chart — so a moment mark never loses characters.
 - Reference hairlines draw at a fixed 1-unit weight, deliberately exempt from `--mc-density`, so tightening the density
-  never thickens the context ink along with the data.
+  never thickens the context ink along with the data. The one exception is the `Callout` elbow, drawn a shade lighter at
+  0.75, because it's a leader line pointing at data rather than a reference the reader measures against.

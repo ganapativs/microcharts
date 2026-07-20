@@ -4,12 +4,19 @@
 // order), click / Enter / Space selects (onSelect). Composes the static
 // component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
+import { labelFont } from "../../core/labels.js";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VOLUME_PROFILE } from "../../core/strings-volume-profile.js";
-import { binMass, volumeProfileGeometry } from "./geometry.js";
+import { binMass, profileLayout } from "./geometry.js";
 import {
   VolumeProfile as StaticVolumeProfile,
   volumeProfileSummary,
@@ -34,6 +41,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
     data,
     valueArea = 0.7,
     align = "left",
+    label: labelProp = "poc",
     bins = 12,
     width = 48,
     height = 32,
@@ -58,13 +66,27 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
     origin: align === "right" ? "right" : "left",
   });
 
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // The POC label's gutter narrows every bar, so the client must reserve it on
+  // the same terms the static does or its overlays anchor to unpainted bars.
+  const fontSize = labelFont(height, 0.11);
   const geo = useMemo(
-    () => volumeProfileGeometry({ data, bins, valueArea, align, width, height, gutter: 0 }),
-    [data, bins, valueArea, align, width, height],
+    () =>
+      profileLayout({
+        data,
+        bins,
+        valueArea,
+        align,
+        width,
+        height,
+        label: labelProp,
+        fontSize,
+        fmt,
+      }),
+    [data, bins, valueArea, align, width, height, labelProp, fontSize, fmt],
   );
   const rows = useMemo(() => binMass(data, bins), [data, bins]);
   const total = useMemo(() => rows.reduce((s, r) => s + r.mass, 0), [rows]);
-  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   // Pointer (viewBox space) → the level band containing y.
   const locate = useCallback(
@@ -137,9 +159,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
     <span
       ref={hostRef}
       {...wrap("mc-volprofile-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       {...bind}
     >
       <StaticVolumeProfile
@@ -147,6 +167,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         data={data}
         valueArea={valueArea}
         align={align}
+        label={labelProp}
         bins={bins}
         width={width}
         height={height}
@@ -154,7 +175,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus band is transient. */}
         {selected !== null && selected !== active ? band(selected, true) : null}

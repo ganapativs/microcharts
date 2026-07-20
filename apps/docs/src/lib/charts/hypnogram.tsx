@@ -50,7 +50,7 @@ export const entry: ChartEntry = {
       description: "Accents one state — the decision read.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"steps" | "lanes"',
       required: false,
       description: "Lanes for nominal states with no rank.",
@@ -71,7 +71,7 @@ export const entry: ChartEntry = {
       name: "colors",
       type: "string[]",
       required: false,
-      description: "Per-state lane colours (lanes variant), cycled; overrides --mc-cat-N.",
+      description: "Per-state lane colours (lanes mode), cycled; overrides --mc-cat-N.",
     },
   ],
   demo: [0, 1, 2, 1, 3, 1, 0],
@@ -107,8 +107,8 @@ export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["steps", "lanes"],
       init: "steps",
     },
@@ -126,7 +126,7 @@ export const playground: PlaygroundSpec = {
       data={SLEEP}
       states={STATES}
       domain={DOM}
-      variant={s.variant as "steps" | "lanes"}
+      mode={s.mode as "steps" | "lanes"}
       emphasis={s.emphasis === "none" ? undefined : (s.emphasis as string)}
       connectors={s.connectors as boolean}
       summary={false}
@@ -139,7 +139,7 @@ export const playground: PlaygroundSpec = {
       "<Hypnogram",
       "  data={sleep}",
       `  states={["Awake", "REM", "Light", "Deep"]}`,
-      s.variant !== "steps" && `  variant="${s.variant}"`,
+      s.mode !== "steps" && `  mode="${s.mode}"`,
       s.emphasis !== "none" && `  emphasis="${s.emphasis}"`,
       s.connectors === false && "  connectors={false}",
       "/>",
@@ -159,13 +159,13 @@ export const recipes: Recipe[] = [
   },
   {
     label: "lanes (nominal)",
-    code: `<Hypnogram data={sleep} variant="lanes" />`,
+    code: `<Hypnogram data={sleep} mode="lanes" />`,
     node: (
       <Hypnogram
         data={SLEEP}
         states={STATES}
         domain={DOM}
-        variant="lanes"
+        mode="lanes"
         summary={false}
         width={160}
         height={64}

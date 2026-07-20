@@ -5,7 +5,7 @@
 import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
-import { textGutter } from "../../core/labels.js";
+import { labelFitsBand, textGutter } from "../../core/labels.js";
 
 interface StripRow {
   y: number;
@@ -59,6 +59,19 @@ function rowStats(sample: readonly number[]): RowStats | null {
   return { p5: small ? e[0] : p5, p25, p50, p75, p95: small ? e[1] : p95, small };
 }
 
+/**
+ * Do the A/B row tags fit? The two arms split the padded box into two rows and
+ * each tag is centred on its row, so once the row pitch is under one em the tags
+ * stack on each other ("A" on "B", "Ctrl" on "Test") and the outer two push
+ * their em-boxes past the viewBox edge. There is no smaller type to retreat to,
+ * so below the pitch the tags drop — pass `labelChars: 0` and the lead gutter
+ * drops with them. The arms are still distinguishable without the tags: row A is
+ * neutral ink and row B is accent, top-to-bottom in the summary's order.
+ */
+export function abTagsFit(height: number, fontSize: number, pad = 2): boolean {
+  return labelFitsBand((height - pad * 2) / 2, fontSize);
+}
+
 export function abStripsGeometry(opts: {
   width: number;
   height: number;
@@ -79,8 +92,11 @@ export function abStripsGeometry(opts: {
   const fontSize = opts.fontSize ?? 0;
   const gutterCh = opts.gutterCh ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
-  // left gutter for the A/B row tags (≈ 2 ch)
-  const lead = textGutter(opts.labelChars ?? 2, fontSize, 3);
+  // left gutter for the A/B row tags (≈ 2 ch). `labelChars: 0` means the caller
+  // dropped the tags (see `abTagsFit`) — the gutter goes with them, so the two
+  // strips reclaim the full width rather than sitting against dead space.
+  const labelChars = opts.labelChars ?? 2;
+  const lead = labelChars > 0 ? textGutter(labelChars, fontSize, 3) : 0;
 
   const domain: readonly [number, number] =
     opts.domain && opts.domain.every((d) => Number.isFinite(d))

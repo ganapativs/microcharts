@@ -90,8 +90,8 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
   const model = trendArrowModel(props);
   const geo = trendArrowGeometry({ width: SIZE, height: SIZE, direction: model.direction, glyph });
 
-  // Right gutter reserved from the rendered text's char count (
-  // 0.62em/char over-estimate; never measured).
+  // Right gutter reserved from the rendered text's char count
+  // (0.62em/char over-estimate; never measured).
   const width = showValue
     ? Math.ceil(geo.labelX + model.display.length * geo.fontSize * 0.62 + 1)
     : SIZE;
@@ -113,6 +113,10 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Symmetric glyph — every direction variant is drawn centred in BOX, so
+      // the box itself is the plot box and holds for arrow/triangle/chevron/flat
+      // alike. `showValue` only widens the viewBox; the glyph's band is unmoved.
+      seat={{ mode: "center", top: 0, bottom: SIZE }}
       className={className ? `mc-trend ${className}` : "mc-trend"}
       style={rootStyle}
     >

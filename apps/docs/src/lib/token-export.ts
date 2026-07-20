@@ -164,7 +164,7 @@ export const BASE_TOKENS: BaseToken[] = [
     note: "Direct-label weight",
   },
   { cssVar: "--mc-inline-nudge", light: "0em", category: "type", note: "Optional inline optical shift" }, // prettier-ignore
-  { cssVar: "--mc-glyph-nudge", light: "-0.04em", category: "type", note: "Centred-glyph optical lift" }, // prettier-ignore
+  { cssVar: "--mc-glyph-nudge", light: "0em", category: "type", note: "Centred-glyph optical lift" }, // prettier-ignore
   // interactive readout surface
   {
     cssVar: "--mc-surface",

@@ -53,6 +53,35 @@ describe("interactive <Ohlc>", () => {
     await expect.poll(() => fig.querySelector(FOCUS)).toBeNull();
   });
 
+  it("a corrupt period is skipped, and the candles after it keep their own O/H/L/C", async () => {
+    // Period 1 is corrupt (high < low): 4 of 5 candles paint. The 2nd painted
+    // candle is period 2 and must announce period 2 — not its left neighbour.
+    const withCorrupt = [
+      { open: 10, high: 15, low: 8, close: 13 },
+      { open: 10, high: 8, low: 12, close: 9 },
+      { open: 20, high: 25, low: 18, close: 23 },
+      { open: 30, high: 35, low: 28, close: 33 },
+      { open: 40, high: 45, low: 38, close: 43 },
+    ];
+    const seen: unknown[] = [];
+    const screen = await render(<Ohlc data={withCorrupt} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-ohlc-live") as HTMLElement;
+    wrap.focus();
+    // Home → the first painted candle, then one step onto the one after the gap.
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect
+      .poll(() => live.textContent)
+      .toBe("Period 3 of 5: open 20, high 25, low 18, close 23.");
+    // The rove never lands on the corrupt period, and the datum names it by
+    // its own data index.
+    expect(seen.at(-1)).toEqual({ index: 2, value: 23 });
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("O20 H25 L18 C23");
+  });
+
   it("controlled selectedIndex pins the frame with no interaction", async () => {
     const screen = await render(<Ohlc data={PERIODS} selectedIndex={0} />);
     const fig = screen.container.querySelector(".mc-ohlc-live") as HTMLElement;

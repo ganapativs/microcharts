@@ -38,8 +38,8 @@ export interface BulletGeometryOptions {
 export function bulletGeometry(opts: BulletGeometryOptions): BulletGeometry {
   const { width, height, pad = 1 } = opts;
   // Non-finite inputs are documented no-shows: NaN/±Infinity value → zero-width
-  // measure, unusable target → no tick, bad bands/domain dropped (
-  // degenerates render as designed empties, never as NaN attributes).
+  // measure, unusable target → no tick, bad bands/domain dropped. Degenerates
+  // render as designed empties, never as NaN attributes.
   const hasValue = Number.isFinite(opts.value);
   const value = hasValue ? opts.value : 0;
   const target = Number.isFinite(opts.target) ? opts.target : undefined;

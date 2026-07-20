@@ -3,8 +3,9 @@
 // region on change; the pip set cross-fades (opacity, reduced-motion → instant).
 // No sub-part navigation — the pips are one value. Composes the static component.
 import { useEffect, useRef, useState } from "react";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
-import { FILL, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
+import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { DicePips as StaticDicePips, dicePipsSummary, type DicePipsProps } from "./index.js";
 
 export interface InteractiveDicePipsProps extends DicePipsProps {
@@ -28,6 +29,9 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
   } = props;
   const summary = dicePipsSummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
+  // seat the wrapper, not just the SVG, so the click target stays on the
+  // painted glyph when this sits inline in prose (see seat-hoist).
+  useSeatHoist(wrap);
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");
 
@@ -69,9 +73,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
     <span
       ref={wrap}
       {...wrapAttrs("mc-dice-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
@@ -79,7 +81,13 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
         pick();
       }}
     >
-      <StaticDicePips {...rest} style={FILL} value={value} strings={strings} summary={false} />
+      <StaticDicePips
+        {...rest}
+        style={fillFor(style)}
+        value={value}
+        strings={strings}
+        summary={false}
+      />
       {live ? (
         <span
           aria-live="polite"

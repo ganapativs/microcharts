@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-// The BUILT artifact — visual baseline doubles as a dist smoke test (plan/09).
+// The BUILT artifact — visual baseline doubles as a dist smoke test.
 import { WindBarb } from "../../dist/charts/wind-barb/index.js";
 
 const styles = readFileSync(fileURLToPath(new URL("../../styles.css", import.meta.url)), "utf8");
@@ -13,7 +13,7 @@ const svg = (props: Record<string, unknown>) => renderToStaticMarkup(h(WindBarb 
 function gallery(): string {
   const sentence = `Winds ${svg({ direction: 225, magnitude: 32, step: 10, size: 24, summary: false })} at the summit station.`;
 
-  // station-row table — the hero context (plan/25 §8)
+  // station-row table — the hero context
   const cell = `<table><tbody>
     <tr><td>KSFO</td><td>${svg({ direction: 280, magnitude: 12, size: 20, summary: false })}</td></tr>
     <tr><td>KJFK</td><td>${svg({ direction: 45, magnitude: 55, size: 20, summary: false })}</td></tr>
@@ -31,7 +31,7 @@ function gallery(): string {
     svg({ direction: 0, magnitude: 1, title: "calm", size: 40 }),
     svg({ direction: 45, magnitude: 25, title: "half + full barbs", size: 40 }),
     svg({ direction: 225, magnitude: 55, title: "pennant", size: 40 }),
-    svg({ direction: 45, magnitude: 25, variant: "arrow", title: "arrow variant", size: 40 }),
+    svg({ direction: 45, magnitude: 25, mode: "arrow", title: "arrow mode", size: 40 }),
     svg({ direction: 45, magnitude: 25, label: "value", title: "with label", size: 40 }),
     svg({ direction: 300, magnitude: -20, title: "negative magnitude (flips 180°)", size: 40 }),
   ].join(" ");

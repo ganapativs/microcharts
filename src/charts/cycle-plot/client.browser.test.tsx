@@ -147,4 +147,16 @@ describe("interactive <CyclePlot>", () => {
     const wrap = screen.container.querySelector(".mc-cycle-plot-live") as HTMLElement;
     expect(wrap.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  it("an empty slot announces no data instead of formatting its NaN center", async () => {
+    // Wed (index 3) has no finite observation in any week → an empty slot whose
+    // geometry center.value is NaN. Selecting it must not leak "NaN".
+    const gappy: number[] = [];
+    for (let w = 0; w < 6; w++) gappy.push(38, 40, 45, Number.NaN, 52, 61, 44);
+    const screen = await mount({ data: gappy, selectedIndex: 3 });
+    const wrap = screen.container.querySelector(".mc-cycle-plot-live") as HTMLElement;
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toBe("Wed: no data.");
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("Wed: —");
+  });
 });

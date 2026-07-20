@@ -36,7 +36,7 @@ export const entry: ChartEntry = {
       description: "The two arms — raw samples, not summaries.",
     },
     {
-      name: "labels",
+      name: "seriesLabels",
       type: "[string, string]",
       required: false,
       description: "Row identities for the gutter tags + summary (default ['A', 'B']).",
@@ -112,12 +112,12 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "labelled arms",
-    code: `<ABStrips data={{ a: control, b: test }} labels={["Control", "Test"]} />`,
+    code: `<ABStrips data={{ a: control, b: test }} seriesLabels={["Control", "Test"]} />`,
     node: (
       <ABStrips
         data={{ a: A, b: B }}
         format={MS}
-        labels={["Ctrl", "Test"]}
+        seriesLabels={["Ctrl", "Test"]}
         summary={false}
         width={180}
         height={22}

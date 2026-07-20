@@ -17,7 +17,8 @@ import { EN_BIAS_STRIP } from "../../core/strings-bias-strip.js";
 import { biasLayout, biasStripGeometry } from "./geometry.js";
 import { BiasStrip as StaticBiasStrip, biasStripSummary, type BiasStripProps } from "./index.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
@@ -163,14 +164,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-bias-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-bias-live", className, style)} {...named(label)} {...bind}>
       <StaticBiasStrip
         {...rest}
         data={data}
@@ -181,7 +175,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}

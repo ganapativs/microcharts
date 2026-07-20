@@ -35,8 +35,8 @@ import winProbWorm from "@/lib/charts/win-prob-worm";
 /** Narrow module map for the homepage catalog board — only the slugs `POOL` can
  *  deal, so the client bundle carries ~three dozen previews instead of the entire
  *  106-chart registry (which imports every chart's static AND interactive entry).
- *  Keep in sync with POOL in `catalog-grid.tsx`; `catalog-grid.test.ts` fails if
- *  they drift. */
+ *  `POOL` below is derived from this map's own keys, so the board can only ever
+ *  deal slugs that are actually bundled — the two cannot drift apart. */
 export const HERO_MODULES: Record<string, ChartModule> = {
   sparkline: sparkline,
   sparkbar: sparkbar,

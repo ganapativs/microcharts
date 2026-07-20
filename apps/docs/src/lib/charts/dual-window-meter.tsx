@@ -46,12 +46,6 @@ export const entry: ChartEntry = {
       description: "A compliance corridor instead of one line.",
     },
     {
-      name: "damping",
-      type: "number",
-      required: false,
-      description: "Ballistics (α) for the live entry's displayed motion only.",
-    },
-    {
       name: "domain",
       type: "[number, number]",
       required: false,

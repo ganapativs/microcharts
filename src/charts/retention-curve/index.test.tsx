@@ -68,3 +68,21 @@ describe("<RetentionCurve>", () => {
 seriesEdgeSuite("RetentionCurve", (data) => (
   <RetentionCurve data={data as number[]} title="Edge" />
 ));
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("RetentionCurve degradation", () => {
+  it("the last-value readout drops under a 7-unit box, the curve still draws", () => {
+    const big = draw(
+      <RetentionCurve data={SAMPLE} unit="week" width={240} height={32} />,
+    ).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(
+      <RetentionCurve data={SAMPLE} unit="week" width={48} height={6} />,
+    ).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+});

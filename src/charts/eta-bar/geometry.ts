@@ -32,7 +32,6 @@ export function etaBarGeometry(opts: {
   const h = round2(height - inset * 2);
   const track = width - inset * 2;
 
-  // done
   if (p >= 1) {
     return {
       done: { x: inset, y, width: round2(track), height: h },

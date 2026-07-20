@@ -20,7 +20,7 @@ export const playground: PlaygroundSpec = {
     return (
       <MiniBarInteractive
         data={rows}
-        sort={s.sort as "none" | "desc" | "asc"}
+        order={s.order as "data" | "desc" | "asc"}
         highlight={(s.highlight as boolean) ? rows[0]!.label : undefined}
         orientation={s.orientation as "horizontal" | "vertical"}
         positive={signed ? "up" : undefined}
@@ -38,7 +38,7 @@ export const playground: PlaygroundSpec = {
     return [
       "<MiniBar",
       `  data={${varName}}`,
-      s.sort !== "none" && `  sort="${s.sort}"`,
+      s.order !== "data" && `  order="${s.order}"`,
       (s.highlight as boolean) && `  highlight="${target}"`,
       s.orientation === "horizontal" && '  orientation="horizontal"',
       signed && '  positive="up"',

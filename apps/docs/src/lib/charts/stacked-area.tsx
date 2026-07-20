@@ -32,7 +32,7 @@ export const entry: ChartEntry = {
       description: "≤ 3 series (hard cap).",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"stacked" | "ridge"',
       required: false,
       description: "Ridge = same stack, overlapping-crest skin.",
@@ -86,8 +86,8 @@ export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["stacked", "ridge"],
       init: "stacked",
     },
@@ -125,7 +125,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <StackedArea
       data={MIX}
-      variant={s.variant as "stacked" | "ridge"}
+      mode={s.mode as "stacked" | "ridge"}
       order={s.order as "data" | "asc"}
       label={s.label as "last" | "none"}
       curve={s.curve as "linear" | "smooth"}
@@ -139,7 +139,7 @@ export const playground: PlaygroundSpec = {
     [
       "<StackedArea",
       "  data={mix}",
-      s.variant !== "stacked" && `  variant="${s.variant}"`,
+      s.mode !== "stacked" && `  mode="${s.mode}"`,
       s.order !== "data" && `  order="${s.order}"`,
       s.label !== "none" && `  label="${s.label}"`,
       s.curve !== "linear" && `  curve="${s.curve}"`,
@@ -159,8 +159,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "ridge skin",
-    code: `<StackedArea data={mix} variant="ridge" />`,
-    node: <StackedArea data={MIX} variant="ridge" summary={false} width={160} height={20} />,
+    code: `<StackedArea data={mix} mode="ridge" />`,
+    node: <StackedArea data={MIX} mode="ridge" summary={false} width={160} height={20} />,
   },
 ];
 

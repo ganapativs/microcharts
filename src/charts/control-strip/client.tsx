@@ -5,7 +5,13 @@
 // component (canon); the crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CONTROL, type ControlStrings } from "../../core/strings-control.js";
@@ -156,14 +162,12 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
     <span
       ref={hostRef}
       {...wrap("mc-control-strip-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticControlStrip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         limits={limits}
         baseline={baseline}

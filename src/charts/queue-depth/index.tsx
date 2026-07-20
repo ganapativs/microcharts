@@ -5,7 +5,7 @@
 // hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUEUE_DEPTH, type QueueDepthStrings } from "../../core/strings-queue-depth.js";
 import { queueDepthGeometry, type QueueDepthGeometry } from "./geometry.js";
@@ -36,6 +36,50 @@ export function queueSummary(
 }
 
 const GLYPH: Record<QueueDepthGeometry["trend"], string> = { up: "▴", down: "▾", flat: "" };
+
+/**
+ * The seat-gated right-gutter labels and, with them, the static's real viewBox
+ * width. Exported as ONE function because both entries need the same answer:
+ * the static draws with it, and the interactive entry must scale pointer x by
+ * the same total — scaling by bare `width` shifts every hit rightward and puts
+ * the last readings out of reach. `endText`/`capText` are `""` when seat-gated
+ * off, which is also the "don't render it" signal.
+ */
+export function queueDepthLabels(
+  geo: QueueDepthGeometry,
+  opts: {
+    width: number;
+    height: number;
+    capacity: number | undefined;
+    label: "last" | "none";
+    fmt: (n: number) => string;
+  },
+): { endText: string; capText: string; totalWidth: number } {
+  const font = labelFont(opts.height);
+  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
+  // box neither readout can be seated inside the plot. Both DROP rather than
+  // spilling past the viewBox, and the gutter below is derived from their text
+  // so it drops with them — the area keeps its own width and simply stops
+  // paying for text it no longer draws. Pure arithmetic: never measured.
+  const fits = labelFitsY(opts.height / 2, font, opts.height);
+  const showEnd = opts.label === "last" && fits;
+  const end = geo.points[geo.points.length - 1]!;
+  const endText = showEnd ? `${opts.fmt(end.value)}${GLYPH[geo.trend]}` : "";
+  // the capacity label yields to the endpoint label when they'd overlap (seat-gate)
+  const showCap =
+    fits &&
+    geo.capLabelY !== null &&
+    opts.capacity !== undefined &&
+    (!showEnd || Math.abs(geo.capLabelY - geo.labelY) >= font + 0.8);
+  const capText = showCap ? opts.fmt(opts.capacity!) : "";
+  // reserve the right gutter for whichever label is wider (containment)
+  const gutterCh = Math.max(endText.length, capText.length);
+  return {
+    endText,
+    capText,
+    totalWidth: opts.width + (gutterCh > 0 ? Math.ceil(gutterCh * font * 0.72) + 4 : 0),
+  };
+}
 
 export interface QueueDepthProps {
   /** Backlog depth per period (≥ 0). `null`/`NaN`/`±Infinity` are gaps. */
@@ -104,17 +148,15 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
   }
 
   const end = geo.points[geo.points.length - 1]!;
-  const showEnd = label === "last";
-  const endText = showEnd ? `${fmt(end.value)}${GLYPH[geo.trend]}` : "";
-  // the capacity label yields to the endpoint label when they'd overlap (seat-gate)
-  const showCap =
-    geo.capLabelY !== null &&
-    capacity !== undefined &&
-    (!showEnd || Math.abs(geo.capLabelY - geo.labelY) >= FONT + 0.8);
-  const capText = showCap ? fmt(capacity!) : "";
-  // reserve the right gutter for whichever label is wider (containment)
-  const gutterCh = Math.max(showEnd ? endText.length : 0, showCap ? capText.length : 0);
-  const totalWidth = width + (gutterCh > 0 ? Math.ceil(gutterCh * FONT * 0.72) + 4 : 0);
+  const { endText, capText, totalWidth } = queueDepthLabels(geo, {
+    width,
+    height,
+    capacity,
+    label,
+    fmt,
+  });
+  const showEnd = endText !== "";
+  const showCap = capText !== "";
 
   const accName = resolveSummary(summary, () => queueSummary(geo, fmt, strings));
 
@@ -144,13 +186,16 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A stock: the zero-anchored area's own baseline is the datum "queue
+      // empty", so that floor belongs on the text baseline. The capacity
+      // hairline floats inside the frame and never redefines the bottom.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={cls}
       style={rootStyle}
     >
       {ann.under}
       {/* stock area — accent, zero-anchored, lowest z */}
       <path d={geo.area} fill={lineColor} fillOpacity={0.22} stroke="none" />
-      {/* capacity hairline — muted, dashed */}
       {geo.capacityY !== null ? (
         <line
           x1={0}
@@ -163,7 +208,6 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* top edge — accent, support width */}
       <path
         d={geo.line}
         data-mc-ink="accent"

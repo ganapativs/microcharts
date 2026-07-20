@@ -35,7 +35,7 @@ export const entry: ChartEntry = {
       description: "Density series, viewport, ticks, covered regions.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"bars" | "heat"',
       required: false,
       description: "Heat is a calmer opacity strip.",
@@ -81,8 +81,8 @@ export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["bars", "heat"],
       init: "bars",
     },
@@ -92,7 +92,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <MinimapStrip
       data={{ ...DATA, window: [s.window as number, (s.window as number) + 140] }}
-      variant={s.variant as "bars" | "heat"}
+      mode={s.mode as "bars" | "heat"}
       markLane={s.markLane as boolean}
       summary={false}
       width={320}
@@ -103,7 +103,7 @@ export const playground: PlaygroundSpec = {
     [
       "<MinimapStrip",
       `  data={{ content, window: [${s.window}, ${(s.window as number) + 140}], marks, known }}`,
-      s.variant !== "bars" && `  variant="${s.variant}"`,
+      s.mode !== "bars" && `  mode="${s.mode}"`,
       s.markLane === false && "  markLane={false}",
       "/>",
     ]
@@ -121,8 +121,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "heat",
-    code: `<MinimapStrip data={data} variant="heat" />`,
-    node: <MinimapStrip data={DATA} variant="heat" summary={false} width={220} height={16} />,
+    code: `<MinimapStrip data={data} mode="heat" />`,
+    node: <MinimapStrip data={DATA} mode="heat" summary={false} width={220} height={16} />,
   },
 ];
 

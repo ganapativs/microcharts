@@ -1,5 +1,5 @@
-// Deterministic 1-D label layout ( discipline: pure arithmetic, no
-// measurement). Given desired label positions on one axis, spread them to a
+// Deterministic 1-D label layout: pure arithmetic, no measurement. Given
+// desired label positions on one axis, spread them to a
 // minimum pitch inside [min, max] with the least total displacement — the
 // classic greedy forward/backward sweep. Returns null when they cannot all
 // fit (caller falls back to its drop-out rule).
@@ -60,6 +60,45 @@ export function textGutter(chars: number, fontSize: number, pad: number): number
  */
 export function textGutterProse(chars: number, fontSize: number, pad: number): number {
   return Math.ceil(chars * fontSize * 0.95) + pad;
+}
+
+/**
+ * Does one line of `fontSize` text anchored at baseline `y` fit vertically
+ * inside a `height`-tall viewBox? `mid` = `dominant-baseline: central` (the box
+ * straddles `y`); otherwise alphabetic (ascent above the baseline, descent
+ * below). The 0.78/0.22 ascent/descent split is the same model the craft audit
+ * uses, so a chart that gates on this agrees with the gate.
+ *
+ * This is the DEGRADATION primitive: a label that no longer fits is DROPPED —
+ * never painted outside the box, never stacked on its neighbour. Pure
+ * arithmetic, because the static path may never measure text.
+ */
+export function labelFitsY(y: number, fontSize: number, height: number, mid = true): boolean {
+  const top = mid ? fontSize * 0.5 : fontSize * 0.78;
+  const bottom = mid ? fontSize * 0.5 : fontSize * 0.22;
+  return y - top >= 0 && y + bottom <= height;
+}
+
+/**
+ * Does a horizontally-set label at `fontSize` fit in `band` viewBox units of
+ * vertical room? The degradation test: a chart that shrinks must DROP a label it
+ * can no longer seat, never draw it overlapping or outside the box.
+ *
+ * A centred label owns a full em-box vertically, so a band shorter than the font
+ * size guarantees one of two failures — the outermost row's text crosses the
+ * viewBox edge (`.mc-root` is `overflow: visible`, so it spills into the page
+ * rather than clipping), or adjacent rows' text stack on each other. Shrinking
+ * the type is not an escape hatch: `labelFont` floors at 7 precisely so text
+ * never reads smaller than the rest of the library, which means below that floor
+ * the label has to go.
+ *
+ * `band` is the vertical room the label actually gets — the row pitch for a
+ * stacked chart, the full height for a single centred label. Pair a `false` here
+ * with dropping the label's reserved gutter in the same branch: a gutter that
+ * outlives its label is dead space that shifts the plot for nothing.
+ */
+export function labelFitsBand(band: number, fontSize: number): boolean {
+  return band >= fontSize;
 }
 
 export function spreadLabels(

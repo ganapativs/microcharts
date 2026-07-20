@@ -43,6 +43,33 @@ describe("<DualWindowMeter>", () => {
     const { container } = draw(<DualWindowMeter data={NOISE} target={75} title="Loudness" />);
     await expectNoA11yViolations(container);
   });
+
+  // Degradation contract: see tests/craft/floor.mjs.
+  it("short box: the readouts drop, both traces still render", () => {
+    const series = Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 4) * 4);
+    const big = draw(
+      <DualWindowMeter data={series} target={-23} width={320} height={28} />,
+    ).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    // labelFont floors at 7 viewBox units — a 7-unit box seats nothing spare
+    const small = draw(
+      <DualWindowMeter data={series} target={-23} width={80} height={6} />,
+    ).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("path").length).toBe(2);
+  });
+
+  it("the readout states the level, not every float digit", () => {
+    const series = Array.from({ length: 60 }, (_, i) => -22 + Math.sin(i / 4) * 4);
+    const { container } = draw(
+      <DualWindowMeter data={series} target={-23} width={320} height={28} />,
+    );
+    for (const t of container.querySelectorAll("text")) {
+      const decimals = t.textContent!.split(".")[1] ?? "";
+      expect(decimals.length).toBeLessThanOrEqual(1);
+    }
+  });
 });
 
 seriesEdgeSuite("DualWindowMeter", (data: readonly Value[]) => (

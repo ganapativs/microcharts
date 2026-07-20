@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
+import { labelFitsY } from "../../core/labels.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { dumbbellGeometry } from "./geometry.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
@@ -104,8 +105,16 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
   }
 
   const fontSize = 6;
-  const hasLabels = data.some((d) => d.label);
-  const maxLabelChars = hasLabels
+  // Rows share the height evenly, so the row pitch IS the vertical room a row
+  // label gets. Once the pitch drops under a line of text the names stack on
+  // each other — the "Paris/Berlin/Rome in a tab header" failure. They DROP
+  // instead, all together (the pitch is uniform, so it is never a partial
+  // decision), and the gutter drops with them so the paired dots — the actual
+  // encoding — reclaim the full width and stay readable.
+  // Pure arithmetic: the static path may never measure text.
+  const rowPitch = data.length > 0 ? height / data.length : 0;
+  const showRowLabels = data.some((d) => d.label) && rowPitch >= fontSize + 0.5;
+  const maxLabelChars = showRowLabels
     ? Math.min(
         6,
         data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0),
@@ -137,6 +146,11 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Paired dots on category rows — value runs sideways, so no row rests on
+      // the box bottom and the stack centres on the cap band. Rows always fill
+      // the height (pitch = height / n), so the box is the plot box vertically;
+      // the label gutter insets only the value axis.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-dumbbell ${className}` : "mc-dumbbell"}
       style={rootStyle}
     >
@@ -167,11 +181,16 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
         const leftX = row.x0 !== null && row.x1 !== null ? Math.min(row.x0, row.x1) : null;
         const rightX = row.x0 !== null && row.x1 !== null ? Math.max(row.x0, row.x1) : null;
         // values render only when BOTH the span is wide enough and each label's
-        // estimate stays inside the viewBox (pure arithmetic — )
+        // estimate stays inside the viewBox — pure arithmetic, never measured.
         const leftVal = leftX !== null ? (row.x0! <= row.x1! ? d.from : d.to) : 0;
         const rightVal = rightX !== null ? (row.x0! <= row.x1! ? d.to : d.from) : 0;
+        // values sit ON the row, so they need the same vertical room the row
+        // names do — and their own line has to clear the box top/bottom once
+        // the row y is clamped against the edge.
         const showValues =
           label === "value" &&
+          rowPitch >= fontSize + 0.5 &&
+          labelFitsY(row.y, fontSize, height) &&
           leftX !== null &&
           rightX !== null &&
           rightX - leftX >= Math.max(est(leftVal), est(rightVal)) &&
@@ -179,7 +198,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
           rightX + 4 + est(rightVal) <= width;
         return (
           <g key={row.index}>
-            {d.label ? (
+            {showRowLabels && d.label ? (
               <text
                 x={geo.labelX}
                 y={row.y}
@@ -200,7 +219,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
                 data-mc-ink={connectorInk}
                 vectorEffect="non-scaling-stroke"
                 // 1.25 sits in the "1.2–1.8 secondary mark" justified-literal
-                // band (FOUNDATION.md §1.2) — a touch thinner than full data ink.
+                // band — a touch thinner than full data ink.
                 strokeWidth={1.25}
               />
             ) : null}

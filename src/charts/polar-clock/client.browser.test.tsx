@@ -51,6 +51,27 @@ describe("interactive <PolarClock>", () => {
     await expect.poll(() => fig.querySelector('path[data-mc-w="tick"]')).not.toBeNull();
   });
 
+  it("a fractional `start` still answers the pointer (client shares the paint's rotation)", async () => {
+    // start=1.5 rotates by whole slots, so Monday sits at 12 o'clock. Inverting
+    // the RAW start here produced index 1.5 — no segment, a dial dead to hover.
+    const seen: unknown[] = [];
+    const screen = await render(
+      <PolarClock data={WEEK} start={1.5} onActive={(d) => seen.push(d)} />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const r = fig.getBoundingClientRect();
+    fig.dispatchEvent(
+      new PointerEvent("pointermove", {
+        bubbles: true,
+        clientX: r.left + r.width / 2,
+        clientY: r.top + 2, // just below 12 o'clock
+      }),
+    );
+    expect(seen.at(-1)).toEqual({ index: 1, value: 200, label: "Monday" });
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toBe("Monday: 200.");
+  });
+
   it("controlled selectedIndex pins the sector without focus", async () => {
     const screen = await render(<PolarClock data={WEEK} selectedIndex={3} />);
     const fig = screen.getByRole("img").element() as HTMLElement;

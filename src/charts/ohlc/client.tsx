@@ -7,7 +7,14 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { ohlcGeometry } from "./geometry.js";
@@ -26,7 +33,7 @@ export interface InteractiveOhlcProps extends OhlcProps, PickerProps {
 export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
   const {
     data,
-    variant = "candle",
+    mode = "candle",
     maxPeriods = 20,
     label = "none",
     domain,
@@ -54,7 +61,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
   // period whole — the wick used to ride the quiet stage and so every wick
   // faded in before any body popped. `order: "x"` clusters each period's marks
   // at one x, so they enter together (a thin vertical wick scaling from its
-  // center is fine). The "bars" variant has no body rect, only support-tick
+  // center is fine). The "bars" mode has no body rect, only support-tick
   // lines; they now trail per period too instead of the whole-svg wipe.
   useEntrance(hostRef, "trail", animate, {
     selector: 'rect[data-mc-ohlc], line[data-mc-w="support"]',
@@ -87,38 +94,52 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     [data, maxPeriods],
   );
 
+  // The navigable stops are the PAINTED candles, keyed by their period index in
+  // `rendered`; corrupt periods are dropped, so that space is sparse and a
+  // lookup — not mark order — is what addresses a period.
+  const markByIndex = useMemo(() => {
+    const m = new Map<number, (typeof geo.marks)[number]>();
+    geo.marks.forEach((k) => m.set(k.index, k));
+    return m;
+  }, [geo]);
+  const stops = useMemo(() => geo.marks.map((m) => m.index), [geo]);
+
+  // Pointer (viewBox space) → nearest candle; returns its PERIOD index.
   const locate = useCallback(
     (x: number) => {
       if (geo.marks.length === 0) return null;
-      let best = 0;
+      let best = geo.marks[0]!.index;
       let bestDist = Infinity;
-      geo.marks.forEach((m, i) => {
+      geo.marks.forEach((m) => {
         const dist = Math.abs(m.x - x);
         if (dist < bestDist) {
           bestDist = dist;
-          best = i;
+          best = m.index;
         }
       });
       return best;
     },
     [geo],
   );
+  // Walk painted candles (skip corrupt periods): step in stop-space, land on
+  // period indices.
+  const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
   // index = the RENDERED period (the most recent `maxPeriods`, corrupt periods
   // skipped); value = that period's close, the settlement price.
   const datum = useCallback(
     (i: number) => {
-      const m = geo.marks[i];
-      const p = m ? rendered[m.index] : undefined;
+      const p = rendered[i];
       return { index: i, value: p ? p.close : null };
     },
-    [geo, rendered],
+    [rendered],
   );
 
   const { active, selected, bind } = useActivePicker({
-    count: geo.marks.length,
+    count: stops.length,
     width,
     height,
     locate,
+    step,
     datum,
     onActive,
     onSelect,
@@ -135,7 +156,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const frame = (i: number, pinned: boolean) => {
-    const m = geo.marks[i];
+    const m = markByIndex.get(i);
     if (!m) return null;
     return (
       <rect
@@ -154,13 +175,16 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
   // The unit shown by the frame + readout: the live hover/keyboard focus,
   // falling back to a pinned selection when the pointer has left.
   const shown = active ?? selected;
-  const mark = shown !== null ? geo.marks[shown] : undefined;
-  const period = mark ? rendered[mark.index] : undefined;
+  const mark = shown !== null ? markByIndex.get(shown) : undefined;
+  const period = shown !== null ? rendered[shown] : undefined;
+  // Ordinal + total are stated over the rendered WINDOW, not the painted
+  // candles: the ordinal is the period's own place in it, so a skipped corrupt
+  // period must still be counted or "period 3 of 4" would name period 4.
   const announced =
     mark && period
       ? strings.ohlcAt(
-          mark.index + 1,
-          geo.marks.length,
+          shown! + 1,
+          rendered.length,
           fmt(period.open),
           fmt(period.high),
           fmt(period.low),
@@ -169,19 +193,12 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-ohlc-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-ohlc-live", className, style)} {...named(ariaLabel)} {...bind}>
       <StaticOhlc
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
-        variant={variant}
+        mode={mode}
         maxPeriods={maxPeriods}
         label={label}
         domain={domain}

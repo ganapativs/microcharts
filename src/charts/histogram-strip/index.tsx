@@ -77,6 +77,10 @@ export function HistogramStrip(props: HistogramStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Counts are zero-anchored and every bin's bottom edge is `height`; the
+      // half-unit inset geometry reserves is at the TOP (headroom for the modal
+      // bin), so the floor is the box bottom and the bins sit on the baseline.
+      seat={{ mode: "floor", bottom: height }}
       className={className ? `mc-histogram ${className}` : "mc-histogram"}
       style={style}
     >

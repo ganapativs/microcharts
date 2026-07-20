@@ -7,7 +7,13 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { isFiniteValue } from "../../core/types.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { pairedBarsGeometry } from "./geometry.js";
@@ -178,17 +184,10 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
   const shownPos = shown !== null ? shown * geo.pitch : 0;
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-paired-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-paired-live", className, style)} {...named(label)} {...bind}>
       <StaticPairedBars
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         mode={mode}
         orientation={orientation}
@@ -210,7 +209,11 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((shownPos + bandW / 2) / width) * 100}%`,
+            // `pitch` is a length on the CATEGORY axis — x when vertical, but y
+            // when horizontal. Only the vertical orientation may spend it on
+            // `left`; a horizontal chart's rows differ in y, and the chip has no
+            // vertical anchor (it sits at `bottom: 100%`), so it centres.
+            left: `${((orientation === "vertical" ? shownPos + bandW / 2 : width / 2) / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >

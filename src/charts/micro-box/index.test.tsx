@@ -36,6 +36,21 @@ describe("<MicroBox>", () => {
     expect(container.querySelectorAll("circle").length).toBe(3);
   });
 
+  it("< 5 raw observations honour `domain` (the dots are not stretched to fit)", () => {
+    // Regression: the small-n path ignored `domain` and always spanned the box,
+    // so the dots disagreed with the interactive entry's stat crosshair.
+    const { container } = draw(<MicroBox data={[1, 2, 3]} domain={[0, 10]} />);
+    const cx = [...container.querySelectorAll("circle")].map((c) => Number(c.getAttribute("cx")));
+    expect(cx[0]).toBeCloseTo(5.2, 1);
+    expect(cx[2]).toBeCloseTo(12.6, 1);
+  });
+
+  it("< 5 all-equal observations sit at centre, not on the left edge", () => {
+    const { container } = draw(<MicroBox data={[7, 7, 7]} />);
+    const cx = [...container.querySelectorAll("circle")].map((c) => Number(c.getAttribute("cx")));
+    expect(cx).toEqual([20, 20, 20]);
+  });
+
   it("non-monotonic stats → dev warning + no plausible-looking render", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { container } = draw(<MicroBox stats={{ min: 5, q1: 3, median: 4, q3: 6, max: 7 }} />);

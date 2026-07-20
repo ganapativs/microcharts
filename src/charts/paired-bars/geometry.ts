@@ -80,11 +80,17 @@ export function pairedBarsGeometry(opts: {
         index: i,
       };
     }
-    // grouped: value bar + slimmer ref bar side by side (ref 70% width)
+    // grouped: value bar + slimmer ref bar side by side (ref 70% width).
+    // The pair is narrower than its band — the ref is slim and sits after a
+    // gap — so CENTRE it, or the group hugs the band's leading edge and leaves
+    // all the slack trailing. That reads as a misaligned focus ring (the ring
+    // hugs the band) and as bars drifting left of their own category.
     const half = band / 2;
+    const group = half * 1.85; // value + 0.15 gap + 0.7 ref
+    const inset = (band - group) / 2;
     return {
-      valueRect: barRect(p.value, start, half),
-      refRect: barRect(p.ref, start + half + half * 0.15, half * 0.7),
+      valueRect: barRect(p.value, start + inset, half),
+      refRect: barRect(p.ref, start + inset + half + half * 0.15, half * 0.7),
       index: i,
     };
   });

@@ -6,7 +6,13 @@
 // Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
@@ -195,14 +201,12 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
     <span
       ref={hostRef}
       {...wrap("mc-timeline-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticEventTimeline
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         domain={domain}
         now={now}

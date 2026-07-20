@@ -45,7 +45,7 @@ export function WildStrip() {
             </span>
           </a>
         ))}
-        {/* the eighth slot — the reader's app. Completes the 4-col grid. */}
+        {/* the reader's slot, one past the showcase. Completes the 4-col grid. */}
         <Link
           prefetch={false}
           href="/docs/quickstart"

@@ -22,6 +22,11 @@ export interface WaterfallGeometry {
   connectors: { x0: number; x1: number; y: number }[];
   totalBar: Rect | null;
   zeroY: number;
+  /** Plot box top/bottom in viewBox units — the half-unit-inset value frame every
+   *  bar, connector and the total bar are clamped into. Prop-derived, never
+   *  data-derived (`zeroY` moves with the domain; this does not). */
+  y0: number;
+  y1: number;
   /** Running totals AFTER each step (2-dp, for the interactive readout). */
   levels: number[];
   /** Column pitch for interactive band lookup (total bar occupies the last). */
@@ -49,6 +54,8 @@ export function waterfallGeometry(opts: {
       connectors: [],
       totalBar: null,
       zeroY: height - 1,
+      y0: 0.5,
+      y1: round2(height - 0.5),
       levels: [],
       pitch: 0,
       domain: [0, 0],
@@ -111,7 +118,17 @@ export function waterfallGeometry(opts: {
     };
   }
 
-  return { bars, connectors, totalBar, zeroY, levels, pitch, domain };
+  return {
+    bars,
+    connectors,
+    totalBar,
+    zeroY,
+    y0: 0.5,
+    y1: round2(height - 0.5),
+    levels,
+    pitch,
+    domain,
+  };
 }
 
 /** One label the caller wants placed under its column. `w` is an over-estimate

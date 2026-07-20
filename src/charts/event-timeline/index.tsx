@@ -182,6 +182,11 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A horizontal lane, not a plot: spans, diamonds and the track all hang off
+      // `height / 2`, so the band is symmetric in the box by construction and the
+      // viewBox frame gives the same midpoint the geometry does. Centred on the
+      // cap band it reads as a rule set in the line rather than a bar on it.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-timeline ${className}` : "mc-timeline"}
       style={rootStyle}
     >

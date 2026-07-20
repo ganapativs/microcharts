@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
+import { labelFitsBand } from "../../core/labels.js";
 import { progressGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -103,12 +104,18 @@ export function Progress(props: ProgressProps): ReactNode {
 
   const model = progressModel(props);
   const fontSize = Math.max(6, Math.min(Math.round(height * 0.75), 11));
+  // Degrade, don't overlap: the percent is centred on the track's midline, so
+  // below one em of box height its em-box crosses the viewBox edge. Drop it —
+  // and with it the gutter, since `progressGeometry` hangs the gutter off the
+  // RIGHT of a track that always starts at x=0, so the bar is byte-identical
+  // either way and the mark never reflows as the label comes and goes.
+  const display = labelFitsBand(height, fontSize) ? model.display : undefined;
   const geo = progressGeometry({
     width,
     height,
     fraction: model.clamped,
     segments,
-    gutterCh: model.display?.length ?? 0,
+    gutterCh: display?.length ?? 0,
     fontSize,
   });
 
@@ -128,6 +135,11 @@ export function Progress(props: ProgressProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The track is a symmetric strip with no meaningful floor, so it centres
+      // on the cap band rather than standing on the baseline. Seating the track
+      // (not the viewBox) is the whole point: the box is 2× the bar's height,
+      // so a plain baseline seat floated the bar a quarter of the box high.
+      seat={{ mode: "center", top: geo.track.y, bottom: geo.track.y + geo.track.h }}
       className={className ? `mc-progress ${className}` : "mc-progress"}
       style={rootStyle}
     >
@@ -180,7 +192,7 @@ export function Progress(props: ProgressProps): ReactNode {
           ) : null}
         </>
       )}
-      {model.display !== undefined ? (
+      {display !== undefined ? (
         <text
           x={geo.labelX}
           y={geo.labelY}
@@ -188,7 +200,7 @@ export function Progress(props: ProgressProps): ReactNode {
           dominantBaseline="central"
           textAnchor="end"
         >
-          {model.display}
+          {display}
         </text>
       ) : null}
       {children}

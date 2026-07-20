@@ -24,6 +24,23 @@ describe("interactive <BubbleRow>", () => {
     expect(live.textContent).toBe("AMER: 890.");
   });
 
+  it("a non-finite bubble announces no data without leaking NaN", async () => {
+    const gappy = [
+      { label: "EMEA", value: 1240 },
+      { label: "AMER", value: Number.NaN },
+      { label: "LATAM", value: null },
+    ];
+    const screen = await render(<BubbleRow data={gappy} title="Markets" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await userEvent.keyboard("{ArrowRight}"); // AMER: NaN
+    expect(live.textContent).toBe("AMER: no data.");
+    await userEvent.keyboard("{ArrowRight}"); // LATAM: null
+    expect(live.textContent).toBe("LATAM: no data.");
+  });
+
   it("wrapper owns naming; static chart is decorative", async () => {
     const screen = await render(<BubbleRow data={REGIONS} title="Markets" />);
     const wrap = screen.container.querySelector(".mc-bubble-live")!;

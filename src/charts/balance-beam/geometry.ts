@@ -4,7 +4,7 @@
 // Weights are area-true (half = k·√value). Endpoints are pre-rotated HERE (no SVG
 // transform in the static entry → containment is provable from coords). 2-dp.
 import { clamp } from "../../core/scale.js";
-import { round2 } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 
 export type BeamShape = "square" | "round";
 export type BeamMode = "ratio" | "difference";
@@ -14,13 +14,16 @@ export interface BalanceBeamGeometry {
   beam: { x1: number; y1: number; x2: number; y2: number };
   fulcrum: string;
   weights: [{ cx: number; cy: number; half: number }, { cx: number; cy: number; half: number }];
-  /** -1 left heavier, 1 right heavier, 0 balanced. */
+  /** -1 left heavier, 1 right heavier, 0 balanced (also when a pan is unknown). */
   heavier: -1 | 0 | 1;
+  /** Per-pan: is there a real number to weigh? An unknown pan is NOT zero — the
+   *  caller draws no weight for it, and the beam stays level. */
+  known: [boolean, boolean];
 }
 
 export function balanceBeamGeometry(opts: {
-  a: number;
-  b: number;
+  a: number | null | undefined;
+  b: number | null | undefined;
   width: number;
   height: number;
   maxTilt: number;
@@ -29,14 +32,21 @@ export function balanceBeamGeometry(opts: {
   pad: number;
 }): BalanceBeamGeometry {
   const { a, b, width, height, maxTilt, mode, domain, pad } = opts;
-  const av = Math.max(0, Number.isFinite(a) ? a : 0);
-  const bv = Math.max(0, Number.isFinite(b) ? b : 0);
+  // A missing/non-finite pan is UNKNOWN, never 0: weighing it as zero would
+  // tilt the beam as if the side really were empty.
+  const ka = isFiniteValue(a);
+  const kb = isFiniteValue(b);
+  const av = ka ? Math.max(0, a) : 0;
+  const bv = kb ? Math.max(0, b) : 0;
+  const comparable = ka && kb;
 
   // normalized imbalance in [-1, 1]; positive = left (a) heavier
   let norm: number;
-  if (mode === "difference" && domain) {
-    const span = domain[1] - domain[0] || 1;
-    norm = clamp((av - bv) / span, -1, 1);
+  if (!comparable) {
+    norm = 0; // nothing to compare — the beam rests level
+  } else if (mode === "difference" && domain) {
+    const span = isFiniteValue(domain[0]) && isFiniteValue(domain[1]) ? domain[1] - domain[0] : 0;
+    norm = clamp((av - bv) / (span || 1), -1, 1);
   } else {
     const sum = av + bv;
     norm = sum === 0 ? 0 : clamp((av - bv) / sum, -1, 1);
@@ -62,8 +72,8 @@ export function balanceBeamGeometry(opts: {
   const maxV = Math.max(av, bv, 1);
   const maxHalf = round2(Math.max(1, Math.min((pivotY - 1) / 2, pivotX - bh, bh * 0.4)));
   const k = maxHalf / Math.sqrt(maxV);
-  const halfA = round2(k * Math.sqrt(av));
-  const halfB = round2(k * Math.sqrt(bv));
+  const halfA = ka ? round2(k * Math.sqrt(av)) : 0;
+  const halfB = kb ? round2(k * Math.sqrt(bv)) : 0;
 
   const weights: BalanceBeamGeometry["weights"] = [
     { cx: leftX, cy: round2(leftY - halfA - 0.5), half: halfA },
@@ -75,7 +85,7 @@ export function balanceBeamGeometry(opts: {
   const fw = round2((baseY - pivotY) * 0.7);
   const fulcrum = `M${pivotX} ${pivotY}L${round2(pivotX + fw)} ${baseY}L${round2(pivotX - fw)} ${baseY}Z`;
 
-  const heavier: -1 | 0 | 1 = av === bv ? 0 : av > bv ? -1 : 1;
+  const heavier: -1 | 0 | 1 = !comparable || av === bv ? 0 : av > bv ? -1 : 1;
 
   return {
     tiltDeg,
@@ -83,5 +93,6 @@ export function balanceBeamGeometry(opts: {
     fulcrum,
     weights,
     heavier,
+    known: [ka, kb],
   };
 }

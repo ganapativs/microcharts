@@ -24,6 +24,17 @@ describe("ohlcGeometry", () => {
     expect(geo.marks.length).toBe(1);
   });
 
+  it("mark.index is the SOURCE period, not a position among the painted marks", () => {
+    // period 1 is corrupt (high < low): the marks after it must keep naming
+    // their own period, or every read back into the caller's array shifts left.
+    const geo = ohlcGeometry({
+      ...base,
+      periods: [p(10, 15, 8, 13), p(10, 8, 12, 9), p(12, 14, 11, 13), p(13, 16, 12, 15)],
+    });
+    expect(geo.invalid).toEqual([1]);
+    expect(geo.marks.map((m) => m.index)).toEqual([0, 2, 3]);
+  });
+
   it("past maxPeriods → most recent N, flagged truncated (never averaged)", () => {
     const many = Array.from({ length: 30 }, (_, i) => p(i, i + 2, i - 1, i + 1));
     const geo = ohlcGeometry({ ...base, periods: many, maxPeriods: 20 });

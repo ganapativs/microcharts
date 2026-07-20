@@ -78,6 +78,11 @@ export function Bullet(props: BulletProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A horizontal track with no bottom to stand on — the measure bar runs
+      // along it, it doesn't rise from it — so the track band centres on the cap
+      // band. The band, not the viewBox: the pad is what keeps the tick ends off
+      // the edge, and it isn't part of the reading.
+      seat={{ mode: "center", top: geo.track.y, bottom: geo.track.y + geo.track.height }}
       className={className ? `mc-bullet ${className}` : "mc-bullet"}
       style={style}
     >

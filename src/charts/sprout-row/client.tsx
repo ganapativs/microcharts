@@ -5,13 +5,21 @@
 // glyph. Composes the static component (overlay rings as children).
 import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import { round2 } from "../../core/types.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { sproutRowGeometry } from "./geometry.js";
+import { sproutRowGeometry, stageGlyphBox } from "./geometry.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
 import {
   SproutRow as StaticSproutRow,
+  sproutLabelsFit,
   sproutLayout,
   sproutRowSummary,
   type SproutRowProps,
@@ -27,6 +35,11 @@ export interface InteractiveSproutRowProps extends SproutRowProps, PickerProps {
    */
   animate?: boolean;
 }
+
+/** Mirrors the static entry's `PAD` — the glyph's usable height is `baselineY - PAD`. */
+const PAD = 2;
+/** Breathing room between the painted glyph and the focus ring. */
+const RING_PAD = 1.5;
 
 export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
   const {
@@ -61,8 +74,16 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
   // The SAME label-driven layout the static derives, so the overlay ring lands
   // on the glyph even when category labels widen the row.
   const lay = useMemo(
-    () => sproutLayout(data, labels, fontSize, props.step),
-    [data, labels, fontSize, props.step],
+    // Mirror the static's label DROP, not just its layout: keeping a band the
+    // static dropped would offset every hit-test by the gutter width.
+    () =>
+      sproutLayout(
+        data,
+        labels && sproutLabelsFit(data, fontSize, height, props.step),
+        fontSize,
+        props.step,
+      ),
+    [data, labels, fontSize, height, props.step],
   );
   const geo = useMemo(
     () =>
@@ -70,7 +91,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
         stages: data.map((d) => d.value),
         height,
         step: lay.step,
-        pad: 2,
+        pad: PAD,
         padX: lay.padX,
         bottomReserve: lay.labelBand,
       }),
@@ -123,14 +144,20 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
         : sproutRowSummary(data, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
+  // Concentric on what the glyph actually paints, at every stage and height —
+  // a fixed radius/offset only lands on the plant at one size, and rode ~10px
+  // above a seed dot at height 36.
   const ring = (i: number, pinned: boolean) => {
     const slot = geo.slots[i];
     if (!slot) return null;
+    // A missing item paints no glyph; ring the seed-sized spot on the soil.
+    const b = stageGlyphBox(slot.stage ?? 0, slot.x, slot.baselineY, slot.baselineY - PAD);
     return (
-      <circle
-        cx={slot.x}
-        cy={slot.baselineY - 5}
-        r={7}
+      <ellipse
+        cx={round2((b.x0 + b.x1) / 2)}
+        cy={round2((b.y0 + b.y1) / 2)}
+        rx={round2((b.x1 - b.x0) / 2 + RING_PAD)}
+        ry={round2((b.y1 - b.y0) / 2 + RING_PAD)}
         fill="none"
         stroke="var(--mc-accent)"
         data-mc-w={pinned ? "tick" : "support"}
@@ -146,9 +173,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-sprout-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticSproutRow
@@ -160,7 +185,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
         fontSize={fontSize}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}

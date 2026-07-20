@@ -45,6 +45,10 @@ export interface PercentileGeometry {
   movement: PercentileMovement;
   /** Fixed population bands: inner = p25–75, outer = p5–95. */
   bands: { inner: BandRect; outer: BandRect };
+  /** Top edge of the plot box — the p100 end of the locked axis. */
+  y0: number;
+  /** Bottom edge of the plot box — the p0 end. Also the inline seat's floor. */
+  y1: number;
   /** True when any finite input fell outside 0–100 and was clamped. */
   clamped: boolean;
 }
@@ -114,6 +118,8 @@ export function percentileGeometry(opts: {
     delta,
     movement,
     bands: { inner: band(25, 75), outer: band(5, 95) },
+    y0: round2(pad),
+    y1: round2(height - pad),
     clamped,
   };
 }

@@ -6,6 +6,8 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TAPE_GAUGE, type TapeGaugeStrings } from "../../core/strings-tape-gauge.js";
+import { isFiniteValue } from "../../core/types.js";
+import { labelFitsY } from "../../core/labels.js";
 import {
   chevronTier,
   tapeGaugeGeometry,
@@ -60,6 +62,8 @@ export function autoSpan(
     let lo = Infinity;
     let hi = -Infinity;
     for (const z of zones) {
+      // One malformed zone must not poison the window for the good ones.
+      if (!isFiniteValue(z.from) || !isFiniteValue(z.to)) continue;
       lo = Math.min(lo, z.from, z.to);
       hi = Math.max(hi, z.from, z.to);
     }
@@ -133,10 +137,21 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const readoutAvail = (vertical ? geo.readout.gutter : width) - 1.6;
   const readoutBase = Math.min(13, Math.max(10, Math.round(Math.min(width, height) * 0.25)));
   // containment wins over a floor at extreme narrow widths (default 46 renders ~11)
+  // — and over BOTH axes: a horizontal gauge's readout sits under the tape
+  // column with only `readout.band` units of vertical room, so sizing it by the
+  // available width alone let a wide, short gauge paint the number past the
+  // bottom of the viewBox.
   const readoutFont = Math.max(
     5,
-    Math.min(readoutBase, readoutAvail / est(valueText.length || 1, 1)),
+    Math.min(readoutBase, readoutAvail / est(valueText.length || 1, 1), geo.readout.band),
   );
+  // Degradation: below the library's 7-unit floor the number would read smaller
+  // than everything else in the chart, so it DROPS instead — the tape, its
+  // ticks, the zone stripe and the pointer still say where the value sits, and
+  // nothing is reserved for text that isn't drawn. Pure arithmetic: the static
+  // path may never measure text.
+  const showReadout =
+    finite && readoutFont >= 7 && labelFitsY(geo.pointer.labelY, readoutFont, height);
 
   // thin tick labels to those that fit their column and don't collide; the
   // formatted string is cached here so render never re-runs Intl per label
@@ -145,6 +160,12 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   for (const t of geo.tickLabels) {
     const s = fmt(t.text);
     const w = est(s.length, tickFont);
+    // A tick near either end of the scale sits within half a line of the box
+    // edge, so its numeral would hang out of the viewBox. Those ticks keep their
+    // mark and DROP their label — the neighbours still name the scale, and the
+    // dropped one costs no reserved space because tick labels never had a
+    // gutter. Pure arithmetic: the static path may never measure text.
+    if (!labelFitsY(t.y, tickFont, height)) continue;
     if (vertical) {
       if (t.x - w < 0.3) continue; // would spill past the left edge
       if (t.y - lastEnd < tickFont * 1.05) continue; // vertical crowding
@@ -191,6 +212,11 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The whole box is the instrument — a scale that scrolls past a pointer
+      // parked at its middle — and nothing in it stands on a bottom edge, so it
+      // centres on the cap band. Centring the box lands the anchor on that fixed
+      // pointer line in either orientation, which is the one place the eye reads.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-tape ${className}` : "mc-tape"}
       style={{ ...style, "--mc-label-size": `${tickFont}px` } as CSSProperties}
     >
@@ -232,7 +258,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               inline fill is needed for a solid arrow. The role is kept for the
               forced-colors Highlight mapping. */}
           <path d={geo.pointer.path} data-mc-ink="accent" style={{ fill: "var(--mc-accent)" }} />
-          {label === "value" ? (
+          {label === "value" && showReadout ? (
             <text
               x={geo.pointer.labelX}
               y={geo.pointer.labelY}
@@ -255,7 +281,25 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
             />
           ) : null}
         </>
-      ) : null}
+      ) : (
+        // No reading: the instrument is still there, so its rail and an unfilled
+        // pointer are drawn as chrome (the Thermometer's empty-channel rule).
+        // A blank box would read as "no chart"; a zeroed scale would read as a
+        // real reading of zero. Neither is true — there is simply no value. One
+        // path carries both marks (rail then pointer) to keep the node count and
+        // the byte cost of a state nobody plots at a minimum.
+        <path
+          d={
+            (vertical
+              ? `M${geo.scaleEdge} 1V${round2(height - 1)}`
+              : `M1 ${geo.scaleEdge}H${round2(width - 1)}`) + geo.pointer.path
+          }
+          data-mc-ink="muted"
+          data-mc-w="hair"
+          vectorEffect="non-scaling-stroke"
+          style={{ fill: "none", strokeOpacity: 0.55 }}
+        />
+      )}
       {children}
     </Chart>
   );

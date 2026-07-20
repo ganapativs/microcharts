@@ -136,7 +136,7 @@ export function divergingStack(
   for (const c of counts) total += c;
   if (total === 0) return null;
 
-  const split = neutralIndex; // null or a valid in-range index (normalized above)
+  const split = neutralIndex;
   const splitAt = split ?? n / 2; // even count: halves meet at center exactly
   const neutralShare = split !== null ? counts[split]! / total : 0;
 

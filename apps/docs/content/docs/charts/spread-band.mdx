@@ -25,7 +25,7 @@ reference whispers: dashed, thinner, neutral — direction is carried by the fil
       { a: 23, b: 16 },
       { a: 24, b: 16 },
     ]}
-    labels={["Organic", "Paid"]}
+    seriesLabels={["Organic", "Paid"]}
     title="Organic vs paid"
     width={220}
     height={30}
@@ -58,7 +58,7 @@ reference whispers: dashed, thinner, neutral — direction is carried by the fil
     { a: 8, b: 12 }, { a: 12, b: 13 }, { a: 14, b: 13 }, { a: 17, b: 14 },
     { a: 20, b: 15 }, { a: 24, b: 16 },
   ]}
-  labels={["Organic", "Paid"]}
+  seriesLabels={["Organic", "Paid"]}
   label="none"
 />`}
 >
@@ -71,7 +71,7 @@ reference whispers: dashed, thinner, neutral — direction is carried by the fil
       { a: 20, b: 15 },
       { a: 24, b: 16 },
     ]}
-    labels={["Organic", "Paid"]}
+    seriesLabels={["Organic", "Paid"]}
     label="none"
     title="No gutter label"
     width={220}
@@ -87,7 +87,7 @@ reference whispers: dashed, thinner, neutral — direction is carried by the fil
     { a: 18, b: 12 }, { a: 16, b: 12 }, { a: 14, b: 13 }, { a: 11, b: 13 },
     { a: 9, b: 14 }, { a: 8, b: 14 },
   ]}
-  labels={["Latency", "Budget"]}
+  seriesLabels={["Latency", "Budget"]}
   positive="down"
 />`}
 >
@@ -100,7 +100,7 @@ reference whispers: dashed, thinner, neutral — direction is carried by the fil
       { a: 9, b: 14 },
       { a: 8, b: 14 },
     ]}
-    labels={["Latency", "Budget"]}
+    seriesLabels={["Latency", "Budget"]}
     positive="down"
     title="Lower is better"
     width={220}
@@ -117,7 +117,7 @@ reference whispers: dashed, thinner, neutral — direction is carried by the fil
     { a: 17000, b: 14000 }, { a: 18000, b: 14000 }, { a: 20000, b: 15000 },
     { a: 21000, b: 15000 }, { a: 23000, b: 16000 }, { a: 24000, b: 16000 },
   ]}
-  labels={["Organic", "Paid"]}
+  seriesLabels={["Organic", "Paid"]}
   locale="de-DE"
 />`}
 >
@@ -136,7 +136,7 @@ reference whispers: dashed, thinner, neutral — direction is carried by the fil
       { a: 23000, b: 16000 },
       { a: 24000, b: 16000 },
     ]}
-    labels={["Organic", "Paid"]}
+    seriesLabels={["Organic", "Paid"]}
     locale="de-DE"
     title="Localized values"
     width={230}
@@ -152,7 +152,7 @@ The gutter label and the hover readout follow the `locale`'s grouping — the Ge
 <LiveDemo
   label="never crosses"
   code={`// the subject leads throughout — one signed band, no crossing dots
-<SpreadBand data={[{ a: 10, b: 5 }, { a: 12, b: 6 }, { a: 14, b: 7 }]} labels={["A", "B"]} />`}
+<SpreadBand data={[{ a: 10, b: 5 }, { a: 12, b: 6 }, { a: 14, b: 7 }]} seriesLabels={["A", "B"]} />`}
 >
   <SpreadBand
     data={[
@@ -160,7 +160,7 @@ The gutter label and the hover readout follow the `locale`'s grouping — the Ge
       { a: 12, b: 6 },
       { a: 14, b: 7 },
     ]}
-    labels={["A", "B"]}
+    seriesLabels={["A", "B"]}
     title="Never crosses"
     width={200}
     height={30}
@@ -187,7 +187,7 @@ The gutter label and the hover readout follow the `locale`'s grouping — the Ge
 
 <LiveDemo
   label="gaps break both lines"
-  code={`<SpreadBand data={[{ a: 12, b: 10 }, { a: 14, b: null }, { a: 13, b: 12 }, { a: 16, b: 13 }]} labels={["A", "B"]} />`}
+  code={`<SpreadBand data={[{ a: 12, b: 10 }, { a: 14, b: null }, { a: 13, b: 12 }, { a: 16, b: 13 }]} seriesLabels={["A", "B"]} />`}
 >
   <SpreadBand
     data={[
@@ -196,7 +196,7 @@ The gutter label and the hover readout follow the `locale`'s grouping — the Ge
       { a: 13, b: 12 },
       { a: 16, b: 13 },
     ]}
-    labels={["A", "B"]}
+    seriesLabels={["A", "B"]}
     title="Shared gaps"
     width={200}
     height={30}

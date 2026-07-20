@@ -4,11 +4,27 @@
 // run). Height + opacity encode run TYPE — streak (ok), break (fail), or the
 // current run — never magnitude. The record streak carries a triangle tick. A
 // null (or NaN) is a gap: it breaks the current run and starts a fresh one. 2-dp.
+import { labelFont } from "../../core/labels.js";
 import { clamp } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 
 /** One trial: a boolean/number outcome, or `null` (a gap that breaks runs). */
 export type StreakDatum = number | boolean | null | undefined;
+
+/** Count-label placement: the current run, the record too, or neither. */
+export type StreakLabel = "current" | "both" | "none";
+
+/** The count label's font in viewBox units. */
+export const streakSparkFont = (height: number): number => labelFont(height, 0.4);
+
+/**
+ * The band reserved above the runs for the count labels — the ONE source both
+ * entries read. `labelRoom` moves the midline the runs centre on, so a client
+ * that recomputed geometry without it would draw its focus outline on runs the
+ * static never placed there (the overlay would sit a band too high).
+ */
+export const streakSparkRoom = (height: number, label: StreakLabel): number =>
+  label === "none" ? 0 : streakSparkFont(height);
 
 /** Runs beyond this collapse the oldest into a single ellipsis slot (dev-warn). */
 export const MAX_RUNS = 40;
@@ -54,6 +70,11 @@ export interface StreakSparkGeometry {
   breaks: number;
   /** the cap was exceeded and the oldest runs were merged. */
   truncated: boolean;
+  /** Run-band top edge (viewBox units) — the box floor of the reserved label
+   *  room, NOT the viewBox top. Runs centre on this band. */
+  y0: number;
+  /** Run-band bottom edge (viewBox units). */
+  y1: number;
 }
 
 export interface StreakSparkGeometryOptions {
@@ -95,6 +116,8 @@ export function streakSparkGeometry(
   const room = Math.max(0, Math.min(labelRoom, Math.max(0, height - pad * 2 - 1)));
   const band = Math.max(1, height - room);
   const mid = round2(room + band / 2);
+  const y0 = round2(room);
+  const y1 = round2(room + band);
 
   // 1 — collapse to runs of equal outcome; a gap flushes the current run.
   type Raw = { on: boolean; len: number; start: number };
@@ -126,6 +149,8 @@ export function streakSparkGeometry(
       recordLen: 0,
       breaks: 0,
       truncated: false,
+      y0,
+      y1,
     };
 
   // 2 — cap: keep the most recent MAX_RUNS, merge the rest into an ellipsis slot.
@@ -196,5 +221,5 @@ export function streakSparkGeometry(
     ? { x: round2(pad), y: round2(mid - hFail / 2), width: ellipsisW, height: hFail }
     : null;
 
-  return { runs, ellipsis, currentLen, currentOn, recordLen, breaks, truncated };
+  return { runs, ellipsis, currentLen, currentOn, recordLen, breaks, truncated, y0, y1 };
 }

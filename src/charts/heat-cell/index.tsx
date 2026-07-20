@@ -96,6 +96,9 @@ export function HeatCell(props: HeatCellProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A square swatch with no floor — centre it on the cap band so it reads
+      // like a piece of punctuation rather than a bar standing on the line.
+      seat={{ mode: "center", top: geo.y, bottom: geo.y + geo.h }}
       className={className ? `mc-heat-cell ${className}` : "mc-heat-cell"}
       style={rootStyle}
     >

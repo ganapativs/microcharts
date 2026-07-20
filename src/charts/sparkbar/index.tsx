@@ -114,6 +114,15 @@ export function SparkBar(props: SparkBarProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Two seats from one chart, which is why this can't be a static table:
+      // bar mode has a real zero floor already flush at `y1 = height`, so it
+      // stands on the baseline like a letter; win-loss is a symmetric mid-line
+      // with no floor, so it centres on the cap band instead.
+      seat={
+        mode === "winloss"
+          ? { mode: "center", top: geo.y0, bottom: geo.y1 }
+          : { mode: "floor", bottom: geo.y1 }
+      }
       className={className ? `mc-sparkbar ${className}` : "mc-sparkbar"}
       style={rootStyle}
     >

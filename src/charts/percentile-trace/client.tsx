@@ -7,7 +7,8 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
@@ -23,12 +24,19 @@ import { percentileGeometry } from "./geometry.js";
 import {
   PercentileTrace as StaticPercentileTrace,
   percentileSummary,
+  percentileGutter,
   INT,
   type PercentileTraceProps,
 } from "./index.js";
 
 export interface InteractivePercentileTraceProps extends PercentileTraceProps, PickerProps {
   strings?: PercentileTraceStrings;
+  /**
+   * Reading noun for the hover/focus announcement (default `"step"`).
+   * Interactive-only: the static entry announces percentiles, never an
+   * individual reading, so it has no unit to name.
+   */
+  unit?: string;
   /**
    * Opt-in entrance motion (default `false`): the line draws on when the
    * chart first mounts client-side. Inert on the server and on hydrated
@@ -43,6 +51,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
     unit = "step",
     height = 20,
     width = 80,
+    label = "last",
     format = INT,
     locale,
     strings = EN_PERCENTILE_TRACE,
@@ -100,9 +109,14 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
     [pointAt],
   );
 
+  // The static reserves a right gutter for the `label="last"` readout and
+  // widens its viewBox by it, so THIS is the pointer basis — not bare `width`.
+  const vbWidth =
+    width + (geo && label === "last" ? percentileGutter(pStr(geo.last.value), height) : 0);
+
   const { active, selected, bind } = useActivePicker({
     count: stops.length,
-    width,
+    width: vbWidth,
     height,
     locate,
     datum,
@@ -134,17 +148,16 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
     <span
       ref={hostRef}
       {...wrap("mc-percentile-trace-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticPercentileTrace
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         width={width}
         height={height}
+        label={label}
         format={format}
         locale={locale}
         strings={strings}
@@ -190,7 +203,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
       {p ? (
         <span
           className="mc-percentile-readout mc-spark-readout"
-          style={{ left: `${(p.x / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${(p.x / vbWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
           {`${unit} ${p.index}: ${pStr(p.value)}`}
         </span>

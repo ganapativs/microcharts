@@ -6,6 +6,8 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
 import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
+const hollow = (el: Element) => el.getAttribute("fill") === "none";
+
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const SAMPLE = [10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16];
 
@@ -43,6 +45,11 @@ describe("<ControlStrip>", () => {
     expect(container.querySelectorAll("circle").length).toBe(13);
   });
 
+  it("dots='none' draws no point marks at all", () => {
+    const { container } = draw(<ControlStrip data={SAMPLE} dots="none" />);
+    expect(container.querySelectorAll("circle").length).toBe(0);
+  });
+
   it("band + center hairline render", () => {
     const { container } = draw(<ControlStrip data={SAMPLE} />);
     expect(container.querySelector('[data-mc-ink="band"]')).not.toBeNull();
@@ -73,6 +80,25 @@ describe("<ControlStrip>", () => {
       80,
       20,
     );
+  });
+
+  // Degradation contract: see tests/craft/floor.mjs.
+  it("short box: the out-of-control halo drops rather than being struck through", () => {
+    const series = [10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16, 10, 9, 11, 10];
+    const big = draw(<ControlStrip data={series} width={240} height={28} />).container;
+    expect([...big.querySelectorAll("circle")].some(hollow)).toBe(true);
+
+    const small = draw(<ControlStrip data={series} width={72} height={8} />).container;
+    const centerY = Number(small.querySelector("line")!.getAttribute("y1"));
+    // no hollow ring is left with the centre hairline crossing its interior
+    for (const c of [...small.querySelectorAll("circle")].filter(hollow)) {
+      const cy = Number(c.getAttribute("cy"));
+      expect(Math.abs(cy - centerY)).toBeGreaterThanOrEqual(Number(c.getAttribute("r")));
+    }
+    // the out-of-control point is still marked, and still by shape+size
+    const filled = [...small.querySelectorAll("circle")].filter((c) => !hollow(c));
+    expect(filled.length).toBeGreaterThanOrEqual(1);
+    expect(filled.some((c) => c.getAttribute("data-mc-ink") === "negative")).toBe(true);
   });
 });
 

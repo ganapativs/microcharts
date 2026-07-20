@@ -60,12 +60,13 @@ export const entry: ChartEntry = {
       type: "string",
       required: false,
       description: "Reading noun for the interactive announcement (default 'step').",
+      interactive: true,
     },
   ],
   demo: DEMO,
   example: {
     title: "Standing",
-    code: `import { PercentileTrace } from "${PKG}/percentile-trace";\n\n<PercentileTrace data={ranks} unit="week" title="Standing" />`,
+    code: `import { PercentileTrace } from "${PKG}/percentile-trace";\n\n<PercentileTrace data={ranks} title="Standing" />`,
   },
   sampleData: [
     {
@@ -89,7 +90,6 @@ export const playground: PlaygroundSpec = {
       data={DEMO}
       bands={s.bands as boolean}
       positive={s.positive as "up" | "down"}
-      unit="week"
       summary={false}
       width={280}
       height={30}
@@ -134,7 +134,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Standing over the season{" "}
         <span className="mc-inline">
-          <PercentileTrace data={DEMO} unit="week" height={16} summary={false} />
+          <PercentileTrace data={DEMO} height={16} summary={false} />
         </span>{" "}
         — climbed from 40th to 81st percentile.
       </p>
@@ -149,7 +149,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <PercentileTrace data={row.data} unit="week" height={18} summary={false} />
+                <PercentileTrace data={row.data} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -169,7 +169,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">percentile now</span>
           </div>
         </div>
-        <PercentileTrace data={CTX_ROWS[0]!.data} unit="week" height={36} summary={false} />
+        <PercentileTrace data={CTX_ROWS[0]!.data} height={36} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">81st</span>\n  <span className="unit">percentile now</span>\n  <PercentileTrace data={ranks} />\n</div>',
@@ -183,7 +183,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <PercentileTrace data={row.data} unit="week" height={14} summary={false} />
+            <PercentileTrace data={row.data} height={14} summary={false} />
           </span>
         ))}
       </div>

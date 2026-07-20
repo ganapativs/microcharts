@@ -3,6 +3,7 @@
 // continuum, so runs are right-angle (H/V) only — never a diagonal. Consecutive
 // same-state entries merge; the last state holds to domain[1]. 2-dp.
 import { round2 } from "../../core/types.js";
+import { labelFitsBand, labelFont, textGutter } from "../../core/labels.js";
 
 export interface HypnoEntry {
   t: number;
@@ -21,6 +22,53 @@ export interface HypnoRun {
 }
 
 const PAD = 1;
+
+/** Row-label layout: whether the state names are drawn, and the gutter they cost. */
+export interface HypnoLabelLayout {
+  show: boolean;
+  /** Left gutter reserved for the names — 0 when they're dropped. */
+  gutter: number;
+  fontSize: number;
+}
+
+/**
+ * Resolve the row-label gutter — the ONE place the static and interactive
+ * entries agree on it, because the gutter shifts every run's x and a
+ * second-guessed copy drifts the hit-test off the drawn marks.
+ *
+ * The names degrade in two directions, and either one drops them outright
+ * rather than letting them overlap or spill:
+ *
+ *  - **Vertically** the rows are the budget. Each name is centred on its row, so
+ *    once the row pitch is under one em the names of adjacent states stack on
+ *    each other ("Awake" on "REM"), and the top and bottom rows push their
+ *    em-boxes past the viewBox edge. `labelFont` floors at 7, so there is no
+ *    smaller type to fall back to — the scaffold goes and the runs keep the box.
+ *  - **Horizontally** the widest name is the budget, reserved at the library's
+ *    per-char over-estimate. Names are caller text of unknown width, so the
+ *    reserve can outgrow the sensible share of a narrow chart (40%); when it
+ *    does, the old behaviour was to CLAMP the gutter, which silently slid the
+ *    text out through the left edge. Dropping is the honest degradation.
+ *
+ * The data is never the thing that degrades: the runs simply reclaim the gutter.
+ */
+export function hypnogramLabels(opts: {
+  labels: boolean;
+  width: number;
+  height: number;
+  rows: number;
+  /** Chars in the widest state name. */
+  maxChars: number;
+}): HypnoLabelLayout {
+  const { labels, width, height, rows, maxChars } = opts;
+  const n = Math.max(1, rows);
+  const fontSize = labelFont(height / n, 0.62);
+  const gutter = textGutter(Math.max(1, maxChars), fontSize, 4);
+  // the pitch geometry actually lays the rows out on — the padded band, split n ways
+  const rowPitch = (height - PAD * 2) / n;
+  const show = labels && labelFitsBand(rowPitch, fontSize) && gutter <= width * 0.4;
+  return { show, gutter: show ? gutter : 0, fontSize };
+}
 
 /** Sort by t, merge consecutive same-state runs into [t0, t1] spans. */
 export function mergeRuns(data: readonly HypnoEntry[], domainEnd: number): HypnoEntry[] {
@@ -42,7 +90,16 @@ export function hypnogramGeometry(opts: {
   style: "steps" | "lanes";
   /** Left gutter reserved for row labels (plot starts here). */
   gutter?: number;
-}): { runs: HypnoRun[]; path: string; connectors: string; rowHeight: number; rowY: number[] } {
+}): {
+  runs: HypnoRun[];
+  path: string;
+  connectors: string;
+  rowHeight: number;
+  rowY: number[];
+  /** Row stack, top and bottom edges — the padded band the rows divide up. */
+  y0: number;
+  y1: number;
+} {
   const { data, states, domain, width, height, style, gutter = 0 } = opts;
   const merged = mergeRuns(data, domain[1]);
   const n0 = Math.max(1, states.length);
@@ -56,6 +113,8 @@ export function hypnogramGeometry(opts: {
       connectors: "",
       rowHeight: round2((height - PAD * 2) / n0),
       rowY: rowY0,
+      y0: PAD,
+      y1: round2(height - PAD),
     };
 
   const [d0, d1] = domain;
@@ -102,7 +161,15 @@ export function hypnogramGeometry(opts: {
     }
   }
 
-  return { runs, path, connectors, rowHeight: round2(rowH), rowY };
+  return {
+    runs,
+    path,
+    connectors,
+    rowHeight: round2(rowH),
+    rowY,
+    y0: PAD,
+    y1: round2(height - PAD),
+  };
 }
 
 /** Distinct states in first-appearance order (the default row order). */

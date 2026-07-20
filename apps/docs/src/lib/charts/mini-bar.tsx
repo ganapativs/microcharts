@@ -70,8 +70,8 @@ export const entry: ChartEntry = {
       description: "Categories in meaningful order.",
     },
     {
-      name: "sort",
-      type: '"none" | "desc" | "asc"',
+      name: "order",
+      type: '"data" | "desc" | "asc"',
       required: false,
       description: "Ranking read vs positional read — data-facing, not styling.",
     },
@@ -130,10 +130,10 @@ export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "sort",
-      label: "sort",
-      options: ["none", "desc", "asc"],
-      init: "none",
+      key: "order",
+      label: "order",
+      options: ["data", "desc", "asc"],
+      init: "data",
     },
     { kind: "toggle", key: "highlight", label: "highlight", init: false },
     {
@@ -151,7 +151,7 @@ export const playground: PlaygroundSpec = {
     return (
       <MiniBar
         data={rows}
-        sort={s.sort as "none" | "desc" | "asc"}
+        order={s.order as "data" | "desc" | "asc"}
         highlight={(s.highlight as boolean) ? rows[0]!.label : undefined}
         orientation={s.orientation as "horizontal" | "vertical"}
         positive={signed ? "up" : undefined}
@@ -168,7 +168,7 @@ export const playground: PlaygroundSpec = {
     return [
       "<MiniBar",
       `  data={${varName}}`,
-      s.sort !== "none" && `  sort="${s.sort}"`,
+      s.order !== "data" && `  order="${s.order}"`,
       (s.highlight as boolean) && `  highlight="${target}"`,
       s.orientation === "horizontal" && '  orientation="horizontal"',
       signed && '  positive="up"',

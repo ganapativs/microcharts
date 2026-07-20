@@ -6,7 +6,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import type { Format } from "../../core/format.js";
 import { EN_SCATTER, type ScatterStrings } from "../../core/strings-scatter.js";
 import { microScatterGeometry, relationshipTier } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -44,8 +43,6 @@ export interface MicroScatterProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
-  format?: Format | undefined;
-  locale?: string | string[] | undefined;
   strings?: ScatterStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -101,6 +98,11 @@ export function MicroScatter(props: MicroScatterProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A 2-D field: the box bottom is the y-axis low end, an extent rather than
+      // anything the dots stand on, so the plot frame centres on the cap band.
+      // The frame is the radius-inset box the scales project into — using the
+      // dots' own extent would rock the whole chart every time a value moved.
+      seat={{ mode: "center", top: rad, bottom: height - rad }}
       className={className ? `mc-scatter ${className}` : "mc-scatter"}
       style={style}
     >

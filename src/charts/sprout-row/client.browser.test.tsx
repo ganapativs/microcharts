@@ -57,13 +57,13 @@ describe("interactive <SproutRow>", () => {
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect
-      .poll(() => screen.container.querySelector('circle[data-mc-w="tick"]'))
+      .poll(() => screen.container.querySelector('ellipse[data-mc-w="tick"]'))
       .not.toBeNull();
   });
 
   it("controlled selectedIndex pins the ring without focus", async () => {
     const screen = await render(<SproutRow data={ACCT} selectedIndex={1} />);
-    expect(screen.container.querySelectorAll('circle[data-mc-w="tick"]')).toHaveLength(1);
+    expect(screen.container.querySelectorAll('ellipse[data-mc-w="tick"]')).toHaveLength(1);
   });
 
   it("consumer children reach the composed static chart", async () => {

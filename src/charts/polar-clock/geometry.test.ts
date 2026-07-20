@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { polarClockGeometry } from "./geometry.js";
+import { polarClockGeometry, polarStart } from "./geometry.js";
 
 const g = (
   values: readonly (number | null)[],
@@ -44,6 +44,29 @@ describe("polarClockGeometry — cyclic radial bars", () => {
 
   it("now → an accent path for that segment", () => {
     expect(g([10, 40, 20], { now: 1 }).accentPath).not.toBeNull();
+  });
+
+  it("polarStart is the one rotation normalizer: floors, wraps, refuses garbage", () => {
+    expect(polarStart(1.5, 7)).toBe(1); // fractional floors to a real slot
+    expect(polarStart(-1, 7)).toBe(6); // negatives wrap
+    expect(polarStart(9, 7)).toBe(2); // past the cycle wraps
+    expect(polarStart(Number.NaN, 7)).toBe(0);
+    expect(polarStart(Infinity, 7)).toBe(0);
+    expect(polarStart(3, 0)).toBe(0); // no segments, no rotation
+  });
+
+  it("a fractional `start` rotates by whole slots (the paint has no half-segment)", () => {
+    // start 1.5 must place index 1 at 12 o'clock, exactly as start 1 does.
+    const half = g([10, 20, 30, 40], { start: 1.5 });
+    const whole = g([10, 20, 30, 40], { start: 1 });
+    expect(half.segments.map((s) => s.pos)).toEqual(whole.segments.map((s) => s.pos));
+    expect(half.segments[1]!.pos).toBe(0);
+  });
+
+  it("the guide centre is the painted centre (client hit-testing shares it)", () => {
+    const geo = g([1, 2, 3], { size: 25.5 });
+    expect(geo.guide.cx).toBe(12.75);
+    expect(geo.guide.cy).toBe(12.75);
   });
 
   it("all-equal → flat", () => {

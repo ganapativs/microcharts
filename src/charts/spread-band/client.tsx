@@ -6,14 +6,22 @@
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { isFiniteValue } from "../../core/types.js";
 import { EN_SPREAD_BAND } from "../../core/strings-spread-band.js";
 import { gutterFont, lastGap, spreadBandGeometry } from "./geometry.js";
 import {
+  DEFAULT_SERIES_LABELS,
   SpreadBand as StaticSpreadBand,
+  seriesPair,
   signedGap,
   spreadBandSummary,
   type SpreadBandProps,
@@ -31,7 +39,7 @@ export interface InteractiveSpreadBandProps extends SpreadBandProps, PickerProps
 export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
   const {
     data,
-    labels = ["A", "B"],
+    seriesLabels = DEFAULT_SERIES_LABELS,
     label = "gap",
     domain,
     width = 80,
@@ -112,7 +120,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : spreadBandSummary(geo, labels, fmt, strings);
+        : spreadBandSummary(geo, seriesLabels, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // The reading shown by the crosshair + readout: the live hover/keyboard focus,
@@ -124,8 +132,9 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
   const bothFinite = isFiniteValue(av) && isFiniteValue(bv);
   const gap = bothFinite ? (av as number) - (bv as number) : 0;
   const aLeads = gap > 0;
-  const leader = aLeads ? labels[0] : labels[1];
-  const other = aLeads ? labels[1] : labels[0];
+  const [labelA, labelB] = seriesPair(seriesLabels);
+  const leader = aLeads ? labelA : labelB;
+  const other = aLeads ? labelB : labelA;
 
   const announced =
     shown === null
@@ -147,15 +156,13 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-spread-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticSpreadBand
         {...rest}
         data={data}
-        labels={labels}
+        seriesLabels={seriesLabels}
         label={label}
         domain={domain}
         width={width}
@@ -165,7 +172,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         strings={strings}
         title={title}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {pinX !== undefined ? (

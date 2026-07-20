@@ -44,7 +44,7 @@ export interface WaterfallProps {
   /** Opening level (prior-period close). */
   start?: number | undefined;
   /** Zero-anchored closing total bar — the key back to reality. */
-  total?: boolean | undefined;
+  totalBar?: boolean | undefined;
   /** `"delta"` = signed value labels (deterministic drop-out). */
   label?: "none" | "delta" | undefined;
   /** `"down"` = decreases are good (cost breakdowns). */
@@ -67,7 +67,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
   const {
     data,
     start = 0,
-    total = true,
+    totalBar = true,
     label = "none",
     positive = "up",
     domain,
@@ -89,7 +89,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
     height,
     deltas: data.map((d) => d.value),
     start,
-    total,
+    total: totalBar,
     domain,
   });
   const fmt = makeFormatter(format, locale);
@@ -148,6 +148,12 @@ export function Waterfall(props: WaterfallProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The domain always contains zero and the total bar is anchored to it, so
+      // the floating steps read as standing on a ground plane — a floor, not a
+      // midline. Two things the seat must dodge: the delta labels below the plot
+      // (`viewH` > `height`) and the half-unit stroke reserve, so the anchor is
+      // the plot floor `y1`, not the viewBox edge.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={className ? `mc-waterfall ${className}` : "mc-waterfall"}
       style={rootStyle}
     >

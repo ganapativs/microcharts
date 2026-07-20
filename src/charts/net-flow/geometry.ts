@@ -44,6 +44,10 @@ interface FlowPoint {
 
 export interface NetFlowGeometry {
   zeroY: number;
+  /** Plot box top/bottom in viewBox units — the padded frame the inflow and
+   *  outflow surfaces are clamped into. Prop-derived, never data-derived. */
+  y0: number;
+  y1: number;
   inArea: { d: string };
   outArea: { d: string };
   netLine: { d: string };
@@ -105,7 +109,6 @@ export function netFlowGeometry(opts: {
   const up = (v: number) => round2(clamp(zeroY - scale(v), pad, height - pad));
 
   // area/line points span the plot edge-to-edge (line-chart geometry);
-  // bars sit centered in per-period slots
   const lineX = (i: number) =>
     n === 1 ? (plotL + plotR) / 2 : plotL + ((plotR - plotL) * i) / (n - 1);
   const slotW = (plotR - plotL) / n;
@@ -163,6 +166,8 @@ export function netFlowGeometry(opts: {
 
   return {
     zeroY,
+    y0: round2(pad),
+    y1: round2(height - pad),
     inArea: { d: degenerate ? "" : zeroArea(inPts, zeroY) },
     outArea: { d: degenerate ? "" : zeroArea(outPts, zeroY) },
     netLine: { d: degenerate ? "" : linePath(netPts) },

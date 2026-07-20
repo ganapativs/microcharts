@@ -14,7 +14,7 @@ export function PreviewLive() {
       progress={0.64}
       elapsed={3.6}
       rate={0.18}
-      formatEta={min}
+      etaFormat={min}
       summary={false}
       width={130}
       height={14}
@@ -31,7 +31,7 @@ export const playground: PlaygroundSpec = {
       elapsed={3.6}
       rate={(s.rate as number) / 100}
       label={s.label as "eta" | "percent" | "none"}
-      formatEta={min}
+      etaFormat={min}
       animate={ui.animate}
       summary={false}
       width={300}
@@ -45,7 +45,7 @@ export const playground: PlaygroundSpec = {
       "  elapsed={3.6}",
       `  rate={${((s.rate as number) / 100).toFixed(2)}}`,
       s.label !== "eta" && `  label="${s.label}"`,
-      "  formatEta={(t) => `${Math.round(t)} min`}",
+      "  etaFormat={(t) => `${Math.round(t)} min`}",
       ui.animate && " animate",
       "/>",
     ]

@@ -3,8 +3,9 @@
 // swap — not d: interpolation); announces at documented thresholds (50 / 90 /
 // 100%), not on every tick. Wrapper focus only. Composes the static component.
 import { useEffect, useRef, useState } from "react";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
-import { FILL, wrap as wrapAttrs } from "../../shared/interactive.js";
+import { named, fillFor, wrap as wrapAttrs } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { Hourglass as StaticHourglass, hourglassSummary, type HourglassProps } from "./index.js";
 
@@ -30,6 +31,9 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
   } = props;
   const summary = hourglassSummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
+  // seat the wrapper, not just the SVG, so the click target stays on the
+  // painted glyph when this sits inline in prose (see seat-hoist).
+  useSeatHoist(wrap);
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");
 
@@ -72,9 +76,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     <span
       ref={wrap}
       {...wrapAttrs("mc-hourglass-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -83,7 +85,13 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
         }
       }}
     >
-      <StaticHourglass {...rest} style={FILL} value={value} strings={strings} summary={false} />
+      <StaticHourglass
+        {...rest}
+        style={fillFor(style)}
+        value={value}
+        strings={strings}
+        summary={false}
+      />
       {live ? (
         <span
           aria-live="polite"

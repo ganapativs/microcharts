@@ -19,7 +19,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <CalibrationStripInteractive
       data={BINS}
-      variant={s.variant as "dots" | "bars"}
+      mode={s.mode as "dots" | "bars"}
       minSupport={s.minSupport as number}
       summary={false}
       animate={ui.animate}
@@ -31,7 +31,7 @@ export const playground: PlaygroundSpec = {
     [
       "<CalibrationStrip",
       "  data={reliability}",
-      s.variant !== "dots" && `  variant="${s.variant}"`,
+      s.mode !== "dots" && `  mode="${s.mode}"`,
       s.minSupport !== 11 && `  minSupport={${s.minSupport}}`,
       ui.animate && " animate",
       "/>",

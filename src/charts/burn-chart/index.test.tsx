@@ -80,3 +80,21 @@ describe("<BurnChart>", () => {
     );
   });
 });
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("BurnChart degradation", () => {
+  it("the gap readout drops under a 7-unit box, plan + actual still draw", () => {
+    const big = draw(
+      <BurnChart data={{ plan: PLAN, actual: ACTUAL }} width={240} height={32} />,
+    ).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(
+      <BurnChart data={{ plan: PLAN, actual: ACTUAL }} width={48} height={6} />,
+    ).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+});

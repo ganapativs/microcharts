@@ -24,6 +24,11 @@ interface OhlcMark {
   up: boolean;
   doji: boolean;
   bodyW: number;
+  /**
+   * Index of this period in the RENDERED window (the most recent `maxPeriods`)
+   * — NOT a position in `marks`. Corrupt periods are dropped, so the space is
+   * sparse: consumers must look periods up by this index, never by mark order.
+   */
   index: number;
 }
 
@@ -34,6 +39,10 @@ export interface OhlcGeometry {
   pitch: number;
   /** Indices of corrupt periods (high < low or open/close outside range). */
   invalid: number[];
+  /** Plot-box top edge (viewBox units) — the price domain's high. */
+  y0: number;
+  /** Plot-box bottom edge (viewBox units) — the price domain's low. */
+  y1: number;
 }
 
 export function ohlcGeometry(opts: {
@@ -46,12 +55,19 @@ export function ohlcGeometry(opts: {
   fontSize: number;
 }): OhlcGeometry {
   const { width, height, gutterCh, fontSize } = opts;
+  // half a unit of inset so a wick's cap is not shaved by the viewBox edge
+  const y0 = 0.5;
+  const y1 = round2(height - 0.5);
   const maxPeriods = Math.max(1, opts.maxPeriods ?? 20);
   const truncated = opts.periods.length > maxPeriods;
   const periods = truncated ? opts.periods.slice(-maxPeriods) : [...opts.periods];
 
   const invalid: number[] = [];
-  const valid = periods.filter((p, i) => {
+  // Carry each surviving period's SOURCE index: dropping a corrupt period
+  // shifts every later one, and a mark that only knew its own position would
+  // read back against the caller's array off by the number of drops before it.
+  const valid: { p: OhlcInput; src: number }[] = [];
+  periods.forEach((p, i) => {
     const ok =
       [p.open, p.high, p.low, p.close].every(Number.isFinite) &&
       p.high >= p.low &&
@@ -59,30 +75,29 @@ export function ohlcGeometry(opts: {
       p.open <= p.high &&
       p.close >= p.low &&
       p.close <= p.high;
-    if (!ok) invalid.push(i);
-    return ok;
+    if (ok) valid.push({ p, src: i });
+    else invalid.push(i);
   });
   const n = valid.length;
-  if (n === 0) return { marks: [], truncated, pitch: 0, invalid };
+  if (n === 0) return { marks: [], truncated, pitch: 0, invalid, y0, y1 };
 
   // +5 gap so the last-close value reads as separate from the final candle
   const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 5) : 0;
   const x0 = 1;
   const x1 = width - 1 - gutter;
 
-  const lo = Math.min(...valid.map((p) => p.low));
-  const hi = Math.max(...valid.map((p) => p.high));
+  const lo = Math.min(...valid.map((e) => e.p.low));
+  const hi = Math.max(...valid.map((e) => e.p.high));
   let domain =
     opts.domain && opts.domain.every((d) => Number.isFinite(d)) ? opts.domain : ([lo, hi] as const);
   if (domain[0] === domain[1]) domain = [domain[0] - 1, domain[1] + 1];
-  const y = (v: number) =>
-    round2(clamp(scaleLinear(domain, [height - 0.5, 0.5])(v), 0.5, height - 0.5));
+  const y = (v: number) => round2(clamp(scaleLinear(domain, [y1, y0])(v), y0, y1));
 
   const pitch = (x1 - x0) / n;
   const bodyW = round2(Math.max(1, Math.min(4, pitch * 0.6)));
 
-  const marks: OhlcMark[] = valid.map((p, index) => ({
-    x: round2(x0 + pitch * (index + 0.5)),
+  const marks: OhlcMark[] = valid.map(({ p, src }, slot) => ({
+    x: round2(x0 + pitch * (slot + 0.5)),
     yH: y(p.high),
     yL: y(p.low),
     yO: y(p.open),
@@ -90,8 +105,8 @@ export function ohlcGeometry(opts: {
     up: p.close > p.open,
     doji: p.close === p.open,
     bodyW,
-    index,
+    index: src,
   }));
 
-  return { marks, truncated, pitch, invalid };
+  return { marks, truncated, pitch, invalid, y0, y1 };
 }

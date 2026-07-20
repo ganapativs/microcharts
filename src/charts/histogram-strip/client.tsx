@@ -5,7 +5,13 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { histogramGeometry } from "./geometry.js";
@@ -128,14 +134,12 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
     <span
       ref={hostRef}
       {...wrap("mc-histogram-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       {...bind}
     >
       <StaticHistogramStrip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         bins={bins}
         markValue={markValue}

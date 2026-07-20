@@ -106,6 +106,10 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Both rows always tile the full inset frame — row height is layout, not
+      // data — so the block has no floor and its extent never moves with the
+      // values. It centres on the cap band.
+      seat={{ mode: "center", top: inset, bottom: height - inset }}
       className={className ? `mc-partition ${className}` : "mc-partition"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >

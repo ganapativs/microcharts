@@ -6,7 +6,13 @@
 // (canon); the readout chip reports the odds.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-quantile-dots.js";
@@ -201,14 +207,12 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     <span
       ref={hostRef}
       {...wrap("mc-quantile-dots-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticQuantileDots
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         count={count}
         threshold={activeThreshold}

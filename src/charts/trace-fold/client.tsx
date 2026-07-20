@@ -5,11 +5,17 @@
 // contract. Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TRACE_FOLD } from "../../core/strings-trace-fold.js";
-import { traceFoldGeometry } from "./geometry.js";
+import { traceFoldGeometry, traceFoldHeight } from "./geometry.js";
 import { TraceFold as StaticTraceFold, traceFoldSummary, type TraceFoldProps } from "./index.js";
 
 export interface InteractiveTraceFoldProps extends TraceFoldProps, PickerProps {
@@ -59,7 +65,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
     for (let i = 0; i < Math.min(40, data.length); i++) seen.add(data[i]!.depth);
     return Math.max(1, seen.size);
   }, [data]);
-  const height = heightProp ?? Math.min(48, Math.max(16, depthCount * 10));
+  const height = heightProp ?? traceFoldHeight(depthCount);
   const geo = useMemo(
     () => traceFoldGeometry({ data, width, height, rowGap: 1.2 }),
     [data, width, height],
@@ -195,14 +201,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
     : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-trace-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-trace-live", className, style)} {...named(label)} {...bind}>
       <StaticTraceFold
         {...rest}
         data={data}
@@ -212,7 +211,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}

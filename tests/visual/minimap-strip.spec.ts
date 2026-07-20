@@ -33,7 +33,7 @@ function gallery(): string {
   const tab = `<div class="tab"><span>doc</span> ${svg({ data: DATA, width: 56, height: 10, markLane: false, summary: false })}</div>`;
   const variants = [
     svg({ data: DATA, width: 200, height: 20, title: "bars (default)" }),
-    svg({ data: DATA, variant: "heat", width: 200, height: 20, title: "heat" }),
+    svg({ data: DATA, mode: "heat", width: 200, height: 20, title: "heat" }),
     svg({ data: DATA, markLane: false, width: 200, height: 20, title: "overlaid ticks" }),
     svg({
       data: { content: CONTENT.slice(0, 200), window: [40, 90], known: [[0, 200]] },

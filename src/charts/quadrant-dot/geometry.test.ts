@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { quadrantDotGeometry } from "./geometry.js";
+import { quadrantDotGeometry, quadrantDotRadii } from "./geometry.js";
 
 const base = { width: 24, height: 24 };
 const FIELD = [
@@ -91,6 +91,32 @@ describe("quadrantDotGeometry", () => {
 
   it("NaN focal → null", () => {
     expect(quadrantDotGeometry({ ...base, data: { x: NaN, y: 3 } })).toBeNull();
+  });
+
+  // Regression: the interactive hard-coded a 3-unit hit radius while the ghosts
+  // are painted proportionally, so past ~58 units the dot outgrew its own hit
+  // box and its rim went dead to the pointer.
+  describe("quadrantDotRadii", () => {
+    it("grows with the box and keeps the ghost inside the focal", () => {
+      const small = quadrantDotRadii(24, 24);
+      const large = quadrantDotRadii(64, 64);
+      expect(large.focal).toBeGreaterThan(small.focal);
+      expect(large.ghost).toBeLessThan(large.focal);
+    });
+
+    it("floors keep marks visible in tiny boxes", () => {
+      const tiny = quadrantDotRadii(8, 8);
+      expect(tiny.focal).toBe(1.6);
+      expect(tiny.ghost).toBe(1);
+    });
+
+    it("sizes off the SHORT side, so a wide box does not inflate the dots", () => {
+      expect(quadrantDotRadii(200, 24)).toEqual(quadrantDotRadii(24, 24));
+    });
+
+    it("a 64-unit box paints ghosts wider than the old fixed 3-unit hit radius", () => {
+      expect(quadrantDotRadii(64, 64).ghost).toBeGreaterThan(3);
+    });
   });
 
   test.prop([

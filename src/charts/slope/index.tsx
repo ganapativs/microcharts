@@ -1,5 +1,5 @@
-// <Slope> — who rose and who fell between two moments (, S2-paired,
-// time on x). Static, hook-free, RSC-safe. Neutral ink until `positive` is
+// <Slope> — who rose and who fell between two moments (S2-paired, time on x).
+// Static, hook-free, RSC-safe. Neutral ink until `positive` is
 // declared — a rank change is not automatically good or bad. Both columns
 // share one y-domain; a two-point line implies nothing about the path between
 // (docs steer to Sparkline for the path).
@@ -116,6 +116,11 @@ export function Slope(props: SlopeProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Segments float between two columns with nothing beneath them, so this
+      // seats like its Dumbbell sibling rather than like a trace. The endpoints
+      // inset by one dot radius at both ends, leaving the frame's midpoint and
+      // the plot's identical.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-slope ${className}` : "mc-slope"}
       style={rootStyle}
     >

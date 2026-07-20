@@ -6,7 +6,13 @@
 // ring + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
@@ -31,9 +37,9 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
     data,
     labels = false,
     label = "none",
-    sort = "none",
+    order = "data",
     domain,
-    max = 12,
+    maxItems = 12,
     format,
     locale,
     width = 80,
@@ -70,7 +76,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
   // band and centerX, so omitting them slides the focus ring off the rows.
   const geo = useMemo(() => {
     const font = Math.min(10, Math.max(6, Math.round(height * 0.4)));
-    const nRows = Math.min(data.length, Math.max(1, Math.min(12, Math.round(max))));
+    const nRows = Math.min(data.length, Math.max(1, Math.min(12, Math.round(maxItems))));
     const footer = label === "totals" && height >= 34 ? font + 3 : 0;
     const rowH = nRows > 0 ? (height - 4 - footer) / nRows : 0;
     const tags = labels && rowH >= 10;
@@ -78,18 +84,18 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
       width,
       height,
       data,
-      sort,
+      order,
       domain,
-      max,
+      maxItems,
       gutterCh: tags ? Math.max(...data.map((d) => d.key.length), 0) : 0,
       fontSize: tags ? Math.max(5, Math.min(font, Math.floor(rowH * 0.5))) : font,
       footer,
     });
-  }, [width, height, data, sort, domain, max, labels, label]);
+  }, [width, height, data, order, domain, maxItems, labels, label]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   // Navigable unit = one DISPLAYED row: index into `geo.rows`, i.e. the sorted +
-  // `max`-capped view order, which is the data order only when sort === "none".
+  // `maxItems`-capped view order, which is the data order only when order === "data".
   const count = geo?.rows.length ?? 0;
 
   const locate = useCallback(
@@ -171,20 +177,18 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-data-diff-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticDataDiff
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         labels={labels}
         label={label}
-        sort={sort}
+        order={order}
         domain={domain}
-        max={max}
+        maxItems={maxItems}
         format={format}
         locale={locale}
         width={width}

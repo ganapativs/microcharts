@@ -6,7 +6,13 @@
 // SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
@@ -187,17 +193,10 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
         : `${shownDatum.label}: ${strings.noData}`;
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-dotplot-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-dotplot-live", className, style)} {...named(label)} {...bind}>
       <StaticDotPlot
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         stem={stem}
         domain={domain}

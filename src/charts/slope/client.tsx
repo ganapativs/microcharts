@@ -7,7 +7,8 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
@@ -172,14 +173,12 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-slope-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticSlope
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         label={label}
         domain={domain}

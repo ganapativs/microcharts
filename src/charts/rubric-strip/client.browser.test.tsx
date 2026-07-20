@@ -24,6 +24,22 @@ describe("interactive <RubricStrip>", () => {
     await expect.poll(() => live.textContent).toBe("Coverage: 0.78, weight 33% of total.");
   });
 
+  it("a null-score criterion announces no score without throwing", async () => {
+    // `score` is typed `number`, but bad data reaches the readout at runtime.
+    const gappy = [
+      { label: "Correctness", score: 0.92, weight: 3 },
+      { label: "Coverage", score: null as unknown as number, weight: 2 },
+      { label: "Style", score: 0.41, weight: 1 },
+    ];
+    const screen = await render(<RubricStrip data={gappy} title="Eval" width={120} height={30} />);
+    const wrap = screen.container.querySelector(".mc-rubric-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowDown");
+    key(wrap, "ArrowDown"); // Coverage: null score
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toBe("Coverage: no score, weight 33% of total.");
+  });
+
   it("onActive reports the focused criterion; null on Escape", async () => {
     const seen: unknown[] = [];
     const screen = await render(

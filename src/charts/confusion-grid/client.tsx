@@ -5,7 +5,13 @@
 // FULL row/column labels — this entry is the full-label read-back path.
 // useActivePicker owns interaction; the SVG is the composed static component.
 import { useCallback, useMemo, useRef } from "react";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { labelFont } from "../../core/labels.js";
@@ -177,9 +183,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
     <span
       ref={hostRef}
       {...wrap("mc-confusion-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticConfusionGrid
@@ -189,7 +193,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
         label={label}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}

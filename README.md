@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/promo.png" alt="microcharts — word-sized charts for React, made for AI first and for the people reading what it writes. 106 chart types, zero dependencies, 0.95–3.67 kB gzip each." width="920">
+<img src="assets/promo.png" alt="microcharts — word-sized charts for React, made for AI first and for the people reading what it writes. 106 chart types, zero dependencies, 0.95–3.93 kB gzip each." width="920">
 
 # @microcharts/react
 
@@ -10,7 +10,7 @@ server-component safe.
 <br>
 
 [![npm](https://img.shields.io/npm/v/@microcharts/react?color=c2410c&label=npm)](https://www.npmjs.com/package/@microcharts/react)
-[![gzip per chart](https://img.shields.io/badge/per_chart-0.95–3.67_kB_gz-c2410c)](https://microcharts.dev/docs/performance)
+[![gzip per chart](https://img.shields.io/badge/per_chart-0.95–3.93_kB_gz-c2410c)](https://microcharts.dev/docs/performance)
 [![zero dependencies](https://img.shields.io/badge/dependencies-0-077353)](https://microcharts.dev)
 [![types](https://img.shields.io/npm/types/@microcharts/react?color=c2410c)](https://microcharts.dev)
 [![React 18 · 19](https://img.shields.io/badge/React-18_·_19-077353)](https://microcharts.dev/docs/quickstart)
@@ -47,7 +47,7 @@ to write are the ones that make it pleasant for a human to use.
   Interactivity is a separate opt-in `/interactive` import.
 - **Accessible by default.** Every chart is an `img` with a natural-language summary built from your data — nothing to
   remember, nothing to drift. → [Accessibility](https://microcharts.dev/docs/accessibility)
-- **Tiny + honest.** **0.95–3.67 kB gzip** per chart (median 2.33; 23 of 106 under 2 kB), budget-gated in CI. Every type
+- **Tiny + honest.** **0.95–3.93 kB gzip** per chart (median 2.51; 15 of 106 under 2 kB), budget-gated in CI. Every type
   has one documented, honest encoding channel. Delight never lies.
 
 ## Install
@@ -179,7 +179,8 @@ and tree-shakes normally — and since charts ship as per-component subpaths, yo
 
 ```bash
 pnpm install
-pnpm check     # typecheck + lint + format + test + knip + sizes
+pnpm check     # typecheck + lint + format + test + knip
+pnpm size      # gzip budgets (needs a build first)
 pnpm build
 ```
 

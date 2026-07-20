@@ -10,8 +10,8 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import type { FiveNumber } from "../../core/quantile.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
-import { isFiniteValue, round2, type Value } from "../../core/types.js";
-import { computeFive, microBoxGeometry } from "./geometry.js";
+import { isFiniteValue, type Value } from "../../core/types.js";
+import { computeFive, microBoxDots, microBoxGeometry } from "./geometry.js";
 
 /** Factual five-number summary. Shared with the interactive entry. */
 export function microBoxSummary(
@@ -97,9 +97,12 @@ export function MicroBox(props: MicroBoxProps): ReactNode {
 
   if (resolved === null || tooFew) {
     const raws = tooFew && resolved ? resolved.raw : [];
-    const lo = Math.min(...raws);
-    const hi = Math.max(...raws);
-    const span = hi - lo || 1;
+    // Same scale the box path uses, so `domain` is honoured and the interactive
+    // entry's hit-testing lands on the dots it can see.
+    const dotX =
+      resolved && raws.length > 0
+        ? microBoxDots({ raw: raws, width, five: resolved.five, domain }).dots
+        : [];
     return (
       <Chart
         width={width}
@@ -107,13 +110,16 @@ export function MicroBox(props: MicroBoxProps): ReactNode {
         title={title}
         summary={accName}
         id={id}
+        // Empty and small-n seat like the drawn box: the raw dots sit on the
+        // same midline, there is simply no box to measure.
+        seat={{ mode: "center", top: 0, bottom: height }}
         className={cls}
         style={style}
       >
-        {raws.map((v, i) => (
+        {raws.map((_v, i) => (
           <circle
             key={i}
-            cx={round2(1.5 + ((v - lo) / span) * (width - 3))}
+            cx={dotX[i]}
             cy={height / 2}
             r={1.5}
             data-mc-ink="point"
@@ -141,6 +147,11 @@ export function MicroBox(props: MicroBoxProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Spread read along a midline: whisker, box and outliers are all built
+      // about `height / 2`, so no edge here is a floor and the box centres on
+      // the cap band. Symmetric in the frame by construction, so the frame IS
+      // the plot box — the box's own height is data-free but says no more.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={cls}
       style={style}
     >

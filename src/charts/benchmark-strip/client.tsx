@@ -7,7 +7,13 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
@@ -148,14 +154,12 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
     <span
       ref={hostRef}
       {...wrap("mc-benchmark-strip-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticBenchmarkStrip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         value={value}
         range={range}

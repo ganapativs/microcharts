@@ -4,7 +4,7 @@
 // otherwise), with no layout shift (tabular-nums). Wrapper focus only — the
 // numeral is one value. Composes the static component.
 import { useEffect, useRef, useState } from "react";
-import { FILL, wrap, type MicroDatum } from "../../shared/interactive.js";
+import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";
@@ -62,9 +62,7 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-fat-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
@@ -74,7 +72,7 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
     >
       <StaticFatDigits
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         value={value}
         domain={domain}
         encode={encode}

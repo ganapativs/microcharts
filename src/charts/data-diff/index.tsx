@@ -38,14 +38,14 @@ export interface DataDiffProps {
   labels?: boolean | undefined;
   /** A tick at added−removed per row (a summary mark, never the two bars). */
   net?: boolean | undefined;
-  /** `"none"` keeps input order (often meaningful); `"net"`/`"magnitude"` reorder. */
-  sort?: "none" | "net" | "magnitude" | undefined;
+  /** `"data"` keeps input order (often meaningful); `"net"`/`"magnitude"` reorder. */
+  order?: "data" | "net" | "magnitude" | undefined;
   /** `"totals"` prints a `+added / −removed` mono footer. */
   label?: "totals" | "none" | undefined;
   /** Shared scale override for cross-chart comparison. */
   domain?: readonly [number, number] | undefined;
-  /** Rows beyond `max` (cap 12) are dropped with a dev warning, never truncated silently. */
-  max?: number | undefined;
+  /** Rows beyond `maxItems` (cap 12) are dropped with a dev warning, never truncated silently. */
+  maxItems?: number | undefined;
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   width?: number | undefined;
@@ -64,10 +64,10 @@ export function DataDiff(props: DataDiffProps): ReactNode {
     data,
     labels = false,
     net = false,
-    sort = "none",
+    order = "data",
     label = "none",
     domain,
-    max = 12,
+    maxItems = 12,
     format,
     locale,
     width = 80,
@@ -93,7 +93,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
   // rows split the plot height — key tags only fit (and the totals footer only
   // earns its band) when there is vertical room. Drop first under degradation.
   const pad = 2;
-  const nRows = Math.min(data.length, Math.max(1, Math.min(12, Math.round(max))));
+  const nRows = Math.min(data.length, Math.max(1, Math.min(12, Math.round(maxItems))));
   const footerH = label === "totals" && height >= 34 ? FONT + 3 : 0;
   const showTotals = footerH > 0;
   const rowH = nRows > 0 ? (height - 2 * pad - footerH) / nRows : 0;
@@ -103,13 +103,19 @@ export function DataDiff(props: DataDiffProps): ReactNode {
   const tagFont = showTags ? Math.max(5, Math.min(FONT, Math.floor(rowH * 0.5))) : FONT;
   const gutterCh = showTags ? Math.max(...data.map((d) => d.key.length), 0) : 0;
 
+  // A stack of diverging rows has no floor — added/removed grow sideways from a
+  // shared vertical axis — so the row band centres on the cap band. It is the
+  // band, not the viewBox: a totals footer steals height off the bottom, which
+  // would otherwise drag the rows visibly high on the line.
+  const seat = { mode: "center", top: pad, bottom: round2(height - pad - footerH) } as const;
+
   const geo = dataDiffGeometry({
     width,
     height,
     data,
-    sort,
+    order,
     domain,
-    max,
+    maxItems,
     gutterCh,
     fontSize: tagFont,
     footer: footerH,
@@ -123,6 +129,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        seat={seat}
         className={cls}
         style={style}
       >
@@ -141,6 +148,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      seat={seat}
       className={cls}
       style={rootStyle}
     >

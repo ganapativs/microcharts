@@ -19,7 +19,7 @@ export const playground: PlaygroundSpec = {
       data={DIFF}
       labels={s.labels as boolean}
       net={s.net as boolean}
-      sort={s.sort as "none" | "net" | "magnitude"}
+      order={s.order as "data" | "net" | "magnitude"}
       label={s.label as "totals" | "none"}
       summary={false}
       animate={ui.animate}
@@ -33,7 +33,7 @@ export const playground: PlaygroundSpec = {
       "  data={diff}",
       s.labels && "  labels",
       s.net && "  net",
-      s.sort !== "none" && `  sort="${s.sort}"`,
+      s.order !== "data" && `  order="${s.order}"`,
       s.label !== "none" && `  label="${s.label}"`,
       ui.animate && " animate",
       "/>",

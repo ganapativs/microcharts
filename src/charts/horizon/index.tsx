@@ -56,7 +56,8 @@ export function Horizon(props: HorizonProps): ReactNode {
 
   const geo = horizonGeometry({ width, height, values: data, domain, baseline, folds, mode });
   const fmt = makeFormatter(format, locale);
-  // values are ordinary S1 data; folding is presentation (spec)
+  // values are ordinary S1 data; folding is presentation, so the summary reads
+  // the unfolded series.
   const accName = resolveSummary(summary, () => describeSeries(data, { format: fmt, strings }));
 
   return (
@@ -66,6 +67,15 @@ export function Horizon(props: HorizonProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The fold origin moves with `mode`, and so does the seat: mirror sends
+      // both signs upward from the strip bottom, which is a real floor to stand
+      // on the baseline; offset hangs negatives below the midline, so the band
+      // is symmetric with no floor and centres on the cap band instead.
+      seat={
+        mode === "offset"
+          ? { mode: "center", top: geo.y0, bottom: geo.y1 }
+          : { mode: "floor", bottom: geo.y1 }
+      }
       className={className ? `mc-horizon ${className}` : "mc-horizon"}
       style={style}
     >

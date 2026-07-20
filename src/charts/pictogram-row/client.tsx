@@ -11,7 +11,13 @@
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PICTOGRAM, type PictogramStrings } from "../../core/strings-pictogram.js";
@@ -182,14 +188,12 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     <span
       ref={hostRef}
       {...wrap("mc-pictogram-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       {...bind}
     >
       <StaticPictogramRow
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         value={value}
         total={total}
         shape={shape}

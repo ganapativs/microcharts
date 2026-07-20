@@ -10,7 +10,13 @@
 // component (canon).
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_COMET_TRAIL, type CometTrailStrings } from "../../core/strings-comet-trail.js";
@@ -182,14 +188,12 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     <span
       ref={wrapRef}
       {...wrap("mc-comet-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticCometTrail
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         trail={trail}
         label={label}

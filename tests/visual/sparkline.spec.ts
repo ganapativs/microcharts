@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-// The BUILT artifact — this doubles as a smoke test that dist renders (plan/09).
+// The BUILT artifact — this doubles as a smoke test that dist renders.
 import { Sparkline } from "../../dist/charts/sparkline/index.js";
 
 const styles = readFileSync(fileURLToPath(new URL("../../styles.css", import.meta.url)), "utf8");
@@ -12,7 +12,7 @@ const styles = readFileSync(fileURLToPath(new URL("../../styles.css", import.met
 const D = [4, 6, 5, 9, 7, 8, 11, 9, 13, 12, 15, 14];
 const svg = (props: Record<string, unknown>) => renderToStaticMarkup(h(Sparkline as never, props));
 
-// The product thesis, shown in its four canonical contexts (plan/04 §6) plus a
+// The product thesis, shown in its four canonical contexts plus a
 // variant strip. This markup is the visual baseline target and the seed for the
 // Phase-3 doc page's "4 contexts" section — one compiled source of truth.
 function gallery(): string {

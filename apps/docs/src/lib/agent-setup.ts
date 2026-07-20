@@ -1,6 +1,6 @@
 /**
  * The agent-setup prompt has ONE source of truth: the fenced ```md block under
- * `## Set up with an AI agent` in `content/docs/quickstart.mdx`. That block is
+ * `### Set up with an AI agent` in `content/docs/quickstart.mdx`. That block is
  * what `<AgentPromptCopy>` copies (read from the DOM) and what the docs render
  * with syntax highlighting.
  *

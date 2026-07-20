@@ -48,3 +48,37 @@ describe("<CoverageStrip>", () => {
 });
 
 seriesEdgeSuite("CoverageStrip", (data) => <CoverageStrip data={data} title="Edge" />);
+
+describe("<CoverageStrip> degrades at small sizes", () => {
+  const DATA = [1, null, 3];
+  // The percent rides the strip's midline; below one em of box height its
+  // em-box crosses the viewBox edge, so it drops rather than spilling.
+  it("keeps the percent while the box holds one em (height 7, font 7)", () => {
+    const { container } = draw(
+      <CoverageStrip data={DATA} expected={8} label="percent" width={80} height={7} />,
+    );
+    expect(container.querySelector("text")!.textContent).toBe("25%");
+  });
+
+  it("drops the percent below one em — cells stay, gutter goes", () => {
+    const { container } = draw(
+      <CoverageStrip data={DATA} expected={8} label="percent" width={80} height={6} />,
+    );
+    expect(container.querySelector("text")).toBeNull();
+    // the mark still reads: measured cells AND the shape-carried gaps
+    expect(container.querySelector('rect[data-mc-ink="cell"]')).not.toBeNull();
+    expect(container.querySelector('rect[data-mc-ink="gap"]')).not.toBeNull();
+    // the gutter leaves with the label — the viewBox is the plain box again
+    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 80 6");
+  });
+
+  it("the cells do not move when the percent drops (no reflow)", () => {
+    const cellX = (h: number) =>
+      [
+        ...draw(
+          <CoverageStrip data={DATA} expected={8} label="percent" width={80} height={h} />,
+        ).container.querySelectorAll("rect"),
+      ].map((r) => r.getAttribute("x"));
+    expect(cellX(7)).toEqual(cellX(6));
+  });
+});

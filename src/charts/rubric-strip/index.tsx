@@ -7,6 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { isFiniteValue } from "../../core/types.js";
 import { EN_RUBRIC, type RubricStrings } from "../../core/strings-rubric.js";
 import { rubricStripGeometry, type RubricInput } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -37,19 +38,23 @@ export interface RubricStripProps {
   children?: ReactNode | undefined;
 }
 
-/** Shared summary — extremes only, NEVER a weighted total. */
+/** Shared summary — extremes only, NEVER a weighted total. Rows whose score is
+ *  missing (null/NaN/±Infinity) are not scored, so they can't be an extreme; when
+ *  none is scored the strip has nothing to say and degrades to `noData`. The
+ *  count still names every row — the strip draws a track for each. */
 export function rubricStripSummary(
   data: readonly RubricStripDatum[],
   strings: RubricStrings,
   fmt: (n: number) => string,
 ): string {
-  if (data.length === 0) return strings.noData;
-  let hi = data[0]!;
-  let lo = data[0]!;
+  let hi: RubricStripDatum | null = null;
+  let lo: RubricStripDatum | null = null;
   for (const d of data) {
-    if (d.score > hi.score) hi = d;
-    if (d.score < lo.score) lo = d;
+    if (!isFiniteValue(d.score)) continue;
+    if (hi === null || d.score > hi.score) hi = d;
+    if (lo === null || d.score < lo.score) lo = d;
   }
+  if (hi === null || lo === null) return strings.noData;
   return strings.rubric(data.length, hi.label, fmt(hi.score), lo.label, fmt(lo.score));
 }
 
@@ -107,6 +112,10 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Score runs sideways: the box is a stack of criterion rows that always
+      // fills it, with weight setting row thickness. Nothing stands on the
+      // bottom edge, so the block centres on the cap band.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-rubric ${className}` : "mc-rubric"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >

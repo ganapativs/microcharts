@@ -12,7 +12,7 @@ export function PreviewLive() {
   return (
     <SpreadBandInteractive
       data={PAIRS}
-      labels={LABELS}
+      seriesLabels={LABELS}
       summary={false}
       width={140}
       height={26}
@@ -26,7 +26,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <SpreadBandInteractive
       data={PAIRS}
-      labels={LABELS}
+      seriesLabels={LABELS}
       label={s.label as "gap" | "none"}
       positive={s.positive as "up" | "down"}
       animate={ui.animate}
@@ -39,7 +39,7 @@ export const playground: PlaygroundSpec = {
     [
       "<SpreadBand",
       "  data={pairs}",
-      '  labels={["Organic", "Paid"]}',
+      '  seriesLabels={["Organic", "Paid"]}',
       s.label !== "gap" && `  label="${s.label}"`,
       s.positive !== "up" && `  positive="${s.positive}"`,
       ui.animate && " animate",

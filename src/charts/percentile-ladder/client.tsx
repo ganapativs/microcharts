@@ -6,8 +6,13 @@
 // (canon); the probe line is an overlay child re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
@@ -15,6 +20,7 @@ import { round2 } from "../../core/types.js";
 import { percentileLadderGeometry } from "./geometry.js";
 import {
   PercentileLadder as StaticPercentileLadder,
+  ladderFont,
   ladderSummary,
   type PercentileLadderProps,
 } from "./index.js";
@@ -64,8 +70,9 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     order: "index",
   });
 
-  // must match the static geometry (label font sizes the log-tag gutter)
-  const font = labelFont(height);
+  // must match the static geometry (label font sizes the log-tag gutter) —
+  // import the CHART's font, not `core/labels`' same-named helper
+  const font = ladderFont(height);
   const geo = useMemo(
     () => percentileLadderGeometry({ width, height, data, ps, scale, domain: props.domain, font }),
     [width, height, data, ps, scale, props.domain, font],
@@ -73,11 +80,18 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const ratioFmt = useMemo(() => makeFormatter({ maximumFractionDigits: 1 }, locale), [locale]);
 
+  // A collapsed ladder (every percentile identical) paints ONE rung, so it
+  // offers one navigable unit — roving the hidden rungs would cycle the chip
+  // through p50/p90/p99 while the probe line never moved. Same predicate the
+  // static renders by (`geo.collapsed`), read from geometry, not re-derived.
+  const count = geo === null ? 0 : geo.collapsed ? 1 : geo.ticks.length;
+
   // index = TICK (percentile rung) index in ascending-p order — the requested
   // `ps` deduped/sorted/capped, not an index into `data`.
   const locate = useCallback(
     (x: number) => {
       if (!geo || geo.ticks.length === 0) return null;
+      if (geo.collapsed) return 0;
       let best = 0;
       let bestDist = Infinity;
       geo.ticks.forEach((t, i) => {
@@ -100,7 +114,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
   );
 
   const { active, selected, bind } = useActivePicker({
-    count: geo?.ticks.length ?? 0,
+    count,
     width,
     height,
     locate,
@@ -158,14 +172,12 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     <span
       ref={hostRef}
       {...wrap("mc-percentile-ladder-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticPercentileLadder
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         ps={ps}
         scale={scale}

@@ -8,7 +8,7 @@ import { BumpStrip } from "@microcharts/react/bump-strip/interactive";
 import { Threshold, Marker } from "@microcharts/react/annotations";
 
 /**
- * 02 · The grammar, live: the JSX types itself in (~10 ms/char), the real
+ * 01 · The grammar, live: the JSX types itself in (~10 ms/char), the real
  * component draws, and the sentence under it is read back OUT OF THE DOM —
  * the actual generated aria-label of the mounted chart, never a hardcoded
  * quote. Each tab's code string mirrors its rendered element exactly.

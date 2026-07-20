@@ -12,7 +12,7 @@ const D = [
 describe("interactive <SpreadBand>", () => {
   it("←/→ steps x announcing the lead at that point", async () => {
     const screen = await render(
-      <SpreadBand data={D} labels={["Organic", "Paid"]} title="Channels" />,
+      <SpreadBand data={D} seriesLabels={["Organic", "Paid"]} title="Channels" />,
     );
     const wrap = screen.container.querySelector(".mc-spread-live") as HTMLElement;
     wrap.focus();

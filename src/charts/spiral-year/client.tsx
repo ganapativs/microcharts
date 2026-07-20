@@ -7,7 +7,8 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
@@ -173,17 +174,10 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-spiral-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-spiral-live", className, style)} {...named(label)} {...bind}>
       <StaticSpiralYear
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         cadence={cadence}
         startDate={startDate}

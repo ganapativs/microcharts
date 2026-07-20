@@ -23,7 +23,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it, expect } from "vitest";
-import { wrap } from "../shared/interactive.js";
+import { wrap, fillFor, FILL } from "../shared/interactive.js";
 
 const CHARTS_DIR = join(import.meta.dirname, "..", "charts");
 
@@ -62,7 +62,11 @@ describe("interactive fill contract", () => {
     // Only enforce on entries that compose a focusable wrapper around a static
     // twin (the interactive pattern). Direct-render glyphs fall through.
     const composesStatic = /<Static[A-Z]\w*/.test(src);
-    const hasWrapper = /role="img"/.test(src);
+    // The focusable wrapper is named through `named(…)`, which emits role/tabIndex
+    // (or `aria-hidden` when the chart is decorative). Match the helper, not a
+    // literal `role="img"` — that string no longer appears in a client entry, and
+    // matching it silently skipped this whole suite.
+    const hasWrapper = /\bnamed\(/.test(src) || /role="(img|slider)"/.test(src);
     if (!composesStatic || !hasWrapper) continue;
 
     describe(name, () => {
@@ -76,9 +80,13 @@ describe("interactive fill contract", () => {
         );
       });
 
-      it("fills the wrapper with FILL on the composed static", () => {
-        expect(src, `${name}: composed <Static…> must carry style={FILL}`).toMatch(
-          /style=\{FILL\}/,
+      it("fills the wrapper with fillFor(style) on the composed static", () => {
+        // `fillFor`, not the bare `FILL` constant: the SVG must also receive any
+        // sizing the consumer set, or a CSS-sized chart (`height: 1.2em` on an
+        // `.mc-inline` host) shrinks the wrapper while the mark stays at its
+        // authored pixel size and overflows the line.
+        expect(src, `${name}: composed <Static…> must carry style={fillFor(style)}`).toMatch(
+          /style=\{fillFor\(style\)\}/,
         );
       });
 
@@ -104,6 +112,44 @@ describe("interactive fill contract", () => {
       const merged = wrap("mc-x", undefined, { width: "100%", display: "block" }).style;
       // consumer overrides win; untouched base keys survive.
       expect(merged).toMatchObject({ display: "block", width: "100%", position: "relative" });
+    });
+  });
+});
+
+describe("fillFor() — consumer sizing reaches the SVG", () => {
+  it("passes FILL through when the consumer sizes nothing", () => {
+    expect(fillFor(undefined)).toBe(FILL);
+    expect(fillFor({ margin: 4 })).toBe(FILL);
+  });
+
+  it("forwards sizing declarations and drops FILL's own so they can't fight", () => {
+    // The inline case: `height: 1.2em` must resize the MARK, not just the
+    // wrapper — otherwise the SVG keeps its authored pixel size and overflows
+    // the line, which is how the interactive twin grew next to the static one.
+    expect(fillFor({ height: "1.2em", width: "auto" })).toEqual({
+      display: "block",
+      height: "1.2em",
+      width: "auto",
+    });
+    // One axis given → the other follows, so the drawing scales instead of
+    // letterboxing inside a box the pointer map measures in full.
+    expect(fillFor({ height: "1.2em" })).toEqual({
+      display: "block",
+      height: "1.2em",
+      width: "auto",
+    });
+    expect(fillFor({ width: "100%" })).toEqual({
+      display: "block",
+      width: "100%",
+      height: "auto",
+    });
+  });
+
+  it("leaves decorative declarations on the wrapper alone (no doubled margin)", () => {
+    expect(fillFor({ height: 20, margin: 8, background: "red" })).toEqual({
+      display: "block",
+      height: 20,
+      width: "auto",
     });
   });
 });

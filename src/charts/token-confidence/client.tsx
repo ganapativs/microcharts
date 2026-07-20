@@ -4,7 +4,7 @@
 // the tier + confidence. HTML host (the documented SVG exception); shares the
 // pure tiering with the static entry.
 import { useCallback, useId, useMemo, useRef, useState, type CSSProperties } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TOKEN_CONFIDENCE } from "../../core/strings-token-confidence.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { tokenTiers, type Tier } from "./geometry.js";
@@ -17,7 +17,17 @@ const CLASS: Record<Tier, string | undefined> = {
 };
 const TIER_INDEX: Record<Tier, 0 | 1 | 2> = { confident: 0, unsure: 1, guessing: 2 };
 
-export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
+export interface InteractiveTokenConfidenceProps extends TokenConfidenceProps {
+  /**
+   * Number format/locale for the focus announcement's confidence reading.
+   * Interactive-only: the static entry renders the text and its underlines,
+   * never a number.
+   */
+  format?: Format;
+  locale?: string | string[];
+}
+
+export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.ReactNode {
   const {
     data,
     tiers = [0.5, 0.8],

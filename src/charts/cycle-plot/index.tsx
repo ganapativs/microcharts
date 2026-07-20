@@ -12,7 +12,7 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_CYCLE, type CycleStrings } from "../../core/strings-cycle.js";
 import type { Value } from "../../core/types.js";
-import { cycleGeometry, type CycleGeometry } from "./geometry.js";
+import { CYCLE_PAD, cycleGeometry, type CycleGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 const slotName = (slots: readonly string[] | undefined, i: number): string =>
@@ -125,6 +125,9 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        // The frame is known without any data, so an empty plot seats exactly
+        // where a populated one does instead of dropping to the viewBox edge.
+        seat={{ mode: "floor", bottom: height - CYCLE_PAD }}
         className={cls}
         style={style}
       >
@@ -155,6 +158,10 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Spine and slot polylines are traces over one fitted value domain, so the
+      // plot's bottom edge is the floor they stand on. `geo.pad` keeps the seat
+      // tied to the scale's own inset rather than a number copied out of it.
+      seat={{ mode: "floor", bottom: height - geo.pad }}
       className={cls}
       style={style}
     >

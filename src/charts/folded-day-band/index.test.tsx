@@ -6,8 +6,7 @@ import { foldedBandGeometry } from "./geometry.js";
 import { EN_FOLDED_BAND } from "../../core/strings-folded-band.js";
 import { makeFormatter } from "../../core/format.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
-import { seriesEdgeSuite } from "../../test/edge-cases.js";
-import type { Value } from "../../core/types.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const fmt = makeFormatter(undefined, undefined);
@@ -63,9 +62,26 @@ describe("<FoldedDayBand>", () => {
   });
 });
 
-seriesEdgeSuite("FoldedDayBand", (data: readonly Value[]) => (
-  <FoldedDayBand
-    data={data.map((v, i) => ({ t: i, value: typeof v === "number" ? v : 0 }))}
-    title="Edge"
-  />
-));
+// Both fields are read — `t` picks the fold bucket, `value` feeds the quantile.
+// The previous spelling pinned `t: i` and laundered every gap into `value: 0`,
+// so a bin with no reading was asserted to be a measured zero (the opposite of
+// empty ≠ zero) and `t` never went non-finite at all.
+//
+// One suite per field, rather than one suite putting the value on both: with
+// both fields degenerate the two halves of foldBins' finiteness check mask each
+// other — drop the `Number.isFinite(d.t)` half and a both-fields mapping still
+// passes, because the `value` half has already skipped the row. `today` is
+// passed so the overlay + percentile clause meet the matrix too.
+const foldedCase = (data: readonly { t: number; value: number }[]) => (
+  <FoldedDayBand data={data} today={data} title="Edge" />
+);
+mappedEdgeSuite(
+  "FoldedDayBand (degenerate t)",
+  (v, i) => ({ t: v as number, value: i }),
+  foldedCase,
+);
+mappedEdgeSuite(
+  "FoldedDayBand (degenerate value)",
+  (v, i) => ({ t: i, value: v as number }),
+  foldedCase,
+);

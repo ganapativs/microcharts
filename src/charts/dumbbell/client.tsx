@@ -5,7 +5,13 @@
 // (onSelect). Composes the static component (canon) — the SVG never drifts.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
@@ -193,8 +199,15 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   const shownRow = shown !== null ? geo.rows[shown] : undefined;
   const shownDatum = shown !== null ? data[shown] : undefined;
   const shownChange = shownDatum ? pairChange(shownDatum.from, shownDatum.to) : null;
+  // A pair may arrive with a null/NaN/±Infinity endpoint; never format one. Like the
+  // static summary (which speaks only finite-both pairs), an incomplete pair reads as
+  // "No data." rather than leaking a half-formatted endpoint. Dumbbell's voice is
+  // label-free, so `label` (optional here) stays out of the announcement.
+  const okFrom = shownDatum ? Number.isFinite(shownDatum.from) : false;
+  const okTo = shownDatum ? Number.isFinite(shownDatum.to) : false;
   const announced = (() => {
     if (!shownDatum) return "";
+    if (!okFrom || !okTo) return strings.noData;
     const c = pairChange(shownDatum.from, shownDatum.to);
     return c
       ? strings.fromTo(fmt(shownDatum.from), fmt(shownDatum.to), c.dir, c.pct)
@@ -202,17 +215,10 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   })();
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-dumbbell-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-dumbbell-live", className, style)} {...named(label)} {...bind}>
       <StaticDumbbell
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         domain={domain}
         width={width}
@@ -236,7 +242,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {`${fmt(shownDatum.from)} → ${fmt(shownDatum.to)}${shownChange ? ` (${shownChange.dir} ${shownChange.pct})` : ""}`}
+          {`${okFrom ? fmt(shownDatum.from) : "—"} → ${okTo ? fmt(shownDatum.to) : "—"}${shownChange ? ` (${shownChange.dir} ${shownChange.pct})` : ""}`}
         </span>
       ) : null}
     </span>

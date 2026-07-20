@@ -81,6 +81,11 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The full-circle track is always drawn, so the ring is symmetric at every
+      // fraction and has no floor to stand on — centre it on the cap band. The
+      // box is the track's outer radius, which `size` fixes and the value never
+      // touches; seating the sweeping arc would bob the glyph as it fills.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-ring ${className}` : "mc-ring"}
       style={rootStyle}
     >

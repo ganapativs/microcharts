@@ -19,6 +19,11 @@ export interface PictogramUnit {
 
 export interface PictogramGeometry {
   units: PictogramUnit[];
+  /** Top of the unit band. Unit size is constant, so this frame is fixed by
+   *  `width`/`height`/`total` alone — the fill fraction never moves it. */
+  y0: number;
+  /** Bottom of the unit band. */
+  y1: number;
 }
 
 /** Left part of a circle cut by a vertical chord at fraction `f` of its width. */
@@ -53,7 +58,12 @@ export function pictogramGeometry(opts: {
 }): PictogramGeometry {
   const { width, height, shape, fractional } = opts;
   const total = Number.isFinite(opts.total) ? Math.floor(opts.total) : 0;
-  if (total <= 0) return { units: [] };
+  // No units to draw: collapse the band to the box mid-line so a seated empty
+  // chart still centres where a drawn one would.
+  if (total <= 0) {
+    const mid = round2(height / 2);
+    return { units: [], y0: mid, y1: mid };
+  }
 
   const raw = Number.isFinite(opts.value) ? opts.value : 0;
   const value = fractional === "round" ? Math.round(raw) : raw;
@@ -76,5 +86,5 @@ export function pictogramGeometry(opts: {
     return unit;
   });
 
-  return { units };
+  return { units, y0: round2(cy - r), y1: round2(cy + r) };
 }

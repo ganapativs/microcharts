@@ -67,7 +67,7 @@ const sessions = [
   { open: 147.2, high: 149.9, low: 144.6, close: 145.9 },
 ];
 
-<Ohlc data={sessions} variant="bars" />
+<Ohlc data={sessions} mode="bars" />
 <Ohlc data={sessions} label="last" />`}
 >
   <span className="inline-flex flex-col gap-3">
@@ -81,7 +81,7 @@ const sessions = [
           close: Math.round((base + (i % 2 === 0 ? 2 : -1.5)) * 10) / 10,
         };
       })}
-      variant="bars"
+      mode="bars"
       title="Bar form"
       width={240}
       height={30}

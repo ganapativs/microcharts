@@ -21,7 +21,14 @@
 // keep reporting the slot, so the shared contract is unchanged.
 import { useCallback, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import { isFiniteValue } from "../../core/types.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CYCLE, type CycleStrings } from "../../core/strings-cycle.js";
@@ -224,14 +231,18 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
     sl && shown !== null
       ? obs !== undefined
         ? strings.cyclePoint(slotName(slots, shown), cycle + 1, cycleVals.length, fmt(obs))
-        : strings.cycleAt(
-            slotName(slots, shown),
-            center,
-            fmt(sl.center.value),
-            sl.n,
-            cycleUnit,
-            driftDir(sl.drift),
-          )
+        : // An empty slot has no center (geometry sets center.value = NaN); never
+          // format it — announce the slot as having no data.
+          !isFiniteValue(sl.center.value)
+          ? strings.cycleEmpty(slotName(slots, shown))
+          : strings.cycleAt(
+              slotName(slots, shown),
+              center,
+              fmt(sl.center.value),
+              sl.n,
+              cycleUnit,
+              driftDir(sl.drift),
+            )
       : "";
 
   const band = (i: number, pinned: boolean) => {
@@ -256,9 +267,7 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-cycle-plot-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
       // The drill is keyboard-only: a pointer picks whole slots, so scrubbing
       // must not resurrect a drill left on the slot the cursor returns to.
@@ -274,7 +283,7 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
     >
       <StaticCyclePlot
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         period={period}
         slots={slots}
@@ -300,7 +309,9 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
         >
           {obs !== undefined
             ? `${slotName(slots, shown)} ${cycle + 1}/${cycleVals.length}: ${fmt(obs)}`
-            : `${slotName(slots, shown)}: ${fmt(sl.center.value)} (${driftName(strings, sl.drift)})`}
+            : !isFiniteValue(sl.center.value)
+              ? `${slotName(slots, shown)}: —`
+              : `${slotName(slots, shown)}: ${fmt(sl.center.value)} (${driftName(strings, sl.drift)})`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

@@ -5,7 +5,8 @@
 // keyboard model beyond wrapper focus — a count has no sub-parts to navigate.
 // Composes the static component (canon); geometry is never re-implemented.
 import { useEffect, useRef, useState } from "react";
-import { FILL, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { EN_TALLY, type TallyStrings } from "../../core/strings-tally.js";
 import { TallyMarks as StaticTallyMarks, tallySummary, type TallyMarksProps } from "./index.js";
 
@@ -31,6 +32,9 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
   } = props;
   const summary = tallySummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
+  // seat the wrapper, not just the SVG, so the click target stays on the
+  // painted glyph when this sits inline in prose (see seat-hoist).
+  useSeatHoist(wrap);
   const prev = useRef(value);
   // length of the path at the previous count — lets a +1 draw ONLY the newly
   // added subpath (static dash prefix = the old marks) instead of re-drawing
@@ -87,9 +91,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
     <span
       ref={wrap}
       {...wrapAttrs("mc-tally-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
@@ -103,7 +105,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
         value={value}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       />
       {live ? (
         <span

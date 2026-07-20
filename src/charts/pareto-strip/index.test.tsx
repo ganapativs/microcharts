@@ -58,8 +58,8 @@ describe("<ParetoStrip>", () => {
     expect(accent.length).toBeLessThan(bars.length);
   });
 
-  it("max rolls the tail into Other (rendered, last)", () => {
-    const { container } = draw(<ParetoStrip data={CAUSES} max={3} width={160} />);
+  it("maxItems rolls the tail into Other (rendered, last)", () => {
+    const { container } = draw(<ParetoStrip data={CAUSES} maxItems={3} width={160} />);
     // 3 head bars + Other = 4 bars
     expect(container.querySelectorAll("rect").length).toBe(4);
   });
@@ -74,5 +74,23 @@ describe("<ParetoStrip>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<ParetoStrip data={CAUSES} title="Incident causes" />);
     await expectNoA11yViolations(container);
+  });
+});
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("ParetoStrip degradation", () => {
+  it("the vital-few readout drops under a 7-unit box, the bars still draw", () => {
+    const big = draw(
+      <ParetoStrip data={CAUSES} unit="causes" metric="incidents" width={240} height={32} />,
+    ).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(
+      <ParetoStrip data={CAUSES} unit="causes" metric="incidents" width={48} height={6} />,
+    ).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("rect").length).toBeGreaterThan(0);
   });
 });

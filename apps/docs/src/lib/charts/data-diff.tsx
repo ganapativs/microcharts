@@ -52,10 +52,10 @@ export const entry: ChartEntry = {
       description: "A tick at added−removed per row — a summary mark, never the two bars.",
     },
     {
-      name: "sort",
-      type: '"none" | "net" | "magnitude"',
+      name: "order",
+      type: '"data" | "net" | "magnitude"',
       required: false,
-      description: "Default 'none' keeps input order (schema order is often meaningful).",
+      description: "Default 'data' keeps input order (schema order is often meaningful).",
     },
     {
       name: "label",
@@ -64,7 +64,7 @@ export const entry: ChartEntry = {
       description: "'totals' prints a +added / −removed footer.",
     },
     {
-      name: "max",
+      name: "maxItems",
       type: "number",
       required: false,
       description: "Row cap (default 12); rows beyond it are dropped with a dev warning.",
@@ -100,10 +100,10 @@ export const playground: PlaygroundSpec = {
     { kind: "toggle", key: "net", label: "net tick", init: false },
     {
       kind: "segmented",
-      key: "sort",
-      label: "sort",
-      options: ["none", "net", "magnitude"],
-      init: "none",
+      key: "order",
+      label: "order",
+      options: ["data", "net", "magnitude"],
+      init: "data",
     },
     { kind: "segmented", key: "label", label: "totals", options: ["none", "totals"], init: "none" },
   ],
@@ -112,7 +112,7 @@ export const playground: PlaygroundSpec = {
       data={DIFF}
       labels={s.labels as boolean}
       net={s.net as boolean}
-      sort={s.sort as "none" | "net" | "magnitude"}
+      order={s.order as "data" | "net" | "magnitude"}
       label={s.label as "totals" | "none"}
       summary={false}
       width={220}
@@ -125,7 +125,7 @@ export const playground: PlaygroundSpec = {
       "  data={diff}",
       s.labels && "  labels",
       s.net && "  net",
-      s.sort !== "none" && `  sort="${s.sort}"`,
+      s.order !== "data" && `  order="${s.order}"`,
       s.label !== "none" && `  label="${s.label}"`,
       "/>",
     ]

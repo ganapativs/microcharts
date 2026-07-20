@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { isFiniteValue } from "../../core/types.js";
 import { EN_STAR_SPOKE, type StarSpokeStrings } from "../../core/strings-star-spoke.js";
 import { starSpokeGeometry } from "./geometry.js";
 
@@ -39,19 +40,23 @@ export interface StarSpokeProps {
   children?: ReactNode | undefined;
 }
 
-/** Shared summary — the extremes of the profile (the outlier read). */
+/** Shared summary — the extremes of the profile (the outlier read). A metric
+ *  with no value (null/NaN/±Infinity) draws no spoke, so it can't be an extreme;
+ *  with none measured there is no profile to describe and this degrades to
+ *  `noData`. The count still names every metric — each keeps its guide. */
 export function starSpokeSummary(
   data: readonly StarSpokeDatum[],
   strings: StarSpokeStrings,
   fmt: (n: number) => string,
 ): string {
-  if (data.length === 0) return strings.noData;
-  let hi = data[0]!;
-  let lo = data[0]!;
+  let hi: StarSpokeDatum | null = null;
+  let lo: StarSpokeDatum | null = null;
   for (const d of data) {
-    if (d.value > hi.value) hi = d;
-    if (d.value < lo.value) lo = d;
+    if (!isFiniteValue(d.value)) continue;
+    if (hi === null || d.value > hi.value) hi = d;
+    if (lo === null || d.value < lo.value) lo = d;
   }
+  if (hi === null || lo === null) return strings.noData;
   return strings.starSpoke(data.length, hi.label, fmt(hi.value), lo.label, fmt(lo.value));
 }
 
@@ -123,6 +128,11 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A radial profile has no floor, so it centres on the cap band. The box is
+      // the square: spoke lengths are the data, and the guides plus the reserved
+      // label ring both run to the edge, so the square is what gets drawn on —
+      // and it stays put whether or not `labels` widens the ring.
+      seat={{ mode: "center", top: 0, bottom: size }}
       className={className ? `mc-star ${className}` : "mc-star"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >

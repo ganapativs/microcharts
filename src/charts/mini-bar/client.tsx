@@ -7,7 +7,13 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { miniBarGeometry } from "./geometry.js";
@@ -32,7 +38,7 @@ export interface InteractiveMiniBarProps extends MiniBarProps, PickerProps {
 export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
   const {
     data,
-    sort = "none",
+    order = "data",
     orientation = "vertical",
     domain,
     width = 50,
@@ -62,7 +68,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     selector: BAR_SELECTOR,
   });
 
-  const sorted = useMemo(() => sortData(data, sort), [data, sort]);
+  const sorted = useMemo(() => sortData(data, order), [data, order]);
   const geo = useMemo(
     () =>
       miniBarGeometry({
@@ -100,7 +106,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
   );
 
   // index = bar position (the data index when unsorted; the visual slot when
-  // `sort` reorders) — the unit `selectedIndex`/overlays also address.
+  // `order` reorders) — the unit `selectedIndex`/overlays also address.
   const datum = useCallback(
     (i: number) => {
       const d = sorted[i];
@@ -168,19 +174,12 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         : `${shownDatum.label}: ${strings.noData}`;
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-minibar-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-minibar-live", className, style)} {...named(label)} {...bind}>
       <StaticMiniBar
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
-        sort={sort}
+        order={order}
         orientation={orientation}
         domain={domain}
         width={width}

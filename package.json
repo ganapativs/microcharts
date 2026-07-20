@@ -1,7 +1,7 @@
 {
   "name": "@microcharts/react",
   "version": "0.5.0",
-  "description": "Word-sized charts for React, made for LLMs and humans. 106 chart types, zero runtime dependencies, 0.9–3.7 kB gzip each, accessible by default, and server-component safe.",
+  "description": "Word-sized charts for React, made for LLMs and humans. 106 chart types, zero runtime dependencies, 0.95–3.9 kB gzip each, accessible by default, and server-component safe.",
   "keywords": [
     "a11y",
     "accessible",
@@ -1147,6 +1147,8 @@
     "build": "tsdown && node scripts/gen-style-splits.mjs",
     "build:site": "pnpm --filter @microcharts/react build && pnpm --filter @microcharts/docs build",
     "gen:promo": "node scripts/gen-promo.mjs",
+    "figma:export": "node scripts/figma-export/generate.mjs",
+    "figma:export:full": "pnpm build && node scripts/figma-export/generate.mjs --qa",
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
@@ -1164,6 +1166,8 @@
     "demo": "pnpm build && node bench/run.mjs && node bench/demo.mjs demo.html",
     "test:visual": "playwright test",
     "craft": "node tests/craft/matrix.mjs",
+    "robust": "node tests/craft/robust.mjs",
+    "floor": "node tests/craft/floor.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm knip",
     "pack:check": "pnpm build && publint && attw --pack .",
     "changeset": "changeset",

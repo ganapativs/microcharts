@@ -18,7 +18,7 @@ export const playground: PlaygroundSpec = {
     <ParetoStripInteractive
       data={CAUSES}
       threshold={s.threshold as number}
-      max={Number(s.max)}
+      maxItems={Number(s.maxItems)}
       unit="causes"
       metric="incidents"
       label={s.label as "count" | "none"}
@@ -33,7 +33,7 @@ export const playground: PlaygroundSpec = {
       "<ParetoStrip",
       "  data={causes}",
       s.threshold !== 80 && `  threshold={${s.threshold}}`,
-      s.max !== "8" && `  max={${s.max}}`,
+      s.maxItems !== "8" && `  maxItems={${s.maxItems}}`,
       s.label !== "count" && `  label="${s.label}"`,
       ui.animate && " animate",
       "/>",

@@ -4,7 +4,7 @@
 // secondary, low-precision "mostly lit / half lit / dark"). Windows: fixed 2
 // columns, filled bottom-up, quantized to the window count. No roofline/antenna/
 // width variation ever — earn every mark. All coords 2-dp.
-import { round2 } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 
 interface SkylineBuilding {
   x: number;
@@ -56,8 +56,10 @@ export function citySkylineGeometry(opts: {
     const y = round2(groundY - h);
     const rows = Math.max(0, Math.floor(h / winUnit));
     const windowCount = rows * WIN_COLS;
+    // A non-finite lit fraction is "unknown", not "dark": clamping NaN would
+    // carry NaN into litCount and out to the interactive readout's lit percent.
     const litRaw = d.lit;
-    const lit = litRaw === undefined ? null : Math.min(1, Math.max(0, litRaw));
+    const lit = isFiniteValue(litRaw) ? Math.min(1, Math.max(0, litRaw)) : null;
     const litCount = lit === null ? 0 : Math.round(lit * windowCount);
 
     // lit windows, filled bottom-up, as one merged subpath string

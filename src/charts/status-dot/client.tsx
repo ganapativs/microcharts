@@ -4,7 +4,7 @@
 // mark has nothing to reveal on hover that the summary doesn't already say
 // (documented skip). Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
-import type { MicroDatum } from "../../shared/interactive.js";
+import { named, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -54,9 +54,7 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
     <span
       ref={hostRef}
       className="mc-status-live"
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

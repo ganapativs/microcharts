@@ -4,6 +4,10 @@ import { userEvent } from "vitest/browser";
 import { Waveform } from "./client.js";
 
 const SPIKE = Array.from({ length: 60 }, (_, i) => (i === 30 ? 0.9 : Math.sin(i / 2) * 0.2));
+// 8 samples at width 120 → 8 buckets, where the two pitches diverge visibly:
+// envelope vertices step 118/7 (last at x = 119), bar centres step 118/8
+// (last at x ≈ 111.6).
+const EIGHT = [0.2, -0.5, 0.8, -0.3, 0.6, -0.7, 0.4, -0.9];
 
 describe("interactive <Waveform>", () => {
   it("←/→ rove buckets; each announces its position + peak", async () => {
@@ -41,6 +45,20 @@ describe("interactive <Waveform>", () => {
     // Pin survives blur (it is selection, not hover).
     fig.blur();
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it('mode="envelope" tracks the envelope pitch, and pins nothing', async () => {
+    const screen = await render(<Waveform data={EIGHT} mode="envelope" width={120} height={24} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{End}");
+    await expect
+      .poll(() => fig.querySelector('line[data-mc-w="support"]')?.getAttribute("x1"))
+      .toBe("119");
+    // No bars are painted in envelope mode, so there is no rect to outline.
+    await userEvent.keyboard("{Enter}");
+    fig.blur();
+    await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).toBeNull();
   });
 
   it("controlled selectedIndex pins the mark with no interaction", async () => {

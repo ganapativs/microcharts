@@ -4,13 +4,18 @@
 // ←/→ events within a lane — ActivityGrid model), click / Enter / Space selects
 // (onSelect). Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_EVENT_RASTER } from "../../core/strings-event-raster.js";
-import { LANE_CAP, rasterDomain } from "./geometry.js";
+import { LANE_CAP, rasterDomain, rasterLabels } from "./geometry.js";
 import {
   EventRaster as StaticEventRaster,
   eventRasterSummary,
@@ -22,6 +27,12 @@ import {
 const LANE_UNIT = 14;
 
 export interface InteractiveEventRasterProps extends EventRasterProps, PickerProps {
+  /**
+   * Number format/locale for the hover/focus readout. Interactive-only: the
+   * static entry renders lane names and marks, never a number.
+   */
+  format?: Format;
+  locale?: string | string[];
   /**
    * Opt-in entrance motion (default `false`): lanes fade in top-to-bottom on
    * first client-side mount. Inert on the server and on hydrated server
@@ -64,11 +75,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
   const n = Math.max(1, lanes.length);
   const height = heightProp ?? n * LANE_UNIT;
   const laneH = height / n;
-  const labels = labelsProp ?? n <= 8;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  // Same font metric as the static entry — the gutter (and therefore every tick
-  // x) is derived from it, so a different value would misplace the overlays.
-  const fontSize = labelFont(laneH, 0.56);
   const domain = useMemo(() => domainProp ?? rasterDomain(data), [domainProp, data]);
 
   const sorted = useMemo(
@@ -82,7 +89,15 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     for (const l of lanes) max = Math.max(max, l.label.length);
     return max;
   }, [lanes]);
-  const gutter = labels ? Math.min(width * 0.45, labelCh * fontSize * 0.66 + 4) : 0;
+  // Shared with the static entry, drop rule included: at small sizes it hands
+  // the gutter back to the lanes, and a copy that didn't would offset every tick.
+  const { gutter } = rasterLabels({
+    labels: labelsProp ?? n <= 8,
+    width,
+    height,
+    lanes: n,
+    maxChars: labelCh,
+  });
   const plotX0 = gutter;
   const plotW = Math.max(1, width - gutter - 1);
   const span = domain[1] - domain[0] || 1;
@@ -222,26 +237,17 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-raster-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-raster-live", className, style)} {...named(label)} {...bind}>
       <StaticEventRaster
         {...rest}
         data={data}
-        labels={labels}
+        labels={labelsProp}
         domain={domain}
         width={width}
         height={height}
-        format={format}
-        locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; band + crosshair are transient. */}
         {pinX !== undefined ? (

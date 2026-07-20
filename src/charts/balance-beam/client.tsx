@@ -6,8 +6,15 @@
 // side flips. Composes the static component (canon).
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { balanceBeamGeometry } from "./geometry.js";
@@ -69,8 +76,8 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
   const geo = useMemo(
     () =>
       balanceBeamGeometry({
-        a: data[0].value,
-        b: data[1].value,
+        a: data[0]?.value,
+        b: data[1]?.value,
         width,
         height,
         maxTilt,
@@ -137,7 +144,8 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
 
   const ring = (i: number, pinned: boolean) => {
     const w = geo.weights[i];
-    if (!w) return null;
+    // No weight is drawn for an unknown pan, so there is nothing to ring.
+    if (!w || !geo.known[i]) return null;
     const common = {
       fill: "none",
       stroke: "var(--mc-accent)",
@@ -163,21 +171,20 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
   // keyboard focus), read the same way the visible readout chip shows it. This
   // takes priority over `changed` so arrowing between the two pans is always
   // announced, not just prop-driven data changes.
-  const panSpoken = pan ? strings.beamPanAt(pan.label, fmt(pan.value)) : "";
+  // An unknown pan has nothing to read out — never format a null.
+  const panKnown = pan !== undefined && isFiniteValue(pan.value);
+  const panSpoken = pan
+    ? panKnown
+      ? strings.beamPanAt(pan.label, fmt(pan.value))
+      : strings.noData
+    : "";
   const announced = shown !== null ? panSpoken : changed;
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-beam-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-beam-live", className, style)} {...named(label)} {...bind}>
       <StaticBeam
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         mode={mode}
         shape={shape}
@@ -196,9 +203,9 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
         {rest.children}
       </StaticBeam>
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
-      {pan ? (
+      {panKnown ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {`${pan.label} ${fmt(pan.value)}`}
+          {`${pan!.label} ${fmt(pan!.value)}`}
         </span>
       ) : null}
     </span>

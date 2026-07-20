@@ -21,7 +21,7 @@ export interface WindBarbProps {
   /** Numeric magnitude beside the glyph, anchored + tabular (label boolean→enum, matching the family vocabulary). */
   label?: "value" | "none" | undefined;
   /** `"arrow"` = plain direction arrow + label when quantized barbs don't fit. */
-  variant?: "barb" | "arrow" | undefined;
+  mode?: "barb" | "arrow" | undefined;
   /** Square glyph edge in viewBox units. */
   size?: number | undefined;
   format?: Format | undefined;
@@ -56,7 +56,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
     magnitude,
     step = 10,
     label = "none",
-    variant = "barb",
+    mode = "barb",
     size = 32,
     format,
     locale,
@@ -76,7 +76,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const fontSize = labelFont(size, 0.26);
-  const labelText = label === "value" || variant === "arrow" ? fmt(mag) : undefined;
+  const labelText = label === "value" || mode === "arrow" ? fmt(mag) : undefined;
   const gutter = labelText ? labelText.length * fontSize * 0.62 + 3 : 0;
   const totalW = size + gutter;
 
@@ -86,9 +86,8 @@ export function WindBarb(props: WindBarbProps): ReactNode {
       ? false
       : (summary ?? windBarbSummary(direction, magnitude, step, strings, fmt));
 
-  // arrowhead for the arrow variant
   const arrowHead = (() => {
-    if (variant !== "arrow" || geo.calm) return null;
+    if (mode !== "arrow" || geo.calm) return null;
     const { x2, y2, x1, y1 } = geo.shaft;
     const ang = Math.atan2(y2 - y1, x2 - x1);
     const a1 = ang + (150 * Math.PI) / 180;
@@ -104,6 +103,10 @@ export function WindBarb(props: WindBarbProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A shaft pivoting about its center has no floor — north and south are the
+      // same glyph flipped — so it centres on the cap band. The seat is the sweep
+      // disc, not the drawn shaft, or the mark would hop as the wind turned.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-windbarb ${className}` : "mc-windbarb"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
@@ -132,7 +135,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
             strokeLinecap="round"
             style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.25)" }}
           />
-          {variant === "arrow" && arrowHead ? (
+          {mode === "arrow" && arrowHead ? (
             <path
               d={arrowHead}
               data-mc-ink="data"

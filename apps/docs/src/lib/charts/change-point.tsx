@@ -44,7 +44,7 @@ export const entry: ChartEntry = {
       description: "Explicit indices override the heuristic entirely — the production path.",
     },
     {
-      name: "max",
+      name: "maxItems",
       type: "number",
       required: false,
       description: "Max detected breaks (1–3). More regimes stop being glanceable.",
@@ -89,14 +89,14 @@ export function Preview() {
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "preset", label: "series", options: ["step", "ramp"], init: "step" },
-    { kind: "range", key: "max", label: "max", min: 1, max: 3, step: 1, init: 2 },
+    { kind: "range", key: "maxItems", label: "maxItems", min: 1, max: 3, step: 1, init: 2 },
     { kind: "toggle", key: "means", label: "means", init: true },
     { kind: "toggle", key: "delta", label: "delta label", init: true },
   ],
   render: (s) => (
     <ChangePoint
       data={s.preset === "ramp" ? RAMP : ERRORS}
-      max={s.max as number}
+      maxItems={s.maxItems as number}
       means={s.means as boolean}
       label={s.delta ? "delta" : "none"}
       title="Error rate"
@@ -109,7 +109,7 @@ export const playground: PlaygroundSpec = {
     [
       "<ChangePoint",
       "  data={errors}",
-      s.max !== 2 && `  max={${s.max}}`,
+      s.maxItems !== 2 && `  maxItems={${s.maxItems}}`,
       s.means === false && "  means={false}",
       s.delta && '  label="delta"',
       "/>",

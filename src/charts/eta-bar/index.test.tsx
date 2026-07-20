@@ -13,7 +13,7 @@ const min = (t: number) => `${Math.round(t)} min`;
 describe("<EtaBar>", () => {
   it("renders done + remaining summary", () => {
     const { container } = draw(
-      <EtaBar progress={0.64} elapsed={3.6} rate={0.18} formatEta={min} width={120} height={14} />,
+      <EtaBar progress={0.64} elapsed={3.6} rate={0.18} etaFormat={min} width={120} height={14} />,
     );
     expect(container.querySelectorAll("rect").length).toBeGreaterThanOrEqual(2);
     expect(
@@ -22,7 +22,7 @@ describe("<EtaBar>", () => {
           progress: 0.64,
           elapsed: 3.6,
           rate: 0.18,
-          formatEta: min,
+          etaFormat: min,
           fmt: makeFormatter(undefined, undefined),
         },
         EN_ETA_BAR,

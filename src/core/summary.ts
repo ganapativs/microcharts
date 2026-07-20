@@ -101,6 +101,8 @@ export interface SummaryStrings {
   ) => string;
   /** S2 bubble announcement, e.g. "EMEA: 1,240." (bubble-row). */
   bubbleAt: (label: string, value: string) => string;
+  /** S2 bubble with no value, e.g. "LATAM: no data." (bubble-row). */
+  bubbleEmpty: (label: string) => string;
   /** S1 tree rings, e.g. "8 years; latest 14, biggest 22 in year 5." (tree-rings). */
   treeRings: (n: number, unit: string, last: string, max: string, argmaxLabel: string) => string;
   /** S1 ring announcement, e.g. "Year 5: 22." (tree-rings). */
@@ -111,6 +113,8 @@ export interface SummaryStrings {
   citySkylineAt: (label: string, value: string) => string;
   /** Skyline building with lit, e.g. "Platform: 46; 70% lit." (city-skyline). */
   citySkylineAtLit: (label: string, value: string, litPct: string) => string;
+  /** Skyline building with no value, e.g. "Web: no data." (city-skyline). */
+  citySkylineEmpty: (label: string) => string;
   /** S4 occupancy, e.g. "34 of 40 seats filled." (honeycomb). */
   honeycomb: (value: string, total: string, unit: string) => string;
   /** Honeycomb cell announcement, e.g. "Cell 7 of 40 — filled." (honeycomb). */
@@ -576,9 +580,9 @@ export interface SummaryStrings {
   ) => string;
   /** CyclePlot summary, no notable drift, e.g. "Peaks Fri (61), dips Sun (38)." */
   cycleNoDrift: (peakSlot: string, peak: string, dipSlot: string, dip: string) => string;
-  /** Slot announcement, e.g. "Mondays: mean 42 across 6 weeks, rising." */
   /** Slot drift direction, indexed by sign+1 (falling, steady, rising). (cycle-plot) */
   cycleDriftNames: readonly [string, string, string];
+  /** Slot announcement, e.g. "Mondays: mean 42 across 6 weeks, rising." */
   cycleAt: (
     slotName: string,
     center: "mean" | "median",
@@ -589,6 +593,8 @@ export interface SummaryStrings {
   ) => string;
   /** Within-slot observation, e.g. "Mon, cycle 3 of 6: 44." */
   cyclePoint: (slotName: string, pos: number, total: number, value: string) => string;
+  /** Slot with no observations, e.g. "Wednesdays: no data." (cycle-plot). */
+  cycleEmpty: (slotName: string) => string;
   /** ChangePoint summary, e.g. "Level shifted up 50% around point 34 (mean 32 → 48); stable since." */
   changePoint: (
     dir: "up" | "down",
@@ -616,6 +622,8 @@ export interface SummaryStrings {
   ensembleSingle: (end: string) => string;
   /** Member announcement, e.g. "Member 7 of 24; ends at 42." */
   ensembleAt: (pos: number, total: number, end: string) => string;
+  /** Member with no terminal value, e.g. "Member 7 of 24; no data." (ensemble-ghosts). */
+  ensembleEmpty: (pos: number, total: number) => string;
   /** Zone display names, indexed severe-low → below → in → above → severe-high. */
   tirNames: readonly [string, string, string, string, string];
   /** One zone clause, e.g. "72% in range" (time-in-range). */
@@ -654,6 +662,8 @@ export interface SummaryStrings {
   rubric: (n: number, hi: string, hiScore: string, lo: string, loScore: string) => string;
   /** Interactive criterion announce, e.g. "Correctness: 0.92, weight 40% of total." */
   rubricRow: (label: string, score: string, weightPct: string) => string;
+  /** Criterion with no score, e.g. "Style: no score, weight 20% of total." (rubric-strip). */
+  rubricRowEmpty: (label: string, weightPct: string) => string;
   /** TokenConfidence empty state, e.g. "No tokens." — a distinct key from the
    *  series `noData` so the aggregate EN dictionary keeps both (spread order). */
   noTokens: string;
@@ -675,6 +685,8 @@ export interface SummaryStrings {
   starSpoke: (n: number, hi: string, hiValue: string, lo: string, loValue: string) => string;
   /** Interactive spoke announce, e.g. "Speed: 0.9." (star-spoke). */
   spokeAt: (label: string, value: string) => string;
+  /** Spoke with no value, e.g. "Speed: no data." (star-spoke). */
+  spokeEmpty: (label: string) => string;
   /** MinimapStrip overview, e.g.
    *  "Viewing 12% of the whole (520–660 of 1,200); 3 marks; 8% unknown." */
   minimap: (

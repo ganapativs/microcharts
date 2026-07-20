@@ -7,7 +7,14 @@
 import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { paretoGeometry } from "./geometry.js";
@@ -30,7 +37,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   const {
     data,
     threshold = 80,
-    max = 8,
+    maxItems = 8,
     unit = "causes",
     metric = "the total",
     width = 80,
@@ -66,7 +73,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   // viewBox — without it the pointer map and readout run short and the
   // crosshair drifts from the cursor.
   const geo = useMemo(() => {
-    const base = paretoGeometry({ width, height, data, threshold, max });
+    const base = paretoGeometry({ width, height, data, threshold, maxItems });
     const showLabel = (props.label ?? "count") === "count" && base != null && base.crossing != null;
     const gutterCh = showLabel
       ? `${base!.vitalCount} of ${base!.n} → ${pct(base!.cumAtCrossing)}`.length
@@ -76,24 +83,28 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
       height,
       data,
       threshold,
-      max,
+      maxItems,
       gutterCh,
       fontSize: labelFont(height),
     });
-  }, [width, height, data, threshold, max, props.label]);
+  }, [width, height, data, threshold, maxItems, props.label]);
 
-  const count = geo?.bars.length ?? 0;
+  // Only bars that PAINT are navigable — a zero-magnitude category (or an
+  // all-zero dataset, which draws nothing at all) must not answer the pointer
+  // with an outline and a readout chip over blank strip.
+  const stops = useMemo(() => geo?.painted ?? [], [geo]);
   const vbWidth = geo?.totalWidth ?? width;
 
-  // Nearest bar to the pointer x (viewBox space). Bars index 1:1 into the
-  // sorted/rolled-up rows — datum.index is that bar index ("Other" is the last
-  // bar when present, never re-ranked).
+  // Nearest painted bar to the pointer x (viewBox space). Bars index 1:1 into
+  // the sorted/rolled-up rows — datum.index is that bar index ("Other" is the
+  // last bar when present, never re-ranked).
   const locate = useCallback(
     (x: number) => {
-      if (!geo || geo.bars.length === 0) return null;
-      let best = 0;
+      if (!geo || stops.length === 0) return null;
+      let best = stops[0]!;
       let bestDist = Infinity;
-      geo.bars.forEach((b, i) => {
+      stops.forEach((i) => {
+        const b = geo.bars[i]!;
         const d = Math.abs(b.x + b.width / 2 - x);
         if (d < bestDist) {
           bestDist = d;
@@ -102,28 +113,18 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
       });
       return best;
     },
-    [geo],
+    [geo, stops],
   );
 
-  // 1-D rove, plus T → the threshold-crossing bar (kept from the old client).
+  // Rove the painted bars (the space is sparse when a category is zero), plus
+  // T → the threshold-crossing bar (kept from the old client).
   const step = useCallback(
     (cur: number, key: string) => {
-      switch (key) {
-        case "ArrowRight":
-          return Math.min(count - 1, cur + 1);
-        case "ArrowLeft":
-          return cur <= 0 ? 0 : cur - 1;
-        case "Home":
-          return 0;
-        case "End":
-          return count - 1;
-        case "t":
-        case "T":
-          return geo?.crossing ? geo.crossing.index : null;
-      }
-      return null;
+      if (key === "t" || key === "T")
+        return geo?.crossing && stops.includes(geo.crossing.index) ? geo.crossing.index : null;
+      return navOrder(stops, cur, key);
     },
-    [count, geo],
+    [geo, stops],
   );
 
   const datum = useCallback(
@@ -135,7 +136,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   );
 
   const { active, selected, bind } = useActivePicker({
-    count,
+    count: stops.length,
     width: vbWidth,
     height,
     locate,
@@ -157,8 +158,15 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
           : paretoSummary(geo, { unit, metric }, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const outline = (i: number, pinned: boolean) => {
+  // A bar is addressable only while it paints — a controlled `selectedIndex`
+  // may still name a zero-magnitude one.
+  const barAt = (i: number) => {
     const b = geo?.bars[i];
+    return b && b.height > 0 ? b : undefined;
+  };
+
+  const outline = (i: number, pinned: boolean) => {
+    const b = barAt(i);
     if (!b) return null;
     return (
       <rect
@@ -175,24 +183,22 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   };
 
   const shown = active ?? selected;
-  const b = shown !== null && geo ? geo.bars[shown] : undefined;
+  const b = shown !== null ? barAt(shown) : undefined;
   const announced = b ? strings.paretoAt(b.label, pct(b.share), pct(b.cum)) : "";
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-pareto-strip-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticParetoStrip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         threshold={threshold}
-        max={max}
+        maxItems={maxItems}
         unit={unit}
         metric={metric}
         width={width}

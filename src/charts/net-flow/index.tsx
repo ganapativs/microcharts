@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js";
 import { resolveSummary } from "../../core/summary.js";
 import {
@@ -92,7 +92,18 @@ export function NetFlow(props: NetFlowProps): ReactNode {
 
   // probe to size the signed-net gutter
   const probe = netFlowGeometry({ width, height, data, mode, domain });
-  const showLabel = label === "last" && probe != null && !probe.degenerate && probe.last != null;
+  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
+  // box a line of text cannot be seated inside the plot at all. The readout
+  // DROPS rather than spilling past the viewBox, and because the gutter is
+  // derived from it the reserved space goes with it — the plot keeps its own
+  // width and simply stops paying for text it no longer draws. Pure arithmetic:
+  // the static path may never measure text.
+  const showLabel =
+    label === "last" &&
+    probe != null &&
+    !probe.degenerate &&
+    probe.last != null &&
+    labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? signedNet(probe!.last!.net, fmt) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
@@ -129,6 +140,10 @@ export function NetFlow(props: NetFlowProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Zero here is a MIDLINE, not a floor: inflow rises above it and outflow
+      // mirrors below on the same scale, so the mark has no bottom to stand on.
+      // Seating the padded plot frame puts that zero baseline on the cap band.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={cls}
       style={rootStyle}
     >

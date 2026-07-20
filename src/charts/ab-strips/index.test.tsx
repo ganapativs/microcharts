@@ -54,8 +54,8 @@ describe("<ABStrips>", () => {
     expect(tags).toContain("B");
   });
 
-  it("custom labels flow into tags + summary", () => {
-    const { container } = draw(<ABStrips data={{ a: A, b: B }} labels={["Ctrl", "Test"]} />);
+  it("custom seriesLabels flow into tags + summary", () => {
+    const { container } = draw(<ABStrips data={{ a: A, b: B }} seriesLabels={["Ctrl", "Test"]} />);
     const label = container.querySelector("svg")!.getAttribute("aria-label")!;
     expect(label).toMatch(/^Test median/);
     expect([...container.querySelectorAll("text")].map((t) => t.textContent)).toContain("Ctrl");
@@ -70,5 +70,35 @@ describe("<ABStrips>", () => {
   it("is axe-clean", async () => {
     const { container } = draw(<ABStrips data={{ a: A, b: B }} title="Latency A/B" />);
     await expectNoA11yViolations(container);
+  });
+});
+
+describe("<ABStrips> degrades at small sizes", () => {
+  const A = [100, 110, 120, 130, 140, 150, 160, 170];
+  const B = [120, 130, 140, 150, 160, 170, 180, 190];
+  const at = (height: number, props = {}) =>
+    draw(<ABStrips data={{ a: A, b: B }} width={160} height={height} {...props} />).container;
+  const texts = (c: Element) => [...c.querySelectorAll("text")].map((t) => t.textContent);
+
+  // The two arms split the box into two rows and each tag is centred on its
+  // row, so under a one-em pitch "A" lands on "B" (and "Ctrl" on "Test").
+  it("keeps the row tags while the row pitch holds one em (height 16 → pitch 6)", () => {
+    expect(texts(at(16))).toEqual(["A", "B", "+15%"]);
+  });
+
+  it("drops the row tags below one em — the strips and the delta survive", () => {
+    const c = at(15);
+    expect(texts(c)).toEqual(["+15%"]);
+    // the marks still read: two median dots, still on the shared scale
+    expect(c.querySelectorAll("circle").length).toBe(2);
+  });
+
+  it("longer row identities drop at the same pitch, never overlap", () => {
+    expect(texts(at(15, { seriesLabels: ["Ctrl", "Test"] }))).toEqual(["+15%"]);
+  });
+
+  it("the tags' lead gutter goes with them — the strips reclaim the width", () => {
+    const outerX = (h: number) => Number([...at(h).querySelectorAll("rect")][0]!.getAttribute("x"));
+    expect(outerX(15)).toBeLessThan(outerX(16));
   });
 });

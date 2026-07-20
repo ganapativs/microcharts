@@ -5,6 +5,7 @@
 // jitter (core/jitter) — deterministic, SSR-stable, never Math.random; the
 // count is never touched. All coords 2-dp.
 import { round2 } from "../../core/types.js";
+import { labelFitsBand } from "../../core/labels.js";
 
 // Minimal mulberry32 stream, seeded straight from the integer count — inlined
 // (not core/jitter) to keep the static entry under the Delta-class 1.5 kB cap
@@ -98,7 +99,13 @@ export function tallyGeometry(opts: {
     remaining -= inThis;
   }
 
-  const showNumeral = overflow === "numeral" && overflowCount > 0;
+  // Degradation: the numeral is a fixed 9 viewBox units tall and rides the
+  // midline, so a box shorter than that cannot seat it — it DROPS rather than
+  // painting above and below the strip, and `gutter`/`width` below fall away
+  // with it so the marks reclaim the box instead of leaving a hole where the
+  // text used to be. Pure arithmetic: the static path may never measure text.
+  const showNumeral =
+    overflow === "numeral" && overflowCount > 0 && labelFitsBand(height, fontSize);
   const glyphs = showNumeral ? `+${overflowCount}`.length : 0;
   const gutter = glyphs * 0.62 * fontSize;
   const numeralX = showNumeral ? round2(maxX + STROKE_GAP) : null;

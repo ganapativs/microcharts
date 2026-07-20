@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { computeFive, microBoxGeometry } from "./geometry.js";
+import { computeFive, microBoxDots, microBoxGeometry } from "./geometry.js";
 
 const RAW = [12, 30, 35, 38, 42, 45, 48, 51, 60, 96];
 
@@ -78,5 +78,54 @@ describe("microBoxGeometry", () => {
       expect(o.x).toBeGreaterThanOrEqual(0);
       expect(o.x).toBeLessThanOrEqual(40.01);
     }
+  });
+});
+
+// Regression: the small-n dot path once carried its own [min,max] → [1.5,w-1.5]
+// scale while the interactive hit-tested `microBoxGeometry`, so the painted dots
+// and the stat crosshair lived in two different spaces — they agreed only when
+// `domain` happened to equal the extent.
+describe("microBoxDots (fewer than 5 observations)", () => {
+  it("dots and stat stops share one scale", () => {
+    const r = computeFive([1, 2, 3], undefined)!;
+    const { dots, statX } = microBoxDots({ raw: r.raw, width: 40, five: r.five, domain: [0, 10] });
+    expect(statX.min).toBe(dots[0]);
+    expect(statX.median).toBe(dots[1]);
+    expect(statX.max).toBe(dots[2]);
+  });
+
+  it("honours an explicit domain instead of stretching to the extent", () => {
+    const r = computeFive([1, 2, 3], undefined)!;
+    // 1..3 of a 0..10 domain occupies the left third, not the full width
+    const wide = microBoxDots({ raw: r.raw, width: 40, five: r.five, domain: [0, 10] });
+    expect(wide.dots[0]).toBeCloseTo(5.2, 1);
+    expect(wide.dots[2]).toBeCloseTo(12.6, 1);
+    // ...and with no domain it does span the box
+    const bare = microBoxDots({ raw: r.raw, width: 40, five: r.five });
+    expect(bare.dots[0]).toBeCloseTo(1.5, 1);
+    expect(bare.dots[2]).toBeCloseTo(38.5, 1);
+  });
+
+  it("all-equal values sit at centre, not pinned to the left edge", () => {
+    const r = computeFive([7, 7, 7], undefined)!;
+    // degenerate domain widens to [6,8] → every mark lands mid-box
+    const { dots, statX } = microBoxDots({ raw: r.raw, width: 40, five: r.five });
+    expect(dots).toEqual([20, 20, 20]);
+    expect(statX.min).toBe(20);
+    expect(statX.max).toBe(20);
+  });
+
+  it("agrees with the box path's stat stops on the same domain", () => {
+    const r = computeFive([1, 2, 3], undefined)!;
+    const dots = microBoxDots({ raw: r.raw, width: 40, five: r.five, domain: [0, 10] });
+    const box = microBoxGeometry({
+      width: 40,
+      height: 14,
+      five: r.five,
+      raw: r.raw,
+      whiskers: "minmax",
+      domain: [0, 10],
+    });
+    expect(dots.statX).toEqual(box.statX);
   });
 });

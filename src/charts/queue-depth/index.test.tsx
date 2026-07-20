@@ -85,3 +85,17 @@ describe("<QueueDepth>", () => {
 });
 
 seriesEdgeSuite("QueueDepth", (data) => <QueueDepth data={data} capacity={50} title="Queue" />);
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("QueueDepth degradation", () => {
+  it("both readouts drop under a 7-unit box, the stock area still draws", () => {
+    const big = draw(<QueueDepth data={DATA} capacity={CAP} width={240} height={32} />).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(<QueueDepth data={DATA} capacity={CAP} width={48} height={6} />).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+});

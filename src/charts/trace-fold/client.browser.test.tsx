@@ -57,6 +57,12 @@ describe("interactive <TraceFold>", () => {
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
 
+  it("defaults to the static entry's box height", async () => {
+    const screen = await render(<TraceFold data={TRACE} format={ms} width={200} />);
+    // 2 depth rows → traceFoldHeight(2) = 32, the same formula the static folds by
+    expect(screen.container.querySelector("svg")?.getAttribute("viewBox")).toBe("0 0 200 32");
+  });
+
   it("controlled selectedIndex pins the outline with no interaction", async () => {
     const screen = await render(
       <TraceFold data={TRACE} format={ms} width={200} height={30} selectedIndex={2} />,

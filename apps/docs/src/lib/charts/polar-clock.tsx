@@ -66,7 +66,7 @@ export const entry: ChartEntry = {
         "Hairline cardinal ticks at 0/¼/½/¾ — the at-rest orientation cue. Default true.",
     },
     {
-      name: "formatSegment",
+      name: "segmentFormat",
       type: "(index, n) => string",
       required: false,
       description: "Segment index → label (default: HH:00 for n=24, weekday for n=7, else index).",

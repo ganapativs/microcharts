@@ -1,5 +1,5 @@
-// <HeartbeatBlip> — is it alive, and how busy? (, structured events,
-// motion type, flagship). A baseline with an ECG-style spike at each event across
+// <HeartbeatBlip> — is it alive, and how busy? (structured events, motion
+// type, flagship). A baseline with an ECG-style spike at each event across
 // the recent window; the STATIC frame shows the spike positions with zero JS, and
 // an empty baseline IS the down signal (shape, never color). The interactive entry
 // sweeps the trace left in real time and blips each arriving event. Every spike is
@@ -120,6 +120,11 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A monitor trace has no floor — it excursions either side of a resting
+      // line — so the band peak-to-dip centres on the cap band. That band is set
+      // by `height` alone, so a flat window seats identically to a busy one, and
+      // the baseline lands low in the cap band the way a real trace reads.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-heartbeat ${className}` : "mc-heartbeat"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >

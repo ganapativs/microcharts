@@ -20,7 +20,7 @@ export const playground: PlaygroundSpec = {
     <WaterfallInteractive
       data={PL}
       start={s.start as number}
-      total={s.total as boolean}
+      totalBar={s.totalBar as boolean}
       label={s.delta ? "delta" : "none"}
       positive={s.positive as "up" | "down"}
       animate={ui.animate}
@@ -34,7 +34,7 @@ export const playground: PlaygroundSpec = {
       "<Waterfall",
       "  data={steps}",
       `  start={${s.start}}`,
-      s.total === false && "  total={false}",
+      s.totalBar === false && "  totalBar={false}",
       s.delta && '  label="delta"',
       s.positive !== "up" && `  positive="${s.positive}"`,
       ui.animate && " animate",

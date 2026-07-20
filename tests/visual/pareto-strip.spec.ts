@@ -41,7 +41,7 @@ function gallery(): string {
   const variants = [
     svg({ data: CAUSES, title: "default 80%" }),
     svg({ data: CAUSES, threshold: 60, title: "60%" }),
-    svg({ data: CAUSES, max: 3, title: "rollup" }),
+    svg({ data: CAUSES, maxItems: 3, title: "rollup" }),
     svg({ data: CAUSES, threshold: false, title: "no threshold" }),
     svg({ data: [{ label: "a", value: 0 }], title: "empty" }),
   ].join(" ");

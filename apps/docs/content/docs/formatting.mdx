@@ -20,10 +20,12 @@ single definition — so a currency chart's spoken summary says "$1,240", not "1
 twice.
 
 `format` takes either **`Intl.NumberFormatOptions`** or a **plain function** `(n) => string`. Formatters are cached
-(`Intl.NumberFormat` construction is expensive), so passing options costs nothing across hundreds of instances — never
-build your own `new Intl.NumberFormat` in a component. Need the same formatting _outside_ a chart (a matching KPI label,
-a table cell)? Import the exported `makeFormatter` helper so your prose numbers line up with the chart's exactly, from
-the same cache:
+(`Intl.NumberFormat` construction is expensive), keyed by locale plus options, so hundreds of instances sharing one
+format shape build one formatter between them — never build your own `new Intl.NumberFormat` in a component. The cache
+is deliberately small: it holds 64 formatters and empties completely when it fills, on the reasoning that one app uses a
+handful of locale × option shapes, and a bounded cache that occasionally rebuilds beats one that grows forever. Need the
+same formatting _outside_ a chart (a matching KPI label, a table cell)? Import the exported `makeFormatter` helper so
+your prose numbers line up with the chart's exactly, from the same cache:
 
 ```tsx
 import { makeFormatter } from "@microcharts/react";
@@ -48,35 +50,6 @@ The arguments are positional — `makeFormatter(format, locale, defaults?)`. The
     title="Revenue"
   />
 </LiveDemo>
-
-## The interactive readout
-
-Import a chart from its `/interactive` subpath and it gains a readout: a small chip that follows the pointer, or the
-focused datum when you rove with the keyboard. It uses the same `format` and `locale` as everything else, so a currency
-chart's hover value matches its label and its summary exactly.
-
-**It is deliberately terse.** The chip names the datum and its value — `Checkout 62%`, `44 → 28` — and nothing else. It
-does not repeat the axis names, the row label already printed beside it, or the grid position the cell already occupies.
-These are word-sized charts; a chip wider than the chart it annotates is worse than no chip.
-
-The fuller sentence still exists. Everything the chip leaves out — the comparison, the quadrant name, the running total,
-the per-cycle breakdown — is announced in the chart's live region, which is what a screen reader reads. So nothing is
-lost by the chip being short; it is a different audience, not less information.
-
-```tsx
-import { Sparkline } from "@microcharts/react/sparkline/interactive";
-
-// the readout, the endpoint label, and the spoken summary all read "$1,600"
-<Sparkline data={revenue} label="last" format={{ style: "currency", currency: "USD" }} />;
-```
-
-The chip is capped at `max(100%, 14em)` wide and ellipsizes past that, so a long formatted value cannot paint across the
-page. If you see an ellipsis, the value is too long for the chart — shorten it with `format` (`notation: "compact"` is
-usually the answer) rather than widening the chart.
-
-Its prose comes from `strings`, like every other word the library renders, so a localized bundle localizes the readout
-too. Its colors come from `--mc-surface`, `--mc-surface-ink` and `--mc-surface-edge`; see
-[Theming](/docs/theming#tokens-in-full).
 
 ## Percent, compact, decimals
 
@@ -116,6 +89,36 @@ reaches your function, so a number a chart derived internally (`value - target`)
     title="p95 latency"
   />
 </LiveDemo>
+
+## The interactive readout
+
+Import a chart from its `/interactive` subpath and it gains a readout: a small chip that follows the pointer, or the
+focused datum when you rove with the keyboard. It uses the same `format` and `locale` as everything else, so a currency
+chart's hover value matches its label and its summary exactly.
+
+**It is deliberately terse.** The chip names the datum and its value — a Funnel stage reads `Checkout 62% (1,240)`, a
+Slope line reads `Brazil: 44 → 28` — and nothing else. It does not repeat the axis names, the row label already printed
+beside it, or the grid position the cell already occupies. These are word-sized charts; a chip wider than the chart it
+annotates is worse than no chip.
+
+The fuller sentence still exists. Everything the chip leaves out — the comparison, the quadrant name, the running total,
+the per-cycle breakdown — is announced in the chart's live region, which is what a screen reader reads. So nothing is
+lost by the chip being short; it is a different audience, not less information.
+
+```tsx
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
+
+// the readout, the endpoint label, and the spoken summary all read "$1,600"
+<Sparkline data={revenue} label="last" format={{ style: "currency", currency: "USD" }} />;
+```
+
+The chip is capped at `max(100%, 14em)` wide and ellipsizes past that, so a long formatted value cannot paint across the
+page. If you see an ellipsis, the value is too long for the chart — shorten it with `format` (`notation: "compact"` is
+usually the answer) rather than widening the chart.
+
+Its prose comes from `strings`, like every other word the library renders, so a localized bundle localizes the readout
+too. Its colors come from `--mc-surface`, `--mc-surface-ink` and `--mc-surface-edge`; see
+[Theming](/docs/theming#the-readout-surface).
 
 ## Locale: separators, not language
 
@@ -192,8 +195,8 @@ shared domain at zero). See [Composition](/docs/composition#small-multiples-one-
 
 On calendar and time charts, `format` still means what it means everywhere else: it formats the **numbers**. On
 `EventTimeline` that's a share, defaulting to a locale-aware percent. On `CalendarStrip` it's the day's value in the
-hover/focus readout — so it lives on the interactive entry only. The static `CalendarStrip` summary counts days ("Active
-11 of 24 days over 4 weeks."), and a count of days is not a number `format` gets to restyle.
+hover/focus readout — so it lives on the interactive entry only. The static `CalendarStrip` summary counts days —
+`Active 3 of 28 days over 4 weeks.` — and a count of days is not a number `format` gets to restyle.
 
 Date and time _strings_ are a separate prop, **`dateFormat`**, taking `Intl.DateTimeFormatOptions` or a
 `(date) => string` function. It lives on the interactive entries (`@microcharts/react/calendar-strip/interactive`,

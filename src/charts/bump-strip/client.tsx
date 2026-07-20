@@ -6,7 +6,8 @@
 import { useCallback, useMemo, useRef } from "react";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
@@ -151,17 +152,10 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
   const announced = point ? strings.rankAt(point.index + 1, data.length, point.rank) : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-bump-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-bump-live", className, style)} {...named(ariaLabel)} {...bind}>
       <StaticBumpStrip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         maxRank={maxRank}
         label={label}

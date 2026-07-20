@@ -7,7 +7,14 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
-import { FILL, nav1d, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  nav1d,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { round2 } from "../../core/types.js";
@@ -37,7 +44,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
     data,
     bins,
     mode = "mirror",
-    labels = ["before", "after"] as const,
+    seriesLabels = ["before", "after"] as const,
     width = 80,
     height = 20,
     format,
@@ -102,7 +109,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
         ? summary
         : geo === null
           ? strings.noData
-          : shiftSummary(geo, fmt, labels, strings);
+          : shiftSummary(geo, fmt, seriesLabels, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const count = geo?.bins.length ?? 0;
@@ -205,18 +212,16 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
     <span
       ref={hostRef}
       {...wrap("mc-shift-histogram-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...named(ariaLabel)}
       {...bind}
     >
       <StaticShiftHistogram
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         bins={bins}
         mode={mode}
-        labels={labels}
+        seriesLabels={seriesLabels}
         width={width}
         height={height}
         format={format}

@@ -83,7 +83,7 @@ const CASES: Record<string, () => ReactElement> = {
   "ab-strips": () => (
     <ABStrips
       data={{ a: [120, 135, 128, 140, 132], b: [150, 162, 158, 149, 155] }}
-      labels={["Control", "Variant"]}
+      seriesLabels={["Control", "Variant"]}
       title="AB"
     />
   ),

@@ -307,11 +307,7 @@ export function runEntrance(
     }
 
     // ACT 2 — the story performs, entering on the beat as the stage lands.
-    // Dash lengths for `vector-effect: non-scaling-stroke` paths are computed
-    // by the browser in SCREEN space (the effect applies post-transform), but
-    // getTotalLength answers in user units — at any CSS scale ≠ 1 the dash
-    // pattern's repeat would leak in as a phantom second fragment. Scale by
-    // the rendered factor (+5% guard; a dash longer than the path is safe).
+    // `screenK` is the rendered scale factor `dashDraw` needs.
     const svgRect = svg.getBoundingClientRect();
     const vb = svg.viewBox?.baseVal;
     const screenK = vb && vb.width > 0 && svgRect.width > 0 ? svgRect.width / vb.width : 1;

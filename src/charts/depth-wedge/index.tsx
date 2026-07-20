@@ -4,7 +4,7 @@
 // y-scale is linear and the visible range is stated — never a silent log.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_DEPTH_WEDGE, type DepthWedgeStrings } from "../../core/strings-depth-wedge.js";
 import { depthWedgeGeometry, type DepthWedgeResult, type Level } from "./geometry.js";
@@ -83,7 +83,16 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
     height,
   });
   const accName = resolveSummary(summary, () => depthWedgeSummary(geo, strings, fmt));
-  const showSpread = label === "spread" && data.demand.length > 0 && data.supply.length > 0;
+  // the spread rides a top gutter at `fontSize * 0.7`; `labelFont` floors at 7
+  // viewBox units, so under a ~9-unit box that gutter is taller than the chart
+  // and the readout hangs out of the bottom. It DROPS instead — the two wedges
+  // and the mid hairline still read the balance, which is the primary encoding.
+  const spreadY = fontSize * 0.7;
+  const showSpread =
+    label === "spread" &&
+    data.demand.length > 0 &&
+    data.supply.length > 0 &&
+    labelFitsY(spreadY, fontSize, height);
 
   return (
     <Chart
@@ -92,6 +101,10 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Both wedges accumulate upward from one shared baseline already flush
+      // with the box bottom, so that edge is a true floor for the baseline. The
+      // spread readout occupies a top gutter, which a floor seat never reads.
+      seat={{ mode: "floor", bottom: geo.yBase }}
       className={className ? `mc-depth ${className}` : "mc-depth"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
@@ -131,7 +144,7 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
       {showSpread ? (
         <text
           x={geo.midX}
-          y={fontSize * 0.7}
+          y={spreadY}
           dominantBaseline="central"
           textAnchor="middle"
           fontSize={fontSize}

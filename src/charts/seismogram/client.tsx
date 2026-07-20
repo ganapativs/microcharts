@@ -8,7 +8,13 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -151,14 +157,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         : seriesStrings.pointEmpty(shown + 1, rendered.length);
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-seismo-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-seismo-live", className, style)} {...named(label)} {...bind}>
       <StaticSeismogram
         {...rest}
         data={data}
@@ -170,7 +169,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
         {selected !== null && selected !== active ? (

@@ -6,7 +6,13 @@
 // and the onActive/onSelect contract. Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PHASE_TRACE } from "../../core/strings-phase-trace.js";
@@ -45,7 +51,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     xLabel = "x",
     yLabel = "y",
     xDomain,
-    yDomain,
+    domain,
     tail = 0.25,
     width = 40,
     height = 32,
@@ -75,7 +81,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     [data],
   );
   const xd = useMemo(() => xDomain ?? extent(finite.map((p) => p.x)), [xDomain, finite]);
-  const yd = useMemo(() => yDomain ?? extent(finite.map((p) => p.y)), [yDomain, finite]);
+  const yd = useMemo(() => domain ?? extent(finite.map((p) => p.y)), [domain, finite]);
   const geo = useMemo(
     () => phaseTraceGeometry({ data, xDomain: xd, yDomain: yd, tail, width, height }),
     [data, xd, yd, tail, width, height],
@@ -143,21 +149,14 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     : "";
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-phase-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      {...bind}
-    >
+    <span ref={hostRef} {...wrap("mc-phase-live", className, style)} {...named(label)} {...bind}>
       <StaticPhaseTrace
         {...rest}
         data={data}
         xLabel={xLabel}
         yLabel={yLabel}
         xDomain={xd}
-        yDomain={yd}
+        domain={yd}
         tail={tail}
         width={width}
         height={height}
@@ -165,7 +164,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection persists through pointer-leave; the ring is transient. */}
         {pinned ? (

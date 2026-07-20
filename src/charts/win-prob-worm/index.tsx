@@ -118,6 +118,10 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The worm hangs off the 50% midline — a fixed 0–100 axis whose meaning
+      // is symmetric about the middle, not about its floor. Centring the frame
+      // on the cap band puts that decision boundary where the eye reads it.
+      seat={{ mode: "center", top: PAD, bottom: height - PAD }}
       className={cls}
       style={rootStyle}
     >
@@ -152,7 +156,6 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
           />
         ) : null,
       )}
-      {/* lead-change dots on the midline */}
       {geo!.crossings.map((c) => (
         <circle key={`x${c.x}`} cx={c.x} cy={c.y} r={1.8} data-mc-ink="point" />
       ))}

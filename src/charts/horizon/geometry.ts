@@ -25,6 +25,10 @@ export interface HorizonGeometry {
   xFor: (i: number) => number;
   /** y of a value inside its fold band (interactive dot). */
   foldedY: (v: number) => number;
+  /** Strip top edge — the deterministic plot box, padded, never data-derived. */
+  y0: number;
+  /** Strip bottom edge; in `"mirror"` every band grows upward from it. */
+  y1: number;
   n: number;
 }
 
@@ -103,7 +107,7 @@ export function horizonGeometry(opts: {
       : round2(midY + frac * (stripBot - midY));
   };
 
-  return { bands, opacities: OPACITY[folds], xFor, foldedY, n };
+  return { bands, opacities: OPACITY[folds], xFor, foldedY, y0: stripTop, y1: stripBot, n };
 }
 
 /** Closed area between a broken line and a horizontal base (per segment run). */

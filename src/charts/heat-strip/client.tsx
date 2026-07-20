@@ -7,7 +7,13 @@
 // `step`), composing the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { FILL, useActivePicker, wrap, type PickerProps } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -136,14 +142,12 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-heat-strip-live", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
       {...bind}
     >
       <StaticHeatStrip
         {...rest}
-        style={FILL}
+        style={fillFor(style)}
         data={data}
         steps={steps}
         shape={shape}

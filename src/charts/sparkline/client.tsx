@@ -13,7 +13,8 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
-  FILL,
+  named,
+  fillFor,
   navOrder,
   useActivePicker,
   wrap,
@@ -146,9 +147,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     <span
       ref={hostRef}
       {...wrap("mc-spark-interactive", className, style)}
-      tabIndex={0}
-      role="img"
-      aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
+      {...named([title, accName].filter(Boolean).join(". ") || undefined)}
       {...bind}
     >
       <StaticSparkline
@@ -165,7 +164,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
         summary={false}
         /* Fill the focusable wrapper exactly so pointer math + overlay marks
            map 1:1 (the wrapper box === the SVG box) and the chart is fluid. */
-        style={FILL}
+        style={fillFor(style)}
       >
         {/* Pinned selection: a persistent ring that survives pointer-leave. */}
         {selPoint ? (

@@ -91,6 +91,11 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // ●●●○○ — one symmetric row of constant-size units. Hollow units hold
+      // their place, so the band is the same height at every value and nothing
+      // rests on a bottom: centre it on the cap band and it sets like the
+      // characters it borrows from.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-pictogram ${className}` : "mc-pictogram"}
       style={style}
     >
