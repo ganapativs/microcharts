@@ -1,5 +1,199 @@
 # @microcharts/react
 
+## 0.6.0
+
+### Minor Changes
+
+- [#42](https://github.com/ganapativs/microcharts/pull/42)
+  [`86dcf8e`](https://github.com/ganapativs/microcharts/commit/86dcf8e9066c801f4cfe935a52d2ff2bd6ee2d37) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - **Breaking (pre-1.0 API freeze): remove props that were declared but
+  never read.** Each of these was accepted by the type signature and documented, but had no effect on rendering,
+  geometry, or the accessible summary — passing one did nothing. They are gone rather than fixed where the chart had no
+  number and no announcement to apply them to.
+
+  Removed outright:
+
+  - `DualSparkline` — `compareLabel`. Never reached the summary or any announcement; the compare series is described
+    positionally.
+  - `DualWindowMeter` — `damping`. Documented as "ballistics for the live entry", but the interactive entry never read
+    it; its motion comes from the shared entrance engine.
+
+  Narrowed to the interactive entry only (still available on `…/interactive`, removed from the static default export,
+  where they did nothing):
+
+  - `PercentileTrace` — `unit`. Names the reading in the hover/focus announcement; the static entry announces
+    percentiles, not individual readings.
+  - `CalendarStrip`, `EventRaster`, `MicroScatter`, `TokenConfidence` — `locale` (and `format` on the latter three).
+    These statics render lane names, marks and text, never a formatted number; only the readout does.
+
+  Wired up instead of removed:
+
+  - `ConfusionGrid` — `format` / `locale` now reach the accuracy gutter label, which previously hard-coded
+    `Math.round(v * 100) + "%"`. Percent formatting goes through the shared cached `makeFormatter`, so the one number
+    this chart renders is locale-aware and honors a custom `format`. Default output is unchanged. The right-hand gutter
+    is measured from the produced string, so a locale that widens the label still fits inside the viewBox.
+
+- [#42](https://github.com/ganapativs/microcharts/pull/42)
+  [`86dcf8e`](https://github.com/ganapativs/microcharts/commit/86dcf8e9066c801f4cfe935a52d2ff2bd6ee2d37) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - One interaction contract across the catalog. 103 of 106 charts now
+  share a single picker kernel, so a consumer's handler reads the same on a Sparkline, an ActivityGrid or a MicroDonut.
+
+  **This is a pre-1.0 minor with breaking changes** — permitted under semver for a `0.x` package, but read the Breaking
+  section below before upgrading.
+
+  **Picker charts (84 multi-unit entries)** gain four props on their `…/interactive` entry:
+
+  - `onActive(datum | null)` — the hovered / keyboard-focused unit changed
+  - `onSelect(datum | null)` — a unit was activated by click, tap, `Enter` or `Space`
+  - `selectedIndex` / `defaultSelectedIndex` — controlled and uncontrolled selection
+
+  The payload is one shape everywhere: `MicroDatum = { index, value, label? }`. `index` identifies the navigable unit
+  (documented per chart — a data index where the chart is 1:1 with `data`, otherwise a unit position). `value` is that
+  unit's primary _encoded_ number, which may be derived — a segment's share, a run's duration, a signed gap, a bin's
+  count — and is `null` where the unit encodes nothing.
+
+  Behavior, everywhere: pointer scrub sets the active unit; click or tap **selects and pins** it (surviving blur);
+  `Enter`/`Space` select; `Escape` clears; re-selecting the same unit clears it; arrows rove on **both** axes;
+  `Home`/`End` jump to the ends. On touch, a tap pins and a drag scrubs. Still one listener on the wrapper and pure math
+  — never a listener per data point.
+
+  **Scalar charts (19 single-unit entries)** take the lean half: `onSelect` only, with `{ index: 0, value, label? }`.
+  There is nothing to rove between and no pinned state, so they don't pretend otherwise.
+
+  **Deliberately excluded**, and documented as such: `MinimapStrip` is a viewport-window slider and keeps its
+  `onWindowChange([lo, hi])` range payload; `TokenConfidence` moves real focus to per-token spans so a screen reader
+  reads the text in flow; `WindBarb` ships no interactive entry at all.
+
+  ### Breaking
+  - **Removed `onPointFocus`** (Sparkline, SparkBar, and Waveform's two-argument `(index, fraction)` form) and
+    **`onRunFocus`** (StreakSpark). Use `onActive`, which reports `{ index, value, label? }`. Waveform's `fraction` has
+    no equivalent — the datum reports the bucket index and its peak.
+  - **`PictogramRow`'s interactive `strings` prop now takes `PictogramStrings`**, which adds a `pictogramUnit` template
+    so roving announces each unit (it previously announced nothing — an accessibility gap). A custom `ScalarStrings`
+    object needs that one template added. The static entry is unchanged.
+  - Charts whose interactive entry hand-rolled geometry that disagreed with their static now mirror the static exactly.
+    This corrects rendered output where the two had drifted — most visibly `EventRaster` (its interactive entry rendered
+    43% shorter than its static) and `Hypnogram` (default size and row-label gutter). Overlays, focus rings and
+    hit-tests now land on the marks.
+  - Six charts that silently ignored `ArrowUp`/`ArrowDown` now accept them as prev/next, matching the rest of the
+    catalog.
+
+  ### Fixed
+  - Nine interactive entries dropped consumer `children`, silently discarding annotations (`<Threshold>`, `<Marker>`,
+    …).
+  - `TreeRings`' pinned mark had its stroke width overridden by the stylesheet.
+  - `SproutRow` ignored `summary={false}`; `CometTrail` mis-indexed its readout when the series contained non-finite
+    values; `ControlStrip` had an index/value misalignment on gappy data; `BalanceBeam` ignored
+    `width`/`height`/`shape`.
+  - `Honeycomb` announced bare numerals to screen readers; it now uses a proper `honeycombCell` template.
+  - `CyclePlot`'s within-slot drill-down (`↑`/`↓` over the observations in the focused slot) is restored.
+
+- [#42](https://github.com/ganapativs/microcharts/pull/42)
+  [`86dcf8e`](https://github.com/ganapativs/microcharts/commit/86dcf8e9066c801f4cfe935a52d2ff2bd6ee2d37) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Interactive charts now forward `className` and `style` to their
+  wrapper and size the inner SVG from one shared `FILL` constant, so the SVG always fills the interactive `<span>` —
+  hover math, crosshairs, and focus rings stay locked to the cursor instead of drifting when the chart is scaled by a
+  consumer. Passing `style` merges (it no longer clobbers the wrapper's `display`/`position`/`line-height`), and
+  `className` composes with the chart's own class. No change at rest — static output is byte-identical.
+
+  Formatters are also hardened against IEEE float noise: `makeFormatter` snaps its input to 12 significant digits before
+  handing it to `Intl` or a custom `format` function, so internally-derived values (`value - target` →
+  `-3.5999999999999943`) render clean without touching real precision.
+
+- [#42](https://github.com/ganapativs/microcharts/pull/42)
+  [`86dcf8e`](https://github.com/ganapativs/microcharts/commit/86dcf8e9066c801f4cfe935a52d2ff2bd6ee2d37) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Prop-name grammar freeze. Non-negotiable
+  [#4](https://github.com/ganapativs/microcharts/issues/4) says the same prop name means the same thing on every chart —
+  an API audit before 1.0 found several names carrying two meanings across the catalog. Each is now spelled one way.
+
+  **This is a pre-1.0 minor with breaking renames** — permitted under semver for a `0.x` package. Every rename below is
+  mechanical: pass the new name, get identical output. No rendering, geometry, or accessibility behaviour changed.
+
+  | Chart              | Old             | New             | Why                                                               |
+  | ------------------ | --------------- | --------------- | ----------------------------------------------------------------- |
+  | `ABStrips`         | `labels`        | `seriesLabels`  | `labels` is a boolean show/hide toggle on 11 other charts         |
+  | `ShiftHistogram`   | `labels`        | `seriesLabels`  | ⇑                                                                 |
+  | `SpreadBand`       | `labels`        | `seriesLabels`  | ⇑                                                                 |
+  | `Waterfall`        | `total`         | `totalBar`      | `total` is a number denominator on 5 other charts                 |
+  | `ChangePoint`      | `max`           | `maxItems`      | `max` is a scale denominator on `Progress` (mirrors `<progress>`) |
+  | `DataDiff`         | `max`           | `maxItems`      | ⇑                                                                 |
+  | `ParetoStrip`      | `max`           | `maxItems`      | ⇑                                                                 |
+  | `CalibrationStrip` | `variant`       | `mode`          | 13 charts already spelled this `mode`                             |
+  | `Hypnogram`        | `variant`       | `mode`          | ⇑                                                                 |
+  | `MinimapStrip`     | `variant`       | `mode`          | ⇑                                                                 |
+  | `Ohlc`             | `variant`       | `mode`          | ⇑                                                                 |
+  | `StackedArea`      | `variant`       | `mode`          | ⇑                                                                 |
+  | `Waveform`         | `variant`       | `mode`          | ⇑                                                                 |
+  | `WindBarb`         | `variant`       | `mode`          | ⇑                                                                 |
+  | `DataDiff`         | `sort`          | `order`         | `sort`/`order` were two names for one concept                     |
+  | `MiniBar`          | `sort`          | `order`         | ⇑                                                                 |
+  | `PhaseTrace`       | `yDomain`       | `domain`        | its three sibling xy-charts use `domain` + `xDomain`              |
+  | `EtaBar`           | `formatEta`     | `etaFormat`     | formatter props read `<thing>Format` everywhere else              |
+  | `PolarClock`       | `formatSegment` | `segmentFormat` | ⇑                                                                 |
+
+  **Value renames.** The ordering vocabulary is now `"data" | "asc" | "desc"` plus per-chart extras, so `"none"` and
+  `"data"` no longer spell the same state:
+
+  - `DataDiff` `order`: `"none"` → `"data"` (`"net"`, `"magnitude"` unchanged)
+  - `MiniBar` `order`: `"none"` → `"data"` (`"desc"`, `"asc"` unchanged)
+
+  `SegmentedBar` (`"data" | "desc"`) and `StackedArea` (`"data" | "asc"`) already complied and are untouched.
+
+  **Additive.** `ControlStrip` gains `dots="none"` — it was the only `dots` prop in the catalog without the escape
+  hatch, so `dots="none"` was a type error on that one chart. It now draws no point marks at all, matching `Sparkline`,
+  `BumpStrip`, `RateVolume` and `StarSpoke`.
+
+  `Progress` keeps `max`: it is a true scale denominator and mirrors the web platform's own `<progress value max>`.
+
+- [#42](https://github.com/ganapativs/microcharts/pull/42)
+  [`86dcf8e`](https://github.com/ganapativs/microcharts/commit/86dcf8e9066c801f4cfe935a52d2ff2bd6ee2d37) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - `defineTheme()` gains a **`strokeWidth`** token — pin the base data
+  stroke weight (`--mc-stroke-width`) alongside the other geometry/type tokens. A number is stringified as-is (not
+  twinned into the dark variant). Additive and identity at its default.
+
+### Patch Changes
+
+- [#42](https://github.com/ganapativs/microcharts/pull/42)
+  [`86dcf8e`](https://github.com/ganapativs/microcharts/commit/86dcf8e9066c801f4cfe935a52d2ff2bd6ee2d37) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Floor charts now seat their baseline flush with the box bottom so they
+  align on the text baseline when rendered inline: SparkBar (bar mode), StackedArea, DepthWedge, and GradeProfile. These
+  marks are flat fill edges (crispEdges rects / stroke-free, dot-free areas), so filling to the box bottom bleeds
+  nothing; the top pad is untouched. SparkBar win-loss keeps its symmetric mid-line inset. No API change.
+
+- [#42](https://github.com/ganapativs/microcharts/pull/42)
+  [`86dcf8e`](https://github.com/ganapativs/microcharts/commit/86dcf8e9066c801f4cfe935a52d2ff2bd6ee2d37) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Pre-1.0 hardening pass. Every fix below is behavioural correctness —
+  no public prop changed (those are in the separate grammar-freeze changeset). Each is now guarded by a catalog-wide
+  test so it can't regress.
+
+  **Inline sizing parity (was a blocker).** A chart switched to its `/interactive` entry took a different amount of
+  space on the line than its static twin. Two causes: the `.mc-inline` glyph rules were direct-child selectors the
+  interactive wrapper broke, and CSS sizing (`height: 1.2em`, `width: 100%`) reached the wrapper but not the composed
+  SVG, so the mark kept its authored pixel size and overflowed. Static and interactive now occupy an identical box at
+  every size — verified across the whole catalog.
+
+  **Pointer accuracy.** Twelve interactive charts reported the wrong unit under the cursor. Causes ranged from a
+  hit-test index computed against a filtered array while read back against the unfiltered one (`Ohlc` — candles after a
+  corrupt period reported their neighbour's values), to a controlled-selection round trip off by one per gap
+  (`RetentionCurve`), a `variant="envelope"` waveform hit-tested on the bar pitch, a fixed hit radius against a
+  size-proportional dot (`QuadrantDot`), phantom navigable units on all-zero data (`ParetoStrip`, `PercentileLadder`),
+  and a focus ring that CSS-lerped across the chart while roving (`BalanceBeam`).
+
+  **Focus-ring symmetry.** Rings now sit concentric around the marks they enclose (`PairedBars`, `SproutRow`,
+  `Waterfall`) instead of hugging a band the mark sits off-centre in.
+
+  **Renders safely on degenerate input.** Twelve charts previously threw or leaked `NaN`/`undefined` into markup and
+  accessible names on empty, all-null, or `NaN`/±Infinity data. A null value now reads as "no data" — visible but
+  distinct from a real zero — never a fabricated measurement.
+
+  **Degrades at small sizes.** Thirty-two charts overlapped or spilled their labels outside the viewBox when the box
+  shrank (a Dumbbell in a tab header stacked its row names; a Thermometer squashed to a blob). Labels now drop cleanly —
+  with their reserved gutter, without reflowing the plot — so every chart stays legible down to at least half its
+  default size.
+
+  **Accessibility.** A decorative interactive chart (`summary={false}`, no `title`) was a focusable `role="img"` with no
+  accessible name; it is now correctly `aria-hidden` and non-focusable, matching the static entry.
+
 ## 0.5.0
 
 ### Minor Changes
