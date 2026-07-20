@@ -15,7 +15,10 @@ function displayedSnippets(mod: ChartModule): string[] {
   out.push(p.code(init, p.data ?? []));
   for (const r of mod.recipes) out.push(r.code);
   if (mod.contexts) {
-    for (const home of Object.values(mod.contexts)) out.push(home.code);
+    for (const [key, home] of Object.entries(mod.contexts)) {
+      if (key === "note" || typeof home !== "object" || !home) continue;
+      out.push(home.code);
+    }
   }
   return out;
 }
