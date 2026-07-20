@@ -32,6 +32,20 @@ const mono = JetBrains_Mono({
 // Apply saved accent + chart preset before first paint.
 const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem("mc-accent");if(a&&a!=="ember")d.dataset.accent=a;var p=localStorage.getItem("mc-preset");if(p&&p!=="modern")d.dataset.mcPreset=p}catch(e){}`;
 
+// Predict the hero's live-mode layout before first paint, so the panel is born
+// its final size instead of growing into it.
+//
+// `LanguageModel.availability()` is async and settles well after paint — that
+// lateness is the whole problem. But the *presence* of the API is synchronous,
+// and whether the model is actually on disk is stable across visits, so one
+// remembered bit plus one sync check predicts the layout precisely: the API has
+// to exist here AND Nano has to have been installed last time. Both true ->
+// reserve. A visitor without Chrome's AI never matches and pays one `typeof`.
+//
+// The flag is written and cleared by use-live-model.ts against the real
+// availability answer, so an uninstalled model self-heals on the next load.
+const LIVE_SCRIPT = `try{if(typeof LanguageModel!=="undefined"&&localStorage.getItem("mc-live")==="1")document.documentElement.dataset.mcLive="1"}catch(e){}`;
+
 // The leading glyph is the hero's own sparkline data ([3,5,4,8,6,9,7,11])
 // rendered in unicode blocks — a chart small enough to sit in a console.log,
 // which is exactly the tagline. Delight that doesn't lie: it's the real series.
@@ -61,7 +75,9 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "/",
-    types: { "application/atom+xml": [{ url: "/rss.xml", title: `${SITE.name} releases` }] },
+    types: {
+      "application/atom+xml": [{ url: "/rss.xml", title: `${SITE.name} releases` }],
+    },
   },
   // Crisp env-aware SVG favicon (app/brand/icon.svg). The apple-touch icon must
   // be listed explicitly — an `icons` object suppresses the app/apple-icon.tsx
@@ -76,7 +92,14 @@ export const metadata: Metadata = {
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
     url: SITE.url,
-    images: [{ url: "/og/default.png", width: 1200, height: 630, alt: SITE.ogImageAlt }],
+    images: [
+      {
+        url: "/og/default.png",
+        width: 1200,
+        height: 630,
+        alt: SITE.ogImageAlt,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -99,6 +122,11 @@ export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      // "cold" = this document painted from server HTML, so entrance
+      // animations must not gate that paint. Flipped to "warm" by <Provider>
+      // once the first page is on screen; from then on every transition is an
+      // SPA one, where the animation costs nothing the reader is waiting for.
+      data-boot="cold"
       className={`${sans.variable} ${display.variable} ${mono.variable}`}
       suppressHydrationWarning
     >
@@ -110,6 +138,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <script dangerouslySetInnerHTML={{ __html: ACCENT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: LIVE_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CONSOLE_SCRIPT }} />
         <script type="application/ld+json">{jsonLdScript(websiteJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareSourceCodeJsonLd())}</script>

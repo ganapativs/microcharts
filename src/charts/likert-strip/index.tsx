@@ -1,5 +1,5 @@
-// <LikertStrip> — does the response lean agree or disagree (,
-// S2-ordinal diverging). The center line is the question; everything else is
+// <LikertStrip> — does the response lean agree or disagree (S2-ordinal
+// diverging). The center line is the question; everything else is
 // the answer. Static, hook-free, RSC-safe. Neutral is NEVER hidden: `omit`
 // removes it from the bar but the labels/summary always carry it.
 import type { CSSProperties, ReactNode } from "react";
@@ -8,7 +8,7 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
-import { likertStripGeometry } from "./geometry.js";
+import { LIKERT_FONT, likertGutter, likertStripGeometry } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
 
 export type LikertDatum = MiniBarDatum;
@@ -76,12 +76,12 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
     devWarn("<LikertStrip> negative counts treated as 0.");
   }
 
-  const fontSize = 5;
+  const fontSize = LIKERT_FONT;
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const hasNeutralLevel = data.length % 2 === 1;
 
   // end labels reserve deterministic ch gutters ("100%" worst case = 4 chars)
-  const gutter = label === "none" ? 0 : Math.ceil(4 * fontSize * 0.62) + 4;
+  const gutter = likertGutter(label !== "none", fontSize);
   const geo = likertStripGeometry({
     width,
     height,
@@ -116,6 +116,12 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   const barH = Math.max(3, height - 4);
   const net = geo ? (geo.shares.positive - geo.shares.negative) * 100 : 0;
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -123,8 +129,13 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Seat the BAR, not the box: the center line runs the full height and the
+      // end labels ride the mid-line, so the frame overstates the mark. A
+      // diverging strip is symmetric about that mid-line with no floor, so it
+      // centres on the cap band.
+      seat={{ mode: "center", top: midY - barH / 2, bottom: midY + barH / 2 }}
       className={className ? `mc-likert ${className}` : "mc-likert"}
-      style={style}
+      style={rootStyle}
     >
       {geo ? (
         <>

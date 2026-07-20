@@ -7,6 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_THERMOMETER, type ThermometerStrings } from "../../core/strings-thermometer.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 import { thermometerGeometry, type Orientation } from "./geometry.js";
 
 export interface ThermometerProps {
@@ -39,6 +40,13 @@ export interface ThermometerProps {
 }
 
 const PAD = 2;
+/**
+ * Smallest across-the-tube box (viewBox units) that still reads as a calibrated
+ * instrument: the capsule is 0.32× it, the bulb 0.64×, the side ticks run to
+ * 0.82× — under 8 those are sub-pixel at any inline size. The label gutter may
+ * never eat into it.
+ */
+const MIN_ACROSS = 8;
 
 export function thermometerSummary(
   value: number,
@@ -82,12 +90,28 @@ export function Thermometer(props: ThermometerProps): ReactNode {
   } = props;
 
   const vertical = orientation === "vertical";
-  const showLabel = label === "value" && isFiniteValue(value);
-  const gutter = showLabel
-    ? Math.ceil(`${makeFormatter(format, locale)(value)}`.length * 0.62 * fontSize + 2)
+  const wantLabel = label === "value" && isFiniteValue(value);
+  const valueText = wantLabel ? makeFormatter(format, locale)(value) : "";
+  // The numeral sits BESIDE a vertical tube (a width gutter, sized by the text)
+  // and BELOW a horizontal one (a height gutter, sized by the em — vertical room
+  // is measured with the font size, never with a character count).
+  const wantGutter = wantLabel
+    ? vertical
+      ? textGutter(valueText.length, fontSize, 2)
+      : Math.ceil(fontSize * 1.25) + 1
     : 0;
-  const width = props.width ?? (vertical ? 16 + gutter : 48);
-  const height = props.height ?? (vertical ? 48 : 16 + gutter);
+  const width = props.width ?? (vertical ? 16 + wantGutter : 48);
+  const height = props.height ?? (vertical ? 48 : 16 + wantGutter);
+  // The tube gets what's left after the gutter — and it must stay an instrument,
+  // not a sliver. Below MIN_ACROSS the capsule, its bulb and its calibration
+  // ticks (all fractions of the across dimension) collapse into the squashed
+  // blob this chart is accused of being, and at narrower boxes still the gutter
+  // exceeds the box outright and the numeral renders at a negative x, outside
+  // the viewBox. So the numeral is the thing that degrades: drop it, hand the
+  // gutter back, and let the calibrated tube keep the whole box.
+  const across = vertical ? width : height;
+  const showLabel = wantLabel && across - wantGutter >= MIN_ACROSS;
+  const gutter = showLabel ? wantGutter : 0;
   // the tube uses the base box; the gutter is reserved outside it
   const boxW = vertical ? width - gutter : width;
   const boxH = vertical ? height : height - gutter;
@@ -109,10 +133,27 @@ export function Thermometer(props: ThermometerProps): ReactNode {
       : (summary ?? thermometerSummary(value, { domain, target, strings, format, locale }));
   const paint = color ?? "var(--mc-accent)";
 
+  // The numeral tracks the fill edge, so it travels with the value — and at the
+  // ends of the scale a centred em-box would hang off the top of the tube (or,
+  // horizontally, off the side). Clamp it into the box: a half-em nudge on a
+  // tick-calibrated tube is a placement detail, and the ticks, not the numeral's
+  // exact y, are what the reading is taken from.
+  const half = fontSize * 0.5;
   const labelPos = showLabel
     ? vertical
-      ? { x: boxW + 1, y: geo.fillEdge, anchor: "start" as const }
-      : { x: geo.fillEdge, y: boxH + fontSize * 0.9, anchor: "middle" as const }
+      ? {
+          x: boxW + 1,
+          y: Math.min(Math.max(geo.fillEdge, half), height - half),
+          anchor: "start" as const,
+        }
+      : {
+          x: Math.min(
+            Math.max(geo.fillEdge, textGutter(valueText.length, fontSize, 0) / 2),
+            width - textGutter(valueText.length, fontSize, 0) / 2,
+          ),
+          y: boxH + fontSize * 0.9,
+          anchor: "middle" as const,
+        }
     : null;
 
   return (
@@ -122,6 +163,15 @@ export function Thermometer(props: ThermometerProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Vertical is an upright instrument: the bulb (or the tube's low end when
+      // `bulb={false}`) rests at `boxH - PAD` and the fill climbs from it, so it
+      // stands on the baseline like a letter. Horizontal has no low end to rest
+      // on — the tube is a band centred on `boxH / 2`, with the bulb concentric
+      // to it — so it centres on the cap band instead. Either way the seat is the
+      // instrument box, never the label gutter reserved outside it.
+      seat={
+        vertical ? { mode: "floor", bottom: boxH - PAD } : { mode: "center", top: 0, bottom: boxH }
+      }
       className={className ? `mc-thermo ${className}` : "mc-thermo"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
@@ -145,7 +195,6 @@ export function Thermometer(props: ThermometerProps): ReactNode {
         rx={geo.tube.r}
         data-mc-ink="fill"
       />
-      {/* fill capsule — from the bulb end to the value edge */}
       {geo.fill.width > 0.1 && geo.fill.height > 0.1 ? (
         <rect
           x={geo.fill.x}
@@ -166,7 +215,6 @@ export function Thermometer(props: ThermometerProps): ReactNode {
         data-mc-ink="muted"
         style={{ strokeOpacity: 0.55, fill: "none" }}
       />
-      {/* calibration ticks */}
       {geo.tickLines.length ? (
         <path
           d={geo.tickLines.map((t) => `M${t.x1} ${t.y1}L${t.x2} ${t.y2}`).join("")}
@@ -197,7 +245,7 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           textAnchor={labelPos.anchor}
           data-mc-ink="label"
         >
-          {makeFormatter(format, locale)(value)}
+          {valueText}
         </text>
       ) : null}
       {children}

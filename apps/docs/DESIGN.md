@@ -87,12 +87,26 @@ light/dark parity holds in both directions.
 
 ## Narrative arc
 
-Hero (the sentence) → 01 the problem (charts grew up in dashboards; answers moved into sentences — real weight
-comparison: recharts 3.9.2 at 145 kB min+gzip + 11 dependencies vs a 2.27 kB median microchart at 0 dependencies, both
-bars real MiniBars, source cited) → 02 the grammar (JSX types in, the real component settles, the generated accessible
-sentence shown under it) → 03 the catalog (tier chips + ~24 live tiles from the registry) → 04 the principles + the
-refusals ("not shipping, on purpose") → 05 made for models (the dark band; machine surfaces terminal) → 06 the receipts
-(each stat drawn by a microchart of itself) → 07 theming (`defineTheme` swatches re-theme the section live) → final CTA.
+The order is the order a human decides in, not the order the library was built in:
+
+Hero (the claim, demonstrated live: an answer with charts inside it) → 01 the grammar (the reader just watched text
+become charts; this explains the trick in the same breath — JSX types in, the real component settles, the generated
+accessible sentence shown under it) → 02 the catalog (what's in the box: tier chips + live tiles; closed by the refusals
+strip — "traded up, on purpose" is the same editorial decision as the catalog) → 03 where they live (where a human uses
+it: product UI, report, cell, sentence — no AI required) → 04 made for models (the one dark band, the AI chapter in
+priority order: the provider wall FIRST — "does it work with my stack?" — then the machine-surfaces terminal and a
+deliberately small safe-to-emit card side by side; graceful degradation is table stakes, not a headline) → 05 the cost
+(the size argument lands AFTER the reader wants the thing: recharts 3.9.2 at 145 kB min+gzip + 11 dependencies vs the
+measured median microchart, same linear scale, source cited; closed by the receipts strip — the page's ONE home for
+sizes/deps/client-JS, each stat drawn by a microchart of itself) → 06 the examples → 07 theming (`defineTheme` swatches
+re-theme the section live) → final CTA.
+
+_2026-07-17 consolidation (two passes): the standalone principles, robustness, and receipts sections were merged away —
+one home per fact. The principles grid restated claims other sections already prove live; its unique line (one encoding
+channel, lie factor = 1) moved into the refusals header. Robustness is the proof of 04's "safe to emit" claim, so it
+lives inside that band, demoted to a half-width card. The receipts are the evidence for the cost argument, so they
+close 05. The size pitch originally opened the page (old problem→solution arc); it moved below because the hero already
+sells the solution and interrupting the demo context with a bundle-size lecture broke the read._
 
 All numbers flow from `docs-facts.ts` / `stats.ts` (measured, CI-checked) — the page cannot quote a size the build
 didn't measure. The one external figure (recharts) is pinned to a version and dated, fetched from bundlephobia

@@ -4,7 +4,7 @@
 // by position first, color second — a clinically proven grammar (AGP lineage).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { ON_FILL_INK } from "../../core/color.js";
 import { EN_TIME_IN_RANGE, type TimeInRangeStrings } from "../../core/strings-time-in-range.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -106,6 +106,11 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // One seat for both orientations: the zones always normalize to fill the
+      // whole strip, so the strip is a fixed frame centred in the box and its
+      // far edge is a frame edge, not a zero. Even the vertical column has
+      // nothing to stand on — it centres on the cap band either way.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-tir ${className}` : "mc-tir"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
@@ -115,7 +120,17 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
           label === "all" || (label === "in" && z.key === "in") ? pct[z.key] : undefined;
         const span = horizontal ? z.width : z.height;
         const text = showLabel !== undefined ? `${showLabel}%` : undefined;
-        const fits = text !== undefined && span >= Math.max(14, text.length * fontSize * 0.62 + 2);
+        // The percent lives INSIDE its zone rect, so it has to clear the rect on
+        // BOTH axes: `span` along the strip, and — the part a short strip broke —
+        // a full line of text across it. `labelFont` floors at 7 viewBox units,
+        // so a 6-unit-tall strip can seat nothing and every percent DROPS; the
+        // zones themselves are the encoding and still read. Pure arithmetic:
+        // the static path may never measure text.
+        const cy = round2(z.y + z.height / 2);
+        const fits =
+          text !== undefined &&
+          span >= Math.max(14, text.length * fontSize * 0.62 + 2) &&
+          labelFitsY(cy, fontSize, height);
         // flat siblings (no per-zone <g>) — the zone list is this chart's SSR
         // hot path; ink comes from an exact role (positive/negative/cat), never
         // "band" (that role would exempt the rect from the craft text-collision
@@ -138,7 +153,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
             <text
               key={`t-${z.key}`}
               x={round2(z.x + z.width / 2)}
-              y={round2(z.y + z.height / 2)}
+              y={cy}
               dominantBaseline="central"
               textAnchor="middle"
               fontSize={fontSize}

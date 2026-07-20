@@ -20,9 +20,9 @@ export function baseOptions(): BaseLayoutProps {
     // GitHub + the accent/appearance control live in the sidebar footer
     // (see DocsSidebarChrome), not as nav links — so they sit bottom-right,
     // out of the reading column.
-    links: [
-      { text: "Home", url: "/" },
-      { text: "Gallery", url: "/gallery" },
-    ],
+    // No standalone links: the wordmark is the way back home, and the sidebar
+    // tree already owns a "Charts" section — anything else here just
+    // duplicates an existing door.
+    links: [],
   };
 }

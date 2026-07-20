@@ -1,10 +1,9 @@
 import { OrbitStatus } from "@microcharts/react/orbit-status";
-import { OrbitStatus as OrbitStatusInteractive } from "@microcharts/react/orbit-status/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const LD: [number, number] = [0, 500];
-const RD: [number, number] = [0, 20];
+export const LD: [number, number] = [0, 500];
+export const RD: [number, number] = [0, 20];
 
 export const entry: ChartEntry = {
   name: "OrbitStatus",
@@ -18,6 +17,7 @@ export const entry: ChartEntry = {
   // faster) — a mount entrance would fight that live motion, so this chart
   // has no `animate` prop at all.
   animates: false,
+  picker: false,
   dataShape: "{ latency: number; rate: number }",
   encoding: { channel: "orbit radius = latency, dash density / speed = rate", precision: "low" },
   nodeBudget: "3",
@@ -82,21 +82,6 @@ export function Preview() {
     />
   );
 }
-
-export const showcase = {
-  hint: "slow? busy?",
-  Node: () => (
-    <OrbitStatus
-      latency={240}
-      rate={12}
-      latencyDomain={LD}
-      rateDomain={RD}
-      title="Payments API"
-      size={32}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "latency", label: "latency (ms)", min: 0, max: 500, step: 10, init: 240 },
@@ -115,31 +100,6 @@ export const playground: PlaygroundSpec = {
     />
   ),
   code: (s) =>
-    [
-      "<OrbitStatus",
-      `  latency={${s.latency}}`,
-      `  rate={${s.rate}}`,
-      "  latencyDomain={[0, 500]}",
-      "  rateDomain={[0, 20]}",
-      s.alert === "on" && "  alert={300}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  // No `animate` prop exists on this chart (see entry.animates) — the
-  // satellite's own orbital speed IS the encoding.
-  renderInteractive: (s) => (
-    <OrbitStatusInteractive
-      latency={s.latency as number}
-      rate={s.rate as number}
-      latencyDomain={LD}
-      rateDomain={RD}
-      alert={s.alert === "on" ? 300 : undefined}
-      summary={false}
-      size={120}
-    />
-  ),
-  codeInteractive: (s) =>
     [
       "<OrbitStatus",
       `  latency={${s.latency}}`,
@@ -304,28 +264,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <OrbitStatusInteractive
-      latency={240}
-      rate={12}
-      latencyDomain={LD}
-      rateDomain={RD}
-      summary={false}
-      size={24}
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -1,11 +1,19 @@
 "use client";
-// Interactive <MiniBar>. One pointer listener; bar index by
-// category-band lookup. ←/→ rove across bars ("East: 940 — 1st of 4."), focus
-// ring overlay on the active bar. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <MiniBar>. useActivePicker owns interaction: one pointer listener
+// + bar-by-band lookup, ←/→ rove bars ("East: 940 — 1st of 4."), click / Enter /
+// Space selects (onSelect). Composes the static component (canon) — the SVG is
+// never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { miniBarGeometry } from "./geometry.js";
@@ -16,7 +24,7 @@ import { MiniBar as StaticMiniBar, miniBarSummary, sortData, type MiniBarProps }
 const BAR_SELECTOR =
   'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"], rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]';
 
-export interface InteractiveMiniBarProps extends MiniBarProps {
+export interface InteractiveMiniBarProps extends MiniBarProps, PickerProps {
   strings?: CategoryStrings;
   /**
    * Opt-in entrance motion (default `false`): bars rise from the baseline
@@ -30,7 +38,7 @@ export interface InteractiveMiniBarProps extends MiniBarProps {
 export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
   const {
     data,
-    sort = "none",
+    order = "data",
     orientation = "vertical",
     domain,
     width = 50,
@@ -41,6 +49,12 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -54,7 +68,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     selector: BAR_SELECTOR,
   });
 
-  const sorted = useMemo(() => sortData(data, sort), [data, sort]);
+  const sorted = useMemo(() => sortData(data, order), [data, order]);
   const geo = useMemo(
     () =>
       miniBarGeometry({
@@ -67,7 +81,6 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     [width, height, sorted, domain, orientation],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
 
   // ranks over finite values (1 = highest), for "1st of 4" wording
   const ranks = useMemo(() => {
@@ -80,6 +93,44 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     return map;
   }, [sorted]);
 
+  // Pointer (viewBox space) → bar index by category-band division. Vertical bars
+  // band along x, horizontal along y.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      if (geo.bars.length === 0 || geo.band === 0) return null;
+      const pos = orientation === "vertical" ? x : y;
+      const i = Math.floor(pos / geo.band);
+      return i >= 0 && i < geo.bars.length ? i : null;
+    },
+    [geo, orientation],
+  );
+
+  // index = bar position (the data index when unsorted; the visual slot when
+  // `order` reorders) — the unit `selectedIndex`/overlays also address.
+  const datum = useCallback(
+    (i: number) => {
+      const d = sorted[i];
+      return {
+        index: i,
+        value: isFiniteValue(d?.value) ? (d!.value as number) : null,
+        label: d?.label,
+      };
+    },
+    [sorted],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.bars.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
   const accName =
     summary === false
       ? undefined
@@ -88,92 +139,47 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         : miniBarSummary(data, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.bars.length === 0 || geo.band === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const pos =
-        orientation === "vertical"
-          ? ((e.clientX - r.left) / r.width) * width
-          : ((e.clientY - r.top) / r.height) * height;
-      const i = Math.floor(pos / geo.band);
-      setActive(i >= 0 && i < geo.bars.length ? i : null);
-    },
-    [geo, orientation, width, height],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.bars.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-        case "ArrowDown":
-          next = Math.min(geo.bars.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-        case "ArrowUp":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.bars.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const activeBar = active !== null ? geo.bars[active] : undefined;
-  const activeDatum = active !== null ? sorted[active] : undefined;
-  const announced =
-    activeDatum === undefined
-      ? ""
-      : isFiniteValue(activeDatum.value)
-        ? strings.category(
-            activeDatum.label,
-            fmt(activeDatum.value),
-            ranks.get(active!)?.rank ?? 0,
-            ranks.get(active!)?.of ?? 0,
-          )
-        : `${activeDatum.label}: ${strings.noData}`;
-
   // focus ring hugs the bar's category band, full value extent
-  const ring =
-    activeBar && !activeBar.empty
-      ? orientation === "vertical"
-        ? { x: activeBar.x - 0.5, y: -0.5, width: activeBar.w + 1, height: height + 1 }
-        : { x: -0.5, y: activeBar.y - 0.5, width: width + 1, height: activeBar.h + 1 }
-      : null;
+  const outline = (i: number, pinned: boolean) => {
+    const b = geo.bars[i];
+    if (!b || b.empty) return null;
+    const ring =
+      orientation === "vertical"
+        ? { x: b.x - 0.5, y: -0.5, width: b.w + 1, height: height + 1 }
+        : { x: -0.5, y: b.y - 0.5, width: width + 1, height: b.h + 1 };
+    return (
+      <rect
+        {...ring}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const shownBar = shown !== null ? geo.bars[shown] : undefined;
+  const shownDatum = shown !== null ? sorted[shown] : undefined;
+  const announced =
+    shownDatum === undefined
+      ? ""
+      : isFiniteValue(shownDatum.value)
+        ? strings.category(
+            shownDatum.label,
+            fmt(shownDatum.value),
+            ranks.get(shown!)?.rank ?? 0,
+            ranks.get(shown!)?.of ?? 0,
+          )
+        : `${shownDatum.label}: ${strings.noData}`;
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-minibar-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-minibar-live", className, style)} {...named(label)} {...bind}>
       <StaticMiniBar
         {...rest}
+        style={fillFor(style)}
         data={data}
-        sort={sort}
+        order={order}
         orientation={orientation}
         domain={domain}
         width={width}
@@ -183,27 +189,21 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {ring ? (
-          <rect
-            {...ring}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticMiniBar>
       <LiveRegion>{announced}</LiveRegion>
-      {activeBar && activeDatum && isFiniteValue(activeDatum.value) ? (
+      {shownBar && shownDatum && isFiniteValue(shownDatum.value) ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((orientation === "vertical" ? activeBar.x + activeBar.w / 2 : width / 2) / width) * 100}%`,
+            left: `${((orientation === "vertical" ? shownBar.x + shownBar.w / 2 : width / 2) / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(activeDatum.value)}
+          {`${shownDatum.label}: ${fmt(shownDatum.value)}`}
         </span>
       ) : null}
     </span>

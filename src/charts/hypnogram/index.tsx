@@ -6,9 +6,14 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { round2 } from "../../core/types.js";
-import { labelFont } from "../../core/labels.js";
 import { EN_HYPNOGRAM, type HypnogramStrings } from "../../core/strings-hypnogram.js";
-import { firstAppearance, hypnogramGeometry, mergeRuns, type HypnoEntry } from "./geometry.js";
+import {
+  firstAppearance,
+  hypnogramGeometry,
+  hypnogramLabels,
+  mergeRuns,
+  type HypnoEntry,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type HypnogramDatum = HypnoEntry;
@@ -25,8 +30,8 @@ export interface HypnogramProps {
   labels?: boolean | undefined;
   /** `"lanes"` renders nominal states as filled blocks — no implied rank.
    * */
-  variant?: "steps" | "lanes" | undefined;
-  /** Per-state lane colours (`"lanes"` variant), cycled; overrides `--mc-cat-N`. */
+  mode?: "steps" | "lanes" | undefined;
+  /** Per-state lane colours (`"lanes"` mode), cycled; overrides `--mc-cat-N`. */
   colors?: readonly string[] | undefined;
   /** Time extent; the last state holds to `domain[1]`. */
   domain?: readonly [number, number] | undefined;
@@ -87,7 +92,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
     states: statesProp,
     emphasis,
     connectors = true,
-    variant = "steps",
+    mode = "steps",
     colors,
     labels: labelsProp,
     domain: domainProp,
@@ -113,11 +118,20 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
   const rowsN = Math.max(1, rowStates.length);
   // one legible row per state — the strip grows with the state count, never crushes
   const height = heightProp ?? Math.max(36, rowsN * 13);
-  const labels = labelsProp ?? width >= 96;
-  const fontSize = labelFont(height / rowsN, 0.62);
-  const gutter = labels
-    ? Math.min(width * 0.4, Math.max(...rowStates.map((s) => s.length), 1) * fontSize * 0.6 + 4)
-    : 0;
+  // Row names are seat-gated: they drop (and hand their gutter back to the runs)
+  // once the row pitch is under one em or the widest name outgrows its share of
+  // the width — see `hypnogramLabels`, the one place both entries derive this.
+  const {
+    show: labels,
+    gutter,
+    fontSize,
+  } = hypnogramLabels({
+    labels: labelsProp ?? width >= 96,
+    width,
+    height,
+    rows: rowsN,
+    maxChars: Math.max(...rowStates.map((s) => s.length), 1),
+  });
 
   const domain = domainProp ?? resolveDomain(data);
   const geo = hypnogramGeometry({
@@ -126,7 +140,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
     domain,
     width,
     height,
-    style: variant,
+    style: mode,
     gutter,
   });
   const accName = resolveSummary(summary, () => hypnogramSummary(data, rowStates, domain, strings));
@@ -142,6 +156,10 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Rows are states, so the lowest row is a category, never a zero — the
+      // stack centres on the cap band. `labels` opens a LEFT gutter only, so the
+      // vertical box holds whether or not the state names are drawn.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-hypno ${className}` : "mc-hypno"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
@@ -176,7 +194,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
         );
       })}
 
-      {variant === "lanes" ? (
+      {mode === "lanes" ? (
         geo.runs.map((r, i) => {
           const active = emphasis ? r.state === emphasis : true;
           return (

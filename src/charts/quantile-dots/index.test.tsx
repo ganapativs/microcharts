@@ -35,6 +35,14 @@ describe("<QuantileDots>", () => {
     expect(container.querySelectorAll("circle").length).toBe(15);
   });
 
+  it("all-equal → still exactly `count` dots (coincident dots must not collapse)", () => {
+    // one column, and the radius floor overflows the stack — dots share
+    // coordinates, so a coordinate-derived key would silently drop duplicates
+    // and the render would undercount what the summary claims.
+    const { container } = draw(<QuantileDots data={[7, 7, 7, 7, 7]} count={20} />);
+    expect(container.querySelectorAll("circle").length).toBe(20);
+  });
+
   it("past-threshold dots are re-inked (flag) AND ringed (never color-alone)", () => {
     const { container } = draw(<QuantileDots data={UNIFORM} threshold={15} side="above" />);
     const flags = container.querySelectorAll('circle[data-mc-ink="flag"]');
@@ -57,3 +65,21 @@ describe("<QuantileDots>", () => {
 });
 
 seriesEdgeSuite("QuantileDots", (data) => <QuantileDots data={data as number[]} title="Edge" />);
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("QuantileDots degradation", () => {
+  it("the count readout drops under a 7-unit box, the dots still draw", () => {
+    const big = draw(
+      <QuantileDots data={UNIFORM} threshold={15} side="above" width={240} height={32} />,
+    ).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(
+      <QuantileDots data={UNIFORM} threshold={15} side="above" width={48} height={6} />,
+    ).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("circle").length).toBeGreaterThan(0);
+  });
+});

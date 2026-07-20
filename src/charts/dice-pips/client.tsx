@@ -3,19 +3,35 @@
 // region on change; the pip set cross-fades (opacity, reduced-motion → instant).
 // No sub-part navigation — the pips are one value. Composes the static component.
 import { useEffect, useRef, useState } from "react";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
+import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { DicePips as StaticDicePips, dicePipsSummary, type DicePipsProps } from "./index.js";
 
 export interface InteractiveDicePipsProps extends DicePipsProps {
   /** Announce face changes through a polite region (default true). */
   live?: boolean;
   strings?: DiceStrings;
+  /** Click/tap or Enter/Space — `{ index: 0, value: the face count }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
-  const { live = true, strings = EN_DICE, title, value, ...rest } = props;
+  const {
+    live = true,
+    strings = EN_DICE,
+    title,
+    value,
+    onSelect,
+    className,
+    style,
+    ...rest
+  } = props;
   const summary = dicePipsSummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
+  // seat the wrapper, not just the SVG, so the click target stays on the
+  // painted glyph when this sits inline in prose (see seat-hoist).
+  useSeatHoist(wrap);
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");
 
@@ -48,16 +64,30 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
+  // The pips are ONE face, not six navigable marks: a single selectable unit
+  // (index 0) carrying the rounded count the face renders.
+  const pick = (): void =>
+    onSelect?.({ index: 0, value: Number.isFinite(value) ? Math.round(value) : null });
+
   return (
     <span
       ref={wrap}
-      className="mc-dice-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...wrapAttrs("mc-dice-live", className, style)}
+      {...named(label)}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
     >
-      <StaticDicePips {...rest} value={value} strings={strings} summary={false} />
+      <StaticDicePips
+        {...rest}
+        style={fillFor(style)}
+        value={value}
+        strings={strings}
+        summary={false}
+      />
       {live ? (
         <span
           aria-live="polite"

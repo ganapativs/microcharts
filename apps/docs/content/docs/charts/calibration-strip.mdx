@@ -60,7 +60,7 @@ dot is never backed by three samples.
     { predicted: 0.7, observed: 0.52, count: 30 },
     { predicted: 0.9, observed: 0.85, count: 8 },
   ]}
-  variant="bars"
+  mode="bars"
 />`}
 >
   <CalibrationStrip
@@ -71,7 +71,7 @@ dot is never backed by three samples.
       { predicted: 0.7, observed: 0.52, count: 30 },
       { predicted: 0.9, observed: 0.85, count: 8 },
     ]}
-    variant="bars"
+    mode="bars"
     title="Deviation"
     width={300}
     height={40}
@@ -171,6 +171,8 @@ announced: one number would hide precisely the per-bin structure the chart exist
 The accessible name reports the worst miscalibration and the support gaps — **"10 bins; largest gap at 0.7 predicted
 (observed 0.52); 2 low-support bins."** The interactive entry roves the bins with ←/→, announcing each bin's predicted
 and observed probability and its sample support.
+
+<InteractionNote slug="calibration-strip" />
 
 ## Props
 

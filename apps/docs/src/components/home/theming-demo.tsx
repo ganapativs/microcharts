@@ -65,8 +65,8 @@ export function ThemingDemo() {
           defineTheme({"{"}{" "}
           {inkPreset ? (
             <>
-              extends: <span className="text-fd-primary">&quot;{preset}&quot;</span>, cat:{" "}
-              <span className="text-fd-primary">{preset}Inks</span>
+              extends: <span className="text-fd-primary">&quot;{preset}&quot;</span>, cat: [
+              <span className="text-fd-primary">{inkCats?.map((c) => `"${c}"`).join(", ")}</span>]
             </>
           ) : (
             <>

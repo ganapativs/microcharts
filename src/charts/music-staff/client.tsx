@@ -1,19 +1,28 @@
 "use client";
-// Interactive <MusicStaff>. Sparkline model: one pointer listener
-// + nearest-note lookup, ←/→ roving, a ring on the focused note, EN.point
-// announcements. Composes the static component (ring as its child).
-import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+// Interactive <MusicStaff>. Sparkline model: useActivePicker owns interaction —
+// one pointer listener + nearest-note lookup, ←/→ roving (rests are skipped),
+// click / Enter / Space selects (onSelect), EN.point announcements. Composes the
+// static component (focus + pin rings as its children) — never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
+import {
+  named,
+  fillFor,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
 import { musicStaffGeometry } from "./geometry.js";
 import { MusicStaff as StaticMusicStaff, type MusicStaffProps } from "./index.js";
 
-const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
-
-export interface InteractiveMusicStaffProps extends MusicStaffProps {
+export interface InteractiveMusicStaffProps extends MusicStaffProps, PickerProps {
   strings?: SeriesStrings;
   /**
    * Opt-in entrance motion (default `false`): the note heads settle onto the
@@ -23,6 +32,19 @@ export interface InteractiveMusicStaffProps extends MusicStaffProps {
   animate?: boolean;
 }
 
+/** Focus (transient) / pin (persistent) ring around a note head. */
+const ring = (nt: { cx: number; cy: number; rx: number }, pinned: boolean): React.ReactNode => (
+  <circle
+    cx={nt.cx}
+    cy={nt.cy}
+    r={nt.rx + 1.5}
+    fill="none"
+    stroke="var(--mc-accent)"
+    data-mc-w={pinned ? "tick" : "support"}
+    vectorEffect="non-scaling-stroke"
+  />
+);
+
 export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
   const {
     data,
@@ -31,7 +53,6 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
     domain,
     width = 60,
     height = 28,
-    fontSize = 7,
     format,
     locale,
     title,
@@ -40,21 +61,29 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
     className,
     style,
     animate = false,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // no LiveRegion here to host it: seat the wrapper so the readout chip
+  // and the hit box travel with the mark when inline (see seat-hoist).
+  useSeatHoist(hostRef);
   // "trail" ordered by x — notes land left→right along the staff, echoing a
   // melody played in time order rather than a generic staggered settle. The
   // melodic contour connects those notes in time, so it must arrive AFTER them,
   // not fade in during the quiet stage before its own noteheads exist: `defer`
   // casts it into the closing act. (Its `data-mc-w="tick"` uniquely picks the
   // contour; the staff + ledger paths carry data-mc-ink="muted" instead.)
-  // Notes play in left→right, then the melodic contour DRAWS through them in
-  // time order — the line connects the notes it just laid down.
   useEntrance(hostRef, "trail", animate, { order: "x", link: 'path[data-mc-w="tick"]' });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // fontSize + gutter mirror the static entry EXACTLY (same default rule), so
+  // both entries compute identical note geometry and the rings cannot drift.
+  const fontSize = props.fontSize ?? labelFont(height);
   const last = lastFinite(data);
   const gutter =
     label === "last" && isFiniteValue(last)
@@ -65,69 +94,61 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
       musicStaffGeometry({ values: data, domain, width: width - gutter, height, range, pad: 2 }),
     [data, domain, width, gutter, height, range],
   );
-  const stops = geo.notes.map((n) => n.index);
-  const [active, setActive] = useState<number | null>(null);
+  // Navigable units are the NOTES, but indices are reported in DATA space (rests
+  // — non-finite values — are simply never landed on), matching Sparkline.
+  const stops = useMemo(() => geo.notes.map((n) => n.index), [geo]);
 
-  const onPointerMove = (e: PointerEvent<HTMLElement>) => {
-    if (geo.notes.length === 0) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    if (r.width === 0) return;
-    const x = ((e.clientX - r.left) / r.width) * width;
-    let best = geo.notes[0]!.index;
-    let bestD = Infinity;
-    for (const nt of geo.notes) {
-      const d = Math.abs(nt.cx - x);
-      if (d < bestD) {
-        bestD = d;
-        best = nt.index;
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.notes.length === 0) return null;
+      let best = geo.notes[0]!.index;
+      let bestD = Infinity;
+      for (const nt of geo.notes) {
+        const d = Math.abs(nt.cx - x);
+        if (d < bestD) {
+          bestD = d;
+          best = nt.index;
+        }
       }
-    }
-    setActive(best);
-  };
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (stops.length === 0) return;
-    const pos = active === null ? -1 : stops.indexOf(active);
-    let target = pos;
-    switch (e.key) {
-      case "ArrowRight":
-        target = Math.min(stops.length - 1, pos + 1);
-        break;
-      case "ArrowLeft":
-        target = pos <= 0 ? 0 : pos - 1;
-        break;
-      case "Home":
-        target = 0;
-        break;
-      case "End":
-        target = stops.length - 1;
-        break;
-      case "Escape":
-        setActive(null);
-        return;
-      default:
-        return;
-    }
-    e.preventDefault();
-    setActive(stops[target]!);
-  };
+      return best;
+    },
+    [geo],
+  );
+
+  const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
+
+  // `value` = the note's PITCH — the datum value the staff position encodes.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.notes.find((n) => n.index === i)?.value ?? null }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: stops.length,
+    width,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false ? undefined : (summary ?? describeSeries(data, { format, locale }));
-  const activeNote = active !== null ? geo.notes.find((n) => n.index === active) : undefined;
-  const activePos = active !== null ? stops.indexOf(active) + 1 : 0;
+  const shown = active ?? selected;
+  const shownNote = shown !== null ? geo.notes.find((n) => n.index === shown) : undefined;
+  const shownPos = shown !== null ? stops.indexOf(shown) + 1 : 0;
+  const selNote = selected !== null ? geo.notes.find((n) => n.index === selected) : undefined;
 
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-staff-live ${className}` : "mc-staff-live"}
-      style={{ display: "inline-block", position: "relative", lineHeight: 0, ...style }}
-      tabIndex={0}
-      role="img"
-      aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
-      onKeyDown={onKeyDown}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-staff-live", className, style)}
+      {...named([title, accName].filter(Boolean).join(". ") || undefined)}
+      {...bind}
     >
       <StaticMusicStaff
         {...rest}
@@ -141,19 +162,11 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
         format={format}
         locale={locale}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
-        {activeNote ? (
-          <circle
-            cx={activeNote.cx}
-            cy={activeNote.cy}
-            r={activeNote.rx + 1.5}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selNote && selected !== active ? ring(selNote, true) : null}
+        {active !== null && shownNote ? ring(shownNote, false) : null}
         {rest.children}
       </StaticMusicStaff>
       <span
@@ -167,14 +180,14 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
           whiteSpace: "nowrap",
         }}
       >
-        {activeNote ? strings.point(activePos, stops.length, fmt(activeNote.value)) : ""}
+        {shownNote ? strings.point(shownPos, stops.length, fmt(shownNote.value)) : ""}
       </span>
-      {activeNote ? (
+      {shownNote ? (
         <span
           className="mc-spark-readout"
-          style={{ left: `${(activeNote.cx / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${(shownNote.cx / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {fmt(activeNote.value)}
+          {fmt(shownNote.value)}
         </span>
       ) : null}
     </span>

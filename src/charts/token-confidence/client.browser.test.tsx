@@ -19,3 +19,15 @@ describe("interactive <TokenConfidence>", () => {
     await expect.poll(() => live.textContent).toBe("guess: guessing, 0.22.");
   });
 });
+
+describe("interactive <TokenConfidence> children", () => {
+  it("renders consumer children (the static does — the client must not drop them)", async () => {
+    const screen = await render(
+      <TokenConfidence data={SENT}>
+        <span data-testid="annotation">note</span>
+      </TokenConfidence>,
+    );
+    const host = screen.container.querySelector(".mc-tc-live") as HTMLElement;
+    expect(host.querySelector('[data-testid="annotation"]')).not.toBeNull();
+  });
+});

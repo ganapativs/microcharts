@@ -37,7 +37,7 @@ describe("<Hypnogram>", () => {
   });
 
   it("lanes style renders one rect per run, no step path", () => {
-    const { container } = draw(<Hypnogram data={SLEEP} domain={[0, 110]} variant="lanes" />);
+    const { container } = draw(<Hypnogram data={SLEEP} domain={[0, 110]} mode="lanes" />);
     expect(container.querySelectorAll("rect").length).toBe(7);
     expect(container.querySelector('path[data-mc-ink="data"]')).toBeNull();
   });
@@ -71,12 +71,12 @@ seriesEdgeSuite("Hypnogram", (data: readonly Value[]) => (
 ));
 
 describe("<Hypnogram> colors", () => {
-  it("colors[] overrides lane fills in the lanes variant", () => {
+  it("colors[] overrides lane fills in the lanes mode", () => {
     const { container } = draw(
       <Hypnogram
         data={SLEEP}
         domain={[0, 110]}
-        variant="lanes"
+        mode="lanes"
         colors={["rgb(1, 2, 3)", "rgb(4, 5, 6)"]}
       />,
     );
@@ -86,5 +86,51 @@ describe("<Hypnogram> colors", () => {
     expect(lanes.length).toBeGreaterThan(0);
     expect(lanes[0]!.style.fill).toBe("rgb(1, 2, 3)");
     expect(lanes[0]!.getAttribute("data-mc-cat")).toBe("1");
+  });
+});
+
+describe("<Hypnogram> degrades at small sizes", () => {
+  const NIGHT = [
+    { t: 0, state: "Awake" },
+    { t: 8, state: "Light" },
+    { t: 22, state: "Deep" },
+    { t: 50, state: "REM" },
+  ];
+  const STATES = ["Awake", "REM", "Light", "Deep"];
+  const at = (height: number, width = 300) =>
+    draw(<Hypnogram data={NIGHT} states={STATES} domain={[0, 120]} width={width} height={height} />)
+      .container;
+
+  // Each state name is centred on its row. Once the row pitch is under one em
+  // the names stack ("Awake" on "REM") — the reported tab-header failure — and
+  // the top and bottom rows push their em-boxes past the viewBox.
+  it("keeps the state names while the row pitch holds one em (height 30 → pitch 7)", () => {
+    expect([...at(30).querySelectorAll("text")].map((t) => t.textContent)).toEqual(STATES);
+  });
+
+  it("drops the state names below one em — the state trace survives", () => {
+    const c = at(29);
+    expect(c.querySelectorAll("text").length).toBe(0);
+    // the mark still reads: the right-angle run path, non-empty
+    const run = c.querySelector('path[data-mc-ink="data"]')!;
+    expect(run.getAttribute("d")).not.toBe("");
+    // and the runs reclaim the gutter: the first run starts at the box edge
+    expect(Number(run.getAttribute("d")!.slice(1).split(" ")[0])).toBeLessThan(5);
+  });
+
+  it("names too wide for their share of the width drop instead of clipping", () => {
+    const c = draw(
+      <Hypnogram
+        data={[
+          { t: 0, state: "Slow-wave sleep" },
+          { t: 8, state: "Rapid eye movement" },
+        ]}
+        width={120}
+        height={40}
+        labels
+      />,
+    ).container;
+    expect(c.querySelector("text")).toBeNull();
+    expect(c.querySelector("path")).not.toBeNull();
   });
 });

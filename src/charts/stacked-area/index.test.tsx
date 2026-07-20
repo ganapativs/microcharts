@@ -41,8 +41,8 @@ describe("<StackedArea>", () => {
     expect(warn).toHaveBeenCalled();
   });
 
-  it("variant='ridge' renders opaque fills (same stack, new skin)", () => {
-    const { container } = draw(<StackedArea data={TRAFFIC} variant="ridge" />);
+  it("mode='ridge' renders opaque fills (same stack, new skin)", () => {
+    const { container } = draw(<StackedArea data={TRAFFIC} mode="ridge" />);
     const first = container.querySelector("g path") as SVGElement;
     expect(first.style.fillOpacity).toBe("1");
   });

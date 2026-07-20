@@ -5,7 +5,7 @@ import type { SummaryStrings } from "./summary.js";
 
 export type SkylineStrings = Pick<
   SummaryStrings,
-  "noData" | "citySkyline" | "citySkylineAt" | "citySkylineAtLit"
+  "noData" | "citySkyline" | "citySkylineAt" | "citySkylineAtLit" | "citySkylineEmpty"
 >;
 
 export const EN_SKYLINE: SkylineStrings = {
@@ -14,4 +14,5 @@ export const EN_SKYLINE: SkylineStrings = {
     `${n} ${unit}; tallest ${tallLabel} at ${tallValue}.`,
   citySkylineAt: (label, value) => `${label}: ${value}.`,
   citySkylineAtLit: (label, value, litPct) => `${label}: ${value}; ${litPct} lit.`,
+  citySkylineEmpty: (label) => `${label}: no data.`,
 };

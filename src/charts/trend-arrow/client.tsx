@@ -4,6 +4,7 @@
 // gives the glyph a one-shot pulse (CSS, reduced-motion-gated). Keyboard: the
 // wrapper is focusable, nothing more. Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
+import { named, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -22,10 +23,12 @@ export interface InteractiveTrendArrowProps extends TrendArrowProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Click/tap or Enter/Space — `{ index: 0, value: the signed change, label: direction }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
-  const { live = true, animate = false, strings = EN_SCALAR, title, ...rest } = props;
+  const { live = true, animate = false, strings = EN_SCALAR, title, onSelect, ...rest } = props;
   const model = trendArrowModel({ ...rest, strings });
   const [pulse, setPulse] = useState(false);
   const prev = useRef(model.direction);
@@ -43,14 +46,27 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
 
   const label = [title, model.summary].filter(Boolean).join(". ") || undefined;
 
+  // One glyph, one selectable unit (index 0): the signed change it encodes,
+  // with the resolved direction as its name. No roving — nothing to rove.
+  const pick = (): void =>
+    onSelect?.({
+      index: 0,
+      value: Number.isFinite(rest.value) ? rest.value : null,
+      label: model.direction,
+    });
+
   return (
     <span
       ref={hostRef}
       className="mc-trend-live"
       data-pulse={pulse ? "1" : undefined}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...named(label)}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
     >
       <StaticTrendArrow {...rest} strings={strings} summary={false} />
       {live ? <LiveRegion>{model.summary}</LiveRegion> : null}

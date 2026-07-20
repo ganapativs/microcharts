@@ -7,9 +7,15 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
+import { labelFitsY, textGutter } from "../../core/labels.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
 import type { Polarity } from "../../core/types.js";
-import { iconArrayGeometry, type IconArrayGeometry, type IconArrayN } from "./geometry.js";
+import {
+  GRID_DIMS,
+  iconArrayGeometry,
+  type IconArrayGeometry,
+  type IconArrayN,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** Factual icon-array summary. Shared with the interactive entry. */
@@ -71,10 +77,20 @@ export function IconArray(props: IconArrayProps): ReactNode {
   } = props;
 
   // label a touch smaller than the strips so the countable grid stays the hero
-  // (~0.5·height, clamped 7–10) — see coverage-strip /
+  // (~0.5·height, clamped 7–10) — see coverage-strip
   const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
-  const showLabel = label !== "none";
-  const gutterCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
+  const wantCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
+  // The ratio label lives in a gutter carved OUT of the width. On a narrow box
+  // that gutter can swallow the grid whole — the units collapse to nothing and
+  // the text runs off the right edge. So the label is gated on the grid keeping
+  // a countable cell (≥ 1.5 units per column, gaps included) after the gutter,
+  // and on the text fitting the box vertically. When it drops, the gutter drops
+  // with it and the grid gets the full width — the countable grid is the chart.
+  const [cols] = GRID_DIMS[total];
+  const wantGutter = wantCh > 0 ? textGutter(wantCh, FONT, 4) : 0;
+  const showLabel =
+    wantCh > 0 && labelFitsY(height / 2, FONT, height) && width - wantGutter >= cols * 1.5 * 1.25;
+  const gutterCh = showLabel ? wantCh : 0;
   const geo = iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT });
 
   if (total === 100 && (width < 40 || height < 40)) {
@@ -95,7 +111,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
         ? "positive"
         : "accent";
   const labelText = label === "percent" ? pctFmt(geo.k / geo.n) : `${geo.k} in ${geo.n}`;
-  // pin the label size to viewBox units (see coverage-strip / )
+  // pin the label size to viewBox units (see coverage-strip)
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
@@ -105,6 +121,11 @@ export function IconArray(props: IconArrayProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A fixed grid of units — the empty slots are drawn too, so the block's
+      // size never changes with the rate and there is no floor for it to stand
+      // on. Centre the grid on the cap band. Seat the grid rather than the box:
+      // the cell cap leaves slack above and below on a tall chart.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-icon-array ${className}` : "mc-icon-array"}
       style={rootStyle}
     >

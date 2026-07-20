@@ -169,6 +169,12 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
       : (summary ??
         eventTimelineSummary(geo.spans.length, geo.points.length, geo.coverage, pctFmt, strings));
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -176,8 +182,13 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A horizontal lane, not a plot: spans, diamonds and the track all hang off
+      // `height / 2`, so the band is symmetric in the box by construction and the
+      // viewBox frame gives the same midpoint the geometry does. Centred on the
+      // cap band it reads as a rule set in the line rather than a bar on it.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-timeline ${className}` : "mc-timeline"}
-      style={style}
+      style={rootStyle}
     >
       <line
         x1={geo.track.x0}

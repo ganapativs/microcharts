@@ -62,7 +62,7 @@ to stop reading. 80% is a working reference, not a law, and `Other` never re-ent
   { label: "Auth", value: 4 },
 ];
 
-<ParetoStrip data={causes} max={3} />
+<ParetoStrip data={causes} maxItems={3} />
 <ParetoStrip data={causes} threshold={false} />`}
 >
   <span className="inline-flex flex-col gap-2">
@@ -75,7 +75,7 @@ to stop reading. 80% is a working reference, not a law, and `Other` never re-ent
         { label: "Network", value: 7 },
         { label: "Auth", value: 4 },
       ]}
-      max={3}
+      maxItems={3}
       title="Rolled up"
       width={240}
       height={26}
@@ -144,14 +144,17 @@ to stop reading. 80% is a working reference, not a law, and `Other` never re-ent
 The accent stops at the crossing, because the chart's one job is to say where to stop reading. The cumulative scale is
 fixed 0–100% and shares the full plot height — never rescaled to make the curve look steeper — and 80% is a
 **reference** default you can move or turn off, never a claimed law. `Other` is rendered honestly at its true size but
-always last and never counted among the vital few; if it towers over the top cause, that usually means `max` is set too
-aggressively.
+always last and never counted among the vital few; if it towers over the top cause, that usually means `maxItems` is set
+too aggressively.
 
 ## Accessibility
 
 The accessible name states the vital-few count and its cumulative — **"Top 4 of 9 causes account for 82% of
-incidents."** — or, without a threshold, the top cause and its share. The interactive entry steps the bars and announces
-each bar's share and running cumulative; **T** jumps to the crossing bar.
+incidents."** — or, when there is no threshold (or no ranked cause reaches it), the top cause and its share, as in the
+rolled-up demo above: **"Timeouts leads at 39%."** The interactive entry steps the bars and announces each bar's share
+and running cumulative; **T** jumps to the crossing bar.
+
+<InteractionNote slug="pareto-strip" />
 
 ## Props
 

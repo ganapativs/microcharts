@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "../../core/strings-volume-profile.js";
-import { binProfile, layoutProfile, volumeProfileGeometry, type LevelRow } from "./geometry.js";
+import { profileLayout, volumeProfileGeometry, type LevelRow } from "./geometry.js";
 
 export type VolumeProfileDatum = LevelRow | number;
 
@@ -73,15 +73,19 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const fontSize = labelFont(height, 0.11);
-  // bin once (the O(data.length) pass) — the POC-label gutter needs the POC
-  // level before layout can run, so layout (O(bins), cheap) runs twice instead
-  // of the whole bin+value-area walk (was the bench-floor regression)
-  const binned = binProfile(data, bins, valueArea);
-  const pre = layoutProfile(binned, { align, width, height, gutter: 0 });
-  const pocText = label === "poc" && pre.poc ? fmt(pre.poc.level) : undefined;
-  const gutter = pocText ? pocText.length * fontSize * 0.6 + 2 : 0;
-
-  const geo = layoutProfile(binned, { align, width, height, gutter });
+  // bins once (the O(data.length) pass); only the O(bins) layout repeats for the
+  // gutter — re-running the bin + value-area walk was the bench-floor regression
+  const { pocText, ...geo } = profileLayout({
+    data,
+    bins,
+    valueArea,
+    align,
+    width,
+    height,
+    label,
+    fontSize,
+    fmt,
+  });
   const accName =
     summary === false ? false : (summary ?? volumeProfileSummary(geo, valueArea, strings, fmt));
 
@@ -96,6 +100,11 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // y encodes LEVEL, not magnitude: the bottom row is the lowest price bin,
+      // not a zero floor, so nothing here belongs on the baseline. The rows
+      // partition a box padded equally top and bottom, so that plot box centres
+      // exactly where the viewBox does — the frame stands in for it.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-volprofile ${className}` : "mc-volprofile"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >

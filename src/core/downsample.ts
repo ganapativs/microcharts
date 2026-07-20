@@ -1,6 +1,6 @@
-// Long-series downsampling. Max-per-bucket, NEVER mean
-// a spike is usually the whole reason someone is looking, and
-// averaging erases it. Buckets are index-proportional so time stays linear.
+// Long-series downsampling. Max-per-bucket, NEVER mean — a spike is usually
+// the whole reason someone is looking, and averaging erases it. Buckets are
+// index-proportional so time stays linear.
 // Outputs are data-space (charts scale + round to viewBox).
 import { isFiniteValue, type Value } from "./types.js";
 

@@ -76,16 +76,20 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A staff is a band, not a column: nothing rests on its lowest line, so it
+      // centres on the cap band. The note band is inset by an equal pad top and
+      // bottom and the five lines are symmetric about its middle in both `range`
+      // settings, so the frame's midpoint IS the staff's — no need to carry the
+      // band out of geometry.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-staff ${className}` : "mc-staff"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* the five staff lines */}
       <path
         d={geo.staffYs.map((y) => `M${PAD} ${y}L${width - gutter - PAD} ${y}`).join("")}
         data-mc-ink="muted"
         style={{ strokeOpacity: 0.4 }}
       />
-      {/* ledger ticks */}
       {geo.ledger.length ? (
         <path
           d={geo.ledger.map((l) => `M${l.x1} ${l.y}L${l.x2} ${l.y}`).join("")}

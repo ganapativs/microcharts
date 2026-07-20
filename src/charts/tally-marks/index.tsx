@@ -67,6 +67,10 @@ export function TallyMarks(props: TallyMarksProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Every stroke spans the same padded band whatever the count — the count
+      // is read across, not up — so there is no floor and the band centres on
+      // the cap band, letting the marks set like the glyphs they imitate.
+      seat={{ mode: "center", top: PAD, bottom: height - PAD }}
       className={className ? `mc-tally ${className}` : "mc-tally"}
       style={{ "--mc-label-size": `${FONT}px`, ...style } as CSSProperties}
     >

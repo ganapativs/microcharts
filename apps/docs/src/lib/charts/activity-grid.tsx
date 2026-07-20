@@ -1,6 +1,5 @@
 import { ActivityGrid } from "@microcharts/react/activity-grid";
-import { ActivityGrid as ActivityGridInteractive } from "@microcharts/react/activity-grid/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -20,10 +19,10 @@ function gridWave(seed: number): number[] {
 
 /** Thursday 1970-01-01 — same fixed alignment day used in the docs page's
  *  "calendar-aligned" example, so the playground's `start` knob is deterministic. */
-const ALIGN_DATE = "1970-01-01";
+export const ALIGN_DATE = "1970-01-01";
 /** Widened bucket range for the `domain` knob — compresses every level below
  *  the wave's natural max (4) so the dimming is visible. */
-const DOMAIN: readonly [number, number] = [0, 6];
+export const DOMAIN: readonly [number, number] = [0, 6];
 
 export const entry: ChartEntry = {
   name: "ActivityGrid",
@@ -116,12 +115,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <ActivityGrid data={entry.demo} cell={10} summary={false} />;
 }
-
-export const showcase = {
-  hint: "cadence",
-  Node: () => <ActivityGridInteractive data={showcaseGrid} cell={9} title="Commit activity" />,
-};
-
 export const playground: PlaygroundSpec = {
   // `title`/`summary` drive the accessible name, not a visual toggle — title
   // stays fixed to "Playground" below.
@@ -162,34 +155,6 @@ export const playground: PlaygroundSpec = {
       s.align !== "none" && `  start="${ALIGN_DATE}"`,
       s.align === "sunday" && "  weekStart={0}",
       s.domain && "  domain={[0, 6]}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <ActivityGridInteractive
-      data={data}
-      layout={s.layout as "grid" | "strip"}
-      shape={s.shape as "square" | "round" | "dot"}
-      cell={Number(s.cell)}
-      start={s.align !== "none" ? ALIGN_DATE : undefined}
-      weekStart={s.align === "sunday" ? 0 : 1}
-      domain={s.domain ? DOMAIN : undefined}
-      animate={ui.animate}
-      title="Playground"
-    />
-  ),
-  codeInteractive: (s, data, ui) =>
-    [
-      "<ActivityGrid",
-      `  data={/* ${data.length} values */}`,
-      `  layout="${s.layout}"`,
-      s.shape !== "square" && `  shape="${s.shape}"`,
-      `  cell={${s.cell}}`,
-      s.align !== "none" && `  start="${ALIGN_DATE}"`,
-      s.align === "sunday" && "  weekStart={0}",
-      s.domain && "  domain={[0, 6]}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -329,19 +294,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<ActivityGrid data={data} layout="strip" cell={7} />`;
 }
-
-export function PreviewLive() {
-  return <ActivityGridInteractive data={entry.demo} cell={10} summary={false} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

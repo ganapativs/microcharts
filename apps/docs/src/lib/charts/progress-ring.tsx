@@ -1,6 +1,5 @@
 import { ProgressRing } from "@microcharts/react/progress-ring";
-import { ProgressRing as ProgressRingInteractive } from "@microcharts/react/progress-ring/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -12,6 +11,7 @@ export const entry: ChartEntry = {
   tagline: "How complete is this? At icon size, where a bar doesn't fit.",
   staticImport: `${PKG}/progress-ring`,
   interactiveImport: `${PKG}/progress-ring/interactive`,
+  picker: false,
   dataShape: "value of max",
   encoding: {
     channel: "arc sweep (fixed 12-o'clock start)",
@@ -52,20 +52,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <ProgressRing value={0.68} summary={false} style={{ width: 40, height: 40 }} />;
 }
-
-export const showcase = {
-  hint: "completion",
-  Node: () => (
-    <ProgressRing
-      value={0.68}
-      label="percent"
-      size={40}
-      title="Backup"
-      style={{ width: 40, height: 40 }}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   // `max` isn't its own knob: `pct` already expresses value as value/max — a
   // second denominator control would just relabel the same fraction.
@@ -93,30 +79,6 @@ export const playground: PlaygroundSpec = {
       (s.sweep as boolean) && "  sweep",
       s.weight !== 3 && `  weight={${s.weight}}`,
       (s.label as boolean) && '  label="percent"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ProgressRingInteractive
-      value={(s.pct as number) / 100}
-      sweep={s.sweep as boolean}
-      weight={s.weight as number}
-      label={(s.label as boolean) ? "percent" : "none"}
-      size={48}
-      summary={false}
-      animate={ui.animate}
-      style={{ width: 96, height: 96 }}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<ProgressRing",
-      `  value={${(s.pct as number) / 100}}`,
-      (s.sweep as boolean) && "  sweep",
-      s.weight !== 3 && `  weight={${s.weight}}`,
-      (s.label as boolean) && '  label="percent"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -230,26 +192,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<ProgressRing value={0.68} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <ProgressRingInteractive
-      value={0.68}
-      summary={false}
-      style={{ width: 40, height: 40 }}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

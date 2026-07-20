@@ -5,12 +5,13 @@ import type { SummaryStrings } from "./summary.js";
 
 export type FlowStrings = Pick<
   SummaryStrings,
-  "noData" | "waterfallStep" | "waterfall" | "rankAt" | "rankRun"
+  "noData" | "waterfallStep" | "waterfallTotal" | "waterfall" | "rankAt" | "rankRun"
 >;
 
 export const EN_FLOW: FlowStrings = {
   noData: "No data.",
   waterfallStep: (label, delta, level) => `${label}: ${delta}, running ${level}.`,
+  waterfallTotal: (level) => `Total: ${level}.`,
   waterfall: (start, end, steps, gains, losses) =>
     `From ${start} to ${end} over ${steps} steps: ${gains} gains, ${losses} losses.`,
   rankAt: (period, total, rank, unit = "Week") => `${unit} ${period} of ${total}: #${rank}.`,

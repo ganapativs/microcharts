@@ -1,6 +1,5 @@
 import { StreakSpark } from "@microcharts/react/streak-spark";
-import { StreakSpark as StreakSparkInteractive } from "@microcharts/react/streak-spark/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -64,13 +63,6 @@ export const entry: ChartEntry = {
       required: false,
       description: "Override or disable the auto summary.",
     },
-    {
-      name: "onRunFocus",
-      type: "(index: number | null) => void",
-      required: false,
-      interactive: true,
-      description: "Fires as hover/keyboard focus moves across runs; `null` on blur.",
-    },
   ],
   demo: STREAK,
   example: {
@@ -88,14 +80,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <StreakSpark data={STREAK} width={180} height={48} summary={false} />;
 }
-
-export const showcase = {
-  hint: "current vs record",
-  Node: () => (
-    <StreakSpark data={STREAK} label="both" title="Deploy streak" width={180} height={48} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "positive", label: "streak is", options: ["up", "down"], init: "up" },
@@ -128,29 +112,6 @@ export const playground: PlaygroundSpec = {
       `  data={[${data.join(", ")}]}`,
       s.positive !== "up" && `  positive="${s.positive}"`,
       s.label !== "current" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <StreakSparkInteractive
-      data={data}
-      positive={s.positive as "up" | "down"}
-      label={s.label as "current" | "both" | "none"}
-      animate={ui.animate}
-      width={340}
-      height={92}
-      className="w-full max-w-md"
-      title="Playground"
-    />
-  ),
-  codeInteractive: (s, data, ui) =>
-    [
-      "<StreakSpark",
-      `  data={[${data.join(", ")}]}`,
-      s.positive !== "up" && `  positive="${s.positive}"`,
-      s.label !== "current" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -278,19 +239,12 @@ export function markCode(width?: number, height?: number): string {
   const size = width && height ? ` width={${width}} height={${height}}` : "";
   return `<StreakSpark data={data}${size} />`;
 }
-
-export function PreviewLive() {
-  return <StreakSparkInteractive data={STREAK} width={180} height={48} summary={false} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -102,10 +102,10 @@ const month = (x) => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"][x];
   <Constellation data={[{ x: 0 }, { x: 2 }, { x: 5 }, { x: 8 }]} title="No values" width={110} height={28} />
 </LiveDemo>
 
-Empty data draws just the frame with "No data." as the summary. A single event has no line to draw — just one dot, and
-the summary says "1 event at …" rather than forcing a range. When every point omits `y`, the vertical spread is
-deterministic jitter for legibility only — the summary and the interactive readout never mention it, and the connector's
-slope carries no meaning in that mode.
+Empty data draws no marks at all — just the sized box — with "No data." as the summary. A single event has no line to
+draw — just one dot, and the summary says "1 event at …" rather than forcing a range. When every point omits `y`, the
+vertical spread is deterministic jitter for legibility only — the summary and the interactive readout never mention it,
+and the connector's slope carries no meaning in that mode.
 
 ## Four homes
 
@@ -129,6 +129,8 @@ The accessible name states the count, the span, and the largest event — **"4 e
 Mar."** The interactive entry lets you arrow through the events chronologically, each announced with its time, value,
 and magnitude through a polite live region; a hover readout shows the same. Magnitude is redundant with the dot size,
 never carried by it alone.
+
+<InteractionNote slug="constellation" />
 
 ## Props
 

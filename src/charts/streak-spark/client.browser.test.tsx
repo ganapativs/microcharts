@@ -39,4 +39,33 @@ describe("interactive <StreakSpark>", () => {
     await userEvent.keyboard("{ArrowRight}");
     expect(live.textContent).toBe("Run 2 of 3: 1 failing.");
   });
+
+  it("onActive reports the focused run datum (run index + length); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<StreakSpark data={D} onActive={(d) => seen.push(d)} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}");
+    expect(seen.at(-1)).toEqual({ index: 1, value: 1, label: "failing" });
+    await userEvent.keyboard("{Escape}");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active run: fires onSelect + pins a persistent outline", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<StreakSpark data={D} onSelect={(d) => picks.push(d)} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}{Enter}");
+    expect(picks.at(-1)).toEqual({ index: 0, value: 2, label: "passing" });
+    // Pin survives blur (it is selection, not hover).
+    fig.blur();
+    await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the outline with no interaction", async () => {
+    const screen = await render(<StreakSpark data={D} selectedIndex={2} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    expect(fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
+  });
 });

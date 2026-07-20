@@ -4,7 +4,7 @@
 // fontSize × 1.1 drop their labels (count × height, no measurement). 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
-import { textGutter } from "../../core/labels.js";
+import { textGutter, textGutterProse } from "../../core/labels.js";
 
 interface SlopeLine {
   x0: number;
@@ -28,6 +28,70 @@ export interface SlopeGeometry {
   colX1: number;
 }
 
+/** Label font size (viewBox units) — shared by both entries. */
+export const SLOPE_FONT = 6;
+
+/**
+ * The frame BOTH entries render against: label gutters reserved from the
+ * deterministic ch counts, plus the reclaim rule — when the gutters ate the
+ * plot the labels drop and the room goes back to the lines. The interactive
+ * entry must use this too, or its hit-test runs against a different plot box
+ * than the SVG the user sees.
+ */
+export function slopeFrame(opts: {
+  width: number;
+  height: number;
+  data: readonly { from: number; to: number; label: string }[];
+  domain?: readonly [number, number] | undefined;
+  label: "none" | "value" | "label" | "both";
+  fmt: (n: number) => string;
+  fontSize?: number;
+}): { geo: SlopeGeometry; labelsDropped: boolean } {
+  const { width, height, data, domain, label, fmt, fontSize = SLOPE_FONT } = opts;
+  const wantLeft = label === "value" || label === "both";
+  const wantLabel = label === "label" || label === "both";
+  const estLeftCh = wantLeft
+    ? data.reduce((m, d) => Math.max(m, Number.isFinite(d.from) ? fmt(d.from).length : 0), 0)
+    : 0;
+  const estRightCh =
+    label === "none"
+      ? 0
+      : data.reduce(
+          (m, d) =>
+            Math.max(
+              m,
+              (wantLeft && Number.isFinite(d.to) ? fmt(d.to).length : 0) +
+                (wantLabel ? Math.min(6, d.label.length) + 1 : 0),
+            ),
+          0,
+        );
+
+  const pairs = data.map((d) => ({ from: d.from, to: d.to }));
+  const geo = slopeGeometry({
+    width,
+    height,
+    pairs,
+    domain,
+    gutterLeftCh: estLeftCh,
+    gutterRightCh: estRightCh,
+    rightIsProse: wantLabel,
+    fontSize,
+  });
+  if (geo.labelsFit) return { geo, labelsDropped: false };
+  return {
+    geo: slopeGeometry({
+      width,
+      height,
+      pairs,
+      domain,
+      gutterLeftCh: 0,
+      gutterRightCh: 0,
+      fontSize,
+    }),
+    labelsDropped: true,
+  };
+}
+
 export function slopeGeometry(opts: {
   width: number;
   height: number;
@@ -35,12 +99,23 @@ export function slopeGeometry(opts: {
   domain?: readonly [number, number] | undefined;
   gutterLeftCh: number;
   gutterRightCh: number;
+  /**
+   * Whether the right gutter carries the caller's category label
+   * (`label="label"`/`"both"`) rather than only our own formatted value.
+   * Category text needs the wider prose estimate; a formatted figure does not,
+   * and over-reserving for it costs enough plot width at the default 40-unit
+   * width to push the labels past their own fit threshold and drop them.
+   */
+  rightIsProse?: boolean | undefined;
   fontSize: number;
 }): SlopeGeometry {
-  const { width, height, pairs, gutterLeftCh, gutterRightCh, fontSize } = opts;
+  const { width, height, pairs, gutterLeftCh, gutterRightCh, fontSize, rightIsProse } = opts;
   const r = 1.5;
+  // The left gutter only ever holds our own formatted value, which is what
+  // textGutter's tabular-figure constant is calibrated for.
   const gutterL = gutterLeftCh > 0 ? textGutter(gutterLeftCh, fontSize, 3) : 0;
-  const gutterR = gutterRightCh > 0 ? textGutter(gutterRightCh, fontSize, 3) : 0;
+  const estimateRight = rightIsProse ? textGutterProse : textGutter;
+  const gutterR = gutterRightCh > 0 ? estimateRight(gutterRightCh, fontSize, 3) : 0;
   const colX0 = round2(gutterL + r);
   const colX1 = round2(width - gutterR - r);
 

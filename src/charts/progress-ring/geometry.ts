@@ -24,6 +24,11 @@ export interface RingGeometry {
   labelY: number;
   /** Center font size in viewBox units. */
   fontSize: number;
+  /** Top edge of the ring's plot box — the track's outer radius. Fixed by
+   *  `size` alone, so the seat never moves as the fraction sweeps. */
+  y0: number;
+  /** Bottom edge of the ring's plot box. */
+  y1: number;
 }
 
 export function ringGeometry(opts: {
@@ -53,5 +58,7 @@ export function ringGeometry(opts: {
     labelX: round2(c),
     labelY: round2(c),
     fontSize,
+    y0: round2(c - rOuter),
+    y1: round2(c + rOuter),
   };
 }

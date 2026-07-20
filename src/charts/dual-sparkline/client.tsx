@@ -1,9 +1,17 @@
 "use client";
-// Interactive <DualSparkline>. Nearest-x lookup announces BOTH
-// series ("Point 9 of 12: 17 vs 15."); crosshair touches both lines. ←/→
-// steps x. Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <DualSparkline>. useActivePicker owns interaction: one pointer
+// listener + nearest-x lookup announcing BOTH series ("Point 9 of 12: 17 vs
+// 15."), ←/→ step x, click / Enter / Space selects (onSelect). The crosshair
+// touches both lines. Composes the static component (canon).
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VS, type VsStrings } from "../../core/strings-vs.js";
@@ -16,7 +24,7 @@ import {
   type DualSparklineProps,
 } from "./index.js";
 
-export interface InteractiveDualSparklineProps extends DualSparklineProps {
+export interface InteractiveDualSparklineProps extends DualSparklineProps, PickerProps {
   strings?: VsStrings;
   seriesStrings?: SeriesStrings;
   /**
@@ -44,6 +52,12 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -52,10 +66,17 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 8));
-  const lastText =
-    label === "last"
-      ? [...data].reverse().find((v): v is number => Number.isFinite(v ?? Number.NaN))
-      : undefined;
+  // Last finite primary value — scanned backwards in place (a `[...data]
+  // .reverse()` copies the whole series) and memoised: the interactive entry
+  // re-renders on every unit crossed during a scrub, and this feeds `geo`.
+  const lastText = useMemo(() => {
+    if (label !== "last") return undefined;
+    for (let i = data.length - 1; i >= 0; i--) {
+      const v = data[i];
+      if (Number.isFinite(v ?? Number.NaN)) return v as number;
+    }
+    return undefined;
+  }, [data, label]);
   const geo = useMemo(
     () =>
       dualSparklineGeometry({
@@ -71,8 +92,42 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
       }),
     [width, height, data, compare, domain, band, curve, lastText, fmt, fontSize],
   );
+  // Navigable unit = one x position on the SHARED index range — 1:1 with the
+  // data index of both series (the shorter one simply has no point there).
   const n = Math.max(data.length, compare.length);
-  const [active, setActive] = useState<number | null>(null);
+
+  const locate = useCallback(
+    (x: number) => {
+      if (n === 0) return null;
+      const span = geo.plot.x1 - geo.plot.x0;
+      const i = Math.round(((x - geo.plot.x0) / Math.max(1, span)) * (n - 1));
+      return Math.min(n - 1, Math.max(0, i));
+    },
+    [n, geo],
+  );
+
+  // `value` = the PRIMARY series' value at that x (the accent line is what the
+  // chart is about); the compare value rides in the readout + announcement,
+  // which state both ("17 vs 15").
+  const datum = useCallback(
+    (i: number) => {
+      const v = data[i];
+      return { index: i, value: isFiniteValue(v) ? v : null };
+    },
+    [data],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: n,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -82,80 +137,30 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
         : dualSummary(data, compare, fmt, strings, seriesStrings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (n === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const span = geo.plot.x1 - geo.plot.x0;
-      const i = Math.round(((x - geo.plot.x0) / Math.max(1, span)) * (n - 1));
-      setActive(Math.min(n - 1, Math.max(0, i)));
-    },
-    [n, geo, width],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (n === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(n - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = n - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, n],
-  );
-
-  const pv = active !== null ? data[active] : undefined;
-  const cv = active !== null ? compare[active] : undefined;
+  // The x shown by the crosshair + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const pv = shown !== null ? data[shown] : undefined;
+  const cv = shown !== null ? compare[shown] : undefined;
   const announced =
-    active !== null
+    shown !== null
       ? strings.vsAt(
-          active + 1,
+          shown + 1,
           n,
           isFiniteValue(pv) ? fmt(pv) : seriesStrings.noData,
           isFiniteValue(cv) ? fmt(cv) : seriesStrings.noData,
         )
       : "";
   const crossX =
-    active !== null
-      ? (geo.primaryPoints[active]?.[0] ?? geo.comparePoints[active]?.[0])
-      : undefined;
+    shown !== null ? (geo.primaryPoints[shown]?.[0] ?? geo.comparePoints[shown]?.[0]) : undefined;
+  const selPoint =
+    selected !== null ? (geo.primaryPoints[selected] ?? geo.comparePoints[selected] ?? null) : null;
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-dual-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-dual-live", className, style)} {...named(ariaLabel)} {...bind}>
       <StaticDualSparkline
         {...rest}
+        style={fillFor(style)}
         data={data}
         compare={compare}
         curve={curve}
@@ -170,6 +175,18 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
         seriesStrings={seriesStrings}
         summary={false}
       >
+        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
+        {selPoint ? (
+          <circle
+            cx={selPoint[0]}
+            cy={selPoint[1]}
+            r={3.2}
+            fill="none"
+            data-mc-ink="accent"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {crossX !== undefined ? (
           <>
             <line
@@ -181,18 +198,18 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />
-            {geo.primaryPoints[active!] ? (
+            {geo.primaryPoints[shown!] ? (
               <circle
-                cx={geo.primaryPoints[active!]![0]}
-                cy={geo.primaryPoints[active!]![1]}
+                cx={geo.primaryPoints[shown!]![0]}
+                cy={geo.primaryPoints[shown!]![1]}
                 r={2}
                 data-mc-ink="accent"
               />
             ) : null}
-            {geo.comparePoints[active!] ? (
+            {geo.comparePoints[shown!] ? (
               <circle
-                cx={geo.comparePoints[active!]![0]}
-                cy={geo.comparePoints[active!]![1]}
+                cx={geo.comparePoints[shown!]![0]}
+                cy={geo.comparePoints[shown!]![1]}
                 r={1.5}
                 style={{ fill: "var(--mc-neutral)" }}
               />
@@ -202,7 +219,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
         {rest.children}
       </StaticDualSparkline>
       <LiveRegion>{announced}</LiveRegion>
-      {active !== null && crossX !== undefined ? (
+      {shown !== null && crossX !== undefined ? (
         <span
           className="mc-spark-readout"
           style={{
@@ -210,7 +227,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
             transform: "translateX(-50%)",
           }}
         >
-          {`${isFiniteValue(pv) ? fmt(pv) : "—"} vs ${isFiniteValue(cv) ? fmt(cv) : "—"}`}
+          {`${isFiniteValue(pv) ? fmt(pv) : "—"} / ${isFiniteValue(cv) ? fmt(cv) : "—"}`}
         </span>
       ) : null}
     </span>

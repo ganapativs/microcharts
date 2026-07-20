@@ -23,6 +23,11 @@ export interface CometTrailGeometry {
   count: number;
   width: number;
   height: number;
+  /** Top edge of the dot band (`pad` + the vertical inset the head reserves). */
+  y0: number;
+  /** Bottom edge of the dot band. The band is symmetric, so `y0`/`y1` together
+   *  are the inline seat's box. */
+  y1: number;
 }
 
 const TRAIL_CAP = 20;
@@ -46,6 +51,10 @@ export function cometTrailGeometry(opts: {
   const vInset = Math.max(headR, opts.vPad ?? 0);
   const trailR = Math.max(0.8, headR * 0.7);
   const keep = Math.min(TRAIL_CAP, Math.max(0, Math.floor(opts.trail))) + 1;
+  // The band the dots can occupy — the value scale's own range. Data-independent,
+  // so it holds for the empty case too.
+  const y0 = round2(pad + vInset);
+  const y1 = round2(height - pad - vInset);
 
   const finite = opts.values.filter((v) => Number.isFinite(v));
   const shown = finite.slice(-keep);
@@ -60,6 +69,8 @@ export function cometTrailGeometry(opts: {
     count: 0,
     width: Math.max(1, Math.round(width)),
     height: Math.max(1, Math.round(height)),
+    y0,
+    y1,
   };
   if (count === 0) return empty;
 
@@ -110,5 +121,7 @@ export function cometTrailGeometry(opts: {
     count,
     width: Math.max(1, Math.round(width)),
     height: Math.max(1, Math.round(height)),
+    y0,
+    y1,
   };
 }

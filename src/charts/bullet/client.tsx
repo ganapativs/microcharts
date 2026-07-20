@@ -3,10 +3,12 @@
 // visual, wrapped focusable, with a readout of the exact value vs target revealed
 // on hover or focus. The wrapper owns the accessible name (role=img); the inner
 // static chart is decorative so the reading isn't announced twice.
-import { useRef, useState, type CSSProperties } from "react";
-import { FILL } from "../../shared/interactive.js";
+import { useRef, useState } from "react";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
 
 // The measure bar shares the "bar" ink with the background bands; it's always
@@ -21,6 +23,8 @@ export interface InteractiveBulletProps extends BulletProps {
    * on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** The bullet was activated (click, tap, Enter or Space): `{ index: 0, value }` — the measure (never the target or a band). */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function Bullet(props: InteractiveBulletProps): React.ReactNode {
@@ -32,12 +36,16 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    onSelect,
     className,
     style,
     ...rest
   } = props;
   const [open, setOpen] = useState(false);
   const hostRef = useRef<HTMLSpanElement>(null);
+  // no LiveRegion here to host it: seat the wrapper so the readout chip
+  // and the hit box travel with the mark when inline (see seat-hoist).
+  useSeatHoist(hostRef);
   useEntrance(hostRef, "sweep", animate, { selector: MEASURE_SELECTOR });
 
   const fmt = makeFormatter(format, locale);
@@ -54,25 +62,26 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
             : ""
         }`;
 
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
+  // Drill-down: the MEASURE — the one thing the bar encodes. The target and the
+  // qualitative bands are context, not the datum.
+  const select = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });
 
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-bullet-interactive ${className}` : "mc-bullet-interactive"}
-      style={wrapStyle}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...wrap("mc-bullet-interactive", className, style)}
+      {...named(label)}
       onPointerEnter={() => setOpen(true)}
       onPointerLeave={() => setOpen(false)}
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
+      onClick={select}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select();
+        }
+      }}
     >
       <StaticBullet
         {...rest}
@@ -81,7 +90,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
         format={format}
         locale={locale}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       />
       {open ? (
         <span className="mc-spark-readout" style={{ right: 0 }}>

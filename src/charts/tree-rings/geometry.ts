@@ -21,7 +21,7 @@ export interface TreeRingsGeometry {
 }
 
 /** A full circle as two half-arcs, 2-dp — exported so multiple ring outlines
- * can be merged into one path (SSR hot path: one node, not N — brief §per-chart 4). */
+ * can be merged into one path (SSR hot path: one node, not N). */
 export function ringOutline(cx: number, cy: number, r: number): string {
   const l = round2(cx - r);
   const rt = round2(cx + r);

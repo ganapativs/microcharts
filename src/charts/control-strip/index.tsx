@@ -9,6 +9,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
+import { round2 } from "../../core/types.js";
 import { EN_CONTROL, type ControlStrings } from "../../core/strings-control.js";
 import { resolveSummary } from "../../core/summary.js";
 import {
@@ -42,8 +43,9 @@ export interface ControlStripProps {
   baseline?: number | undefined;
   /** Western Electric secondary run rules (WE-1/2/4 subset). */
   rules?: ControlRules | undefined;
-  /** `"out"` (default) marks only out-of-control points; `"all"` marks every point. */
-  dots?: "out" | "all" | undefined;
+  /** `"out"` (default) marks only out-of-control points; `"all"` marks every
+   *  point; `"none"` draws no point marks at all. */
+  dots?: "out" | "all" | "none" | undefined;
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
@@ -93,6 +95,8 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        // Empty stands on the same padded floor a drawn trace would.
+        seat={{ mode: "floor", bottom: height - 2 }}
         className={cls}
         style={style}
       >
@@ -103,6 +107,29 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
 
   const accName = resolveSummary(summary, () => controlSummary(geo, fmt, strings));
   const flagIdx = new Set(geo.violations.filter((v) => v.rule !== "we1").map((v) => v.index));
+
+  // Point marks scale with the plot, not with nothing. At the authored heights
+  // a fixed r=3 ring is a neat halo around an out-of-control point; on a short
+  // strip the plot band collapses to a few units while the ring does not, so
+  // the centre hairline runs straight THROUGH the hollow ring and reads as a
+  // line crossing out a point rather than a point sitting above the centre.
+  // Tying the radii to the padded plot height keeps the ring a halo at every
+  // size — the ring stays a shape cue (never color-alone), just smaller.
+  const plotH = Math.max(0, height - 4);
+  const markScale = Math.min(1, Math.max(0.45, plotH / 24));
+  const rRing = round2(3 * markScale);
+  const rFlag = round2(2.4 * markScale);
+  const rOut = round2(1.6 * markScale);
+  const rDot = round2(1 * markScale);
+  // The ring is a HALO around an out-of-control point, and the centre hairline
+  // is a reference rule — a rule crossing the empty middle of a ring reads as a
+  // point struck through, not a point above centre. Scaling alone can't fix it:
+  // on a squat strip the plot band is a couple of units tall, so centre and an
+  // out point are barely apart at any radius. So the ring is drawn only where
+  // it clears the hairline, per point. Without it the out point is still marked
+  // — a negative dot at 1.6× the ordinary vertex, so the cue stays shape+size,
+  // never color alone.
+  const ringClears = (y: number) => Math.abs(y - geo.center.y) >= rRing;
 
   // annotations host contract: Marker x = data INDEX (point position),
   // Threshold/TargetZone y = data values on the shared value scale.
@@ -121,6 +148,11 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A trace over a fitted value domain, so it stands on the plot's padded
+      // floor like a sparkline — the same 2-unit inset the annotation frame
+      // above uses. The band is centre ± 3σ̂, i.e. DATA: seating that would make
+      // the strip bob down the page every time the process shifted.
+      seat={{ mode: "floor", bottom: height - 2 }}
       className={cls}
       style={style}
     >
@@ -171,7 +203,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
             key={`f${p.x}`}
             cx={p.x}
             cy={p.y}
-            r={2.4}
+            r={rFlag}
             data-mc-ink="muted"
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
@@ -183,35 +215,41 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
           no ink role expresses that (the negative role fills), so it stays a
           literal stroke; width still comes from the shared role. */}
       {geo.points.flatMap((p) =>
-        p.out
-          ? [
-              <circle
-                key={`o${p.x}`}
-                cx={p.x}
-                cy={p.y}
-                r={3}
-                fill="none"
-                stroke="var(--mc-negative)"
-                strokeOpacity={0.5}
-                data-mc-w="tick"
-                vectorEffect="non-scaling-stroke"
-              />,
-              <circle key={`d${p.x}`} cx={p.x} cy={p.y} r={1.6} data-mc-ink="negative" />,
-            ]
-          : dots === "all"
+        dots === "none"
+          ? []
+          : p.out
             ? [
-                // custom `color` can't come from the static "point" role rule,
-                // so it falls back to a plain fill attribute (no role → no CSS)
-                <circle
-                  key={`a${p.x}`}
-                  cx={p.x}
-                  cy={p.y}
-                  r={1}
-                  data-mc-ink={color ? undefined : "point"}
-                  fill={color}
-                />,
+                ...(ringClears(p.y)
+                  ? [
+                      <circle
+                        key={`o${p.x}`}
+                        cx={p.x}
+                        cy={p.y}
+                        r={rRing}
+                        fill="none"
+                        stroke="var(--mc-negative)"
+                        strokeOpacity={0.5}
+                        data-mc-w="tick"
+                        vectorEffect="non-scaling-stroke"
+                      />,
+                    ]
+                  : []),
+                <circle key={`d${p.x}`} cx={p.x} cy={p.y} r={rOut} data-mc-ink="negative" />,
               ]
-            : [],
+            : dots === "all"
+              ? [
+                  // custom `color` can't come from the static "point" role rule,
+                  // so it falls back to a plain fill attribute (no role → no CSS)
+                  <circle
+                    key={`a${p.x}`}
+                    cx={p.x}
+                    cy={p.y}
+                    r={rDot}
+                    data-mc-ink={color ? undefined : "point"}
+                    fill={color}
+                  />,
+                ]
+              : [],
       )}
       {ann.over}
       {ann.rest}

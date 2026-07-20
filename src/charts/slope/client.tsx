@@ -1,18 +1,27 @@
 "use client";
-// Interactive <Slope>. One pointer listener; nearest line by
-// vertical distance at the pointer's interpolated x (pure point-to-segment
-// math over ≤ 7 lines). ↑/↓ rove categories ordered by their `to` value.
-// Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Slope>. useActivePicker owns interaction: one pointer listener +
+// nearest-line hit-test (point-to-segment math over ≤ 7 lines) — ↑/↓ (or ←/→)
+// rove categories ordered by their `to` value, announcing each slope; click /
+// Enter / Space selects a line (onSelect). Composes the static component
+// (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { pairChange } from "../dumbbell/index.js";
-import { slopeGeometry } from "./geometry.js";
+import { SLOPE_FONT, slopeFrame } from "./geometry.js";
 import { Slope as StaticSlope, slopeSummary, type SlopeProps } from "./index.js";
 
-export interface InteractiveSlopeProps extends SlopeProps {
+export interface InteractiveSlopeProps extends SlopeProps, PickerProps {
   strings?: PairedStrings;
   /**
    * Opt-in entrance motion (default `false`): the lines draw on when the
@@ -35,38 +44,26 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate, { selector: "line" });
 
-  const fontSize = 6;
+  const fontSize = SLOPE_FONT;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  // interactive overlay works on the label-free frame (labels only shift
-  // gutters; recompute with the same rule as the static entry)
+  // The overlay + hit-test must resolve against the SAME frame the composed
+  // static renders — label gutters included (shared rule, never re-derived).
   const geo = useMemo(
-    () =>
-      slopeGeometry({
-        width,
-        height,
-        pairs: data.map((d) => ({ from: d.from, to: d.to })),
-        domain,
-        gutterLeftCh: 0,
-        gutterRightCh: 0,
-        fontSize,
-      }),
-    [width, height, data, domain],
+    () => slopeFrame({ width, height, data, domain, label, fmt, fontSize }).geo,
+    [width, height, data, domain, label, fmt, fontSize],
   );
-  const [active, setActive] = useState<number | null>(null);
-
-  const accName =
-    summary === false
-      ? undefined
-      : typeof summary === "string"
-        ? summary
-        : slopeSummary(data, strings);
-  const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   /** Rows ordered by `to` (descending) for ↑/↓ roving. */
   const order = useMemo(() => {
@@ -75,13 +72,10 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
     return idx.map((e) => e.i);
   }, [data]);
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.lines.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const y = ((e.clientY - r.top) / r.height) * height;
+  // Nearest line by vertical distance at the pointer's interpolated x.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      if (geo.lines.length === 0) return null;
       const t = Math.min(1, Math.max(0, (x - geo.colX0) / Math.max(1, geo.colX1 - geo.colX0)));
       let best: number | null = null;
       let bestDist = Infinity;
@@ -94,83 +88,97 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
           best = line.index;
         }
       }
-      setActive(best);
+      return best;
     },
-    [geo, width, height],
+    [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (order.length === 0) return;
-      const pos = active === null ? -1 : order.indexOf(active);
-      let next = pos;
-      switch (e.key) {
-        case "ArrowDown":
-          next = Math.min(order.length - 1, pos + 1);
-          break;
-        case "ArrowUp":
-          next = Math.max(0, pos <= 0 ? 0 : pos - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = order.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(order[next]!);
+  // Roving walks the `to`-ordered sequence; ↑/↓ and ←/→ both map to prev/next.
+  // `cur` is a DATA index (or -1); translate through `order`. Boundaries consume.
+  const step = useCallback((cur: number, key: string) => navOrder(order, cur, key), [order]);
+
+  // index = ROW (category) index; value = the row's `to` (the "after" endpoint,
+  // the ordering key + primary read), null when missing; label = category.
+  const datum = useCallback(
+    (i: number) => {
+      const d = data[i];
+      return { index: i, value: d && Number.isFinite(d.to) ? d.to : null, label: d?.label };
     },
-    [active, order],
+    [data],
   );
 
-  const activeDatum = active !== null ? data[active] : undefined;
-  const activeLine = active !== null ? geo.lines.find((l) => l.index === active) : undefined;
+  const { active, selected, bind } = useActivePicker({
+    count: data.length,
+    width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : slopeSummary(data, strings);
+  const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  // Accent line over the whole row's slope. Transient for hover/focus; a
+  // distinguishing `data-mc-w="tick"` marks the persistent pinned selection.
+  const accentLine = (i: number, pinned: boolean) => {
+    const l = geo.lines.find((x) => x.index === i);
+    if (!l || l.y0 === null || l.y1 === null) return null;
+    return (
+      <line
+        x1={l.x0}
+        y1={l.y0}
+        x2={l.x1}
+        y2={l.y1}
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.5)" }}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const shownDatum = shown !== null ? data[shown] : undefined;
+  const shownLine = shown !== null ? geo.lines.find((l) => l.index === shown) : undefined;
   const announced = (() => {
-    if (!activeDatum) return "";
-    const okFrom = Number.isFinite(activeDatum.from);
-    const okTo = Number.isFinite(activeDatum.to);
+    if (!shownDatum) return "";
+    const okFrom = Number.isFinite(shownDatum.from);
+    const okTo = Number.isFinite(shownDatum.to);
     if (okFrom && okTo) {
-      const c = pairChange(activeDatum.from, activeDatum.to);
+      const c = pairChange(shownDatum.from, shownDatum.to);
       return c
-        ? strings.slopeAt(
-            activeDatum.label,
-            fmt(activeDatum.from),
-            fmt(activeDatum.to),
-            c.dir,
-            c.pct,
-          )
-        : strings.flatPair(fmt(activeDatum.from));
+        ? strings.slopeAt(shownDatum.label, fmt(shownDatum.from), fmt(shownDatum.to), c.dir, c.pct)
+        : strings.flatPair(fmt(shownDatum.from));
     }
     if (okFrom || okTo) {
       return strings.slopeIncomplete(
-        activeDatum.label,
-        fmt(okFrom ? activeDatum.from : activeDatum.to),
+        shownDatum.label,
+        fmt(okFrom ? shownDatum.from : shownDatum.to),
       );
     }
-    return `${activeDatum.label}: ${strings.noData}`;
+    return `${shownDatum.label}: ${strings.noData}`;
   })();
 
   return (
     <span
       ref={hostRef}
-      className="mc-slope-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-slope-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticSlope
         {...rest}
+        style={fillFor(style)}
         data={data}
         label={label}
         domain={domain}
@@ -180,14 +188,18 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        highlight={active ?? rest.highlight}
-      />
+      >
+        {/* Pinned selection persists through pointer-leave; focus line is transient. */}
+        {selected !== null && selected !== active ? accentLine(selected, true) : null}
+        {active !== null ? accentLine(active, false) : null}
+        {rest.children}
+      </StaticSlope>
       <LiveRegion>{announced}</LiveRegion>
-      {activeDatum && activeLine ? (
+      {shownDatum && shownLine ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {Number.isFinite(activeDatum.from) && Number.isFinite(activeDatum.to)
-            ? `${activeDatum.label}: ${fmt(activeDatum.from)} → ${fmt(activeDatum.to)}`
-            : activeDatum.label}
+          {Number.isFinite(shownDatum.from) && Number.isFinite(shownDatum.to)
+            ? `${shownDatum.label}: ${fmt(shownDatum.from)} → ${fmt(shownDatum.to)}`
+            : shownDatum.label}
         </span>
       ) : null}
     </span>

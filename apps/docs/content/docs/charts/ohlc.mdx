@@ -67,7 +67,7 @@ const sessions = [
   { open: 147.2, high: 149.9, low: 144.6, close: 145.9 },
 ];
 
-<Ohlc data={sessions} variant="bars" />
+<Ohlc data={sessions} mode="bars" />
 <Ohlc data={sessions} label="last" />`}
 >
   <span className="inline-flex flex-col gap-3">
@@ -81,7 +81,7 @@ const sessions = [
           close: Math.round((base + (i % 2 === 0 ? 2 : -1.5)) * 10) / 10,
         };
       })}
-      variant="bars"
+      mode="bars"
       title="Bar form"
       width={240}
       height={30}
@@ -147,6 +147,8 @@ averaged into fake candles. Bodies keep a minimum 1-unit height so doji sessions
 
 The accessible name is the run read — **"20 periods. Last close 150.3, up 7.4%; range 136.4 to 156."** The interactive
 entry announces each session's four prices (**"Period 18 of 20: open 145.6, high 150.6, low 141.6, close 144.1."**).
+
+<InteractionNote slug="ohlc" />
 
 ## Props
 

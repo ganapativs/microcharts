@@ -2,25 +2,17 @@
 // Interactive <MinimapStrip>. Drag or click to move the viewport
 // window; ←/→ nudge 5% (Shift 20%). The window maps linearly to the domain — no
 // fisheye. Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { fillFor, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_MINIMAP } from "../../core/strings-minimap.js";
-import { minimapDomain } from "./geometry.js";
+import { minimapDomain, minimapWindow } from "./geometry.js";
 import {
   MinimapStrip as StaticMinimapStrip,
   minimapSummary,
   type MinimapStripProps,
 } from "./index.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveMinimapProps extends MinimapStripProps {
   onWindowChange?: (window: [number, number]) => void;
@@ -45,15 +37,21 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
     summary,
     onWindowChange,
     animate = false,
+    className,
+    style,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
 
-  const domain = useMemo(() => domainProp ?? minimapDomain(data), [domainProp, data]);
+  const domain = useMemo(() => minimapDomain(data, domainProp), [domainProp, data]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [win, setWin] = useState<[number, number]>(data.window);
+  // A slider always has a position: an unmeasurable window starts as the whole
+  // domain, so drag/keys have something real to move.
+  const [win, setWin] = useState<[number, number]>(
+    () => minimapWindow(data.window) ?? [domain[0], domain[1]],
+  );
 
   const span = domain[1] - domain[0] || 1;
   const winSpan = win[1] - win[0];
@@ -111,14 +109,7 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
   return (
     <span
       ref={hostRef}
-      className="mc-minimap-live"
-      style={{
-        display: "inline-block",
-        position: "relative",
-        lineHeight: 0,
-        cursor: "ew-resize",
-        touchAction: "none",
-      }}
+      {...wrap("mc-minimap-live", className, style)}
       tabIndex={0}
       role="slider"
       aria-label={[title, accName].filter(Boolean).join(". ") || label}
@@ -140,7 +131,7 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       />
       <span
         aria-live="polite"

@@ -28,7 +28,7 @@ function gallery(): string {
   const tab = `<div class="tab"><span>P&amp;L</span> ${svg({ data: PL, start: 60, width: 44, height: 10, summary: false })}</div>`;
   const variants = [
     svg({ data: PL, start: 60, width: 90, title: "with total" }),
-    svg({ data: PL, start: 60, total: false, width: 90, title: "no total" }),
+    svg({ data: PL, start: 60, totalBar: false, width: 90, title: "no total" }),
     svg({ data: PL, start: 60, positive: "down", width: 90, title: "costs: down is good" }),
     svg({ data: [{ label: "One", value: 12 }], start: 0, width: 90, title: "single step" }),
   ].join(" ");

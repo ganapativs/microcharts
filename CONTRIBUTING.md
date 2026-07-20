@@ -13,12 +13,12 @@ These are CI-enforced and reviewers will not waive them:
    typical chart.
 3. **Static-first.** Default exports are hook-free, listener-free, pure SVG — RSC-safe and SSR-static.
    Interactivity/animation live only in `client.tsx` entries. Never blur that line.
-4. **Accessible by default.** Every chart is `role="img"` with a `<title>` and `aria-labelledby`; the auto-generated
-   summary is the default accessible name.
+4. **Accessible by default.** Every chart is `role="img"` with a `<title>`, named by its auto-generated summary; an
+   explicit `id` opts into `<title>/<desc>` + `aria-labelledby`, and `summary={false}` makes it decorative.
 5. **One grammar.** Same prop name = same meaning on every chart. New data shape = new component, not an option bag.
 
-The full rationale lives in [`plan/`](./plan). **Read the relevant plan doc before working in an area** —
-`plan/README.md` is the index. If code and plan disagree, raise it in an issue; don't silently diverge.
+The full rationale lives in [`CLAUDE.md`](./CLAUDE.md) — the working contract for this repo, and the place to read
+before working in an area. If code and contract disagree, raise it in an issue; don't silently diverge.
 
 ## Setup
 
@@ -33,7 +33,8 @@ Node ≥ 20, pnpm (see `packageManager` in `package.json`).
 ## Workflow
 
 1. Open an issue first for anything non-trivial — especially **new chart types**, which must clear the admission bar
-   (unique data story, honest encoding, readable at ≤ 200×60 px, no training needed). See `plan/05` / `plan/15–17`.
+   (unique data story, honest encoding, readable at ≤ 200×60 px, no training needed). See "Not shipped (by design)" in
+   `CLAUDE.md`.
 2. Branch from `main`. Keep PRs focused.
 3. Run `pnpm check` before pushing (git hooks run a subset automatically).
 
@@ -52,7 +53,7 @@ change for the changelog.
 
 ## Definition of Done — per chart
 
-A chart is not done until (see `plan/09`):
+A chart is not done until (the full bar lives in `CLAUDE.md`, "Quality bar"):
 
 - [ ] Static + interactive entries, shared grammar props
 - [ ] Shared edge-case fixture suite green (empty, single point, all-equal, nulls, all-null, negatives, NaN/±Infinity —

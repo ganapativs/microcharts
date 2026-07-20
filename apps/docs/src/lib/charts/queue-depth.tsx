@@ -1,6 +1,5 @@
 import { QueueDepth } from "@microcharts/react/queue-depth";
-import { QueueDepth as QueueDepthInteractive } from "@microcharts/react/queue-depth/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a support backlog growing through capacity (100) to 2.14× at the end
@@ -57,14 +56,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <QueueDepth data={DATA} capacity={CAP} summary={false} width={150} height={26} />;
 }
-
-export const showcase = {
-  hint: "backlog vs capacity",
-  Node: () => (
-    <QueueDepth data={DATA} capacity={CAP} title="Support queue" width={150} height={26} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "capacity", label: "capacity", init: true },
@@ -86,28 +77,6 @@ export const playground: PlaygroundSpec = {
       "  data={data}",
       s.capacity && "  capacity={100}",
       s.label !== "last" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <QueueDepthInteractive
-      data={DATA}
-      capacity={s.capacity ? CAP : undefined}
-      label={s.label as "last" | "none"}
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<QueueDepth",
-      "  data={data}",
-      s.capacity && "  capacity={100}",
-      s.label !== "last" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -225,28 +194,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<QueueDepth data={data} capacity={100} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <QueueDepthInteractive
-      data={DATA}
-      capacity={CAP}
-      summary={false}
-      width={150}
-      height={26}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

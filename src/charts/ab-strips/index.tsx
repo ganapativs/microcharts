@@ -8,7 +8,8 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
-import { abStripsGeometry, type ABStripsGeometry } from "./geometry.js";
+import { labelFitsBand } from "../../core/labels.js";
+import { abStripsGeometry, abTagsFit, type ABStripsGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** Signed percent (or absolute when the base is 0) delta of B vs A. */
@@ -23,13 +24,13 @@ export function abDelta(geo: ABStripsGeometry, fmt: (n: number) => string): stri
 export function abSummary(
   geo: ABStripsGeometry,
   fmt: (n: number) => string,
-  labels: readonly [string, string],
+  seriesLabels: readonly [string, string],
   strings: ABStrings,
 ): string {
   const base = strings.ab(
-    labels[1],
+    seriesLabels[1],
     fmt(geo.bMedian),
-    labels[0],
+    seriesLabels[0],
     fmt(geo.aMedian),
     abDelta(geo, fmt),
     `${Math.round(geo.overlap * 100)}%`,
@@ -43,7 +44,7 @@ export interface ABStripsProps {
   /** The two arms. */
   data: { a: readonly number[]; b: readonly number[] };
   /** Row identities for gutter tags + summary (default ["A", "B"]). */
-  labels?: readonly [string, string] | undefined;
+  seriesLabels?: readonly [string, string] | undefined;
   /** Which direction of the B−A delta reads as good (colors the delta label). */
   positive?: "up" | "down" | undefined;
   /** `"delta"` (default) states the signed median delta in a gutter. */
@@ -66,7 +67,7 @@ export interface ABStripsProps {
 export function ABStrips(props: ABStripsProps): ReactNode {
   const {
     data,
-    labels = ["A", "B"] as const,
+    seriesLabels = ["A", "B"] as const,
     positive,
     label = "delta",
     domain,
@@ -90,7 +91,10 @@ export function ABStrips(props: ABStripsProps): ReactNode {
   const FONT = Math.min(8, Math.max(6, Math.round(height * 0.3)));
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-ab-strips ${className}` : "mc-ab-strips";
-  const labelChars = Math.max(labels[0].length, labels[1].length);
+  // Row tags are seat-gated — they drop, and give their lead gutter back to the
+  // strips, once the two rows are pitched closer than one em (see `abTagsFit`).
+  const showTags = abTagsFit(height, FONT);
+  const labelChars = showTags ? Math.max(seriesLabels[0].length, seriesLabels[1].length) : 0;
 
   const probe = abStripsGeometry({
     width,
@@ -101,7 +105,8 @@ export function ABStrips(props: ABStripsProps): ReactNode {
     domain,
     fontSize: FONT,
   });
-  const showLabel = label === "delta" && probe != null;
+  // the delta rides the box's own midline, so it needs one em of box height
+  const showLabel = label === "delta" && probe != null && labelFitsBand(height, FONT);
   const labelText = showLabel ? abDelta(probe!, fmt) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
@@ -124,6 +129,8 @@ export function ABStrips(props: ABStripsProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        // Empty seats like the drawn pair: same centre, no rows to measure.
+        seat={{ mode: "center", top: 0, bottom: height }}
         className={cls}
         style={style}
       >
@@ -132,7 +139,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
     );
   }
 
-  const accName = resolveSummary(summary, () => abSummary(geo, fmt, labels, strings));
+  const accName = resolveSummary(summary, () => abSummary(geo, fmt, seriesLabels, strings));
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   // delta valence: which direction is good (sign is also in the text) — B always
@@ -153,6 +160,11 @@ export function ABStrips(props: ABStripsProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Two arms as stacked rows on one shared value axis — the lower row is
+      // arm B, a category, never a zero — so the pair centres on the cap band.
+      // The rows split the padded frame evenly, which puts the stack's centre
+      // exactly at the frame's; the delta gutter only widens the viewBox.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={cls}
       style={rootStyle}
     >
@@ -185,7 +197,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
         const bandFill = isB ? (color ?? "var(--mc-accent)") : undefined;
         const bandInk = isB ? undefined : "neutral";
         return (
-          <g key={`band-${labels[i]}`}>
+          <g key={`band-${seriesLabels[i]}`}>
             <rect
               x={r.outer.x}
               y={round2(r.y - 0.9)}
@@ -228,18 +240,20 @@ export function ABStrips(props: ABStripsProps): ReactNode {
         const custom = isB && color ? color : undefined;
         const ink = custom ? undefined : isB ? "accent" : "neutral";
         return (
-          <g key={`mark-${labels[i]}`}>
+          <g key={`mark-${seriesLabels[i]}`}>
             <circle cx={r.median.x} cy={r.y} r={1.7} data-mc-ink={ink} fill={custom} />
-            <text
-              x={round2(2)}
-              y={r.y}
-              textAnchor="start"
-              dominantBaseline="central"
-              data-mc-ink="label"
-              fontSize={FONT}
-            >
-              {labels[i]}
-            </text>
+            {showTags ? (
+              <text
+                x={round2(2)}
+                y={r.y}
+                textAnchor="start"
+                dominantBaseline="central"
+                data-mc-ink="label"
+                fontSize={FONT}
+              >
+                {seriesLabels[i]}
+              </text>
+            ) : null}
           </g>
         );
       })}

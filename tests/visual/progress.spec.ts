@@ -12,7 +12,7 @@ const svg = (props: Record<string, unknown>) => renderToStaticMarkup(h(Progress 
 function gallery(): string {
   const sentence = `The migration is ${svg({ value: 0.68, title: "Migration" })} through the backlog.`;
 
-  // table cell + KPI card — the hero contexts (plan/22 #4)
+  // table cell + KPI card — the hero contexts
   const cell = `<table><tbody>
     <tr><td>tenant-a</td><td>${svg({ value: 0.92, summary: false })}</td></tr>
     <tr><td>tenant-b</td><td>${svg({ value: 0.44, summary: false })}</td></tr>

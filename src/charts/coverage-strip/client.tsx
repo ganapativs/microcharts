@@ -1,18 +1,27 @@
 "use client";
-// Interactive <CoverageStrip>. One pointer listener on the wrapper
-// + pure grid lookup (x → slot by division) — never a node per cell. ←/→ steps
-// slots, Home/End jump. The live region says exactly what each slot is: a
-// measured value, or "no measurement" (the honest distinction). Composes the
-// static component (canon); the focus ring is an overlay child re-using the
-// same geometry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <CoverageStrip>. useActivePicker owns interaction: one pointer
+// listener on the wrapper + pure grid lookup (x → slot by division) — never a
+// node per cell. ←/→ steps slots, Home/End jump, click / Enter / Space selects
+// (onSelect). The live region says exactly what each slot is: a measured value,
+// or "no measurement" (the honest distinction). Composes the static component
+// (canon); the focus ring is an overlay child re-using the same geometry.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.js";
+import { labelFitsBand } from "../../core/labels.js";
 import { coverageGeometry } from "./geometry.js";
 import { CoverageStrip as StaticCoverageStrip, type CoverageStripProps } from "./index.js";
 
-export interface InteractiveCoverageStripProps extends CoverageStripProps {
+export interface InteractiveCoverageStripProps extends CoverageStripProps, PickerProps {
   strings?: CoverageStrings;
   /**
    * Opt-in entrance motion (default `false`): the strip wipes in left to right
@@ -41,10 +50,19 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
+  // no LiveRegion here to host it: seat the wrapper so the readout chip
+  // and the hit box travel with the mark when inline (see seat-hoist).
+  useSeatHoist(hostRef);
   // Time runs along x: each slot lights up in turn, oldest→newest. An explicit
   // `order:"x"` + `window` spreads the cascade across the whole strip (it does
   // NOT collapse under the default stagger cap), so the reveal reads as time
@@ -58,6 +76,10 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
   // must match the static entry's font formula — the label gutter widens
   // totalWidth, and a mismatched fontSize would drift the readout off-cell
   const font = Math.min(11, Math.max(7, Math.round(height * 0.62)));
+  // …and its drop rule: the static drops the percent (and its gutter) once the
+  // box is shorter than one em, so reserving it here would widen totalWidth past
+  // the composed static's and hang the readout off the end of the strip.
+  const showLabel = label === "percent" && labelFitsBand(height, font);
   const geo = useMemo(
     () =>
       coverageGeometry({
@@ -69,17 +91,16 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         steps,
         domain,
         shape,
-        gutterCh: label === "percent" ? 4 : 0,
+        gutterCh: showLabel ? 4 : 0,
         fontSize: font,
       }),
-    [width, height, data, expected, mode, steps, domain, shape, label, font],
+    [width, height, data, expected, mode, steps, domain, shape, showLabel, font],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(
     () => makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale),
     [locale],
   );
-  const [active, setActive] = useState<number | null>(null);
 
   const accName =
     summary === false
@@ -91,71 +112,71 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
           : strings.coverage(geo.measured, geo.expected, pctFmt(geo.coverage), geo.longestGap);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.pitch === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * geo.totalWidth;
-      const i = Math.min(geo.cells.length - 1, Math.max(0, Math.floor(x / geo.pitch)));
-      setActive(i);
+  // Pointer (viewBox space) → slot index by pitch division, clamped to the strip.
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.pitch === 0 || geo.cells.length === 0) return null;
+      return Math.min(geo.cells.length - 1, Math.max(0, Math.floor(x / geo.pitch)));
     },
     [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.cells.length === 0) return;
-      if (!["ArrowRight", "ArrowLeft", "Home", "End", "Escape"].includes(e.key)) return;
-      e.preventDefault();
-      if (e.key === "Escape") {
-        setActive(null);
-        return;
-      }
-      const max = geo.cells.length - 1;
-      // functional update — rapid key presses compose without a stale closure
-      setActive((prev) => {
-        const pos = prev ?? -1;
-        switch (e.key) {
-          case "ArrowRight":
-            return Math.min(max, pos + 1);
-          case "ArrowLeft":
-            return pos <= 0 ? 0 : pos - 1;
-          case "Home":
-            return 0;
-          case "End":
-            return max;
-          default:
-            return prev;
-        }
-      });
-    },
+  // index = slot (time-ordered); value = the measured number, or `null` for a
+  // gap (no measurement) or an unreadable NaN. Slots have no human name.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
     [geo],
   );
 
-  const cell = active !== null ? geo.cells[active] : undefined;
+  const { active, selected, bind } = useActivePicker({
+    count: geo.cells.length,
+    width: geo.totalWidth,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const ring = (i: number, pinned: boolean) => {
+    const c = geo.cells[i];
+    if (!c) return null;
+    return (
+      <rect
+        x={c.x - 0.75}
+        y={c.y - 0.75}
+        width={c.w + 1.5}
+        height={c.h + 1.5}
+        rx={c.rx + 0.75}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const cell = shown !== null ? geo.cells[shown] : undefined;
   let announced = "";
   if (cell) {
     announced = !cell.present
-      ? strings.coverageSlot(active! + 1, null)
-      : strings.coverageSlot(active! + 1, cell.value === null ? "—" : fmt(cell.value));
+      ? strings.coverageSlot(shown! + 1, null)
+      : strings.coverageSlot(shown! + 1, cell.value === null ? "—" : fmt(cell.value));
   }
 
   return (
     <span
       ref={hostRef}
-      className="mc-coverage-strip-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-coverage-strip-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticCoverageStrip
         {...rest}
+        style={fillFor(style)}
         data={data}
         expected={expected}
         mode={mode}
@@ -170,19 +191,9 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         strings={strings}
         summary={false}
       >
-        {cell ? (
-          <rect
-            x={cell.x - 0.75}
-            y={cell.y - 0.75}
-            width={cell.w + 1.5}
-            height={cell.h + 1.5}
-            rx={cell.rx + 0.75}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticCoverageStrip>
       {cell ? (

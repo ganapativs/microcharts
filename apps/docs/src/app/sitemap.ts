@@ -12,7 +12,7 @@ function canonical(path: string): string {
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["/", "/gallery", "/brand"].map((path) => ({
+  const staticRoutes = ["/", "/charts", "/brand"].map((path) => ({
     url: canonical(path),
     changeFrequency: "weekly" as const,
     priority: path === "/" ? 1 : 0.8,

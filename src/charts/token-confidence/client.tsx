@@ -4,7 +4,7 @@
 // the tier + confidence. HTML host (the documented SVG exception); shares the
 // pure tiering with the static entry.
 import { useCallback, useId, useMemo, useRef, useState, type CSSProperties } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TOKEN_CONFIDENCE } from "../../core/strings-token-confidence.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { tokenTiers, type Tier } from "./geometry.js";
@@ -17,7 +17,17 @@ const CLASS: Record<Tier, string | undefined> = {
 };
 const TIER_INDEX: Record<Tier, 0 | 1 | 2> = { confident: 0, unsure: 1, guessing: 2 };
 
-export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
+export interface InteractiveTokenConfidenceProps extends TokenConfidenceProps {
+  /**
+   * Number format/locale for the focus announcement's confidence reading.
+   * Interactive-only: the static entry renders the text and its underlines,
+   * never a number.
+   */
+  format?: Format;
+  locale?: string | string[];
+}
+
+export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.ReactNode {
   const {
     data,
     tiers = [0.5, 0.8],
@@ -30,6 +40,7 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
     summary,
     className,
     style,
+    children,
   } = props;
 
   const tokens = useMemo(() => tokenTiers({ data, tiers }), [data, tiers]);
@@ -37,6 +48,14 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
     () => tokens.map((t, i) => (t.tier !== "confident" ? i : -1)).filter((i) => i >= 0),
     [tokens],
   );
+  // token index → its position in `flagged` (a plain `indexOf` inside the token
+  // render loop below is quadratic on a long streamed reply, and that loop runs
+  // again on every arrow key).
+  const flaggedPosOf = useMemo(() => {
+    const m = new Map<number, number>();
+    flagged.forEach((t, pos) => m.set(t, pos));
+    return m;
+  }, [flagged]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const refs = useRef<(HTMLSpanElement | null)[]>([]);
   const [active, setActive] = useState<number | null>(null);
@@ -113,7 +132,7 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
       onKeyDown={onKeyDown}
     >
       {tokens.map((t, i) => {
-        const flaggedPos = flagged.indexOf(i);
+        const flaggedPos = flaggedPosOf.get(i) ?? -1;
         const isFlagged = flaggedPos >= 0;
         const cls = CLASS[t.tier] ?? (show === "all" ? "mc-tc-seen" : undefined);
         // underline the WORD only — whitespace stays outside the marked span
@@ -162,6 +181,7 @@ export function TokenConfidence(props: TokenConfidenceProps): React.ReactNode {
           {" ― unsure · ⋯ guessing"}
         </span>
       ) : null}
+      {children}
       <LiveRegion>{announced}</LiveRegion>
     </span>
   );

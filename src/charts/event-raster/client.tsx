@@ -1,30 +1,38 @@
 "use client";
-// Interactive <EventRaster>. One pointer listener; lane from y,
-// nearest event from x. ↑/↓ lanes, ←/→ events within a lane (2-D keyboard,
-// ActivityGrid model). Composes the static component (canon).
+// Interactive <EventRaster>. useActivePicker owns interaction: one pointer
+// listener (lane from y, nearest event from x), 2-D roving keyboard (↑/↓ lanes,
+// ←/→ events within a lane — ActivityGrid model), click / Enter / Space selects
+// (onSelect). Composes the static component (canon).
+import { useCallback, useMemo, useRef } from "react";
+import { makeFormatter, type Format } from "../../core/format.js";
 import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
-import { makeFormatter } from "../../core/format.js";
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_EVENT_RASTER } from "../../core/strings-event-raster.js";
-import { LANE_CAP, rasterDomain } from "./geometry.js";
+import { LANE_CAP, rasterDomain, rasterLabels } from "./geometry.js";
 import {
   EventRaster as StaticEventRaster,
   eventRasterSummary,
   type EventRasterProps,
 } from "./index.js";
 
-const FILL: CSSProperties = { width: "100%", height: "auto" };
-const LANE_UNIT = 8;
+// Mirrors the static entry's lane unit exactly — the interactive default height
+// must equal the static default height or the two render at different sizes.
+const LANE_UNIT = 14;
 
-export interface InteractiveEventRasterProps extends EventRasterProps {
+export interface InteractiveEventRasterProps extends EventRasterProps, PickerProps {
+  /**
+   * Number format/locale for the hover/focus readout. Interactive-only: the
+   * static entry renders lane names and marks, never a number.
+   */
+  format?: Format;
+  locale?: string | string[];
   /**
    * Opt-in entrance motion (default `false`): lanes fade in top-to-bottom on
    * first client-side mount. Inert on the server and on hydrated server
@@ -46,6 +54,12 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -61,18 +75,29 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
   const n = Math.max(1, lanes.length);
   const height = heightProp ?? n * LANE_UNIT;
   const laneH = height / n;
-  const labels = labelsProp ?? n <= 8;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const fontSize = Math.max(5, Math.min(Math.round(laneH * 0.7), 7));
   const domain = useMemo(() => domainProp ?? rasterDomain(data), [domainProp, data]);
 
   const sorted = useMemo(
     () => lanes.map((l) => [...l.events].filter((e) => Number.isFinite(e)).sort((a, b) => a - b)),
     [lanes],
   );
-  const gutter = labels
-    ? Math.min(width * 0.45, Math.max(...lanes.map((d) => d.label.length), 1) * fontSize * 0.66 + 4)
-    : 0;
+  // Widest lane label, in chars. Memoised away from the render path (a scrub
+  // re-renders per unit crossed); the gutter itself is cheap arithmetic on top.
+  const labelCh = useMemo(() => {
+    let max = 1;
+    for (const l of lanes) max = Math.max(max, l.label.length);
+    return max;
+  }, [lanes]);
+  // Shared with the static entry, drop rule included: at small sizes it hands
+  // the gutter back to the lanes, and a copy that didn't would offset every tick.
+  const { gutter } = rasterLabels({
+    labels: labelsProp ?? n <= 8,
+    width,
+    height,
+    lanes: n,
+    maxChars: labelCh,
+  });
   const plotX0 = gutter;
   const plotW = Math.max(1, width - gutter - 1);
   const span = domain[1] - domain[0] || 1;
@@ -81,28 +106,30 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     [plotX0, plotW, span, domain],
   );
 
-  const [pos, setPos] = useState<{ lane: number; ev: number } | null>(null);
+  // Unit = one EVENT, flattened lane-major across lanes (lane 0's events first,
+  // then lane 1's…): the raster is 2-D (lane × time) but the contract's index is
+  // a single number, so it addresses the event, not a lane×slot pair. `starts`
+  // holds each lane's first unit index (and `starts[n]` the total).
+  const starts = useMemo(() => {
+    const out = [0];
+    for (let i = 0; i < sorted.length; i++) out.push(out[i]! + sorted[i]!.length);
+    return out;
+  }, [sorted]);
+  const count = starts[starts.length - 1]!;
+  const laneOf = useCallback(
+    (i: number) => {
+      for (let l = sorted.length - 1; l >= 0; l--) if (i >= starts[l]!) return l;
+      return 0;
+    },
+    [sorted, starts],
+  );
 
-  const accName =
-    summary === false
-      ? undefined
-      : typeof summary === "string"
-        ? summary
-        : eventRasterSummary(data, [], strings);
-  const label = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const y = ((e.clientY - r.top) / r.height) * height;
-      const lane = Math.max(0, Math.min(n - 1, Math.floor(y / laneH)));
-      const evs = sorted[lane]!;
-      if (evs.length === 0) {
-        setPos({ lane, ev: -1 });
-        return;
-      }
-      const x = ((e.clientX - r.left) / r.width) * width;
+  const locate = useCallback(
+    (x: number, y: number) => {
+      const lane = Math.max(0, Math.min(sorted.length - 1, Math.floor(y / laneH)));
+      const evs = sorted[lane];
+      // An empty lane holds no navigable unit — nothing to report.
+      if (!evs || evs.length === 0) return null;
       let best = 0;
       let bestD = Infinity;
       evs.forEach((t, i) => {
@@ -112,80 +139,132 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
           best = i;
         }
       });
-      setPos({ lane, ev: best });
+      return starts[lane]! + best;
     },
-    [height, width, n, laneH, sorted, xOf],
+    [sorted, laneH, xOf, starts],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      setPos((prev) => {
-        const cur = prev ?? { lane: 0, ev: 0 };
-        let { lane, ev } = cur;
-        switch (e.key) {
-          case "ArrowUp":
-            lane = Math.max(0, lane - 1);
-            ev = 0;
-            break;
-          case "ArrowDown":
-            lane = Math.min(n - 1, lane + 1);
-            ev = 0;
-            break;
-          case "ArrowLeft":
-            ev = Math.max(0, ev - 1);
-            break;
-          case "ArrowRight":
-            ev = Math.min((sorted[lane]?.length ?? 1) - 1, ev + 1);
-            break;
-          case "Escape":
-            return null;
-          default:
-            return prev;
-        }
-        e.preventDefault();
-        return { lane, ev };
-      });
+  // 2-D roving: ↑/↓ jump to the first event of the nearest populated lane, ←/→
+  // walk events INSIDE the current lane. All four arrows are intercepted so a
+  // sideways key can never cross a lane boundary.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      if (count === 0) return null;
+      if (cur < 0) return key === "End" ? count - 1 : 0;
+      const lane = laneOf(cur);
+      const ev = cur - starts[lane]!;
+      const len = sorted[lane]!.length;
+      const laneJump = (dir: number) => {
+        for (let l = lane + dir; l >= 0 && l < sorted.length; l += dir)
+          if (sorted[l]!.length > 0) return starts[l]!;
+        return cur; // boundary: consume the key without moving
+      };
+      switch (key) {
+        case "ArrowUp":
+          return laneJump(-1);
+        case "ArrowDown":
+          return laneJump(1);
+        case "ArrowLeft":
+          return ev > 0 ? cur - 1 : cur;
+        case "ArrowRight":
+          return ev < len - 1 ? cur + 1 : cur;
+        case "Home":
+          return 0;
+        case "End":
+          return count - 1;
+      }
+      return null;
     },
-    [n, sorted],
+    [count, laneOf, starts, sorted],
   );
 
-  const evs = pos ? sorted[pos.lane]! : [];
-  const t = pos && pos.ev >= 0 && evs.length ? evs[pos.ev] : undefined;
+  // value = the event's TIME on the shared axis (what its tick x encodes);
+  // label = its lane.
+  const datum = useCallback(
+    (i: number) => {
+      const lane = laneOf(i);
+      return {
+        index: i,
+        value: sorted[lane]![i - starts[lane]!] ?? null,
+        label: lanes[lane]?.label,
+      };
+    },
+    [laneOf, sorted, starts, lanes],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count,
+    width,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : eventRasterSummary(data, [], strings);
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  // unit index → its lane + event time (undefined when out of range)
+  const at = (i: number | null): { lane: number; t: number } | undefined => {
+    if (i === null || i < 0 || i >= count) return undefined;
+    const lane = laneOf(i);
+    const t = sorted[lane]?.[i - starts[lane]!];
+    return t === undefined ? undefined : { lane, t };
+  };
+  const shown = active ?? selected;
+  const cur = at(shown);
+  const shownLane = cur ? cur.lane : null;
+  const t = cur ? cur.t : undefined;
+  const pin = selected !== null && selected !== active ? at(selected) : undefined;
+  const pinX = pin ? pin.t : undefined;
   const announced =
-    pos && t !== undefined
-      ? strings.eventRasterAt(lanes[pos.lane]!.label, fmt(t), pos.ev + 1, evs.length)
+    shownLane !== null && t !== undefined
+      ? strings.eventRasterAt(
+          lanes[shownLane]!.label,
+          fmt(t),
+          shown! - starts[shownLane]! + 1,
+          sorted[shownLane]!.length,
+        )
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-raster-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setPos(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setPos(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-raster-live", className, style)} {...named(label)} {...bind}>
       <StaticEventRaster
         {...rest}
         data={data}
-        labels={labels}
+        labels={labelsProp}
         domain={domain}
         width={width}
         height={height}
-        format={format}
-        locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
-        {pos ? (
+        {/* Pinned selection persists through pointer-leave; band + crosshair are transient. */}
+        {pinX !== undefined ? (
+          <line
+            x1={xOf(pinX)}
+            x2={xOf(pinX)}
+            y1={0.5}
+            y2={height - 0.5}
+            stroke="var(--mc-accent)"
+            data-mc-w="support"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {shownLane !== null ? (
           <rect
             x={plotX0 - 0.5}
-            y={pos.lane * laneH + 0.3}
+            y={shownLane * laneH + 0.3}
             width={plotW + 1}
             height={laneH - 0.6}
             fill="none"
@@ -209,12 +288,12 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
         {rest.children}
       </StaticEventRaster>
       <LiveRegion>{announced}</LiveRegion>
-      {t !== undefined ? (
+      {t !== undefined && shownLane !== null ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(xOf(t) / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${lanes[pos!.lane]!.label} · ${fmt(t)}`}
+          {`${lanes[shownLane]!.label} · ${fmt(t)}`}
         </span>
       ) : null}
     </span>

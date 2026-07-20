@@ -7,6 +7,29 @@
 
 @layer microcharts.tokens, microcharts.base, microcharts.charts, microcharts.motion;
 
+/* Inline-seat plumbing. NOT theme tokens — a chart writes these on its own root
+   from its geometry (see `Seat` in shared/Chart.tsx) and the `.mc-inline` rule
+   reads them back. They are registered rather than merely used because custom
+   properties inherit by default, and inheriting is exactly wrong here: a seat
+   belongs to ONE mark. Left unregistered, a `--mc-seat` set anywhere up the tree
+   — a consumer who picked the same name, or a themed wrapper — would flow down
+   into every unseated chart beneath it and shift marks that never asked for a
+   seat (the `var(…, 0)` fallback can't help; it only applies when NOTHING in the
+   cascade sets the property). `inherits: false` scopes each seat to its own
+   element, and `initial-value` makes the unseated default guaranteed instead of
+   incidental. Deliberately outside the layers: @property is not layer-scoped,
+   and these are internal plumbing, not part of the themeable surface. */
+@property --mc-seat {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --mc-seat-mid {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
 @layer microcharts.tokens {
   :where(:root) {
     /* semantic color — matte finish, Okabe-Ito hue geometry (CVD-safe): the
@@ -49,12 +72,14 @@
        (see .mc-inline). 0 by default — the seat is font-independent; override
        per face only if a typeface wants marks a hair off the line. */
     --mc-inline-nudge: 0em;
-    /* Optical lift for centred glyph marks (arrow/dot/…) on top of the
-       `vertical-align: middle` seat. Pure middle centres on the x-height, which
-       reads a touch low beside cap-height digits (e.g. a Delta "+3.8%"); this
-       lifts the glyph toward the x-height↔cap-height midpoint. Font-relative
-       (em) so it tracks size. Set 0em for exact x-height centring. */
-    --mc-glyph-nudge: -0.04em;
+    /* Extra optical shift for centred marks only (glyphs, dials, strips) on top
+       of the cap-band seat. Now 0 by default: the seat lands on the true cap
+       midpoint, so there is nothing left to correct. It used to be -0.04em
+       because the old seat was `vertical-align: middle`, which centres on the
+       x-height and therefore read low beside cap-height digits. Kept as a token
+       because a display face with an unusual cap ratio may still want a hair of
+       adjustment; negative lifts. */
+    --mc-glyph-nudge: 0em;
 
     /* interactive readout chip surface — a tooltip needs a legible backing, so
        this is the one place a mark sits on an opaque plane. Defaults to the
@@ -219,7 +244,18 @@
     font-variant-numeric: tabular-nums;
     font-family: var(--mc-font-numeric);
     font-weight: var(--mc-label-weight);
-    font-size: calc(var(--mc-label-size) * var(--mc-density));
+    /* Density scales the label, but only up to 1.25 — past that the text outgrows
+       the gutter the geometry reserved for it and paints outside the viewBox
+       (`.mc-root` is overflow: visible, so it spills into the page rather than
+       clipping). Gutters are computed server-side from a character-count
+       estimate and cannot see a runtime CSS variable, so the cap is the only
+       place this can be enforced. Measured on the worst case in the catalog
+       (dot-plot, a caller-supplied all-caps row label, whose prose gutter has the
+       least slack): no spill at 0.8 / 1 / 1.25, and 7.5 units of spill at 1.5.
+       Compact density (< 1) is always safe — it shrinks the text inside a gutter
+       already reserved for the larger size. Stroke and gap keep scaling
+       unclamped below; neither is bounded by a reserved text box. */
+    font-size: calc(var(--mc-label-size) * min(1.25, var(--mc-density)));
     fill: var(--mc-stroke);
   }
   /* small-multiples wrapper — layout-neutral by default */
@@ -247,48 +283,68 @@
     margin-inline: 0.2em;
     translate: 0 var(--mc-inline-nudge);
   }
-  /* Symmetric glyph marks (arrow/triangle, dot, moon, dice, radial dials, …)
-     have no bottom baseline to sit on: a baseline seat makes them ride ~4px
-     high on the line. Centre them on the text instead — `vertical-align: middle`
-     aligns the box middle with the x-height midpoint, so the glyph sits like an
-     icon in running prose. Pure middle reads a hair low next to cap-height
-     digits, so `--mc-glyph-nudge` lifts it toward the x-height↔cap-height
-     midpoint — a font-relative middle ground, not a typeface-fragile px hack.
-     Floor-anchored data marks (bars, areas, lines) keep the baseline seat. */
-  :where(
-    .mc-inline:has(
-      > :is(
-        .mc-trend,
-        .mc-status,
-        .mc-breathing,
-        .mc-moon,
-        .mc-dice,
-        .mc-windbarb,
-        .mc-donut,
-        .mc-ring,
-        .mc-orbit,
-        .mc-star,
-        .mc-heartbeat,
-        .mc-hourglass,
-        .mc-wave,
-        .mc-constellation,
-        .mc-spiral,
-        .mc-polar,
-        .mc-tree
-      )
-    )
-  ) {
-    vertical-align: middle;
-    translate: 0 var(--mc-glyph-nudge);
+  /* The seat itself. The wrapper always baseline-seats (above); this rule then
+     shifts the MARK to where it actually belongs on the line, using the two
+     custom properties the chart emitted from its own geometry (see `Seat` in
+     shared/Chart.tsx). No per-chart CSS, no `:has()` allowlist of class names —
+     the numbers come from the same source as the drawing, so a chart whose
+     padding changes cannot drift out of alignment.
+
+     Two things make this work:
+
+     - `100%` in a translate resolves against the element's OWN height, so one
+       unitless fraction seats the mark at any rendered size — authored px, a CSS
+       height override, or a fluid container. Nothing has to know the used size.
+     - `translate` is its own property, not `transform`, so it composes with the
+       motion engine's transforms instead of overwriting them.
+
+     The shift is visual only: transforms don't affect layout, so the wrapper's
+     baseline — and therefore the line box and the leading around it — is
+     untouched. A seated mark never reflows the sentence it sits in.
+
+     `--mc-seat-mid` is 0 for floor marks and 1 for centred ones; multiplying the
+     cap term by it keeps both modes in a single declaration. Charts that don't
+     emit a seat get 0 and keep the legacy baseline seat. */
+  :where(.mc-inline .mc-root) {
+    translate: 0
+      calc(var(--mc-seat, 0) * 100% + var(--mc-seat-mid, 0) * (var(--mc-glyph-nudge) - 0.36em));
   }
-  /* The status dot reads like a bullet, not a period — the `middle` seat +
-     `--mc-glyph-nudge` above land it on the x-height midpoint, so the old
-     hard-coded `translate: 0 -0.18em` is gone (it double-counted the shift and
-     rode the dot high). align-self just keeps it centred in its own box. */
-  :where(.mc-inline > .mc-status) {
+  /* `cap` is exactly the half-cap-height this wants and needs no per-font
+     tuning; `0.36em` above is the fallback for browsers without it (≈ half of a
+     0.72em typical cap height). `.mc-root` carries `font: inherit`, so `cap`
+     here resolves against the SURROUNDING PROSE — not `--mc-label-size`, which
+     only ever applies to `.mc-root text`. */
+  @supports (height: 1cap) {
+    :where(.mc-inline .mc-root) {
+      translate: 0
+        calc(var(--mc-seat, 0) * 100% + var(--mc-seat-mid, 0) * (var(--mc-glyph-nudge) - 0.5cap));
+    }
+  }
+  /* An INTERACTIVE wrapper hoists its chart's seat up to itself (see
+     `useSeatHoist` in shared/live-region.tsx) and marks itself `data-mc-seated`.
+     Seating the wrapper instead of the SVG moves the whole box — the mark AND
+     the `.mc-spark-readout` chip the wrapper positions — so the chip stays
+     pinned to the mark it annotates instead of floating a seat's worth above it.
+     Identical declaration to the rule above: `100%` resolves against the
+     wrapper's own height, which IS the SVG's height, and `cap` resolves against
+     the same inherited prose font. The SVG then must NOT seat itself again. */
+  :where(.mc-inline [data-mc-seated]) {
+    translate: 0
+      calc(var(--mc-seat, 0) * 100% + var(--mc-seat-mid, 0) * (var(--mc-glyph-nudge) - 0.36em));
+  }
+  :where(.mc-inline [data-mc-seated] > .mc-root) {
+    translate: none;
+  }
+  @supports (height: 1cap) {
+    :where(.mc-inline [data-mc-seated]) {
+      translate: 0
+        calc(var(--mc-seat, 0) * 100% + var(--mc-seat-mid, 0) * (var(--mc-glyph-nudge) - 0.5cap));
+    }
+  }
+  :where(.mc-inline .mc-status) {
     align-self: center;
   }
-  :where(.mc-inline > .mc-trend) {
+  :where(.mc-inline .mc-trend) {
     width: 0.95em;
     height: 0.95em;
   }
@@ -397,8 +453,11 @@
   /* @mc-chart-end */
   /* @mc-chart balance-beam */
   /* interactive BalanceBeam: the beam + weights ease to the new tilt (SVG
-     geometry props; jump where unsupported). Inside .mc-root → reduced-motion-gated */
-  :where(.mc-beam-live :is(line, rect, circle)) {
+     geometry props; jump where unsupported). Inside .mc-root → reduced-motion-gated.
+     `:not([data-mc-w])` excludes the interaction overlay: a focus ring must SNAP
+     to the pan it names — lerping it across the beam leaves it visibly off-centre
+     for the whole transition, and a ring that trails the focus is a lie. */
+  :where(.mc-beam-live :is(line, rect, circle):not([data-mc-w])) {
     transition:
       x1 var(--mc-duration) var(--mc-easing),
       y1 var(--mc-duration) var(--mc-easing),
@@ -654,6 +713,16 @@
   }
   /* @mc-chart-end */
 
+  /* MinimapStrip is a range slider, not an image: it drags a window along the
+     series, so it advertises a horizontal-resize cursor and opts out of the
+     browser's touch panning. In CSS rather than an inline style so the client
+     can route className/style through the shared `wrap` helper like every
+     other interactive entry. */
+  :where(.mc-minimap-live) {
+    cursor: ew-resize;
+    touch-action: none;
+  }
+
   /* Interactive readout — the value revealed on hover/focus. A small chip on an
      opaque surface so the figure stays legible over any mark or content it
      floats above. Zero-specificity, so a component's inline position wins. */
@@ -674,6 +743,23 @@
     letter-spacing: 0.01em;
     white-space: nowrap;
     pointer-events: none;
+    /* The chip is nowrap HTML floating over an SVG, so its width is its text's
+       width — unbounded by the chart. Measured before this: a phase-trace
+       readout 217px wide against a 44px chart, and stacked-area's grew with the
+       series count, so it had no bound at all.
+
+       The cap is `max(100%, 14em)`, not `100%`. This is a tooltip: overhanging
+       its trigger is normal and expected, and these charts are word-sized — a
+       40px-wide phase-trace clamped to its own width could not render even
+       "30, 55" without an ellipsis, so `100%` would trade a runaway chip for
+       silent truncation on every small chart. 14em (~28 characters at the chip's
+       own size) bounds the runaway while leaving a terse readout room to render
+       in full. Content is still trimmed per chart — readout-containment.browser
+       .test.tsx fails any readout that ellipsizes at its chart's default size. */
+    box-sizing: border-box;
+    max-width: max(100%, 14em);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

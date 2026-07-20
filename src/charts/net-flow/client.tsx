@@ -1,16 +1,26 @@
 "use client";
-// Interactive <NetFlow>. One pointer listener + nearest-period
-// math. ←/→ step periods; the live region states in, out, AND signed net — the
-// full picture, never a net without its gross. Composes the static component
-// (canon); the crosshair + in/out value ticks are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <NetFlow>. useActivePicker owns interaction: one pointer listener
+// + nearest-period math, ←/→ rove periods, click / Enter / Space selects
+// (onSelect). The live region states in, out, AND signed net — the full
+// picture, never a net without its gross. Composes the static component (canon);
+// the crosshair + in/out/net ticks + pinned net ring are overlay children.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js";
 import { netFlowGeometry } from "./geometry.js";
 import { NetFlow as StaticNetFlow, netFlowSummary, signedNet, type NetFlowProps } from "./index.js";
 
-export interface InteractiveNetFlowProps extends NetFlowProps {
+export interface InteractiveNetFlowProps extends NetFlowProps, PickerProps {
   strings?: NetFlowStrings;
   /**
    * Opt-in entrance motion (default `false`): the flow areas wipe on when the
@@ -32,18 +42,77 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
 
-  const geo = useMemo(
-    () => netFlowGeometry({ width, height, data, mode, domain: props.domain }),
-    [width, height, data, mode, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = netFlowGeometry({ width, height, data, mode, domain: props.domain });
+    const showLabel =
+      (props.label ?? "last") === "last" && base != null && !base.degenerate && base.last != null;
+    const gutterCh = showLabel ? signedNet(base!.last!.net, fmt).length : 0;
+    return netFlowGeometry({
+      width,
+      height,
+      data,
+      mode,
+      domain: props.domain,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, mode, props.domain, props.label, fmt]);
+
+  const total = data.length;
+  const navigable = geo !== null && !geo.degenerate;
+
+  // Pointer (viewBox space) → nearest period by x.
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || geo.degenerate) return null;
+      let best = 0;
+      let bestDist = Infinity;
+      geo.points.forEach((pt, i) => {
+        const d = Math.abs(pt.x - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [geo],
+  );
+
+  // Period (DATA) index; `value` is the signed NET (in − out) — this chart's
+  // decision value. Its gross in/out are still announced + shown in the readout.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo?.points[i]?.net ?? null }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: navigable ? total : 0,
+    width: geo ? geo.totalWidth : width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -55,75 +124,24 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
           : netFlowSummary(geo, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const total = data.length;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || geo.degenerate || total === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * geo.totalWidth;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.points.forEach((p, i) => {
-        const d = Math.abs(p.x - x);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, total],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (total === 0 || geo?.degenerate) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((prev) => Math.min(total - 1, (prev ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((prev) => (prev === null || prev <= 0 ? 0 : prev - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(total - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [total, geo],
-  );
-
-  const p = active !== null && geo ? geo.points[active] : undefined;
-  const announced = p
-    ? strings.netFlowAt(active! + 1, total, fmt(p.in), fmt(p.out), signedNet(p.net, fmt))
+  const shown = active ?? selected;
+  const ap = active !== null && geo ? geo.points[active] : undefined; // transient focus
+  const sp = selected !== null && selected !== active && geo ? geo.points[selected] : undefined; // pin
+  const rp = shown !== null && geo ? geo.points[shown] : undefined; // readout + announce
+  const announced = rp
+    ? strings.netFlowAt(shown! + 1, total, fmt(rp.in), fmt(rp.out), signedNet(rp.net, fmt))
     : "";
 
   return (
     <span
       ref={hostRef}
-      className="mc-net-flow-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-net-flow-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticNetFlow
         {...rest}
+        style={fillFor(style)}
         data={data}
         mode={mode}
         width={width}
@@ -133,12 +151,24 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {p ? (
+        {/* Pinned selection: a persistent net ring that survives pointer-leave. */}
+        {sp ? (
+          <circle
+            cx={sp.x}
+            cy={sp.netY}
+            r={2.4}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {ap ? (
           <>
             <line
-              x1={p.x}
+              x1={ap.x}
               y1={0.5}
-              x2={p.x}
+              x2={ap.x}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
               data-mc-w="support"
@@ -146,8 +176,8 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               vectorEffect="non-scaling-stroke"
             />
             <circle
-              cx={p.x}
-              cy={p.inTopY}
+              cx={ap.x}
+              cy={ap.inTopY}
               r={1.6}
               fill="none"
               stroke="var(--mc-stroke)"
@@ -155,8 +185,8 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               vectorEffect="non-scaling-stroke"
             />
             <circle
-              cx={p.x}
-              cy={p.outBotY}
+              cx={ap.x}
+              cy={ap.outBotY}
               r={1.6}
               fill="none"
               stroke="var(--mc-stroke)"
@@ -164,8 +194,8 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               vectorEffect="non-scaling-stroke"
             />
             <circle
-              cx={p.x}
-              cy={p.netY}
+              cx={ap.x}
+              cy={ap.netY}
               r={2.4}
               fill="none"
               stroke="var(--mc-stroke)"
@@ -176,27 +206,15 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticNetFlow>
-      {p ? (
+      {rp ? (
         <span
           className="mc-net-flow-readout mc-spark-readout"
-          style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${(rp.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${fmt(p.in)} / ${fmt(p.out)} · ${signedNet(p.net, fmt)}`}
+          {`${fmt(rp.in)} / ${fmt(rp.out)} · ${signedNet(rp.net, fmt)}`}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

@@ -45,6 +45,10 @@ export interface QueueDepthGeometry {
   capLabelY: number | null;
   /** Resolved (zero-anchored) value domain `[min,max]` — the annotation-host y-frame. */
   domain: readonly [number, number];
+  /** Top edge of the plot box. */
+  y0: number;
+  /** Bottom edge of the plot box — where the zero-anchored area lands. */
+  y1: number;
 }
 
 // least-squares slope of y over consecutive integer x (per-step drift)
@@ -157,7 +161,10 @@ export function queueDepthGeometry(opts: {
 
   const now = finite[finite.length - 1]!;
   const capacityY = capacity !== null && capacity >= yMin && capacity <= yMax ? Y(capacity) : null;
-  const clampY = (y: number): number => round2(clamp(y, fontSize * 0.7, height - fontSize * 0.3));
+  // `dominant-baseline: central` straddles y by half a font EACH way, so the
+  // clamp is symmetric. Below `height < fontSize` no clamp exists and the caller
+  // drops the readouts rather than painting them past the box.
+  const clampY = (y: number): number => round2(clamp(y, fontSize * 0.5, height - fontSize * 0.5));
   const end = points[points.length - 1]!;
 
   return {
@@ -174,5 +181,7 @@ export function queueDepthGeometry(opts: {
     labelY: fontSize > 0 ? clampY(end.y) : end.y,
     capLabelY: capacityY !== null && fontSize > 0 ? clampY(capacityY) : capacityY,
     domain: [yMin, yMax],
+    y0: round2(pad),
+    y1: round2(height - pad),
   };
 }

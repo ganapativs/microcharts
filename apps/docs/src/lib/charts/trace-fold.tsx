@@ -1,9 +1,8 @@
 import { TraceFold } from "@microcharts/react/trace-fold";
-import { TraceFold as TraceFoldInteractive } from "@microcharts/react/trace-fold/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const ms = (n: number) => `${Math.round(n)} ms`;
+export const ms = (n: number) => `${Math.round(n)} ms`;
 export const TRACE = [
   { label: "request", start: 0, duration: 214, depth: 0 },
   { label: "db.query", start: 10, duration: 86, depth: 1, parent: 0 },
@@ -78,12 +77,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <TraceFold data={TRACE} format={ms} summary={false} width={180} height={48} />;
 }
-
-export const showcase = {
-  hint: "critical path",
-  Node: () => <TraceFold data={TRACE} format={ms} title="Request trace" width={180} height={48} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -112,29 +105,6 @@ export const playground: PlaygroundSpec = {
       "  data={spans}",
       s.emphasis !== "critical" && `  emphasis="${s.emphasis}"`,
       s.labels === false && "  labels={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <TraceFoldInteractive
-      data={TRACE}
-      emphasis={s.emphasis as "critical" | "none"}
-      labels={s.labels as boolean}
-      format={ms}
-      animate={ui.animate}
-      summary={false}
-      width={320}
-      height={48}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<TraceFold",
-      "  data={spans}",
-      s.emphasis !== "critical" && `  emphasis="${s.emphasis}"`,
-      s.labels === false && "  labels={false}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -255,28 +225,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<TraceFold data={spans} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <TraceFoldInteractive
-      data={TRACE}
-      format={ms}
-      summary={false}
-      width={180}
-      height={48}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

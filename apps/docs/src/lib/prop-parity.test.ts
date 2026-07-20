@@ -2,7 +2,11 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { STABLE_CHARTS } from "./charts/registry";
-import { SHARED_PROP_NAMES, SHARED_INTERACTIVE_NAMES } from "./charts/shared-props";
+import {
+  SHARED_PROP_NAMES,
+  SHARED_INTERACTIVE_NAMES,
+  SHARED_INTERACTIVE_PROPS,
+} from "./charts/shared-props";
 
 // Each chart's prop table (hand-authored in lib/charts/<slug>.tsx) must document
 // every chart-SPECIFIC prop the component actually accepts — on BOTH the static
@@ -89,6 +93,72 @@ describe("interactive-flagged props are interactive-only", () => {
         notOnClient,
         `${chart.slug}: flagged interactive but not on client: ${notOnClient}`,
       ).toEqual([]);
+    });
+  }
+});
+
+// The picker contract. `interfaceProps()` above reads only an interface's OWN
+// body, so props inherited via `extends PickerProps` are invisible to it — the
+// four picker props could vanish from the library, or appear on a chart that
+// has no units to rove between, and nothing above would notice. These guards
+// tie `entry.picker` (the registry's machine-readable split) to the library.
+const PICKER_PROPS = ["onActive", "onSelect", "selectedIndex", "defaultSelectedIndex"] as const;
+/** The picker props that only make sense with more than one navigable unit. */
+const ROVING_PROPS: ReadonlySet<string> = new Set([
+  "onActive",
+  "selectedIndex",
+  "defaultSelectedIndex",
+]);
+
+/** Registry's claim: a multi-unit chart with the shared picker contract. */
+const isPickerChart = (c: (typeof STABLE_CHARTS)[number]) =>
+  Boolean(c.interactiveImport) && c.picker !== false;
+
+describe("picker contract", () => {
+  it("the four picker props are shared grammar, flagged interactive", () => {
+    for (const n of PICKER_PROPS) {
+      const p = SHARED_INTERACTIVE_PROPS.find((x) => x.name === n);
+      expect(p, `SHARED_INTERACTIVE_PROPS missing picker prop ${n}`).toBeDefined();
+      expect(p?.interactive, `${n} must be flagged interactive`).toBe(true);
+      expect(p?.description.length, `${n} needs a description`).toBeGreaterThan(0);
+    }
+  });
+
+  for (const chart of STABLE_CHARTS) {
+    if (!chart.interactiveImport) continue;
+    it(`${chart.slug}`, () => {
+      const client = resolve(chartsDir, chart.slug, "client.tsx");
+      const src = existsSync(client) ? readFileSync(client, "utf8") : "";
+      // The contract is inherited via `extends … PickerProps`, never re-declared.
+      const extendsPicker = /interface \w*Props\b[^{]*\bPickerProps\b/.test(src);
+      expect(
+        extendsPicker,
+        extendsPicker
+          ? `${chart.slug} extends PickerProps but the registry marks it picker: false`
+          : `${chart.slug} is a picker chart in the registry but its client entry does not extend PickerProps`,
+      ).toBe(isPickerChart(chart));
+
+      // Picker props are documented ONCE in the shared grammar — a per-chart row
+      // would drift from it, and on a lean chart it would be a lie.
+      const redocumented = chart.props
+        .map((p) => p.name)
+        .filter((n) => (PICKER_PROPS as readonly string[]).includes(n));
+      expect(
+        redocumented,
+        `${chart.slug} re-documents shared picker props: ${redocumented.join(", ")}`,
+      ).toEqual([]);
+
+      // A `picker: false` chart may still declare a whole-chart `onSelect` —
+      // the lean scalar charts do, and it means the same thing (the one unit was
+      // activated). What it must NOT have is the roving half of the contract:
+      // there is nothing to move an active cursor between.
+      if (!isPickerChart(chart)) {
+        const roving = interfaceProps(client).filter((p) => ROVING_PROPS.has(p));
+        expect(
+          roving,
+          `${chart.slug} is marked picker: false but declares roving props: ${roving.join(", ")}`,
+        ).toEqual([]);
+      }
     });
   }
 });

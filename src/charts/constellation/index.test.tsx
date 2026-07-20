@@ -62,3 +62,47 @@ describe("<Constellation>", () => {
     await expectNoA11yViolations(container);
   });
 });
+
+describe("<Constellation> degrades at small sizes", () => {
+  const EV = [
+    { x: 0, y: 40, m: 2 },
+    { x: 2, y: 90, m: 7 },
+    { x: 5, y: 30, m: 3 },
+  ];
+
+  // The magnitude numeral prefers to sit above the brightest star and falls
+  // back to below it. The fallback is pinned inside the frame, then checked:
+  // if the pinned line can't clear the star's halo, the numeral drops.
+  it("keeps the numeral while a placement clears both the frame and the halo", () => {
+    const { container } = draw(<Constellation data={EV} label="max" width={63} height={17} />);
+    expect(container.querySelector("text")!.textContent).toBe("7");
+  });
+
+  it("never paints the numeral outside the viewBox", () => {
+    for (const [w, h] of [
+      [90, 24],
+      [63, 17],
+      [60, 20],
+      [45, 12],
+    ] as const) {
+      const { container } = draw(<Constellation data={EV} label="max" width={w} height={h} />);
+      const t = container.querySelector("text");
+      if (!t) continue;
+      const fs = Number(t.getAttribute("font-size"));
+      const y = Number(t.getAttribute("y"));
+      const half = (t.textContent!.length * fs * 0.62) / 2;
+      const x = Number(t.getAttribute("x"));
+      expect(y - fs * 0.78).toBeGreaterThanOrEqual(0);
+      expect(y + fs * 0.22).toBeLessThanOrEqual(h);
+      expect(x - half).toBeGreaterThanOrEqual(0);
+      expect(x + half).toBeLessThanOrEqual(w);
+    }
+  });
+
+  it("drops the numeral when nothing clears — the stars and halo still render", () => {
+    const { container } = draw(<Constellation data={EV} label="max" width={38} height={10} />);
+    expect(container.querySelector("text")).toBeNull();
+    // 3 events + the brightest-star halo
+    expect(container.querySelectorAll("circle").length).toBe(4);
+  });
+});

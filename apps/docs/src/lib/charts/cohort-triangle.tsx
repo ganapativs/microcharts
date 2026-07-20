@@ -1,6 +1,5 @@
 import { CohortTriangle } from "@microcharts/react/cohort-triangle";
-import { CohortTriangle as CohortTriangleInteractive } from "@microcharts/react/cohort-triangle/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -102,12 +101,6 @@ const cohorts = [
 export function Preview() {
   return <CohortTriangle data={COHORTS} cell={10} labels={false} summary={false} />;
 }
-
-export const showcase = {
-  hint: "equal maturity",
-  Node: () => <CohortTriangle data={COHORTS} cell={12} unit="month" title="Retention cohorts" />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "labels", label: "labels", init: true },
@@ -138,30 +131,6 @@ export const playground: PlaygroundSpec = {
       s.highlight !== "none" && `  highlight="${s.highlight}"`,
       `  cell={${s.cell}}`,
       '  unit="month"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <CohortTriangleInteractive
-      data={COHORTS}
-      labels={s.labels as boolean}
-      highlight={s.highlight === "none" ? undefined : (s.highlight as string)}
-      cell={Number(s.cell)}
-      unit="month"
-      animate={ui.animate}
-      title="Playground"
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<CohortTriangle",
-      "  data={cohorts}",
-      s.labels === false && "  labels={false}",
-      s.highlight !== "none" && `  highlight="${s.highlight}"`,
-      `  cell={${s.cell}}`,
-      '  unit="month"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -277,21 +246,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<CohortTriangle data={cohorts} labels={false} cell={7} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <CohortTriangleInteractive data={COHORTS} cell={10} labels={false} summary={false} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

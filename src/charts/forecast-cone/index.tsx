@@ -12,7 +12,7 @@ import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.j
 import { forecastConeGeometry, type ForecastConeGeometry, type ForecastInput } from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** Factual forecast summary. Shared with the interactive entry. */
@@ -96,7 +96,13 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
   const at = data.length + forecast.mid.length;
 
   const probe = forecastConeGeometry({ width, height, data, forecast, target, domain });
-  const showLabel = label === "landing" && probe != null;
+  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
+  // box a line of text cannot be seated inside the plot at all. The readout
+  // DROPS rather than spilling past the viewBox, and because the gutter is
+  // derived from it the reserved space goes with it — the plot keeps its own
+  // width and simply stops paying for text it no longer draws. Pure arithmetic:
+  // the static path may never measure text.
+  const showLabel = label === "landing" && probe != null && labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? fmt(probe!.landing.value) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
@@ -119,6 +125,8 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        // Empty stands on the same padded floor a drawn cone would.
+        seat={{ mode: "floor", bottom: height - 2 }}
         className={cls}
         style={style}
       >
@@ -159,6 +167,11 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // History plus a fan, both over one fitted value domain — a trace, so it
+      // stands on the plot's padded floor like a sparkline (the same 2-unit
+      // inset the annotation frame above uses). The cone's own edges are data
+      // and the landing gutter only widens the viewBox; neither moves the seat.
+      seat={{ mode: "floor", bottom: height - 2 }}
       className={cls}
       style={rootStyle}
     >

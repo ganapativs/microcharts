@@ -49,7 +49,7 @@ average delta without its spread is how A/B results lie.
   code={`const control = Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22);
 const test = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
 
-<ABStrips data={{ a: control, b: test }} labels={["Control", "Test"]} />`}
+<ABStrips data={{ a: control, b: test }} seriesLabels={["Control", "Test"]} />`}
 >
   <span className="inline-flex flex-col gap-2">
     <ABStrips
@@ -58,7 +58,7 @@ const test = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
         b: Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22),
       }}
       format={(n) => `${Math.round(n)} ms`}
-      labels={["Ctrl", "Test"]}
+      seriesLabels={["Ctrl", "Test"]}
       title="Labelled"
       width={240}
       height={24}
@@ -126,6 +126,8 @@ and an arm with fewer than 8 points falls back to a min–max band.
 The accessible name states both medians, the delta, and the overlap — **"B median 115 ms vs A 129 ms (-11%); middle
 halves overlap 35%."**. The interactive entry roves the rows (↑/↓) and the quantile edges (←/→): the median announces
 the delta vs the other arm, other edges announce the percentile.
+
+<InteractionNote slug="ab-strips" />
 
 ## Props
 

@@ -3,9 +3,11 @@ import { useState, type ReactNode } from "react";
 import { Play, RotateCw } from "lucide-react";
 import "@microcharts/react/motion"; // enables `animate` (same import consumers use)
 import { cn } from "@/lib/cn";
-import { getModule } from "@/lib/charts/registry";
+// Lazy, one chunk per chart — a static `registry` import here would put all 106
+// chart modules (each with its interactive twin) in this route's client bundle.
+import { useChartModule } from "@/lib/charts/use-chart-module";
 import { CodeWithData } from "@/components/ui/code-with-data";
-import type { Knob, KnobValue, SampleData } from "@/lib/charts/types";
+import type { ChartModule, Knob, KnobValue, SampleData } from "@/lib/charts/types";
 
 /* ── shared control primitives ─────────────────────────────────────────── */
 
@@ -264,11 +266,21 @@ function KnobControl({
  * The unified live playground for any chart: props, static ↔ interactive mode,
  * opt-in entrance motion with replay, and a copy-complete snippet that tracks
  * every toggle. `<Playground chart="bullet" />`
+ *
+ * The module resolves LAZILY, one chunk per chart — every knob's initial state
+ * is derived from `mod.playground`, so the view only mounts once that has landed
+ * (the loader keys it by slug, so the initializers re-run on a chart change).
  */
 export function Playground({ chart }: { chart: string }) {
-  const mod = getModule(chart);
-  const spec = mod?.playground;
-  const entry = mod?.entry;
+  const mod = useChartModule(chart);
+  // Reserve the playground's resolved height so the swap causes no layout shift.
+  if (!mod) return <div className="not-prose my-6 min-h-[26rem]" aria-hidden />;
+  return <PlaygroundView key={chart} mod={mod} />;
+}
+
+function PlaygroundView({ mod }: { mod: ChartModule }) {
+  const spec = mod.playground;
+  const entry = mod.entry;
   const [state, setState] = useState<Record<string, KnobValue>>(() =>
     Object.fromEntries((spec?.knobs ?? []).map((k) => [k.key, k.init])),
   );

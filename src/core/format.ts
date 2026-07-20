@@ -23,16 +23,26 @@ function cachedNumberFormat(
 
 /**
  * Resolves the shared `format`/`locale` props into a formatter function.
- * Custom functions pass through; `Intl` options hit the cached instance.
+ * Custom functions pass through; `Intl` options hit the cached instance. Both
+ * receive a float-noise-cleaned number: charts compute differences/sums/ratios
+ * internally (e.g. `value - target` → `-3.5999999999999943`), and a consumer's
+ * `format` function is written for clean data, not for IEEE arithmetic. The
+ * number is snapped to 12 significant digits first — far more than any label
+ * shows, well inside the ~15–17 digits where binary-float noise appears.
  */
 export function makeFormatter(
   format: Format | undefined,
   locale: string | string[] | undefined,
   defaults?: Intl.NumberFormatOptions,
 ): (n: number) => string {
-  if (typeof format === "function") return format;
+  // `toPrecision` passes ±Infinity/NaN through unchanged.
+  const clean = (n: number) => Number(n.toPrecision(12));
+  if (typeof format === "function") {
+    const fn = format;
+    return (n) => fn(clean(n));
+  }
   const nf = cachedNumberFormat(locale, format ?? defaults);
-  return (n) => nf.format(n);
+  return (n) => nf.format(clean(n));
 }
 
 // Cached date/time formatting — same caching

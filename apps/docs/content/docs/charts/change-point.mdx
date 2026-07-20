@@ -5,7 +5,7 @@ description:
   heuristic. Context for every anomaly.
 ---
 
-ChangePoint answers "when did the behavior change level?". It shades each detected regime, draws a per-regime mean, and
+ChangePoint answers "when did the behavior change level?". It shades alternating regimes, draws a per-regime mean, and
 marks the break where one level became another — because a spike means nothing without the regime it broke. The detector
 is a **documented heuristic, not statistics**; for production anomaly pipelines, pass your own break indices and the
 chart becomes pure annotation.
@@ -126,10 +126,10 @@ the "no data" summary and no marks.
 Context for every anomaly — the shading names the regime a value belongs to, and the break marks where the level truly
 changed, so a reader sees "errors stepped up here" rather than "errors are high". The detector is a **labelled
 heuristic**: a two-segment mean-shift found by binary segmentation, accepted only when the split both cuts the variance
-enough and clears an effect-size threshold, so constant and low-noise series show no break. It is deliberately
-conservative — a gradual ramp is not a level shift, and the ramp variant above shows the chart honestly finding nothing.
-For anomaly pipelines that already know their breakpoints, `breaks={[…]}` turns the detection off and the chart becomes
-a faithful annotation.
+enough and clears an effect-size threshold, so a constant series shows no break. It is a mean-shift test, not a trend
+test: a steady ramp is still fitted as two regimes (the ramp variant above reports a shift around point 10), so pass
+`breaks` explicitly when you already know the series is trending rather than stepping. For anomaly pipelines that
+already know their breakpoints, `breaks={[…]}` turns the detection off and the chart becomes a faithful annotation.
 
 ## Accessibility
 
@@ -137,6 +137,8 @@ The accessible name states the shift, the break, the regime means, and what happ
 around point 14 (mean 30 → 48); stable since."** — or, with no detected shift, "No clear level shift across N points."
 The interactive entry steps the points with ←/→ (value + regime) and cycles the breaks with Tab, each announcing its
 mean shift.
+
+<InteractionNote slug="change-point" />
 
 ## Props
 

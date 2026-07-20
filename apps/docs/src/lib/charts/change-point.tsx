@@ -1,6 +1,5 @@
 import { ChangePoint } from "@microcharts/react/change-point";
-import { ChangePoint as ChangePointInteractive } from "@microcharts/react/change-point/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // error rate that stepped up on the 14th, then held — a clean level shift
@@ -12,7 +11,7 @@ export const ERRORS: number[] = [
     .fill(0)
     .map((_, i) => 48 + ((i * 5) % 5) - 2),
 ];
-const RAMP = Array.from({ length: 40 }, (_, i) => 20 + i * 1.2);
+export const RAMP = Array.from({ length: 40 }, (_, i) => 20 + i * 1.2);
 
 export const entry: ChartEntry = {
   name: "ChangePoint",
@@ -45,7 +44,7 @@ export const entry: ChartEntry = {
       description: "Explicit indices override the heuristic entirely — the production path.",
     },
     {
-      name: "max",
+      name: "maxItems",
       type: "number",
       required: false,
       description: "Max detected breaks (1–3). More regimes stop being glanceable.",
@@ -87,25 +86,17 @@ const errors = [
 export function Preview() {
   return <ChangePoint data={ERRORS} summary={false} width={120} height={16} />;
 }
-
-export const showcase = {
-  hint: "a spike needs its regime",
-  Node: () => (
-    <ChangePoint data={ERRORS} label="delta" title="Error rate" width={160} height={22} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "preset", label: "series", options: ["step", "ramp"], init: "step" },
-    { kind: "range", key: "max", label: "max", min: 1, max: 3, step: 1, init: 2 },
+    { kind: "range", key: "maxItems", label: "maxItems", min: 1, max: 3, step: 1, init: 2 },
     { kind: "toggle", key: "means", label: "means", init: true },
     { kind: "toggle", key: "delta", label: "delta label", init: true },
   ],
   render: (s) => (
     <ChangePoint
       data={s.preset === "ramp" ? RAMP : ERRORS}
-      max={s.max as number}
+      maxItems={s.maxItems as number}
       means={s.means as boolean}
       label={s.delta ? "delta" : "none"}
       title="Error rate"
@@ -118,34 +109,9 @@ export const playground: PlaygroundSpec = {
     [
       "<ChangePoint",
       "  data={errors}",
-      s.max !== 2 && `  max={${s.max}}`,
+      s.maxItems !== 2 && `  maxItems={${s.maxItems}}`,
       s.means === false && "  means={false}",
       s.delta && '  label="delta"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ChangePointInteractive
-      data={s.preset === "ramp" ? RAMP : ERRORS}
-      max={s.max as number}
-      means={s.means as boolean}
-      label={s.delta ? "delta" : "none"}
-      title="Error rate"
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={28}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<ChangePoint",
-      "  data={errors}",
-      s.max !== 2 && `  max={${s.max}}`,
-      s.means === false && "  means={false}",
-      s.delta && '  label="delta"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -255,19 +221,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<ChangePoint data={errors} />`;
 }
-
-export function PreviewLive() {
-  return <ChangePointInteractive data={ERRORS} summary={false} width={120} height={16} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

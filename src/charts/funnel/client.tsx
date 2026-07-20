@@ -1,10 +1,19 @@
 "use client";
-// Interactive <Funnel>. One pointer listener; stage by x-band.
-// ←/→ rove stages ("Checkout: 2,730 — 22% of visitors."). Composes the static.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Funnel>. useActivePicker owns interaction: one pointer listener +
+// stage-by-x-band lookup, ←/→ rove stages ("Checkout: 2,730 — 22% of visitors."),
+// click / Enter / Space selects (onSelect). Composes the static component (canon)
+// — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { funnelGeometry } from "./geometry.js";
@@ -14,7 +23,7 @@ import { Funnel as StaticFunnel, funnelSummary, type FunnelProps } from "./index
 // `rise` selector only matches "bar".
 const STAGE_SELECTOR = 'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"]';
 
-export interface InteractiveFunnelProps extends FunnelProps {
+export interface InteractiveFunnelProps extends FunnelProps, PickerProps {
   strings?: CompositionStrings;
   /**
    * Opt-in entrance motion (default `false`): stage columns rise from the
@@ -38,6 +47,12 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -64,7 +79,40 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
-  const [active, setActive] = useState<number | null>(null);
+
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.stages.length === 0 || geo.pitch === 0) return null;
+      const i = Math.floor(x / geo.pitch);
+      return i >= 0 && i < geo.stages.length ? i : null;
+    },
+    [geo],
+  );
+  // Unit = stage. Stages are 1:1 with `data` (a funnel never rolls up), so the
+  // datum index is also the consumer's data index.
+  const datum = useCallback(
+    (i: number) => {
+      const d = data[geo.stages[i]!.index];
+      return {
+        index: i,
+        value: d && isFiniteValue(d.value) ? d.value : null,
+        label: d?.label,
+      };
+    },
+    [data, geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.stages.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -74,73 +122,44 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         : funnelSummary(data, fmt, pctFmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.stages.length === 0 || geo.pitch === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const i = Math.floor(x / geo.pitch);
-      setActive(i >= 0 && i < geo.stages.length ? i : null);
-    },
-    [geo, width],
-  );
+  const outline = (i: number, pinned: boolean) => {
+    const s = geo.stages[i];
+    if (!s) return null;
+    return (
+      <rect
+        x={s.x - 0.5}
+        y={-0.5}
+        width={s.w + 1}
+        height={height + 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.stages.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.stages.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.stages.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const st = active !== null ? geo.stages[active] : undefined;
-  const datum = st ? data[st.index] : undefined;
+  const shown = active ?? selected;
+  const st = shown !== null ? geo.stages[shown] : undefined;
+  const stDatum = st ? data[st.index] : undefined;
   const firstLabel = data[0]?.label ?? "";
   const announced =
-    st && datum && isFiniteValue(datum.value)
-      ? strings.stageAt(datum.label, fmt(datum.value), pctFmt(st.share), firstLabel)
-      : datum
-        ? `${datum.label}: ${strings.noData}`
+    st && stDatum && isFiniteValue(stDatum.value)
+      ? strings.stageAt(stDatum.label, fmt(stDatum.value), pctFmt(st.share), firstLabel)
+      : stDatum
+        ? `${stDatum.label}: ${strings.noData}`
         : "";
 
   return (
     <span
       ref={hostRef}
-      className="mc-funnel-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-funnel-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticFunnel
         {...rest}
+        style={fillFor(style)}
         data={data}
         mode={mode}
         connectors={connectors}
@@ -152,22 +171,13 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {st ? (
-          <rect
-            x={st.x - 0.5}
-            y={-0.5}
-            width={st.w + 1}
-            height={height + 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticFunnel>
       <LiveRegion>{announced}</LiveRegion>
-      {st && datum && isFiniteValue(datum.value) ? (
+      {st && stDatum && isFiniteValue(stDatum.value) ? (
         <span
           className="mc-spark-readout"
           style={{
@@ -175,7 +185,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {`${datum.label} ${pctFmt(st.share)}`}
+          {`${stDatum.label} ${pctFmt(st.share)} (${fmt(stDatum.value)})`}
         </span>
       ) : null}
     </span>

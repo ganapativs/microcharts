@@ -1,11 +1,20 @@
 "use client";
-// Interactive <RateVolume>. One pointer listener + nearest-period
-// math. ←/→ step periods; the live region ALWAYS pairs both numbers — a rate is
+// Interactive <RateVolume>. useActivePicker owns interaction: one pointer
+// listener + nearest-period math, ←/→ rove periods, click / Enter / Space
+// selects (onSelect). The live region ALWAYS pairs both numbers — a rate is
 // never announced without its volume. Composes the static component (canon); the
-// crosshair + bar highlight are overlay children re-using geometry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// crosshair + rate ring + pin are overlay children re-using geometry.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { rateVolumeGeometry } from "./geometry.js";
@@ -15,7 +24,7 @@ import {
   type RateVolumeProps,
 } from "./index.js";
 
-export interface InteractiveRateVolumeProps extends RateVolumeProps {
+export interface InteractiveRateVolumeProps extends RateVolumeProps, PickerProps {
   strings?: RateVolumeStrings;
   /**
    * Opt-in entrance motion (default `false`): the rate line draws on when the
@@ -40,6 +49,12 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -49,22 +64,84 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
   // base svg opacity — no ink role of their own to animate as "marks".
   useEntrance(hostRef, "draw", animate);
 
-  const geo = useMemo(
-    () =>
-      rateVolumeGeometry({
-        width,
-        height,
-        data,
-        minVolume,
-        curve,
-        domain: props.domain,
-        volumeDomain: props.volumeDomain,
-      }),
-    [width, height, data, minVolume, curve, props.domain, props.volumeDomain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = rateVolumeGeometry({
+      width,
+      height,
+      data,
+      minVolume,
+      curve,
+      domain: props.domain,
+      volumeDomain: props.volumeDomain,
+    });
+    const showLabel = (props.label ?? "last") === "last" && base?.last != null;
+    const gutterCh = showLabel ? fmt(base!.last!.rate).length : 0;
+    return rateVolumeGeometry({
+      width,
+      height,
+      data,
+      minVolume,
+      curve,
+      domain: props.domain,
+      volumeDomain: props.volumeDomain,
+      gutterCh,
+      fontSize: labelFont(height, 0.62),
+    });
+  }, [width, height, data, minVolume, curve, props.domain, props.volumeDomain, props.label, fmt]);
   const fmtVol = useMemo(() => makeFormatter(volumeFormat, locale), [volumeFormat, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  const total = data.length;
+  // A period carries a real rate only on a finite rate + positive volume.
+  const valid = (i: number): boolean => {
+    const d = data[i];
+    return !!d && Number.isFinite(d.rate) && Number.isFinite(d.volume) && d.volume > 0;
+  };
+
+  // Pointer (viewBox space) → nearest period by bar center.
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || total === 0) return null;
+      let best = 0;
+      let bestDist = Infinity;
+      geo.bars.forEach((b, i) => {
+        const d = Math.abs(b.x + b.width / 2 - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [geo, total],
+  );
+
+  // Period (DATA) index; `value` is the RATE (the precise primary channel), or
+  // `null` on a zero/undefined-volume period. The volume is still announced +
+  // shown in the readout.
+  const datum = useCallback(
+    (i: number) => {
+      const d = data[i];
+      const ok = !!d && Number.isFinite(d.rate) && Number.isFinite(d.volume) && d.volume > 0;
+      return { index: i, value: ok ? d!.rate : null };
+    },
+    [data],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo ? total : 0,
+    width: geo ? geo.totalWidth : width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -76,91 +153,68 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
           : rateVolumeSummary(geo, fmt, fmtVol, unit, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const total = data.length;
+  // The active period's mark (crosshair + rate ring); a pin repeats it in "tick"
+  // weight so a selection survives pointer-leave.
+  const mark = (i: number, pinned: boolean) => {
+    const bar = geo?.bars[i];
+    if (!bar) return null;
+    const cx = bar.x + bar.width / 2;
+    const vp = valid(i) ? geo!.points.find((pt) => Math.abs(pt.x - cx) < 0.01) : undefined;
+    const w = pinned ? "tick" : "support";
+    return (
+      <>
+        <line
+          x1={cx}
+          y1={0.5}
+          x2={cx}
+          y2={height - 0.5}
+          stroke="var(--mc-accent)"
+          data-mc-w={w}
+          strokeDasharray="1.5 2"
+          vectorEffect="non-scaling-stroke"
+        />
+        {vp ? (
+          <circle
+            cx={vp.x}
+            cy={vp.y}
+            r={2.6}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w={w}
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+      </>
+    );
+  };
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || total === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * geo.totalWidth;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.bars.forEach((b, i) => {
-        const d = Math.abs(b.x + b.width / 2 - x);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, total],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (total === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((prev) => Math.min(total - 1, (prev ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((prev) => (prev === null || prev <= 0 ? 0 : prev - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(total - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [total],
-  );
-
-  // the active period's mark + announcement (both numbers, always)
-  const bar = active !== null && geo ? geo.bars[active] : undefined;
-  const datum = active !== null ? data[active] : undefined;
-  const validPoint =
-    bar && datum && Number.isFinite(datum.rate) && Number.isFinite(datum.volume) && datum.volume > 0
-      ? geo!.points.find((p) => Math.abs(p.x - (bar.x + bar.width / 2)) < 0.01)
-      : undefined;
+  const shown = active ?? selected;
+  const sBar = shown !== null && geo ? geo.bars[shown] : undefined;
+  const sDatum = shown !== null ? data[shown] : undefined;
   const announced =
-    active === null || !datum
+    shown === null || !sDatum
       ? ""
-      : datum.volume > 0 && Number.isFinite(datum.rate) && Number.isFinite(datum.volume)
+      : valid(shown)
         ? strings.rateVolumeAt(
-            active + 1,
+            shown + 1,
             total,
-            fmt(datum.rate),
-            fmtVol(datum.volume),
+            fmt(sDatum.rate),
+            fmtVol(sDatum.volume),
             unit,
-            minVolume !== undefined && datum.volume < minVolume,
+            minVolume !== undefined && sDatum.volume < minVolume,
           )
-        : strings.rateVolumeNoEvents(active + 1, total);
+        : strings.rateVolumeNoEvents(shown + 1, total);
 
   return (
     <span
       ref={hostRef}
-      className="mc-rate-volume-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-rate-volume-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticRateVolume
         {...rest}
+        style={fillFor(style)}
         data={data}
         minVolume={minVolume}
         volumeFormat={volumeFormat}
@@ -173,43 +227,23 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {bar ? (
-          <>
-            <line
-              x1={bar.x + bar.width / 2}
-              y1={0.5}
-              x2={bar.x + bar.width / 2}
-              y2={height - 0.5}
-              stroke="var(--mc-accent)"
-              data-mc-w="support"
-              strokeDasharray="1.5 2"
-              vectorEffect="non-scaling-stroke"
-            />
-            {validPoint ? (
-              <circle
-                cx={validPoint.x}
-                cy={validPoint.y}
-                r={2.6}
-                fill="none"
-                stroke="var(--mc-accent)"
-                data-mc-w="support"
-                vectorEffect="non-scaling-stroke"
-              />
-            ) : null}
-          </>
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus mark is transient. */}
+        {selected !== null && selected !== active ? mark(selected, true) : null}
+        {active !== null ? mark(active, false) : null}
         {rest.children}
       </StaticRateVolume>
-      {bar && datum ? (
+      {sBar && sDatum ? (
         <span
           className="mc-rate-volume-readout mc-spark-readout"
           style={{
-            left: `${((bar.x + bar.width / 2) / geo!.totalWidth) * 100}%`,
+            left: `${((sBar.x + sBar.width / 2) / geo!.totalWidth) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {datum.volume > 0 && Number.isFinite(datum.rate)
-            ? `${fmt(datum.rate)} · ${fmtVol(datum.volume)}`
+          {valid(shown!)
+            ? `${fmt(sDatum.rate)} · ${fmtVol(sDatum.volume)} ${unit}${
+                minVolume !== undefined && sDatum.volume < minVolume ? " (low)" : ""
+              }`
             : "no events"}
         </span>
       ) : null}

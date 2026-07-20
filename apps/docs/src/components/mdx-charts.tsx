@@ -5,6 +5,7 @@ import { getMDXComponents } from "@/components/mdx";
 import { Sizing } from "@/components/charts/sizing";
 import { Usage } from "@/components/charts/usage";
 import { PropTable } from "@/components/charts/prop-table";
+import { InteractionNote } from "@/components/charts/interaction-note";
 import { ChartChooser } from "@/components/charts/chooser";
 
 // The registry-dragging interactive shells — deferred via next/dynamic (SSR on)
@@ -31,6 +32,7 @@ export function getChartMDXComponents(components?: MDXComponents) {
     Sizing,
     Usage,
     PropTable,
+    InteractionNote,
     ChartChooser,
     Playground,
     FourContexts,

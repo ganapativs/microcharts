@@ -14,7 +14,7 @@ const PAIRS = ORG.map((a, i) => ({ a, b: PAID[i]! }));
 
 describe("<SpreadBand>", () => {
   it("signed bands + dashed reference behind a solid subject summary", () => {
-    const { container } = draw(<SpreadBand data={PAIRS} labels={["Organic", "Paid"]} />);
+    const { container } = draw(<SpreadBand data={PAIRS} seriesLabels={["Organic", "Paid"]} />);
     const paths = [...container.querySelectorAll("path")];
     // aLeadBand, bLeadBand, reference, subject
     expect(paths.length).toBe(4);
@@ -42,7 +42,7 @@ describe("<SpreadBand>", () => {
           { a: 12, b: 6 },
           { a: 14, b: 7 },
         ]}
-        labels={["A", "B"]}
+        seriesLabels={["A", "B"]}
       />,
     );
     expect(container.querySelectorAll('circle[data-mc-ink="point"]').length).toBe(0);
@@ -65,9 +65,24 @@ describe("<SpreadBand>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
   });
 
+  it("a short label pair still names both sides", () => {
+    const { container } = draw(
+      <SpreadBand
+        data={[
+          { a: 10, b: 5 },
+          { a: 12, b: 6 },
+        ]}
+        seriesLabels={["Organic"] as unknown as [string, string]}
+      />,
+    );
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "Organic leads B by 6; never crossed.",
+    );
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(
-      <SpreadBand data={PAIRS} labels={["Organic", "Paid"]} title="Organic vs paid" />,
+      <SpreadBand data={PAIRS} seriesLabels={["Organic", "Paid"]} title="Organic vs paid" />,
     );
     await expectNoA11yViolations(container);
   });
@@ -77,7 +92,7 @@ describe("<SpreadBand>", () => {
       (children) => (
         <SpreadBand
           data={PAIRS}
-          labels={["Organic", "Paid"]}
+          seriesLabels={["Organic", "Paid"]}
           width={80}
           height={20}
           summary={false}
@@ -93,4 +108,26 @@ describe("<SpreadBand>", () => {
 
 seriesEdgeSuite("SpreadBand", (data) => (
   <SpreadBand data={data.map((v) => ({ a: v, b: 3 }))} title="Edge" />
+));
+
+// Both halves degenerate, with the gap label ON — the gutter label and the
+// summary both name the two series, which is where an `undefined` leaked.
+seriesEdgeSuite("SpreadBand (both series degenerate)", (data) => (
+  <SpreadBand
+    data={data.map((v, i) => ({ a: v, b: i % 2 ? v : (data[data.length - 1 - i] ?? null) }))}
+    seriesLabels={["Organic", "Paid"]}
+    label="gap"
+    title="Edge"
+  />
+));
+
+// A pair shorter than two is a shape the types forbid but callers still build
+// from runtime data; the summary must never say "leads undefined".
+seriesEdgeSuite("SpreadBand (short label pair)", (data) => (
+  <SpreadBand
+    data={data.map((v) => ({ a: v, b: 3 }))}
+    seriesLabels={["Organic"] as unknown as [string, string]}
+    label="gap"
+    title="Edge"
+  />
 ));

@@ -81,10 +81,12 @@ precision is the point.
 
 ## Accessibility
 
-The accessible name names the task and its state — **"uploading: 62% complete."** — or, in drain mode, **"expiring: 70%
-remaining."** An empty word reads "No data." The interactive entry glides the ink edge with a reduced-motion-gated
-clip-path transition and announces changes through a polite live region, throttled to at most once a second so a
-streaming value never spams.
+The accessible name names the task and its state — **"uploading: 62% complete."** — or, in drain mode, where `value` is
+the fraction already drained, **"expiring: 30% remaining."** for `value={0.7}`. An empty word reads "No data." The
+interactive entry glides the ink edge with a reduced-motion-gated clip-path transition and announces changes through a
+polite live region, throttled to at most once a second so a streaming value never spams.
+
+<InteractionNote slug="fill-word" />
 
 ## Props
 

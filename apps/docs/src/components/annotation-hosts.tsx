@@ -147,7 +147,7 @@ export function AnnotationHostGallery() {
       </Cell>
 
       <Cell name="SpreadBand" mark="Marker">
-        <SpreadBand data={PAIRS} labels={["Organic", "Paid"]} width={W} height={H}>
+        <SpreadBand data={PAIRS} seriesLabels={["Organic", "Paid"]} width={W} height={H}>
           <Marker x={4} label="launch" />
         </SpreadBand>
       </Cell>

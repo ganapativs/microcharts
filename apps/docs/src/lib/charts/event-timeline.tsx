@@ -1,18 +1,17 @@
 import { EventTimeline } from "@microcharts/react/event-timeline";
-import { EventTimeline as EventTimelineInteractive } from "@microcharts/react/event-timeline/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const H = 3_600_000;
-const T0 = Date.UTC(2026, 5, 3);
-const DATA = [
+export const H = 3_600_000;
+export const T0 = Date.UTC(2026, 5, 3);
+export const DATA = [
   { start: T0 + 1 * H, end: T0 + 5 * H, label: "Freeze", kind: "accent" as const },
   { start: T0 + 6 * H, end: T0 + 15 * H, label: "Healthy", kind: "positive" as const },
   { start: T0 + 11 * H, label: "Incident", kind: "negative" as const },
   { start: T0 + 16 * H, end: T0 + 18 * H, kind: "negative" as const },
   { start: T0 + 20 * H, label: "Release" },
 ];
-const WINDOW: [number, number] = [T0, T0 + 24 * H];
+export const WINDOW: [number, number] = [T0, T0 + 24 * H];
 /** A second service with a clean window — contrast for the cell/tab homes. */
 const AUTH = [{ start: T0, end: T0 + 24 * H, label: "Healthy", kind: "positive" as const }];
 
@@ -92,14 +91,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <EventTimeline data={DATA} domain={WINDOW} summary={false} width={150} height={20} />;
 }
-
-export const showcase = {
-  hint: "when + how long",
-  Node: () => (
-    <EventTimeline data={DATA} domain={WINDOW} title="API uptime" width={150} height={20} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   // data and domain aren't knobbed — they're the fixture + shared window, not
   // interactive toggles (same convention as every other domain-taking chart).
@@ -131,30 +122,6 @@ export const playground: PlaygroundSpec = {
       "  domain={today}",
       s.now && "  now={Date.now()}",
       s.label !== "none" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <EventTimelineInteractive
-      data={DATA}
-      domain={WINDOW}
-      now={s.now ? T0 + 21 * H : undefined}
-      label={s.label as "none" | "spans"}
-      animate={ui.animate}
-      width={280}
-      height={36}
-      summary={false}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<EventTimeline",
-      "  data={windows}",
-      "  domain={today}",
-      s.now && "  now={Date.now()}",
-      s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -283,28 +250,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<EventTimeline data={windows} domain={window} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <EventTimelineInteractive
-      data={DATA}
-      domain={WINDOW}
-      summary={false}
-      width={150}
-      height={20}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

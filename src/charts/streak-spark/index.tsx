@@ -1,5 +1,5 @@
-// <StreakSpark> — the current run against the record, with run texture (
-// §2). Static, hook-free, RSC-safe. A pass/fail sequence collapses to RUNS: ok
+// <StreakSpark> — the current run against the record, with run texture.
+// Static, hook-free, RSC-safe. A pass/fail sequence collapses to RUNS: ok
 // runs sit low and translucent, break (fail) runs sit thin and saturated, and
 // the CURRENT run is the loud accent bar at the right. The record streak wears a
 // small triangle tick. Direction is encoded by height + opacity AND color, never
@@ -7,11 +7,17 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { labelFont } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_STREAK_SPARK, type StreakSparkStrings } from "../../core/strings-streak-spark.js";
 import { round2 } from "../../core/types.js";
-import { streakSparkGeometry, type StreakDatum, type StreakSparkGeometry } from "./geometry.js";
+import {
+  streakSparkFont,
+  streakSparkGeometry,
+  streakSparkRoom,
+  type StreakDatum,
+  type StreakLabel,
+  type StreakSparkGeometry,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface StreakSparkProps {
@@ -22,7 +28,7 @@ export interface StreakSparkProps {
   positive?: "up" | "down" | undefined;
   /** Count labels: the current run (`"current"`, default), the record too
    *  (`"both"`), or neither (`"none"`). Seat-gated — they drop at small sizes. */
-  label?: "current" | "both" | "none" | undefined;
+  label?: StreakLabel | undefined;
   width?: number | undefined;
   height?: number | undefined;
   /** Tints the current (accent) bar; valence runs keep their tokens. */
@@ -75,14 +81,23 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const geo = streakSparkGeometry(data, { width, height, threshold, positive });
+  const fontSize = streakSparkFont(height);
+  // Reserve the label's own band before geometry (canon: gutters are reserved,
+  // never measured). One font is enough even for the record run, which carries a
+  // triangle tick between bar and number: runs centre inside the band below the
+  // reservation, so a run's top sits at `room + (band - h) / 2` and `h` is at
+  // most half the band — that centring slack (≥ band / 4) already covers the
+  // tick. Reserving `fontSize + TRIANGLE_H` instead would take 51% of a default
+  // 20-unit box and shrink the current run from 10 units to 4.9, turning a
+  // streak chart into a number with a hairline under it.
+  const labelRoom = streakSparkRoom(height, label);
+  const geo = streakSparkGeometry(data, { width, height, threshold, positive, labelRoom });
   if (geo.truncated)
     devWarn(
       "<StreakSpark> more than 40 runs — the oldest collapse into an ellipsis slot; pre-aggregate or window the data.",
     );
   const accName = resolveSummary(summary, () => streakSparkSummary(geo, strings, fmt));
 
-  const fontSize = labelFont(height, 0.4);
   const currentRun = geo.runs.find((r) => r.current);
   const recordRun = geo.runs.find((r) => r.record);
   const currentIsRecord = !!recordRun && currentRun === recordRun;
@@ -127,6 +142,12 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
     );
   }
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -134,8 +155,13 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Runs are a midline-anchored lane — heights encode run TYPE, so the band's
+      // bottom carries no meaning to stand on. It must be the run band and not the
+      // box: `label` reserves room off the top, which moves the midline the runs
+      // centre on, and seating the viewBox would ride that reservation.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-streak ${className}` : "mc-streak"}
-      style={style}
+      style={rootStyle}
     >
       {geo.ellipsis ? (
         <rect

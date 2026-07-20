@@ -9,7 +9,7 @@ import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { clamp, scaleLinear } from "../../core/scale.js";
 import {
   EN_PERCENTILE_TRACE,
@@ -40,8 +40,6 @@ export interface PercentileTraceProps {
   bands?: boolean | undefined;
   /** Which direction is good — colors the endpoint dot (default "up"). */
   positive?: Polarity | undefined;
-  /** Reading noun for the interactive announcement (default "step"). */
-  unit?: string | undefined;
   /** `"last"` states the final percentile in a right gutter. */
   label?: "last" | "none" | undefined;
   width?: number | undefined;
@@ -60,6 +58,30 @@ export interface PercentileTraceProps {
 
 /** Integer formatting shared with the interactive entry. */
 export const INT: Intl.NumberFormatOptions = { maximumFractionDigits: 0 };
+
+/**
+ * Right gutter reserved for the `label="last"` readout, in viewBox units — it
+ * WIDENS the viewBox (`width + gutter`), so it is also the interactive entry's
+ * pointer basis. Exported because the client must scale pointer x by the same
+ * total the static drew with; scaling by bare `width` walks the crosshair
+ * progressively rightward and puts the last readings out of reach.
+ */
+export const percentileGutter = (labelText: string, height: number): number =>
+  labelText && percentileLabelFits(height)
+    ? Math.ceil(labelText.length * labelFont(height) * 0.72) + 4
+    : 0;
+
+/**
+ * Does the box have vertical room for the readout at all? `labelFont` floors at
+ * 7 viewBox units, so under a 7-unit-tall box a line of text cannot be seated
+ * inside the plot — it DROPS rather than spilling past the viewBox, and the
+ * gutter above drops with it so the trace keeps its own width instead of
+ * reserving space for text nobody draws. Exported for the same reason the
+ * gutter is: both entries must reach the same answer. Pure arithmetic — the
+ * static path may never measure text.
+ */
+export const percentileLabelFits = (height: number): boolean =>
+  labelFitsY(height / 2, labelFont(height), height);
 
 export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   const {
@@ -113,17 +135,20 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
     devWarn("<PercentileTrace>: ranks are 0–100; out-of-range clamped.");
   }
 
-  const showLabel = label === "last";
+  const showLabel = label === "last" && percentileLabelFits(height);
   const labelText = showLabel ? pStr(geo.last.value) : "";
-  const gutter = labelText ? Math.ceil(labelText.length * FONT * 0.72) + 4 : 0;
+  const gutter = percentileGutter(labelText, height);
 
   const lineColor = color ?? "var(--mc-accent)";
   // endpoint valence: rising standing is good by default; the line already
   // carries direction, so this color is a redundant cue
   const good = positive === "down" ? geo.delta < 0 : geo.delta > 0;
   const dotFill = geo.delta === 0 ? lineColor : good ? "var(--mc-positive)" : "var(--mc-negative)";
-  // label y clamped by font ascent so the number never spills the viewBox
-  const labelY = round2(clamp(geo.last.y, FONT * 0.7, height - FONT * 0.3));
+  // `dominant-baseline: central` straddles y by half a font EACH way, so the
+  // clamp is symmetric — an asymmetric margin let the bottom of the glyph box
+  // hang out of a short viewBox. Below `height < FONT` no clamp exists at all,
+  // and `showLabel` above has already dropped the readout.
+  const labelY = round2(clamp(geo.last.y, FONT * 0.5, height - FONT * 0.5));
 
   // annotations host contract: Marker x = reading index on the locked scale,
   // Threshold/TargetZone y = percentile ranks on the fixed [0,100] axis.
@@ -142,6 +167,10 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The axis is locked to [0,100], so the frame's bottom is a real p0 floor
+      // the trace is measured against — it seats on the text baseline. The
+      // population bands ride inside that frame and never move it.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={cls}
       style={{ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties}
     >

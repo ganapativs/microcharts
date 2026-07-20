@@ -55,3 +55,38 @@ describe("<Thermometer>", () => {
     await expectNoA11yViolations(container);
   });
 });
+
+describe("<Thermometer> degrades at small sizes", () => {
+  // The value numeral is reserved BESIDE the tube, so on a narrow box the
+  // gutter eats the instrument — and past that, exceeds the box outright and
+  // renders the numeral at a negative x. The numeral is what degrades.
+  it("keeps the numeral while the tube keeps its minimum width (20 wide)", () => {
+    const { container } = draw(<Thermometer value={72} label="value" width={20} height={48} />);
+    expect(container.querySelector("text")!.textContent).toBe("72");
+  });
+
+  it("drops the numeral rather than squash the tube — and gives the gutter back", () => {
+    const { container } = draw(<Thermometer value={72} label="value" width={19} height={48} />);
+    expect(container.querySelector("text")).toBeNull();
+    // the instrument still reads: a positive-width capsule and a real bulb
+    const tube = container.querySelector('rect[data-mc-ink="fill"]')!;
+    expect(Number(tube.getAttribute("width"))).toBeGreaterThan(0);
+    const bulb = container.querySelector("circle")!;
+    expect(Number(bulb.getAttribute("r"))).toBeGreaterThan(0);
+    // the tube reclaims the whole box: the gutter left with the numeral
+    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 19 48");
+  });
+
+  it("the numeral stays inside the box at the ends of the scale", () => {
+    for (const value of [0, 100]) {
+      const { container } = draw(
+        <Thermometer value={value} label="value" width={30} height={48} />,
+      );
+      const t = container.querySelector("text")!;
+      const fs = Number(t.getAttribute("font-size"));
+      const y = Number(t.getAttribute("y"));
+      expect(y - fs / 2).toBeGreaterThanOrEqual(0);
+      expect(y + fs / 2).toBeLessThanOrEqual(48);
+    }
+  });
+});

@@ -1,9 +1,17 @@
 "use client";
-// Interactive <SegmentedBar>. One pointer listener; segment by
-// x lookup. ←/→ rove segments incl. "Other", which announces its member count
-// ("Other: 5%, 3 categories."). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <SegmentedBar>. useActivePicker owns interaction: one pointer
+// listener + segment-by-x lookup, ←/→ rove segments incl. "Other" (which
+// announces its member count), click / Enter / Space selects (onSelect).
+// Composes the static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
@@ -14,7 +22,7 @@ import {
   type SegmentedBarProps,
 } from "./index.js";
 
-export interface InteractiveSegmentedBarProps extends SegmentedBarProps {
+export interface InteractiveSegmentedBarProps extends SegmentedBarProps, PickerProps {
   strings?: CompositionStrings;
   /**
    * Opt-in entrance motion (default `false`): segments sweep in left to right,
@@ -37,6 +45,12 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -68,7 +82,33 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pcts = useMemo(() => largestRemainderPercents(geo.segments.map((s) => s.share)), [geo]);
-  const [active, setActive] = useState<number | null>(null);
+
+  const locate = useCallback(
+    (x: number) => {
+      const i = geo.segments.findIndex((s) => x >= s.x && x <= s.x + s.w + 0.5);
+      return i >= 0 ? i : null;
+    },
+    [geo],
+  );
+  const datum = useCallback(
+    (i: number) => {
+      const d = rolled[geo.segments[i]!.index];
+      return { index: i, value: d?.value ?? null, label: d?.label };
+    },
+    [geo, rolled],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.segments.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -78,72 +118,38 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
         : sharesSummary(rolled, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.segments.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      const i = geo.segments.findIndex((s) => x >= s.x && x <= s.x + s.w + 0.5);
-      setActive(i >= 0 ? i : null);
-    },
-    [geo, width],
-  );
+  const outline = (i: number, pinned: boolean) => {
+    const s = geo.segments[i];
+    if (!s) return null;
+    return (
+      <rect
+        x={s.x - 0.5}
+        y={0.5}
+        width={s.w + 1}
+        height={height - 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.segments.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.segments.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.segments.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const seg = active !== null ? geo.segments[active] : undefined;
-  const datum = seg ? rolled[seg.index] : undefined;
+  const shown = active ?? selected;
+  const shownSeg = shown !== null ? geo.segments[shown] : undefined;
+  const shownDatum = shownSeg ? rolled[shownSeg.index] : undefined;
   const announced =
-    seg && datum
-      ? datum.members > 1
-        ? strings.shareOther(datum.label, `${pcts[active!]}%`, datum.members)
-        : strings.shareAt(datum.label, `${pcts[active!]}%`, fmt(datum.value))
+    shownSeg && shownDatum
+      ? shownDatum.members > 1
+        ? strings.shareOther(shownDatum.label, `${pcts[shown!]}%`, shownDatum.members)
+        : strings.shareAt(shownDatum.label, `${pcts[shown!]}%`, fmt(shownDatum.value))
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-segbar-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-segbar-live", className, style)} {...named(label)} {...bind}>
       <StaticSegmentedBar
         {...rest}
+        style={fillFor(style)}
         data={data}
         maxSegments={maxSegments}
         order={order}
@@ -154,30 +160,23 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
         strings={strings}
         summary={false}
       >
-        {seg ? (
-          <rect
-            x={seg.x - 0.5}
-            y={0.5}
-            width={seg.w + 1}
-            height={height - 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticSegmentedBar>
       <LiveRegion>{announced}</LiveRegion>
-      {seg && datum ? (
+      {shownSeg && shownDatum ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((seg.x + seg.w / 2) / width) * 100}%`,
+            left: `${((shownSeg.x + shownSeg.w / 2) / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {`${datum.label} ${pcts[active!]}%`}
+          {shownDatum.members > 1
+            ? `${shownDatum.label} ${pcts[shown!]}% (${shownDatum.members} ${shownDatum.members === 1 ? "category" : "categories"})`
+            : `${shownDatum.label} ${pcts[shown!]}% (${fmt(shownDatum.value)})`}
         </span>
       ) : null}
     </span>

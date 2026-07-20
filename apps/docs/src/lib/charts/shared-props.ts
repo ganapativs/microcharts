@@ -40,7 +40,8 @@ export const GRAMMAR_PROPS: ChartProp[] = [
     name: "title",
     type: "string",
     required: false,
-    description: "A visible title, wired into the chart's accessible name.",
+    description:
+      "Names the chart — rendered as an SVG `<title>`, so it becomes the accessible name and the native hover tooltip, not visible text on the page.",
   },
   {
     name: "summary",
@@ -138,6 +139,14 @@ export const I18N_PROPS: ChartProp[] = [
 /**
  * The shared INTERACTIVE grammar — props that exist only on `/interactive`
  * entries but mean the same thing wherever they appear.
+ *
+ * `animate` is on every interactive entry whose marks can carry an entrance
+ * (`entry.animates === false` marks the ones that can't). `live` is narrower
+ * still — only the entries whose value can change under a static cursor
+ * declare it. The four picker props
+ * (`onActive`, `onSelect`, `selectedIndex`, `defaultSelectedIndex`) come from
+ * `PickerProps` and exist only on charts with more than one navigable unit —
+ * `entry.picker === false` marks the ones without (see `types.ts`).
  */
 export const SHARED_INTERACTIVE_PROPS: ChartProp[] = [
   {
@@ -154,7 +163,39 @@ export const SHARED_INTERACTIVE_PROPS: ChartProp[] = [
     required: false,
     interactive: true,
     description:
-      "Announce value changes through a polite live region as the data updates (default on). Throttled so a streaming value never spams a screen reader.",
+      "Announce value changes through a polite live region as the data updates (default on), on the entries whose value can change without the reader touching the chart. Charts that stream a fast-moving number throttle their own announcements — EtaBar exposes the interval as `announceEvery`.",
+  },
+  {
+    name: "onActive",
+    type: "(datum: MicroDatum | null) => void",
+    required: false,
+    interactive: true,
+    description:
+      "The active unit changed — the one under the pointer or the keyboard focus. `null` when the chart is cleared (pointer leaves, focus blurs, Escape). Payload is `MicroDatum` — `{ index, value, label? }`, where `index` identifies the navigable unit and `value` is its primary encoded number (`null` for an empty unit).",
+  },
+  {
+    name: "onSelect",
+    type: "(datum: MicroDatum | null) => void",
+    required: false,
+    interactive: true,
+    description:
+      "A unit was activated — click, tap, `Enter` or `Space` — pinning it so it survives blur. `null` when the selection is cleared (re-activating the same unit, or `Escape`). Same `MicroDatum` payload as `onActive`.",
+  },
+  {
+    name: "selectedIndex",
+    type: "number | null",
+    required: false,
+    interactive: true,
+    description:
+      "Controlled selected unit — an index into the chart's navigable units, or `null` for none. Pass it to own the selection; pair with `onSelect`.",
+  },
+  {
+    name: "defaultSelectedIndex",
+    type: "number | null",
+    required: false,
+    interactive: true,
+    description:
+      "Uncontrolled initial selection. Ignored once `selectedIndex` is set. Use it to open a chart with one unit already pinned.",
   },
 ];
 

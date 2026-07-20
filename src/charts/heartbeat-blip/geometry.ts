@@ -16,6 +16,11 @@ export interface HeartbeatGeometry {
   lastAgoMs: number | null;
   width: number;
   height: number;
+  /** Top edge of the trace band — the spike peak. Fixed by `height`/`pad`, so a
+   *  quiet window and a busy one occupy the same frame. */
+  y0: number;
+  /** Bottom edge of the trace band — the post-spike dip, below the baseline. */
+  y1: number;
 }
 
 export function heartbeatGeometry(opts: {
@@ -63,5 +68,7 @@ export function heartbeatGeometry(opts: {
     lastAgoMs,
     width: Math.max(1, Math.round(width)),
     height: Math.max(1, Math.round(height)),
+    y0: peakY,
+    y1: dipY,
   };
 }

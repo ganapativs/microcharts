@@ -1,10 +1,19 @@
 "use client";
-// Interactive <HistogramStrip>. One pointer listener; bin by
-// x-band. ←/→ rove bins ("40 to 50: 34 values."). Composes the static entry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <HistogramStrip>. useActivePicker owns interaction: one pointer
+// listener + bin-by-x-band lookup, ←/→ rove bins ("40 to 50: 34 values."),
+// click / Enter / Space pins one (onSelect). Composes the static entry (canon).
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { histogramGeometry } from "./geometry.js";
 import {
   HistogramStrip as StaticHistogramStrip,
@@ -12,7 +21,7 @@ import {
   type HistogramStripProps,
 } from "./index.js";
 
-export interface InteractiveHistogramStripProps extends HistogramStripProps {
+export interface InteractiveHistogramStripProps extends HistogramStripProps, PickerProps {
   strings?: DistStrings;
   /**
    * Opt-in entrance motion (default `false`): bins rise from the baseline
@@ -36,6 +45,12 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -47,7 +62,6 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
     [width, height, data, domain, bins, markValue],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
 
   const modal = geo.modalBin >= 0 ? geo.bars[geo.modalBin] : undefined;
   const accName =
@@ -58,66 +72,74 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
         : histogramSummary(geo.total, modal, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.bars.length === 0 || geo.pitch === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.bars.length === 0 || geo.pitch === 0) return null;
       const i = Math.floor(x / geo.pitch);
-      setActive(i >= 0 && i < geo.bars.length ? i : null);
+      return i >= 0 && i < geo.bars.length ? i : null;
     },
-    [geo, width],
+    [geo],
+  );
+  // `index` is the BIN index (not an index into `data`): a histogram's navigable
+  // unit is the bin. `value` is the bin's count — `null` for an empty bin — and
+  // `label` its formatted range.
+  const datum = useCallback(
+    (i: number) => {
+      const b = geo.bars[i];
+      return {
+        index: i,
+        value: b && b.count > 0 ? b.count : null,
+        label: b ? `${fmt(b.x0)}–${fmt(b.x1)}` : undefined,
+      };
+    },
+    [geo, fmt],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.bars.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.bars.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.bars.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
+  const { active, selected, bind } = useActivePicker({
+    count: geo.bars.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
-  const bar = active !== null ? geo.bars[active] : undefined;
+  // The bin shown by the outline + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const bar = shown !== null ? geo.bars[shown] : undefined;
   const announced = bar ? strings.binAt(fmt(bar.x0), fmt(bar.x1), bar.count) : "";
+
+  const outline = (i: number, pinned: boolean) => {
+    const b = geo.bars[i];
+    if (!b) return null;
+    return (
+      <rect
+        x={b.x - 0.5}
+        y={-0.5}
+        width={b.w + 1}
+        height={height + 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
   return (
     <span
       ref={hostRef}
-      className="mc-histogram-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-histogram-live", className, style)}
+      {...named(label)}
+      {...bind}
     >
       <StaticHistogramStrip
         {...rest}
+        style={fillFor(style)}
         data={data}
         bins={bins}
         markValue={markValue}
@@ -129,33 +151,12 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
         strings={strings}
         summary={false}
       >
-        {bar ? (
-          <rect
-            x={bar.x - 0.5}
-            y={-0.5}
-            width={bar.w + 1}
-            height={height + 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
+        {selected !== null && selected !== active ? outline(selected, true) : null}
+        {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticHistogramStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {bar ? (
         <span
           className="mc-spark-readout"
@@ -164,7 +165,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
             transform: "translateX(-50%)",
           }}
         >
-          {bar.count}
+          {`${fmt(bar.x0)}–${fmt(bar.x1)}: ${bar.count}`}
         </span>
       ) : null}
     </span>

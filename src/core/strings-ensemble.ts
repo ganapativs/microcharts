@@ -5,7 +5,7 @@ import type { SummaryStrings } from "./summary.js";
 
 export type EnsembleStrings = Pick<
   SummaryStrings,
-  "noData" | "ensemble" | "ensembleSingle" | "ensembleAt"
+  "noData" | "ensemble" | "ensembleSingle" | "ensembleAt" | "ensembleEmpty"
 >;
 
 export const EN_ENSEMBLE: EnsembleStrings = {
@@ -14,4 +14,5 @@ export const EN_ENSEMBLE: EnsembleStrings = {
     `${n} simulated paths end between ${lo} and ${hi}; typical path ends near ${mid}.`,
   ensembleSingle: (end) => `Single path, ends at ${end}.`,
   ensembleAt: (pos, total, end) => `Member ${pos} of ${total}; ends at ${end}.`,
+  ensembleEmpty: (pos, total) => `Member ${pos} of ${total}; no data.`,
 };

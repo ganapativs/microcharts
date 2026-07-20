@@ -5,6 +5,51 @@
 // to per-bucket counts (opacity) and SAYS SO in the summary. 2-dp.
 import { uniformBins } from "../../core/bin.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
+import { labelFitsBand, labelFont, textGutter } from "../../core/labels.js";
+
+/** Lane-label layout: whether the source names are drawn, and the gutter they cost. */
+export interface RasterLabelLayout {
+  show: boolean;
+  /** Left gutter reserved for the names — 0 when they're dropped. */
+  gutter: number;
+  fontSize: number;
+}
+
+/**
+ * Resolve the lane-label gutter — the ONE place the static and interactive
+ * entries agree on it, because the gutter is the plot's x origin and a
+ * second-guessed copy puts every tick and every hover overlay in the wrong place.
+ *
+ * The names degrade in two directions, and either one drops them outright rather
+ * than letting them overlap or spill:
+ *
+ *  - **Vertically** the lane pitch is the budget. Each name is centred in its
+ *    lane, so once the lane is shorter than one em the names of adjacent sources
+ *    stack, and the first and last lanes push their em-boxes past the viewBox
+ *    edge — that is a Raster in a tab header stacking "api/db/cache". `labelFont`
+ *    floors at 7, so there is no smaller type to retreat to.
+ *  - **Horizontally** the widest name is the budget, at the library's per-char
+ *    over-estimate. Names are caller text of unknown width, so the reserve can
+ *    outgrow the sensible share of a narrow chart (45%); when it did, the old
+ *    behaviour CLAMPED the gutter and slid the text out through the left edge.
+ *
+ * The events never degrade: the lanes reclaim the gutter and keep every tick.
+ */
+export function rasterLabels(opts: {
+  labels: boolean;
+  width: number;
+  height: number;
+  lanes: number;
+  /** Chars in the widest lane name. */
+  maxChars: number;
+}): RasterLabelLayout {
+  const { labels, width, height, lanes, maxChars } = opts;
+  const laneH = height / Math.max(1, lanes);
+  const fontSize = labelFont(laneH, 0.56);
+  const gutter = textGutter(Math.max(1, maxChars), fontSize, 4);
+  const show = labels && labelFitsBand(laneH, fontSize) && gutter <= width * 0.45;
+  return { show, gutter: show ? gutter : 0, fontSize };
+}
 
 export interface RasterLaneInput {
   label: string;

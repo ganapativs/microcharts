@@ -1,6 +1,5 @@
 import { ConfusionGrid } from "@microcharts/react/confusion-grid";
-import { ConfusionGrid as ConfusionGridInteractive } from "@microcharts/react/confusion-grid/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 import { confusionMatrix } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
@@ -87,12 +86,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <ConfusionGrid data={CATDOG} summary={false} size={48} />;
 }
-
-export const showcase = {
-  hint: "errors",
-  Node: () => <ConfusionGrid data={THREE} title="Classifier" size={52} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -131,31 +124,6 @@ export const playground: PlaygroundSpec = {
       s.accent !== "diagonal" && `  accent="${s.accent}"`,
       s.label === true && '  label="accuracy"',
       s.round === true && '  shape="round"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ConfusionGridInteractive
-      data={THREE}
-      normalize={s.normalize as "row" | "none"}
-      accent={s.accent as "diagonal" | "errors"}
-      label={s.label ? "accuracy" : "none"}
-      shape={s.round ? "round" : "square"}
-      summary={false}
-      animate={ui.animate}
-      size={120}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<ConfusionGrid",
-      "  data={{ labels, counts }}",
-      s.normalize !== "row" && `  normalize="${s.normalize}"`,
-      s.accent !== "diagonal" && `  accent="${s.accent}"`,
-      s.label === true && '  label="accuracy"',
-      s.round === true && '  shape="round"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -254,19 +222,12 @@ export function Mark() {
 export function markCode(): string {
   return `<ConfusionGrid data={{ labels, counts }} />`;
 }
-
-export function PreviewLive() {
-  return <ConfusionGridInteractive data={CATDOG} summary={false} size={48} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

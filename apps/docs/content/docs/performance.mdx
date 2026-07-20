@@ -2,7 +2,7 @@
 title: Performance
 description:
   Zero dependencies, budget-gated sizes, and server rendering with no client JavaScript — 106 chart types measured at
-  0.9–3.6 kB gzip (median 2.3) and rendered to SVG at about 0.035 ms each. Every number here is reproducible from one
+  1–3.9 kB gzip (median 2.5) and rendered to SVG at about 0.031 ms each. Every number here is reproducible from one
   command.
 ---
 
@@ -20,17 +20,39 @@ build.
 
 <SizeDistribution />
 
-The whole catalog lands between **0.91 kB and 3.64 kB** gzip, with a **median of 2.3 kB** — and that's the _static_
-entry. Interactivity is opt-in from a separate `/interactive` subpath and adds roughly a kilobyte (median 3.57 kB), so a
-page pays for hover and keyboard only where it actually uses them.
+The whole catalog lands between **0.95 kB and 3.93 kB** gzip, with a **median of 2.51 kB** — and that's the _static_
+entry. Interactivity is opt-in from the `/interactive` subpath, which runs a median 4.7 kB — about 2.2 kB more — for the
+whole contract: hover, roving keyboard focus, select-to-pin, touch scrub, and live announcements. A page pays for it
+only where it actually uses it. About 0.5 kB of that is the shared picker kernel, which the per-subpath gate measures
+standalone in every entry; a page using several interactive charts bundles it once.
 
 <SizeTable />
 
-Eight charts sit above the 3 kB reference line. Sparkline, the most configurable primitive in the set, is the largest;
-the rest are the value-series charts that can host annotations (ChangePoint, WinProbWorm, ForecastCone, DualSparkline,
-BurnChart, SpreadBand) plus Station Glyph, which packs the most geometry per mark. The annotation hosts carry a small
-shared walker that resolves `Threshold`, `Marker`, and the rest against the chart's scale — you pay for it only on those
-charts, and each is still smaller than a single icon font.
+Twenty charts sit above the 3 kB reference line, none of them by more than 0.93 kB. Sparkline, the most configurable
+primitive in the set, is the largest; most of the rest are the value-series charts that can host annotations
+(ChangePoint, WinProbWorm, ForecastCone, DualSparkline, BurnChart, SpreadBand, RetentionCurve, ControlStrip,
+PercentileLadder, QueueDepth, SparkBar, ShiftHistogram, StackedArea, ABStrips), plus Station Glyph, Slope, PolarClock,
+Constellation, and TapeGauge, which share one layout pass between their static and interactive entries so overlays can
+never drift from the marks. The annotation hosts carry a small shared walker that resolves `Threshold`, `Marker`, and
+the rest against the chart's scale — you pay for it only on those charts, and each is still smaller than a single icon
+font.
+
+### Splitting the stylesheet
+
+`@microcharts/react/styles.css` is one artifact for the whole catalog, and importing it once is the right default — it
+is small, it caches, and it never grows with the number of charts you use. If you ship exactly one or two charts and
+want the rules for the rest gone, there is an opt-in split: `@microcharts/react/styles/core.css` carries everything
+shared, and `@microcharts/react/styles/<slug>.css` carries the rules specific to a single chart. Only the charts with
+chart-specific CSS have a file; the rest need `core.css` alone.
+
+```ts
+import "@microcharts/react/styles/core.css";
+import "@microcharts/react/styles/sparkline.css";
+```
+
+`core.css` plus the slugs you import is equivalent to the matching subset of `styles.css` — same rules, same `@layer`
+membership, same cascade order — so the split is a byte trade, never a behavior change. Import one or the other, not
+both.
 
 ## Server rendering
 
@@ -41,11 +63,11 @@ string:
 <ScalingTable />
 
 A table of **500 sparklines becomes HTML in under six milliseconds**, streams as part of the document, and ships nothing
-to hydrate. Across all 106 chart types the median render is about **0.035 ms per chart** — the heavier expressive and
+to hydrate. Across all 106 chart types the median render is about **0.031 ms per chart** — the heavier expressive and
 frontier instruments cost more geometry, the simple strips cost almost nothing.
 
 The core summary kernel is just as cheap: `describeSeries`, which writes every chart's accessible sentence, runs at
-roughly **966,000 calls per second** (24-point series, measured by `pnpm bench`), so accessibility is never the thing
+roughly **829,000 calls per second** (24-point series, measured by `pnpm bench`), so accessibility is never the thing
 that slows a render down.
 
 ## Why it's fast
@@ -60,15 +82,41 @@ The speed isn't a trick — it's the absence of one.
   `shape-rendering: crispEdges`, so the browser does less work rasterising them.
 - **One stylesheet, one cascade layer.** Theming is CSS custom properties in a low-specificity `@layer`, not inline
   styles recomputed per instance.
+- **A scrub costs one render per unit crossed, not one per pointer move.** Interactive entries put a single listener on
+  the wrapper and resolve the unit with pure math, then bail out when the unit hasn't changed — so a sweep across a
+  24-point Sparkline re-renders at most 24 times no matter how many pointer events the browser delivers.
+
+### Re-rendering many charts
+
+Static entries are hook-free — that's what keeps them RSC-safe — so they can't memoise internally: a parent re-render
+re-runs each chart's geometry. That's cheap per chart, but it adds up in a table of hundreds.
+
+If you render many charts inside a component that re-renders for unrelated reasons, wrap them and keep `data`
+referentially stable:
+
+```tsx
+const Spark = memo(Sparkline);
+```
+
+The catch is that `memo` only helps when props are actually stable — pass a fresh array literal (`data={[1, 2, 3]}`) or
+JSX children and it misses every time, and you pay the comparison on top of the render you were going to do anyway.
+Hoist the array, or skip it.
+
+We don't ship `memo` on the charts themselves for exactly that reason: it would tax the common case to speed up a
+specific one, and it's your call, not ours.
 
 ## Honest caveats
 
-- **Two charts are marginally under their SSR floor.** Ensemble Ghosts and Win-Probability Worm draw the most paths per
-  render and land just below their per-chart throughput target. They're flagged in the bench output, not hidden —
-  `pnpm bench` exits non-zero and names them.
-- **Interactive entries do ship JavaScript.** The `/interactive` subpath adds a client component and a pointer listener.
-  It's still tiny, but it isn't zero — reach for the static entry unless a chart genuinely needs hover, keyboard, or
-  live announcements.
+- **The bench is one process, and that used to bite.** Measuring 106 components in sequence let earlier charts leave the
+  later ones cold, and a median over windows short enough for one GC pause produced bimodal numbers — the same chart
+  read 140 and 35 rows/ms on consecutive runs of identical code. `pnpm bench` now warms each component immediately
+  before timing it and reports the fastest window, since GC and scheduler noise only ever slow a window down. Every
+  chart clears its floor; if one stops, `pnpm bench` exits non-zero and names it.
+- **Interactive entries do ship JavaScript.** The `/interactive` subpath adds a client component and a small set of
+  listeners on the wrapper — pointer, keyboard, and touch — plus the shared picker kernel that resolves them to a unit
+  with pure math. There is still never a listener per data point, so a 30-point chart and a 365-cell grid cost the same.
+  It's tiny, but it isn't zero — reach for the static entry unless a chart genuinely needs hover, keyboard, selection,
+  or live announcements.
 - **These numbers are one machine, one Node.** They measure _relative_ cost honestly and reproduce on your hardware;
   treat them as a floor to reproduce, not an absolute to quote.
 

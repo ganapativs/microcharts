@@ -21,6 +21,10 @@ export interface WindBarbGeometry {
   counts: { pennant: number; full: number; half: number };
   /** Center, for the calm-circle glyph. */
   center: { x: number; y: number };
+  /** Top edge of the plot box — the disc the shaft sweeps as direction turns. */
+  y0: number;
+  /** Bottom edge of that same disc. Direction and magnitude never move it. */
+  y1: number;
 }
 
 function rot(x: number, y: number, a: number): [number, number] {
@@ -47,6 +51,10 @@ export function windBarbGeometry(opts: {
   const dx = Math.sin(θ);
   const dy = -Math.cos(θ);
   const center = { x: cx, y: cy };
+  // The shaft rotates about the center, so the plot box is its sweep disc —
+  // fixed by width/height alone, identical for calm and for every direction.
+  const y0 = round2(cy - R);
+  const y1 = round2(cy + R);
 
   if (!Number.isFinite(m) || m < step / 4) {
     return {
@@ -56,6 +64,8 @@ export function windBarbGeometry(opts: {
       calm: true,
       counts: { pennant: 0, full: 0, half: 0 },
       center,
+      y0,
+      y1,
     };
   }
 
@@ -135,5 +145,5 @@ export function windBarbGeometry(opts: {
     });
   }
 
-  return { shaft, barbs, pennants, calm: false, counts: { pennant, full, half }, center };
+  return { shaft, barbs, pennants, calm: false, counts: { pennant, full, half }, center, y0, y1 };
 }

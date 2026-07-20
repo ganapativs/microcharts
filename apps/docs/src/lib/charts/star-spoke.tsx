@@ -1,6 +1,5 @@
 import { StarSpoke } from "@microcharts/react/star-spoke";
-import { StarSpoke as StarSpokeInteractive } from "@microcharts/react/star-spoke/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const PROFILE = [
@@ -78,12 +77,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <StarSpoke data={PROFILE} summary={false} size={84} />;
 }
-
-export const showcase = {
-  hint: "profile",
-  Node: () => <StarSpoke data={PROFILE} dots="tips" title="Product profile" size={84} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "dots", label: "dots", init: false },
@@ -110,31 +103,6 @@ export const playground: PlaygroundSpec = {
       s.guides === false && "  guides={false}",
       s.compare === true && "  compare={baseline}",
       s.labels === true && "  labels",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <StarSpokeInteractive
-      data={PROFILE}
-      dots={s.dots ? "tips" : "none"}
-      guides={s.guides as boolean}
-      compare={s.compare ? [0.5, 0.5, 0.5, 0.5, 0.5] : undefined}
-      labels={s.labels as boolean}
-      animate={ui.animate}
-      summary={false}
-      size={110}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<StarSpoke",
-      "  data={metrics}",
-      s.dots === true && '  dots="tips"',
-      s.guides === false && "  guides={false}",
-      s.compare === true && "  compare={baseline}",
-      s.labels === true && "  labels",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -255,19 +223,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<StarSpoke data={metrics} />`;
 }
-
-export function PreviewLive() {
-  return <StarSpokeInteractive data={PROFILE} summary={false} size={84} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

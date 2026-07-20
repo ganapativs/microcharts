@@ -107,6 +107,15 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Both bars in a pair share one zero-anchored domain over the full box, so
+      // vertical pairs stand on the box bottom like any column chart. Horizontal
+      // puts value on the x-axis — the box becomes a stack of category rows with
+      // no floor, and centring on the cap band is the honest seat.
+      seat={
+        orientation === "vertical"
+          ? { mode: "floor", bottom: height }
+          : { mode: "center", top: 0, bottom: height }
+      }
       className={className ? `mc-paired ${className}` : "mc-paired"}
       style={style}
     >

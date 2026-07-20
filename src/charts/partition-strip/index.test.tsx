@@ -4,8 +4,7 @@ import { render } from "@testing-library/react";
 import { PartitionStrip, partitionStripSummary } from "./index.js";
 import { EN_PARTITION } from "../../core/strings-partition.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
-import { seriesEdgeSuite } from "../../test/edge-cases.js";
-import type { Value } from "../../core/types.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -65,12 +64,21 @@ describe("<PartitionStrip>", () => {
   });
 });
 
-seriesEdgeSuite("PartitionStrip", (data: readonly Value[]) => (
-  <PartitionStrip
-    data={data.map((v, i) => ({ label: `g${i}`, value: typeof v === "number" ? v : 0 }))}
-    title="Edge"
-  />
-));
+// `parentValue` reads a node's own `value` OR the sum of its children, so the
+// matrix runs once down each branch. The previous spelling laundered every gap
+// into `value: 0` and never built a child at all — which both hid the child sum
+// and asserted that a part nobody measured occupies zero width. `labels` on:
+// the numeral leaks live in the text, not the rects.
+mappedEdgeSuite(
+  "PartitionStrip (degenerate parent value)",
+  (v, i) => ({ label: `g${i}`, value: v as number }),
+  (data) => <PartitionStrip data={data} labels title="Edge" />,
+);
+mappedEdgeSuite(
+  "PartitionStrip (degenerate child value)",
+  (v, i) => ({ label: `g${i}`, children: [{ label: `c${i}`, value: v as number }] }),
+  (data) => <PartitionStrip data={data} labels title="Edge" />,
+);
 
 describe("<PartitionStrip> colors", () => {
   it("colors[] overrides group fills, cycling", () => {

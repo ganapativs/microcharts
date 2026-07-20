@@ -1,6 +1,5 @@
 import { QuadrantDot } from "@microcharts/react/quadrant-dot";
-import { QuadrantDot as QuadrantDotInteractive } from "@microcharts/react/quadrant-dot/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a prioritization backlog — effort (x) vs impact (y)
@@ -21,7 +20,7 @@ export const FIELD = [
   { x: 3, y: 2 },
   { x: 6, y: 1 },
 ];
-const AXES = {
+export const AXES = {
   xLabel: "effort",
   yLabel: "impact",
   xDomain: [0, 10] as const,
@@ -133,21 +132,6 @@ export function Preview() {
     <QuadrantDot data={FOCAL} field={FIELD} {...AXES} summary={false} width={48} height={48} />
   );
 }
-
-export const showcase = {
-  hint: "the focal, against the field",
-  Node: () => (
-    <QuadrantDot
-      data={FOCAL}
-      field={FIELD}
-      {...AXES}
-      title="Effort vs impact"
-      width={72}
-      height={72}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "splitX", label: "split x", min: 2, max: 8, step: 1, init: 5 },
@@ -178,35 +162,6 @@ export const playground: PlaygroundSpec = {
       s.region === false && "  region={false}",
       s.named && `  quadrants={["quick win", "big bet", "skip", "time sink"]}`,
       '  xLabel="effort" yLabel="impact"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <QuadrantDotInteractive
-      data={FOCAL}
-      field={FIELD}
-      {...AXES}
-      split={[s.splitX as number, s.splitY as number]}
-      region={s.region as boolean}
-      quadrants={s.named ? ["quick win", "big bet", "skip", "time sink"] : undefined}
-      title="Effort vs impact"
-      summary={false}
-      animate={ui.animate}
-      width={120}
-      height={120}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<QuadrantDot",
-      "  data={item}",
-      "  field={backlog}",
-      `  split={[${s.splitX}, ${s.splitY}]}`,
-      s.region === false && "  region={false}",
-      s.named && `  quadrants={["quick win", "big bet", "skip", "time sink"]}`,
-      '  xLabel="effort" yLabel="impact"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -328,29 +283,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<QuadrantDot data={item} field={backlog} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <QuadrantDotInteractive
-      data={FOCAL}
-      field={FIELD}
-      {...AXES}
-      summary={false}
-      width={48}
-      height={48}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

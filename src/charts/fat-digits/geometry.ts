@@ -2,10 +2,10 @@
 // the exact channel; font-WEIGHT is a redundant preattentive tier (5 or 3
 // ordinal steps) so big numbers in a dense column pop before you read them.
 // DEVIATION from FatFonts: the source encodes magnitude as glyph ink
-// AREA via a custom font; shipping a font would break zero-dep (
-// #1), so we map to discrete font-weight tiers on the inherited font. Weight is
-// ordinal, never continuous; the numeral is always the exact value.
-import { round2 } from "../../core/types.js";
+// AREA via a custom font; shipping a font would break zero-dep, so magnitude
+// maps to discrete font-weight tiers on the inherited font. Weight is ordinal,
+// never continuous; the numeral is always the exact value.
+import { isFiniteValue, round2 } from "../../core/types.js";
 
 export type FatTiers = 3 | 5;
 
@@ -19,18 +19,29 @@ function clamp01(n: number): number {
   return n < 0 ? 0 : n > 1 ? 1 : n;
 }
 
-/** value → { weight, tier } (1-based tier). No domain → the middle tier. */
+/**
+ * value → { weight, tier } (1-based tier). No USABLE domain → the middle tier.
+ * "Usable" means a finite, non-degenerate pair: a short array (`domain[1]`
+ * undefined) or a non-finite bound would make the ratio NaN, and a NaN index
+ * silently reads an undefined weight AND leaks "tier NaN" into the summary.
+ * The domain is validated once, here, where the numbers enter.
+ */
 export function fatTier(
   value: number,
   domain: readonly [number, number] | undefined,
   tiers: FatTiers,
 ): { weight: number; tier: number } {
   const steps = WEIGHTS[tiers];
+  const usable =
+    domain !== undefined &&
+    isFiniteValue(domain[0]) &&
+    isFiniteValue(domain[1]) &&
+    domain[0] !== domain[1];
   let idx: number;
-  if (!domain || domain[0] === domain[1] || !Number.isFinite(value)) {
+  if (!usable || !isFiniteValue(value)) {
     idx = Math.floor((tiers - 1) / 2); // middle tier
   } else {
-    const t = clamp01((value - domain[0]) / (domain[1] - domain[0]));
+    const t = clamp01((value - domain[0]!) / (domain[1]! - domain[0]!));
     idx = Math.round(t * (tiers - 1));
   }
   return { weight: steps[idx]!, tier: idx + 1 };

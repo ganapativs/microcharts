@@ -71,3 +71,136 @@ describe("<TapeGauge>", () => {
 valueEdgeSuite("TapeGauge", (value: number) => (
   <TapeGauge value={value} title="Edge" height={64} />
 ));
+
+// The scalar suite above walks `value`. ZONES are the other numeric input, and a
+// malformed zone used to sail past the `b <= a` reject (NaN compares false) and
+// emit y="NaN" height="NaN".
+const z = (from: unknown, to: unknown, tone: "pos" | "neg" | "warn" | "neutral" = "warn") =>
+  ({ from, to, tone }) as unknown as { from: number; to: number; tone: "warn" };
+
+describe("<TapeGauge> degenerate zones (tests/craft/robust.mjs)", () => {
+  const CASES: Record<string, readonly ReturnType<typeof z>[]> = {
+    empty: [],
+    "single zone": [z(130, 150)],
+    "zero-width zone": [z(140, 140)],
+    "reversed zone": [z(150, 130)],
+    "null bounds": [z(null, null)],
+    "one null bound": [z(130, null)],
+    "NaN and ±Infinity": [
+      z(Number.NaN, 150),
+      z(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY),
+    ],
+    "mixed good and malformed": [z(130, 150, "pos"), z(Number.NaN, Number.NaN)],
+    negatives: [z(-150, -130)],
+    huge: [z(1e15, 3e15)],
+    tiny: [z(1e-9, 3e-9)],
+  };
+
+  for (const [label, zones] of Object.entries(CASES)) {
+    it(`${label} → renders, no non-finite leak, a11y contract holds`, () => {
+      const { container } = draw(
+        <TapeGauge value={142} rate={1} zones={zones} span={60} height={64} title="Edge" />,
+      );
+      for (const el of container.querySelectorAll("*"))
+        for (const attr of [
+          "d",
+          "x",
+          "y",
+          "x1",
+          "x2",
+          "y1",
+          "y2",
+          "cx",
+          "cy",
+          "r",
+          "width",
+          "height",
+          "viewBox",
+          "aria-label",
+        ])
+          expect(el.getAttribute(attr) ?? "", `<${el.tagName} ${attr}>`).not.toMatch(
+            /NaN|Infinity/,
+          );
+      expect(container.textContent).not.toMatch(/NaN|Infinity|undefined/);
+      expect(container.querySelector('[role="img"][aria-label]')).not.toBeNull();
+    });
+  }
+
+  it("a malformed zone is dropped, and a good one beside it still draws", () => {
+    const { container } = draw(
+      <TapeGauge value={142} zones={CASES["mixed good and malformed"]!} span={60} height={64} />,
+    );
+    expect(container.querySelectorAll("rect").length).toBe(1);
+  });
+
+  it("empty ≠ zero: no reading draws the rail + an unfilled pointer, not a blank box", () => {
+    const { container } = draw(<TapeGauge value={NaN} zones={ZONES} span={60} height={64} />);
+    // one muted path carries the rail + the unfilled pointer
+    const chrome = container.querySelector<SVGPathElement>('path[data-mc-ink="muted"]')!;
+    expect(chrome).not.toBeNull();
+    expect(chrome.getAttribute("d")).toMatch(/^M[\d.]+ 1V[\d.]+M/);
+    expect(container.querySelectorAll("rect").length).toBe(0); // no zone read as level
+    expect([...container.querySelectorAll("text")].length).toBe(0); // no readout
+  });
+});
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox — and the tape still
+// renders.
+describe("TapeGauge degradation", () => {
+  it("a tick numeral within half a line of the box edge drops", () => {
+    const big = draw(
+      <TapeGauge value={142} zones={ZONES} span={60} width={160} height={30} />,
+    ).container;
+    const bigTicks = [...big.querySelectorAll("text[data-mc-ink='label']")];
+    expect(bigTicks.length).toBeGreaterThan(0);
+    for (const t of bigTicks) {
+      const y = Number(t.getAttribute("y"));
+      const fs = Number(t.getAttribute("font-size"));
+      expect(y - fs * 0.5).toBeGreaterThanOrEqual(0);
+      expect(y + fs * 0.5).toBeLessThanOrEqual(30);
+    }
+
+    // at 18 units tall the outermost tick sits under 3.5 units from the edge
+    const small = draw(
+      <TapeGauge value={142} zones={ZONES} span={60} width={96} height={18} />,
+    ).container;
+    for (const t of small.querySelectorAll("text[data-mc-ink='label']")) {
+      const y = Number(t.getAttribute("y"));
+      const fs = Number(t.getAttribute("font-size"));
+      expect(y - fs * 0.5).toBeGreaterThanOrEqual(0);
+      expect(y + fs * 0.5).toBeLessThanOrEqual(18);
+    }
+    // the tape, its ticks and the pointer survive
+    expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+
+  it("the hero readout drops when the box cannot seat it at 7 units", () => {
+    const big = draw(
+      <TapeGauge
+        value={142}
+        zones={ZONES}
+        span={60}
+        orientation="horizontal"
+        width={160}
+        height={30}
+      />,
+    ).container;
+    expect([...big.querySelectorAll("text")].some((t) => t.textContent === "142")).toBe(true);
+
+    // horizontal seats the readout UNDER the tape column — a 18-unit box leaves
+    // it under 7 units of room, so it drops rather than painting past the edge
+    const small = draw(
+      <TapeGauge
+        value={142}
+        zones={ZONES}
+        span={60}
+        orientation="horizontal"
+        width={96}
+        height={18}
+      />,
+    ).container;
+    expect([...small.querySelectorAll("text")].some((t) => t.textContent === "142")).toBe(false);
+    expect(small.querySelector("path[data-mc-ink='accent']")).not.toBeNull();
+  });
+});

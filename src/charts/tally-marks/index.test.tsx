@@ -53,3 +53,17 @@ describe("<TallyMarks>", () => {
     await expectNoA11yViolations(container);
   });
 });
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("TallyMarks degradation", () => {
+  it("the +N overflow numeral drops under its own 9-unit height, the strokes still draw", () => {
+    const big = draw(<TallyMarks value={23} total={12} height={32} />).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(<TallyMarks value={23} total={12} height={8} />).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelector("path")).not.toBeNull();
+  });
+});

@@ -32,6 +32,10 @@ interface ShiftBin {
 
 export interface ShiftHistogramGeometry {
   centerY: number;
+  /** Plot box top/bottom in viewBox units — the padded mirror frame the tallest
+   *  bin on either side can reach. Prop-derived, never data-derived. */
+  y0: number;
+  y1: number;
   bins: ShiftBin[];
   medians: {
     before: { x: number; value: number } | null;
@@ -114,6 +118,8 @@ export function shiftHistogramGeometry(opts: {
 
   return {
     centerY,
+    y0: round2(pad),
+    y1: round2(height - pad),
     bins,
     medians: {
       before: bMed === null ? null : { x: medX(bMed), value: round2(bMed) },

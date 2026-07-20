@@ -1,10 +1,20 @@
 "use client";
-// Interactive <RetentionCurve>. One pointer listener + nearest-
-// period math. ←/→ step periods; the live region states retention and, when a
-// benchmark is present, its value too. Composes the static component (canon);
-// the crosshair + ghost-value tick are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <RetentionCurve>. useActivePicker owns interaction: one pointer
+// listener + nearest-period math, roving keyboard (←/→ step periods, Home/End
+// ends), touch tap-to-pin, and the onActive/onSelect contract. The live region
+// states retention and, when a benchmark is present, its value too. Composes
+// the static component (canon); the crosshair + ghost-value tick are children.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
+import {
+  named,
+  fillFor,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
@@ -16,7 +26,9 @@ import {
   type RetentionCurveProps,
 } from "./index.js";
 
-export interface InteractiveRetentionCurveProps extends RetentionCurveProps {
+type RetentionPoint = NonNullable<ReturnType<typeof retentionGeometry>>["points"][number];
+
+export interface InteractiveRetentionCurveProps extends RetentionCurveProps, PickerProps {
   strings?: RetentionStrings;
   /**
    * Opt-in entrance motion (default `false`): the line draws on when the
@@ -41,19 +53,46 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
 
-  const geo = useMemo(
-    () =>
-      retentionGeometry({ width, height, data, benchmark, plateau, curve, domain: props.domain }),
-    [width, height, data, benchmark, plateau, curve, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = retentionGeometry({
+      width,
+      height,
+      data,
+      benchmark,
+      plateau,
+      curve,
+      domain: props.domain,
+    });
+    const showLabel = (props.label ?? "last") === "last" && base != null;
+    const gutterCh = showLabel ? fmt(base!.last.value).length : 0;
+    return retentionGeometry({
+      width,
+      height,
+      data,
+      benchmark,
+      plateau,
+      curve,
+      domain: props.domain,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, benchmark, plateau, curve, props.domain, props.label, fmt]);
 
   const accName =
     summary === false
@@ -65,56 +104,61 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
           : retentionSummary(geo, fmt, unit, data.length, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const count = geo?.points.length ?? 0;
+  // The navigable stops are the finite periods, keyed by their PERIOD index —
+  // the same index `onSelect` emits, so `selectedIndex` round-trips. Gaps make
+  // that space sparse, hence the lookup and `navOrder` below.
+  const ptByPeriod = useMemo(() => {
+    const m = new Map<number, RetentionPoint>();
+    geo?.points.forEach((p) => m.set(p.period, p));
+    return m;
+  }, [geo]);
+  const stops = useMemo(() => geo?.points.map((p) => p.period) ?? [], [geo]);
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * geo.totalWidth;
-      let best = 0;
+  // Nearest-period hit-test in viewBox space (scaled into `totalWidth`);
+  // returns the PERIOD index.
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || geo.points.length === 0) return null;
+      let best = geo.points[0]!.period;
       let bestDist = Infinity;
-      geo.points.forEach((p, i) => {
-        const d = Math.abs(p.x - px);
+      geo.points.forEach((p) => {
+        const d = Math.abs(p.x - x);
         if (d < bestDist) {
           bestDist = d;
-          best = i;
+          best = p.period;
         }
       });
-      setActive(best);
+      return best;
     },
-    [geo, count],
+    [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (count === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((prev) => Math.min(count - 1, (prev ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((prev) => (prev === null || prev <= 0 ? 0 : prev - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(count - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [count],
+  // Walk finite periods (skip gaps): step in stop-space, land on period indices.
+  const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
+
+  // Navigable unit = a finite cohort period; `index` is its original period
+  // (the data index the consumer knows), `value` its retained fraction.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: ptByPeriod.get(i)?.value ?? null }),
+    [ptByPeriod],
   );
 
-  const p = active !== null && geo ? geo.points[active] : undefined;
+  const { active, selected, bind } = useActivePicker({
+    count: stops.length,
+    width: geo?.totalWidth ?? width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const shown = active ?? selected;
+  const p = shown !== null ? ptByPeriod.get(shown) : undefined;
+  const pin = selected !== null && selected !== active ? ptByPeriod.get(selected) : undefined;
   const announced = p
     ? strings.retentionAt(unit, p.period, fmt(p.value), p.bench === null ? null : fmt(p.bench))
     : "";
@@ -122,18 +166,13 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
   return (
     <span
       ref={hostRef}
-      className="mc-retention-curve-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-retention-curve-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticRetentionCurve
         {...rest}
+        style={fillFor(style)}
         data={data}
         benchmark={benchmark}
         plateau={plateau}
@@ -146,6 +185,18 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
         strings={strings}
         summary={false}
       >
+        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
+        {pin ? (
+          <circle
+            cx={pin.x}
+            cy={pin.y}
+            r={2.4}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {p ? (
           <>
             <line

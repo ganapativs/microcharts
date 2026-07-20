@@ -1,6 +1,5 @@
 import { RateVolume } from "@microcharts/react/rate-volume";
-import { RateVolume as RateVolumeInteractive } from "@microcharts/react/rate-volume/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a conversion rate climbing as reach drains away — the last reading is a big
@@ -15,9 +14,9 @@ export const DEMO = [
   { rate: 3.6, volume: 66 },
   { rate: 4.1, volume: 38 },
 ];
-const PCT = { style: "percent", maximumFractionDigits: 1 } as const;
+export const PCT = { style: "percent", maximumFractionDigits: 1 } as const;
 // the rates as fractions so percent formatting reads them (2.3% → 0.023)
-const FRAC = DEMO.map((d) => ({ rate: d.rate / 100, volume: d.volume }));
+export const FRAC = DEMO.map((d) => ({ rate: d.rate / 100, volume: d.volume }));
 
 export const entry: ChartEntry = {
   name: "RateVolume",
@@ -106,21 +105,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <RateVolume data={FRAC} format={PCT} summary={false} width={150} height={26} />;
 }
-
-export const showcase = {
-  hint: "rate on volume",
-  Node: () => (
-    <RateVolume
-      data={FRAC}
-      format={PCT}
-      minVolume={50}
-      title="Conversion rate"
-      width={150}
-      height={26}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "minVolume", label: "flag low volume", init: true },
@@ -158,31 +142,6 @@ export const playground: PlaygroundSpec = {
       s.minVolume && "  minVolume={50}",
       s.curve !== "linear" && `  curve="${s.curve}"`,
       s.label !== "last" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <RateVolumeInteractive
-      data={FRAC}
-      format={PCT}
-      minVolume={s.minVolume ? 50 : undefined}
-      curve={s.curve as "linear" | "step"}
-      label={s.label as "last" | "none"}
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={28}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<RateVolume",
-      "  data={periods}",
-      s.minVolume && "  minVolume={50}",
-      s.curve !== "linear" && `  curve="${s.curve}"`,
-      s.label !== "last" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -335,28 +294,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<RateVolume data={periods} minVolume={50} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <RateVolumeInteractive
-      data={FRAC}
-      format={PCT}
-      summary={false}
-      width={150}
-      height={26}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -69,7 +69,14 @@ describe("catalog shared + interactive props", () => {
       expect(names.has(n), `sharedProps missing grammar prop ${n}`).toBe(true);
     }
     // shared interactive grammar lives here (documented once), flagged interactive
-    for (const n of ["animate", "live"]) {
+    for (const n of [
+      "animate",
+      "live",
+      "onActive",
+      "onSelect",
+      "selectedIndex",
+      "defaultSelectedIndex",
+    ]) {
       const p = SHARED_PROPS.find((x) => x.name === n);
       expect(p?.interactive, `sharedProps ${n} must be flagged interactive`).toBe(true);
     }
@@ -80,9 +87,9 @@ describe("catalog shared + interactive props", () => {
   it("interactive-only props are documented on the charts that own them", () => {
     expect(owns("calendar-strip", "dateFormat")).toBe(true);
     expect(owns("event-timeline", "dateFormat")).toBe(true);
-    expect(owns("sparkline", "onPointFocus")).toBe(true);
+    // minimap-strip is the deliberate exception to the picker contract — a
+    // range/slider primitive, so it keeps its own window callback.
     expect(owns("minimap-strip", "onWindowChange")).toBe(true);
-    expect(owns("streak-spark", "onRunFocus")).toBe(true);
     expect(owns("eta-bar", "announceEvery")).toBe(true);
     expect(owns("tape-gauge", "announceEvery")).toBe(true);
   });

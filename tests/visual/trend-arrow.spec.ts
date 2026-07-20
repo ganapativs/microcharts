@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-// The BUILT artifact — visual baseline doubles as a dist smoke test (plan/09).
+// The BUILT artifact — visual baseline doubles as a dist smoke test.
 import { TrendArrow } from "../../dist/charts/trend-arrow/index.js";
 
 const styles = readFileSync(fileURLToPath(new URL("../../styles.css", import.meta.url)), "utf8");
@@ -13,7 +13,7 @@ const svg = (props: Record<string, unknown>) => renderToStaticMarkup(h(TrendArro
 function gallery(): string {
   const sentence = `Checkout latency ${svg({ value: -0.08, positive: "down", title: "Latency" })} improved again this week.`;
 
-  // table direction column — the hero context (plan/22 #1)
+  // table direction column — the hero context
   const cell = `<table><tbody>
     <tr><td>API p95</td><td>${svg({ value: -0.12, positive: "down", summary: false })}</td><td>184 ms</td></tr>
     <tr><td>Error rate</td><td>${svg({ value: 0.4, positive: "down", summary: false })}</td><td>0.42%</td></tr>

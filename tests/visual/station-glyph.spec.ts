@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-// The BUILT artifact — visual baseline doubles as a dist smoke test (plan/09).
+// The BUILT artifact — visual baseline doubles as a dist smoke test.
 import { StationGlyph } from "../../dist/charts/station-glyph/index.js";
 
 const styles = readFileSync(fileURLToPath(new URL("../../styles.css", import.meta.url)), "utf8");
@@ -24,7 +24,7 @@ const OBS = {
 function gallery(): string {
   const sentence = `${OBS.station} reports ${svg({ ...OBS, size: 32, summary: false })} this hour.`;
 
-  // station-list table — the hero context (plan/25 §20)
+  // station-list table — the hero context
   const cell = `<table><tbody>
     <tr><td>KSFO</td><td>${svg({ ...OBS, size: 26, summary: false })}</td></tr>
     <tr><td>KJFK</td><td>${svg({ cloud: 1, wind: { direction: 300, magnitude: 45 }, temp: 4, dewpoint: 2, pressure: 988, station: "KJFK", size: 26, summary: false })}</td></tr>

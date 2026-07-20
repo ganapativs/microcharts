@@ -19,7 +19,7 @@ export interface EtaBarProps {
   /** `"eta"` (the product) · `"percent"` · `"none"`. */
   label?: "eta" | "percent" | "none" | undefined;
   /** Unit-bearing ETA label ("2 min") — the caller owns units. */
-  formatEta?: ((t: number) => string) | undefined;
+  etaFormat?: ((t: number) => string) | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Format | undefined;
@@ -39,7 +39,7 @@ export function etaBarSummary(
     progress: number;
     elapsed: number;
     rate: number | null;
-    formatEta?: ((t: number) => string) | undefined;
+    etaFormat?: ((t: number) => string) | undefined;
     fmt: (n: number) => string;
   },
   strings: EtaBarStrings,
@@ -48,7 +48,7 @@ export function etaBarSummary(
   const pct = `${Math.round(Math.max(0, Math.min(1, opts.progress || 0)) * 100)}%`;
   if (opts.progress >= 1) return strings.etaBarDone;
   if (geo.indeterminate || geo.remainingTime == null) return strings.etaBarStalled(pct);
-  const rem = opts.formatEta ? opts.formatEta(geo.remainingTime) : opts.fmt(geo.remainingTime);
+  const rem = opts.etaFormat ? opts.etaFormat(geo.remainingTime) : opts.fmt(geo.remainingTime);
   return strings.etaBar(pct, rem);
 }
 
@@ -58,7 +58,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
     elapsed,
     rate,
     label = "eta",
-    formatEta,
+    etaFormat,
     width = 80,
     height = 8,
     format,
@@ -85,8 +85,8 @@ export function EtaBar(props: EtaBarProps): ReactNode {
         ? `${Math.round(p * 100)}%`
         : pre.indeterminate || pre.remainingTime == null
           ? undefined
-          : formatEta
-            ? formatEta(pre.remainingTime)
+          : etaFormat
+            ? etaFormat(pre.remainingTime)
             : fmt(pre.remainingTime);
 
   const gutter = etaText ? Math.min(width * 0.5, etaText.length * fontSize * 0.62 + 4) : 0;
@@ -97,7 +97,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
     summary === false
       ? false
       : (summary ??
-        etaBarSummary({ progress, elapsed, rate: rate ?? null, formatEta, fmt }, strings));
+        etaBarSummary({ progress, elapsed, rate: rate ?? null, etaFormat, fmt }, strings));
 
   const dividerX = geo.done.x + geo.done.width;
 
@@ -108,6 +108,11 @@ export function EtaBar(props: EtaBarProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The bar's axis is time, running left to right — nothing rises off a
+      // bottom edge — so the track band centres on the cap band. The band is the
+      // inset rect every branch of the geometry shares; the ETA numeral sits in a
+      // gutter beside it, which never moves the mark off the line.
+      seat={{ mode: "center", top: geo.done.y, bottom: geo.done.y + geo.done.height }}
       className={className ? `mc-eta ${className}` : "mc-eta"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >

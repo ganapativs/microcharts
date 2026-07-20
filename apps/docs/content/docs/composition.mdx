@@ -16,8 +16,9 @@ Every chart is transparent: it **never paints its own background**. That's delib
 surface it lands on and picks up the ink color from `--mc-stroke` (which tracks light/dark for you). The one decision
 that's yours: give it a container with real contrast.
 
-- Put the chart on a surface with enough contrast for a 1.5 px line — the default strokes clear 4.5:1 on the built-in
-  light and dark themes.
+- Put the chart on a surface with enough contrast for a 1.5 px line — the data, valence, and accent inks all clear 4.5:1
+  on the built-in light and dark themes. (`--mc-neutral`, the muted context ink for baselines and ghost marks, sits at
+  3.5:1 — comfortably past the 3:1 bar for non-text, and deliberately quieter than the data.)
 - Don't wrap it in a low-contrast tint and expect the chart to compensate; it won't, by design.
 - Need the ink to differ from the page (charts on a colored panel)? Set `--mc-stroke` on the container. See
   [Theming](/docs/theming).
@@ -29,10 +30,10 @@ that's yours: give it a container with real contrast.
 
 ## In a sentence
 
-A word-sized chart in running prose scales with the **font**, aligns to the text baseline, and drops its axis-labels and
-endpoint dots so it reads as one glyph, not a widget. Wrap it in `mc-inline` (shipped in `styles.css`), pass
-`dots="none"`, and mark it decorative with `summary={false}` so a screen reader hears the sentence, not a second
-description.
+A word-sized chart in running prose scales with the **font** and aligns to the text baseline; drop its endpoint dots and
+it reads as one glyph, not a widget. (There are no axes to drop — no chart in the catalog draws one.) Wrap it in
+`mc-inline` (shipped in `styles.css`), pass `dots="none"`, and mark it decorative with `summary={false}` so a screen
+reader hears the sentence, not a second description.
 
 <LiveDemo
   label="Inline in prose"
@@ -172,7 +173,13 @@ import { Sparkline } from "@microcharts/react/sparkline";
 </LiveDemo>
 
 Pass `zero` when the group is bars or areas (so the shared domain anchors at zero), or an explicit `domain={[min, max]}`
-when you want a fixed frame instead of the data's own range.
+when you want a fixed frame instead of the data's own range (`domain` defaults to `"shared"`).
+
+Two details worth knowing. Only children that actually carry a `data` prop get the scale and size injected — plain
+wrappers, labels, and captions pass through untouched, so you can interleave them without them collecting stray DOM
+attributes. And the group renders one `<div className="mc-group">`, an `inline-flex` row that wraps: its gap is
+`--mc-gap` scaled by `--mc-density`, and `className`/`style` on `SparkGroup` land on that div if you want a different
+layout.
 
 ## Decorative vs. summarized — the `summary` decision
 
@@ -184,5 +191,6 @@ You'll notice `summary={false}` on nearly every demo above. That's a deliberate 
   `summary={false}`. The surrounding text is the accessible name; a per-chart summary would just make a screen reader
   read the same thing many times.
 
-This is the only accessibility lever you routinely touch. Everything else — the `role="img"`, the `<title>`, keyboard
-support on interactive entries — is automatic. See [Accessibility](/docs/accessibility).
+This is the only accessibility lever you routinely touch. Everything else — the `role="img"`, the `<title>`, and the
+whole interaction contract on interactive entries (roving arrow keys, select-to-pin with **Enter** or **Space**, touch
+scrub, live announcements) — is automatic. See [Accessibility](/docs/accessibility).

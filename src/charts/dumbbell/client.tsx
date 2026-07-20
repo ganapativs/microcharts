@@ -1,9 +1,17 @@
 "use client";
-// Interactive <Dumbbell>. One pointer listener; row by y-band.
-// ↑/↓ rove rows; ←/→ within a row toggles the from/to announcement
-// ("From: 62,000." / "To: 84,000."). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Dumbbell>. useActivePicker owns interaction: one pointer listener
+// + row-by-y-band lookup — ↑/↓ (or ←/→) rove rows, announcing each pair's change
+// ("From 62,000 to 84,000, up 35%."); click / Enter / Space selects a row
+// (onSelect). Composes the static component (canon) — the SVG never drifts.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
@@ -15,7 +23,7 @@ import {
   type DumbbellProps,
 } from "./index.js";
 
-export interface InteractiveDumbbellProps extends DumbbellProps {
+export interface InteractiveDumbbellProps extends DumbbellProps, PickerProps {
   strings?: PairedStrings;
   /**
    * Opt-in entrance motion (default `false`): the from/to endpoint dots settle
@@ -37,6 +45,12 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const height = props.height ?? data.length * 12;
@@ -47,9 +61,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   // attribute, only the "to" dot does — a bare `circle` selector catches both.
   // The connector is valence-encoded DATA (its color reads the change
   // direction), so it must arrive WITH the endpoints, not materialize before
-  // them: `defer` casts it into the closing act so it draws in as the dots land
-  // The two endpoint dots land first (top→down), then the change bar DRAWS
-  // between them dot-to-dot, then the labels speak — the pair connects itself.
+  // them: `defer` casts it into the closing act so it draws in as the dots land.
   useEntrance(hostRef, "trail", animate, {
     selector: "circle",
     order: "y",
@@ -57,13 +69,18 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   });
 
   const fontSize = 6;
-  const hasLabels = data.some((d) => d.label);
-  const maxLabelChars = hasLabels
-    ? Math.min(
-        6,
-        data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0),
-      )
-    : 0;
+  // Label-gutter width, in chars — a full scan of the rows, so it is memoised:
+  // the interactive entry re-renders on every unit crossed during a scrub.
+  const maxLabelChars = useMemo(
+    () =>
+      data.some((d) => d.label)
+        ? Math.min(
+            6,
+            data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0),
+          )
+        : 0,
+    [data],
+  );
   const geo = useMemo(
     () =>
       dumbbellGeometry({
@@ -77,9 +94,62 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     [width, height, data, domain, maxLabelChars],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
-  /** null = whole pair; "from" | "to" = one end focused via ←/→. */
-  const [end, setEnd] = useState<"from" | "to" | null>(null);
+
+  // Pointer (viewBox space) → row index by pure y-band math (rows are the axis).
+  const locate = useCallback(
+    (_x: number, y: number) => {
+      if (geo.rows.length === 0 || geo.pitch === 0) return null;
+      const i = Math.floor(y / geo.pitch);
+      return i >= 0 && i < geo.rows.length ? i : null;
+    },
+    [geo],
+  );
+
+  // 1-D roving over rows. Layout is vertical, so ↑/↓ walk rows; ←/→ map to the
+  // same prev/next for pointer-free reach. Boundary keys are consumed.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const n = geo.rows.length;
+      if (n === 0) return null;
+      switch (key) {
+        case "ArrowDown":
+        case "ArrowRight":
+          return Math.min(n - 1, cur + 1);
+        case "ArrowUp":
+        case "ArrowLeft":
+          return cur <= 0 ? 0 : cur - 1;
+        case "Home":
+          return 0;
+        case "End":
+          return n - 1;
+      }
+      return null;
+    },
+    [geo],
+  );
+
+  // index = ROW (category) index; value = the row's `to` (the "after" endpoint,
+  // the pair's primary read), null when the endpoint is missing; label = category.
+  const datum = useCallback(
+    (i: number) => {
+      const d = data[i];
+      return { index: i, value: d && Number.isFinite(d.to) ? d.to : null, label: d?.label };
+    },
+    [data],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.rows.length,
+    width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -89,79 +159,66 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
         : dumbbellSummary(data, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.rows.length === 0 || geo.pitch === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.height === 0) return;
-      const y = ((e.clientY - r.top) / r.height) * height;
-      const i = Math.floor(y / geo.pitch);
-      setActive(i >= 0 && i < geo.rows.length ? i : null);
-      setEnd(null);
-    },
-    [geo, height],
-  );
+  // Accent rings hugging the whole row (both endpoints). Transient for
+  // hover/focus; a distinguishing `data-mc-w="tick"` marks the persistent pin.
+  const marks = (i: number, pinned: boolean) => {
+    const row = geo.rows[i];
+    if (!row) return null;
+    const wRole = pinned ? "tick" : "support";
+    return (
+      <>
+        {row.x0 !== null ? (
+          <circle
+            cx={row.x0}
+            cy={row.y}
+            r={3.25}
+            fill="none"
+            stroke="var(--mc-accent)"
+            strokeWidth={1.25}
+            data-mc-w={wRole}
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {row.x1 !== null ? (
+          <circle
+            cx={row.x1}
+            cy={row.y}
+            r={3.25}
+            fill="none"
+            stroke="var(--mc-accent)"
+            strokeWidth={1.25}
+            data-mc-w={wRole}
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+      </>
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.rows.length === 0) return;
-      const cur = active ?? 0;
-      switch (e.key) {
-        case "ArrowDown":
-          setActive(Math.min(geo.rows.length - 1, cur + 1));
-          setEnd(null);
-          break;
-        case "ArrowUp":
-          setActive(Math.max(0, cur - 1));
-          setEnd(null);
-          break;
-        case "ArrowRight":
-          setActive(cur);
-          setEnd("to");
-          break;
-        case "ArrowLeft":
-          setActive(cur);
-          setEnd("from");
-          break;
-        case "Escape":
-          setActive(null);
-          setEnd(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [active, geo],
-  );
-
-  const activeRow = active !== null ? geo.rows[active] : undefined;
-  const activeDatum = active !== null ? data[active] : undefined;
+  const shown = active ?? selected;
+  const shownRow = shown !== null ? geo.rows[shown] : undefined;
+  const shownDatum = shown !== null ? data[shown] : undefined;
+  const shownChange = shownDatum ? pairChange(shownDatum.from, shownDatum.to) : null;
+  // A pair may arrive with a null/NaN/±Infinity endpoint; never format one. Like the
+  // static summary (which speaks only finite-both pairs), an incomplete pair reads as
+  // "No data." rather than leaking a half-formatted endpoint. Dumbbell's voice is
+  // label-free, so `label` (optional here) stays out of the announcement.
+  const okFrom = shownDatum ? Number.isFinite(shownDatum.from) : false;
+  const okTo = shownDatum ? Number.isFinite(shownDatum.to) : false;
   const announced = (() => {
-    if (!activeDatum) return "";
-    if (end === "from") return `From: ${fmt(activeDatum.from)}.`;
-    if (end === "to") return `To: ${fmt(activeDatum.to)}.`;
-    const c = pairChange(activeDatum.from, activeDatum.to);
+    if (!shownDatum) return "";
+    if (!okFrom || !okTo) return strings.noData;
+    const c = pairChange(shownDatum.from, shownDatum.to);
     return c
-      ? strings.fromTo(fmt(activeDatum.from), fmt(activeDatum.to), c.dir, c.pct)
-      : strings.flatPair(fmt(activeDatum.from));
+      ? strings.fromTo(fmt(shownDatum.from), fmt(shownDatum.to), c.dir, c.pct)
+      : strings.flatPair(fmt(shownDatum.from));
   })();
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-dumbbell-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-dumbbell-live", className, style)} {...named(label)} {...bind}>
       <StaticDumbbell
         {...rest}
+        style={fillFor(style)}
         data={data}
         domain={domain}
         width={width}
@@ -171,48 +228,21 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {activeRow ? (
-          <>
-            {(end === null || end === "from") && activeRow.x0 !== null ? (
-              <circle
-                cx={activeRow.x0}
-                cy={activeRow.y}
-                r={3.25}
-                fill="none"
-                stroke="var(--mc-accent)"
-                strokeWidth={1.25}
-                vectorEffect="non-scaling-stroke"
-              />
-            ) : null}
-            {(end === null || end === "to") && activeRow.x1 !== null ? (
-              <circle
-                cx={activeRow.x1}
-                cy={activeRow.y}
-                r={3.25}
-                fill="none"
-                stroke="var(--mc-accent)"
-                strokeWidth={1.25}
-                vectorEffect="non-scaling-stroke"
-              />
-            ) : null}
-          </>
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? marks(selected, true) : null}
+        {active !== null ? marks(active, false) : null}
         {rest.children}
       </StaticDumbbell>
       <LiveRegion>{announced}</LiveRegion>
-      {activeRow && activeDatum ? (
+      {shownRow && shownDatum ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(((activeRow.x0 ?? 0) + (activeRow.x1 ?? activeRow.x0 ?? 0)) / 2 / width) * 100}%`,
+            left: `${(((shownRow.x0 ?? 0) + (shownRow.x1 ?? shownRow.x0 ?? 0)) / 2 / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {end === "from"
-            ? fmt(activeDatum.from)
-            : end === "to"
-              ? fmt(activeDatum.to)
-              : `${fmt(activeDatum.from)} → ${fmt(activeDatum.to)}`}
+          {`${okFrom ? fmt(shownDatum.from) : "—"} → ${okTo ? fmt(shownDatum.to) : "—"}${shownChange ? ` (${shownChange.dir} ${shownChange.pct})` : ""}`}
         </span>
       ) : null}
     </span>

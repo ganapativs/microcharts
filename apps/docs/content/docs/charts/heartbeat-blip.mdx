@@ -38,6 +38,12 @@ baseline goes flat and stays flat.
 - **Avoid for** — exact event counts (`Seismogram`, `EventTimeline`), a continuous level (`BreathingDot`), or long-term
   trends (`Sparkline`).
 
+## Sizing
+
+`width` and `height` are viewBox units that also set the rendered pixel box — they default to `60 × 16`, sized to sit in
+a status table row or a header. Omit them and drive the width from CSS to fill a column; the viewBox keeps the aspect
+ratio. `window` sets how much time the strip covers, which changes the density of the trace rather than its box.
+
 ## Variants
 
 <LiveDemo
@@ -120,6 +126,8 @@ The accessible name is the count, the window, and the time since the last event 
 3s ago."** — or **"No events in the last minute."** when the trace is flat. The trace sweeps only when motion is allowed
 and on-screen; the live region announces on data change, and there is no per-spike navigation because the spikes are
 transient — the summary is the record.
+
+<InteractionNote slug="heartbeat-blip" />
 
 ## Props
 

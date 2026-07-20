@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { linePath, smoothPath, stepPath, areaPath, type Curve } from "../../core/path.js";
 import { describeSeries, type DescribeOptions, resolveSummary } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
+import { labelFitsY } from "../../core/labels.js";
 import { type Value } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
@@ -88,7 +89,14 @@ export function Sparkline(props: SparklineProps): ReactNode {
   // the chart's box (containment rule). No DOM measurement.
   const last = lastFinite(data);
   const labelText = label === "last" && last !== undefined ? fmt(last) : undefined;
-  const metrics = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
+  const fitted = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
+  // `labelMetrics` shrinks the figure to fit the gutter's WIDTH budget, down to
+  // a 5-unit floor; nothing there answers whether the box is tall enough to seat
+  // a line of it. Below that the readout DROPS — never painted half outside the
+  // viewBox — and because the gutter below is `metrics?.gutter`, the reserved
+  // space goes with it and the line reclaims the full width. Pure arithmetic:
+  // the static path may never measure text.
+  const metrics = fitted && labelFitsY(height / 2, fitted.fontSize, height) ? fitted : undefined;
 
   // "minmax" labels reserve top/bottom gutters BEFORE geometry and
   // sit above the max / below the min — the only spots the data can't occupy.
@@ -134,6 +142,14 @@ export function Sparkline(props: SparklineProps): ReactNode {
   const showMinMax = dots === "minmax";
   const showEndpoint = dots !== "none";
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = metrics
+    ? { ...style, "--mc-label-size": `${metrics.fontSize}px` }
+    : (style as CSSProperties);
+
   return (
     <Chart
       width={width}
@@ -141,8 +157,13 @@ export function Sparkline(props: SparklineProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A trace over a value range reads as standing on its own floor, so the
+      // plot's bottom edge lands on the text baseline. `geo.plot.y1` — not the
+      // viewBox — because a `label="minmax"` gutter lifts that floor, and the
+      // seat has to follow the frame the line is actually drawn in.
+      seat={{ mode: "floor", bottom: geo.plot.y1 }}
       className={className ? `mc-spark ${className}` : "mc-spark"}
-      style={style}
+      style={rootStyle}
     >
       {geo.band ? (
         <rect
@@ -205,10 +226,13 @@ export function Sparkline(props: SparklineProps): ReactNode {
       {labelText !== undefined && metrics && geo.last ? (
         <text
           x={geo.last.x + 6}
-          /* y clamped so ascenders/descenders stay inside the viewBox */
+          /* `dominant-baseline: central` straddles y by HALF a font each way, so
+             the clamp is symmetric — 0.55 reserved more than the box had and,
+             with `min` applied last, pushed the figure off the TOP of a short
+             viewBox. `metrics` above guarantees a valid range here. */
           y={Math.min(
-            Math.max(geo.last.y, metrics.fontSize * 0.55),
-            height - metrics.fontSize * 0.55,
+            Math.max(geo.last.y, metrics.fontSize * 0.5),
+            height - metrics.fontSize * 0.5,
           )}
           fontSize={metrics.fontSize}
           dominantBaseline="central"

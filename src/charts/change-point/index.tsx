@@ -11,7 +11,7 @@ import { scaleLinear, extent } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-change-point.js";
-import { changePointGeometry, type ChangePointGeometry } from "./geometry.js";
+import { CHANGE_POINT_PAD, changePointGeometry, type ChangePointGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 // signed=false for the summary, where the direction word already carries the sign
@@ -45,7 +45,7 @@ export interface ChangePointProps {
   /** `"auto"` runs the heuristic; an index array overrides detection entirely. */
   breaks?: "auto" | readonly number[] | undefined;
   /** Max detected breaks (1–3). More regimes stop being glanceable. */
-  max?: number | undefined;
+  maxItems?: number | undefined;
   /** Per-regime mean hairlines (default true). */
   means?: boolean | undefined;
   /** `"delta"` prints the signed % across the most recent break in a gutter. */
@@ -69,7 +69,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
   const {
     data,
     breaks = "auto",
-    max = 2,
+    maxItems = 2,
     means = true,
     label = "none",
     domain,
@@ -91,7 +91,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-change-point ${className}` : "mc-change-point";
 
-  const probe = changePointGeometry({ width, height, data, breaks, max, domain });
+  const probe = changePointGeometry({ width, height, data, breaks, maxItems, domain });
   const showLabel = label === "delta" && probe != null && probe.breaks.length > 0;
   const labelText = showLabel ? pct(probe!.breaks[probe!.breaks.length - 1]!.delta) : "";
   // 0.72·em/char (not 0.62) — the delta label always carries the wide `%` glyph
@@ -106,6 +106,9 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        // Same frame the populated chart seats on, so an empty slot in a column
+        // of these sits on the baseline at exactly the same height.
+        seat={{ mode: "floor", bottom: height - CHANGE_POINT_PAD }}
         className={cls}
         style={style}
       >
@@ -138,6 +141,11 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A trace over a value range stands on its own floor (Sparkline's
+      // precedent). The plot box, not the viewBox: regime tints and break
+      // hairlines deliberately bleed to the full height, and seating on those
+      // would hang the line two units above the baseline.
+      seat={{ mode: "floor", bottom: height - CHANGE_POINT_PAD }}
       className={cls}
       style={rootStyle}
     >

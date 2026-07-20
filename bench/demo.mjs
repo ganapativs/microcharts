@@ -1,7 +1,7 @@
-// Checkpoint-2 demo generator (plan/10 ✋ Checkpoint 2). Renders every chart via
-// the REAL built components → static SVG and assembles a self-contained showcase
-// page (four contexts, all five charts + variants, a shared-scale density table,
-// size/bench receipts, light/dark). Run after `pnpm build && node bench/run.mjs`:
+// Demo generator. Renders the catalog via the REAL built components → static
+// SVG and assembles a self-contained showcase page (four contexts, variants, a
+// shared-scale density table, size/bench receipts, light/dark).
+// Run after `pnpm build && node bench/run.mjs`:
 //   node bench/demo.mjs out.html
 import { readFileSync, writeFileSync } from "node:fs";
 import { createElement as h } from "react";

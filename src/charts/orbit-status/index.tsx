@@ -1,5 +1,5 @@
-// <OrbitStatus> — how slow and how busy is this dependency right now? (
-// #22, structured two-variable, motion type). The STATIC frame carries BOTH
+// <OrbitStatus> — how slow and how busy is this dependency right now?
+// (structured two-variable, motion type). The STATIC frame carries BOTH
 // variables with zero JS: orbit radius = latency, orbit dash density = call rate
 // (quantized to 5 steps, "denser dashes = more calls"), satellite at the top. The
 // interactive entry mirrors the rate as the satellite's angular SPEED (same 5
@@ -104,6 +104,11 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Concentric dial, no floor — it centres on the cap band. The box has to
+      // be the square itself: the orbit radius IS the latency, so seating the
+      // drawn circle would slide the whole glyph up the line as latency fell.
+      // The label only widens the viewBox; the dial's band is unmoved.
+      seat={{ mode: "center", top: 0, bottom: geo.size }}
       className={className ? `mc-orbit ${className}` : "mc-orbit"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >

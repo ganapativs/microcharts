@@ -1,10 +1,9 @@
 import { DualSparkline } from "@microcharts/react/dual-sparkline";
-import { DualSparkline as DualSparklineInteractive } from "@microcharts/react/dual-sparkline/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const US = [12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21];
-const BENCH = [12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16];
+export const US = [12, 13, 12.4, 14, 15.2, 14.8, 16, 17.5, 17, 18.4, 19, 21];
+export const BENCH = [12, 12.4, 12.8, 13.1, 13.6, 14, 14.2, 14.8, 15, 15.4, 15.8, 16];
 /** Same two series, roles swapped or matched — zero invented numbers, three real
  *  reads: leading, trailing, and identical ("Matching benchmark."). */
 const ROWS: { label: string; data: number[]; compare: number[]; read: string }[] = [
@@ -41,12 +40,6 @@ export const entry: ChartEntry = {
       type: "(number | null)[]",
       required: true,
       description: "The benchmark — dashed, thinner, neutral.",
-    },
-    {
-      name: "compareLabel",
-      type: "string",
-      required: false,
-      description: "Names the reference in the summary and announcements.",
     },
     {
       name: "curve",
@@ -93,14 +86,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <DualSparkline data={US} compare={BENCH} summary={false} width={130} height={22} />;
 }
-
-export const showcase = {
-  hint: "vs benchmark",
-  Node: () => (
-    <DualSparkline data={US} compare={BENCH} title="Conversion vs market" width={130} height={22} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -130,30 +115,6 @@ export const playground: PlaygroundSpec = {
       "  compare={market}",
       s.label !== "none" && `  label="${s.label}"`,
       s.band && "  band={[13, 16]}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <DualSparklineInteractive
-      data={US}
-      compare={BENCH}
-      label={s.label as "last" | "none"}
-      band={s.band ? [13, 16] : undefined}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<DualSparkline",
-      "  data={ours}",
-      "  compare={market}",
-      s.label !== "none" && `  label="${s.label}"`,
-      s.band && "  band={[13, 16]}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -285,28 +246,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<DualSparkline data={ours} compare={market} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <DualSparklineInteractive
-      data={US}
-      compare={BENCH}
-      summary={false}
-      width={130}
-      height={22}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

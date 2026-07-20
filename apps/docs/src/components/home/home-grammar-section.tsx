@@ -2,11 +2,13 @@ import { SectionMark } from "@/components/home/section-mark";
 import { GrammarDemo } from "@/components/home/grammar-demo";
 import { Reveal } from "@/components/ui/reveal";
 
-/** 02 · The grammar — plain text in, shipped components out. */
+/** 01 · The grammar — plain text in, shipped components out. First section
+ *  after the hero on purpose: the reader just watched a reply stream charts
+ *  into a sentence; this explains the trick in the same breath. */
 export function HomeGrammarSection({ catalogTotal }: { catalogTotal: number }) {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="02">the grammar</SectionMark>
+      <SectionMark n="01">the grammar</SectionMark>
       <div className="grid items-start gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
         <Reveal>
           <h2 className="display text-[length:var(--text-fluid-h2)]">

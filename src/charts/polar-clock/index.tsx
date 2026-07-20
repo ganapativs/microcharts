@@ -28,7 +28,7 @@ export interface PolarClockProps {
   /** Numeral of the peak value in a bottom gutter (`max`), or none (default). */
   label?: "max" | "none" | undefined;
   /** Segment index → label (default: HH:00 for n=24, weekday for n=7, else index). */
-  formatSegment?: ((index: number, n: number) => string) | undefined;
+  segmentFormat?: ((index: number, n: number) => string) | undefined;
   size?: number | undefined;
   color?: string | undefined;
   fontSize?: number | undefined;
@@ -56,7 +56,7 @@ function defaultSegmentLabel(strings: PolarClockStrings) {
 export function polarClockSummary(
   data: readonly Value[],
   opts: {
-    formatSegment?: ((index: number, n: number) => string) | undefined;
+    segmentFormat?: ((index: number, n: number) => string) | undefined;
     strings?: PolarClockStrings | undefined;
     format?: Format | undefined;
     locale?: string | string[] | undefined;
@@ -64,7 +64,7 @@ export function polarClockSummary(
 ): string {
   const { strings = EN_POLAR_CLOCK, format, locale } = opts;
   const fmt = makeFormatter(format, locale);
-  const seg = opts.formatSegment ?? defaultSegmentLabel(strings);
+  const seg = opts.segmentFormat ?? defaultSegmentLabel(strings);
   const n = data.length;
   const finite = data
     .map((v, index) => ({ v, index }))
@@ -92,7 +92,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
     mode = "length",
     labels = true,
     label = "none",
-    formatSegment,
+    segmentFormat,
     size = 24,
     color,
     format,
@@ -111,7 +111,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
   const accName =
     summary === false
       ? false
-      : (summary ?? polarClockSummary(data, { formatSegment, strings, format, locale }));
+      : (summary ?? polarClockSummary(data, { segmentFormat, strings, format, locale }));
   const fmt = makeFormatter(format, locale);
 
   const labelBand = label === "max" ? Math.ceil(fontSize * 1.35) : 0;
@@ -127,6 +127,10 @@ export function PolarClock(props: PolarClockProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The dial is the mark, and it's radially symmetric — centre it on the cap
+      // band. Seating the dial rather than the viewBox matters here: `label="max"`
+      // appends a text band below, which would otherwise drag the dial upward.
+      seat={{ mode: "center", top: PAD, bottom: geo.size - PAD }}
       className={className ? `mc-polar ${className}` : "mc-polar"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >

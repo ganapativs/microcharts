@@ -43,4 +43,38 @@ describe("interactive <OrbitStatus>", () => {
     );
     expect(live.textContent).toBe("Latency high — 350ms.");
   });
+
+  // ONE unit (the dependency) → the lean scalar contract: onSelect only.
+  it("click fires onSelect with the latency", async () => {
+    const onSelect = vi.fn();
+    const screen = await render(
+      <OrbitStatus
+        latency={240}
+        rate={12}
+        latencyDomain={[0, 500]}
+        title="API"
+        onSelect={onSelect}
+      />,
+    );
+    const fig = screen.container.querySelector(".mc-orbit-live") as HTMLElement;
+    fig.click();
+    expect(onSelect).toHaveBeenLastCalledWith({ index: 0, value: 240, label: "API" });
+  });
+
+  it("Enter fires onSelect", async () => {
+    const onSelect = vi.fn();
+    const screen = await render(
+      <OrbitStatus
+        latency={240}
+        rate={12}
+        latencyDomain={[0, 500]}
+        title="API"
+        onSelect={onSelect}
+      />,
+    );
+    const fig = screen.container.querySelector(".mc-orbit-live") as HTMLElement;
+    fig.focus();
+    fig.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    expect(onSelect).toHaveBeenLastCalledWith({ index: 0, value: 240, label: "API" });
+  });
 });

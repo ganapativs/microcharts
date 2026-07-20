@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { binMass, volumeProfileGeometry } from "./geometry.js";
+import { binMass, profileLayout, volumeProfileGeometry } from "./geometry.js";
 
 const PROFILE = [
   { level: 138, weight: 8 },
@@ -45,6 +45,28 @@ describe("volumeProfileGeometry", () => {
       gutter: 0,
     });
     expect(geo.even).toBe(true);
+  });
+
+  it("profileLayout reserves the POC-label gutter", () => {
+    const args = {
+      data: PROFILE,
+      bins: 5,
+      valueArea: 0.7,
+      width: 48,
+      height: 32,
+      fontSize: 4,
+      fmt: (n: number) => `${n}`,
+    } as const;
+    const withLabel = profileLayout({ ...args, align: "left", label: "poc" });
+    const without = profileLayout({ ...args, align: "left", label: "none" });
+    expect(withLabel.pocText).toBe("142");
+    expect(without.pocText).toBeUndefined();
+    // the gutter narrows every bar, so a caller that skips it overdraws
+    expect(withLabel.bars[0]!.width).toBeLessThan(without.bars[0]!.width);
+    // right-anchored bars start further right for the same reason
+    const right = profileLayout({ ...args, align: "right", label: "poc" });
+    const rightBare = profileLayout({ ...args, align: "right", label: "none" });
+    expect(right.bars[0]!.x).toBeGreaterThan(rightBare.bars[0]!.x);
   });
 
   test.prop([

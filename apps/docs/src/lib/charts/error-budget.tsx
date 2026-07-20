@@ -1,6 +1,5 @@
 import { ErrorBudget } from "@microcharts/react/error-budget";
-import { ErrorBudget as ErrorBudgetInteractive } from "@microcharts/react/error-budget/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 import { budgetRemainingCurve } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
@@ -79,21 +78,6 @@ const remaining = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64,
 export function Preview() {
   return <ErrorBudget data={DEMO} window={WINDOW} summary={false} width={150} height={26} />;
 }
-
-export const showcase = {
-  hint: "budget vs steady burn",
-  Node: () => (
-    <ErrorBudget
-      data={DEMO}
-      window={WINDOW}
-      unit="day"
-      title="Checkout SLO"
-      width={150}
-      height={26}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "wedges", label: "burn-rate lines", init: true },
@@ -125,31 +109,6 @@ export const playground: PlaygroundSpec = {
       "  window={30}",
       s.wedges === false && "  rates={[1]}",
       s.label !== "remaining" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ErrorBudgetInteractive
-      data={s.exhausted ? BURNED : DEMO}
-      window={s.exhausted ? 20 : WINDOW}
-      rates={s.wedges ? undefined : [1]}
-      label={s.label as "remaining" | "none"}
-      unit="day"
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<ErrorBudget",
-      "  data={remaining}",
-      "  window={30}",
-      s.wedges === false && "  rates={[1]}",
-      s.label !== "remaining" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -283,28 +242,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<ErrorBudget data={remaining} window={30} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <ErrorBudgetInteractive
-      data={DEMO}
-      window={WINDOW}
-      summary={false}
-      width={150}
-      height={26}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

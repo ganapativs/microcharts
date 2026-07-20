@@ -1,11 +1,10 @@
 import { CalendarStrip } from "@microcharts/react/calendar-strip";
-import { CalendarStrip as CalendarStripInteractive } from "@microcharts/react/calendar-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // pinned end — docs must be deterministic (never a live "now")
-const END = "2026-07-01";
-const DATA = Array.from({ length: 18 }, (_, i) => ({
+export const END = "2026-07-01";
+export const DATA = Array.from({ length: 18 }, (_, i) => ({
   date: `2026-06-${String(4 + i).padStart(2, "0")}`,
   value: i % 4 === 3 ? 0 : (i % 7) + 1,
 }));
@@ -106,19 +105,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <CalendarStrip data={DATA} end={END} summary={false} style={{ width: 110, height: 62 }} />;
 }
-
-export const showcase = {
-  hint: "weekday rhythm",
-  Node: () => (
-    <CalendarStrip
-      data={DATA}
-      end={END}
-      title="Deploy cadence"
-      style={{ width: 110, height: 62 }}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   // `data` and `end` are pinned to the module's `days`/`end` constants — the
   // docs demo must stay deterministic (a live "now" would drift screenshots).
@@ -173,38 +159,6 @@ export const playground: PlaygroundSpec = {
       s.shape !== "square" && `  shape="${s.shape}"`,
       Number(s.cell) !== 7 && `  cell={${s.cell}}`,
       Number(s.gap) !== 1 && `  gap={${s.gap}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <CalendarStripInteractive
-      data={DATA}
-      end={END}
-      weeks={Number(s.weeks)}
-      weekStart={s.weekStart === "sunday" ? 0 : 1}
-      shape={s.shape as "square" | "round" | "dot"}
-      cell={Number(s.cell)}
-      gap={Number(s.gap)}
-      summary={false}
-      animate={ui.animate}
-      style={{
-        width: 180,
-        height: "auto",
-      }}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<CalendarStrip",
-      "  data={days}",
-      `  end="${END}"`,
-      s.weeks !== "4" && `  weeks={${s.weeks}}`,
-      s.weekStart === "sunday" && "  weekStart={0}",
-      s.shape !== "square" && `  shape="${s.shape}"`,
-      Number(s.cell) !== 7 && `  cell={${s.cell}}`,
-      Number(s.gap) !== 1 && `  gap={${s.gap}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -336,27 +290,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<CalendarStrip data={days} end={today} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <CalendarStripInteractive
-      data={DATA}
-      end={END}
-      summary={false}
-      style={{ width: 110, height: 62 }}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

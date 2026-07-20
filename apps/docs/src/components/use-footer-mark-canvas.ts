@@ -331,8 +331,16 @@ export function useFooterMarkCanvas(
     // before a footer-height scrub could finish): 0 = the band is a full
     // band-height below the fold, 1 = the footer bottom reaches the viewport
     // bottom, i.e. the reveal completes exactly as you land on it.
+    // The host box, re-read at most once per frame. The pointer handlers need it
+    // to map client coords into canvas space, and pointermove fires far more often
+    // than once a frame — reading `getBoundingClientRect()` there forced a full
+    // layout on every pointer event, on every page (this footer is site-wide).
+    // The canvas is `absolute inset-0` of the host, so one rect serves both.
+    let box: DOMRect | null = null;
+    const hostBox = () => (box ??= host.getBoundingClientRect());
+
     const progress = () => {
-      const r = host.getBoundingClientRect();
+      const r = (box = host.getBoundingClientRect());
       const vh = window.innerHeight || 1;
       return clamp01(1 - (r.bottom - vh) / 240);
     };
@@ -665,10 +673,21 @@ export function useFooterMarkCanvas(
 
     // ── wiring ────────────────────────────────────────────────────────────
     const ro = new ResizeObserver(() => {
+      box = null;
       build();
       drawStill(); // repaint immediately; a running loop overwrites next frame
     });
     ro.observe(host);
+
+    // The running loop refreshes `box` every frame via progress(); this keeps it
+    // honest while the loop is paused (offscreen, hidden tab) so the first
+    // pointer event after resuming maps to the right place. Nulling is free —
+    // no layout is read here.
+    const onGeometryChange = () => {
+      box = null;
+    };
+    window.addEventListener("scroll", onGeometryChange, { passive: true });
+    window.addEventListener("resize", onGeometryChange, { passive: true });
 
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting;
@@ -691,7 +710,7 @@ export function useFooterMarkCanvas(
     });
 
     const onMove = (e: PointerEvent) => {
-      const b = canvas.getBoundingClientRect();
+      const b = hostBox();
       const nx = e.clientX - b.left;
       const ny = e.clientY - b.top;
       if (mouseFine) {
@@ -716,17 +735,35 @@ export function useFooterMarkCanvas(
       py = -1e9;
     };
     const onDown = (e: PointerEvent) => {
-      const b = canvas.getBoundingClientRect();
+      const b = hostBox();
       const now = performance.now() / 1000;
       // double-tap deals the whole field new data — a new trading day
       if (now - lastDownT < 0.35) seedShift += 977;
       lastDownT = now;
       pulses.push({ x: e.clientX - b.left, y: e.clientY - b.top, t0: now });
+      // touch has no hover: the torch has to be lit by the finger itself, and
+      // capture keeps the move stream alive once the finger leaves the host
+      if (e.pointerType !== "mouse") {
+        px = e.clientX - b.left;
+        py = e.clientY - b.top;
+        try {
+          host.setPointerCapture(e.pointerId);
+        } catch {
+          // stale/synthetic pointer id — the torch still tracks, just uncaptured
+        }
+      }
+    };
+    // a lifted finger is a left pointer; a cancel means the browser took the
+    // gesture for a vertical scroll (touch-action: pan-y), so drop it too
+    const onUp = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") onLeave();
     };
     if (!reduced) {
       host.addEventListener("pointermove", onMove);
       host.addEventListener("pointerleave", onLeave);
       host.addEventListener("pointerdown", onDown);
+      host.addEventListener("pointerup", onUp);
+      host.addEventListener("pointercancel", onUp);
     }
 
     refreshPalette();
@@ -744,10 +781,14 @@ export function useFooterMarkCanvas(
       ro.disconnect();
       io.disconnect();
       mo.disconnect();
+      window.removeEventListener("scroll", onGeometryChange);
+      window.removeEventListener("resize", onGeometryChange);
       document.removeEventListener("visibilitychange", onVis);
       host.removeEventListener("pointermove", onMove);
       host.removeEventListener("pointerleave", onLeave);
       host.removeEventListener("pointerdown", onDown);
+      host.removeEventListener("pointerup", onUp);
+      host.removeEventListener("pointercancel", onUp);
     };
   }, [hostRef, canvasRef]);
 }

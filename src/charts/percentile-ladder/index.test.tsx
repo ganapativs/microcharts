@@ -39,6 +39,25 @@ describe("<PercentileLadder>", () => {
     const { container } = draw(<PercentileLadder data={SAMPLE} title="Latency percentiles" />);
     await expectNoA11yViolations(container);
   });
+
+  // Degradation contract: see tests/craft/floor.mjs.
+  it("short box: the log tag and its gutter drop together, ticks still render", () => {
+    const sample = [120, 135, 128, 480, 142, 2100, 155, 138, 900, 148];
+    const big = draw(
+      <PercentileLadder data={sample} scale="log" width={240} height={20} />,
+    ).container;
+    expect([...big.querySelectorAll("text")].map((t) => t.textContent)).toContain("log");
+
+    const small = draw(
+      <PercentileLadder data={sample} scale="log" width={84} height={7} />,
+    ).container;
+    expect([...small.querySelectorAll("text")].map((t) => t.textContent)).not.toContain("log");
+    // graduated ticks — the primary encoding — survive
+    expect(small.querySelectorAll("line").length).toBeGreaterThanOrEqual(2);
+    // the tag's left gutter went with it: the track starts at the bare pad
+    const track = small.querySelector("line")!;
+    expect(Number(track.getAttribute("x1"))).toBeLessThan(4);
+  });
 });
 
 seriesEdgeSuite("PercentileLadder", (data) => <PercentileLadder data={data} title="Edge" />);

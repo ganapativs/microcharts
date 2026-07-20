@@ -4,7 +4,7 @@
 // a target line. The window sizes are part of the reading and appear in docs.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_DUAL_WINDOW, type DualWindowStrings } from "../../core/strings-dual-window.js";
@@ -20,8 +20,6 @@ export interface DualWindowMeterProps {
   windows?: [number, number] | undefined;
   /** Compliance corridor instead of a single target (a muted zone). */
   band?: readonly [number, number] | undefined;
-  /** Ballistics for the live entry only (α on the displayed motion). */
-  damping?: number | undefined;
   /** Right-edge current readings. */
   label?: "last" | "none" | undefined;
   domain?: readonly [number, number] | undefined;
@@ -81,7 +79,11 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
     [wf, ws] = [Math.min(wf, ws), Math.max(wf, ws)];
   }
 
-  const fmt = makeFormatter(format, locale);
+  // A word-sized right-edge readout states the level, not its every decimal:
+  // the raw rolling mean of a noisy series is a full float ("-23.858"), which
+  // both over-claims precision and outgrows the gutter it was measured for. One
+  // fraction digit is the DEFAULT only — an explicit `format` still wins.
+  const fmt = makeFormatter(format, locale, { maximumFractionDigits: 1 });
   const fontSize = labelFont(height, 0.32);
   // the two O(n·window) rolling means are computed ONCE and reused for both
   // the preliminary (gutter-sizing) pass and the final layout pass below —
@@ -130,17 +132,23 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
   // both readings need ~2.4× the font of vertical room; below that, show only the
   // sustained (slow) reading rather than crush two numbers together
   const bothFit = height >= fontSize * 2.4;
-  const showLabels = label === "last";
+  // `labelFont` floors at 7 viewBox units, so under a 7-unit box not even the
+  // sustained reading fits — it DROPS rather than spilling past the box. The
+  // two traces against the target line are the encoding and survive alone.
+  const showLabels = label === "last" && labelFitsY(height / 2, fontSize, height);
   const showFast = showLabels && bothFit;
-  const clampY = (y: number) => clamp(y, fontSize * 0.6, height - fontSize * 0.4);
+  // the readout is `dominant-baseline: central`, so its box straddles y by half
+  // a font EACH WAY — an asymmetric 0.6/0.4 clamp let the descender side hang
+  // out of the box once the label filled the height.
+  const clampY = (y: number) => clamp(y, fontSize * 0.5, height - fontSize * 0.5);
   let slowY = geo.slowLastY == null ? 0 : clampY(geo.slowLastY);
   let fastY = geo.fastLastY == null ? 0 : clampY(geo.fastLastY);
   if (bothFit && geo.slowLastY != null && geo.fastLastY != null) {
-    const gap = Math.min(fontSize * 1.3, height - fontSize * 0.9);
+    const gap = Math.min(fontSize * 1.3, height - fontSize);
     const center = clamp(
       (geo.slowLastY + geo.fastLastY) / 2,
-      fontSize * 0.6 + gap / 2,
-      height - fontSize * 0.4 - gap / 2,
+      fontSize * 0.5 + gap / 2,
+      height - fontSize * 0.5 - gap / 2,
     );
     const slowBelow = geo.slowLastY >= geo.fastLastY;
     slowY = round2(center + (slowBelow ? gap / 2 : -gap / 2));
@@ -154,6 +162,11 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Two traces read like any other line chart, so they stand on the plot
+      // floor rather than centring. The floor comes from the geometry's padded
+      // frame, not from the traces: the domain auto-fits the rolling means, and a
+      // data-derived seat would make the meter bob every time a window updated.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={className ? `mc-dualwin ${className}` : "mc-dualwin"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >

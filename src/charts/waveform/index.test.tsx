@@ -23,8 +23,8 @@ describe("<Waveform>", () => {
     expect(waveformSummary([0, 0, 0, 0], EN_WAVEFORM, fmt)).toBe("Silent.");
   });
 
-  it("envelope variant renders one filled area path", () => {
-    const { container } = draw(<Waveform data={SPIKE} variant="envelope" />);
+  it("envelope mode renders one filled area path", () => {
+    const { container } = draw(<Waveform data={SPIKE} mode="envelope" />);
     // one area path; it carries "bar" ink so the rise entrance covers it
     // (the inline fill keeps the envelope color)
     const paths = container.querySelectorAll("path");

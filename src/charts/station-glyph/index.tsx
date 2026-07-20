@@ -1,16 +1,14 @@
-// <StationGlyph> — a full weather observation in one character (,
-// F2). Static, hook-free, RSC-safe. Sky cover fills the center disc, a
+// <StationGlyph> — a full weather observation in one character.
+// Static, hook-free, RSC-safe. Sky cover fills the center disc, a
 // wind barb gives direction + quantized speed (reused from WindBarb), and up to
 // three corner numerals carry temperature, dew point, and pressure. One glyph,
 // four channels, no legend — the meteorologist's station model, shrunk to a word.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont } from "../../core/labels.js";
-import { round2 } from "../../core/types.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_STATION_GLYPH, type StationGlyphStrings } from "../../core/strings-station-glyph.js";
 import { octant } from "../../core/strings-wind-barb.js";
-import { stationGlyphGeometry } from "./geometry.js";
+import { stationGlyphGeometry, stationLayout } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface Wind {
@@ -107,28 +105,26 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const font = labelFont(size, 0.24);
 
   const tempT = temp != null && Number.isFinite(temp) ? `${fmt(temp)}°` : null;
   const dewT = dewpoint != null && Number.isFinite(dewpoint) ? `${fmt(dewpoint)}°` : null;
   const presT = pressure != null && Number.isFinite(pressure) ? fmt(pressure) : null;
   const stationT = station || null;
 
-  // reserve numeral gutters sized to the widest numeral on each side, then place
-  // the disc center in absolute coords
-  const gap = 3;
-  const gutW = (s: string | null): number => (s ? 0.62 * font * s.length + gap : 1);
-  const padXL = round2(Math.max(gutW(tempT), gutW(dewT)) + 0.5);
-  const padXR = round2(gutW(presT) + 0.5);
-  const padY = round2(font + 2);
-  const W = round2(padXL + size + padXR);
-  const H = round2(size + padY * 2);
-  const r = round2(size * 0.24);
-  const dcx = round2(padXL + size / 2);
-  const dcy = round2(padY + size / 2);
-  // push temp/dew toward the top/bottom of the disc (where it is narrowest and
-  // the radial barb is furthest away), so the numerals clear both disc and barb
-  const yOff = round2(r * 0.78);
+  // gutters + disc placement are pure (geometry.ts) so the interactive entry
+  // hit-tests exactly the coordinates this entry draws
+  const {
+    width: W,
+    height: H,
+    font,
+    cx: dcx,
+    cy: dcy,
+    r,
+    yOff,
+    gap,
+    y0,
+    y1,
+  } = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT });
 
   const geo = stationGlyphGeometry({
     cloud: cloud ?? null,
@@ -150,6 +146,11 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The disc is the anchor and it has no floor, so the glyph square centres
+      // on the cap band. Seating that square rather than the viewBox keeps the
+      // disc on the line whichever numerals are present — the gutters are
+      // reserved by string length, so the box grows but the center holds.
+      seat={{ mode: "center", top: y0, bottom: y1 }}
       className={className ? `mc-station ${className}` : "mc-station"}
       style={{ ...style, "--mc-label-size": `${font}px` } as CSSProperties}
     >

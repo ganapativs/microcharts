@@ -1,5 +1,5 @@
-// <SegmentedBar> — what is this made of, and in what proportions (,
-// S3). Static, hook-free, RSC-safe. Segments always sum to the full bar; past
+// <SegmentedBar> — what is this made of, and in what proportions (S3).
+// Static, hook-free, RSC-safe. Segments always sum to the full bar; past
 // `maxSegments` the tail rolls into a labeled "Other" — nothing is silently
 // dropped. A flat bar beats a donut of the same data at every size we ship.
 import type { CSSProperties, ReactNode } from "react";
@@ -97,6 +97,12 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
   const pcts = largestRemainderPercents(geo.segments.map((s) => s.share));
   const accName = resolveSummary(summary, () => sharesSummary(rolled, strings));
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -104,8 +110,12 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The bar is one fixed-length rule inset a unit at top and bottom: the
+      // segments partition its length, never its height, so no edge is a data
+      // floor. It centres on the cap band and reads as punctuation in the line.
+      seat={{ mode: "center", top: 1, bottom: height - 1 }}
       className={className ? `mc-segbar ${className}` : "mc-segbar"}
-      style={style}
+      style={rootStyle}
     >
       {geo.segments.map((seg, i) => {
         const d = rolled[seg.index]!;

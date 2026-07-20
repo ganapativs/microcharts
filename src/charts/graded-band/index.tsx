@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { round2, type Value } from "../../core/types.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { gradedBandGeometry, type GradedBandGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -85,7 +85,10 @@ export function GradedBand(props: GradedBandProps): ReactNode {
   // label size in viewBox units (~0.62·height, clamped 7–11) — see coverage-strip
   const FONT = labelFont(height, 0.62);
   const fmt = makeFormatter(format, locale);
-  const showLabel = label === "median";
+  // `labelFont` floors at 7 viewBox units: under a 7-unit box the median
+  // readout cannot sit inside the frame, so it DROPS rather than painting above
+  // and below it. The graded nesting is the primary read and survives alone.
+  const showLabel = label === "median" && labelFitsY(height / 2, FONT, height);
   const geo = gradedBandGeometry({ width, height, data, levels, value, domain });
   const cls = className ? `mc-graded-band ${className}` : "mc-graded-band";
 
@@ -97,6 +100,8 @@ export function GradedBand(props: GradedBandProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        // Empty seats like the drawn band: same centre, no band to measure.
+        seat={{ mode: "center", top: 0, bottom: height }}
         className={cls}
         style={style}
       >
@@ -115,7 +120,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
   const medW = medText.length * FONT * 0.62;
   const medFlip = geo.median.x + 3 + medW > width - 1;
   const medX = round2(medFlip ? geo.median.x - 3 : geo.median.x + 3);
-  // pin the label size to viewBox units (see coverage-strip / )
+  // pin the label size to viewBox units (see coverage-strip)
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
@@ -125,6 +130,10 @@ export function GradedBand(props: GradedBandProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Seat the band, not the box: the median tick overshoots it by half a unit
+      // and the frame is twice its height. Intervals are explicitly NEVER bars
+      // from zero, so there is no floor here — the band centres on the cap band.
+      seat={{ mode: "center", top: geo.bandY, bottom: geo.bandY + geo.bandH }}
       className={cls}
       style={rootStyle}
     >

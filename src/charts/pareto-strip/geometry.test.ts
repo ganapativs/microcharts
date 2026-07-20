@@ -18,6 +18,33 @@ describe("paretoGeometry", () => {
     const geo = paretoGeometry({ ...base, data: shuffled })!;
     expect(geo.bars[0]!.label).toBe("Timeouts"); // largest first
     expect(geo.bars.at(-1)!.cum).toBeCloseTo(1, 2); // ends at 100%
+    // bars seat flush on the box bottom (inline text-baseline alignment)
+    for (const b of geo.bars) expect(b.y + b.height).toBeCloseTo(20, 1);
+  });
+
+  it("`painted` lists only bars with height — the set a reader can point at", () => {
+    const geo = paretoGeometry({ ...base, data: CAUSES })!;
+    expect(geo.painted).toEqual(geo.bars.map((_, i) => i));
+
+    const withZero = paretoGeometry({
+      ...base,
+      data: [
+        { label: "A", value: 10 },
+        { label: "B", value: 0 },
+      ],
+    })!;
+    expect(withZero.painted).toEqual([0]);
+
+    // all-zero: nothing paints, so nothing is navigable
+    const zeros = paretoGeometry({
+      ...base,
+      data: [
+        { label: "A", value: 0 },
+        { label: "B", value: 0 },
+      ],
+    })!;
+    expect(zeros.bars.length).toBe(2);
+    expect(zeros.painted).toEqual([]);
   });
 
   it("marks bars up to the threshold crossing as vital (accent stops there)", () => {
@@ -37,15 +64,15 @@ describe("paretoGeometry", () => {
     expect(geo.bars.at(-1)!.cum).toBeCloseTo(1, 2);
   });
 
-  it("rolls categories beyond max into Other, always last", () => {
-    const geo = paretoGeometry({ ...base, data: CAUSES, max: 3 })!;
+  it("rolls categories beyond maxItems into Other, always last", () => {
+    const geo = paretoGeometry({ ...base, data: CAUSES, maxItems: 3 })!;
     expect(geo.other).not.toBeNull();
     expect(geo.bars.at(-1)!.label).toBe("Other");
     expect(geo.other!.count).toBe(3); // Config/Network/Other bugs rolled up
   });
 
   it("Other never counts as vital even if large", () => {
-    const geo = paretoGeometry({ ...base, data: CAUSES, max: 1, threshold: 80 })!;
+    const geo = paretoGeometry({ ...base, data: CAUSES, maxItems: 1, threshold: 80 })!;
     const other = geo.bars.find((b) => b.label === "Other")!;
     expect(other.vital).toBe(false);
   });
@@ -84,8 +111,9 @@ describe("paretoGeometry", () => {
     for (const b of geo.bars) {
       expect(b.x).toBeGreaterThanOrEqual(-0.01);
       expect(b.x + b.width).toBeLessThanOrEqual(80.01);
-      expect(b.y).toBeGreaterThanOrEqual(1.99);
-      expect(round(b.y + b.height)).toBeLessThanOrEqual(18.01);
+      expect(b.y).toBeGreaterThanOrEqual(1.99); // top pad preserved
+      // bar fill floor seats flush with the box bottom (y = height)
+      expect(round(b.y + b.height)).toBeLessThanOrEqual(20.01);
     }
   });
 });

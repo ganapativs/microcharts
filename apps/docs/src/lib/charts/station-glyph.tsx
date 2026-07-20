@@ -1,6 +1,5 @@
 import { StationGlyph } from "@microcharts/react/station-glyph";
-import { StationGlyph as StationGlyphInteractive } from "@microcharts/react/station-glyph/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const OBS = {
@@ -63,12 +62,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <StationGlyph {...OBS} summary={false} size={48} />;
 }
-
-export const showcase = {
-  hint: "sky · wind · temp · dew · pressure",
-  Node: () => <StationGlyph {...OBS} title="KSFO observation" size={48} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "cloud", label: "sky cover", min: 0, max: 1, step: 0.05, init: 0.75 },
@@ -98,33 +91,6 @@ export const playground: PlaygroundSpec = {
       "  pressure={1013}",
       "/>",
     ].join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <StationGlyphInteractive
-      station="KSFO"
-      cloud={s.cloud as number}
-      wind={{ direction: s.direction as number, magnitude: s.magnitude as number }}
-      temp={16}
-      dewpoint={9}
-      pressure={1013}
-      summary={false}
-      animate={ui.animate}
-      size={44}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<StationGlyph",
-      '  station="KSFO"',
-      `  cloud={${s.cloud}}`,
-      `  wind={{ direction: ${s.direction}, magnitude: ${s.magnitude} }}`,
-      "  temp={16}",
-      "  dewpoint={9}",
-      "  pressure={1013}",
-      ui.animate && " animate",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
   interactiveHint:
     "Focus the glyph and use ←/→ to step through each field — station, wind, sky, temperature, dew point, pressure — announced one at a time. Home reads the whole observation.",
 };
@@ -240,19 +206,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} />`;
 }
-
-export function PreviewLive() {
-  return <StationGlyphInteractive {...OBS} summary={false} size={48} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -4,35 +4,31 @@
 //
 //   1. COMPOSE the static component (`summary={false}`, overlay marks passed
 //      as its children) — never re-implement the visual; it cannot drift.
-//   2. ONE pointer listener on the wrapper + nearest-stop math — never a DOM
-//      node per point (500 rows × 30 pts must stay cheap).
+//   2. useActivePicker owns interaction: ONE pointer listener + nearest-stop
+//      math, roving keyboard, touch tap-to-pin, and the onActive/onSelect
+//      contract — never a DOM node per point (500 rows × 30 pts stays cheap).
 //   3. The wrapper owns the accessible name (role=img + aria-label) and the
 //      roving keyboard; announcements go through a polite live region using
 //      the i18n-able SummaryStrings.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
 import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
 
-// The composed static SVG fills the focusable wrapper so the wrapper's box and
-// the SVG's box coincide — pointer→viewBox math and overlay marks stay exact,
-// and the chart scales fluidly with its container.
-const FILL: CSSProperties = { display: "block", width: "100%", height: "auto" };
-
-export interface InteractiveSparklineProps extends SparklineProps {
-  /** Called with the index of the focused point (or `null` when cleared). */
-  onPointFocus?: (index: number | null) => void;
+export interface InteractiveSparklineProps extends SparklineProps, PickerProps {
   /** Swappable announcement strings (defaults to EN). */
   strings?: SeriesStrings;
   /**
@@ -56,11 +52,14 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     summary,
     format,
     locale,
-    onPointFocus,
     strings = EN_SERIES,
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -90,28 +89,17 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     });
   }, [data, width, height, domain, fill, band, label, fmt, props.maxPoints]);
 
-  // Indices with a finite value — the only navigable stops.
+  // Indices with a finite value — the only navigable stops. Callbacks report the
+  // DATA index (what the consumer indexes into), so we walk finite indices and
+  // hit-test to the nearest one, but never land on a gap.
   const stops = useMemo(
     () => data.map((v, i) => (isFiniteValue(v) ? i : -1)).filter((i) => i >= 0),
     [data],
   );
-  const [active, setActive] = useState<number | null>(null);
 
-  const move = useCallback(
-    (next: number | null) => {
-      setActive(next);
-      onPointFocus?.(next);
-    },
-    [onPointFocus],
-  );
-
-  // ONE listener; nearest finite stop by x distance in viewBox space.
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (stops.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
+  const locate = useCallback(
+    (x: number) => {
+      if (stops.length === 0) return null;
       let best = stops[0]!;
       let bestDist = Infinity;
       for (const i of stops) {
@@ -123,66 +111,44 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
           best = i;
         }
       }
-      if (best !== active) move(best);
+      return best;
     },
-    [stops, geo, width, active, move],
+    [stops, geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (stops.length === 0) return;
-      const pos = active === null ? -1 : stops.indexOf(active);
-      let target = pos;
-      switch (e.key) {
-        case "ArrowRight":
-          target = Math.min(stops.length - 1, pos + 1);
-          break;
-        case "ArrowLeft":
-          target = pos <= 0 ? 0 : pos - 1;
-          break;
-        case "Home":
-          target = 0;
-          break;
-        case "End":
-          target = stops.length - 1;
-          break;
-        case "Escape":
-          move(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      move(stops[target]!);
-    },
-    [active, stops, move],
-  );
+  const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
+
+  const datum = useCallback((i: number) => ({ index: i, value: data[i] as number }), [data]);
+
+  const { active, selected, bind } = useActivePicker({
+    count: stops.length,
+    width,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false ? undefined : (summary ?? describeSeries(data, { format, locale }));
-  const activeValue = active !== null ? (data[active] as number) : null;
-  const activePoint = active !== null ? geo.points[active] : null;
-  const activePos = active !== null ? stops.indexOf(active) + 1 : 0;
-
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
-  };
+  // The unit shown by the crosshair + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const shownValue = shown !== null ? (data[shown] as number) : null;
+  const shownPoint = shown !== null ? geo.points[shown] : null;
+  const shownPos = shown !== null ? stops.indexOf(shown) + 1 : 0;
+  const selPoint = selected !== null ? geo.points[selected] : null;
 
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-spark-interactive ${className}` : "mc-spark-interactive"}
-      style={wrapStyle}
-      tabIndex={0}
-      role="img"
-      aria-label={[title, accName].filter(Boolean).join(". ") || undefined}
-      onKeyDown={onKeyDown}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => move(null)}
-      onBlur={() => move(null)}
+      {...wrap("mc-spark-interactive", className, style)}
+      {...named([title, accName].filter(Boolean).join(". ") || undefined)}
+      {...bind}
     >
       <StaticSparkline
         {...rest}
@@ -198,50 +164,52 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
         summary={false}
         /* Fill the focusable wrapper exactly so pointer math + overlay marks
            map 1:1 (the wrapper box === the SVG box) and the chart is fluid. */
-        style={FILL}
+        style={fillFor(style)}
       >
-        {activePoint ? (
+        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
+        {selPoint ? (
+          <circle
+            cx={selPoint[0]}
+            cy={selPoint[1]}
+            r={3.2}
+            fill="none"
+            data-mc-ink="accent"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {shownPoint ? (
           <line
-            x1={activePoint[0]}
+            x1={shownPoint[0]}
             y1={geo.plot.y0}
-            x2={activePoint[0]}
+            x2={shownPoint[0]}
             y2={geo.plot.y1}
             data-mc-ink="muted"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
-        {activePoint ? (
-          <circle cx={activePoint[0]} cy={activePoint[1]} r={2.6} data-mc-ink="accent" />
+        {shownPoint ? (
+          <circle cx={shownPoint[0]} cy={shownPoint[1]} r={2.6} data-mc-ink="accent" />
         ) : null}
         {rest.children}
       </StaticSparkline>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {activeValue !== null ? strings.point(activePos, stops.length, fmt(activeValue)) : ""}
-      </span>
-      {activePoint &&
-      activeValue !== null &&
+      <LiveRegion>
+        {shownValue !== null ? strings.point(shownPos, stops.length, fmt(shownValue)) : ""}
+      </LiveRegion>
+      {shownPoint &&
+      shownValue !== null &&
       /* At the endpoint the persistent `label="last"` already shows this value —
          a floating readout there just collides with it. Skip it; every other
          point still gets the readout. */
-      !(label === "last" && active === stops[stops.length - 1]) ? (
+      !(label === "last" && shown === stops[stops.length - 1]) ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(activePoint[0] / width) * 100}%`,
+            left: `${(shownPoint[0] / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(activeValue)}
+          {fmt(shownValue)}
         </span>
       ) : null}
     </span>

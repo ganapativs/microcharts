@@ -1,6 +1,5 @@
 import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
-import { DualWindowMeter as DualWindowMeterInteractive } from "@microcharts/react/dual-window-meter/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const LOUDNESS = Array.from(
@@ -47,12 +46,6 @@ export const entry: ChartEntry = {
       description: "A compliance corridor instead of one line.",
     },
     {
-      name: "damping",
-      type: "number",
-      required: false,
-      description: "Ballistics (α) for the live entry's displayed motion only.",
-    },
-    {
       name: "domain",
       type: "[number, number]",
       required: false,
@@ -87,21 +80,6 @@ export function Preview() {
     />
   );
 }
-
-export const showcase = {
-  hint: "compliance",
-  Node: () => (
-    <DualWindowMeter
-      data={LOUDNESS}
-      target={-23}
-      format={{ maximumFractionDigits: 1 }}
-      title="Loudness"
-      width={130}
-      height={24}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "fast", label: "fast window", min: 2, max: 8, init: 3 },
@@ -126,30 +104,6 @@ export const playground: PlaygroundSpec = {
       "  target={-23}",
       `  windows={[${s.fast}, ${s.slow}]}`,
       s.band === true && "  band={[-25, -21]}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <DualWindowMeterInteractive
-      data={LOUDNESS}
-      target={-23}
-      windows={[s.fast as number, s.slow as number]}
-      band={s.band ? [-25, -21] : undefined}
-      summary={false}
-      animate={ui.animate}
-      width={320}
-      height={28}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<DualWindowMeter",
-      "  data={samples}",
-      "  target={-23}",
-      `  windows={[${s.fast}, ${s.slow}]}`,
-      s.band === true && "  band={[-25, -21]}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -312,29 +266,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<DualWindowMeter data={samples} target={-23} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <DualWindowMeterInteractive
-      data={LOUDNESS}
-      target={-23}
-      format={{ maximumFractionDigits: 1 }}
-      summary={false}
-      width={130}
-      height={24}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

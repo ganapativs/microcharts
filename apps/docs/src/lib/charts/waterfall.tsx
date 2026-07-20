@@ -1,9 +1,8 @@
 import { Waterfall } from "@microcharts/react/waterfall";
-import { Waterfall as WaterfallInteractive } from "@microcharts/react/waterfall/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const PL = [
+export const PL = [
   { label: "Product", value: 42 },
   { label: "Services", value: 18 },
   { label: "Refunds", value: -12 },
@@ -41,7 +40,7 @@ export const entry: ChartEntry = {
       description: "Opening level (prior-period close).",
     },
     {
-      name: "total",
+      name: "totalBar",
       type: "boolean",
       required: false,
       description: "Zero-anchored closing total bar (default on).",
@@ -81,19 +80,12 @@ export const entry: ChartEntry = {
 
 export function Preview() {
   return <Waterfall data={PL} start={60} summary={false} width={130} height={24} />;
-}
-
-export const showcase = {
-  hint: "bridge",
-  Node: () => <Waterfall data={PL} start={60} title="Net income bridge" width={130} height={24} />,
-};
-
-// domain, format, locale, id, className, style, children: styling/formatting
+} // domain, format, locale, id, className, style, children: styling/formatting
 
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "start", label: "start", min: 0, max: 100, step: 5, init: 60 },
-    { kind: "toggle", key: "total", label: "total bar", init: true },
+    { kind: "toggle", key: "totalBar", label: "total bar", init: true },
     { kind: "toggle", key: "delta", label: "delta labels", init: false },
     {
       kind: "segmented",
@@ -107,7 +99,7 @@ export const playground: PlaygroundSpec = {
     <Waterfall
       data={PL}
       start={s.start as number}
-      total={s.total as boolean}
+      totalBar={s.totalBar as boolean}
       label={s.delta ? "delta" : "none"}
       positive={s.positive as "up" | "down"}
       summary={false}
@@ -120,35 +112,9 @@ export const playground: PlaygroundSpec = {
       "<Waterfall",
       "  data={steps}",
       `  start={${s.start}}`,
-      s.total === false && "  total={false}",
+      s.totalBar === false && "  totalBar={false}",
       s.delta && '  label="delta"',
       s.positive !== "up" && `  positive="${s.positive}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <WaterfallInteractive
-      data={PL}
-      start={s.start as number}
-      total={s.total as boolean}
-      label={s.delta ? "delta" : "none"}
-      positive={s.positive as "up" | "down"}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={32}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Waterfall",
-      "  data={steps}",
-      `  start={${s.start}}`,
-      s.total === false && "  total={false}",
-      s.delta && '  label="delta"',
-      s.positive !== "up" && `  positive="${s.positive}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -313,21 +279,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Waterfall data={steps} start={open} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <WaterfallInteractive data={PL} start={60} summary={false} width={130} height={24} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

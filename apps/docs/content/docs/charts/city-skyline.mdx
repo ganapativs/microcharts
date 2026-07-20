@@ -124,18 +124,20 @@ it's a plain, honest bar row.
 
 ## Why this default
 
-Windows come on when `lit` is present, because the two-variable read is exactly why this beats a `MiniBar` — the docs
-page shows the same data as MiniBar for the comparison. Heights are always zero-anchored bars; the lit windows are
-quantized to the window count and filled bottom-up, so the activation reads as a fill level. There is no roofline
-variation, no antennas, and nothing encoded in building width — width, roof, and ground are constants, because every
-mark must earn its place. The secondary channel drops out before the primary: a building too short for any window row is
-a solid tower, and its `lit` still shows in the per-building readout on hover or keyboard focus.
+Windows come on when `lit` is present, because the two-variable read is exactly why this beats a `MiniBar`. Heights are
+always zero-anchored bars; the lit windows are quantized to the window count and filled bottom-up, so the activation
+reads as a fill level. There is no roofline variation, no antennas, and nothing encoded in building width — width, roof,
+and ground are constants, because every mark must earn its place. The secondary channel drops out before the primary: a
+building too short for any window row is a solid tower, and its `lit` still shows in the per-building readout on hover
+or keyboard focus.
 
 ## Accessibility
 
 The accessible name names the count and the tallest — **"5 teams; tallest Platform at 46."** The interactive entry roves
 the buildings with ←/→ (or hover), announcing each as "Platform: 46; 70% lit." — the size precisely, the activation as a
 percent.
+
+<InteractionNote slug="city-skyline" />
 
 ## Props
 

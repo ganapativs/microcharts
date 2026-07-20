@@ -36,7 +36,7 @@ jobs:
   visual:
     runs-on: ubuntu-latest
     # Pinned to the Playwright release matching @playwright/test so baselines
-    # render byte-identical to local generation (plan/09 §1).
+    # render byte-identical to local generation.
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
     steps:

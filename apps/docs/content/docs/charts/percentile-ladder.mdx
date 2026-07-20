@@ -183,16 +183,18 @@ renders when it applies.
 
 ## Why this default
 
-The track is always zero-anchored — tick **distances** carry the story, so cropping the origin would distort every gap
-between percentiles. Height and accent grow toward the tail because the tail, not the median, is usually the SLO
-question. A log transform for long tails is never silent: it only applies when every sample is strictly positive, and an
-in-chart `log` tag renders whenever it does, so the axis is never misread as linear.
+The default linear track is zero-anchored — tick **distances** carry the story, so cropping the origin would distort
+every gap between percentiles. Height and accent grow toward the tail because the tail, not the median, is usually the
+SLO question. A log transform for long tails is never silent: it only applies when every sample is strictly positive,
+and an in-chart `log` tag renders whenever it does, so the axis is never misread as linear.
 
 ## Accessibility
 
 The accessible name states every marked percentile and the tail's multiple of the median — **"p50 124.5, p90 488.1, p99
 1,661.13 — the slowest 1% take 13.3× the median."** The interactive entry roves ticks with ←/→ (Home/End jump to the
 ends), announcing each tick's value and its multiple of the median (**"p99: 1,661.13 — 13.3× the median."**).
+
+<InteractionNote slug="percentile-ladder" />
 
 ## Props
 

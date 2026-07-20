@@ -1,9 +1,9 @@
-// Per-chart bench scenario registry (plan/21 §6.0.D). Batches add one entry per
-// chart — `run.mjs` measures each against its SSR floor (plan/07). Datasets are
+// Per-chart bench scenario registry. Batches add one entry per
+// chart — `run.mjs` measures each against its SSR floor. Datasets are
 // PRE-COMPUTED pools (data generation must not pollute the render timing) and
 // deterministic (no Math.random — reproducible numbers).
 //
-// Floors: the ~50 rows/ms plan/07 number was calibrated on the single-path
+// Floors: the ~50 rows/ms number was calibrated on the single-path
 // sparkline scenario. Node count dominates SSR cost, so N-node charts carry
 // their own regression floor, set at ~half of the measured 2026-07-08 baseline
 // (bench/results.json) — a tripwire against regressions, not an aspiration.
@@ -1054,7 +1054,7 @@ export const SCENARIOS = [
     floor: 18,
     props: (i) => ({
       data: waves[i % POOL].map((v, k) => ({ a: v, b: waves[(i + 1) % POOL][k] })),
-      labels: ["A", "B"],
+      seriesLabels: ["A", "B"],
       summary: false,
     }),
   },

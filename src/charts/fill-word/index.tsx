@@ -88,6 +88,12 @@ export function FillWord(props: FillWordProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The word IS the mark, so it has to sit like the words around it. Both
+      // copies and the numeral share one centred baseline inside a box 1.4× the
+      // font size, so the box is symmetric by construction and centring lands the
+      // word's optical middle on the cap band — unseated it would ride a third of
+      // a line high, which reads as a typo rather than a chart.
+      seat={{ mode: "center", top: 0, bottom: geo.height }}
       className={className ? `mc-fillword ${className}` : "mc-fillword"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >

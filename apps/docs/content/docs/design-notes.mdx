@@ -28,10 +28,15 @@ A preset can restyle a chart without ever changing what it says.
 ## Static first, interactivity opt-in
 
 Nearly every chart ships as two entries (WindBarb is static-only). The default is pure SVG — hook-free, listener-free,
-safe inside a React Server Component, and it renders to HTML with zero client JavaScript. Hover, keyboard navigation,
-and live announcements live in a separate `/interactive` subpath you import only where you need them. The line between
-the two is never blurred, so you never pay for interactivity you didn't ask for, and a static chart can never
-accidentally drag a listener into your server bundle.
+safe inside a React Server Component, and it renders to HTML with zero client JavaScript. Hover, roving keyboard focus,
+touch scrub, select-to-pin, and live announcements live in a separate `/interactive` subpath you import only where you
+need them. The line between the two is never blurred, so you never pay for interactivity you didn't ask for, and a
+static chart can never accidentally drag a listener into your server bundle.
+
+The interactive entry composes the static one rather than re-implementing it, so the interactive rendering can't drift
+from the static one. Every multi-unit chart resolves a gesture to a navigable _unit_ through the same kernel — so
+interaction is one thing to learn across the catalog, not one dialect per chart. Single-unit charts have nothing to rove
+between and take `onSelect` alone.
 
 ## One grammar, not an options bag
 
@@ -54,8 +59,9 @@ makes the charts calm: there's no room for anything that isn't carrying informat
 
 ## Motion lives in the interactive build, not on every chart
 
-Static charts don't move at all — there's nothing to animate and no `animate` prop to pass. Only the `/interactive`
-entries can play an entrance, and only when you opt in with `animate` (off by default). It runs through CSS, gated on
+Static charts have no `animate` prop and run no animation JavaScript — the one thing that moves inside a static host is
+`<Marker celebrate>`, a pure-CSS one-shot burst that reduced motion stills. Only the `/interactive` entries can play an
+entrance, and only when you opt in with `animate` (off by default). It runs through the Web Animations API, gated on
 `prefers-reduced-motion`. Every entrance follows the logic of the data it draws: a line draws left-to-right along its
 time axis, bars grow from the baseline, a donut fills clockwise from twelve o'clock, and labels arrive last — they
 annotate marks that already exist. Marks decelerate into place; they never bounce, loop, or draw the eye away from the
@@ -64,9 +70,11 @@ server render or turn into decoration.
 
 ## Budgets are build gates
 
-Size and speed aren't aspirations here — they're CI gates. A chart that grows past its gzip budget or drops below its
-render floor fails the build, the same way a failing test does. The numbers on the [Performance](/docs/performance) page
-are regenerated from the real build on every release, so they can't quietly rot.
+Size isn't an aspiration here — it's a CI gate. A chart that grows past its gzip budget fails the build, the same way a
+failing test does, and the SSR benchmark exits non-zero when a chart drops below its render floor. The numbers on the
+[Performance](/docs/performance) page are never hand-typed: the sizes are re-measured from the built `dist/` on every CI
+run, and the throughput figures are derived from the checked-in benchmark result, so a claim can't drift from what was
+measured.
 
 ## One package
 

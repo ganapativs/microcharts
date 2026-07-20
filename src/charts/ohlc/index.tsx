@@ -50,7 +50,7 @@ export interface OhlcProps {
   data: readonly OhlcDatum[];
   /** `"candle"` (default) | `"bars"` (open tick left, close tick right).
    * */
-  variant?: "candle" | "bars" | undefined;
+  mode?: "candle" | "bars" | undefined;
   /** Renders the most recent N with a dev warning past it (never averaged). */
   maxPeriods?: number | undefined;
   /** `"last"` = last close in a right gutter. */
@@ -72,7 +72,7 @@ export interface OhlcProps {
 export function Ohlc(props: OhlcProps): ReactNode {
   const {
     data,
-    variant = "candle",
+    mode = "candle",
     maxPeriods = 20,
     label = "none",
     domain,
@@ -117,6 +117,12 @@ export function Ohlc(props: OhlcProps): ReactNode {
   const accName = resolveSummary(summary, () => ohlcSummary(data, fmt, pctFmt, strings));
   const lastMark = geo.marks.at(-1);
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -124,8 +130,13 @@ export function Ohlc(props: OhlcProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The box floor is the range low, not a zero — but that is exactly
+      // Sparkline's fitted-domain case, and candles read as columns standing in a
+      // frame far more than as a symmetric glyph. Centring a 16-unit run of
+      // candles would drop half the wicks below the baseline.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={className ? `mc-ohlc ${className}` : "mc-ohlc"}
-      style={style}
+      style={rootStyle}
     >
       {/* flat siblings, no per-mark <g> wrapper: up to maxPeriods (20) marks is
           this chart's SSR hot path. */}
@@ -150,7 +161,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         );
-        if (variant === "candle") {
+        if (mode === "candle") {
           return [
             wick,
             /* hollow up / filled down — the shape code */

@@ -46,6 +46,10 @@ export interface BiasGeometry {
   withinPct: number | null;
   /** Count of finite pairs (stats basis). */
   n: number;
+  /** Plot box (viewBox y) the symmetric diff scale paints into — the caption
+   *  gutter is already subtracted, so the zero line is its exact centre. */
+  y0: number;
+  y1: number;
 }
 
 /** Uniform down-sample preserving first/last — display only, never stats.
@@ -86,6 +90,8 @@ export function biasStripGeometry(opts: {
       bias: null,
       withinPct: null,
       n: 0,
+      y0: round2(rad),
+      y1: round2(height - rad),
     };
   }
 
@@ -119,8 +125,10 @@ export function biasStripGeometry(opts: {
   // reserve the caption gutter (top) only when a bias line exists to sit in it.
   // means lie within their extent domain and diffs within [-m, m], so both
   // scales already land inside their range — no clamp needed on the marks.
+  const y1 = height - rad;
+  const y0 = rad + (hasBand ? captionPad : 0);
   const sx = scaleLinear(xd, [rad, width - rad]);
-  const sy = scaleLinear([-m, m], [height - rad, rad + (hasBand ? captionPad : 0)]);
+  const sy = scaleLinear([-m, m], [y1, y0]);
   const cy = (v: number) => round2(sy(v));
   const zeroY = cy(0);
   const biasY = hasBand ? cy(bias) : null;
@@ -155,5 +163,7 @@ export function biasStripGeometry(opts: {
     bias: round2(bias),
     withinPct,
     n,
+    y0: round2(y0),
+    y1: round2(y1),
   };
 }

@@ -14,7 +14,7 @@ const D = [0, 100] as const;
 function gallery(): string {
   const sentence = `Peak load today hit ${svg({ value: 86, domain: D, title: "Peak load" })} on the shared scale.`;
 
-  // table-cell matrix — the hero context (plan/22 #3): shared domain per grid
+  // table-cell matrix — the hero context: shared domain per grid
   const row = (name: string, values: number[]) =>
     `<tr><td>${name}</td>${values
       .map((v) => `<td>${svg({ value: v, domain: D, summary: false })}</td>`)

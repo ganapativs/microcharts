@@ -9,6 +9,9 @@ const ACCT = [
   { label: "Gamma", value: null },
 ] as const;
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <SproutRow>", () => {
   it("arrow keys rove and announce each item's stage", async () => {
     const screen = await render(<SproutRow data={ACCT} title="Accounts" />);
@@ -28,5 +31,47 @@ describe("interactive <SproutRow>", () => {
     const wrap = screen.container.querySelector(".mc-sprout-live")!;
     expect(wrap.getAttribute("aria-label")).toBe("Accounts. 3 items; 1 at bloom, 0 at seed.");
     expect(wrap.querySelector("svg")!.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("onActive reports the focused datum (value = stage); null once cleared", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<SproutRow data={ACCT} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-sprout-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    expect(seen.at(-1)).toEqual({ index: 0, value: 3, label: "Acme" });
+    key(wrap, "End"); // the missing item reports a null value
+    expect(seen.at(-1)).toEqual({ index: 2, value: null, label: "Gamma" });
+    key(wrap, "Escape");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active sprout: fires onSelect + pins a ring", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<SproutRow data={ACCT} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-sprout-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    key(wrap, "Enter");
+    expect(picks.at(-1)).toEqual({ index: 0, value: 3, label: "Acme" });
+    // Pin survives blur (it is selection, not hover).
+    wrap.blur();
+    await expect
+      .poll(() => screen.container.querySelector('ellipse[data-mc-w="tick"]'))
+      .not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring without focus", async () => {
+    const screen = await render(<SproutRow data={ACCT} selectedIndex={1} />);
+    expect(screen.container.querySelectorAll('ellipse[data-mc-w="tick"]')).toHaveLength(1);
+  });
+
+  it("consumer children reach the composed static chart", async () => {
+    const screen = await render(
+      <SproutRow data={ACCT}>
+        <rect data-testid="annotation" x={0} y={0} width={1} height={1} />
+      </SproutRow>,
+    );
+    expect(screen.container.querySelector('[data-testid="annotation"]')).not.toBeNull();
   });
 });

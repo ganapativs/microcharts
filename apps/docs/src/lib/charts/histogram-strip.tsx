@@ -1,9 +1,8 @@
 import { HistogramStrip } from "@microcharts/react/histogram-strip";
-import { HistogramStrip as HistogramStripInteractive } from "@microcharts/react/histogram-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const TIMES = Array.from({ length: 120 }, (_, i) =>
+export const TIMES = Array.from({ length: 120 }, (_, i) =>
   i % 3 === 0 ? 40 + (i % 10) : 20 + ((i * 7) % 60),
 );
 // Per-endpoint latency samples (ms) — distinct clusters, a real "distributions
@@ -88,14 +87,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <HistogramStrip data={TIMES} summary={false} width={130} height={34} />;
 }
-
-export const showcase = {
-  hint: "distribution",
-  Node: () => (
-    <HistogramStrip data={TIMES} markValue={45} title="Response times" width={130} height={34} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   // data is the fixed demo series; width/height/color/format/strings/title/
   // summary/id/className/style/children are sizing/styling/accessible-name
@@ -133,32 +124,6 @@ export const playground: PlaygroundSpec = {
       (s.markValue as boolean) && "  markValue={45}",
       (s.domain as boolean) && "  domain={[0, 100]}",
       (s.locale as string) !== "en-US" && `  locale="${s.locale}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <HistogramStripInteractive
-      data={TIMES}
-      bins={s.bins as number}
-      markValue={(s.markValue as boolean) ? 45 : undefined}
-      domain={(s.domain as boolean) ? [0, 100] : undefined}
-      locale={s.locale as string}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={64}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<HistogramStrip",
-      "  data={times}",
-      `  bins={${s.bins}}`,
-      (s.markValue as boolean) && "  markValue={45}",
-      (s.domain as boolean) && "  domain={[0, 100]}",
-      (s.locale as string) !== "en-US" && `  locale="${s.locale}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -274,19 +239,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<HistogramStrip data={times} />`;
 }
-
-export function PreviewLive() {
-  return <HistogramStripInteractive data={TIMES} summary={false} width={130} height={34} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

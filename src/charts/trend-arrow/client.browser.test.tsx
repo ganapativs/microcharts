@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { TrendArrow } from "./client.js";
 
+const key = (el: HTMLElement, k: string) =>
+  el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+
 describe("interactive <TrendArrow>", () => {
   it("focusable wrapper owns the naming; static chart is decorative", async () => {
     const screen = await render(<TrendArrow value={0.12} title="Growth" />);
@@ -25,5 +28,22 @@ describe("interactive <TrendArrow>", () => {
   it("live={false} → no live region", async () => {
     await render(<TrendArrow value={0.1} live={false} />);
     expect(document.querySelector('[aria-live="polite"]')).toBeNull();
+  });
+
+  it("click fires onSelect with the signed change + direction", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<TrendArrow value={-0.05} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-trend-live") as HTMLElement;
+    wrap.click();
+    expect(picks).toEqual([{ index: 0, value: -0.05, label: "down" }]);
+  });
+
+  it("Enter fires onSelect from the focused wrapper", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<TrendArrow value={0.12} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-trend-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Enter");
+    expect(picks).toEqual([{ index: 0, value: 0.12, label: "up" }]);
   });
 });

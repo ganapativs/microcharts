@@ -22,12 +22,14 @@ export function shiftDelta(geo: ShiftHistogramGeometry, fmt: (n: number) => stri
 export function shiftSummary(
   geo: ShiftHistogramGeometry,
   fmt: (n: number) => string,
-  labels: readonly [string, string],
+  seriesLabels: readonly [string, string],
   strings: ShiftStrings,
 ): string {
   const { before, after } = geo.medians;
-  if (before === null && after !== null) return strings.shiftOneSide(fmt(after.value), labels[0]);
-  if (after === null && before !== null) return strings.shiftOneSide(fmt(before.value), labels[1]);
+  if (before === null && after !== null)
+    return strings.shiftOneSide(fmt(after.value), seriesLabels[0]);
+  if (after === null && before !== null)
+    return strings.shiftOneSide(fmt(before.value), seriesLabels[1]);
   if (before === null || after === null) return strings.noData;
   const samples = geo.nBefore !== geo.nAfter ? strings.shiftSamples(geo.nBefore, geo.nAfter) : "";
   if (geo.shift === 0) return strings.shiftHeld(fmt(before.value)) + samples;
@@ -43,7 +45,7 @@ export interface ShiftHistogramProps {
   /** Mirror (default) or overlay (after outline over before fill). */
   mode?: ShiftMode | undefined;
   /** Side identities for the summary (default ["before", "after"]). */
-  labels?: readonly [string, string] | undefined;
+  seriesLabels?: readonly [string, string] | undefined;
   /** `"shift"` states the signed median shift in a right gutter. */
   label?: "shift" | "none" | undefined;
   domain?: readonly [number, number] | undefined;
@@ -66,7 +68,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
     data,
     bins,
     mode = "mirror",
-    labels = ["before", "after"] as const,
+    seriesLabels = ["before", "after"] as const,
     label = "shift",
     domain,
     width = 80,
@@ -128,7 +130,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
     );
   }
 
-  const accName = resolveSummary(summary, () => shiftSummary(geo, fmt, labels, strings));
+  const accName = resolveSummary(summary, () => shiftSummary(geo, fmt, seriesLabels, strings));
   const afterFill = color ?? "var(--mc-accent)";
   const overlay = mode === "overlay";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
@@ -140,6 +142,11 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Mirrored around the center hairline: before grows up, after grows down,
+      // and neither side is a floor. The seat is the padded plot frame, not the
+      // viewBox, so the mirror axis lands on the cap band where the eye expects
+      // the shared zero to be.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={cls}
       style={rootStyle}
     >
@@ -207,7 +214,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
           )
         ) : null,
       )}
-      {/* median ticks per side */}
       {geo.medians.before ? (
         <line
           x1={geo.medians.before.x}

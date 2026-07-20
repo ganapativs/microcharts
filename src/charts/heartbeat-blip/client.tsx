@@ -6,6 +6,9 @@
 // unforgivable lie here). Gated on reduced-motion (→ the static frame, re-rendered
 // on data change) and on-screen (paused off-viewport). Composes the static (canon).
 import { useEffect, useMemo, useRef, useState } from "react";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
+import type { MicroDatum } from "../../shared/interactive.js";
+import { heartbeatGeometry } from "./geometry.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -17,6 +20,8 @@ import {
 
 export interface InteractiveHeartbeatBlipProps extends HeartbeatBlipProps {
   strings?: HeartbeatStrings;
+  /** The trace was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — the in-window event count. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 const TICK_MS = 250; // drift cadence — coarse, so it's a readable sweep not a jitter
@@ -41,6 +46,9 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     strings = EN_HEARTBEAT,
     title,
     summary,
+    onSelect,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -99,17 +107,38 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     }
   }, [events, win, now, strings, reduced, inView, wrapRef]);
 
+  // Drill-down: the rate read the trace encodes — how many events are in the
+  // window at the frame currently on screen — named by that window.
+  const select = (): void =>
+    onSelect?.({
+      index: 0,
+      value: heartbeatGeometry({
+        events,
+        window: win,
+        now: liveNow,
+        width: 60,
+        height: 16,
+        pad: 1,
+      }).count,
+      label: strings.heartbeatWindow(win),
+    });
+
   return (
     <span
       ref={wrapRef}
-      className="mc-heartbeat-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
+      {...wrap("mc-heartbeat-live", className, style)}
+      {...named(ariaLabel)}
+      onClick={select}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select();
+        }
+      }}
     >
       <StaticHeartbeatBlip
         {...rest}
+        style={fillFor(style)}
         events={events}
         window={win}
         now={liveNow}

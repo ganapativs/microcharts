@@ -1,6 +1,5 @@
 import { MinimapStrip } from "@microcharts/react/minimap-strip";
-import { MinimapStrip as MinimapStripInteractive } from "@microcharts/react/minimap-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const CONTENT = Array.from(
@@ -22,6 +21,7 @@ export const entry: ChartEntry = {
   tagline: "Where am I in the whole, and where in the whole is everything else I care about.",
   staticImport: `${PKG}/minimap-strip`,
   interactiveImport: `${PKG}/minimap-strip/interactive`,
+  picker: false,
   dataShape: "{ content, window, marks?, known? }",
   encoding: { channel: "position (window + marks along the extent)", precision: "high / low" },
   nodeBudget: "≤ 5",
@@ -35,7 +35,7 @@ export const entry: ChartEntry = {
       description: "Density series, viewport, ticks, covered regions.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"bars" | "heat"',
       required: false,
       description: "Heat is a calmer opacity strip.",
@@ -77,18 +77,12 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <MinimapStrip data={DATA} summary={false} width={130} height={16} />;
 }
-
-export const showcase = {
-  hint: "position",
-  Node: () => <MinimapStrip data={DATA} title="Document position" width={130} height={16} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["bars", "heat"],
       init: "bars",
     },
@@ -98,7 +92,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <MinimapStrip
       data={{ ...DATA, window: [s.window as number, (s.window as number) + 140] }}
-      variant={s.variant as "bars" | "heat"}
+      mode={s.mode as "bars" | "heat"}
       markLane={s.markLane as boolean}
       summary={false}
       width={320}
@@ -109,30 +103,8 @@ export const playground: PlaygroundSpec = {
     [
       "<MinimapStrip",
       `  data={{ content, window: [${s.window}, ${(s.window as number) + 140}], marks, known }}`,
-      s.variant !== "bars" && `  variant="${s.variant}"`,
+      s.mode !== "bars" && `  mode="${s.mode}"`,
       s.markLane === false && "  markLane={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <MinimapStripInteractive
-      data={{ ...DATA, window: [s.window as number, (s.window as number) + 140] }}
-      variant={s.variant as "bars" | "heat"}
-      markLane={s.markLane as boolean}
-      animate={ui.animate}
-      summary={false}
-      width={320}
-      height={20}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<MinimapStrip",
-      `  data={{ content, window: [${s.window}, ${(s.window as number) + 140}], marks, known }}`,
-      s.variant !== "bars" && `  variant="${s.variant}"`,
-      s.markLane === false && "  markLane={false}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -149,8 +121,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "heat",
-    code: `<MinimapStrip data={data} variant="heat" />`,
-    node: <MinimapStrip data={DATA} variant="heat" summary={false} width={220} height={16} />,
+    code: `<MinimapStrip data={data} mode="heat" />`,
+    node: <MinimapStrip data={DATA} mode="heat" summary={false} width={220} height={16} />,
   },
 ];
 
@@ -246,19 +218,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<MinimapStrip data={{ content, window, marks, known }} />`;
 }
-
-export function PreviewLive() {
-  return <MinimapStripInteractive data={DATA} summary={false} width={130} height={16} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

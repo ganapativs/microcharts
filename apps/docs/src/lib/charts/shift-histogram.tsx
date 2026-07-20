@@ -1,6 +1,5 @@
 import { ShiftHistogram } from "@microcharts/react/shift-histogram";
-import { ShiftHistogram as ShiftHistogramInteractive } from "@microcharts/react/shift-histogram/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 import { shiftHistogramFromDelta } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
@@ -49,7 +48,7 @@ export const entry: ChartEntry = {
       description: "Mirror (default) or after-as-outline over before fill.",
     },
     {
-      name: "labels",
+      name: "seriesLabels",
       type: "[string, string]",
       required: false,
       description: "Side identities for the summary (default ['before', 'after']).",
@@ -90,20 +89,6 @@ export function Preview() {
     />
   );
 }
-
-export const showcase = {
-  hint: "before vs after",
-  Node: () => (
-    <ShiftHistogram
-      data={{ before: BEFORE, after: AFTER }}
-      format={MS}
-      title="The fix"
-      width={160}
-      height={24}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -135,31 +120,6 @@ export const playground: PlaygroundSpec = {
       s.mode !== "mirror" && `  mode="${s.mode}"`,
       s.bins !== "auto" && `  bins={${s.bins}}`,
       s.label !== "shift" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ShiftHistogramInteractive
-      data={{ before: BEFORE, after: AFTER }}
-      format={MS}
-      mode={s.mode as "mirror" | "overlay"}
-      bins={s.bins === "auto" ? undefined : Number(s.bins)}
-      label={s.label as "shift" | "none"}
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={28}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<ShiftHistogram",
-      "  data={{ before, after }}",
-      s.mode !== "mirror" && `  mode="${s.mode}"`,
-      s.bins !== "auto" && `  bins={${s.bins}}`,
-      s.label !== "shift" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -311,28 +271,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<ShiftHistogram data={{ before, after }} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <ShiftHistogramInteractive
-      data={{ before: BEFORE, after: AFTER }}
-      format={MS}
-      summary={false}
-      width={160}
-      height={24}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

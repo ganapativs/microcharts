@@ -101,6 +101,13 @@ export function Funnel(props: FunnelProps): ReactNode {
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const accName = resolveSummary(summary, () => funnelSummary(data, fmt, pctFmt, strings));
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle =
+    fontSize > 0 ? { ...style, "--mc-label-size": `${fontSize}px` } : (style as CSSProperties);
+
   return (
     <Chart
       width={width}
@@ -108,8 +115,12 @@ export function Funnel(props: FunnelProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Stage columns are zero-anchored and every one ends at `height`, slats
+      // included; the label gutter geometry reserves is at the TOP, so nothing
+      // eats into the floor and the columns sit on the baseline.
+      seat={{ mode: "floor", bottom: height }}
       className={className ? `mc-funnel ${className}` : "mc-funnel"}
-      style={style}
+      style={rootStyle}
     >
       {geo.slats.map((s, i) => (s.d ? <path key={`s${i}`} d={s.d} data-mc-ink="band" /> : null))}
       {geo.stages.map((st) => {

@@ -1,6 +1,5 @@
 import { StatusDot } from "@microcharts/react/status-dot";
-import { StatusDot as StatusDotInteractive } from "@microcharts/react/status-dot/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -33,6 +32,7 @@ export const entry: ChartEntry = {
   tagline: "What state is this thing in: shape and color paired, never color alone.",
   staticImport: `${PKG}/status-dot`,
   interactiveImport: `${PKG}/status-dot/interactive`,
+  picker: false,
   dataShape: '"ok" | "warn" | "error" | "off" | "busy" (extensible)',
   encoding: { channel: "paired glyph shape + semantic color", precision: "n/a — categorical" },
   nodeBudget: "≤ 2 (mark + optional pulse halo)",
@@ -80,12 +80,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "state",
-  Node: () => <StatusDot status="busy" pulse title="Pipeline" style={{ width: 18, height: 18 }} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -107,25 +101,6 @@ export const playground: PlaygroundSpec = {
   ),
   code: (s) =>
     ["<StatusDot", `  status="${s.status}"`, (s.pulse as boolean) && "  pulse", "/>"]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <StatusDotInteractive
-      status={s.status as string}
-      pulse={s.pulse as boolean}
-      summary={false}
-      animate={ui.animate}
-      style={{ width: 40, height: 40 }}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<StatusDot",
-      `  status="${s.status}"`,
-      (s.pulse as boolean) && "  pulse",
-      ui.animate && " animate",
-      "/>",
-    ]
       .filter(Boolean)
       .join("\n"),
   interactiveHint: "Cycle the state — each change is announced politely with its label.",
@@ -252,31 +227,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<StatusDot status="ok" />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex items-center gap-3">
-      {(["ok", "warn", "error", "off", "busy"] as const).map((s) => (
-        <StatusDotInteractive
-          key={s}
-          status={s}
-          summary={false}
-          style={{ width: 14, height: 14 }}
-          animate
-        />
-      ))}
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

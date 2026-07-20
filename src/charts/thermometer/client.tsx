@@ -3,9 +3,10 @@
 // the fill glides to its new level (CSS, reduced-motion-gated); announces through
 // a polite region on change, and calls out a target crossing. No pointer math —
 // a single value; hover is a reveal, not a lookup. Composes the static component.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
+import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_THERMOMETER, type ThermometerStrings } from "../../core/strings-thermometer.js";
@@ -33,6 +34,8 @@ export interface InteractiveThermometerProps extends ThermometerProps {
    * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Click/tap or Enter/Space — `{ index: 0, value: the reading }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function Thermometer(props: InteractiveThermometerProps): React.ReactNode {
@@ -47,6 +50,9 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
     format,
     locale,
     animate = false,
+    onSelect,
+    className,
+    style,
     ...rest
   } = props;
   const summary = thermometerSummary(value, { domain, target, strings, format, locale });
@@ -65,20 +71,27 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
   }, [value, summary, live]);
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
-  const readout = isFiniteValue(value) ? makeFormatter(format, locale)(value) : "";
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  const readout = isFiniteValue(value) ? fmt(value) : "";
+  // One reading, one selectable unit (index 0) — the same number the readout
+  // shows, in domain units.
+  const pick = (): void => onSelect?.({ index: 0, value: isFiniteValue(value) ? value : null });
 
   return (
     <span
       ref={hostRef}
-      className="mc-thermo-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...wrap("mc-thermo-live", className, style)}
+      {...named(label)}
       onPointerEnter={() => setHover(true)}
       onPointerLeave={() => setHover(false)}
       onFocus={() => setHover(true)}
       onBlur={() => setHover(false)}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
     >
       <StaticThermometer
         {...rest}
@@ -90,6 +103,7 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
         locale={locale}
         strings={strings}
         summary={false}
+        style={fillFor(style)}
       />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
       {hover && readout ? (

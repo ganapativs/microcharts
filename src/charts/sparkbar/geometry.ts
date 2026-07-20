@@ -10,15 +10,28 @@ export type SparkBarMode = "bar" | "winloss";
 
 /** Endpoint-label metrics, anchored (never measures text — unmeasurable
  *  server-side). fontSize in viewBox units; gutter over-estimates width so the
- *  label never overruns. Kept local to avoid bundling the Sparkline. */
+ *  label never overruns. Kept local to avoid bundling the Sparkline.
+ *
+ *  Mirrors `sparkline/geometry.ts#labelMetrics` deliberately — the duplication is
+ *  a bundling decision, so the two must stay behaviourally identical. When the
+ *  label wants more than the ~45% budget the size shrinks (5-unit floor) instead
+ *  of the gutter being clamped under a full-length string, which used to let a
+ *  long value overhang the viewBox by ~6 units. */
 export function labelMetrics(
   text: string,
   width: number,
   height: number,
 ): { fontSize: number; gutter: number } {
-  const fontSize = Math.max(6, Math.min(Math.round(height * 0.5), 11));
-  const gutter = Math.min(textGutter(text.length, fontSize, 6), Math.floor(width * 0.45));
-  return { fontSize, gutter };
+  const ideal = Math.max(6, Math.min(Math.round(height * 0.5), 11));
+  const budget = Math.floor(width * 0.45);
+  const needs = (size: number): number => textGutter(text.length, size, 6);
+
+  let fontSize = ideal;
+  if (needs(fontSize) > budget && text.length > 0) {
+    const fitted = Math.floor((budget - 6) / (text.length * 0.62));
+    fontSize = Math.max(5, Math.min(ideal, fitted));
+  }
+  return { fontSize, gutter: needs(fontSize) };
 }
 
 /** One placed bar. `sign` drives valence color; `gap` bars (null data) are dropped. */
@@ -43,6 +56,10 @@ export interface SparkBarGeometry {
   slot: number;
   /** Left plot inset. */
   x0: number;
+  /** Top edge of the plot box — the inline seat's upper bound. */
+  y0: number;
+  /** Bottom edge of the plot box — where bars land in bar mode. */
+  y1: number;
 }
 
 export interface SparkBarGeometryOptions {
@@ -105,7 +122,7 @@ export function sparkBarGeometry(
         last: i === lastFinite,
       });
     }
-    return { bars, baselineY: mid, domain: [-1, 1], slot, x0 };
+    return { bars, baselineY: mid, domain: [-1, 1], slot, x0, y0, y1 };
   }
 
   const domain = opts.domain ?? niceDomain(data, true);
@@ -134,5 +151,5 @@ export function sparkBarGeometry(
       last: i === lastFinite,
     });
   }
-  return { bars, baselineY, domain, slot, x0 };
+  return { bars, baselineY, domain, slot, x0, y0, y1 };
 }

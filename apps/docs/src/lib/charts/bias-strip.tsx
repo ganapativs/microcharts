@@ -1,6 +1,5 @@
 import { BiasStrip } from "@microcharts/react/bias-strip";
-import { BiasStrip as BiasStripInteractive } from "@microcharts/react/bias-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 import { biasPairsFromDrift } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
@@ -10,7 +9,7 @@ const DIFFS = [
   1.8, 2.4, 1.5, 2.9, 2.1, 1.2, 2.6, 3.0, 1.9, 2.3, 6.5, 2.0, 1.7, 2.8, 2.2, -1.5, 2.5, 1.6, 2.7,
   2.0,
 ];
-const PAIRS = DIFFS.map((d, i) => ({ a: i + d, b: i }));
+export const PAIRS = DIFFS.map((d, i) => ({ a: i + d, b: i }));
 
 export const entry: ChartEntry = {
   name: "BiasStrip",
@@ -61,12 +60,6 @@ const pairs = [
 export function Preview() {
   return <BiasStrip data={PAIRS} summary={false} width={120} height={64} />;
 }
-
-export const showcase = {
-  hint: "agreement",
-  Node: () => <BiasStrip data={PAIRS} title="Device vs reference" width={120} height={64} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "wide", label: "99% limits", init: false },
@@ -91,30 +84,6 @@ export const playground: PlaygroundSpec = {
       (s.wide as boolean) && "  limits={2.58}",
       !(s.caption as boolean) && '  label="none"',
       s.r !== 1.5 && `  r={${s.r}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <BiasStripInteractive
-      data={PAIRS}
-      limits={(s.wide as boolean) ? 2.58 : 1.96}
-      label={(s.caption as boolean) ? "bias" : "none"}
-      r={s.r as number}
-      summary={false}
-      animate={ui.animate}
-      width={220}
-      height={120}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<BiasStrip",
-      "  data={pairs}",
-      (s.wide as boolean) && "  limits={2.58}",
-      !(s.caption as boolean) && '  label="none"',
-      s.r !== 1.5 && `  r={${s.r}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -227,19 +196,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<BiasStrip data={pairs} />`;
 }
-
-export function PreviewLive() {
-  return <BiasStripInteractive data={PAIRS} summary={false} width={120} height={64} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

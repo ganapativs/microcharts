@@ -30,7 +30,11 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
 2. **Budgets are CI gates:** ≤ 3 kB gzip per static subpath (≤ 2 kB target, simple "Delta-class" charts ≤ 1.5 kB),
    interactive ≤ static + 1 kB, shared kernel ≤ 5 kB, `styles.css` ≤ 12 kB, ≤ ~6 SVG nodes typical per chart, 0 client
    JS for static charts in RSC. `.size-limit.json` is generated (`scripts/gen-size-limits.mjs` from
-   `scripts/size-budgets.json`), never hand-edited.
+   `scripts/size-budgets.json`), never hand-edited. **Two of these ceilings no longer describe the shipped budgets and
+   need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 17 statics sit above 3 kB, none by more
+   than 0.9 kB; and `interactive ≤ static + 1 kB` is currently unreachable — 89 of 105 interactive entries are 1.8–2.3
+   kB above their static twin, because size-limit measures each subpath standalone and so charges every one of them the
+   full shared picker kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
 3. **Static-first architecture:** default exports are hook-free, listener-free, observer-free pure-SVG components —
    RSC-safe, SSR-static. Interactivity and animation live only in separate `'use client'` entries (`…/interactive`).
    Never blur this line.
@@ -63,7 +67,12 @@ core math + static SVG attribute assertions, and `@vitest/browser` (Playwright p
 interactive entries (jsdom has no SVG layout: `getBBox`/`getScreenCTM`/`getComputedTextLength` return 0) · Playwright
 screenshots + **Argos** for visual review · size-limit as a custom CI step · **knip** (unused deps/exports/files) ·
 publint + arethetypeswrong on release · changesets + npm trusted publishing (OIDC, provenance). Docs: **Fumadocs** +
-Next static export. ESM-only, per-component subpath exports, `sideEffects: false`, types-first export conditions.
+Next static export. ESM-only, per-component subpath exports, types-first export conditions, and a **narrow `sideEffects`
+allowlist — never `false`**: `**/*.css` and `./dist/shared/motion-engine.js` both carry load-bearing side effects (the
+stylesheet is a bare import; the engine self-registers via `registerMotionEngine` at module scope), so `false` would let
+a bundler legally drop them and silently ship unstyled or unanimated charts. Everything outside those two globs still
+tree-shakes. Bundle analyzers that only test `sideEffects === false` will label the package "some side-effects" — that
+badge is a heuristic, not a regression; don't "fix" it.
 
 ## Architecture map
 
@@ -120,6 +129,19 @@ override — the `data-mc-cat` attribute stays for motion + forced-colors). (The
 prop opts into `<title>/<desc>` + `aria-labelledby`. Never generate ids in static components (module counters desync
 under StrictMode/concurrent renders → hydration mismatches). Interactive entries may use `useId`.
 
+**Inline seat (every chart emits one):** a chart passes `seat={{ mode, top, bottom }}` to `<Chart>` so `.mc-inline` can
+sit it on a line of text — `mode: "floor"` when the mark has a meaningful bottom (bars, areas, columns: its floor lands
+on the text baseline like a letter), `mode: "center"` when it's symmetric with no floor (glyphs, dials, strips, rows,
+anything anchored on a midline: its box centres on the cap band). Coordinates are viewBox units from the top. Pass the
+**plot box**, never the data bounding box — a data-derived seat makes the mark bob vertically as values change — and
+never the raw viewBox when a label gutter would drag the plot off the line. If the plot box depends on a prop, branch on
+it: `SparkBar` is floor in bar mode and centre in win-loss. Geometry owns the box: export `y0`/`y1` from `geometry.ts`
+rather than re-deriving padding in `index.tsx`. `Chart` turns the seat into `--mc-seat`/`--mc-seat-mid`, which are
+registered with `@property … inherits: false` precisely so a seat can't leak down the tree into another chart. A chart
+that omits `seat` silently falls back to the legacy viewBox-bottom seat and will ride high — adding one is part of
+shipping a chart, not an optimisation. The two exceptions are `Delta` and `TokenConfidence`, which render inline HTML
+rather than `<Chart>` and own their own baseline.
+
 **Containment (hard rule):** nothing may paint outside the viewBox — `.mc-root` has `overflow: visible`, so an escape is
 a layout spill, not a clip. Direct labels reserve a deterministic gutter before geometry (fontSize in viewBox units set
 as an SVG attribute — never em-based CSS for in-chart text — with a per-char over-estimate); label y is clamped by font
@@ -133,9 +155,9 @@ newer). Number formatting only via `makeFormatter` (`core/format.ts`, cached `In
 
 Static + interactive entries · shared edge-case fixture suite green (empty, single point, all-equal, nulls, all-null,
 negatives, NaN/±Infinity — documented behavior) · property tests · axe clean + summary correct · visual baselines
-approved (light/dark × presets) · size-budget entry · a doc page · a bench scenario. SVG testing uses normalized
-attribute assertions (coords rounded to 2 decimals at generation), never whole-markup snapshots. React 18 + 19 matrix,
-StrictMode on.
+approved (light/dark × presets) · size-budget entry · an inline `seat` · a doc page · a bench scenario. SVG testing uses
+normalized attribute assertions (coords rounded to 2 decimals at generation), never whole-markup snapshots. React 18 +
+19 matrix, StrictMode on.
 
 ## Docs site (`apps/docs`)
 

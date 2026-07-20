@@ -5,6 +5,8 @@
 // keyboard model beyond wrapper focus — a count has no sub-parts to navigate.
 // Composes the static component (canon); geometry is never re-implemented.
 import { useEffect, useRef, useState } from "react";
+import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { EN_TALLY, type TallyStrings } from "../../core/strings-tally.js";
 import { TallyMarks as StaticTallyMarks, tallySummary, type TallyMarksProps } from "./index.js";
 
@@ -12,12 +14,27 @@ export interface InteractiveTallyMarksProps extends TallyMarksProps {
   /** Announce count changes through a polite region (default true). */
   live?: boolean;
   strings?: TallyStrings;
+  /** Click/tap or Enter/Space — `{ index: 0, value: the count }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
-  const { live = true, strings = EN_TALLY, title, value, pen, ...rest } = props;
+  const {
+    live = true,
+    strings = EN_TALLY,
+    title,
+    value,
+    pen,
+    onSelect,
+    className,
+    style,
+    ...rest
+  } = props;
   const summary = tallySummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
+  // seat the wrapper, not just the SVG, so the click target stays on the
+  // painted glyph when this sits inline in prose (see seat-hoist).
+  useSeatHoist(wrap);
   const prev = useRef(value);
   // length of the path at the previous count — lets a +1 draw ONLY the newly
   // added subpath (static dash prefix = the old marks) instead of re-drawing
@@ -62,16 +79,34 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
+  // The strokes are ONE count, not N navigable marks: a single selectable unit
+  // (index 0) carrying the integer the tally reads back (floored, ≥ 0).
+  const pick = (): void =>
+    onSelect?.({
+      index: 0,
+      value: Number.isFinite(value) ? Math.max(0, Math.floor(value)) : null,
+    });
+
   return (
     <span
       ref={wrap}
-      className="mc-tally-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...wrapAttrs("mc-tally-live", className, style)}
+      {...named(label)}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
     >
-      <StaticTallyMarks {...rest} pen={pen} value={value} strings={strings} summary={false} />
+      <StaticTallyMarks
+        {...rest}
+        pen={pen}
+        value={value}
+        strings={strings}
+        summary={false}
+        style={fillFor(style)}
+      />
       {live ? (
         <span
           aria-live="polite"

@@ -34,4 +34,36 @@ describe("interactive <MicroScatter>", () => {
     );
     await expect.poll(() => document.querySelector(".mc-spark-readout")?.textContent).toBe("1, 10");
   });
+
+  it("onActive reports the focused point (y as value, x as label); null after Escape", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<MicroScatter data={DATA} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-scatter-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(seen.at(-1)).toEqual({ index: 0, value: 10, label: "1" });
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(seen.at(-1)).toEqual({ index: 1, value: 30, label: "2" });
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active point: fires onSelect + pins a ring that survives blur", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<MicroScatter data={DATA} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-scatter-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    expect(picks.at(-1)).toEqual({ index: 0, value: 10, label: "1" });
+    wrap.blur();
+    await expect
+      .poll(() => screen.container.querySelector('circle[data-mc-w="tick"]'))
+      .not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the ring without focus", async () => {
+    const screen = await render(<MicroScatter data={DATA} selectedIndex={1} />);
+    expect(screen.container.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
 });

@@ -1,10 +1,9 @@
 import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
-import { BenchmarkStrip as BenchmarkStripInteractive } from "@microcharts/react/benchmark-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // 42 peer latencies (ms), stable + deterministic
-const PEERS = Array.from(
+export const PEERS = Array.from(
   { length: 42 },
   (_, i) => 180 + Math.round(220 * Math.sin(i / 5) ** 2) + (i % 7) * 12,
 );
@@ -69,14 +68,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <BenchmarkStrip data={PEERS} value={312} summary={false} width={140} height={14} />;
 }
-
-export const showcase = {
-  hint: "peer band + dot",
-  Node: () => (
-    <BenchmarkStrip data={PEERS} value={312} title="Latency vs peers" width={150} height={14} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value", min: 120, max: 460, step: 4, init: 312 },
@@ -114,30 +105,6 @@ export const playground: PlaygroundSpec = {
       `  value={${s.value}}`,
       s.range !== "p5p95" && `  range="${s.range}"`,
       s.label !== "percentile" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <BenchmarkStripInteractive
-      data={data}
-      value={s.value as number}
-      range={s.range as "p5p95" | "minmax"}
-      label={s.label as "percentile" | "value" | "none"}
-      summary={false}
-      animate={ui.animate}
-      width={280}
-      height={16}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<BenchmarkStrip",
-      "  data={peerLatencies}",
-      `  value={${s.value}}`,
-      s.range !== "p5p95" && `  range="${s.range}"`,
-      s.label !== "percentile" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -262,28 +229,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<BenchmarkStrip data={peerLatencies} value={value} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <BenchmarkStripInteractive
-      data={PEERS}
-      value={312}
-      summary={false}
-      width={140}
-      height={14}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

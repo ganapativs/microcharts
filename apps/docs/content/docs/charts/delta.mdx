@@ -63,8 +63,9 @@ cost).
   </span>
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the sign and magnitude follow that locale's own
-grouping and decimal marks (a German reader sees a comma decimal and a space before the `%`, not a period).
+`format` also takes `Intl.NumberFormatOptions` — with a `locale`, the magnitude follows that locale's own grouping and
+decimal marks (a German reader sees a comma decimal and a space before the `%`, not a period). The leading sign is the
+library's own `+` / `−`, so it reads the same in every locale.
 
 <LiveDemo
   label="locale"
@@ -121,6 +122,8 @@ an em dash rather than `NaN%`, because a broken number should read as "nothing t
 Delta renders accessible inline text — the glyph is decorative and the value carries the meaning. Color is a redundant
 channel on top of the direction glyph and the sign, so the change survives forced-colors and color-blind viewing. The
 interactive entry re-announces the figure through a polite live region when the value changes.
+
+<InteractionNote slug="delta" />
 
 ## Props
 

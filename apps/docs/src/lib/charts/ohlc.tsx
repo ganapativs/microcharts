@@ -1,9 +1,8 @@
 import { Ohlc } from "@microcharts/react/ohlc";
-import { Ohlc as OhlcInteractive } from "@microcharts/react/ohlc/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const PERIODS = Array.from({ length: 20 }, (_, i) => {
+export const PERIODS = Array.from({ length: 20 }, (_, i) => {
   const base = 140 + Math.sin(i / 3) * 8 + i * 0.6;
   return {
     open: Math.round(base * 10) / 10,
@@ -37,7 +36,7 @@ export const entry: ChartEntry = {
       description: "Periods, oldest first.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"candle" | "bars"',
       required: false,
       description: "Candle bodies or open/close ticks.",
@@ -78,22 +77,15 @@ export const entry: ChartEntry = {
 
 export function Preview() {
   return <Ohlc data={PERIODS} summary={false} width={140} height={24} />;
-}
-
-export const showcase = {
-  hint: "price action",
-  Node: () => <Ohlc data={PERIODS} title="ACME 20 sessions" width={140} height={24} />,
-};
-
-// domain/format/locale/strings/title/summary/id/className/style/children:
+} // domain/format/locale/strings/title/summary/id/className/style/children:
 // styling/formatting escape hatches or accessible-name overrides — no
 
 export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["candle", "bars"],
       init: "candle",
     },
@@ -109,7 +101,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <Ohlc
       data={PERIODS}
-      variant={s.variant as "candle" | "bars"}
+      mode={s.mode as "candle" | "bars"}
       label={s.label as "last" | "none"}
       maxPeriods={s.maxPeriods as number}
       summary={false}
@@ -121,33 +113,9 @@ export const playground: PlaygroundSpec = {
     [
       "<Ohlc",
       "  data={sessions}",
-      s.variant !== "candle" && `  variant="${s.variant}"`,
+      s.mode !== "candle" && `  mode="${s.mode}"`,
       s.label !== "none" && `  label="${s.label}"`,
       s.maxPeriods !== 20 && `  maxPeriods={${s.maxPeriods}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <OhlcInteractive
-      data={PERIODS}
-      variant={s.variant as "candle" | "bars"}
-      label={s.label as "last" | "none"}
-      maxPeriods={s.maxPeriods as number}
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={32}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Ohlc",
-      "  data={sessions}",
-      s.variant !== "candle" && `  variant="${s.variant}"`,
-      s.label !== "none" && `  label="${s.label}"`,
-      s.maxPeriods !== 20 && `  maxPeriods={${s.maxPeriods}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -164,10 +132,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "bars with last close",
-    code: `<Ohlc data={sessions} variant="bars" label="last" />`,
-    node: (
-      <Ohlc data={PERIODS} variant="bars" label="last" summary={false} width={170} height={20} />
-    ),
+    code: `<Ohlc data={sessions} mode="bars" label="last" />`,
+    node: <Ohlc data={PERIODS} mode="bars" label="last" summary={false} width={170} height={20} />,
   },
 ];
 
@@ -296,19 +262,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Ohlc data={sessions} />`;
 }
-
-export function PreviewLive() {
-  return <OhlcInteractive data={PERIODS} summary={false} width={140} height={24} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

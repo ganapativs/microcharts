@@ -1,6 +1,5 @@
 import { IconArray } from "@microcharts/react/icon-array";
-import { IconArray as IconArrayInteractive } from "@microcharts/react/icon-array/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -57,12 +56,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <IconArray value={0.15} total={20} summary={false} width={110} height={26} />;
 }
-
-export const showcase = {
-  hint: "countable rate",
-  Node: () => <IconArray value={0.15} total={20} title="Adverse events" width={120} height={28} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "pct", label: "rate %", min: 0, max: 100, step: 1, init: 15 },
@@ -104,34 +97,6 @@ export const playground: PlaygroundSpec = {
       s.total !== "20" && `  total={${s.total}}`,
       s.label !== "ratio" && `  label="${s.label}"`,
       s.shape !== "square" && `  shape="${s.shape}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => {
-    const total = Number(s.total) as 10 | 20 | 100;
-    const tall = total === 100;
-    return (
-      <IconArrayInteractive
-        value={(s.pct as number) / 100}
-        total={total}
-        label={s.label as "ratio" | "percent" | "none"}
-        shape={s.shape as "square" | "round" | "dot"}
-        summary={false}
-        animate={ui.animate}
-        width={tall ? 200 : 220}
-        height={tall ? 100 : 30}
-      />
-    );
-  },
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<IconArray",
-      `  value={${((s.pct as number) / 100).toFixed(2)}}`,
-      s.total !== "20" && `  total={${s.total}}`,
-      s.label !== "ratio" && `  label="${s.label}"`,
-      s.shape !== "square" && `  shape="${s.shape}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -240,21 +205,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<IconArray value={0.15} total={20} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <IconArrayInteractive value={0.15} total={20} summary={false} width={110} height={26} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -1,11 +1,20 @@
 "use client";
-// Interactive <Constellation>. One pointer listener; nearest event
-// by squared 2-D distance over the precomputed stars. ←/→ step chronologically.
-// Focus ring on the active event; readout names the time, value, and magnitude.
-// Composes the static component (canon). Vertical jitter (value-less data) stays
-// layout-only — the readout never presents it as data.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Constellation>. useActivePicker owns interaction: one pointer
+// listener + nearest-star math (squared 2-D distance over the precomputed
+// stars), ←/→ (and ↑/↓) step chronologically, click / Enter / Space selects.
+// Focus ring on the active event, persistent ring on the pinned one; the readout
+// names the time, value, and magnitude. Composes the static component (canon).
+// Vertical jitter (value-less data) stays layout-only — the readout never
+// presents it as data.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";
@@ -16,7 +25,7 @@ import {
   type ConstellationProps,
 } from "./index.js";
 
-export interface InteractiveConstellationProps extends ConstellationProps {
+export interface InteractiveConstellationProps extends ConstellationProps, PickerProps {
   strings?: ConstellationStrings;
   /**
    * Opt-in entrance motion (default `false`): stars fade and scale in on
@@ -42,6 +51,12 @@ export function Constellation(props: InteractiveConstellationProps): React.React
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -75,14 +90,100 @@ export function Constellation(props: InteractiveConstellationProps): React.React
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const xFmt = useCallback((x: number) => (xFormat ? xFormat(x) : fmt(x)), [xFormat, fmt]);
-  const [active, setActive] = useState<number | null>(null); // index into geo.stars
 
-  /** Stars ordered by time for ←/→ stepping. */
+  // The picker's index space is the DATA index (`star.index`), not the position
+  // in `geo.stars` — points dropped by the geometry (non-finite x, or a missing
+  // y in value mode) leave gaps, and a consumer's onActive/selectedIndex must
+  // still line up with `data`. This map walks back to the drawn star.
+  const byData = useMemo(() => {
+    const m = new Map<number, number>();
+    geo.stars.forEach((s, i) => m.set(s.index, i));
+    return m;
+  }, [geo]);
+  const starAt = useCallback(
+    (i: number | null) => (i === null ? undefined : geo.stars[byData.get(i) ?? -1]),
+    [geo, byData],
+  );
+
+  /** Data indices ordered by time — the rove order for ←/→ (and ↑/↓). */
   const order = useMemo(() => {
-    const idx = geo.stars.map((s, i) => ({ i, x: s.x }));
+    const idx = geo.stars.map((s) => ({ i: s.index, x: s.x }));
     idx.sort((a, b) => a.x - b.x);
     return idx.map((e) => e.i);
   }, [geo]);
+
+  // Nearest star by squared 2-D distance — a scatter has no x-only "column".
+  const locate = useCallback(
+    (x: number, y: number) => {
+      let best: number | null = null;
+      let bestDist = Infinity;
+      for (const s of geo.stars) {
+        const d = (s.cx - x) ** 2 + (s.cy - y) ** 2;
+        if (d < bestDist) {
+          bestDist = d;
+          best = s.index;
+        }
+      }
+      return best;
+    },
+    [geo],
+  );
+
+  // Chronological rove. A scatter has no rows/lanes, so both axes map to
+  // prev/next (as the 1-D default does) — only the ORDER is custom (time, not
+  // array order), which is why this chart supplies its own `step`.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const pos = cur < 0 ? -1 : order.indexOf(cur);
+      let t = pos;
+      switch (key) {
+        case "ArrowRight":
+        case "ArrowDown":
+          t = Math.min(order.length - 1, pos + 1);
+          break;
+        case "ArrowLeft":
+        case "ArrowUp":
+          t = pos <= 0 ? 0 : pos - 1;
+          break;
+        case "Home":
+          t = 0;
+          break;
+        case "End":
+          t = order.length - 1;
+          break;
+        default:
+          return null;
+      }
+      return order[t] ?? null;
+    },
+    [order],
+  );
+
+  // value = the star's encoded number: its y value, else its magnitude when the
+  // layout is jittered (y then encodes nothing). label = the formatted time.
+  const datum = useCallback(
+    (i: number) => {
+      const s = starAt(i);
+      const v = s && Number.isFinite(s.value) ? s.value : s && Number.isFinite(s.m) ? s.m : null;
+      return { index: i, value: v, label: s ? xFmt(s.x) : undefined };
+    },
+    [starAt, xFmt],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.stars.length,
+    // the rendered viewBox (rounded), not the raw props — the composed static
+    // chart sizes itself from these, so pointer math maps 1:1
+    width: geo.width,
+    height: geo.height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -92,85 +193,34 @@ export function Constellation(props: InteractiveConstellationProps): React.React
         : constellationSummary(data, { xFormat, strings, format, locale });
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.stars.length === 0) return;
-      const rct = e.currentTarget.getBoundingClientRect();
-      if (rct.width === 0 || rct.height === 0) return;
-      const x = ((e.clientX - rct.left) / rct.width) * width;
-      const y = ((e.clientY - rct.top) / rct.height) * height;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.stars.forEach((s, i) => {
-        const dist = (s.cx - x) ** 2 + (s.cy - y) ** 2;
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, width, height],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (order.length === 0) return;
-      const pos = active === null ? -1 : order.indexOf(active);
-      let next = pos;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(order.length - 1, pos + 1);
-          break;
-        case "ArrowLeft":
-          next = pos <= 0 ? 0 : pos - 1;
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = order.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(order[next]!);
-    },
-    [active, order],
-  );
-
-  const activeStar = active !== null ? geo.stars[active] : undefined;
+  // The star shown by the focus ring + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const shownStar = starAt(shown);
+  const activeStar = starAt(active);
+  const selStar = selected !== active ? starAt(selected) : undefined;
   // Detail = value and/or magnitude; never the jittered vertical position.
-  const detail = activeStar
+  const detail = shownStar
     ? [
-        Number.isFinite(activeStar.value) ? fmt(activeStar.value) : null,
-        Number.isFinite(activeStar.m) ? `magnitude ${fmt(activeStar.m)}` : null,
+        Number.isFinite(shownStar.value) ? fmt(shownStar.value) : null,
+        Number.isFinite(shownStar.m) ? `magnitude ${fmt(shownStar.m)}` : null,
       ]
         .filter(Boolean)
         .join(", ") || "event"
     : "";
-  const readout = activeStar ? `${xFmt(activeStar.x)}: ${detail}` : "";
-  const announced = activeStar ? strings.constellationAt(xFmt(activeStar.x), detail) : "";
+  const readout = shownStar ? `${xFmt(shownStar.x)}: ${detail}` : "";
+  const announced = shownStar ? strings.constellationAt(xFmt(shownStar.x), detail) : "";
 
   return (
     <span
       ref={hostRef}
-      className="mc-constellation-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-constellation-live", className, style)}
+      {...named(label)}
+      {...bind}
     >
       <StaticConstellation
         {...rest}
+        style={fillFor(style)}
         data={data}
         connect={connect}
         domain={domain}
@@ -184,6 +234,19 @@ export function Constellation(props: InteractiveConstellationProps): React.React
         strings={strings}
         summary={false}
       >
+        {/* Pinned selection persists through pointer-leave (a heavier ring than
+            the transient focus one); the static halo already uses w="tick". */}
+        {selStar ? (
+          <circle
+            cx={selStar.cx}
+            cy={selStar.cy}
+            r={selStar.r + 1.5}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="full"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {activeStar ? (
           <circle
             cx={activeStar.cx}
@@ -198,10 +261,10 @@ export function Constellation(props: InteractiveConstellationProps): React.React
         {rest.children}
       </StaticConstellation>
       <LiveRegion>{announced}</LiveRegion>
-      {activeStar ? (
+      {shownStar ? (
         <span
           className="mc-spark-readout"
-          style={{ left: `${(activeStar.cx / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${(shownStar.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
         >
           {readout}
         </span>

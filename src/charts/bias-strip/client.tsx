@@ -1,27 +1,31 @@
 "use client";
-// Interactive <BiasStrip>. One pointer listener; nearest pair by
-// squared Euclidean distance over the precomputed dots. ←/→ step pairs ordered
-// by mean, announcing the formatted mean, difference, and whether the pair falls
-// outside the limits of agreement. Focus ring on the active dot. Composes the
-// static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+// Interactive <BiasStrip>. useActivePicker owns interaction: one pointer
+// listener + nearest-pair-by-squared-Euclidean-distance math, ←/→ (and ↑/↓)
+// step pairs ordered by mean, click / Enter / Space selects (onSelect).
+// Composes the static component (canon) — the SVG is never re-implemented.
+//
+// Unit = a plotted pair, so `datum.index` is the DOT POSITION in the displayed
+// cloud — the geometry drops non-finite pairs and down-samples to ≤ 40 dots, so
+// this equals the data index only for small, all-finite inputs (the pair's own
+// data index stays in the announcement). `value` is the DIFFERENCE (a − b), the
+// encoded y channel; the pair's mean travels as `label`.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_BIAS_STRIP } from "../../core/strings-bias-strip.js";
 import { biasLayout, biasStripGeometry } from "./geometry.js";
 import { BiasStrip as StaticBiasStrip, biasStripSummary, type BiasStripProps } from "./index.js";
+import {
+  named,
+  fillFor,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 
-const FILL: CSSProperties = { width: "100%", height: "auto" };
-
-export interface InteractiveBiasStripProps extends BiasStripProps {
+export interface InteractiveBiasStripProps extends BiasStripProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the pair dots settle onto the
    * plot on first client-side mount. Inert on the server and on hydrated
@@ -42,6 +46,12 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const { rad, outlierRad, captionPad } = biasLayout(width, height, props.label ?? "bias", props.r);
@@ -60,7 +70,6 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
     () => makeFormatter(format, locale, { signDisplay: "exceptZero" }),
     [format, locale],
   );
-  const [active, setActive] = useState<number | null>(null); // index into geo.dots
 
   /** Dots ordered by mean (x) for ←/→ stepping. */
   const order = useMemo(() => {
@@ -69,21 +78,9 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
     return idx.map((e) => e.i);
   }, [geo]);
 
-  const accName =
-    summary === false
-      ? undefined
-      : typeof summary === "string"
-        ? summary
-        : biasStripSummary(geo, strings, fmtSigned);
-  const label = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.dots.length === 0) return;
-      const rct = e.currentTarget.getBoundingClientRect();
-      if (rct.width === 0 || rct.height === 0) return;
-      const x = ((e.clientX - rct.left) / rct.width) * width;
-      const y = ((e.clientY - rct.top) / rct.height) * height;
+  const locate = useCallback(
+    (x: number, y: number) => {
+      if (geo.dots.length === 0) return null;
       let best = 0;
       let bestDist = Infinity;
       geo.dots.forEach((d, i) => {
@@ -93,69 +90,81 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
           best = i;
         }
       });
-      setActive(best);
+      return best;
     },
-    [geo, width, height],
+    [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (order.length === 0) return;
-      const pos = active === null ? -1 : order.indexOf(active);
-      let next = pos;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(order.length - 1, pos + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, pos <= 0 ? 0 : pos - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = order.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(order[next]!);
+  // 1-D roving in mean order (not dot order): step in position space, then map back.
+  const step = useCallback((cur: number, key: string) => navOrder(order, cur, key), [order]);
+
+  const datum = useCallback(
+    (i: number) => {
+      const p = geo.dots[i] ? data[geo.dots[i]!.index] : undefined;
+      return {
+        index: i,
+        value: p ? p.a - p.b : null,
+        label: p ? fmt((p.a + p.b) / 2) : undefined,
+      };
     },
-    [active, order],
+    [geo, data, fmt],
   );
 
-  const activeDot = active !== null ? geo.dots[active] : undefined;
-  const activePair = activeDot ? data[activeDot.index] : undefined;
-  const mean = activePair ? (activePair.a + activePair.b) / 2 : 0;
-  const diff = activePair ? activePair.a - activePair.b : 0;
+  const { active, selected, bind } = useActivePicker({
+    count: geo.dots.length,
+    width,
+    height,
+    locate,
+    datum,
+    step,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : biasStripSummary(geo, strings, fmtSigned);
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
+
+  const ring = (i: number, pinned: boolean) => {
+    const d = geo.dots[i];
+    if (!d) return null;
+    return (
+      <circle
+        cx={d.x}
+        cy={d.y}
+        r={(d.outside ? outlierRad : rad) + 1.25}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  const shown = active ?? selected;
+  const shownDot = shown !== null ? geo.dots[shown] : undefined;
+  const shownPair = shownDot ? data[shownDot.index] : undefined;
+  const mean = shownPair ? (shownPair.a + shownPair.b) / 2 : 0;
+  const diff = shownPair ? shownPair.a - shownPair.b : 0;
   const announced =
-    activeDot && activePair
+    shownDot && shownPair
       ? strings.biasStripAt(
-          activeDot.index + 1,
+          shownDot.index + 1,
           data.length,
           fmt(mean),
           fmtSigned(diff),
-          activeDot.outside ? strings.biasOutside : "",
+          shownDot.outside ? strings.biasOutside : "",
         )
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-bias-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-bias-live", className, style)} {...named(label)} {...bind}>
       <StaticBiasStrip
         {...rest}
         data={data}
@@ -166,31 +175,23 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
-        {activeDot ? (
-          <circle
-            cx={activeDot.x}
-            cy={activeDot.y}
-            r={(activeDot.outside ? outlierRad : rad) + 1.25}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticBiasStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {activeDot && activePair ? (
+      {shownDot && shownPair ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(activeDot.x / width) * 100}%`,
+            left: `${(shownDot.x / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {`${fmt(mean)}, ${fmtSigned(diff)}`}
+          {`${fmt(mean)}, ${fmtSigned(diff)}${shownDot.outside ? " — outside limits" : ""}`}
         </span>
       ) : null}
     </span>

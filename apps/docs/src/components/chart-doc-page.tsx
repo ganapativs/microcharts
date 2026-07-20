@@ -43,7 +43,15 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
   ];
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full} breadcrumb={{ enabled: false }}>
+    <DocsPage
+      toc={page.data.toc}
+      full={page.data.full}
+      breadcrumb={{ enabled: false }}
+      // prev/next in sidebar-tree order — 106 chart pages are a reference you
+      // page through; without this every hop reopens the sidebar (worst on
+      // mobile, where the tree hides behind the hamburger).
+      footer={{ enabled: true }}
+    >
       <script type="application/ld+json">{jsonLdScript(breadcrumbJsonLd(crumbs))}</script>
       <script type="application/ld+json">
         {jsonLdScript(

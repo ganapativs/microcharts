@@ -17,7 +17,7 @@ export interface PhaseTraceProps {
   xLabel?: string | undefined;
   yLabel?: string | undefined;
   xDomain?: readonly [number, number] | undefined;
-  yDomain?: readonly [number, number] | undefined;
+  domain?: readonly [number, number] | undefined;
   /** Fraction of points drawn in accent — the "recent motion" read. */
   tail?: number | undefined;
   /** Anchors the path's origin for full-journey reads. */
@@ -76,7 +76,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
     xLabel = "x",
     yLabel = "y",
     xDomain,
-    yDomain,
+    domain,
     tail = 0.25,
     startDot = false,
     grid = false,
@@ -98,7 +98,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
 
   const finite = data.filter((p) => isFiniteValue(p.x) && isFiniteValue(p.y));
   const xd = xDomain ?? extent(finite.map((p) => p.x));
-  const yd = yDomain ?? extent(finite.map((p) => p.y));
+  const yd = domain ?? extent(finite.map((p) => p.y));
   const fmt = makeFormatter(format, locale);
   const geo = phaseTraceGeometry({ data, xDomain: xd, yDomain: yd, tail, width, height });
   const accName =
@@ -113,6 +113,10 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The trajectory fills a plane whose bottom edge IS the y-domain's minimum,
+      // so it stands on that edge the way any fitted-domain trace does. Centring
+      // would sink half of a 32-unit plane below the baseline for no gain.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={className ? `mc-phase ${className}` : "mc-phase"}
       style={style}
     >

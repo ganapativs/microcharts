@@ -5,7 +5,7 @@
 // center pointer + readout, and a rate chevron (a SEPARATE channel from level).
 // Ticks/labels are generated only within the window, so containment is by
 // construction — no clipPath. 2-dp.
-import { round2 } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 import type { Orientation } from "../../core/types.js";
 
 export type { Orientation } from "../../core/types.js";
@@ -67,8 +67,14 @@ export function tapeGaugeGeometry(opts: {
   /** Right/bottom edge of the scale column (label anchor line). */
   scaleEdge: number;
   pointer: { path: string; labelX: number; labelY: number };
-  /** Center of the readout gutter and its available extent (for font fitting). */
-  readout: { gutter: number };
+  /**
+   * The readout's own box: `gutter` is the extent ACROSS the scale axis (for
+   * fitting the number's width), `band` the extent ALONG the readout's line —
+   * the vertical room a horizontal gauge leaves under the tape column, or the
+   * whole height when the readout rides the midline of a vertical one. Both are
+   * needed: sizing a hero number by width alone let it outgrow a short box.
+   */
+  readout: { gutter: number; band: number };
   window: [number, number];
   containingZone: Zone | null;
 } {
@@ -98,6 +104,10 @@ export function tapeGaugeGeometry(opts: {
   // zone stripe: a thin band hugging the pointer, clipped to the window
   const zoneRects: TapeRect[] = [];
   for (const z of zones) {
+    // A zone with a missing/non-finite bound has no extent on the scale. It has
+    // to be rejected HERE: `b <= a` below is false for NaN, so an unguarded
+    // zone sails past that check and emits y="NaN" height="NaN".
+    if (!isFiniteValue(z.from) || !isFiniteValue(z.to)) continue;
     const a = Math.max(lo, Math.min(z.from, z.to));
     const b = Math.min(hi, Math.max(z.from, z.to));
     if (b <= a) continue;
@@ -130,7 +140,6 @@ export function tapeGaugeGeometry(opts: {
     }
   });
 
-  // fixed center pointer + readout box
   let pointer: { path: string; labelX: number; labelY: number };
   if (vertical) {
     const y = round2(height / 2);
@@ -150,9 +159,23 @@ export function tapeGaugeGeometry(opts: {
   }
   // gutter available to the readout = space past the pointer tip
   const gutter = vertical ? round2(width - tapeExtent - 3) : round2(width);
+  // A vertical gauge centres the readout on the box midline, so it owns the full
+  // height; a horizontal one seats it under the tape column, so it only gets
+  // what is left below `tapeExtent + 3` — twice that, because `labelY` centres
+  // in the leftover and the glyph box straddles it.
+  const band = vertical ? round2(height) : round2(2 * (height - pointer.labelY));
 
+  // Same rule for the spoken zone: only a zone with two finite bounds can
+  // contain the value (±Infinity bounds would "contain" everything and put an
+  // unbounded range in the summary).
   const containingZone =
-    zones.find((z) => value >= Math.min(z.from, z.to) && value <= Math.max(z.from, z.to)) ?? null;
+    zones.find(
+      (z) =>
+        isFiniteValue(z.from) &&
+        isFiniteValue(z.to) &&
+        value >= Math.min(z.from, z.to) &&
+        value <= Math.max(z.from, z.to),
+    ) ?? null;
 
   return {
     zoneRects,
@@ -160,7 +183,7 @@ export function tapeGaugeGeometry(opts: {
     tickLabels,
     scaleEdge,
     pointer,
-    readout: { gutter },
+    readout: { gutter, band },
     window: [round2(lo), round2(hi)],
     containingZone,
   };

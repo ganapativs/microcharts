@@ -13,20 +13,20 @@ const svg = (props: Record<string, unknown>) => renderToStaticMarkup(h(EtaBar as
 const min = (t: number) => `${Math.round(t)} min`;
 
 function gallery(): string {
-  const sentence = `Export is ${svg({ progress: 0.64, elapsed: 3.6, rate: 0.18, formatEta: min, width: 100, height: 12, summary: false })} away.`;
+  const sentence = `Export is ${svg({ progress: 0.64, elapsed: 3.6, rate: 0.18, etaFormat: min, width: 100, height: 12, summary: false })} away.`;
   const cell = `<table><tbody>
     <tr><td>export.zip</td><td>${svg({ progress: 0.64, elapsed: 128, rate: 0.5, width: 60, height: 8, summary: false })}</td></tr>
     <tr><td>backup.tar</td><td>${svg({ progress: 0.3, elapsed: 40, rate: 0, width: 60, height: 8, summary: false })}</td></tr>
   </tbody></table>`;
   const kpi = `<div class="card"><div class="label">Export progress</div><div class="value">64%</div>
-    ${svg({ progress: 0.64, elapsed: 3.6, rate: 0.18, formatEta: min, width: 200, height: 16, title: "Export progress" })}</div>`;
+    ${svg({ progress: 0.64, elapsed: 3.6, rate: 0.18, etaFormat: min, width: 200, height: 16, title: "Export progress" })}</div>`;
   const tab = `<div class="tab"><span>export</span> ${svg({ progress: 0.64, elapsed: 3.6, rate: 0.18, label: "none", width: 56, height: 10, summary: false })}</div>`;
   const variants = [
     svg({
       progress: 0.64,
       elapsed: 3.6,
       rate: 0.18,
-      formatEta: min,
+      etaFormat: min,
       width: 160,
       height: 16,
       title: "default (eta label)",
@@ -52,7 +52,7 @@ function gallery(): string {
       progress: 0.08,
       elapsed: 30,
       rate: 0.001,
-      formatEta: min,
+      etaFormat: min,
       width: 160,
       height: 16,
       title: "overflow (remainder ≫ elapsed)",
@@ -61,7 +61,7 @@ function gallery(): string {
   const presets = ["editorial", "mono", "vivid"]
     .map(
       (p) =>
-        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ progress: 0.64, elapsed: 3.6, rate: 0.18, formatEta: min, width: 140, height: 14, summary: false })}</span>`,
+        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ progress: 0.64, elapsed: 3.6, rate: 0.18, etaFormat: min, width: 140, height: 14, summary: false })}</span>`,
     )
     .join(" ");
   return `<style>${styles}

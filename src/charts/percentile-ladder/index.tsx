@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { round2, type Value } from "../../core/types.js";
+import { labelFitsY } from "../../core/labels.js";
 import { percentileLadderGeometry, type PercentileLadderGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -55,7 +56,12 @@ export interface PercentileLadderProps {
 const LABEL_MIN_WIDTH = 56;
 // label size in viewBox units — a touch smaller than the strips (three labels
 // must share the track), ~0.5·height clamped 6–9
-const labelFont = (height: number): number => Math.min(9, Math.max(6, Math.round(height * 0.5)));
+// Exported, and NOT named `labelFont`: this chart deliberately diverges from
+// the shared `core/labels` helper, and the interactive entry importing that one
+// by the same name silently sized the log-tag gutter differently — every tick x
+// then shifted between the two entries. One name, one source.
+export const ladderFont = (height: number): number =>
+  Math.min(9, Math.max(6, Math.round(height * 0.5)));
 
 /** Places tick labels at their tick x (clamped inside the box), ENDPOINT-FIRST:
  *  p50 and the tail always win; an interior label is dropped (→ null) when it
@@ -110,7 +116,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
     children,
   } = props;
 
-  const FONT = labelFont(height);
+  const FONT = ladderFont(height);
   // scale="log" silently falls back to linear on any value ≤ 0 (docs note it);
   // the in-chart `log` tag renders only when the transform IS applied
   const geo = percentileLadderGeometry({ width, height, data, ps, scale, domain, font: FONT });
@@ -143,11 +149,16 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   const labelText = (p: number, value: number): string =>
     label === "values" ? fmt(value) : label === "both" ? `p${p} ${fmt(value)}` : String(p);
 
-  const showLabels = label !== "none" && width >= LABEL_MIN_WIDTH;
-  const texts = rendered.map((t) => labelText(t.p, t.value));
-  const labelX = showLabels ? ladderLabelLayout(geo, texts, width, FONT) : null;
   // keep the alphabetic descender (≈0.22·fs) inside the viewBox
   const labelY = round2(height - FONT * 0.22 - 0.2);
+  // `ladderFont` floors at 6 viewBox units; under a box that short the label
+  // row's ascender clears the top of the frame, so the row DROPS entirely
+  // (as it already does under LABEL_MIN_WIDTH) and the graduated ticks — the
+  // primary encoding — carry the read on their own.
+  const showLabels =
+    label !== "none" && width >= LABEL_MIN_WIDTH && labelFitsY(labelY, FONT, height, false);
+  const texts = rendered.map((t) => labelText(t.p, t.value));
+  const labelX = showLabels ? ladderLabelLayout(geo, texts, width, FONT) : null;
   // pin the label size to viewBox units (see coverage-strip / )
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
@@ -158,6 +169,17 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // When the percentile labels render they are the lowest ink by a wide
+      // margin — the track deliberately rides high (0.35·h) to clear them — so
+      // they take the floor and their own text baseline is the seat. Centring
+      // the tick band instead would hang the entire label row below the line.
+      // Bare, the ticks straddle the track and nothing is a floor, so the band
+      // centres.
+      seat={
+        showLabels
+          ? { mode: "floor", bottom: labelY }
+          : { mode: "center", top: geo.y0, bottom: geo.y1 }
+      }
       className={cls}
       style={rootStyle}
     >

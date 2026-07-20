@@ -1,13 +1,12 @@
 import { WinProbWorm } from "@microcharts/react/win-prob-worm";
-import { WinProbWorm as WinProbWormInteractive } from "@microcharts/react/win-prob-worm/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a game where the lead flips three times, then home pulls away to 98%
 export const GAME: number[] = [50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98];
-const NAILBITER: number[] = [50, 53, 49, 52, 48, 51, 47, 50, 46, 49, 45, 48, 52];
-const DECIDED: number[] = [50, 58, 66, 74, 80, 86, 90, 93, 96, 98, 99];
-const SIDES: [string, string] = ["home", "away"];
+export const NAILBITER: number[] = [50, 53, 49, 52, 48, 51, 47, 50, 46, 49, 45, 48, 52];
+export const DECIDED: number[] = [50, 58, 66, 74, 80, 86, 90, 93, 96, 98, 99];
+export const SIDES: [string, string] = ["home", "away"];
 
 export const entry: ChartEntry = {
   name: "WinProbWorm",
@@ -65,14 +64,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <WinProbWorm data={GAME} sides={SIDES} summary={false} width={120} height={16} />;
 }
-
-export const showcase = {
-  hint: "watch the lead flip",
-  Node: () => (
-    <WinProbWorm data={GAME} sides={SIDES} title="Win probability" width={160} height={24} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -104,31 +95,6 @@ export const playground: PlaygroundSpec = {
       '  sides={["home", "away"]}',
       s.swing === false && "  markSwing={false}",
       s.label === false && '  label="none"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <WinProbWormInteractive
-      data={s.game === "nailbiter" ? NAILBITER : s.game === "decided" ? DECIDED : GAME}
-      sides={SIDES}
-      markSwing={s.swing as boolean}
-      label={s.label ? "last" : "none"}
-      title="Win probability"
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<WinProbWorm",
-      `  data={${s.game === "nailbiter" ? "nailbiter" : s.game === "decided" ? "decided" : "game"}}`,
-      '  sides={["home", "away"]}',
-      s.swing === false && "  markSwing={false}",
-      s.label === false && '  label="none"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -236,28 +202,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<WinProbWorm data={winProb} sides={["home", "away"]} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <WinProbWormInteractive
-      data={GAME}
-      sides={SIDES}
-      summary={false}
-      width={120}
-      height={16}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

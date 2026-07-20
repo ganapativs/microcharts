@@ -1,10 +1,9 @@
 import { BubbleRow } from "@microcharts/react/bubble-row";
-import { BubbleRow as BubbleRowInteractive } from "@microcharts/react/bubble-row/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 type Row = { label: string; value: number }[];
-const REGIONS: Row = [
+export const REGIONS: Row = [
   { label: "EMEA", value: 1240 },
   { label: "AMER", value: 890 },
   { label: "APAC", value: 560 },
@@ -72,12 +71,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <BubbleRow data={REGIONS} summary={false} height={30} />;
 }
-
-export const showcase = {
-  hint: "presence, not precision",
-  Node: () => <BubbleRow data={REGIONS} title="Market size" height={34} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -110,27 +103,6 @@ export const playground: PlaygroundSpec = {
       "  data={regions}",
       s.align !== "center" && `  align="${s.align}"`,
       s.label !== "value" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <BubbleRowInteractive
-      data={REGIONS}
-      align={s.align as "center" | "baseline"}
-      label={s.label as "value" | "both" | "none"}
-      summary={false}
-      animate={ui.animate}
-      height={44}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<BubbleRow",
-      "  data={regions}",
-      s.align !== "center" && `  align="${s.align}"`,
-      s.label !== "value" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -257,19 +229,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<BubbleRow data={regions} />`;
 }
-
-export function PreviewLive() {
-  return <BubbleRowInteractive data={REGIONS} summary={false} height={30} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

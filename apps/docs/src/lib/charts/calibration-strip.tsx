@@ -1,6 +1,5 @@
 import { CalibrationStrip } from "@microcharts/react/calibration-strip";
-import { CalibrationStrip as CalibrationStripInteractive } from "@microcharts/react/calibration-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 import { calibrationBins } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
@@ -51,7 +50,7 @@ export const entry: ChartEntry = {
       description: "Below this a bin renders low-confidence.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"dots" | "bars"',
       required: false,
       description: "Bars draw signed deviation columns.",
@@ -84,18 +83,12 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <CalibrationStrip data={BINS} summary={false} width={130} height={32} />;
 }
-
-export const showcase = {
-  hint: "reliability",
-  Node: () => <CalibrationStrip data={BINS} title="Model calibration" width={130} height={32} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["dots", "bars"],
       init: "dots",
     },
@@ -104,7 +97,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <CalibrationStrip
       data={BINS}
-      variant={s.variant as "dots" | "bars"}
+      mode={s.mode as "dots" | "bars"}
       minSupport={s.minSupport as number}
       summary={false}
       width={300}
@@ -115,30 +108,8 @@ export const playground: PlaygroundSpec = {
     [
       "<CalibrationStrip",
       "  data={reliability}",
-      s.variant !== "dots" && `  variant="${s.variant}"`,
+      s.mode !== "dots" && `  mode="${s.mode}"`,
       s.minSupport !== 11 && `  minSupport={${s.minSupport}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <CalibrationStripInteractive
-      data={BINS}
-      variant={s.variant as "dots" | "bars"}
-      minSupport={s.minSupport as number}
-      summary={false}
-      animate={ui.animate}
-      width={300}
-      height={44}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<CalibrationStrip",
-      "  data={reliability}",
-      s.variant !== "dots" && `  variant="${s.variant}"`,
-      s.minSupport !== 11 && `  minSupport={${s.minSupport}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -155,8 +126,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "deviation bars",
-    code: `<CalibrationStrip data={reliability} variant="bars" />`,
-    node: <CalibrationStrip data={BINS} variant="bars" summary={false} width={220} height={36} />,
+    code: `<CalibrationStrip data={reliability} mode="bars" />`,
+    node: <CalibrationStrip data={BINS} mode="bars" summary={false} width={220} height={36} />,
   },
 ];
 
@@ -244,21 +215,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<CalibrationStrip data={reliability} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <CalibrationStripInteractive data={BINS} summary={false} width={130} height={32} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

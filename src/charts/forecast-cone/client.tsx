@@ -1,10 +1,19 @@
 "use client";
-// Interactive <ForecastCone>. One pointer listener + region-aware
-// nearest-x: history points announce a value, forecast points announce the
-// median + 80% interval. ←/→ step; Home/End jump the ends. Composes the static
-// component (canon); the crosshair + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <ForecastCone>. useActivePicker owns interaction: one pointer
+// listener + region-aware nearest-x (history points announce a value, forecast
+// points the median + 80% interval), ←/→ (Home/End) rove, click / Enter /
+// Space selects (onSelect). Composes the static component (canon); the
+// crosshair + readout chip are overlay children.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.js";
@@ -15,7 +24,7 @@ import {
   type ForecastConeProps,
 } from "./index.js";
 
-export interface InteractiveForecastConeProps extends ForecastConeProps {
+export interface InteractiveForecastConeProps extends ForecastConeProps, PickerProps {
   strings?: ForecastStrings;
   /**
    * Opt-in entrance motion (default `false`): the history line and fan cone
@@ -39,6 +48,12 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -48,12 +63,32 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
   // fan-from-origin grow doesn't exist in the engine yet.
   useEntrance(hostRef, "wipe", animate);
 
-  const geo = useMemo(
-    () => forecastConeGeometry({ width, height, data, forecast, target, domain: props.domain }),
-    [width, height, data, forecast, target, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = forecastConeGeometry({
+      width,
+      height,
+      data,
+      forecast,
+      target,
+      domain: props.domain,
+    });
+    const showLabel = (props.label ?? "landing") === "landing" && base != null;
+    const gutterCh = showLabel ? fmt(base!.landing.value).length : 0;
+    return forecastConeGeometry({
+      width,
+      height,
+      data,
+      forecast,
+      target,
+      domain: props.domain,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, forecast, target, props.domain, props.label, fmt]);
 
   const at = data.length + forecast.mid.length;
   const accName =
@@ -68,54 +103,69 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
 
   const count = geo?.points.length ?? 0;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * geo.totalWidth;
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || geo.points.length === 0) return null;
       let best = 0;
       let bestDist = Infinity;
       geo.points.forEach((p, i) => {
-        const d = Math.abs(p.x - px);
+        const d = Math.abs(p.x - x);
         if (d < bestDist) {
           bestDist = d;
           best = i;
         }
       });
-      setActive(best);
+      return best;
     },
-    [geo, count],
+    [geo],
+  );
+  // index = the point's position on the whole period axis (history then
+  // forecast, non-finite inputs dropped); value = the actual in the history
+  // region, the CENTRAL (median) forecast in the forecast region.
+  const datum = useCallback(
+    (i: number) => {
+      const p = geo?.points[i];
+      return { index: i, value: p ? p.value : null };
+    },
+    [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (count === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((prev) => Math.min(count - 1, (prev ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((prev) => (prev === null || prev <= 0 ? 0 : prev - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(count - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [count],
-  );
+  const { active, selected, bind } = useActivePicker({
+    count,
+    width: geo?.totalWidth ?? width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
-  const p = active !== null && geo ? geo.points[active] : undefined;
+  const dot = (i: number, pinned: boolean) => {
+    const pt = geo?.points[i];
+    if (!pt) return null;
+    /* circle isn't covered by the path/line/polyline accent element-split
+       (styles.css) — a plain data-mc-ink="accent" would fill it solid and
+       drop the stroke, so ink stays a justified literal; width still takes
+       a role (orthogonal to ink). */
+    return (
+      <circle
+        cx={pt.x}
+        cy={pt.y}
+        r={2.4}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
+  // The point shown by the crosshair + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const p = shown !== null && geo ? geo.points[shown] : undefined;
   const announced = p
     ? p.kind === "history"
       ? strings.forecastAtHistory(unit, p.period, fmt(p.value))
@@ -123,25 +173,20 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
     : "";
   const readout = p
     ? p.kind === "history"
-      ? fmt(p.value)
-      : `${fmt(p.value)} · ${fmt(p.lo!)}–${fmt(p.hi!)}`
+      ? `${unit} ${p.period}: ${fmt(p.value)}`
+      : `${unit} ${p.period}: ${fmt(p.value)} · ${fmt(p.lo!)}–${fmt(p.hi!)}`
     : "";
 
   return (
     <span
       ref={hostRef}
-      className="mc-forecast-cone-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-forecast-cone-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticForecastCone
         {...rest}
+        style={fillFor(style)}
         data={data}
         forecast={forecast}
         target={target}
@@ -153,33 +198,21 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
         strings={strings}
         summary={false}
       >
+        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
+        {selected !== null && selected !== active ? dot(selected, true) : null}
         {p ? (
-          <>
-            <line
-              x1={p.x}
-              y1={0.5}
-              x2={p.x}
-              y2={height - 0.5}
-              data-mc-ink="muted"
-              data-mc-w="support"
-              strokeDasharray="1.5 2"
-              vectorEffect="non-scaling-stroke"
-            />
-            {/* circle isn't covered by the path/line/polyline accent element-split
-                (styles.css) — a plain data-mc-ink="accent" would fill it solid and
-                drop the stroke, so ink stays a justified literal; width still takes
-                a role (orthogonal to ink). */}
-            <circle
-              cx={p.x}
-              cy={p.y}
-              r={2.4}
-              fill="none"
-              stroke="var(--mc-accent)"
-              data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
-            />
-          </>
+          <line
+            x1={p.x}
+            y1={0.5}
+            x2={p.x}
+            y2={height - 0.5}
+            data-mc-ink="muted"
+            data-mc-w="support"
+            strokeDasharray="1.5 2"
+            vectorEffect="non-scaling-stroke"
+          />
         ) : null}
+        {active !== null ? dot(active, false) : null}
         {rest.children}
       </StaticForecastCone>
       {p ? (

@@ -155,8 +155,8 @@ A few faint paths and one emphasized, because a mean line hides that futures dis
 ensembles can share an average and a final range while telling completely different stories along the way. The
 emphasized path defaults to the **real member** closest to the pointwise median, so the representative is an outcome
 that actually happened in the simulation, not a synthetic average of paths that never occurred (`emphasis="median"`
-draws that synthetic path instead, and the summary calls it out). Selection and emphasis are deterministic — nothing
-about this chart varies between renders of the same data.
+draws that synthetic path instead). Selection and emphasis are deterministic — nothing about this chart varies between
+renders of the same data.
 
 The static frame is not a hypothetical-outcome plot. The **loop** — flipping through the members one at a time on hover
 — is the HOP, and it lives only in the interactive entry, gated on reduced motion with arrow-key stepping as the
@@ -167,6 +167,8 @@ non-animated equivalent.
 The accessible name states the endpoint spread and the typical path — **"8 simulated paths end between 28 and 61;
 typical path ends near 46."** The interactive entry flips through the members (the HOP loop) on hover; with reduced
 motion, ←/→ step them discretely, and each member is announced with its endpoint.
+
+<InteractionNote slug="ensemble-ghosts" />
 
 ## Props
 

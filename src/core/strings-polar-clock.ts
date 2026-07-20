@@ -1,7 +1,7 @@
 // PolarClock summary templates (polar-clock) — its OWN module. A cyclic S1
 // series (24 hours, 7 days, any n) read as radial bars around a clock face; the
 // summary names the peak and the quiet point of the cycle. Segment labels come
-// from a `formatSegment` option (hour formatting for n=24, these weekday names
+// from a `segmentFormat` option (hour formatting for n=24, these weekday names
 // for n=7). English lives only in core string modules (canon). Aggregate:
 // core/strings.ts `EN`.
 import type { SummaryStrings } from "./summary.js";

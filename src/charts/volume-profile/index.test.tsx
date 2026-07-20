@@ -69,3 +69,17 @@ describe("<VolumeProfile>", () => {
 seriesEdgeSuite("VolumeProfile", (data: readonly Value[]) => (
   <VolumeProfile data={data as readonly number[]} title="Edge" width={48} height={32} />
 ));
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("VolumeProfile degradation", () => {
+  it("the POC price drops once its gutter would eat half the box, the bars still draw", () => {
+    const big = draw(<VolumeProfile data={PROFILE} bins={5} width={120} height={80} />).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(<VolumeProfile data={PROFILE} bins={5} width={24} height={16} />).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+});

@@ -21,10 +21,48 @@ export function bucketCount(width: number, samples: number): number {
   return Math.max(1, Math.min(Math.floor(width / 2), samples, 64));
 }
 
+/** Bars TILE the inner width: k slots of `bucketW`, each inset by half a gap. */
+function barPitch(width: number, k: number): { bucketW: number; gap: number } {
+  const bucketW = (width - PAD * 2) / k;
+  return { bucketW, gap: Math.min(bucketW * 0.35, 1) };
+}
+
+/** Envelope vertices SPAN the inner width — first and last sit on the edges, so
+ *  the pitch is `k - 1` steps, not `k` slots. */
+function envelopeStep(width: number, k: number): number {
+  return (width - PAD * 2) / Math.max(1, k - 1);
+}
+
+/**
+ * The painted x of bucket `i`: a bar's centre, or an envelope vertex. The two
+ * variants sit on DIFFERENT pitches, so the hit-test, crosshair and readout must
+ * all read the one that is actually on screen.
+ */
+export function bucketX(
+  i: number,
+  opts: { width: number; buckets: number; mode: "bars" | "envelope" },
+): number {
+  const k = Math.max(1, Math.floor(opts.buckets));
+  if (opts.mode === "envelope") return round2(PAD + i * envelopeStep(opts.width, k));
+  const { bucketW, gap } = barPitch(opts.width, k);
+  return round2(PAD + i * bucketW + gap / 2 + Math.max(0.4, bucketW - gap) / 2);
+}
+
 function maxAbs(values: readonly Value[]): number {
   let m = 0;
   for (const v of values) if (isFiniteValue(v) && Math.abs(v) > m) m = Math.abs(v);
   return m;
+}
+
+export interface WaveformGeometry {
+  bars: WaveBar[];
+  path: string;
+  peak: number;
+  peakIndex: number;
+  /** Top edge of the plot box — the mirrored band's upper bound. */
+  y0: number;
+  /** Bottom edge of the plot box — where bars land when `mirror` is off. */
+  y1: number;
 }
 
 export function waveformGeometry(opts: {
@@ -34,17 +72,15 @@ export function waveformGeometry(opts: {
   buckets: number;
   domain: readonly [number, number] | null;
   mirror: boolean;
-}): { bars: WaveBar[]; path: string; peak: number; peakIndex: number } {
+}): WaveformGeometry {
   const { data, width, height, buckets, domain, mirror } = opts;
   const k = Math.max(1, Math.floor(buckets));
   const dmax = domain ? Math.max(Math.abs(domain[0]), Math.abs(domain[1])) : maxAbs(data);
 
-  const innerW = width - PAD * 2;
   const innerH = height - PAD * 2;
   const cy = round2(height / 2);
   const halfH = innerH / 2;
-  const bucketW = innerW / k;
-  const gap = Math.min(bucketW * 0.35, 1);
+  const { bucketW, gap } = barPitch(width, k);
 
   const vals = maxPerBucket(data, k, { abs: true });
   let peak = 0;
@@ -67,7 +103,7 @@ export function waveformGeometry(opts: {
   });
 
   const path = barsPath(bars, mirror, cy);
-  return { bars, path, peak: round2(peak), peakIndex };
+  return { bars, path, peak: round2(peak), peakIndex, y0: PAD, y1: height - PAD };
 }
 
 /** One `<path>` of rect subpaths (1 node regardless of sample count). A
@@ -82,7 +118,7 @@ export function barsPath(bars: readonly WaveBar[], mirror: boolean, cy: number):
   return d;
 }
 
-/** Filled min/max envelope area (waveform `variant="envelope"`) — same bucket
+/** Filled min/max envelope area (waveform `mode="envelope"`) — same bucket
  *  math + null semantics as the bars; a smoother editorial texture. */
 export function envelopePath(opts: {
   data: readonly Value[];
@@ -95,11 +131,10 @@ export function envelopePath(opts: {
   const { data, width, height, buckets, domain, mirror } = opts;
   const k = Math.max(1, Math.floor(buckets));
   const dmax = domain ? Math.max(Math.abs(domain[0]), Math.abs(domain[1])) : maxAbs(data);
-  const innerW = width - PAD * 2;
   const innerH = height - PAD * 2;
   const cy = height / 2;
   const halfH = innerH / 2;
-  const step = innerW / Math.max(1, k - 1);
+  const step = envelopeStep(width, k);
   const { min, max } = envelope(data, k);
 
   const yFor = (v: number | null, top: boolean): number => {

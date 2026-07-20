@@ -12,6 +12,8 @@ interface ParetoBar {
   y: number;
   height: number;
   label: string;
+  /** Raw magnitude for this bar (the rolled-up sum for "Other"). */
+  value: number;
   share: number;
   cum: number;
   vital: boolean;
@@ -19,6 +21,13 @@ interface ParetoBar {
 
 export interface ParetoGeometry {
   bars: ParetoBar[];
+  /**
+   * Indices of the bars that actually paint (height > 0). A zero-magnitude
+   * category — or every category, on an all-zero dataset — draws nothing, so
+   * this is also the set of navigable units: hover must not outline a bar the
+   * reader cannot see.
+   */
+  painted: number[];
   line: { d: string };
   thresholdY: number | null;
   /** First bar whose cumulative share ≥ threshold. */
@@ -40,7 +49,7 @@ export function paretoGeometry(opts: {
   height: number;
   data: readonly { label: string; value: number }[];
   threshold?: number | false | undefined;
-  max?: number | undefined;
+  maxItems?: number | undefined;
   pad?: number | undefined;
   gutterCh?: number | undefined;
   fontSize?: number | undefined;
@@ -54,16 +63,16 @@ export function paretoGeometry(opts: {
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
-  const max = Math.max(1, Math.min(12, Math.round(opts.max ?? 8)));
+  const cap = Math.max(1, Math.min(12, Math.round(opts.maxItems ?? 8)));
   const threshold = opts.threshold === false ? null : (opts.threshold ?? 80);
 
   // stable descending sort (input order breaks ties)
   const sorted = valid.map((d, i) => ({ ...d, i })).sort((a, b) => b.value - a.value || a.i - b.i);
   const nOriginal = sorted.length;
 
-  // roll everything beyond `max` into Other (always last, never re-ranked)
-  const head = sorted.slice(0, max);
-  const tail = sorted.slice(max);
+  // roll everything beyond `maxItems` into Other (always last, never re-ranked)
+  const head = sorted.slice(0, cap);
+  const tail = sorted.slice(cap);
   const otherValue = tail.reduce((s, d) => s + d.value, 0);
   const rows: { label: string; value: number; isOther: boolean }[] = head.map((d) => ({
     label: d.label,
@@ -78,6 +87,14 @@ export function paretoGeometry(opts: {
   const plotW = width - 2 * pad;
   const plotH = height - 2 * pad;
   const baseline = height - pad;
+  // Bars are crispEdges fills (no stroke), so their floor seats flush with the
+  // box bottom (y = height) — this removes the dead bottom pad so the strip
+  // aligns on the text baseline when rendered inline. The cumulative line and
+  // threshold are STROKED, so they keep the inset frame (baseline / plotH): a
+  // stroke centred on `height` would bleed half its width past the viewBox.
+  // Top pad is preserved for both — the max bar still tops at `pad`.
+  const barFloor = height;
+  const barPlotH = height - pad;
   const k = rows.length;
   const colW = plotW / k;
   const maxVal = Math.max(...rows.map((r) => r.value), 0);
@@ -103,18 +120,23 @@ export function paretoGeometry(opts: {
   const colCenter = (i: number) => round2(pad + i * colW + colW / 2);
 
   const bars: ParetoBar[] = rows.map((r, i) => {
-    const h = maxVal > 0 ? round2((r.value / maxVal) * plotH) : 0;
+    const h = maxVal > 0 ? round2((r.value / maxVal) * barPlotH) : 0;
     return {
       x: round2(pad + i * colW + colW * 0.1),
       width: round2(colW * 0.8),
-      y: round2(baseline - h),
+      y: round2(barFloor - h),
       height: h,
       label: r.label,
+      value: round2(r.value),
       share: round2(degenerate ? 0 : r.value / total),
       cum: round2(cums[i]!),
       // the accent stops at the crossing: every non-Other bar up to it is vital
       vital: crossingIndex >= 0 && i <= crossingIndex && !r.isOther,
     };
+  });
+  const painted: number[] = [];
+  bars.forEach((b, i) => {
+    if (b.height > 0) painted.push(i);
   });
   const crossing =
     crossingIndex >= 0 ? { index: crossingIndex, x: colCenter(crossingIndex) } : null;
@@ -128,6 +150,7 @@ export function paretoGeometry(opts: {
 
   return {
     bars,
+    painted,
     line,
     thresholdY: thFrac === null ? null : round2(baseline - thFrac * plotH),
     crossing,

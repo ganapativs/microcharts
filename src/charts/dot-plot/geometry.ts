@@ -4,7 +4,7 @@
 // (magnitude read) — the prop flips the honesty regime. Coords 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
-import { textGutter } from "../../core/labels.js";
+import { textGutterProse } from "../../core/labels.js";
 
 interface DotRow {
   /** Row center on the category axis. */
@@ -45,7 +45,8 @@ export function dotPlotGeometry(opts: {
   const n = values.length;
   const r = 2;
 
-  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 3) : 0;
+  // Caller-supplied row label, not a figure we formatted — see textGutterProse.
+  const gutter = gutterCh > 0 ? textGutterProse(gutterCh, fontSize, 3) : 0;
   const x0 = gutter + r;
   const x1 = width - r;
 
@@ -89,7 +90,8 @@ export function dotPlotGeometry(opts: {
   };
 }
 
-/** Truncate a category label by CHARACTER COUNT (never measured — ). */
+/** Truncate a category label by CHARACTER COUNT — text is never measured, so
+ * the static path stays server-renderable. */
 export function truncateLabel(label: string, max = 6): string {
   return label.length <= max ? label : `${label.slice(0, max)}…`;
 }

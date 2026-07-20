@@ -21,6 +21,8 @@ export interface DepthWedgeResult {
   demandPath: string;
   supplyPath: string;
   midX: number;
+  /** Wedge baseline — the deterministic plot floor, flush with the box bottom. */
+  yBase: number;
   spread: number;
   ratio: number;
   /** Lead side for the summary: 1 = demand, -1 = supply, 0 = balanced. */
@@ -117,6 +119,7 @@ export function depthWedgeGeometry(opts: {
     demandPath: demandWedge.path,
     supplyPath: supplyWedge.path,
     midX,
+    yBase,
     spread: round2(spread),
     ratio,
     lead,

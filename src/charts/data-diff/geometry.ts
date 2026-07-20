@@ -39,9 +39,9 @@ export function dataDiffGeometry(opts: {
   width: number;
   height: number;
   data: readonly { key: string; added: number; removed: number }[];
-  sort?: "none" | "net" | "magnitude" | undefined;
+  order?: "data" | "net" | "magnitude" | undefined;
   domain?: readonly [number, number] | undefined;
-  max?: number | undefined;
+  maxItems?: number | undefined;
   pad?: number | undefined;
   gutterCh?: number | undefined;
   fontSize?: number | undefined;
@@ -60,15 +60,15 @@ export function dataDiffGeometry(opts: {
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
-  const cap = Math.max(1, Math.min(12, Math.round(opts.max ?? 12)));
+  const cap = Math.max(1, Math.min(12, Math.round(opts.maxItems ?? 12)));
 
-  // sort is a VIEW concern — never mutate the caller's order semantics silently;
-  // "none" preserves input (schema/alphabetical order is often meaningful)
-  const sort = opts.sort ?? "none";
+  // order is a VIEW concern — never mutate the caller's order semantics silently;
+  // "data" preserves input (schema/alphabetical order is often meaningful)
+  const order = opts.order ?? "data";
   const withIdx = rowsIn.map((r, i) => ({ ...r, i }));
-  if (sort === "net")
+  if (order === "net")
     withIdx.sort((a, b) => b.added - b.removed - (a.added - a.removed) || a.i - b.i);
-  else if (sort === "magnitude")
+  else if (order === "magnitude")
     withIdx.sort(
       (a, b) => Math.max(b.added, b.removed) - Math.max(a.added, a.removed) || a.i - b.i,
     );

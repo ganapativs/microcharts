@@ -91,6 +91,10 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Occupancy fills the comb as a block, so there is no floor to stand on.
+      // The hex rows, not the viewBox: `height` is padded and ceiled to a whole
+      // unit, which would bias the centre downward by the rounding residue.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-honeycomb ${className}` : "mc-honeycomb"}
       style={style}
     >

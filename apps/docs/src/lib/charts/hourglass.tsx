@@ -1,6 +1,5 @@
 import { Hourglass } from "@microcharts/react/hourglass";
-import { Hourglass as HourglassInteractive } from "@microcharts/react/hourglass/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -16,6 +15,7 @@ export const entry: ChartEntry = {
   // value-transition in client.tsx) — a mount entrance would fight that
   // existing motion, so this chart has no `animate` prop at all.
   animates: false,
+  picker: false,
   dataShape: "{ value: number }",
   encoding: { channel: "sand area split top (remaining) / bottom (elapsed)", precision: "medium" },
   nodeBudget: "4",
@@ -61,12 +61,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "gone and remaining",
-  Node: () => <Hourglass value={0.7} label="remaining" title="Session" height={28} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "elapsed %", min: 0, max: 100, step: 1, init: 75 },
@@ -89,27 +83,6 @@ export const playground: PlaygroundSpec = {
     />
   ),
   code: (s) =>
-    [
-      "<Hourglass",
-      `  value={${((s.value as number) / 100).toFixed(2)}}`,
-      s.label !== "none" && `  label="${s.label}"`,
-      s.stream === false && "  stream={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  // No `animate` prop exists on this chart (see entry.animates) — the sand
-  // levels' own value-transition cross-fade is the only motion.
-  renderInteractive: (s) => (
-    <HourglassInteractive
-      value={(s.value as number) / 100}
-      label={s.label as "none" | "remaining" | "elapsed"}
-      stream={s.stream as boolean}
-      summary={false}
-      height={64}
-    />
-  ),
-  codeInteractive: (s) =>
     [
       "<Hourglass",
       `  value={${((s.value as number) / 100).toFixed(2)}}`,
@@ -215,25 +188,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Hourglass value={0.7} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex items-center gap-3">
-      {[0.15, 0.4, 0.6, 0.85].map((v) => (
-        <HourglassInteractive key={v} value={v} summary={false} />
-      ))}
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

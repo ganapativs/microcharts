@@ -1,16 +1,26 @@
 "use client";
-// Interactive <Ohlc>. Nearest-x lookup; ←/→ steps the RENDERED
-// periods ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close
-// 148.20."). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Ohlc>. useActivePicker owns interaction: one pointer listener +
+// nearest-x lookup over the rendered periods, ←/→ (Home/End) rove them
+// ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20."),
+// click / Enter / Space selects (onSelect). Composes the static component
+// (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
+import {
+  named,
+  fillFor,
+  navOrder,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { ohlcGeometry } from "./geometry.js";
 import { Ohlc as StaticOhlc, ohlcSummary, type OhlcProps } from "./index.js";
 
-export interface InteractiveOhlcProps extends OhlcProps {
+export interface InteractiveOhlcProps extends OhlcProps, PickerProps {
   strings?: OhlcStrings;
   /**
    * Opt-in entrance motion (default `false`): periods reveal left-to-right
@@ -23,7 +33,7 @@ export interface InteractiveOhlcProps extends OhlcProps {
 export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
   const {
     data,
-    variant = "candle",
+    mode = "candle",
     maxPeriods = 20,
     label = "none",
     domain,
@@ -35,6 +45,12 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -45,7 +61,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
   // period whole — the wick used to ride the quiet stage and so every wick
   // faded in before any body popped. `order: "x"` clusters each period's marks
   // at one x, so they enter together (a thin vertical wick scaling from its
-  // center is fine). The "bars" variant has no body rect, only support-tick
+  // center is fine). The "bars" mode has no body rect, only support-tick
   // lines; they now trail per period too instead of the whole-svg wipe.
   useEntrance(hostRef, "trail", animate, {
     selector: 'rect[data-mc-ohlc], line[data-mc-w="support"]',
@@ -77,7 +93,59 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     () => (data.length > maxPeriods ? data.slice(-maxPeriods) : [...data]),
     [data, maxPeriods],
   );
-  const [active, setActive] = useState<number | null>(null);
+
+  // The navigable stops are the PAINTED candles, keyed by their period index in
+  // `rendered`; corrupt periods are dropped, so that space is sparse and a
+  // lookup — not mark order — is what addresses a period.
+  const markByIndex = useMemo(() => {
+    const m = new Map<number, (typeof geo.marks)[number]>();
+    geo.marks.forEach((k) => m.set(k.index, k));
+    return m;
+  }, [geo]);
+  const stops = useMemo(() => geo.marks.map((m) => m.index), [geo]);
+
+  // Pointer (viewBox space) → nearest candle; returns its PERIOD index.
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.marks.length === 0) return null;
+      let best = geo.marks[0]!.index;
+      let bestDist = Infinity;
+      geo.marks.forEach((m) => {
+        const dist = Math.abs(m.x - x);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = m.index;
+        }
+      });
+      return best;
+    },
+    [geo],
+  );
+  // Walk painted candles (skip corrupt periods): step in stop-space, land on
+  // period indices.
+  const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
+  // index = the RENDERED period (the most recent `maxPeriods`, corrupt periods
+  // skipped); value = that period's close, the settlement price.
+  const datum = useCallback(
+    (i: number) => {
+      const p = rendered[i];
+      return { index: i, value: p ? p.close : null };
+    },
+    [rendered],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: stops.length,
+    width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -87,63 +155,36 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
         : ohlcSummary(data, fmt, pctFmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.marks.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.marks.forEach((m, i) => {
-        const dist = Math.abs(m.x - x);
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, width],
-  );
+  const frame = (i: number, pinned: boolean) => {
+    const m = markByIndex.get(i);
+    if (!m) return null;
+    return (
+      <rect
+        x={m.x - m.bodyW / 2 - 1}
+        y={0.5}
+        width={m.bodyW + 2}
+        height={height - 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.marks.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.marks.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.marks.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const mark = active !== null ? geo.marks[active] : undefined;
-  const period = mark ? rendered[mark.index] : undefined;
+  // The unit shown by the frame + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const mark = shown !== null ? markByIndex.get(shown) : undefined;
+  const period = shown !== null ? rendered[shown] : undefined;
+  // Ordinal + total are stated over the rendered WINDOW, not the painted
+  // candles: the ordinal is the period's own place in it, so a skipped corrupt
+  // period must still be counted or "period 3 of 4" would name period 4.
   const announced =
     mark && period
       ? strings.ohlcAt(
-          mark.index + 1,
-          geo.marks.length,
+          shown! + 1,
+          rendered.length,
           fmt(period.open),
           fmt(period.high),
           fmt(period.low),
@@ -152,22 +193,12 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
       : "";
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-ohlc-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-ohlc-live", className, style)} {...named(ariaLabel)} {...bind}>
       <StaticOhlc
         {...rest}
+        style={fillFor(style)}
         data={data}
-        variant={variant}
+        mode={mode}
         maxPeriods={maxPeriods}
         label={label}
         domain={domain}
@@ -178,18 +209,9 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {mark ? (
-          <rect
-            x={mark.x - mark.bodyW / 2 - 1}
-            y={0.5}
-            width={mark.bodyW + 2}
-            height={height - 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; the focus frame is transient. */}
+        {selected !== null && selected !== active ? frame(selected, true) : null}
+        {active !== null ? frame(active, false) : null}
         {rest.children}
       </StaticOhlc>
       <LiveRegion>{announced}</LiveRegion>
@@ -201,7 +223,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {fmt(period.close)}
+          {`O${fmt(period.open)} H${fmt(period.high)} L${fmt(period.low)} C${fmt(period.close)}`}
         </span>
       ) : null}
     </span>

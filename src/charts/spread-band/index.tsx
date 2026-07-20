@@ -1,5 +1,5 @@
-// <SpreadBand> — which of two series leads, by how much, and since when (
-// §6). Subject (a) and reference (b) on ONE shared domain; the SIGNED gap between
+// <SpreadBand> — which of two series leads, by how much, and since when.
+// Subject (a) and reference (b) on ONE shared domain; the SIGNED gap between
 // them is filled and split at crossings, so "who is ahead" and "when it flipped"
 // read at a glance. The reference whispers (dashed, thinner, neutral); direction
 // is carried by fill sign + text, never color alone. Static, hook-free, RSC-safe.
@@ -24,6 +24,16 @@ export function signedGap(gap: number, fmt: (n: number) => string): string {
   return gap > 0 ? `+${fmt(gap)}` : fmt(gap);
 }
 
+/** Placeholder names, used for whichever half of the pair the caller omitted. */
+export const DEFAULT_SERIES_LABELS: readonly [string, string] = ["A", "B"];
+
+/** Both names, always. A summary names the leader AND the side it leads, so a
+ *  pair that is short or blank still needs something to call the other one —
+ *  never `undefined` in a sentence. */
+export function seriesPair(labels: readonly (string | undefined)[] | undefined): [string, string] {
+  return [labels?.[0] || DEFAULT_SERIES_LABELS[0], labels?.[1] || DEFAULT_SERIES_LABELS[1]];
+}
+
 /** Factual lead summary — leader, current gap, and where the lines last crossed. */
 export function spreadBandSummary(
   geo: SpreadBandGeometry,
@@ -35,8 +45,9 @@ export function spreadBandSummary(
   const gap = geo.last.a - geo.last.b;
   if (geo.coincident || gap === 0) return strings.spreadBandTie;
   const aLeads = gap > 0;
-  const leader = aLeads ? labels[0] : labels[1];
-  const other = aLeads ? labels[1] : labels[0];
+  const [a, b] = seriesPair(labels);
+  const leader = aLeads ? a : b;
+  const other = aLeads ? b : a;
   const since =
     geo.lastFlip !== null ? strings.spreadBandFlip(geo.lastFlip + 1) : strings.spreadBandNever;
   return strings.spreadBand(leader, other, fmt(Math.abs(gap)), since);
@@ -46,7 +57,7 @@ export interface SpreadBandProps {
   /** Paired readings: `a` = subject, `b` = reference. Null in either = gap in both. */
   data: readonly SpreadDatum[];
   /** Names the two series in summaries/announcements/label. Default `["A", "B"]`. */
-  labels?: readonly [string, string] | undefined;
+  seriesLabels?: readonly [string, string] | undefined;
   /** Which lead is the good valence — `"down"` flips the fill colors. Default `"up"`. */
   positive?: Polarity | undefined;
   /** `"gap"` (default) states the current signed gap in a right gutter. */
@@ -70,7 +81,7 @@ export interface SpreadBandProps {
 export function SpreadBand(props: SpreadBandProps): ReactNode {
   const {
     data,
-    labels = ["A", "B"],
+    seriesLabels = DEFAULT_SERIES_LABELS,
     positive = "up",
     label = "gap",
     domain,
@@ -105,7 +116,7 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
     fontSize,
   });
 
-  const accName = resolveSummary(summary, () => spreadBandSummary(geo, labels, fmt, strings));
+  const accName = resolveSummary(summary, () => spreadBandSummary(geo, seriesLabels, fmt, strings));
 
   // annotations host contract: Marker x = data INDEX, Threshold/TargetZone y =
   // data values on the shared value scale.
@@ -130,6 +141,12 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
   ] as const;
   const leaderGood = (gap ?? 0) > 0 ? aGood : !aGood;
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -137,8 +154,12 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The signed fill is bounded by the two lines, not by a zero line, so
+      // there is nothing mid-anchored to centre on — the shared plot floor is
+      // the frame both series stand in, and it seats on the text baseline.
+      seat={{ mode: "floor", bottom: geo.plot.y1 }}
       className={className ? `mc-spread ${className}` : "mc-spread"}
-      style={style}
+      style={rootStyle}
     >
       {ann.under}
       {!geo.coincident ? (

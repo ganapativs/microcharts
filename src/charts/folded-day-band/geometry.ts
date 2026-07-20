@@ -29,6 +29,10 @@ export interface FoldedBandResult {
   todayPercentile: number | null;
   bins: number;
   binStats: FoldedBinStat[];
+  /** Plot box, top and bottom edges — the padded frame every envelope and the
+   *  median line are scaled into. */
+  y0: number;
+  y1: number;
 }
 
 function foldBins(data: readonly TP[], period: number, bins: number): number[][] {
@@ -159,5 +163,7 @@ export function foldedBandGeometry(opts: {
     todayPercentile,
     bins,
     binStats,
+    y0: round2(pad),
+    y1: round2(pad + plotH),
   };
 }

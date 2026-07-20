@@ -73,12 +73,14 @@ fence-breakers as dots.
 
 Never a box from fewer than 5 observations — dots at the raw values instead. Precomputed `stats` with non-monotonic
 values are refused with a dev warning: garbage in must not render a plausible-looking lie. Outlier dots cap at 3 per
-side (the furthest); the clipped count rides the announcements.
+side (the furthest).
 
 ## Accessibility
 
 The accessible name is the five-number reading — **"Median 42, middle half 35 to 51, range 12 to 96."** The interactive
 entry roves a fixed 5-stop model (min → Q1 → median → Q3 → max), announcing each stat (**"Median: 42."**).
+
+<InteractionNote slug="micro-box" />
 
 ## Props
 

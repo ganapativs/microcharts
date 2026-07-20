@@ -44,4 +44,33 @@ describe("interactive <Sparkline>", () => {
     const fig = await mount();
     expect(fig.querySelector("svg")!.getAttribute("aria-hidden")).toBe("true");
   });
+
+  it("onActive reports the focused datum (data index + value); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<Sparkline data={D} onActive={(d) => seen.push(d)} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}");
+    expect(seen.at(-1)).toEqual({ index: 1, value: 6 });
+    await userEvent.keyboard("{Escape}");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active point: fires onSelect + pins a persistent ring", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<Sparkline data={D} onSelect={(d) => picks.push(d)} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}{Enter}");
+    expect(picks.at(-1)).toEqual({ index: 1, value: 6 });
+    // Pin survives blur (it is selection, not hover).
+    fig.blur();
+    await expect.poll(() => fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the mark with no internal state", async () => {
+    const screen = await render(<Sparkline data={D} selectedIndex={3} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    expect(fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
 });

@@ -137,13 +137,15 @@ above renders "-23,9", not "-23.9", and the accessible name reads "Slow window -
 
 Thin-fast, thick-slow because the sustained read should carry more ink — a momentary spike on the fast trace matters
 less than a slow-window drift away from target. The window sizes are part of the reading, not a hidden implementation
-detail, so they are documented on every example and available to the summary. Both traces always share one domain; a
-trace begins only where its window has filled, never faking a partial-window value.
+detail — `windows` is an explicit prop, and the examples that change it state both sizes. Both traces always share one
+domain; a trace begins only where its window has filled, never faking a partial-window value.
 
 ## Accessibility
 
-The accessible name leads with the sustained read — **"Slow window -23.1 vs target -23; fast -20.4."** The interactive
+The accessible name leads with the sustained read — **"Slow window -25 vs target -23; fast -23.9."** The interactive
 entry roves the samples with ←/→, announcing the fast value, the slow value, and the target at each point.
+
+<InteractionNote slug="dual-window-meter" />
 
 ## Props
 

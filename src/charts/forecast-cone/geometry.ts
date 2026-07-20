@@ -50,9 +50,26 @@ export interface ForecastConeGeometry {
   domain: readonly [number, number];
 }
 
-// normalize a [lo,hi] pair (swap if reversed)
-const pair = (p: readonly [number, number]): [number, number] =>
-  p[0] <= p[1] ? [p[0], p[1]] : [p[1], p[0]];
+/**
+ * Normalize the interval band to one finite `[lo,hi]` pair per median point
+ * (swapping a reversed pair). A bound that is missing, short (`[lo]` with no
+ * `hi`), null or non-finite is UNKNOWN and falls back to the MEDIAN: the known
+ * side is kept, the unknown side claims no distance from the median, and a pair
+ * with neither bound collapses onto the median line. An unknown interval shows
+ * as no interval — never as a NaN coordinate or a "between NaN and 36" summary.
+ */
+const band = (
+  raw: readonly (readonly [number, number])[] | undefined,
+  mids: readonly number[],
+): [number, number][] =>
+  mids.map((m, j) => {
+    const p = raw?.[j];
+    const a = isFiniteValue(p?.[0]) ? p![0] : undefined;
+    const b = isFiniteValue(p?.[1]) ? p![1] : undefined;
+    const lo = a ?? m;
+    const hi = b ?? m;
+    return lo <= hi ? [lo, hi] : [hi, lo];
+  });
 
 export function forecastConeGeometry(opts: {
   width: number;
@@ -82,8 +99,8 @@ export function forecastConeGeometry(opts: {
   const X = (i: number) => round2(n <= 1 ? (pad + width - pad) / 2 : pad + (W * i) / (n - 1));
 
   // aligned band pairs (cap at 2 bands: 80 outer, 50 inner)
-  const p80 = opts.forecast.p80.slice(0, F).map(pair);
-  const p50 = opts.forecast.p50?.slice(0, F).map(pair);
+  const p80 = band(opts.forecast.p80, mids);
+  const p50 = opts.forecast.p50 ? band(opts.forecast.p50, mids) : undefined;
 
   const allVals = [
     ...history,
@@ -176,8 +193,13 @@ export function forecastConeGeometry(opts: {
     now: H > 0 ? round2(history[H - 1]!) : null,
     widening,
     labelX: round2(width + 3),
+    // The readout is `dominant-baseline: central`, so its box straddles y by
+    // HALF a font each way — the clamp has to be symmetric. (An asymmetric
+    // margin let the bottom of the glyph box hang out of a short viewBox.)
+    // Below `height < fontSize` no clamp exists at all; the caller drops the
+    // label there rather than painting it, so this value goes unused.
     labelY:
-      fontSize > 0 ? round2(clamp(landing.y, fontSize * 0.7, height - fontSize * 0.6)) : landing.y,
+      fontSize > 0 ? round2(clamp(landing.y, fontSize * 0.5, height - fontSize * 0.5)) : landing.y,
     totalWidth: width + gutter,
     domain: dom,
   };

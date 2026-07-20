@@ -104,9 +104,9 @@ they overlap exactly, and at 75% dot opacity the overlap itself reads as extra d
 
 ## Why this default
 
-Axes are unlabeled at this scale, so `title` must name both variables — the examples here all follow that convention.
-The summary's relationship words are a documented heuristic on |r| (≥ 0.7 strong, ≥ 0.4 moderate, ≥ 0.2 weak), and
-whenever a relationship word appears, r appears beside it: claim and evidence travel together. Fewer than 3 points, or a
+Axes are unlabeled at this scale, so `title` must name both variables, the way the hero demo above does. The summary's
+relationship words are a documented heuristic on |r| (≥ 0.7 strong, ≥ 0.4 moderate, ≥ 0.2 weak), and whenever a
+relationship word appears, r appears beside it: claim and evidence travel together. Fewer than 3 points, or a
 zero-variance cloud, makes no claim at all.
 
 ## Accessibility
@@ -114,6 +114,8 @@ zero-variance cloud, makes no claim at all.
 The accessible name is the count plus the evidence-backed relationship — **"24 points. Strong positive relationship (r
 0.93)."** — or just **"2 points."** when no claim is honest. The interactive entry steps points ordered by x and
 announces each formatted pair.
+
+<InteractionNote slug="micro-scatter" />
 
 ## Props
 

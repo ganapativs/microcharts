@@ -1,27 +1,26 @@
 "use client";
-// Interactive <Waveform>. One pointer listener; bucket by x lookup.
-// Hover shows the bucket peak + crosshair; ←/→ rove buckets. Composes the static
-// component (canon). onPointFocus supports scrub-to-seek recipes.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+// Interactive <Waveform>. useActivePicker owns interaction: ONE pointer listener
+// + nearest-bucket-by-x, ←/→ rove buckets, click / Enter / Space selects
+// (onSelect). Composes the static component (canon) — the merged bar path is
+// never re-implemented; the client only overlays a transient crosshair, a
+// persistent pin and a readout.
+import { useCallback, useMemo, useRef } from "react";
 import { maxPerBucket } from "../../core/downsample.js";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_WAVEFORM } from "../../core/strings-waveform.js";
-import { bucketCount, waveformGeometry } from "./geometry.js";
+import { bucketCount, bucketX, waveformGeometry } from "./geometry.js";
 import { Waveform as StaticWaveform, waveformSummary, type WaveformProps } from "./index.js";
 
-const FILL: CSSProperties = { width: "100%", height: "auto" };
-
-export interface InteractiveWaveformProps extends WaveformProps {
-  onPointFocus?: (index: number, fraction: number) => void;
+export interface InteractiveWaveformProps extends WaveformProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the bars rise from the center
    * on first client-side mount. Inert on the server and on hydrated server
@@ -33,6 +32,7 @@ export interface InteractiveWaveformProps extends WaveformProps {
 export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   const {
     data,
+    mode = "bars",
     mirror = true,
     domain,
     width = 120,
@@ -42,8 +42,13 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
     strings = EN_WAVEFORM,
     title,
     summary,
-    onPointFocus,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -55,7 +60,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   // the filled envelope just wipes across.
   useEntrance(hostRef, "scan", animate, {
     selector: 'path[data-mc-ink="bar"]',
-    origin: (props.variant ?? "bars") === "envelope" ? "left" : mirror ? "center" : "bottom",
+    origin: mode === "envelope" ? "left" : mirror ? "center" : "bottom",
   });
 
   const buckets = useMemo(() => bucketCount(width, Math.max(1, data.length)), [width, data.length]);
@@ -65,7 +70,55 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   );
   const bucketVals = useMemo(() => maxPerBucket(data, buckets, { abs: true }), [data, buckets]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // The painted x of a bucket — bars and the envelope sit on different pitches,
+  // so every x-aware surface here reads it from geometry rather than assuming.
+  const xOf = useCallback(
+    (i: number) => bucketX(i, { width, buckets, mode }),
+    [width, buckets, mode],
+  );
+
+  // nearest bucket by x-distance to its painted position in viewBox space —
+  // never a DOM node per bucket. The navigable unit is the BUCKET; its index is
+  // the bucket index (== data index when the signal renders 1 sample/bar).
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.bars.length === 0) return null;
+      let best = 0;
+      let bestD = Infinity;
+      for (const b of geo.bars) {
+        const d = Math.abs(xOf(b.index) - x);
+        if (d < bestD) {
+          bestD = d;
+          best = b.index;
+        }
+      }
+      return best;
+    },
+    [geo, xOf],
+  );
+
+  // datum index = BUCKET index; value = the bucket's peak magnitude (the encoded
+  // amplitude), or `null` for an empty bucket.
+  const datum = useCallback(
+    (i: number) => {
+      const v = bucketVals[i];
+      return { index: i, value: v == null ? null : Math.abs(v) };
+    },
+    [bucketVals],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.bars.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -75,86 +128,26 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
         : waveformSummary(data, strings, fmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const move = useCallback(
-    (i: number | null) => {
-      setActive(i);
-      if (i != null) onPointFocus?.(i, buckets > 1 ? i / (buckets - 1) : 0);
-    },
-    [onPointFocus, buckets],
-  );
+  const shown = active ?? selected;
+  const shownBar = shown !== null ? geo.bars[shown] : undefined;
+  const shownVal = shown !== null ? bucketVals[shown] : null;
+  const pct = shownBar ? `${Math.round((shownBar.index / Math.max(1, buckets - 1)) * 100)}%` : "";
+  const announced = shownBar
+    ? strings.waveformAt(pct, fmt(shownVal == null ? 0 : Math.abs(shownVal)))
+    : "";
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.bars.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      let best = 0;
-      let bestD = Infinity;
-      for (const b of geo.bars) {
-        const c = b.x + b.width / 2;
-        const d = Math.abs(c - x);
-        if (d < bestD) {
-          bestD = d;
-          best = b.index;
-        }
-      }
-      move(best);
-    },
-    [geo, width, move],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.bars.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.bars.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.bars.length - 1;
-          break;
-        case "Escape":
-          move(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      move(next);
-    },
-    [active, geo, move],
-  );
-
-  const bar = active != null ? geo.bars[active] : undefined;
-  const rawVal = active != null ? bucketVals[active] : null;
-  const pct = bar ? `${Math.round((bar.index / Math.max(1, buckets - 1)) * 100)}%` : "";
-  const announced = bar ? strings.waveformAt(pct, fmt(rawVal == null ? 0 : Math.abs(rawVal))) : "";
+  const shownX = shownBar ? xOf(shownBar.index) : 0;
+  // Accent outline around the pinned bucket — persists through pointer-leave.
+  // Envelope mode paints no bars, so there is no rect to outline there.
+  const selBar =
+    mode === "bars" && selected !== null && selected !== active ? geo.bars[selected] : undefined;
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-wave-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => move(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => move(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-wave-live", className, style)} {...named(label)} {...bind}>
       <StaticWaveform
         {...rest}
         data={data}
+        mode={mode}
         mirror={mirror}
         domain={domain}
         width={width}
@@ -163,31 +156,44 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
-        {bar ? (
+        {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
+        {selBar ? (
+          <rect
+            x={selBar.x - 0.5}
+            y={selBar.y - 0.5}
+            width={selBar.width + 1}
+            height={Math.max(selBar.height, 0.4) + 1}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {shownBar ? (
           <line
-            x1={bar.x + bar.width / 2}
-            x2={bar.x + bar.width / 2}
+            x1={shownX}
+            x2={shownX}
             y1={0.5}
             y2={height - 0.5}
             data-mc-ink="muted"
-            data-mc-w="tick"
+            data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {rest.children}
       </StaticWaveform>
       <LiveRegion>{announced}</LiveRegion>
-      {bar ? (
+      {shownBar ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((bar.x + bar.width / 2) / width) * 100}%`,
+            left: `${(shownX / width) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {`${pct} · ${fmt(rawVal == null ? 0 : Math.abs(rawVal))}`}
+          {`${pct} · ${fmt(shownVal == null ? 0 : Math.abs(shownVal))}`}
         </span>
       ) : null}
     </span>

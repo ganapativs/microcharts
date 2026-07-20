@@ -120,12 +120,13 @@ The same chart, sized for four real contexts.
 
 ## Why this default
 
-A bare line, no dots, no fill, no band — the shape of the series is the whole story until you ask for more. Dots and
-fill are opt-in because at word size they compete with the line for the same few pixels; adding them by default would
-make every sparkline noisier for the common case that only needs direction and range. Long series decimate to a
-min/max-preserving envelope rather than a naive stride sample, so a single spike at point 1,500 of 2,000 still shows up
-— silently dropping it would be the more common bug in a naive implementation, and a chart that hides its own spikes is
-dishonest by construction.
+A bare line plus one accent dot on the last point — no fill, no band, no min/max dots. The shape of the series is the
+whole story until you ask for more, and the endpoint dot marks where "now" is. Min/max dots, fill, and the band are
+opt-in because at word size they compete with the line for the same few pixels; adding them by default would make every
+sparkline noisier for the common case that only needs direction and range. Long series decimate to a min/max-preserving
+envelope rather than a naive stride sample, so a single spike at point 1,500 of 2,000 still shows up — silently dropping
+it would be the more common bug in a naive implementation, and a chart that hides its own spikes is dishonest by
+construction.
 
 ## Accessibility
 
@@ -135,6 +136,8 @@ By default the chart is an `img` whose accessible name is generated from the dat
 
 Pass a `title` to name it, or `summary={false}` to make it decorative when the surrounding text already says what it
 shows. The interactive entry adds a polite live region that reads each focused point as you arrow through it.
+
+<InteractionNote slug="sparkline" />
 
 ## Props
 

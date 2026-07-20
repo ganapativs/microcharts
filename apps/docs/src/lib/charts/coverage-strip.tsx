@@ -1,11 +1,25 @@
 import { CoverageStrip } from "@microcharts/react/coverage-strip";
-import { CoverageStrip as CoverageStripInteractive } from "@microcharts/react/coverage-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a live window with real gaps: null = no measurement, 0 = a measured zero.
 // Cast to number[] for the shared playground contract; CoverageStrip accepts nulls.
-const COVERAGE = [3, 4, null, 5, 0, null, null, 6, 8, 7, null, 9, 11, 10] as unknown as number[];
+export const COVERAGE = [
+  3,
+  4,
+  null,
+  5,
+  0,
+  null,
+  null,
+  6,
+  8,
+  7,
+  null,
+  9,
+  11,
+  10,
+] as unknown as number[];
 
 export const entry: ChartEntry = {
   name: "CoverageStrip",
@@ -77,21 +91,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <CoverageStrip data={[...COVERAGE]} summary={false} width={130} height={12} />;
 }
-
-export const showcase = {
-  hint: "presence strip",
-  Node: () => (
-    <CoverageStrip
-      data={[...COVERAGE]}
-      expected={18}
-      label="percent"
-      title="Coverage"
-      width={150}
-      height={14}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -141,32 +140,6 @@ export const playground: PlaygroundSpec = {
       s.mode !== "binary" && `  mode="${s.mode}"`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       s.label !== "none" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <CoverageStripInteractive
-      data={data}
-      expected={18}
-      mode={s.mode as "binary" | "intensity"}
-      shape={s.shape as "square" | "round"}
-      label={s.label as "none" | "percent"}
-      summary={false}
-      animate={ui.animate}
-      width={260}
-      height={16}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<CoverageStrip",
-      "  data={readings}",
-      "  expected={18}",
-      s.mode !== "binary" && `  mode="${s.mode}"`,
-      s.shape !== "square" && `  shape="${s.shape}"`,
-      s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -317,27 +290,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<CoverageStrip data={readings} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <CoverageStripInteractive
-      data={[...COVERAGE]}
-      summary={false}
-      width={130}
-      height={12}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

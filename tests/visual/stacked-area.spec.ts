@@ -27,7 +27,7 @@ function gallery(): string {
   const tab = `<div class="tab"><span>Mix</span> ${svg({ data: MIX, width: 44, height: 10, summary: false })}</div>`;
   const variants = [
     svg({ data: MIX, width: 90, title: "stacked" }),
-    svg({ data: MIX, width: 90, variant: "ridge", title: "ridge" }),
+    svg({ data: MIX, width: 90, mode: "ridge", title: "ridge" }),
     svg({ data: MIX, width: 90, curve: "smooth", title: "smooth" }),
     svg({ data: MIX.slice(0, 2), width: 90, title: "two series" }),
   ].join(" ");

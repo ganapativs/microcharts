@@ -1,9 +1,8 @@
 import { MusicStaff } from "@microcharts/react/music-staff";
-import { MusicStaff as MusicStaffInteractive } from "@microcharts/react/music-staff/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const MELODY = [3, 5, 4, 8, 6, 9, 7, 11];
+export const MELODY = [3, 5, 4, 8, 6, 9, 7, 11];
 
 export const entry: ChartEntry = {
   name: "MusicStaff",
@@ -62,14 +61,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <MusicStaff data={MELODY} summary={false} width={80} height={22} />;
 }
-
-export const showcase = {
-  hint: "read as melody",
-  Node: () => (
-    <MusicStaff data={MELODY} label="last" title="Sprint melody" width={90} height={24} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -98,28 +89,6 @@ export const playground: PlaygroundSpec = {
       "  data={weeks}",
       s.range !== "ledger" && `  range="${s.range}"`,
       s.label && '  label="last"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <MusicStaffInteractive
-      data={data}
-      range={s.range as "ledger" | "staff"}
-      label={s.label ? "last" : "none"}
-      summary={false}
-      animate={ui.animate}
-      width={220}
-      height={40}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<MusicStaff",
-      "  data={weeks}",
-      s.range !== "ledger" && `  range="${s.range}"`,
-      s.label && '  label="last"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -225,19 +194,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<MusicStaff data={weeks} />`;
 }
-
-export function PreviewLive() {
-  return <MusicStaffInteractive data={MELODY} summary={false} width={80} height={22} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

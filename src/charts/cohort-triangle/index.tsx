@@ -119,6 +119,10 @@ export function CohortTriangle(props: CohortTriangleProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Rows are cohorts, so the bottom edge is the newest vintage rather than a
+      // zero line — centre the block. `labels` only opens a LEFT gutter, which
+      // never moves the vertical box, so one seat covers both label modes.
+      seat={{ mode: "center", top: 0, bottom: h }}
       className={className ? `mc-cohort ${className}` : "mc-cohort"}
       style={rootStyle}
     >

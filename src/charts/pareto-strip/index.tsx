@@ -7,7 +7,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { round2 } from "../../core/types.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
 import { paretoGeometry, type ParetoGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -30,8 +30,8 @@ export interface ParetoStripProps {
   data: readonly { label: string; value: number }[];
   /** Cumulative reference line % (default 80; `false` turns it off). */
   threshold?: number | false | undefined;
-  /** Categories beyond `max` roll up into Other (default 8). */
-  max?: number | undefined;
+  /** Categories beyond `maxItems` roll up into Other (default 8). */
+  maxItems?: number | undefined;
   /** Category noun for the summary (default "causes"). */
   unit?: string | undefined;
   /** Total-metric noun for the summary (default "the total"). */
@@ -54,7 +54,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
   const {
     data,
     threshold = 80,
-    max = 8,
+    maxItems = 8,
     unit = "causes",
     metric = "the total",
     label = "count",
@@ -73,14 +73,32 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
   const FONT = labelFont(height);
   const cls = className ? `mc-pareto-strip ${className}` : "mc-pareto-strip";
 
-  const probe = paretoGeometry({ width, height, data, threshold, max });
-  const showLabel = label === "count" && probe != null && probe.crossing != null;
+  const probe = paretoGeometry({ width, height, data, threshold, maxItems });
+  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
+  // box a line of text cannot be seated inside the plot at all. The readout
+  // DROPS rather than spilling past the viewBox, and because the gutter is
+  // derived from it the reserved space goes with it — the plot keeps its own
+  // width and simply stops paying for text it no longer draws. Pure arithmetic:
+  // the static path may never measure text.
+  const showLabel =
+    label === "count" &&
+    probe != null &&
+    probe.crossing != null &&
+    labelFitsY(height / 2, FONT, height);
   const labelText = showLabel
     ? `${probe!.vitalCount} of ${probe!.n} → ${pct(probe!.cumAtCrossing)}`
     : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
-  const geo = paretoGeometry({ width, height, data, threshold, max, gutterCh, fontSize: FONT });
+  const geo = paretoGeometry({
+    width,
+    height,
+    data,
+    threshold,
+    maxItems,
+    gutterCh,
+    fontSize: FONT,
+  });
 
   if (geo === null) {
     return (
@@ -109,14 +127,20 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The ranked bars are the primary read and geometry already seats them
+      // flush at `height` (unstroked fills need no bottom reserve — only the
+      // cumulative line keeps the inset frame), so the bar floor is the box
+      // bottom and the strip stands on the baseline.
+      seat={{ mode: "floor", bottom: height }}
       className={cls}
       style={rootStyle}
     >
       {/* bars — vital few accent, the rest muted (where to stop reading); a
           custom `color` prop still needs an inline override, so the ink role
           only drives the default accent/neutral pair */}
-      {geo.bars.map((b) =>
-        b.height > 0 ? (
+      {geo.painted.map((i) => {
+        const b = geo.bars[i]!;
+        return (
           <rect
             key={b.label}
             x={b.x}
@@ -128,8 +152,8 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
             shapeRendering="crispEdges"
             style={color ? { fill: b.vital ? accent : "var(--mc-neutral)" } : undefined}
           />
-        ) : null,
-      )}
+        );
+      })}
       {/* cumulative-share line — fixed 0–100% over the full height */}
       {geo.line.d ? (
         <path

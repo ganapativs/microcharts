@@ -56,12 +56,12 @@ disclosed in the accessible summary.
   label="envelope"
   code={`<Waveform
   data={Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220))}
-  variant="envelope"
+  mode="envelope"
 />`}
 >
   <Waveform
     data={Array.from({ length: 200 }, (_, i) => Math.sin(i / 3) * 0.4 * (1 - Math.abs(i - 100) / 220))}
-    variant="envelope"
+    mode="envelope"
     title="Envelope"
     width={280}
     height={30}
@@ -105,6 +105,8 @@ silently rescaled to look loud.
 
 The accessible name discloses the peak — **"Peak 0.738 at 63% through 200 samples."** Pure silence reads **"Silent."**
 rather than blank. The interactive entry roves the buckets, announcing each bucket's position and peak amplitude.
+
+<InteractionNote slug="waveform" />
 
 ## Props
 

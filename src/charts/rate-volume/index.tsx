@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
 import { resolveSummary } from "../../core/summary.js";
 import {
@@ -108,7 +108,13 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
 
   // probe once to size the gutter to the endpoint rate label
   const probe = rateVolumeGeometry({ width, height, data, minVolume, curve, domain, volumeDomain });
-  const showLabel = label === "last" && probe?.last != null;
+  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
+  // box a line of text cannot be seated inside the plot at all. The readout
+  // DROPS rather than spilling past the viewBox, and because the gutter is
+  // derived from it the reserved space goes with it — the plot keeps its own
+  // width and simply stops paying for text it no longer draws. Pure arithmetic:
+  // the static path may never measure text.
+  const showLabel = label === "last" && probe?.last != null && labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? fmt(probe!.last!.rate) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
@@ -153,6 +159,11 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The ghost volume bars are zero-anchored, so the plot floor is the mark's
+      // real bottom and belongs on the text baseline; the rate line rides above
+      // it. Seat the padded plot rather than the box, or the bars hang two units
+      // below the line they should be standing on.
+      seat={{ mode: "floor", bottom: geo.plotB }}
       className={cls}
       style={rootStyle}
     >

@@ -123,11 +123,12 @@ export function errorBudgetGeometry(opts: {
     points,
     exhausted: exhaustedIdx >= 0 ? { x: X(elapsed(exhaustedIdx)), index: exhaustedIdx } : null,
     labelX: round2(width + 3),
-    // central-baseline box spans ≈ ±0.55·fontSize, so keep that margin from
-    // both edges or a 0%-remaining (bottom) label escapes
+    // central-baseline box straddles y by HALF a font each way, so keep exactly
+    // that margin from both edges or a 0%-remaining (bottom) label escapes.
+    // Below `height < fontSize` no clamp exists; the caller drops the label.
     labelY:
       fontSize > 0
-        ? round2(clamp(remaining.y, fontSize * 0.7, height - fontSize * 0.6))
+        ? round2(clamp(remaining.y, fontSize * 0.5, height - fontSize * 0.5))
         : remaining.y,
     totalWidth: width + gutter,
   };

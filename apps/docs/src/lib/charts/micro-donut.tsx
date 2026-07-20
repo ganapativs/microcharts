@@ -1,9 +1,8 @@
 import { MicroDonut } from "@microcharts/react/micro-donut";
-import { MicroDonut as MicroDonutInteractive } from "@microcharts/react/micro-donut/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const MIX = [
+export const MIX = [
   { label: "Chrome", value: 620 },
   { label: "Safari", value: 240 },
   { label: "Firefox", value: 90 },
@@ -92,12 +91,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <MicroDonut data={MIX} summary={false} style={{ width: 40, height: 40 }} />;
 }
-
-export const showcase = {
-  hint: "mix icon",
-  Node: () => <MicroDonut data={MIX} title="Traffic mix" style={{ width: 40, height: 40 }} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "maxWedges", label: "max wedges", min: 2, max: 4, init: 4 },
@@ -122,30 +115,6 @@ export const playground: PlaygroundSpec = {
       s.maxWedges !== 4 && `  maxWedges={${s.maxWedges}}`,
       s.weight !== 5 && `  weight={${s.weight}}`,
       (s.decorative as boolean) && "  decorative",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <MicroDonutInteractive
-      data={MIX}
-      maxWedges={s.maxWedges as number}
-      weight={s.weight as number}
-      decorative={s.decorative as boolean}
-      size={48}
-      summary={false}
-      animate={ui.animate}
-      style={{ width: 96, height: 96 }}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<MicroDonut",
-      "  data={mix}",
-      s.maxWedges !== 4 && `  maxWedges={${s.maxWedges}}`,
-      s.weight !== 5 && `  weight={${s.weight}}`,
-      (s.decorative as boolean) && "  decorative",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -252,21 +221,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<MicroDonut data={mix} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <MicroDonutInteractive data={MIX} summary={false} style={{ width: 40, height: 40 }} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

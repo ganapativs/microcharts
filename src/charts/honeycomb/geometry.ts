@@ -12,6 +12,10 @@ export interface HoneycombGeometry {
   filledCount: number;
   width: number;
   height: number;
+  /** Comb block, top and bottom edges — the outer hex row extents, not the
+   *  padded/ceiled viewBox. */
+  y0: number;
+  y1: number;
 }
 
 const SQRT3 = Math.sqrt(3);
@@ -85,5 +89,14 @@ export function honeycombGeometry(opts: {
   const width = Math.max(1, Math.ceil(pad * 2 + cols * colSpace + offset));
   const height = Math.max(1, Math.ceil(pad * 2 + r + (rows - 1) * rowSpace + r));
 
-  return { cells, filledPath, emptyPath, filledCount, width, height };
+  return {
+    cells,
+    filledPath,
+    emptyPath,
+    filledCount,
+    width,
+    height,
+    y0: round2(pad),
+    y1: round2(pad + 2 * r + (rows - 1) * rowSpace),
+  };
 }

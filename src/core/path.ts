@@ -1,7 +1,7 @@
 // SVG path builders. Inputs are points ALREADY in pixel/viewBox
 // space; `null` breaks the line into separate subpaths (gaps). Coords
-// are rounded to 2 decimals at generation (: smaller output + stable
-// attribute assertions, ). Static-safe: no measurement, no DOM.
+// are rounded to 2 decimals at generation — smaller output + stable attribute
+// assertions. Static-safe: no measurement, no DOM.
 import { round2 as r, type XY } from "./types.js";
 
 export type Curve = "linear" | "smooth" | "step";

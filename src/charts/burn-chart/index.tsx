@@ -7,7 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_BURN, type BurnStrings } from "../../core/strings-burn.js";
 import { burnGeometry, type BurnGeometry, type BurnMode } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -45,7 +45,8 @@ export interface BurnChartProps {
   mode?: BurnMode | undefined;
   /** The dotted projection to the deadline. Default true. */
   projection?: boolean | undefined;
-  /** Work-unit noun for the summary (default "points"). */
+  /** Work-unit noun for the summary and readout. Defaults to `strings.burnWork`
+   *  ("points" in EN) so a localized bundle can replace it. */
   work?: string | undefined;
   /** Period noun for the summary + gap label (default "day"). */
   unit?: string | undefined;
@@ -71,7 +72,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
     data,
     mode = "down",
     projection = true,
-    work = "points",
+    work,
     unit = "day",
     label = "gap",
     domain,
@@ -89,6 +90,10 @@ export function BurnChart(props: BurnChartProps): ReactNode {
     children,
   } = props;
 
+  // The work noun defaults from `strings`, not from a literal: it is rendered
+  // display text, so an English default here would survive a localized bundle.
+  const workWord = work ?? strings.burnWork;
+
   const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-burn-chart ${className}` : "mc-burn-chart";
@@ -96,7 +101,14 @@ export function BurnChart(props: BurnChartProps): ReactNode {
 
   const probe = burnGeometry({ width, height, plan, actual, mode, projection, domain });
   const gapText = (delta: number) => `${delta > 0 ? "+" : ""}${delta} ${unit.charAt(0)}`;
-  const showLabel = label === "gap" && probe?.landing != null;
+  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
+  // box a line of text cannot be seated inside the plot at all. The readout
+  // DROPS rather than spilling past the viewBox, and because the gutter is
+  // derived from it the reserved space goes with it — the plot keeps its own
+  // width and simply stops paying for text it no longer draws. Pure arithmetic:
+  // the static path may never measure text.
+  const showLabel =
+    label === "gap" && probe?.landing != null && labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? gapText(probe!.landing!.delta) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
@@ -135,7 +147,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         burnSummary(
           geo,
           fmt,
-          { unit, work, mode, elapsed: actual.length, total: plan.length },
+          { unit, work: workWord, mode, elapsed: actual.length, total: plan.length },
           strings,
         ));
   const lineColor = color ?? "var(--mc-accent)";
@@ -167,6 +179,10 @@ export function BurnChart(props: BurnChartProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Zero-anchored: "nothing left to burn" is the bottom of the frame, and
+      // that floor is the whole read, so it stands on the text baseline. The
+      // pad comes from the geometry so the seat can't drift from the scales.
+      seat={{ mode: "floor", bottom: height - geo.pad }}
       className={cls}
       style={rootStyle}
     >

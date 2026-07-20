@@ -126,14 +126,15 @@ down builds any combination for you.)
      particular face wants marks a hair off the line. */
   --mc-inline-nudge: 0em;
 
-  /* Optical lift for centred glyph marks (arrow, dot, moon…) that sit on the
-     x-height seat instead of the baseline — font-relative. 0em to centre exactly
-     on the x-height; the default nudges toward the cap-height midpoint. */
-  --mc-glyph-nudge: -0.04em;
+  /* Extra optical shift for centred marks (arrow, dot, moon, dials, strips) on
+     top of the cap-band seat — font-relative, negative lifts. 0em by default:
+     the seat already lands on the true cap midpoint, so there is nothing left
+     to correct unless a display face has an unusual cap ratio. */
+  --mc-glyph-nudge: 0em;
 
   /* Motion & type */
 
-  /* Entrance timing for interactive entries; static charts never animate. */
+  /* Motion duration — readout transitions, value pulses, entrance animation. */
   --mc-duration: 300ms;
 
   /* Ease-out entrance; no bounce or loop. */
@@ -146,7 +147,8 @@ down builds any combination for you.)
      face to give numbers their own typeface without touching the page font. */
   --mc-font-numeric: var(--mc-font);
 
-  /* Interactive readout chip (hover/focus). Defaults to system canvas. */
+  /* Interactive readout chip (hover, focus, or a pinned selection).
+     Defaults to system canvas. */
   --mc-surface: Canvas;
   --mc-surface-ink: CanvasText;
   --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);
@@ -162,12 +164,12 @@ The colour tokens split into two groups, and knowing which is which is what keep
 says. Color encodes; it never merely decorates.
 
 **Categorical colors are a last resort.** Most microcharts show one series and never touch the palette. When a chart
-genuinely needs several, the six `--mc-cat-*` hues are ordered high-contrast-first and chosen to survive color-vision
-differences _and_ grayscale print — so a two-series chart automatically reaches for the most separable pair.
+genuinely needs several, the six `--mc-cat-*` hues are lightness-ordered for grayscale and colour-vision separation, and
+gold leads because true yellow is too low-contrast on a light surface.
 
 To recolour the series on _one_ instance without touching the global palette, the categorical charts (`SegmentedBar`,
 `StackedArea`, `PartitionStrip`, `Hypnogram`, `MicroDonut`) take a `colors` array — cycled per series, overriding
-`--mc-cat-*` just there. A rolled-up "Other" or an emphasised node keeps its neutral/accent role.
+`--mc-cat-*` just there. A rolled-up "Other" segment stays neutral rather than taking a series colour.
 
 <LiveDemo
   label="Per-instance colors[]"
@@ -190,16 +192,17 @@ To recolour the series on _one_ instance without touching the global palette, th
 ## Presets
 
 Setting tokens by hand is one path; a **preset** is a whole look bundled under one name, applied with a `data-mc-theme`
-attribute — pure CSS, zero JavaScript. They change how charts _look_, never what the data _means_.
+attribute — pure CSS, zero JavaScript. They change how charts _look_, never what the data _means_. `modern` is what you
+get with no attribute at all: it's the base token set, not a bundle layered on top, so there's nothing to apply.
 
 <LiveDemo
   label="Presets"
-  code={`<div data-mc-theme="modern"><Sparkline data={data} dots="minmax" /></div>
+  code={`<div><Sparkline data={data} dots="minmax" /></div> {/* modern — the default, no attribute */}
 <div data-mc-theme="editorial"><Sparkline data={data} dots="minmax" /></div>
 <div data-mc-theme="vivid"><Sparkline data={data} dots="minmax" /></div>
 <div data-mc-theme="mono"><Sparkline data={data} dots="minmax" /></div>`}
 >
-  <div data-mc-theme="modern">
+  <div>
     <Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={28} dots="minmax" title="modern" />
   </div>
   <div data-mc-theme="editorial">
@@ -217,10 +220,17 @@ What each preset retunes — every other token stays at its default:
 
 <PresetDeltas />
 
-The last two — `print` and `eink` — are output-context bundles rather than a look you'd ship on screen. `print` deepens
-the ink and thins the stroke for paper; `eink` drops to grayscale and lets sign ride lightness (positive black, negative
-gray) with heavier strokes for a low-refresh e-paper panel. Apply them the same way — `data-mc-theme="print"` on the
-region you're about to render.
+The last two — `print` and `eink` — are output-context bundles rather than a look you'd ship on screen. `print` pins a
+near-black ink, deepens the valence colours for CMYK, and thins the stroke to `1.25`; `eink` drops to grayscale and lets
+sign ride lightness (positive black, negative gray) with a `2` stroke for a low-refresh e-paper panel. Apply them the
+same way — `data-mc-theme="print"` on the region you're about to render. Both pin a fixed light-surface ink, so both
+also ship hand-tuned dark twins: on a dark viewer `eink` flips to true night mode (white ink on black) and `print` lifts
+to a dark-paper ink, while the stroke weight and band identity carry over.
+
+The look presets — `editorial`, `mono`, `vivid`, `print`, `eink` — also answer to `data-mc-preset`, the page-global
+form: set it once on `<html>` for an app shell, and a nearer `data-mc-theme` still wins by proximity. `dark` is the
+exception, matching `data-mc-theme="dark"` only, because it's a colour-scheme scope rather than a look you'd pin
+app-wide.
 
 <Callout type="info">
   Every preset above carries a **Copy tokens** button, and the [studio below](#copy-tokens) lets you pair any preset
@@ -260,9 +270,10 @@ import { MicroProvider } from "@microcharts/react";
 ```
 
 It renders a single `<div>` that sets `data-mc-theme` (the preset) plus any `tokens` as inline `--mc-*` custom
-properties — identical to writing them by hand. `theme` takes any preset (`modern`, `editorial`, `mono`, `vivid`,
-`dark`, plus the output-context `print` and `eink`); `tokens` takes any `--mc-*` overrides. Reach for whichever reads
-better in your code — it's the same cascade underneath.
+properties — identical to writing them by hand. `theme="modern"` writes no attribute, since modern _is_ the base token
+set. `theme` takes any preset (`modern`, `editorial`, `mono`, `vivid`, `dark`, plus the output-context `print` and
+`eink`); `tokens` takes any `--mc-*` overrides. Reach for whichever reads better in your code — it's the same cascade
+underneath.
 
 ## Build a theme from one colour
 
@@ -305,6 +316,7 @@ One accent, a full derived palette (these are the real values `defineTheme` retu
       "--mc-cat-3": "#bc7548",
       "--mc-cat-4": "#6d7218",
       "--mc-cat-5": "#2d9e82",
+      "--mc-cat-6": "#04759f",
     }}
   >
     <SegmentedBar
@@ -322,10 +334,11 @@ One accent, a full derived palette (these are the real values `defineTheme` retu
   </div>
 </LiveDemo>
 
-The result carries everything you need for any delivery: `vars` (a `--mc-*` object), `style` (the same, ready to spread
-onto `MicroProvider` or any element), `css(selector)` (a string with the dark-mode twin included), and `extend()` to
-spin a variant off an existing theme. Extend a preset, pin any token, or pass an explicit palette when you don't want
-derivation:
+The result carries everything you need for any delivery: `vars` (a `--mc-*` object), `darkVars` (the derived dark twins,
+empty when `dark: false`), `style` (an alias of `vars`, ready to spread onto `MicroProvider` or any element),
+`css(selector = ":root")` (a string with the `prefers-color-scheme: dark` block included), `toString()` (the same as
+`css(":root")`), and `extend()` to spin a variant off an existing theme. Extend a preset, pin any token, or pass an
+explicit palette when you don't want derivation:
 
 ```tsx
 // extend a preset — the brand accent flows through
@@ -339,6 +352,16 @@ defineTheme({
   accent: "#6d28d9",
   cat: ["#2563eb", "#db2777", "#65a30d"],
 });
+
+// derive a specific number of categorical tones instead of the default six
+defineTheme({ accent: "#6d28d9", cat: 3 });
+
+// opt out of accent-seeded derivation, or out of dark twins entirely
+defineTheme({ accent: "#6d28d9", derive: false });
+defineTheme({ accent: "#6d28d9", dark: false });
+
+// override just some dark twins (the rest stay auto-derived)
+defineTheme({ accent: "#6d28d9", dark: { accent: "#a78bfa" } });
 
 // compose a compact variant off an existing theme
 defineTheme({ density: 0.85 }).extend({ labelWeight: 500 });
@@ -361,6 +384,15 @@ still comes from `width`/`height`, so nothing reflows unexpectedly.
   --mc-density: 0.85;
 }
 ```
+
+One asymmetry worth knowing: **stroke and gap scale without limit, but the label stops scaling at 1.25.** Direct labels
+sit in a gutter the chart reserves from a character-count estimate while it draws — server-side, where text cannot be
+measured. That reservation is fixed at render time and cannot see a CSS variable set later, so past about 1.25 the text
+outgrows the space held for it and paints outside the chart. Below `1` there is no such limit: the label shrinks inside
+a gutter already reserved for something bigger, which is always safe.
+
+So `--mc-density: 2` gives you double-weight strokes and double gaps, with labels at 1.25×. If you want genuinely larger
+text, scale the chart — `width`/`height`, or `--mc-label-size` — rather than leaning on density.
 
 ## The font
 
@@ -393,9 +425,11 @@ in a dedicated face — a tabular numeric font, or a mono for a data-dense KPI �
 
 ## The readout surface
 
-The only opaque plane in the whole library is the value chip an interactive chart shows on hover or focus. Its three
-`--mc-surface*` tokens default to the system `Canvas`, so it adapts to light, dark, and forced-colors with no
-configuration. Point them at your popover tokens when you want the chip to match a themed surface exactly.
+The only opaque plane in the whole library is the value chip an interactive chart shows for its active unit — under the
+pointer, under keyboard focus, or pinned in place after a click, tap, or **Enter**. Its three `--mc-surface*` tokens
+default to the system `Canvas`, so it adapts to light, dark, and forced-colors with no configuration. Point them at your
+popover tokens when you want the chip to match a themed surface exactly — one set of tokens covers the hovered, focused,
+and pinned states alike.
 
 ## Dark mode and forced colors
 
@@ -405,3 +439,6 @@ surface. microcharts follows `prefers-color-scheme` out of the box, and you can 
 
 Under Windows High Contrast (`forced-colors`), the semantic tokens defer to system colors — ink to `CanvasText`, accent
 to `Highlight`, muted marks to `GrayText` — so a chart stays legible even when your palette is overridden entirely.
+
+`prefers-contrast: more` is handled too: charts bump `--mc-stroke-width` to `2` and deepen `--mc-band` from an 8% to a
+16% mix of the ink, so lines and normal-range shading both gain weight without you configuring anything.

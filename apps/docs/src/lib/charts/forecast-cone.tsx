@@ -1,6 +1,5 @@
 import { ForecastCone } from "@microcharts/react/forecast-cone";
-import { ForecastCone as ForecastConeInteractive } from "@microcharts/react/forecast-cone/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // weekly revenue ($M): 7 weeks of history, a 4-week widening forecast
@@ -98,21 +97,6 @@ const history = [30, 32, 31, 34, 36, 35, 38];`,
 export function Preview() {
   return <ForecastCone data={HIST} forecast={FORE} summary={false} width={150} height={24} />;
 }
-
-export const showcase = {
-  hint: "widening forecast",
-  Node: () => (
-    <ForecastCone
-      data={HIST}
-      forecast={FORE}
-      target={45}
-      title="Q4 revenue"
-      width={150}
-      height={24}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "p50", label: "inner band", init: true },
@@ -143,30 +127,6 @@ export const playground: PlaygroundSpec = {
       "  forecast={forecast}",
       s.target && "  target={45}",
       s.label !== "landing" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ForecastConeInteractive
-      data={HIST}
-      forecast={s.p50 ? FORE : { mid: FORE.mid, p80: FORE.p80 }}
-      target={s.target ? 45 : undefined}
-      label={s.label as "landing" | "none"}
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={28}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<ForecastCone",
-      "  data={history}",
-      "  forecast={forecast}",
-      s.target && "  target={45}",
-      s.label !== "landing" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -308,28 +268,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<ForecastCone data={history} forecast={forecast} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <ForecastConeInteractive
-      data={HIST}
-      forecast={FORE}
-      summary={false}
-      width={150}
-      height={24}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

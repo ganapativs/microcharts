@@ -1,17 +1,18 @@
 "use client";
-// Interactive <GradeProfile>. One pointer listener maps x → the
-// segment under the cursor; ←/→ step segments. Each announces the distance,
-// grade, and cumulative climb — the readout gives the TRUE grade, not the bin.
-// Composes the static component (canon).
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+// Interactive <GradeProfile>. useActivePicker owns interaction: one pointer
+// listener maps x → the segment under the cursor, ←/→ step segments, click /
+// Enter / Space selects (onSelect). Each unit announces the distance, grade,
+// and cumulative climb — the readout gives the TRUE grade, not the bin.
+// Composes the static component (canon) — the SVG is never re-implemented.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_GRADE_PROFILE } from "../../core/strings-grade-profile.js";
@@ -23,7 +24,6 @@ import {
   type GradeProfileProps,
 } from "./index.js";
 
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 const DEFAULT_BINS = [3, 6, 10] as const;
 
 // Segments quantize into 4 grade bins; bin 1 ("moderate") carries no ink
@@ -33,7 +33,7 @@ const DEFAULT_BINS = [3, 6, 10] as const;
 const SEGMENT_SELECTOR =
   'path[data-mc-ink="band"], path[data-mc-ink="negative"], path[data-mc-ink="bar"], path[data-mc-cat="1"]';
 
-export interface InteractiveGradeProfileProps extends GradeProfileProps {
+export interface InteractiveGradeProfileProps extends GradeProfileProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): the baseline-anchored terrain
    * segments rise into place when the chart first mounts client-side. Inert
@@ -56,6 +56,12 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -76,7 +82,46 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pct = useMemo(() => gradePercent(locale), [locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // index = SEGMENT index (the span between two consecutive plotted points);
+  // non-finite / non-monotone pairs drop out as gaps, so this is a unit
+  // position, not an index into `data`.
+  const locate = useCallback(
+    (x: number) => {
+      const segs = geo.segments;
+      if (segs.length === 0) return null;
+      // Nearest by gap, not by containment: the segments do NOT tile the width —
+      // a non-finite or non-monotone pair leaves a real hole — so a containment
+      // miss must resolve to the closest neighbour, never to the last segment.
+      let best = 0;
+      let bestD = Infinity;
+      segs.forEach((s, i) => {
+        const d = x < s.x0 ? s.x0 - x : x > s.x1 ? x - s.x1 : 0;
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [geo],
+  );
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.segments[i]?.grade ?? null }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.segments.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -86,52 +131,27 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
         : gradeProfileSummary(geo, strings, fmt, pct);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      const segs = geo.segments;
-      if (segs.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      let i = segs.findIndex((s) => x >= s.x0 && x <= s.x1);
-      if (i < 0) i = x <= segs[0]!.x0 ? 0 : segs.length - 1;
-      setActive(i);
-    },
-    [geo, width],
-  );
+  const chord = (i: number, pinned: boolean) => {
+    const s = geo.segments[i];
+    if (!s) return null;
+    return (
+      <>
+        <line
+          x1={s.x0}
+          y1={s.y0}
+          x2={s.x1}
+          y2={s.y1}
+          data-mc-ink="accent"
+          data-mc-w={pinned ? "tick" : "full"}
+          vectorEffect="non-scaling-stroke"
+        />
+        <circle cx={s.x1} cy={s.y1} r={1.75} data-mc-ink="accent" />
+      </>
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const total = geo.segments.length;
-      if (total === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(total - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = total - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const seg = active !== null ? geo.segments[active] : undefined;
+  const shown = active ?? selected;
+  const seg = shown !== null ? geo.segments[shown] : undefined;
   const announced = seg
     ? strings.gradeProfileAt(fmt(seg.dEnd), pct(seg.grade), fmt(seg.cumGain))
     : "";
@@ -140,15 +160,9 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
   return (
     <span
       ref={hostRef}
-      className="mc-grade-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-grade-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticGradeProfile
         {...rest}
@@ -161,22 +175,11 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       >
-        {seg ? (
-          <>
-            <line
-              x1={seg.x0}
-              y1={seg.y0}
-              x2={seg.x1}
-              y2={seg.y1}
-              data-mc-ink="accent"
-              data-mc-w="full"
-              vectorEffect="non-scaling-stroke"
-            />
-            <circle cx={seg.x1} cy={seg.y1} r={1.75} data-mc-ink="accent" />
-          </>
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus chord is transient. */}
+        {selected !== null && selected !== active ? chord(selected, true) : null}
+        {active !== null ? chord(active, false) : null}
         {rest.children}
       </StaticGradeProfile>
       <LiveRegion>{announced}</LiveRegion>
@@ -185,7 +188,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
           className="mc-spark-readout"
           style={{ left: `${(midX / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {pct(seg.grade)}
+          {`${fmt(seg.dEnd)}: ${pct(seg.grade)}, ${fmt(seg.cumGain)} gained`}
         </span>
       ) : null}
     </span>

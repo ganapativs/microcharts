@@ -1,9 +1,8 @@
 import { LikertStrip } from "@microcharts/react/likert-strip";
-import { LikertStrip as LikertStripInteractive } from "@microcharts/react/likert-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const SURVEY = [
+export const SURVEY = [
   { label: "Strongly disagree", value: 10 },
   { label: "Disagree", value: 14 },
   { label: "Neutral", value: 14 },
@@ -80,12 +79,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <LikertStrip data={SURVEY} summary={false} width={130} height={20} />;
 }
-
-export const showcase = {
-  hint: "sentiment",
-  Node: () => <LikertStrip data={SURVEY} title="Q1 satisfaction" width={130} height={20} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -119,28 +112,6 @@ export const playground: PlaygroundSpec = {
       "  data={responses}",
       s.neutral !== "split" && `  neutral="${s.neutral}"`,
       s.label !== "ends" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <LikertStripInteractive
-      data={SURVEY}
-      neutral={s.neutral as "split" | "omit"}
-      label={s.label as "ends" | "net" | "none"}
-      summary={false}
-      animate={ui.animate}
-      width={260}
-      height={26}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<LikertStrip",
-      "  data={responses}",
-      s.neutral !== "split" && `  neutral="${s.neutral}"`,
-      s.label !== "ends" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -280,19 +251,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<LikertStrip data={responses} />`;
 }
-
-export function PreviewLive() {
-  return <LikertStripInteractive data={SURVEY} summary={false} width={130} height={20} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -40,4 +40,21 @@ describe("interactive <BreathingDot>", () => {
     // no ring while unknown
     expect(screen.container.querySelectorAll("circle").length).toBe(1);
   });
+
+  it("click fires onSelect with the level + band name", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<BreathingDot value={0.9} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-breathing-live") as HTMLElement;
+    wrap.click();
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 0.9, label: "strained" });
+  });
+
+  it("Enter fires onSelect", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(<BreathingDot value={0.2} onSelect={(d) => picks.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-breathing-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 0.2, label: "calm" });
+  });
 });

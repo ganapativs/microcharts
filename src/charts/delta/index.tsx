@@ -20,6 +20,8 @@ const GLYPH = {
 export interface DeltaModel {
   /** Signed value for display (`+12.4%`, `−3%`, or `—` for non-finite). */
   display: string;
+  /** The signed number actually encoded (fraction when `from` is given); `null` if non-finite. */
+  shown: number | null;
   /** `pos` | `neg` | `flat` (drives the valence color). */
   valence: "pos" | "neg" | "flat";
   glyphKey: "up" | "down" | "flat";
@@ -45,6 +47,7 @@ export function deltaModel(props: DeltaProps): DeltaModel {
 
   return {
     display,
+    shown: finite ? shown : null,
     valence: sign === 0 ? "flat" : sign === goodDir ? "pos" : "neg",
     glyphKey: sign > 0 ? "up" : sign < 0 ? "down" : "flat",
     summary: sign === 0 ? "No change." : `${sign > 0 ? "Up" : "Down"} ${magnitude}.`,

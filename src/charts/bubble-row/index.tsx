@@ -7,6 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_BUBBLE, type BubbleStrings } from "../../core/strings-bubble.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
+import { isFiniteValue } from "../../core/types.js";
 import { bubbleRowGeometry, type BubbleAlign } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -88,7 +89,10 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
 
   const text = (i: number): string | null => {
     const d = data[i]!;
-    if (label === "none" || d.value === null) return null;
+    // The geometry already treats any non-finite value as "no bubble" (it draws
+    // the minR presence ring). The numeral has to agree: `=== null` alone let
+    // NaN/±Infinity through to `fmt` and painted a literal "NaN" label.
+    if (label === "none" || !isFiniteValue(d.value)) return null;
     return label === "both" ? `${d.label} ${fmt(d.value)}` : fmt(d.value);
   };
   // Numeral widths feed the geometry so bubbles spread to fit every number — the
@@ -116,6 +120,8 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
   const accName = resolveSummary(summary, () =>
     bubbleRowSummary(data, { strings, format, locale }),
   );
+  // The numerals' text baseline — also the inline seat's floor when they render.
+  const labelY = geo.height - PAD - fontSize * 0.32;
 
   const placed = geo.bubbles
     .map((b) => {
@@ -131,6 +137,21 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Numerals, when they render, are the lowest ink and the row stops being
+      // symmetric — so they take the floor, and their own text baseline becomes
+      // the seat. Seating the bubble band instead would leave the whole numeral
+      // band hanging below the line and into the next one. With `label="none"`
+      // the align prop decides, because it decides whether there's a floor at
+      // all: `baseline` sits the circles on a shelf — weights on a bench — that
+      // belongs on the text baseline, while `center` is a symmetric specimen row
+      // with nothing underneath it.
+      seat={
+        labelBand > 0
+          ? { mode: "floor", bottom: labelY }
+          : align === "baseline"
+            ? { mode: "floor", bottom: geo.y1 }
+            : { mode: "center", top: geo.y0, bottom: geo.y1 }
+      }
       className={className ? `mc-bubble ${className}` : "mc-bubble"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
@@ -150,7 +171,7 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
         <text
           key={`t${p.index}`}
           x={p.x}
-          y={geo.height - PAD - fontSize * 0.32}
+          y={labelY}
           fontSize={fontSize}
           textAnchor="middle"
           data-mc-ink="label"

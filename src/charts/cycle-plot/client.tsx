@@ -1,18 +1,41 @@
 "use client";
-// Interactive <CyclePlot>. ←/→ step slots (announcing the slot's
-// center, cycle count, and drift); ↑/↓ step cycles within the focused slot
-// (announcing individual observations). A pointer picks the slot under the
-// cursor. Composes the static component (canon); the focus band + readout chip
-// are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <CyclePlot>. ←/→ step slots in render order (left→right, skipping
+// empty slots), announcing each slot's center, cycle count, and drift;
+// Enter/Space/click pins a slot (onSelect). A pointer picks the slot under the
+// cursor. useActivePicker owns interaction, composing the static component
+// (canon); the focus band + readout chip are overlay children.
+//
+// Index space: the navigable unit is the SLOT (index = slot index, render/
+// left-to-right order — a rollup, not the original data index); value = the
+// slot's center (mean/median), or `null` for an empty slot; label = the slot
+// name when supplied.
+//
+// TWO-LEVEL NAVIGATION, one-level contract. ←/→ walk slots (the kernel's axis);
+// ↑/↓ drill into the individual observations WITHIN the active slot. The drill
+// is deliberately CHART-LOCAL: `useActivePicker` stays single-axis so the ~84
+// other picker charts don't carry a compound-selection kernel for one chart's
+// feature. It is held as `{slot, cycle}` — keyed by slot, so moving slots
+// implicitly drops it with no reset effect — and driven from `step`, which
+// consumes ↑/↓ (returning the unchanged slot) and re-renders via its own state.
+// The drill is a READOUT depth, not a second selection axis: onActive/onSelect
+// keep reporting the slot, so the shared contract is unchanged.
+import { useCallback, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { isFiniteValue } from "../../core/types.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CYCLE, type CycleStrings } from "../../core/strings-cycle.js";
 import { cycleGeometry } from "./geometry.js";
 import { CyclePlot as StaticCyclePlot, cycleSummary, type CyclePlotProps } from "./index.js";
 
-export interface InteractiveCyclePlotProps extends CyclePlotProps {
+export interface InteractiveCyclePlotProps extends CyclePlotProps, PickerProps {
   strings?: CycleStrings;
   /**
    * Opt-in entrance motion (default `false`): the spine draws on when the
@@ -25,8 +48,17 @@ export interface InteractiveCyclePlotProps extends CyclePlotProps {
 const slotName = (slots: readonly string[] | undefined, i: number): string =>
   slots?.[i] ?? `slot ${i + 1}`;
 
+/** Within-slot drill state: which slot, and which observation inside it (-1 = none). */
+type Drill = { slot: number; cycle: number } | null;
+
 const driftDir = (d: number): "rising" | "falling" | "steady" =>
   d > 0 ? "rising" : d < 0 ? "falling" : "steady";
+
+/** Localized drift word. `driftDir` stays: the summary passes the English token
+ *  on as a semantic discriminant, which a translator branches on. What must not
+ *  ship is that token rendered straight into the readout as display text. */
+const driftName = (strings: { cycleDriftNames: readonly [string, string, string] }, d: number) =>
+  strings.cycleDriftNames[d > 0 ? 2 : d < 0 ? 0 : 1];
 
 export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
   const {
@@ -44,6 +76,12 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -63,8 +101,112 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
     [width, height, data, period, center, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  // [slot, cycle] — cycle < 0 means the whole-slot readout
-  const [sel, setSel] = useState<{ slot: number; cycle: number } | null>(null);
+
+  // Non-empty slots in render order — the actual navigable stops (empties are
+  // skipped, like the pointer already does).
+  const stops = useMemo(
+    () => (geo ? geo.slots.map((sl, i) => (sl.n > 0 ? i : -1)).filter((i) => i >= 0) : []),
+    [geo],
+  );
+
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || stops.length === 0) return null;
+      let best = stops[0]!;
+      let bestDist = Infinity;
+      for (const i of stops) {
+        const d = Math.abs(geo.slots[i]!.center.x - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      }
+      return best;
+    },
+    [geo, stops],
+  );
+
+  // Within-slot drill: `cycle` is the index into the slot's observations in time
+  // order, -1 meaning "the whole slot" (the ↑ exit rung). Keyed by slot so a
+  // stale drill can never leak onto a different slot's readout. A ref mirrors
+  // the state (the kernel's own pattern) so back-to-back keydowns in one tick
+  // read the fresh cycle instead of the last render's closure.
+  const [drill, setDrill] = useState<Drill>(null);
+  const drillRef = useRef<Drill>(null);
+  const drillTo = (d: Drill): void => {
+    drillRef.current = d;
+    setDrill(d);
+  };
+
+  const step = useCallback(
+    (cur: number, key: string) => {
+      // ↑/↓ drill inside the active slot rather than moving between slots. With
+      // nothing active yet, ↓ enters the first slot's first observation and ↑
+      // just lands on the slot (matching the kernel's "first arrow selects unit
+      // 0" contract). Returning the slot index consumes the key without moving.
+      if (key === "ArrowDown" || key === "ArrowUp") {
+        const slot = cur < 0 ? stops[0] : cur;
+        if (slot === undefined) return null;
+        const n = geo?.values[slot]?.length ?? 0;
+        const d = drillRef.current;
+        const at = d && d.slot === slot ? d.cycle : -1;
+        drillTo({
+          slot,
+          cycle: key === "ArrowDown" ? Math.min(n - 1, at + 1) : Math.max(-1, at - 1),
+        });
+        return slot;
+      }
+      const pos = cur < 0 ? -1 : stops.indexOf(cur);
+      let t = pos;
+      switch (key) {
+        case "ArrowRight":
+          t = Math.min(stops.length - 1, pos + 1);
+          break;
+        case "ArrowLeft":
+          t = pos <= 0 ? 0 : pos - 1;
+          break;
+        case "Home":
+          t = 0;
+          break;
+        case "End":
+          t = stops.length - 1;
+          break;
+        default:
+          return null;
+      }
+      drillTo(null); // a slot move drops the drill (only on keys that move)
+      return stops[t] ?? null;
+    },
+    // `drillTo` touches only a ref + a setter, so it needs no dep of its own.
+    [stops, geo],
+  );
+
+  // index = slot index (render order); value = the slot center, null when empty;
+  // label = the slot's name when supplied.
+  const datum = useCallback(
+    (i: number) => {
+      const c = geo?.slots[i]?.center.value;
+      return {
+        index: i,
+        value: c !== undefined && Number.isFinite(c) ? c : null,
+        label: slots?.[i],
+      };
+    },
+    [geo, slots],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo?.slots.length ?? 0,
+    width,
+    height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -76,97 +218,72 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
           : cycleSummary(geo, { slots, cycleUnit }, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const count = geo?.slots.length ?? 0;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * width;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.slots.forEach((sl, i) => {
-        const d = Math.abs(sl.center.x - px);
-        if (sl.n > 0 && d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setSel({ slot: best, cycle: -1 });
-    },
-    [geo, count, width],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!geo || count === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setSel((p) => ({ slot: Math.min(count - 1, (p?.slot ?? -1) + 1), cycle: -1 }));
-          break;
-        case "ArrowLeft":
-          setSel((p) => ({ slot: p === null || p.slot <= 0 ? 0 : p.slot - 1, cycle: -1 }));
-          break;
-        case "ArrowDown":
-          setSel((p) => {
-            if (p === null) return { slot: 0, cycle: 0 };
-            const n = geo.values[p.slot]?.length ?? 0;
-            return { slot: p.slot, cycle: Math.min(n - 1, p.cycle + 1) };
-          });
-          break;
-        case "ArrowUp":
-          setSel((p) =>
-            p === null
-              ? { slot: 0, cycle: -1 }
-              : { slot: p.slot, cycle: Math.max(-1, p.cycle - 1) },
-          );
-          break;
-        case "Home":
-          setSel({ slot: 0, cycle: -1 });
-          break;
-        case "End":
-          setSel({ slot: count - 1, cycle: -1 });
-          break;
-        case "Escape":
-          setSel(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [geo, count],
-  );
-
-  const sl = sel && geo ? geo.slots[sel.slot] : undefined;
-  const name = sel ? slotName(slots, sel.slot) : "";
-  const cycleVals = sel && geo ? (geo.values[sel.slot] ?? []) : [];
-  const obs = sel && sel.cycle >= 0 ? cycleVals[sel.cycle] : undefined;
-
+  // The slot shown by the focus band + readout: live focus, falling back to a
+  // pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const sl = shown !== null && geo ? geo.slots[shown] : undefined;
+  // Drilled observation, when ↑/↓ have gone below the slot level. The drill is
+  // keyed by slot, so it simply doesn't apply once `shown` moves elsewhere.
+  const cycleVals = shown !== null && geo ? (geo.values[shown] ?? []) : [];
+  const cycle = drill && drill.slot === shown ? drill.cycle : -1;
+  const obs = cycle >= 0 ? cycleVals[cycle] : undefined;
   const announced =
-    sl && sel
+    sl && shown !== null
       ? obs !== undefined
-        ? strings.cyclePoint(name, sel.cycle + 1, cycleVals.length, fmt(obs))
-        : strings.cycleAt(name, center, fmt(sl.center.value), sl.n, cycleUnit, driftDir(sl.drift))
+        ? strings.cyclePoint(slotName(slots, shown), cycle + 1, cycleVals.length, fmt(obs))
+        : // An empty slot has no center (geometry sets center.value = NaN); never
+          // format it — announce the slot as having no data.
+          !isFiniteValue(sl.center.value)
+          ? strings.cycleEmpty(slotName(slots, shown))
+          : strings.cycleAt(
+              slotName(slots, shown),
+              center,
+              fmt(sl.center.value),
+              sl.n,
+              cycleUnit,
+              driftDir(sl.drift),
+            )
       : "";
-  const readout = sl ? (obs !== undefined ? fmt(obs) : fmt(sl.center.value)) : "";
+
+  const band = (i: number, pinned: boolean) => {
+    const s = geo?.slots[i];
+    if (!s) return null;
+    return (
+      <rect
+        x={s.x0}
+        y={0.5}
+        width={Math.max(0, s.x1 - s.x0)}
+        height={height - 1}
+        fill="var(--mc-accent)"
+        fillOpacity={pinned ? 0.14 : 0.08}
+        stroke="var(--mc-accent)"
+        data-mc-w={pinned ? "tick" : "hair"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
   return (
     <span
       ref={hostRef}
-      className="mc-cycle-plot-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setSel(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setSel(null)}
+      {...wrap("mc-cycle-plot-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
+      // The drill is keyboard-only: a pointer picks whole slots, so scrubbing
+      // must not resurrect a drill left on the slot the cursor returns to.
+      // Escape clears everything (the kernel never routes it through `step`).
+      onPointerMove={(e) => {
+        if (drillRef.current) drillTo(null);
+        bind.onPointerMove(e);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") drillTo(null);
+        bind.onKeyDown(e);
+      }}
     >
       <StaticCyclePlot
         {...rest}
+        style={fillFor(style)}
         data={data}
         period={period}
         slots={slots}
@@ -180,27 +297,21 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {sl ? (
-          <rect
-            x={sl.x0}
-            y={0.5}
-            width={Math.max(0, sl.x1 - sl.x0)}
-            height={height - 1}
-            fill="var(--mc-accent)"
-            fillOpacity={0.08}
-            stroke="var(--mc-accent)"
-            data-mc-w="hair"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus band is transient. */}
+        {selected !== null && selected !== active ? band(selected, true) : null}
+        {active !== null ? band(active, false) : null}
         {rest.children}
       </StaticCyclePlot>
-      {sl && geo ? (
+      {sl && geo && shown !== null ? (
         <span
           className="mc-cycle-plot-readout mc-spark-readout"
           style={{ left: `${(sl.center.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {readout}
+          {obs !== undefined
+            ? `${slotName(slots, shown)} ${cycle + 1}/${cycleVals.length}: ${fmt(obs)}`
+            : !isFiniteValue(sl.center.value)
+              ? `${slotName(slots, shown)}: —`
+              : `${slotName(slots, shown)}: ${fmt(sl.center.value)} (${driftName(strings, sl.drift)})`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

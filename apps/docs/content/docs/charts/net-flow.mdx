@@ -124,8 +124,8 @@ answers both.
   />
 </LiveDemo>
 
-The net label and accessible summary both follow `format`/`locale` — 42000 reads "42.000" under `de-DE` rather than the
-English "42,000".
+The net label and accessible summary both follow `format`/`locale` — 38000 reads "38.000" under `de-DE` rather than the
+English "38,000".
 
 ## Edge cases
 
@@ -168,6 +168,8 @@ label's **text** so direction is never carried by color alone.
 The accessible name pairs the net with its gross and counts the healthy periods — **"Net +14k last period; in 57k vs out
 43k; net positive 10 of 12 periods."**. The interactive entry steps the periods and announces inflow, outflow, and the
 signed net together.
+
+<InteractionNote slug="net-flow" />
 
 ## Props
 

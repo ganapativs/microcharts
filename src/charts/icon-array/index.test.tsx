@@ -49,6 +49,20 @@ describe("<IconArray>", () => {
     const { container } = draw(<IconArray value={0.15} total={20} title="Adverse events" />);
     await expectNoA11yViolations(container);
   });
+
+  // Degradation contract: see tests/craft/floor.mjs.
+  it("narrow box: the ratio label drops and the grid reclaims the gutter", () => {
+    const big = draw(<IconArray value={0.15} total={20} width={120} height={40} />).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    // a 9-char gutter would swallow the grid whole at this width
+    const small = draw(<IconArray value={0.15} total={20} width={36} height={12} />).container;
+    expect(small.querySelector("text")).toBeNull();
+    // all 20 countable units still render, and with real area
+    const units = [...small.querySelectorAll("rect")];
+    expect(units.length).toBe(20);
+    expect(Number(units[0]!.getAttribute("width"))).toBeGreaterThan(0.5);
+  });
 });
 
 valueEdgeSuite("IconArray", (value) => <IconArray value={value} title="Edge" />);

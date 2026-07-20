@@ -65,6 +65,10 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A row of calibrated swatches: intensity is colour, never height, so
+      // there is no floor. The cell band is centred in the box by construction
+      // (geometry insets it equally top and bottom), so the box is the seat.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-heat-strip ${className}` : "mc-heat-strip"}
       style={style}
     >

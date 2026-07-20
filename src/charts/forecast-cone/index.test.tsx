@@ -126,3 +126,119 @@ seriesEdgeSuite("ForecastCone", (data) => (
     title="Edge"
   />
 ));
+
+// The shared suite above walks `data` (the history). The FORECAST is the other
+// numeric input and has its own shape (mid[] + [lo,hi] pairs), so it gets the
+// same matrix here: a malformed band must never reach a coordinate or the name.
+const f = (mid: unknown, p80: unknown): ForecastInput => ({ mid, p80 }) as unknown as ForecastInput;
+
+describe("<ForecastCone> degenerate forecast input (tests/craft/robust.mjs)", () => {
+  const CASES: Record<string, ForecastInput> = {
+    "empty mid": f([], []),
+    "single period": f([39], [[36]]), // a SHORT pair — no hi bound
+    "missing p80 rows": f([39, 40, 41], [[36, 42]]),
+    "no p80 at all": f([39, 40], undefined),
+    "all equal": f(
+      [40, 40],
+      [
+        [40, 40],
+        [40, 40],
+      ],
+    ),
+    "null bounds": f(
+      [39, 40],
+      [
+        [null, null],
+        [null, 45],
+      ],
+    ),
+    "NaN and ±Infinity": f(
+      [39, 40],
+      [
+        [Number.NaN, 42],
+        [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY],
+      ],
+    ),
+    "reversed pairs": f(
+      [39, 40],
+      [
+        [42, 36],
+        [45, 35],
+      ],
+    ),
+    negatives: f(
+      [-39, -40],
+      [
+        [-42, -36],
+        [-45, -35],
+      ],
+    ),
+    huge: f(
+      [1e15, 3e15],
+      [
+        [1e15, 2e15],
+        [9e14, 4e15],
+      ],
+    ),
+    tiny: f(
+      [1e-9, 2e-9],
+      [
+        [1e-9, 3e-9],
+        [1e-9, 4e-9],
+      ],
+    ),
+  };
+
+  for (const [label, forecast] of Object.entries(CASES)) {
+    it(`${label} → renders, no non-finite leak, a11y contract holds`, () => {
+      const { container } = draw(<ForecastCone data={HIST} forecast={forecast} title="Edge" />);
+      for (const el of container.querySelectorAll("*"))
+        for (const attr of [
+          "d",
+          "x",
+          "y",
+          "x1",
+          "x2",
+          "y1",
+          "y2",
+          "cx",
+          "cy",
+          "r",
+          "width",
+          "height",
+          "viewBox",
+          "aria-label",
+        ])
+          expect(el.getAttribute(attr) ?? "", `<${el.tagName} ${attr}>`).not.toMatch(
+            /NaN|Infinity/,
+          );
+      expect(container.textContent).not.toMatch(/NaN|Infinity|undefined/);
+      expect(container.querySelector('[role="img"][aria-label]')).not.toBeNull();
+    });
+  }
+
+  it("an unknown interval bound collapses the band onto the median, never to NaN", () => {
+    const { container } = draw(
+      <ForecastCone data={HIST} forecast={f([39], [[36]])} title="Edge" />,
+    );
+    // "…(80% between 36 and 39)…" — the known bound is kept, the missing one
+    // falls back to the median rather than inventing a range.
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain(
+      "80% between 36 and 39",
+    );
+  });
+});
+
+// Degradation contract (tests/craft/floor.mjs): a label the box can no longer
+// seat is DROPPED — never painted outside the viewBox, never stacked on a
+// neighbour — the reserved gutter goes with it, and the mark still renders.
+describe("ForecastCone degradation", () => {
+  it("the landing readout drops under a 7-unit box, the cone still draws", () => {
+    const big = draw(<ForecastCone data={HIST} forecast={FC} width={240} height={32} />).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    const small = draw(<ForecastCone data={HIST} forecast={FC} width={48} height={6} />).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+});

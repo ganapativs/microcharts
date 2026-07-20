@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { Dumbbell } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
-import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -78,11 +78,50 @@ describe("<Dumbbell>", () => {
     );
     await expectNoA11yViolations(container);
   });
+
+  // Degradation contract: a label that no longer fits is DROPPED, never stacked
+  // on its neighbour (the "Paris/Berlin/Rome in a tab header" bug) and never
+  // painted outside the box. See tests/craft/floor.mjs.
+  it("small box: row names drop rather than stacking, dots still render", () => {
+    const rows = [
+      { label: "East", from: 47, to: 1 },
+      { label: "West", from: 41, to: 53 },
+      { label: "South", from: 33, to: 43 },
+      { label: "North", from: 44, to: 57 },
+      { label: "Mid", from: 20, to: 26 },
+    ];
+    const big = draw(<Dumbbell data={rows} width={220} height={80} />).container;
+    expect([...big.querySelectorAll("text")].map((t) => t.textContent)).toContain("South");
+
+    // pitch = 28 / 5 = 5.6 viewBox units, under the 6-unit label line
+    const small = draw(<Dumbbell data={rows} width={77} height={28} />).container;
+    expect(small.querySelectorAll("text").length).toBe(0);
+    // the paired dots — the actual encoding — survive
+    expect(small.querySelectorAll("circle").length).toBeGreaterThanOrEqual(rows.length);
+    // and the gutter went with the labels: the plot reclaims the full width
+    const xs = [...small.querySelectorAll("circle")].map((c) => Number(c.getAttribute("cx")));
+    expect(Math.min(...xs)).toBeLessThan(6);
+  });
 });
 
-seriesEdgeSuite("Dumbbell", (data) => (
-  <Dumbbell
-    data={data.map((v, i) => ({ label: `c${i}`, from: v ?? Number.NaN, to: (v ?? 0) * 1.2 }))}
-    title="Edge"
-  />
-));
+// Both endpoints are encoded, so the matrix runs once per endpoint. The previous
+// spelling wrote `to: (v ?? 0) * 1.2`, which turned every missing endpoint into a
+// measured zero — the opposite of "empty ≠ zero" — and, by deriving `to` from
+// `from`, let the `okFrom` check discard the row before `okTo` was consulted, so
+// a broken `to` guard would have read as passing. One suite per endpoint keeps
+// the other finite and guarantees every matrix value reaches both fields.
+// `label="value"` renders the formatted endpoints: that is where a numeral leak
+// surfaces.
+const dumbbellCase = (data: readonly { label: string; from: number; to: number }[]) => (
+  <Dumbbell data={data} title="Edge" label="value" width={160} height={60} />
+);
+mappedEdgeSuite(
+  "Dumbbell (degenerate from)",
+  (v, i) => ({ label: `c${i}`, from: v as number, to: 10 + i * 5 }),
+  dumbbellCase,
+);
+mappedEdgeSuite(
+  "Dumbbell (degenerate to)",
+  (v, i) => ({ label: `c${i}`, from: 10 + i * 5, to: v as number }),
+  dumbbellCase,
+);

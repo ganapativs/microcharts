@@ -1,13 +1,27 @@
+import type { ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { describeSeries } from "@microcharts/react";
+import { Sparkline } from "@microcharts/react/sparkline";
 import { SectionMark } from "@/components/home/section-mark";
 import { ProviderWall } from "@/components/charts/ai-static";
 import { PROVIDER_GROUPS } from "@/lib/ai-providers";
 import { Reveal } from "@/components/ui/reveal";
 
 /**
- * 05 · Made for models — the page's one dark band. The `dark` class re-scopes
- * the theme tokens, so this is the real hand-tuned dark theme, not a tinted
- * box. Terminal lines land one by one on reveal (hv-term-line).
+ * 04 · Made for models — the page's one dark band, the machine-facing
+ * chapter. Priority order tuned for a human skimming: the tools they already
+ * use come FIRST (the wall answers "does it work with my stack?"), then the
+ * two supporting proofs side by side — the machine surfaces a model reads
+ * from, and a deliberately small hostile-data card (graceful degradation is
+ * table stakes, not a headline: it gets a half-width card, not a section).
+ * The `dark` class re-scopes the theme tokens, so this is the real
+ * hand-tuned dark theme, not a tinted box. Terminal lines land one by one on
+ * reveal (hv-term-line).
+ *
+ * The hostile-data card: each row feeds a genuinely malformed input to the
+ * SAME component, renders whatever it produces, and prints the summary
+ * `describeSeries` generates from it. No try/catch anywhere; the sentence is
+ * computed live (never hand-typed) so it can't drift or lie.
  */
 
 const SURFACES = [
@@ -25,47 +39,74 @@ const SURFACES = [
   },
 ] as const;
 
-const CLAIMS = [
+type Value = number | null;
+
+type Case = {
+  /** The literal, with the hostile bytes tinted so the eye lands on them. */
+  literal: ReactNode;
+  /** What the model actually emitted — fed verbatim to render + describe. */
+  data: readonly Value[];
+};
+
+/** Tint for the bytes that crash a naive chart: NaN, ±Infinity, null, []. */
+function Bad({ children }: { children: ReactNode }) {
+  return <span className="text-[color:var(--mc-negative)]">{children}</span>;
+}
+
+// Four maximally-distinct rows (one summary shape each): non-finite → filtered,
+// empty → no data, single → one value, flat-negative → covers flat AND minus in
+// one line. Kept deliberately small: degradation is a guarantee, not a pitch.
+const CASES: readonly Case[] = [
   {
-    title: "One grammar",
-    body: "The same prop means the same thing on every chart. A model that has seen one chart can write them all.",
+    literal: (
+      <>
+        [<Bad>NaN</Bad>, 3, <Bad>Infinity</Bad>]
+      </>
+    ),
+    data: [NaN, 3, Infinity],
   },
   {
-    title: "Text is the wire format",
-    body: "A reply streams as plain text; each chart block becomes the shipped component the moment it closes.",
+    literal: <Bad>[]</Bad>,
+    data: [],
   },
   {
-    title: "Safe to emit",
-    body: "data alone renders something correct. Bad values degrade to documented behavior, never to a crash in the reply.",
+    literal: <>[7]</>,
+    data: [7],
   },
-] as const;
+  {
+    literal: <>[-4, -4]</>,
+    data: [-4, -4],
+  },
+];
 
 const PROVIDER_COUNT = PROVIDER_GROUPS.reduce((n, g) => n + g.names.length, 0);
 
-export function HomeModelsSection({ catalogTotal }: { catalogTotal: number }) {
+export function HomeModelsSection() {
   return (
     <section className="dark hv-band py-14 text-fd-foreground">
       <div className="mx-auto max-w-shell px-4 sm:px-6">
-        <SectionMark n="05">made for models</SectionMark>
-        <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
-          <Reveal>
-            <h2 className="display text-[length:var(--text-fluid-h2)]">
-              Built to be written by a model, read by a person.
-            </h2>
-            <dl className="mt-6 space-y-5">
-              {CLAIMS.map((c) => (
-                <div key={c.title}>
-                  <dt className="font-medium text-fd-foreground">{c.title}</dt>
-                  <dd className="mt-1 max-w-md text-sm leading-relaxed text-fd-muted-foreground">
-                    {c.body}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
+        <SectionMark n="04">made for models</SectionMark>
 
-          <Reveal delay={80}>
-            <div className="panel overflow-hidden">
+        <Reveal>
+          <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">
+            Built to be written by a model, read by a person.
+          </h2>
+          <p className="mt-4 max-w-2xl text-fd-muted-foreground">
+            A reply streams as plain text, and each chart block becomes the shipped component the
+            moment it closes. Text is the wire format, so the grammar already renders wherever your
+            models write: {PROVIDER_COUNT} assistants, coding agents, and SDKs, no adapter in
+            between.
+          </p>
+        </Reveal>
+
+        <Reveal delay={80} className="mt-8">
+          <ProviderWall compact />
+        </Reveal>
+
+        <div className="mt-10 grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
+          <Reveal delay={120}>
+            <h3 className="font-medium text-fd-foreground">The docs, in model-ready form.</h3>
+            <div className="panel mt-3 overflow-hidden">
               <div className="flex items-center border-b border-hairline px-4 py-2.5">
                 <span className="mono-label">machine surfaces</span>
               </div>
@@ -100,14 +141,55 @@ export function HomeModelsSection({ catalogTotal }: { catalogTotal: number }) {
               kept in sync with package.json#exports, gated by tests
             </p>
           </Reveal>
-        </div>
 
-        <Reveal delay={120} className="mt-10">
-          <p className="mono-label mb-4 opacity-70">
-            reads wherever text does · {PROVIDER_COUNT} tools, {catalogTotal} types
-          </p>
-          <ProviderWall compact />
-        </Reveal>
+          <Reveal delay={160}>
+            <h3 className="font-medium text-fd-foreground">Safe to emit, even mid-stream.</h3>
+            <div className="panel mt-3 overflow-hidden">
+              <div className="flex items-center border-b border-hairline px-4 py-2.5">
+                <span className="mono-label">malformed in · rendered + described out</span>
+              </div>
+              <ul>
+                {CASES.map((c, i) => {
+                  // The chart's accessible name and the visible sentence are
+                  // the SAME describeSeries call, by construction.
+                  const summary = describeSeries(c.data);
+                  return (
+                    <li
+                      key={String(c.data)}
+                      className="hx-stagger flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-hairline px-4 py-2.5 first:border-t-0"
+                      style={{ "--i": i } as React.CSSProperties}
+                    >
+                      <code className="w-[8.5rem] shrink-0 font-mono text-[0.75rem] leading-tight text-fd-foreground">
+                        {c.literal}
+                      </code>
+                      <span className="flex h-[18px] w-12 shrink-0 items-center justify-start">
+                        <Sparkline
+                          data={c.data}
+                          width={48}
+                          height={18}
+                          dots="minmax"
+                          summary={summary}
+                        />
+                      </span>
+                      <span className="min-w-0 flex-1 text-[0.8rem] leading-snug text-fd-muted-foreground">
+                        &ldquo;{summary}&rdquo;
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <p className="mono-label mt-3 opacity-60">
+              no try/catch on this page · documented edge cases, verified in the test suite
+            </p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-fd-muted-foreground">
+              A model mid-reply can&rsquo;t promise clean numbers. <code>data</code> alone renders
+              something correct, and bad values degrade to documented behavior, never to a crash in
+              the reply. The sentence each row writes about itself is what a screen reader hears and
+              a model can quote back.
+            </p>
+          </Reveal>
+        </div>
       </div>
     </section>
   );

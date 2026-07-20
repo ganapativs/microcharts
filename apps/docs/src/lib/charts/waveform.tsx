@@ -1,6 +1,5 @@
 import { Waveform } from "@microcharts/react/waveform";
-import { Waveform as WaveformInteractive } from "@microcharts/react/waveform/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const WAVE = Array.from(
@@ -45,7 +44,7 @@ export const entry: ChartEntry = {
       description: "0–1 played fraction; left buckets tint accent.",
     },
     {
-      name: "variant",
+      name: "mode",
       type: '"bars" | "envelope"',
       required: false,
       description: "Envelope draws the min/max area.",
@@ -55,14 +54,6 @@ export const entry: ChartEntry = {
       type: "boolean",
       required: false,
       description: "Mirror around center; false for magnitude-only.",
-    },
-    {
-      name: "onPointFocus",
-      type: "(index: number, fraction: number) => void",
-      required: false,
-      interactive: true,
-      description:
-        "Fires as focus moves, with the position as a 0–1 fraction — wire scrub-to-seek.",
     },
   ],
   demo: [0.82],
@@ -86,18 +77,12 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <Waveform data={WAVE} summary={false} width={130} height={26} />;
 }
-
-export const showcase = {
-  hint: "signal",
-  Node: () => <Waveform data={WAVE} progress={0.63} title="Voice memo" width={130} height={26} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "variant",
-      label: "variant",
+      key: "mode",
+      label: "mode",
       options: ["bars", "envelope"],
       init: "bars",
     },
@@ -107,7 +92,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <Waveform
       data={WAVE}
-      variant={s.variant as "bars" | "envelope"}
+      mode={s.mode as "bars" | "envelope"}
       mirror={s.mirror as boolean}
       progress={(s.progress as number) / 100}
       summary={false}
@@ -119,33 +104,9 @@ export const playground: PlaygroundSpec = {
     [
       "<Waveform",
       "  data={samples}",
-      s.variant !== "bars" && `  variant="${s.variant}"`,
+      s.mode !== "bars" && `  mode="${s.mode}"`,
       s.mirror === false && "  mirror={false}",
       `  progress={${((s.progress as number) / 100).toFixed(2)}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <WaveformInteractive
-      data={WAVE}
-      variant={s.variant as "bars" | "envelope"}
-      mirror={s.mirror as boolean}
-      progress={(s.progress as number) / 100}
-      animate={ui.animate}
-      summary={false}
-      width={320}
-      height={32}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Waveform",
-      "  data={samples}",
-      s.variant !== "bars" && `  variant="${s.variant}"`,
-      s.mirror === false && "  mirror={false}",
-      `  progress={${((s.progress as number) / 100).toFixed(2)}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -162,8 +123,8 @@ export const recipes: Recipe[] = [
   },
   {
     label: "envelope",
-    code: `<Waveform data={samples} variant="envelope" />`,
-    node: <Waveform data={WAVE} variant="envelope" summary={false} width={200} height={28} />,
+    code: `<Waveform data={samples} mode="envelope" />`,
+    node: <Waveform data={WAVE} mode="envelope" summary={false} width={200} height={28} />,
   },
 ];
 
@@ -247,19 +208,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Waveform data={samples} />`;
 }
-
-export function PreviewLive() {
-  return <WaveformInteractive data={WAVE} summary={false} width={130} height={26} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -101,13 +101,16 @@ bands reveal synchronization, diagonals reveal propagation, and sparse rows reve
 
 Lanes stay aligned to a shared time domain because vertical banding — several sources firing at the same instant — is
 the phenomenon the chart exists to reveal. An empty lane is kept, not dropped: silence is signal. When a lane is so
-dense that ticks would alias into a solid smear, `overflow="bin"` switches it to per-bucket counts shown as opacity and
-the summary says which lanes were binned — the encoding change never hides.
+dense that ticks would alias into a solid smear, it switches to per-bucket counts shown as opacity, and the summary says
+which lanes were binned — the encoding change never hides. That is `overflow="bin"`, the default; `overflow="clip"` opts
+out and keeps one tick per event whatever the density.
 
 ## Accessibility
 
 The accessible name summarises the field — **"4 lanes, 25 events; busiest api (11)."** The interactive entry roves lanes
 with ↑/↓ and events with ←/→, announcing each event's lane, time, and position within the lane.
+
+<InteractionNote slug="event-raster" />
 
 ## Props
 

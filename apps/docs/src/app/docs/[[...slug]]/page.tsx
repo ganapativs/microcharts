@@ -40,7 +40,12 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   ];
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full} breadcrumb={{ enabled: false }}>
+    <DocsPage
+      toc={page.data.toc}
+      full={page.data.full}
+      breadcrumb={{ enabled: false }}
+      footer={{ enabled: true }}
+    >
       <script type="application/ld+json">{jsonLdScript(breadcrumbJsonLd(crumbs))}</script>
       <script type="application/ld+json">
         {jsonLdScript(

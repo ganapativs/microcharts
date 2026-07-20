@@ -26,13 +26,23 @@ export function microDonutGeometry(opts: {
   shares: readonly number[];
   weight: number;
   gapDeg?: number | undefined;
-}): { wedges: Wedge[]; weight: number } {
+}): {
+  wedges: Wedge[];
+  weight: number;
+  /** Top edge of the ring's plot box — the outer radius, not the viewBox edge.
+   *  Butt-capped strokes at rMid reach exactly rOuter, so the band is the box. */
+  y0: number;
+  /** Bottom edge of the ring's plot box. */
+  y1: number;
+} {
   const { size, shares, gapDeg = 2 } = opts;
   const c = size / 2;
   const rOuter = c - 0.5;
+  const y0 = round2(c - rOuter);
+  const y1 = round2(c + rOuter);
   const weight = round2(Math.min(Math.max(opts.weight, 1), rOuter - 0.5));
   const norm = normalizeShares(shares);
-  if (!norm) return { wedges: [], weight };
+  if (!norm) return { wedges: [], weight, y0, y1 };
 
   const rInner = rOuter - weight;
   const rMid = round2((rOuter + rInner) / 2);
@@ -55,5 +65,5 @@ export function microDonutGeometry(opts: {
     });
     angle = a1 + gap;
   });
-  return { wedges, weight };
+  return { wedges, weight, y0, y1 };
 }

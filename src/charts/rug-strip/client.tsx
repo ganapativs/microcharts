@@ -1,16 +1,24 @@
 "use client";
-// Interactive <RugStrip>. One pointer listener; nearest tick by
-// binary search over the sorted positions. ←/→ step through the SORTED
-// observations ("5.2 — 19th of 38."). Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <RugStrip>. useActivePicker owns interaction: one pointer
+// listener + nearest tick by binary search over the sorted positions, ←/→/↑/↓
+// step through the SORTED observations ("5.2 — 19th of 38."), click / Enter /
+// Space pins one (onSelect). Composes the static component (canon).
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import { rugGeometry } from "./geometry.js";
 import { RugStrip as StaticRugStrip, rugSummary, type RugStripProps } from "./index.js";
 
-export interface InteractiveRugStripProps extends RugStripProps {
+export interface InteractiveRugStripProps extends RugStripProps, PickerProps {
   strings?: DistStrings;
   /**
    * Opt-in entrance motion (default `false`): the tiers of ticks fade onto the
@@ -45,6 +53,12 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const width = props.width ?? (orientation === "horizontal" ? 60 : 10);
@@ -72,78 +86,85 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
     [length, width, height, data, domain, markValue, orientation],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
 
-  const auto = rugSummary(geo.ticks, fmt, strings);
-  const accName = summary === false ? undefined : typeof summary === "string" ? summary : auto;
+  // `rugSummary` quantiles the ticks (a sort over every observation) — compute
+  // it only on the path that actually uses it.
+  const accName =
+    summary === false
+      ? undefined
+      : typeof summary === "string"
+        ? summary
+        : rugSummary(geo.ticks, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.ticks.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const pos =
-        orientation === "horizontal"
-          ? ((e.clientX - r.left) / r.width) * length
-          : ((e.clientY - r.top) / r.height) * length;
-      setActive(nearestTick(geo.ticks, pos));
-    },
-    [geo, orientation, length],
+  const locate = useCallback(
+    (x: number, y: number) =>
+      geo.ticks.length === 0 ? null : nearestTick(geo.ticks, orientation === "horizontal" ? x : y),
+    [geo, orientation],
+  );
+  // The navigable unit is one OBSERVATION, and `index` is its RANK in the
+  // ascending-sorted finite values — not its position in `data`. The rug draws
+  // (and announces) observations in sorted order, and non-finite entries are
+  // dropped, so rank is the only stable identity the chart itself exposes.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.ticks[i]?.value ?? null }),
+    [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.ticks.length === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-        case "ArrowDown":
-          next = Math.min(geo.ticks.length - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-        case "ArrowUp":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.ticks.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
+  const { active, selected, bind } = useActivePicker({
+    count: geo.ticks.length,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
-  const activeTick = active !== null ? geo.ticks[active] : undefined;
-  const announced = activeTick
-    ? strings.observation(fmt(activeTick.value), (active ?? 0) + 1, geo.ticks.length)
+  // The tick shown by the crosshair + readout: the live hover/keyboard focus,
+  // falling back to a pinned selection when the pointer has left.
+  const shown = active ?? selected;
+  const shownTick = shown !== null ? geo.ticks[shown] : undefined;
+  const announced = shownTick
+    ? strings.observation(fmt(shownTick.value), (shown ?? 0) + 1, geo.ticks.length)
     : "";
 
+  const mark = (i: number, pinned: boolean) => {
+    const t = geo.ticks[i];
+    if (!t) return null;
+    // pin = "tick" (convention); the transient mark uses "full", not "support",
+    // because the static already emits "support" ticks — "support" would collide.
+    const w = pinned ? "tick" : "full";
+    return orientation === "horizontal" ? (
+      <line
+        x1={t.pos}
+        y1={0}
+        x2={t.pos}
+        y2={height}
+        data-mc-ink="accent"
+        data-mc-w={w}
+        vectorEffect="non-scaling-stroke"
+      />
+    ) : (
+      <line
+        x1={0}
+        y1={t.pos}
+        x2={width}
+        y2={t.pos}
+        data-mc-ink="accent"
+        data-mc-w={w}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
+
   return (
-    <span
-      ref={hostRef}
-      className="mc-rug-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-rug-live", className, style)} {...named(label)} {...bind}>
       <StaticRugStrip
         {...rest}
+        style={fillFor(style)}
         data={data}
         markValue={markValue}
         orientation={orientation}
@@ -155,48 +176,28 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
         height={height}
         summary={false}
       >
-        {activeTick ? (
-          orientation === "horizontal" ? (
-            <line
-              x1={activeTick.pos}
-              y1={0}
-              x2={activeTick.pos}
-              y2={height}
-              data-mc-ink="accent"
-              data-mc-w="full"
-              vectorEffect="non-scaling-stroke"
-            />
-          ) : (
-            <line
-              x1={0}
-              y1={activeTick.pos}
-              x2={width}
-              y2={activeTick.pos}
-              data-mc-ink="accent"
-              data-mc-w="full"
-              vectorEffect="non-scaling-stroke"
-            />
-          )
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus tick is transient. */}
+        {selected !== null && selected !== active ? mark(selected, true) : null}
+        {active !== null ? mark(active, false) : null}
         {rest.children}
       </StaticRugStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {activeTick ? (
+      {shownTick ? (
         <span
           className="mc-spark-readout"
           style={
             orientation === "horizontal"
-              ? { left: `${(activeTick.pos / width) * 100}%`, transform: "translateX(-50%)" }
+              ? { left: `${(shownTick.pos / width) * 100}%`, transform: "translateX(-50%)" }
               : {
                   left: "100%",
-                  top: `${(activeTick.pos / height) * 100}%`,
+                  top: `${(shownTick.pos / height) * 100}%`,
                   bottom: "auto",
                   transform: "translateY(-50%)",
                   marginLeft: "0.3em",
                 }
           }
         >
-          {fmt(activeTick.value)}
+          {fmt(shownTick.value)}
         </span>
       ) : null}
     </span>

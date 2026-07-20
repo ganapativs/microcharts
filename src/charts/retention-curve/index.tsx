@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
 import { retentionGeometry, type RetentionCurveType, type RetentionGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -87,7 +87,13 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
   const cls = className ? `mc-retention-curve ${className}` : "mc-retention-curve";
 
   const probe = retentionGeometry({ width, height, data, benchmark, plateau, curve, domain });
-  const showLabel = label === "last" && probe != null;
+  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
+  // box a line of text cannot be seated inside the plot at all. The readout
+  // DROPS rather than spilling past the viewBox, and because the gutter is
+  // derived from it the reserved space goes with it — the plot keeps its own
+  // width and simply stops paying for text it no longer draws. Pure arithmetic:
+  // the static path may never measure text.
+  const showLabel = label === "last" && probe != null && labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? fmt(probe!.last.value) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
@@ -145,6 +151,10 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The domain is locked to the full share range, so the frame's bottom is
+      // an honest "nobody left" floor and the curve descends toward it — that
+      // floor sits on the text baseline. The benchmark ghost shares the frame.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={cls}
       style={rootStyle}
     >

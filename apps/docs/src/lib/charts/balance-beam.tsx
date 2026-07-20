@@ -1,10 +1,9 @@
 import { BalanceBeam } from "@microcharts/react/balance-beam";
-import { BalanceBeam as BalanceBeamInteractive } from "@microcharts/react/balance-beam/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 type Pair = [{ label: string; value: number }, { label: string; value: number }];
-const FLOW: Pair = [
+export const FLOW: Pair = [
   { label: "Inflow", value: 620 },
   { label: "Outflow", value: 480 },
 ];
@@ -75,12 +74,6 @@ export function Preview() {
     </span>
   );
 }
-
-export const showcase = {
-  hint: "which side wins",
-  Node: () => <BalanceBeam data={FLOW} label="values" title="Cash flow" width={72} height={30} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "left", label: "left", min: 0, max: 1000, step: 20, init: 620 },
@@ -113,31 +106,6 @@ export const playground: PlaygroundSpec = {
       `  data={[{ label: "Inflow", value: ${s.left} }, { label: "Outflow", value: ${s.right} }]}`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       s.label && '  label="values"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <BalanceBeamInteractive
-      data={[
-        { label: "Inflow", value: s.left as number },
-        { label: "Outflow", value: s.right as number },
-      ]}
-      shape={s.shape as "square" | "round"}
-      label={s.label ? "values" : "none"}
-      summary={false}
-      animate={ui.animate}
-      width={120}
-      height={44}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<BalanceBeam",
-      `  data={[{ label: "Inflow", value: ${s.left} }, { label: "Outflow", value: ${s.right} }]}`,
-      s.shape !== "square" && `  shape="${s.shape}"`,
-      s.label && '  label="values"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -288,32 +256,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<BalanceBeam data={[{ label: "A", value: 620 }, { label: "B", value: 480 }]} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <span className="inline-flex items-center gap-4">
-      <BalanceBeamInteractive data={FLOW} summary={false} width={56} height={24} animate />
-      <BalanceBeam
-        data={[
-          { label: "A", value: 500 },
-          { label: "B", value: 500 },
-        ]}
-        summary={false}
-        width={56}
-        height={24}
-      />
-    </span>
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

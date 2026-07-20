@@ -1,6 +1,5 @@
 import { ControlStrip } from "@microcharts/react/control-strip";
-import { ControlStrip as ControlStripInteractive } from "@microcharts/react/control-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // 30 fill-weight readings (g); mostly in control, two excursions
@@ -56,9 +55,9 @@ export const entry: ChartEntry = {
     },
     {
       name: "dots",
-      type: '"out" | "all"',
+      type: '"out" | "all" | "none"',
       required: false,
-      description: "Mark only out-of-control points (default) or every point.",
+      description: "Mark only out-of-control points (default), every point, or none.",
     },
   ],
   demo: DEMO,
@@ -77,12 +76,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <ControlStrip data={DEMO} summary={false} width={150} height={22} />;
 }
-
-export const showcase = {
-  hint: "in / out of control",
-  Node: () => <ControlStrip data={DEMO} title="Line 3 fill weight" width={150} height={22} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -113,30 +106,6 @@ export const playground: PlaygroundSpec = {
       s.limits !== "sigma" && `  limits="${s.limits}"`,
       s.rules && '  rules="we"',
       s.dots && '  dots="all"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ControlStripInteractive
-      data={DEMO}
-      limits={s.limits as "sigma" | "percentile"}
-      rules={s.rules ? "we" : "none"}
-      dots={s.dots ? "all" : "out"}
-      summary={false}
-      animate={ui.animate}
-      width={280}
-      height={26}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<ControlStrip",
-      "  data={weights}",
-      s.limits !== "sigma" && `  limits="${s.limits}"`,
-      s.rules && '  rules="we"',
-      s.dots && '  dots="all"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -245,19 +214,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<ControlStrip data={weights} />`;
 }
-
-export function PreviewLive() {
-  return <ControlStripInteractive data={DEMO} summary={false} width={150} height={22} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

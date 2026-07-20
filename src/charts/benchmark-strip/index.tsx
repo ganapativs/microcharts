@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { round2, type Polarity, type Value } from "../../core/types.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { benchmarkStripGeometry, type BenchmarkStripGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -76,7 +76,11 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
   // label size in viewBox units (~0.62·height, clamped 7–11) — see coverage-strip
   const FONT = labelFont(height, 0.62);
   const fmt = makeFormatter(format, locale);
-  const showLabel = label !== "none";
+  // `labelFont` floors at 7 viewBox units, so below a 7-unit box the readout
+  // cannot be painted inside the strip at all. It DROPS rather than spilling
+  // above and below the box — the band and focal dot stay readable, and the
+  // gutter goes with it so the strip reclaims the full width.
+  const showLabel = label !== "none" && labelFitsY(height / 2, FONT, height);
   const geo = benchmarkStripGeometry({
     width,
     height,
@@ -98,6 +102,8 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        // Empty seats like the drawn strip: same midline, no band to measure.
+        seat={{ mode: "center", top: 0, bottom: height }}
         className={cls}
         style={style}
       >
@@ -128,7 +134,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
   // the percentile/value reads OUT in a clean right gutter (over the band it was
   // cramped + low-contrast) — colored like the dot so it stays tied to the focal
   const midY = round2(height / 2);
-  // pin the label size to viewBox units (see coverage-strip / )
+  // pin the label size to viewBox units (see coverage-strip)
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
@@ -138,6 +144,11 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A focal dot riding the peer bands on a midline — the strip runs along
+      // the value axis, so neither edge is a floor and it centres on the cap
+      // band. `bandH` is a fixed fraction of the height and `bandY` centres it,
+      // so the frame is the plot box; the label gutter only widens the viewBox.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={cls}
       style={rootStyle}
     >

@@ -7,7 +7,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import type { Format } from "../../core/format.js";
 import { parseUTCDay } from "../../core/calendar.js";
 import { isoDate } from "../../core/calendar-grid.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
@@ -67,12 +66,10 @@ export interface CalendarStripProps {
   /** Explicit `[min, max]` for step bucketing; auto-fit when omitted. */
   domain?: readonly [number, number] | undefined;
   /** Cell edge length in viewBox units (default 7 — grid-sibling parity with
-   * ActivityGrid/GardenGrid; ). */
+   * ActivityGrid/GardenGrid). */
   cell?: number | undefined;
   gap?: number | undefined;
   color?: string | undefined;
-  format?: Format | undefined;
-  locale?: string | string[] | undefined;
   strings?: CalendarStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -135,6 +132,10 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Weeks stack downward with no encoding floor — the last row is Sunday,
+      // not a baseline — so the block centres on the cap band. Row count varies
+      // with `weeks`, and the viewBox tracks it, so the seat follows from it.
+      seat={{ mode: "center", top: 0, bottom: geo.height }}
       className={className ? `mc-calendar ${className}` : "mc-calendar"}
       style={style}
     >

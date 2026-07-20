@@ -1,9 +1,8 @@
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
-import { SegmentedBar as SegmentedBarInteractive } from "@microcharts/react/segmented-bar/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const MIX = [
+export const MIX = [
   { label: "Chrome", value: 620 },
   { label: "Safari", value: 240 },
   { label: "Firefox", value: 90 },
@@ -100,14 +99,7 @@ export const entry: ChartEntry = {
 
 export function Preview() {
   return <SegmentedBar data={MIX} summary={false} width={130} height={16} />;
-}
-
-export const showcase = {
-  hint: "composition",
-  Node: () => <SegmentedBar data={MIX} title="Browser share" width={130} height={16} />,
-};
-
-// format/locale/strings/title/summary/id/className/style/children/width/height:
+} // format/locale/strings/title/summary/id/className/style/children/width/height:
 // styling/formatting escape hatches, not chart-shape knobs — no interactive
 
 export const playground: PlaygroundSpec = {
@@ -140,30 +132,6 @@ export const playground: PlaygroundSpec = {
       s.label !== "none" && `  label="${s.label}"`,
       s.order !== "data" && `  order="${s.order}"`,
       s.maxSegments !== 5 && `  maxSegments={${s.maxSegments}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <SegmentedBarInteractive
-      data={MIX}
-      label={s.label as "none" | "percent" | "value"}
-      order={s.order as "data" | "desc"}
-      maxSegments={s.maxSegments as number}
-      summary={false}
-      animate={ui.animate}
-      width={260}
-      height={22}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<SegmentedBar",
-      "  data={mix}",
-      s.label !== "none" && `  label="${s.label}"`,
-      s.order !== "data" && `  order="${s.order}"`,
-      s.maxSegments !== 5 && `  maxSegments={${s.maxSegments}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -286,19 +254,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<SegmentedBar data={mix} />`;
 }
-
-export function PreviewLive() {
-  return <SegmentedBarInteractive data={MIX} summary={false} width={130} height={16} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -17,6 +17,11 @@ export interface HourglassGeometry {
   bottomSand: string;
   /** Falling-sand cue at the neck (only while 0 < value < 1). */
   stream: { x: number; y1: number; y2: number } | null;
+  /** Top edge of the instrument — the outer face of the top cap plate. The
+   *  frame, not the sand, so the seat holds at every value. */
+  y0: number;
+  /** Bottom edge of the instrument — the outer face of the bottom cap plate. */
+  y1: number;
 }
 
 function clamp01(n: number): number {
@@ -84,5 +89,5 @@ export function hourglassGeometry(opts: {
   const stream =
     e > 0.005 && e < 0.995 ? { x: cx, y1: round2(neck - 1), y2: round2(neck + 4) } : null;
 
-  return { frame, caps, topSand, bottomSand, stream };
+  return { frame, caps, topSand, bottomSand, stream, y0: round2(pad), y1: round2(height - pad) };
 }

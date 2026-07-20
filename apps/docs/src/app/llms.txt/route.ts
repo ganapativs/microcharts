@@ -59,8 +59,13 @@ export function GET() {
 
 Use \`${SITE.pkg}\` for React. Import individual charts from subpaths, for example
 \`${SITE.pkg}/sparkline\`. Static entries are hook-free and React Server Component safe.
-Interactive entries live under \`/interactive\`. Theme with \`--mc-*\` CSS variables, or build a
-palette from one accent with \`defineTheme\` from \`${SITE.pkg}/theme\`.
+Interactive entries live under \`/interactive\` and share one interaction contract: hover or
+arrow keys make a unit active, click/tap/Enter/Space selects and pins it, Escape clears,
+Home/End jump to the ends. Read it with \`onActive(datum)\` and \`onSelect(datum)\`, payload
+\`{ index, value, label? }\`; control the pin with \`selectedIndex\` / \`defaultSelectedIndex\`.
+Single-unit scalar charts (Delta, Progress, StatusDot, Bullet, …) take \`onSelect\` only.
+Theme with \`--mc-*\` CSS variables, or build a palette from one accent with \`defineTheme\` from
+\`${SITE.pkg}/theme\`.
 
 ${guideBlocks}
 
@@ -70,6 +75,7 @@ ${chartLines}
 
 ## Machine Interfaces
 
+- [Agent setup prompt](${abs("/agent-setup.md")}): paste-and-run setup for a coding agent — install, wire styles, record conventions.
 - [Chart catalog JSON](${abs("/catalog.json")}): names, import paths, props, data shapes.
 - [Catalog JSON Schema](${abs("/catalog.schema.json")}): the contract the catalog validates against.
 - [Full docs context](${abs("/llms-full.txt")}): complete generated docs text.
@@ -79,6 +85,9 @@ ${chartLines}
 - No pie, needle-gauge/speedometer, battery, waffle, or violin. Part-to-whole at this size is [SegmentedBar](${mdUrl(["charts", "segmented-bar"])}) (comparative) or [MicroDonut](${mdUrl(["charts", "micro-donut"])}) (capped icon-size mix); measure-vs-target is [Bullet](${mdUrl(["charts", "bullet"])}) or [TapeGauge](${mdUrl(["charts", "tape-gauge"])}).
 - No runtime dependencies. Never add one to render a chart.
 - Static charts ship no client JavaScript. Interactivity is a separate \`/interactive\` import.
+- No per-point event handlers, and no wrapping a chart in your own click target. A chart owns its whole gesture surface; use \`onActive\` / \`onSelect\` on the \`/interactive\` entry.
+- \`onPointFocus\` and \`onRunFocus\` were removed. Use \`onActive\` — same signal, one name across the catalog.
+- Not every chart is interactive. [WindBarb](${mdUrl(["charts", "wind-barb"])}) is static-only; [MinimapStrip](${mdUrl(["charts", "minimap-strip"])}) is a range slider with \`onWindowChange([lo, hi])\` rather than a unit picker.
 `;
 
   return new Response(body, {

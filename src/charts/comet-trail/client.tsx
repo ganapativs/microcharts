@@ -4,9 +4,19 @@
 // head decays into the trail. A continuous stream makes the comet; a stalled
 // stream goes still, which is itself the signal. The dot jumps to truth, eased,
 // never simulated between updates. Reduced-motion → instant reposition (the static
-// encoding is already complete). Composes the static component (canon).
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+// encoding is already complete). useActivePicker owns interaction: one pointer
+// listener + nearest-point-by-x math, ←/→ walk the trail (left = older, right =
+// newer), click / Enter / Space selects (onSelect). Composes the static
+// component (canon).
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_COMET_TRAIL, type CometTrailStrings } from "../../core/strings-comet-trail.js";
@@ -18,9 +28,22 @@ import {
   type CometTrailProps,
 } from "./index.js";
 
-export interface InteractiveCometTrailProps extends CometTrailProps {
+export interface InteractiveCometTrailProps extends CometTrailProps, PickerProps {
   strings?: CometTrailStrings;
 }
+
+/** Focus / pinned-selection ring around a shown point. */
+const ring = (m: { cx: number; cy: number; r: number }, pinned: boolean) => (
+  <circle
+    cx={m.cx}
+    cy={m.cy}
+    r={m.r + 1.5}
+    fill="none"
+    stroke="var(--mc-accent)"
+    data-mc-w={pinned ? "tick" : "support"}
+    vectorEffect="non-scaling-stroke"
+  />
+);
 
 export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
   const {
@@ -35,6 +58,12 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     strings = EN_COMET_TRAIL,
     title,
     summary,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
   const fontSize = props.fontSize ?? labelFont(height);
@@ -44,12 +73,20 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
   const labelBand = label === "last" ? fontSize * 3 : 0;
   const geo = useMemo(
     () =>
-      cometTrailGeometry({ values: data, width: width - labelBand, height, domain, trail, pad: 1 }),
-    [data, width, labelBand, height, domain, trail],
+      cometTrailGeometry({
+        values: data,
+        width: width - labelBand,
+        height,
+        domain,
+        trail,
+        pad: 1,
+        // Mirrors the static entry exactly — omitting vPad would compute a
+        // different y scale than the SVG being composed and drift the overlays.
+        vPad: label === "last" ? fontSize * 0.6 : 0,
+      }),
+    [data, width, labelBand, height, domain, trail, label, fontSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null); // trail position, null = head
-  const [announced, setAnnounced] = useState("");
   const prevHead = useRef<{ cx: number; cy: number } | null>(null);
 
   const accName =
@@ -79,54 +116,84 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     );
   }, [geo, reduced, inView, wrapRef]);
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const len = geo.trail.length;
-      if (geo.head === null) return;
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        setActive((p) => {
-          const next = p === null ? 0 : Math.min(len - 1, p + 1);
-          if (len === 0) return null;
-          const t = geo.trail[next]!;
-          setAnnounced(strings.cometTrailAt(next + 1, fmt(data[t.index] ?? NaN)));
-          return next;
-        });
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        setActive((p) => {
-          if (p === null || p === 0) {
-            setAnnounced(cometTrailSummary(data, { trail, strings, format, locale }));
-            return null;
-          }
-          const next = p - 1;
-          const t = geo.trail[next]!;
-          setAnnounced(strings.cometTrailAt(next + 1, fmt(data[t.index] ?? NaN)));
-          return next;
-        });
-      } else if (e.key === "Escape") {
-        setActive(null);
-        setAnnounced("");
+  // Unit = one SHOWN point, in visual left→right order: 0 = oldest point in the
+  // window, count-1 = the head (now). `geo.trail` is newest-first, so it is
+  // walked backwards. Not the data index — the window keeps only the last
+  // `trail + 1` finite values.
+  const marks = useMemo(() => {
+    const out: { cx: number; cy: number; r: number }[] = [];
+    for (let k = geo.trail.length - 1; k >= 0; k--) {
+      const t = geo.trail[k]!;
+      out.push({ cx: t.cx, cy: t.cy, r: t.r });
+    }
+    if (geo.head) out.push({ cx: geo.head.cx, cy: geo.head.cy, r: geo.head.r });
+    return out;
+  }, [geo]);
+
+  // The values behind those marks, same order (non-finite entries are dropped
+  // by the geometry, so the window is taken over the finite values).
+  const shownValues = useMemo(() => {
+    const finite = data.filter((v) => Number.isFinite(v));
+    return finite.slice(finite.length - marks.length);
+  }, [data, marks.length]);
+
+  const locate = useCallback(
+    (x: number) => {
+      if (marks.length === 0) return null;
+      let best = 0;
+      let bestD = Infinity;
+      for (let i = 0; i < marks.length; i++) {
+        const d = Math.abs(marks[i]!.cx - x);
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
       }
+      return best;
     },
-    [geo, data, trail, strings, fmt, format, locale],
+    [marks],
   );
 
-  const activeMark = active !== null ? geo.trail[active] : (geo.head ?? undefined);
+  // value = the point's value.
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: shownValues[i] ?? null }),
+    [shownValues],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: marks.length,
+    width,
+    height: geo.height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const shown = active ?? selected;
+  const shownMark = shown !== null ? marks[shown] : undefined;
+  const shownValue = shown !== null ? shownValues[shown] : undefined;
+  const pinMark = selected !== null && selected !== active ? marks[selected] : undefined;
+  // Age in updates: the head is "now", every earlier point is k updates ago.
+  const announced =
+    shownMark && shownValue !== undefined
+      ? shown === marks.length - 1
+        ? strings.cometTrailNow(fmt(shownValue))
+        : strings.cometTrailAt(marks.length - 1 - shown!, fmt(shownValue))
+      : "";
 
   return (
     <span
       ref={wrapRef}
-      className="mc-comet-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-comet-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticCometTrail
         {...rest}
+        style={fillFor(style)}
         data={data}
         trail={trail}
         label={label}
@@ -139,17 +206,9 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {active !== null && activeMark ? (
-          <circle
-            cx={activeMark.cx}
-            cy={activeMark.cy}
-            r={activeMark.r + 1.5}
-            fill="none"
-            stroke="var(--mc-accent)"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; the focus ring is transient. */}
+        {pinMark ? ring(pinMark, true) : null}
+        {active !== null && marks[active] ? ring(marks[active]!, false) : null}
         {rest.children}
       </StaticCometTrail>
       <LiveRegion>{announced}</LiveRegion>

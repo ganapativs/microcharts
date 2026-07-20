@@ -44,6 +44,19 @@ describe("<GradedBand>", () => {
     const { container } = draw(<GradedBand data={SAMPLE} title="Forecast estimate" />);
     await expectNoA11yViolations(container);
   });
+
+  // Degradation contract: see tests/craft/floor.mjs.
+  it("short box: the median readout drops, the graded bands still render", () => {
+    const draws = [120, 135, 128, 480, 142, 2100, 155, 138, 900, 148];
+    const big = draw(<GradedBand data={draws} label="median" width={160} height={16} />).container;
+    expect(big.querySelector("text")).not.toBeNull();
+
+    // labelFont floors at 7 viewBox units — a 6-unit box cannot seat a line
+    const small = draw(<GradedBand data={draws} label="median" width={56} height={6} />).container;
+    expect(small.querySelector("text")).toBeNull();
+    expect(small.querySelectorAll("rect").length).toBeGreaterThanOrEqual(1);
+    expect(small.querySelector("line")).not.toBeNull(); // median tick survives
+  });
 });
 
 seriesEdgeSuite("GradedBand", (data) => <GradedBand data={data} title="Edge" />);

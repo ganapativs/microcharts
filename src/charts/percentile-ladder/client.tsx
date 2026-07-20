@@ -1,10 +1,18 @@
 "use client";
-// Interactive <PercentileLadder>. One pointer listener + pure
-// nearest-tick math. ←/→ step ticks; each announces its value and its multiple
-// of the median ("p99: 2.1 s — 17× the median."). Composes the static component
+// Interactive <PercentileLadder>. useActivePicker owns interaction: one pointer
+// listener + pure nearest-tick math, ←/→ step ticks, click / Enter / Space
+// selects (onSelect). Each rung announces its value and its multiple of the
+// median ("p99: 2.1 s — 17× the median."). Composes the static component
 // (canon); the probe line is an overlay child re-using geometry.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
@@ -12,11 +20,12 @@ import { round2 } from "../../core/types.js";
 import { percentileLadderGeometry } from "./geometry.js";
 import {
   PercentileLadder as StaticPercentileLadder,
+  ladderFont,
   ladderSummary,
   type PercentileLadderProps,
 } from "./index.js";
 
-export interface InteractivePercentileLadderProps extends PercentileLadderProps {
+export interface InteractivePercentileLadderProps extends PercentileLadderProps, PickerProps {
   strings?: QuantileStrings;
   /**
    * Opt-in entrance motion (default `false`): the percentile ticks pop onto
@@ -41,6 +50,12 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -55,15 +70,60 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     order: "index",
   });
 
-  // must match the static geometry (label font sizes the log-tag gutter)
-  const font = Math.min(9, Math.max(6, Math.round(height * 0.5)));
+  // must match the static geometry (label font sizes the log-tag gutter) —
+  // import the CHART's font, not `core/labels`' same-named helper
+  const font = ladderFont(height);
   const geo = useMemo(
     () => percentileLadderGeometry({ width, height, data, ps, scale, domain: props.domain, font }),
     [width, height, data, ps, scale, props.domain, font],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const ratioFmt = useMemo(() => makeFormatter({ maximumFractionDigits: 1 }, locale), [locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // A collapsed ladder (every percentile identical) paints ONE rung, so it
+  // offers one navigable unit — roving the hidden rungs would cycle the chip
+  // through p50/p90/p99 while the probe line never moved. Same predicate the
+  // static renders by (`geo.collapsed`), read from geometry, not re-derived.
+  const count = geo === null ? 0 : geo.collapsed ? 1 : geo.ticks.length;
+
+  // index = TICK (percentile rung) index in ascending-p order — the requested
+  // `ps` deduped/sorted/capped, not an index into `data`.
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || geo.ticks.length === 0) return null;
+      if (geo.collapsed) return 0;
+      let best = 0;
+      let bestDist = Infinity;
+      geo.ticks.forEach((t, i) => {
+        const d = Math.abs(t.x - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [geo],
+  );
+  const datum = useCallback(
+    (i: number) => {
+      const t = geo?.ticks[i];
+      return { index: i, value: t?.value ?? null, label: t ? `p${t.p}` : undefined };
+    },
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -82,57 +142,24 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     return mid.value;
   }, [geo]);
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || geo.ticks.length === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.ticks.forEach((t, i) => {
-        const d = Math.abs(t.x - x);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, width],
-  );
+  const probe = (i: number, pinned: boolean) => {
+    const t = geo?.ticks[i];
+    if (!t) return null;
+    return (
+      <line
+        x1={t.x}
+        y1={0.5}
+        x2={t.x}
+        y2={height - 0.5}
+        data-mc-ink="accent"
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
+  };
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!geo || geo.ticks.length === 0) return;
-      const pos = active ?? -1;
-      let next = pos;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.ticks.length - 1, pos + 1);
-          break;
-        case "ArrowLeft":
-          next = pos <= 0 ? 0 : pos - 1;
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.ticks.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
-  );
-
-  const tick = active !== null && geo ? geo.ticks[active] : undefined;
+  const shown = active ?? selected;
+  const tick = shown !== null && geo ? geo.ticks[shown] : undefined;
   const announced = tick
     ? strings.ladderProbe(
         String(tick.p),
@@ -144,18 +171,13 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
   return (
     <span
       ref={hostRef}
-      className="mc-percentile-ladder-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-percentile-ladder-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticPercentileLadder
         {...rest}
+        style={fillFor(style)}
         data={data}
         ps={ps}
         scale={scale}
@@ -167,17 +189,9 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         strings={strings}
         summary={false}
       >
-        {tick ? (
-          <line
-            x1={tick.x}
-            y1={0.5}
-            x2={tick.x}
-            y2={height - 0.5}
-            data-mc-ink="accent"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; probe is transient. */}
+        {selected !== null && selected !== active ? probe(selected, true) : null}
+        {active !== null ? probe(active, false) : null}
         {rest.children}
       </StaticPercentileLadder>
       {tick ? (
@@ -185,7 +199,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
           className="mc-ladder-readout mc-spark-readout"
           style={{ left: `${(tick.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`p${tick.p} ${fmt(tick.value)}`}
+          {`p${tick.p} ${fmt(tick.value)} (${ratioFmt(medianValue === 0 ? 0 : round2(tick.value / medianValue))}×)`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

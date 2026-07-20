@@ -1,17 +1,26 @@
 "use client";
-// Interactive <ErrorBudget>. One pointer listener + nearest-step
-// math. ←/→ step; End jumps to now. The live region states remaining AND the
-// local burn multiple. Composes the static component (canon); the crosshair +
-// focus ring + readout chip are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <ErrorBudget>. useActivePicker owns interaction: one pointer
+// listener + nearest-step math, ←/→ step, End jumps to now, click / Enter /
+// Space selects (onSelect). The live region states remaining AND the local burn
+// multiple. Composes the static component (canon); the crosshair + focus ring +
+// pin + readout chip are overlay children.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
+import { labelFont } from "../../core/labels.js";
 import { errorBudgetGeometry } from "./geometry.js";
 import { ErrorBudget as StaticErrorBudget, RATE_FMT, PCT, type ErrorBudgetProps } from "./index.js";
 
-export interface InteractiveErrorBudgetProps extends ErrorBudgetProps {
+export interface InteractiveErrorBudgetProps extends ErrorBudgetProps, PickerProps {
   strings?: ErrorBudgetStrings;
   /**
    * Opt-in entrance motion (default `false`): the remaining-budget line draws
@@ -35,20 +44,77 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
 
-  const geo = useMemo(
-    () => errorBudgetGeometry({ width, height, data, window, rates }),
-    [width, height, data, window, rates],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox. The composed static reserves a right gutter for the "remaining"
+  // label (widening the viewBox past `width`); without it the pointer map and
+  // readout run at a short scale and the crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = errorBudgetGeometry({ width, height, data, window, rates });
+    const showLabel = (props.label ?? "remaining") === "remaining" && base != null;
+    const gutterCh = showLabel ? fmt(base!.remaining.value).length : 0;
+    return errorBudgetGeometry({
+      width,
+      height,
+      data,
+      window,
+      rates,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, window, rates, props.label, fmt]);
 
   const total = window ?? data.length;
+  const count = geo?.points.length ?? 0;
+
+  // Pointer (viewBox space) → nearest observed step by x.
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || count === 0) return null;
+      let best = 0;
+      let bestDist = Infinity;
+      geo.points.forEach((p, i) => {
+        const d = Math.abs(p.x - x);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best;
+    },
+    [geo, count],
+  );
+
+  // Observed-step index; `value` is the budget remaining fraction (0–1).
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo?.points[i]?.value ?? null }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count,
+    width: geo ? geo.totalWidth : width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
   const accName =
     summary === false
       ? undefined
@@ -67,75 +133,24 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
               );
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const count = geo?.points.length ?? 0;
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * geo.totalWidth;
-      let best = 0;
-      let bestDist = Infinity;
-      geo.points.forEach((p, i) => {
-        const d = Math.abs(p.x - px);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setActive(best);
-    },
-    [geo, count],
-  );
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (count === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((prev) => Math.min(count - 1, (prev ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((prev) => (prev === null || prev <= 0 ? 0 : prev - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(count - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [count],
-  );
-
-  const p = active !== null && geo ? geo.points[active] : undefined;
-  const announced = p
-    ? strings.errorBudgetAt(unit, p.index + 1, total, fmt(p.value), RATE_FMT(p.rate))
+  const shown = active ?? selected;
+  const ap = active !== null && geo ? geo.points[active] : undefined; // transient focus
+  const sp = selected !== null && selected !== active && geo ? geo.points[selected] : undefined; // pin
+  const rp = shown !== null && geo ? geo.points[shown] : undefined; // readout + announce
+  const announced = rp
+    ? strings.errorBudgetAt(unit, rp.index + 1, total, fmt(rp.value), RATE_FMT(rp.rate))
     : "";
 
   return (
     <span
       ref={hostRef}
-      className="mc-error-budget-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-error-budget-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticErrorBudget
         {...rest}
+        style={fillFor(style)}
         data={data}
         window={window}
         rates={rates}
@@ -147,12 +162,24 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {p ? (
+        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
+        {sp ? (
+          <circle
+            cx={sp.x}
+            cy={sp.y}
+            r={2.4}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
+        {ap ? (
           <>
             <line
-              x1={p.x}
+              x1={ap.x}
               y1={0.5}
-              x2={p.x}
+              x2={ap.x}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
               data-mc-w="support"
@@ -160,8 +187,8 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
               vectorEffect="non-scaling-stroke"
             />
             <circle
-              cx={p.x}
-              cy={p.y}
+              cx={ap.x}
+              cy={ap.y}
               r={2.4}
               fill="none"
               stroke="var(--mc-accent)"
@@ -172,12 +199,12 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
         ) : null}
         {rest.children}
       </StaticErrorBudget>
-      {p ? (
+      {rp ? (
         <span
           className="mc-error-budget-readout mc-spark-readout"
-          style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${(rp.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${fmt(p.value)} · ${RATE_FMT(p.rate)}×`}
+          {`${fmt(rp.value)} · ${RATE_FMT(rp.rate)}×`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

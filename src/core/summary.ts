@@ -77,6 +77,8 @@ export interface SummaryStrings {
     rightLabel: string,
     rightValue: string,
   ) => string;
+  /** Interactive pan announcement, e.g. "Inflow: 620." (balance-beam). */
+  beamPanAt: (label: string, value: string) => string;
   /** S2 ordinal growth stages (seed/sprout/leaf/bloom). (sprout-row) */
   sproutStageNames: readonly [string, string, string, string];
   /** S2 sprout summary, e.g. "6 accounts; 2 at bloom, 1 at seed." (sprout-row). */
@@ -99,6 +101,8 @@ export interface SummaryStrings {
   ) => string;
   /** S2 bubble announcement, e.g. "EMEA: 1,240." (bubble-row). */
   bubbleAt: (label: string, value: string) => string;
+  /** S2 bubble with no value, e.g. "LATAM: no data." (bubble-row). */
+  bubbleEmpty: (label: string) => string;
   /** S1 tree rings, e.g. "8 years; latest 14, biggest 22 in year 5." (tree-rings). */
   treeRings: (n: number, unit: string, last: string, max: string, argmaxLabel: string) => string;
   /** S1 ring announcement, e.g. "Year 5: 22." (tree-rings). */
@@ -109,8 +113,12 @@ export interface SummaryStrings {
   citySkylineAt: (label: string, value: string) => string;
   /** Skyline building with lit, e.g. "Platform: 46; 70% lit." (city-skyline). */
   citySkylineAtLit: (label: string, value: string, litPct: string) => string;
+  /** Skyline building with no value, e.g. "Web: no data." (city-skyline). */
+  citySkylineEmpty: (label: string) => string;
   /** S4 occupancy, e.g. "34 of 40 seats filled." (honeycomb). */
   honeycomb: (value: string, total: string, unit: string) => string;
+  /** Honeycomb cell announcement, e.g. "Cell 7 of 40 — filled." (honeycomb). */
+  honeycombCell: (index: number, total: number, filled: boolean) => string;
   /** S1 sparse events, e.g. "4 events between Jan and Jun; largest at Mar." */
   constellation: (n: number, first: string, last: string, largest: string) => string;
   /** Single sparse event, e.g. "1 event at Mar." (constellation). */
@@ -255,6 +263,8 @@ export interface SummaryStrings {
   boxStat: (which: "min" | "q1" | "median" | "q3" | "max", value: string) => string;
   /** Waterfall step, e.g. "Refunds: −140, running 1,410." */
   waterfallStep: (label: string, delta: string, level: string) => string;
+  /** Closing-total announcement, e.g. "Total: 1,360." (waterfall) */
+  waterfallTotal: (level: string) => string;
   /** Waterfall summary, e.g. "From 1,200 to 1,540 over 5 steps: +480 gains, −140 losses." */
   waterfall: (start: string, end: string, steps: number, gains: string, losses: string) => string;
   /** Rank announcement, e.g. "Week 4 of 12: #3." `unit` names the period
@@ -271,6 +281,8 @@ export interface SummaryStrings {
   vsMatching: string;
   /** Stack point, e.g. "Point 8 of 12: Mobile 45%, Web 38%, API 17%." */
   stackAt: (position: number, total: number, clauses: string) => string;
+  /** Name for a series the caller left unlabelled, e.g. "Series 2". (stacked-area) */
+  seriesFallback: (position: number) => string;
   /** Stack summary, e.g. "3 series over 12 points; Mobile leads at 45% share." */
   shareShift: (count: number, points: number, topLabel: string, topPct: string) => string;
   /** OHLC period, e.g. "Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20." */
@@ -329,6 +341,13 @@ export interface SummaryStrings {
   iconArray: (k: number, n: number, pct: string, note: "none" | "all" | "sub" | null) => string;
   /** Icon-array unit announcement, e.g. "Unit 7 of 20 — filled. 3 of 20 filled." */
   iconArrayUnit: (index: number, n: number, filled: boolean, filledCount: number) => string;
+  /**
+   * Pictogram unit announcement, e.g. "Unit 7 of 8 — 40% filled." (pictogram-row).
+   * Unlike `iconArrayUnit` a pictogram unit may be PARTLY filled (`fractional`),
+   * so fullness is a three-state discriminator plus a preformatted percentage
+   * (only meaningful for `"part"`).
+   */
+  pictogramUnit: (index: number, n: number, fill: "full" | "part" | "none", pct: string) => string;
   /** Quantile-dots with a threshold, e.g. "4 in 20 chances above 15 min." */
   quantileDots: (past: number, count: number, side: string, threshold: string) => string;
   /** Quantile-dots without a threshold, e.g. "Most likely 12–15; range 4 to 38." */
@@ -405,6 +424,8 @@ export interface SummaryStrings {
   burnFlatlined: string;
   /** Burn "remain" (down) / "done" (up) verb. */
   burnRemain: string;
+  /** Default noun for the work being burned down, e.g. "points". (burn-chart) */
+  burnWork: string;
   burnDone: string;
   /** Burn period announcement, e.g. "day 12: 34 points remain, plan 28." */
   burnAt: (
@@ -559,6 +580,8 @@ export interface SummaryStrings {
   ) => string;
   /** CyclePlot summary, no notable drift, e.g. "Peaks Fri (61), dips Sun (38)." */
   cycleNoDrift: (peakSlot: string, peak: string, dipSlot: string, dip: string) => string;
+  /** Slot drift direction, indexed by sign+1 (falling, steady, rising). (cycle-plot) */
+  cycleDriftNames: readonly [string, string, string];
   /** Slot announcement, e.g. "Mondays: mean 42 across 6 weeks, rising." */
   cycleAt: (
     slotName: string,
@@ -570,6 +593,8 @@ export interface SummaryStrings {
   ) => string;
   /** Within-slot observation, e.g. "Mon, cycle 3 of 6: 44." */
   cyclePoint: (slotName: string, pos: number, total: number, value: string) => string;
+  /** Slot with no observations, e.g. "Wednesdays: no data." (cycle-plot). */
+  cycleEmpty: (slotName: string) => string;
   /** ChangePoint summary, e.g. "Level shifted up 50% around point 34 (mean 32 → 48); stable since." */
   changePoint: (
     dir: "up" | "down",
@@ -597,6 +622,8 @@ export interface SummaryStrings {
   ensembleSingle: (end: string) => string;
   /** Member announcement, e.g. "Member 7 of 24; ends at 42." */
   ensembleAt: (pos: number, total: number, end: string) => string;
+  /** Member with no terminal value, e.g. "Member 7 of 24; no data." (ensemble-ghosts). */
+  ensembleEmpty: (pos: number, total: number) => string;
   /** Zone display names, indexed severe-low → below → in → above → severe-high. */
   tirNames: readonly [string, string, string, string, string];
   /** One zone clause, e.g. "72% in range" (time-in-range). */
@@ -635,6 +662,8 @@ export interface SummaryStrings {
   rubric: (n: number, hi: string, hiScore: string, lo: string, loScore: string) => string;
   /** Interactive criterion announce, e.g. "Correctness: 0.92, weight 40% of total." */
   rubricRow: (label: string, score: string, weightPct: string) => string;
+  /** Criterion with no score, e.g. "Style: no score, weight 20% of total." (rubric-strip). */
+  rubricRowEmpty: (label: string, weightPct: string) => string;
   /** TokenConfidence empty state, e.g. "No tokens." — a distinct key from the
    *  series `noData` so the aggregate EN dictionary keeps both (spread order). */
   noTokens: string;
@@ -656,6 +685,8 @@ export interface SummaryStrings {
   starSpoke: (n: number, hi: string, hiValue: string, lo: string, loValue: string) => string;
   /** Interactive spoke announce, e.g. "Speed: 0.9." (star-spoke). */
   spokeAt: (label: string, value: string) => string;
+  /** Spoke with no value, e.g. "Speed: no data." (star-spoke). */
+  spokeEmpty: (label: string) => string;
   /** MinimapStrip overview, e.g.
    *  "Viewing 12% of the whole (520–660 of 1,200); 3 marks; 8% unknown." */
   minimap: (

@@ -26,6 +26,13 @@ export interface SpanRect {
   duration: number;
 }
 
+/** `parent` is an index INTO this array, so only a whole number in range can
+ *  address a row. A fractional or non-finite parent addresses nothing — treating
+ *  it as an index reads `children[1e-9]`, which is `undefined`. */
+function parentOf(p: number | undefined, n: number): number | null {
+  return p != null && Number.isInteger(p) && p >= 0 && p < n ? p : null;
+}
+
 /** Critical-path membership per span index. Explicit flags win; else walk the
  *  parent tree choosing the longest-duration child at each level (ties → earliest
  *  start); with neither, only the root span is on the path. */
@@ -34,7 +41,7 @@ export function criticalPath(data: readonly Span[]): boolean[] {
   const flags = data.map((s) => s.critical === true);
   if (flags.some(Boolean)) return flags;
 
-  const hasParents = data.some((s) => s.parent != null);
+  const hasParents = data.some((s) => parentOf(s.parent, n) !== null);
   const onPath = Array.from({ length: n }, () => false);
   if (n === 0) return onPath;
 
@@ -56,7 +63,8 @@ export function criticalPath(data: readonly Span[]): boolean[] {
   const children: number[][] = data.map(() => []);
   let root = -1;
   data.forEach((s, i) => {
-    if (s.parent != null && s.parent >= 0 && s.parent < n) children[s.parent]!.push(i);
+    const p = parentOf(s.parent, n);
+    if (p !== null) children[p]!.push(i);
     else if (root < 0) root = i;
   });
   if (root < 0) root = 0;
@@ -77,6 +85,12 @@ export function criticalPath(data: readonly Span[]): boolean[] {
     cur = best;
   }
   return onPath;
+}
+
+/** Default box height: rows tall enough to seat a legible in-bar label. Shared
+ *  so both entries fold the same trace to the same size. */
+export function traceFoldHeight(depthCount: number): number {
+  return Math.min(72, Math.max(24, depthCount * 16));
 }
 
 export function traceFoldGeometry(opts: {
@@ -127,10 +141,16 @@ export function traceFoldGeometry(opts: {
   let longest: { label: string; duration: number; critical: boolean } | null = null;
   const rects: SpanRect[] = spans.map((s, i) => {
     const dur = Number.isFinite(s.duration) && s.duration > 0 ? s.duration : 0;
-    const x = xOf(s.start);
-    const w = round2(Math.max(1, xOf(s.start + dur) - x));
+    // A span with no start has no place on a wall clock — the domain scan above
+    // already skipped it, so feeding its start to `xOf` is what produced
+    // x="NaN". It keeps its row (and its index, which `parent` and the
+    // interactive picker address it by) but is given no width, so it is drawn as
+    // absent rather than as a zero-duration sliver at time 0.
+    const placed = Number.isFinite(s.start);
+    const x = placed ? xOf(s.start) : round2(pad);
+    const w = placed ? round2(Math.max(1, xOf(s.start + dur) - x)) : 0;
     const row = rowOf.get(s.depth) ?? 0;
-    const eligible = !hasSubLevel || s.depth > minDepth;
+    const eligible = placed && (!hasSubLevel || s.depth > minDepth);
     if (eligible && (!longest || dur > longest.duration))
       longest = { label: s.label, duration: round2(dur), critical: flags[i]! };
     return {

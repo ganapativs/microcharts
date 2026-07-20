@@ -1,7 +1,6 @@
 import { Sparkline } from "@microcharts/react/sparkline";
-import { Sparkline as SparklineInteractive } from "@microcharts/react/sparkline/interactive";
 import { wave } from "./demo-data";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -73,14 +72,6 @@ export const entry: ChartEntry = {
       required: false,
       description: "Override or disable the auto summary.",
     },
-    {
-      name: "onPointFocus",
-      type: "(index: number | null) => void",
-      required: false,
-      interactive: true,
-      description:
-        "Fires as hover/keyboard focus moves; `null` on blur. Wire crosshair or scrub-to-seek recipes.",
-    },
   ],
   demo: [3, 5, 4, 8, 6, 9, 7, 11, 10, 14],
   example: {
@@ -92,20 +83,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <Sparkline data={entry.demo} width={180} height={48} dots="minmax" summary={false} />;
 }
-
-export const showcase = {
-  hint: "trend",
-  Node: () => (
-    <SparklineInteractive
-      data={[8, 11, 9, 14, 12, 18, 15, 21, 19, 26, 24, 30]}
-      width={150}
-      height={44}
-      dots="minmax"
-      title="Revenue trend"
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "curve", options: ["linear", "smooth", "step"], init: "smooth" },
@@ -143,35 +120,6 @@ export const playground: PlaygroundSpec = {
       s.fill && "  fill",
       s.band && "  band={[10, 26]}",
       s.label !== "none" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <SparklineInteractive
-      data={data}
-      width={340}
-      height={92}
-      curve={s.curve as "linear" | "smooth" | "step"}
-      dots={s.dots as "auto" | "minmax" | "none"}
-      fill={s.fill as boolean}
-      band={s.band ? [10, 26] : undefined}
-      label={s.label as "none" | "last" | "minmax"}
-      animate={ui.animate}
-      className="w-full max-w-md"
-      title="Playground"
-    />
-  ),
-  codeInteractive: (s, data, ui) =>
-    [
-      "<Sparkline",
-      `  data={[${data.join(", ")}]}`,
-      `  curve="${s.curve}"`,
-      `  dots="${s.dots}"`,
-      s.fill && "  fill",
-      s.band && "  band={[10, 26]}",
-      s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -293,28 +241,12 @@ export function markCode(width?: number, height?: number): string {
   const size = width && height ? ` width={${width}} height={${height}}` : "";
   return `<Sparkline data={data}${size} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <SparklineInteractive
-      data={entry.demo}
-      width={180}
-      height={48}
-      dots="minmax"
-      summary={false}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

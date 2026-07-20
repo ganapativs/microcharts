@@ -1,10 +1,9 @@
 import { GardenGrid } from "@microcharts/react/garden-grid";
-import { GardenGrid as GardenGridInteractive } from "@microcharts/react/garden-grid/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // 12 weeks of activity, some quiet
-const WEEKS = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26];
+export const WEEKS = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 19, 0, 26];
 
 export const entry: ChartEntry = {
   name: "GardenGrid",
@@ -72,12 +71,6 @@ const weeks = [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9, 3, 0, 24, 30, 11, 6, 1
 export function Preview() {
   return <GardenGrid data={WEEKS} summary={false} cell={9} />;
 }
-
-export const showcase = {
-  hint: "rhythm in grayscale",
-  Node: () => <GardenGrid data={WEEKS} unit="weeks" title="Activity" cell={10} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "rows", label: "rows", min: 1, max: 7, step: 1, init: 7 },
@@ -108,29 +101,6 @@ export const playground: PlaygroundSpec = {
       s.rows !== 7 && `  rows={${s.rows}}`,
       s.steps !== "5" && `  steps={${s.steps}}`,
       s.empty !== "outline" && `  empty="${s.empty}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <GardenGridInteractive
-      data={data}
-      rows={s.rows as number}
-      steps={Number(s.steps) as 3 | 5}
-      empty={s.empty as "outline" | "blank"}
-      summary={false}
-      animate={ui.animate}
-      cell={12}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<GardenGrid",
-      "  data={weeks}",
-      s.rows !== 7 && `  rows={${s.rows}}`,
-      s.steps !== "5" && `  steps={${s.steps}}`,
-      s.empty !== "outline" && `  empty="${s.empty}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -238,19 +208,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<GardenGrid data={weeks} />`;
 }
-
-export function PreviewLive() {
-  return <GardenGridInteractive data={WEEKS} summary={false} cell={9} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

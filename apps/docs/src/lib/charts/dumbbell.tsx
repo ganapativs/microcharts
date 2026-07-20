@@ -1,9 +1,8 @@
 import { Dumbbell } from "@microcharts/react/dumbbell";
-import { Dumbbell as DumbbellInteractive } from "@microcharts/react/dumbbell/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const BANDS = [
+export const BANDS = [
   { label: "Paris", from: 52, to: 61 },
   { label: "Berlin", from: 48, to: 68 },
   { label: "Oslo", from: 66, to: 60 },
@@ -70,12 +69,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <Dumbbell data={BANDS} summary={false} width={130} height={52} />;
 }
-
-export const showcase = {
-  hint: "before → after",
-  Node: () => <Dumbbell data={BANDS} title="Band moves" width={130} height={52} />,
-};
-
 export const playground: PlaygroundSpec = {
   // domain/color/format/locale/strings are styling/formatting overrides,
 
@@ -103,30 +96,6 @@ export const playground: PlaygroundSpec = {
       (s.positive as boolean) && '  positive="up"',
       (s.values as boolean) && '  label="value"',
       (s.highlight as boolean) && '  highlight="Berlin"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <DumbbellInteractive
-      data={BANDS}
-      positive={(s.positive as boolean) ? "up" : undefined}
-      label={(s.values as boolean) ? "value" : "none"}
-      highlight={(s.highlight as boolean) ? "Berlin" : undefined}
-      summary={false}
-      animate={ui.animate}
-      width={240}
-      height={96}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Dumbbell",
-      "  data={bands}",
-      (s.positive as boolean) && '  positive="up"',
-      (s.values as boolean) && '  label="value"',
-      (s.highlight as boolean) && '  highlight="Berlin"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -230,19 +199,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<Dumbbell data={[{ from: 48, to: 68 }]} />`;
 }
-
-export function PreviewLive() {
-  return <DumbbellInteractive data={BANDS} summary={false} width={130} height={52} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

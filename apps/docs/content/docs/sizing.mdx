@@ -11,17 +11,27 @@ client JavaScript involved — a static chart scales purely through SVG and CSS.
 
 ## The three ways to size a chart
 
-| You want…                    | Do this                                          |
-| ---------------------------- | ------------------------------------------------ |
-| A sensible default           | Pass nothing — every chart has an intrinsic box. |
-| An exact pixel size          | Set `width` / `height` props.                    |
-| To fill whatever contains it | Add `style={{ width: "100%", height: "auto" }}`. |
+| You want…                    | Do this                                                  |
+| ---------------------------- | -------------------------------------------------------- |
+| A sensible default           | Pass nothing — every chart has an intrinsic box.         |
+| An exact pixel size          | Set `width` / `height` props (where the chart has them). |
+| To fill whatever contains it | Add `style={{ width: "100%", height: "auto" }}`.         |
+
+<Callout type="warn">
+  `width`/`height` are the common case, not a universal one. Grid charts derive their box from the cell instead —
+  `ActivityGrid`, `CalendarStrip`, `GardenGrid` and `CohortTriangle` take `cell` and `gap`, `Honeycomb` takes `cell`,
+  and `ConfusionGrid` takes `size`. The box then follows from the number of cells, so you tune the cell, not the frame.
+  Glyph marks (`StatusDot`, `TrendArrow`, `MoonPhase`, `DicePips`, and friends) have one fixed intrinsic box and are
+  sized with CSS. And `TokenConfidence` isn't an `<svg>` at all — it's text, so it inherits the font size of whatever
+  it sits in. Everything below about `viewBox` scaling applies to the SVG charts.
+</Callout>
 
 ## Default: data alone
 
-`data` alone always renders something correct — at the chart's own intrinsic size. Each chart type ships a default
-`width`/`height` tuned to its shape (a Sparkline is wide and short; a RubricStrip grows a row per criterion). Good for
-dropping a mark into a table cell or a sentence without thinking about dimensions.
+`data` alone always renders something correct — at the chart's own intrinsic size. Each chart type ships a default box
+tuned to its shape: a Sparkline defaults to a wide, short 80 × 20, while a RubricStrip has no fixed default height at
+all — it grows a row per criterion. Good for dropping a mark into a table cell or a sentence without thinking about
+dimensions.
 
 <LiveDemo
   label="Intrinsic size"
@@ -75,10 +85,35 @@ You can still pass `width`/`height` alongside fluid CSS — they become the char
 before CSS overrides the width. If you use a utility framework, the equivalent classes work just as well
 (`className="w-full h-auto"`).
 
+To give a whole row of charts one identical box rather than sizing each by hand, put `width`/`height` on `SparkGroup`
+instead: it enforces them on every series child that didn't set its own (and shares one scale while it's there — see
+[Formatting & scale](/docs/formatting#scale-the-domain-decision)).
+
 <Callout type="info">
   `.mc-root` is `display: inline-block` by default (so a chart flows next to text). When you make one fill a block-level
   container, it behaves as expected — but if you ever see it not stretching, that's the reason: give it a `display:
   block` or a flex/grid parent.
+</Callout>
+
+## Interactive charts size the same way
+
+Everything above applies **unchanged** to the `…/interactive` entries. An interactive chart wraps its SVG in a focusable
+`<span>` (it owns the pointer, keyboard, and touch gestures for the whole chart), but that wrapper and the SVG are
+always the **same box**: the wrapper is an `inline-block` that hugs its child, and the composed SVG inside is pinned to
+`width: 100%; height: auto`. Your `style` merges over the wrapper's base style and your `className` composes after its
+base class, so the same recipe fills it:
+
+```tsx
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
+
+// identical to the static entry — fills its container
+<Sparkline data={data} style={{ width: "100%", height: "auto" }} />;
+```
+
+<Callout type="info">
+  Because the wrapper and the SVG share one box, hit-testing is exact at any size: the crosshair, highlight, and readout
+  land under the cursor, a touch drag scrubs the unit actually beneath the finger, and a pinned selection stays on the
+  right unit when the box reflows. An interactive chart is its static twin plus interaction, never a different size.
 </Callout>
 
 ## Inline in a sentence
@@ -96,8 +131,25 @@ A word-sized chart in running prose should scale with the **font**, not a pixel 
 </p>
 ```
 
-`mc-inline` handles vertical alignment against the baseline; the `em` height ties the mark to the surrounding type size,
-so it stays proportional wherever the text lands.
+`mc-inline` handles vertical alignment; the `em` height ties the mark to the surrounding type size, so it stays
+proportional wherever the text lands. Alignment is a **baseline seat**, not a fixed nudge: the wrapper is an
+`inline-flex` box whose only child is the SVG, so it takes its baseline from the SVG's bottom edge and the mark stands
+on the text baseline exactly like a glyph. That's typeface-independent — bars sit where letters sit in any font.
+
+Symmetric glyph marks have no bottom edge to stand on, so `mc-inline` centers those on the cap band instead:
+`TrendArrow`, `StatusDot`, `MoonPhase`, `DicePips`, the radial dials and the other glyph shapes read like an icon set in
+running prose. You don't opt in.
+
+Which seat a mark gets isn't guessed from its class name — each chart reports its own plot box, measured in the same
+viewBox units it draws in, and the stylesheet seats the mark from that. So a chart whose padding changes can't drift out
+of alignment, and a chart that changes shape with its props carries the right seat for each: `SparkBar` stands on the
+baseline in bar mode and centers in win-loss, because only one of those has a real floor. Two tokens let you nudge the
+result if a particular typeface needs it — `--mc-inline-nudge` for every mark, and `--mc-glyph-nudge` for centered ones
+only.
+
+<Callout type="info">
+  Leave `<Delta>` bare — no `mc-inline` wrapper. It renders as inline text and already owns its own baseline.
+</Callout>
 
 ## Strokes stay crisp at any scale
 

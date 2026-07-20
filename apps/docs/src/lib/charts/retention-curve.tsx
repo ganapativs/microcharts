@@ -1,6 +1,5 @@
 import { RetentionCurve } from "@microcharts/react/retention-curve";
-import { RetentionCurve as RetentionCurveInteractive } from "@microcharts/react/retention-curve/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // a weekly cohort that decays then plateaus around 38%
@@ -88,21 +87,6 @@ const industry = [1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28, 0.279
 export function Preview() {
   return <RetentionCurve data={DEMO} summary={false} width={150} height={26} />;
 }
-
-export const showcase = {
-  hint: "cohort decay",
-  Node: () => (
-    <RetentionCurve
-      data={DEMO}
-      benchmark={BENCH}
-      unit="week"
-      title="W12 cohort"
-      width={150}
-      height={26}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "benchmark", label: "benchmark", init: true },
@@ -128,31 +112,6 @@ export const playground: PlaygroundSpec = {
       s.benchmark && "  benchmark={industry}",
       s.plateau === false && "  plateau={false}",
       s.curve !== "step" && `  curve="${s.curve}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <RetentionCurveInteractive
-      data={DEMO}
-      benchmark={s.benchmark ? BENCH : undefined}
-      plateau={s.plateau as boolean}
-      curve={s.curve as "step" | "smooth"}
-      unit="week"
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<RetentionCurve",
-      "  data={cohort}",
-      s.benchmark && "  benchmark={industry}",
-      s.plateau === false && "  plateau={false}",
-      s.curve !== "step" && `  curve="${s.curve}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -279,19 +238,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<RetentionCurve data={cohort} />`;
 }
-
-export function PreviewLive() {
-  return <RetentionCurveInteractive data={DEMO} summary={false} width={150} height={26} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -34,6 +34,16 @@ export interface QuadrantDotGeometry {
 
 const finite = (p: Pt): boolean => Number.isFinite(p.x) && Number.isFinite(p.y);
 
+/**
+ * Mark radii — proportional to the box, so they must not be re-derived by the
+ * interactive entry: its hit radius is sized from the PAINTED ghost, and a
+ * fixed one leaves the outer ring of a large dot dead to the pointer.
+ */
+export function quadrantDotRadii(width: number, height: number): { focal: number; ghost: number } {
+  const focal = Math.max(1.6, Math.min(width, height) * 0.1);
+  return { focal, ghost: Math.max(1, focal * 0.52) };
+}
+
 export function quadrantDotGeometry(opts: {
   width: number;
   height: number;

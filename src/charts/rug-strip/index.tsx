@@ -1,5 +1,5 @@
-// <RugStrip> — where the raw observations actually sit (, S1
-// distribution). Static, hook-free, RSC-safe. Every tick is one observation;
+// <RugStrip> — where the raw observations actually sit (S1 distribution).
+// Static, hook-free, RSC-safe. Every tick is one observation;
 // density comes from ink accumulation only (tiered opacity, see geometry).
 // The strongest single story is `markValue`: one raw value against the field.
 import type { CSSProperties, ReactNode } from "react";
@@ -105,11 +105,15 @@ export function RugStrip(props: RugStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Ticks read across the full thickness (the highlight spans it edge to
+      // edge) and value runs along the strip, so neither orientation has a
+      // bottom that means anything — the field centres on the cap band.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-rug ${className}` : "mc-rug"}
       style={style}
     >
       {geo.ticks.length === 0 ? (
-        /* designed empty: a quiet axis line, not a blank hole (§8a.3) */
+        /* designed empty: a quiet axis line, not a blank hole */
         <line
           x1={orientation === "horizontal" ? 0 : width / 2}
           y1={orientation === "horizontal" ? height / 2 : 0}

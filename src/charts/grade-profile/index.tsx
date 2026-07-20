@@ -99,6 +99,12 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
     label === "max" && geo.maxGrade > 0 && topPad >= fontSize + 0.8 && labelW <= width;
   const labelX = showLabel ? round2(clamp(geo.summitX, labelW / 2, width - labelW / 2)) : 0;
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -106,8 +112,13 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Every segment quad is anchored to `yBase`, already flushed to the box
+      // bottom, so the profile stands on the baseline like a skyline. The
+      // summit label lives in the top gutter above the plot and is irrelevant
+      // to a floor seat.
+      seat={{ mode: "floor", bottom: geo.yBase }}
       className={className ? `mc-grade ${className}` : "mc-grade"}
-      style={style}
+      style={rootStyle}
     >
       {geo.segments.map((seg, i) => (
         <path

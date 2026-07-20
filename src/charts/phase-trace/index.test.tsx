@@ -6,8 +6,7 @@ import { phaseTraceGeometry } from "./geometry.js";
 import { EN_PHASE_TRACE } from "../../core/strings-phase-trace.js";
 import { makeFormatter } from "../../core/format.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
-import { seriesEdgeSuite } from "../../test/edge-cases.js";
-import type { Value } from "../../core/types.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const fmt = makeFormatter(undefined, undefined);
@@ -62,11 +61,19 @@ describe("<PhaseTrace>", () => {
   });
 });
 
-seriesEdgeSuite("PhaseTrace", (data: readonly Value[]) => (
-  <PhaseTrace
-    data={data.map((v, i) => ({ x: i, y: typeof v === "number" ? v : 0 }))}
-    xLabel="i"
-    yLabel="v"
-    title="Edge"
-  />
-));
+// BOTH coordinates are encoded, so the matrix runs once per coordinate. The
+// previous spelling pinned `x: i` and laundered `y` to 0, so a sample with no
+// reading was drawn as a real point at zero and a non-finite `x` never reached
+// the path at all.
+//
+// One suite per field, rather than one suite putting the value on both: with
+// both fields degenerate the two halves of the finiteness check mask each other
+// (the `y` half discards the row before the `x` half is consulted), and index
+// parity would decide which of NaN/±Infinity ever landed on which coordinate.
+// Splitting guarantees every matrix value reaches every field. `grid` +
+// `startDot` are on so every emitted coordinate meets the matrix.
+const phaseTraceCase = (data: readonly { x: number; y: number }[]) => (
+  <PhaseTrace data={data} grid startDot xLabel="i" yLabel="v" title="Edge" />
+);
+mappedEdgeSuite("PhaseTrace (degenerate x)", (v, i) => ({ x: v as number, y: i }), phaseTraceCase);
+mappedEdgeSuite("PhaseTrace (degenerate y)", (v, i) => ({ x: i, y: v as number }), phaseTraceCase);

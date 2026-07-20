@@ -1,11 +1,10 @@
 import { SpiralYear } from "@microcharts/react/spiral-year";
-import { SpiralYear as SpiralYearInteractive } from "@microcharts/react/spiral-year/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
 // A synthetic year with a summer peak and a winter dip.
-const YEAR = Array.from({ length: 52 }, (_, i) => {
+export const YEAR = Array.from({ length: 52 }, (_, i) => {
   const seasonal = Math.round(200 + 140 * Math.sin(((i - 8) / 52) * Math.PI * 2));
   return i === 29 ? 480 : seasonal;
 });
@@ -90,12 +89,6 @@ const byWeek = [
 export function Preview() {
   return <SpiralYear data={YEAR} summary={false} size={40} />;
 }
-
-export const showcase = {
-  hint: "the year's shape",
-  Node: () => <SpiralYear data={YEAR} title="Seasonality" size={56} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "steps", label: "steps", options: ["5", "3"], init: "5" },
@@ -119,29 +112,6 @@ export const playground: PlaygroundSpec = {
       s.steps !== "5" && `  steps={${s.steps}}`,
       s.mark !== "dot" && `  mark="${s.mark}"`,
       s.monthTicks !== "on" && "  monthTicks={false}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <SpiralYearInteractive
-      data={YEAR}
-      steps={s.steps === "3" ? 3 : 5}
-      mark={s.mark as "dot" | "arc"}
-      monthTicks={s.monthTicks === "on"}
-      animate={ui.animate}
-      summary={false}
-      size={128}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<SpiralYear",
-      "  data={byWeek}",
-      s.steps !== "5" && `  steps={${s.steps}}`,
-      s.mark !== "dot" && `  mark="${s.mark}"`,
-      s.monthTicks !== "on" && "  monthTicks={false}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -241,19 +211,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<SpiralYear data={byWeek} />`;
 }
-
-export function PreviewLive() {
-  return <SpiralYearInteractive data={YEAR} summary={false} size={40} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

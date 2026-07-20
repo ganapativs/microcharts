@@ -81,8 +81,11 @@ shows the numeral instead. That numeral fallback is the documented honesty rule,
 
 The accessible name states the value against its range — **"4 out of 6."** — and drops the frame to just the exact
 number once past six (**"9."**). Zero reads "0 out of 6." (a real zero), and an invalid value reads "No data." The
-interactive entry cross-fades the pip set on change and announces the new face through a polite live region; the pips
-are one value, so there is no cursor to move.
+interactive entry pops the pips into place on change (a short scale-up with a per-pip stagger, skipped under
+`prefers-reduced-motion`) and announces the new face through a polite live region; the pips are one value, so there is
+no cursor to move.
+
+<InteractionNote slug="dice-pips" />
 
 ## Props
 

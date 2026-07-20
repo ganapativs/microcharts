@@ -1,17 +1,26 @@
 "use client";
-// Interactive <BurnChart>. One pointer listener + nearest-period
-// math across history AND the projection region. ←/→ step days, Home/End jump
-// start/deadline. Composes the static component (canon); the crosshair + marker
-// are overlay children.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <BurnChart>. useActivePicker owns interaction: one pointer
+// listener + nearest-period math across history AND the projection region,
+// roving keyboard (←/→ step days, Home/End jump start/deadline), touch
+// tap-to-pin, and the onActive/onSelect contract. Composes the static
+// component (canon); the crosshair + marker are overlay children.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_BURN, type BurnStrings } from "../../core/strings-burn.js";
 import { burnGeometry } from "./geometry.js";
 import { BurnChart as StaticBurnChart, burnSummary, type BurnChartProps } from "./index.js";
 
-export interface InteractiveBurnChartProps extends BurnChartProps {
+export interface InteractiveBurnChartProps extends BurnChartProps, PickerProps {
   strings?: BurnStrings;
   /**
    * Opt-in entrance motion (default `false`): the line draws on when the
@@ -26,7 +35,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
     data,
     mode = "down",
     projection = true,
-    work = "points",
+    work,
     unit = "day",
     height = 20,
     width = 80,
@@ -36,8 +45,18 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
+
+  // The work noun defaults from `strings`, not from a literal: it is rendered
+  // display text, so an English default here would survive a localized bundle.
+  const workWord = work ?? strings.burnWork;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The actual line (ink="data") draws as the story; the dotted projection is
@@ -46,21 +65,36 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
   // static markup changes.)
   useEntrance(hostRef, "draw", animate, { defer: 'path[stroke-dasharray="1 2"]' });
 
-  const geo = useMemo(
-    () =>
-      burnGeometry({
-        width,
-        height,
-        plan: data.plan,
-        actual: data.actual,
-        mode,
-        projection,
-        domain: props.domain,
-      }),
-    [width, height, data.plan, data.actual, mode, projection, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox — without it the pointer map and readout run short and the
+  // crosshair drifts from the cursor.
+  const geo = useMemo(() => {
+    const base = burnGeometry({
+      width,
+      height,
+      plan: data.plan,
+      actual: data.actual,
+      mode,
+      projection,
+      domain: props.domain,
+    });
+    const showLabel = (props.label ?? "gap") === "gap" && base?.landing != null;
+    const gutterCh = showLabel
+      ? `${base!.landing!.delta > 0 ? "+" : ""}${base!.landing!.delta} ${unit.charAt(0)}`.length
+      : 0;
+    return burnGeometry({
+      width,
+      height,
+      plan: data.plan,
+      actual: data.actual,
+      mode,
+      projection,
+      domain: props.domain,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data.plan, data.actual, mode, projection, props.domain, props.label, unit]);
 
   const accName =
     summary === false
@@ -72,7 +106,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
           : burnSummary(
               geo,
               fmt,
-              { unit, work, mode, elapsed: data.actual.length, total: data.plan.length },
+              { unit, work: workWord, mode, elapsed: data.actual.length, total: data.plan.length },
               strings,
             );
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
@@ -80,90 +114,84 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
   const count = geo?.points.length ?? 0;
   const verb = mode === "down" ? strings.burnRemain : strings.burnDone;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo || count === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * geo.totalWidth;
+  // Nearest-period hit-test in viewBox space (scaled into `totalWidth`, the
+  // rendered viewBox — the label gutter is part of it).
+  const locate = useCallback(
+    (x: number) => {
+      if (!geo || geo.points.length === 0) return null;
       let best = 0;
       let bestDist = Infinity;
       geo.points.forEach((p, i) => {
-        const d = Math.abs(p.x - px);
+        const d = Math.abs(p.x - x);
         if (d < bestDist) {
           bestDist = d;
           best = i;
         }
       });
-      setActive(best);
+      return best;
     },
-    [geo, count],
+    [geo],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (count === 0) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setActive((prev) => Math.min(count - 1, (prev ?? -1) + 1));
-          break;
-        case "ArrowLeft":
-          setActive((prev) => (prev === null || prev <= 0 ? 0 : prev - 1));
-          break;
-        case "Home":
-          setActive(0);
-          break;
-        case "End":
-          setActive(count - 1);
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
+  // Navigable unit = a rendered period point; `index` is that point's period
+  // (the data index the consumer knows), `value` its actual/projected/plan.
+  const datum = useCallback(
+    (i: number) => {
+      const pt = geo?.points[i];
+      return {
+        index: pt?.period ?? i,
+        value: pt ? (pt.actual ?? pt.projected ?? pt.plan) : null,
+      };
     },
-    [count],
+    [geo],
   );
 
-  const p = active !== null && geo ? geo.points[active] : undefined;
+  const { active, selected, bind } = useActivePicker({
+    count,
+    width: geo?.totalWidth ?? width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const shown = active ?? selected;
+  const p = shown !== null && geo ? geo.points[shown] : undefined;
+  const pin = selected !== null && selected !== active && geo ? geo.points[selected] : undefined;
   const announced = p
     ? p.actual !== null
       ? strings.burnAt(
           unit,
           p.period,
           fmt(p.actual),
-          work,
+          workWord,
           verb,
           p.plan === null ? null : fmt(p.plan),
         )
       : p.projected !== null
-        ? strings.burnAtProjected(unit, p.period, fmt(p.projected), work, verb)
+        ? strings.burnAtProjected(unit, p.period, fmt(p.projected), workWord, verb)
         : p.plan !== null
-          ? strings.burnAt(unit, p.period, fmt(p.plan), work, verb, null)
+          ? strings.burnAt(unit, p.period, fmt(p.plan), workWord, verb, null)
           : ""
     : "";
 
   return (
     <span
       ref={hostRef}
-      className="mc-burn-chart-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-burn-chart-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticBurnChart
         {...rest}
+        style={fillFor(style)}
         data={data}
         mode={mode}
         projection={projection}
-        work={work}
+        work={workWord}
         unit={unit}
         width={width}
         height={height}
@@ -172,6 +200,18 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
+        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
+        {pin ? (
+          <circle
+            cx={pin.x}
+            cy={pin.y}
+            r={2.4}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {p ? (
           <>
             <line
@@ -203,11 +243,11 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
           style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
           {p.actual !== null
-            ? fmt(p.actual)
+            ? `${fmt(p.actual)}${p.plan !== null ? ` / ${fmt(p.plan)}` : ""} ${workWord}`
             : p.projected !== null
-              ? `${fmt(p.projected)}⋯`
+              ? `${fmt(p.projected)}⋯ ${workWord}`
               : p.plan !== null
-                ? fmt(p.plan)
+                ? `${fmt(p.plan)} ${workWord}`
                 : ""}
         </span>
       ) : null}

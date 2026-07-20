@@ -49,7 +49,7 @@ const mix = [
   { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
 ];
 
-<StackedArea data={mix} variant="ridge" />
+<StackedArea data={mix} mode="ridge" />
 <StackedArea data={mix} order="asc" />
 <StackedArea data={mix} locale="de-DE" label="last" />`}
 >
@@ -60,7 +60,7 @@ const mix = [
         { label: "Web", values: [50, 48, 47, 45, 42, 41, 38, 36, 35, 33, 32, 30] },
         { label: "API", values: [20, 18, 17, 15, 14, 12, 10, 8, 7, 7, 5, 4] },
       ]}
-      variant="ridge"
+      mode="ridge"
       title="Ridge skin"
       width={220}
       height={30}
@@ -149,6 +149,8 @@ together. `order="asc"` puts the smallest series on top, where curvature distort
 
 The accessible name is the share-shift read — **"3 series over 12 points; Mobile leads at 66% share."** The interactive
 entry announces every layer at once (**"Point 8 of 12: Mobile 56%, Web 36%, API 8%."**).
+
+<InteractionNote slug="stacked-area" />
 
 ## Props
 

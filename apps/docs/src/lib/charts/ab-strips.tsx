@@ -1,6 +1,5 @@
 import { ABStrips } from "@microcharts/react/ab-strips";
-import { ABStrips as ABStripsInteractive } from "@microcharts/react/ab-strips/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 import { abArmsFromDelta } from "./contexts-helpers";
 
 const PKG = "@microcharts/react";
@@ -37,7 +36,7 @@ export const entry: ChartEntry = {
       description: "The two arms — raw samples, not summaries.",
     },
     {
-      name: "labels",
+      name: "seriesLabels",
       type: "[string, string]",
       required: false,
       description: "Row identities for the gutter tags + summary (default ['A', 'B']).",
@@ -74,21 +73,6 @@ export function Preview() {
     />
   );
 }
-
-export const showcase = {
-  hint: "A vs B, with spread",
-  Node: () => (
-    <ABStrips
-      data={{ a: A, b: B }}
-      format={MS}
-      positive="down"
-      title="Latency A/B"
-      width={160}
-      height={22}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -121,29 +105,6 @@ export const playground: PlaygroundSpec = {
     ]
       .filter(Boolean)
       .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <ABStripsInteractive
-      data={{ a: A, b: B }}
-      format={MS}
-      positive={s.positive as "up" | "down"}
-      label={s.label as "delta" | "none"}
-      summary={false}
-      animate={ui.animate}
-      width={280}
-      height={26}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<ABStrips",
-      "  data={{ a: control, b: test }}",
-      s.positive === "down" && '  positive="down"',
-      s.label !== "delta" && `  label="${s.label}"`,
-      ui.animate && " animate",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
   interactiveHint:
     "Hover or arrow (↑/↓ rows, ←/→ edges) — the median announces the delta vs the other arm; other edges announce the percentile.",
 };
@@ -151,12 +112,12 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "labelled arms",
-    code: `<ABStrips data={{ a: control, b: test }} labels={["Control", "Test"]} />`,
+    code: `<ABStrips data={{ a: control, b: test }} seriesLabels={["Control", "Test"]} />`,
     node: (
       <ABStrips
         data={{ a: A, b: B }}
         format={MS}
-        labels={["Ctrl", "Test"]}
+        seriesLabels={["Ctrl", "Test"]}
         summary={false}
         width={180}
         height={22}
@@ -275,29 +236,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<ABStrips data={{ a, b }} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <ABStripsInteractive
-      data={{ a: A, b: B }}
-      format={MS}
-      positive="down"
-      summary={false}
-      width={160}
-      height={22}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

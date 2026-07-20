@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { MicroScatter } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
-import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -58,6 +58,15 @@ describe("<MicroScatter>", () => {
   });
 });
 
-seriesEdgeSuite("MicroScatter", (data) => (
-  <MicroScatter data={data.map((v, i) => ({ x: i, y: v ?? Number.NaN }))} title="Edge" trend />
-));
+// Both coordinates are encoded, so the matrix runs once per coordinate. The
+// previous spelling pinned `x: i`, so a point with no x-reading — the case that
+// would put cx="NaN" in the markup, and that skews the least-squares fit — never
+// met the chart. One suite per coordinate keeps the other finite so each half of
+// the finiteness filter is exercised alone rather than short-circuited by its
+// neighbour, and every matrix value reaches both fields. `trend` is on: the
+// regression line is computed from raw pairs and is the second leak surface.
+const scatterCase = (data: readonly { x: number; y: number }[]) => (
+  <MicroScatter data={data} title="Edge" trend />
+);
+mappedEdgeSuite("MicroScatter (degenerate x)", (v, i) => ({ x: v as number, y: i }), scatterCase);
+mappedEdgeSuite("MicroScatter (degenerate y)", (v, i) => ({ x: i, y: v as number }), scatterCase);

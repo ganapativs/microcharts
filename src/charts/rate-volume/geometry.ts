@@ -43,6 +43,8 @@ export interface RateVolumeGeometry {
   n: number;
   labelX: number;
   labelY: number;
+  /** Plot floor — the padded zero line the volume bars stand on. */
+  plotB: number;
   totalWidth: number;
 }
 
@@ -154,6 +156,7 @@ export function rateVolumeGeometry(opts: {
     // centered (start-anchored) — never overlaps the line or escapes the plot
     labelX: round2(width + 3),
     labelY: round2(height / 2),
+    plotB,
     totalWidth: width + gutter,
   };
 }

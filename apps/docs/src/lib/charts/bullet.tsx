@@ -1,6 +1,5 @@
 import { Bullet } from "@microcharts/react/bullet";
-import { Bullet as BulletInteractive } from "@microcharts/react/bullet/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 
@@ -12,6 +11,7 @@ export const entry: ChartEntry = {
   tagline: "A measure against a target and qualitative bands.",
   staticImport: `${PKG}/bullet`,
   interactiveImport: `${PKG}/bullet/interactive`,
+  picker: false,
   dataShape: "value + target + bands",
   encoding: { channel: "position (measure length vs a target tick)", precision: "high" },
   nodeBudget: "≤ 6",
@@ -59,23 +59,7 @@ export const entry: ChartEntry = {
 
 export function Preview() {
   return <Bullet value={72} target={80} bands={[50, 90]} width={190} height={22} summary={false} />;
-}
-
-export const showcase = {
-  hint: "vs target",
-  Node: () => (
-    <BulletInteractive
-      value={72}
-      target={80}
-      bands={[50, 90]}
-      width={168}
-      height={26}
-      title="Quota attainment"
-    />
-  ),
-};
-
-// color, format, locale, id, className, style, children: styling/formatting
+} // color, format, locale, id, className, style, children: styling/formatting
 // escape hatches, not chart-shape knobs — no interactive control (consistent
 // with every other chart's playground). title/summary are accessible-name
 // overrides fixed to "Playground" here for a stable live-region readout.
@@ -106,31 +90,6 @@ export const playground: PlaygroundSpec = {
       `  target={${s.target}}`,
       s.bands && "  bands={[50, 90]}",
       s.domain && "  domain={[0, 60]}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <BulletInteractive
-      value={s.value as number}
-      target={s.target as number}
-      bands={s.bands ? [50, 90] : undefined}
-      domain={s.domain ? [0, 60] : undefined}
-      animate={ui.animate}
-      width={300}
-      height={28}
-      className="w-full max-w-md"
-      title="Playground"
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Bullet",
-      `  value={${s.value}}`,
-      `  target={${s.target}}`,
-      s.bands && "  bands={[50, 90]}",
-      s.domain && "  domain={[0, 60]}",
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -279,29 +238,12 @@ export function markCode(width?: number, height?: number): string {
   const size = width && height ? ` width={${width}} height={${height}}` : "";
   return `<Bullet value={72} target={80} bands={[50, 90]}${size} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <BulletInteractive
-      value={72}
-      target={80}
-      bands={[50, 90]}
-      width={190}
-      height={22}
-      summary={false}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -1,5 +1,5 @@
-// <SpiralYear> — how did the year breathe? Seasonality at a glance (,
-// S1 calendar). A calendar series wound onto an Archimedean spiral: angle =
+// <SpiralYear> — how did the year breathe? Seasonality at a glance (S1
+// calendar). A calendar series wound onto an Archimedean spiral: angle =
 // position in the year (Jan 1 at 12 o'clock, clockwise), each turn outward = the
 // next year. The value is a 5-step (or 3-step) opacity — an ORDINAL channel, the
 // weakest ordered one — so this is a PATTERN instrument; point reads steer to
@@ -135,6 +135,10 @@ export function SpiralYear(props: SpiralYearProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // A disc: radially symmetric about the box centre with no bottom edge to
+      // seat, so it centres on the cap band. Bounds are the padded square the
+      // spiral is drawn into — how many turns it fills never moves them.
+      seat={{ mode: "center", top: PAD, bottom: geo.size - PAD }}
       className={className ? `mc-spiral ${className}` : "mc-spiral"}
       style={style}
     >

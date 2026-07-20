@@ -26,25 +26,48 @@ describe("docs-facts derivations", () => {
     }
   });
 
-  // performance.mdx prose names these explicitly ("Eight charts sit above the 3 kB
-  // reference line. Sparkline … is the largest; the rest are the value-series charts
-  // that can host annotations … plus Station Glyph"). If the measured sizes shift,
+  // performance.mdx prose names these explicitly ("Seventeen charts sit above the
+  // 3 kB reference line … Sparkline is the largest"). If the measured sizes shift,
   // the prose is stale — fail here so it gets revisited.
   it("matches the performance.mdx claim about the 3 kB line", () => {
-    expect(SIZE.over3).toHaveLength(8);
+    expect(SIZE.over3).toHaveLength(20);
     // over3 is largest-first — Sparkline leads, the annotation hosts + Station Glyph follow.
     expect(SIZE.over3[0]?.slug).toBe("sparkline");
+    // None is more than 0.93 kB over the 3 kB line.
+    expect(Math.max(...SIZE.over3.map((c) => c.kB))).toBeLessThan(3.93 + 0.001);
     const over3Slugs = SIZE.over3.map((c) => c.slug).sort();
     expect(over3Slugs).toEqual(
       [
         "burn-chart",
         "change-point",
+        // Crossed the line in the 2026-07-19 inline-seat re-baseline, which
+        // absorbed the seat metadata (~25 B/subpath) together with the
+        // concurrent interaction-contract growth — see $seat in
+        // scripts/size-budgets.json.
+        "control-strip",
         "dual-sparkline",
         "forecast-cone",
+        "percentile-ladder",
+        "polar-clock",
+        "queue-depth",
+        "retention-curve",
+        "shift-histogram",
+        // Station Glyph and Slope crossed the line when their layout math moved into
+        // geometry.ts to be shared with the interactive entry — the fix for overlays
+        // being hit-tested against a different box than the one rendered.
+        "slope",
+        "sparkbar",
         "spread-band",
         "sparkline",
+        "stacked-area",
         "station-glyph",
         "win-prob-worm",
+        // Crossed in the 2026-07-20 release-hardening pass: ABStrips and
+        // Constellation gained small-size label-drop degradation gates, TapeGauge
+        // gained null/empty-state chrome + a two-axis readout fit. All < 0.93 kB over.
+        "ab-strips",
+        "constellation",
+        "tape-gauge",
       ].sort(),
     );
   });

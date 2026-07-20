@@ -1,9 +1,8 @@
 import { Slope } from "@microcharts/react/slope";
-import { Slope as SlopeInteractive } from "@microcharts/react/slope/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const RANKS = [
+export const RANKS = [
   { label: "East", from: 40, to: 47 },
   { label: "West", from: 55, to: 41 },
   { label: "South", from: 30, to: 33 },
@@ -77,12 +76,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <Slope data={RANKS} summary={false} width={90} height={70} />;
 }
-
-export const showcase = {
-  hint: "two moments",
-  Node: () => <Slope data={RANKS} title="Before vs after" width={90} height={70} />,
-};
-
 export const playground: PlaygroundSpec = {
   // domain/color/format/locale/strings are styling/formatting overrides,
 
@@ -116,30 +109,6 @@ export const playground: PlaygroundSpec = {
       s.label !== "none" && `  label="${s.label}"`,
       (s.positive as boolean) && '  positive="up"',
       (s.highlight as boolean) && '  highlight="West"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <SlopeInteractive
-      data={RANKS}
-      label={s.label as "none" | "value" | "label" | "both"}
-      positive={(s.positive as boolean) ? "up" : undefined}
-      highlight={(s.highlight as boolean) ? "West" : undefined}
-      animate={ui.animate}
-      summary={false}
-      width={200}
-      height={130}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Slope",
-      "  data={cohorts}",
-      s.label !== "none" && `  label="${s.label}"`,
-      (s.positive as boolean) && '  positive="up"',
-      (s.highlight as boolean) && '  highlight="West"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -249,19 +218,12 @@ export function Mark(_props: { data: number[]; width?: number; height?: number }
 export function markCode(): string {
   return `<Slope data={cohorts} />`;
 }
-
-export function PreviewLive() {
-  return <SlopeInteractive data={RANKS} summary={false} width={90} height={70} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

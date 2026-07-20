@@ -11,7 +11,7 @@ import { textGutter } from "../../core/labels.js";
 export type IconArrayN = 10 | 20 | 100;
 
 /** cols × rows per denominator — legibility is designed, not arbitrary. */
-const GRID_DIMS: Record<IconArrayN, [number, number]> = {
+export const GRID_DIMS: Record<IconArrayN, [number, number]> = {
   10: [5, 2],
   20: [10, 2],
   100: [10, 10],
@@ -31,6 +31,12 @@ export interface IconArrayGeometry {
   labelX: number;
   labelY: number;
   totalWidth: number;
+  /** Top of the unit grid. The grid is centred in the box and capped at an
+   *  8-unit cell, so on a tall chart it floats well inside the viewBox — the
+   *  seat has to follow the grid, not the box. */
+  y0: number;
+  /** Bottom of the unit grid. */
+  y1: number;
 }
 
 /** Resolve a 0–1 rate to a whole unit count, half-up, clamped to [0, n]. */
@@ -99,5 +105,7 @@ export function iconArrayGeometry(opts: {
     labelX: round2(gridRight + 4), // start-anchored, right after the grid
     labelY: round2(height / 2),
     totalWidth: width,
+    y0: startY,
+    y1: round2(startY + gridH),
   };
 }

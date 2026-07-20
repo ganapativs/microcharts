@@ -40,4 +40,38 @@ describe("interactive <EventTimeline>", () => {
     await userEvent.keyboard("{Home}");
     expect(fig.querySelector('rect[stroke="var(--mc-accent)"]')).not.toBeNull();
   });
+
+  it("onActive reports the focused item; null once cleared", async () => {
+    const seen: unknown[] = [];
+    const fig = await mount(
+      <EventTimeline data={DATA} domain={WINDOW} onActive={(d) => seen.push(d)} />,
+    );
+    fig.focus();
+    await userEvent.keyboard("{Home}");
+    expect(seen.at(-1)).toEqual({ index: 0, value: 4.5 * H, label: "Deploy freeze" });
+    await userEvent.keyboard("{ArrowRight}");
+    // A point event is an instant — zero duration.
+    expect(seen.at(-1)).toEqual({ index: 1, value: 0, label: "Incident" });
+    await userEvent.keyboard("{Escape}");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active item: fires onSelect + pins an outline", async () => {
+    const picks: unknown[] = [];
+    const fig = await mount(
+      <EventTimeline data={DATA} domain={WINDOW} onSelect={(d) => picks.push(d)} />,
+    );
+    fig.focus();
+    await userEvent.keyboard("{Home}");
+    await userEvent.keyboard("{Enter}");
+    expect(picks.at(-1)).toEqual({ index: 0, value: 4.5 * H, label: "Deploy freeze" });
+    // Pin survives blur (it is selection, not hover).
+    fig.blur();
+    await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("controlled selectedIndex pins the outline without focus", async () => {
+    const fig = await mount(<EventTimeline data={DATA} domain={WINDOW} selectedIndex={1} />);
+    expect(fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
+  });
 });

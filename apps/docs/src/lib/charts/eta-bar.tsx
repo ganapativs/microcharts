@@ -1,9 +1,8 @@
 import { EtaBar } from "@microcharts/react/eta-bar";
-import { EtaBar as EtaBarInteractive } from "@microcharts/react/eta-bar/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const min = (t: number) => `${Math.round(t)} min`;
+export const min = (t: number) => `${Math.round(t)} min`;
 
 export const entry: ChartEntry = {
   name: "EtaBar",
@@ -13,6 +12,7 @@ export const entry: ChartEntry = {
   tagline: "How long this will actually take, given how it has actually been going.",
   staticImport: `${PKG}/eta-bar`,
   interactiveImport: `${PKG}/eta-bar/interactive`,
+  picker: false,
   dataShape: "{ progress, elapsed, rate? }",
   encoding: { channel: "time axis — elapsed vs predicted-remaining", precision: "high / medium" },
   nodeBudget: "≤ 4",
@@ -34,7 +34,7 @@ export const entry: ChartEntry = {
       description: "The remaining-time read is the product.",
     },
     {
-      name: "formatEta",
+      name: "etaFormat",
       type: "(t: number) => string",
       required: false,
       description: 'Unit-bearing ETA label ("2 min") — the caller owns units.',
@@ -51,7 +51,7 @@ export const entry: ChartEntry = {
   demo: [64],
   example: {
     title: "Export progress",
-    code: `import { EtaBar } from "${PKG}/eta-bar";\n\n<EtaBar progress={0.64} elapsed={3.6} rate={0.18} formatEta={(t) => \`\${Math.round(t)} min\`} title="Export" />`,
+    code: `import { EtaBar } from "${PKG}/eta-bar";\n\n<EtaBar progress={0.64} elapsed={3.6} rate={0.18} etaFormat={(t) => \`\${Math.round(t)} min\`} title="Export" />`,
   },
 };
 
@@ -61,29 +61,13 @@ export function Preview() {
       progress={0.64}
       elapsed={3.6}
       rate={0.18}
-      formatEta={min}
+      etaFormat={min}
       summary={false}
       width={130}
       height={14}
     />
   );
 }
-
-export const showcase = {
-  hint: "forecast",
-  Node: () => (
-    <EtaBar
-      progress={0.64}
-      elapsed={3.6}
-      rate={0.18}
-      formatEta={min}
-      title="Export"
-      width={130}
-      height={14}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "progress", label: "progress %", min: 0, max: 100, init: 64 },
@@ -102,7 +86,7 @@ export const playground: PlaygroundSpec = {
       elapsed={3.6}
       rate={(s.rate as number) / 100}
       label={s.label as "eta" | "percent" | "none"}
-      formatEta={min}
+      etaFormat={min}
       summary={false}
       width={300}
       height={16}
@@ -115,33 +99,7 @@ export const playground: PlaygroundSpec = {
       "  elapsed={3.6}",
       `  rate={${((s.rate as number) / 100).toFixed(2)}}`,
       s.label !== "eta" && `  label="${s.label}"`,
-      "  formatEta={(t) => `${Math.round(t)} min`}",
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <EtaBarInteractive
-      progress={(s.progress as number) / 100}
-      elapsed={3.6}
-      rate={(s.rate as number) / 100}
-      label={s.label as "eta" | "percent" | "none"}
-      formatEta={min}
-      animate={ui.animate}
-      summary={false}
-      width={300}
-      height={16}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<EtaBar",
-      `  progress={${((s.progress as number) / 100).toFixed(2)}}`,
-      "  elapsed={3.6}",
-      `  rate={${((s.rate as number) / 100).toFixed(2)}}`,
-      s.label !== "eta" && `  label="${s.label}"`,
-      "  formatEta={(t) => `${Math.round(t)} min`}",
-      ui.animate && " animate",
+      "  etaFormat={(t) => `${Math.round(t)} min`}",
       "/>",
     ]
       .filter(Boolean)
@@ -179,7 +137,7 @@ export const contexts: ChartContexts = {
             progress={0.64}
             elapsed={3.6}
             rate={0.18}
-            formatEta={min}
+            etaFormat={min}
             height={16}
             summary={false}
           />
@@ -201,7 +159,7 @@ export const contexts: ChartContexts = {
                   progress={0.64}
                   elapsed={3.6}
                   rate={0.18}
-                  formatEta={min}
+                  etaFormat={min}
                   height={18}
                   summary={false}
                 />
@@ -228,7 +186,7 @@ export const contexts: ChartContexts = {
           progress={0.64}
           elapsed={3.6}
           rate={0.18}
-          formatEta={min}
+          etaFormat={min}
           height={36}
           summary={false}
         />
@@ -249,7 +207,7 @@ export const contexts: ChartContexts = {
               progress={0.64}
               elapsed={3.6}
               rate={0.18}
-              formatEta={min}
+              etaFormat={min}
               height={14}
               summary={false}
             />
@@ -268,7 +226,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
       progress={p}
       elapsed={3.6}
       rate={0.18}
-      formatEta={min}
+      etaFormat={min}
       label="none"
       summary={false}
       width={props.width ?? 60}
@@ -280,30 +238,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<EtaBar progress={0.64} elapsed={3.6} rate={0.18} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <EtaBarInteractive
-      progress={0.64}
-      elapsed={3.6}
-      rate={0.18}
-      formatEta={min}
-      summary={false}
-      width={130}
-      height={14}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

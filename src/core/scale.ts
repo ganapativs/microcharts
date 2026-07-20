@@ -45,9 +45,9 @@ export function extent(values: readonly Value[]): [number, number] | null {
 }
 
 /**
- * A domain suitable for the y-axis. `zero: true` anchors at 0 (areas/bars —
- * , /06); otherwise fits the data. Falls back to `[0, 1]`
- * when nothing is plottable so a chart still has a valid coordinate space.
+ * A domain suitable for the y-axis. `zero: true` anchors at 0 (areas/bars);
+ * otherwise fits the data. Falls back to `[0, 1]` when nothing is plottable so
+ * a chart still has a valid coordinate space.
  */
 export function niceDomain(values: readonly Value[], zero = false): [number, number] {
   const e = extent(values);

@@ -1,10 +1,19 @@
 "use client";
-// Interactive <Horizon>. Interaction is ESSENTIAL here — the
-// encoding is learned: the nearest-x crosshair announces the TRUE value, not
-// the band, and raises a value dot at the folded position. ←/→ steps x.
-// Composes the static component (canon).
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <Horizon>. Interaction is ESSENTIAL here — the encoding is
+// learned: the nearest-x crosshair announces the TRUE value, not the band, and
+// raises a value dot at the folded position. useActivePicker owns interaction:
+// one pointer listener + nearest-x math, roving keyboard (←/→ step x, Home/End
+// ends), touch tap-to-pin, and the onActive/onSelect contract. Composes the
+// static component (canon).
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -13,7 +22,7 @@ import { isFiniteValue } from "../../core/types.js";
 import { horizonGeometry } from "./geometry.js";
 import { Horizon as StaticHorizon, type HorizonProps } from "./index.js";
 
-export interface InteractiveHorizonProps extends HorizonProps {
+export interface InteractiveHorizonProps extends HorizonProps, PickerProps {
   strings?: SeriesStrings & SlotStrings;
   /**
    * Opt-in entrance motion (default `false`): the folded bands wipe on when
@@ -40,6 +49,12 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -51,7 +66,6 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
     [width, height, data, domain, baseline, folds, mode],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
 
   const accName =
     summary === false
@@ -61,72 +75,58 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
         : describeSeries(data, { format: fmt, strings });
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (geo.n === 0) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * width;
+  // Pointer (viewBox x) → nearest sample index. All samples are navigable
+  // (a non-finite one still announces as empty).
+  const locate = useCallback(
+    (x: number) => {
+      if (geo.n === 0) return null;
       const i = Math.round(((x - 0.5) / Math.max(1, width - 1)) * (geo.n - 1));
-      setActive(Math.min(geo.n - 1, Math.max(0, i)));
+      return Math.min(geo.n - 1, Math.max(0, i));
     },
     [geo, width],
   );
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.n === 0) return;
-      const cur = active ?? 0;
-      let next = cur;
-      switch (e.key) {
-        case "ArrowRight":
-          next = Math.min(geo.n - 1, cur + 1);
-          break;
-        case "ArrowLeft":
-          next = Math.max(0, cur - 1);
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.n - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, geo],
+  // Navigable unit = a data sample; `index` is the data index, `value` its
+  // number (or `null` when non-finite).
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: isFiniteValue(data[i]) ? (data[i] as number) : null }),
+    [data],
   );
 
-  const value = active !== null ? data[active] : undefined;
+  const { active, selected, bind } = useActivePicker({
+    count: geo.n,
+    width,
+    height,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  const shown = active ?? selected;
+  const value = shown !== null ? data[shown] : undefined;
+  const crossX = shown !== null ? geo.xFor(shown) : undefined;
+  const selValue = selected !== null && selected !== active ? data[selected] : undefined;
+  const selX = selected !== null && selected !== active ? geo.xFor(selected) : undefined;
   const announced =
-    active !== null
+    shown !== null
       ? isFiniteValue(value)
-        ? strings.point(active + 1, geo.n, fmt(value))
-        : strings.pointEmpty(active + 1, geo.n)
+        ? strings.point(shown + 1, geo.n, fmt(value))
+        : strings.pointEmpty(shown + 1, geo.n)
       : "";
-  const crossX = active !== null ? geo.xFor(active) : undefined;
 
   return (
     <span
       ref={hostRef}
-      className="mc-horizon-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-horizon-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticHorizon
         {...rest}
+        style={fillFor(style)}
         data={data}
         folds={folds}
         mode={mode}
@@ -138,6 +138,18 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
         locale={locale}
         summary={false}
       >
+        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
+        {selX !== undefined && isFiniteValue(selValue) ? (
+          <circle
+            cx={selX}
+            cy={geo.foldedY(selValue)}
+            r={2.6}
+            fill="none"
+            stroke="var(--mc-accent)"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {crossX !== undefined ? (
           <>
             <line
@@ -157,7 +169,7 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
         {rest.children}
       </StaticHorizon>
       <LiveRegion>{announced}</LiveRegion>
-      {active !== null && crossX !== undefined ? (
+      {crossX !== undefined ? (
         <span
           className="mc-spark-readout"
           style={{

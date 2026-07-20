@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { ForecastCone } from "./client.js";
 import type { ForecastInput } from "./geometry.js";
 
@@ -13,6 +14,10 @@ const FC: ForecastInput = {
     [33, 55],
   ],
 };
+
+// transient focus dot vs the persistent pin
+const FOCUS = 'circle[data-mc-w="support"]';
+const PIN = 'circle[data-mc-w="tick"]';
 
 describe("interactive <ForecastCone>", () => {
   it("region-aware: history announces a value, forecast the median + interval", async () => {
@@ -29,7 +34,7 @@ describe("interactive <ForecastCone>", () => {
     // a VISIBLE readout chip pairs median · interval in the forecast region
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("42 · 33–55");
+      .toBe("week 11: 42 · 33–55");
   });
 
   it("rapid arrow presses don't drop (functional updater)", async () => {
@@ -41,5 +46,38 @@ describe("interactive <ForecastCone>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("week 3: 31.");
+  });
+
+  it("onActive reports the focused datum (axis index + value); null on clear", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <ForecastCone data={HIST} forecast={FC} onActive={(d) => seen.push(d)} />,
+    );
+    const fig = screen.container.querySelector(".mc-forecast-cone-live") as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}");
+    expect(seen.at(-1)).toEqual({ index: 1, value: 32 });
+    await userEvent.keyboard("{Escape}");
+    expect(seen.at(-1)).toBeNull();
+  });
+
+  it("Enter selects the active point: fires onSelect + pins a persistent dot", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <ForecastCone data={HIST} forecast={FC} onSelect={(d) => picks.push(d)} />,
+    );
+    const fig = screen.container.querySelector(".mc-forecast-cone-live") as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}{Enter}");
+    expect(picks.at(-1)).toEqual({ index: 1, value: 32 });
+    fig.blur();
+    await expect.poll(() => fig.querySelector(PIN)).not.toBeNull();
+    await expect.poll(() => fig.querySelector(FOCUS)).toBeNull();
+  });
+
+  it("controlled selectedIndex pins the dot with no interaction", async () => {
+    const screen = await render(<ForecastCone data={HIST} forecast={FC} selectedIndex={2} />);
+    const fig = screen.container.querySelector(".mc-forecast-cone-live") as HTMLElement;
+    expect(fig.querySelector(PIN)).not.toBeNull();
   });
 });

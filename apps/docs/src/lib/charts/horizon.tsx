@@ -1,9 +1,8 @@
 import { Horizon } from "@microcharts/react/horizon";
-import { Horizon as HorizonInteractive } from "@microcharts/react/horizon/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const LOAD = [
+export const LOAD = [
   2, 5, 9, 14, 22, 31, 26, 18, 12, 24, 38, 45, 41, 30, 19, 11, 6, 3, 8, 16, 27, 35, 29, 20,
 ];
 
@@ -67,12 +66,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <Horizon data={LOAD} summary={false} width={130} height={16} />;
 }
-
-export const showcase = {
-  hint: "dense fold",
-  Node: () => <Horizon data={LOAD} title="Cluster load" width={130} height={16} />,
-};
-
 export const playground: PlaygroundSpec = {
   // `domain`, `color`, `format`/`locale` are universal chart props (covered on
   // every chart's common-props doc), not Horizon-specific — left out here so
@@ -112,30 +105,6 @@ export const playground: PlaygroundSpec = {
       s.folds !== "2" && `  folds={${s.folds}}`,
       s.mode !== "mirror" && `  mode="${s.mode}"`,
       s.baseline !== 0 && `  baseline={${s.baseline}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <HorizonInteractive
-      data={LOAD.map((v, i) => v - 20 + (i % 3))}
-      folds={Number(s.folds) as 2 | 3}
-      mode={s.mode as "mirror" | "offset"}
-      baseline={s.baseline as number}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={24}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Horizon",
-      "  data={cpuLoad}",
-      s.folds !== "2" && `  folds={${s.folds}}`,
-      s.mode !== "mirror" && `  mode="${s.mode}"`,
-      s.baseline !== 0 && `  baseline={${s.baseline}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -258,19 +227,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Horizon data={series} />`;
 }
-
-export function PreviewLive() {
-  return <HorizonInteractive data={LOAD} summary={false} width={130} height={16} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

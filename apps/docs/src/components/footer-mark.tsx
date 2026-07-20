@@ -11,9 +11,12 @@ export function FooterMark() {
 
   return (
     <>
+      {/* touch-pan-y: vertical drags still scroll the page, horizontal ones
+          drive the torch instead of being stolen as a scroll gesture (which
+          cancels the pointer stream and freezes the lens mid-field) */}
       <div
         ref={hostRef}
-        className="display absolute inset-0 select-none"
+        className="display absolute inset-0 touch-pan-y select-none"
         role="img"
         aria-label="microcharts"
       >

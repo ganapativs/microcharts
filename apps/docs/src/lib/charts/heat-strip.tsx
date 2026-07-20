@@ -1,10 +1,9 @@
 import { HeatStrip } from "@microcharts/react/heat-strip";
-import { HeatStrip as HeatStripInteractive } from "@microcharts/react/heat-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const LOAD = Array.from({ length: 30 }, (_, i) => Math.round(Math.sin(i / 4) * 40 + 50));
-const D: [number, number] = [0, 100];
+export const LOAD = Array.from({ length: 30 }, (_, i) => Math.round(Math.sin(i / 4) * 40 + 50));
+export const D: [number, number] = [0, 100];
 // Matches the top-of-page demo series.
 const HOURLY_LOAD = [
   12, 25, 38, 52, 66, 79, 88, 90, 84, 71, 55, 40, 28, 45, 62, 78, 85, 74, 58, 35,
@@ -72,12 +71,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <HeatStrip data={LOAD} domain={D} summary={false} width={130} height={18} />;
 }
-
-export const showcase = {
-  hint: "intensity strip",
-  Node: () => <HeatStrip data={LOAD} domain={D} title="CPU pressure" width={130} height={18} />,
-};
-
 export const playground: PlaygroundSpec = {
   // shared domain across rows (see "shared-domain rows" below) — a slider
   // that rescales just this one strip would demo the anti-pattern the page
@@ -113,30 +106,6 @@ export const playground: PlaygroundSpec = {
       "  domain={[0, 100]}",
       s.steps !== 5 && `  steps={${s.steps}}`,
       s.shape !== "square" && `  shape="${s.shape}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <HeatStripInteractive
-      data={data}
-      domain={D}
-      steps={s.steps as number}
-      shape={s.shape as "square" | "round" | "dot"}
-      summary={false}
-      animate={ui.animate}
-      width={260}
-      height={30}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<HeatStrip",
-      "  data={hourlyLoad}",
-      "  domain={[0, 100]}",
-      s.steps !== 5 && `  steps={${s.steps}}`,
-      s.shape !== "square" && `  shape="${s.shape}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -252,21 +221,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<HeatStrip data={data} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <HeatStripInteractive data={LOAD} domain={D} summary={false} width={130} height={18} animate />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

@@ -1,21 +1,22 @@
 "use client";
-// Interactive <ActivityGrid>. The GitHub interaction:
-// hover a cell for its value, or roving-focus the grid and walk it in 2-D with
-// the arrow keys. Composes the static component (summary={false}, focus ring as its child),
-// one pointer listener on the wrapper, announcements via SummaryStrings.
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type PointerEvent,
-} from "react";
+// Interactive <ActivityGrid>. The GitHub interaction: hover/tap a cell for its
+// value, or roving-focus the grid and walk it in 2-D with the arrow keys; click
+// / Enter / Space selects a cell (onSelect). useActivePicker owns interaction
+// (one wrapper listener + pure grid math), composing the static component
+// (summary={false}, focus + pin rings as its children) — the SVG never drifts.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { activityGridGeometry } from "./geometry.js";
 import {
   ActivityGrid as StaticActivityGrid,
@@ -26,7 +27,7 @@ import {
   type ActivityGridProps,
 } from "./index.js";
 
-export interface InteractiveActivityGridProps extends ActivityGridProps {
+export interface InteractiveActivityGridProps extends ActivityGridProps, PickerProps {
   /** Swappable announcement strings (defaults to EN). */
   strings?: SeriesStrings & SlotStrings;
   /**
@@ -57,6 +58,10 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     animate = false,
     className,
     style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -69,12 +74,77 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     () => activityGridGeometry(data, { rows, cell, gap, levels: LEVELS, domain, offset }),
     [data, rows, cell, gap, domain, offset],
   );
-  const step = cell + gap;
+  const stepPx = cell + gap;
   const w = Math.max(geo.width, 1);
   const h = Math.max(geo.height, 1);
-
-  const [active, setActive] = useState<number | null>(null);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+
+  // Pointer (viewBox space) → cell index by pure grid math.
+  const locate = useCallback(
+    (x: number, y: number) => {
+      const col = Math.floor(x / stepPx);
+      const row = Math.floor(y / stepPx);
+      const i = col * rows + row - offset;
+      return row >= 0 && row < rows && i >= 0 && i < geo.cells.length ? i : null;
+    },
+    [stepPx, rows, offset, geo],
+  );
+
+  // 2-D roving: walk in SLOT space (data index + calendar offset), so a padded
+  // first column still walks like the grid the reader sees. Boundary keys are
+  // consumed (return the current index) rather than ignored.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const n = geo.cells.length;
+      if (n === 0) return null;
+      if (key === "Home") return 0;
+      if (key === "End") return n - 1;
+      // Nothing active yet: the first arrow lands on cell 0 (kernel contract).
+      const first = cur < 0;
+      const c = first ? 0 : cur;
+      const slot = c + offset;
+      const col = Math.floor(slot / rows);
+      const row = slot % rows;
+      const clamp = (i: number) => (i >= 0 && i < n ? i : null);
+      let next: number;
+      switch (key) {
+        case "ArrowDown":
+          next = row < rows - 1 ? (clamp(c + 1) ?? c) : c;
+          break;
+        case "ArrowUp":
+          next = row > 0 ? (clamp(c - 1) ?? c) : c;
+          break;
+        case "ArrowRight":
+          next = clamp((col + 1) * rows + row - offset) ?? c;
+          break;
+        case "ArrowLeft":
+          next = clamp((col - 1) * rows + row - offset) ?? c;
+          break;
+        default:
+          return null;
+      }
+      return first ? 0 : next;
+    },
+    [rows, offset, geo],
+  );
+
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.cells.length,
+    width: w,
+    height: h,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -84,94 +154,46 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         : activitySummary(data, fmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const clampIndex = useCallback((i: number) => (i >= 0 && i < geo.cells.length ? i : null), [geo]);
-
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (geo.cells.length === 0) return;
-      const cur = active ?? 0;
-      // navigate in SLOT space (data index + calendar offset), so a padded
-      // first column still walks like the grid the reader sees
-      const slot = cur + offset;
-      const col = Math.floor(slot / rows);
-      const row = slot % rows;
-      let next: number | null = cur;
-      switch (e.key) {
-        case "ArrowDown":
-          next = row < rows - 1 ? (clampIndex(cur + 1) ?? cur) : cur;
-          break;
-        case "ArrowUp":
-          next = row > 0 ? (clampIndex(cur - 1) ?? cur) : cur;
-          break;
-        case "ArrowRight":
-          next = clampIndex((col + 1) * rows + row - offset) ?? cur;
-          break;
-        case "ArrowLeft":
-          next = clampIndex((col - 1) * rows + row - offset) ?? cur;
-          break;
-        case "Home":
-          next = 0;
-          break;
-        case "End":
-          next = geo.cells.length - 1;
-          break;
-        case "Escape":
-          setActive(null);
-          return;
-        default:
-          return;
-      }
-      e.preventDefault();
-      setActive(next);
-    },
-    [active, rows, offset, geo, clampIndex],
-  );
-
-  // ONE listener on the wrapper; cell lookup is pure grid math.
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * w;
-      const y = ((e.clientY - r.top) / r.height) * h;
-      const col = Math.floor(x / step);
-      const row = Math.floor(y / step);
-      const i = col * rows + row - offset;
-      setActive(row >= 0 && row < rows && i >= 0 && i < geo.cells.length ? i : null);
-    },
-    [w, h, step, rows, offset, geo],
-  );
-
-  const activeCell = active !== null ? geo.cells[active] : undefined;
-  const announced =
-    activeCell === undefined
-      ? ""
-      : activeCell.value === null
-        ? strings.pointEmpty(activeCell.index + 1, geo.cells.length)
-        : strings.point(activeCell.index + 1, geo.cells.length, fmt(activeCell.value));
-
-  const wrapStyle: CSSProperties = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    ...style,
+  const ring = (i: number, pinned: boolean) => {
+    const c = geo.cells[i];
+    if (!c) return null;
+    // ring hugs the drawn mark, not the slot — shapes stay aligned
+    const m = cellMetrics(cell, shape);
+    return (
+      <rect
+        x={c.x + m.inset - 0.5}
+        y={c.y + m.inset - 0.5}
+        width={c.size - m.inset * 2 + 1}
+        height={c.size - m.inset * 2 + 1}
+        rx={m.rx + 0.5}
+        fill="none"
+        stroke="var(--mc-accent)"
+        strokeWidth={1.5}
+        data-mc-w={pinned ? "tick" : "support"}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
   };
+
+  const shown = active ?? selected;
+  const shownCell = shown !== null ? geo.cells[shown] : undefined;
+  const announced =
+    shownCell === undefined
+      ? ""
+      : shownCell.value === null
+        ? strings.pointEmpty(shownCell.index + 1, geo.cells.length)
+        : strings.point(shownCell.index + 1, geo.cells.length, fmt(shownCell.value));
 
   return (
     <span
       ref={hostRef}
-      className={className ? `mc-activity-interactive ${className}` : "mc-activity-interactive"}
-      style={wrapStyle}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onKeyDown={onKeyDown}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onBlur={() => setActive(null)}
+      {...wrap("mc-activity-interactive", className, style)}
+      {...named(label)}
+      {...bind}
     >
       <StaticActivityGrid
         {...rest}
+        style={fillFor(style)}
         data={data}
         layout={layout}
         shape={shape}
@@ -184,37 +206,21 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         locale={locale}
         summary={false}
       >
-        {activeCell
-          ? (() => {
-              /* ring hugs the drawn mark, not the slot — shapes stay aligned */
-              const m = cellMetrics(cell, shape);
-              return (
-                <rect
-                  x={activeCell.x + m.inset - 0.5}
-                  y={activeCell.y + m.inset - 0.5}
-                  width={activeCell.size - m.inset * 2 + 1}
-                  height={activeCell.size - m.inset * 2 + 1}
-                  rx={m.rx + 0.5}
-                  fill="none"
-                  stroke="var(--mc-accent)"
-                  strokeWidth={1.5}
-                  vectorEffect="non-scaling-stroke"
-                />
-              );
-            })()
-          : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticActivityGrid>
       <LiveRegion>{announced}</LiveRegion>
-      {activeCell ? (
+      {shownCell ? (
         <span
           className="mc-spark-readout"
           style={{
-            left: `${((activeCell.x + activeCell.size / 2) / w) * 100}%`,
+            left: `${((shownCell.x + shownCell.size / 2) / w) * 100}%`,
             transform: "translateX(-50%)",
           }}
         >
-          {activeCell.value === null ? "—" : fmt(activeCell.value)}
+          {shownCell.value === null ? "—" : fmt(shownCell.value)}
         </span>
       ) : null}
     </span>

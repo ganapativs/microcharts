@@ -38,7 +38,7 @@ function gallery(): string {
     svg({ data: DIFF, title: "default" }),
     svg({ data: DIFF, labels: true, title: "labels" }),
     svg({ data: DIFF, net: true, label: "totals", title: "net + totals" }),
-    svg({ data: DIFF, sort: "net", title: "sort=net" }),
+    svg({ data: DIFF, order: "net", title: "order=net" }),
     svg({
       data: [
         { key: "same", added: 0, removed: 0 },

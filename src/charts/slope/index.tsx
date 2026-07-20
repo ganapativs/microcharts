@@ -1,5 +1,5 @@
-// <Slope> — who rose and who fell between two moments (, S2-paired,
-// time on x). Static, hook-free, RSC-safe. Neutral ink until `positive` is
+// <Slope> — who rose and who fell between two moments (S2-paired, time on x).
+// Static, hook-free, RSC-safe. Neutral ink until `positive` is
 // declared — a rank change is not automatically good or bad. Both columns
 // share one y-domain; a two-point line implies nothing about the path between
 // (docs steer to Sparkline for the path).
@@ -11,7 +11,7 @@ import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { spreadLabels } from "../../core/labels.js";
 import { pairChange, type DumbbellDatum } from "../dumbbell/index.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
-import { slopeGeometry } from "./geometry.js";
+import { SLOPE_FONT, slopeFrame } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type SlopeDatum = DumbbellDatum & { label: string };
@@ -79,50 +79,13 @@ export function Slope(props: SlopeProps): ReactNode {
     devWarn(`<Slope> ${data.length} categories — crossings tangle past 7.`);
   }
 
-  const fontSize = 6;
+  const fontSize = SLOPE_FONT;
   const fmt = makeFormatter(format, locale);
   const wantLeft = label === "value" || label === "both";
   const wantLabel = label === "label" || label === "both";
-  const estLeftCh = wantLeft
-    ? data.reduce((m, d) => Math.max(m, Number.isFinite(d.from) ? fmt(d.from).length : 0), 0)
-    : 0;
-  const estRightCh =
-    label === "none"
-      ? 0
-      : data.reduce(
-          (m, d) =>
-            Math.max(
-              m,
-              (wantLeft && Number.isFinite(d.to) ? fmt(d.to).length : 0) +
-                (wantLabel ? Math.min(6, d.label.length) + 1 : 0),
-            ),
-          0,
-        );
-
-  const pairs = data.map((d) => ({ from: d.from, to: d.to }));
-  let geo = slopeGeometry({
-    width,
-    height,
-    pairs,
-    domain,
-    gutterLeftCh: estLeftCh,
-    gutterRightCh: estRightCh,
-    fontSize,
-  });
   // gutters ate the plot → drop labels AND give the reclaimed room back to
   // the lines (a squeezed slope with labels is a pile, without them a sliver)
-  const labelsDropped = !geo.labelsFit;
-  if (labelsDropped) {
-    geo = slopeGeometry({
-      width,
-      height,
-      pairs,
-      domain,
-      gutterLeftCh: 0,
-      gutterRightCh: 0,
-      fontSize,
-    });
-  }
+  const { geo, labelsDropped } = slopeFrame({ width, height, data, domain, label, fmt, fontSize });
   const accName = resolveSummary(summary, () => slopeSummary(data, strings));
 
   const goodDir = positive === "down" ? -1 : 1;
@@ -140,6 +103,12 @@ export function Slope(props: SlopeProps): ReactNode {
   const leftYs = showLabels ? layoutColumn(geo.lines.map((l) => l.y0)) : [];
   const rightYs = showLabels ? layoutColumn(geo.lines.map((l) => l.y1)) : [];
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -147,8 +116,13 @@ export function Slope(props: SlopeProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Segments float between two columns with nothing beneath them, so this
+      // seats like its Dumbbell sibling rather than like a trace. The endpoints
+      // inset by one dot radius at both ends, leaving the frame's midpoint and
+      // the plot's identical.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-slope ${className}` : "mc-slope"}
-      style={style}
+      style={rootStyle}
     >
       {geo.lines.map((line) => {
         const d = data[line.index]!;

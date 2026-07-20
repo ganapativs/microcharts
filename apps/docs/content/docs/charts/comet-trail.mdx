@@ -27,8 +27,8 @@ Motion happens **only on a data change** — there is no idle loop. When a new v
 library's canonical strong ease-out) from its old position to the new one and the previous head steps down into the
 trail; a continuous stream produces the comet, a stalled stream simply goes still, which is itself the signal (staleness
 reads as stillness). The dot jumps to the truth, eased — it never simulates phantom positions between updates. Under
-`prefers-reduced-motion` the head repositions instantly (the static encoding is already complete), and the sweep pauses
-off-screen.
+`prefers-reduced-motion` the head repositions instantly (the static encoding is already complete), and the same is true
+off-screen — one shared viewport check means the ease only runs while the chart is actually in view.
 
 ## When to use it
 
@@ -36,6 +36,13 @@ off-screen.
   per-stream "where is it now" in a table.
 - **Avoid for** — the full history (`Sparkline`), an exact multi-point comparison (`Sparkline`, `DotPlot`), or discrete
   events (`HeartbeatBlip`).
+
+## Sizing
+
+`width` and `height` are viewBox units that also set the rendered pixel box — they default to `60 × 16`, sized to sit in
+a table cell or beside a line of text. Omit them and drive the width from CSS to fill a column; the viewBox keeps the
+aspect ratio. `trail` controls how many recent points the tail carries, which is a density decision rather than a size
+one.
 
 ## Variants
 
@@ -84,9 +91,12 @@ sparkline, which is the better tool for the full history.
 
 ## Accessibility
 
-The accessible name is the now-value and the recent trend — **"Now 87, rising over the last 12 updates."** — or **"Now
-87."** for a single point. Arrow keys step back through the trail ("3 updates ago: 78.") and return toward now; motion
-is gated on `prefers-reduced-motion`, and the trail opacity is age, never a value you must read from fading.
+The accessible name is the now-value and the recent trend — **"Now 87, rising over the last 12 updates."** — or just the
+value when there is a single point, as in the edge case above: **"Now 52."** Arrow keys step back through the trail ("3
+updates ago: 78.") and return toward now; motion is gated on `prefers-reduced-motion`, and the trail opacity is age,
+never a value you must read from fading.
+
+<InteractionNote slug="comet-trail" />
 
 ## Props
 

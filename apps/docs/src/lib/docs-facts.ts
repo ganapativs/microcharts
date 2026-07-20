@@ -93,14 +93,12 @@ export const BENCH = {
   medianBytes: bench.agg.medianBytes,
   fastest: bench.agg.fastest,
   slowest: bench.agg.slowest,
-  belowFloor: bench.agg.belowFloor,
+  // Empty in a healthy run, so the JSON widens to `never[]` — name the shape
+  // (`sync-bench.mjs` emits {slug, rowsPerMs, floor}) so consumers still typecheck.
+  belowFloor: bench.agg.belowFloor as readonly { slug: string; rowsPerMs: number; floor: number }[],
   chart: (slug: string) => bench.charts[slug as keyof typeof bench.charts],
   /** `describeSeries` (24 pts), calls/sec — the real `pnpm bench` core measurement. */
   describeSeriesOpsPerSec: bench.core[0]?.opsPerSec,
   /** Same figure, rounded to the nearest thousand for prose (never hand-typed). */
   describeSeriesOpsPerSecRounded: Math.round((bench.core[0]?.opsPerSec ?? 0) / 1000) * 1000,
 } as const;
-
-/** The headline "N charts on the server in about M ms" line, from the real run. */
-export const SSR_HEADLINE =
-  bench.scenarios.find((s) => s.count === 500) ?? bench.scenarios[bench.scenarios.length - 1];

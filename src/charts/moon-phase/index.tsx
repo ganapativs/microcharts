@@ -1,5 +1,5 @@
-// <MoonPhase> — how far through a cycle/period, readable across cultures (
-// #6, S4, flagship). The lit AREA equals the value exactly (closed-form
+// <MoonPhase> — how far through a cycle/period, readable across cultures (S4,
+// flagship). The lit AREA equals the value exactly (closed-form
 // terminator, not the phase-angle approximation). progress mode is monotonic
 // (0 new → 0.5 half → 1 full); cycle mode maps the real lunar cycle. Static,
 // hook-free, RSC-safe.
@@ -63,6 +63,10 @@ export function MoonPhase(props: MoonPhaseProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The disc is the frame and it never changes size — only its lit fraction
+      // does — so seating the disc bounds centres the moon on the cap band and
+      // holds through the whole cycle.
+      seat={{ mode: "center", top: geo.disc.cy - geo.disc.r, bottom: geo.disc.cy + geo.disc.r }}
       className={className ? `mc-moon ${className}` : "mc-moon"}
       style={style}
     >

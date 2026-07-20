@@ -1,17 +1,28 @@
 "use client";
-// Interactive <QuantileDots> — the probe. Pointer x moves a live
-// threshold; the count past it recomputes purely. ←/→ nudge the probe one bin,
-// Enter announces, Esc returns to the prop threshold. Composes the static
-// component with the live threshold (canon); the readout chip reports the odds.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <QuantileDots> — the probe. Pointer x moves a live threshold and
+// the count past it recomputes purely; ←/→ step it one quantile bin, Enter /
+// Space / click pins a bin, Esc returns to the prop threshold. useActivePicker
+// owns interaction. Composes the static component with the live threshold
+// (canon); the readout chip reports the odds.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-quantile-dots.js";
-import { quantileDotsGeometry } from "./geometry.js";
+import { labelFont } from "../../core/labels.js";
+import { quantileDotplot } from "../../core/quantile.js";
+import { round2 } from "../../core/types.js";
+import { quantileDotsGeometry, type QuantileDotsGeometry } from "./geometry.js";
 import { QuantileDots as StaticQuantileDots, type QuantileDotsProps } from "./index.js";
 
-export interface InteractiveQuantileDotsProps extends QuantileDotsProps {
+export interface InteractiveQuantileDotsProps extends QuantileDotsProps, PickerProps {
   strings?: QuantileDotsStrings;
   /**
    * Opt-in entrance motion (default `false`): the quantile dots pop into
@@ -35,6 +46,12 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     title,
     summary,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -48,23 +65,105 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
   });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  // probe value overrides the prop threshold; null ⇒ use the prop threshold
-  const [probe, setProbe] = useState<number | null>(null);
-  const activeThreshold = probe ?? threshold;
 
-  const geo = useMemo(
-    () =>
-      quantileDotsGeometry({
-        width,
-        height,
-        data,
-        count,
-        threshold: activeThreshold,
-        side,
-        domain: props.domain,
-      }),
-    [width, height, data, count, activeThreshold, side, props.domain],
+  // The dotplot itself — columns, bin width and per-column masses — is
+  // independent of the threshold, so it is the stable basis for navigation
+  // (the geometry below is not: its label gutter widens with the live count).
+  const plot = useMemo(
+    () => quantileDotplot(data, Math.max(1, Math.min(25, Math.round(count ?? 20)))),
+    [data, count],
   );
+  const columns = plot?.columns ?? 0;
+  const colCounts = useMemo(() => {
+    const c = Array.from<number>({ length: columns }).fill(0);
+    if (plot) for (const d of plot.dots) c[d.column]!++;
+    return c;
+  }, [plot, columns]);
+  /** Data value at the left edge of quantile bin `i` — where the probe sits. */
+  const binLo = useCallback(
+    (i: number) => (plot ? round2(plot.x0 + i * plot.binWidth) : undefined),
+    [plot],
+  );
+
+  // The rendered viewBox width varies with the live "N in count" gutter, so the
+  // pointer basis is read from the LAST rendered geometry (below) instead of
+  // being captured at hook-call time — hence hit-testing in 0–1 wrapper
+  // fractions (`width`/`height` of 1) and converting inside `locate`.
+  const geoRef = useRef<QuantileDotsGeometry | null>(null);
+  const locate = useCallback(
+    (f: number) => {
+      const g = geoRef.current;
+      if (!g || columns === 0) return null;
+      const t = ((f * g.totalWidth - g.pad) / (width - 2 * g.pad)) * columns;
+      return Math.max(0, Math.min(columns - 1, Math.floor(t)));
+    },
+    [columns, width],
+  );
+  // `index` is the quantile BIN (column) index — not an index into `data`, and
+  // not a dot index: the navigable unit is the column of dots the probe snaps
+  // to. `value` is that column's probability mass in dots (`null` for an empty
+  // column), `label` its formatted value range.
+  const datum = useCallback(
+    (i: number) => {
+      const lo = binLo(i);
+      return {
+        index: i,
+        value: colCounts[i] ? colCounts[i]! : null,
+        label:
+          lo === undefined ? undefined : `${fmt(lo)}–${fmt(round2(lo + (plot?.binWidth ?? 0)))}`,
+      };
+    },
+    [binLo, colCounts, fmt, plot],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: columns,
+    width: 1,
+    height: 1,
+    locate,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
+
+  // The probe shown by the threshold line + readout: the live hover/keyboard
+  // focus, falling back to a pinned selection, then to the prop threshold.
+  const shown = active ?? selected;
+  const activeThreshold = (shown !== null ? binLo(shown) : undefined) ?? threshold;
+
+  // Mirror the static's label gutter so `totalWidth` matches the rendered
+  // viewBox exactly. The composed static reserves a right gutter for the
+  // "N in count" label (widening the viewBox past `width`); if the pointer
+  // map and readout used a gutter-less `totalWidth`, the crosshair line
+  // (drawn at the true viewBox scale) would drift right of the cursor.
+  const geo = useMemo(() => {
+    const base = quantileDotsGeometry({
+      width,
+      height,
+      data,
+      count,
+      threshold: activeThreshold,
+      side,
+      domain: props.domain,
+    });
+    const hasThreshold = activeThreshold !== undefined && Number.isFinite(activeThreshold);
+    const showLabel = (props.label ?? "count") === "count" && hasThreshold && base != null;
+    const gutterCh = showLabel ? `${base!.past} in ${base!.count}`.length : 0;
+    return quantileDotsGeometry({
+      width,
+      height,
+      data,
+      count,
+      threshold: activeThreshold,
+      side,
+      domain: props.domain,
+      gutterCh,
+      fontSize: labelFont(height),
+    });
+  }, [width, height, data, count, activeThreshold, side, props.domain, props.label]);
+  geoRef.current = geo;
 
   // static accessible name reflects the PROP threshold (the documented default)
   const staticName = useMemo(
@@ -89,71 +188,31 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
               );
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // clamp to the data range AND round to 2 dp so the live threshold reads clean
-  const clampVal = useCallback(
-    (v: number): number => {
-      const c = geo ? Math.max(geo.x0, Math.min(geo.x0 + geo.range, v)) : v;
-      return Math.round(c * 100) / 100;
-    },
-    [geo],
-  );
-
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      if (!geo) return;
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || geo.range === 0) return;
-      const px = ((e.clientX - r.left) / r.width) * geo.totalWidth;
-      const frac = (px - geo.pad) / (width - 2 * geo.pad);
-      setProbe(clampVal(geo.x0 + Math.max(0, Math.min(1, frac)) * geo.range));
-    },
-    [geo, width, clampVal],
-  );
-
-  const step = geo && geo.columns > 0 ? geo.range / geo.columns : 1;
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!geo) return;
-      switch (e.key) {
-        case "ArrowRight":
-          setProbe((prev) => clampVal((prev ?? threshold ?? geo.x0) + step));
-          break;
-        case "ArrowLeft":
-          setProbe((prev) => clampVal((prev ?? threshold ?? geo.x0 + geo.range) - step));
-          break;
-        case "Escape":
-          setProbe(null);
-          return;
-        case "Enter":
-          break;
-        default:
-          return;
-      }
-      e.preventDefault();
-    },
-    [geo, step, threshold, clampVal],
-  );
-
   const announced =
     geo && activeThreshold !== undefined && Number.isFinite(activeThreshold)
       ? strings.quantileDots(geo.past, geo.count, side, fmt(activeThreshold))
       : "";
 
+  // Pinned selection persists through pointer-leave; the static's own threshold
+  // line follows the transient probe.
+  const selLo = selected !== null && selected !== active ? binLo(selected) : undefined;
+  const selX =
+    geo && selLo !== undefined
+      ? geo.range === 0
+        ? geo.pad + (width - 2 * geo.pad) / 2
+        : geo.pad + Math.max(0, Math.min(1, (selLo - geo.x0) / geo.range)) * (width - 2 * geo.pad)
+      : null;
+
   return (
     <span
       ref={hostRef}
-      className="mc-quantile-dots-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={ariaLabel}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setProbe(null)}
-      onKeyDown={onKeyDown}
-      onBlur={() => setProbe(null)}
+      {...wrap("mc-quantile-dots-live", className, style)}
+      {...named(ariaLabel)}
+      {...bind}
     >
       <StaticQuantileDots
         {...rest}
+        style={fillFor(style)}
         data={data}
         count={count}
         threshold={activeThreshold}
@@ -165,6 +224,17 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
         strings={strings}
         summary={false}
       >
+        {selX !== null ? (
+          <line
+            x1={round2(selX)}
+            y1={1}
+            x2={round2(selX)}
+            y2={height - 1}
+            data-mc-ink="accent"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
         {rest.children}
       </StaticQuantileDots>
       {geo && geo.threshold && activeThreshold !== undefined ? (
@@ -175,7 +245,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
             transform: "translateX(-50%)",
           }}
         >
-          {`${geo.past} in ${geo.count}`}
+          {`${geo.past} in ${geo.count} ${side} ${fmt(activeThreshold)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

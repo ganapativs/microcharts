@@ -31,7 +31,7 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
     title: "Charts",
     links: [
       ...featured.map((c) => ({ href: `/docs/charts/${c.slug}`, label: c.name })),
-      { href: "/gallery", label: `All ${STABLE_CHARTS.length} charts →` },
+      { href: "/charts", label: `All ${STABLE_CHARTS.length} charts →` },
     ],
   },
   {
@@ -47,7 +47,11 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
 export function SiteFooter() {
   return (
     <footer className="relative overflow-hidden">
-      <div className="relative z-10 mx-auto max-w-shell px-4 pb-4 pt-14 sm:px-6">
+      {/* the link layers sit above the canvas field, so they must be
+          transparent to the pointer — only the links themselves take it back,
+          or the torch/swell is unreachable across most of the footer (on
+          mobile the 2-col grid covers nearly the whole field) */}
+      <div className="pointer-events-none relative z-10 mx-auto max-w-shell px-4 pb-4 pt-14 [&_a]:pointer-events-auto sm:px-6">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           <div className="col-span-2 sm:col-span-1">
             <Link
@@ -94,7 +98,7 @@ export function SiteFooter() {
 
       <FooterMark />
 
-      <div className="absolute inset-x-0 bottom-3 z-10 mx-auto max-w-shell px-4 sm:bottom-4 sm:px-6">
+      <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 mx-auto max-w-shell px-4 [&_a]:pointer-events-auto sm:bottom-4 sm:px-6">
         <div className="flex flex-col gap-3 text-fd-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span className="mono-label flex items-center gap-1.5">
             <span>© 2026</span>

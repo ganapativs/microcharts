@@ -137,19 +137,22 @@ read as weekdays — Monday first by default (`weekStart={0}` for Sunday).
 
 ## Why this default
 
-Five levels (the empty track plus four intensity steps) is the same discrete ramp HeatCell and HeatStrip use — one
-calibration means "how intense" reads the same across the library, and a reader never has to relearn a color scale per
-chart. Levels are discrete, never a continuous gradient: a continuous ramp implies precision a handful of pixels can't
-actually deliver, and discrete bins are honest about that. Monday-first weeks (`weekStart={1}`) match the ISO calendar
-most teams already track cadence against; `weekStart={0}` switches to Sunday-first without touching the data.
-Column-major fill (each column is a week, top-to-bottom) is what makes the grid read as a calendar instead of an
-arbitrary sequence of cells.
+Five levels (the empty track plus four intensity steps) matches the five steps HeatCell and HeatStrip default to, and
+the four intensity steps share their exact opacity ramp — one calibration means "how intense" reads the same across the
+library, and a reader never has to relearn a color scale per chart. Only level 0 differs: here it is a faint empty
+track, because an activity slot with no activity is genuinely empty, not a bottom-of-scale value. Levels are discrete,
+never a continuous gradient: a continuous ramp implies precision a handful of pixels can't actually deliver, and
+discrete bins are honest about that. Monday-first weeks (`weekStart={1}`) match the ISO calendar most teams already
+track cadence against; `weekStart={0}` switches to Sunday-first without touching the data. Column-major fill (each
+column is a week, top-to-bottom) is what makes the grid read as a calendar instead of an arbitrary sequence of cells.
 
 ## Accessibility
 
 Intensity is a color channel, so ActivityGrid always pairs it with a numeric summary of its total and peak — the
 information survives forced-colors and color-blind viewing. The interactive entry adds 2-D arrow-key navigation,
 announcing each cell's value as you move.
+
+<InteractionNote slug="activity-grid" />
 
 ## Props
 

@@ -83,6 +83,8 @@ export function dualWindowGeometry(opts: {
   fastLastY: number | null;
   slowLastY: number | null;
   lastX: number;
+  /** Plot-box floor — the padded bottom edge both traces are scaled into. */
+  y1: number;
 } {
   const { data, windows, target, band, domain, width, height, gutter } = opts;
   const [wf, ws] = windows;
@@ -143,5 +145,6 @@ export function dualWindowGeometry(opts: {
     fastLastY: fastLast == null ? null : round2(yOf(fastLast)),
     slowLastY: slowLast == null ? null : round2(yOf(slowLast)),
     lastX: round2(xOf(data.length - 1)),
+    y1: round2(height - pad),
   };
 }

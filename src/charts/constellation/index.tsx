@@ -1,5 +1,5 @@
-// <Constellation> — when rare events happened, and how big (, S1
-// points). Position is the channel: x = time, y = value; optional magnitude sets
+// <Constellation> — when rare events happened, and how big (S1 points).
+// Position is the channel: x = time, y = value; optional magnitude sets
 // area-true dot size. A hairline chronology line connects the events in time
 // order. When no values are given, vertical position is deterministic jitter that
 // encodes NOTHING (the docs and this file say so; the summary never reads it).
@@ -9,6 +9,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
+import { round2 } from "../../core/types.js";
 import { constellationGeometry } from "./geometry.js";
 
 export interface ConstellationPoint {
@@ -143,10 +144,24 @@ export function Constellation(props: ConstellationProps): ReactNode {
       // 0.95·em ascent (glyph caps run taller than a 0.8 estimate — a 0.8 gap let
       // the top of the numeral kiss the halo ring).
       const ascent = fontSize * 0.95;
-      const aboveClears = largest.cy - haloR - gap - ascent >= PAD;
-      const y = aboveClears ? largest.cy - haloR - gap : largest.cy + haloR + gap + ascent;
-      const x = Math.min(Math.max(largest.cx, PAD + textW / 2), geo.width - PAD - textW / 2);
-      maxLabel = { x, y, text: t, anchor: "middle" };
+      const above = largest.cy - haloR - gap;
+      // Degrade, don't spill. Above is preferred. Below is the fallback, and it
+      // used to be taken on faith — on a short box the numeral's descender line
+      // ran straight out through the bottom edge, and `.mc-root` is
+      // `overflow: visible`, so it landed in the page rather than clipping. So
+      // the fallback is now pinned to the frame (`maxY` keeps the whole em-box
+      // inside) and then CHECKED: it is only used if the pinned line still
+      // clears the star's halo. On a box too short to hold both the star and a
+      // numeral clear of it, the numeral is DROPPED — the halo already marks
+      // which event is brightest, and the summary always carries the number.
+      const maxY = geo.height - fontSize * 0.22;
+      const pinned = Math.min(largest.cy + haloR + gap + ascent, maxY);
+      const clears = pinned - fontSize * 0.78 >= largest.cy + haloR;
+      const y = above - ascent >= PAD ? above : clears ? pinned : null;
+      if (y !== null) {
+        const x = Math.min(Math.max(largest.cx, PAD + textW / 2), geo.width - PAD - textW / 2);
+        maxLabel = { x, y: round2(y), text: t, anchor: "middle" };
+      }
     }
   }
 
@@ -157,6 +172,10 @@ export function Constellation(props: ConstellationProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Scattered points with nothing resting on anything — no floor to stand
+      // on — so the inset plot frame centres on the cap band. The frame is the
+      // padded box, not the stars' extent, which moves with every event.
+      seat={{ mode: "center", top: PAD, bottom: geo.height - PAD }}
       className={className ? `mc-constellation ${className}` : "mc-constellation"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >

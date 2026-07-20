@@ -1,6 +1,5 @@
 import { RubricStrip } from "@microcharts/react/rubric-strip";
-import { RubricStrip as RubricStripInteractive } from "@microcharts/react/rubric-strip/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const RUBRIC = [
@@ -63,12 +62,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <RubricStrip data={RUBRIC} summary={false} width={120} height={30} />;
 }
-
-export const showcase = {
-  hint: "scorecard",
-  Node: () => <RubricStrip data={RUBRIC} target={0.7} title="Model eval" width={120} height={30} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "labels", label: "labels", init: true },
@@ -91,28 +84,6 @@ export const playground: PlaygroundSpec = {
       "  data={criteria}",
       s.labels === false && "  labels={false}",
       s.showTarget && `  target={${((s.target as number) / 100).toFixed(2)}}`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <RubricStripInteractive
-      data={RUBRIC}
-      labels={s.labels as boolean}
-      target={s.showTarget ? (s.target as number) / 100 : undefined}
-      summary={false}
-      animate={ui.animate}
-      width={260}
-      height={40}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<RubricStrip",
-      "  data={criteria}",
-      s.labels === false && "  labels={false}",
-      s.showTarget && `  target={${((s.target as number) / 100).toFixed(2)}}`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -251,19 +222,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<RubricStrip data={criteria} />`;
 }
-
-export function PreviewLive() {
-  return <RubricStripInteractive data={RUBRIC} summary={false} width={120} height={30} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

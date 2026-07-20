@@ -4,6 +4,7 @@
 // Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
 // mark). Composes the static component (canon).
 import { useEffect, useRef, useState } from "react";
+import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -23,10 +24,21 @@ export interface InteractiveProgressProps extends ProgressProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Click/tap or Enter/Space — `{ index: 0, value: the fraction value/max }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function Progress(props: InteractiveProgressProps): React.ReactNode {
-  const { live = true, animate = false, strings = EN_SCALAR, title, ...rest } = props;
+  const {
+    live = true,
+    animate = false,
+    strings = EN_SCALAR,
+    title,
+    onSelect,
+    className,
+    style,
+    ...rest
+  } = props;
   const model = progressModel({ ...rest, strings });
   const wholePct = Number.isFinite(model.fraction) ? Math.round(model.fraction * 100) : null;
   const hostRef = useRef<HTMLSpanElement>(null);
@@ -42,16 +54,24 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
 
   const label = [title, model.summary].filter(Boolean).join(". ") || undefined;
 
+  // One bar, one selectable unit (index 0): the fraction it encodes (unclamped —
+  // the label already tells the truth past 100%).
+  const pick = (): void =>
+    onSelect?.({ index: 0, value: Number.isFinite(model.fraction) ? model.fraction : null });
+
   return (
     <span
       ref={hostRef}
-      className="mc-progress-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...wrap("mc-progress-live", className, style)}
+      {...named(label)}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
     >
-      <StaticProgress {...rest} strings={strings} summary={false} />
+      <StaticProgress {...rest} style={fillFor(style)} strings={strings} summary={false} />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );

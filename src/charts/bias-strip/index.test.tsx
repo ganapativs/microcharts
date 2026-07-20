@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { BiasStrip } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
-import { seriesEdgeSuite } from "../../test/edge-cases.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -95,6 +95,15 @@ describe("<BiasStrip>", () => {
   });
 });
 
-seriesEdgeSuite("BiasStrip", (data) => (
-  <BiasStrip data={data.map((v, i) => ({ a: v ?? Number.NaN, b: i }))} title="Edge" />
-));
+// Both members of the pair are encoded — x is (a+b)/2 and y is a−b, so each
+// reaches both axes. The previous spelling pinned `b: i`, so a degenerate
+// reference measurement never met the chart at all and only half the pair's
+// guard was ever exercised. One suite per member keeps the other finite, so a
+// broken half can't hide behind its neighbour and every matrix value reaches
+// every field. `label="bias"` at a box that seats it: the caption is where a
+// numeral leak would surface.
+const biasCase = (data: readonly { a: number; b: number }[]) => (
+  <BiasStrip data={data} title="Edge" width={120} height={44} label="bias" />
+);
+mappedEdgeSuite("BiasStrip (degenerate a)", (v, i) => ({ a: v as number, b: i }), biasCase);
+mappedEdgeSuite("BiasStrip (degenerate b)", (v, i) => ({ a: i, b: v as number }), biasCase);

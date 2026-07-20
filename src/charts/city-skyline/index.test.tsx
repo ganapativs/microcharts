@@ -1,9 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
-import { CitySkyline } from "./index.js";
+import { CitySkyline, citySkylineSummary } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { expectHostsAnnotations } from "../../test/annotation-host.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const TEAMS = [
@@ -76,4 +77,53 @@ describe("<CitySkyline>", () => {
       24,
     );
   });
+
+  describe("degenerate values", () => {
+    it("an unmeasured group can't be the tallest, but still counts", () => {
+      expect(
+        citySkylineSummary(
+          [{ label: "Platform", value: null as unknown as number }, ...TEAMS.slice(1)],
+          { unit: "teams" },
+        ),
+      ).toBe("5 teams; tallest API at 40.");
+    });
+
+    it("nothing measured reads as no data, never as NaN or ∞", () => {
+      expect(
+        citySkylineSummary(TEAMS.map((d) => ({ ...d, value: null as unknown as number }))),
+      ).toBe("No data.");
+      expect(
+        citySkylineSummary(TEAMS.map((d) => ({ ...d, value: Number.NEGATIVE_INFINITY }))),
+      ).toBe("No data.");
+    });
+
+    it("label='value' prints no numeral for an unmeasured group (empty ≠ zero)", () => {
+      const { container } = draw(
+        <CitySkyline
+          data={[
+            { label: "A", value: 40 },
+            { label: "B", value: null as unknown as number },
+          ]}
+          label="value"
+        />,
+      );
+      expect([...container.querySelectorAll("text")].map((t) => t.textContent)).toEqual(["40"]);
+    });
+
+    it("all-unmeasured still draws the ground line — empty is visible", () => {
+      const { container } = draw(
+        <CitySkyline data={TEAMS.map((d) => ({ ...d, value: null as unknown as number }))} />,
+      );
+      expect(container.querySelectorAll("line").length).toBe(1);
+    });
+  });
 });
+
+// `lit` rides the same degenerate value as `value` so the secondary channel's
+// clamp is exercised too — `Math.max(0, NaN)` is NaN, which used to reach the
+// interactive readout's lit percent.
+mappedEdgeSuite(
+  "CitySkyline",
+  (v, i) => ({ label: `g${i}`, value: v as number, lit: v ?? undefined }),
+  (data) => <CitySkyline data={data} label="value" labels bw={40} title="Edge" unit="teams" />,
+);

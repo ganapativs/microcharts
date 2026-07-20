@@ -164,9 +164,12 @@ export function burnGeometry(opts: {
     finishes,
     points,
     labelX: round2(width + 3),
+    // `dominant-baseline: central` straddles y by half a font EACH way, so the
+    // clamp is symmetric. Below `height < fontSize` no clamp exists and the
+    // caller drops the label rather than painting it past the box.
     labelY:
       fontSize > 0
-        ? round2(clamp(Y(nowActual), fontSize * 0.7, height - fontSize * 0.3))
+        ? round2(clamp(Y(nowActual), fontSize * 0.5, height - fontSize * 0.5))
         : Y(nowActual),
     totalWidth: width + gutter,
     domain: [yMin, yMax],

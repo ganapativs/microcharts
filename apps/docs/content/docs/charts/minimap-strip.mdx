@@ -54,7 +54,7 @@ name.
     window: [300, 440],
     marks: [600, 1000],
   }}
-  variant="heat"
+  mode="heat"
 />`}
 >
   <MinimapStrip
@@ -63,7 +63,7 @@ name.
       window: [300, 440],
       marks: [600, 1000],
     }}
-    variant="heat"
+    mode="heat"
     title="Heat"
     width={300}
     height={18}
@@ -110,6 +110,8 @@ fisheye to distort where you are.
 
 The accessible name places you in the whole — **"Viewing 12% of the whole (520–660 of 1,200); 3 marks; 8% unknown."**
 The interactive entry is a slider: drag or click to move the window, or nudge it with ←/→ (Shift for a bigger jump).
+
+<InteractionNote slug="minimap-strip" />
 
 ## Props
 

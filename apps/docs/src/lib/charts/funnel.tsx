@@ -1,9 +1,8 @@
 import { Funnel } from "@microcharts/react/funnel";
-import { Funnel as FunnelInteractive } from "@microcharts/react/funnel/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
-const PIPE = [
+export const PIPE = [
   { label: "Visitors", value: 12400 },
   { label: "Signups", value: 5704 },
   { label: "Activated", value: 2730 },
@@ -80,12 +79,6 @@ export const entry: ChartEntry = {
 export function Preview() {
   return <Funnel data={PIPE} summary={false} width={130} height={40} />;
 }
-
-export const showcase = {
-  hint: "conversion",
-  Node: () => <Funnel data={PIPE} title="Signup funnel" width={130} height={40} />,
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -125,32 +118,6 @@ export const playground: PlaygroundSpec = {
       !(s.connectors as boolean) && "  connectors={false}",
       s.label !== "none" && `  label="${s.label}"`,
       (s.highlight as boolean) && '  highlight="Activated"',
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => (
-    <FunnelInteractive
-      data={PIPE}
-      mode={s.mode as "absolute" | "rate"}
-      connectors={s.connectors as boolean}
-      label={s.label as "none" | "percent" | "value"}
-      highlight={(s.highlight as boolean) ? "Activated" : undefined}
-      animate={ui.animate}
-      summary={false}
-      width={260}
-      height={78}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<Funnel",
-      "  data={stages}",
-      s.mode !== "absolute" && `  mode="${s.mode}"`,
-      !(s.connectors as boolean) && "  connectors={false}",
-      s.label !== "none" && `  label="${s.label}"`,
-      (s.highlight as boolean) && '  highlight="Activated"',
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -271,19 +238,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<Funnel data={stages} />`;
 }
-
-export function PreviewLive() {
-  return <FunnelInteractive data={PIPE} summary={false} width={130} height={40} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

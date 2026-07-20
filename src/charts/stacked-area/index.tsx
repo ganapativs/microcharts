@@ -43,7 +43,7 @@ export interface StackedAreaProps {
   data: readonly StackedAreaDatum[];
   /** `"ridge"` — the relocated MountainRidges look; same stack, new skin.
    * */
-  variant?: "stacked" | "ridge" | undefined;
+  mode?: "stacked" | "ridge" | undefined;
   /** `"asc"` puts the smallest series on top (least thickness distortion). */
   order?: "data" | "asc" | undefined;
   /** `"last"` = endpoint share labels per series (deterministic drop-out). */
@@ -71,7 +71,7 @@ const CAT_N = CAT_TOKENS.length;
 export function StackedArea(props: StackedAreaProps): ReactNode {
   const {
     data,
-    variant = "stacked",
+    mode = "stacked",
     order = "data",
     label = "none",
     colors,
@@ -111,7 +111,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
   const fontSize = Math.max(5, Math.min(Math.round(height * 0.3), 7));
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   // ridge forces smooth silhouettes (documented)
-  const usedCurve: Curve = variant === "ridge" ? "smooth" : curve;
+  const usedCurve: Curve = mode === "ridge" ? "smooth" : curve;
   const geo = stackedAreaGeometry({
     width,
     height,
@@ -129,6 +129,12 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
   // endpoint labels drop when rows are too dense for the series count
   const labelsFit = height / Math.max(1, series.length) >= fontSize * 1.1;
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+
   return (
     <Chart
       width={width}
@@ -136,18 +142,23 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // The stack is zero-anchored and its floor was deliberately flushed to
+      // the box bottom, so the composition stands on the text baseline exactly
+      // where letters do. Endpoint share labels ride inside the plot, not in a
+      // band below it, so they don't move the seat.
+      seat={{ mode: "floor", bottom: geo.plot.y1 }}
       className={className ? `mc-stacked ${className}` : "mc-stacked"}
-      style={style}
+      style={rootStyle}
     >
       {/* back-to-front for ridge (opaque fills), bottom-up for stacked */}
-      {(variant === "ridge" ? [...geo.layers].reverse() : geo.layers).map((layer) => (
+      {(mode === "ridge" ? [...geo.layers].reverse() : geo.layers).map((layer) => (
         <g key={layer.index}>
           {layer.dArea ? (
             <path
               d={layer.dArea}
               data-mc-cat={(layer.index % CAT_N) + 1}
               style={{
-                fillOpacity: variant === "ridge" ? 1 : 0.8,
+                fillOpacity: mode === "ridge" ? 1 : 0.8,
                 ...(colors ? { fill: colors[layer.index % colors.length] } : null),
               }}
             />
@@ -156,19 +167,19 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
             <path
               d={layer.dTop}
               fill="none"
-              // top-edge hairline: no data-mc-cat stroke variant exists yet
+              // top-edge hairline: no data-mc-cat stroke mode exists yet
               // (styles.css only element-splits accent/positive/negative/ghost
               // for stroked marks — cat roles are fill-only), so this stays a
               // literal var reference; ridge trades it for a fixed surface
               // "crest light" instead of the category color.
               stroke={
-                variant === "ridge"
+                mode === "ridge"
                   ? "var(--mc-surface, Canvas)"
                   : colors
                     ? colors[layer.index % colors.length]
                     : `var(${CAT_TOKENS[layer.index % CAT_N]})`
               }
-              data-mc-w={variant === "ridge" ? "support" : "tick"}
+              data-mc-w={mode === "ridge" ? "support" : "tick"}
               vectorEffect="non-scaling-stroke"
             />
           ) : null}

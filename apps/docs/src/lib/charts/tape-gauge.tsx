@@ -1,6 +1,5 @@
 import { TapeGauge } from "@microcharts/react/tape-gauge";
-import { TapeGauge as TapeGaugeInteractive } from "@microcharts/react/tape-gauge/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 export const ZONES = [
@@ -18,6 +17,7 @@ export const entry: ChartEntry = {
     "The level now, the zone it's in, and how fast it's moving, with the eye parked in one place.",
   staticImport: `${PKG}/tape-gauge`,
   interactiveImport: `${PKG}/tape-gauge/interactive`,
+  picker: false,
   dataShape: "value: number, rate?: number, zones?: { from, to, tone }[]",
   encoding: {
     channel: "position on a moving scale = level; chevron count = rate (a separate channel)",
@@ -105,22 +105,6 @@ export function Preview() {
     />
   );
 }
-
-export const showcase = {
-  hint: "rising into caution",
-  Node: () => (
-    <TapeGauge
-      value={142}
-      rate={1}
-      zones={ZONES}
-      span={60}
-      title="Airspeed"
-      width={46}
-      height={60}
-    />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "value", label: "value", min: 100, max: 200, step: 1, init: 142 },
@@ -155,34 +139,6 @@ export const playground: PlaygroundSpec = {
       s.rate !== 0 && `  rate={${s.rate}}`,
       "  zones={zones}",
       s.orientation !== "vertical" && `  orientation="${s.orientation}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, _data, ui) => {
-    const vertical = s.orientation !== "horizontal";
-    return (
-      <TapeGaugeInteractive
-        value={s.value as number}
-        rate={s.rate as number}
-        zones={ZONES}
-        span={60}
-        orientation={s.orientation as "vertical" | "horizontal"}
-        summary={false}
-        animate={ui.animate}
-        width={vertical ? 44 : 240}
-        height={vertical ? 112 : 48}
-      />
-    );
-  },
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<TapeGauge",
-      `  value={${s.value}}`,
-      s.rate !== 0 && `  rate={${s.rate}}`,
-      "  zones={zones}",
-      s.orientation !== "vertical" && `  orientation="${s.orientation}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -319,30 +275,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<TapeGauge value={142} rate={1} zones={zones} span={60} />`;
 }
-
-export function PreviewLive() {
-  return (
-    <TapeGaugeInteractive
-      value={142}
-      rate={1}
-      zones={ZONES}
-      span={60}
-      summary={false}
-      width={46}
-      height={60}
-      animate
-    />
-  );
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

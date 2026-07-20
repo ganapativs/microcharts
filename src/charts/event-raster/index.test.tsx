@@ -55,3 +55,42 @@ seriesEdgeSuite("EventRaster", (data: readonly Value[]) => (
     title="Edge"
   />
 ));
+
+describe("<EventRaster> degrades at small sizes", () => {
+  const LANES = [
+    { label: "api", events: [2, 5, 9] },
+    { label: "db", events: [3, 15] },
+    { label: "cache", events: [6, 41] },
+  ];
+
+  // Each lane name is centred in its lane. Once a lane is shorter than one em
+  // the names stack on each other and the outer two spill past the viewBox —
+  // the tab-header failure. `labelFont` floors at 7, so they drop instead.
+  it("keeps the lane names while a lane holds one em (height 21 → lane 7)", () => {
+    const { container } = draw(<EventRaster data={LANES} width={200} height={21} />);
+    expect([...container.querySelectorAll("text")].map((t) => t.textContent)).toEqual([
+      "api",
+      "db",
+      "cache",
+    ]);
+  });
+
+  it("drops the lane names below one em — every event tick survives", () => {
+    const { container } = draw(<EventRaster data={LANES} width={200} height={20} />);
+    expect(container.querySelectorAll("text").length).toBe(0);
+    // the marks still read: one raster path per lane, none of them empty
+    const paths = [...container.querySelectorAll("path")];
+    expect(paths.length).toBe(3);
+    for (const p of paths) expect(p.getAttribute("d")).not.toBe("");
+    // and the lanes reclaim the gutter: the plot now starts at the box edge
+    const first = paths[0]!.getAttribute("d")!;
+    expect(Number(first.slice(1).split(" ")[0])).toBeLessThan(20);
+  });
+
+  it("names too wide for their share of the width drop instead of clipping", () => {
+    const wide = [{ label: "authorization-service", events: [2, 5] }];
+    const { container } = draw(<EventRaster data={wide} width={60} height={24} />);
+    expect(container.querySelector("text")).toBeNull();
+    expect(container.querySelector("path")).not.toBeNull();
+  });
+});

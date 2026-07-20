@@ -5,8 +5,7 @@ import { StarSpoke, starSpokeSummary } from "./index.js";
 import { EN_STAR_SPOKE } from "../../core/strings-star-spoke.js";
 import { makeFormatter } from "../../core/format.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
-import { seriesEdgeSuite } from "../../test/edge-cases.js";
-import type { Value } from "../../core/types.js";
+import { mappedEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const fmt = makeFormatter(undefined, undefined);
@@ -81,12 +80,49 @@ describe("<StarSpoke>", () => {
     const { container } = draw(<StarSpoke data={PROFILE} title="Product profile" />);
     await expectNoA11yViolations(container);
   });
+
+  describe("degenerate values", () => {
+    it("an unmeasured metric can't be an extreme, but still counts", () => {
+      expect(
+        starSpokeSummary(
+          [{ label: "Speed", value: null as unknown as number }, ...PROFILE.slice(1)],
+          EN_STAR_SPOKE,
+          fmt,
+        ),
+      ).toBe("5 metrics; highest Ease (0.7), lowest Cost (0.3).");
+    });
+
+    it("nothing measured reads as no data, never as NaN or ∞", () => {
+      expect(
+        starSpokeSummary(
+          PROFILE.map((d) => ({ ...d, value: null as unknown as number })),
+          EN_STAR_SPOKE,
+          fmt,
+        ),
+      ).toBe("No data.");
+      expect(
+        starSpokeSummary(
+          PROFILE.map((d) => ({ ...d, value: Number.NaN })),
+          EN_STAR_SPOKE,
+          fmt,
+        ),
+      ).toBe("No data.");
+    });
+
+    it("all-unmeasured still draws the guide scaffold — empty is visible", () => {
+      const { container } = draw(
+        <StarSpoke data={PROFILE.map((d) => ({ ...d, value: null as unknown as number }))} />,
+      );
+      expect(container.querySelector('path[data-mc-ink="muted"]')!.getAttribute("d")).not.toBe("");
+    });
+  });
 });
 
-seriesEdgeSuite("StarSpoke", (data: readonly Value[]) => (
-  <StarSpoke
-    data={data.map((v, i) => ({ label: `m${i}`, value: typeof v === "number" ? v : 0 }))}
-    domain={[0, 1]}
-    title="Edge"
-  />
-));
+// `value` is typed `number`, but an unmeasured metric is a real state. The
+// previous spelling of this suite laundered every gap into `value: 0` before the
+// chart saw it, which hid the `toPrecision` crash and drew "no data" as zero.
+mappedEdgeSuite(
+  "StarSpoke",
+  (v, i) => ({ label: `m${i}`, value: v as number }),
+  (data) => <StarSpoke data={data} domain={[0, 1]} title="Edge" />,
+);

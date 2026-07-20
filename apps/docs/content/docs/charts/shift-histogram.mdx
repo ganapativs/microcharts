@@ -92,8 +92,8 @@ const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
   />
 </LiveDemo>
 
-The median shift label and accessible summary follow `format`/`locale` — 12000 reads "12.000" under `de-DE` rather than
-the English "12,000".
+The median shift label and accessible summary follow `format`/`locale` — the before median above reads "12.400" under
+`de-DE` rather than the English "12,400".
 
 ## Edge cases
 
@@ -145,6 +145,8 @@ summary names the direction and, when the sample sizes differ, carries both.
 The accessible name states the median shift plainly — **"Median fell from 116 ms to 92 ms."** — appending "On N / M
 samples" when the sizes differ. The interactive entry steps the bins and announces each bin's before/after proportions;
 **M** jumps to the two median bins.
+
+<InteractionNote slug="shift-histogram" />
 
 ## Props
 

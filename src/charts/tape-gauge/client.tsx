@@ -3,16 +3,16 @@
 // update as `value`/`rate` change, and a polite live region re-announces the
 // full reading, throttled (≥ 5 s). No pointer scrubbing — there is no series.
 // Composes the static entry (canon); the scale window stays centered on value.
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { named, fillFor, wrap } from "../../shared/interactive.js";
+import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TAPE_GAUGE } from "../../core/strings-tape-gauge.js";
 import { autoSpan } from "./index.js";
 import { TapeGauge as StaticTapeGauge, tapeGaugeSummary, type TapeGaugeProps } from "./index.js";
 import { tapeGaugeGeometry } from "./geometry.js";
-
-const FILL: CSSProperties = { width: "100%", height: "auto" };
 
 export interface InteractiveTapeGaugeProps extends TapeGaugeProps {
   /** Minimum ms between live-region announcements (documented throttle). */
@@ -26,6 +26,8 @@ export interface InteractiveTapeGaugeProps extends TapeGaugeProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** The gauge was activated (click, tap, Enter or Space): `{ index: 0, value }` — the current reading. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
@@ -36,8 +38,8 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     span: spanProp,
     rateTiers: tiersProp,
     orientation = "vertical",
-    width = 28,
-    height = 48,
+    width = 46,
+    height = 60,
     format,
     locale,
     strings = EN_TAPE_GAUGE,
@@ -45,6 +47,9 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     summary,
     announceEvery = 5000,
     animate = false,
+    onSelect,
+    className,
+    style,
     ...rest
   } = props;
 
@@ -53,8 +58,14 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
 
   const span = spanProp && spanProp > 0 ? spanProp : autoSpan(value, zones, rate);
   const tiers = tiersProp ?? [span / 60, span / 15];
-  const fmt = makeFormatter(format, locale);
-  const geo = tapeGaugeGeometry({ value, span, zones, tick: null, width, height, orientation });
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // The tape walks ticks and zones; in `live` use this component re-renders on
+  // every reading, so keep it off the render path when only the throttled
+  // announcement changed.
+  const geo = useMemo(
+    () => tapeGaugeGeometry({ value, span, zones, tick: null, width, height, orientation }),
+    [value, span, zones, width, height, orientation],
+  );
   const full =
     summary === false
       ? undefined
@@ -74,14 +85,21 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     }
   }, [full, announceEvery]);
 
+  // Drill-down: the reading under the fixed pointer — the number the tape shows.
+  const select = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });
+
   return (
     <span
       ref={hostRef}
-      className="mc-tape-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...wrap("mc-tape-live", className, style)}
+      {...named(label)}
+      onClick={select}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select();
+        }
+      }}
     >
       <StaticTapeGauge
         {...rest}
@@ -97,7 +115,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
         locale={locale}
         strings={strings}
         summary={false}
-        style={FILL}
+        style={fillFor(style)}
       />
       <LiveRegion>{announced}</LiveRegion>
     </span>

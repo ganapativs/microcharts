@@ -1,10 +1,9 @@
 import { GradedBand } from "@microcharts/react/graded-band";
-import { GradedBand as GradedBandInteractive } from "@microcharts/react/graded-band/interactive";
-import type { ChartContexts, ChartEntry, ChartModule, PlaygroundSpec, Recipe } from "./types";
+import type { ChartContexts, ChartEntry, ChartModuleStatic, PlaygroundSpec, Recipe } from "./types";
 
 const PKG = "@microcharts/react";
 // posterior draws for one estimate (deterministic pseudo-sample)
-const DRAWS = Array.from(
+export const DRAWS = Array.from(
   { length: 160 },
   (_, i) => 21 + Math.round(9 * Math.sin(i) + 6 * Math.sin(i * 2.3)),
 );
@@ -75,14 +74,6 @@ const posterior = Array.from(
 export function Preview() {
   return <GradedBand data={DRAWS} summary={false} width={140} height={14} />;
 }
-
-export const showcase = {
-  hint: "uncertainty band",
-  Node: () => (
-    <GradedBand data={DRAWS} label="median" title="Forecast estimate" width={150} height={14} />
-  ),
-};
-
 export const playground: PlaygroundSpec = {
   knobs: [
     {
@@ -120,30 +111,6 @@ export const playground: PlaygroundSpec = {
       s.levels === "50/90" && "  levels={[50, 90]}",
       s.softEdge && "  softEdge",
       s.label !== "none" && `  label="${s.label}"`,
-      "/>",
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  renderInteractive: (s, data, ui) => (
-    <GradedBandInteractive
-      data={data}
-      levels={s.levels === "50/90" ? [50, 90] : [50, 80, 95]}
-      softEdge={s.softEdge as boolean}
-      label={s.label as "none" | "median"}
-      animate={ui.animate}
-      summary={false}
-      width={280}
-      height={16}
-    />
-  ),
-  codeInteractive: (s, _data, ui) =>
-    [
-      "<GradedBand",
-      "  data={posterior}",
-      s.levels === "50/90" && "  levels={[50, 90]}",
-      s.softEdge && "  softEdge",
-      s.label !== "none" && `  label="${s.label}"`,
-      ui.animate && " animate",
       "/>",
     ]
       .filter(Boolean)
@@ -248,19 +215,12 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 export function markCode(): string {
   return `<GradedBand data={posterior} />`;
 }
-
-export function PreviewLive() {
-  return <GradedBandInteractive data={DRAWS} summary={false} width={140} height={14} animate />;
-}
-
 export default {
   entry,
   Preview,
-  PreviewLive,
-  showcase,
   playground,
   recipes,
   contexts,
   Mark,
   markCode,
-} satisfies ChartModule;
+} satisfies ChartModuleStatic;

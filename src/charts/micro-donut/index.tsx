@@ -74,6 +74,10 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
       title={decorative ? undefined : title}
       summary={accName}
       id={id}
+      // A ring has no floor — the wheel reads as a piece of punctuation, so it
+      // centres on the cap band. The box is the outer radius (geometry), not the
+      // viewBox: the half-unit inset would otherwise seat it a touch low.
+      seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-donut ${className}` : "mc-donut"}
       style={style}
     >

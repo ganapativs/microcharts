@@ -4,6 +4,7 @@
 // otherwise), with no layout shift (tabular-nums). Wrapper focus only — the
 // numeral is one value. Composes the static component.
 import { useEffect, useRef, useState } from "react";
+import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";
@@ -19,6 +20,8 @@ export interface InteractiveFatDigitsProps extends FatDigitsProps {
    * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Click/tap or Enter/Space — `{ index: 0, value: the numeral }`. */
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
 
 export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
@@ -26,6 +29,7 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
     live = true,
     strings = EN_FAT,
     animate = false,
+    onSelect,
     title,
     value,
     domain,
@@ -33,6 +37,8 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
     tiers = 5,
     format,
     locale,
+    className,
+    style,
     ...rest
   } = props;
   const hostRef = useRef<HTMLSpanElement>(null);
@@ -49,17 +55,24 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
 
+  // One numeral, one selectable unit (index 0): the value it prints.
+  const pick = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });
+
   return (
     <span
       ref={hostRef}
-      className="mc-fat-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
+      {...wrap("mc-fat-live", className, style)}
+      {...named(label)}
+      onClick={pick}
+      onKeyDown={(e) => {
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        pick();
+      }}
     >
       <StaticFatDigits
         {...rest}
+        style={fillFor(style)}
         value={value}
         domain={domain}
         encode={encode}

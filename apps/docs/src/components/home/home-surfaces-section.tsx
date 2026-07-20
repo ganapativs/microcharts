@@ -8,7 +8,7 @@ import { SectionMark } from "@/components/home/section-mark";
 import { Reveal } from "@/components/ui/reveal";
 
 /**
- * 07 · Where they live — the pitch is "sits INSIDE an interface," so this
+ * 03 · Where they live — the pitch is "sits INSIDE an interface," so this
  * section puts real charts inside the surfaces they were built for, all at
  * once: a product dashboard, a written report, and the small placements a
  * chart drops into (a table cell, a KPI figure, a tab, a sentence). No video,
@@ -259,7 +259,7 @@ function ChatSurface() {
 export function HomeSurfacesSection() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="07">where they live</SectionMark>
+      <SectionMark n="03">where they live</SectionMark>
 
       {/* One bento, no separate header band: the heading is the top-left cell so
           the flagship product surface fills what was dead space top-right. Two

@@ -5,10 +5,14 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import type { Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
 import { EN_EVENT_RASTER, type EventRasterStrings } from "../../core/strings-event-raster.js";
-import { eventRasterGeometry, LANE_CAP, rasterDomain, type RasterLaneInput } from "./geometry.js";
+import {
+  eventRasterGeometry,
+  LANE_CAP,
+  rasterDomain,
+  rasterLabels,
+  type RasterLaneInput,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type EventRasterDatum = RasterLaneInput;
@@ -24,8 +28,6 @@ export interface EventRasterProps {
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Format | undefined;
-  locale?: string | string[] | undefined;
   strings?: EventRasterStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -83,16 +85,20 @@ export function EventRaster(props: EventRasterProps): ReactNode {
     devWarn(`<EventRaster> ${data.length} lanes — capped at ${LANE_CAP}.`);
   const lanesN = Math.max(1, Math.min(LANE_CAP, data.length));
   const height = heightProp ?? lanesN * LANE_UNIT;
-  const labels = labelsProp ?? lanesN <= 8;
-  const laneH = height / lanesN;
-  const fontSize = labelFont(laneH, 0.56);
-
-  const gutter = labels
-    ? Math.min(
-        width * 0.45,
-        Math.max(...data.slice(0, LANE_CAP).map((d) => d.label.length), 1) * fontSize * 0.66 + 4,
-      )
-    : 0;
+  // Lane names are seat-gated: they drop (and hand their gutter back to the
+  // events) once a lane is under one em tall or the widest name outgrows its
+  // share of the width — see `rasterLabels`, shared with the interactive entry.
+  const {
+    show: labels,
+    gutter,
+    fontSize,
+  } = rasterLabels({
+    labels: labelsProp ?? lanesN <= 8,
+    width,
+    height,
+    lanes: lanesN,
+    maxChars: Math.max(...data.slice(0, LANE_CAP).map((d) => d.label.length), 1),
+  });
 
   const domain = domainProp ?? rasterDomain(data);
   const geo = eventRasterGeometry({ data, domain, width, height, gutter, overflow });
@@ -106,6 +112,10 @@ export function EventRaster(props: EventRasterProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
+      // Lanes are sources, not magnitudes — the bottom lane is the last row
+      // rather than a floor, so the stack centres on the cap band. Lanes divide
+      // the full height, and `labels` only takes a LEFT gutter from it.
+      seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-raster ${className}` : "mc-raster"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >

@@ -7,7 +7,7 @@
 import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
-import { textGutter } from "../../core/labels.js";
+import { labelFitsY, textGutter } from "../../core/labels.js";
 
 interface LadderTick {
   p: number;
@@ -31,6 +31,11 @@ export interface PercentileLadderGeometry {
   /** All tick values coincide → render one tick. */
   collapsed: boolean;
   labelY: number;
+  /** Plot box (viewBox y): the reach of the tallest tick either side of the
+   *  track. Fixed by `height` alone — never the drawn ticks, whose halves vary
+   *  with the percentile count. */
+  y0: number;
+  y1: number;
 }
 
 const LADDER_MAX_PS = 4;
@@ -66,11 +71,17 @@ export function percentileLadderGeometry(opts: {
 
   // log only when every sample value is > 0 (a single ≤ 0 makes log a lie)
   const log = opts.scale === "log" && finite.every((v) => v > 0) && dataMax > 0;
+  const y = round2(height * 0.35); // track sits upper — labels get room below
+  // The tag rides the track's midline, so it needs half a font of room above
+  // `y`. Below that the tag paints out of the top of the box, so it DROPS —
+  // and its gutter drops with it, rather than reserving space for absent text.
+  // At that size the chart is too small to state anything in ink; the scale is
+  // still declared in the accessible summary and the docs.
+  const showTag = log && labelFitsY(y, font, height);
   // left gutter for the "log" tag, sized to the tag width ("log" ≈ 3 ch) so it
   // never collides with the p50 tick/label at any font size
-  const lead = log ? textGutter(3, font, 6) : 0;
+  const lead = showTag ? textGutter(3, font, 6) : 0;
 
-  const y = round2(height * 0.35); // track sits upper — labels get room below
   const x0 = pad + lead;
 
   let x: (v: number) => number;
@@ -110,8 +121,10 @@ export function percentileLadderGeometry(opts: {
     ticks,
     ratio,
     log,
-    logTag: log ? { x: round2(pad - 2), y } : null,
+    logTag: showTag ? { x: round2(pad - 2), y } : null,
     collapsed,
     labelY: round2(height - 0.5),
+    y0: round2(y - maxHalf),
+    y1: round2(y + maxHalf),
   };
 }

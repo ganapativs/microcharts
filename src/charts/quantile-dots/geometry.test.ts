@@ -48,6 +48,17 @@ describe("quantileDotsGeometry", () => {
     expect(xs.size).toBe(1);
   });
 
+  it("an overflowing stack spreads over the plot — never piles on one y", () => {
+    // 20 dots at the 1.25 radius floor need 50px of stack in a 16px plot; the
+    // row step tightens instead of clamping every overflow row to the top.
+    const geo = quantileDotsGeometry({ ...base, data: [7, 7, 7, 7, 7], count: 20 })!;
+    const ys = new Set(geo.dots.map((d) => d.y));
+    expect(ys.size).toBe(20);
+    // and it still spans the plot, bottom-up
+    expect(Math.max(...geo.dots.map((d) => d.y))).toBeCloseTo(20 - 2 - geo.dots[0]!.r, 1);
+    expect(Math.min(...geo.dots.map((d) => d.y))).toBeCloseTo(2 + geo.dots[0]!.r, 1);
+  });
+
   it("radius never below the floor (1.25)", () => {
     const geo = quantileDotsGeometry({ ...base, data: WAITS, count: 25 })!;
     for (const d of geo.dots) expect(d.r).toBeGreaterThanOrEqual(1.25);

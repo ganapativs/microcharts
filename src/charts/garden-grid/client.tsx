@@ -1,9 +1,18 @@
 "use client";
-// Interactive <GardenGrid>. Same model as ActivityGrid: one
-// pointer listener + pure grid lookup, 2-D roving keyboard, a ring on the
-// focused cell. Announces the ordinal step, not a false-precise value.
-import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
+// Interactive <GardenGrid>. Same model as ActivityGrid: useActivePicker owns
+// interaction (one wrapper listener + pure grid math), 2-D roving keyboard, a
+// ring on the focused cell and a pinned ring on the selected one; click / Enter
+// / Space selects (onSelect). Announces the ordinal step, not a false-precise
+// value. Composes the static component (canon) — the SVG never drifts.
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import {
+  named,
+  fillFor,
+  useActivePicker,
+  wrap,
+  type PickerProps,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { gardenGridGeometry } from "./geometry.js";
@@ -14,7 +23,7 @@ import {
   type GardenGridProps,
 } from "./index.js";
 
-export interface InteractiveGardenGridProps extends GardenGridProps {
+export interface InteractiveGardenGridProps extends GardenGridProps, PickerProps {
   strings?: GardenStrings;
   /**
    * Opt-in entrance motion (default `false`): dots settle into place on first
@@ -23,6 +32,8 @@ export interface InteractiveGardenGridProps extends GardenGridProps {
    */
   animate?: boolean;
 }
+
+const PAD = 1;
 
 export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
   const {
@@ -39,6 +50,12 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
     summary,
     strings = EN_GARDEN,
     animate = false,
+    className,
+    style,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
     ...rest
   } = props;
 
@@ -49,12 +66,80 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
   useEntrance(hostRef, "trail", animate, { selector: "circle[data-mc-ink]" });
 
   const geo = useMemo(
-    () => gardenGridGeometry({ values: data, rows, cell, gap, steps, domain, pad: 1 }),
+    () => gardenGridGeometry({ values: data, rows, cell, gap, steps, domain, pad: PAD }),
     [data, rows, cell, gap, steps, domain],
   );
   const stepPx = cell + gap;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [active, setActive] = useState<number | null>(null);
+
+  // Pointer (viewBox space) → cell index by pure grid math (column-major, the
+  // order geometry lays cells out in).
+  const locate = useCallback(
+    (x: number, y: number) => {
+      const col = Math.floor((x - PAD) / stepPx);
+      const row = Math.floor((y - PAD) / stepPx);
+      const i = col * rows + row;
+      return row >= 0 && row < rows && i >= 0 && i < geo.cells.length ? i : null;
+    },
+    [stepPx, rows, geo],
+  );
+
+  // 2-D roving: all four arrows are intercepted (a grid must never fall back to
+  // the 1-D default, which would walk ←/→ across a row boundary). Boundary keys
+  // are consumed (return the current index) rather than ignored.
+  const step = useCallback(
+    (cur: number, key: string) => {
+      const n = geo.cells.length;
+      if (n === 0) return null;
+      if (key === "Home") return 0;
+      if (key === "End") return n - 1;
+      // Nothing active yet: the first arrow lands on cell 0 (kernel contract).
+      const first = cur < 0;
+      const c = first ? 0 : cur;
+      const col = Math.floor(c / rows);
+      const row = c % rows;
+      const clamp = (i: number) => (i >= 0 && i < n ? i : null);
+      let next: number;
+      switch (key) {
+        case "ArrowDown":
+          next = row < rows - 1 ? (clamp(c + 1) ?? c) : c;
+          break;
+        case "ArrowUp":
+          next = row > 0 ? (clamp(c - 1) ?? c) : c;
+          break;
+        case "ArrowRight":
+          next = clamp((col + 1) * rows + row) ?? c;
+          break;
+        case "ArrowLeft":
+          next = clamp((col - 1) * rows + row) ?? c;
+          break;
+        default:
+          return null;
+      }
+      return first ? 0 : next;
+    },
+    [rows, geo],
+  );
+
+  // index = data index (cells are 1:1 with `data`); value = the cell's number
+  // (`null` when the datum is missing/non-finite).
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
+    [geo],
+  );
+
+  const { active, selected, bind } = useActivePicker({
+    count: geo.cells.length,
+    width: geo.width,
+    height: geo.height,
+    locate,
+    step,
+    datum,
+    onActive,
+    onSelect,
+    selectedIndex,
+    defaultSelectedIndex,
+  });
 
   const accName =
     summary === false
@@ -64,58 +149,25 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
         : gardenGridSummary(data, { unit, strings, format, locale });
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const clamp = useCallback((i: number) => (i >= 0 && i < geo.cells.length ? i : null), [geo]);
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (geo.cells.length === 0) return;
-    const cur = active ?? 0;
-    const col = Math.floor(cur / rows);
-    const row = cur % rows;
-    let next: number | null = cur;
-    switch (e.key) {
-      case "ArrowDown":
-        next = row < rows - 1 ? (clamp(cur + 1) ?? cur) : cur;
-        break;
-      case "ArrowUp":
-        next = row > 0 ? (clamp(cur - 1) ?? cur) : cur;
-        break;
-      case "ArrowRight":
-        next = clamp((col + 1) * rows + row) ?? cur;
-        break;
-      case "ArrowLeft":
-        next = clamp((col - 1) * rows + row) ?? cur;
-        break;
-      case "Home":
-        next = 0;
-        break;
-      case "End":
-        next = geo.cells.length - 1;
-        break;
-      case "Escape":
-        setActive(null);
-        return;
-      default:
-        return;
-    }
-    e.preventDefault();
-    setActive(next);
+  const ring = (i: number, pinned: boolean) => {
+    const c = geo.cells[i];
+    if (!c) return null;
+    return (
+      <circle
+        cx={c.cx}
+        cy={c.cy}
+        r={geo.rMax + 1}
+        fill="none"
+        stroke="var(--mc-accent)"
+        strokeWidth={1.25}
+        data-mc-w={pinned ? "tick" : undefined}
+        vectorEffect="non-scaling-stroke"
+      />
+    );
   };
 
-  const onPointerMove = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      const r = e.currentTarget.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      const x = ((e.clientX - r.left) / r.width) * geo.width;
-      const y = ((e.clientY - r.top) / r.height) * geo.height;
-      const col = Math.floor((x - 1) / stepPx);
-      const row = Math.floor((y - 1) / stepPx);
-      const i = col * rows + row;
-      setActive(row >= 0 && row < rows && i >= 0 && i < geo.cells.length ? i : null);
-    },
-    [geo, stepPx, rows],
-  );
-
-  const c = active !== null ? geo.cells[active] : undefined;
+  const shown = active ?? selected;
+  const c = shown !== null ? geo.cells[shown] : undefined;
   const announced = !c
     ? ""
     : c.value === null
@@ -123,20 +175,10 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
       : strings.gardenCell(c.index + 1, geo.cells.length, fmt(c.value), c.step, steps);
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-garden-live"
-      style={{ display: "inline-block", position: "relative", lineHeight: 0 }}
-      tabIndex={0}
-      role="img"
-      aria-label={label}
-      onKeyDown={onKeyDown}
-      onPointerMove={onPointerMove}
-      onPointerLeave={() => setActive(null)}
-      onBlur={() => setActive(null)}
-    >
+    <span ref={hostRef} {...wrap("mc-garden-live", className, style)} {...named(label)} {...bind}>
       <StaticGardenGrid
         {...rest}
+        style={fillFor(style)}
         data={data}
         rows={rows}
         steps={steps}
@@ -149,17 +191,9 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {c ? (
-          <circle
-            cx={c.cx}
-            cy={c.cy}
-            r={geo.rMax + 1}
-            fill="none"
-            stroke="var(--mc-accent)"
-            strokeWidth={1.25}
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
+        {selected !== null && selected !== active ? ring(selected, true) : null}
+        {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticGardenGrid>
       <LiveRegion>{announced}</LiveRegion>
@@ -168,7 +202,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
           className="mc-spark-readout"
           style={{ left: `${(c.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {c.value === null ? "—" : fmt(c.value)}
+          {c.value === null ? "—" : `${fmt(c.value)}, step ${c.step}/${steps}`}
         </span>
       ) : null}
     </span>

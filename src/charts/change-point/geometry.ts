@@ -12,6 +12,9 @@ export const BREAK_SS_RATIO = 0.2;
 export const BREAK_EFFECT_SIZE = 0.8;
 /** Minimum segment length = max(3, ⌈n / this⌉). */
 export const BREAK_MIN_SEG_DIVISOR = 10;
+/** Vertical inset of the plot box: the series line lives in [PAD, height − PAD].
+ *  Exported so the component can seat the plot without re-deriving the frame. */
+export const CHANGE_POINT_PAD = 2;
 
 interface Stat {
   sum: number;
@@ -103,7 +106,7 @@ export function changePointGeometry(opts: {
   height: number;
   data: readonly number[];
   breaks?: "auto" | readonly number[] | undefined;
-  max?: number | undefined;
+  maxItems?: number | undefined;
   domain?: readonly [number, number] | undefined;
   pad?: number | undefined;
 }): ChangePointGeometry | null {
@@ -111,7 +114,7 @@ export function changePointGeometry(opts: {
   const n = data.length;
   if (n === 0) return null;
 
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? CHANGE_POINT_PAD;
   // one pass for the y-domain (inlined min/max — avoids the `extent` import)
   let lo = Infinity;
   let hi = -Infinity;
@@ -136,7 +139,7 @@ export function changePointGeometry(opts: {
     opts.breaks && opts.breaks !== "auto"
       ? [...opts.breaks].filter((i) => Number.isInteger(i) && i > 0 && i < n).sort((a, b) => a - b)
       : n >= 8
-        ? detectBreaks(data as number[], opts.max)
+        ? detectBreaks(data as number[], opts.maxItems)
         : [];
   const bpts = [...new Set(rawBreaks)];
 
