@@ -9,12 +9,16 @@ const guides = readdirSync(dir)
   .filter((f) => f.endsWith(".mdx"))
   .map((f) => ({ f, src: readFileSync(resolve(dir, f), "utf8") }));
 const bySrc = (name: string) => guides.find((g) => g.f === name)?.src ?? "";
-const round1 = (n: number) => Math.round(n * 10) / 10;
 
 // Literals that were true once and silently rotted. If any reappears, a claim
 // has drifted from the measured catalog again — regenerate, don't hand-edit.
 const FORBIDDEN: { pattern: RegExp; why: string }[] = [
-  { pattern: /~?1\s*kB each/i, why: "false size claim — sizes span ~0.95–3.9 kB" },
+  { pattern: /~?1\s*kB each/i, why: "false size claim — use ~1–4 kB, not '1 kB each'" },
+  {
+    pattern: /0\.95[–-]/,
+    why: "stale size literal — marketing uses ~1–4 kB; measured min lives in performance.mdx",
+  },
+  { pattern: /1–3\.9\s*kB/i, why: "stale rounded size span — use ~1–4 kB in marketing prose" },
   { pattern: /\b98\s+charts\b/, why: "stale catalog count" },
   { pattern: /\b100\s+chart(?: type)?s?\b/, why: "stale catalog count" },
   { pattern: /^#+\s+The five\s*$/m, why: "heading mismatched its four-context grid" },
@@ -45,10 +49,10 @@ describe("docs guide claims stay true", () => {
   });
 
   // performance.mdx quotes the precise measured size stats (min/max/median);
-  // index.mdx quotes the same numbers rounded to one decimal for prose. Both
-  // are hand-typed literals (frontmatter/prose can't import docs-facts), so
-  // this test is what keeps them from silently rotting — regenerate the
-  // literal from SIZE, never hand-edit past a drift.
+  // marketing guides use a durable "~1–4 kB" band. Precise literals are
+  // hand-typed (frontmatter/prose can't import docs-facts), so this test is
+  // what keeps them from silently rotting — regenerate from SIZE, never
+  // hand-edit past a drift.
   it("performance.mdx quotes the precise measured size stats", () => {
     const src = bySrc("performance.mdx");
     expect(src).toContain(`${SIZE.min} kB and ${SIZE.max} kB`);
@@ -58,13 +62,10 @@ describe("docs guide claims stay true", () => {
     expect(src).toContain(`median ${SIZE.interactiveMedian} kB`);
   });
 
-  it("index.mdx quotes the size stats rounded to one decimal", () => {
+  it("index.mdx quotes the durable marketing size band", () => {
     const src = bySrc("index.mdx");
-    const min = round1(SIZE.min);
-    const max = round1(SIZE.max);
-    const median = round1(SIZE.median);
-    expect(src).toContain(`${min}–${max} kB gzip`);
-    expect(src).toContain(`median ${median}`);
+    expect(src).toContain("~1–4 kB gzip");
+    expect(src).not.toMatch(/\d\.\d+–\d+(\.\d+)?\s*kB/);
   });
 
   it("performance.mdx quotes the measured per-chart SSR median in both frontmatter and body", () => {

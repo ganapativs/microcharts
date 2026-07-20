@@ -18,7 +18,7 @@ export const playground: PlaygroundSpec = {
     <FoldedDayBandInteractive
       data={DATA}
       today={s.today ? TODAY : undefined}
-      bands={
+      percentiles={
         s.single
           ? [[25, 75]]
           : [
@@ -38,7 +38,7 @@ export const playground: PlaygroundSpec = {
       "<FoldedDayBand",
       "  data={observations}",
       s.today === true && "  today={today}",
-      s.single === true && "  bands={[[25, 75]]}",
+      s.single === true && "  percentiles={[[25, 75]]}",
       s.bins !== 24 && `  bins={${s.bins}}`,
       ui.animate && " animate",
       "/>",

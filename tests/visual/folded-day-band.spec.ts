@@ -40,7 +40,7 @@ function gallery(): string {
       height: 40,
       title: "default (25–75, 5–95 + today)",
     }),
-    svg({ data: DATA, bands: [[25, 75]], width: 200, height: 40, title: "one band" }),
+    svg({ data: DATA, percentiles: [[25, 75]], width: 200, height: 40, title: "one band" }),
     svg({ data: DATA, width: 200, height: 40, title: "no today overlay" }),
     svg({
       data: [{ t: 3, value: 10 }],

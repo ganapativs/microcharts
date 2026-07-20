@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Provider } from "@/components/provider";
 import { SITE } from "@/lib/site";
-import { SIZE } from "@/lib/docs-facts";
 import {
   jsonLdScript,
   softwareApplicationJsonLd,
@@ -49,7 +48,7 @@ const LIVE_SCRIPT = `try{if(typeof LanguageModel!=="undefined"&&localStorage.get
 // The leading glyph is the hero's own sparkline data ([3,5,4,8,6,9,7,11])
 // rendered in unicode blocks — a chart small enough to sit in a console.log,
 // which is exactly the tagline. Delight that doesn't lie: it's the real series.
-const CONSOLE_SCRIPT = `try{console.log("%c▁▃▂▅▄▆▅█%c  ${SITE.name}%c\\n${SITE.tagline}\\nThat glyph is the hero's sparkline in text. Small enough for a sentence, a table cell, or a console.log.\\nZero dependencies, ${SIZE.min}–${SIZE.max} kB gzip per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#c2410c;font-size:15px;letter-spacing:1.5px","color:#c2410c;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.7")}catch(e){}`;
+const CONSOLE_SCRIPT = `try{console.log("%c▁▃▂▅▄▆▅█%c  ${SITE.name}%c\\n${SITE.tagline}\\nThat glyph is the hero's sparkline in text. Small enough for a sentence, a table cell, or a console.log.\\nZero dependencies, ~1–4 kB gzip per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#c2410c;font-size:15px;letter-spacing:1.5px","color:#c2410c;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.7")}catch(e){}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),

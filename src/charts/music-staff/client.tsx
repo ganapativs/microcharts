@@ -48,7 +48,7 @@ const ring = (nt: { cx: number; cy: number; rx: number }, pinned: boolean): Reac
 export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
   const {
     data,
-    range = "ledger",
+    mode = "ledger",
     label = "none",
     domain,
     width = 60,
@@ -90,9 +90,8 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
       ? Math.ceil(`${fmt(last as number)}`.length * 0.62 * fontSize + 2)
       : 0;
   const geo = useMemo(
-    () =>
-      musicStaffGeometry({ values: data, domain, width: width - gutter, height, range, pad: 2 }),
-    [data, domain, width, gutter, height, range],
+    () => musicStaffGeometry({ values: data, domain, width: width - gutter, height, mode, pad: 2 }),
+    [data, domain, width, gutter, height, mode],
   );
   // Navigable units are the NOTES, but indices are reported in DATA space (rests
   // — non-finite values — are simply never landed on), matching Sparkline.
@@ -153,7 +152,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
       <StaticMusicStaff
         {...rest}
         data={data}
-        range={range}
+        mode={mode}
         label={label}
         domain={domain}
         width={width}

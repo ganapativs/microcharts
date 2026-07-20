@@ -6,6 +6,7 @@
 // Composes the static component (canon); geometry is never re-implemented.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { EN_TALLY, type TallyStrings } from "../../core/strings-tally.js";
 import { TallyMarks as StaticTallyMarks, tallySummary, type TallyMarksProps } from "./index.js";
@@ -107,21 +108,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );
 }

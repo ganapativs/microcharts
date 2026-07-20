@@ -39,13 +39,13 @@ export function waterfallGeometry(opts: {
   width: number;
   height: number;
   deltas: readonly Value[];
-  start: number;
+  open: number;
   total: boolean;
   domain?: readonly [number, number] | undefined;
   gap?: number | undefined;
 }): WaterfallGeometry {
   const { width, height, total, gap = 1 } = opts;
-  const start = Number.isFinite(opts.start) ? opts.start : 0;
+  const open = Number.isFinite(opts.open) ? opts.open : 0;
   const deltas = opts.deltas.map((d) => (isFiniteValue(d) ? d : 0));
   const n = deltas.length;
   if (n === 0) {
@@ -63,14 +63,14 @@ export function waterfallGeometry(opts: {
   }
 
   const levels: number[] = [];
-  let running = start;
+  let running = open;
   for (const d of deltas) {
     running += d;
     levels.push(round2(running));
   }
 
-  const lo = Math.min(0, start, ...levels);
-  const hi = Math.max(0, start, ...levels);
+  const lo = Math.min(0, open, ...levels);
+  const hi = Math.max(0, open, ...levels);
   const domain =
     opts.domain && opts.domain.every((d) => Number.isFinite(d)) ? opts.domain : ([lo, hi] as const);
   const y = (v: number) =>
@@ -83,17 +83,17 @@ export function waterfallGeometry(opts: {
 
   const bars: WaterfallBar[] = [];
   const connectors: { x0: number; x1: number; y: number }[] = [];
-  let level = start;
+  let level = open;
   deltas.forEach((d, index) => {
-    const from = level;
+    const barFrom = level;
     level += d;
-    const yTop = y(Math.max(from, level));
-    const yBot = y(Math.min(from, level));
+    const yTop = y(Math.max(barFrom, level));
+    const yBot = y(Math.min(barFrom, level));
     const x = round2(index * pitch);
     const h = Math.max(round2(yBot - yTop), 1); // zero delta → visible 1-unit tick
     bars.push({
       x,
-      y: d === 0 ? round2(y(from) - 0.5) : yTop,
+      y: d === 0 ? round2(y(barFrom) - 0.5) : yTop,
       w: round2(Math.min(colW, round2(width - x))),
       h: d === 0 ? 1 : h,
       sign: d > 0 ? 1 : d < 0 ? -1 : 0,

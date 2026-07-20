@@ -182,7 +182,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Order book depth{" "}
         <span className="mc-inline">
-          <DepthWedge data={BOOK} height={16} summary={false} />
+          <DepthWedge data={BOOK} label="none" width={72} height={20} summary={false} />
         </span>{" "}
         — bid-side liquidity thicker below mid.
       </p>
@@ -197,7 +197,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <DepthWedge data={row.data} height={18} summary={false} />
+                <DepthWedge data={row.data} label="none" width={72} height={20} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -231,13 +231,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <DepthWedge data={row.data} height={14} summary={false} />
+            <DepthWedge data={row.data} label="none" width={64} height={18} summary={false} />
           </span>
         ))}
       </div>
     ),
     code: '<button className="tab">\n  BTC <DepthWedge data={{ demand, supply }} />\n</button>',
   },
+  note: "Best at KPI/card scale — book depth needs width to show both sides.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

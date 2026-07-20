@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { musicStaffGeometry } from "./geometry.js";
 
-const g = (values: (number | null)[], range: "staff" | "ledger" = "ledger") =>
-  musicStaffGeometry({ values, width: 60, height: 20, range, pad: 2 });
+const g = (values: (number | null)[], mode: "staff" | "ledger" = "ledger") =>
+  musicStaffGeometry({ values, width: 60, height: 20, mode, pad: 2 });
 
 describe("musicStaffGeometry — pitch on a staff", () => {
   it("always draws five staff lines", () => {
@@ -29,7 +29,7 @@ describe("musicStaffGeometry — pitch on a staff", () => {
     expect(new Set(geo.notes.map((n) => n.cx)).size).toBe(3); // distinct times
   });
 
-  it("ledger range has 13 positions; staff range clamps to 9", () => {
+  it("ledger mode has 13 positions; staff mode clamps to 9", () => {
     // extreme spread → the min/max land at the outermost positions
     const led = g([0, 100]);
     const stf = g([0, 100], "staff");
@@ -46,7 +46,7 @@ describe("musicStaffGeometry — pitch on a staff", () => {
   test.prop([fc.array(fc.integer({ min: 0, max: 100 }), { minLength: 1, maxLength: 16 })])(
     "notes stay inside the box",
     (values) => {
-      const geo = musicStaffGeometry({ values, width: 60, height: 20, range: "ledger", pad: 2 });
+      const geo = musicStaffGeometry({ values, width: 60, height: 20, mode: "ledger", pad: 2 });
       for (const n of geo.notes) {
         expect(n.cy - n.ry).toBeGreaterThanOrEqual(-0.5);
         expect(n.cy + n.ry).toBeLessThanOrEqual(20.5);

@@ -33,6 +33,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
     target,
     format,
     locale,
+    strings,
     title,
     summary,
     animate = false,
@@ -49,7 +50,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
   useEntrance(hostRef, "sweep", animate, { selector: MEASURE_SELECTOR });
 
   const fmt = makeFormatter(format, locale);
-  const auto = bulletSummary(fmt(value), target === undefined ? null : fmt(target));
+  const auto = bulletSummary(fmt(value), target === undefined ? null : fmt(target), strings);
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : auto;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
@@ -89,6 +90,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
         target={target}
         format={format}
         locale={locale}
+        strings={strings}
         summary={false}
         style={fillFor(style)}
       />

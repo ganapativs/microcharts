@@ -35,3 +35,6 @@ fixtures/next/CHANGELOG.md
 
 # Local scratch work (never committed)
 /scratchpad/
+
+# figma-export generated artifacts (regenerate with pnpm figma:export)
+scripts/figma-export/out/

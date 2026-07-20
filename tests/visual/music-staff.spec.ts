@@ -27,7 +27,7 @@ function gallery(): string {
 
   const variants = [
     svg({ data: MELODY, title: "ledger" }),
-    svg({ data: MELODY, range: "staff", title: "staff range" }),
+    svg({ data: MELODY, mode: "staff", title: "staff range" }),
     svg({ data: MELODY, label: "last", title: "last value" }),
     svg({ data: [3, 5, null, 8, null, 6], title: "with rests" }),
   ]

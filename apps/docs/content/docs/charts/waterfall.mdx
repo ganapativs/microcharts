@@ -17,7 +17,7 @@ direction from the running level AND by valence color, never color alone.
       { label: "Opex", value: -26 },
       { label: "FX", value: 5 },
     ]}
-    start={60}
+    open={60}
     title="Net income bridge"
     width={220}
     height={30}
@@ -49,8 +49,8 @@ direction from the running level AND by valence color, never color alone.
   code={`// label="delta" prints each step's signed value in a band below the plot.
 // When labels would collide, the biggest movers win — a deterministic drop-out,
 // never a random overlap.
-<Waterfall data={steps} start={60} label="delta" />
-<Waterfall data={steps} start={60} totalBar={false} />`}
+<Waterfall data={steps} open={60} label="delta" />
+<Waterfall data={steps} open={60} totalBar={false} />`}
 >
   <span className="inline-flex flex-col gap-3">
     <Waterfall
@@ -61,7 +61,7 @@ direction from the running level AND by valence color, never color alone.
         { label: "Opex", value: -26 },
         { label: "FX", value: 5 },
       ]}
-      start={60}
+      open={60}
       label="delta"
       title="Net income bridge"
       width={240}
@@ -75,7 +75,7 @@ direction from the running level AND by valence color, never color alone.
         { label: "Opex", value: -26 },
         { label: "FX", value: 5 },
       ]}
-      start={60}
+      open={60}
       totalBar={false}
       title="Steps only"
       width={220}
@@ -94,7 +94,7 @@ direction from the running level AND by valence color, never color alone.
     { label: "Vendors", value: -5 },
     { label: "Travel", value: -3 },
   ]}
-  start={40}
+  open={40}
   positive="down"
 />`}
 >
@@ -105,7 +105,7 @@ direction from the running level AND by valence color, never color alone.
       { label: "Vendors", value: -5 },
       { label: "Travel", value: -3 },
     ]}
-    start={40}
+    open={40}
     positive="down"
     title="Cost bridge"
     width={220}
@@ -125,7 +125,7 @@ direction from the running level AND by valence color, never color alone.
     { label: "Q2", value: -35 },
     { label: "Q3", value: -10 },
   ]}
-  start={0}
+  open={0}
 />`}
 >
   <Waterfall
@@ -134,7 +134,7 @@ direction from the running level AND by valence color, never color alone.
       { label: "Q2", value: -35 },
       { label: "Q3", value: -10 },
     ]}
-    start={0}
+    open={0}
     title="All losses"
     width={180}
     height={30}
@@ -151,7 +151,7 @@ direction from the running level AND by valence color, never color alone.
     { label: "Flat", value: 0 },
     { label: "Refunds", value: -12 },
   ]}
-  start={50}
+  open={50}
 />`}
 >
   <Waterfall
@@ -160,7 +160,7 @@ direction from the running level AND by valence color, never color alone.
       { label: "Flat", value: 0 },
       { label: "Refunds", value: -12 },
     ]}
-    start={50}
+    open={50}
     title="Zero step"
     width={180}
     height={30}

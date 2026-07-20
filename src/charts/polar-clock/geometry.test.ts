@@ -6,7 +6,15 @@ const g = (
   values: readonly (number | null)[],
   extra: Partial<Parameters<typeof polarClockGeometry>[0]> = {},
 ) =>
-  polarClockGeometry({ values, size: 24, inner: 0.35, start: 0, pad: 1, mode: "length", ...extra });
+  polarClockGeometry({
+    values,
+    size: 24,
+    inner: 0.35,
+    origin: 0,
+    pad: 1,
+    mode: "length",
+    ...extra,
+  });
 
 describe("polarClockGeometry — cyclic radial bars", () => {
   it("one segment per value; peak has the longest bar", () => {
@@ -30,8 +38,8 @@ describe("polarClockGeometry — cyclic radial bars", () => {
     expect((geo.segmentsPath.match(/M/g) ?? []).length).toBeGreaterThanOrEqual(2);
   });
 
-  it("start rotates which index sits at 12 o'clock", () => {
-    const geo = g([1, 2, 3, 4], { start: 2 });
+  it("origin rotates which index sits at 12 o'clock", () => {
+    const geo = g([1, 2, 3, 4], { origin: 2 });
     expect(geo.segments[2]!.pos).toBe(0); // index 2 → 12 o'clock slot
   });
 
@@ -55,10 +63,10 @@ describe("polarClockGeometry — cyclic radial bars", () => {
     expect(polarStart(3, 0)).toBe(0); // no segments, no rotation
   });
 
-  it("a fractional `start` rotates by whole slots (the paint has no half-segment)", () => {
-    // start 1.5 must place index 1 at 12 o'clock, exactly as start 1 does.
-    const half = g([10, 20, 30, 40], { start: 1.5 });
-    const whole = g([10, 20, 30, 40], { start: 1 });
+  it("a fractional `origin` rotates by whole slots (the paint has no half-segment)", () => {
+    // origin 1.5 must place index 1 at 12 o'clock, exactly as origin 1 does.
+    const half = g([10, 20, 30, 40], { origin: 1.5 });
+    const whole = g([10, 20, 30, 40], { origin: 1 });
     expect(half.segments.map((s) => s.pos)).toEqual(whole.segments.map((s) => s.pos));
     expect(half.segments[1]!.pos).toBe(0);
   });

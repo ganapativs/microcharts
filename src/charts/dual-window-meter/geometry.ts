@@ -3,6 +3,7 @@
 // window thin, slow window thick. The plotted values are rolling means and the
 // window sizes are part of the meaning (stated, never hidden). A trace starts
 // where its window fills — no partial-window fake. 2-dp.
+import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
 export interface Rect {
@@ -33,12 +34,6 @@ export function rollingMean(data: readonly Value[], w: number): (number | null)[
     out.push(count > 0 ? sum / count : null);
   }
   return out;
-}
-
-function lastFinite(arr: readonly (number | null)[]): number | null {
-  for (let i = arr.length - 1; i >= 0; i--)
-    if (arr[i] != null && Number.isFinite(arr[i]!)) return arr[i]!;
-  return null;
 }
 
 /** Path from a value array, breaking at nulls (leading gap survives). */
@@ -133,8 +128,8 @@ export function dualWindowGeometry(opts: {
       }
     : null;
 
-  const fastLast = lastFinite(fast);
-  const slowLast = lastFinite(slow);
+  const fastLast = lastFinite(fast) ?? null;
+  const slowLast = lastFinite(slow) ?? null;
   return {
     fastPath: linePath(fast, xOf, yOf),
     slowPath: linePath(slow, xOf, yOf),

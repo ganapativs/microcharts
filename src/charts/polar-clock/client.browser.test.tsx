@@ -51,12 +51,12 @@ describe("interactive <PolarClock>", () => {
     await expect.poll(() => fig.querySelector('path[data-mc-w="tick"]')).not.toBeNull();
   });
 
-  it("a fractional `start` still answers the pointer (client shares the paint's rotation)", async () => {
-    // start=1.5 rotates by whole slots, so Monday sits at 12 o'clock. Inverting
-    // the RAW start here produced index 1.5 — no segment, a dial dead to hover.
+  it("a fractional `origin` still answers the pointer (client shares the paint's rotation)", async () => {
+    // origin=1.5 rotates by whole slots, so Monday sits at 12 o'clock. Inverting
+    // the RAW origin here produced index 1.5 — no segment, a dial dead to hover.
     const seen: unknown[] = [];
     const screen = await render(
-      <PolarClock data={WEEK} start={1.5} onActive={(d) => seen.push(d)} />,
+      <PolarClock data={WEEK} origin={1.5} onActive={(d) => seen.push(d)} />,
     );
     const fig = screen.getByRole("img").element() as HTMLElement;
     const r = fig.getBoundingClientRect();

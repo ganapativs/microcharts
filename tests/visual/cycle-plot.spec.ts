@@ -32,7 +32,7 @@ function gallery(): string {
   const variants = [
     svg({ data: WEEKS, period: 7, title: "default" }),
     svg({ data: WEEKS, period: 7, center: "median", title: "median" }),
-    svg({ data: WEEKS, period: 7, trend: "none", title: "spine only" }),
+    svg({ data: WEEKS, period: 7, trend: false, title: "spine only" }),
     svg({ data: WEEKS, period: 7, spine: false, title: "drift only" }),
     svg({ data: [5, 6, 7], period: 7, title: "period ≥ n" }),
   ].join(" ");

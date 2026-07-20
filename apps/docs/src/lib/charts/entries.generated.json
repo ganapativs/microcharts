@@ -315,7 +315,7 @@
         "description": "Cell mark: crisp square, soft corners, or padded dot."
       },
       {
-        "name": "start",
+        "name": "anchor",
         "type": "string | Date",
         "required": false,
         "description": "First slot's calendar day (UTC) — pads the first column so weekday rows align."
@@ -324,7 +324,7 @@
         "name": "weekStart",
         "type": "0 | 1",
         "required": false,
-        "description": "Start of week for start alignment (0 Sunday, 1 Monday)."
+        "description": "Start of week for anchor alignment (0 Sunday, 1 Monday)."
       },
       {
         "name": "cell",
@@ -1601,7 +1601,7 @@
         "description": "Signed deltas in order."
       },
       {
-        "name": "start",
+        "name": "open",
         "type": "number",
         "required": false,
         "description": "Opening level (prior-period close)."
@@ -1628,7 +1628,7 @@
     "demo": [42, 18, -12, -26, 5],
     "example": {
       "title": "Net income bridge",
-      "code": "import { Waterfall } from \"@microcharts/react/waterfall\";\n\n<Waterfall data={steps} start={60} title=\"Net income bridge\" />"
+      "code": "import { Waterfall } from \"@microcharts/react/waterfall\";\n\n<Waterfall data={steps} open={60} title=\"Net income bridge\" />"
     },
     "sampleData": [
       {
@@ -3365,9 +3365,9 @@
       },
       {
         "name": "trend",
-        "type": "\"line\" | \"none\"",
+        "type": "boolean",
         "required": false,
-        "description": "Within-slot micro-trend, or a spine-only quiet form."
+        "description": "Within-slot micro-trend line (default true); false = spine + ticks only."
       },
       {
         "name": "spine",
@@ -4155,7 +4155,7 @@
         "description": "The series; null = a rest."
       },
       {
-        "name": "range",
+        "name": "mode",
         "type": "\"staff\" | \"ledger\"",
         "required": false,
         "description": "ledger (±2, default) or staff (clamp on-staff)."
@@ -4499,7 +4499,7 @@
         "description": "Radial bars (default) or fixed-length 5-step fill."
       },
       {
-        "name": "start",
+        "name": "origin",
         "type": "number",
         "required": false,
         "description": "Index rendered at 12 o'clock (week-start / midnight)."
@@ -4843,7 +4843,7 @@
         "description": "Rate extent (default [0, 2·rate])."
       },
       {
-        "name": "alert",
+        "name": "threshold",
         "type": "number",
         "required": false,
         "description": "Latency threshold: at/above it the satellite doubles + the summary flags it."
@@ -5166,7 +5166,7 @@
         "name": "target",
         "type": "number",
         "required": false,
-        "description": "Pass-threshold tick across all rows."
+        "description": "Pass target — one tick across all rows."
       },
       {
         "name": "labels",
@@ -5725,7 +5725,7 @@
         "description": "The current period overlaid."
       },
       {
-        "name": "bands",
+        "name": "percentiles",
         "type": "[number, number][]",
         "required": false,
         "description": "Percentile pairs, outermost last."
@@ -6246,7 +6246,13 @@
         "name": "bins",
         "type": "[number, number, number]",
         "required": false,
-        "description": "Ascending grade % thresholds that quantize the four difficulty bins."
+        "description": "Ascending grade-% thresholds (always percent) that quantize the four difficulty bins."
+      },
+      {
+        "name": "format",
+        "type": "Intl.NumberFormatOptions | (n) => string",
+        "required": false,
+        "description": "Formats distance and elevation in the summary and readout; grades always render as percent."
       },
       {
         "name": "label",
@@ -6509,7 +6515,7 @@
         "description": "Percentile ranks 0–100, one per reading; out-of-range values are clamped."
       },
       {
-        "name": "bands",
+        "name": "showBands",
         "type": "boolean",
         "required": false,
         "description": "Draw the fixed p25–75 and p5–95 population fields (default true)."

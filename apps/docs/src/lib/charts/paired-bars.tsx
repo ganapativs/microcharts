@@ -232,12 +232,12 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <PairedBars data={rows} positive="down" summary={false} width={40} height={14} />
+            <PairedBars data={rows} positive="down" summary={false} width={64} height={16} />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Regional <PairedBars data={regions} positive="down" width={40} height={14} />\n</button>\n<button className="tab">\n  Marketing <PairedBars data={marketing} positive="down" width={40} height={14} />\n</button>`,
+    code: `<button className="tab">\n  Regional <PairedBars data={regions} positive="down" width={64} height={16} />\n</button>\n<button className="tab">\n  Marketing <PairedBars data={marketing} positive="down" width={64} height={16} />\n</button>`,
   },
 };
 

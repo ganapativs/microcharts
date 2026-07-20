@@ -108,6 +108,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        seat={{ mode: "floor", bottom: height }}
         className={cls}
         style={style}
       >

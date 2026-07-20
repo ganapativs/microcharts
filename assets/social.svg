@@ -93,6 +93,6 @@
   </g>
 
   <!-- footer: stat line + url, centered + stacked -->
-  <text x="640" y="540" text-anchor="middle" xml:space="preserve" font-size="16" fill="#8b93a6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">106 chart types<tspan fill="#5b6377">   ·   </tspan>0 dependencies<tspan fill="#5b6377">   ·   </tspan>0.95–3.67 kB gzip<tspan fill="#5b6377">   ·   </tspan>RSC-safe<tspan fill="#5b6377">   ·   </tspan>accessible by default</text>
+  <text x="640" y="540" text-anchor="middle" xml:space="preserve" font-size="16" fill="#8b93a6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">106 chart types<tspan fill="#5b6377">   ·   </tspan>0 dependencies<tspan fill="#5b6377">   ·   </tspan>~1–4 kB gzip<tspan fill="#5b6377">   ·   </tspan>RSC-safe<tspan fill="#5b6377">   ·   </tspan>accessible by default</text>
   <text x="640" y="586" text-anchor="middle" font-size="17" fill="#f7924e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">microcharts.dev</text>
 </svg>

@@ -221,11 +221,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <TokenConfidence
-              data={ANSWER.slice(0, 6)}
-              summary={false}
-              style={{ fontSize: "0.55rem" }}
-            />
+            <TokenConfidence data={row.data} summary={false} style={{ fontSize: "0.55rem" }} />
           </span>
         ))}
       </div>

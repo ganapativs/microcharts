@@ -174,7 +174,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         CPU × latency phase{" "}
         <span className="mc-inline">
-          <PhaseTrace data={TRAJ} xLabel="CPU" yLabel="Latency" grid height={16} summary={false} />
+          <PhaseTrace data={TRAJ} height={28} summary={false} />
         </span>{" "}
         — lag loop in the upper-right regime.
       </p>
@@ -189,14 +189,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <PhaseTrace
-                  data={row.data}
-                  xLabel="CPU"
-                  yLabel="Latency"
-                  grid
-                  height={18}
-                  summary={false}
-                />
+                <PhaseTrace data={row.data} height={28} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -237,20 +230,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <PhaseTrace
-              data={row.data}
-              xLabel="CPU"
-              yLabel="Latency"
-              grid
-              height={14}
-              summary={false}
-            />
+            <PhaseTrace data={row.data} height={24} summary={false} />
           </span>
         ))}
       </div>
     ),
     code: '<button className="tab">\n  api <PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" />\n</button>',
   },
+  note: "Best at KPI/card scale — phase loops need a square plot.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

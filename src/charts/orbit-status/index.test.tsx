@@ -16,8 +16,8 @@ describe("<OrbitStatus>", () => {
     );
   });
 
-  it("alert flags the summary", () => {
-    expect(orbitStatusSummary(350, 12, { alert: 300 })).toBe(
+  it("threshold flags the summary", () => {
+    expect(orbitStatusSummary(350, 12, { threshold: 300 })).toBe(
       "350ms latency at 12 calls/s — above alert threshold.",
     );
   });

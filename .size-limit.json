@@ -7,7 +7,7 @@
   {
     "name": "@microcharts/react/sparkline (static)",
     "path": "dist/charts/sparkline/index.js",
-    "limit": "4.01 kB",
+    "limit": "4.02 kB",
     "gzip": true
   },
   {
@@ -31,37 +31,37 @@
   {
     "name": "@microcharts/react/delta (static)",
     "path": "dist/charts/delta/index.js",
-    "limit": "1.01 kB",
+    "limit": "1.16 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/delta/interactive",
     "path": "dist/charts/delta/client.js",
-    "limit": "1.90 kB",
+    "limit": "2.05 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/bullet (static)",
     "path": "dist/charts/bullet/index.js",
-    "limit": "1.89 kB",
+    "limit": "1.94 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/bullet/interactive",
     "path": "dist/charts/bullet/client.js",
-    "limit": "2.97 kB",
+    "limit": "3.03 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/activity-grid (static)",
     "path": "dist/charts/activity-grid/index.js",
-    "limit": "2.33 kB",
+    "limit": "2.38 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/activity-grid/interactive",
     "path": "dist/charts/activity-grid/client.js",
-    "limit": "4.83 kB",
+    "limit": "4.88 kB",
     "gzip": true
   },
   {
@@ -85,7 +85,7 @@
   {
     "name": "@microcharts/react/status-dot/interactive",
     "path": "dist/charts/status-dot/client.js",
-    "limit": "2.60 kB",
+    "limit": "2.59 kB",
     "gzip": true
   },
   {
@@ -211,13 +211,13 @@
   {
     "name": "@microcharts/react/slope (static)",
     "path": "dist/charts/slope/index.js",
-    "limit": "3.32 kB",
+    "limit": "3.35 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/slope/interactive",
     "path": "dist/charts/slope/client.js",
-    "limit": "5.67 kB",
+    "limit": "5.68 kB",
     "gzip": true
   },
   {
@@ -295,7 +295,7 @@
   {
     "name": "@microcharts/react/funnel (static)",
     "path": "dist/charts/funnel/index.js",
-    "limit": "2.39 kB",
+    "limit": "2.40 kB",
     "gzip": true
   },
   {
@@ -319,7 +319,7 @@
   {
     "name": "@microcharts/react/waterfall (static)",
     "path": "dist/charts/waterfall/index.js",
-    "limit": "2.97 kB",
+    "limit": "2.96 kB",
     "gzip": true
   },
   {
@@ -379,7 +379,7 @@
   {
     "name": "@microcharts/react/horizon (static)",
     "path": "dist/charts/horizon/index.js",
-    "limit": "2.56 kB",
+    "limit": "2.57 kB",
     "gzip": true
   },
   {
@@ -409,7 +409,7 @@
   {
     "name": "@microcharts/react/event-timeline/interactive",
     "path": "dist/charts/event-timeline/client.js",
-    "limit": "5.35 kB",
+    "limit": "5.33 kB",
     "gzip": true
   },
   {
@@ -421,7 +421,7 @@
   {
     "name": "@microcharts/react/coverage-strip/interactive",
     "path": "dist/charts/coverage-strip/client.js",
-    "limit": "4.56 kB",
+    "limit": "4.55 kB",
     "gzip": true
   },
   {
@@ -439,13 +439,13 @@
   {
     "name": "@microcharts/react/percentile-ladder (static)",
     "path": "dist/charts/percentile-ladder/index.js",
-    "limit": "3.24 kB",
+    "limit": "3.28 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/percentile-ladder/interactive",
     "path": "dist/charts/percentile-ladder/client.js",
-    "limit": "5.40 kB",
+    "limit": "5.44 kB",
     "gzip": true
   },
   {
@@ -463,13 +463,13 @@
   {
     "name": "@microcharts/react/net-flow (static)",
     "path": "dist/charts/net-flow/index.js",
-    "limit": "2.92 kB",
+    "limit": "2.93 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/retention-curve (static)",
     "path": "dist/charts/retention-curve/index.js",
-    "limit": "3.24 kB",
+    "limit": "3.25 kB",
     "gzip": true
   },
   {
@@ -481,13 +481,13 @@
   {
     "name": "@microcharts/react/burn-chart (static)",
     "path": "dist/charts/burn-chart/index.js",
-    "limit": "3.43 kB",
+    "limit": "3.44 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/burn-chart/interactive",
     "path": "dist/charts/burn-chart/client.js",
-    "limit": "5.74 kB",
+    "limit": "5.75 kB",
     "gzip": true
   },
   {
@@ -499,7 +499,7 @@
   {
     "name": "@microcharts/react/error-budget/interactive",
     "path": "dist/charts/error-budget/client.js",
-    "limit": "5.17 kB",
+    "limit": "5.15 kB",
     "gzip": true
   },
   {
@@ -535,7 +535,7 @@
   {
     "name": "@microcharts/react/quantile-dots/interactive",
     "path": "dist/charts/quantile-dots/client.js",
-    "limit": "5.06 kB",
+    "limit": "5.03 kB",
     "gzip": true
   },
   {
@@ -559,7 +559,7 @@
   {
     "name": "@microcharts/react/shift-histogram/interactive",
     "path": "dist/charts/shift-histogram/client.js",
-    "limit": "5.51 kB",
+    "limit": "5.52 kB",
     "gzip": true
   },
   {
@@ -607,7 +607,7 @@
   {
     "name": "@microcharts/react/cycle-plot/interactive",
     "path": "dist/charts/cycle-plot/client.js",
-    "limit": "5.62 kB",
+    "limit": "5.61 kB",
     "gzip": true
   },
   {
@@ -643,7 +643,7 @@
   {
     "name": "@microcharts/react/tally-marks/interactive",
     "path": "dist/charts/tally-marks/client.js",
-    "limit": "2.63 kB",
+    "limit": "2.69 kB",
     "gzip": true
   },
   {
@@ -655,7 +655,7 @@
   {
     "name": "@microcharts/react/dice-pips/interactive",
     "path": "dist/charts/dice-pips/client.js",
-    "limit": "2.42 kB",
+    "limit": "2.49 kB",
     "gzip": true
   },
   {
@@ -679,7 +679,7 @@
   {
     "name": "@microcharts/react/fat-digits/interactive",
     "path": "dist/charts/fat-digits/client.js",
-    "limit": "2.91 kB",
+    "limit": "2.92 kB",
     "gzip": true
   },
   {
@@ -715,7 +715,7 @@
   {
     "name": "@microcharts/react/hourglass/interactive",
     "path": "dist/charts/hourglass/client.js",
-    "limit": "2.81 kB",
+    "limit": "2.88 kB",
     "gzip": true
   },
   {
@@ -901,7 +901,7 @@
   {
     "name": "@microcharts/react/net-flow/interactive",
     "path": "dist/charts/net-flow/client.js",
-    "limit": "5.13 kB",
+    "limit": "5.14 kB",
     "gzip": true
   },
   {
@@ -913,7 +913,7 @@
   {
     "name": "@microcharts/react/rate-volume/interactive",
     "path": "dist/charts/rate-volume/client.js",
-    "limit": "5.19 kB",
+    "limit": "5.20 kB",
     "gzip": true
   },
   {
@@ -1003,13 +1003,13 @@
   {
     "name": "@microcharts/react/token-confidence (static)",
     "path": "dist/charts/token-confidence/index.js",
-    "limit": "1.01 kB",
+    "limit": "1.02 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/token-confidence/interactive",
     "path": "dist/charts/token-confidence/client.js",
-    "limit": "1.91 kB",
+    "limit": "1.92 kB",
     "gzip": true
   },
   {
@@ -1051,7 +1051,7 @@
   {
     "name": "@microcharts/react/dual-window-meter/interactive",
     "path": "dist/charts/dual-window-meter/client.js",
-    "limit": "4.79 kB",
+    "limit": "4.78 kB",
     "gzip": true
   },
   {
@@ -1099,7 +1099,7 @@
   {
     "name": "@microcharts/react/confusion-grid/interactive",
     "path": "dist/charts/confusion-grid/client.js",
-    "limit": "5.02 kB",
+    "limit": "5.01 kB",
     "gzip": true
   },
   {
@@ -1111,7 +1111,7 @@
   {
     "name": "@microcharts/react/folded-day-band/interactive",
     "path": "dist/charts/folded-day-band/client.js",
-    "limit": "4.59 kB",
+    "limit": "4.60 kB",
     "gzip": true
   },
   {
@@ -1213,7 +1213,7 @@
   {
     "name": "@microcharts/react/win-prob-worm (static)",
     "path": "dist/charts/win-prob-worm/index.js",
-    "limit": "3.54 kB",
+    "limit": "3.55 kB",
     "gzip": true
   },
   {
@@ -1225,7 +1225,7 @@
   {
     "name": "@microcharts/react/queue-depth (static)",
     "path": "dist/charts/queue-depth/index.js",
-    "limit": "3.29 kB",
+    "limit": "3.30 kB",
     "gzip": true
   },
   {
@@ -1261,13 +1261,13 @@
   {
     "name": "@microcharts/react/percentile-trace (static)",
     "path": "dist/charts/percentile-trace/index.js",
-    "limit": "2.89 kB",
+    "limit": "2.90 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/percentile-trace/interactive",
     "path": "dist/charts/percentile-trace/client.js",
-    "limit": "5.12 kB",
+    "limit": "5.13 kB",
     "gzip": true
   },
   {

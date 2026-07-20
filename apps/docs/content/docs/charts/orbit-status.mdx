@@ -46,15 +46,15 @@ set it.
 ## Variants
 
 <LiveDemo
-  label="an SLO alert, and an idle service"
-  code={`<OrbitStatus latency={340} rate={8} alert={300} latencyDomain={[0, 500]} rateDomain={[0, 20]} />
+  label="an SLO threshold, and an idle service"
+  code={`<OrbitStatus latency={340} rate={8} threshold={300} latencyDomain={[0, 500]} rateDomain={[0, 20]} />
 <OrbitStatus latency={100} rate={0} latencyDomain={[0, 500]} rateDomain={[0, 20]} />`}
 >
   <span className="inline-flex gap-6 items-center">
     <OrbitStatus
       latency={340}
       rate={8}
-      alert={300}
+      threshold={300}
       latencyDomain={[0, 500]}
       rateDomain={[0, 20]}
       size={40}
@@ -113,16 +113,16 @@ The dash-density static encoding exists because a paused satellite says nothing 
 variables or the chart would fail the survivor test, so rate lives in the dashes as well as the spin. The rate is
 quantized to five ordinal steps in both renderings — five dash counts and five angular periods — and radius and speed
 always come from the same domains in the static and interactive frames, so nothing drifts. A lone orbit radius is
-meaningless, so the docs insist on explicit `latencyDomain` and `rateDomain` — the same steer as `FatDigits`. An alert
-doubles the satellite's size and flags the summary, never relying on color alone. Unknown latency or rate goes gray and
-stops the spin: an unknown dependency must not look healthy.
+meaningless, so the docs insist on explicit `latencyDomain` and `rateDomain` — the same steer as `FatDigits`. At
+`threshold`, the satellite doubles and flags the summary, never relying on color alone. Unknown latency or rate goes
+gray and stops the spin: an unknown dependency must not look healthy.
 
 ## Accessibility
 
-The accessible name is both variables with units — **"240ms latency at 12 calls/s."** — plus "— above alert threshold"
-when the latency crosses `alert`, or **"Latency unknown."** when a value is missing. The alert state is carried by the
-satellite's size and the summary, never color alone; motion is gated on `prefers-reduced-motion`; and the live region
-announces threshold crossings only.
+The accessible name is both variables with units — **"240ms latency at 12 calls/s."** — plus "— above threshold" when
+the latency crosses `threshold`, or **"Latency unknown."** when a value is missing. The threshold state is carried by
+the satellite's size and the summary, never color alone; motion is gated on `prefers-reduced-motion`; and the live
+region announces threshold crossings only.
 
 <InteractionNote slug="orbit-status" />
 

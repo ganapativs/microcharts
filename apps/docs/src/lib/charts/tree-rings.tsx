@@ -145,14 +145,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Account age{" "}
         <span className="mc-inline">
-          <TreeRings
-            data={YEARS}
-            label="last"
-            unit="years"
-            periodWord="year"
-            size={20}
-            summary={false}
-          />
+          <TreeRings data={YEARS} unit="years" periodWord="year" size={20} summary={false} />
         </span>{" "}
         — 8 years, last year the thickest ring.
       </p>
@@ -169,7 +162,6 @@ export const contexts: ChartContexts = {
               <td className="py-1.5">
                 <TreeRings
                   data={row.data}
-                  label="last"
                   unit="years"
                   periodWord="year"
                   size={22}
@@ -215,14 +207,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <TreeRings
-              data={row.data}
-              label="last"
-              unit="years"
-              periodWord="year"
-              size={18}
-              summary={false}
-            />
+            <TreeRings data={row.data} unit="years" periodWord="year" size={18} summary={false} />
           </span>
         ))}
       </div>

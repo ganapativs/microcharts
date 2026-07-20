@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, PL } from "./waterfall";
 
 export function PreviewLive() {
   return (
-    <WaterfallInteractive data={PL} start={60} summary={false} width={130} height={24} animate />
+    <WaterfallInteractive data={PL} open={60} summary={false} width={130} height={24} animate />
   );
 }
 
@@ -19,7 +19,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <WaterfallInteractive
       data={PL}
-      start={s.start as number}
+      open={s.open as number}
       totalBar={s.totalBar as boolean}
       label={s.delta ? "delta" : "none"}
       positive={s.positive as "up" | "down"}
@@ -33,7 +33,7 @@ export const playground: PlaygroundSpec = {
     [
       "<Waterfall",
       "  data={steps}",
-      `  start={${s.start}}`,
+      `  open={${s.open}}`,
       s.totalBar === false && "  totalBar={false}",
       s.delta && '  label="delta"',
       s.positive !== "up" && `  positive="${s.positive}"`,

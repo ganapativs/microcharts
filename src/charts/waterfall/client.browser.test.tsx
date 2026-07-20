@@ -12,7 +12,7 @@ const key = (el: HTMLElement, k: string) =>
 
 describe("interactive <Waterfall>", () => {
   it("←/→ rove steps with running levels; End focuses the total", async () => {
-    const screen = await render(<Waterfall data={PL} start={1200} title="P&L" />);
+    const screen = await render(<Waterfall data={PL} open={1200} title="P&L" />);
     const wrap = screen.container.querySelector(".mc-waterfall-live") as HTMLElement;
     wrap.focus();
     // First arrow lands on step 0 (kernel contract), not step 1.
@@ -27,9 +27,7 @@ describe("interactive <Waterfall>", () => {
 
   it("onActive reports the focused step (delta as value); null on Escape", async () => {
     const seen: unknown[] = [];
-    const screen = await render(
-      <Waterfall data={PL} start={1200} onActive={(d) => seen.push(d)} />,
-    );
+    const screen = await render(<Waterfall data={PL} open={1200} onActive={(d) => seen.push(d)} />);
     const wrap = screen.container.querySelector(".mc-waterfall-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
@@ -43,7 +41,7 @@ describe("interactive <Waterfall>", () => {
   it("Enter selects the active step: fires onSelect + pins a box that survives blur", async () => {
     const picks: unknown[] = [];
     const screen = await render(
-      <Waterfall data={PL} start={1200} onSelect={(d) => picks.push(d)} />,
+      <Waterfall data={PL} open={1200} onSelect={(d) => picks.push(d)} />,
     );
     const wrap = screen.container.querySelector(".mc-waterfall-live") as HTMLElement;
     wrap.focus();
@@ -57,7 +55,7 @@ describe("interactive <Waterfall>", () => {
   });
 
   it("controlled selectedIndex pins the box without focus", async () => {
-    const screen = await render(<Waterfall data={PL} start={1200} selectedIndex={1} />);
+    const screen = await render(<Waterfall data={PL} open={1200} selectedIndex={1} />);
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
 });

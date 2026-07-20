@@ -130,6 +130,8 @@ export interface ChartContexts {
   cell: ContextHome;
   kpi: ContextHome;
   tab: ContextHome;
+  /** Muted caveat under the four-homes grid when a placement is a stretch. */
+  note?: string;
 }
 
 export interface Recipe {

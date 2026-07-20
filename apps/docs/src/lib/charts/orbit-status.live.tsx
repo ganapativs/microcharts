@@ -29,7 +29,7 @@ export const playground: PlaygroundSpec = {
       rate={s.rate as number}
       latencyDomain={LD}
       rateDomain={RD}
-      alert={s.alert === "on" ? 300 : undefined}
+      threshold={s.threshold === "on" ? 300 : undefined}
       summary={false}
       size={120}
     />
@@ -41,7 +41,7 @@ export const playground: PlaygroundSpec = {
       `  rate={${s.rate}}`,
       "  latencyDomain={[0, 500]}",
       "  rateDomain={[0, 20]}",
-      s.alert === "on" && "  alert={300}",
+      s.threshold === "on" && "  threshold={300}",
       "/>",
     ]
       .filter(Boolean)

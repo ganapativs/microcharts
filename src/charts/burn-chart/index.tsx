@@ -132,6 +132,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        seat={{ mode: "floor", bottom: height - 2 }}
         className={cls}
         style={style}
       >

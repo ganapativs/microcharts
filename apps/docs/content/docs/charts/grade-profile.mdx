@@ -128,9 +128,9 @@ const trail = [
   />
 </LiveDemo>
 
-`format` accepts `Intl.NumberFormatOptions` (with a `locale`) or a formatting function, and applies to the distance and
-elevation numbers in the summary and readout. Grades carry their own percent formatting, so the locale still decides the
-decimal mark: the alpine profile above reads **"12.000, 1.250 gain; steepest 12,3% at 3.500."** in German.
+`format` accepts `Intl.NumberFormatOptions` (with a `locale`) or a formatting function, and applies to **distance and
+elevation** numbers in the summary and readout — not grade. Grades are always percent-encoded; the locale still decides
+the decimal mark: the alpine profile above reads **"12.000, 1.250 gain; steepest 12,3% at 3.500."** in German.
 
 ## Edge cases
 

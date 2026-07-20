@@ -4,6 +4,7 @@
 // No sub-part navigation — the pips are one value. Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
 import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { DicePips as StaticDicePips, dicePipsSummary, type DicePipsProps } from "./index.js";
@@ -88,21 +89,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
         strings={strings}
         summary={false}
       />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );
 }

@@ -19,7 +19,11 @@ import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.js";
 import { labelFitsBand } from "../../core/labels.js";
 import { coverageGeometry } from "./geometry.js";
-import { CoverageStrip as StaticCoverageStrip, type CoverageStripProps } from "./index.js";
+import {
+  CoverageStrip as StaticCoverageStrip,
+  coverageSummary,
+  type CoverageStripProps,
+} from "./index.js";
 
 export interface InteractiveCoverageStripProps extends CoverageStripProps, PickerProps {
   strings?: CoverageStrings;
@@ -107,9 +111,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
       ? undefined
       : typeof summary === "string"
         ? summary
-        : geo.expected === 0
-          ? strings.noData
-          : strings.coverage(geo.measured, geo.expected, pctFmt(geo.coverage), geo.longestGap);
+        : coverageSummary(geo, pctFmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Pointer (viewBox space) → slot index by pitch division, clamped to the strip.

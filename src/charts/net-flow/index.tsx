@@ -117,6 +117,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        seat={{ mode: "center", top: 2, bottom: height - 2 }}
         className={cls}
         style={style}
       >

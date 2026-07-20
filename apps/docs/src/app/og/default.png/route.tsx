@@ -75,7 +75,7 @@ export function GET() {
 
       {/* footer */}
       <div style={{ display: "flex", fontSize: 26, color: "#6b6659", fontFamily: "monospace" }}>
-        Zero deps · RSC-safe · Accessible by default
+        Zero deps · ~1–4 kB · RSC-safe · Accessible by default
       </div>
     </div>,
     size,

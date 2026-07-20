@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { named, fillFor, wrap as wrapAttrs } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { Hourglass as StaticHourglass, hourglassSummary, type HourglassProps } from "./index.js";
@@ -92,21 +93,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
         strings={strings}
         summary={false}
       />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );
 }

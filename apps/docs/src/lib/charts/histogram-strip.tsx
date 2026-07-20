@@ -216,12 +216,12 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <HistogramStrip data={series} summary={false} width={40} height={14} />
+            <HistogramStrip data={series} summary={false} width={64} height={16} />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  API <HistogramStrip data={times} width={40} height={14} />\n</button>`,
+    code: `<button className="tab">\n  API <HistogramStrip data={times} width={64} height={16} />\n</button>`,
   },
 };
 

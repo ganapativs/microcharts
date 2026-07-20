@@ -33,7 +33,7 @@ export const entry: ChartEntry = {
       name: "target",
       type: "number",
       required: false,
-      description: "Pass-threshold tick across all rows.",
+      description: "Pass target — one tick across all rows.",
     },
     {
       name: "labels",

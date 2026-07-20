@@ -146,6 +146,7 @@ export function Slope(props: SlopeProps): ReactNode {
                 x2={line.x1}
                 y2={line.y1}
                 stroke={stroke}
+                data-mc-ink="data"
                 style={{
                   strokeWidth: isHl
                     ? "calc(var(--mc-stroke-width) * 1.5)"
@@ -161,16 +162,29 @@ export function Slope(props: SlopeProps): ReactNode {
                 x2={line.y0 !== null ? line.x0 + 6 : line.x1}
                 y2={(line.y0 ?? line.y1)!}
                 stroke={stroke}
+                data-mc-ink="data"
                 style={{ strokeWidth: "var(--mc-stroke-width)" }}
                 strokeDasharray="1.5 1.5"
                 vectorEffect="non-scaling-stroke"
               />
             ) : null}
             {line.y0 !== null ? (
-              <circle cx={line.x0} cy={line.y0} r={1.5} style={{ fill: stroke }} />
+              <circle
+                cx={line.x0}
+                cy={line.y0}
+                r={1.5}
+                data-mc-ink="point"
+                style={{ fill: stroke }}
+              />
             ) : null}
             {line.y1 !== null ? (
-              <circle cx={line.x1} cy={line.y1} r={1.5} style={{ fill: stroke }} />
+              <circle
+                cx={line.x1}
+                cy={line.y1}
+                r={1.5}
+                data-mc-ink="point"
+                style={{ fill: stroke }}
+              />
             ) : null}
             {showLabels && wantLeft && leftYs[line.index] !== null ? (
               <text
@@ -179,6 +193,7 @@ export function Slope(props: SlopeProps): ReactNode {
                 fontSize={fontSize}
                 dominantBaseline="central"
                 textAnchor="end"
+                data-mc-ink="label"
               >
                 {fmt(d.from)}
               </text>

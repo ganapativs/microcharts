@@ -65,8 +65,8 @@ export interface CyclePlotProps {
   slots?: readonly string[] | undefined;
   /** Center statistic — median for skewed slot distributions. */
   center?: "mean" | "median" | undefined;
-  /** Within-slot micro-trend: `"line"` (default) or `"none"` (spine only). */
-  trend?: "line" | "none" | undefined;
+  /** Within-slot micro-trend line (default true); false = spine + ticks only. */
+  trend?: boolean | undefined;
   /** `false` drops the spine (within-slot drift only — rare). */
   spine?: boolean | undefined;
   /** Cycle noun for the summary, e.g. "weeks" (default "cycles"). */
@@ -92,7 +92,7 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
     period,
     slots,
     center = "mean",
-    trend = "line",
+    trend = true,
     spine = true,
     cycleUnit = "cycles",
     domain,
@@ -167,7 +167,7 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
     >
       {ann.under}
       {/* within-slot polylines — raw values in time order, muted, never smoothed */}
-      {trend === "line"
+      {trend
         ? geo.slots.map((sl) =>
             sl.line ? (
               <path

@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { waterfallGeometry, placeWaterfallLabels } from "./geometry.js";
 
-const base = { width: 70, height: 18, start: 0, total: true };
+const base = { width: 70, height: 18, open: 0, total: true };
 
 describe("waterfallGeometry", () => {
   it("bars float at the running level; total bar anchors at zero", () => {
-    const geo = waterfallGeometry({ ...base, start: 1200, deltas: [300, -140, 180] });
+    const geo = waterfallGeometry({ ...base, open: 1200, deltas: [300, -140, 180] });
     expect(geo.levels).toEqual([1500, 1360, 1540]);
     expect(geo.totalBar).not.toBeNull();
     // the total spans zero → its level: y(0) is one edge
@@ -32,8 +32,8 @@ describe("waterfallGeometry", () => {
     fc.array(fc.double({ noNaN: true, min: -1e4, max: 1e4 }), { minLength: 1, maxLength: 7 }),
     fc.double({ noNaN: true, min: -1e4, max: 1e4 }),
     fc.boolean(),
-  ])("containment: bars + connectors + total inside the box", (deltas, start, total) => {
-    const geo = waterfallGeometry({ width: 70, height: 18, deltas, start, total });
+  ])("containment: bars + connectors + total inside the box", (deltas, open, total) => {
+    const geo = waterfallGeometry({ width: 70, height: 18, deltas, open, total });
     for (const b of [...geo.bars, ...(geo.totalBar ? [geo.totalBar] : [])]) {
       expect(b.x).toBeGreaterThanOrEqual(0);
       expect(b.x + b.w).toBeLessThanOrEqual(70.01);

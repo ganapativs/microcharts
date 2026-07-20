@@ -19,6 +19,7 @@ import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.j
 import { eventTimelineGeometry } from "./geometry.js";
 import {
   EventTimeline as StaticEventTimeline,
+  eventTimelineSummary,
   formatDuration,
   normalizeItems,
   timelineDomain,
@@ -159,9 +160,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
       ? undefined
       : typeof summary === "string"
         ? summary
-        : geo.spans.length === 0 && geo.points.length === 0
-          ? strings.noData
-          : strings.timeline(geo.spans.length, geo.points.length, pctFmt(geo.coverage));
+        : eventTimelineSummary(geo.spans.length, geo.points.length, geo.coverage, pctFmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const shown = active ?? selected;

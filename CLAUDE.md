@@ -1,6 +1,6 @@
 # microcharts — contributor & agent guide
 
-Word-sized charts for React: zero runtime dependencies, ~1–3 kB gzip per chart, accessible by default,
+Word-sized charts for React: zero runtime dependencies, ~1–4 kB gzip per chart, accessible by default,
 handcrafted-feeling. They're built to sit _inside_ an interface — a sentence, a table cell, a KPI card, a tab header, a
 streamed AI reply — and to be safe for a model to emit and a person to read. Package: **`@microcharts/react`**.
 

@@ -5,7 +5,7 @@ import type { SummaryStrings } from "./summary.js";
 
 export type TokenConfidenceStrings = Pick<
   SummaryStrings,
-  "noTokens" | "tokenConfidence" | "tokenTierNames" | "tokenAt"
+  "noTokens" | "tokenConfidence" | "tokenTierNames" | "tokenAt" | "tokenConfidenceLabel"
 >;
 
 export const EN_TOKEN_CONFIDENCE: TokenConfidenceStrings = {
@@ -14,4 +14,5 @@ export const EN_TOKEN_CONFIDENCE: TokenConfidenceStrings = {
     `${n} tokens: ${confident} confident, ${unsure} unsure, ${guessing} guessing.`,
   tokenTierNames: ["confident", "unsure", "guessing"],
   tokenAt: (token, tier, confidence) => `${token}: ${tier}, ${confidence}.`,
+  tokenConfidenceLabel: "Token confidence",
 };

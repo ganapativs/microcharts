@@ -34,7 +34,7 @@ export const entry: ChartEntry = {
       description: "Signed deltas in order.",
     },
     {
-      name: "start",
+      name: "open",
       type: "number",
       required: false,
       description: "Opening level (prior-period close).",
@@ -62,7 +62,7 @@ export const entry: ChartEntry = {
   demo: PL.map((d) => d.value),
   example: {
     title: "Net income bridge",
-    code: `import { Waterfall } from "${PKG}/waterfall";\n\n<Waterfall data={steps} start={60} title="Net income bridge" />`,
+    code: `import { Waterfall } from "${PKG}/waterfall";\n\n<Waterfall data={steps} open={60} title="Net income bridge" />`,
   },
   sampleData: [
     {
@@ -79,12 +79,12 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <Waterfall data={PL} start={60} summary={false} width={130} height={24} />;
+  return <Waterfall data={PL} open={60} summary={false} width={130} height={24} />;
 } // domain, format, locale, id, className, style, children: styling/formatting
 
 export const playground: PlaygroundSpec = {
   knobs: [
-    { kind: "range", key: "start", label: "start", min: 0, max: 100, step: 5, init: 60 },
+    { kind: "range", key: "open", label: "open", min: 0, max: 100, step: 5, init: 60 },
     { kind: "toggle", key: "totalBar", label: "total bar", init: true },
     { kind: "toggle", key: "delta", label: "delta labels", init: false },
     {
@@ -98,7 +98,7 @@ export const playground: PlaygroundSpec = {
   render: (s) => (
     <Waterfall
       data={PL}
-      start={s.start as number}
+      open={s.open as number}
       totalBar={s.totalBar as boolean}
       label={s.delta ? "delta" : "none"}
       positive={s.positive as "up" | "down"}
@@ -111,7 +111,7 @@ export const playground: PlaygroundSpec = {
     [
       "<Waterfall",
       "  data={steps}",
-      `  start={${s.start}}`,
+      `  open={${s.open}}`,
       s.totalBar === false && "  totalBar={false}",
       s.delta && '  label="delta"',
       s.positive !== "up" && `  positive="${s.positive}"`,
@@ -126,13 +126,13 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "signed step labels (biggest movers win collisions)",
-    code: `<Waterfall data={steps} start={60} label="delta" />`,
-    node: <Waterfall data={PL} start={60} label="delta" summary={false} width={220} height={26} />,
+    code: `<Waterfall data={steps} open={60} label="delta" />`,
+    node: <Waterfall data={PL} open={60} label="delta" summary={false} width={220} height={26} />,
   },
   {
     label: "P&L rows",
-    code: `{quarters.map((q) => (\n  <Waterfall key={q.id} data={q.steps} start={q.open} title={q.name} />\n))}`,
-    node: <Waterfall data={PL} start={60} summary={false} width={160} height={20} />,
+    code: `{quarters.map((q) => (\n  <Waterfall key={q.id} data={q.steps} open={q.open} title={q.name} />\n))}`,
+    node: <Waterfall data={PL} open={60} summary={false} width={160} height={20} />,
   },
   {
     label: "cost bridge (down is good)",
@@ -140,7 +140,7 @@ export const recipes: Recipe[] = [
     node: (
       <Waterfall
         data={PL.map((d) => ({ label: d.label, value: -d.value }))}
-        start={60}
+        open={60}
         positive="down"
         summary={false}
         width={160}
@@ -184,12 +184,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Net income bridged from $60k to $87k this quarter{" "}
         <span className="mc-inline">
-          <Waterfall data={PL} start={60} summary={false} width={100} height={16} />
+          <Waterfall data={PL} open={60} summary={false} width={100} height={16} />
         </span>{" "}
         — Product and Services carried it past Refunds and Opex.
       </p>
     ),
-    code: `<p>\n  Net income bridged from $60k to $87k this quarter{" "}\n  <Waterfall data={steps} start={60} width={100} height={16} /> — Product and\n  Services carried it past Refunds and Opex.\n</p>`,
+    code: `<p>\n  Net income bridged from $60k to $87k this quarter{" "}\n  <Waterfall data={steps} open={60} width={100} height={16} /> — Product and\n  Services carried it past Refunds and Opex.\n</p>`,
   },
   cell: {
     render: () => (
@@ -201,13 +201,7 @@ export const contexts: ChartContexts = {
               <tr key={u.name}>
                 <td className="py-1.5 pr-3 text-fd-muted-foreground">{u.name}</td>
                 <td className="py-1.5">
-                  <Waterfall
-                    data={u.steps}
-                    start={u.start}
-                    summary={false}
-                    width={70}
-                    height={16}
-                  />
+                  <Waterfall data={u.steps} open={u.start} summary={false} width={70} height={16} />
                 </td>
                 <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
                   {net >= 0 ? "+" : "−"}
@@ -219,7 +213,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: `<td>\n  <Waterfall data={unit.steps} start={unit.start} />\n</td>`,
+    code: `<td>\n  <Waterfall data={unit.steps} open={unit.start} />\n</td>`,
   },
   kpi: {
     render: () => (
@@ -231,10 +225,10 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">from $60k</span>
           </div>
         </div>
-        <Waterfall data={PL} start={60} summary={false} width={200} height={26} />
+        <Waterfall data={PL} open={60} summary={false} width={200} height={26} />
       </>
     ),
-    code: `<div className="kpi">\n  <span className="figure">$87k</span>\n  <span className="unit">from $60k</span>\n  <Waterfall data={steps} start={60} />\n</div>`,
+    code: `<div className="kpi">\n  <span className="figure">$87k</span>\n  <span className="unit">from $60k</span>\n  <Waterfall data={steps} open={60} />\n</div>`,
   },
   tab: {
     render: () => (
@@ -251,17 +245,17 @@ export const contexts: ChartContexts = {
             {b.name}
             <Waterfall
               data={b.steps}
-              start={60}
+              open={60}
               positive={b.positive}
               summary={false}
-              width={44}
-              height={14}
+              width={64}
+              height={16}
             />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Revenue <Waterfall data={steps} start={60} />\n</button>`,
+    code: `<button className="tab">\n  Revenue <Waterfall data={steps} open={60} />\n</button>`,
   },
 };
 
@@ -277,7 +271,7 @@ export function Mark(props: { data: number[]; width?: number; height?: number })
 }
 
 export function markCode(): string {
-  return `<Waterfall data={steps} start={open} />`;
+  return `<Waterfall data={steps} open={open} />`;
 }
 export default {
   entry,

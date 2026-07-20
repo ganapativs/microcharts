@@ -9,6 +9,7 @@ import { seriesStats } from "../../core/stats.js";
 import type { Value } from "../../core/types.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { parseUTCDay } from "../../core/calendar.js";
+import { EN_ACTIVITY, type ActivityStrings } from "../../core/strings-activity.js";
 import { cellMetrics, stepOpacity, type CellShape } from "../../shared/cell.js";
 import { activityGridGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -21,21 +22,25 @@ export const levelOpacity = (level: number): number => stepOpacity(level, LEVELS
 
 export { cellMetrics, type CellShape } from "../../shared/cell.js";
 
-/** Leading empty slots so slot 0 lands on `start`'s real weekday (UTC — via
- *  core/calendar; unparseable dates align to 0, matching the no-start layout). */
-export function calendarOffset(start: string | Date | undefined, weekStart: 0 | 1): number {
-  if (start === undefined) return 0;
-  const t = parseUTCDay(start);
+/** Leading empty slots so slot 0 lands on `anchor`'s real weekday (UTC — via
+ *  core/calendar; unparseable dates align to 0, matching the no-anchor layout). */
+export function calendarOffset(anchor: string | Date | undefined, weekStart: 0 | 1): number {
+  if (anchor === undefined) return 0;
+  const t = parseUTCDay(anchor);
   if (t === null) return 0;
   return (new Date(t).getUTCDay() - weekStart + 7) % 7;
 }
 
 /** Factual S1-binned summary — total, span, and the busiest bin. Shared with
  *  the interactive entry (one wording, no drift). */
-export function activitySummary(data: readonly Value[], fmt: (n: number) => string): string {
+export function activitySummary(
+  data: readonly Value[],
+  fmt: (n: number) => string,
+  strings: ActivityStrings = EN_ACTIVITY,
+): string {
   const s = seriesStats(data);
-  if (!s) return "No activity.";
-  return `Total ${fmt(s.sum)} over ${s.count} ${s.count === 1 ? "period" : "periods"}. Busiest ${fmt(s.max)}.`;
+  if (!s) return strings.noActivity;
+  return strings.activityGrid(fmt(s.sum), s.count, fmt(s.max));
 }
 
 export interface ActivityGridProps {
@@ -46,8 +51,8 @@ export interface ActivityGridProps {
   shape?: CellShape | undefined;
   /** First slot's calendar day — pads the first column so weekday rows align
    *  (grid layout only). ISO `yyyy-mm-dd` or Date, UTC. */
-  start?: string | Date | undefined;
-  /** Locale start-of-week for `start` alignment (0 = Sunday, 1 = Monday). */
+  anchor?: string | Date | undefined;
+  /** Locale start-of-week for `anchor` alignment (0 = Sunday, 1 = Monday). */
   weekStart?: 0 | 1 | undefined;
   /** Cell edge length in viewBox units. */
   cell?: number | undefined;
@@ -57,6 +62,7 @@ export interface ActivityGridProps {
   color?: string | undefined;
   format?: Format | undefined;
   locale?: string | string[] | undefined;
+  strings?: ActivityStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -70,7 +76,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
     data,
     layout = "grid",
     shape = "square",
-    start,
+    anchor,
     weekStart = 1,
     cell = 10,
     gap = 2,
@@ -78,6 +84,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
     color,
     format,
     locale,
+    strings = EN_ACTIVITY,
     title,
     summary,
     id,
@@ -92,11 +99,11 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
     gap,
     levels: LEVELS,
     domain,
-    offset: layout === "grid" ? calendarOffset(start, weekStart) : 0,
+    offset: layout === "grid" ? calendarOffset(anchor, weekStart) : 0,
   });
   const mark = cellMetrics(cell, shape);
   const fmt = makeFormatter(format, locale);
-  const accName = resolveSummary(summary, () => activitySummary(data, fmt));
+  const accName = resolveSummary(summary, () => activitySummary(data, fmt, strings));
 
   const w = Math.max(geo.width, 1);
   const h = Math.max(geo.height, 1);

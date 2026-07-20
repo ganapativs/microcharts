@@ -181,7 +181,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Monthly retention cohorts{" "}
         <span className="mc-inline">
-          <CohortTriangle data={COHORTS} cell={8} unit="month" summary={false} />
+          <CohortTriangle data={COHORTS} labels={false} cell={10} unit="month" summary={false} />
         </span>{" "}
         — January vintage retains 37% at month 5.
       </p>
@@ -196,7 +196,13 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <CohortTriangle data={row.data} cell={9} unit="month" summary={false} />
+                <CohortTriangle
+                  data={row.data}
+                  labels={false}
+                  cell={12}
+                  unit="month"
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -216,7 +222,13 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">M5 retention</span>
           </div>
         </div>
-        <CohortTriangle data={CTX_ROWS[0]!.data} cell={12} unit="month" summary={false} />
+        <CohortTriangle
+          data={CTX_ROWS[0]!.data}
+          labels={false}
+          cell={12}
+          unit="month"
+          summary={false}
+        />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">37%</span>\n  <span className="unit">M5 retention</span>\n  <CohortTriangle data={cohorts} labels={false} cell={7} />\n</div>',
@@ -230,13 +242,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <CohortTriangle data={row.data} cell={7} unit="month" summary={false} />
+            <CohortTriangle data={row.data} labels={false} cell={10} unit="month" summary={false} />
           </span>
         ))}
       </div>
     ),
     code: '<button className="tab">\n  Jan <CohortTriangle data={cohorts} labels={false} cell={7} />\n</button>',
   },
+  note: "Best at KPI/card scale — cohort cells need room to resolve.",
 };
 
 export function Mark(_props: { data: number[]; width?: number; height?: number }) {

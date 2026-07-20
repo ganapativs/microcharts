@@ -156,7 +156,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Service events this hour{" "}
         <span className="mc-inline">
-          <EventRaster data={RASTER} height={16} summary={false} />
+          <EventRaster data={RASTER} labels={false} height={20} summary={false} />
         </span>{" "}
         — checkout-api busiest, 9 events.
       </p>
@@ -171,7 +171,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <EventRaster data={row.data} height={18} summary={false} />
+                <EventRaster data={row.data} labels={false} height={20} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -205,13 +205,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <EventRaster data={row.data} height={14} summary={false} />
+            <EventRaster data={row.data} labels={false} height={18} summary={false} />
           </span>
         ))}
       </div>
     ),
     code: '<button className="tab">\n  checkout <EventRaster data={services} />\n</button>',
   },
+  note: "Best at KPI/card scale — multi-lane rasters need height per series.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

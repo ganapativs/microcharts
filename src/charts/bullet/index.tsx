@@ -6,12 +6,17 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { EN_BULLET, type BulletStrings } from "../../core/strings-bullet.js";
 import { bulletGeometry } from "./geometry.js";
 
 /** Factual S4 summary — value, target, and where the value lands. Shared with
  *  the interactive entry (one wording, no drift). */
-export function bulletSummary(value: string, target: string | null): string {
-  return target ? `${value} of ${target} target.` : `${value}.`;
+export function bulletSummary(
+  value: string,
+  target: string | null,
+  strings: BulletStrings = EN_BULLET,
+): string {
+  return target ? strings.bulletTarget(value, target) : strings.bullet(value);
 }
 
 export interface BulletProps {
@@ -26,6 +31,7 @@ export interface BulletProps {
   color?: string | undefined;
   format?: Format | undefined;
   locale?: string | string[] | undefined;
+  strings?: BulletStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -45,6 +51,7 @@ export function Bullet(props: BulletProps): ReactNode {
     color,
     format,
     locale,
+    strings = EN_BULLET,
     title,
     summary,
     id,
@@ -65,8 +72,9 @@ export function Bullet(props: BulletProps): ReactNode {
           ? bulletSummary(
               fmt(value),
               target !== undefined && Number.isFinite(target) ? fmt(target) : null,
+              strings,
             )
-          : "No data.";
+          : strings.noData;
 
   // More bands → widen the shade spread so regions stay distinguishable.
   const steps = Math.max(1, geo.regions.length);

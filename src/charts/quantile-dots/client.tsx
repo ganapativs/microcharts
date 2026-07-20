@@ -20,7 +20,11 @@ import { labelFont } from "../../core/labels.js";
 import { quantileDotplot } from "../../core/quantile.js";
 import { round2 } from "../../core/types.js";
 import { quantileDotsGeometry, type QuantileDotsGeometry } from "./geometry.js";
-import { QuantileDots as StaticQuantileDots, type QuantileDotsProps } from "./index.js";
+import {
+  QuantileDots as StaticQuantileDots,
+  quantileDotsSummary,
+  type QuantileDotsProps,
+} from "./index.js";
 
 export interface InteractiveQuantileDotsProps extends QuantileDotsProps, PickerProps {
   strings?: QuantileDotsStrings;
@@ -165,8 +169,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
   }, [width, height, data, count, activeThreshold, side, props.domain, props.label]);
   geoRef.current = geo;
 
-  // static accessible name reflects the PROP threshold (the documented default)
-  const staticName = useMemo(
+  const staticGeo = useMemo(
     () =>
       quantileDotsGeometry({ width, height, data, count, threshold, side, domain: props.domain }),
     [width, height, data, count, threshold, side, props.domain],
@@ -176,16 +179,9 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
       ? undefined
       : typeof summary === "string"
         ? summary
-        : staticName === null
+        : staticGeo === null
           ? strings.noData
-          : threshold !== undefined && Number.isFinite(threshold)
-            ? strings.quantileDots(staticName.past, staticName.count, side, fmt(threshold))
-            : strings.quantileDotsRange(
-                fmt(staticName.mode.lo),
-                fmt(staticName.mode.hi),
-                fmt(staticName.min),
-                fmt(staticName.max),
-              );
+          : quantileDotsSummary(staticGeo, fmt, { threshold, side }, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const announced =

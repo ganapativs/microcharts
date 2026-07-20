@@ -165,7 +165,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Incidents this quarter{" "}
         <span className="mc-inline">
-          <Constellation data={INCIDENTS} xFormat={monthFmt} height={16} summary={false} />
+          <Constellation data={INCIDENTS} xFormat={monthFmt} height={28} summary={false} />
         </span>{" "}
         — four events, largest severity in February.
       </p>
@@ -180,7 +180,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <Constellation data={row.data} xFormat={monthFmt} height={18} summary={false} />
+                <Constellation data={row.data} xFormat={monthFmt} height={28} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -214,13 +214,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <Constellation data={row.data} xFormat={monthFmt} height={14} summary={false} />
+            <Constellation data={row.data} xFormat={monthFmt} height={24} summary={false} />
           </span>
         ))}
       </div>
     ),
     code: '<button className="tab">\n  Prod <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} />\n</button>',
   },
+  note: "Best at KPI/card scale — event clouds need height to separate.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

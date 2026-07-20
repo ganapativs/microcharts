@@ -29,7 +29,7 @@ describe("<FoldedDayBand>", () => {
       today: TODAY,
       period: 24,
       bins: 24,
-      bands: BANDS,
+      percentiles: BANDS,
       width: 120,
       height: 32,
     });
@@ -49,7 +49,7 @@ describe("<FoldedDayBand>", () => {
       today: null,
       period: 24,
       bins: 24,
-      bands: BANDS,
+      percentiles: BANDS,
       width: 120,
       height: 32,
     });

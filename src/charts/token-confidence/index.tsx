@@ -72,7 +72,7 @@ export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
       ? { "aria-hidden": true as const }
       : {
           role: "img" as const,
-          "aria-label": [title, accName].filter(Boolean).join(". ") || "Token confidence",
+          "aria-label": [title, accName].filter(Boolean).join(". ") || strings.tokenConfidenceLabel,
         };
 
   return (

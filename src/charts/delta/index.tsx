@@ -4,6 +4,7 @@
 // like text; the glyph is an inline SVG. Direction is ALWAYS double-encoded —
 // triangle shape (up/down/flat) AND color — never color alone.
 import { makeFormatter, type Format } from "../../core/format.js";
+import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import type { CSSProperties, ReactNode } from "react";
 
 // viewBox is 0 0 10 10 (y grows downward). Each mark is vertically CENTERED in
@@ -31,7 +32,7 @@ export interface DeltaModel {
 
 /** Pure resolution of a Delta's display/valence/summary from its props. */
 export function deltaModel(props: DeltaProps): DeltaModel {
-  const { value, from, positive = "up", format, locale } = props;
+  const { value, from, positive = "up", format, locale, strings = EN_SCALAR } = props;
   const delta = from === undefined ? value : value - from;
   const finite = Number.isFinite(delta);
   const shown = from === undefined ? value : from !== 0 ? delta / Math.abs(from) : delta;
@@ -50,7 +51,8 @@ export function deltaModel(props: DeltaProps): DeltaModel {
     shown: finite ? shown : null,
     valence: sign === 0 ? "flat" : sign === goodDir ? "pos" : "neg",
     glyphKey: sign > 0 ? "up" : sign < 0 ? "down" : "flat",
-    summary: sign === 0 ? "No change." : `${sign > 0 ? "Up" : "Down"} ${magnitude}.`,
+    summary:
+      sign === 0 ? strings.flatChange : strings.scalarDir(sign > 0 ? "up" : "down", magnitude),
   };
 }
 
@@ -64,6 +66,7 @@ export interface DeltaProps {
   /** Number formatting; defaults to a locale-aware percent. */
   format?: Format | undefined;
   locale?: string | string[] | undefined;
+  strings?: ScalarStrings | undefined;
   /** Accessible name override; `false` = decorative (redundant with nearby text). */
   summary?: string | false | undefined;
   title?: string | undefined;

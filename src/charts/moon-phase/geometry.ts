@@ -3,6 +3,7 @@
 // under-lights mid-cycle). Closed form: the terminator is a semi-ellipse with
 // rx = r·|2f−1|; lit area = right semicircle ± semi-ellipse = f·πr² exactly.
 // Waxing lights from the right. All coords 2-dp.
+import { clamp } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 
 export type MoonMode = "progress" | "cycle";
@@ -13,10 +14,6 @@ export interface MoonGeometry {
   litPath: string;
   /** Illuminated fraction (0–1) actually drawn. */
   litFraction: number;
-}
-
-function clamp01(n: number): number {
-  return n < 0 ? 0 : n > 1 ? 1 : n;
 }
 
 /** Lit path for illumination `f` (0–1). `litLeft` mirrors it (waning). */
@@ -48,7 +45,7 @@ export function moonGeometry(opts: {
   pad: number;
 }): MoonGeometry {
   const { value, mode, size, pad } = opts;
-  const v = clamp01(Number.isFinite(value) ? value : 0);
+  const v = clamp(Number.isFinite(value) ? value : 0, 0, 1);
   const cx = round2(size / 2);
   const cy = round2(size / 2);
   const r = round2(size / 2 - pad);

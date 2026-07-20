@@ -17,7 +17,7 @@ const PL = [
 
 describe("<Waterfall>", () => {
   it("floating bars + connectors + total summary", () => {
-    const { container } = draw(<Waterfall data={PL} start={1200} />);
+    const { container } = draw(<Waterfall data={PL} open={1200} />);
     expect(container.querySelectorAll("rect").length).toBe(5); // 4 steps + total
     expect(container.querySelectorAll("line").length).toBe(4);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
@@ -42,7 +42,7 @@ describe("<Waterfall>", () => {
   });
 
   it('label="delta" draws signed value labels below the plot', () => {
-    const { container } = draw(<Waterfall data={PL} start={1200} label="delta" width={260} />);
+    const { container } = draw(<Waterfall data={PL} open={1200} label="delta" width={260} />);
     const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);
     expect(texts.length).toBeGreaterThan(0);
     expect(texts).toContain("+300");
@@ -84,7 +84,7 @@ describe("<Waterfall>", () => {
   });
 
   it("is axe-clean", async () => {
-    const { container } = draw(<Waterfall data={PL} start={1200} title="Monthly P&L" />);
+    const { container } = draw(<Waterfall data={PL} open={1200} title="Monthly P&L" />);
     await expectNoA11yViolations(container);
   });
 });

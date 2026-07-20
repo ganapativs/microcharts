@@ -163,12 +163,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Trades concentrated at{" "}
         <span className="mc-inline">
-          <VolumeProfile data={PROFILE} label="none" summary={false} width={32} height={16} />
+          <VolumeProfile data={PROFILE} label="none" summary={false} width={28} height={28} />
         </span>{" "}
         — point of control at 142, value area spans 138–146.
       </p>
     ),
-    code: '<p>\n  Trades at <VolumeProfile data={profile} label="none" width={32} height={16} /> — POC 142.\n</p>',
+    code: '<p>\n  Trades at <VolumeProfile data={profile} label="none" width={28} height={28} /> — POC 142.\n</p>',
   },
   cell: {
     render: () => (
@@ -219,6 +219,7 @@ export const contexts: ChartContexts = {
     ),
     code: '<button className="tab">AAPL <VolumeProfile data={profile} label="none" width={28} height={28} /></button>',
   },
+  note: "Best at KPI/card scale — profile needs a near-square seat.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

@@ -202,12 +202,12 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <Slope data={rows} summary={false} width={40} height={18} />
+            <Slope data={rows} summary={false} width={64} height={20} />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Regions <Slope data={cohorts} width={40} height={18} />\n</button>`,
+    code: `<button className="tab">\n  Regions <Slope data={cohorts} width={64} height={20} />\n</button>`,
   },
 };
 

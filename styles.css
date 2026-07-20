@@ -967,5 +967,14 @@
     :where(.mc-delta) {
       color: CanvasText;
     }
+    /* StatusDot: silhouette carries state; map fills/strokes to system ink */
+    :where(.mc-root [data-mc-status]) {
+      fill: CanvasText;
+    }
+    :where(.mc-root circle[data-mc-status="ring"]),
+    :where(.mc-root circle[data-mc-status="half"]) {
+      fill: none;
+      stroke: CanvasText;
+    }
   }
 }

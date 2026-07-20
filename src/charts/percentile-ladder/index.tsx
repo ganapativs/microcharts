@@ -117,6 +117,16 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   } = props;
 
   const FONT = ladderFont(height);
+  const labelY = round2(height - FONT * 0.22 - 0.2);
+  const showLabels =
+    label !== "none" && width >= LABEL_MIN_WIDTH && labelFitsY(labelY, FONT, height, false);
+  const trackY = round2(height * 0.35);
+  const maxHalf = round2(Math.min(3, height * 0.28));
+  const bareSeat = {
+    mode: "center" as const,
+    top: round2(trackY - maxHalf),
+    bottom: round2(trackY + maxHalf),
+  };
   // scale="log" silently falls back to linear on any value ≤ 0 (docs note it);
   // the in-chart `log` tag renders only when the transform IS applied
   const geo = percentileLadderGeometry({ width, height, data, ps, scale, domain, font: FONT });
@@ -133,6 +143,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        seat={showLabels ? { mode: "floor", bottom: labelY } : bareSeat}
         className={cls}
         style={style}
       >
@@ -150,13 +161,10 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
     label === "values" ? fmt(value) : label === "both" ? `p${p} ${fmt(value)}` : String(p);
 
   // keep the alphabetic descender (≈0.22·fs) inside the viewBox
-  const labelY = round2(height - FONT * 0.22 - 0.2);
   // `ladderFont` floors at 6 viewBox units; under a box that short the label
   // row's ascender clears the top of the frame, so the row DROPS entirely
   // (as it already does under LABEL_MIN_WIDTH) and the graduated ticks — the
   // primary encoding — carry the read on their own.
-  const showLabels =
-    label !== "none" && width >= LABEL_MIN_WIDTH && labelFitsY(labelY, FONT, height, false);
   const texts = rendered.map((t) => labelText(t.p, t.value));
   const labelX = showLabels ? ladderLabelLayout(geo, texts, width, FONT) : null;
   // pin the label size to viewBox units (see coverage-strip / )

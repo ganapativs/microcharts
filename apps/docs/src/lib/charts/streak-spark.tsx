@@ -165,7 +165,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Deploy streak{" "}
         <span className="mc-inline">
-          <StreakSpark data={STREAK} label="both" height={16} summary={false} />
+          <StreakSpark data={STREAK} label="none" height={16} summary={false} />
         </span>{" "}
         — 7 greens in a row, last fail 3 days ago.
       </p>
@@ -180,7 +180,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <StreakSpark data={row.data} label="both" height={18} summary={false} />
+                <StreakSpark data={row.data} label="none" height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -214,7 +214,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <StreakSpark data={row.data} label="both" height={14} summary={false} />
+            <StreakSpark data={row.data} label="none" height={14} summary={false} />
           </span>
         ))}
       </div>

@@ -33,7 +33,7 @@ export const entry: ChartEntry = {
       description: "The series; null = a rest.",
     },
     {
-      name: "range",
+      name: "mode",
       type: '"staff" | "ledger"',
       required: false,
       description: "ledger (±2, default) or staff (clamp on-staff).",
@@ -65,8 +65,8 @@ export const playground: PlaygroundSpec = {
   knobs: [
     {
       kind: "segmented",
-      key: "range",
-      label: "range",
+      key: "mode",
+      label: "mode",
       options: ["ledger", "staff"],
       init: "ledger",
     },
@@ -76,7 +76,7 @@ export const playground: PlaygroundSpec = {
   render: (s, data) => (
     <MusicStaff
       data={data}
-      range={s.range as "ledger" | "staff"}
+      mode={s.mode as "ledger" | "staff"}
       label={s.label ? "last" : "none"}
       summary={false}
       width={220}
@@ -87,7 +87,7 @@ export const playground: PlaygroundSpec = {
     [
       "<MusicStaff",
       "  data={weeks}",
-      s.range !== "ledger" && `  range="${s.range}"`,
+      s.mode !== "ledger" && `  mode="${s.mode}"`,
       s.label && '  label="last"',
       "/>",
     ]
@@ -99,9 +99,9 @@ export const playground: PlaygroundSpec = {
 
 export const recipes: Recipe[] = [
   {
-    label: "staff range clamps the pitch on-staff",
-    code: `<MusicStaff data={weeks} range="staff" />`,
-    node: <MusicStaff data={MELODY} range="staff" summary={false} width={120} height={24} />,
+    label: "staff mode clamps the pitch on-staff",
+    code: `<MusicStaff data={weeks} mode="staff" />`,
+    node: <MusicStaff data={MELODY} mode="staff" summary={false} width={120} height={24} />,
   },
   {
     label: "a rest (null) leaves a gap",
@@ -171,12 +171,12 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {t.name}
-            <MusicStaff data={t.data} summary={false} width={44} height={16} />
+            <MusicStaff data={t.data} summary={false} width={72} height={20} />
           </span>
         ))}
       </div>
     ),
-    code: '<button className="tab">Platform <MusicStaff data={weeks} width={44} height={16} /></button>',
+    code: '<button className="tab">Platform <MusicStaff data={weeks} width={72} height={20} /></button>',
   },
 };
 

@@ -185,14 +185,14 @@ export const contexts: ChartContexts = {
             <tr key={row.q}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{row.q}</td>
               <td className="py-1.5">
-                <LikertStrip data={row.data} summary={false} label="net" width={120} height={16} />
+                <LikertStrip data={row.data} summary={false} label="none" width={120} height={16} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
     ),
-    code: `<td>\n  <LikertStrip data={q.responses} label="net" />\n</td>`,
+    code: `<td>\n  <LikertStrip data={q.responses} label="none" />\n</td>`,
   },
   kpi: {
     render: () => (

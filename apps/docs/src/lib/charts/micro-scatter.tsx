@@ -222,13 +222,13 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <MicroScatter data={pairs} summary={false} width={44} height={18} />
+            <MicroScatter data={pairs} summary={false} width={64} height={20} />
             <span className="text-fd-muted-foreground text-xs">r {r}</span>
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Paid <MicroScatter data={pairs} height={18} /> r 0.93\n</button>`,
+    code: `<button className="tab">\n  Paid <MicroScatter data={pairs} width={64} height={20} /> r 0.93\n</button>`,
   },
 };
 

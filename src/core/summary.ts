@@ -38,6 +38,10 @@ export interface SummaryStrings {
   stepsDone: (done: number, total: number) => string;
   /** S3 discrete units, e.g. "5 of 8." (pictogram-row). */
   countOf: (value: string, total: number) => string;
+  /** S4 bullet value-only, e.g. "72." (bullet). */
+  bullet: (value: string) => string;
+  /** S4 bullet vs target, e.g. "72 of 80 target." (bullet). */
+  bulletTarget: (value: string, target: string) => string;
   /** S4 counted total, e.g. "23 counted." (tally-marks). */
   tally: (value: string) => string;
   /** S4 dice face, e.g. "4 out of 6." (dice-pips). */
@@ -91,6 +95,10 @@ export interface SummaryStrings {
   gardenGrid: (n: number, unit: string, peak: string, active: number) => string;
   /** S1 garden cell, e.g. "3 of 12: 8, step 2 of 5." (garden-grid). */
   gardenCell: (pos: number, total: number, value: string, k: number, steps: number) => string;
+  /** ActivityGrid empty, e.g. "No activity." — distinct from series `noData`. */
+  noActivity: string;
+  /** S1-binned activity, e.g. "Total 6 over 3 periods. Busiest 3." (activity-grid). */
+  activityGrid: (total: string, count: number, busiest: string) => string;
   /** S2 bubble row, e.g. "4 items; largest EMEA at 1,240, smallest LATAM at 210." */
   bubbleRow: (
     n: number,
@@ -673,6 +681,8 @@ export interface SummaryStrings {
   tokenTierNames: readonly [string, string, string];
   /** Interactive token announce, e.g. "sauce: guessing, 0.22." (token-confidence). */
   tokenAt: (token: string, tier: string, confidence: string) => string;
+  /** TokenConfidence aria-label fallback when title and summary are absent. */
+  tokenConfidenceLabel: string;
   /** WindBarb reading, e.g. "Southwest (225°), magnitude 32." */
   windBarb: (compass: string, deg: string, value: string) => string;
   /** Calm state, e.g. "Calm." (wind-barb). */

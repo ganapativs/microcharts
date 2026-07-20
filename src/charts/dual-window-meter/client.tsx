@@ -5,6 +5,7 @@
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { lastFinite } from "../../core/stats.js";
 import { labelFont } from "../../core/labels.js";
 import {
   named,
@@ -110,7 +111,13 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
       ? undefined
       : typeof summary === "string"
         ? summary
-        : dualWindowSummary(lastFinite(fast), lastFinite(slow), target, strings, fmt);
+        : dualWindowSummary(
+            lastFinite(fast) ?? null,
+            lastFinite(slow) ?? null,
+            target,
+            strings,
+            fmt,
+          );
   const labelText = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // The sample shown by the crosshair + readout: the live hover/keyboard focus,
@@ -182,10 +189,4 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
       ) : null}
     </span>
   );
-}
-
-function lastFinite(arr: readonly (number | null)[]): number | null {
-  for (let i = arr.length - 1; i >= 0; i--)
-    if (arr[i] != null && Number.isFinite(arr[i]!)) return arr[i]!;
-  return null;
 }

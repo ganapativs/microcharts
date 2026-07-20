@@ -17,7 +17,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <PercentileTraceInteractive
       data={DEMO}
-      bands={s.bands as boolean}
+      showBands={s.showBands as boolean}
       positive={s.positive as "up" | "down"}
       unit="week"
       animate={ui.animate}
@@ -30,7 +30,7 @@ export const playground: PlaygroundSpec = {
     [
       "<PercentileTrace",
       "  data={ranks}",
-      s.bands === false && "  bands={false}",
+      s.showBands === false && "  showBands={false}",
       s.positive !== "up" && `  positive="${s.positive}"`,
       ui.animate && " animate",
       "/>",

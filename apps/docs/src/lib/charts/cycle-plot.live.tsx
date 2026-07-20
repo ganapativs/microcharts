@@ -23,7 +23,7 @@ export const playground: PlaygroundSpec = {
       slots={DAYS}
       cycleUnit="weeks"
       center={s.center as "mean" | "median"}
-      trend={s.trend as "line" | "none"}
+      trend={s.trend as boolean}
       spine={s.spine as boolean}
       animate={ui.animate}
       summary={false}
@@ -37,7 +37,7 @@ export const playground: PlaygroundSpec = {
       "  data={daily}",
       "  period={7}",
       s.center !== "mean" && `  center="${s.center}"`,
-      s.trend !== "line" && `  trend="${s.trend}"`,
+      s.trend === false && "  trend={false}",
       s.spine === false && "  spine={false}",
       ui.animate && " animate",
       "/>",

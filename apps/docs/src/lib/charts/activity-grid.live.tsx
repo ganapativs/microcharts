@@ -25,7 +25,7 @@ export const playground: PlaygroundSpec = {
       layout={s.layout as "grid" | "strip"}
       shape={s.shape as "square" | "round" | "dot"}
       cell={Number(s.cell)}
-      start={s.align !== "none" ? ALIGN_DATE : undefined}
+      anchor={s.align !== "none" ? ALIGN_DATE : undefined}
       weekStart={s.align === "sunday" ? 0 : 1}
       domain={s.domain ? DOMAIN : undefined}
       animate={ui.animate}
@@ -39,7 +39,7 @@ export const playground: PlaygroundSpec = {
       `  layout="${s.layout}"`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       `  cell={${s.cell}}`,
-      s.align !== "none" && `  start="${ALIGN_DATE}"`,
+      s.align !== "none" && `  anchor="${ALIGN_DATE}"`,
       s.align === "sunday" && "  weekStart={0}",
       s.domain && "  domain={[0, 6]}",
       ui.animate && " animate",

@@ -17,7 +17,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, data, ui) => (
     <MusicStaffInteractive
       data={data}
-      range={s.range as "ledger" | "staff"}
+      mode={s.mode as "ledger" | "staff"}
       label={s.label ? "last" : "none"}
       summary={false}
       animate={ui.animate}
@@ -29,7 +29,7 @@ export const playground: PlaygroundSpec = {
     [
       "<MusicStaff",
       "  data={weeks}",
-      s.range !== "ledger" && `  range="${s.range}"`,
+      s.mode !== "ledger" && `  mode="${s.mode}"`,
       s.label && '  label="last"',
       ui.animate && " animate",
       "/>",

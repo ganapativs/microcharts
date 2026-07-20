@@ -51,7 +51,7 @@ const curve = (h) => 40 + 42 _ Math.max(0, 1 - Math.abs(h - 14) / 10); const obs
 <LiveDemo
   label="one band vs locale"
   dataOf="folded-day-band"
-  code={`<FoldedDayBand data={observations} bands={[[25, 75]]} />
+  code={`<FoldedDayBand data={observations} percentiles={[[25, 75]]} />
 <FoldedDayBand
   data={observations}
   format={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }}
@@ -66,7 +66,7 @@ const curve = (h) => 40 + 42 _ Math.max(0, 1 - Math.abs(h - 14) / 10); const obs
           value: Math.round(40 + 42 * Math.max(0, 1 - Math.abs(h - 14) / 10) + Math.sin(d + h) * 8),
         })),
       ).flat()}
-      bands={[[25, 75]]}
+      percentiles={[[25, 75]]}
       title="Middle half only"
       width={300}
       height={40}

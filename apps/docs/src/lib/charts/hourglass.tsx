@@ -122,7 +122,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Session time remaining{" "}
         <span className="mc-inline">
-          <Hourglass value={0.75} label="remaining" height={16} summary={false} />
+          <Hourglass value={0.75} height={24} summary={false} />
         </span>{" "}
         — 75% elapsed, renew soon.
       </p>
@@ -137,7 +137,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <Hourglass value={row.value} label="remaining" height={18} summary={false} />
+                <Hourglass value={row.value} height={24} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -171,7 +171,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <Hourglass value={row.value} label="remaining" height={14} summary={false} />
+            <Hourglass value={row.value} height={24} summary={false} />
           </span>
         ))}
       </div>

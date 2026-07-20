@@ -16,7 +16,7 @@ export interface FoldedDayBandProps {
   /** The current period overlaid — the "how typical is now" read. */
   today?: readonly TP[] | undefined;
   /** Percentile pairs, outermost last; ≤ 2 pairs. */
-  bands?: readonly [number, number][] | undefined;
+  percentiles?: readonly [number, number][] | undefined;
   /** Fold-axis resolution. */
   bins?: number | undefined;
   width?: number | undefined;
@@ -62,7 +62,7 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
     data,
     period = 24,
     today,
-    bands = [
+    percentiles = [
       [25, 75],
       [5, 95],
     ],
@@ -86,13 +86,13 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
     today: today ?? null,
     period,
     bins,
-    bands,
+    percentiles,
     width,
     height,
   });
   const accName = resolveSummary(summary, () => foldedBandSummary(geo, period, strings, fmt));
 
-  // outer band faintest → drawn first; opacity by index (outermost last in bands)
+  // outer band faintest → drawn first; opacity by index (outermost last in percentiles)
   const order = geo.bandPaths.map((_p, i) => i).reverse();
 
   return (

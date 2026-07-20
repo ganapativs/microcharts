@@ -86,6 +86,7 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
         title={title}
         summary={accName}
         id={id}
+        seat={{ mode: "center", top: PAD, bottom: height - PAD }}
         className={cls}
         style={style}
       >

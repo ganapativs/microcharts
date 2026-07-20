@@ -30,9 +30,9 @@ describe("orbitStatusGeometry — two live variables", () => {
     expect(g(200, 4).orbit.rateStep).toBeGreaterThanOrEqual(1);
   });
 
-  it("alert → the satellite doubles and flags", () => {
-    const calm = g(200, 5, { alert: 300 });
-    const hot = g(350, 5, { alert: 300 });
+  it("threshold → the satellite doubles and flags", () => {
+    const calm = g(200, 5, { threshold: 300 });
+    const hot = g(350, 5, { threshold: 300 });
     expect(calm.satellite.alerted).toBe(false);
     expect(hot.satellite.alerted).toBe(true);
     expect(hot.satellite.r).toBeGreaterThan(calm.satellite.r);

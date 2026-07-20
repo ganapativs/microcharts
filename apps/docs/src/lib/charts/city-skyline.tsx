@@ -180,7 +180,14 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Team sizes across eng{" "}
         <span className="mc-inline">
-          <CitySkyline data={TEAMS} labels unit="teams" height={16} summary={false} />
+          <CitySkyline
+            data={TEAMS.slice(0, 3)}
+            unit="teams"
+            height={16}
+            bw={8}
+            gap={3}
+            summary={false}
+          />
         </span>{" "}
         — Platform is largest at 46, 70% activated.
       </p>
@@ -195,7 +202,14 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <CitySkyline data={row.data} labels unit="teams" height={18} summary={false} />
+                <CitySkyline
+                  data={row.data}
+                  unit="teams"
+                  height={20}
+                  bw={9}
+                  gap={3}
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -215,7 +229,14 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">heads · 70% lit</span>
           </div>
         </div>
-        <CitySkyline data={CTX_ROWS[0]!.data} labels unit="teams" height={36} summary={false} />
+        <CitySkyline
+          data={CTX_ROWS[0]!.data}
+          unit="teams"
+          height={40}
+          bw={14}
+          gap={5}
+          summary={false}
+        />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">46</span>\n  <span className="unit">heads · 70% lit</span>\n  <CitySkyline data={teams} />\n</div>',
@@ -229,7 +250,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <CitySkyline data={row.data} labels unit="teams" height={14} summary={false} />
+            <CitySkyline data={row.data} unit="teams" height={16} bw={7} gap={2} summary={false} />
           </span>
         ))}
       </div>

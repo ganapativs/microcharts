@@ -215,12 +215,12 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <Funnel data={stages} summary={false} width={40} height={14} />
+            <Funnel data={stages} summary={false} width={64} height={16} />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Organic <Funnel data={stages} width={40} height={14} />\n</button>`,
+    code: `<button className="tab">\n  Organic <Funnel data={stages} width={64} height={16} />\n</button>`,
   },
 };
 

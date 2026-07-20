@@ -40,7 +40,15 @@ export const entry: ChartEntry = {
       name: "bins",
       type: "[number, number, number]",
       required: false,
-      description: "Ascending grade % thresholds that quantize the four difficulty bins.",
+      description:
+        "Ascending grade-% thresholds (always percent) that quantize the four difficulty bins.",
+    },
+    {
+      name: "format",
+      type: "Intl.NumberFormatOptions | (n) => string",
+      required: false,
+      description:
+        "Formats distance and elevation in the summary and readout; grades always render as percent.",
     },
     {
       name: "label",

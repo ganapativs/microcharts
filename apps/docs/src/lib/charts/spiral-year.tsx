@@ -145,7 +145,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Revenue seasonality{" "}
         <span className="mc-inline">
-          <SpiralYear data={YEAR} size={20} summary={false} />
+          <SpiralYear data={YEAR} size={28} summary={false} />
         </span>{" "}
         — summer swell, outlier week 29.
       </p>
@@ -160,7 +160,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <SpiralYear data={row.data} size={22} summary={false} />
+                <SpiralYear data={row.data} size={32} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -194,13 +194,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <SpiralYear data={row.data} size={18} summary={false} />
+            <SpiralYear data={row.data} size={28} summary={false} />
           </span>
         ))}
       </div>
     ),
     code: '<button className="tab">\n  2024 <SpiralYear data={byWeek} />\n</button>',
   },
+  note: "Year spiral needs card scale — weekly rings collapse below ~36px.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

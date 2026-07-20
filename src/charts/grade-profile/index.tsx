@@ -22,6 +22,7 @@ export interface GradeProfileProps {
   label?: "max" | "none" | undefined;
   width?: number | undefined;
   height?: number | undefined;
+  /** Formats distance in the summary; grade % always uses `%`. */
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: GradeProfileStrings | undefined;

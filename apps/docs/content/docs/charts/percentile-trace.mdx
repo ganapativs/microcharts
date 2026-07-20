@@ -51,9 +51,9 @@ chart is the entity itself, drifting through a known landscape.
 ## Variants
 
 <LiveDemo
-  label="bands, and no bands"
+  label="showBands, and no bands"
   code={`<PercentileTrace data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]} />
-<PercentileTrace data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]} bands={false} />`}
+<PercentileTrace data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]} showBands={false} />`}
 >
   <span className="inline-flex flex-col gap-1.5">
     <PercentileTrace
@@ -65,7 +65,7 @@ chart is the entity itself, drifting through a known landscape.
     />
     <PercentileTrace
       data={[40, 46, 52, 58, 63, 68, 72, 76, 79, 81]}
-      bands={false}
+      showBands={false}
       unit="week"
       title="no bands"
       width={220}

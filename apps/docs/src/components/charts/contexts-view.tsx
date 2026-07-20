@@ -69,6 +69,9 @@ export function FourContextsView({ mod }: { mod: ChartModule }) {
           );
         })}
       </div>
+      {ctx.note ? (
+        <p className="mt-2 text-[0.7rem] leading-snug text-fd-muted-foreground/80">{ctx.note}</p>
+      ) : null}
     </div>
   );
 }

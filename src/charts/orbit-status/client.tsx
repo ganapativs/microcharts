@@ -38,7 +38,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     rate,
     latencyDomain,
     rateDomain,
-    alert,
+    threshold,
     size = 20,
     format,
     locale,
@@ -54,8 +54,9 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();
   const geo = useMemo(
-    () => orbitStatusGeometry({ latency, rate, size, latencyDomain, rateDomain, alert, pad: 1 }),
-    [latency, rate, size, latencyDomain, rateDomain, alert],
+    () =>
+      orbitStatusGeometry({ latency, rate, size, latencyDomain, rateDomain, threshold, pad: 1 }),
+    [latency, rate, size, latencyDomain, rateDomain, threshold],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [announced, setAnnounced] = useState("");
@@ -69,7 +70,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       ? undefined
       : typeof summary === "string"
         ? summary
-        : orbitStatusSummary(latency, rate, { alert, strings, format, locale });
+        : orbitStatusSummary(latency, rate, { threshold, strings, format, locale });
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // ONE unit — the dependency itself. There is nothing to rove between and no
@@ -120,8 +121,8 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     if (prevAlerted.current === alerted) return;
     prevAlerted.current = alerted;
     if (alerted) setAnnounced(strings.orbitAlert(fmt(Math.max(0, latency))));
-    else setAnnounced(orbitStatusSummary(latency, rate, { alert, strings, format, locale }));
-  }, [geo.satellite.alerted, latency, rate, alert, strings, fmt, format, locale]);
+    else setAnnounced(orbitStatusSummary(latency, rate, { threshold, strings, format, locale }));
+  }, [geo.satellite.alerted, latency, rate, threshold, strings, fmt, format, locale]);
 
   return (
     <span
@@ -147,7 +148,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
         rate={rate}
         latencyDomain={latencyDomain}
         rateDomain={rateDomain}
-        alert={alert}
+        threshold={threshold}
         size={size}
         format={format}
         locale={locale}

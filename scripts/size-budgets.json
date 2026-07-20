@@ -8,7 +8,7 @@
   "styles": "12 kB",
   "charts": {
     "sparkline": {
-      "static": "4.01 kB",
+      "static": "4.02 kB",
       "interactive": "6.25 kB"
     },
     "sparkbar": {
@@ -16,16 +16,16 @@
       "interactive": "5.37 kB"
     },
     "delta": {
-      "static": "1.01 kB",
-      "interactive": "1.90 kB"
+      "static": "1.16 kB",
+      "interactive": "2.05 kB"
     },
     "bullet": {
-      "static": "1.89 kB",
-      "interactive": "2.97 kB"
+      "static": "1.94 kB",
+      "interactive": "3.03 kB"
     },
     "activity-grid": {
-      "static": "2.33 kB",
-      "interactive": "4.83 kB"
+      "static": "2.38 kB",
+      "interactive": "4.88 kB"
     },
     "trend-arrow": {
       "static": "1.92 kB",
@@ -33,7 +33,7 @@
     },
     "status-dot": {
       "static": "1.75 kB",
-      "interactive": "2.60 kB"
+      "interactive": "2.59 kB"
     },
     "heat-cell": {
       "static": "2.01 kB",
@@ -76,8 +76,8 @@
       "interactive": "4.75 kB"
     },
     "slope": {
-      "static": "3.32 kB",
-      "interactive": "5.67 kB"
+      "static": "3.35 kB",
+      "interactive": "5.68 kB"
     },
     "micro-scatter": {
       "static": "2.09 kB",
@@ -113,7 +113,7 @@
       "interactive": "4.83 kB"
     },
     "funnel": {
-      "static": "2.39 kB",
+      "static": "2.40 kB",
       "interactive": "4.56 kB"
     },
     "likert-strip": {
@@ -121,7 +121,7 @@
       "interactive": "4.90 kB"
     },
     "waterfall": {
-      "static": "2.97 kB",
+      "static": "2.96 kB",
       "interactive": "5.13 kB"
     },
     "bump-strip": {
@@ -141,7 +141,7 @@
       "interactive": "4.95 kB"
     },
     "horizon": {
-      "static": "2.56 kB",
+      "static": "2.57 kB",
       "interactive": "4.71 kB"
     },
     "calendar-strip": {
@@ -150,19 +150,19 @@
     },
     "event-timeline": {
       "static": "2.87 kB",
-      "interactive": "5.35 kB"
+      "interactive": "5.33 kB"
     },
     "coverage-strip": {
       "static": "2.48 kB",
-      "interactive": "4.56 kB"
+      "interactive": "4.55 kB"
     },
     "benchmark-strip": {
       "static": "3.01 kB",
       "interactive": "5.10 kB"
     },
     "percentile-ladder": {
-      "static": "3.24 kB",
-      "interactive": "5.40 kB"
+      "static": "3.28 kB",
+      "interactive": "5.44 kB"
     },
     "graded-band": {
       "static": "3.00 kB",
@@ -174,23 +174,23 @@
     },
     "rate-volume": {
       "static": "2.86 kB",
-      "interactive": "5.19 kB"
+      "interactive": "5.20 kB"
     },
     "net-flow": {
-      "static": "2.92 kB",
-      "interactive": "5.13 kB"
+      "static": "2.93 kB",
+      "interactive": "5.14 kB"
     },
     "retention-curve": {
-      "static": "3.24 kB",
+      "static": "3.25 kB",
       "interactive": "5.52 kB"
     },
     "burn-chart": {
-      "static": "3.43 kB",
-      "interactive": "5.74 kB"
+      "static": "3.44 kB",
+      "interactive": "5.75 kB"
     },
     "error-budget": {
       "static": "3.00 kB",
-      "interactive": "5.17 kB"
+      "interactive": "5.15 kB"
     },
     "control-strip": {
       "static": "3.28 kB",
@@ -202,7 +202,7 @@
     },
     "quantile-dots": {
       "static": "2.72 kB",
-      "interactive": "5.06 kB"
+      "interactive": "5.03 kB"
     },
     "ab-strips": {
       "static": "3.08 kB",
@@ -210,7 +210,7 @@
     },
     "shift-histogram": {
       "static": "3.16 kB",
-      "interactive": "5.51 kB"
+      "interactive": "5.52 kB"
     },
     "pareto-strip": {
       "static": "2.59 kB",
@@ -226,7 +226,7 @@
     },
     "cycle-plot": {
       "static": "3.00 kB",
-      "interactive": "5.62 kB"
+      "interactive": "5.61 kB"
     },
     "change-point": {
       "static": "3.57 kB",
@@ -238,11 +238,11 @@
     },
     "tally-marks": {
       "static": "1.66 kB",
-      "interactive": "2.63 kB"
+      "interactive": "2.69 kB"
     },
     "dice-pips": {
       "static": "1.50 kB",
-      "interactive": "2.42 kB"
+      "interactive": "2.49 kB"
     },
     "fill-word": {
       "static": "1.57 kB",
@@ -250,7 +250,7 @@
     },
     "fat-digits": {
       "static": "1.82 kB",
-      "interactive": "2.91 kB"
+      "interactive": "2.92 kB"
     },
     "thermometer": {
       "static": "2.50 kB",
@@ -262,7 +262,7 @@
     },
     "hourglass": {
       "static": "1.88 kB",
-      "interactive": "2.81 kB"
+      "interactive": "2.88 kB"
     },
     "balance-beam": {
       "static": "2.38 kB",
@@ -349,8 +349,8 @@
       "interactive": "4.60 kB"
     },
     "token-confidence": {
-      "static": "1.01 kB",
-      "interactive": "1.91 kB"
+      "static": "1.02 kB",
+      "interactive": "1.92 kB"
     },
     "wind-barb": {
       "static": "2.64 kB"
@@ -365,7 +365,7 @@
     },
     "dual-window-meter": {
       "static": "2.68 kB",
-      "interactive": "4.79 kB"
+      "interactive": "4.78 kB"
     },
     "depth-wedge": {
       "static": "2.40 kB",
@@ -381,11 +381,11 @@
     },
     "confusion-grid": {
       "static": "2.75 kB",
-      "interactive": "5.02 kB"
+      "interactive": "5.01 kB"
     },
     "folded-day-band": {
       "static": "2.50 kB",
-      "interactive": "4.59 kB"
+      "interactive": "4.60 kB"
     },
     "volume-profile": {
       "static": "2.90 kB",
@@ -420,11 +420,11 @@
       "interactive": "4.66 kB"
     },
     "win-prob-worm": {
-      "static": "3.54 kB",
+      "static": "3.55 kB",
       "interactive": "5.64 kB"
     },
     "queue-depth": {
-      "static": "3.29 kB",
+      "static": "3.30 kB",
       "interactive": "5.50 kB"
     },
     "spread-band": {
@@ -436,8 +436,8 @@
       "interactive": "4.96 kB"
     },
     "percentile-trace": {
-      "static": "2.89 kB",
-      "interactive": "5.12 kB"
+      "static": "2.90 kB",
+      "interactive": "5.13 kB"
     }
   },
   "$labelsize": "LABEL-SIZE PIN (2026-07-19): `styles.css` sets `font-size` on `.mc-root text`, and a CSS declaration outranks an SVG presentation attribute, so a chart's `fontSize={n}` was inert unless it also pinned `--mc-label-size`. 22 charts did not, and painted labels at 1.3-2.4x the size their gutters were computed for — measured spills up to 17.5 viewBox units past the viewBox, at default size, with the catalog's own sample data (src/test/label-containment.browser.test.tsx reproduces it). Pinning the var costs ~30 B gzip per affected subpath (+1.35 kB across the catalog). Twelve budgets are raised here to absorb it, each to ~60 B of headroom. Sparkline static 3.7 -> 3.8 kB touches the USER-APPROVED flagship exception above and needs the same sign-off. The alternative to paying these bytes is shipping charts whose labels paint into the page, so the bytes are not optional. STREAK-SPARK LABEL BAND (same pass): its geometry reserved no room above the runs, so the DEFAULT label=\"current\" rendered nothing below ~48 units against a default height of 20 — a documented prop that did nothing at word size. Reserving the band costs ~50 B static / ~20 B interactive; both budgets raised here.",
