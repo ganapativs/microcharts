@@ -1197,12 +1197,12 @@
     "oxfmt": "^0.59.0",
     "oxlint": "^1.74.0",
     "playwright": "^1.61.1",
-    "prettier": "^3.9.5",
+    "prettier": "^3.9.6",
     "publint": "^0.3.21",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "size-limit": "^12.1.0",
-    "tsdown": "^0.22.9",
+    "tsdown": "^0.22.13",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10",
     "vitest-browser-react": "^2.2.0"
@@ -1213,5 +1213,5 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@11.10.0+sha512.0b7f8b98060031904c017e3a41eb187a16d40eeb829b95c4f8cb03681761fc4ab53dd219115b9b447f4dce1a05a214764461e7d3703392a9f32f9511ce8c86c8"
+  "packageManager": "pnpm@11.15.1+sha512.81350b07e53c9538a02f1f2303b4290fa2d7be04e56e2a970c4cc4b417dc761de196edabd49d55c7dc9580db81007c44143e4e3d7e462b3000d23c255122d065"
 }
