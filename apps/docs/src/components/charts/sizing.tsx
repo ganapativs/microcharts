@@ -1,8 +1,9 @@
+"use client";
+import "@microcharts/react/motion";
 import type { ReactNode } from "react";
-import { LiveDemo } from "@/components/ui/live-demo";
-import { getModule } from "@/lib/charts/registry";
-
-/** Per-chart sizing recipes — each pairs a live chart with its exact JSX. */
+import { LiveDemoView } from "@/components/ui/live-demo-view";
+import { useChartModule } from "@/lib/charts/use-chart-module";
+import { swapChartTree } from "@/lib/charts/swap-chart-tree";
 
 /** A visibly-constrained box so the "fills its container" recipe reads as fluid. */
 function FluidFrame({ children }: { children: ReactNode }) {
@@ -18,17 +19,25 @@ function FluidFrame({ children }: { children: ReactNode }) {
   );
 }
 
+/** Per-chart sizing recipes — interactive twin via the lazy chart module. */
 export function Sizing({ chart }: { chart: string }) {
-  const recipes = getModule(chart)?.recipes;
+  const mod = useChartModule(chart);
+  if (!mod) return <div className="not-prose my-6 min-h-32" aria-hidden />;
+  const recipes = mod.recipes;
   if (!recipes || recipes.length === 0) return null;
+
+  const { Chart, ChartLive } = mod;
 
   return (
     <>
-      {recipes.map((r) => (
-        <LiveDemo key={r.label} label={r.label} code={r.code}>
-          {r.fluid ? <FluidFrame>{r.node}</FluidFrame> : r.node}
-        </LiveDemo>
-      ))}
+      {recipes.map((r) => {
+        const node = Chart && ChartLive ? swapChartTree(r.node, Chart, ChartLive) : r.node;
+        return (
+          <LiveDemoView key={r.label} label={r.label} code={r.code}>
+            {r.fluid ? <FluidFrame>{node}</FluidFrame> : node}
+          </LiveDemoView>
+        );
+      })}
     </>
   );
 }

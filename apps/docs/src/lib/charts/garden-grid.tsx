@@ -150,7 +150,7 @@ export const contexts: ChartContexts = {
         — busy mid-month, quiet weeks 4 and 10.
       </p>
     ),
-    code: "<p>\n  Contributions this quarter <GardenGrid data={weeks} rows={1} /> — busy mid-month, quiet weeks 4 and 10.\n</p>",
+    code: '<p>\n  Contributions this quarter{" "}\n  <span className="mc-inline">\n    <GardenGrid data={weeks} rows={1} summary={false} />\n  </span>{" "}\n  — busy mid-month, quiet weeks 4 and 10.\n</p>',
   },
   cell: {
     render: () => (

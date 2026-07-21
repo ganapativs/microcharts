@@ -207,6 +207,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
       <path
         d={geo.fastPath}
         data-mc-ink="accent"
+        fill="none"
         strokeLinejoin="round"
         strokeLinecap="round"
         style={{ strokeWidth: "calc(var(--mc-stroke-width) * 0.7)" }}

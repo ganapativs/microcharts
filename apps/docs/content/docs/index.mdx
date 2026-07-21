@@ -1,8 +1,8 @@
 ---
 title: Introduction
 description:
-  Word-sized charts for React, made for LLMs and humans — zero dependencies, ~1–4 kB gzip each, accessible by default,
-  and server-component safe. 106 chart types, one grammar.
+  Word-sized charts for React, made for LLMs and humans — zero dependencies, ~2–7 kB interactive · ~1–4 kB static,
+  accessible by default, and server-component safe. 106 chart types, one grammar.
 ---
 
 microcharts is a set of tiny, handcrafted charts for React — **made for AI first, and for the people reading what it
@@ -11,11 +11,13 @@ describes itself in words, so a chart an LLM streams into a chat reply, a docume
 can read and trust. They're built to sit _inside_ an interface — in a sentence, a table cell, a KPI card, a tab header,
 a streamed reply — where a full chart library would be too heavy and too loud. One quiet signal, read at a glance.
 
+Prefer [Set up with AI](/docs/quickstart#set-up-with-an-ai-agent) — paste one prompt and an agent installs the package,
+imports the stylesheet, and verifies with a first chart. Or install manually (both steps are required):
+
 <PackageTabs />
 
-Installing is half the setup — the other half is one stylesheet import at your app root; the
-[Quickstart](/docs/quickstart) shows both, or hands the whole thing to
-[your coding agent](/docs/quickstart#set-up-with-an-ai-agent).
+The other half of manual setup is one stylesheet import at your app root — see the
+[Quickstart](/docs/quickstart#set-up-manually).
 
 Every chart renders from `data` alone, ships as pure SVG with **zero runtime dependencies**, and carries an accessible
 description generated from the data itself — the same properties that make it safe for a model to write are the ones
@@ -43,7 +45,7 @@ that make it pleasant for a human to use.
   have nothing to rove between and take `onSelect` alone.
 - **Accessible by default.** Each chart is an `img` with a natural-language summary built from your data — nothing to
   remember, nothing to drift.
-- **Tiny.** Static charts are **~1–4 kB gzip** each, imported from their own subpath and budget-gated in CI.
+- **Tiny.** **~2–7 kB interactive · ~1–4 kB static** gzip each, imported from their own subpath and budget-gated in CI.
 
 ## One catalog, one grammar
 

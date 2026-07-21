@@ -149,7 +149,7 @@ export const contexts: ChartContexts = {
         — 38% at week 12, above benchmark.
       </p>
     ),
-    code: "<p>\n  W12 cohort retention <RetentionCurve data={cohort} /> — 38% at week 12, above benchmark.\n</p>",
+    code: '<p>\n  W12 cohort retention{" "}\n  <span className="mc-inline">\n    <RetentionCurve data={cohort} summary={false} />\n  </span>{" "}\n  — 38% at week 12, above benchmark.\n</p>',
   },
   cell: {
     render: () => (

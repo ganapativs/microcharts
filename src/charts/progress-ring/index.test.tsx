@@ -25,9 +25,24 @@ describe("<ProgressRing>", () => {
     expect(container.querySelector("text")!.getAttribute("text-anchor")).toBe("middle");
   });
 
+  it("3-digit percent (100%) still clears the inner ring", () => {
+    const { container } = draw(<ProgressRing value={1} label="percent" size={32} weight={3} />);
+    const text = container.querySelector("text")!;
+    expect(text.textContent).toBe("100%");
+    const fs = Number(text.getAttribute("font-size"));
+    const rInner = 32 / 2 - 0.5 - 3;
+    expect((4 * fs * 0.62) / 2).toBeLessThanOrEqual(rInner - 1);
+  });
+
   it("overflow: ring clamps, label tells the truth", () => {
     const { container } = draw(<ProgressRing value={1.12} label="percent" size={32} />);
     expect(container.querySelector("text")!.textContent).toBe("112%");
+  });
+
+  it("icon-sized ring drops a 3-digit label instead of colliding", () => {
+    const { container } = draw(<ProgressRing value={1} label="percent" size={16} weight={3} />);
+    expect(container.querySelector("text")).toBeNull();
+    expect(container.querySelectorAll("path").length).toBeGreaterThanOrEqual(1);
   });
 
   it("max <= 0 → track only + 'No data.'", () => {

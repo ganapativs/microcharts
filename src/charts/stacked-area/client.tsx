@@ -192,7 +192,6 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection: a persistent crosshair that survives pointer-leave. */}
         {selX !== undefined && selected !== active ? (
           <line
             x1={selX}

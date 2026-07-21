@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { TraceFold } from "@microcharts/react/trace-fold";
 import { TraceFold as TraceFoldInteractive } from "@microcharts/react/trace-fold/interactive";
 import staticModule, { playground as staticPlayground, TRACE, ms } from "./trace-fold";
 
@@ -50,6 +51,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: TraceFold,
+  ChartLive: TraceFoldInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

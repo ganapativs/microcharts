@@ -159,7 +159,7 @@ export const contexts: ChartContexts = {
         — 34% remaining, burn rate elevated.
       </p>
     ),
-    code: "<p>\n  Checkout SLO budget <ErrorBudget data={remaining} window={30} /> — 34% remaining, burn rate elevated.\n</p>",
+    code: '<p>\n  Checkout SLO budget{" "}\n  <span className="mc-inline">\n    <ErrorBudget data={remaining} window={30} summary={false} />\n  </span>{" "}\n  — 34% remaining, burn rate elevated.\n</p>',
   },
   cell: {
     render: () => (

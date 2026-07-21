@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { DataDiff } from "@microcharts/react/data-diff";
 import { DataDiff as DataDiffInteractive } from "@microcharts/react/data-diff/interactive";
 import staticModule, { playground as staticPlayground, DIFF } from "./data-diff";
 
@@ -44,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: DataDiff,
+  ChartLive: DataDiffInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

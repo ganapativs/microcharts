@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { QuantileDots } from "@microcharts/react/quantile-dots";
 import { QuantileDots as QuantileDotsInteractive } from "@microcharts/react/quantile-dots/interactive";
 import staticModule, { playground as staticPlayground, WAITS, MIN_FMT } from "./quantile-dots";
 
@@ -53,6 +54,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: QuantileDots,
+  ChartLive: QuantileDotsInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

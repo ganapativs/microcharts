@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, textGutter } from "../../core/labels.js";
 import { EN_ETA_BAR, type EtaBarStrings } from "../../core/strings-eta-bar.js";
 import { etaBarGeometry, hatchPath } from "./geometry.js";
 
@@ -89,7 +89,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
             ? etaFormat(pre.remainingTime)
             : fmt(pre.remainingTime);
 
-  const gutter = etaText ? Math.min(width * 0.5, etaText.length * fontSize * 0.62 + 4) : 0;
+  const gutter = etaText ? Math.min(width * 0.5, textGutter(etaText.length, fontSize, 4)) : 0;
   const barWidth = width - gutter;
   const geo = etaBarGeometry({ progress, elapsed, rate: rate ?? null, width: barWidth, height });
 
@@ -116,9 +116,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
       className={className ? `mc-eta ${className}` : "mc-eta"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* track — a faint neutral wash, deliberately lighter than the shared
-          --mc-band token (which is stroke-derived and reads too dark under a
-          solid accent fill); the 14% literal is a justified, tuned exception */}
       <rect
         x={geo.done.x}
         y={geo.done.y}
@@ -127,7 +124,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
         rx={geo.done.height / 2}
         style={{ fill: "var(--mc-neutral)", fillOpacity: 0.14 }}
       />
-      {/* elapsed (done) */}
       <rect
         x={geo.done.x}
         y={geo.done.y}
@@ -136,7 +132,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
         rx={geo.done.height / 2}
         data-mc-ink="accent"
       />
-      {/* remaining texture when stalled */}
       {geo.indeterminate && geo.remaining ? (
         <path
           d={hatchPath(geo.remaining)}
@@ -146,7 +141,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* now divider */}
       {geo.remaining ? (
         <line
           x1={dividerX}
@@ -158,7 +152,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* overflow chevron — remainder is far larger than elapsed */}
       {geo.overflow ? (
         <path
           d={`M${round2(barWidth - 3)} ${round2(geo.done.y + 1)}L${round2(barWidth - 1)} ${round2(height / 2)}L${round2(barWidth - 3)} ${round2(geo.done.y + geo.done.height - 1)}`}

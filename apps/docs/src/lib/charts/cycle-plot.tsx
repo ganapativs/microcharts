@@ -166,7 +166,7 @@ export const contexts: ChartContexts = {
         — weekday peak Wednesday, weekend dip.
       </p>
     ),
-    code: "<p>\n  Weekly traffic shape <CyclePlot data={daily} period={7} /> — weekday peak Wednesday, weekend dip.\n</p>",
+    code: '<p>\n  Weekly traffic shape{" "}\n  <span className="mc-inline">\n    <CyclePlot data={daily} period={7} summary={false} />\n  </span>{" "}\n  — weekday peak Wednesday, weekend dip.\n</p>',
   },
   cell: {
     render: () => (

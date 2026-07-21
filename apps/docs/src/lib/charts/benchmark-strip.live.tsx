@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
 import { BenchmarkStrip as BenchmarkStripInteractive } from "@microcharts/react/benchmark-strip/interactive";
 import staticModule, { playground as staticPlayground, PEERS } from "./benchmark-strip";
 
@@ -51,6 +52,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: BenchmarkStrip,
+  ChartLive: BenchmarkStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

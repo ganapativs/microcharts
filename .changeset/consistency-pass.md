@@ -17,8 +17,12 @@ output.
 | `OrbitStatus`     | `alert`                   | `threshold`       | Decision cutoffs spell `threshold` elsewhere                              |
 | `CyclePlot`       | `trend: "line" \| "none"` | `trend?: boolean` | Matches `MicroScatter`                                                    |
 
-**Non-breaking (same PR):** empty-state `seat` on 11 charts; `LiveRegion` on dice-pips / tally-marks / hourglass;
-`data-mc-ink` on Slope + forced-colors for `data-mc-status`; Delta / Bullet / ActivityGrid / TokenConfidence English via
-`strings-*`; core `clamp` / `lastFinite` reuse; docs registry + MDX synced (catalog.json / llms surfaces regenerate).
+**Also in this release:** chart polish (label defaults, annotation hosts, motion safety); interactive scrub/HOP
+re-render wins (picker SVG cache, Sparkline memo overlays, EnsembleGhosts DOM hop); size sync tolerates over-budget
+`size-limit --json`; marketing band **~2–7 kB interactive · ~1–4 kB static**.
+
+**Non-breaking:** empty-state `seat` on 11 charts; `LiveRegion` on dice-pips / tally-marks / hourglass; `data-mc-ink` on
+Slope + forced-colors for `data-mc-status`; Delta / Bullet / ActivityGrid / TokenConfidence English via `strings-*`;
+core `clamp` / `lastFinite` reuse; docs registry + MDX synced (catalog.json / llms surfaces regenerate).
 
 Examples microsites migrate after publish — not in this release.

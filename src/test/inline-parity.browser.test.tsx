@@ -100,4 +100,29 @@ describe(".mc-inline: the interactive twin occupies the static twin's box", () =
       near(s.svg.height, l.svg.height);
     });
   }
+
+  // Flex column + FILL width:100% used to stretch the interactive wrapper to the
+  // panel (static attribute box stayed put). fit-content width on WRAP prevents
+  // that without centering the mark in left-aligned KPI columns.
+  it("sparkline: flex-column child keeps the static attribute box", async () => {
+    const screen = await render(
+      <div style={{ display: "flex", flexDirection: "column", width: 400, gap: 8 }}>
+        <span>label</span>
+        <StaticSparkline data={WAVE} width={90} height={28} summary={false} />
+      </div>,
+    );
+    const sSvg = screen.container.querySelector("svg")!.getBoundingClientRect();
+    screen.unmount();
+    const live = await render(
+      <div style={{ display: "flex", flexDirection: "column", width: 400, gap: 8 }}>
+        <span>label</span>
+        <LiveSparkline data={WAVE} width={90} height={28} summary={false} />
+      </div>,
+    );
+    const lSvg = live.container.querySelector("svg")!.getBoundingClientRect();
+    near(sSvg.width, lSvg.width);
+    near(sSvg.height, lSvg.height);
+    near(sSvg.width, 90);
+    near(sSvg.height, 28);
+  });
 });

@@ -7,6 +7,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
 import { shiftHistogramGeometry, type ShiftHistogramGeometry, type ShiftMode } from "./geometry.js";
@@ -18,7 +19,6 @@ export function shiftDelta(geo: ShiftHistogramGeometry, fmt: (n: number) => stri
   return geo.shift > 0 ? `+${fmt(geo.shift)}` : fmt(geo.shift);
 }
 
-/** Factual shift summary. Shared with the interactive entry. */
 export function shiftSummary(
   geo: ShiftHistogramGeometry,
   fmt: (n: number) => string,
@@ -85,7 +85,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
     children,
   } = props;
 
-  const FONT = Math.min(9, Math.max(6, Math.round(height * 0.42)));
+  const FONT = labelFont(height, 0.42);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-shift-histogram ${className}` : "mc-shift-histogram";
 
@@ -151,7 +151,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* center hairline — the mirror axis */}
       <line
         x1={0}
         y1={geo.centerY}
@@ -162,9 +161,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         data-mc-w="hair"
         vectorEffect="non-scaling-stroke"
       />
-      {/* before bins — upward, muted. They sit ON the center axis and grow up,
-          so the sweep pins each bin's bottom edge to the axis (origin "bottom")
-          — a centered origin would detach them from the shared mirror line. */}
+      {/* Before bins up from center (origin bottom — keep them on the axis). */}
       {geo.bins.map((b) =>
         b.up > 0 ? (
           <rect
@@ -180,7 +177,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
           />
         ) : null,
       )}
-      {/* after bins — downward (mirror) or an outline above the center (overlay) */}
+      {/* After bins: mirror down, or outline above in overlay mode. */}
       {geo.bins.map((b) =>
         b.down > 0 ? (
           overlay ? (

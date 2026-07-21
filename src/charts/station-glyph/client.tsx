@@ -249,7 +249,6 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus box is transient. */}
         {selected !== active ? outline(selected, true) : null}
         {outline(active, false)}
         {rest.children}

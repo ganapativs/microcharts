@@ -54,6 +54,7 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
     <span
       ref={hostRef}
       className="mc-status-live"
+      data-mc-host=""
       {...named(label)}
       onClick={pick}
       onKeyDown={(e) => {

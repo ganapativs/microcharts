@@ -3,6 +3,7 @@
 // anchored at zero. Coords 2-dp via the kernel.
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
 
 interface BulletRegion {
   x: number;
@@ -12,15 +13,17 @@ interface BulletRegion {
 }
 
 export interface BulletGeometry {
-  /** Full track [0, max]. */
   track: { x: number; width: number; y: number; height: number };
   /** Qualitative bands (ascending); empty when no thresholds given. */
   regions: BulletRegion[];
-  /** The measure bar (0 → value, clamped to the track). */
   measure: { x: number; width: number; y: number; height: number };
-  /** Target/comparative tick, or null. */
+  /** Target tick, or null. */
   tick: { x: number; y0: number; y1: number } | null;
   max: number;
+  /** viewBox width including right label gutter */
+  totalWidth: number;
+  labelX: number;
+  labelY: number;
 }
 
 export interface BulletGeometryOptions {
@@ -33,10 +36,13 @@ export interface BulletGeometryOptions {
   /** Explicit `[0, max]`; auto-fit to value/target/bands when omitted. */
   domain?: readonly [number, number] | undefined;
   pad?: number | undefined;
+  /** Chars in the reserved right-hand label gutter (0 = none). */
+  gutterCh?: number | undefined;
+  fontSize?: number | undefined;
 }
 
 export function bulletGeometry(opts: BulletGeometryOptions): BulletGeometry {
-  const { width, height, pad = 1 } = opts;
+  const { width, height, pad = 1, gutterCh = 0, fontSize = 0 } = opts;
   // Non-finite inputs are documented no-shows: NaN/±Infinity value → zero-width
   // measure, unusable target → no tick, bad bands/domain dropped. Degenerates
   // render as designed empties, never as NaN attributes.
@@ -92,5 +98,19 @@ export function bulletGeometry(opts: BulletGeometryOptions): BulletGeometry {
           y1: round2(trackY + trackH * 0.88),
         };
 
-  return { track, regions, measure, tick, max };
+  // Label gutter is reserved OUTSIDE the track (Progress idiom): the viewBox
+  // widens, the track/measure never shrink, so the same value renders the same
+  // bar length whatever the label says.
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 5) : 0;
+
+  return {
+    track,
+    regions,
+    measure,
+    tick,
+    max,
+    totalWidth: round2(width + gutter),
+    labelX: round2(width + gutter),
+    labelY: round2(height / 2),
+  };
 }

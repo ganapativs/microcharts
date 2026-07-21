@@ -265,7 +265,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               dominantBaseline="central"
               textAnchor="middle"
               fontSize={readoutFont}
-              fontWeight={700}
+              style={{ fontWeight: 700 }}
             >
               {valueText}
             </text>
@@ -275,6 +275,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               d={chevrons.join("")}
               data-mc-ink="accent"
               data-mc-w="support"
+              fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"

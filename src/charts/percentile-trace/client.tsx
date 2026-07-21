@@ -163,7 +163,6 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the ring is transient. */}
         {pinned ? (
           <circle
             cx={pinned.x}

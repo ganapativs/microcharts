@@ -5,8 +5,10 @@
 // RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { ON_FILL_INK } from "../../core/color.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
 import { round2 } from "../../core/types.js";
 import { eventTimelineGeometry } from "./geometry.js";
@@ -76,7 +78,7 @@ const KIND_INK: Record<EventKind, string> = {
   accent: "accent",
 };
 
-/** Factual timeline summary — merged coverage never double-counts. Shared. */
+/** Merged coverage never double-counts. */
 export function eventTimelineSummary(
   spans: number,
   events: number,
@@ -150,7 +152,7 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
 
   const items = normalizeItems(data);
   const win = timelineDomain(items, domain);
-  const fontSize = Math.max(4, Math.min(Math.round(height * 0.45), 6));
+  const fontSize = labelFont(height, 0.45);
   const geo = eventTimelineGeometry({
     width,
     height,
@@ -225,8 +227,9 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
                 y={round2(height / 2)}
                 fontSize={fontSize}
                 dominantBaseline="central"
+                style={{ fontWeight: 600 }}
                 textAnchor="middle"
-                data-mc-ink="label"
+                fill={ON_FILL_INK}
               >
                 {items[s.i]!.label}
               </text>

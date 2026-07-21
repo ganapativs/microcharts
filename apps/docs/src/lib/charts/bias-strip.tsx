@@ -128,7 +128,7 @@ export const contexts: ChartContexts = {
         — +2 bias, 18 of 20 pairs within limits.
       </p>
     ),
-    code: "<p>\n  Device vs reference <BiasStrip data={pairs} width={90} height={24} /> — +2 bias, 18 of 20 within limits.\n</p>",
+    code: '<p>\n  Device vs reference{" "}\n  <span className="mc-inline">\n    <BiasStrip data={pairs} width={90} height={24} summary={false} />\n  </span>{" "}\n  — +2 bias, 18 of 20 within limits.\n</p>',
   },
   cell: {
     render: () => (

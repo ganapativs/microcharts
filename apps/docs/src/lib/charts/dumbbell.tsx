@@ -127,7 +127,7 @@ export const contexts: ChartContexts = {
         from €48k to €68k after the review — up 42%.
       </p>
     ),
-    code: `<p>\n  Berlin's band moved{" "}\n  <Dumbbell data={[{ from: 48, to: 68 }]} width={70} height={14} /> from €48k to €68k — up 42%.\n</p>`,
+    code: `<p>\n  Berlin's band moved{" "}\n  <span className="mc-inline">\n    <Dumbbell data={[{ from: 48, to: 68 }]} width={70} height={14} summary={false} />\n  </span>{" "}\n  from €48k to €68k — up 42%.\n</p>`,
   },
   cell: {
     render: () => (
@@ -170,10 +170,10 @@ export const contexts: ChartContexts = {
       <div className="flex flex-wrap gap-1.5">
         {(
           [
-            ["Offices", BANDS],
-            ["Levels", LEVELS],
+            ["Offices", BANDS[1]!],
+            ["Levels", LEVELS[1]!],
           ] as const
-        ).map(([name, rows], i) => (
+        ).map(([name, row], i) => (
           <span
             key={name}
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${
@@ -183,12 +183,12 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <Dumbbell data={rows} summary={false} width={60} height={12} />
+            <Dumbbell data={[row]} summary={false} width={60} height={12} />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Offices <Dumbbell data={bands} width={60} height={12} />\n</button>`,
+    code: `<button className="tab">\n  Offices <Dumbbell data={[{ from: 48, to: 68 }]} width={60} height={12} summary={false} />\n</button>`,
   },
 };
 

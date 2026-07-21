@@ -139,7 +139,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         : miniBarSummary(data, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // focus ring hugs the bar's category band, full value extent
+  const shown = active ?? selected;
   const outline = (i: number, pinned: boolean) => {
     const b = geo.bars[i];
     if (!b || b.empty) return null;
@@ -158,7 +158,6 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     );
   };
 
-  const shown = active ?? selected;
   const shownBar = shown !== null ? geo.bars[shown] : undefined;
   const shownDatum = shown !== null ? sorted[shown] : undefined;
   const announced =
@@ -189,7 +188,6 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}

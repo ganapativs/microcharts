@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { PairedBars } from "@microcharts/react/paired-bars";
 import { PairedBars as PairedBarsInteractive } from "@microcharts/react/paired-bars/interactive";
 import staticModule, { playground as staticPlayground, BUDGET } from "./paired-bars";
 
@@ -45,6 +46,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: PairedBars,
+  ChartLive: PairedBarsInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

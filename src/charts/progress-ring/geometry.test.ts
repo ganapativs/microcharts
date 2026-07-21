@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { ringGeometry } from "./geometry.js";
+import { ringGeometry, ringLabelFont } from "./geometry.js";
 
 describe("ringGeometry", () => {
   it("fraction 0 → track only (no zero-length arc artifact)", () => {
@@ -29,6 +29,23 @@ describe("ringGeometry", () => {
     expect(done.arc).toBe("");
   });
 
+  it("3-digit percent stays inside the hole (≥1 unit air from the ring)", () => {
+    for (const size of [24, 32, 40, 48]) {
+      const weight = 3;
+      const rInner = size / 2 - 0.5 - weight;
+      const geo = ringGeometry({ size, fraction: 1, weight, sweep: false, labelChars: 4 });
+      expect(geo.fontSize).toBeGreaterThan(0);
+      const halfW = (4 * geo.fontSize * 0.62) / 2;
+      expect(halfW).toBeLessThanOrEqual(rInner - 1);
+      expect(geo.fontSize / 2).toBeLessThanOrEqual(rInner - 1);
+    }
+  });
+
+  it("tiny ring drops the label rather than touching the track", () => {
+    const geo = ringGeometry({ size: 14, fraction: 0.5, weight: 3, sweep: false, labelChars: 4 });
+    expect(geo.fontSize).toBe(0);
+  });
+
   test.prop([
     fc.double({ min: 0, max: 1, noNaN: true }),
     fc.integer({ min: 1, max: 10 }),
@@ -40,5 +57,14 @@ describe("ringGeometry", () => {
       expect(v).toBeGreaterThanOrEqual(-0.01);
       expect(v).toBeLessThanOrEqual(24.01);
     }
+  });
+});
+
+describe("ringLabelFont", () => {
+  it("sizes for ≥4 glyphs so 9% and 100% share one fit budget", () => {
+    const a = ringLabelFont(16, 2);
+    const b = ringLabelFont(16, 4);
+    expect(a).toBe(b);
+    expect(a).toBeGreaterThan(0);
   });
 });

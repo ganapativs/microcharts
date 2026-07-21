@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { DepthWedge } from "@microcharts/react/depth-wedge";
 import { DepthWedge as DepthWedgeInteractive } from "@microcharts/react/depth-wedge/interactive";
 import staticModule, { playground as staticPlayground, BOOK } from "./depth-wedge";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: DepthWedge,
+  ChartLive: DepthWedgeInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

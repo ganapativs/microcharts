@@ -199,7 +199,6 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus sector is transient. */}
         {pinPath ? <path d={pinPath} data-mc-ink="accent" data-mc-w="tick" /> : null}
         {activePath ? <path d={activePath} data-mc-ink="accent" /> : null}
         {rest.children}

@@ -196,17 +196,13 @@ export function AppearanceMenu() {
             style={pos}
             className="glass glass-strong pop-in fixed z-[60] w-[20rem] max-w-[calc(100vw-1.5rem)] overflow-hidden"
           >
-            {/* live preview — the accent on a real microchart, no overlap */}
             <div className="border-b border-hairline">
               <div className="flex items-center justify-between px-4 pb-1.5 pt-3">
                 <span className="mono-label text-[0.56rem]">Preview</span>
                 <span className="mono-label text-[0.56rem] text-fd-primary">{current.label}</span>
               </div>
               <div className="grid-paper flex items-center justify-center px-5 pb-4 pt-1">
-                {/* Both marks re-theme live off the [data-accent] the buttons set
-                    on <html>: the line takes the emphasis accent, the segmented
-                    bar the DERIVED categorical palette — so the picker shows the
-                    whole matched theme, not just the accent. */}
+                {/* Sparkline uses --accent; SegmentedBar uses derived cats. */}
                 <div
                   key={accent + preset}
                   className="mc-morph hv-theme-stage flex w-full flex-col items-center gap-2"
@@ -233,7 +229,7 @@ export function AppearanceMenu() {
                   />
                 </div>
               </div>
-              {/* a hairline accent rule under the preview — thin, never loud */}
+
               <div aria-hidden className="h-0.5 w-full" style={{ background: "var(--accent)" }} />
             </div>
 
@@ -291,10 +287,6 @@ export function AppearanceMenu() {
                 })}
               </div>
 
-              {/* Copy the live look, or jump to the full token studio. Turns the
-                  preview into something you can paste into your own app. */}
-              {/* A hairline that fades at both ends — calmer than an edge-to-edge
-                  rule; never a hard line across the panel. */}
               <div
                 aria-hidden
                 className="mx-1 mt-4 h-px"

@@ -43,6 +43,6 @@ export const CATEGORICAL = [
 ] as const;
 
 /** Label ink for text sitting ON a saturated data fill (dense cells, wedges).
- *  Near-white with a hair of translucency so it reads on any --mc-cat-* fill
- *  in light and dark; the one sanctioned literal for this job. */
-export const ON_FILL_INK = "rgba(255,255,255,0.96)";
+ *  Resolves `--mc-on-fill` (default near-white in styles.css) so themes can
+ *  retint pastel fills without touching chart code. */
+export const ON_FILL_INK = "var(--mc-on-fill)";

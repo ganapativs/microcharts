@@ -56,7 +56,7 @@ export const entry: ChartEntry = {
       type: '"none" | "delta"',
       required: false,
       description:
-        '"delta" prints each step\'s signed value in a band below the plot; the biggest movers win when labels would collide.',
+        '"delta" (default) prints each step\'s signed value in a band below the plot; the biggest movers win when labels would collide.',
     },
   ],
   demo: PL.map((d) => d.value),
@@ -86,7 +86,7 @@ export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "open", label: "open", min: 0, max: 100, step: 5, init: 60 },
     { kind: "toggle", key: "totalBar", label: "total bar", init: true },
-    { kind: "toggle", key: "delta", label: "delta labels", init: false },
+    { kind: "toggle", key: "delta", label: "delta labels", init: true },
     {
       kind: "segmented",
       key: "positive",
@@ -113,7 +113,7 @@ export const playground: PlaygroundSpec = {
       "  data={steps}",
       `  open={${s.open}}`,
       s.totalBar === false && "  totalBar={false}",
-      s.delta && '  label="delta"',
+      !s.delta && '  label="none"',
       s.positive !== "up" && `  positive="${s.positive}"`,
       "/>",
     ]
@@ -125,9 +125,9 @@ export const playground: PlaygroundSpec = {
 
 export const recipes: Recipe[] = [
   {
-    label: "signed step labels (biggest movers win collisions)",
-    code: `<Waterfall data={steps} open={60} label="delta" />`,
-    node: <Waterfall data={PL} open={60} label="delta" summary={false} width={220} height={26} />,
+    label: "no step labels",
+    code: `<Waterfall data={steps} open={60} label="none" />`,
+    node: <Waterfall data={PL} open={60} label="none" summary={false} width={220} height={26} />,
   },
   {
     label: "P&L rows",
@@ -189,7 +189,7 @@ export const contexts: ChartContexts = {
         — Product and Services carried it past Refunds and Opex.
       </p>
     ),
-    code: `<p>\n  Net income bridged from $60k to $87k this quarter{" "}\n  <Waterfall data={steps} open={60} width={100} height={16} /> — Product and\n  Services carried it past Refunds and Opex.\n</p>`,
+    code: `<p>\n  Net income bridged from $60k to $87k this quarter{" "}\n  <span className="mc-inline">\n    <Waterfall data={steps} open={60} width={100} height={16} summary={false} />\n  </span>{" "}\n  — Product and\n  Services carried it past Refunds and Opex.\n</p>`,
   },
   cell: {
     render: () => (

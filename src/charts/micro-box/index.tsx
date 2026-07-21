@@ -13,7 +13,6 @@ import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
 import { computeFive, microBoxDots, microBoxGeometry } from "./geometry.js";
 
-/** Factual five-number summary. Shared with the interactive entry. */
 export function microBoxSummary(
   five: FiveNumber,
   fmt: (n: number) => string,

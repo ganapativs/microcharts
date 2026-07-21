@@ -82,8 +82,13 @@ export function Waveform(props: WaveformProps): ReactNode {
 
   const hasProgress = progress != null && Number.isFinite(progress);
   const playedIdx = hasProgress ? Math.round(Math.max(0, Math.min(1, progress)) * buckets) : 0;
-  const played = geo.bars.filter((b) => b.index < playedIdx);
-  const rest = geo.bars.filter((b) => b.index >= playedIdx);
+  let played = geo.bars;
+  let rest = geo.bars;
+  if (hasProgress) {
+    played = [];
+    rest = [];
+    for (const b of geo.bars) (b.index < playedIdx ? played : rest).push(b);
+  }
 
   return (
     <Chart
@@ -101,7 +106,6 @@ export function Waveform(props: WaveformProps): ReactNode {
       className={className ? `mc-wave ${className}` : "mc-wave"}
       style={style}
     >
-      {/* center hairline */}
       {mirror ? (
         <line
           x1={1}

@@ -18,7 +18,6 @@ import { resolveSummary } from "../../core/summary.js";
 const slotName = (slots: readonly string[] | undefined, i: number): string =>
   slots?.[i] ?? `slot ${i + 1}`;
 
-/** Factual cycle summary. Shared with the interactive entry. */
 export function cycleSummary(
   geo: CycleGeometry,
   opts: { slots?: readonly string[] | undefined; cycleUnit: string },
@@ -166,7 +165,6 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
       style={style}
     >
       {ann.under}
-      {/* within-slot polylines — raw values in time order, muted, never smoothed */}
       {trend
         ? geo.slots.map((sl) =>
             sl.line ? (
@@ -183,7 +181,6 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
             ) : null,
           )
         : null}
-      {/* the spine — slot centers connected (only across non-empty slots) */}
       {spine && geo.spine.d ? (
         <path
           d={geo.spine.d}
@@ -194,7 +191,6 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* slot-mean ticks — accent, the seasonality read */}
       {geo.slots.map((sl) =>
         sl.n > 0 ? (
           <circle key={sl.x0} cx={sl.center.x} cy={sl.center.y} r={1.3} style={{ fill: accent }} />

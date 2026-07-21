@@ -24,7 +24,6 @@ export function GET() {
         position: "relative",
       }}
     >
-      {/* wordmark */}
       <div style={{ display: "flex", alignItems: "center", gap: 16, fontFamily: "monospace" }}>
         <div
           style={{
@@ -55,7 +54,6 @@ export function GET() {
         <div style={{ fontSize: 28, letterSpacing: "-0.01em", color: "#191712" }}>microcharts</div>
       </div>
 
-      {/* headline + inline chart */}
       <div style={{ display: "flex", flexDirection: "column" }}>
         <div style={{ fontSize: 88, lineHeight: 1.02, letterSpacing: "-0.03em", maxWidth: 940 }}>
           {SITE.tagline}
@@ -73,9 +71,8 @@ export function GET() {
         </svg>
       </div>
 
-      {/* footer */}
       <div style={{ display: "flex", fontSize: 26, color: "#6b6659", fontFamily: "monospace" }}>
-        Zero deps · ~1–4 kB · RSC-safe · Accessible by default
+        Zero deps · ~2–7 kB interactive · ~1–4 kB static · RSC-safe · Accessible by default
       </div>
     </div>,
     size,

@@ -69,7 +69,7 @@ export const entry: ChartEntry = {
       name: "label",
       type: '"none" | "percent" | "value"',
       required: false,
-      description: "Centered per segment (deterministic drop-out).",
+      description: "Centered per segment (deterministic drop-out; default percent).",
     },
     {
       name: "colors",
@@ -109,7 +109,7 @@ export const playground: PlaygroundSpec = {
       key: "label",
       label: "labels",
       options: ["none", "percent", "value"],
-      init: "none",
+      init: "percent",
     },
     { kind: "segmented", key: "order", label: "order", options: ["data", "desc"], init: "data" },
     { kind: "range", key: "maxSegments", label: "max segments", min: 2, max: 5, init: 5 },
@@ -129,7 +129,7 @@ export const playground: PlaygroundSpec = {
     [
       "<SegmentedBar",
       "  data={mix}",
-      s.label !== "none" && `  label="${s.label}"`,
+      s.label !== "percent" && `  label="${s.label}"`,
       s.order !== "data" && `  order="${s.order}"`,
       s.maxSegments !== 5 && `  maxSegments={${s.maxSegments}}`,
       "/>",
@@ -146,7 +146,7 @@ export const recipes: Recipe[] = [
     node: <SegmentedBar data={MIX} summary={false} width={60} height={10} />,
   },
   {
-    label: "with percents",
+    label: "value labels",
     code: `<SegmentedBar
   data={[
     { label: "Chrome", value: 620 },
@@ -155,10 +155,10 @@ export const recipes: Recipe[] = [
     { label: "Edge", value: 30 },
     { label: "Arc", value: 20 },
   ]}
-  label="percent"
+  label="value"
   style={{ width: 160 }}
 />`,
-    node: <SegmentedBar data={MIX} label="percent" summary={false} width={160} height={14} />,
+    node: <SegmentedBar data={MIX} label="value" summary={false} width={160} height={14} />,
   },
 ];
 
@@ -173,7 +173,7 @@ export const contexts: ChartContexts = {
         — 62% Chrome, 24% Safari, the rest long tail.
       </p>
     ),
-    code: `<p>\n  This week's sessions skew Chrome{" "}\n  <SegmentedBar data={mix} width={90} height={14} /> — 62% Chrome, 24% Safari, the rest long tail.\n</p>`,
+    code: `<p>\n  This week's sessions skew Chrome{" "}\n  <span className="mc-inline">\n    <SegmentedBar data={mix} width={90} height={14} summary={false} />\n  </span>{" "}\n  — 62% Chrome, 24% Safari, the rest long tail.\n</p>`,
   },
   cell: {
     render: () => (
@@ -208,10 +208,10 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">sessions on Chrome</span>
           </div>
         </div>
-        <SegmentedBar data={MIX} label="percent" summary={false} width={200} height={20} />
+        <SegmentedBar data={MIX} summary={false} width={200} height={20} />
       </>
     ),
-    code: `<div className="kpi">\n  <span className="figure">62%</span>\n  <span className="unit">sessions on Chrome</span>\n  <SegmentedBar data={mix} label="percent" width={200} height={20} />\n</div>`,
+    code: `<div className="kpi">\n  <span className="figure">62%</span>\n  <span className="unit">sessions on Chrome</span>\n  <SegmentedBar data={mix} width={200} height={20} />\n</div>`,
   },
   tab: {
     render: () => (

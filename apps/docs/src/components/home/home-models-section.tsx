@@ -7,22 +7,9 @@ import { ProviderWall } from "@/components/charts/ai-static";
 import { PROVIDER_GROUPS } from "@/lib/ai-providers";
 import { Reveal } from "@/components/ui/reveal";
 
-/**
- * 04 · Made for models — the page's one dark band, the machine-facing
- * chapter. Priority order tuned for a human skimming: the tools they already
- * use come FIRST (the wall answers "does it work with my stack?"), then the
- * two supporting proofs side by side — the machine surfaces a model reads
- * from, and a deliberately small hostile-data card (graceful degradation is
- * table stakes, not a headline: it gets a half-width card, not a section).
- * The `dark` class re-scopes the theme tokens, so this is the real
- * hand-tuned dark theme, not a tinted box. Terminal lines land one by one on
- * reveal (hv-term-line).
- *
- * The hostile-data card: each row feeds a genuinely malformed input to the
- * SAME component, renders whatever it produces, and prints the summary
- * `describeSeries` generates from it. No try/catch anywhere; the sentence is
- * computed live (never hand-typed) so it can't drift or lie.
- */
+/** 04 · Models (dark band). Provider wall first, then machine surfaces + a
+ *  hostile-data card. `dark` re-scopes real theme tokens. Hostile rows call
+ *  `describeSeries` live — no hand-typed summaries. */
 
 const SURFACES = [
   {

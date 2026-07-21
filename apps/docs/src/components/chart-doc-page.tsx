@@ -17,6 +17,7 @@ import { abs } from "@/lib/site";
 import { breadcrumbJsonLd, jsonLdScript, techArticleJsonLd } from "@/lib/jsonld";
 import { docLastModified } from "@/lib/doc-dates";
 import { RouteTransition } from "@/components/route-transition";
+import { ChartSlugProvider } from "@/components/charts/chart-slug-context";
 
 /**
  * Render a docs page from the **chart route** — the /docs/charts index and every
@@ -33,6 +34,8 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
   const url = abs(page.url);
+  // Per-chart pages only — LiveDemo variants swap static → interactive via this.
+  const chartSlug = page.slugs.length >= 2 ? page.slugs[1] : undefined;
 
   const crumbs = [
     { name: "Docs", url: abs("/docs") },
@@ -64,17 +67,14 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
           }),
         )}
       </script>
-      {/* Calm fade + lift on navigation. Wraps only the article content — never
-          the DocsPage grid-area siblings (toc/sidebar), which must stay direct
-          grid children of the layout. Keyed on pathname; reduced-motion gated. */}
+      {/* Transition on article only — toc/sidebar must stay layout grid kids. */}
       <RouteTransition className="flex flex-1 flex-col gap-4">
         <DocsTitle className="font-display text-[2.15em] font-medium tracking-[-0.025em]">
           {page.data.title}
         </DocsTitle>
         <DocsDescription className="mb-0 text-base">{page.data.description}</DocsDescription>
         <div className="flex flex-row items-center gap-1.5 border-b border-hairline pb-6">
-          {/* Route the Fumadocs built-ins through the canon secondary button so the
-              title row matches every other text action on the site. */}
+          {/* Fumadocs actions use cta-ghost like the rest of the site. */}
           <MarkdownCopyButton markdownUrl={markdownUrl} className="cta-ghost" />
           <ViewOptionsPopover
             markdownUrl={markdownUrl}
@@ -83,7 +83,9 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
           />
         </div>
         <DocsBody>
-          <MDX components={getChartMDXComponents({ a: createRelativeLink(source, page) })} />
+          <ChartSlugProvider slug={chartSlug}>
+            <MDX components={getChartMDXComponents({ a: createRelativeLink(source, page) })} />
+          </ChartSlugProvider>
         </DocsBody>
       </RouteTransition>
     </DocsPage>

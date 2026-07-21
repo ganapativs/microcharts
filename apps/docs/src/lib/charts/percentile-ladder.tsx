@@ -165,7 +165,7 @@ export const contexts: ChartContexts = {
         — p99 at 2.1 s, long tail visible.
       </p>
     ),
-    code: "<p>\n  Request latency <PercentileLadder data={latencies} /> — p99 at 2.1 s, long tail visible.\n</p>",
+    code: '<p>\n  Request latency{" "}\n  <span className="mc-inline">\n    <PercentileLadder data={latencies} summary={false} />\n  </span>{" "}\n  — p99 at 2.1 s, long tail visible.\n</p>',
   },
   cell: {
     render: () => (

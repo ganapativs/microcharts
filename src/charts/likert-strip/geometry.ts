@@ -2,6 +2,7 @@
 // Signed segment lengths from a center line via core/stack.divergingStack.
 // Graded opacity encodes ordinal distance from neutral, never magnitude. 2-dp.
 import { divergingStack, type DivergingStack } from "../../core/stack.js";
+import { labelFont, textGutter } from "../../core/labels.js";
 import { round2, type Value } from "../../core/types.js";
 
 interface LikertSegment {
@@ -21,16 +22,18 @@ export interface LikertGeometry {
   shares: { negative: number; positive: number; neutral: number };
 }
 
-/** Label font size (viewBox units) — shared by both entries. */
-export const LIKERT_FONT = 5;
+/** Label font size (viewBox units) — `labelFont` floor 7, scaled to strip height. */
+export function likertFont(height: number): number {
+  return labelFont(height, 0.5);
+}
 
 /**
  * End-label gutter reserved on BOTH sides before geometry runs ("100%" worst
  * case = 4 chars). Shared so the static frame and the interactive overlay/
  * hit-test always resolve against the same plot box.
  */
-export function likertGutter(labelled: boolean, fontSize: number = LIKERT_FONT): number {
-  return labelled ? Math.ceil(4 * fontSize * 0.62) + 4 : 0;
+export function likertGutter(labelled: boolean, fontSize: number): number {
+  return labelled ? textGutter(4, fontSize, 4) : 0;
 }
 
 export function likertStripGeometry(opts: {

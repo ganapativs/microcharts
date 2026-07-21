@@ -150,7 +150,7 @@ export const contexts: ChartContexts = {
         — step-up on day 14, regime break at 2.1%.
       </p>
     ),
-    code: "<p>\n  Error rate this week <ChangePoint data={errors} /> — step-up on day 14, regime break at 2.1%.\n</p>",
+    code: '<p>\n  Error rate this week{" "}\n  <span className="mc-inline">\n    <ChangePoint data={errors} summary={false} />\n  </span>{" "}\n  — step-up on day 14, regime break at 2.1%.\n</p>',
   },
   cell: {
     render: () => (

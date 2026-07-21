@@ -14,7 +14,6 @@ import { resolveSummary } from "../../core/summary.js";
 
 const pct = (frac: number): string => `${Math.round(frac * 100)}%`;
 
-/** Factual pareto summary. Shared with the interactive entry. */
 export function paretoSummary(
   geo: ParetoGeometry,
   opts: { unit: string; metric: string },
@@ -136,9 +135,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* bars — vital few accent, the rest muted (where to stop reading); a
-          custom `color` prop still needs an inline override, so the ink role
-          only drives the default accent/neutral pair */}
+      {/* Vital few accent / rest muted; `color` overrides via inline fill. */}
       {geo.painted.map((i) => {
         const b = geo.bars[i]!;
         return (
@@ -155,7 +152,6 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
           />
         );
       })}
-      {/* cumulative-share line — fixed 0–100% over the full height */}
       {geo.line.d ? (
         <path
           d={geo.line.d}
@@ -165,7 +161,6 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* threshold reference + crossing mark */}
       {geo.thresholdY !== null ? (
         <line
           x1={0}

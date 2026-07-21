@@ -150,7 +150,7 @@ export const contexts: ChartContexts = {
         — 8 years, last year the thickest ring.
       </p>
     ),
-    code: "<p>\n  Account age <TreeRings data={years} /> — 8 years, last year the thickest ring.\n</p>",
+    code: '<p>\n  Account age{" "}\n  <span className="mc-inline">\n    <TreeRings data={years} summary={false} />\n  </span>{" "}\n  — 8 years, last year the thickest ring.\n</p>',
   },
   cell: {
     render: () => (

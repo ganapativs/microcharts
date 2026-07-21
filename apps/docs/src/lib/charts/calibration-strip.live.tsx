@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { CalibrationStrip } from "@microcharts/react/calibration-strip";
 import { CalibrationStrip as CalibrationStripInteractive } from "@microcharts/react/calibration-strip/interactive";
 import staticModule, { playground as staticPlayground, BINS } from "./calibration-strip";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: CalibrationStrip,
+  ChartLive: CalibrationStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

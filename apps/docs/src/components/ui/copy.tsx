@@ -41,11 +41,35 @@ export function CopyButton({
 }
 
 /** The install command — mono, framed, one-click copy. `not-prose` so the inner
- * <code> never inherits the docs prose inline-code chip (the nested-pill bug). */
-export function InstallCommand({ command = "pnpm add @microcharts/react" }: { command?: string }) {
+ * <code> never inherits the docs prose inline-code chip (the nested-pill bug).
+ * `well` (default) is the framed pill; `inline` is a quiet mono cue for hero
+ * meta rows — familiarity without competing with CTAs. */
+export function InstallCommand({
+  command = "pnpm add @microcharts/react",
+  className,
+  variant = "well",
+}: {
+  command?: string;
+  className?: string;
+  variant?: "well" | "inline";
+}) {
+  if (variant === "inline") {
+    return (
+      <span className={cn("not-prose inline-flex items-center gap-1", className)}>
+        <CommandLine command={command} className="text-[0.8rem] leading-none" />
+        <CopyButton text={command} size={7} className="size-6 opacity-55 hover:opacity-100" />
+      </span>
+    );
+  }
+
   return (
-    <div className="command-well not-prose group flex h-10 items-center gap-2.5 pl-3.5 pr-1.5">
-      <CommandLine command={command} className="min-w-0 flex-1 truncate text-sm" />
+    <div
+      className={cn(
+        "command-well not-prose group flex h-10 w-fit max-w-full items-center gap-2.5 pl-3.5 pr-1.5",
+        className,
+      )}
+    >
+      <CommandLine command={command} className="min-w-0 truncate text-sm" />
       <CopyButton text={command} size={7} className="shrink-0" />
     </div>
   );

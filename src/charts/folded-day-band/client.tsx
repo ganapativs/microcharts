@@ -162,7 +162,6 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {pinned ? (
           <line
             x1={pinned.x}

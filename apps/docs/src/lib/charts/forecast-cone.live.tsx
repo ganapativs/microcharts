@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ForecastCone } from "@microcharts/react/forecast-cone";
 import { ForecastCone as ForecastConeInteractive } from "@microcharts/react/forecast-cone/interactive";
 import staticModule, { playground as staticPlayground, HIST, FORE } from "./forecast-cone";
 
@@ -51,6 +52,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ForecastCone,
+  ChartLive: ForecastConeInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

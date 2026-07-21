@@ -11,8 +11,9 @@ export function SizeDistribution() {
       <SizeFootprintCard />
       {SIZE.over3.length > 0 ? (
         <figcaption className="mt-3 text-[0.82rem] leading-relaxed text-fd-muted-foreground">
-          {SIZE.under2} of {SIZE.count} charts ship under 2 kB; {SIZE.under3} under 3 kB. Above the
-          3 kB mark —{" "}
+          Interactive median {SIZE.interactiveMedian} kB across {SIZE.interactiveCount} entries. On
+          the static twin, {SIZE.under2} of {SIZE.count} charts ship under 2 kB; {SIZE.under3} under
+          3 kB. Above the 3 kB static mark —{" "}
           {SIZE.over3.map((c, i) => (
             <span key={c.slug}>
               {i > 0 && ", "}

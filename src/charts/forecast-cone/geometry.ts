@@ -119,11 +119,9 @@ export function forecastConeGeometry(opts: {
   const yScale = scaleLinear(dom, [height - pad, pad]);
   const Y = (v: number) => round2(clamp(yScale(v), pad, height - pad));
 
-  // history line + boundary (today)
   const histPts: XY[] = history.map((v, i) => [X(i), Y(v)]);
   const boundary = H > 0 ? { x: X(H - 1), y: Y(history[H - 1]!) } : { x: X(0), y: Y(mids[0]!) };
 
-  // forecast x positions start right after the boundary
   const fx = (j: number) => X(H + j);
 
   // cone band polygons emanate from the boundary point (narrow) and widen
@@ -138,7 +136,6 @@ export function forecastConeGeometry(opts: {
   const bands: { p: 50 | 80; d: string }[] = [{ p: 80, d: coneD(p80) }];
   if (p50) bands.push({ p: 50, d: coneD(p50) });
 
-  // mid path — connects the join then dashes across the forecast
   const midPts: XY[] = [];
   if (H > 0) midPts.push([boundary.x, boundary.y]);
   mids.forEach((v, j) => midPts.push([fx(j), Y(v)]));

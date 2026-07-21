@@ -4,6 +4,7 @@
 // pattern — the face never pretends. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
 import { dicePipsGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -23,7 +24,6 @@ export interface DicePipsProps {
   children?: ReactNode | undefined;
 }
 
-const FONT = 10; // >6 numeral, viewBox units
 const PAD_DIVISOR = 0.28; // pip inset from the face edge
 
 export function dicePipsSummary(value: number, strings: DiceStrings = EN_DICE): string {
@@ -47,6 +47,8 @@ export function DicePips(props: DicePipsProps): ReactNode {
   } = props;
 
   const geo = dicePipsGeometry({ value, size, pad: size * PAD_DIVISOR });
+  const fontSize = labelFont(size, 0.6);
+  const showNumeral = geo.numeral !== null && labelFitsY(size / 2, fontSize, size);
   const accName = resolveSummary(summary, () => dicePipsSummary(value, strings));
 
   return (
@@ -61,7 +63,7 @@ export function DicePips(props: DicePipsProps): ReactNode {
       // the pip grid is laid out inside it, so the seat survives the switch.
       seat={{ mode: "center", top: geo.face.y, bottom: geo.face.y + geo.face.height }}
       className={className ? `mc-dice ${className}` : "mc-dice"}
-      style={{ "--mc-label-size": `${FONT}px`, ...style } as CSSProperties}
+      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
       {face ? (
         <rect
@@ -77,11 +79,11 @@ export function DicePips(props: DicePipsProps): ReactNode {
       {geo.pips.map((p) => (
         <circle key={`${p.cx},${p.cy}`} cx={p.cx} cy={p.cy} r={p.r} data-mc-ink="point" />
       ))}
-      {geo.numeral !== null ? (
+      {showNumeral ? (
         <text
           x={size / 2}
           y={size / 2}
-          fontSize={FONT}
+          fontSize={fontSize}
           dominantBaseline="central"
           textAnchor="middle"
           data-mc-ink="point"

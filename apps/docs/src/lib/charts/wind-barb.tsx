@@ -126,7 +126,7 @@ export const contexts: ChartContexts = {
         — SW 32 kt, three full barbs.
       </p>
     ),
-    code: "<p>\n  Wind at KSFO <WindBarb direction={225} magnitude={32} /> — SW 32 kt, three full barbs.\n</p>",
+    code: '<p>\n  Wind at KSFO{" "}\n  <span className="mc-inline">\n    <WindBarb direction={225} magnitude={32} summary={false} />\n  </span>{" "}\n  — SW 32 kt, three full barbs.\n</p>',
   },
   cell: {
     render: () => (

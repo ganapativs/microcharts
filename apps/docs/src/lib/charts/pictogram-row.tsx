@@ -66,28 +66,35 @@ export const playground: PlaygroundSpec = {
       init: "clip",
     },
   ],
-  render: (s) => (
-    <PictogramRow
-      value={s.value as number}
-      total={s.total as number}
-      shape={s.shape as "dot" | "square"}
-      fractional={s.fractional as "clip" | "round"}
-      summary={false}
-      width={240}
-      height={28}
-    />
-  ),
-  code: (s) =>
-    [
+  render: (s) => {
+    const total = s.total as number;
+    const value = Math.min(s.value as number, total);
+    return (
+      <PictogramRow
+        value={value}
+        total={total}
+        shape={s.shape as "dot" | "square"}
+        fractional={s.fractional as "clip" | "round"}
+        summary={false}
+        width={240}
+        height={28}
+      />
+    );
+  },
+  code: (s) => {
+    const total = s.total as number;
+    const value = Math.min(s.value as number, total);
+    return [
       "<PictogramRow",
-      `  value={${s.value}}`,
-      `  total={${s.total}}`,
+      `  value={${value}}`,
+      `  total={${total}}`,
       s.shape !== "dot" && `  shape="${s.shape}"`,
       s.fractional !== "clip" && `  fractional="${s.fractional}"`,
       "/>",
     ]
       .filter(Boolean)
-      .join("\n"),
+      .join("\n");
+  },
   interactiveHint: "Step the count — each change announces the new figure politely.",
 };
 
@@ -137,7 +144,7 @@ export const contexts: ChartContexts = {
         of its 8 seats — a working majority.
       </p>
     ),
-    code: `<p>\n  The oversight committee holds{" "}\n  <PictogramRow value={5} total={8} height={16} /> of its 8 seats — a working majority.\n</p>`,
+    code: `<p>\n  The oversight committee holds{" "}\n  <span className="mc-inline">\n    <PictogramRow value={5} total={8} height={16} summary={false} />\n  </span>{" "}\n  of its 8 seats — a working majority.\n</p>`,
   },
   cell: {
     render: () => (

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { MoonPhase } from "@microcharts/react/moon-phase";
 import { MoonPhase as MoonPhaseInteractive } from "@microcharts/react/moon-phase/interactive";
 import staticModule, { playground as staticPlayground } from "./moon-phase";
 
@@ -41,6 +42,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: MoonPhase,
+  ChartLive: MoonPhaseInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

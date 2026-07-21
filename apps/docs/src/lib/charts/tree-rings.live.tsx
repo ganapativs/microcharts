@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { TreeRings } from "@microcharts/react/tree-rings";
 import { TreeRings as TreeRingsInteractive } from "@microcharts/react/tree-rings/interactive";
 import staticModule, { playground as staticPlayground, YEARS } from "./tree-rings";
 
@@ -43,6 +44,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: TreeRings,
+  ChartLive: TreeRingsInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

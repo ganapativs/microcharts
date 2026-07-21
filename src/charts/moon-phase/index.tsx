@@ -70,11 +70,9 @@ export function MoonPhase(props: MoonPhaseProps): ReactNode {
       className={className ? `mc-moon ${className}` : "mc-moon"}
       style={style}
     >
-      {/* base disc — the unlit face, faintly visible so the whole moon reads */}
       <circle cx={geo.disc.cx} cy={geo.disc.cy} r={geo.disc.r} data-mc-ink="band" />
-      {/* lit region — warm moonlight (thematic; the lit AREA is still the datum) */}
+      {/* Lit area = datum; fill is thematic. */}
       {geo.litPath ? <path d={geo.litPath} style={{ fill: color ?? "var(--mc-moon)" }} /> : null}
-      {/* hairline outline gives the disc a crisp edge */}
       <circle
         cx={geo.disc.cx}
         cy={geo.disc.cy}

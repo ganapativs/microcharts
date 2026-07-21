@@ -26,7 +26,7 @@ export interface DeltaModel {
   /** `pos` | `neg` | `flat` (drives the valence color). */
   valence: "pos" | "neg" | "flat";
   glyphKey: "up" | "down" | "flat";
-  /** Factual summary sentence — direction + magnitude, never valence. */
+  /** Direction + magnitude, never valence. */
   summary: string;
 }
 

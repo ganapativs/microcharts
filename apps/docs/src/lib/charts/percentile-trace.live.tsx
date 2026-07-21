@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { PercentileTrace } from "@microcharts/react/percentile-trace";
 import { PercentileTrace as PercentileTraceInteractive } from "@microcharts/react/percentile-trace/interactive";
 import staticModule, { playground as staticPlayground, DEMO } from "./percentile-trace";
 
@@ -41,6 +42,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: PercentileTrace,
+  ChartLive: PercentileTraceInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

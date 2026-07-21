@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ShiftHistogram } from "@microcharts/react/shift-histogram";
 import { ShiftHistogram as ShiftHistogramInteractive } from "@microcharts/react/shift-histogram/interactive";
 import staticModule, { playground as staticPlayground, BEFORE, AFTER, MS } from "./shift-histogram";
 
@@ -52,6 +53,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ShiftHistogram,
+  ChartLive: ShiftHistogramInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

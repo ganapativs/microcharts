@@ -172,7 +172,6 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
         {sp ? (
           <circle
             cx={sp.x}

@@ -3,7 +3,6 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { GET } from "@/app/agent-setup.md/route";
 import { extractAgentSetupPrompt, getAgentSetupPrompt } from "./agent-setup";
-import { SHARED_PROP_NAMES } from "./charts/shared-props";
 import { SITE } from "./site";
 
 const prompt = getAgentSetupPrompt();
@@ -41,15 +40,19 @@ describe("agent-setup prompt (single source → /agent-setup.md)", () => {
     }
   });
 
-  it("names only real shared-grammar props", () => {
-    // The grammar list is hard-wrapped across lines in the MDX source — span it.
-    const line = prompt.match(/same thing on every chart:([\s\S]*?)Chart-specific/)?.[1] ?? "";
-    const named = [...line.matchAll(/`([a-zA-Z]+)`/g)].map((m) => m[1]);
-    expect(named.length).toBeGreaterThanOrEqual(8);
-    for (const name of named)
-      expect(SHARED_PROP_NAMES.has(name), `prompt names unknown shared prop \`${name}\``).toBe(
-        true,
-      );
+  it("points agents at catalog.json for the full prop/callback surface", () => {
+    expect(prompt).toContain(`${SITE.url}/catalog.json`);
+    expect(prompt).toMatch(/sharedProps/);
+    expect(prompt).toMatch(/sharedInteractive/);
+    expect(prompt).toMatch(/Do \*\*not\*\* read the whole file|do not read the whole file/i);
+  });
+
+  it("covers the install traps that break real apps", () => {
+    expect(prompt).toMatch(/"use client"/);
+    expect(prompt).toMatch(/pages\/_app\.tsx/);
+    expect(prompt).toMatch(/@microcharts\/react\/motion/);
+    expect(prompt).toMatch(/styles\.css/);
+    expect(prompt).toMatch(/scaffold|React 18\/19 app/);
   });
 
   it("references the package and the llms.txt index", () => {

@@ -26,7 +26,6 @@ function quadName(
     : strings.quadrantName(geo.yHigh, yLabel, geo.xHigh, xLabel);
 }
 
-/** Factual quadrant summary. Shared with the interactive entry. */
 export function quadrantSummary(
   geo: QuadrantDotGeometry,
   opts: { xLabel: string; yLabel: string; quadrants?: QuadrantNames | undefined },
@@ -142,7 +141,6 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
       className={cls}
       style={style}
     >
-      {/* faint tint on the focal's quadrant */}
       {region ? (
         <rect
           x={geo.region.x}
@@ -152,7 +150,6 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           data-mc-ink="region"
         />
       ) : null}
-      {/* the split cross — always where the split truly is */}
       {geo.cross.x !== null ? (
         <line
           x1={geo.cross.x}
@@ -177,8 +174,7 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* peer field — small, muted, behind the focal (0.42 so peers read on
-          dark; the role's 0.18 is tuned for large area marks, not tiny dots) */}
+      {/* Peers at 0.42 — ghost role's 0.18 is for area fills, too faint on dots. */}
       {geo.ghosts.map((g) => (
         <circle
           key={`${g.vx}:${g.vy}`}
@@ -189,9 +185,7 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           fillOpacity={0.42}
         />
       ))}
-      {/* the focal item — accent, larger, on top, over a soft accent glow (a
-          FILLED disc, not a hollow ring: a ring lets the cross line show as a
-          chord through it) so it is unmistakable against the peer cloud */}
+      {/* Focal + filled halo (ring would let the cross cut through as a chord). */}
       <circle
         cx={geo.dot.x}
         cy={geo.dot.y}

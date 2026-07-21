@@ -16,7 +16,6 @@ import {
   type RateVolumePoint,
 } from "./geometry.js";
 
-/** Factual rate-volume summary. Shared with the interactive entry. */
 export function rateVolumeSummary(
   geo: RateVolumeGeometry,
   fmtRate: (n: number) => string,
@@ -168,8 +167,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* ghost volume bars — the denominator, zero-anchored, low z. Static neutral
-          fill via the ghost ink-role (earns the forced-colors mapping). */}
+      {/* Volume bars (ghost ink → forced-colors). */}
       {geo.bars.map((b) =>
         b.height > 0 ? (
           <rect
@@ -183,8 +181,6 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
           />
         ) : null,
       )}
-      {/* rate line — the precise series. data ink-role supplies the tokenized
-          stroke-width/caps; accent stroke set inline so it reads over the bars. */}
       {geo.line.d ? (
         <path
           d={geo.line.d}
@@ -193,7 +189,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
           style={{ stroke: lineColor }}
         />
       ) : null}
-      {/* low-denominator marks: hollow rings (shape cue, never color-alone) */}
+      {/* Low-n: hollow rings (shape, not color alone). */}
       {geo.points.map((p) =>
         p.low ? (
           <circle

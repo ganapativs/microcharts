@@ -175,7 +175,6 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
         seriesStrings={seriesStrings}
         summary={false}
       >
-        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
         {selPoint ? (
           <circle
             cx={selPoint[0]}

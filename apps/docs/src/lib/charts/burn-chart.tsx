@@ -172,7 +172,7 @@ export const contexts: ChartContexts = {
         — on track, 18 points left with 4 days to go.
       </p>
     ),
-    code: "<p>\n  Sprint 12 burndown <BurnChart data={{ plan, actual }} /> — on track, 18 points left with 4 days to go.\n</p>",
+    code: '<p>\n  Sprint 12 burndown{" "}\n  <span className="mc-inline">\n    <BurnChart data={{ plan, actual }} summary={false} />\n  </span>{" "}\n  — on track, 18 points left with 4 days to go.\n</p>',
   },
   cell: {
     render: () => (

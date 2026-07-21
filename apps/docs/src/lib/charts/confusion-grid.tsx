@@ -63,6 +63,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Cell shape from the shared vocabulary (default 'square').",
     },
+    {
+      name: "color",
+      type: "string",
+      required: false,
+      description: "Accent fill override.",
+    },
   ],
   demo: [87, 12],
   example: {
@@ -162,7 +168,7 @@ export const contexts: ChartContexts = {
         — 87% cats correct, 12% dogs misclassified.
       </p>
     ),
-    code: "<p>\n  Classifier accuracy <ConfusionGrid data={{ labels, counts }} /> — 87% cats correct, 12% dogs misclassified.\n</p>",
+    code: '<p>\n  Classifier accuracy{" "}\n  <span className="mc-inline">\n    <ConfusionGrid data={{ labels, counts }} summary={false} />\n  </span>{" "}\n  — 87% cats correct, 12% dogs misclassified.\n</p>',
   },
   cell: {
     render: () => (

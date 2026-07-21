@@ -5,7 +5,7 @@ const charts = (segs: LiveSeg[]) => segs.filter((s) => s.kind === "chart");
 
 describe("parseLiveReply — inline forms", () => {
   it("parses a complete inline sparkline", () => {
-    const segs = parseLiveReply("Revenue built `chart sparkline 3 5 4 8`, nice.");
+    const segs = parseLiveReply("Revenue built `microchart sparkline 3 5 4 8`, nice.");
     expect(segs).toHaveLength(3);
     const c = segs[1];
     expect(c).toMatchObject({
@@ -18,62 +18,71 @@ describe("parseLiveReply — inline forms", () => {
   });
 
   it("keeps an unterminated backtick in flight", () => {
-    const segs = parseLiveReply("Revenue built `chart sparkli");
+    const segs = parseLiveReply("Revenue built `microchart sparkli");
     const c = segs[1];
-    expect(c).toMatchObject({ kind: "chart", complete: false, spec: null, raw: "`chart sparkli" });
+    expect(c).toMatchObject({
+      kind: "chart",
+      complete: false,
+      spec: null,
+      raw: "`microchart sparkli",
+    });
   });
 
   it("tolerates thousands commas, %, $, and a trailing period", () => {
-    const segs = parseLiveReply("`chart sparkbar 1,024 $95 88% 130.`");
+    const segs = parseLiveReply("`microchart sparkbar 1,024 $95 88% 130.`");
     expect(charts(segs)[0].spec).toEqual({ type: "sparkbar", values: [1024, 95, 88, 130] });
   });
 
   it("rejects an unknown type but keeps it visible as raw", () => {
-    const segs = parseLiveReply("`chart pie 1 2 3`");
-    expect(charts(segs)[0]).toMatchObject({ complete: true, spec: null, raw: "`chart pie 1 2 3`" });
+    const segs = parseLiveReply("`microchart pie 1 2 3`");
+    expect(charts(segs)[0]).toMatchObject({
+      complete: true,
+      spec: null,
+      raw: "`microchart pie 1 2 3`",
+    });
   });
 
   it("rejects non-numeric series", () => {
-    const segs = parseLiveReply("`chart sparkline 3 five 4 8`");
+    const segs = parseLiveReply("`microchart sparkline 3 five 4 8`");
     expect(charts(segs)[0].spec).toBeNull();
   });
 
   it("clamps oversize series to 24 points", () => {
     const nums = Array.from({ length: 40 }, (_, i) => i + 1).join(" ");
-    const segs = parseLiveReply(`\`chart sparkline ${nums}\``);
+    const segs = parseLiveReply(`\`microchart sparkline ${nums}\``);
     const spec = charts(segs)[0].spec;
     expect(spec && spec.type === "sparkline" && spec.values.length).toBe(24);
   });
 
   it("reads delta as a fraction, normalizing percent-looking values", () => {
     const f = (s: string) => charts(parseLiveReply(s))[0].spec;
-    expect(f("`chart delta +0.184`")).toEqual({ type: "delta", value: 0.184 });
-    expect(f("`chart delta +18`")).toEqual({ type: "delta", value: 0.18 });
-    expect(f("`chart trend-arrow -5`")).toEqual({ type: "trend-arrow", value: -0.05 });
-    expect(f("`chart delta huge`")).toBeNull();
+    expect(f("`microchart delta +0.184`")).toEqual({ type: "delta", value: 0.184 });
+    expect(f("`microchart delta +18`")).toEqual({ type: "delta", value: 0.18 });
+    expect(f("`microchart trend-arrow -5`")).toEqual({ type: "trend-arrow", value: -0.05 });
+    expect(f("`microchart delta huge`")).toBeNull();
   });
 
   it("parses bullet key=value with optional bands", () => {
-    expect(charts(parseLiveReply("`chart bullet value=72 target=80 bands=50,90`"))[0].spec).toEqual(
-      { type: "bullet", value: 72, target: 80, bands: [50, 90] },
-    );
-    expect(charts(parseLiveReply("`chart bullet value=72`"))[0].spec).toEqual({
+    expect(
+      charts(parseLiveReply("`microchart bullet value=72 target=80 bands=50,90`"))[0].spec,
+    ).toEqual({ type: "bullet", value: 72, target: 80, bands: [50, 90] });
+    expect(charts(parseLiveReply("`microchart bullet value=72`"))[0].spec).toEqual({
       type: "bullet",
       value: 72,
     });
-    expect(charts(parseLiveReply("`chart bullet target=80`"))[0].spec).toBeNull();
+    expect(charts(parseLiveReply("`microchart bullet target=80`"))[0].spec).toBeNull();
   });
 
   it("accepts only known status-dot states", () => {
-    expect(charts(parseLiveReply("`chart status-dot warn`"))[0].spec).toEqual({
+    expect(charts(parseLiveReply("`microchart status-dot warn`"))[0].spec).toEqual({
       type: "status-dot",
       status: "warn",
     });
-    expect(charts(parseLiveReply("`chart status-dot exploded`"))[0].spec).toBeNull();
+    expect(charts(parseLiveReply("`microchart status-dot exploded`"))[0].spec).toBeNull();
   });
 
   it("rejects a removed type (streak) but keeps it visible as raw", () => {
-    expect(charts(parseLiveReply("`chart streak 1 1 -1 1`"))[0]).toMatchObject({
+    expect(charts(parseLiveReply("`microchart streak 1 1 -1 1`"))[0]).toMatchObject({
       complete: true,
       spec: null,
     });
@@ -88,7 +97,7 @@ describe("parseLiveReply — inline forms", () => {
 describe("parseLiveReply — fenced forms", () => {
   it("parses a labeled mini-bar block", () => {
     const segs = parseLiveReply(
-      "Broad growth:\n```chart mini-bar Net-new by region ($k)\nNA 48\nEU 39\nUK 27\n```\nDone.",
+      "Broad growth:\n```microchart mini-bar Net-new by region ($k)\nNA 48\nEU 39\nUK 27\n```\nDone.",
     );
     const c = charts(segs)[0];
     expect(c.block).toBe(true);
@@ -105,7 +114,7 @@ describe("parseLiveReply — fenced forms", () => {
 
   it("supports multi-word labels and clamps their length", () => {
     const segs = parseLiveReply(
-      "```chart mini-bar Mix\nNorth America somewhere far 48\nEU 39\n```",
+      "```microchart mini-bar Mix\nNorth America somewhere far 48\nEU 39\n```",
     );
     const spec = charts(segs)[0].spec;
     expect(spec && spec.type === "mini-bar" && spec.items[0]).toEqual({
@@ -115,7 +124,9 @@ describe("parseLiveReply — fenced forms", () => {
   });
 
   it("parses a segmented mix block with labeled lines", () => {
-    const segs = parseLiveReply("```chart segmented Sessions by source\nOrganic 46\nPaid 24\n```");
+    const segs = parseLiveReply(
+      "```microchart segmented Sessions by source\nOrganic 46\nPaid 24\n```",
+    );
     expect(charts(segs)[0].spec).toEqual({
       type: "segmented",
       title: "Sessions by source",
@@ -127,15 +138,15 @@ describe("parseLiveReply — fenced forms", () => {
   });
 
   it("parses histogram/seismogram number lines and enforces a minimum", () => {
-    const ok = parseLiveReply("```chart seismogram Errors per minute\n2 1 3 2 18 24 9\n```");
+    const ok = parseLiveReply("```microchart seismogram Errors per minute\n2 1 3 2 18 24 9\n```");
     expect(charts(ok)[0].spec).toMatchObject({ type: "seismogram", title: "Errors per minute" });
-    const short = parseLiveReply("```chart histogram t\n1 2 3\n```");
+    const short = parseLiveReply("```microchart histogram t\n1 2 3\n```");
     expect(charts(short)[0].spec).toBeNull();
   });
 
   it("trims separator newlines around a block so it doesn't add phantom lines", () => {
     const segs = parseLiveReply(
-      "Balanced distribution:\n```chart mini-bar Mix\nNA 48\nEU 39\n```\nOrganic keeps climbing.",
+      "Balanced distribution:\n```microchart mini-bar Mix\nNA 48\nEU 39\n```\nOrganic keeps climbing.",
     );
     expect(segs).toHaveLength(3);
     expect(segs[0]).toEqual({ kind: "text", text: "Balanced distribution:" });
@@ -143,7 +154,7 @@ describe("parseLiveReply — fenced forms", () => {
   });
 
   it("keeps an unterminated fence in flight", () => {
-    const segs = parseLiveReply("Spike:\n```chart seismogram Errors\n2 1 3");
+    const segs = parseLiveReply("Spike:\n```microchart seismogram Errors\n2 1 3");
     expect(charts(segs)[0]).toMatchObject({ block: true, complete: false, spec: null });
   });
 

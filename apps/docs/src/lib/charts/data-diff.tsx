@@ -187,7 +187,7 @@ export const contexts: ChartContexts = {
         — 3 tables added, 1 column removed.
       </p>
     ),
-    code: "<p>\n  Schema migration diff <DataDiff data={diff} /> — 3 tables added, 1 column removed.\n</p>",
+    code: '<p>\n  Schema migration diff{" "}\n  <span className="mc-inline">\n    <DataDiff data={diff} summary={false} />\n  </span>{" "}\n  — 3 tables added, 1 column removed.\n</p>',
   },
   cell: {
     render: () => (

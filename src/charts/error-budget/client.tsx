@@ -166,7 +166,6 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
         {sp ? (
           <circle
             cx={sp.x}

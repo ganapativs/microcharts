@@ -134,7 +134,6 @@ export function PolarClock(props: PolarClockProps): ReactNode {
       className={className ? `mc-polar ${className}` : "mc-polar"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* zero baseline all bars grow from */}
       <circle
         cx={geo.guide.cx}
         cy={geo.guide.cy}
@@ -163,9 +162,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
       ) : geo.segmentsPath ? (
         <path d={geo.segmentsPath} data-mc-ink="bar" style={color ? { fill: color } : undefined} />
       ) : null}
-      {/* now-segment: a FILLED sector. The accent-path CSS rule strokes (not
-          fills) accent paths, so an inline fill is needed for it to read solid;
-          the role is kept for the forced-colors Highlight mapping. */}
+      {/* Now sector: inline fill (accent-path CSS only strokes); role for FC. */}
       {geo.accentPath ? (
         <path d={geo.accentPath} data-mc-ink="accent" style={{ fill: "var(--mc-accent)" }} />
       ) : null}

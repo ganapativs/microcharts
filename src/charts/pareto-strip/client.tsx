@@ -206,7 +206,6 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}

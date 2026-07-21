@@ -150,7 +150,7 @@ export const contexts: ChartContexts = {
         — summer swell, outlier week 29.
       </p>
     ),
-    code: "<p>\n  Revenue seasonality <SpiralYear data={byWeek} /> — summer swell, outlier week 29.\n</p>",
+    code: '<p>\n  Revenue seasonality{" "}\n  <span className="mc-inline">\n    <SpiralYear data={byWeek} summary={false} />\n  </span>{" "}\n  — summer swell, outlier week 29.\n</p>',
   },
   cell: {
     render: () => (

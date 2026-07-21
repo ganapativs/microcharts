@@ -165,7 +165,7 @@ export const contexts: ChartContexts = {
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Payments API health{" "}
-        <span className="mc-inline inline-flex items-center align-middle">
+        <span className="mc-inline">
           <OrbitStatus
             latency={240}
             rate={12}
@@ -178,7 +178,7 @@ export const contexts: ChartContexts = {
         — 240 ms latency, 12 req/s, orbit stable.
       </p>
     ),
-    code: "<p>\n  Payments API health <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} /> — 240 ms latency, 12 req/s, orbit stable.\n</p>",
+    code: `<p>\n  Payments API health{" "}\n  <span className="mc-inline">\n    <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} size={16} summary={false} />\n  </span>{" "}\n  — 240 ms latency, 12 req/s, orbit stable.\n</p>`,
   },
   cell: {
     render: () => (
@@ -188,17 +188,15 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <span className="inline-flex items-center">
-                  <OrbitStatus
-                    latency={row.latency}
-                    rate={row.rate}
-                    latencyDomain={LD}
-                    rateDomain={RD}
-                    threshold={row.threshold}
-                    size={18}
-                    summary={false}
-                  />
-                </span>
+                <OrbitStatus
+                  latency={row.latency}
+                  rate={row.rate}
+                  latencyDomain={LD}
+                  rateDomain={RD}
+                  threshold={row.threshold}
+                  size={18}
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -206,7 +204,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: "<td>\n  <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} />\n</td>",
+    code: "<td>\n  <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} size={18} summary={false} />\n</td>",
   },
   kpi: {
     render: () => (

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { BiasStrip } from "@microcharts/react/bias-strip";
 import { BiasStrip as BiasStripInteractive } from "@microcharts/react/bias-strip/interactive";
 import staticModule, { playground as staticPlayground, PAIRS } from "./bias-strip";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: BiasStrip,
+  ChartLive: BiasStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

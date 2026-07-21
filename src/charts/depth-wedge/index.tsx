@@ -130,7 +130,6 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
           shapeRendering="crispEdges"
         />
       ) : null}
-      {/* mid hairline in the gap */}
       <line
         x1={geo.midX}
         x2={geo.midX}

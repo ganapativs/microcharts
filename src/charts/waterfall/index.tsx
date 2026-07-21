@@ -12,12 +12,12 @@ import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 import { waterfallGeometry, placeWaterfallLabels } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
-import { textGutter } from "../../core/labels.js";
+import { labelFont, textGutter } from "../../core/labels.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type WaterfallDatum = MiniBarDatum;
 
-/** Factual waterfall summary — endpoints + split gains/losses. Shared. */
+/** Endpoints + split gains/losses. */
 export function waterfallSummary(
   data: readonly WaterfallDatum[],
   open: number,
@@ -68,7 +68,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
     data,
     open = 0,
     totalBar = true,
-    label = "none",
+    label = "delta",
     positive = "up",
     domain,
     width = 70,
@@ -99,7 +99,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
   // Direct value labels sit in a reserved band BELOW the plot (like the endpoint
   // gutter idiom): the viewBox grows downward, so the plot — and every
   // interactive overlay drawn over it — keeps its y∈[0,height] coordinates.
-  const FONT = Math.min(9, Math.max(6, Math.round(height * 0.5)));
+  const FONT = labelFont(height, 0.5);
   const labelText = (v: number): string => `${v < 0 ? "−" : "+"}${fmt(Math.abs(v))}`;
   const labels =
     label === "delta"

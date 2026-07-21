@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Progress } from "@microcharts/react/progress";
 import { Progress as ProgressInteractive } from "@microcharts/react/progress/interactive";
 import staticModule, { playground as staticPlayground } from "./progress";
 
@@ -40,6 +41,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Progress,
+  ChartLive: ProgressInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

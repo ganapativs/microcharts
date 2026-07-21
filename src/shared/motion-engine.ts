@@ -89,11 +89,8 @@ const MARKS: Record<EntranceArchetype, string> = {
 // Dots that ride a drawn line pop exactly as the draw front reaches them.
 const DRAW_DOTS = '[data-mc-ink="point"], circle';
 
-// Three-act orchestration on one beat grid — every entrance tells the same
-// story shape: the STAGE (context ink: bands, tracks, backdrop channels)
-// settles in quietly first; the STORY (the primary encoding) performs on the
-// beat as the stage lands; the VOICE (labels, values, accents, flags) speaks
-// as the story finishes. Nothing on the chart ever simply appears.
+// Stage → story → voice on one beat grid. Context ink first, primary marks on
+// the beat, labels/accents as the story finishes.
 const BEAT = 90;
 const LEAVES = "path, rect, circle, line, ellipse, polygon, polyline, text";
 const VOICE_INK =
@@ -132,6 +129,14 @@ function observeOnce(el: Element, start: () => void): () => void {
   });
   pending.set(el, start);
   io.observe(el);
+  // Sync path: already on-screen (or IO delivered a record this tick).
+  for (const e of io.takeRecords()) {
+    if (e.target !== el || !e.isIntersecting) continue;
+    io.unobserve(el);
+    pending.delete(el);
+    start();
+    return () => {};
+  }
   return () => {
     io?.unobserve(el);
     pending.delete(el);
@@ -275,16 +280,14 @@ export function runEntrance(
     const storyStart = wholeSvgFinal ? 0 : BEAT;
     svg.style.opacity = "";
 
-    // ── casting: every visible element belongs to an act ──────────────────
+    // Stage / story / voice / link cast
     const storySet = new Set<Element>(marks);
     const stageEls: SVGGraphicsElement[] = [];
     const voiceEls: SVGGraphicsElement[] = [];
     const linkEls: SVGGraphicsElement[] = [];
     for (const el of svg.querySelectorAll<SVGGraphicsElement>(LEAVES)) {
       if (storySet.has(el)) continue;
-      // A LINK (a connector between the story's marks, a stem to a dot) draws
-      // itself on once those marks have landed — it belongs to neither the
-      // quiet stage nor the closing voice.
+      // Connectors draw once their marks have landed.
       if (options.link && el.matches(options.link)) linkEls.push(el);
       else if (
         el.tagName === "text" ||
@@ -295,7 +298,7 @@ export function runEntrance(
       else if (!wholeSvgFinal) stageEls.push(el);
     }
 
-    // ACT 1 — the stage settles in quietly (context before content).
+    // Stage (context ink)
     for (const el of stageEls) {
       anims.push(
         el.animate([{ opacity: 0 }, { opacity: 1 }], {
@@ -306,8 +309,7 @@ export function runEntrance(
       );
     }
 
-    // ACT 2 — the story performs, entering on the beat as the stage lands.
-    // `screenK` is the rendered scale factor `dashDraw` needs.
+    // Story marks — `screenK` is the rendered scale factor `dashDraw` needs.
     const svgRect = svg.getBoundingClientRect();
     const vb = svg.viewBox?.baseVal;
     const screenK = vb && vb.width > 0 && svgRect.width > 0 ? svgRect.width / vb.width : 1;
@@ -439,22 +441,16 @@ export function runEntrance(
       }
     });
 
-    // When the story finishes — the voice waits for it.
     const storySpan = propAt
       ? win
       : norms
         ? win + dur
         : (n > 0 ? stagger(n - 1, n, step) : 0) + dur;
     const storyEnd = wholeSvgFinal ? dur : storyStart + storySpan;
-    // The acts OVERLAP rather than queue: a connector begins forming as its
-    // endpoints are ~60% landed (it "arrives" with them, not after a dead beat),
-    // and the voice speaks into the tail of the story. This keeps the causal
-    // ORDER while collapsing the dead air between acts — the whole entrance
-    // reads as one continuous gesture, not three sequential clips.
+    // Overlap acts (~60% settle) so connectors/voice don't queue behind dead air.
     const storySettle = wholeSvgFinal ? storyEnd : storyEnd - Math.min(dur * 0.4, 130);
 
-    // ACT 3 (positional) — dots that ride a drawn line pop out of it exactly
-    // as the draw front reaches them (delay follows each dot's x position).
+    // Dots on a drawn line pop when the stroke front reaches them.
     const spoken = new Set<Element>(marks);
     if (kind === "draw" && marks.length > 0) {
       const dots = Array.from(svg.querySelectorAll<SVGGraphicsElement>(DRAW_DOTS)).filter(
@@ -569,15 +565,11 @@ export function runEntrance(
       });
     }
 
-    // ACT 3 — the voice speaks into the tail of the link/story: values and
-    // accents pop, labels fade, all on the same final beat — starting a beat
-    // before the connectors fully land so the close feels continuous.
+    // Voice into story/link tail
     const voiceDelay = Math.max(linkEnd - BEAT, storyStart + BEAT);
     for (const el of voiceEls) {
       if (spoken.has(el)) continue;
-      // Text is a voice too — it should arrive, not blink on: a tiny lift and
-      // settle (≤1 user unit, anchored to its own text-anchor so it never
-      // drifts across its gutter). Other voice marks (accents, points) scale-pop.
+      // Text lifts in; accents/points scale-pop.
       const isText = el.tagName === "text";
       const a = isText ? el.getAttribute("text-anchor") : null;
       el.style.transformBox = "fill-box";
@@ -618,12 +610,23 @@ export function runEntrance(
 
   // Hold the first frame hidden from the caller's pre-paint layout effect
   // until the chart is on screen and the entrance takes over — the finished
-  // chart never flashes before its own entrance.
+  // chart never flashes before its own entrance. Sync takeRecords covers the
+  // already-visible case; a short timeout clears the hold if IO never fires
+  // (off-tab, zero-size host, etc.).
   svg.style.opacity = "0";
-  const unobserve = observeOnce(svg, start);
+  let started = false;
+  const kick = (): void => {
+    if (started) return;
+    started = true;
+    start();
+  };
+  const unobserve = observeOnce(svg, kick);
+  const safety = window.setTimeout(kick, 400);
 
   return () => {
+    window.clearTimeout(safety);
     unobserve();
+    if (!started) svg.style.opacity = "";
     finishAll();
   };
 }

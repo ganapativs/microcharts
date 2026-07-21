@@ -1,9 +1,10 @@
+"use client";
 import type { ReactNode } from "react";
-import { Sparkline } from "@microcharts/react/sparkline";
-import { SparkBar } from "@microcharts/react/sparkbar";
-import { Delta } from "@microcharts/react/delta";
-import { Bullet } from "@microcharts/react/bullet";
-import { SegmentedBar } from "@microcharts/react/segmented-bar";
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
+import { SparkBar } from "@microcharts/react/sparkbar/interactive";
+import { Delta } from "@microcharts/react/delta/interactive";
+import { Bullet } from "@microcharts/react/bullet/interactive";
+import { SegmentedBar } from "@microcharts/react/segmented-bar/interactive";
 import { SectionMark } from "@/components/home/section-mark";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -12,8 +13,9 @@ import { Reveal } from "@/components/ui/reveal";
  * section puts real charts inside the surfaces they were built for, all at
  * once: a product dashboard, a written report, and the small placements a
  * chart drops into (a table cell, a KPI figure, a tab, a sentence). No video,
- * no rotation. Every mark is a real static `@microcharts/react` component;
- * the demo IS the product. One motion idea only: cells settle on reveal.
+ * no rotation. Every mark is the interactive `@microcharts/react` entry so
+ * hover/scrub works in situ; the demo IS the product. One motion idea only:
+ * cells settle on reveal.
  */
 
 /* Illustrative product/report data — depicting an app, not claiming a fact. */
@@ -119,7 +121,6 @@ function ReportSurface() {
 function PlacementQuad() {
   return (
     <div className="grid grid-cols-2 gap-2.5">
-      {/* table cell */}
       <div className="plate-inner flex flex-col gap-1.5 p-3">
         <Where>table cell</Where>
         <table className="mc-inline-table w-full text-[0.82rem] tabular-nums">
@@ -152,7 +153,6 @@ function PlacementQuad() {
         </table>
       </div>
 
-      {/* KPI figure */}
       <div className="plate-inner flex flex-col gap-1.5 p-3">
         <Where>KPI card</Where>
         <div className="flex items-baseline gap-1.5">
@@ -162,7 +162,6 @@ function PlacementQuad() {
         <span className="mono-label opacity-70">net revenue retention</span>
       </div>
 
-      {/* tab header */}
       <div className="plate-inner col-span-2 flex flex-col gap-2 p-3">
         <Where>tab header</Where>
         <div className="flex items-center gap-4 text-[0.82rem]">
@@ -189,7 +188,6 @@ function PlacementQuad() {
         </div>
       </div>
 
-      {/* inside a sentence */}
       <div className="plate-inner col-span-2 flex flex-col gap-1.5 p-3">
         <Where>a sentence</Where>
         <p className="text-[0.9rem] leading-relaxed text-fd-foreground">
@@ -261,12 +259,7 @@ export function HomeSurfacesSection() {
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
       <SectionMark n="03">where they live</SectionMark>
 
-      {/* One bento, no separate header band: the heading is the top-left cell so
-          the flagship product surface fills what was dead space top-right. Two
-          height-matched masonry columns (header+report+chat ≈ product+placements),
-          each packing independently so no corner is left blank. Every surface
-          shows at once — a carousel would hide all but one, a weaker proof that
-          the charts live everywhere. Mobile stacks. */}
+      {/* Heading = top-left bento cell. Two masonry columns; mobile stacks. */}
       <div className="grid items-start gap-4 lg:grid-cols-2">
         <div className="grid items-start gap-4">
           <Reveal className="flex flex-col gap-3 lg:pr-6 lg:pt-1">

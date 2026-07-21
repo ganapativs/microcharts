@@ -89,8 +89,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     for (const l of lanes) max = Math.max(max, l.label.length);
     return max;
   }, [lanes]);
-  // Shared with the static entry, drop rule included: at small sizes it hands
-  // the gutter back to the lanes, and a copy that didn't would offset every tick.
+  // Same drop rule as static — a mismatch would offset every tick.
   const { gutter } = rasterLabels({
     labels: labelsProp ?? n <= 8,
     width,
@@ -249,7 +248,6 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; band + crosshair are transient. */}
         {pinX !== undefined ? (
           <line
             x1={xOf(pinX)}

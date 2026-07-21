@@ -12,7 +12,6 @@ import { labelFont, labelFitsY } from "../../core/labels.js";
 import { benchmarkStripGeometry, type BenchmarkStripGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual benchmark summary. Shared with the interactive entry. */
 export function benchmarkSummary(
   geo: BenchmarkStripGeometry,
   fmt: (n: number) => string,
@@ -152,9 +151,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* peer quantile bands — DATA (the cohort's spread), not a background
-          band, so they take neutral ink like ABStrips' rows; opacity grades
-          outer (p5–95) vs the middle half. */}
+      {/* Peer quantile bands as neutral ink (cohort spread, not a wash). */}
       <rect
         x={geo.outer.x}
         y={geo.bandY}
@@ -196,8 +193,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
           fill={dotFill}
         />
       ) : null}
-      {/* focal dot; the surface-colored halo is a knockout against the band,
-          not an ink role — an ink role here would set stroke: none and kill it */}
+      {/* Focal + surface halo (ink role would force stroke:none). */}
       <circle
         cx={geo.dot.x}
         cy={midY}

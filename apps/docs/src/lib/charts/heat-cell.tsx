@@ -158,7 +158,7 @@ export const contexts: ChartContexts = {
         76% — level 4 of 5, its hottest slot today.
       </p>
     ),
-    code: `<p>\n  shard-a load just crossed{" "}\n  <HeatCell value={76} domain={[0, 100]} /> 76% — level 4 of 5.\n</p>`,
+    code: `<p>\n  shard-a load just crossed{" "}\n  <span className="mc-inline">\n    <HeatCell value={76} domain={[0, 100]} summary={false} />\n  </span>{" "}\n  76% — level 4 of 5.\n</p>`,
   },
   cell: {
     render: () => (

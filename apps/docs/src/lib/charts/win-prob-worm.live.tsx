@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { WinProbWorm } from "@microcharts/react/win-prob-worm";
 import { WinProbWorm as WinProbWormInteractive } from "@microcharts/react/win-prob-worm/interactive";
 import staticModule, {
   playground as staticPlayground,
@@ -58,6 +59,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: WinProbWorm,
+  ChartLive: WinProbWormInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -139,7 +139,7 @@ export const contexts: ChartContexts = {
         — climbed from 40th to 81st percentile.
       </p>
     ),
-    code: "<p>\n  Standing over the season <PercentileTrace data={ranks} /> — climbed from 40th to 81st percentile.\n</p>",
+    code: '<p>\n  Standing over the season{" "}\n  <span className="mc-inline">\n    <PercentileTrace data={ranks} summary={false} />\n  </span>{" "}\n  — climbed from 40th to 81st percentile.\n</p>',
   },
   cell: {
     render: () => (

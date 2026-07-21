@@ -127,7 +127,7 @@ export const contexts: ChartContexts = {
         — 75% elapsed, renew soon.
       </p>
     ),
-    code: "<p>\n  Session time remaining <Hourglass value={0.7} /> — 75% elapsed, renew soon.\n</p>",
+    code: '<p>\n  Session time remaining{" "}\n  <span className="mc-inline">\n    <Hourglass value={0.7} summary={false} />\n  </span>{" "}\n  — 75% elapsed, renew soon.\n</p>',
   },
   cell: {
     render: () => (

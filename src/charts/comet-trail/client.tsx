@@ -206,7 +206,6 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the focus ring is transient. */}
         {pinMark ? ring(pinMark, true) : null}
         {active !== null && marks[active] ? ring(marks[active]!, false) : null}
         {rest.children}

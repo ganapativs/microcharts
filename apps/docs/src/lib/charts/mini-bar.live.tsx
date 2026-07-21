@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { MiniBar } from "@microcharts/react/mini-bar";
 import { MiniBar as MiniBarInteractive } from "@microcharts/react/mini-bar/interactive";
 import staticModule, { playground as staticPlayground, MIX, SIGNED } from "./mini-bar";
 
@@ -24,6 +25,7 @@ export const playground: PlaygroundSpec = {
         highlight={(s.highlight as boolean) ? rows[0]!.label : undefined}
         orientation={s.orientation as "horizontal" | "vertical"}
         positive={signed ? "up" : undefined}
+        label={s.label as "none" | "max"}
         animate={ui.animate}
         summary={false}
         width={160}
@@ -42,6 +44,7 @@ export const playground: PlaygroundSpec = {
       (s.highlight as boolean) && `  highlight="${target}"`,
       s.orientation === "horizontal" && '  orientation="horizontal"',
       signed && '  positive="up"',
+      s.label !== "none" && `  label="${s.label}"`,
       ui.animate && " animate",
       "/>",
     ]
@@ -52,6 +55,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: MiniBar,
+  ChartLive: MiniBarInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

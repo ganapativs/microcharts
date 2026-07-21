@@ -158,7 +158,6 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
         {selBar ? (
           <rect
             x={selBar.x - 0.5}

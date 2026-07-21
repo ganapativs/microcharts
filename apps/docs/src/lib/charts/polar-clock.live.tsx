@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { PolarClock } from "@microcharts/react/polar-clock";
 import { PolarClock as PolarClockInteractive } from "@microcharts/react/polar-clock/interactive";
 import staticModule, { playground as staticPlayground, DAY } from "./polar-clock";
 
@@ -41,6 +42,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: PolarClock,
+  ChartLive: PolarClockInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

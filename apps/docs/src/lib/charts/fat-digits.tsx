@@ -134,7 +134,7 @@ export const contexts: ChartContexts = {
         — Acme at 2.1M stands out.
       </p>
     ),
-    code: "<p>\n  Revenue column scan <FatDigits value={2100} domain={[0, 2100]} /> — Acme at 2.1M stands out.\n</p>",
+    code: '<p>\n  Revenue column scan{" "}\n  <span className="mc-inline">\n    <FatDigits value={2100} domain={[0, 2100]} summary={false} />\n  </span>{" "}\n  — Acme at 2.1M stands out.\n</p>',
   },
   cell: {
     render: () => (

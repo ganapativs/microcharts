@@ -171,7 +171,6 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
         {selected !== null && selected !== active ? (
           <line
             x1={slotW * (selected + 0.5)}

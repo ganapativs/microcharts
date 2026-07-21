@@ -46,10 +46,10 @@ direction from the running level AND by valence color, never color alone.
 <LiveDemo
   label="signed step labels vs no total bar"
   dataOf="waterfall"
-  code={`// label="delta" prints each step's signed value in a band below the plot.
-// When labels would collide, the biggest movers win — a deterministic drop-out,
-// never a random overlap.
-<Waterfall data={steps} open={60} label="delta" />
+  code={`// label="delta" is the default — each step's signed value sits in a band below
+// the plot. When labels would collide, the biggest movers win — a deterministic
+// drop-out, never a random overlap. Pass label="none" to drop the band.
+<Waterfall data={steps} open={60} />
 <Waterfall data={steps} open={60} totalBar={false} />`}
 >
   <span className="inline-flex flex-col gap-3">
@@ -62,7 +62,6 @@ direction from the running level AND by valence color, never color alone.
         { label: "FX", value: 5 },
       ]}
       open={60}
-      label="delta"
       title="Net income bridge"
       width={240}
       height={30}

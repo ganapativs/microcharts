@@ -209,7 +209,6 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the focus frame is transient. */}
         {selected !== null && selected !== active ? frame(selected, true) : null}
         {active !== null ? frame(active, false) : null}
         {rest.children}

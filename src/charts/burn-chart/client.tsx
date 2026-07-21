@@ -200,7 +200,6 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {pin ? (
           <circle
             cx={pin.x}

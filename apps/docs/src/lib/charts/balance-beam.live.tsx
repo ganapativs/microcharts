@@ -57,6 +57,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: BalanceBeam,
+  ChartLive: BalanceBeamInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

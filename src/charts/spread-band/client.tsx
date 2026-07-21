@@ -174,7 +174,6 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {pinX !== undefined ? (
           <line
             x1={pinX}

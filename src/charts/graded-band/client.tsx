@@ -167,7 +167,6 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus edges are transient. */}
         {selected !== null && selected !== active ? edges(selected, true) : null}
         {active !== null ? edges(active, false) : null}
         {rest.children}

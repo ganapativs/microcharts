@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { CohortTriangle } from "@microcharts/react/cohort-triangle";
 import { CohortTriangle as CohortTriangleInteractive } from "@microcharts/react/cohort-triangle/interactive";
 import staticModule, { playground as staticPlayground, COHORTS } from "./cohort-triangle";
 
@@ -44,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: CohortTriangle,
+  ChartLive: CohortTriangleInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

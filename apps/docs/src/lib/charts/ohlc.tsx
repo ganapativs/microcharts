@@ -184,7 +184,7 @@ export const contexts: ChartContexts = {
         $150.30, up 7.4% over 20 sessions.
       </p>
     ),
-    code: `<p>\n  ACME closed the session at{" "}\n  <Ohlc data={sessions} width={90} height={14} /> $150.30, up 7.4% over 20 sessions.\n</p>`,
+    code: `<p>\n  ACME closed the session at{" "}\n  <span className="mc-inline">\n    <Ohlc data={sessions} width={90} height={14} summary={false} />\n  </span>{" "}\n  $150.30, up 7.4% over 20 sessions.\n</p>`,
   },
   cell: {
     render: () => (

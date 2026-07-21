@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { MinimapStrip } from "@microcharts/react/minimap-strip";
 import { MinimapStrip as MinimapStripInteractive } from "@microcharts/react/minimap-strip/interactive";
 import staticModule, { playground as staticPlayground, DATA } from "./minimap-strip";
 
@@ -40,6 +41,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: MinimapStrip,
+  ChartLive: MinimapStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

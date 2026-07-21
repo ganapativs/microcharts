@@ -1,11 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ArrowUp, RotateCcw } from "lucide-react";
-// Inline marks stay STATIC — a word-sized sparkline/delta reads at a glance and
-// needs no interaction. The four STANDALONE (fenced) charts are INTERACTIVE:
-// hovering/focusing reveals the per-item labels + values a block chart can't
-// show at rest. Same everywhere — the scripted tour and the live reply both
-// use these, so a visitor without on-device AI gets the same affordance.
+// Inline marks = static. Fenced block charts = interactive (same in tour + live).
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SparkBar } from "@microcharts/react/sparkbar";
 import { Delta } from "@microcharts/react/delta";
@@ -21,19 +17,10 @@ import { LIVE_SAMPLES, parseLiveReply, type ChartSpec } from "@/lib/live-grammar
 import { useLiveModel } from "@/components/home/use-live-model";
 
 /**
- * Home hero stream — chart grammar → real components, mid-sentence. Three
- * scenarios rotate (business → incident → markets) so the reply reads alive;
- * each mixes inline word-sized marks with one captioned block chart. Data
- * charts take the site accent so the reply reads vibrant, not grey; charts
- * that already encode meaning by colour (delta, trend, status, bullet) keep
- * their own semantics. Ghosts of every scenario are grid-stacked so the panel
- * reserves the tallest reply — nothing below shifts as scenarios swap.
- *
- * When Chrome's built-in model is already installed (Prompt API reports
- * `available`), the panel ALSO offers live mode: sample chips + a free input,
- * and the reply is generated on-device by Gemini Nano, streamed through the
- * same raw-grammar → morph pipeline. The scripted tour stays the default and
- * the fallback — live complements it, never replaces it.
+ * Hero stream: grammar → real charts mid-sentence. Three rotating scenarios;
+ * valence charts keep their own colors, others use the site accent. Ghost
+ * replies stack to reserve max height.
+ * Live mode (Prompt API `available`) adds chips + input; tour remains default.
  */
 
 const ACCENT = "var(--mc-accent)";
@@ -84,7 +71,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "r-spark",
         kind: "chart",
-        raw: "`chart sparkline 132 148 141 165 159 182 176 203`",
+        raw: "`microchart sparkline 132 148 141 165 159 182 176 203`",
         node: (
           <Sparkline
             data={[132, 148, 141, 165, 159, 182, 176, 203]}
@@ -101,7 +88,7 @@ const SCENARIOS: Scenario[] = [
         id: "r-delta",
         kind: "chart",
         bare: true,
-        raw: "`chart delta +0.184`",
+        raw: "`microchart delta +0.184`",
         node: <Delta value={0.184} summary={false} />,
       },
       {
@@ -113,7 +100,7 @@ const SCENARIOS: Scenario[] = [
         id: "r-mini",
         kind: "chart",
         block: true,
-        raw: "```chart mini-bar Net-new by region ($k)\nNA 48\nEU 39\nUK 27\nAPAC 22\nLATAM 18\n```",
+        raw: "```microchart mini-bar Net-new by region ($k)\nNA 48\nEU 39\nUK 27\nAPAC 22\nLATAM 18\n```",
         node: (
           <Block title="Net-new by region ($k)">
             <MiniBar
@@ -137,7 +124,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "r-bullet",
         kind: "chart",
-        raw: "`chart bullet value=72 target=80 bands=50,90`",
+        raw: "`microchart bullet value=72 target=80 bands=50,90`",
         node: (
           <Bullet value={72} target={80} bands={[50, 90]} width={66} height={12} summary={false} />
         ),
@@ -157,7 +144,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "i-bar",
         kind: "chart",
-        raw: "`chart sparkbar 120 118 122 90 60 95 128 130`",
+        raw: "`microchart sparkbar 120 118 122 90 60 95 128 130`",
         node: (
           <SparkBar
             data={[120, 118, 122, 90, 60, 95, 128, 130]}
@@ -177,7 +164,7 @@ const SCENARIOS: Scenario[] = [
         id: "i-seis",
         kind: "chart",
         block: true,
-        raw: "```chart seismogram Errors per minute\n2 1 3 2 18 24 9 4 2 1 2 3\n```",
+        raw: "```microchart seismogram Errors per minute\n2 1 3 2 18 24 9 4 2 1 2 3\n```",
         node: (
           <Block title="Errors per minute">
             <Seismogram
@@ -195,7 +182,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "i-status",
         kind: "chart",
-        raw: "`chart status-dot warn`",
+        raw: "`microchart status-dot warn`",
         node: <StatusDot status="warn" style={{ width: 11, height: 11 }} summary={false} />,
       },
       {
@@ -213,7 +200,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "m-trend",
         kind: "chart",
-        raw: "`chart trend-arrow +0.038`",
+        raw: "`microchart trend-arrow +0.038`",
         node: <TrendArrow value={0.038} summary={false} />,
       },
       {
@@ -225,7 +212,7 @@ const SCENARIOS: Scenario[] = [
         id: "m-hist",
         kind: "chart",
         block: true,
-        raw: "```chart histogram 1-min returns (bps)\n-2 -1 0 1 -1 2 1 0 3 1 -1 0 2 1 4 -2 1 0\n```",
+        raw: "```microchart histogram 1-min returns (bps)\n-2 -1 0 1 -1 2 1 0 3 1 -1 0 2 1 4 -2 1 0\n```",
         node: (
           <Block title="1-min returns (bps)">
             <HistogramStrip
@@ -243,7 +230,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "m-rug",
         kind: "chart",
-        raw: "`chart rug-strip 3 5 5 6 8 8 9 11 12 12 14`",
+        raw: "`microchart rug-strip 3 5 5 6 8 8 9 11 12 12 14`",
         node: (
           <RugStrip
             data={[3, 5, 5, 6, 8, 8, 9, 11, 12, 12, 14]}
@@ -262,7 +249,7 @@ const SCENARIOS: Scenario[] = [
       {
         id: "m-bullet",
         kind: "chart",
-        raw: "`chart bullet value=88 target=75 bands=60,95`",
+        raw: "`microchart bullet value=88 target=75 bands=60,95`",
         node: (
           <Bullet value={88} target={75} bands={[60, 95]} width={66} height={12} summary={false} />
         ),
@@ -483,14 +470,13 @@ export function StreamVignette({
     };
   }, [total, startDelay]);
 
-  // Advance one atom at a time with human-feel pacing.
+  // Advance one atom at a time.
   useEffect(() => {
     if (mode !== "tour") return;
     if (!running || pos >= total) {
       if (pos >= total) setRunning(false);
       return;
     }
-    // which segment is the cursor inside?
     let acc = 0;
     let seg: Seg = active.segs[0];
     let inSeg = 0;
@@ -507,7 +493,7 @@ export function StreamVignette({
     const delay =
       seg.kind === "chart"
         ? closing
-          ? 360 // savor the morph
+          ? 360 // morph hold
           : 9
         : 26 + Math.random() * 42;
     const t = window.setTimeout(() => setPos((p) => p + 1), delay);
@@ -553,7 +539,6 @@ export function StreamVignette({
     void live.ask(question);
   };
 
-  // Build the visible reply at the current position.
   const view: ReactNode[] = [];
   let acc = 0;
   for (const s of active.segs) {
@@ -616,17 +601,8 @@ export function StreamVignette({
         </button>
       </div>
       <div className={`relative px-5 py-5 ${serif ? "hv-reply-body" : ""}`}>
-        {/* every scenario's finished reply is stacked in one grid cell, so the
-            panel reserves the tallest — this ALONE fixes the panel height. Both
-            the tour stream and a live reply paint over it as absolute overlays,
-            so neither can grow the panel (a long live answer scrolls in place,
-            it never shifts the page). The min-height hands the compact sample
-            chips' reclaimed space to the answer: it holds the reply area (and
-            thus the whole panel) at the height it had with the taller chips, so
-            shrinking the chips grew the answer instead of shrinking the panel. */}
-        {/* The floor value lives in CSS (.hv-reply-floor[data-live]) so the
-            pre-paint prediction can apply the exact same 297px before React
-            has run — two sources would mean two heights and a shift. */}
+        {/* Stacked finished replies size the panel; tour/live overlay absolutely.
+            Floor height is CSS-only (.hv-reply-floor) so SSR prediction matches. */}
         <div
           className="hv-reply-floor grid text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed"
           data-live={live.supported ? "1" : undefined}
@@ -670,17 +646,9 @@ export function StreamVignette({
           </div>
         )}
       </div>
-      {/* .hv-composer is the animating row (grid 0fr -> 1fr). It is rendered
-          unconditionally — collapsed and inert when live is off — because that
-          is what lets `1fr` resolve to the composer's REAL height at any width,
-          so the pre-paint prediction reserves an exact box with no magic number
-          to drift.
-
-          THREE levels, all load-bearing: the grid, then a bare clipping item,
-          then the painted content. The middle one cannot be skipped — under
-          border-box sizing a grid item never shrinks below its own padding, so
-          hanging the padding directly on the item leaked its full 27px into
-          every collapsed panel, including for visitors with no Chrome AI. */}
+      {/* Always mount .hv-composer (0fr→1fr) so 1fr = real height when collapsed.
+          Grid → bare clip item → content: padding on the grid item itself leaks
+          ~27px when collapsed (border-box min-size). */}
       <div
         className="hv-composer"
         data-open={live.supported ? "1" : undefined}

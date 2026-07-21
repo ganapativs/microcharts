@@ -184,7 +184,7 @@ export const contexts: ChartContexts = {
         — inflow outweighs outflow, beam tilts right.
       </p>
     ),
-    code: '<p>\n  Cash flow this month <BalanceBeam data={[{ label: "A", value: 620 }, { label: "B", value: 480 }]} /> — inflow outweighs outflow, beam tilts right.\n</p>',
+    code: '<p>\n  Cash flow this month{" "}\n  <span className="mc-inline">\n    <BalanceBeam data={[{ label: "A", value: 620 }, { label: "B", value: 480 }]} summary={false} />\n  </span>{" "}\n  — inflow outweighs outflow, beam tilts right.\n</p>',
   },
   cell: {
     render: () => (

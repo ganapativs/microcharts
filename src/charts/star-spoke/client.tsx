@@ -189,7 +189,6 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus spoke is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
         {active !== null ? mark(active, false) : null}
         {rest.children}

@@ -15,7 +15,6 @@ import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { coverageGeometry, type CoverageStripGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual coverage summary. Shared with the interactive entry. */
 export function coverageSummary(
   geo: CoverageStripGeometry,
   pctFmt: (n: number) => string,

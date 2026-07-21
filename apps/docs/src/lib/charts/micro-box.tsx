@@ -140,7 +140,7 @@ export const contexts: ChartContexts = {
         — median 110ms, but the tail stretched past 300ms.
       </p>
     ),
-    code: `<p>\n  Checkout latency this week{" "}\n  <MicroBox stats={{ min: 40, q1: 88, median: 110, q3: 145, max: 320 }} width={90} height={16} /> — median 110ms, tail past 300ms.\n</p>`,
+    code: `<p>\n  Checkout latency this week{" "}\n  <span className="mc-inline">\n    <MicroBox stats={{ min: 40, q1: 88, median: 110, q3: 145, max: 320 }} width={90} height={16} summary={false} />\n  </span>{" "}\n  — median 110ms, tail past 300ms.\n</p>`,
   },
   cell: {
     render: () => (

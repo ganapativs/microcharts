@@ -55,6 +55,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Bars draw signed deviation columns.",
     },
+    {
+      name: "color",
+      type: "string",
+      required: false,
+      description: "Accent stroke/fill override.",
+    },
   ],
   demo: [70, 52],
   example: {
@@ -148,7 +154,7 @@ export const contexts: ChartContexts = {
         — well-calibrated above 0.6 predicted probability.
       </p>
     ),
-    code: "<p>\n  Model calibration <CalibrationStrip data={reliability} /> — well-calibrated above 0.6 predicted probability.\n</p>",
+    code: '<p>\n  Model calibration{" "}\n  <span className="mc-inline">\n    <CalibrationStrip data={reliability} summary={false} />\n  </span>{" "}\n  — well-calibrated above 0.6 predicted probability.\n</p>',
   },
   cell: {
     render: () => (

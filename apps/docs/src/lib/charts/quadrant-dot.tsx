@@ -210,7 +210,7 @@ export const contexts: ChartContexts = {
         — one high-impact, low-effort outlier.
       </p>
     ),
-    code: "<p>\n  Effort vs impact <QuadrantDot data={item} field={backlog} /> — one high-impact, low-effort outlier.\n</p>",
+    code: '<p>\n  Effort vs impact{" "}\n  <span className="mc-inline">\n    <QuadrantDot data={item} field={backlog} summary={false} />\n  </span>{" "}\n  — one high-impact, low-effort outlier.\n</p>',
   },
   cell: {
     render: () => (

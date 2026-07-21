@@ -31,8 +31,7 @@ export function calendarOffset(anchor: string | Date | undefined, weekStart: 0 |
   return (new Date(t).getUTCDay() - weekStart + 7) % 7;
 }
 
-/** Factual S1-binned summary — total, span, and the busiest bin. Shared with
- *  the interactive entry (one wording, no drift). */
+/** Total, span, and busiest bin. */
 export function activitySummary(
   data: readonly Value[],
   fmt: (n: number) => string,
@@ -107,6 +106,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
 
   const w = Math.max(geo.width, 1);
   const h = Math.max(geo.height, 1);
+  const cellFill = color ? ({ fill: color } as CSSProperties) : undefined;
 
   return (
     <Chart
@@ -133,7 +133,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
           shapeRendering={mark.crisp ? "crispEdges" : undefined}
           data-mc-ink="cell"
           fillOpacity={levelOpacity(c.level)}
-          style={color ? { fill: color } : undefined}
+          style={cellFill}
         />
       ))}
       {children}

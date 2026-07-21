@@ -28,8 +28,7 @@ export function pairChange(from: number, to: number): { dir: "up" | "down"; pct:
   return { dir, pct };
 }
 
-/** Factual paired summary — single row: "From 62,000 to 84,000, up 35%.";
- *  multi-row leads with the largest change. Shared with the interactive entry. */
+/** From/to + percent change; multi-row leads with the largest move. */
 export function dumbbellSummary(
   data: readonly DumbbellDatum[],
   fmt: (n: number) => string,
@@ -139,6 +138,8 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
   // be sized for a font the browser never paints (see label-containment tests).
   const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
 
+  // Value runs on x; Threshold/TargetZone are y-valued so annotations can't map
+  // honestly here — pass children through (same contract as horizontal MiniBar).
   return (
     <Chart
       width={width}

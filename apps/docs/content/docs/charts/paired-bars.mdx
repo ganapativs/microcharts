@@ -119,6 +119,7 @@ The gap named in the summary follows `format`/`locale` — 12000 reads "12.000" 
   label="missing reference"
   code={`// value bar alone; the interactive entry announces "no reference"
 <PairedBars data={[{ label: "East", value: 940, ref: null }]} />`}
+  expectWarn
 >
   <PairedBars data={[{ label: "East", value: 940, ref: null }]} title="No plan yet" width={100} height={44} />
 </LiveDemo>

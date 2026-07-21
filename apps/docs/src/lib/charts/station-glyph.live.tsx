@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { StationGlyph } from "@microcharts/react/station-glyph";
 import { StationGlyph as StationGlyphInteractive } from "@microcharts/react/station-glyph/interactive";
 import staticModule, { playground as staticPlayground, OBS } from "./station-glyph";
 
@@ -45,6 +46,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: StationGlyph,
+  ChartLive: StationGlyphInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

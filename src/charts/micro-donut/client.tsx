@@ -180,7 +180,6 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus wedge is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
         {active !== null ? mark(active, false) : null}
         {rest.children}

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { CyclePlot } from "@microcharts/react/cycle-plot";
 import { CyclePlot as CyclePlotInteractive } from "@microcharts/react/cycle-plot/interactive";
 import staticModule, { playground as staticPlayground, WEEKS, DAYS } from "./cycle-plot";
 
@@ -48,6 +49,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: CyclePlot,
+  ChartLive: CyclePlotInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

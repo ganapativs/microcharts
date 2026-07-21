@@ -186,7 +186,7 @@ export const contexts: ChartContexts = {
         — January vintage retains 37% at month 5.
       </p>
     ),
-    code: "<p>\n  Monthly retention cohorts <CohortTriangle data={cohorts} labels={false} cell={7} /> — January vintage retains 37% at month 5.\n</p>",
+    code: '<p>\n  Monthly retention cohorts{" "}\n  <span className="mc-inline">\n    <CohortTriangle data={cohorts} labels={false} cell={7} summary={false} />\n  </span>{" "}\n  — January vintage retains 37% at month 5.\n</p>',
   },
   cell: {
     render: () => (

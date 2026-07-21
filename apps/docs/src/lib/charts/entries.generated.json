@@ -2328,6 +2328,12 @@
         "type": "boolean",
         "required": false,
         "description": "Fade past the outer band — 'this is approximate'."
+      },
+      {
+        "name": "label",
+        "type": "\"median\" | \"none\"",
+        "required": false,
+        "description": "States the median in a right gutter (default none)."
       }
     ],
     "demo": [12, 17, 21, 21, 26, 38],

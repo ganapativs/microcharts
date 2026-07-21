@@ -179,7 +179,6 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus halo is transient. */}
         {selected !== null && selected !== active ? halo(selected, true) : null}
         {active !== null ? halo(active, false) : null}
         {rest.children}

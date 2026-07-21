@@ -2,10 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://microcharts.dev/catalog.schema.json",
   "title": "microcharts catalog",
-  "description": "Machine-readable catalog of every microcharts chart: import paths, data shape, primary encoding, and props. `sharedProps` lists the grammar/layout/interactive props common to every chart; each chart's `props` lists only its chart-specific knobs. Read both to know a chart's full surface. Generated from the chart registry; served at /catalog.json.",
+  "description": "Machine-readable catalog of every microcharts chart: import paths, data shape, primary encoding, and props. Full API for a chart = sharedProps + charts[n].props; interactive shared callbacks apply only when listed in charts[n].sharedInteractive. See top-level howToRead. Generated from the chart registry; served at /catalog.json.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["package", "homepage", "sharedProps", "charts"],
+  "required": ["package", "homepage", "howToRead", "sharedProps", "charts"],
   "properties": {
     "$schema": {
       "type": "string",
@@ -22,9 +22,14 @@
       "format": "uri",
       "description": "Documentation site origin."
     },
+    "howToRead": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Instructions for assembling a chart's full prop surface from sharedProps, props, and sharedInteractive."
+    },
     "sharedProps": {
       "type": "array",
-      "description": "Props whose name means the same thing on every chart — the shared grammar, layout props, i18n, and the shared interactive props (`animate`, `live`). Documented once here rather than repeated in every chart's `props`.",
+      "description": "Props whose name means the same thing wherever they appear — grammar, layout, i18n, and shared interactive props. Interactive names in this list apply to a chart ONLY when also listed in that chart's sharedInteractive.",
       "items": { "$ref": "#/$defs/prop" }
     },
     "charts": {
@@ -108,6 +113,29 @@
           "description": "Import path of the `…/interactive` client entry, when the chart has one.",
           "examples": ["@microcharts/react/sparkline/interactive"]
         },
+        "picker": {
+          "type": "boolean",
+          "description": "Present on interactive charts. `true` ⇒ multi-unit picker contract (onActive / onSelect / selectedIndex / defaultSelectedIndex). `false` ⇒ no roving picker (lean scalars, MinimapStrip, TokenConfidence)."
+        },
+        "animates": {
+          "type": "boolean",
+          "description": "Present on interactive charts. `true` ⇒ accepts shared `animate` (requires `@microcharts/react/motion`). `false` ⇒ no entrance motion prop."
+        },
+        "sharedInteractive": {
+          "type": "array",
+          "description": "Exact shared interactive prop names this chart's `/interactive` entry accepts (subset of sharedProps). Empty array ⇒ interactive entry exists but takes none of the shared interactive props. Omit the field when there is no interactive entry.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "animate",
+              "live",
+              "onActive",
+              "onSelect",
+              "selectedIndex",
+              "defaultSelectedIndex"
+            ]
+          }
+        },
         "dataShape": {
           "type": "string",
           "description": "The shape of the `data` prop, as source text."
@@ -128,7 +156,7 @@
         },
         "props": {
           "type": "array",
-          "description": "Chart-specific props. Every chart also accepts everything in top-level `sharedProps`.",
+          "description": "Chart-specific props only. Combine with sharedProps; apply shared interactive names only when listed in sharedInteractive. Chart-specific callbacks (e.g. onWindowChange) appear here with interactive:true.",
           "items": { "$ref": "#/$defs/prop" }
         },
         "examples": {

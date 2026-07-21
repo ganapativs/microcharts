@@ -11,7 +11,7 @@
 // bespoke, so `bind.onPointerMove` is deliberately NOT spread — pointer POSITION
 // carries no meaning over a bundle of overlapping strands, hovering the chart
 // plays the loop instead. Everything else in `bind` is wired.
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -31,6 +31,19 @@ import {
   ensembleSummary,
   type EnsembleGhostsProps,
 } from "./index.js";
+
+const Static = memo(StaticEnsembleGhosts);
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function hopGroup(svg: SVGSVGElement): SVGGElement {
+  let g = svg.querySelector("g[data-mc-hop]") as SVGGElement | null;
+  if (!g) {
+    g = document.createElementNS(SVG_NS, "g");
+    g.setAttribute("data-mc-hop", "");
+    svg.appendChild(g);
+  }
+  return g;
+}
 
 export interface InteractiveEnsembleGhostsProps extends EnsembleGhostsProps, PickerProps {
   strings?: EnsembleStrings;
@@ -73,10 +86,8 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     [width, height, data, ghosts, emphasis, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  // The ambient HOP frame (a member index), independent of the picker's
-  // active/selected — it is animation, not a user choice, so it never fires
-  // onActive and never announces per frame.
-  const [hop, setHop] = useState<number | null>(null);
+  // Ambient HOP frame — DOM only (no React state). setState every 400ms was
+  // rebuilding the whole static bundle; the loop never announces per frame.
   const hopRef = useRef<number | null>(null);
   const [stopped, setStopped] = useState("");
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -90,6 +101,37 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     (member: number) => paths.findIndex((g) => g.member === member),
     [paths],
   );
+
+  const paintHop = useCallback(
+    (member: number | null) => {
+      const svg = hostRef.current?.querySelector("svg");
+      if (!svg) return;
+      const g = hopGroup(svg);
+      if (member === null) {
+        g.replaceChildren();
+        return;
+      }
+      const src = paths[posOf(member)];
+      if (!src) {
+        g.replaceChildren();
+        return;
+      }
+      let el = g.querySelector("path") as SVGPathElement | null;
+      if (!el) {
+        el = document.createElementNS(SVG_NS, "path");
+        el.setAttribute("fill", "none");
+        el.setAttribute("stroke-linejoin", "round");
+        el.setAttribute("stroke-linecap", "round");
+        el.setAttribute("vector-effect", "non-scaling-stroke");
+        el.style.stroke = "var(--mc-accent)";
+        el.style.strokeWidth = "var(--mc-stroke-width)";
+        g.appendChild(el);
+      }
+      el.setAttribute("d", src.d);
+    },
+    [paths, posOf],
+  );
+
   // Strand vertices parsed from the EMITTED path data — the hit-test can never
   // drift from the drawn geometry because it reads the same numbers.
   const verts = useMemo(() => paths.map((g) => (g.d.match(/[-\d.]+/g) ?? []).map(Number)), [paths]);
@@ -189,14 +231,14 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
       const p = hopRef.current === null ? -1 : posOf(hopRef.current);
       const next = paths[(p + 1) % paths.length]!.member;
       hopRef.current = next;
-      setHop(next);
+      paintHop(next);
     }, 400);
-  }, [reduced, paths, posOf, selected]);
+  }, [reduced, paths, posOf, selected, paintHop]);
 
   const clearHop = useCallback(() => {
     hopRef.current = null;
-    setHop(null);
-  }, []);
+    paintHop(null);
+  }, [paintHop]);
 
   useEffect(() => stop, [stop]);
 
@@ -210,11 +252,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
           : ensembleSummary(geo, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // The picker's choice wins over the ambient frame; the loop only plays while
-  // nothing is picked.
   const shown = active ?? selected;
-  // The transient strand: the focused member, else the ambient HOP frame.
-  const frame = active ?? hop;
   const announced = shown !== null ? say(shown) : stopped;
 
   // announce where the loop stopped (never per frame)
@@ -243,6 +281,8 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
       />
     );
   };
+
+  const svgStyle = useMemo(() => fillFor(style), [style]);
 
   return (
     <span
@@ -274,9 +314,9 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
         leave();
       }}
     >
-      <StaticEnsembleGhosts
+      <Static
         {...rest}
-        style={fillFor(style)}
+        style={svgStyle}
         data={data}
         ghosts={ghosts}
         emphasis={emphasis}
@@ -288,12 +328,10 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the surfaced HOP
-            frame / focused strand is transient. */}
         {selected !== null && selected !== active ? strand(selected, true) : null}
-        {frame !== null ? strand(frame, false) : null}
+        {active !== null ? strand(active, false) : null}
         {rest.children}
-      </StaticEnsembleGhosts>
+      </Static>
       <LiveRegion>{announced}</LiveRegion>
     </span>
   );

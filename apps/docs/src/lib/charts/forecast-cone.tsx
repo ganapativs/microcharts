@@ -182,7 +182,7 @@ export const contexts: ChartContexts = {
         — median path clears target by week 3.
       </p>
     ),
-    code: "<p>\n  Q4 revenue forecast <ForecastCone data={history} forecast={forecast} /> — median path clears target by week 3.\n</p>",
+    code: '<p>\n  Q4 revenue forecast{" "}\n  <span className="mc-inline">\n    <ForecastCone data={history} forecast={forecast} summary={false} />\n  </span>{" "}\n  — median path clears target by week 3.\n</p>',
   },
   cell: {
     render: () => (

@@ -194,7 +194,7 @@ export const contexts: ChartContexts = {
         — top 3 causes account for 80%.
       </p>
     ),
-    code: "<p>\n  Incident causes <ParetoStrip data={causes} /> — top 3 causes account for 80%.\n</p>",
+    code: '<p>\n  Incident causes{" "}\n  <span className="mc-inline">\n    <ParetoStrip data={causes} summary={false} />\n  </span>{" "}\n  — top 3 causes account for 80%.\n</p>',
   },
   cell: {
     render: () => (

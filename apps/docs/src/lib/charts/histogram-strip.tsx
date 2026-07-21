@@ -163,7 +163,7 @@ export const contexts: ChartContexts = {
         — most calls land 40–50 ms, a few tail past 70.
       </p>
     ),
-    code: `<p>\n  API latency this hour{" "}\n  <HistogramStrip data={times} width={90} height={18} /> — most calls land 40–50 ms, a few tail past 70.\n</p>`,
+    code: `<p>\n  API latency this hour{" "}\n  <span className="mc-inline">\n    <HistogramStrip data={times} width={90} height={18} summary={false} />\n  </span>{" "}\n  — most calls land 40–50 ms, a few tail past 70.\n</p>`,
   },
   cell: {
     render: () => (

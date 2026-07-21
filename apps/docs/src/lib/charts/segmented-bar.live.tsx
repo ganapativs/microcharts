@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { SegmentedBar as SegmentedBarInteractive } from "@microcharts/react/segmented-bar/interactive";
 import staticModule, { playground as staticPlayground, MIX } from "./segmented-bar";
 
@@ -30,7 +31,7 @@ export const playground: PlaygroundSpec = {
     [
       "<SegmentedBar",
       "  data={mix}",
-      s.label !== "none" && `  label="${s.label}"`,
+      s.label !== "percent" && `  label="${s.label}"`,
       s.order !== "data" && `  order="${s.order}"`,
       s.maxSegments !== 5 && `  maxSegments={${s.maxSegments}}`,
       ui.animate && " animate",
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: SegmentedBar,
+  ChartLive: SegmentedBarInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

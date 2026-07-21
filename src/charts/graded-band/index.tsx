@@ -12,7 +12,6 @@ import { labelFont, labelFitsY } from "../../core/labels.js";
 import { gradedBandGeometry, type GradedBandGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual graded-band summary. Shared with the interactive entry. */
 export function gradedBandSummary(
   geo: GradedBandGeometry,
   fmt: (n: number) => string,
@@ -89,10 +88,10 @@ export function GradedBand(props: GradedBandProps): ReactNode {
   // readout cannot sit inside the frame, so it DROPS rather than painting above
   // and below it. The graded nesting is the primary read and survives alone.
   const showLabel = label === "median" && labelFitsY(height / 2, FONT, height);
-  const geo = gradedBandGeometry({ width, height, data, levels, value, domain });
+  const bare = gradedBandGeometry({ width, height, data, levels, value, domain });
   const cls = className ? `mc-graded-band ${className}` : "mc-graded-band";
 
-  if (geo === null) {
+  if (bare === null) {
     return (
       <Chart
         width={width}
@@ -110,22 +109,31 @@ export function GradedBand(props: GradedBandProps): ReactNode {
     );
   }
 
+  // Right gutter (prop contract) — never over the band. Gutter width matches the
+  // formatted median so the readout can't collide with the outer interval.
+  const medText = showLabel ? fmt(bare.median.value) : "";
+  const geo = showLabel
+    ? gradedBandGeometry({
+        width,
+        height,
+        data,
+        levels,
+        value,
+        domain,
+        gutterCh: medText.length,
+        fontSize: FONT,
+      })!
+    : bare;
+
   const accName = resolveSummary(summary, () => gradedBandSummary(geo, fmt, strings));
   const k = geo.bands.length;
   const outer = geo.bands[0];
-
-  // median value reads right at the median tick (over the faint band, like the
-  // gallery), flipping to the tick's left near the right edge — never escapes
-  const medText = showLabel ? fmt(geo.median.value) : "";
-  const medW = medText.length * FONT * 0.62;
-  const medFlip = geo.median.x + 3 + medW > width - 1;
-  const medX = round2(medFlip ? geo.median.x - 3 : geo.median.x + 3);
   // pin the label size to viewBox units (see coverage-strip)
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart
-      width={width}
+      width={geo.totalWidth}
       height={height}
       title={title}
       summary={accName}
@@ -149,8 +157,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           style={{ fill: color ?? "var(--mc-accent)", fillOpacity: OPACITY(0, k) * 0.5 }}
         />
       ) : null}
-      {/* fill via inline STYLE (see benchmark-strip): band ink-role CSS would
-          override a fill attribute to the faint --mc-band token. */}
+      {/* Inline fill — band ink-role would force --mc-band. */}
       {geo.bands.map((b) => (
         <rect
           key={b.p}
@@ -163,8 +170,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           style={{ fill: color ?? "var(--mc-accent)", fillOpacity: OPACITY(b.step, k) }}
         />
       ))}
-      {/* median tick — the "data" ink role IS this mark exactly: no fill,
-          data-ink stroke at the full primary width */}
+
       <line
         x1={geo.median.x}
         y1={geo.bandY - 0.5}
@@ -189,13 +195,12 @@ export function GradedBand(props: GradedBandProps): ReactNode {
       ) : null}
       {showLabel ? (
         <text
-          x={medX}
-          y={round2(height / 2)}
-          textAnchor={medFlip ? "end" : "start"}
+          x={geo.labelX}
+          y={geo.labelY}
+          textAnchor="end"
           dominantBaseline="central"
-          data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
+          style={{ fontWeight: 600, fontVariantNumeric: "tabular-nums" }}
         >
           {medText}
         </text>

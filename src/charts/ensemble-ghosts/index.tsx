@@ -9,10 +9,11 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_ENSEMBLE, type EnsembleStrings } from "../../core/strings-ensemble.js";
-import { ensembleGeometry, PAD, type EnsembleGeometry } from "./geometry.js";
+import { ensembleEndLabel, ensembleGeometry, PAD, type EnsembleGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 
-/** Factual ensemble summary. Shared with the interactive entry. */
 export function ensembleSummary(
   geo: EnsembleGeometry,
   fmt: (v: number) => string,
@@ -36,6 +37,8 @@ export interface EnsembleGhostsProps {
   emphasis?: "nearest-median" | "median" | number | undefined;
   /** Ghost endpoint dots — makes the final-value spread countable. */
   endpoints?: boolean | undefined;
+  /** `"end"` (default) states the emphasised path's endpoint in a right gutter. */
+  label?: "end" | "none" | undefined;
   domain?: readonly [number, number] | undefined;
   format?: Format | undefined;
   locale?: string | string[] | undefined;
@@ -57,6 +60,7 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
     ghosts = 8,
     emphasis = "nearest-median",
     endpoints = false,
+    label = "end",
     domain,
     format,
     locale,
@@ -77,7 +81,6 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
       "EnsembleGhosts: members with non-finite values are excluded from selection and median.",
     );
 
-  const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-ensemble-ghosts ${className}` : "mc-ensemble-ghosts";
   const geo = ensembleGeometry({ width, height, data, ghosts, emphasis, domain });
 
@@ -89,7 +92,6 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
-        // Empty stands on the same padded floor a drawn bundle would.
         seat={{ mode: "floor", bottom: height - PAD }}
         className={cls}
         style={style}
@@ -99,24 +101,40 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
     );
   }
 
+  const fmt = makeFormatter(format, locale);
+  const FONT = label === "end" ? labelFont(height) : 0;
+  const showLabel = FONT > 0 && labelFitsY(height / 2, FONT, height);
+  const labelText = showLabel ? fmt(geo.landing.value) : "";
+  const box = ensembleEndLabel(width, height, geo.landing.y, labelText, FONT);
+
   const accName = resolveSummary(summary, () => ensembleSummary(geo, fmt, strings));
   const accent = color ?? "var(--mc-accent)";
+  const rootStyle = showLabel
+    ? ({ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties)
+    : style;
+
+  const ann = children
+    ? resolveAnnotations(children, {
+        x: (i) => geo.xFor(Math.round(i)),
+        y: geo.yFor,
+        width,
+        height,
+        fontSize: annotationFontSize(height),
+      })
+    : { under: null, over: null, rest: null };
 
   return (
     <Chart
-      width={width}
+      width={box.totalWidth}
       height={height}
       title={title}
       summary={accName}
       id={id}
-      // A bundle of traces over one fitted domain takes the seat a single
-      // sparkline takes — it stands on the plot's padded floor. The bundle's
-      // own extent is data and changes shape run to run; the frame does not.
       seat={{ mode: "floor", bottom: height - PAD }}
       className={cls}
-      style={style}
+      style={rootStyle}
     >
-      {/* the faint member bundle — the spread of possible futures */}
+      {ann.under}
       {geo.ghostPaths.map((g) => (
         <path
           key={g.member}
@@ -130,7 +148,6 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ))}
-      {/* optional endpoint dots — the final-value spread, countable */}
       {endpoints
         ? geo.ghostEnds.map((e) => (
             <circle
@@ -143,7 +160,6 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
             />
           ))
         : null}
-      {/* the emphasised representative — accent, on top */}
       <path
         d={geo.emphasisPath.d}
         data-mc-ink="data"
@@ -153,7 +169,21 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
         strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
       />
-      {children}
+      {showLabel ? (
+        <text
+          x={box.labelX}
+          y={box.labelY}
+          textAnchor="start"
+          dominantBaseline="central"
+          data-mc-ink="label"
+          fontSize={FONT}
+          style={{ fontVariantNumeric: "tabular-nums" }}
+        >
+          {labelText}
+        </text>
+      ) : null}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

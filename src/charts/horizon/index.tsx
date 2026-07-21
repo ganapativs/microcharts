@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { describeSeries, type SeriesStrings, resolveSummary } from "../../core/summary.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import type { Value } from "../../core/types.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { horizonGeometry } from "./geometry.js";
 
 export interface HorizonProps {
@@ -60,6 +61,16 @@ export function Horizon(props: HorizonProps): ReactNode {
   // the unfolded series.
   const accName = resolveSummary(summary, () => describeSeries(data, { format: fmt, strings }));
 
+  const ann = children
+    ? resolveAnnotations(children, {
+        x: geo.xFor,
+        y: geo.foldedY,
+        width,
+        height,
+        fontSize: annotationFontSize(height),
+      })
+    : { under: null, over: null, rest: null };
+
   return (
     <Chart
       width={width}
@@ -79,6 +90,7 @@ export function Horizon(props: HorizonProps): ReactNode {
       className={className ? `mc-horizon ${className}` : "mc-horizon"}
       style={style}
     >
+      {ann.under}
       {geo.bands.map((band, i) => {
         const positive = band.sign > 0;
         return (
@@ -93,7 +105,8 @@ export function Horizon(props: HorizonProps): ReactNode {
           />
         );
       })}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

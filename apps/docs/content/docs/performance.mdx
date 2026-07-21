@@ -1,8 +1,9 @@
 ---
 title: Performance
 description:
-  Zero dependencies, budget-gated sizes, and server rendering with no client JavaScript — 106 chart types at ~1–4 kB
-  gzip each, rendered to SVG at about 0.031 ms each. Every number here is reproducible from one command.
+  Zero dependencies, budget-gated sizes, and server rendering with no client JavaScript — 106 chart types at ~2–7 kB
+  interactive · ~1–4 kB static, static SSR median about 0.031 ms each. Every number here is reproducible from one
+  command.
 ---
 
 Performance isn't a marketing line here — it's a build gate. Every figure on this page is produced by a command you can
@@ -19,22 +20,21 @@ build.
 
 <SizeDistribution />
 
-The whole catalog lands between **0.97 kB and 3.93 kB** gzip, with a **median of 2.51 kB** — and that's the _static_
-entry. Interactivity is opt-in from the `/interactive` subpath, which runs a median 4.7 kB — about 2.2 kB more — for the
-whole contract: hover, roving keyboard focus, select-to-pin, touch scrub, and live announcements. A page pays for it
-only where it actually uses it. About 0.5 kB of that is the shared picker kernel, which the per-subpath gate measures
-standalone in every entry; a page using several interactive charts bundles it once.
+The interactive catalog lands between **1.86 kB and 6.49 kB** gzip, with a **median of 4.88 kB** — hover, roving
+keyboard focus, select-to-pin, touch scrub, and live announcements from the `/interactive` subpath. The static twin
+lands between **0.97 kB and 3.96 kB**, with a **median of 2.58 kB** — pure SVG, zero client JavaScript. A page pays for
+interactivity only where it actually uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which
+the per-subpath gate measures standalone in every entry; a page using several interactive charts bundles it once.
 
 <SizeTable />
 
-Twenty charts sit above the 3 kB reference line, none of them by more than 0.93 kB. Sparkline, the most configurable
-primitive in the set, is the largest; most of the rest are the value-series charts that can host annotations
-(ChangePoint, WinProbWorm, ForecastCone, DualSparkline, BurnChart, SpreadBand, RetentionCurve, ControlStrip,
-PercentileLadder, QueueDepth, SparkBar, ShiftHistogram, StackedArea, ABStrips), plus Station Glyph, Slope, PolarClock,
-Constellation, and TapeGauge, which share one layout pass between their static and interactive entries so overlays can
-never drift from the marks. The annotation hosts carry a small shared walker that resolves `Threshold`, `Marker`, and
-the rest against the chart's scale — you pay for it only on those charts, and each is still smaller than a single icon
-font.
+Twenty-two charts sit above the 3 kB static reference line, none of them by more than 0.96 kB. Sparkline, the most
+configurable primitive in the set, is the largest; most of the rest are value-series charts that host annotations
+(ChangePoint, WinProbWorm, ForecastCone, DualSparkline, BurnChart, SpreadBand, RetentionCurve, ControlStrip, QueueDepth,
+SparkBar, EnsembleGhosts, NetFlow, Slope), plus Station Glyph, PercentileLadder, ShiftHistogram, StackedArea, ABStrips,
+PolarClock, Constellation, and TapeGauge. The annotation hosts carry a small shared walker that resolves `Threshold`,
+`Marker`, and the rest against the chart's scale — you pay for it only on those charts, and each is still smaller than a
+single icon font.
 
 ### Splitting the stylesheet
 
@@ -62,8 +62,8 @@ string:
 <ScalingTable />
 
 A table of **500 sparklines becomes HTML in under six milliseconds**, streams as part of the document, and ships nothing
-to hydrate. Across all 106 chart types the median render is about **0.031 ms per chart** — the heavier expressive and
-frontier instruments cost more geometry, the simple strips cost almost nothing.
+to hydrate. Across all 106 chart types the median **static** SSR render is about **0.031 ms per chart** — the heavier
+expressive and frontier instruments cost more geometry, the simple strips cost almost nothing.
 
 The core summary kernel is just as cheap: `describeSeries`, which writes every chart's accessible sentence, runs at
 roughly **829,000 calls per second** (24-point series, measured by `pnpm bench`), so accessibility is never the thing

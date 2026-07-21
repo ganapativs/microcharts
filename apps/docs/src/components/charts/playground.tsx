@@ -195,8 +195,8 @@ function Shell({
         >
           {(
             [
-              ["static", "Static", "pure SVG · zero client JS"],
               ["interactive", "Interactive", "hover · keyboard · live values"],
+              ["static", "Static", "pure SVG · zero client JS"],
             ] as const
           ).map(([m, label, caption]) => (
             <button
@@ -286,7 +286,9 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   );
   const [data, setData] = useState<number[]>(spec?.data ?? []);
   const [seed, setSeed] = useState(1);
-  const [mode, setMode] = useState<"static" | "interactive">("static");
+  const [mode, setMode] = useState<"static" | "interactive">(() =>
+    spec.renderInteractive ? "interactive" : "static",
+  );
   const [animate, setAnimate] = useState(false);
   const [take, setTake] = useState(0);
   if (!spec || !entry) return null;

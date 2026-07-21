@@ -1,12 +1,11 @@
 import { Fragment } from "react";
-import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowUpRight } from "lucide-react";
 import { docsMeta } from "@/lib/metadata";
 import { getModule, STABLE_CHARTS } from "@/lib/charts/registry";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
 import { GalleryDock } from "./gallery-dock";
 import { GalleryStage } from "./gallery-stage";
+import { GalleryCard } from "./gallery-card";
 import { WildStrip } from "./wild-strip";
 
 export const metadata: Metadata = docsMeta({
@@ -53,7 +52,8 @@ export default function GalleryPage() {
           </h1>
           <p className="mt-4 text-fd-muted-foreground">
             Every chart at the size it lives (in a sentence, a table cell, a KPI card), beside the
-            decision it answers. Search or filter to the one you need.
+            decision it answers. Search or filter to the one you need. Live by default — hover a
+            mark to scrub; switch to Static in the dock if you want stillness.
           </p>
         </header>
 
@@ -81,25 +81,14 @@ export default function GalleryPage() {
                   data-name={c.name}
                   data-keywords={keywords(c)}
                 >
-                  <Link prefetch={false} href={`/docs/charts/${c.slug}`} className="g2-card">
-                    <span className="g2-spot" aria-hidden />
-                    <ArrowUpRight className="g2-arrow size-4" aria-hidden />
-                    {/* Previews are decorative on the card — `inert` keeps the live
-                        charts animating but out of the tab order and a11y tree, so
-                        no interactive control ever nests inside the link. */}
-                    <div className="g2-stage" inert>
-                      <GalleryStage slug={c.slug}>{Preview ? <Preview /> : null}</GalleryStage>
-                    </div>
-                    <div className="g2-meta">
-                      {/* name owns its own full-width line so it never truncates
-                          against the collection tag */}
-                      <span className="g2-name">{c.name}</span>
-                      <div className="g2-subrow">
-                        <p className="g2-tag">{c.tagline}</p>
-                        <span className="g2-coll">{c.collection}</span>
-                      </div>
-                    </div>
-                  </Link>
+                  <GalleryCard
+                    href={`/docs/charts/${c.slug}`}
+                    name={c.name}
+                    collection={c.collection}
+                    tagline={c.tagline}
+                  >
+                    <GalleryStage slug={c.slug}>{Preview ? <Preview /> : null}</GalleryStage>
+                  </GalleryCard>
                 </article>
               </Fragment>
             );
@@ -120,7 +109,7 @@ export default function GalleryPage() {
         </div>
       </div>
 
-      {/* outside the full-bleed .g2 plane — the strip sits on the footer's
+      {/* outside the .g2 shell — the strip sits on the footer's
           own grid (max-w-shell) so its edges line up with the footer below. */}
       <WildStrip />
 

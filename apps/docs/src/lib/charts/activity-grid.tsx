@@ -212,7 +212,7 @@ export const contexts: ChartContexts = {
         — bursts of shipping, punctuated by two dead-quiet days.
       </p>
     ),
-    code: `<p>\n  Commit cadence for the last two weeks{" "}\n  <ActivityGrid data={commits.slice(0, 14)} layout="strip" cell={7} /> — bursts of shipping, punctuated by two dead-quiet days.\n</p>`,
+    code: `<p>\n  Commit cadence for the last two weeks{" "}\n  <span className="mc-inline">\n    <ActivityGrid data={commits.slice(0, 14)} layout="strip" cell={7} summary={false} />\n  </span>{" "}\n  — bursts of shipping, punctuated by two dead-quiet days.\n</p>`,
   },
   cell: {
     render: () => {

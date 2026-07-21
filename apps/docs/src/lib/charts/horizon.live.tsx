@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Horizon } from "@microcharts/react/horizon";
 import { Horizon as HorizonInteractive } from "@microcharts/react/horizon/interactive";
 import staticModule, { playground as staticPlayground, LOAD } from "./horizon";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Horizon,
+  ChartLive: HorizonInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { GradeProfile } from "@microcharts/react/grade-profile";
 import { GradeProfile as GradeProfileInteractive } from "@microcharts/react/grade-profile/interactive";
 import staticModule, { playground as staticPlayground, TRAIL, m } from "./grade-profile";
 
@@ -41,6 +42,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: GradeProfile,
+  ChartLive: GradeProfileInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

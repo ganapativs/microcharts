@@ -205,7 +205,7 @@ export const contexts: ChartContexts = {
         — 86% coverage, two gaps on Tuesday.
       </p>
     ),
-    code: "<p>\n  Sensor uptime this week <CoverageStrip data={readings} /> — 86% coverage, two gaps on Tuesday.\n</p>",
+    code: '<p>\n  Sensor uptime this week{" "}\n  <span className="mc-inline">\n    <CoverageStrip data={readings} summary={false} />\n  </span>{" "}\n  — 86% coverage, two gaps on Tuesday.\n</p>',
   },
   cell: {
     render: () => (

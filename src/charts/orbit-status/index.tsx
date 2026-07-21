@@ -113,7 +113,6 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
       className={className ? `mc-orbit ${className}` : "mc-orbit"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* orbit — radius is latency, dash density is rate */}
       <circle
         cx={geo.orbit.cx}
         cy={geo.orbit.cy}
@@ -128,7 +127,6 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
             : null),
         }}
       />
-      {/* the service */}
       <circle
         cx={geo.center.cx}
         cy={geo.center.cy}
@@ -136,7 +134,6 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
         data-mc-ink={geo.unknown ? "neutral" : "bar"}
         style={geo.unknown ? { fillOpacity: 0.5 } : undefined}
       />
-      {/* the dependency */}
       {!geo.unknown ? (
         <circle
           className="mc-orbit-satellite"

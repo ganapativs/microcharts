@@ -59,8 +59,15 @@ describe("<Waterfall>", () => {
     }
   });
 
-  it('label defaults to "none" — no text, viewBox unchanged', () => {
+  it('label defaults to "delta" — direct value labels below the plot', () => {
     const { container } = draw(<Waterfall data={PL} width={260} height={18} />);
+    expect(container.querySelectorAll("text").length).toBeGreaterThan(0);
+    const vb = container.querySelector("svg")!.getAttribute("viewBox")!.split(" ").map(Number);
+    expect(vb[3]).toBeGreaterThan(18);
+  });
+
+  it('label="none" — no text, viewBox unchanged', () => {
+    const { container } = draw(<Waterfall data={PL} width={260} height={18} label="none" />);
     expect(container.querySelectorAll("text").length).toBe(0);
     expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 260 18");
   });
@@ -97,7 +104,7 @@ describe("<Waterfall> annotations", () => {
   it("hosts annotations, clamped to the value plot (not the label band)", () => {
     expectHostsAnnotations(
       (children) => (
-        <Waterfall data={PL} width={70} height={18} summary={false}>
+        <Waterfall data={PL} width={70} height={18} label="none" summary={false}>
           {children}
         </Waterfall>
       ),

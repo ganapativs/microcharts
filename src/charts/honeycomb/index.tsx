@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import type { EmptyCellStyle } from "../../core/types.js";
 import { honeycombGeometry } from "./geometry.js";
@@ -23,6 +24,8 @@ export interface HoneycombProps {
   empty?: EmptyCellStyle | undefined;
   /** Noun for the summary (e.g. "seats"). */
   unit?: string | undefined;
+  /** `"count"` / `"percent"` centers a readout when the comb has room. */
+  label?: "none" | "count" | "percent" | undefined;
   /** Hex outer radius (circumradius) in viewBox units. Default 4. */
   cell?: number | undefined;
   color?: string | undefined;
@@ -63,6 +66,7 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
     empty = "outline",
     unit = "",
     cell = 4,
+    label = "none",
     color,
     format,
     locale,
@@ -78,11 +82,31 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
   if (total > 60) devWarn("<Honeycomb> over 60 cells stops being countable — use Progress.");
 
   const geo = honeycombGeometry({ total, value, rows, cellR: cell, pad: PAD });
+  let labelText: string | undefined;
+  let fontSize = 0;
+  if (label !== "none") {
+    fontSize = labelFont(Math.min(geo.width, geo.height), 0.28);
+    const filled = Math.max(0, Math.round(value));
+    const cap = Math.floor(total);
+    const fmt = makeFormatter(format, locale);
+    labelText =
+      label === "count"
+        ? `${fmt(filled)}/${fmt(cap)}`
+        : cap > 0
+          ? makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 })(
+              filled / cap,
+            )
+          : undefined;
+  }
+  const showLabel = labelText !== undefined && labelFitsY(geo.height / 2, fontSize, geo.height);
   const accName =
     summary === false
       ? false
       : (summary ?? honeycombSummary(value, { total, unit, strings, format, locale }));
   const fill = color ?? "var(--mc-accent)";
+  const rootStyle = showLabel
+    ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties)
+    : style;
 
   return (
     <Chart
@@ -96,15 +120,25 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
       // unit, which would bias the centre downward by the rounding residue.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-honeycomb ${className}` : "mc-honeycomb"}
-      style={style}
+      style={rootStyle}
     >
-      {/* empty cells — "blank" draws nothing (GardenGrid's pattern); "outline"
-          is a quiet hairline ring, fill:none already comes from the role */}
+      {/* empty="outline" hairline; "blank" draws nothing. */}
       {geo.emptyPath && empty !== "blank" ? (
         <path d={geo.emptyPath} data-mc-ink="muted" strokeOpacity={0.75} />
       ) : null}
-      {/* filled cells */}
       {geo.filledPath ? <path d={geo.filledPath} style={{ fill }} /> : null}
+      {showLabel ? (
+        <text
+          x={geo.width / 2}
+          y={geo.height / 2}
+          fontSize={fontSize}
+          dominantBaseline="central"
+          textAnchor="middle"
+          data-mc-ink="label"
+        >
+          {labelText}
+        </text>
+      ) : null}
       {children}
     </Chart>
   );

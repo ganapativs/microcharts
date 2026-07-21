@@ -235,7 +235,6 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus dot is transient. */}
         {selected !== null && selected !== active ? dot(selected, true) : null}
         {active !== null ? dot(active, false) : null}
         {rest.children}

@@ -195,7 +195,6 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}

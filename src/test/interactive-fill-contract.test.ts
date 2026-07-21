@@ -108,10 +108,33 @@ describe("interactive fill contract", () => {
 
     it("merges consumer style over the wrapper base (base wins nothing it sets)", () => {
       const base = wrap("mc-x", undefined, undefined).style;
-      expect(base).toMatchObject({ display: "inline-block", position: "relative", lineHeight: 0 });
+      expect(base).toMatchObject({
+        display: "inline-block",
+        position: "relative",
+        lineHeight: 0,
+        verticalAlign: "middle",
+        width: "fit-content",
+        maxWidth: "100%",
+      });
       const merged = wrap("mc-x", undefined, { width: "100%", display: "block" }).style;
       // consumer overrides win; untouched base keys survive.
-      expect(merged).toMatchObject({ display: "block", width: "100%", position: "relative" });
+      expect(merged).toMatchObject({
+        display: "block",
+        width: "100%",
+        position: "relative",
+        verticalAlign: "middle",
+        maxWidth: "100%",
+      });
+      expect(merged.alignSelf).toBeUndefined();
+      expect(merged.justifySelf).toBeUndefined();
+    });
+
+    it("stamps data-mc-host for table-cell CSS hooks", () => {
+      expect(wrap("mc-x", undefined, undefined)["data-mc-host"]).toBe("");
+    });
+
+    it("returns a stable object when className and style are omitted", () => {
+      expect(wrap("mc-x", undefined, undefined)).toBe(wrap("mc-x", undefined, undefined));
     });
   });
 });

@@ -6,12 +6,21 @@
 import { useEffect, useRef, useState } from "react";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
 import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { MoonPhase as StaticMoonPhase, moonPhaseSummary, type MoonPhaseProps } from "./index.js";
 
 export interface InteractiveMoonPhaseProps extends MoonPhaseProps {
   live?: boolean;
   strings?: MoonStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the disc pops in (fade + scale)
+   * when the chart first mounts client-side — a whole-svg animation, so it
+   * never collides with the per-change bloom the lit region already plays.
+   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
+   */
+  animate?: boolean;
   /** Click/tap or Enter/Space — `{ index: 0, value: the clamped 0–1 fraction }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -23,6 +32,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     title,
     value,
     mode = "progress",
+    animate = false,
     onSelect,
     className,
     style,
@@ -30,6 +40,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
   } = props;
   const summary = moonPhaseSummary(value, mode, strings);
   const wrap = useRef<HTMLSpanElement>(null);
+  useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
   const last = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);

@@ -57,7 +57,7 @@ classic pictogram lie this component refuses to tell.
 
 ## Edge cases
 
-<LiveDemo label="zero total" code={`<PictogramRow value={3} total={0} title="No capacity" />`}>
+<LiveDemo label="zero total" code={`<PictogramRow value={3} total={0} title="No capacity" />`} expectWarn>
   <PictogramRow value={3} total={0} title="No capacity" width={90} height={18} />
 </LiveDemo>
 
@@ -65,7 +65,11 @@ classic pictogram lie this component refuses to tell.
   <PictogramRow value={-2} total={4} title="Deficit" width={90} height={18} />
 </LiveDemo>
 
-<LiveDemo label="overflow — value past the total" code={`<PictogramRow value={9} total={8} title="Over capacity" />`}>
+<LiveDemo
+  label="overflow — value past the total"
+  code={`<PictogramRow value={9} total={8} title="Over capacity" />`}
+  expectWarn
+>
   <PictogramRow value={9} total={8} title="Over capacity" width={90} height={18} />
 </LiveDemo>
 

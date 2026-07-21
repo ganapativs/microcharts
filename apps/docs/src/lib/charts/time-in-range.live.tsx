@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { TimeInRange } from "@microcharts/react/time-in-range";
 import { TimeInRange as TimeInRangeInteractive } from "@microcharts/react/time-in-range/interactive";
 import staticModule, { playground as staticPlayground, GLUCOSE } from "./time-in-range";
 
@@ -60,6 +61,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: TimeInRange,
+  ChartLive: TimeInRangeInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

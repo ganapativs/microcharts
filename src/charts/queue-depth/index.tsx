@@ -14,7 +14,6 @@ import { scaleLinear } from "../../core/scale.js";
 import type { Value } from "../../core/types.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual backlog summary. Shared with the interactive entry. */
 export function queueSummary(
   geo: QueueDepthGeometry,
   fmt: (n: number) => string,
@@ -195,7 +194,6 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
       style={rootStyle}
     >
       {ann.under}
-      {/* stock area — accent, zero-anchored, lowest z */}
       <path d={geo.area} fill={lineColor} fillOpacity={0.22} stroke="none" />
       {geo.capacityY !== null ? (
         <line
@@ -217,7 +215,6 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
         vectorEffect="non-scaling-stroke"
         style={color ? { stroke: color } : undefined}
       />
-      {/* above-capacity spans — negative, full width (shape + color) */}
       {geo.breach ? (
         <path
           d={geo.breach}
@@ -227,7 +224,6 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* endpoint dot — accent, or negative when breached */}
       <circle
         cx={end.x}
         cy={end.y}

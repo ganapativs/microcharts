@@ -90,6 +90,7 @@ quality into one number.
   code={`// a score of 2 on a [0, 1] domain draws a full-length bar instead of
 // overflowing the track
 <RubricStrip data={[{ label: "Bonus", score: 2, weight: 1 }]} />`}
+  expectWarn
 >
   <RubricStrip data={[{ label: "Bonus", score: 2, weight: 1 }]} title="Clamped" width={200} height={16} />
 </LiveDemo>

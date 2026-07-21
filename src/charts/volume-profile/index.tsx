@@ -122,7 +122,6 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
           style={{ fill: "var(--mc-accent)", fillOpacity: 0.1 }}
         />
       ) : null}
-      {/* bars (one path) */}
       {normal.length > 0 ? (
         <path
           d={normal.map((b) => `M${b.x} ${b.y}h${b.width}v${b.height}h${-b.width}z`).join("")}
@@ -130,7 +129,6 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
           shapeRendering="crispEdges"
         />
       ) : null}
-      {/* POC bar accented */}
       {pocBar ? (
         <path
           d={`M${pocBar.x} ${pocBar.y}h${pocBar.width}v${pocBar.height}h${-pocBar.width}z`}

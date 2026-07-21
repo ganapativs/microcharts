@@ -1,4 +1,4 @@
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType, ElementType, ReactNode } from "react";
 
 /** Per-chart registry contract. One module per slug under `lib/charts/`. */
 
@@ -182,4 +182,14 @@ export interface ChartModule extends ChartModuleStatic {
    * static or prefers reduced motion (then they stay on `Preview`).
    */
   PreviewLive?: ComponentType;
+  /**
+   * Static chart component identity used inside authored `contexts` JSX — paired
+   * with `ChartLive` so four-homes can swap to the interactive twin in place.
+   */
+  Chart?: ElementType;
+  /**
+   * Interactive twin of `Chart` (same props). Four-homes prefer this when set;
+   * at rest it must match the static footprint (library fill/seat parity).
+   */
+  ChartLive?: ElementType;
 }

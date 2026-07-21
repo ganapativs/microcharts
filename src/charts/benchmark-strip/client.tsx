@@ -171,7 +171,6 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus tick is transient. */}
         {selected !== null && selected !== active ? tick(selected, true) : null}
         {active !== null ? tick(active, false) : null}
         {rest.children}

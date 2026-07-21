@@ -2,11 +2,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "next-themes";
 import { defineTheme, type ThemePreset } from "@microcharts/react/theme";
-import { Sparkline } from "@microcharts/react/sparkline";
-import { SegmentedBar } from "@microcharts/react/segmented-bar";
-import { Bullet } from "@microcharts/react/bullet";
-import { Delta } from "@microcharts/react/delta";
-import { StackedArea } from "@microcharts/react/stacked-area";
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
+import { SegmentedBar } from "@microcharts/react/segmented-bar/interactive";
+import { Bullet } from "@microcharts/react/bullet/interactive";
+import { Delta } from "@microcharts/react/delta/interactive";
+import { StackedArea } from "@microcharts/react/stacked-area/interactive";
 import { INK_PRESET_CATS } from "@/lib/token-export";
 
 /**

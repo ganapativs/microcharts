@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { SproutRow } from "@microcharts/react/sprout-row";
 import { SproutRow as SproutRowInteractive } from "@microcharts/react/sprout-row/interactive";
 import staticModule, { playground as staticPlayground, ACCTS } from "./sprout-row";
 
@@ -39,6 +40,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: SproutRow,
+  ChartLive: SproutRowInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

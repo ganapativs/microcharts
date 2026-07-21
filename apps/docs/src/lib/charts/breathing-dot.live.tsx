@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { BreathingDot } from "@microcharts/react/breathing-dot";
 import { BreathingDot as BreathingDotInteractive } from "@microcharts/react/breathing-dot/interactive";
 import staticModule, { playground as staticPlayground } from "./breathing-dot";
 
@@ -35,6 +36,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: BreathingDot,
+  ChartLive: BreathingDotInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

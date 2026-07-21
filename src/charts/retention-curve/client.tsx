@@ -185,7 +185,6 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {pin ? (
           <circle
             cx={pin.x}

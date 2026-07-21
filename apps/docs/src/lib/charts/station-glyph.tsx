@@ -176,7 +176,7 @@ export const contexts: ChartContexts = {
         — overcast, SW 15 kt, 16°C.
       </p>
     ),
-    code: '<p>\n  KSFO conditions <StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} /> — overcast, SW 15 kt, 16°C.\n</p>',
+    code: '<p>\n  KSFO conditions{" "}\n  <span className="mc-inline">\n    <StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} summary={false} />\n  </span>{" "}\n  — overcast, SW 15 kt, 16°C.\n</p>',
   },
   cell: {
     render: () => (

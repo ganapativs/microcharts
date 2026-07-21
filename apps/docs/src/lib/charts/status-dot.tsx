@@ -147,7 +147,7 @@ export const contexts: ChartContexts = {
         degraded.
       </p>
     ),
-    code: `<p>\n  Checkout is{" "}\n  <span className="mc-inline">\n    <StatusDot status="ok" style={{ width: "0.7em", height: "0.7em" }} />\n  </span>{" "}\n  operational; Billing is{" "}\n  <span className="mc-inline">\n    <StatusDot status="warn" style={{ width: "0.7em", height: "0.7em" }} />\n  </span>{" "}\n  degraded.\n</p>`,
+    code: `<p>\n  Checkout is{" "}\n  <span className="mc-inline">\n    <StatusDot status="ok" style={{ width: "0.7em", height: "0.7em" }} summary={false} />\n  </span>{" "}\n  operational; Billing is{" "}\n  <span className="mc-inline">\n    <StatusDot status="warn" style={{ width: "0.7em", height: "0.7em" }} summary={false} />\n  </span>{" "}\n  degraded.\n</p>`,
   },
   cell: {
     render: () => (

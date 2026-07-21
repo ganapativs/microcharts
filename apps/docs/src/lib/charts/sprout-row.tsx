@@ -137,7 +137,7 @@ export const contexts: ChartContexts = {
         — two at bloom, one still seed.
       </p>
     ),
-    code: `<p>\n  Account health this week{" "}\n  <SproutRow data={accounts} height={18} /> — two at bloom, one still seed.\n</p>`,
+    code: `<p>\n  Account health this week{" "}\n  <span className="mc-inline">\n    <SproutRow data={accounts} height={18} summary={false} />\n  </span>{" "}\n  — two at bloom, one still seed.\n</p>`,
   },
   cell: {
     render: () => (

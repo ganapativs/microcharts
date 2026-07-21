@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { LikertStrip } from "@microcharts/react/likert-strip";
 import { LikertStrip as LikertStripInteractive } from "@microcharts/react/likert-strip/interactive";
 import staticModule, { playground as staticPlayground, SURVEY } from "./likert-strip";
 
@@ -40,6 +41,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: LikertStrip,
+  ChartLive: LikertStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

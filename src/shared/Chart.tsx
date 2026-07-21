@@ -81,7 +81,7 @@ export function Chart(props: ChartProps): ReactNode {
   const { width, height, title, summary, id, seat, className, style, children } = props;
   const naming = accessibleNaming(title, summary, id);
   const seated = seatVars(seat, height);
-  const rootStyle = seated ? { ...style, ...seated } : style;
+  const rootStyle = seated ? (style ? { ...style, ...seated } : seated) : style;
 
   return (
     <svg

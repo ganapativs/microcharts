@@ -52,6 +52,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Ghost endpoint dots — makes the final-value spread countable.",
     },
+    {
+      name: "label",
+      type: '"end" | "none"',
+      required: false,
+      description: "Emphasised path endpoint in a right gutter (default end).",
+    },
   ],
   demo: FUTURES.map((m) => m[m.length - 1]!),
   example: {
@@ -85,6 +91,13 @@ export const playground: PlaygroundSpec = {
       init: "nearest-median",
     },
     { kind: "toggle", key: "endpoints", label: "endpoints", init: false },
+    {
+      kind: "segmented",
+      key: "label",
+      label: "label",
+      options: ["end", "none"],
+      init: "end",
+    },
   ],
   render: (s) => (
     <EnsembleGhosts
@@ -92,6 +105,7 @@ export const playground: PlaygroundSpec = {
       ghosts={s.ghosts as number}
       emphasis={s.emphasis as "nearest-median" | "median"}
       endpoints={s.endpoints as boolean}
+      label={s.label as "end" | "none"}
       summary={false}
       width={280}
       height={44}
@@ -104,6 +118,7 @@ export const playground: PlaygroundSpec = {
       s.ghosts !== 8 && `  ghosts={${s.ghosts}}`,
       s.emphasis !== "nearest-median" && `  emphasis="${s.emphasis}"`,
       s.endpoints && "  endpoints",
+      s.label !== "end" && `  label="${s.label}"`,
       "/>",
     ]
       .filter(Boolean)
@@ -156,7 +171,7 @@ export const contexts: ChartContexts = {
         — 70% of paths finish above target.
       </p>
     ),
-    code: "<p>\n  Simulated futures <EnsembleGhosts data={futures} /> — 70% of paths finish above target.\n</p>",
+    code: '<p>\n  Simulated futures{" "}\n  <span className="mc-inline">\n    <EnsembleGhosts data={futures} summary={false} />\n  </span>{" "}\n  — 70% of paths finish above target.\n</p>',
   },
   cell: {
     render: () => (

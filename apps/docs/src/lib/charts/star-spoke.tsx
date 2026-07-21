@@ -158,7 +158,7 @@ export const contexts: ChartContexts = {
         — strong on speed, weak on cost.
       </p>
     ),
-    code: "<p>\n  Product profile <StarSpoke data={metrics} /> — strong on speed, weak on cost.\n</p>",
+    code: '<p>\n  Product profile{" "}\n  <span className="mc-inline">\n    <StarSpoke data={metrics} summary={false} />\n  </span>{" "}\n  — strong on speed, weak on cost.\n</p>',
   },
   cell: {
     render: () => (

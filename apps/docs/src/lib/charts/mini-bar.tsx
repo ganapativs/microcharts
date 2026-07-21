@@ -93,6 +93,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Engages pos/neg tokens on signed data.",
     },
+    {
+      name: "label",
+      type: '"none" | "max"',
+      required: false,
+      description: 'Peak-value readout (vertical only; default "none").',
+    },
   ],
   demo: MIX.map((d) => d.value),
   example: {
@@ -144,6 +150,13 @@ export const playground: PlaygroundSpec = {
       init: "vertical",
     },
     { kind: "toggle", key: "positive", label: "signed + valence", init: false },
+    {
+      kind: "segmented",
+      key: "label",
+      label: "label",
+      options: ["none", "max"],
+      init: "none",
+    },
   ],
   render: (s) => {
     const signed = s.positive as boolean;
@@ -155,6 +168,7 @@ export const playground: PlaygroundSpec = {
         highlight={(s.highlight as boolean) ? rows[0]!.label : undefined}
         orientation={s.orientation as "horizontal" | "vertical"}
         positive={signed ? "up" : undefined}
+        label={s.label as "none" | "max"}
         summary={false}
         width={160}
         height={s.orientation === "horizontal" ? 96 : 52}
@@ -172,6 +186,7 @@ export const playground: PlaygroundSpec = {
       (s.highlight as boolean) && `  highlight="${target}"`,
       s.orientation === "horizontal" && '  orientation="horizontal"',
       signed && '  positive="up"',
+      s.label !== "none" && `  label="${s.label}"`,
       "/>",
     ]
       .filter(Boolean)
@@ -218,7 +233,7 @@ export const contexts: ChartContexts = {
         — East alone outsells North more than seven to one.
       </p>
     ),
-    code: `<p>\n  Q3 revenue splits four ways{" "}\n  <MiniBar data={regions} width={70} height={16} /> — East alone outsells North more than seven to one.\n</p>`,
+    code: `<p>\n  Q3 revenue splits four ways{" "}\n  <span className="mc-inline">\n    <MiniBar data={regions} width={70} height={16} summary={false} />\n  </span>{" "}\n  — East alone outsells North more than seven to one.\n</p>`,
   },
   cell: {
     render: () => (

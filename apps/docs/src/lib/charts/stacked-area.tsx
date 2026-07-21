@@ -203,7 +203,7 @@ export const contexts: ChartContexts = {
         — mobile overtook web, now 66% of sessions.
       </p>
     ),
-    code: `<p>\n  Traffic mix this year{" "}\n  <StackedArea data={mix} width={80} height={16} /> — mobile overtook web, now 66% of sessions.\n</p>`,
+    code: `<p>\n  Traffic mix this year{" "}\n  <span className="mc-inline">\n    <StackedArea data={mix} width={80} height={16} summary={false} />\n  </span>{" "}\n  — mobile overtook web, now 66% of sessions.\n</p>`,
   },
   cell: {
     render: () => (

@@ -58,7 +58,14 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
 
   // reuse Progress's resolved model (fraction/clamp/label semantics)
   const model = progressModel({ value, max, positive, format, locale, strings, label: "percent" });
-  const geo = ringGeometry({ size, fraction: model.clamped, weight, sweep });
+  const showLabel = label === "percent" && model.display !== undefined;
+  const geo = ringGeometry({
+    size,
+    fraction: model.clamped,
+    weight,
+    sweep,
+    labelChars: showLabel ? model.display!.length : 0,
+  });
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
 
   const auto = !Number.isFinite(model.fraction)
@@ -99,7 +106,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
           style={{ strokeWidth: geo.weight, ...(color ? { stroke: color } : null) }}
         />
       ) : null}
-      {label === "percent" && model.display !== undefined ? (
+      {showLabel && geo.fontSize > 0 ? (
         <text
           x={geo.labelX}
           y={geo.labelY}

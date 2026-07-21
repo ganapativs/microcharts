@@ -208,7 +208,7 @@ export const contexts: ChartContexts = {
         — quiet on three, no telemetry the rest of this week.
       </p>
     ),
-    code: `<p>\n  api shipped on 11 of the last 24 tracked days{" "}\n  <CalendarStrip data={days} end="2026-07-01" cell={4} /> — quiet on three.\n</p>`,
+    code: `<p>\n  api shipped on 11 of the last 24 tracked days{" "}\n  <span className="mc-inline">\n    <CalendarStrip data={days} end="2026-07-01" cell={4} summary={false} />\n  </span>{" "}\n  — quiet on three.\n</p>`,
   },
   cell: {
     render: () => (

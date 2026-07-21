@@ -156,7 +156,7 @@ export const contexts: ChartContexts = {
         — $72K raised, $8K from goal.
       </p>
     ),
-    code: '<p>\n  Fundraiser progress <Thermometer value={72} target={80} orientation="horizontal" bulb={false} /> — $72K raised, $8K from goal.\n</p>',
+    code: '<p>\n  Fundraiser progress{" "}\n  <span className="mc-inline">\n    <Thermometer value={72} target={80} orientation="horizontal" bulb={false} summary={false} />\n  </span>{" "}\n  — $72K raised, $8K from goal.\n</p>',
   },
   cell: {
     render: () => (

@@ -151,7 +151,7 @@ export const contexts: ChartContexts = {
         — at line 660 of 1,200, dense middle section.
       </p>
     ),
-    code: "<p>\n  Scroll position in log <MinimapStrip data={{ content, window, marks, known }} /> — at line 660 of 1,200, dense middle section.\n</p>",
+    code: '<p>\n  Scroll position in log{" "}\n  <span className="mc-inline">\n    <MinimapStrip data={{ content, window, marks, known }} summary={false} />\n  </span>{" "}\n  — at line 660 of 1,200, dense middle section.\n</p>',
   },
   cell: {
     render: () => (

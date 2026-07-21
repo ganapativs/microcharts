@@ -163,7 +163,6 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selNote && selected !== active ? ring(selNote, true) : null}
         {active !== null && shownNote ? ring(shownNote, false) : null}
         {rest.children}

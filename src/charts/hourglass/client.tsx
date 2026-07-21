@@ -4,6 +4,7 @@
 // 100%), not on every tick. Wrapper focus only. Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { named, fillFor, wrap as wrapAttrs } from "../../shared/interactive.js";
@@ -13,6 +14,14 @@ import { Hourglass as StaticHourglass, hourglassSummary, type HourglassProps } f
 export interface InteractiveHourglassProps extends HourglassProps {
   live?: boolean;
   strings?: HourglassStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the glyph pops in (fade + scale)
+   * when the chart first mounts client-side — a whole-svg animation, so it
+   * never collides with the per-change sand settle this entry already drives.
+   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
+   */
+  animate?: boolean;
   /** The glyph was activated (click, tap, Enter or Space): `{ index: 0, value }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -25,6 +34,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     strings = EN_HOURGLASS,
     title,
     value,
+    animate = false,
     onSelect,
     className,
     style,
@@ -35,6 +45,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
   // seat the wrapper, not just the SVG, so the click target stays on the
   // painted glyph when this sits inline in prose (see seat-hoist).
   useSeatHoist(wrap);
+  useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");
 

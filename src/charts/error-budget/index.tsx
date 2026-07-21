@@ -12,7 +12,6 @@ import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-err
 import { errorBudgetGeometry, type ErrorBudgetGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual error-budget summary. Shared with the interactive entry. */
 export function errorBudgetSummary(
   geo: ErrorBudgetGeometry,
   fmt: (n: number) => string,
@@ -163,7 +162,6 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
       style={rootStyle}
     >
       {ann.under}
-      {/* faster burn-rate reference lines — faint policy context (region ink) */}
       {geo.wedges.map((w) => (
         <path
           key={w.rate}
@@ -176,7 +174,6 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ))}
-      {/* steady-burn diagonal — the pace that exactly spends the window */}
       <line
         x1={geo.diagonal.x1}
         y1={geo.diagonal.y1}
@@ -188,7 +185,6 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
         data-mc-w="support"
         vectorEffect="non-scaling-stroke"
       />
-      {/* actual remaining line */}
       <path
         d={geo.line.d}
         data-mc-ink="data"
@@ -196,7 +192,6 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
         vectorEffect="non-scaling-stroke"
         style={{ stroke: lineColor }}
       />
-      {/* exhaustion ✕ at the zero-crossing */}
       {geo.exhausted ? (
         <>
           <line

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { MusicStaff } from "@microcharts/react/music-staff";
 import { MusicStaff as MusicStaffInteractive } from "@microcharts/react/music-staff/interactive";
 import staticModule, { playground as staticPlayground, MELODY } from "./music-staff";
 
@@ -40,6 +41,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: MusicStaff,
+  ChartLive: MusicStaffInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

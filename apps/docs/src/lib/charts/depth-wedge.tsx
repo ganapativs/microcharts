@@ -187,7 +187,7 @@ export const contexts: ChartContexts = {
         — bid-side liquidity thicker below mid.
       </p>
     ),
-    code: "<p>\n  Order book depth <DepthWedge data={{ demand, supply }} /> — bid-side liquidity thicker below mid.\n</p>",
+    code: '<p>\n  Order book depth{" "}\n  <span className="mc-inline">\n    <DepthWedge data={{ demand, supply }} summary={false} />\n  </span>{" "}\n  — bid-side liquidity thicker below mid.\n</p>',
   },
   cell: {
     render: () => (

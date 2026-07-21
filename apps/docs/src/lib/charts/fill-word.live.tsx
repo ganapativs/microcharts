@@ -47,6 +47,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: FillWord,
+  ChartLive: FillWordInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -23,6 +23,12 @@ describe("<MinimapStrip>", () => {
   it("renders the window + content + marks summary", () => {
     const { container } = draw(<MinimapStrip data={DATA} />);
     expect(container.querySelectorAll("rect").length).toBeGreaterThanOrEqual(1);
+    // Mark strokes are accent paths — without fill="none" the accent ink rule
+    // zeroes the stroke (fill:accent, stroke:none) and the zero-area vertical
+    // lines render nothing at all. Guard visibility.
+    const mark = container.querySelector('path[data-mc-ink="accent"]');
+    expect(mark).not.toBeNull();
+    expect(mark!.getAttribute("fill")).toBe("none");
     expect(minimapSummary(DATA, minimapDomain(DATA), 0.08, EN_MINIMAP, fmt)).toBe(
       "Viewing 12% of the whole (520–660 of 1,200); 3 marks; 8% unknown.",
     );

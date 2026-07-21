@@ -171,7 +171,7 @@ export const contexts: ChartContexts = {
         — East is furthest off target, 940 spent against a 1,200 budget.
       </p>
     ),
-    code: `<p>\n  Regional spend vs plan this quarter{" "}\n  <PairedBars data={regions} width={100} height={18} /> — East is furthest off target, 940 spent against a 1,200 budget.\n</p>`,
+    code: `<p>\n  Regional spend vs plan this quarter{" "}\n  <span className="mc-inline">\n    <PairedBars data={regions} width={100} height={18} summary={false} />\n  </span>{" "}\n  — East is furthest off target, 940 spent against a 1,200 budget.\n</p>`,
   },
   cell: {
     render: () => (
@@ -232,12 +232,12 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <PairedBars data={rows} positive="down" summary={false} width={64} height={16} />
+            <PairedBars data={[rows[0]!]} positive="down" summary={false} width={64} height={16} />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Regional <PairedBars data={regions} positive="down" width={64} height={16} />\n</button>\n<button className="tab">\n  Marketing <PairedBars data={marketing} positive="down" width={64} height={16} />\n</button>`,
+    code: `<button className="tab">\n  Regional <PairedBars data={[{ label: "East", value: 940, ref: 1200 }]} positive="down" width={64} height={16} summary={false} />\n</button>`,
   },
 };
 

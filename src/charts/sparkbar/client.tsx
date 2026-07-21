@@ -46,6 +46,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     mode = "bar",
     gap = 0.25,
     label = "none",
+    positive = "up",
     color,
     title,
     summary,
@@ -179,6 +180,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         mode={mode}
         gap={gap}
         label={label}
+        positive={positive}
         color={color}
         format={format}
         locale={locale}
@@ -186,7 +188,6 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         style={fillFor(style)}
       >
         {rest.children}
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
       </StaticSparkBar>

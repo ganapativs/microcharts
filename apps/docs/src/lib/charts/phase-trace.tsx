@@ -179,7 +179,7 @@ export const contexts: ChartContexts = {
         — lag loop in the upper-right regime.
       </p>
     ),
-    code: '<p>\n  CPU × latency phase <PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" /> — lag loop in the upper-right regime.\n</p>',
+    code: '<p>\n  CPU × latency phase{" "}\n  <span className="mc-inline">\n    <PhaseTrace data={trajectory} xLabel="CPU" yLabel="Latency" summary={false} />\n  </span>{" "}\n  — lag loop in the upper-right regime.\n</p>',
   },
   cell: {
     render: () => (

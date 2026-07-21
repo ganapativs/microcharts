@@ -117,7 +117,7 @@ export const contexts: ChartContexts = {
         — moderate strain, pulsing at 42%.
       </p>
     ),
-    code: "<p>\n  System load right now <BreathingDot value={0.42} /> — moderate strain, pulsing at 42%.\n</p>",
+    code: '<p>\n  System load right now{" "}\n  <span className="mc-inline">\n    <BreathingDot value={0.42} summary={false} />\n  </span>{" "}\n  — moderate strain, pulsing at 42%.\n</p>',
   },
   cell: {
     render: () => (

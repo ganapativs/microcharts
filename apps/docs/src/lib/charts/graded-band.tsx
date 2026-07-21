@@ -53,6 +53,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Fade past the outer band — 'this is approximate'.",
     },
+    {
+      name: "label",
+      type: '"median" | "none"',
+      required: false,
+      description: "States the median in a right gutter (default none).",
+    },
   ],
   demo: [12, 17, 21, 21, 26, 38],
   example: {
@@ -148,7 +154,7 @@ export const contexts: ChartContexts = {
         — 50% band spans 17–21, point at 19.
       </p>
     ),
-    code: "<p>\n  Forecast estimate <GradedBand data={posterior} /> — 50% band spans 17–21, point at 19.\n</p>",
+    code: '<p>\n  Forecast estimate{" "}\n  <span className="mc-inline">\n    <GradedBand data={posterior} summary={false} />\n  </span>{" "}\n  — 50% band spans 17–21, point at 19.\n</p>',
   },
   cell: {
     render: () => (

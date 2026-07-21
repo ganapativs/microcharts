@@ -5,6 +5,8 @@
 // (docs steer to Sparkline for the path).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
@@ -16,7 +18,6 @@ import { resolveSummary } from "../../core/summary.js";
 
 export type SlopeDatum = DumbbellDatum & { label: string };
 
-/** Factual slope summary — counts + the largest change. Shared with client. */
 export function slopeSummary(data: readonly SlopeDatum[], strings: PairedStrings): string {
   const finite = data.filter((d) => Number.isFinite(d.from) && Number.isFinite(d.to));
   if (finite.length === 0) return strings.noData;
@@ -103,6 +104,16 @@ export function Slope(props: SlopeProps): ReactNode {
   const leftYs = showLabels ? layoutColumn(geo.lines.map((l) => l.y0)) : [];
   const rightYs = showLabels ? layoutColumn(geo.lines.map((l) => l.y1)) : [];
 
+  const ann = children
+    ? resolveAnnotations(children, {
+        x: (i) => (Math.round(i) <= 0 ? geo.colX0 : geo.colX1),
+        y: scaleLinear(geo.domain, [height - 1.5, 1.5]),
+        width,
+        height,
+        fontSize: annotationFontSize(height),
+      })
+    : { under: null, over: null, rest: null };
+
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
@@ -124,6 +135,7 @@ export function Slope(props: SlopeProps): ReactNode {
       className={className ? `mc-slope ${className}` : "mc-slope"}
       style={rootStyle}
     >
+      {ann.under}
       {geo.lines.map((line) => {
         const d = data[line.index]!;
         const isHl = highlight !== undefined && (highlight === d.label || highlight === line.index);
@@ -215,7 +227,8 @@ export function Slope(props: SlopeProps): ReactNode {
           </g>
         );
       })}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

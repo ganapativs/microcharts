@@ -8,12 +8,13 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
-import { LIKERT_FONT, likertGutter, likertStripGeometry } from "./geometry.js";
+import { likertFont, likertGutter, likertStripGeometry } from "./geometry.js";
+import { labelFitsY } from "../../core/labels.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
 
 export type LikertDatum = MiniBarDatum;
 
-/** Factual likert summary — |net| < 5 pts reads "Balanced." (documented). */
+/** |net| < 5 pts reads "Balanced." */
 export function likertSummary(
   shares: { negative: number; positive: number; neutral: number },
   hasNeutralLevel: boolean,
@@ -57,7 +58,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
     neutral = "split",
     label = "ends",
     width = 60,
-    height = 12,
+    height = 14,
     format,
     locale,
     strings = EN_COMPOSITION,
@@ -76,12 +77,13 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
     devWarn("<LikertStrip> negative counts treated as 0.");
   }
 
-  const fontSize = LIKERT_FONT;
+  const fontSize = likertFont(height);
+  const wantLabels = label !== "none" && labelFitsY(height / 2, fontSize, height);
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const hasNeutralLevel = data.length % 2 === 1;
 
   // end labels reserve deterministic ch gutters ("100%" worst case = 4 chars)
-  const gutter = likertGutter(label !== "none", fontSize);
+  const gutter = likertGutter(wantLabels, fontSize);
   const geo = likertStripGeometry({
     width,
     height,
@@ -163,7 +165,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
               />
             ) : null,
           )}
-          {label === "ends" ? (
+          {wantLabels && label === "ends" ? (
             <>
               <text
                 x={leftLabel.x}
@@ -186,7 +188,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
                 {pctFmt(geo.shares.positive)}
               </text>
             </>
-          ) : label === "net" ? (
+          ) : wantLabels && label === "net" ? (
             <text
               x={rightLabel.x}
               y={midY}

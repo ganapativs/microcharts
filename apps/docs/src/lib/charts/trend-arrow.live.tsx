@@ -52,6 +52,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: TrendArrow,
+  ChartLive: TrendArrowInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

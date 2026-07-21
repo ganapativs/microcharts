@@ -170,7 +170,7 @@ export const contexts: ChartContexts = {
         — 7 greens in a row, last fail 3 days ago.
       </p>
     ),
-    code: "<p>\n  Deploy streak <StreakSpark data={data}${size} /> — 7 greens in a row, last fail 3 days ago.\n</p>",
+    code: '<p>\n  Deploy streak{" "}\n  <span className="mc-inline">\n    <StreakSpark data={data}${size} summary={false} />\n  </span>{" "}\n  — 7 greens in a row, last fail 3 days ago.\n</p>',
   },
   cell: {
     render: () => (

@@ -179,7 +179,6 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus mark is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
         {active !== null ? mark(active, false) : null}
         {rest.children}

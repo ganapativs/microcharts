@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
 import { EnsembleGhosts as EnsembleGhostsInteractive } from "@microcharts/react/ensemble-ghosts/interactive";
 import staticModule, { playground as staticPlayground, FUTURES } from "./ensemble-ghosts";
 
@@ -22,6 +23,7 @@ export const playground: PlaygroundSpec = {
       ghosts={s.ghosts as number}
       emphasis={s.emphasis as "nearest-median" | "median"}
       endpoints={s.endpoints as boolean}
+      label={s.label as "end" | "none"}
       animate={ui.animate}
       summary={false}
       width={280}
@@ -35,6 +37,7 @@ export const playground: PlaygroundSpec = {
       s.ghosts !== 8 && `  ghosts={${s.ghosts}}`,
       s.emphasis !== "nearest-median" && `  emphasis="${s.emphasis}"`,
       s.endpoints && "  endpoints",
+      s.label !== "end" && `  label="${s.label}"`,
       ui.animate && " animate",
       "/>",
     ]
@@ -44,6 +47,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: EnsembleGhosts,
+  ChartLive: EnsembleGhostsInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

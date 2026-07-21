@@ -155,7 +155,7 @@ export const contexts: ChartContexts = {
         inside the band, not at either edge.
       </p>
     ),
-    code: `<p>\n  Their $62k offer sits{" "}\n  <RugStrip data={salaries} markValue={62} height={18} /> inside the band, not at either edge.\n</p>`,
+    code: `<p>\n  Their $62k offer sits{" "}\n  <span className="mc-inline">\n    <RugStrip data={salaries} markValue={62} height={18} summary={false} />\n  </span>{" "}\n  inside the band, not at either edge.\n</p>`,
   },
   cell: {
     render: () => (

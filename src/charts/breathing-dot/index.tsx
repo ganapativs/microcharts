@@ -93,8 +93,7 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
       className={className ? `mc-breathing ${className}` : "mc-breathing"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* level ring — its distance from the core is the static level read.
-          Secondary stroke: role hair (⅓ of --mc-stroke-width), not a literal. */}
+      {/* Level ring (distance from core); hair stroke role. */}
       {!geo.unknown ? (
         <circle
           cx={geo.ring.cx}
@@ -105,7 +104,6 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
           style={{ fill: "none", strokeOpacity: 0.7 }}
         />
       ) : null}
-      {/* core dot — colored by band, or a filled neutral (role) when unknown */}
       <circle
         className="mc-breathing-core"
         cx={geo.core.cx}

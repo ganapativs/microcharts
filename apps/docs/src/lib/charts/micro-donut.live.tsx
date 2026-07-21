@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { MicroDonut } from "@microcharts/react/micro-donut";
 import { MicroDonut as MicroDonutInteractive } from "@microcharts/react/micro-donut/interactive";
 import staticModule, { playground as staticPlayground, MIX } from "./micro-donut";
 
@@ -21,6 +22,7 @@ export const playground: PlaygroundSpec = {
       data={MIX}
       maxWedges={s.maxWedges as number}
       weight={s.weight as number}
+      label={s.label as "none" | "total"}
       decorative={s.decorative as boolean}
       size={48}
       summary={false}
@@ -34,6 +36,7 @@ export const playground: PlaygroundSpec = {
       "  data={mix}",
       s.maxWedges !== 4 && `  maxWedges={${s.maxWedges}}`,
       s.weight !== 5 && `  weight={${s.weight}}`,
+      s.label !== "none" && `  label="${s.label}"`,
       (s.decorative as boolean) && "  decorative",
       ui.animate && " animate",
       "/>",
@@ -44,6 +47,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: MicroDonut,
+  ChartLive: MicroDonutInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

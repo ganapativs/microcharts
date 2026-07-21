@@ -12,7 +12,6 @@ import { EN_BURN, type BurnStrings } from "../../core/strings-burn.js";
 import { burnGeometry, type BurnGeometry, type BurnMode } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual burn summary. Shared with the interactive entry. */
 export function burnSummary(
   geo: BurnGeometry,
   fmt: (n: number) => string,
@@ -188,7 +187,6 @@ export function BurnChart(props: BurnChartProps): ReactNode {
       style={rootStyle}
     >
       {ann.under}
-      {/* plan line — dashed, muted, full length (the deadline is its end) */}
       {geo.plan.d ? (
         <path
           d={geo.plan.d}
@@ -199,7 +197,6 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* today tick — a quiet vertical hairline */}
       <line
         x1={geo.today.x}
         y1={1}
@@ -210,7 +207,6 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         data-mc-w="hair"
         vectorEffect="non-scaling-stroke"
       />
-      {/* projection — dotted + provisional; the fitted slope, never optimistic */}
       {geo.projection ? (
         <path
           d={geo.projection.d}
@@ -221,7 +217,6 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           style={{ stroke: lineColor, strokeWidth: "var(--mc-stroke-width)" }}
         />
       ) : null}
-      {/* actual line — solid accent, to today */}
       {geo.actual.d ? (
         <path
           d={geo.actual.d}

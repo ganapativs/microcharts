@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { EventTimeline } from "@microcharts/react/event-timeline";
 import { EventTimeline as EventTimelineInteractive } from "@microcharts/react/event-timeline/interactive";
 import staticModule, {
   playground as staticPlayground,
@@ -57,6 +58,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: EventTimeline,
+  ChartLive: EventTimelineInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

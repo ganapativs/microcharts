@@ -163,7 +163,7 @@ export const contexts: ChartContexts = {
         — peak at 2pm, quiet after midnight.
       </p>
     ),
-    code: "<p>\n  Traffic by hour <PolarClock data={byHour} now={14} /> — peak at 2pm, quiet after midnight.\n</p>",
+    code: '<p>\n  Traffic by hour{" "}\n  <span className="mc-inline">\n    <PolarClock data={byHour} now={14} summary={false} />\n  </span>{" "}\n  — peak at 2pm, quiet after midnight.\n</p>',
   },
   cell: {
     render: () => (

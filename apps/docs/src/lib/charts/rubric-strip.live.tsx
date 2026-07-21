@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { RubricStrip } from "@microcharts/react/rubric-strip";
 import { RubricStrip as RubricStripInteractive } from "@microcharts/react/rubric-strip/interactive";
 import staticModule, { playground as staticPlayground, RUBRIC } from "./rubric-strip";
 
@@ -40,6 +41,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: RubricStrip,
+  ChartLive: RubricStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

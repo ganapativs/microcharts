@@ -166,7 +166,6 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; the ring is transient. */}
         {pinned ? (
           <circle
             cx={pinned.x}

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ConfusionGrid } from "@microcharts/react/confusion-grid";
 import { ConfusionGrid as ConfusionGridInteractive } from "@microcharts/react/confusion-grid/interactive";
 import staticModule, { playground as staticPlayground, CATDOG, THREE } from "./confusion-grid";
 
@@ -43,6 +44,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ConfusionGrid,
+  ChartLive: ConfusionGridInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

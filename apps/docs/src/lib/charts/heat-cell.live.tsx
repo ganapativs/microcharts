@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { HeatCell } from "@microcharts/react/heat-cell";
 import { HeatCell as HeatCellInteractive } from "@microcharts/react/heat-cell/interactive";
 import staticModule, { playground as staticPlayground, D } from "./heat-cell";
 
@@ -55,6 +56,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: HeatCell,
+  ChartLive: HeatCellInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

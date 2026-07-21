@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { OrbitStatus } from "@microcharts/react/orbit-status";
 import { OrbitStatus as OrbitStatusInteractive } from "@microcharts/react/orbit-status/interactive";
 import staticModule, { playground as staticPlayground, LD, RD } from "./orbit-status";
 
@@ -50,6 +51,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: OrbitStatus,
+  ChartLive: OrbitStatusInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

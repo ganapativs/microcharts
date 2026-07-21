@@ -161,7 +161,7 @@ export const contexts: ChartContexts = {
         — checkout-api busiest, 9 events.
       </p>
     ),
-    code: "<p>\n  Service events this hour <EventRaster data={services} /> — checkout-api busiest, 9 events.\n</p>",
+    code: '<p>\n  Service events this hour{" "}\n  <span className="mc-inline">\n    <EventRaster data={services} summary={false} />\n  </span>{" "}\n  — checkout-api busiest, 9 events.\n</p>',
   },
   cell: {
     render: () => (

@@ -145,7 +145,7 @@ export const contexts: ChartContexts = {
         — 64% done, ~2 min remaining.
       </p>
     ),
-    code: "<p>\n  Export progress <EtaBar progress={0.64} elapsed={3.6} rate={0.18} /> — 64% done, ~2 min remaining.\n</p>",
+    code: '<p>\n  Export progress{" "}\n  <span className="mc-inline">\n    <EtaBar progress={0.64} elapsed={3.6} rate={0.18} summary={false} />\n  </span>{" "}\n  — 64% done, ~2 min remaining.\n</p>',
   },
   cell: {
     render: () => (

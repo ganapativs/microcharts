@@ -127,7 +127,7 @@ export const contexts: ChartContexts = {
         — peaked in week 4, closing at 11 story points.
       </p>
     ),
-    code: "<p>\n  Sprint velocity <MusicStaff data={weeks} width={90} height={20} /> — peaked week 4.\n</p>",
+    code: '<p>\n  Sprint velocity{" "}\n  <span className="mc-inline">\n    <MusicStaff data={weeks} width={90} height={20} summary={false} />\n  </span>{" "}\n  — peaked week 4.\n</p>',
   },
   cell: {
     render: () => (

@@ -153,7 +153,6 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection: a persistent accent tick that survives pointer-leave. */}
         {selected != null && selected !== active ? (
           <line
             x1={selX}

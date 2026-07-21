@@ -177,7 +177,6 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus chord is transient. */}
         {selected !== null && selected !== active ? chord(selected, true) : null}
         {active !== null ? chord(active, false) : null}
         {rest.children}

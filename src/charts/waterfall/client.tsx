@@ -181,7 +181,6 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus box is transient. */}
         {selected !== null && selected !== active ? box(selected, true) : null}
         {active !== null ? box(active, false) : null}
         {rest.children}

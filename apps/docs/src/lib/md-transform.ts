@@ -64,11 +64,11 @@ function propTableMarkdown(chart: ChartLike): string {
 }
 
 /** Render a chart's `<Usage>` panel — the canonical import + usage snippet plus
- *  the install command — as text, so the mirror keeps the "how to use it" block. */
+ *  the full-setup door (package + stylesheet) — as text for the mirror. */
 function usageMarkdown(chart: ChartLike): string {
   const code = chart.example?.code?.trim();
   if (!code) return "";
-  return `${fence("tsx", code)}\n\nInstall: \`pnpm add @microcharts/react\``;
+  return `${fence("tsx", code)}\n\nSetup (package + stylesheet): [Quickstart](/docs/quickstart#set-up-with-an-ai-agent) or paste [\`/agent-setup.md\`](/agent-setup.md) into your agent.`;
 }
 
 const headingLevel = (line: string): number => line.match(/^(#{1,6})\s/)?.[1].length ?? 0;
@@ -97,9 +97,9 @@ function dropEmptyHeadings(md: string): string {
 function grammarText(): string {
   const rows = GRAMMAR.map(
     (g) =>
-      `**${g.label}** — ${g.blurb}\n\n\`\`\`chart ${g.type}\n${g.body}\n\`\`\`\n\nEquivalent React:\n\n${fence("tsx", g.jsx)}`,
+      `**${g.label}** — ${g.blurb}\n\n\`\`\`microchart ${g.type}\n${g.body}\n\`\`\`\n\nEquivalent React:\n\n${fence("tsx", g.jsx)}`,
   );
-  return `The grammar has two forms — a fenced \`chart\` block for a standalone chart, or an inline \`chart <type> <data>\` span inside a sentence. Body is whitespace/comma numbers, or key=value for composites.\n\n${rows.join(
+  return `The grammar has two forms — a fenced \`microchart\` block for a standalone chart, or an inline \`microchart <type> <data>\` span inside a sentence. Body is whitespace/comma numbers, or key=value for composites.\n\n${rows.join(
     "\n\n",
   )}`;
 }
@@ -116,7 +116,9 @@ function surfaceText(): string {
 }
 
 function cheatSheetText(): string {
-  const grammar = GRAMMAR.map((g) => `- \`chart ${g.type}\` — ${g.body} (${g.blurb})`).join("\n");
+  const grammar = GRAMMAR.map((g) => `- \`microchart ${g.type}\` — ${g.body} (${g.blurb})`).join(
+    "\n",
+  );
   const rules = AGENT_RULES.map((r) => `- ${r}`).join("\n");
   const surfaces = MACHINE_SURFACES.map((s) => s.label).join(" · ");
   return `**Agent cheat sheet.** Grammar:\n\n${grammar}\n\nRules:\n\n${rules}\n\nSurfaces: ${surfaces}`;

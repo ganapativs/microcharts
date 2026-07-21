@@ -138,7 +138,6 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
         locale={locale}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {selX !== undefined && isFiniteValue(selValue) ? (
           <circle
             cx={selX}

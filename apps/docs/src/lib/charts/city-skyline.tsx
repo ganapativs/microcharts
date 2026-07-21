@@ -192,7 +192,7 @@ export const contexts: ChartContexts = {
         — Platform is largest at 46, 70% activated.
       </p>
     ),
-    code: "<p>\n  Team sizes across eng <CitySkyline data={teams} /> — Platform is largest at 46, 70% activated.\n</p>",
+    code: '<p>\n  Team sizes across eng{" "}\n  <span className="mc-inline">\n    <CitySkyline data={teams} summary={false} />\n  </span>{" "}\n  — Platform is largest at 46, 70% activated.\n</p>',
   },
   cell: {
     render: () => (

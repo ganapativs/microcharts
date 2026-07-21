@@ -5,6 +5,7 @@
 // exists to kill, so a lone cell defaults to [0, 1] (documented loudly).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { ON_FILL_INK } from "../../core/color.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -12,8 +13,6 @@ import { valueStepOpacity, type CellShape } from "../../shared/cell.js";
 import { heatCellGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual S4 summary — value + calibrated level. Shared with the interactive
- *  entry (one wording, no drift; ActivityGrid announcement parity). */
 export function heatCellSummary(
   value: number,
   step: number | null,
@@ -122,7 +121,11 @@ export function HeatCell(props: HeatCellProps): ReactNode {
           y={SIZE / 2}
           fontSize={fontSize}
           dominantBaseline="central"
+          style={{ fontWeight: 600 }}
           textAnchor="middle"
+          // Upper steps are opaque enough for on-fill ink (--mc-on-fill);
+          // faint cells keep stroke ink so the number doesn't wash out.
+          fill={geo.step !== null && geo.step >= steps / 2 ? ON_FILL_INK : undefined}
         >
           {text}
         </text>

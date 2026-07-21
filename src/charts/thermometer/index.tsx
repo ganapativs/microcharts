@@ -175,8 +175,7 @@ export function Thermometer(props: ThermometerProps): ReactNode {
       className={className ? `mc-thermo ${className}` : "mc-thermo"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* bulb reservoir — always full; dynamic fill → inline; width is the
-          role (orthogonal to ink), not a literal */}
+      {/* Bulb always full; fill inline, width from role. */}
       {geo.bulb ? (
         <circle
           cx={geo.bulb.cx}
@@ -186,7 +185,6 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           style={{ fill: paint, stroke: "var(--mc-neutral)" }}
         />
       ) : null}
-      {/* tube capsule — the empty channel (rounded, reads closed) */}
       <rect
         x={geo.tube.x}
         y={geo.tube.y}
@@ -205,7 +203,6 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           style={{ fill: paint }}
         />
       ) : null}
-      {/* tube outline — instrument chrome, drawn over the fill */}
       <rect
         x={geo.tube.x}
         y={geo.tube.y}
@@ -222,10 +219,7 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           style={{ strokeOpacity: 0.7 }}
         />
       ) : null}
-      {/* target line — across the tube (distinct shape), accent via the flag
-          role. Literal width (justified): sits between the tube outline and
-          full data ink so it reads as a goal marker, not the primary fill —
-          no support/tick/hair ratio lands there. */}
+      {/* Target tick: flag role + literal width (between outline and data ink). */}
       {geo.targetTick ? (
         <line
           x1={geo.targetTick.x1}

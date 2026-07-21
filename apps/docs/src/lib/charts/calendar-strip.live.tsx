@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { CalendarStrip } from "@microcharts/react/calendar-strip";
 import { CalendarStrip as CalendarStripInteractive } from "@microcharts/react/calendar-strip/interactive";
 import staticModule, { playground as staticPlayground, DATA, END } from "./calendar-strip";
 
@@ -58,6 +59,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: CalendarStrip,
+  ChartLive: CalendarStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

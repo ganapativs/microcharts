@@ -176,7 +176,6 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
         height={height}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus tick is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
         {active !== null ? mark(active, false) : null}
         {rest.children}

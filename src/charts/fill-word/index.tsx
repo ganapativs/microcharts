@@ -104,7 +104,6 @@ export function FillWord(props: FillWordProps): ReactNode {
           <text {...textProps} data-mc-ink="label" style={{ fillOpacity: 0.4 }}>
             {word}
           </text>
-          {/* the accent copy, clipped to the value fraction of its own extent */}
           <text {...textProps} data-mc-ink="accent" style={{ clipPath: geo.clip ?? undefined }}>
             {word}
           </text>

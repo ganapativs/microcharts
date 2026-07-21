@@ -115,7 +115,7 @@ export const contexts: ChartContexts = {
         — 68% through, waxing past half.
       </p>
     ),
-    code: "<p>\n  Sprint progress <MoonPhase value={0.68} /> — 68% through, waxing past half.\n</p>",
+    code: '<p>\n  Sprint progress{" "}\n  <span className="mc-inline">\n    <MoonPhase value={0.68} summary={false} />\n  </span>{" "}\n  — 68% through, waxing past half.\n</p>',
   },
   cell: {
     render: () => (

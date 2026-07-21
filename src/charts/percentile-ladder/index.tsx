@@ -12,7 +12,6 @@ import { labelFitsY } from "../../core/labels.js";
 import { percentileLadderGeometry, type PercentileLadderGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual ladder summary. Shared with the interactive entry. */
 export function ladderSummary(
   geo: PercentileLadderGeometry,
   fmt: (n: number) => string,

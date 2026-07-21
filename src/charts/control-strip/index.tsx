@@ -19,7 +19,6 @@ import {
   type ControlRules,
 } from "./geometry.js";
 
-/** Factual control summary. Shared with the interactive entry. */
 export function controlSummary(
   geo: ControlGeometry,
   fmt: (n: number) => string,
@@ -157,12 +156,10 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
       style={style}
     >
       {ann.under}
-      {/* control band — the in-control zone */}
       {geo.degenerate ? null : (
         <rect x={0} y={geo.band.y} width={width} height={geo.band.height} data-mc-ink="band" />
       )}
-      {/* provisional limits (n < 10) get a dashed outline — a separate muted
-          rect: the band role's `stroke: none` would override stroke attributes */}
+      {/* Provisional limits (n<10): dashed outline (band role kills stroke). */}
       {geo.degenerate || geo.reliable ? null : (
         <rect
           x={0}
@@ -176,7 +173,6 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       )}
-      {/* center hairline */}
       <line
         x1={0}
         y1={geo.center.y}
@@ -187,7 +183,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
         strokeOpacity={0.55}
         vectorEffect="non-scaling-stroke"
       />
-      {/* faint connecting line — points carry the story, not the path */}
+
       <path
         d={geo.line.d}
         data-mc-ink="data"
@@ -210,10 +206,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
           />
         ) : null,
       )}
-      {/* out-of-control points — ringed negative dot (ring = shape cue), flat
-          siblings (no per-point <g>). The ring is a hollow NEGATIVE stroke —
-          no ink role expresses that (the negative role fills), so it stays a
-          literal stroke; width still comes from the shared role. */}
+      {/* OOC: negative ring stroke (role fills; no ink role for hollow ring). */}
       {geo.points.flatMap((p) =>
         dots === "none"
           ? []

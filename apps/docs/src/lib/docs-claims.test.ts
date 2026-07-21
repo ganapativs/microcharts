@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { CATALOG, SIZE, BENCH } from "./docs-facts";
+import { CATALOG, SIZE, BENCH, SIZE_MARKETING } from "./docs-facts";
 
 // Guide MDX = the top-level docs pages (charts/** is owned by the chart shells).
 const dir = resolve(process.cwd(), "content/docs");
@@ -13,12 +13,22 @@ const bySrc = (name: string) => guides.find((g) => g.f === name)?.src ?? "";
 // Literals that were true once and silently rotted. If any reappears, a claim
 // has drifted from the measured catalog again — regenerate, don't hand-edit.
 const FORBIDDEN: { pattern: RegExp; why: string }[] = [
-  { pattern: /~?1\s*kB each/i, why: "false size claim — use ~1–4 kB, not '1 kB each'" },
+  {
+    pattern: /~?1\s*kB each/i,
+    why: `false size claim — use "${SIZE_MARKETING}", not '1 kB each'`,
+  },
   {
     pattern: /0\.95[–-]/,
-    why: "stale size literal — marketing uses ~1–4 kB; measured min lives in performance.mdx",
+    why: `stale size literal — marketing uses "${SIZE_MARKETING}"; measured mins live in performance.mdx`,
   },
-  { pattern: /1–3\.9\s*kB/i, why: "stale rounded size span — use ~1–4 kB in marketing prose" },
+  {
+    pattern: /1–3\.9\s*kB/i,
+    why: `stale rounded size span — use "${SIZE_MARKETING}" in marketing prose`,
+  },
+  {
+    pattern: /~1–4\s*kB(?:\s+gzip)?(?!\s*static)/i,
+    why: `stale static-only band — use "${SIZE_MARKETING}" (interactive first)`,
+  },
   { pattern: /\b98\s+charts\b/, why: "stale catalog count" },
   { pattern: /\b100\s+chart(?: type)?s?\b/, why: "stale catalog count" },
   { pattern: /^#+\s+The five\s*$/m, why: "heading mismatched its four-context grid" },
@@ -49,22 +59,20 @@ describe("docs guide claims stay true", () => {
   });
 
   // performance.mdx quotes the precise measured size stats (min/max/median);
-  // marketing guides use a durable "~1–4 kB" band. Precise literals are
-  // hand-typed (frontmatter/prose can't import docs-facts), so this test is
-  // what keeps them from silently rotting — regenerate from SIZE, never
-  // hand-edit past a drift.
+  // marketing guides use SIZE_MARKETING. Precise literals are hand-typed
+  // (frontmatter/prose can't import docs-facts), so this test is what keeps
+  // them from silently rotting — regenerate from SIZE, never hand-edit past a drift.
   it("performance.mdx quotes the precise measured size stats", () => {
     const src = bySrc("performance.mdx");
+    expect(src).toContain(`${SIZE.interactiveMin} kB and ${SIZE.interactiveMax} kB`);
+    expect(src).toContain(`median of ${SIZE.interactiveMedian} kB`);
     expect(src).toContain(`${SIZE.min} kB and ${SIZE.max} kB`);
     expect(src).toContain(`median of ${SIZE.median} kB`);
-    // The interactive-entry median is hand-typed in prose too — guard it so it
-    // can't silently drift from the measured value the way it did once before.
-    expect(src).toContain(`median ${SIZE.interactiveMedian} kB`);
   });
 
   it("index.mdx quotes the durable marketing size band", () => {
     const src = bySrc("index.mdx");
-    expect(src).toContain("~1–4 kB gzip");
+    expect(src).toContain(SIZE_MARKETING);
     expect(src).not.toMatch(/\d\.\d+–\d+(\.\d+)?\s*kB/);
   });
 

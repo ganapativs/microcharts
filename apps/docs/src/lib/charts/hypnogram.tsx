@@ -218,7 +218,7 @@ export const contexts: ChartContexts = {
         — two deep blocks, REM before wake.
       </p>
     ),
-    code: "<p>\n  Last night&apos;s sleep <Hypnogram data={sleep} states={states} width={90} height={20} /> — two deep blocks.\n</p>",
+    code: '<p>\n  Last night&apos;s sleep{" "}\n  <span className="mc-inline">\n    <Hypnogram data={sleep} states={states} width={90} height={20} summary={false} />\n  </span>{" "}\n  — two deep blocks.\n</p>',
   },
   cell: {
     render: () => (

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ActivityGrid } from "@microcharts/react/activity-grid";
 import { ActivityGrid as ActivityGridInteractive } from "@microcharts/react/activity-grid/interactive";
 import staticModule, {
   entry,
@@ -51,6 +52,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ActivityGrid,
+  ChartLive: ActivityGridInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

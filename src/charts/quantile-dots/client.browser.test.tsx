@@ -8,13 +8,22 @@ const key = (el: HTMLElement, k: string) =>
   el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
 
 describe("interactive <QuantileDots>", () => {
+  it("idle with a prop threshold shows HTML odds, not a sticky chip", async () => {
+    const screen = await render(
+      <QuantileDots data={UNIFORM} threshold={15} side="above" title="Bus wait" />,
+    );
+    const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;
+    expect(wrap.querySelector(".mc-spark-readout")).toBeNull();
+    expect(wrap.querySelector(".mc-quantile-dots-odds")?.textContent).toBe("5 in 20");
+  });
+
   it("the probe: hovering recomputes the count past the live threshold", async () => {
     const screen = await render(
       <QuantileDots data={UNIFORM} threshold={15} side="above" title="Bus wait" />,
     );
     const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;
-    const r = wrap.getBoundingClientRect();
-    // hover near the right edge → few dots above
+    const svg = wrap.querySelector("svg")!;
+    const r = svg.getBoundingClientRect();
     wrap.dispatchEvent(
       new PointerEvent("pointermove", {
         bubbles: true,
@@ -24,26 +33,46 @@ describe("interactive <QuantileDots>", () => {
     );
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toMatch(/^\d+ in 20 chances above /);
-    // the readout chip reports the live odds + probe side/threshold
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
       .toMatch(/^\d+ in 20 above \d+/);
+    // Idle HTML odds hide while probing (chip carries the readout).
+    expect(wrap.querySelector(".mc-quantile-dots-odds")).toBeNull();
   });
 
-  // Regression: the crosshair line is drawn inside the static at the true
-  // viewBox scale — which includes the "N in count" label gutter. If the client
-  // computes its geometry without the gutter, its `totalWidth` is short and the
-  // pointer→line map runs at a different scale than the cursor, so the line
-  // drifts increasingly left as you move right. Assert unit tracking:
-  // the line must move ~1px per cursor px across the plot (CSS-independent).
-  it("readout chip and crosshair line share the gutter-aware width basis", async () => {
+  it("viewBox width stays at the plot width while probing (no gutter reflow)", async () => {
+    const screen = await render(
+      <QuantileDots data={UNIFORM} threshold={15} side="above" width={120} title="Bus wait" />,
+    );
+    const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;
+    const svg = wrap.querySelector("svg")!;
+    const vb = () => Number(svg.getAttribute("viewBox")!.split(" ")[2]);
+    expect(vb()).toBe(120);
+
+    const sr = svg.getBoundingClientRect();
+    const at = (frac: number) =>
+      wrap.dispatchEvent(
+        new PointerEvent("pointermove", {
+          bubbles: true,
+          clientX: sr.left + sr.width * frac,
+          clientY: sr.top + sr.height / 2,
+        }),
+      );
+    at(0.2);
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
+    expect(vb()).toBe(120);
+    at(0.85);
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toMatch(/above/);
+    expect(vb()).toBe(120);
+  });
+
+  it("readout chip and crosshair line share the plot width basis", async () => {
     const screen = await render(
       <QuantileDots data={UNIFORM} threshold={15} side="above" width={120} title="Bus wait" />,
     );
     const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;
     const svg = wrap.querySelector("svg")!;
     const sr = svg.getBoundingClientRect();
-    // hover at 40% across — inside the plot, left of the label gutter
     wrap.dispatchEvent(
       new PointerEvent("pointermove", {
         bubbles: true,
@@ -53,19 +82,13 @@ describe("interactive <QuantileDots>", () => {
     );
     await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
 
-    // The crosshair line is drawn in the STATIC's viewBox (gutter-aware).
-    // The readout chip is positioned by the CLIENT's `left: %`. Both must use
-    // the SAME totalWidth basis, else the line drifts from the readout/cursor.
     const vbWidth = Number(svg.getAttribute("viewBox")!.split(" ")[2]);
     const line = wrap.querySelector('line[data-mc-ink="muted"]') as SVGLineElement;
     const lineFrac = Number(line.getAttribute("x1")) / vbWidth;
     const chip = wrap.querySelector(".mc-spark-readout") as HTMLElement;
     const chipFrac = parseFloat(chip.style.left) / 100;
-    // pre-fix: client totalWidth = width (no gutter) < static viewBox width, so
-    // chipFrac ran ahead of lineFrac by the gutter ratio (~0.33). Now they match.
     expect(Math.abs(lineFrac - chipFrac)).toBeLessThan(0.02);
-    // and the gutter really is present (viewBox wider than the plot `width`)
-    expect(vbWidth).toBeGreaterThan(120);
+    expect(vbWidth).toBe(120);
   });
 
   it("Escape returns the probe to the prop threshold", async () => {
@@ -74,8 +97,7 @@ describe("interactive <QuantileDots>", () => {
     wrap.focus();
     key(wrap, "ArrowLeft");
     key(wrap, "Escape");
-    // no crash; static threshold count (5 in 20) still reachable via the label
-    expect(wrap.querySelector(".mc-quantile-dots") || wrap.querySelector("svg")).toBeTruthy();
+    expect(wrap.querySelector(".mc-quantile-dots-odds")?.textContent).toBe("5 in 20");
   });
 
   it("onActive reports the focused quantile bin (column index + mass); null once cleared", async () => {
@@ -86,7 +108,6 @@ describe("interactive <QuantileDots>", () => {
     const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    // index is the quantile COLUMN (bin) index; value the dots stacked in it.
     expect(seen.at(-1)).toMatchObject({ index: 0 });
     expect(seen.at(-1)!.value).toBeGreaterThan(0);
     key(wrap, "Escape");
@@ -104,7 +125,6 @@ describe("interactive <QuantileDots>", () => {
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
     expect(picks.at(-1)).toMatchObject({ index: 1 });
-    // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('line[data-mc-ink="accent"]'))

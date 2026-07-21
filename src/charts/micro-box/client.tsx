@@ -177,7 +177,6 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus rule is transient. */}
         {selected !== null && selected !== active ? rule(selected, true) : null}
         {active !== null ? rule(active, false) : null}
         {rest.children}

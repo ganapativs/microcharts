@@ -34,7 +34,7 @@ export function seriesPair(labels: readonly (string | undefined)[] | undefined):
   return [labels?.[0] || DEFAULT_SERIES_LABELS[0], labels?.[1] || DEFAULT_SERIES_LABELS[1]];
 }
 
-/** Factual lead summary — leader, current gap, and where the lines last crossed. */
+/** Leader, gap, and last crossover. */
 export function spreadBandSummary(
   geo: SpreadBandGeometry,
   labels: readonly [string, string],

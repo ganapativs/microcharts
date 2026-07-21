@@ -59,6 +59,7 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
     <span
       ref={hostRef}
       className="mc-trend-live"
+      data-mc-host=""
       data-pulse={pulse ? "1" : undefined}
       {...named(label)}
       onClick={pick}

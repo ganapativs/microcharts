@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { CoverageStrip } from "@microcharts/react/coverage-strip";
 import { CoverageStrip as CoverageStripInteractive } from "@microcharts/react/coverage-strip/interactive";
 import staticModule, { playground as staticPlayground, COVERAGE } from "./coverage-strip";
 
@@ -52,6 +53,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: CoverageStrip,
+  ChartLive: CoverageStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

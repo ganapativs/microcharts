@@ -2,6 +2,7 @@ import type { MDXComponents } from "mdx/types";
 import type { FC } from "react";
 import dynamic from "next/dynamic";
 import { getMDXComponents } from "@/components/mdx";
+import * as chartTagsLive from "@/components/mdx-chart-tags-live";
 import { Sizing } from "@/components/charts/sizing";
 import { Usage } from "@/components/charts/usage";
 import { PropTable } from "@/components/charts/prop-table";
@@ -20,15 +21,14 @@ const FourContexts = dynamic(() =>
 
 /**
  * The full MDX map for the **chart route** (`/docs/charts` + every chart page).
- * It is the shared guide-safe base plus everything that intentionally pulls the
- * 106-chart component `registry` — `Sizing`, `Usage`, `PropTable`,
- * `ChartChooser`, `Playground`, and the full slug-driven `FourContexts`. Only
- * chart pages render these, so only the chart route pays for the chart graph;
- * text guides use the leaner `getMDXComponents` / `getGuideMDXComponents`.
+ * Chart tags are the `/interactive` twins (RSC children are opaque, so a
+ * post-hoc swap cannot rewrite static MDX demos). Guides keep the lean static
+ * map via `getMDXComponents` / `getGuideMDXComponents`.
  */
 export function getChartMDXComponents(components?: MDXComponents) {
   return {
     ...getMDXComponents(),
+    ...chartTagsLive,
     Sizing,
     Usage,
     PropTable,

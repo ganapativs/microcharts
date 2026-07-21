@@ -170,7 +170,7 @@ export const contexts: ChartContexts = {
         — four events, largest severity in February.
       </p>
     ),
-    code: "<p>\n  Incidents this quarter <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} /> — four events, largest severity in February.\n</p>",
+    code: '<p>\n  Incidents this quarter{" "}\n  <span className="mc-inline">\n    <Constellation data={[{ x: 0, y: 40, m: 2 }, { x: 2, y: 90, m: 7 }]} summary={false} />\n  </span>{" "}\n  — four events, largest severity in February.\n</p>',
   },
   cell: {
     render: () => (

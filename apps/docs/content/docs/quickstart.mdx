@@ -7,7 +7,94 @@ description:
 
 ## Set up
 
-Two steps, once, at your app root — and you're set.
+Prefer an agent — paste the prompt once. It installs the package, imports the stylesheet at your app root, records the
+conventions in your agent-rules file, and verifies with a first chart. Or do the two steps yourself under
+[Set up manually](#set-up-manually).
+
+### Set up with an AI agent
+
+Hand the prompt below to your coding agent — **Cursor, Claude Code, GitHub Copilot, Codex**, or any model, large or
+small. Works on a fresh repo or an existing one. It's also served verbatim at [`/agent-setup.md`](/agent-setup.md).
+
+<div className="agent-prompt">
+
+```md title="Paste into your agent"
+Set up **@microcharts/react** in this repo — word-sized, zero-dependency React charts (React 18 or 19 peer, ESM-only).
+Complete every step in order; don't stop to ask.
+
+## 1 · Install
+
+- If this repo is not already a React 18/19 app, scaffold one first (Vite `react-ts` or Next.js), then continue.
+- Install `@microcharts/react` with this repo's package manager.
+- Import the stylesheet once at the app root (both package + stylesheet are required):
+  - Next.js App Router: `app/layout.tsx`
+  - Next.js Pages Router: `pages/_app.tsx`
+  - Vite / other React apps: the entry file (e.g. `src/main.tsx`) `import "@microcharts/react/styles.css"`
+- Charts inherit the page font. If labels look like a serif fallback, set `:root { --mc-font: system-ui, sans-serif; }`.
+
+## 2 · Docs — fetch small, on demand
+
+- https://microcharts.dev/llms.txt — index: every chart + guide links. Read this now.
+- https://microcharts.dev/catalog.json — full API. Do **not** read the whole file. Find the chart by `slug`, then use
+  `sharedProps` + that chart's `props`. If the chart has `sharedInteractive` / the document has `howToRead`, follow
+  those; otherwise use the chart's `.md` for interactive callbacks. Never invent props.
+- https://microcharts.dev/docs/charts/<slug>.md — one chart's page (import path, edge cases). Fetch only for charts you
+  use — pick the slug from the index.
+- https://microcharts.dev/docs/quickstart.md — grammar + interactive contract, if you need more than the rules below.
+
+If you can't fetch URLs, skip this step — the rules below are enough to render a first chart correctly.
+
+## 3 · Record the conventions
+
+Append the rules below as a `## microcharts` section in `AGENTS.md` (create the file if missing — Cursor, Copilot, and
+Codex read it). If this repo uses Claude Code, mirror it: `ln -s AGENTS.md CLAUDE.md` on macOS/Linux, or copy the
+section into `CLAUDE.md` on Windows.
+
+- One chart = one subpath import, e.g. `import { Sparkline } from "@microcharts/react/sparkline"`. The default export is
+  static — RSC-safe, zero client JS. Add `/interactive` only when hover, keyboard, touch, or selection is needed. That
+  entry is a client component: in Next.js App Router, import it from a `"use client"` file. WindBarb is static-only.
+- `data` alone always renders; single-value charts take `value` instead. Shared prop names mean the same thing
+  everywhere — see `sharedProps` in `/catalog.json`. Chart-specific props and callbacks live on the chart's catalog
+  entry and its `.md` page; don't memorize them.
+- Interactive entries share one contract: hover/arrows activate; click/tap/Enter/Space select; Escape clears. Prefer
+  each chart's `sharedInteractive` list when present (lean scalars may take only `onSelect`; MinimapStrip uses
+  `onWindowChange` in chart `props`). For entrance motion: pass `animate` and import `@microcharts/react/motion` once on
+  the client.
+- `null`, `NaN`, or non-finite values in `data` are gaps, never zeros.
+- Accessibility is automatic (`role="img"` + a generated summary). Inline in a sentence: wrap in
+  `<span className="mc-inline">` and pass `summary={false}`.
+- Theme with `--mc-*` or `data-mc-theme` (omit for default), or `defineTheme` from `@microcharts/react/theme`. Charts
+  paint no background. Prefer tokens; `color` / categorical `colors[]` are valid when the chart's docs say so.
+- Annotations are children: `Threshold`, `TargetZone`, `Marker`, `Callout` from `@microcharts/react/annotations`.
+- Never add another charting dependency. No pie or gauge — use `Bullet`, `SegmentedBar`, or `MicroDonut`.
+
+## 4 · Verify
+
+Render `<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />` in a real page, then run the dev server or
+build. Self-check:
+
+- Chart missing or unstyled → the styles.css import isn't at the root (step 1).
+- Labels render in a serif font → set `--mc-font` (step 1).
+
+Finish with a short report: the installed version, the file importing styles.css, the file holding the conventions, and
+the page rendering the test chart.
+```
+
+<AgentPromptCopy />
+
+</div>
+
+The prompt fetches small, targeted files — the [`/llms.txt`](/llms.txt) index first, then one chart's `.md` page at a
+time — so it stays inside the context window of smaller models and works from today's real API instead of a memorized
+guess. The rules are inlined too, so it still works when the agent can't reach the network.
+
+### Set up manually
+
+Two steps, once, at your app root — package plus stylesheet. Both are required.
+
+<Accordions type="single">
+
+<Accordion title="Install the package and import styles.css">
 
 **1 · Install.** React 18 or 19 is a peer dependency; there are no other runtime dependencies.
 
@@ -51,92 +138,6 @@ import "@microcharts/react/styles.css";
 Full detail — why it inherits, and per-scope fonting — in [Theming](/docs/theming#the-font).
 
 </Callout>
-
-### Set up with an AI agent
-
-Prefer to automate it? Hand the prompt below to your coding agent — **Cursor, Claude Code, GitHub Copilot, Codex**, or
-any model, large or small. It runs the two steps above, pulls just the doc pages it needs, records the conventions in
-your repo's agent-rules file, and renders a first chart to verify. Works on a fresh repo or an existing one. It's also
-served verbatim at [`/agent-setup.md`](/agent-setup.md).
-
-<Accordions type="single">
-
-<Accordion title="The setup prompt — paste into your agent">
-
-<div className="agent-prompt">
-
-```md title="Paste into your agent"
-Set up **@microcharts/react** in this repo — word-sized, zero-dependency React charts (React 18 or 19 peer, ESM-only).
-Complete every step in order; don't stop to ask.
-
-## 1 · Install
-
-- Install `@microcharts/react` with this repo's package manager.
-- Import the stylesheet once, at the app root — Next.js: `app/layout.tsx`; Vite or other React apps: the entry file
-  (e.g. `src/main.tsx`): `import "@microcharts/react/styles.css"`
-
-## 2 · Docs — fetch small, on demand
-
-- https://microcharts.dev/llms.txt — the index: every chart with a one-line "when to use", plus guide links. Read this
-  one now.
-- https://microcharts.dev/docs/charts/<slug>.md — one chart's full page (exact import path, props, edge cases). Fetch
-  only for charts you actually use — pick the slug from the index.
-- https://microcharts.dev/docs/quickstart.md — setup + the shared grammar, if you need more than the rules below.
-- https://microcharts.dev/catalog.json — the whole API as JSON. Large; for programmatic use, don't read it whole.
-
-If you can't fetch URLs, skip this step — the rules below are enough to render correct charts.
-
-## 3 · Record the conventions
-
-Append the rules below as a `## microcharts` section in `AGENTS.md` (create the file if missing — Cursor, Copilot, and
-Codex read it). If this repo uses Claude Code, mirror it: `ln -s AGENTS.md CLAUDE.md` on macOS/Linux, or copy the
-section into `CLAUDE.md` on Windows.
-
-- One chart = one import, e.g. `import { Sparkline } from "@microcharts/react/sparkline"`. The default export is static
-  — RSC-safe, zero client JS. Add `/interactive` to the path only when hover, keyboard, touch, or selection is needed
-  (that entry is a client component). WindBarb is static-only.
-- `data` alone always renders; single-value charts (Delta, Progress, StatusDot, TrendArrow, …) take `value` instead. The
-  same props mean the same thing on every chart: `data`, `domain`, `color`, `title`, `summary`, `format`, `positive`,
-  `label`, `dots`. Chart-specific props live on each chart's `.md` page.
-- Interactive entries share one interaction contract. Hover or arrows make a unit active; click, tap, Enter or Space
-  selects and pins it; Escape clears; Home/End jump to the ends. Read values with `onActive(datum)` and
-  `onSelect(datum)` — the payload is `{ index, value, label? }` — and control the pin with `selectedIndex` /
-  `defaultSelectedIndex`. Never attach your own per-point handlers or wrap a chart in a click target; the chart owns the
-  whole gesture surface. Single-unit scalar charts (Delta, Progress, StatusDot, Bullet, …) take `onSelect` only.
-  MinimapStrip is a range slider with `onWindowChange([lo, hi])` instead.
-- `null` or `NaN` in `data` is a gap, never a zero.
-- Accessibility is automatic (`role="img"` + a summary generated from the data). Inline in a sentence: wrap the mark in
-  `<span className="mc-inline">` and pass `summary={false}`.
-- Theme with `--mc-*` variables or a preset attribute `data-mc-theme="editorial | mono | vivid | dark | print | eink"` —
-  omit the attribute entirely for the default look — or `defineTheme` from `@microcharts/react/theme` for a derived
-  palette. Never hardcode colors; charts paint no background — place them on a surface with contrast.
-- `width` and `height` are viewBox units on the charts that take them; fill a container with
-  `style={{ width: "100%", height: "auto" }}`. Fixed-glyph charts (Delta, StatusDot, TrendArrow, …) have no `width` —
-  size them with `style` or CSS.
-- Format numbers with one `format` prop (`Intl.NumberFormatOptions` or `(n) => string`) plus `locale`. Fix the scale
-  with `domain={[min, max]}`. Share one scale across small multiples with `SparkGroup`.
-- Annotations are children: `Threshold`, `TargetZone`, `Marker`, `Callout` from `@microcharts/react/annotations`.
-- Never add another charting dependency. No pie or gauge — use `Bullet`, `SegmentedBar`, or `MicroDonut`.
-
-## 4 · Verify
-
-Render `<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />` in a real page, then run the dev server or
-build. Self-check:
-
-- Chart missing or unstyled → the styles.css import isn't at the root (step 1).
-- Labels render in a serif font → the page sets no `font-family`; add `:root { --mc-font: system-ui, sans-serif; }`.
-
-Finish with a short report: the installed version, the file importing styles.css, the file holding the conventions, and
-the page rendering the test chart.
-```
-
-<AgentPromptCopy />
-
-</div>
-
-The prompt fetches small, targeted files — the [`/llms.txt`](/llms.txt) index first, then one chart's `.md` page at a
-time — so it stays inside the context window of smaller models and works from today's real API instead of a memorized
-guess. The rules are inlined too, so it still works when the agent can't reach the network.
 
 </Accordion>
 

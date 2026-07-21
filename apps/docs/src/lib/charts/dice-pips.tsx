@@ -102,7 +102,7 @@ export const contexts: ChartContexts = {
         — rated 4 of 6, elevated but not critical.
       </p>
     ),
-    code: "<p>\n  Incident severity <DicePips value={4} /> — rated 4 of 6, elevated but not critical.\n</p>",
+    code: '<p>\n  Incident severity{" "}\n  <span className="mc-inline">\n    <DicePips value={4} summary={false} />\n  </span>{" "}\n  — rated 4 of 6, elevated but not critical.\n</p>',
   },
   cell: {
     render: () => (

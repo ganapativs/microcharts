@@ -117,7 +117,7 @@ export const contexts: ChartContexts = {
         — 62% of the file transferred.
       </p>
     ),
-    code: '<p>\n  Upload progress <FillWord word="loading" value={0.62} /> — 62% of the file transferred.\n</p>',
+    code: '<p>\n  Upload progress{" "}\n  <span className="mc-inline">\n    <FillWord word="loading" value={0.62} summary={false} />\n  </span>{" "}\n  — 62% of the file transferred.\n</p>',
   },
   cell: {
     render: () => (

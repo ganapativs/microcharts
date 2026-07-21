@@ -136,7 +136,7 @@ export const contexts: ChartContexts = {
         — 23 collected, 27 to goal.
       </p>
     ),
-    code: "<p>\n  Petition signatures <TallyMarks value={12} /> — 23 collected, 27 to goal.\n</p>",
+    code: '<p>\n  Petition signatures{" "}\n  <span className="mc-inline">\n    <TallyMarks value={12} summary={false} />\n  </span>{" "}\n  — 23 collected, 27 to goal.\n</p>',
   },
   cell: {
     render: () => (

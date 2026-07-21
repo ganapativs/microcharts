@@ -230,7 +230,6 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {selected !== null && selected !== active ? crosshair(selected, true) : null}
         {active !== null ? crosshair(active, false) : null}
         {rest.children}

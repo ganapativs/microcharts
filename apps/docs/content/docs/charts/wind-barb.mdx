@@ -97,6 +97,7 @@ is five.
 <LiveDemo
   label="negative magnitude flips the bearing 180° (dev warning, not an error)"
   code={`<WindBarb direction={90} magnitude={-25} />`}
+  expectWarn
 >
   <WindBarb direction={90} magnitude={-25} title="Flipped" size={40} />
 </LiveDemo>

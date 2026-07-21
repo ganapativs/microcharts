@@ -11,6 +11,7 @@ import {
   Square,
 } from "lucide-react";
 import type { ChartCollection } from "@/lib/charts/types";
+import { SetupWithAi } from "@/components/ui/setup-with-ai";
 import { setGalleryMode } from "./gallery-mode";
 import { useGalleryDock } from "./use-gallery-dock";
 
@@ -153,6 +154,7 @@ export function GalleryDockBar({
         <span className="g2-dock-count" role="status" aria-live="polite">
           {shown !== null && shown !== total ? shown : total}
         </span>
+        <SetupWithAi variant="chip" />
         <button
           type="button"
           className="g2-icon-btn g2-top"

@@ -210,7 +210,7 @@ export const contexts: ChartContexts = {
         — net positive for the third month.
       </p>
     ),
-    code: "<p>\n  Monthly cash flow <NetFlow data={months} /> — net positive for the third month.\n</p>",
+    code: '<p>\n  Monthly cash flow{" "}\n  <span className="mc-inline">\n    <NetFlow data={months} summary={false} />\n  </span>{" "}\n  — net positive for the third month.\n</p>',
   },
   cell: {
     render: () => (

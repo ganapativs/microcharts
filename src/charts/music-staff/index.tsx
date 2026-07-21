@@ -97,9 +97,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
           style={{ strokeOpacity: 0.7 }}
         />
       ) : null}
-      {/* melodic contour — a whisper of a line through the notes in time order, so
-          the SHAPE of the tune (rise/fall) reads at a glance; the noteheads stay
-          the precise marks, this is only the second-read guide */}
+      {/* Contour line — shape only; noteheads carry the values. */}
       {geo.notes.length >= 2 ? (
         <path
           d={geo.notes

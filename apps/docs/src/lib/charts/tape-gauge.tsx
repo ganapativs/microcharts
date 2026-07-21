@@ -207,7 +207,7 @@ export const contexts: ChartContexts = {
         — 142 knots, rising into caution band.
       </p>
     ),
-    code: '<p>\n  Airspeed reading <TapeGauge value={142} rate={1} zones={zones} span={60} orientation="horizontal" /> — 142 knots, rising into caution band.\n</p>',
+    code: '<p>\n  Airspeed reading{" "}\n  <span className="mc-inline">\n    <TapeGauge value={142} rate={1} zones={zones} span={60} orientation="horizontal" summary={false} />\n  </span>{" "}\n  — 142 knots, rising into caution band.\n</p>',
   },
   cell: {
     render: () => (

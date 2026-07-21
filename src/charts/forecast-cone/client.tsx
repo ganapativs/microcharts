@@ -198,7 +198,6 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {selected !== null && selected !== active ? dot(selected, true) : null}
         {p ? (
           <line

@@ -13,7 +13,6 @@ import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retentio
 import { retentionGeometry, type RetentionCurveType, type RetentionGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual retention summary. Shared with the interactive entry. */
 export function retentionSummary(
   geo: RetentionGeometry,
   fmt: (n: number) => string,
@@ -160,7 +159,6 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
       style={rootStyle}
     >
       {ann.under}
-      {/* benchmark ghost — dashed + muted, subordinate by construction */}
       {geo.ghost ? (
         <path
           d={geo.ghost.d}
@@ -171,7 +169,6 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* plateau marker — dotted horizontal, only when the criterion holds */}
       {geo.plateau ? (
         <line
           x1={geo.plateau.fromX}

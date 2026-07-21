@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Slope } from "@microcharts/react/slope";
 import { Slope as SlopeInteractive } from "@microcharts/react/slope/interactive";
 import staticModule, { playground as staticPlayground, RANKS } from "./slope";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Slope,
+  ChartLive: SlopeInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

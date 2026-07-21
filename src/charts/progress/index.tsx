@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
-import { labelFitsBand } from "../../core/labels.js";
+import { labelFont, labelFitsBand } from "../../core/labels.js";
 import { progressGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -103,7 +103,7 @@ export function Progress(props: ProgressProps): ReactNode {
   } = props;
 
   const model = progressModel(props);
-  const fontSize = Math.max(6, Math.min(Math.round(height * 0.75), 11));
+  const fontSize = labelFont(height, 0.75);
   // Degrade, don't overlap: the percent is centred on the track's midline, so
   // below one em of box height its em-box crosses the viewBox edge. Drop it —
   // and with it the gutter, since `progressGeometry` hangs the gutter off the

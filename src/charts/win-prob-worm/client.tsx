@@ -171,7 +171,6 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {selected !== null && selected !== active ? crosshair(selected, true) : null}
         {active !== null ? crosshair(active, false) : null}
         {rest.children}

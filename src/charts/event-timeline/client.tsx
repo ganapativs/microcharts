@@ -217,7 +217,6 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {pinned ? outline(pinned, true) : null}
         {active !== null && ordered[active] ? outline(ordered[active]!, false) : null}
         {rest.children}

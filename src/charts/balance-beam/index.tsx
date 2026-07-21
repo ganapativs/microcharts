@@ -179,9 +179,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
       className={className ? `mc-beam ${className}` : "mc-beam"}
       style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
     >
-      {/* fulcrum */}
       <path d={geo.fulcrum} data-mc-ink="neutral" />
-      {/* beam */}
       <line
         x1={geo.beam.x1}
         y1={geo.beam.y1}
@@ -189,12 +187,10 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
         y2={geo.beam.y2}
         data-mc-ink="data"
       />
-      {/* area-true weights — the heavier pan carries the accent. An unknown pan
-          draws NO weight: a missing value is not a weightless one, and the bare
-          fulcrum + level beam read as "nothing to weigh" rather than as zero. */}
+      {/* Heavier pan = accent. Unknown pan: no weight mark (missing ≠ zero). */}
       {geo.known[0] ? weightMark(geo.weights[0], "wl", geo.heavier === -1) : null}
       {geo.known[1] ? weightMark(geo.weights[1], "wr", geo.heavier === 1) : null}
-      {/* An unknown pan prints no numeral either — there is no value to print. */}
+
       {showValues
         ? ([l, r] as (BeamDatum | undefined)[]).map((d, i) =>
             geo.known[i] ? (

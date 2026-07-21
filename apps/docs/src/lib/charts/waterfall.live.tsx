@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Waterfall } from "@microcharts/react/waterfall";
 import { Waterfall as WaterfallInteractive } from "@microcharts/react/waterfall/interactive";
 import staticModule, { playground as staticPlayground, PL } from "./waterfall";
 
@@ -35,7 +36,7 @@ export const playground: PlaygroundSpec = {
       "  data={steps}",
       `  open={${s.open}}`,
       s.totalBar === false && "  totalBar={false}",
-      s.delta && '  label="delta"',
+      !s.delta && '  label="none"',
       s.positive !== "up" && `  positive="${s.positive}"`,
       ui.animate && " animate",
       "/>",
@@ -46,6 +47,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Waterfall,
+  ChartLive: WaterfallInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

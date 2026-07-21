@@ -10,6 +10,7 @@
 // kernel, no roving, no selection state to rove between.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
@@ -25,6 +26,14 @@ import {
 
 export interface InteractiveOrbitStatusProps extends OrbitStatusProps {
   strings?: OrbitStatusStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the glyph pops in (fade + scale)
+   * when the chart first mounts client-side — a whole-svg animation, so it
+   * never collides with the continuous orbit this entry already drives.
+   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
+   */
+  animate?: boolean;
   /** The dependency was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — value is latency. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -45,6 +54,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     strings = EN_ORBIT_STATUS,
     title,
     summary,
+    animate = false,
     className,
     style,
     onSelect,
@@ -53,6 +63,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
 
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();
+  useEntrance(wrapRef, "pop", animate);
   const geo = useMemo(
     () =>
       orbitStatusGeometry({ latency, rate, size, latencyDomain, rateDomain, threshold, pad: 1 }),

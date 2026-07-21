@@ -135,7 +135,7 @@ export const contexts: ChartContexts = {
         — on track for Friday&rsquo;s cutover.
       </p>
     ),
-    code: `<p>\n  Database migration to the new cluster is{" "}\n  <Progress value={0.68} title="Migration status" width={90} height={18} />{" "}\n  — on track for Friday's cutover.\n</p>`,
+    code: `<p>\n  Database migration to the new cluster is{" "}\n  <span className="mc-inline">\n    <Progress value={0.68} title="Migration status" width={90} height={18} summary={false} />\n  </span>\n  {" "}\n  — on track for Friday's cutover.\n</p>`,
   },
   cell: {
     render: () => (

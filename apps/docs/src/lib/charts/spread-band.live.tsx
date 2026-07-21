@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { SpreadBand } from "@microcharts/react/spread-band";
 import { SpreadBand as SpreadBandInteractive } from "@microcharts/react/spread-band/interactive";
 import staticModule, { playground as staticPlayground, PAIRS, LABELS } from "./spread-band";
 
@@ -51,6 +52,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: SpreadBand,
+  ChartLive: SpreadBandInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

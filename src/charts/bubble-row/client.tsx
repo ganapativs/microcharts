@@ -177,7 +177,6 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
@@ -188,7 +187,6 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
           className="mc-spark-readout"
           style={{ left: `${(b.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {/* chips are terse — the live region keeps the full sentence */}
           {announced.replace(/[.。]$/, "")}
         </span>
       ) : null}

@@ -167,7 +167,7 @@ export const contexts: ChartContexts = {
         — 16% of waits exceed the 15 min SLA.
       </p>
     ),
-    code: "<p>\n  Bus wait times <QuantileDots data={waits} threshold={15} /> — 16% of waits exceed the 15 min SLA.\n</p>",
+    code: '<p>\n  Bus wait times{" "}\n  <span className="mc-inline">\n    <QuantileDots data={waits} threshold={15} summary={false} />\n  </span>{" "}\n  — 16% of waits exceed the 15 min SLA.\n</p>',
   },
   cell: {
     render: () => (

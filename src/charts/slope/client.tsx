@@ -189,7 +189,6 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus line is transient. */}
         {selected !== null && selected !== active ? accentLine(selected, true) : null}
         {active !== null ? accentLine(active, false) : null}
         {rest.children}

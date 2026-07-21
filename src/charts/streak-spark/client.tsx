@@ -185,7 +185,6 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
         style={fillFor(style)}
       >
         {children}
-        {/* Pinned selection persists through pointer-leave; focus outline transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
       </StaticStreakSpark>

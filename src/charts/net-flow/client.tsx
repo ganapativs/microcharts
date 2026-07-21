@@ -77,7 +77,6 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
   const total = data.length;
   const navigable = geo !== null && !geo.degenerate;
 
-  // Pointer (viewBox space) → nearest period by x.
   const locate = useCallback(
     (x: number) => {
       if (!geo || geo.degenerate) return null;
@@ -151,7 +150,6 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection: a persistent net ring that survives pointer-leave. */}
         {sp ? (
           <circle
             cx={sp.x}

@@ -136,7 +136,7 @@ export const contexts: ChartContexts = {
         — 3 of 20 patients, 15%.
       </p>
     ),
-    code: "<p>\n  Adverse event rate <IconArray value={0.15} total={20} /> — 3 of 20 patients, 15%.\n</p>",
+    code: '<p>\n  Adverse event rate{" "}\n  <span className="mc-inline">\n    <IconArray value={0.15} total={20} summary={false} />\n  </span>{" "}\n  — 3 of 20 patients, 15%.\n</p>',
   },
   cell: {
     render: () => (

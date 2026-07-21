@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ErrorBudget } from "@microcharts/react/error-budget";
 import { ErrorBudget as ErrorBudgetInteractive } from "@microcharts/react/error-budget/interactive";
 import staticModule, { playground as staticPlayground, DEMO, WINDOW, BURNED } from "./error-budget";
 
@@ -52,6 +53,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ErrorBudget,
+  ChartLive: ErrorBudgetInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

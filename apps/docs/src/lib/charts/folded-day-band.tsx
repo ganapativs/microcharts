@@ -164,7 +164,7 @@ export const contexts: ChartContexts = {
         — afternoon peak normal; tonight runs hot.
       </p>
     ),
-    code: "<p>\n  Traffic vs typical day <FoldedDayBand data={observations} /> — afternoon peak normal; tonight runs hot.\n</p>",
+    code: '<p>\n  Traffic vs typical day{" "}\n  <span className="mc-inline">\n    <FoldedDayBand data={observations} summary={false} />\n  </span>{" "}\n  — afternoon peak normal; tonight runs hot.\n</p>',
   },
   cell: {
     render: () => (

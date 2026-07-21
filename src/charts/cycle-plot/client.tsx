@@ -297,7 +297,6 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus band is transient. */}
         {selected !== null && selected !== active ? band(selected, true) : null}
         {active !== null ? band(active, false) : null}
         {rest.children}

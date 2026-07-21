@@ -177,7 +177,6 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus band is transient. */}
         {selected !== null && selected !== active ? band(selected, true) : null}
         {active !== null ? band(active, false) : null}
         {rest.children}

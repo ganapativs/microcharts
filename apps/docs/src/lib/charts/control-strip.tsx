@@ -144,7 +144,7 @@ export const contexts: ChartContexts = {
         — in control except one excursion at t=18.
       </p>
     ),
-    code: "<p>\n  Line 3 fill weight <ControlStrip data={weights} /> — in control except one excursion at t=18.\n</p>",
+    code: '<p>\n  Line 3 fill weight{" "}\n  <span className="mc-inline">\n    <ControlStrip data={weights} summary={false} />\n  </span>{" "}\n  — in control except one excursion at t=18.\n</p>',
   },
   cell: {
     render: () => (

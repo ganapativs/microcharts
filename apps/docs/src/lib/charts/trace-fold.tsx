@@ -157,7 +157,7 @@ export const contexts: ChartContexts = {
         — 214 ms total, DB span dominates.
       </p>
     ),
-    code: "<p>\n  Request trace <TraceFold data={spans} /> — 214 ms total, DB span dominates.\n</p>",
+    code: '<p>\n  Request trace{" "}\n  <span className="mc-inline">\n    <TraceFold data={spans} summary={false} />\n  </span>{" "}\n  — 214 ms total, DB span dominates.\n</p>',
   },
   cell: {
     render: () => (

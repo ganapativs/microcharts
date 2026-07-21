@@ -169,7 +169,7 @@ export const contexts: ChartContexts = {
         — heavier bundles paint slower, r 0.93.
       </p>
     ),
-    code: `<p>\n  Bundle size and paint time{" "}\n  <MicroScatter data={pairs} height={20} /> — heavier bundles paint slower, r 0.93.\n</p>`,
+    code: `<p>\n  Bundle size and paint time{" "}\n  <span className="mc-inline">\n    <MicroScatter data={pairs} height={20} summary={false} />\n  </span>{" "}\n  — heavier bundles paint slower, r 0.93.\n</p>`,
   },
   cell: {
     render: () => (

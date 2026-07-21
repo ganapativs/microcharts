@@ -189,7 +189,6 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; probe is transient. */}
         {selected !== null && selected !== active ? probe(selected, true) : null}
         {active !== null ? probe(active, false) : null}
         {rest.children}

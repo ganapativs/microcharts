@@ -18,7 +18,6 @@ import {
 import { round2, type Polarity, type Value } from "../../core/types.js";
 import { percentileGeometry, type PercentileGeometry } from "./geometry.js";
 
-/** Factual percentile-drift summary. Shared with the interactive entry. */
 export function percentileSummary(
   geo: PercentileGeometry,
   pStr: (n: number) => string,

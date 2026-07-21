@@ -176,7 +176,7 @@ export const contexts: ChartContexts = {
         — trending down.
       </p>
     ),
-    code: `<p>\n  p95 latency this week{" "}\n  <Sparkline data={[48, 45, 44, 40, 38, 36, 33, 31]} width={64} height={16} dots="none" /> — trending down.\n</p>`,
+    code: `<p>\n  p95 latency this week{" "}\n  <span className="mc-inline">\n    <Sparkline data={[48, 45, 44, 40, 38, 36, 33, 31]} width={64} height={16} dots="none" summary={false} />\n  </span>{" "}\n  — trending down.\n</p>`,
   },
   cell: {
     render: () => (
@@ -194,7 +194,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: `<tr>\n  <td>checkout-api</td>\n  <td>\n    <Sparkline data={[48, 45, 44, 40, 38, 36, 33, 31]} width={64} height={18} dots="none" />\n  </td>\n  <td>31 ms</td>\n</tr>`,
+    code: `<tr>\n  <td>checkout-api</td>\n  <td>\n    <Sparkline data={[48, 45, 44, 40, 38, 36, 33, 31]} width={64} height={18} dots="none" summary={false} />\n  </td>\n  <td>31 ms</td>\n</tr>`,
   },
   kpi: {
     render: () => (
@@ -209,7 +209,7 @@ export const contexts: ChartContexts = {
         <Sparkline data={CONNECTIONS} summary={false} width={90} height={28} fill />
       </>
     ),
-    code: `<div className="kpi">\n  <span className="figure">1,600</span>\n  <span className="unit">concurrent, now</span>\n  <Sparkline data={[1240, 1310, 1290, 1420, 1380, 1510, 1470, 1600]} width={90} height={28} fill />\n</div>`,
+    code: `<div className="kpi">\n  <span className="figure">1,600</span>\n  <span className="unit">concurrent, now</span>\n  <Sparkline data={[1240, 1310, 1290, 1420, 1380, 1510, 1470, 1600]} width={90} height={28} fill summary={false} />\n</div>`,
   },
   tab: {
     render: () => (
@@ -229,7 +229,7 @@ export const contexts: ChartContexts = {
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  CPU <Sparkline data={[62, 65, 61, 68, 70, 66, 72, 75]} width={40} height={14} dots="none" />\n</button>`,
+    code: `<button className="tab">\n  CPU <Sparkline data={[62, 65, 61, 68, 70, 66, 72, 75]} width={40} height={14} dots="none" summary={false} />\n</button>`,
   },
 };
 

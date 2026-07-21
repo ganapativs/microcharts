@@ -168,7 +168,7 @@ export const contexts: ChartContexts = {
         — point of control at 142, value area spans 138–146.
       </p>
     ),
-    code: '<p>\n  Trades at <VolumeProfile data={profile} label="none" width={28} height={28} /> — POC 142.\n</p>',
+    code: '<p>\n  Trades at{" "}\n  <span className="mc-inline">\n    <VolumeProfile data={profile} label="none" width={28} height={28} summary={false} />\n  </span>{" "}\n  — POC 142.\n</p>',
   },
   cell: {
     render: () => (

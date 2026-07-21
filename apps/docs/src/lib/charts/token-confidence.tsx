@@ -173,7 +173,7 @@ export const contexts: ChartContexts = {
         — high on facts, dips on dates.
       </p>
     ),
-    code: "<p>\n  Model answer confidence <TokenConfidence data={tokens} /> — high on facts, dips on dates.\n</p>",
+    code: '<p>\n  Model answer confidence{" "}\n  <span className="mc-inline">\n    <TokenConfidence data={tokens} summary={false} />\n  </span>{" "}\n  — high on facts, dips on dates.\n</p>',
   },
   cell: {
     render: () => (

@@ -105,6 +105,7 @@ so the color is only a redundant cue — never the sole signal.
   label="out-of-range clamp"
   code={`// ranks are 0–100 — values outside are clamped (and dev-warn once)
 <PercentileTrace data={[102, 88, 96]} unit="week" />`}
+  expectWarn
 >
   <PercentileTrace data={[102, 88, 96]} unit="week" title="Clamped ranks" width={180} height={26} />
 </LiveDemo>

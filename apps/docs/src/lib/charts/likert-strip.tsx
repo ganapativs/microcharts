@@ -175,7 +175,7 @@ export const contexts: ChartContexts = {
         — 62% agree, 24% disagree. Leans positive.
       </p>
     ),
-    code: `<p>\n  Checkout satisfaction, Q1{" "}\n  <LikertStrip data={responses} label="none" height={16} /> — 62% agree, 24% disagree. Leans positive.\n</p>`,
+    code: `<p>\n  Checkout satisfaction, Q1{" "}\n  <span className="mc-inline">\n    <LikertStrip data={responses} label="none" height={16} summary={false} />\n  </span>{" "}\n  — 62% agree, 24% disagree. Leans positive.\n</p>`,
   },
   cell: {
     render: () => (

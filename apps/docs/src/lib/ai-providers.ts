@@ -20,6 +20,7 @@ export const PROVIDER_GROUPS: ProviderGroup[] = [
       "gemini",
       "grok",
       "deepseek",
+      "kimi",
       "meta",
       "mistral",
       "perplexity",

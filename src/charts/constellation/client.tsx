@@ -234,8 +234,6 @@ export function Constellation(props: InteractiveConstellationProps): React.React
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave (a heavier ring than
-            the transient focus one); the static halo already uses w="tick". */}
         {selStar ? (
           <circle
             cx={selStar.cx}

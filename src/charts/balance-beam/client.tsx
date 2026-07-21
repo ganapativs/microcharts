@@ -197,7 +197,6 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}

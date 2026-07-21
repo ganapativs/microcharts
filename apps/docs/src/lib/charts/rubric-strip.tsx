@@ -149,7 +149,7 @@ export const contexts: ChartContexts = {
         — 78% weighted, accuracy weakest.
       </p>
     ),
-    code: "<p>\n  Model eval scorecard <RubricStrip data={criteria} /> — 78% weighted, accuracy weakest.\n</p>",
+    code: '<p>\n  Model eval scorecard{" "}\n  <span className="mc-inline">\n    <RubricStrip data={criteria} summary={false} />\n  </span>{" "}\n  — 78% weighted, accuracy weakest.\n</p>',
   },
   cell: {
     render: () => (

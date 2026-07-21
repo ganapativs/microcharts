@@ -182,7 +182,6 @@ export function Constellation(props: ConstellationProps): ReactNode {
       {geo.connectorPath ? (
         <path d={geo.connectorPath} data-mc-ink="ghost" data-mc-w="tick" />
       ) : null}
-      {/* faint halo behind the brightest event — a star that stands out */}
       {largest ? (
         <circle
           cx={largest.cx}

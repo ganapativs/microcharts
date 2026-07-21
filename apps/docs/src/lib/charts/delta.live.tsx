@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Delta } from "@microcharts/react/delta";
 import { Delta as DeltaInteractive } from "@microcharts/react/delta/interactive";
 import staticModule, { playground as staticPlayground } from "./delta";
 
@@ -89,6 +90,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Delta,
+  ChartLive: DeltaInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

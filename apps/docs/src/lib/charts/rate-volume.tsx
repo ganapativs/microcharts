@@ -203,7 +203,7 @@ export const contexts: ChartContexts = {
         — 4.2% on 1,240 sessions this week.
       </p>
     ),
-    code: "<p>\n  Conversion rate <RateVolume data={periods} minVolume={50} /> — 4.2% on 1,240 sessions this week.\n</p>",
+    code: '<p>\n  Conversion rate{" "}\n  <span className="mc-inline">\n    <RateVolume data={periods} minVolume={50} summary={false} />\n  </span>{" "}\n  — 4.2% on 1,240 sessions this week.\n</p>',
   },
   cell: {
     render: () => (

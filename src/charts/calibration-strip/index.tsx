@@ -27,6 +27,7 @@ export interface CalibrationStripProps {
   /** `"bars"` draws signed deviation columns from the diagonal.
    * */
   mode?: "dots" | "bars" | undefined;
+  color?: string | undefined;
   width?: number | undefined;
   height?: number | undefined;
   format?: Format | undefined;
@@ -67,6 +68,7 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
     bins = 10,
     minSupport,
     mode = "dots",
+    color,
     width = 100,
     height = 32,
     format,
@@ -119,7 +121,7 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
           fillOpacity={0.35}
         />
       ))}
-      {/* identity diagonal — a reference axis (a path, not a connector line) */}
+
       <path
         d={`M${geo.diagonal.x1} ${geo.diagonal.y1}L${geo.diagonal.x2} ${geo.diagonal.y2}`}
         data-mc-ink="muted"
@@ -143,7 +145,10 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                 y2={p.y}
                 data-mc-ink="accent"
                 strokeOpacity={p.lowSupport ? 0.4 : 1}
-                style={{ strokeWidth: "var(--mc-stroke-width)" }}
+                style={{
+                  strokeWidth: "var(--mc-stroke-width)",
+                  ...(color ? { stroke: color } : null),
+                }}
                 vectorEffect="non-scaling-stroke"
               />
             );
@@ -156,13 +161,20 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                 cy={p.y}
                 r={1.6}
                 fill="none"
-                stroke="var(--mc-accent)"
+                stroke={color ?? "var(--mc-accent)"}
                 strokeOpacity={0.5}
                 data-mc-w="support"
                 vectorEffect="non-scaling-stroke"
               />
             ) : (
-              <circle key={i} cx={p.x} cy={p.y} r={1.6} data-mc-ink="accent" />
+              <circle
+                key={i}
+                cx={p.x}
+                cy={p.y}
+                r={1.6}
+                data-mc-ink="accent"
+                style={color ? { fill: color } : undefined}
+              />
             ),
           )}
       {children}

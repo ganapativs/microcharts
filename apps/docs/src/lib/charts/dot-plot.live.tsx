@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { DotPlot } from "@microcharts/react/dot-plot";
 import { DotPlot as DotPlotInteractive } from "@microcharts/react/dot-plot/interactive";
 import staticModule, { playground as staticPlayground, TEAM } from "./dot-plot";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: DotPlot,
+  ChartLive: DotPlotInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

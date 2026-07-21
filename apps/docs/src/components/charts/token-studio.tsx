@@ -100,7 +100,7 @@ const LEGEND = [
 // One theme preview pane — real charts painted under a resolved token map, on a
 // fixed light or ink "page" so the mode reads truthfully whatever the reader's.
 // The sparkline shows ink + band + accent endpoint; the bars show valence with a
-// single accent-highlighted peak, so a brand-accent choice is unmistakable.
+// accent peak so a brand color choice is obvious.
 function PreviewPane({
   tone,
   style,
@@ -216,7 +216,6 @@ export function TokenStudio() {
 
   return (
     <div className="not-prose my-6 overflow-hidden rounded-2xl border border-fd-border/70 bg-fd-card/30">
-      {/* ── controls: a full-width strip, labels left, choices right ── */}
       <div className="flex flex-col gap-3.5 border-b border-fd-border/60 p-4 sm:p-5">
         <FieldRow label="Style">
           <div className="flex flex-wrap gap-1.5">
@@ -315,7 +314,6 @@ export function TokenStudio() {
         </FieldRow>
       </div>
 
-      {/* ── preview: a full-width banner, both modes side by side ───── */}
       <div className="grid gap-3 border-b border-fd-border/60 p-4 sm:grid-cols-2 sm:p-5">
         <PreviewPane tone="light" style={lightStyle} label="Light" />
         <PreviewPane tone="dark" style={darkStyle} label="Dark" />

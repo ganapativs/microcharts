@@ -167,7 +167,7 @@ export const contexts: ChartContexts = {
         — 865 m gain over 800 km.
       </p>
     ),
-    code: "<p>\n  Queen stage elevation <GradeProfile data={trail} /> — 865 m gain over 800 km.\n</p>",
+    code: '<p>\n  Queen stage elevation{" "}\n  <span className="mc-inline">\n    <GradeProfile data={trail} summary={false} />\n  </span>{" "}\n  — 865 m gain over 800 km.\n</p>',
   },
   cell: {
     render: () => (

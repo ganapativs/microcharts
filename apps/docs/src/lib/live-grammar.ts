@@ -75,10 +75,10 @@ function cleanTitle(s: string): string {
   return s.replace(/[`*_]/g, "").trim().slice(0, 40);
 }
 
-/** `chart <type> <args>` — the inline (single-backtick) forms. */
+/** `microchart <type> <args>` — the inline (single-backtick) forms. */
 function parseInline(body: string): ChartSpec | null {
   const toks = body.trim().split(/\s+/);
-  if (toks[0] !== "chart" || toks.length < 3) return null;
+  if (toks[0] !== "microchart" || toks.length < 3) return null;
   const type = toks[1];
   const rest = toks.slice(2);
   switch (type) {
@@ -124,11 +124,11 @@ function parseInline(body: string): ChartSpec | null {
   }
 }
 
-/** ```chart <type> <title>\n<data lines>\n``` — the block (fenced) forms. */
+/** ```microchart <type> <title>\n<data lines>\n``` — the block (fenced) forms. */
 function parseFence(inner: string): ChartSpec | null {
   const lines = inner.trim().split("\n");
   const head = lines[0].trim().split(/\s+/);
-  if (head[0] !== "chart" || head.length < 2) return null;
+  if (head[0] !== "microchart" || head.length < 2) return null;
   const type = head[1];
   const title = cleanTitle(head.slice(2).join(" "));
   const body = lines.slice(1).filter((l) => l.trim() !== "");
@@ -189,7 +189,7 @@ export function parseLiveReply(input: string): LiveSeg[] {
       const complete = end !== -1;
       const inner = complete ? input.slice(i + 3, end) : input.slice(i + 3);
       const raw = complete ? input.slice(i, end + 3) : input.slice(i);
-      if (complete && !inner.trimStart().startsWith("chart")) {
+      if (complete && !inner.trimStart().startsWith("microchart")) {
         segs.push({ kind: "code", text: inner.trim() });
       } else {
         segs.push({
@@ -207,7 +207,7 @@ export function parseLiveReply(input: string): LiveSeg[] {
       const complete = end !== -1;
       const inner = complete ? input.slice(i + 1, end) : input.slice(i + 1);
       const raw = complete ? input.slice(i, end + 1) : input.slice(i);
-      if (complete && !inner.trimStart().startsWith("chart ")) {
+      if (complete && !inner.trimStart().startsWith("microchart ")) {
         segs.push({ kind: "code", text: inner });
       } else {
         segs.push({
@@ -248,19 +248,19 @@ export function parseLiveReply(input: string): LiveSeg[] {
 
 export const LIVE_SYSTEM_PROMPT = `You are a sharp, concise data analyst. Answer in 50–100 words of plain prose. No headings, no bullet lists, no bold.
 Weave 3–5 tiny charts into your sentences using EXACTLY this syntax:
-\`chart sparkline 132 148 141 165 182\` — a trend, 4–16 numbers
-\`chart sparkbar 12 18 9 22 30\` — bars, 4–16 numbers
-\`chart delta +0.18\` — change, as a signed fraction
-\`chart trend-arrow -0.05\` — direction, as a signed fraction
-\`chart bullet value=72 target=80 bands=50,90\` — progress vs target
-\`chart status-dot ok\` — one of: ok, warn, error, off, busy
+\`microchart sparkline 132 148 141 165 182\` — a trend, 4–16 numbers
+\`microchart sparkbar 12 18 9 22 30\` — bars, 4–16 numbers
+\`microchart delta +0.18\` — change, as a signed fraction
+\`microchart trend-arrow -0.05\` — direction, as a signed fraction
+\`microchart bullet value=72 target=80 bands=50,90\` — progress vs target
+\`microchart status-dot ok\` — one of: ok, warn, error, off, busy
 Exactly one standalone chart, fenced on its own lines, where the breakdown carries the story:
-\`\`\`chart mini-bar Net-new by region ($k)
+\`\`\`microchart mini-bar Net-new by region ($k)
 NA 48
 EU 39
 UK 27
 \`\`\`
-(also \`\`\`chart segmented <title> with the same label-value lines for a share-of-total mix, or \`\`\`chart histogram <title> / \`\`\`chart seismogram <title> with one line of numbers under it)
+(also \`\`\`microchart segmented <title> with the same label-value lines for a share-of-total mix, or \`\`\`microchart histogram <title> / \`\`\`microchart seismogram <title> with one line of numbers under it)
 Pair charts so they build on each other: a trend with its delta, a spike with the status it caused, a total with its breakdown. Invent plausible, internally consistent numbers. Never explain the syntax or mention charts.`;
 
 export const LIVE_FEW_SHOTS: { role: "user" | "assistant"; content: string }[] = [
@@ -268,25 +268,25 @@ export const LIVE_FEW_SHOTS: { role: "user" | "assistant"; content: string }[] =
   {
     role: "assistant",
     content:
-      "Q3 landed 12% ahead of plan. Revenue built week over week `chart sparkline 132 148 141 165 159 182 176 203`, up `chart delta +0.184` on Q2, and growth was broad, not one deal carrying it:\n```chart mini-bar Net-new by region ($k)\nNA 48\nEU 39\nUK 27\nAPAC 22\nLATAM 18\n```\nPipeline sits `chart bullet value=72 target=80 bands=50,90` to target, our sixth straight beat. A clean quarter, clear to raise for Q4.",
+      "Q3 landed 12% ahead of plan. Revenue built week over week `microchart sparkline 132 148 141 165 159 182 176 203`, up `microchart delta +0.184` on Q2, and growth was broad, not one deal carrying it:\n```microchart mini-bar Net-new by region ($k)\nNA 48\nEU 39\nUK 27\nAPAC 22\nLATAM 18\n```\nPipeline sits `microchart bullet value=72 target=80 bands=50,90` to target, our sixth straight beat. A clean quarter, clear to raise for Q4.",
   },
   { role: "user", content: "Did last night's deploy hurt latency?" },
   {
     role: "assistant",
     content:
-      "Briefly, yes. p95 held near 180 ms `chart sparkline 178 181 176 183 179 240 212 184` until the 02:10 deploy pushed it up `chart delta +0.31` for twenty minutes:\n```chart seismogram Slow requests per minute\n2 1 2 3 19 26 14 6 3 2 1 2\n```\nRollback landed at 02:31 `chart status-dot warn`, and by morning we were back inside budget `chart bullet value=91 target=100 bands=80,110`. Adding a latency gate to the canary.",
+      "Briefly, yes. p95 held near 180 ms `microchart sparkline 178 181 176 183 179 240 212 184` until the 02:10 deploy pushed it up `microchart delta +0.31` for twenty minutes:\n```microchart seismogram Slow requests per minute\n2 1 2 3 19 26 14 6 3 2 1 2\n```\nRollback landed at 02:31 `microchart status-dot warn`, and by morning we were back inside budget `microchart bullet value=91 target=100 bands=80,110`. Adding a latency gate to the canary.",
   },
   { role: "user", content: "How did NVDA trade today?" },
   {
     role: "assistant",
     content:
-      "NVDA closed +3.8% `chart trend-arrow +0.038`, climbing steadily into the bell `chart sparkline 100 101 102 104 103 105 107 109`. Volume skewed to the open and the close `chart sparkbar 42 28 19 15 14 18 26 38`, and intraday returns stayed tight, no fat tails:\n```chart histogram 1-min returns (bps)\n-2 -1 0 1 -1 2 1 0 3 1 -1 0 2 1 4 -2 1 0\n```\nThe desk sits `chart delta +0.021` over benchmark weight going into tomorrow.",
+      "NVDA closed +3.8% `microchart trend-arrow +0.038`, climbing steadily into the bell `microchart sparkline 100 101 102 104 103 105 107 109`. Volume skewed to the open and the close `microchart sparkbar 42 28 19 15 14 18 26 38`, and intraday returns stayed tight, no fat tails:\n```microchart histogram 1-min returns (bps)\n-2 -1 0 1 -1 2 1 0 3 1 -1 0 2 1 4 -2 1 0\n```\nThe desk sits `microchart delta +0.021` over benchmark weight going into tomorrow.",
   },
   { role: "user", content: "Break down our traffic mix this week" },
   {
     role: "assistant",
     content:
-      "Sessions grew steadily `chart sparkline 4200 4390 4310 4580 4720 4950 5210`, up `chart delta +0.11` on last week, and the mix stayed healthy rather than paid-heavy:\n```chart segmented Sessions by source\nOrganic 46\nPaid 24\nReferral 16\nEmail 9\nSocial 5\n```\nOrganic has led for nine straight weeks, and conversion held `chart status-dot ok` through the growth.",
+      "Sessions grew steadily `microchart sparkline 4200 4390 4310 4580 4720 4950 5210`, up `microchart delta +0.11` on last week, and the mix stayed healthy rather than paid-heavy:\n```microchart segmented Sessions by source\nOrganic 46\nPaid 24\nReferral 16\nEmail 9\nSocial 5\n```\nOrganic has led for nine straight weeks, and conversion held `microchart status-dot ok` through the growth.",
   },
 ];
 

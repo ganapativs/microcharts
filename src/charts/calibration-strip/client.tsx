@@ -158,7 +158,6 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
         {pinned ? (
           <circle
             cx={pinned.x}

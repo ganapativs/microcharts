@@ -117,14 +117,13 @@ export function HomeCatalogSection() {
           ))}
           <span className="mono-label ml-1 inline-flex items-center gap-2 leading-none">
             <span aria-hidden className="hx-pulse size-1.5 shrink-0 rounded-full bg-fd-primary" />
-            live: every tile is the shipped component
+            live: every tile is interactive
           </span>
         </div>
       </Reveal>
 
       <Reveal delay={80} className="mt-6">
-        {/* The first board is rendered here, on the server: pure SVG, zero client
-            chart JS. The client grid takes over once the pool's modules land. */}
+        {/* SSR board; client grid takes over after modules load. */}
         <CatalogGrid total={CATALOG.total} tiles={TILES}>
           {FIRST_BOARD}
         </CatalogGrid>

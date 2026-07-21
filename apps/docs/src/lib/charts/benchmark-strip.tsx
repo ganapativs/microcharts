@@ -160,7 +160,7 @@ export const contexts: ChartContexts = {
         — slower than 78% of the cohort.
       </p>
     ),
-    code: "<p>\n  Latency vs peers <BenchmarkStrip data={peerLatencies} value={value} /> — slower than 78% of the cohort.\n</p>",
+    code: '<p>\n  Latency vs peers{" "}\n  <span className="mc-inline">\n    <BenchmarkStrip data={peerLatencies} value={value} summary={false} />\n  </span>{" "}\n  — slower than 78% of the cohort.\n</p>',
   },
   cell: {
     render: () => (
