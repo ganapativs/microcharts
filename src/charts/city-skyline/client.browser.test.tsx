@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { userEvent } from "vitest/browser";
 import { CitySkyline } from "./client.js";
@@ -17,13 +17,17 @@ describe("interactive <CitySkyline>", () => {
     const screen = await render(<CitySkyline data={TEAMS} title="Teams" />);
     const fig = screen.getByRole("img").element() as HTMLElement;
     const live = fig.querySelector('[aria-live="polite"]')!;
+    const hear = (msg: string) =>
+      vi.waitFor(() => {
+        expect(live.textContent).toBe(msg);
+      });
     fig.focus();
     await userEvent.keyboard("{ArrowRight}");
-    expect(live.textContent).toBe("Platform: 46; 70% lit.");
+    await hear("Platform: 46; 70% lit.");
     await userEvent.keyboard("{ArrowRight}");
-    expect(live.textContent).toBe("Core: 32; 50% lit.");
+    await hear("Core: 32; 50% lit.");
     await userEvent.keyboard("{ArrowRight}"); // Web has no lit
-    expect(live.textContent).toBe("Web: 28.");
+    await hear("Web: 28.");
   });
 
   it("a null-value building announces no data without throwing", async () => {
