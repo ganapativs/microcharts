@@ -210,7 +210,10 @@ function round2Y(
   height: number,
   fontSize: number,
 ): number {
-  // stagger endpoint labels down the right edge in layer order
+  // stagger endpoint labels down the right edge in layer order. Alphabetic
+  // baseline: keep the em-box (≈0.78 above / 0.22 below) inside the viewBox.
   const y = fontSize + layer.index * fontSize * 1.15;
-  return Math.round(Math.min(y, height - 1) * 100) / 100;
+  const lo = fontSize * 0.78;
+  const hi = height - fontSize * 0.22;
+  return Math.round(Math.min(Math.max(y, lo), hi) * 100) / 100;
 }
