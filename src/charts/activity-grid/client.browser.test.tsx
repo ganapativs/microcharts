@@ -55,7 +55,11 @@ describe("interactive <ActivityGrid>", () => {
   // viewBox-drawn ring reference different widths and the hover ring drifts far
   // from the cursor (the "cursor right / highlight left" bug).
   it("inner SVG fills a stretched wrapper (no pointer/ring decoupling)", async () => {
-    const fig = await mount(<ActivityGrid data={DATA} title="Commits" style={{ width: 600 }} />);
+    // Override wrap()'s maxWidth:100% so an explicit px width isn't capped by
+    // the browser viewport (vitest's iframe can be < 600px wide).
+    const fig = await mount(
+      <ActivityGrid data={DATA} title="Commits" style={{ width: 600, maxWidth: 600 }} />,
+    );
     const svg = fig.querySelector("svg")!;
     const wrapW = fig.getBoundingClientRect().width;
     const svgW = svg.getBoundingClientRect().width;
@@ -64,7 +68,9 @@ describe("interactive <ActivityGrid>", () => {
   });
 
   it("hover ring lands under the cursor in a stretched wrapper", async () => {
-    const fig = await mount(<ActivityGrid data={DATA} title="Commits" style={{ width: 600 }} />);
+    const fig = await mount(
+      <ActivityGrid data={DATA} title="Commits" style={{ width: 600, maxWidth: 600 }} />,
+    );
     const r = fig.getBoundingClientRect();
     const cx = r.left + r.width * 0.85;
     const cy = r.top + r.height / 2;

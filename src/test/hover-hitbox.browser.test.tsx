@@ -6,7 +6,7 @@
 //      unit. The kernel measures the SVG's painted box instead.
 //   2. Flex parents + FILL width:100% stretched the wrapper; fit-content width
 //      keeps the static attribute box without centering KPI columns.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-react";
 
 import "../../styles.css";
@@ -47,20 +47,22 @@ describe("interactive hit box tracks the painted mark", () => {
     const cells = [...svg.querySelectorAll('rect[data-mc-ink="cell"]')] as SVGRectElement[];
     expect(cells.length).toBe(STRIP.length);
 
-    const left = cells[0]!.getBoundingClientRect();
-    fireMove(host, left.left + left.width / 2, left.top + left.height / 2);
-    const ringL = svg.querySelector('rect[data-mc-w="support"]') as SVGRectElement;
-    expect(ringL).toBeTruthy();
-    expect(
-      Math.abs(+ringL.getAttribute("x")! - (+cells[0]!.getAttribute("x")! - 0.5)),
-    ).toBeLessThan(0.6);
+    const ringAt = async (cell: SVGRectElement) => {
+      const want = +cell.getAttribute("x")! - 0.5;
+      fireMove(
+        host,
+        cell.getBoundingClientRect().left + cell.getBoundingClientRect().width / 2,
+        cell.getBoundingClientRect().top + cell.getBoundingClientRect().height / 2,
+      );
+      return vi.waitFor(() => {
+        const el = svg.querySelector('rect[data-mc-w="support"]') as SVGRectElement | null;
+        if (!el || Math.abs(+el.getAttribute("x")! - want) > 0.6) throw new Error("no ring");
+        return el;
+      });
+    };
 
-    const right = cells[cells.length - 1]!.getBoundingClientRect();
-    fireMove(host, right.left + right.width / 2, right.top + right.height / 2);
-    const ringR = svg.querySelector('rect[data-mc-w="support"]') as SVGRectElement;
-    expect(
-      Math.abs(+ringR.getAttribute("x")! - (+cells[cells.length - 1]!.getAttribute("x")! - 0.5)),
-    ).toBeLessThan(0.6);
+    await ringAt(cells[0]!);
+    await ringAt(cells[cells.length - 1]!);
   });
 
   it("sparkline in items-center tab: chart midY matches label midY", async () => {
