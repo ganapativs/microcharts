@@ -116,8 +116,8 @@
     "interactive": 5.73
   },
   "stacked-area": {
-    "static": 3.06,
-    "interactive": 5.54
+    "static": 3.08,
+    "interactive": 5.56
   },
   "ohlc": {
     "static": 2.66,
@@ -177,7 +177,7 @@
   },
   "quantile-dots": {
     "static": 2.67,
-    "interactive": 5.15
+    "interactive": 5.14
   },
   "ab-strips": {
     "static": 3.03,
