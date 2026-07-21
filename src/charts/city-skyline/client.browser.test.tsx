@@ -1,6 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
-import { userEvent } from "vitest/browser";
 import { CitySkyline } from "./client.js";
 
 const TEAMS = [
@@ -15,19 +14,15 @@ const key = (el: HTMLElement, k: string) =>
 describe("interactive <CitySkyline>", () => {
   it("arrow keys rove buildings; the lit fraction is announced as a percent", async () => {
     const screen = await render(<CitySkyline data={TEAMS} title="Teams" />);
-    const fig = screen.getByRole("img").element() as HTMLElement;
-    const live = fig.querySelector('[aria-live="polite"]')!;
-    const hear = (msg: string) =>
-      vi.waitFor(() => {
-        expect(live.textContent).toBe(msg);
-      });
-    fig.focus();
-    await userEvent.keyboard("{ArrowRight}");
-    await hear("Platform: 46; 70% lit.");
-    await userEvent.keyboard("{ArrowRight}");
-    await hear("Core: 32; 50% lit.");
-    await userEvent.keyboard("{ArrowRight}"); // Web has no lit
-    await hear("Web: 28.");
+    const wrap = screen.container.querySelector(".mc-skyline-live") as HTMLElement;
+    const live = wrap.querySelector('[aria-live="polite"]')!;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    await expect.poll(() => live.textContent).toBe("Platform: 46; 70% lit.");
+    key(wrap, "ArrowRight");
+    await expect.poll(() => live.textContent).toBe("Core: 32; 50% lit.");
+    key(wrap, "ArrowRight"); // Web has no lit
+    await expect.poll(() => live.textContent).toBe("Web: 28.");
   });
 
   it("a null-value building announces no data without throwing", async () => {
@@ -38,12 +33,12 @@ describe("interactive <CitySkyline>", () => {
       { label: "Web", value: 28 },
     ];
     const screen = await render(<CitySkyline data={data} title="Teams" />);
-    const fig = screen.getByRole("img").element() as HTMLElement;
-    const live = fig.querySelector('[aria-live="polite"]')!;
-    fig.focus();
-    await userEvent.keyboard("{ArrowRight}");
-    await userEvent.keyboard("{ArrowRight}"); // Core: null
-    expect(live.textContent).toBe("Core: no data.");
+    const wrap = screen.container.querySelector(".mc-skyline-live") as HTMLElement;
+    const live = wrap.querySelector('[aria-live="polite"]')!;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    key(wrap, "ArrowRight"); // Core: null
+    await expect.poll(() => live.textContent).toBe("Core: no data.");
   });
 
   it("wrapper owns naming; static chart is decorative", async () => {
