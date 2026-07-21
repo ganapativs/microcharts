@@ -177,78 +177,72 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     labelFitsY(height / 2, labelFont(height), height);
   const idleOdds = showIdleOdds && staticGeo ? `${staticGeo.past} in ${staticGeo.count}` : null;
 
-  const host = wrap("mc-quantile-dots-live", className, style);
-
   return (
     <span
       ref={hostRef}
-      {...host}
-      style={{
-        ...host.style,
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "0.35em",
-      }}
+      {...wrap("mc-quantile-dots-live", className, style)}
       {...named(ariaLabel)}
       {...bind}
     >
-      <span style={{ position: "relative", display: "inline-block", lineHeight: 0 }}>
-        <StaticQuantileDots
-          {...rest}
-          style={fillFor(style)}
-          data={data}
-          count={count}
-          threshold={activeThreshold}
-          side={side}
-          width={width}
-          height={height}
-          format={format}
-          locale={locale}
-          strings={strings}
-          label="none"
-          summary={false}
-        >
-          {selX !== null ? (
-            <line
-              x1={round2(selX)}
-              y1={1}
-              x2={round2(selX)}
-              y2={height - 1}
-              data-mc-ink="accent"
-              data-mc-w="tick"
-              vectorEffect="non-scaling-stroke"
-            />
+      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35em" }}>
+        <span style={{ position: "relative", display: "inline-block", lineHeight: 0 }}>
+          <StaticQuantileDots
+            {...rest}
+            style={fillFor(style)}
+            data={data}
+            count={count}
+            threshold={activeThreshold}
+            side={side}
+            width={width}
+            height={height}
+            format={format}
+            locale={locale}
+            strings={strings}
+            label="none"
+            summary={false}
+          >
+            {selX !== null ? (
+              <line
+                x1={round2(selX)}
+                y1={1}
+                x2={round2(selX)}
+                y2={height - 1}
+                data-mc-ink="accent"
+                data-mc-w="tick"
+                vectorEffect="non-scaling-stroke"
+              />
+            ) : null}
+            {rest.children}
+          </StaticQuantileDots>
+          {shown !== null && geo && geo.threshold && activeThreshold !== undefined ? (
+            <span
+              className="mc-quantile-dots-readout mc-spark-readout"
+              style={{
+                left: `${(geo.threshold.x / width) * 100}%`,
+                transform: "translateX(-50%)",
+              }}
+            >
+              {`${geo.past} in ${geo.count} ${side} ${fmt(activeThreshold)}`}
+            </span>
           ) : null}
-          {rest.children}
-        </StaticQuantileDots>
-        {shown !== null && geo && geo.threshold && activeThreshold !== undefined ? (
+        </span>
+        {idleOdds ? (
           <span
-            className="mc-quantile-dots-readout mc-spark-readout"
+            className="mc-quantile-dots-odds"
+            aria-hidden
             style={{
-              left: `${(geo.threshold.x / width) * 100}%`,
-              transform: "translateX(-50%)",
+              font: `${labelFont(height)}px var(--mc-font, inherit)`,
+              fontVariantNumeric: "tabular-nums",
+              color: "var(--mc-neutral)",
+              lineHeight: 1,
+              whiteSpace: "nowrap",
+              pointerEvents: "none",
             }}
           >
-            {`${geo.past} in ${geo.count} ${side} ${fmt(activeThreshold)}`}
+            {idleOdds}
           </span>
         ) : null}
       </span>
-      {idleOdds ? (
-        <span
-          className="mc-quantile-dots-odds"
-          aria-hidden
-          style={{
-            font: `${labelFont(height)}px var(--mc-font, inherit)`,
-            fontVariantNumeric: "tabular-nums",
-            color: "var(--mc-neutral)",
-            lineHeight: 1,
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
-          }}
-        >
-          {idleOdds}
-        </span>
-      ) : null}
       <LiveRegion>{announced}</LiveRegion>
     </span>
   );

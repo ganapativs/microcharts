@@ -240,6 +240,14 @@
        one --mc-density retunes every stroke without touching the base token. */
     --mc-sw: calc(var(--mc-stroke-width) * var(--mc-density));
   }
+  /* Chart-only table cells: kill the font strut so a lone SVG seats the row
+     height instead of a 1em line-box around an inline mark. */
+  :where(td:has(> .mc-root:only-child)),
+  :where(td:has(> [data-mc-host]:only-child)),
+  :where(td:has(> [class$="-live"]:only-child)),
+  :where(td:has(> [class$="-interactive"]:only-child)) {
+    line-height: 0;
+  }
   :where(.mc-root text) {
     font-variant-numeric: tabular-nums;
     font-family: var(--mc-font-numeric);
@@ -492,15 +500,6 @@
     fill: none;
     stroke: var(--mc-accent);
   }
-  /* valence on stroked marks (seismogram spikes) — same element-split */
-  :where(.mc-root :is(path, line, polyline)[data-mc-ink="positive"]) {
-    fill: none;
-    stroke: var(--mc-positive);
-  }
-  :where(.mc-root :is(path, line, polyline)[data-mc-ink="negative"]) {
-    fill: none;
-    stroke: var(--mc-negative);
-  }
   /* width roles — orthogonal to ink (color) roles, composable on any stroked
      mark. Ratios of the primary width so presets and prefers-contrast retune
      every stroke in a chart, not just the data line. At the default 1.5 these
@@ -544,6 +543,23 @@
   :where(.mc-root [data-mc-ink="negative"]) {
     fill: var(--mc-negative);
     stroke: none;
+  }
+  /* valence on stroked marks — AFTER the fill rules so cascade wins under
+     `:where()` (zero specificity). Bare `path` is opt-in via [fill="none"] so
+     filled wedges (DepthWedge, NetFlow) keep their fill. */
+  :where(.mc-root :is(line, polyline)[data-mc-ink="positive"]) {
+    fill: none;
+    stroke: var(--mc-positive);
+  }
+  :where(.mc-root :is(line, polyline)[data-mc-ink="negative"]) {
+    fill: none;
+    stroke: var(--mc-negative);
+  }
+  :where(.mc-root path[data-mc-ink="positive"][fill="none"]) {
+    stroke: var(--mc-positive);
+  }
+  :where(.mc-root path[data-mc-ink="negative"][fill="none"]) {
+    stroke: var(--mc-negative);
   }
   /* filled no-valence marks (flat trend glyph, off states) */
   :where(.mc-root [data-mc-ink="neutral"]) {
